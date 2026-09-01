@@ -18,7 +18,6 @@ library;
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'app_update.dart';
 import 'data/content.dart';
@@ -129,12 +128,14 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
               style: FilledButton.styleFrom(backgroundColor: NwsbColors.goldLight, foregroundColor: NwsbColors.deep),
               onPressed: () async {
                 Navigator.of(context).pop();
-                final opened = await launchUrl(update.apkUrl, mode: LaunchMode.externalApplication);
-                if (!opened && mounted) {
+                try {
+                  await NwsbAppUpdate.downloadAndInstall(update);
+                } catch (_) {
+                  if (!mounted) return;
                   final root = _navigatorKey.currentContext;
                   if (root != null) {
                     ScaffoldMessenger.of(root).showSnackBar(
-                      const SnackBar(content: Text('Could not open the update. Please try again when you are online.')),
+                      const SnackBar(content: Text('Could not download the update. Please try again when you are online.')),
                     );
                   }
                 }

@@ -267,6 +267,80 @@ if (m.includes('android.speech.tts.engine.TTS_SERVICE')) {
 }
 writeFileSync(manifest, m);
 
+// ── in-app APK installer ───────────────────────────────────────────────
+// The update screen downloads into the app sandbox and calls this channel.
+// FileProvider is required because Android will not accept a file:// URI.
+if (!m.includes('android.permission.REQUEST_INSTALL_PACKAGES')) {
+  m = m.replace(
+    '<uses-permission android:name="android.permission.INTERNET"/>',
+    '<uses-permission android:name="android.permission.INTERNET"/>\n' +
+    '    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>',
+  );
+}
+if (!m.includes('androidx.core.content.FileProvider')) {
+  m = m.replace(
+    '</application>',
+    `    <provider\n` +
+    `        android:name="androidx.core.content.FileProvider"\n` +
+    `        android:authorities="${APP_ID}.fileprovider"\n` +
+    `        android:exported="false"\n` +
+    `        android:grantUriPermissions="true">\n` +
+    `        <meta-data\n` +
+    `            android:name="android.support.FILE_PROVIDER_PATHS"\n` +
+    `            android:resource="@xml/update_paths" />\n` +
+    `    </provider>\n` +
+    `</application>`,
+  );
+}
+writeFileSync(manifest, m);
+
+const xmlDir = join(android, 'app', 'src', 'main', 'res', 'xml');
+mkdirSync(xmlDir, { recursive: true });
+writeFileSync(join(xmlDir, 'update_paths.xml'),
+  '<?xml version="1.0" encoding="utf-8"?>\n' +
+  '<paths xmlns:android="http://schemas.android.com/apk/res/android">\n' +
+  '    <files-path name="updates" path="." />\n' +
+  '</paths>\n');
+
+const activity = join(android, 'app', 'src', 'main', 'kotlin', 'com', 'nowssb', 'nowssb', 'MainActivity.kt');
+mkdirSync(dirname(activity), { recursive: true });
+writeFileSync(activity, `package com.nowssb.nowssb
+
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
+import androidx.core.content.FileProvider
+import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.plugin.common.MethodChannel
+import java.io.File
+
+class MainActivity : FlutterActivity() {
+    override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
+        super.configureFlutterEngine(flutterEngine)
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "com.nowssb.app/update")
+            .setMethodCallHandler { call, result ->
+                if (call.method != "installApk") { result.notImplemented(); return@setMethodCallHandler }
+                val file = File(call.argument<String>("path") ?: "")
+                if (!file.exists()) { result.error("MISSING_APK", "Downloaded APK is missing", null); return@setMethodCallHandler }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !packageManager.canRequestPackageInstalls()) {
+                    startActivity(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:$packageName")))
+                    result.error("INSTALL_PERMISSION", "Allow NowssB to install updates, then try again", null)
+                    return@setMethodCallHandler
+                }
+                val uri = FileProvider.getUriForFile(this, "$packageName.fileprovider", file)
+                startActivity(Intent(Intent.ACTION_VIEW).apply {
+                    setDataAndType(uri, "application/vnd.android.package-archive")
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
+                })
+                result.success(null)
+            }
+    }
+}
+`);
+done.push('configured in-app APK download installer');
+
 // ── the config itself ──────────────────────────────────────────────────
 // Not a secret: google-services.json ships inside every copy of the APK and
 // identifies the project rather than authorising anything. The keystore and

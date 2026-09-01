@@ -3,6 +3,14 @@ library;
 import 'package:flutter/material.dart';
 
 const _bg = AssetImage('assets/profile/profile-01.jpg');
+const _ring = AssetImage('assets/profile/profile-02.png');
+const _motto = AssetImage('assets/profile/profile-03.jpg');
+const _about = AssetImage('assets/profile/profile-04.jpg');
+const _quote = AssetImage('assets/profile/profile-05.jpg');
+const _quick = AssetImage('assets/profile/profile-06.jpg');
+const _activity = AssetImage('assets/profile/profile-07.jpg');
+const _progress = AssetImage('assets/profile/profile-10.png');
+const _banner = AssetImage('assets/profile/profile-11.png');
 const _ink = Color(0xFFF4F2EE);
 const _muted = Color(0x99F4F2EE);
 const _gold = Color(0xFFE3BD7D);
@@ -20,15 +28,18 @@ class ProfileScreen extends StatelessWidget {
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(20, 18, 20, 36),
             sliver: SliverList(delegate: SliverChildListDelegate([
-              Row(children: [
+              _imagePanel(_banner, Padding(padding: const EdgeInsets.fromLTRB(18, 22, 18, 18), child: Row(children: [
                 _CircleButton(icon: Icons.arrow_back, onTap: () => Navigator.maybePop(context)),
                 const Spacer(),
                 const Text('MY PROFILE', style: TextStyle(color: _muted, fontSize: 11, letterSpacing: 3)),
-              ]),
+              ])),
               const SizedBox(height: 20),
               _panel(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Row(children: [
-                  Container(width: 70, height: 70, decoration: const BoxDecoration(shape: BoxShape.circle, image: DecorationImage(image: NetworkImage('https://media.nowssb.com/migrated-images/1590b73b14f17aee_image-131_jyrnhx.jpg'), fit: BoxFit.cover))),
+                  Stack(children: [
+                    Container(width: 70, height: 70, decoration: const BoxDecoration(shape: BoxShape.circle, image: DecorationImage(image: NetworkImage('https://media.nowssb.com/migrated-images/1590b73b14f17aee_image-131_jyrnhx.jpg'), fit: BoxFit.cover))),
+                    Positioned.fill(child: Image(image: _ring, fit: BoxFit.cover)),
+                  ]),
                   const SizedBox(width: 16),
                   const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('Practitioner', style: TextStyle(color: _muted, fontSize: 11, letterSpacing: 2)), SizedBox(height: 5), Text('Practitioner', style: TextStyle(color: _ink, fontSize: 25, fontWeight: FontWeight.w500)), SizedBox(height: 7), Text('Practicing daily, growing steadily.', style: TextStyle(color: _muted, fontSize: 12))])),
                   const Icon(Icons.edit_outlined, color: _muted, size: 18),
@@ -37,11 +48,11 @@ class ProfileScreen extends StatelessWidget {
                 Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6), decoration: BoxDecoration(color: const Color(0x1AE3BD7D), borderRadius: BorderRadius.circular(99), border: Border.all(color: const Color(0x55E3BD7D))), child: const Text('●  FREE PLAN', style: TextStyle(color: _gold, fontSize: 10, letterSpacing: 1.5))),
               ])),
               const SizedBox(height: 18),
-              _section('YOUR PROGRESS', _panel(Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: const [_Stat('12', 'DAYS\nDAY STREAK'), _Stat('47', 'TOTAL\nSESSIONS'), _Stat('128', 'LEARNED\nWORDS'), _Stat('5', 'OF 5\nORGANS')] ))),
-              _section('ABOUT NOWSSB', _panel(const Text('Before a word had a spelling, it had a sound. NowssB works backward from the dictionary — past the meaning, past the letters — to the breath and vibration a word first came from, so you practice the origin, not just the definition.', style: TextStyle(color: _muted, fontSize: 13, height: 1.6)))),
-              _section('QUICK ACCESS', _panel(Wrap(spacing: 8, runSpacing: 8, children: const [_Quick('Sessions', Icons.local_fire_department_outlined), _Quick('Saved', Icons.bookmark_border), _Quick('Liked', Icons.favorite_border), _Quick('Journal', Icons.menu_book_outlined), _Quick('Settings', Icons.settings_outlined)]))),
-              _section('RECENT ACTIVITY', _panel(Column(children: const [_Activity('Morning Calm', 'Guided Meditation', '2h ago'), _Activity('Deep Breathing', 'Breathwork Session', '1d ago'), _Activity('Body Scan', 'Sleep Wind-Down', '3d ago')] ))),
-              _section('MY MOTTO', _panel(const Text('My Focus.\nBreathe.\nLet go.\nGrow.', style: TextStyle(color: _ink, fontSize: 27, height: 1.28, fontWeight: FontWeight.w400)))),
+              _section('YOUR PROGRESS', _imagePanel(_progress, Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: const [_Stat('12', 'DAYS\nDAY STREAK'), _Stat('47', 'TOTAL\nSESSIONS'), _Stat('128', 'LEARNED\nWORDS'), _Stat('5', 'OF 5\nORGANS')] ))),
+              _section('ABOUT NOWSSB', _imagePanel(_about, const Text('Before a word had a spelling, it had a sound. NowssB works backward from the dictionary — past the meaning, past the letters — to the breath and vibration a word first came from, so you practice the origin, not just the definition.', style: TextStyle(color: _muted, fontSize: 13, height: 1.6)))),
+              _section('QUICK ACCESS', _imagePanel(_quick, Wrap(spacing: 8, runSpacing: 8, children: const [_Quick('Sessions', Icons.local_fire_department_outlined), _Quick('Saved', Icons.bookmark_border), _Quick('Liked', Icons.favorite_border), _Quick('Journal', Icons.menu_book_outlined), _Quick('Settings', Icons.settings_outlined)]))),
+              _section('RECENT ACTIVITY', _imagePanel(_activity, Column(children: const [_Activity('Morning Calm', 'Guided Meditation', '2h ago'), _Activity('Deep Breathing', 'Breathwork Session', '1d ago'), _Activity('Body Scan', 'Sleep Wind-Down', '3d ago')] ))),
+              _section('MY MOTTO', _imagePanel(_motto, const Text('My Focus.\nBreathe.\nLet go.\nGrow.', style: TextStyle(color: _ink, fontSize: 27, height: 1.28, fontWeight: FontWeight.w400)))),
               _section('PREFERENCES', _panel(Column(children: const [_Pref('Sound Feedback', 'ON'), _Pref('Practice Duration', '15 MIN'), _Pref('Daily Reminder', '07:00'), _Pref('Playback Voice', 'FEMALE'), _Pref('App Version', 'v2.4.1')] ))),
               _section('SHOP & ORDERS', _panel(Column(children: const [_Pref('Cart', '2'), _Pref('Wishlist', '5'), _Pref('Orders', '3')] ))),
               _section('ACCOUNT', _panel(Column(children: const [_Pref('Member Since', 'JAN 2025'), _Pref('Current Plan', 'FREE')] ))),
@@ -55,6 +66,7 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Widget _section(String title, Widget child) => Padding(padding: const EdgeInsets.only(top: 22), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: const TextStyle(color: _muted, fontSize: 10, letterSpacing: 2.5)), const SizedBox(height: 9), child]));
+  Widget _imagePanel(ImageProvider image, Widget child) => Container(width: double.infinity, decoration: BoxDecoration(borderRadius: BorderRadius.circular(22), border: Border.all(color: const Color(0x22FFFFFF)), image: DecorationImage(image: image, fit: BoxFit.cover, colorFilter: const ColorFilter.mode(Color(0xB8000000), BlendMode.darken)), boxShadow: const [BoxShadow(color: Color(0x55000000), blurRadius: 22, offset: Offset(0, 10))]), child: ClipRRect(borderRadius: BorderRadius.circular(22), child: child));
   Widget _panel(Widget child) => Container(width: double.infinity, padding: const EdgeInsets.all(18), decoration: BoxDecoration(color: const Color(0xB80D0D10), borderRadius: BorderRadius.circular(24), border: Border.all(color: const Color(0x22FFFFFF)), boxShadow: const [BoxShadow(color: Color(0x55000000), blurRadius: 22, offset: Offset(0, 10))]), child: child);
 }
 
