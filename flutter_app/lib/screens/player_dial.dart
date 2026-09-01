@@ -156,6 +156,7 @@ class _PlayerDialState extends State<PlayerDial> {
                             ),
                           ],
                         ),
+                      ),
                       ],
                     ),
                   );

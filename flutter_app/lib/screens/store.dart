@@ -34,7 +34,7 @@ class _StoreHomeContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = <Widget>[
-      const _StoreBanner(),
+      _StoreBanner(),
       const _StoreRemoteBanner(url: 'https://media.nowssb.com/migrated-images/ccadecda89d460a6_grok_image_1778521152376_il2xkh.jpg', height: 190),
       _StoreVideoSection(asset: 'assets/video/store-word-library.mp4', eyebrow: 'THE WORD LIBRARY', title: 'Build Your\nPersonal Library', sub: 'Each word targets a specific organ. The more words you own, the more healing sentences you can build.', chips: const ['HEART HEALTH', 'IMMUNITY', 'MENTAL CLARITY', 'GUT HEALTH', 'SKIN & GLOW', 'LUNG & BREATH'], button: 'Browse The Word Atelier', onTap: () => _push(context, const WordAtelierScreen())),
       const _StoreRemoteBanner(url: 'https://media.nowssb.com/migrated-images/16c653d97f27f932_file_00000000c81c81fba2f7377fc71229be_uvvxfz.png', height: 160, margin: EdgeInsets.symmetric(vertical: 20)),
