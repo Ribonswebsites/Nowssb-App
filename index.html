@@ -3747,10 +3747,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 #sub-profile::before {
     content:"";
     position:fixed; inset:0;
-    background-image:
-      radial-gradient(circle at 50% 0%, rgba(0,0,0,.15), rgba(0,0,0,.72) 60%),
-      linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.75) 40%, rgba(0,0,0,.92)),
-      var(--img-bg);
+    background-image:var(--img-bg);
     background-size: cover;
     background-position: center top;
     background-attachment: fixed;
@@ -3799,7 +3796,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     pointer-events:none;
     z-index:2;
   }
-#sub-profile .avatar { position:absolute; inset:0; border-radius:0; background:#0a0a0a;
+#sub-profile .avatar { position:absolute; inset:0; border-radius:18px; background:#0a0a0a;
     display:flex; align-items:center; justify-content:center;
     font-family:var(--mono); font-size:24px; font-weight:600; color:var(--text);
     background-size:cover; background-position:center;

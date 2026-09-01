@@ -15,8 +15,7 @@ class ProfileScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFF070708),
       body: Stack(children: [
-        Positioned.fill(child: Image(image: _bg, fit: BoxFit.cover, opacity: const AlwaysStoppedAnimation(.18))),
-        Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.black.withOpacity(.32), const Color(0xFF070708).withOpacity(.98)])))),
+        Positioned.fill(child: Image(image: _bg, fit: BoxFit.cover)),
         SafeArea(child: CustomScrollView(slivers: [
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(20, 18, 20, 36),
