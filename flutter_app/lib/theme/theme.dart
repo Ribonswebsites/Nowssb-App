@@ -65,9 +65,6 @@ class NwsbTheme {
           onSurface: NwsbColors.ink,
         ),
         textTheme: _text(NwsbColors.ink, NwsbColors.inkSoft),
-        cardTheme: const CardThemeData(shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(22)))),
-        dialogTheme: const DialogThemeData(shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(24)))),
-        bottomSheetTheme: const BottomSheetThemeData(shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(26)))),
         splashFactory: NoSplash.splashFactory,
       );
 
@@ -81,9 +78,6 @@ class NwsbTheme {
           onSurface: Colors.white,
         ),
         textTheme: _text(Colors.white, const Color(0xB3C8E8F5)),
-        cardTheme: const CardThemeData(shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(22)))),
-        dialogTheme: const DialogThemeData(shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(24)))),
-        bottomSheetTheme: const BottomSheetThemeData(shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(26)))),
         splashFactory: NoSplash.splashFactory,
       );
 }
