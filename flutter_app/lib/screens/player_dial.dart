@@ -181,7 +181,18 @@ class _PlayerDialState extends State<PlayerDial> {
                 ),
               ),
               Expanded(
-                child: ListView(
+                child: NotificationListener<ScrollNotification>(
+                  onNotification: (notification) {
+                    if (notification is UserScrollNotification) {
+                      if (notification.direction == ScrollDirection.reverse && !_expanded) {
+                        setState(() => _expanded = true);
+                      } else if (notification.direction == ScrollDirection.forward && _expanded && notification.metrics.pixels <= 0) {
+                        setState(() => _expanded = false);
+                      }
+                    }
+                    return false;
+                  },
+                  child: ListView(
                   padding: const EdgeInsets.fromLTRB(22, 8, 22, 16),
                   children: [
                     _row(Icons.tune, 'EQUALIZER', eq, () {}),
@@ -210,6 +221,7 @@ class _PlayerDialState extends State<PlayerDial> {
                       style: const TextStyle(color: Color(0x47FFFFFF), fontSize: 10, letterSpacing: 2.2),
                     ),
                   ],
+                  ),
                 ),
               ),
               if (_expanded)

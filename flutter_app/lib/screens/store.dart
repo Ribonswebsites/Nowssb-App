@@ -208,6 +208,7 @@ class StoreWebViewScreen extends StatefulWidget {
 }
 
 class _StoreWebViewScreenState extends State<StoreWebViewScreen> {
+  bool _entered = false;
   late final WebViewController _controller = WebViewController()
     ..setJavaScriptMode(JavaScriptMode.unrestricted)
     ..setNavigationDelegate(NavigationDelegate(
@@ -216,11 +217,13 @@ class _StoreWebViewScreenState extends State<StoreWebViewScreen> {
     ..loadRequest(Uri.parse('https://ribonswebsites.github.io/Nowssb-App/'));
 
   Future<void> _enterWebViewStore() async {
+    if (_entered) return;
+    _entered = true;
     final section = widget.section;
     final script = switch (section) {
-      'real-meaning' => "if(window.nssOpenSub)nssOpenSub('real-meaning'); setTimeout(function(){if(window.rmSkipIntro)rmSkipIntro();},700);",
-      'meaning-store' => "if(window.nssOpenSub)nssOpenSub('meaning-store'); setTimeout(function(){if(window.msEnterFromIntro)msEnterFromIntro();},700);",
-      'signature-store' => "if(window.nssOpenSub)nssOpenSub('signature-store'); setTimeout(function(){if(window.sigEnterStore)sigEnterStore();},700);",
+      'real-meaning' => "document.getElementById('splash')?.classList.remove('active'); document.getElementById('landing')?.classList.add('active'); if(window.nssOpenSub)nssOpenSub('real-meaning'); setTimeout(function(){if(window.rmSkipIntro)rmSkipIntro();},250);",
+      'meaning-store' => "document.getElementById('splash')?.classList.remove('active'); document.getElementById('landing')?.classList.add('active'); if(window.nssOpenSub)nssOpenSub('meaning-store'); setTimeout(function(){if(window.msEnterFromIntro)msEnterFromIntro();},250);",
+      'signature-store' => "document.getElementById('splash')?.classList.remove('active'); document.getElementById('landing')?.classList.add('active'); if(window.nssOpenSub)nssOpenSub('signature-store'); setTimeout(function(){if(window.sigEnterStore)sigEnterStore();},250);",
       _ => '',
     };
     if (script.isNotEmpty) await _controller.runJavaScript(script);
