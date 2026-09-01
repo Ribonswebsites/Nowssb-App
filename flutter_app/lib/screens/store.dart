@@ -4,6 +4,8 @@ library;
 import 'package:flutter/material.dart';
 
 import '../data/content.dart';
+import '../media/nwsb_video.dart';
+import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 import '../widgets/intro_gate.dart';
 import '../widgets/page_shell.dart';
@@ -13,154 +15,92 @@ class StoreScreen extends StatelessWidget {
   const StoreScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return PageShell(
-      eyebrow: 'Own the sounds that heal',
-      title: 'NowssB Store',
-      film: 'assets/video/store-section.mp4',
-      slivers: [
-        SliverToBoxAdapter(child: _StoreHero()),
-        SliverPadding(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-          sliver: SliverList.list(children: [
-            const _StoreSectionLabel('THE LIBRARY'),
-            _DepartmentCard(
-              art: 'assets/store/intro-words.webp',
-              eyebrow: 'Word Atelier',
-              title: 'Words that heal',
-              body: 'Explore pronunciation, origin, organ and sound — one word at a time.',
-              onTap: (c) => _open(c, const WordAtelierScreen()),
-            ),
-            _DepartmentCard(
-              art: 'assets/store/intro-meanings.webp',
-              eyebrow: 'Meaning Store',
-              title: 'What a word truly means',
-              body: 'Unlock the origin, vibration and hidden meaning behind every word.',
-              onTap: (c) => _open(c, const MeaningStoreScreen()),
-            ),
-            _DepartmentCard(
-              art: 'assets/store/intro-signature.webp',
-              eyebrow: 'Signature Store',
-              title: 'The rarest collection',
-              body: 'Signature words and meanings gathered into one premium shelf.',
-              onTap: (c) => _open(c, const SignatureStoreScreen()),
-            ),
-            _DepartmentCard(
-              art: 'assets/store/intro-ebooks.webp',
-              eyebrow: 'Shabdapathy · Library',
-              title: 'Read, learn, practice',
-              body: 'Deep-dive guides on word science, phonetic origin and sound healing.',
-              onTap: (c) => _open(c, const EbooksStoreScreen()),
-            ),
-            const SizedBox(height: 8),
-            const _StoreFooter(),
-          ]),
-        ),
-      ],
+  Widget build(BuildContext context) => IntroGate(
+        tag: 'Shabdapathy · Collections',
+        eyebrow: '',
+        title: 'The NowssB Store',
+        body: 'Two libraries. One destination. Own the words that heal — unlock the origins that no dictionary ever told you.',
+        stats: const ['Word Library', 'Meaning Library', 'AI-Decoded'],
+        art: 'assets/store/intro-store.webp',
+        enterLabel: 'Enter Store',
+        onBack: () => Navigator.of(context).maybePop(),
+        child: const _StoreHomeContent(),
     );
-  }
-
-  static void _open(BuildContext context, Widget page) {
-    Navigator.of(context, rootNavigator: true).push(
-      MaterialPageRoute<void>(builder: (_) => page),
-    );
-  }
 }
 
-class _StoreHero extends StatelessWidget {
+class _StoreHomeContent extends StatelessWidget {
+  const _StoreHomeContent();
+
   @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: SizedBox(
-          height: 220,
-          child: Stack(fit: StackFit.expand, children: [
-            Image.asset('assets/store/intro-store.webp', fit: BoxFit.cover),
-            const DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0x22060C18), Color(0xEE060C18)],
-                ),
+  Widget build(BuildContext context) => Scaffold(
+        backgroundColor: NwsbColors.deep,
+        body: SafeArea(
+          child: CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(child: _StoreBanner()),
+              SliverToBoxAdapter(child: _StoreRemoteBanner(url: 'https://media.nowssb.com/migrated-images/ccadecda89d460a6_grok_image_1778521152376_il2xkh.jpg', height: 190)),
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                sliver: SliverList.list(children: [
+                  _StoreVideoSection(asset: 'assets/video/store-word-library.mp4', eyebrow: 'THE WORD LIBRARY', title: 'Build Your\nPersonal Library', sub: 'Each word targets a specific organ. The more words you own, the more healing sentences you can build.', chips: const ['HEART HEALTH', 'IMMUNITY', 'MENTAL CLARITY', 'GUT HEALTH', 'SKIN & GLOW', 'LUNG & BREATH'], button: 'Browse The Word Atelier', onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const WordAtelierScreen()))),
+                  _StoreRemoteBanner(url: 'https://media.nowssb.com/migrated-images/16c653d97f27f932_file_00000000c81c81fba2f7377fc71229be_uvvxfz.png', height: 160, margin: const EdgeInsets.symmetric(vertical: 20)),
+                  _StoreVideoSection(asset: 'assets/video/store-meaning-library.mp4', eyebrow: 'THE MEANING LIBRARY', title: 'Unlock the\nTruth Behind Words', sub: 'Base meanings · Your purchased words · AI-decoded origins', chips: const ['COUNTRY', 'EARTH', 'BODY', 'MIND', 'SOUL', 'BLOOD'], button: 'Browse Meaning Store', onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const MeaningStoreScreen()))),
+                  _SignatureDoor(onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SignatureStoreScreen()))),
+                  _StoreVideoBanner(asset: 'assets/video/store-verify-banner.mp4', poster: 'assets/video/store-verify-banner-poster.webp'),
+                  const Padding(padding: EdgeInsets.fromLTRB(20, 24, 20, 4), child: Text('Everything Else, In One Place', style: TextStyle(fontSize: 10, letterSpacing: 2.5, color: NwsbColors.gold))),
+                  _MiniStoreCard(eyebrow: 'Verified · Badges', title: 'Get Verified', sub: 'Blue, Silver, Gold or Diamond — stand out on your profile.', icon: Icons.verified_outlined, onTap: () {}),
+                  _MiniStoreCard(eyebrow: 'Read · Learn · Practice', title: 'NowssB Ebooks', sub: 'Deep-dive guides on word science and sound healing.', icon: Icons.menu_book_outlined, onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EbooksStoreScreen()))),
+                  _MiniStoreCard(eyebrow: 'Resonance · Frequency · X', title: 'Subscription Plans', sub: 'More words, more features — see every tier.', icon: Icons.auto_awesome_outlined, onTap: () {}),
+                  const Padding(padding: EdgeInsets.fromLTRB(20, 20, 20, 0), child: Text('Disclaimer & Confidentiality\n\nWords, meanings, ebooks and verification badges shared or sold here are for educational and wellness purposes only — nothing here is medical advice. Purchases are final once unlocked. Any information you share with us is kept strictly confidential and never sold or shared with third parties.', style: TextStyle(fontSize: 11, height: 1.5, color: Color(0x73FFFFFF)))),
+                  const Padding(padding: EdgeInsets.symmetric(vertical: 24), child: Center(child: Text('NowssB\n© 2026 Adv. Sanjaykumar Gadge · Shabdapathy', textAlign: TextAlign.center, style: TextStyle(fontSize: 11, height: 1.6, color: Color(0x73FFFFFF)))),
+                ]),
               ),
-            ),
-            Positioned(
-              left: 18,
-              right: 18,
-              bottom: 18,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text('WORDS · MEANINGS · BOOKS', style: TextStyle(fontSize: 9, letterSpacing: 2.5, color: NwsbColors.gold)),
-                  SizedBox(height: 6),
-                  Text('Everything that helps you heal in one place.', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: Colors.white, height: 1.12)),
-                ],
-              ),
-            ),
-          ]),
-        ),
-      ),
-    );
-  }
-}
-
-class _StoreSectionLabel extends StatelessWidget {
-  const _StoreSectionLabel(this.text);
-  final String text;
-  @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: Text(text, style: const TextStyle(fontSize: 9, letterSpacing: 3, fontWeight: FontWeight.w700, color: NwsbColors.gold)),
-      );
-}
-
-class _DepartmentCard extends StatelessWidget {
-  const _DepartmentCard({required this.art, required this.eyebrow, required this.title, required this.body, required this.onTap});
-  final String art, eyebrow, title, body;
-  final void Function(BuildContext) onTap;
-  @override
-  Widget build(BuildContext context) => Material(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(18),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: () => onTap(context),
-          borderRadius: BorderRadius.circular(18),
-          child: Container(
-            height: 142,
-            margin: const EdgeInsets.only(bottom: 12),
-            clipBehavior: Clip.antiAlias,
-            decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0x1FFFFFFF))),
-            child: Stack(fit: StackFit.expand, children: [
-            Image.asset(art, fit: BoxFit.cover),
-            const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.centerLeft, end: Alignment.centerRight, colors: [Color(0xF0060C18), Color(0xB0060C18), Color(0x33060C18)]))),
-            Padding(
-              padding: const EdgeInsets.all(18),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, mainAxisSize: MainAxisSize.min, children: [
-                Text(eyebrow.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 8.5, letterSpacing: 2.0, color: NwsbColors.gold)),
-                const SizedBox(height: 4),
-                Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Colors.white)),
-                const SizedBox(height: 4),
-                Text(body, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 11, height: 1.25, color: Color(0xB3FFFFFF))),
-              ]),
-            ),
-            const Positioned(right: 18, bottom: 18, child: Icon(Icons.arrow_forward, size: 18, color: Color(0xD9FFFFFF))),
-            ]),
+            ],
           ),
         ),
       );
 }
 
-class _StoreFooter extends StatelessWidget {
-  const _StoreFooter();
+class _StoreBanner extends StatelessWidget {
   @override
-  Widget build(BuildContext context) => const Padding(
-        padding: EdgeInsets.symmetric(vertical: 18),
-        child: Text('NowssB · Shabdapathy · Own the sounds that heal', textAlign: TextAlign.center, style: TextStyle(fontSize: 10, letterSpacing: 1.4, color: Color(0x66FFFFFF))),
-      );
+  Widget build(BuildContext context) => SizedBox(height: 230, child: Stack(fit: StackFit.expand, children: [
+        Image.network('https://media.nowssb.com/migrated-images/d748b5f773a2d866_grok_image_1778576400577_mnxqkd.jpg', fit: BoxFit.cover),
+        const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x33060C18), Color(0xF0060C18)]))),
+        const Positioned(left: 20, right: 20, bottom: 22, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('SHABDAPATHY · COLLECTIONS', style: TextStyle(fontSize: 10, letterSpacing: 2.5, color: NwsbColors.gold)), SizedBox(height: 8), Text('The NowssB Store', style: TextStyle(fontSize: 30, fontWeight: FontWeight.w300, color: Colors.white)), SizedBox(height: 5), Text('Word Library · Meaning Library · NowssB Signature', style: TextStyle(fontSize: 11, color: Color(0xB3FFFFFF)))])),
+      ]));
+}
+
+class _StoreRemoteBanner extends StatelessWidget {
+  const _StoreRemoteBanner({required this.url, required this.height, this.margin = EdgeInsets.zero});
+  final String url; final double height; final EdgeInsets margin;
+  @override
+  Widget build(BuildContext context) => Container(margin: margin, height: height, width: double.infinity, color: Colors.black, child: Image.network(url, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const SizedBox.shrink()));
+}
+
+class _StoreVideoSection extends StatelessWidget {
+  const _StoreVideoSection({required this.asset, required this.eyebrow, required this.title, required this.sub, required this.chips, required this.button, required this.onTap});
+  final String asset, eyebrow, title, sub, button; final List<String> chips; final VoidCallback onTap;
+  @override
+  Widget build(BuildContext context) => Container(height: 470, margin: const EdgeInsets.symmetric(horizontal: 20), clipBehavior: Clip.antiAlias, decoration: BoxDecoration(borderRadius: BorderRadius.circular(18), color: Colors.black), child: Stack(fit: StackFit.expand, children: [NwsbVideo(asset: asset, priority: ClipPriority.feature), const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x22060C18), Color(0xF5060C18)]))), Padding(padding: const EdgeInsets.fromLTRB(20, 22, 20, 20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(eyebrow, style: const TextStyle(fontSize: 10, letterSpacing: 2.2, color: NwsbColors.gold)), const Spacer(), Text(title, style: const TextStyle(fontSize: 28, height: 1.05, fontWeight: FontWeight.w300, color: Colors.white)), const SizedBox(height: 12), Text(sub, style: const TextStyle(fontSize: 12, height: 1.45, color: Color(0xCCFFFFFF))), const SizedBox(height: 12), Wrap(spacing: 7, runSpacing: 7, children: chips.map((c) => Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6), decoration: BoxDecoration(color: const Color(0x18FFFFFF), border: Border.all(color: const Color(0x26FFFFFF))), child: Text(c, style: const TextStyle(fontSize: 8, letterSpacing: 1.5, color: Color(0xCCFFFFFF)))).toList()), const SizedBox(height: 16), GestureDetector(onTap: onTap, child: Container(padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12), color: Colors.white, child: Row(mainAxisSize: MainAxisSize.min, children: [Text(button, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: NwsbColors.ink)), const SizedBox(width: 12), const Icon(Icons.arrow_forward, size: 15, color: NwsbColors.ink)])))]))]));
+}
+
+class _SignatureDoor extends StatelessWidget {
+  const _SignatureDoor({required this.onTap}); final VoidCallback onTap;
+  @override
+  Widget build(BuildContext context) => GestureDetector(onTap: onTap, child: Container(height: 230, margin: const EdgeInsets: EdgeInsets.fromLTRB(20, 20, 20, 0), clipBehavior: Clip.antiAlias, decoration: BoxDecoration(borderRadius: BorderRadius.circular(18), color: Colors.black), child: Stack(fit: StackFit.expand, children: [NwsbVideo(asset: 'assets/video/signature-store.mp4', poster: 'assets/video/signature-store-poster.webp', priority: ClipPriority.feature), const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x33060C18), Color(0xEE060C18)]))), const Padding(padding: EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('SHABDAPATHY · THE RAREST', style: TextStyle(fontSize: 10, letterSpacing: 2.2, color: NwsbColors.gold)), Spacer(), Text('Words & Meanings', style: TextStyle(fontSize: 25, color: Colors.white, fontWeight: FontWeight.w300)), SizedBox(height: 6), Text('One per category. Owned once, never restocked.', style: TextStyle(fontSize: 11, color: Color(0xB3FFFFFF))), SizedBox(height: 12), Text('15 Words   ·   5 Meanings', style: TextStyle(fontSize: 10, letterSpacing: 1.5, color: Color(0xCCFFFFFF)))]),)]));
+}
+
+class _StoreVideoBanner extends StatelessWidget {
+  const _StoreVideoBanner({required this.asset, required this.poster}); final String asset, poster;
+  @override
+  Widget build(BuildContext context) => Padding(padding: const EdgeInsets.fromLTRB(20, 20, 20, 0), child: ClipRRect(borderRadius: BorderRadius.circular(16), child: AspectRatio(aspectRatio: 16 / 5, child: NwsbVideo(asset: asset, poster: poster, priority: ClipPriority.decoration))));
+}
+
+class _MiniStoreCard extends StatelessWidget {
+  const _MiniStoreCard({required this.eyebrow, required this.title, required this.sub, required this.icon, required this.onTap});
+  final String eyebrow, title, sub; final IconData icon; final VoidCallback onTap;
+  @override
+  Widget build(BuildContext context) => GestureDetector(onTap: onTap, child: Container(margin: const EdgeInsets.fromLTRB(20, 10, 20, 0), padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: const Color(0x0AFFFFFF), borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0x1FFFFFFF))), child: Row(children: [Container(width: 44, height: 44, decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0x14FFFFFF)), child: Icon(icon, color: NwsbColors.gold, size: 21)), const SizedBox(width: 14), Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(eyebrow, style: const TextStyle(fontSize: 9, letterSpacing: 1.2, color: Color(0x99FFFFFF))), const SizedBox(height: 3), Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white)), const SizedBox(height: 3), Text(sub, style: const TextStyle(fontSize: 11, height: 1.3, color: Color(0x8CFFFFFF)))]), const Icon(Icons.arrow_forward, size: 16, color: Color(0xB3FFFFFF))]));
 }
 
 class WordAtelierScreen extends StatelessWidget {
