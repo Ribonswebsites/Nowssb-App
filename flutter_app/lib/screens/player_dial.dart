@@ -80,7 +80,9 @@ class _PlayerDialState extends State<PlayerDial> {
 
     return ColoredBox(
       color: const Color(0xFF1B1E27),
-      child: SafeArea(
+      child: Material(
+        color: Colors.transparent,
+        child: SafeArea(
         child: GestureDetector(
           onVerticalDragUpdate: (d) {
             if (d.delta.dy < -6) setState(() => _expanded = true);
@@ -258,6 +260,7 @@ class _PlayerDialState extends State<PlayerDial> {
             ],
           ),
         ),
+      ),
       ),
     );
   }
