@@ -32,7 +32,7 @@ class ProfileScreen extends StatelessWidget {
                 _CircleButton(icon: Icons.arrow_back, onTap: () => Navigator.maybePop(context)),
                 const Spacer(),
                 const Text('MY PROFILE', style: TextStyle(color: _muted, fontSize: 11, letterSpacing: 3)),
-              ])),
+              ]))),
               const SizedBox(height: 20),
               _panel(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Row(children: [
