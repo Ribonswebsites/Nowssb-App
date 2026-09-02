@@ -170,9 +170,16 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
   Widget build(BuildContext context) {
     if (_loading) return const Scaffold(backgroundColor: Colors.black, body: Center(child: CircularProgressIndicator(strokeWidth: 1, color: _accent)));
     final int today = (DateTime.now().weekday - 1).clamp(0, 6).toInt();
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Stack(
+    return Theme(
+      data: ThemeData.dark(useMaterial3: true).copyWith(
+        scaffoldBackgroundColor: Colors.black,
+        colorScheme: const ColorScheme.dark(primary: _accent),
+        splashFactory: NoSplash.splashFactory,
+        textTheme: ThemeData.dark().textTheme.apply(fontFamily: 'SF Pro Display'),
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: Stack(
         children: [
           const Positioned.fill(child: _Background()),
           Positioned.fill(child: IgnorePointer(child: CustomPaint(painter: _GrainPainter()))),
@@ -203,8 +210,9 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
               ),
             ),
           ),
-          if (_recentOpen) _recentSheet(),
-        ],
+            if (_recentOpen) _recentSheet(),
+          ],
+        ),
       ),
     );
   }
@@ -239,7 +247,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                 width: 132,
                 child: Stack(children: [
                   Positioned.fill(child: Container(decoration: BoxDecoration(color: const Color(0xFF0A0A0A), image: _photo == null ? null : DecorationImage(image: FileImage(_photo!), fit: BoxFit.cover)))),
-                  Positioned.fill(child: Opacity(opacity: .98, child: Image.asset('assets/profile_source/img-ring.png', fit: BoxFit.cover, alignment: const Alignment(.0, -.16)))),
+                  Positioned.fill(child: Transform.scale(scale: 1.16, child: Opacity(opacity: .98, child: Image.asset('assets/profile_source/img-ring.png', fit: BoxFit.cover, alignment: const Alignment(.0, -.16))))),
                   Positioned.fill(child: Center(child: Text(_photo == null ? (_nameController.text.trim().isEmpty ? 'P' : _nameController.text.trim().substring(0, 1)).toUpperCase() : '', style: const TextStyle(fontFamily: _mono, fontSize: 24, fontWeight: FontWeight.w600, color: _text)))),
                   Positioned(right: 10, bottom: 10, child: _circleButton(asset: 'assets/icons/icon_02.svg', size: 28, onTap: _pickPhoto)),
                 ]),
