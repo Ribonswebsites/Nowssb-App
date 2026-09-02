@@ -114,36 +114,44 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
       final context = _navigatorKey.currentContext;
       if (context == null) return;
       _shownUpdateBuild = update.build;
+      double? progress;
+      bool updating = false;
+      String status = 'The update will download inside NowssB, then Android will show its install confirmation.';
       await showDialog<void>(
         context: context,
         barrierDismissible: true,
-        builder: (context) => AlertDialog(
-          backgroundColor: const Color(0xFF102037),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-          title: const Text('A new NowssB update is ready', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
-          content: const Text('Open the official NowssB download page to get the latest Android package.', style: TextStyle(color: Color(0xCCFFFFFF), height: 1.45)),
-          actions: [
-            TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Later')),
-            FilledButton(
-              style: FilledButton.styleFrom(backgroundColor: NwsbColors.goldLight, foregroundColor: NwsbColors.deep),
-              onPressed: () async {
-                Navigator.of(context).pop();
-                try {
-                  await NwsbAppUpdate.downloadAndInstall(update);
-                } catch (_) {
-                  if (!mounted) return;
-                  final root = _navigatorKey.currentContext;
-                  if (root != null) {
-                    ScaffoldMessenger.of(root).showSnackBar(
-                      const SnackBar(content: Text('Could not download the update. Please try again when you are online.')),
-                    );
+        builder: (context) => StatefulBuilder(builder: (context, setDialogState) {
+          return AlertDialog(
+            backgroundColor: const Color(0xFF102037),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+            title: Text(updating ? 'Updating NowssB…' : 'A new NowssB update is ready', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+            content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(status, style: const TextStyle(color: Color(0xCCFFFFFF), height: 1.45)),
+              if (updating) ...[
+                const SizedBox(height: 18),
+                LinearProgressIndicator(value: progress, color: NwsbColors.goldLight, backgroundColor: Colors.white24),
+                const SizedBox(height: 8),
+                Text(progress == null ? 'Downloading update…' : 'Downloading ${(progress! * 100).round()}%', style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12)),
+              ],
+            ]),
+            actions: [
+              if (!updating) TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Later')),
+              FilledButton(
+                style: FilledButton.styleFrom(backgroundColor: NwsbColors.goldLight, foregroundColor: NwsbColors.deep),
+                onPressed: updating ? null : () async {
+                  setDialogState(() { updating = true; status = 'Downloading the update inside the app…'; });
+                  try {
+                    await NwsbAppUpdate.downloadAndInstall(update, onProgress: (value) => setDialogState(() => progress = value));
+                    if (context.mounted) setDialogState(() { updating = false; status = 'Update downloaded. Opening Android installer…'; });
+                  } catch (_) {
+                    if (context.mounted) setDialogState(() { updating = false; status = 'Update failed. Check your connection and try again.'; });
                   }
-                }
-              },
-              child: const Text('Get update'),
-            ),
-          ],
-        ),
+                },
+                child: Text(updating ? 'Updating…' : 'Update now'),
+              ),
+            ],
+          );
+        }),
       );
     } finally {
       _checkingForUpdate = false;

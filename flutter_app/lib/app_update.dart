@@ -42,7 +42,7 @@ class NwsbAppUpdate {
     }
   }
 
-  static Future<void> downloadAndInstall(NwsbAppUpdate update) async {
+  static Future<void> downloadAndInstall(NwsbAppUpdate update, {void Function(double?)? onProgress}) async {
     if (!Platform.isAndroid) throw UnsupportedError('In-app APK installation is Android-only');
     final dir = await getApplicationSupportDirectory();
     final file = File(path.join(dir.path, 'nowssb-update-${update.build}.apk'));
@@ -50,9 +50,16 @@ class NwsbAppUpdate {
     try {
       final response = await client.send(http.Request('GET', update.apkUrl)).timeout(const Duration(minutes: 5));
       if (response.statusCode != 200) throw HttpException('APK download failed: ${response.statusCode}');
+      final total = response.contentLength;
+      var received = 0;
+      onProgress?.call(total == null || total <= 0 ? null : 0);
       final sink = file.openWrite();
       try {
-        await response.stream.pipe(sink);
+        await for (final chunk in response.stream) {
+          received += chunk.length;
+          sink.add(chunk);
+          onProgress?.call(total == null || total <= 0 ? null : received / total);
+        }
       } finally {
         await sink.close();
       }
