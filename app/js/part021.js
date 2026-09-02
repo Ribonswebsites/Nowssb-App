@@ -544,6 +544,12 @@ window.goTo = function(dest) {
       try { if (!localStorage.getItem('nwsb_done')) start(); }
       catch(e){ start(); }
     }, 1000);
+    setTimeout(function(){
+      try {
+        var last = localStorage.getItem('nwsb_last_sub');
+        if (last && document.getElementById('sub-' + last) && typeof openSub === 'function') openSub(last);
+      } catch(e) {}
+    }, 1150);
   }
 };
 

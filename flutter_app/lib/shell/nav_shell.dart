@@ -36,7 +36,7 @@ class NavScope extends InheritedWidget {
 }
 
 class _NavShellState extends State<NavShell> {
-  int _i = 0;
+  int _i = Settings.instance.lastTab;
 
   /// Which home. The website keeps both in the DOM and switches a class;
   /// here it is two different screens rather than two skins — see
@@ -65,6 +65,7 @@ class _NavShellState extends State<NavShell> {
     if (tab == _i) return;
     Settings.instance.fadeBackgroundForNavigation();
     setState(() => _i = tab);
+    Settings.instance.setLastTab(tab);
   }
 
   static const _tabs = [

@@ -54,7 +54,7 @@ Future<void> main() async {
 
   // Nothing decodes underneath the start animation. Released by the splash
   // when it finishes, and by the eight-second ceiling if it never does.
-  VideoPool.instance.hold();
+  if (Settings.instance.showSplash) VideoPool.instance.hold();
   VideoPool.instance.startHeartbeat();
 
   runApp(const NowssbApp());
@@ -103,7 +103,7 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
   /// The start animation plays once per launch, and the app is built behind
   /// it rather than after it — so by the time the clip ends the first screen
   /// is already laid out and there is no second wait.
-  bool _splashDone = false;
+  bool _splashDone = !Settings.instance.showSplash;
 
   Future<void> _checkForUpdate() async {
     if (_checkingForUpdate || !_splashDone) return;

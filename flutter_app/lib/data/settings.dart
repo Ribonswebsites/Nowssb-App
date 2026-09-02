@@ -34,6 +34,8 @@ class Settings extends ChangeNotifier {
   static const _kDownload = 'nwsb_player_download';
   static const _kPlaylist = 'nwsb_player_playlist';
   static const _kNowPlaying = 'nwsb_player_now_playing';
+  static const _kLastTab = 'nwsb_last_tab';
+  static const _kLaunched = 'nwsb_has_launched';
 
   /// One selected Fashion Plus film plays behind every primary page while
   /// motion mode is enabled.
@@ -77,6 +79,8 @@ class Settings extends ChangeNotifier {
   bool _downloadOnly = false;
   String _playlist = 'Classic';
   String _nowPlaying = 'On';
+  int _lastTab = 0;
+  bool _showSplash = true;
 
   /// Motion mode: do page backgrounds play, or hold their first frame?
   bool get fashionPlus => _fashionPlus;
@@ -99,6 +103,8 @@ class Settings extends ChangeNotifier {
   bool get downloadOnly => _downloadOnly;
   String get playlist => _playlist;
   String get nowPlaying => _nowPlaying;
+  int get lastTab => _lastTab;
+  bool get showSplash => _showSplash;
 
   Future<void> load() async {
     try {
@@ -120,6 +126,9 @@ class Settings extends ChangeNotifier {
       _downloadOnly = p.getBool(_kDownload) ?? _downloadOnly;
       _playlist = p.getString(_kPlaylist) ?? _playlist;
       _nowPlaying = p.getString(_kNowPlaying) ?? _nowPlaying;
+      _lastTab = _validIndex(p.getInt(_kLastTab) ?? 0, 5, fallback: 0);
+      _showSplash = !(p.getBool(_kLaunched) ?? false);
+      await p.setBool(_kLaunched, true);
       notifyListeners();
     } catch (_) {
       // A platform that refuses storage is not a reason to fail to start.
@@ -174,6 +183,11 @@ class Settings extends ChangeNotifier {
   Future<void> toggleDownloadOnly() async { _downloadOnly = !_downloadOnly; await _save(_kDownload, _downloadOnly); notifyListeners(); }
   Future<void> setPlaylist(String value) async { _playlist = value; await _saveString(_kPlaylist, value); notifyListeners(); }
   Future<void> setNowPlaying(String value) async { _nowPlaying = value; await _saveString(_kNowPlaying, value); notifyListeners(); }
+  Future<void> setLastTab(int value) async {
+    _lastTab = _validIndex(value, 5, fallback: 0);
+    await _saveInt(_kLastTab, _lastTab);
+    notifyListeners();
+  }
 
   /// A tab does not change the selected asset, but it should still make the
   /// background arrive gently rather than appearing as a hard cut.

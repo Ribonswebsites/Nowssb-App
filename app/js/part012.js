@@ -1758,6 +1758,11 @@ function applyHealthGenderHighlight(gender) {
 function openSub(id) {
   const sub = document.getElementById('sub-' + id);
   if (!sub) return;
+  try {
+    if (id !== 'login' && id !== 'signup' && id !== 'onboarding' && id !== 'splash') {
+      localStorage.setItem('nwsb_last_sub', id);
+    }
+  } catch (e) {}
   if (typeof window.nwsbFpFadeBackground === 'function') {
     window.nwsbFpFadeBackground();
   }
