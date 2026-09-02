@@ -332,9 +332,21 @@ class _TopRow extends StatelessWidget {
       children: [
         _HamburgerButton(onTap: onMenu),
         const SizedBox(width: 12),
-        // The app's own mark, kept small and continuously alive in the
-        // fixed header. The full-screen launch animation remains in Splash.
-        const LoopingLogoMark(size: 46),
+        // Normal home only: the static mark sits in a raised neumorphic disc.
+        Container(
+          width: 56,
+          height: 56,
+          padding: const EdgeInsets.all(5),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: NwsbColors.surface,
+            boxShadow: const [
+              BoxShadow(color: Color(0xFFFFFFFF), blurRadius: 8, offset: Offset(-4, -4)),
+              BoxShadow(color: Color(0x33000000), blurRadius: 8, offset: Offset(4, 4)),
+            ],
+          ),
+          child: const LoopingLogoMark(size: 46),
+        ),
         const SizedBox(width: 12),
         // Flexible, not a bare Column: 'NOWSBANSIU EDITION' at 2pt of letter
         // spacing is wider than it looks, and on a 412pt screen it pushed
