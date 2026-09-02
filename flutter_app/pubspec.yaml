@@ -54,6 +54,7 @@ flutter:
     - assets/icons/
     - assets/store/
     - assets/profile/
+    - assets/profile_source/
     - assets/store/collections/
     - assets/fashion/
     - assets/player/
