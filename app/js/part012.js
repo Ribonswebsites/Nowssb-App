@@ -1558,11 +1558,6 @@ function isInStandaloneMode() {
 
 // ── DOWNLOAD POPUP ──
 function openDlPopup() {
-  // The standalone listing is the single source of truth for website and
-  // WebView downloads. Its Install control points at the latest Flutter APK.
-  window.location.href = './download/';
-  return;
-
   const overlay  = document.getElementById('dlOverlay');
   const viewInstall = document.getElementById('dlViewInstall');
   const viewIOS  = document.getElementById('dlViewIOS');
@@ -1634,18 +1629,21 @@ async function triggerInstall() {
   if (isAndroid()) {
     const btn = document.getElementById('dlInstallBtn');
     const note = document.getElementById('dlAndroidInstallNote');
-    if (btn) { btn.disabled = true; btn.textContent = 'Starting APK download…'; }
-    if (note) note.style.display = 'block';
-    const link = document.createElement('a');
-    link.href = 'https://github.com/Ribonswebsites/Nowssb-App/releases/download/nowssb-android/NowssB-Android.apk';
-    link.download = 'NowssB-Android.apk';
-    link.rel = 'noopener';
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    window.setTimeout(() => {
-      if (btn) { btn.disabled = false; btn.textContent = 'Download NowssB APK'; }
-    }, 900);
+    if (btn) { btn.disabled = true; btn.textContent = 'Updating…'; }
+    if (note) { note.style.display = 'block'; note.textContent = 'Downloading the update inside NowssB…'; }
+    fetch('https://github.com/Ribonswebsites/Nowssb-App/releases/download/nowssb-android/NowssB-Android.apk', {cache:'no-store'})
+      .then(r => { if (!r.ok) throw new Error('download failed'); return r.blob(); })
+      .then(blob => {
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob); link.download = 'NowssB-Android.apk'; link.rel = 'noopener';
+        document.body.appendChild(link); link.click(); link.remove();
+        if (btn) { btn.disabled = false; btn.textContent = 'Updated'; }
+        if (note) note.textContent = 'Updated. Android has saved the APK; tap it in Downloads to finish installation.';
+      })
+      .catch(() => {
+        if (btn) { btn.disabled = false; btn.textContent = 'Try again'; }
+        if (note) note.textContent = 'Update failed. Check your connection and try again.';
+      });
     return;
   }
   // Already installed → nothing to download.
@@ -1664,7 +1662,11 @@ async function triggerInstall() {
       prompt.prompt();                                   // ← fires the native install dialog directly
       const { outcome } = await prompt.userChoice;
       deferredInstallPrompt = null; window._bipEvent = null;
-      if (outcome === 'accepted') closeDlSheet();
+      if (outcome === 'accepted') {
+        const btn = document.getElementById('dlInstallBtn');
+        if (btn) { btn.disabled = true; btn.textContent = 'Updated'; }
+        setTimeout(closeDlSheet, 900);
+      }
       // outcome === 'dismissed' — the native dialog worked; user said no. Fine.
     } catch (e) {
       deferredInstallPrompt = null; window._bipEvent = null;
