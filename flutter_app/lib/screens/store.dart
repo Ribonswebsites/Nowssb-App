@@ -36,7 +36,7 @@ class _StoreHomeContent extends StatelessWidget {
     final items = <Widget>[
       _StoreBanner(),
       const _StoreRemoteBanner(url: 'https://media.nowssb.com/migrated-images/ccadecda89d460a6_grok_image_1778521152376_il2xkh.jpg', height: 190),
-      _StoreVideoSection(asset: 'assets/video/store-word-library.mp4', eyebrow: 'THE WORD LIBRARY', title: 'Build Your\nPersonal Library', sub: 'Each word targets a specific organ. The more words you own, the more healing sentences you can build.', chips: const ['HEART HEALTH', 'IMMUNITY', 'MENTAL CLARITY', 'GUT HEALTH', 'SKIN & GLOW', 'LUNG & BREATH'], button: 'Browse The Word Atelier', onTap: () => _push(context, const WordAtelierScreen())),
+      _StoreVideoSection(asset: 'assets/video/store-section.mp4', eyebrow: 'THE WORD LIBRARY', title: 'Build Your\nPersonal Library', sub: 'Each word targets a specific organ. The more words you own, the more healing sentences you can build.', chips: const ['HEART HEALTH', 'IMMUNITY', 'MENTAL CLARITY', 'GUT HEALTH', 'SKIN & GLOW', 'LUNG & BREATH'], button: 'Browse The Word Atelier', onTap: () => _push(context, const WordAtelierScreen())),
       const _StoreRemoteBanner(url: 'https://media.nowssb.com/migrated-images/16c653d97f27f932_file_00000000c81c81fba2f7377fc71229be_uvvxfz.png', height: 160, margin: EdgeInsets.symmetric(vertical: 20)),
       _StoreVideoSection(asset: 'assets/video/store-meaning-library.mp4', eyebrow: 'THE MEANING LIBRARY', title: 'Unlock the\nTruth Behind Words', sub: 'Base meanings · Your purchased words · AI-decoded origins', chips: const ['COUNTRY', 'EARTH', 'BODY', 'MIND', 'SOUL', 'BLOOD'], button: 'Browse Meaning Store', onTap: () => _push(context, const MeaningStoreScreen())),
       _SignatureDoor(onTap: () => _push(context, const SignatureStoreScreen())),
@@ -182,31 +182,19 @@ class _MiniStoreCard extends StatelessWidget {
 class WordAtelierScreen extends StatelessWidget {
   const WordAtelierScreen({super.key});
   @override
-  Widget build(BuildContext context) => _StoreContentPage(
-        title: 'The Word Atelier',
-        film: 'assets/video/store-word-library.mp4',
-        child: _WordsShelf(),
-      );
+  Widget build(BuildContext context) => IntroGate(tag: 'Shabdapathy · Word Science', eyebrow: '', title: 'The Word Atelier', body: 'Every word carries a vibrational signature that predates all dictionaries. Explore the phonetic origin of any word in any language.', stats: const ['Unlimited Words', 'AI-Powered', 'Every Language'], art: 'assets/store/intro-words.webp', fullBleed: true, enterLabel: 'Enter The Word Atelier', onBack: () => Navigator.of(context).pop(), child: _StoreContentPage(title: 'The Word Atelier', film: 'assets/video/store-section.mp4', child: _WordsShelf()));
 }
 
 class MeaningStoreScreen extends StatelessWidget {
   const MeaningStoreScreen({super.key});
   @override
-  Widget build(BuildContext context) => _StoreContentPage(
-        title: 'The Meaning Store',
-        film: 'assets/video/store-meaning-library.mp4',
-        child: _MeaningsShelf(),
-      );
+  Widget build(BuildContext context) => IntroGate(tag: 'Shabdapathy · Origins', eyebrow: '', title: 'The Meaning Store', body: 'Base meanings, purchased words and AI-decoded origins — the truth behind the sound.', stats: const ['Base Meanings', 'AI-Decoded', 'Owned Forever'], art: 'assets/store/intro-meanings.webp', fullBleed: true, enterLabel: 'Enter The Meaning Store', onBack: () => Navigator.of(context).pop(), child: _StoreContentPage(title: 'The Meaning Store', film: 'assets/video/store-meaning-library.mp4', child: _MeaningsShelf()));
 }
 
 class SignatureStoreScreen extends StatelessWidget {
   const SignatureStoreScreen({super.key});
   @override
-  Widget build(BuildContext context) => const _StoreContentPage(
-        title: 'Words & Meanings',
-        film: 'assets/video/signature-store.mp4',
-        child: _SignatureShelf(),
-      );
+  Widget build(BuildContext context) => IntroGate(tag: 'Shabdapathy · The Rarest', eyebrow: '', title: 'Words & Meanings', body: 'One per category. Owned once, never restocked.', stats: const ['15 Words', '5 Meanings', 'Never Restocked'], art: 'assets/store/intro-signature.webp', fullBleed: true, enterLabel: 'Enter Signature Store', onBack: () => Navigator.of(context).pop(), child: _StoreContentPage(title: 'Words & Meanings', film: 'assets/video/signature-store.mp4', child: const _SignatureShelf()));
 }
 
 class EbooksStoreScreen extends StatelessWidget {
