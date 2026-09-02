@@ -182,7 +182,7 @@ class _MiniStoreCard extends StatelessWidget {
 class WordAtelierScreen extends StatelessWidget {
   const WordAtelierScreen({super.key});
   @override
-  Widget build(BuildContext context) => IntroGate(tag: 'Shabdapathy · Word Science', eyebrow: '', title: 'The Word Atelier', body: 'Every word carries a vibrational signature that predates all dictionaries. Explore the phonetic origin of any word in any language.', stats: const ['Unlimited Words', 'AI-Powered', 'Every Language'], art: 'assets/store/intro-words.webp', fullBleed: true, enterLabel: 'Enter The Word Atelier', onBack: () => Navigator.of(context).pop(), child: _StoreContentPage(title: 'The Word Atelier', film: 'assets/video/store-section.mp4', child: _WordsShelf()));
+  Widget build(BuildContext context) => IntroGate(tag: 'Shabdapathy · Word Science', eyebrow: '', title: 'The Word Atelier', body: 'Every word carries a vibrational signature that predates all dictionaries. Explore the phonetic origin of any word in any language.', stats: const ['Unlimited Words', 'AI-Powered', 'Every Language'], art: 'assets/store/intro-words.webp', fullBleed: true, enterLabel: 'Enter The Word Atelier', onBack: () => Navigator.of(context).pop(), child: _StoreContentPage(title: 'The Word Atelier', film: 'assets/video/store-section.mp4', child: const _WordAtelierBody()));
 }
 
 class MeaningStoreScreen extends StatelessWidget {
@@ -212,6 +212,43 @@ class EbooksStoreScreen extends StatelessWidget {
         onBack: () => Navigator.of(context).pop(),
         child: _StoreContentPage(title: 'The NowssB Ebooks', film: 'assets/video/store-verify-banner.mp4', child: _BooksShelf()),
       );
+}
+
+class _WordAtelierBody extends StatefulWidget {
+  const _WordAtelierBody();
+  @override
+  State<_WordAtelierBody> createState() => _WordAtelierBodyState();
+}
+
+class _WordAtelierBodyState extends State<_WordAtelierBody> {
+  final _search = TextEditingController();
+  String _query = '';
+
+  @override
+  void dispose() { _search.dispose(); super.dispose(); }
+
+  @override
+  Widget build(BuildContext context) {
+    final all = ContentStore.instance.library;
+    final words = all.where((w) => _query.isEmpty || w.word.toLowerCase().contains(_query.toLowerCase()) || w.meaning.toLowerCase().contains(_query.toLowerCase())).toList();
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      ClipRRect(borderRadius: BorderRadius.circular(14), child: SizedBox(height: 150, width: double.infinity, child: Stack(fit: StackFit.expand, children: [
+        NwsbVideo(asset: 'assets/video/store-word-library.mp4', poster: 'assets/video/store-word-library-poster.webp', priority: ClipPriority.feature),
+        const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x22060C18), Color(0xE6060C18)]))),
+        const Padding(padding: EdgeInsets.all(16), child: Align(alignment: Alignment.bottomLeft, child: Text('The Word Atelier', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w300, color: Colors.white)))),
+      ]))),
+      const SizedBox(height: 16),
+      Container(height: 48, padding: const EdgeInsets.symmetric(horizontal: 14), decoration: BoxDecoration(color: const Color(0x0FFFFFFF), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0x26FFFFFF))), child: Row(children: [const Icon(Icons.search, size: 18, color: Color(0x80FFFFFF)), const SizedBox(width: 10), Expanded(child: TextField(controller: _search, onChanged: (v) => setState(() => _query = v), style: const TextStyle(color: Colors.white, fontSize: 13), decoration: const InputDecoration(border: InputBorder.none, hintText: 'Type any word, name, country…', hintStyle: TextStyle(color: Color(0x73FFFFFF)))),), if (_query.isNotEmpty) IconButton(onPressed: () { _search.clear(); setState(() => _query = ''); }, icon: const Icon(Icons.close, size: 17, color: Color(0x99FFFFFF)))])),
+      const SizedBox(height: 20),
+      const Text('YOUR WORD LIBRARY', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 2.2, color: NwsbColors.gold)),
+      const SizedBox(height: 7),
+      const Text('Every word carries a vibrational signature.', style: TextStyle(fontSize: 13, color: Color(0x99FFFFFF))),
+      const SizedBox(height: 14),
+      Wrap(spacing: 7, runSpacing: 7, children: const [_StoreChip('ALL'), _StoreChip('HEART HEALTH'), _StoreChip('IMMUNITY'), _StoreChip('MENTAL CLARITY'), _StoreChip('GUT HEALTH'), _StoreChip('SKIN & GLOW')]),
+      const SizedBox(height: 18),
+      if (words.isEmpty) const _Await('No words found. Search another word or add one to your library.') else for (final w in words) WordRow(word: w.word, deva: w.deva, sub: w.meaning.isNotEmpty ? w.meaning : w.organ, trailing: _Price(w.price), onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => WordDetail(word: w)))),
+    ]);
+  }
 }
 
 class _StoreContentPage extends StatelessWidget {
