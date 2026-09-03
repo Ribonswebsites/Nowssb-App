@@ -13,6 +13,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/models.dart';
@@ -1691,27 +1692,126 @@ class PracticeProgressScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
-    animation: PracticeProgress.instance,
-    builder: (context, _) {
-      final progress = PracticeProgress.instance;
-      final completed = progress.completedTodayFor(words);
-      final goal = words.isEmpty ? 0 : (completed / words.length * 100).round().clamp(0, 100);
-      return Scaffold(
-        backgroundColor: NwsbColors.deep,
-        appBar: AppBar(backgroundColor: NwsbColors.deep, foregroundColor: Colors.white, title: const Text('Your progress')),
-        body: SafeArea(child: Padding(padding: const EdgeInsets.all(24), child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          const Text('LIVE PRACTICE DATA', style: TextStyle(color: NwsbColors.goldLight, letterSpacing: 2, fontSize: 11, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 18),
-          Text(progress.totalSessions == 0 ? 'Your first completed playback will appear here.' : 'Your progress is built from completed sessions on this device.', style: const TextStyle(color: Color(0xCCFFFFFF), fontSize: 17, height: 1.45)),
-          const SizedBox(height: 26),
-          _ProgressStat(value: '${progress.todaySessions}', label: 'Sessions today'),
-          _ProgressStat(value: '${progress.totalSessions}', label: 'Total sessions'),
-          _ProgressStat(value: '${progress.streak}', label: 'Day streak'),
-          _ProgressStat(value: words.isEmpty ? '—' : '$goal%', label: words.isEmpty ? 'Today’s goal' : '$completed of ${words.length} words today'),
-        ]))),
+        animation: PracticeProgress.instance,
+        builder: (context, _) {
+          final progress = PracticeProgress.instance;
+          final completed = progress.completedTodayFor(words);
+          final goal = words.isEmpty
+              ? 0
+              : (completed / words.length * 100).round().clamp(0, 100);
+          return Scaffold(
+            backgroundColor: NwsbColors.deep,
+            appBar: AppBar(
+              backgroundColor: NwsbColors.deep,
+              foregroundColor: Colors.white,
+              title: const Text('My Progress'),
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(bottom: Radius.circular(22)),
+              ),
+            ),
+            body: SafeArea(
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
+                children: [
+                  const _ProgressHeading(),
+                  const SizedBox(height: 20),
+                  _ProgressPanel(
+                    title: 'YOUR PRACTICE',
+                    child: Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: [
+                        _ProgressStat(value: '${progress.streak}', label: 'Day streak'),
+                        _ProgressStat(value: '${progress.totalSessions}', label: 'Total sessions'),
+                        _ProgressStat(value: '${progress.todaySessions}', label: 'Today'),
+                        _ProgressStat(value: words.isEmpty ? '—' : '$goal%', label: 'Today’s goal'),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  _ProgressPanel(
+                    title: 'THIS WEEK',
+                    child: _WeekGrid(streak: progress.streak),
+                  ),
+                  const SizedBox(height: 18),
+                  _ProgressPanel(
+                    title: 'BODY MAP',
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: 220,
+                          child: SvgPicture.asset(
+                            'assets/icons/bodymap.svg',
+                            fit: BoxFit.contain,
+                            semanticsLabel: 'Healing body map',
+                          ),
+                        ),
+                        const Text(
+                          'Your practiced words activate resonance pathways through the body.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Color(0xB3C8E8F5), fontSize: 13, height: 1.45),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  _ProgressPanel(
+                    title: 'MILESTONES',
+                    child: _MilestoneGrid(
+                      streak: progress.streak,
+                      sessions: progress.totalSessions,
+                      words: words.length,
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  _ProgressPanel(
+                    title: 'WEEKLY INSIGHT',
+                    child: const Text(
+                      'Complete your first practice session and a personal insight will appear here — built from your actual data, not a template.',
+                      style: TextStyle(color: Color(0xB8FFFFFF), fontSize: 14, height: 1.65),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
       );
-    },
-  );
+}
+
+class _ProgressHeading extends StatelessWidget {
+  const _ProgressHeading();
+  @override
+  Widget build(BuildContext context) => const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('YOUR HEALING JOURNEY', style: TextStyle(color: NwsbColors.goldLight, letterSpacing: 2.5, fontSize: 11, fontWeight: FontWeight.w700)),
+          SizedBox(height: 8),
+          Text('What your practice has added up to.', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700)),
+          SizedBox(height: 6),
+          Text('Every session, word, and day is recorded here.', style: TextStyle(color: Color(0x99FFFFFF), fontSize: 13)),
+        ],
+      );
+}
+
+class _ProgressPanel extends StatelessWidget {
+  const _ProgressPanel({required this.title, required this.child});
+  final String title;
+  final Widget child;
+  @override
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: const Color(0x0DFFFFFF),
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: const Color(0x24FFFFFF)),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(title, style: const TextStyle(color: NwsbColors.goldLight, letterSpacing: 2, fontSize: 10, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 14),
+          child,
+        ]),
+      );
 }
 
 class _ProgressStat extends StatelessWidget {
@@ -1719,10 +1819,90 @@ class _ProgressStat extends StatelessWidget {
   final String value;
   final String label;
   @override
-  Widget build(BuildContext context) => Container(
-    margin: const EdgeInsets.only(bottom: 12),
-    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
-    decoration: BoxDecoration(color: const Color(0x14FFFFFF), borderRadius: BorderRadius.circular(22), border: Border.all(color: const Color(0x24FFFFFF))),
-    child: Row(children: [Text(value, style: const TextStyle(color: NwsbColors.goldLight, fontSize: 26, fontWeight: FontWeight.w800)), const SizedBox(width: 16), Expanded(child: Text(label, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600)))]),
-  );
+  Widget build(BuildContext context) => SizedBox(
+        width: 140,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+          decoration: BoxDecoration(
+            color: const Color(0x14FFFFFF),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: const Color(0x24FFFFFF)),
+          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(value, style: const TextStyle(color: NwsbColors.goldLight, fontSize: 25, fontWeight: FontWeight.w800)),
+            const SizedBox(height: 4),
+            Text(label, style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12)),
+          ]),
+        ),
+      );
+}
+
+class _WeekGrid extends StatelessWidget {
+  const _WeekGrid({required this.streak});
+  final int streak;
+  @override
+  Widget build(BuildContext context) {
+    const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+      for (var i = 0; i < days.length; i++)
+        Column(children: [
+          Container(
+            width: 32,
+            height: 32,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: i >= days.length - (streak.clamp(0, 7)) ? NwsbColors.goldLight : const Color(0x14FFFFFF),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Text(days[i], style: TextStyle(color: i >= days.length - streak.clamp(0, 7) ? NwsbColors.deep : Colors.white54, fontWeight: FontWeight.w700)),
+          ),
+          const SizedBox(height: 6),
+          Text(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][i], style: const TextStyle(color: Colors.white54, fontSize: 10)),
+        ]),
+    ]);
+  }
+}
+
+class _MilestoneGrid extends StatelessWidget {
+  const _MilestoneGrid({required this.streak, required this.sessions, required this.words});
+  final int streak;
+  final int sessions;
+  final int words;
+  @override
+  Widget build(BuildContext context) {
+    final items = [
+      ('◎', 'First Session', 'Complete 1 session', sessions >= 1),
+      ('◈', '3-Day Streak', 'Practice 3 days in a row', streak >= 3),
+      ('◉', 'Weekly Rhythm', '7 consecutive days', streak >= 7),
+      ('◆', '21-Day Resonance', '21 days unbroken', streak >= 21),
+      ('◇', '5 Words Activated', 'Practice 5 unique words', words >= 5),
+      ('⬡', '10 Words Activated', 'Practice 10 unique words', words >= 10),
+      ('▲', 'Deep Practitioner', '21 sessions completed', sessions >= 21),
+      ('★', 'Century Mark', '100 sessions logged', sessions >= 100),
+    ];
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: items.length,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, crossAxisSpacing: 10, mainAxisSpacing: 10, childAspectRatio: 1.35),
+      itemBuilder: (_, i) {
+        final m = items[i];
+        return Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: m.$4 ? const Color(0x0DE8D5A3) : const Color(0x0DFFFFFF),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: m.$4 ? const Color(0x55E8D5A3) : const Color(0x24FFFFFF)),
+          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(m.$1, style: TextStyle(color: m.$4 ? NwsbColors.goldLight : Colors.white38, fontSize: 18)),
+            const Spacer(),
+            Text(m.$2, style: TextStyle(color: m.$4 ? NwsbColors.goldLight : Colors.white70, fontSize: 11, fontWeight: FontWeight.w600)),
+            const SizedBox(height: 3),
+            Text(m.$3, style: const TextStyle(color: Colors.white54, fontSize: 9)),
+          ]),
+        );
+      },
+    );
+  }
 }
