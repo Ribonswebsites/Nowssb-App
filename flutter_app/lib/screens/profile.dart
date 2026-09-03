@@ -246,9 +246,26 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
               SizedBox(
                 width: 132,
                 child: Stack(children: [
-                  Positioned.fill(child: Container(decoration: BoxDecoration(color: const Color(0xFF0A0A0A), image: _photo == null ? null : DecorationImage(image: FileImage(_photo!), fit: BoxFit.cover)))),
+                  const Positioned.fill(child: ColoredBox(color: Color(0xFF0A0A0A))),
                   Positioned.fill(child: Transform.scale(scale: 1.16, child: Opacity(opacity: .98, child: Image.asset('assets/profile_source/img-ring.png', fit: BoxFit.cover, alignment: const Alignment(.0, -.16))))),
-                  Positioned.fill(child: Center(child: Text(_photo == null ? (_nameController.text.trim().isEmpty ? 'P' : _nameController.text.trim().substring(0, 1)).toUpperCase() : '', style: const TextStyle(fontFamily: _mono, fontSize: 24, fontWeight: FontWeight.w600, color: _text)))),
+                  Positioned(
+                    top: 18,
+                    right: 17,
+                    child: Container(
+                      width: 76,
+                      height: 76,
+                      clipBehavior: Clip.antiAlias,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: const Color(0xFF0A0A0A),
+                        border: Border.all(color: const Color(0x99E8D5A3), width: 1.2),
+                        boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 8, offset: Offset(2, 3))],
+                      ),
+                      child: _photo == null
+                          ? Center(child: Text((_nameController.text.trim().isEmpty ? 'P' : _nameController.text.trim().substring(0, 1)).toUpperCase(), style: const TextStyle(fontFamily: _mono, fontSize: 24, fontWeight: FontWeight.w600, color: _text)))
+                          : Image.file(_photo!, fit: BoxFit.cover),
+                    ),
+                  ),
                   Positioned(right: 10, bottom: 10, child: _circleButton(asset: 'assets/icons/icon_02.svg', size: 28, onTap: _pickPhoto)),
                 ]),
               ),
