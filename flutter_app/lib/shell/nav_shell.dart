@@ -4,6 +4,7 @@ library;
 import 'package:flutter/material.dart';
 import '../theme/tokens.dart';
 import '../data/settings.dart';
+import '../data/content.dart';
 import '../screens/home_fashion.dart';
 import '../screens/home_normal.dart';
 import '../screens/library.dart';
@@ -92,6 +93,12 @@ class _NavShellState extends State<NavShell> {
   void _goToSlot(String id) {
     final tab = _primaryTab(id);
     if (tab != null) { _goToTab(tab); return; }
+    if (id == 'progress') {
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) => PracticeProgressScreen(words: Content.instance.library),
+      ));
+      return;
+    }
     Navigator.of(context).push(MaterialPageRoute(builder: (_) => const QuickAccessScreen()));
   }
 
