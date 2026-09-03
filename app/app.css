@@ -1055,3 +1055,15 @@ body:not(.fi-ready) #fashionHomeIntro{display:none!important;visibility:hidden!i
 #sub-my-progress .mp-insight-dot {
   border-radius: 50% !important;
 }
+
+/* My Progress: keep the final cards reachable above the device bottom edge. */
+#sub-my-progress #mpMainContent {
+  min-height: 0 !important;
+}
+#sub-my-progress #mpBody {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)) !important;
+  scroll-padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)) !important;
+  -webkit-overflow-scrolling: touch !important;
+}
