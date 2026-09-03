@@ -1796,6 +1796,49 @@ class _EmptyPanel extends StatelessWidget { const _EmptyPanel({required this.tit
 class _NativeFeedback extends StatelessWidget { const _NativeFeedback(); @override Widget build(BuildContext context)=>Container(padding:const EdgeInsets.all(16),decoration:BoxDecoration(color:const Color(0x0DFFFFFF),border:Border.all(color:const Color(0x24FFFFFF)),borderRadius:BorderRadius.circular(18)),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[const Text("What's working for you?",style:TextStyle(color:Colors.white70,fontSize:13)),const SizedBox(height:10),Wrap(spacing:7,runSpacing:7,children:['Morning routine','Evening session','Repeat mode','Listening mode','Word meaning','Phonetic guide'].map((x)=>_FeedbackChip(x)).toList()),const SizedBox(height:14),const Text("What's not working or feels off?",style:TextStyle(color:Colors.white70,fontSize:13)),const SizedBox(height:10),Wrap(spacing:7,runSpacing:7,children:['Too many words','Audio missing','Pronunciation unclear','App too slow'].map((x)=>_FeedbackChip(x)).toList())])); }
 class _FeedbackChip extends StatelessWidget { const _FeedbackChip(this.text); final String text; @override Widget build(BuildContext context)=>Container(padding:const EdgeInsets.symmetric(horizontal:11,vertical:8),decoration:BoxDecoration(color:const Color(0x0FFFFFFF),border:Border.all(color:const Color(0x33FFFFFF)),borderRadius:BorderRadius.circular(20)),child:Text(text,style:const TextStyle(color:Colors.white60,fontSize:10))); }
 
-class _Milestones extends StatelessWidget { const _Milestones({required this.streak,required this.sessions,required this.words}); final int streak,sessions,words; @override Widget build(BuildContext context){final a=[('◎','First Session','Complete 1 session',sessions>=1),('◈','3-Day Streak','Practice 3 days in a row',streak>=3),('◉','Weekly Rhythm','7 consecutive days',streak>=7),('◆','21-Day Resonance','21 days unbroken',streak>=21),('◇','5 Words Activated','Practice 5 unique words',words>=5),('⬡','10 Words Activated','Practice 10 unique words',words>=10),('▲','Deep Practitioner','21 sessions completed',sessions>=21),('★','Century Mark','100 sessions logged',sessions>=100)];return GridView.builder(shrinkWrap:true,physics:const NeverScrollableScrollPhysics(),itemCount:a.length,gridDelegate:const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount:2,crossAxisSpacing:10,mainAxisSpacing:10,childAspectRatio:1.3),itemBuilder:(_,i){final m=a[i];return Container(padding:const EdgeInsets.all(13),decoration:BoxDecoration(color:m.$4?const Color(0x0DE8D5A3):const Color(0x0DFFFFFF),border:Border.all(color:m.$4?const Color(0x55E8D5A3):const Color(0x24FFFFFF)),borderRadius:BorderRadius.circular(16)),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[Text(m.$1,style:TextStyle(color:m.$4?NwsbColors.goldLight:Colors.white38,fontSize:18)),const Spacer(),Text(m.$2,style:TextStyle(color:m.$4?NwsbColors.goldLight:Colors.white70,fontSize:11,fontWeight:FontWeight.w600)),const SizedBox(height:3),Text(m.$3,style:const TextStyle(color:Colors.white54,fontSize:9))]));}});}}
+class _Milestones extends StatelessWidget {
+  const _Milestones({required this.streak, required this.sessions, required this.words});
+  final int streak, sessions, words;
+  @override
+  Widget build(BuildContext context) {
+    final items = [
+      ('◎', 'First Session', 'Complete 1 session', sessions >= 1),
+      ('◈', '3-Day Streak', 'Practice 3 days in a row', streak >= 3),
+      ('◉', 'Weekly Rhythm', '7 consecutive days', streak >= 7),
+      ('◆', '21-Day Resonance', '21 days unbroken', streak >= 21),
+      ('◇', '5 Words Activated', 'Practice 5 unique words', words >= 5),
+      ('⬡', '10 Words Activated', 'Practice 10 unique words', words >= 10),
+      ('▲', 'Deep Practitioner', '21 sessions completed', sessions >= 21),
+      ('★', 'Century Mark', '100 sessions logged', sessions >= 100),
+    ];
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: items.length,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2, crossAxisSpacing: 10, mainAxisSpacing: 10, childAspectRatio: 1.3,
+      ),
+      itemBuilder: (_, i) {
+        final item = items[i];
+        final unlocked = item.$4;
+        return Container(
+          padding: const EdgeInsets.all(13),
+          decoration: BoxDecoration(
+            color: unlocked ? const Color(0x0DE8D5A3) : const Color(0x0DFFFFFF),
+            border: Border.all(color: unlocked ? const Color(0x55E8D5A3) : const Color(0x24FFFFFF)),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(item.$1, style: TextStyle(color: unlocked ? NwsbColors.goldLight : Colors.white38, fontSize: 18)),
+            const Spacer(),
+            Text(item.$2, style: TextStyle(color: unlocked ? NwsbColors.goldLight : Colors.white70, fontSize: 11, fontWeight: FontWeight.w600)),
+            const SizedBox(height: 3),
+            Text(item.$3, style: const TextStyle(color: Colors.white54, fontSize: 9)),
+          ]),
+        );
+      },
+    );
+  }
+}
 class _NativeBodyMap extends StatelessWidget { const _NativeBodyMap(); @override Widget build(BuildContext context)=>Container(padding:const EdgeInsets.all(14),decoration:BoxDecoration(color:const Color(0x0DFFFFFF),border:Border.all(color:const Color(0x24FFFFFF)),borderRadius:BorderRadius.circular(18)),child:Column(children:[SizedBox(height:290,child:SvgPicture.asset('assets/icons/bodymap.svg', fit: BoxFit.contain, placeholderBuilder: (_) => const Icon(Icons.accessibility_new, color: NwsbColors.goldLight, size: 150))),const Text('Your practiced words activate resonance pathways through the body.',textAlign:TextAlign.center,style:TextStyle(color:Colors.white54,fontSize:12,height:1.5))])); }
 class _NativeInsight extends StatelessWidget { const _NativeInsight(); @override Widget build(BuildContext context)=>Container(padding:const EdgeInsets.all(20),decoration:BoxDecoration(gradient:const LinearGradient(colors:[Color(0xD9060C18),Color(0xB80F1C37)]),border:Border.all(color:const Color(0x24C8E8F5)),borderRadius:BorderRadius.circular(18)),child:const Column(crossAxisAlignment:CrossAxisAlignment.start,children:[Row(children:[Text('•',style:TextStyle(color:NwsbColors.mist,fontSize:18)),SizedBox(width:8),Text('SHABDAPATHY · AI ANALYSIS',style:TextStyle(color:NwsbColors.mist,letterSpacing:2.5,fontSize:9,fontWeight:FontWeight.w700))]),SizedBox(height:14),Text('Complete your first practice session and a personal insight will appear here — built from your actual data, not a template.',style:TextStyle(color:Color(0xB8FFFFFF),fontSize:14,height:1.7))]));
