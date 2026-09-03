@@ -19,6 +19,7 @@ import '../theme/tokens.dart';
 import '../widgets/page_shell.dart';
 import 'fashion_plus.dart';
 import 'sound_library.dart';
+import 'quick_access.dart';
 
 class WidgetsPage extends StatefulWidget {
   const WidgetsPage({super.key});
@@ -99,6 +100,13 @@ class _WidgetsPageState extends State<WidgetsPage> {
               icon: Icons.auto_awesome_motion_outlined,
               go: () => Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => const FashionPlusScreen())),
+            ),
+            _Door(
+              title: 'Quick Access',
+              sub: 'Customize your bottom navigation bar',
+              icon: Icons.tune,
+              go: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const QuickAccessScreen())),
             ),
           ]),
         ),

@@ -10,6 +10,7 @@ import '../screens/library.dart';
 import '../screens/practice.dart';
 import '../screens/profile.dart';
 import '../screens/store.dart';
+import '../screens/quick_access.dart';
 import '../widgets/pool_hud.dart';
 
 class NavShell extends StatefulWidget {
@@ -68,13 +69,31 @@ class _NavShellState extends State<NavShell> {
     Settings.instance.setLastTab(tab);
   }
 
-  static const _tabs = [
-    ('Connect', Icons.groups_outlined),
-    ('Practice', Icons.headphones_outlined),
-    ('Library', Icons.menu_book_outlined),
-    ('Store', Icons.storefront_outlined),
-    ('Profile', Icons.person_outline),
-  ];
+  static const _navFeatures = <String, Map<String, String>>{
+    'connect': {'label': 'Connect', 'img': 'https://media.nowssb.com/migrated-images/ea559460014dd8d9_file_00000000b84c7209ab496862cacd6a7f_kagsie.png'},
+    'practice': {'label': 'Practice', 'img': 'https://media.nowssb.com/migrated-images/44ed38a222535b9c_38538b80-56d8-11f1-8fad-095787cce754_xam2bb.png'},
+    'library': {'label': 'Library', 'img': 'https://media.nowssb.com/migrated-images/62e5d0908e54a2a6_c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png'},
+    'store': {'label': 'Store', 'img': 'https://media.nowssb.com/migrated-images/86a1283688196499_ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png'},
+    'profile': {'label': 'Profile', 'img': 'https://media.nowssb.com/migrated-images/3979b9fa35b579e6_62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png'},
+    'progress': {'label': 'Progress', 'img': 'https://media.nowssb.com/migrated-images/0480c10b8a8d79dd_file_00000000ae607208aa51504989648920_ml2czc.png'},
+    'wordscience': {'label': 'Word Sci', 'img': 'https://media.nowssb.com/migrated-images/dd44cf9fc35b783c_file_0000000086d872089ce376674620d5f3_mtfftb.png'},
+    'meaningstore': {'label': 'Meaning', 'img': 'https://media.nowssb.com/migrated-images/1a5f669e63dbae9d_file_00000000854881fa9a548a68fae59c15_w1utya.png'},
+    'search': {'label': 'Search', 'img': 'https://media.nowssb.com/migrated-images/8d85320f63c3e176_file_00000000029c7208b5e915d9af2c480c_tuccwo.png'},
+    'cart': {'label': 'Cart', 'img': 'https://media.nowssb.com/migrated-images/311c26afee2bc52c_file_00000000f02c72088cd128f3f4b08af5_vskoom.png'},
+    'wishlist': {'label': 'Wishlist', 'img': 'https://media.nowssb.com/migrated-images/a74a9935fb237eb8_file_0000000055d8720895f7ba98c4a7bf4a_s2lzab.png'},
+    'routines': {'label': 'Routines', 'img': 'https://media.nowssb.com/migrated-images/307233cd22669455_file_00000000f740820ba6aaa761133e8889_fitm0p.png'},
+    'chat': {'label': 'Chat', 'img': 'https://media.nowssb.com/migrated-images/db15f3026ea179dc_1ae1b990-5bf2-11f1-8248-b91d5cd919c2_z3xi3j.png'},
+    'ai': {'label': 'AI Rx', 'img': 'https://media.nowssb.com/migrated-images/41c9ed21b2822c90_file_0000000062a882089abd27eb90ea3945_ngqyu6.png'},
+    'streak': {'label': 'Streak', 'img': 'https://media.nowssb.com/migrated-images/f82047a0e727766b_file_0000000010fc820891f9e15a38316d2b_ffffhq.png'},
+    'settings': {'label': 'Settings', 'img': 'https://media.nowssb.com/migrated-images/523b5889d13cb14a_260480b0-56d8-11f1-8fad-095787cce754_rz6zbi.png'},
+    'everything': {'label': 'Everything', 'img': 'https://media.nowssb.com/migrated-images/47f9e2c9fad5a78f_file_00000000be547207aaa56f43cfef4f67_nxhvw0.png'},
+  };
+  int? _primaryTab(String id) => const {'connect': 0, 'practice': 1, 'library': 2, 'store': 3, 'profile': 4}[id];
+  void _goToSlot(String id) {
+    final tab = _primaryTab(id);
+    if (tab != null) { _goToTab(tab); return; }
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => const QuickAccessScreen()));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -166,49 +185,63 @@ class _NavShellState extends State<NavShell> {
                   constraints: const BoxConstraints(maxWidth: double.infinity),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 14),
-                    child: Container(
-                      height: 66,
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.circular(33),
-                ),
-                child: Row(
-                  children: [
-                    for (var i = 0; i < _tabs.length; i++)
-                      Expanded(
-                        child: GestureDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onTap: () => _goToTab(i),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                _tabs[i].$2,
-                                size: 22,
-                                color: i == _i
-                                    ? NwsbColors.goldLight
-                                    : const Color(0x99FFFFFF),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                _tabs[i].$1,
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: i == _i
-                                      ? FontWeight.w700
-                                      : FontWeight.w400,
-                                  color: i == _i
-                                      ? NwsbColors.goldLight
-                                      : const Color(0x99FFFFFF),
+                    child: Builder(builder: (context) {
+                      final settings = Settings.instance;
+                      final radius = settings.navShape == 'pill'
+                          ? 40.0
+                          : settings.navShape == 'rect'
+                              ? (settings.navCorner == 'rounded' ? 20.0 : 2.0)
+                              : 33.0;
+                      final background = settings.navColor == 'black'
+                          ? Colors.black
+                          : const Color(0xDD182033);
+                      return Container(
+                        height: 66,
+                        decoration: BoxDecoration(
+                          color: background,
+                          borderRadius: BorderRadius.circular(radius),
+                          border: Border.all(color: const Color(0x22FFFFFF)),
+                        ),
+                        child: Row(children: [
+                          for (final id in settings.navSlots)
+                            Expanded(
+                              child: GestureDetector(
+                                behavior: HitTestBehavior.opaque,
+                                onTap: () => _goToSlot(id),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Image.network(
+                                      _navFeatures[id]?['img'] ?? '',
+                                      width: 28,
+                                      height: 28,
+                                      fit: BoxFit.contain,
+                                      errorBuilder: (_, __, ___) => Icon(
+                                        Icons.circle_outlined,
+                                        size: 22,
+                                        color: id == 'connect' || _primaryTab(id) == _i
+                                            ? NwsbColors.goldLight
+                                            : const Color(0x99FFFFFF),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 3),
+                                    Text(
+                                      _navFeatures[id]?['label'] ?? id,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: 9,
+                                        fontWeight: _primaryTab(id) == _i ? FontWeight.w700 : FontWeight.w400,
+                                        color: _primaryTab(id) == _i ? NwsbColors.goldLight : const Color(0x99FFFFFF),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
-                        ),
-                      ),
-                  ],
-                    ),
-                  ),
+                            ),
+                        ]),
+                      );
+                    }),
                 ),
               ),
             ),

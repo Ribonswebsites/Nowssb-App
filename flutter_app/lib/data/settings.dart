@@ -36,6 +36,10 @@ class Settings extends ChangeNotifier {
   static const _kNowPlaying = 'nwsb_player_now_playing';
   static const _kLastTab = 'nwsb_last_tab';
   static const _kLaunched = 'nwsb_has_launched';
+  static const _kNavShape = 'nwsb_nav_shape';
+  static const _kNavColor = 'nwsb_nav_color';
+  static const _kNavCorner = 'nwsb_nav_rect_corner';
+  static const _kNavSlots = 'nwsb_nav_slots';
 
   /// One selected Fashion Plus film plays behind every primary page while
   /// motion mode is enabled.
@@ -81,6 +85,10 @@ class Settings extends ChangeNotifier {
   String _nowPlaying = 'On';
   int _lastTab = 0;
   bool _showSplash = true;
+  String _navShape = 'default';
+  String _navColor = 'glass';
+  String _navCorner = 'rounded';
+  List<String> _navSlots = ['connect', 'practice', 'library', 'store', 'profile'];
 
   /// Motion mode: do page backgrounds play, or hold their first frame?
   bool get fashionPlus => _fashionPlus;
@@ -105,6 +113,10 @@ class Settings extends ChangeNotifier {
   String get nowPlaying => _nowPlaying;
   int get lastTab => _lastTab;
   bool get showSplash => _showSplash;
+  String get navShape => _navShape;
+  String get navColor => _navColor;
+  String get navCorner => _navCorner;
+  List<String> get navSlots => List.unmodifiable(_navSlots);
 
   Future<void> load() async {
     try {
@@ -127,6 +139,14 @@ class Settings extends ChangeNotifier {
       _playlist = p.getString(_kPlaylist) ?? _playlist;
       _nowPlaying = p.getString(_kNowPlaying) ?? _nowPlaying;
       _lastTab = _validIndex(p.getInt(_kLastTab) ?? 0, 5, fallback: 0);
+      final shape = p.getString(_kNavShape);
+      final color = p.getString(_kNavColor);
+      final corner = p.getString(_kNavCorner);
+      if (['default', 'pill', 'rect'].contains(shape)) _navShape = shape!;
+      if (['glass', 'black'].contains(color)) _navColor = color!;
+      if (['rounded', 'edge'].contains(corner)) _navCorner = corner!;
+      final slots = p.getStringList(_kNavSlots);
+      if (slots != null && slots.isNotEmpty) _navSlots = slots.take(5).toList();
       _showSplash = !(p.getBool(_kLaunched) ?? false);
       await p.setBool(_kLaunched, true);
       notifyListeners();
@@ -188,6 +208,28 @@ class Settings extends ChangeNotifier {
     await _saveInt(_kLastTab, _lastTab);
     notifyListeners();
   }
+
+  Future<void> setNavConfig({String? shape, String? color, String? corner, List<String>? slots}) async {
+    if (shape != null) _navShape = shape;
+    if (color != null) _navColor = color;
+    if (corner != null) _navCorner = corner;
+    if (slots != null && slots.isNotEmpty) _navSlots = slots.take(5).toList();
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.setString(_kNavShape, _navShape);
+      await p.setString(_kNavColor, _navColor);
+      await p.setString(_kNavCorner, _navCorner);
+      await p.setStringList(_kNavSlots, _navSlots);
+    } catch (_) {}
+    notifyListeners();
+  }
+
+  Future<void> resetNavConfig() => setNavConfig(
+        shape: 'default',
+        color: 'glass',
+        corner: 'rounded',
+        slots: ['connect', 'practice', 'library', 'store', 'profile'],
+      );
 
   /// A tab does not change the selected asset, but it should still make the
   /// background arrive gently rather than appearing as a hard cut.
