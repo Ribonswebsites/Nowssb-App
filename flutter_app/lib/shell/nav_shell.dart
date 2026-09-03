@@ -95,7 +95,7 @@ class _NavShellState extends State<NavShell> {
     if (tab != null) { _goToTab(tab); return; }
     if (id == 'progress') {
       Navigator.of(context).push(MaterialPageRoute(
-        builder: (_) => PracticeProgressScreen(words: Content.instance.library),
+        builder: (_) => PracticeProgressScreen(words: ContentStore.instance.library),
       ));
       return;
     }
