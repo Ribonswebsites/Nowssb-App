@@ -1035,3 +1035,23 @@ body:not(.fi-ready) #fashionHomeIntro{display:none!important;visibility:hidden!i
 /* Nuclear lock: sub-screens are fully invisible unless .open */
 .sub-screen:not(.open){visibility:hidden!important;pointer-events:none!important;}
 .sub-screen.open{visibility:visible!important;pointer-events:auto!important;}
+
+/* My Progress: all card-like and rectangular blocks use soft rounded corners. */
+#sub-my-progress .sub-header,
+#sub-my-progress .sub-body,
+#sub-my-progress .sl-intro-page,
+#sub-my-progress .sl-intro-bg,
+#sub-my-progress .sl-intro-bottom,
+#sub-my-progress [class*="mp-"] {
+  border-radius: 20px !important;
+}
+#sub-my-progress .mp-chip,
+#sub-my-progress .mp-submit-btn,
+#sub-my-progress .mp-feedback-textarea,
+#sub-my-progress .mp-feedback-saved {
+  border-radius: 16px !important;
+}
+#sub-my-progress .mp-lp-dot,
+#sub-my-progress .mp-insight-dot {
+  border-radius: 50% !important;
+}

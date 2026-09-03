@@ -1722,7 +1722,7 @@ class _ProgressStat extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     margin: const EdgeInsets.only(bottom: 12),
     padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
-    decoration: BoxDecoration(color: const Color(0x14FFFFFF), borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0x24FFFFFF))),
+    decoration: BoxDecoration(color: const Color(0x14FFFFFF), borderRadius: BorderRadius.circular(22), border: Border.all(color: const Color(0x24FFFFFF))),
     child: Row(children: [Text(value, style: const TextStyle(color: NwsbColors.goldLight, fontSize: 26, fontWeight: FontWeight.w800)), const SizedBox(width: 16), Expanded(child: Text(label, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600)))]),
   );
 }
