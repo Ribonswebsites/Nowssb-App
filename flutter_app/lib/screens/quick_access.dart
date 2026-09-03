@@ -58,6 +58,35 @@ class _QuickAccessScreenState extends State<QuickAccessScreen> {
   Widget _section(String t)=>Padding(padding:const EdgeInsets.only(top:22,bottom:10),child:Text(t.toUpperCase(),style:const TextStyle(color:NwsbColors.goldLight,letterSpacing:2,fontSize:10,fontWeight:FontWeight.w700)));
   Widget _options(Map<String,String> values,String selected,ValueChanged<String> onTap)=>Wrap(spacing:8,runSpacing:8,children:values.entries.map((e)=>ChoiceChip(label:Text(e.value),selected:e.key==selected,onSelected:(_)=>onTap(e.key),selectedColor:NwsbColors.goldLight,backgroundColor:const Color(0x14FFFFFF),labelStyle:TextStyle(color:e.key==selected?NwsbColors.deep:Colors.white70,fontSize:11),side:const BorderSide(color:Color(0x24FFFFFF)))).toList());
   Widget _preview(){final radius=shape=='pill'?40.0:shape=='rect'?(corner=='rounded'?20.0:2.0):28.0;final bg=color=='black'?Colors.black:const Color(0xDD182033);return Container(padding:const EdgeInsets.all(10),decoration:BoxDecoration(color:const Color(0x0DFFFFFF),borderRadius:BorderRadius.circular(16)),child:Container(height:82,padding:const EdgeInsets.symmetric(horizontal:8),decoration:BoxDecoration(color:bg,borderRadius:BorderRadius.circular(radius),border:Border.all(color:const Color(0x33FFFFFF))),child:Row(children:[for(final id in slots)Expanded(child:Column(mainAxisAlignment:MainAxisAlignment.center,children:[_icon(getById(id)['img']!,28),const SizedBox(height:4),Text(getById(id)['label']!,maxLines:1,overflow:TextOverflow.ellipsis,style:const TextStyle(color:Colors.white70,fontSize:9))]))])));}
-  Widget _grid(List<String> ids)=>GridView.count(shrinkWrap:true,physics:const NeverScrollableScrollPhysics(),crossAxisCount:3,mainAxisSpacing:9,crossAxisSpacing:9,childAspectRatio:1.05,children:[for(final id in ids){final f=getById(id);final selected=slots.contains(id);GestureDetector(onTap:()=>toggle(id),child:Container(decoration:BoxDecoration(color:selected?const Color(0x1AE8D5A3):const Color(0x0DFFFFFF),borderRadius:BorderRadius.circular(16),border:Border.all(color:selected?const Color(0x66E8D5A3):const Color(0x24FFFFFF))),child:Stack(children:[Center(child:Column(mainAxisAlignment:MainAxisAlignment.center,children:[_icon(f['img']!,30),const SizedBox(height:5),Text(f['label']!,style:TextStyle(color:selected?NwsbColors.goldLight:Colors.white70,fontSize:10,fontWeight:selected?FontWeight.w700:FontWeight.w400))])),if(selected)Positioned(top:6,right:7,child:Text('${slots.indexOf(id)+1}',style:const TextStyle(color:NwsbColors.goldLight,fontSize:11,fontWeight:FontWeight.w800)))]))}]);
+  Widget _grid(List<String> ids) => GridView.count(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        crossAxisCount: 3,
+        mainAxisSpacing: 9,
+        crossAxisSpacing: 9,
+        childAspectRatio: 1.05,
+        children: ids.map((id) {
+          final f = getById(id);
+          final selected = slots.contains(id);
+          return GestureDetector(
+            onTap: () => toggle(id),
+            child: Container(
+              decoration: BoxDecoration(
+                color: selected ? const Color(0x1AE8D5A3) : const Color(0x0DFFFFFF),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: selected ? const Color(0x66E8D5A3) : const Color(0x24FFFFFF)),
+              ),
+              child: Stack(children: [
+                Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  _icon(f['img']!, 30),
+                  const SizedBox(height: 5),
+                  Text(f['label']!, style: TextStyle(color: selected ? NwsbColors.goldLight : Colors.white70, fontSize: 10, fontWeight: selected ? FontWeight.w700 : FontWeight.w400)),
+                ])),
+                if (selected) Positioned(top: 6, right: 7, child: Text('${slots.indexOf(id) + 1}', style: const TextStyle(color: NwsbColors.goldLight, fontSize: 11, fontWeight: FontWeight.w800))),
+              ]),
+            ),
+          );
+        }).toList(),
+      );
   Widget _icon(String url,double size)=>Image.network(url,width:size,height:size,fit:BoxFit.contain,errorBuilder:(_,__,___)=>Icon(Icons.circle_outlined,size:size,color:Colors.white54));
 }
