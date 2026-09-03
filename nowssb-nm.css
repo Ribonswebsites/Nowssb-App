@@ -16015,3 +16015,30 @@ a:active,
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
+
+/* Tablet responsive layout: use the full viewport in portrait and landscape. */
+@media (min-width: 600px) {
+  html, body {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    overflow-x: hidden !important;
+  }
+  body > .screen,
+  body > .sub-screen,
+  body > #ig-bottomnav,
+  body > #ig-store-subtabs,
+  body > #profile-subnav {
+    width: 100vw !important;
+    max-width: none !important;
+    left: 0 !important;
+    right: 0 !important;
+  }
+  .screen > .home-body,
+  .sub-screen > .sub-body,
+  .sub-screen > .sub-header,
+  #home-nm > .nm-wrap {
+    width: 100% !important;
+    max-width: none !important;
+  }
+}

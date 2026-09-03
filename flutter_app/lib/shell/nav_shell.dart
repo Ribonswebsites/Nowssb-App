@@ -163,7 +163,7 @@ class _NavShellState extends State<NavShell> {
               top: false,
               child: Center(
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 760),
+                  constraints: const BoxConstraints(maxWidth: double.infinity),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 14),
                     child: Container(

@@ -187,7 +187,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
             bottom: false,
             child: Center(
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 460),
+                constraints: const BoxConstraints(maxWidth: double.infinity),
                 child: ListView(
                   padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
                   children: [
