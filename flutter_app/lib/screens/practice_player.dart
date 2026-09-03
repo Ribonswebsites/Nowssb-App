@@ -1702,8 +1702,8 @@ class _PracticeProgressScreenState extends State<PracticeProgressScreen> {
       backgroundColor: Colors.black,
       body: Stack(children: [
         Positioned.fill(
-          child: Image.network(
-            'https://media.nowssb.com/migrated-images/dacda2a3a19c8f91_file_000000004738820ea48974114d0c6926_pxjrbc.png',
+          child: Image.asset(
+            'assets/profile_source/img-progress.png',
             fit: BoxFit.cover,
             errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF101218)),
           ),
