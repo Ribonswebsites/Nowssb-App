@@ -16045,9 +16045,9 @@ a:active,
 
 /* Fashion Customize experience banner: the announcement appears before the
    customization panel, then exits left to reveal the controls. */
-.customize-experience-banner{width:100%;min-height:96px;margin:16px 0 10px;padding:18px 18px 18px 22px;display:flex;align-items:flex-end;justify-content:space-between;box-sizing:border-box;background:#000;border:1px solid rgba(255,255,255,.16);border-radius:18px;overflow:hidden;cursor:pointer;}
+.customize-experience-banner{width:100%;min-height:96px;margin:16px 0 10px;padding:18px 18px 18px 22px;display:flex!important;visibility:visible!important;align-items:flex-end;justify-content:space-between;box-sizing:border-box;background:#000!important;border:1px solid rgba(255,255,255,.16);border-radius:18px;overflow:hidden;cursor:pointer;animation:customizeExperienceSlideOut 1200ms cubic-bezier(.7,0,.2,1) 5000ms both;}
 .customize-experience-copy{color:#fff;font-size:25px;line-height:1.08;font-weight:700;letter-spacing:-.3px;}
 .customize-experience-arrow{width:44px;height:44px;flex:0 0 44px;display:grid;place-items:center;border-radius:50%;background:#fff;}
 .customize-experience-arrow svg{width:22px;height:22px;}
-.customize-experience-banner.is-exiting{animation:customizeExperienceSlideOut 1200ms cubic-bezier(.7,0,.2,1) 1800ms both;}
+.customize-experience-banner.is-exiting{animation:customizeExperienceSlideOut 1200ms cubic-bezier(.7,0,.2,1) 5000ms both;}
 @keyframes customizeExperienceSlideOut{0%{transform:translateX(0);opacity:1}72%{transform:translateX(-110%);opacity:1}100%{transform:translateX(-110%);opacity:0;visibility:hidden}}
