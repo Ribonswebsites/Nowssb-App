@@ -1686,9 +1686,64 @@ const _playerThemes = <_PlayerTheme>[
   _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/28b7b32c97232472_grok_image_1782796933792_qwzfgx.jpg', video: 'https://nowssb.com/assets/videos/39905d27bd778cff_grok_video_2026-06-30-10-52-20_zk87yh.mp4', accent: Color(0xFF8FE6FF)),
 ];
 
-class PracticeProgressScreen extends StatelessWidget {
+class PracticeProgressScreen extends StatefulWidget {
   const PracticeProgressScreen({super.key, required this.words});
   final List<Word> words;
+
+  @override
+  State<PracticeProgressScreen> createState() => _PracticeProgressScreenState();
+}
+
+class _PracticeProgressScreenState extends State<PracticeProgressScreen> {
+  bool _intro = true;
+
+  Widget _introPage(PracticeProgress p) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Stack(children: [
+        Positioned.fill(
+          child: Image.network(
+            'https://media.nowssb.com/migrated-images/dacda2a3a19c8f91_file_000000004738820ea48974114d0c6926_pxjrbc.png',
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF101218)),
+          ),
+        ),
+        Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.black.withOpacity(.18), Colors.black.withOpacity(.92)], stops: const [0.18, .9])))),
+        SafeArea(child: Padding(
+          padding: const EdgeInsets.fromLTRB(22, 18, 22, 28),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(children: [
+              IconButton(onPressed: () => Navigator.of(context).pop(), icon: const Icon(Icons.arrow_back, color: Colors.white70, size: 19)),
+              const Spacer(),
+              const Text('HEALING JOURNEY', style: TextStyle(color: Colors.white70, fontSize: 10, letterSpacing: 1.5)),
+            ]),
+            const Spacer(),
+            const Text('MY PROGRESS', style: TextStyle(color: NwsbColors.goldLight, fontSize: 11, letterSpacing: 2.4, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 12),
+            const Text('Your\npractice.\nYour proof.', style: TextStyle(color: Colors.white, fontSize: 42, height: .98, fontWeight: FontWeight.w700, letterSpacing: -1.6)),
+            const SizedBox(height: 20),
+            Container(height: 1, color: Colors.white24),
+            const SizedBox(height: 18),
+            const Text("Every session you complete is recorded here. Your streak, the words you've activated, the organs you've reached — all real, all yours.", style: TextStyle(color: Colors.white70, fontSize: 14, height: 1.5)),
+            const SizedBox(height: 20),
+            Row(children: [
+              Text('${p.streak}', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700)), const Text(' day streak', style: TextStyle(color: Colors.white60, fontSize: 12)),
+              const Padding(padding: EdgeInsets.symmetric(horizontal: 10), child: Text('·', style: TextStyle(color: Colors.white54))),
+              Text('${p.totalSessions}', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700)), const Text(' sessions', style: TextStyle(color: Colors.white60, fontSize: 12)),
+              const Padding(padding: EdgeInsets.symmetric(horizontal: 10), child: Text('·', style: TextStyle(color: Colors.white54))),
+              Text('${p.uniqueWords}', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700)), const Text(' words', style: TextStyle(color: Colors.white60, fontSize: 12)),
+            ]),
+            const SizedBox(height: 24),
+            SizedBox(width: double.infinity, child: OutlinedButton(
+              onPressed: () => setState(() => _intro = false),
+              style: OutlinedButton.styleFrom(side: const BorderSide(color: Color(0x66C8E8F5)), padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
+              child: const Row(mainAxisAlignment: MainAxisAlignment.center, children: [Text('VIEW MY PROGRESS', style: TextStyle(color: Color(0xD9C8E8F5), fontSize: 12, letterSpacing: 1.5, fontWeight: FontWeight.w700)), SizedBox(width: 10), Icon(Icons.arrow_forward, color: Color(0xD9C8E8F5), size: 17)]),
+            )),
+          ]),
+        )),
+      ]),
+    );
+  }
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
@@ -1696,6 +1751,7 @@ class PracticeProgressScreen extends StatelessWidget {
         builder: (context, _) {
           final p = PracticeProgress.instance;
           final uniqueWords = p.uniqueWords;
+          if (_intro) return _introPage(p);
           return Scaffold(
             backgroundColor: NwsbColors.deep,
             appBar: AppBar(
@@ -1714,7 +1770,7 @@ class PracticeProgressScreen extends StatelessWidget {
                 _WebsiteWeek(streak: p.streak),
                 if (p.lastPracticed != null) _LastPracticed(value: p.lastPracticed!),
                 const _WebsiteSectionLabel('Recent Sessions'),
-                _RecentSessions(sessions: p.sessionsSnapshot, words: words),
+                _RecentSessions(sessions: p.sessionsSnapshot, words: widget.words),
                 const _WebsiteSectionLabel('Your Feedback'),
                 const _NativeFeedback(),
                 const _WebsiteSectionLabel('Milestones'),
