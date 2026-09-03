@@ -9,6 +9,7 @@ import '../screens/home_fashion.dart';
 import '../screens/home_normal.dart';
 import '../screens/library.dart';
 import '../screens/practice.dart';
+import '../screens/practice_player.dart';
 import '../screens/profile.dart';
 import '../screens/store.dart';
 import '../screens/quick_access.dart';
