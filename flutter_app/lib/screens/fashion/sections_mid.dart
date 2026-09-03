@@ -15,6 +15,9 @@ import '../../media/nwsb_video.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/home_skin.dart';
 import '../../widgets/home_parts.dart';
+import '../quick_access.dart';
+import '../fashion_plus.dart';
+import '../widgets_page.dart';
 
 /// 7 · tiles — index.html:1939. The tip rail, then four tiles two-up.
 class FashTiles extends StatelessWidget {
@@ -612,11 +615,11 @@ class FashCustomize extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SectionPane(
-      child: GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: Row(
-          children: [
+      child: Column(children: [
+        GestureDetector(
+          onTap: onTap,
+          behavior: HitTestBehavior.opaque,
+          child: Row(children: [
             Container(
               width: 46,
               height: 46,
@@ -649,11 +652,42 @@ class FashCustomize extends StatelessWidget {
               ),
             ),
             const Icon(Icons.chevron_right, size: 20, color: Color(0xB3FFFFFF)),
-          ],
+          ]),
         ),
-      ),
+        const SizedBox(height: 16),
+        _FashionCustomizeRow(title: 'Themes', sub: 'Black Edition', icon: Icons.grid_view_rounded, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const WidgetsPage()))),
+        _FashionCustomizeRow(title: 'Background', sub: 'Fashion backdrop', image: 'https://media.nowssb.com/migrated-images/cfc84fc5478b4b63_file_00000000b11472098a225d3703b04a60_phr6ph.png', icon: Icons.wallpaper_rounded, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FashionPlusScreen()))),
+        _FashionCustomizeRow(title: 'Start Image', sub: 'Art behind the start', image: 'https://media.nowssb.com/migrated-images/5e8a9fdb18e034ec_file_000000009f10820bb6872a5ed8007148_pvqjaa.png', icon: Icons.image_outlined, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FashionPlusScreen()))),
+        _FashionCustomizeRow(title: 'Quick Access', sub: 'Bottom nav bar', image: 'https://media.nowssb.com/migrated-images/272b820a002190fe_file_000000002cf4820b865caf6fc0554959_k7drqx.png', icon: Icons.apps_rounded, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const QuickAccessScreen()))),
+      ]),
     );
   }
+}
+
+class _FashionCustomizeRow extends StatelessWidget {
+  const _FashionCustomizeRow({required this.title, required this.sub, required this.icon, required this.onTap, this.image});
+  final String title, sub;
+  final IconData icon;
+  final String? image;
+  final VoidCallback onTap;
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0x18FFFFFF))),
+          child: Row(children: [
+            Container(width: 48, height: 48, decoration: BoxDecoration(color: const Color(0x0FFFFFFF), borderRadius: BorderRadius.circular(15), border: Border.all(color: const Color(0x33FFFFFF))), child: image == null ? Icon(icon, color: Colors.white, size: 24) : ClipRRect(borderRadius: BorderRadius.circular(14), child: Image.network(image!, fit: BoxFit.cover, errorBuilder: (_, __, ___) => Icon(icon, color: Colors.white, size: 24)))),
+            const SizedBox(width: 16),
+            Container(width: 1, height: 34, color: const Color(0x24FFFFFF)),
+            const SizedBox(width: 16),
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w700)), const SizedBox(height: 3), Text(sub, style: const TextStyle(color: Color(0x8CFFFFFF), fontSize: 13))])),
+            Container(width: 42, height: 42, decoration: BoxDecoration(color: const Color(0x14FFFFFF), shape: BoxShape.circle, border: Border.all(color: const Color(0x2FFFFFFF))), child: const Icon(Icons.arrow_forward, color: Colors.white70, size: 20)),
+          ]),
+        ),
+      );
 }
 
 /// 11 · fashplus — index.html:2069. `.fps-mini`. The third line reports the
