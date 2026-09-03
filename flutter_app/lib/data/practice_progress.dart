@@ -50,6 +50,26 @@ class PracticeProgress extends ChangeNotifier {
 
   int get totalSessions => _sessions.length;
 
+  List<Map<String, dynamic>> get sessionsSnapshot => _sessions.values
+      .map((session) => Map<String, dynamic>.from(session))
+      .toList()
+    ..sort((a, b) => '${b['completedAt'] ?? b['date']}'.compareTo('${a['completedAt'] ?? a['date']}'));
+
+  int get uniqueWords => _sessions.values
+      .map((session) => '${session['word'] ?? ''}')
+      .where((word) => word.isNotEmpty)
+      .toSet()
+      .length;
+
+  String? get lastPracticed {
+    final dates = _sessions.values
+        .map((session) => '${session['date'] ?? ''}')
+        .where((date) => date.isNotEmpty)
+        .toList()
+      ..sort();
+    return dates.isEmpty ? null : dates.last;
+  }
+
   int get todaySessions {
     final today = _day(DateTime.now());
     return _sessions.values.where((session) => session['date'] == today).length;
