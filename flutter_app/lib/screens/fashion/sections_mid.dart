@@ -614,8 +614,10 @@ class FashCustomize extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SectionPane(
-      child: Column(children: [
+    return Column(children: [
+      _CustomizeExperienceBanner(onTap: onTap),
+      SectionPane(
+        child: Column(children: [
         GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
@@ -659,9 +661,46 @@ class FashCustomize extends StatelessWidget {
         _FashionCustomizeRow(title: 'Background', sub: 'Fashion backdrop', image: 'https://media.nowssb.com/migrated-images/cfc84fc5478b4b63_file_00000000b11472098a225d3703b04a60_phr6ph.png', icon: Icons.wallpaper_rounded, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FashionPlusScreen()))),
         _FashionCustomizeRow(title: 'Start Image', sub: 'Art behind the start', image: 'https://media.nowssb.com/migrated-images/5e8a9fdb18e034ec_file_000000009f10820bb6872a5ed8007148_pvqjaa.png', icon: Icons.image_outlined, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FashionPlusScreen()))),
         _FashionCustomizeRow(title: 'Quick Access', sub: 'Bottom nav bar', image: 'https://media.nowssb.com/migrated-images/272b820a002190fe_file_000000002cf4820b865caf6fc0554959_k7drqx.png', icon: Icons.apps_rounded, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const QuickAccessScreen()))),
-      ]),
-    );
+        ]),
+      ),
+    ]);
   }
+}
+
+class _CustomizeExperienceBanner extends StatefulWidget {
+  const _CustomizeExperienceBanner({this.onTap});
+  final VoidCallback? onTap;
+  @override
+  State<_CustomizeExperienceBanner> createState() => _CustomizeExperienceBannerState();
+}
+
+class _CustomizeExperienceBannerState extends State<_CustomizeExperienceBanner> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 900));
+  late final Animation<Offset> _slide = Tween(begin: Offset.zero, end: const Offset(-1.1, 0)).animate(CurvedAnimation(parent: _controller, curve: const Cubic(.7, 0, .2, 1)));
+  @override
+  void initState() { super.initState(); Future<void>.delayed(const Duration(milliseconds: 1100), () { if (mounted) _controller.forward(); }); }
+  @override
+  void dispose() { _controller.dispose(); super.dispose(); }
+  @override
+  Widget build(BuildContext context) => SlideTransition(
+        position: _slide,
+        child: FadeTransition(
+          opacity: Tween(begin: 1.0, end: 0.0).animate(CurvedAnimation(parent: _controller, curve: const Interval(.72, 1, curve: Curves.easeOut))),
+          child: GestureDetector(
+            onTap: widget.onTap,
+            child: Container(
+              height: 96,
+              margin: const EdgeInsets.fromLTRB(16, 16, 16, 10),
+              padding: const EdgeInsets.fromLTRB(22, 18, 18, 18),
+              decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0x29FFFFFF))),
+              child: Row(crossAxisAlignment: CrossAxisAlignment.end, mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                const Text('Customized\nyou app experiance', style: TextStyle(color: Colors.white, fontSize: 25, height: 1.08, fontWeight: FontWeight.w700, letterSpacing: -.3)),
+                Container(width: 44, height: 44, decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle), child: const Icon(Icons.arrow_forward, color: Color(0xFF060C18), size: 22)),
+              ]),
+            ),
+          ),
+        ),
+      );
 }
 
 class _FashionCustomizeRow extends StatelessWidget {

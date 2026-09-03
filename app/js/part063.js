@@ -284,3 +284,27 @@
   else boot();
 
 })();
+
+/* The Fashion announcement is deliberately replayed on every viewport entry,
+   so returning to the customization section shows the banner again. */
+(function(){
+  function replay(el){
+    el.classList.remove('is-exiting');
+    void el.offsetWidth;
+    el.classList.add('is-exiting');
+  }
+  function init(){
+    var el=document.getElementById('customizeExperienceBanner');
+    if(!el) return;
+    replay(el);
+    if('IntersectionObserver' in window){
+      var seen=false;
+      new IntersectionObserver(function(entries){
+        var visible=entries[0].isIntersecting;
+        if(visible && !seen) replay(el);
+        seen=visible;
+      },{threshold:.35}).observe(el);
+    }
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
+})();
