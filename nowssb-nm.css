@@ -16051,3 +16051,17 @@ a:active,
 .customize-experience-arrow svg{width:22px;height:22px;}
 .customize-experience-banner.is-exiting{animation:customizeExperienceSlideOut 1200ms cubic-bezier(.7,0,.2,1) 5000ms both;}
 @keyframes customizeExperienceSlideOut{0%{transform:translateX(0);opacity:1}72%{transform:translateX(-110%);opacity:1}100%{transform:translateX(-110%);opacity:0;visibility:hidden}}
+/* My Progress FINAL Glass Orb scenes: first video belongs only to the intro; second belongs to the dashboard. */
+#sub-my-progress .mp-final-scene-one{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:.9;filter:brightness(.78) contrast(1.08);}
+#sub-my-progress #mpIntroPage .sl-intro-bg{display:none;}
+#sub-my-progress .mp-orb-copy{position:absolute;left:50%;top:30%;transform:translate(-50%,-50%);width:230px;text-align:center;z-index:2;color:#f5f5f3;text-shadow:0 2px 18px #000,0 1px 3px #000;pointer-events:none;}
+#sub-my-progress .mp-orb-kicker{font-size:9px;letter-spacing:.28em;font-weight:700;}
+#sub-my-progress .mp-orb-total{font-size:66px;line-height:.94;font-weight:280;letter-spacing:-.065em;margin:9px 0 6px;}
+#sub-my-progress .mp-orb-time{font-size:18px;font-weight:330;}
+#sub-my-progress .mp-orb-label{font-size:8px;letter-spacing:.24em;color:#bfc1c0;margin-top:6px;}
+#sub-my-progress #mpBody>.sub-section-label:first-child,#sub-my-progress #mpBody>.mp-greeting{margin-top:-70px;position:relative;z-index:3;}
+#sub-my-progress #mpIntroPage>*:not(.mp-final-scene-one){position:relative;z-index:1;}
+#sub-my-progress .mp-final-scene-two{height:250px;margin:0 0 16px;border:1px solid rgba(255,255,255,.13);border-radius:24px;overflow:hidden;position:relative;background:#020304;}
+#sub-my-progress .mp-final-scene-two video{width:100%;height:100%;object-fit:cover;display:block;filter:brightness(.8) contrast(1.08);}
+#sub-my-progress .mp-final-scene-two:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 35%,rgba(0,0,0,.72));pointer-events:none;}
+#sub-my-progress .mp-final-scene-two:before{content:"Your practice, moving forward.";position:absolute;z-index:1;left:18px;bottom:16px;color:#fff;font-size:16px;font-weight:600;}
