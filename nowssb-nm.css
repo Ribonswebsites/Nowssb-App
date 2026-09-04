@@ -16065,3 +16065,6 @@ a:active,
 #sub-my-progress .mp-final-scene-two video{width:100%;height:100%;object-fit:cover;display:block;filter:brightness(.8) contrast(1.08);}
 #sub-my-progress .mp-final-scene-two:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 35%,rgba(0,0,0,.72));pointer-events:none;}
 #sub-my-progress .mp-final-scene-two:before{content:"Your practice, moving forward.";position:absolute;z-index:1;left:18px;bottom:16px;color:#fff;font-size:16px;font-weight:600;}
+body.scene2 #sub-my-progress #videoBg{opacity:0;}
+body.scene2 #sub-my-progress #videoBg2{opacity:.92;}
+#sub-my-progress{--bg:#020304;--white:#f5f5f3;--muted:#9b9d9e;--gold:#d9c98f;--line:rgba(255,255,255,.13);}
