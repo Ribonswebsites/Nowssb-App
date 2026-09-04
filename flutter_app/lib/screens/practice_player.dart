@@ -1695,7 +1695,7 @@ class PracticeProgressScreen extends StatefulWidget {
 }
 
 class _PracticeProgressScreenState extends State<PracticeProgressScreen> {
-  bool _intro = true;
+  bool _intro = false;
 
   Widget _introPage(PracticeProgress p) {
     return Scaffold(
@@ -1778,10 +1778,10 @@ class _PracticeProgressScreenState extends State<PracticeProgressScreen> {
             body: ListView(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 140),
               children: [
-                _WebsiteProgressGreeting(streak: p.streak, sessions: p.totalSessions, words: uniqueWords),
-                const _ProgressSceneTwo(),
+                const _ProgressOrbScene(),
                 const _WebsiteSectionLabel('Your Numbers'),
                 _WebsiteStats(streak: p.streak, sessions: p.totalSessions, words: uniqueWords),
+                const _ProgressSceneTwo(),
                 const _WebsiteSectionLabel('This Week'),
                 _WebsiteWeek(streak: p.streak),
                 if (p.lastPracticed != null) _LastPracticed(value: p.lastPracticed!),
@@ -1799,6 +1799,53 @@ class _PracticeProgressScreenState extends State<PracticeProgressScreen> {
             ),
           );
         },
+      );
+}
+
+class _ProgressOrbScene extends StatelessWidget {
+  const _ProgressOrbScene();
+
+  @override
+  Widget build(BuildContext context) => Container(
+        height: 500,
+        margin: const EdgeInsets.only(bottom: 0),
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(26),
+          border: Border.all(color: const Color(0x24FFFFFF)),
+          color: Colors.black,
+        ),
+        child: Stack(fit: StackFit.expand, children: [
+          const NwsbVideo(
+            asset: 'assets/video/my-progress-scene-1.mp4',
+            poster: 'assets/profile_source/img-progress.png',
+            priority: ClipPriority.feature,
+            fit: BoxFit.cover,
+          ),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Colors.transparent, Colors.black.withOpacity(.6)],
+              ),
+            ),
+          ),
+          const Positioned(
+            top: 145,
+            left: 0,
+            right: 0,
+            child: Column(children: [
+              Text('TOTAL SESSIONS', style: TextStyle(color: Colors.white, fontSize: 9, letterSpacing: 2.5, fontWeight: FontWeight.w700)),
+              SizedBox(height: 8),
+              Text('128', style: TextStyle(color: Colors.white, fontSize: 66, height: .94, fontWeight: FontWeight.w300, letterSpacing: -3.5)),
+              SizedBox(height: 6),
+              Text('42h 18m', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w300)),
+              SizedBox(height: 6),
+              Text('MEDITATION TIME', style: TextStyle(color: Colors.white70, fontSize: 8, letterSpacing: 2.2)),
+            ]),
+          ),
+        ]),
       );
 }
 
