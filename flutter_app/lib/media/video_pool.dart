@@ -187,9 +187,13 @@ class VideoPool {
   /// else has to change: every test asserts against this constant rather
   /// than against the literal, so the invariant holds at whatever it is set
   /// to.
-  /// All mounted videos remain live so they can autoplay and loop together.
-  /// This is intentionally higher than the normal visible viewport count.
-  static const int maxLive = 128;
+  /// Keep a bounded set of real decoders. The old value (128) was never
+  /// enforced consistently and allowed every mounted Fashion/Normal clip to
+  /// initialize at once; Android then let one clip play while the rest
+  /// stalled or stopped. Eight supports the visible home surfaces together
+  /// without exhausting hardware codecs. Off-screen clips retain their
+  /// posters and are reopened as they approach the viewport.
+  static const int maxLive = 8;
 
   /// How long a clip gets to open before it counts as failed.
   ///
@@ -549,7 +553,7 @@ class VideoPool {
         // is the whole point, and it is why a hundred idle clips now cost a
         // hundred pictures instead of a hundred ExoPlayers.
         final want = _leases
-            .where((l) => l._eligible)
+            .where((l) => l._eligible && l._distance != double.infinity)
             .toList()
           ..sort((a, b) {
             if (a.priority != b.priority) {
@@ -559,9 +563,14 @@ class VideoPool {
           });
 
         // Held: nothing is kept, so the pass becomes a pure give-back.
-        // Keep every mounted lease. Distance remains useful for stable
-        // opening order, but never evicts a video that should keep playing.
-        final keep = _held ? <VideoLease>{} : want.toSet();
+        // Keep only the nearest visible/high-priority leases. Mounted lists
+        // can contain many more clips than the device has hardware codecs;
+        // opening all of them at once is what caused one video to play while
+        // the rest stopped. The remainder keeps its poster and is promoted
+        // when scrolling brings it near the viewport.
+        final keep = _held
+            ? <VideoLease>{}
+            : want.take(maxLive).toSet();
 
         // GIVE BACK FIRST, AND WAIT FOR IT.
         //
