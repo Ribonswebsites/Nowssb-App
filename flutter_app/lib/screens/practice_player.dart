@@ -401,7 +401,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
         Positioned.fill(
           child: IgnorePointer(
             child: Opacity(
-              opacity: .42,
+              opacity: .78,
               child: NwsbVideo(
                 asset: pageBackgroundVideo,
                 fit: BoxFit.cover,
@@ -411,7 +411,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
             ),
           ),
         ),
-        const Positioned.fill(child: ColoredBox(color: Color(0x99000000))),
+        const Positioned.fill(child: ColoredBox(color: Color(0x55000000))),
         SafeArea(
           child: LayoutBuilder(builder: (context, constraints) {
           final stageWidth = math.min(constraints.maxWidth - 24, 340.0);

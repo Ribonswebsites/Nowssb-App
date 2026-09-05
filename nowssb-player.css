@@ -1851,8 +1851,9 @@
   transform: scale(1.14);
 }
 .lgp .lgp-scrim {
-  background: linear-gradient(180deg, rgba(5,5,5,.82) 0%, rgba(5,5,5,.92) 40%, #050505 100%) !important;
+  background: linear-gradient(180deg, rgba(5,5,5,.18) 0%, rgba(5,5,5,.42) 48%, rgba(5,5,5,.78) 100%) !important;
 }
+.lgp .lgp-page-bg-video { opacity:.78; }
 .lgp .lgp-orbs { display: none !important; }
 
 .lgp .lgp-now-btn {
