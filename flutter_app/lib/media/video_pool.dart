@@ -792,8 +792,11 @@ class VideoPool {
   void startHeartbeat() {
     _beat ??= Timer.periodic(const Duration(milliseconds: 500), (_) {
       if (_leases.isEmpty) return;
-      _rebalanceSoon();
-      // A player that missed its start gets another chance every beat.
+      // Do not rebalance here. Rebalancing can tear down and recreate a
+      // controller while a home is laying out, which produced the visible
+      // play-pause-play loop. Layout reports are the only thing allowed to
+      // change ownership; the heartbeat only resumes a controller that has
+      // stopped unexpectedly.
       _assertPlaying();
     });
   }
