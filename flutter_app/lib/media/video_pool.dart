@@ -782,13 +782,15 @@ class VideoPool {
     }
   }
 
-  /// A slow heartbeat, as a backstop for anything the per-frame measuring
+  /// A short heartbeat, as a backstop for anything the per-frame measuring
   /// misses — a screen that is completely static produces no frames, so it
   /// reports nothing, so a clip that arrived during the quiet would wait
-  /// forever. Two seconds costs nothing and cannot deadlock.
+  /// forever. A half-second retry is deliberate: some Android surfaces accept
+  /// the first play request, render briefly, then pause while the texture is
+  /// attached. Reasserting play keeps every live visible clip moving.
   Timer? _beat;
   void startHeartbeat() {
-    _beat ??= Timer.periodic(const Duration(seconds: 2), (_) {
+    _beat ??= Timer.periodic(const Duration(milliseconds: 500), (_) {
       if (_leases.isEmpty) return;
       _rebalanceSoon();
       // A player that missed its start gets another chance every beat.
