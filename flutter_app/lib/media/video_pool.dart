@@ -68,6 +68,7 @@ class VideoLease extends ChangeNotifier {
   VideoPlayerController? _controller;
   bool _wantsPlay = false;
   bool _disposed = false;
+  Future<void>? _playInFlight;
 
   /// How many times this clip has refused to open, and the earliest moment it
   /// may be tried again.
@@ -136,8 +137,19 @@ class VideoLease extends ChangeNotifier {
     _wantsPlay = true;
     final c = _controller;
     if (c != null && c.value.isInitialized && !c.value.isPlaying) {
-      c.play();
+      _ensurePlaying(c);
     }
+  }
+
+  Future<void> _ensurePlaying(VideoPlayerController c) {
+    final current = _playInFlight;
+    if (current != null) return current;
+    final request = c.play().catchError((_) {});
+    _playInFlight = request;
+    request.whenComplete(() {
+      if (identical(_playInFlight, request)) _playInFlight = null;
+    });
+    return request;
   }
 
   void pause() {
@@ -709,7 +721,7 @@ class VideoPool {
     // playing with sound is what put the website in Android's notification
     // shade next to a music player.
     await c.setVolume(0);
-    if (l._wantsPlay) await c.play();
+    if (l._wantsPlay) await l._ensurePlaying(c);
 
     l._changed();
     // Asking once is not the same as it having happened. The readout said
@@ -778,7 +790,7 @@ class VideoPool {
       final c = l._controller;
       if (c == null || !c.value.isInitialized) continue;
       if (c.value.isPlaying) continue;
-      c.play();
+      l._ensurePlaying(c);
     }
   }
 
