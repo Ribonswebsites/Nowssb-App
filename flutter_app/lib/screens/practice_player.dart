@@ -1672,18 +1672,10 @@ class _PlayerTheme {
 }
 
 const _playerThemes = <_PlayerTheme>[
-  // Same ordered clips as nowssb-player.js — streamed from the live site so
-  // the native player is not stuck on a missing bundled assets/videos path.
-  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/d694cb3157c4e58f_grok_image_1782656710977_nj5r6x.jpg', video: 'https://nowssb.com/assets/videos/79d7c93a6734ed8d_grok_video_2026-06-28-19-55-09_otgbxd.mp4', accent: Color(0xFF9BB8FF)),
-  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/3670d1e477f48c31_grok_image_1782656676834_rzp2cz.jpg', video: 'https://nowssb.com/assets/videos/a1b0a1b513ec57f6_grok_video_2026-06-28-19-54-38_wrxkgr.mp4', accent: Color(0xFF7FE9DA)),
-  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/fd380f5670852d0c_grok_image_1782656704854_cfsah3.jpg', video: 'https://nowssb.com/assets/videos/dc68caaf51e87003_grok_video_2026-06-28-19-55-02_of5fwh.mp4', accent: Color(0xFFBD7BFF)),
-  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/e8bb832f2815c15a_grok_image_1782656684101_o9vc93.jpg', video: 'https://nowssb.com/assets/videos/d8ac259577c403f3_grok_video_2026-06-28-19-54-43_it2bur.mp4', accent: Color(0xFFA6DCFF)),
-  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/48ad23ade254b2d7_grok_image_1782795582310_llvpix.jpg', video: 'https://nowssb.com/assets/videos/3b63edc1485a45e2_grok_video_2026-06-30-10-29-43_hzxyun.mp4', accent: Color(0xFFB9A6FF)),
-  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/20314fda05d34b49_grok_image_1782796537731_vzyhwn.jpg', video: 'https://nowssb.com/assets/videos/a779a65872bf917c_grok_video_2026-06-30-10-45-45_dg2ohg.mp4', accent: Color(0xFFA6C8FF)),
-  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/f734c819e92db433_grok_image_1782796641824_izkh09.jpg', video: 'https://nowssb.com/assets/videos/da4159578099ee48_grok_video_2026-06-30-10-47-20_rljghs.mp4', accent: Color(0xFFB9A6FF)),
-  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/e103480a2c87d55b_grok_image_1782796519587_thrrws.jpg', video: 'https://nowssb.com/assets/videos/e55e1f1f879d8074_grok_video_2026-06-30-10-45-34_pg2y2j.mp4', accent: Color(0xFFE8D5A3)),
-  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/122962572090895c_grok_image_1782796924745_nmksmi.jpg', video: 'https://nowssb.com/assets/videos/7a0e0cf6903f3b16_grok_video_2026-06-30-10-52-07_gvffol.mp4', accent: Color(0xFFF0D9A8)),
-  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/28b7b32c97232472_grok_image_1782796933792_qwzfgx.jpg', video: 'https://nowssb.com/assets/videos/39905d27bd778cff_grok_video_2026-06-30-10-52-20_zk87yh.mp4', accent: Color(0xFF8FE6FF)),
+  // The active word index selects one of these two clips, so navigation
+  // alternates backgrounds while replaying the same word keeps its clip.
+  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/d694cb3157c4e58f_grok_image_1782656710977_nj5r6x.jpg', video: 'assets/video/grok_video_2026-09-05-15-32-08.mp4', accent: Color(0xFF9BB8FF)),
+  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/3670d1e477f48c31_grok_image_1782656676834_rzp2cz.jpg', video: 'assets/video/grok_video_2026-09-05-15-32-13.mp4', accent: Color(0xFF7FE9DA)),
 ];
 
 class PracticeProgressScreen extends StatefulWidget {

@@ -84,6 +84,13 @@
       accent:'#8fe6ff' },
   ];
 
+  /* Prayer/session clips alternate by active word index. Replaying a word
+     keeps its clip; Next/Previous selects the next indexed clip. */
+  var PRAYER_WORD_VIDEOS = [
+    'grok_video_2026-09-05-15-32-08.mp4',
+    'grok_video_2026-09-05-15-32-13.mp4'
+  ];
+
   /* Exposed so app/js/part051.js's background video pre-warmer (Cache
      Storage, same mechanism as every other decorative video in the app)
      can also warm these — the practice screen builds its <video> elements
@@ -97,8 +104,8 @@
      of the queue — the pre-warmer (app/js/part051.js) walks this list in
      order into Cache Storage, and a cached entry means the panel is not
      waiting on the network when the player opens. */
-  window.NWSB_PLAYER_VIDEO_URLS = LGP_THEMES
-    .map(function (t) { return cldVid(t.video, 720); })
+  window.NWSB_PLAYER_VIDEO_URLS = PRAYER_WORD_VIDEOS
+    .concat(LGP_THEMES.map(function (t) { return cldVid(t.video, 720); }))
     .concat(Object.keys(ORGAN_VIDEOS).map(function (k) { return ORGAN_VIDEOS[k]; }).filter(Boolean).map(function (v) { return cldVid(v, 640); }));
   /* The pictures behind the player go into the same cache. They are what
      shows while a clip is still opening, so an uncached one is a visible
@@ -396,7 +403,12 @@
        stutter, but that meant the video never changed on word navigation
        at all, only between sessions — not what was wanted. */
     var _thIdx = Math.abs(idx);
-    var th = LGP_THEMES[_thIdx % LGP_THEMES.length];
+    var _baseTheme = LGP_THEMES[_thIdx % LGP_THEMES.length];
+    var th = {
+      img: _baseTheme.img,
+      video: PRAYER_WORD_VIDEOS[_thIdx % PRAYER_WORD_VIDEOS.length],
+      accent: _baseTheme.accent
+    };
     var hr = new Date().getHours();
     var timeLabel = hr < 10 ? 'Morning' : hr < 13 ? 'Midday' : hr < 17 ? 'Afternoon' : hr < 20 ? 'Evening' : 'Night';
     var ar = (typeof getActiveRoutine === 'function') ? getActiveRoutine() : null;
