@@ -64,24 +64,21 @@ const _rail = [
       NwsbMarks.crown,
       'The Full Library',
       'NowssB Subscription',
-      'https://res.r2.com/eenvubod/video/upload/v1784895544/'
-          'grok_video_2026-07-24-17-46-41_vkxr4r.mp4',
+      'assets/video/hero-subscription.mp4',
       3),
   // The clip a word page opens with — NWSB_WORD_BANNER_VID.
   _Rail(
       NwsbMarks.word,
       'Where a word begins',
       'NowssB Word Store',
-      'https://res.r2.com/yvi3d7ov/video/upload/v1785512057/'
-          'grok_video_2026-07-31-20-43-13_qh2qjg.mp4',
+      'assets/video/hero-word-store.mp4',
       3),
   // The clip every meaning's page opens with — MS_MEANING_VID.
   _Rail(
       NwsbMarks.meaning,
       'What a word truly means',
       'NowssB Meaning Store',
-      'https://res.r2.com/yvi3d7ov/video/upload/v1785511438/'
-          'grok_video_2026-07-31-15-41-50_oxszei.mp4',
+      'assets/video/hero-meaning-store.mp4',
       3),
   _Rail(NwsbMarks.signature, 'The rarest word', 'The Signature',
       'assets/video/signature-banner.mp4', 3),
@@ -91,8 +88,7 @@ const _rail = [
       NwsbMarks.book,
       'Page by page',
       'NowssB eBooks',
-      'https://res.r2.com/eenvubod/video/upload/v1785406073/'
-          'grok_video_2026-07-30-15-35-40_xwm1ei.mp4',
+      'assets/video/hero-ebooks.mp4',
       2),
   _Rail(NwsbMarks.sound, 'Every word you own', 'Sound Library',
       'assets/video/sound-library-banner.mp4', 2),
