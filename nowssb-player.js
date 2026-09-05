@@ -104,8 +104,9 @@
      of the queue — the pre-warmer (app/js/part051.js) walks this list in
      order into Cache Storage, and a cached entry means the panel is not
      waiting on the network when the player opens. */
-  window.NWSB_PLAYER_VIDEO_URLS = PRAYER_WORD_VIDEOS
-    .concat(LGP_THEMES.map(function (t) { return cldVid(t.video, 720); }))
+  window.NWSB_PLAYER_VIDEO_URLS = LGP_THEMES
+    .map(function (t) { return cldVid(t.video, 720); })
+    .concat(PRAYER_WORD_VIDEOS)
     .concat(Object.keys(ORGAN_VIDEOS).map(function (k) { return ORGAN_VIDEOS[k]; }).filter(Boolean).map(function (v) { return cldVid(v, 640); }));
   /* The pictures behind the player go into the same cache. They are what
      shows while a clip is still opening, so an uncached one is a visible
@@ -403,12 +404,8 @@
        stutter, but that meant the video never changed on word navigation
        at all, only between sessions — not what was wanted. */
     var _thIdx = Math.abs(idx);
-    var _baseTheme = LGP_THEMES[_thIdx % LGP_THEMES.length];
-    var th = {
-      img: _baseTheme.img,
-      video: PRAYER_WORD_VIDEOS[_thIdx % PRAYER_WORD_VIDEOS.length],
-      accent: _baseTheme.accent
-    };
+    var th = LGP_THEMES[_thIdx % LGP_THEMES.length];
+    var pageBgSrc = PRAYER_WORD_VIDEOS[_thIdx % PRAYER_WORD_VIDEOS.length];
     var hr = new Date().getHours();
     var timeLabel = hr < 10 ? 'Morning' : hr < 13 ? 'Midday' : hr < 17 ? 'Afternoon' : hr < 20 ? 'Evening' : 'Night';
     var ar = (typeof getActiveRoutine === 'function') ? getActiveRoutine() : null;
@@ -676,6 +673,7 @@
 
     body.innerHTML =
       '<div class="lgp' + (playing ? ' playing' : '') + '" style="--lg-bg:url(\'' + th.img + '\');--lg-accent:' + th.accent + ';">' +
+        '<video class="lgp-page-bg-video" autoplay loop muted playsinline webkit-playsinline preload="auto" aria-hidden="true" src="' + pageBgSrc + '"></video>' +
         '<div class="lgp-bg"></div><div class="lgp-scrim"></div><div class="lgp-orbs"></div>' +
         '<div class="lgp-top">' +
           '<button class="lgp-back lgp-now-btn" onclick="closeSub&&closeSub(\'practice\')" aria-label="Back">' +

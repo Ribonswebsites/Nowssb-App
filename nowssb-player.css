@@ -27,6 +27,11 @@
 .lgp.lg-t5 { --lg-bg:url('assets/player/t-mountain.jpg'); --lg-accent:#cfdcff; }
 .lgp.lg-t6 { --lg-bg:url('assets/player/t-wave.jpg');     --lg-accent:#7fe9da; }
 
+.lgp .lgp-page-bg-video {
+  position:absolute; inset:0; z-index:0; width:100%; height:100%;
+  object-fit:cover; pointer-events:none; opacity:.42;
+}
+
 .lgp .lgp-scrim {
   position:absolute; inset:0; z-index:0; pointer-events:none;
   background:
@@ -41,7 +46,7 @@
     radial-gradient(circle 4px at 86% 60%, rgba(255,255,255,.5), transparent 60%),
     radial-gradient(circle 2px at 24% 74%, rgba(255,255,255,.6), transparent 60%);
 }
-.lgp > *:not(.lgp-bg):not(.lgp-scrim):not(.lgp-orbs) { position:relative; z-index:2; }
+.lgp > *:not(.lgp-bg):not(.lgp-page-bg-video):not(.lgp-scrim):not(.lgp-orbs) { position:relative; z-index:2; }
 
 /* top bar */
 .lgp .lgp-top { position:relative; width:100%; display:flex; align-items:center; justify-content:space-between; }
