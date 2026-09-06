@@ -4,6 +4,8 @@ library;
 
 import 'package:flutter/material.dart';
 
+import 'glassmorphism_theme.dart';
+
 class NmSuppliedActionBar extends StatelessWidget {
   const NmSuppliedActionBar({super.key, this.onSupport, this.onCoach});
 
@@ -19,6 +21,7 @@ class NmSuppliedActionBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final glass = NormalGlassMode.of(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
       child: Column(
@@ -31,7 +34,13 @@ class NmSuppliedActionBar extends StatelessWidget {
                 child: Icon(Icons.auto_awesome, size: 21, color: _accent),
               ),
               SizedBox(width: 14),
-              Expanded(child: Text('How can we help today?', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, letterSpacing: -.2, color: _textPrimary))),
+              Expanded(
+                  child: Text('How can we help today?',
+                      style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -.2,
+                          color: _textPrimary))),
             ],
           ),
           const SizedBox(height: 24),
@@ -40,25 +49,77 @@ class NmSuppliedActionBar extends StatelessWidget {
             decoration: BoxDecoration(
               color: _surface,
               borderRadius: BorderRadius.circular(999),
-              boxShadow: const [BoxShadow(color: _shadowDark, offset: Offset(8, 8), blurRadius: 18), BoxShadow(color: _shadowLight, offset: Offset(-8, -8), blurRadius: 18)],
+              border: glass
+                  ? Border.all(color: const Color(0xF2FFFFFF), width: 1.5)
+                  : null,
+              boxShadow: glass
+                  ? null
+                  : const [
+                      BoxShadow(
+                          color: _shadowDark,
+                          offset: Offset(8, 8),
+                          blurRadius: 18),
+                      BoxShadow(
+                          color: _shadowLight,
+                          offset: Offset(-8, -8),
+                          blurRadius: 18)
+                    ],
             ),
             child: Row(
               children: [
-                _ActionCircle(icon: Icons.support_agent_outlined, label: 'Help and support', onTap: onSupport),
+                _ActionCircle(
+                    icon: Icons.support_agent_outlined,
+                    label: 'Help and support',
+                    onTap: onSupport),
                 const SizedBox(width: 8),
-                _ActionCircle(icon: Icons.person_add_alt_1_outlined, label: 'Personal coach', onTap: onCoach),
+                _ActionCircle(
+                    icon: Icons.person_add_alt_1_outlined,
+                    label: 'Personal coach',
+                    onTap: onCoach),
                 const SizedBox(width: 10),
-                const Expanded(child: Text('Personal Coach', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _textPrimary))),
+                const Expanded(
+                    child: Text('Personal Coach',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800,
+                            color: _textPrimary))),
                 GestureDetector(
                   onTap: onCoach,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 13),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 22, vertical: 13),
                     decoration: BoxDecoration(
                       color: _surface,
                       borderRadius: BorderRadius.circular(999),
-                      boxShadow: const [BoxShadow(color: _shadowDark, offset: Offset(5, 5), blurRadius: 11), BoxShadow(color: _shadowLight, offset: Offset(-5, -5), blurRadius: 11)],
+                      border: glass
+                          ? Border.all(
+                              color: const Color(0xF2FFFFFF), width: 1.5)
+                          : null,
+                      boxShadow: glass
+                          ? null
+                          : const [
+                              BoxShadow(
+                                  color: _shadowDark,
+                                  offset: Offset(5, 5),
+                                  blurRadius: 11),
+                              BoxShadow(
+                                  color: _shadowLight,
+                                  offset: Offset(-5, -5),
+                                  blurRadius: 11)
+                            ],
                     ),
-                    child: const Row(mainAxisSize: MainAxisSize.min, children: [Text('Enter', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: _textPrimary)), SizedBox(width: 6), Icon(Icons.arrow_forward_rounded, size: 16, color: _textPrimary)]),
+                    child: const Row(mainAxisSize: MainAxisSize.min, children: [
+                      Text('Enter',
+                          style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: _textPrimary)),
+                      SizedBox(width: 6),
+                      Icon(Icons.arrow_forward_rounded,
+                          size: 16, color: _textPrimary)
+                    ]),
                   ),
                 ),
               ],
@@ -76,12 +137,32 @@ class _NeoCircle extends StatelessWidget {
   final Widget child;
 
   @override
-  Widget build(BuildContext context) => Container(
-        width: size,
-        height: size,
-        decoration: const BoxDecoration(color: NmSuppliedActionBar._surface, shape: BoxShape.circle, boxShadow: [BoxShadow(color: NmSuppliedActionBar._shadowDark, offset: Offset(6, 6), blurRadius: 12), BoxShadow(color: NmSuppliedActionBar._shadowLight, offset: Offset(-6, -6), blurRadius: 12)]),
-        child: Center(child: child),
-      );
+  Widget build(BuildContext context) {
+    final glass = NormalGlassMode.of(context);
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+          color: glass ? const Color(0x66FFFFFF) : NmSuppliedActionBar._surface,
+          shape: BoxShape.circle,
+          border: glass
+              ? Border.all(color: const Color(0xF2FFFFFF), width: 1.5)
+              : null,
+          boxShadow: glass
+              ? null
+              : const [
+                  BoxShadow(
+                      color: NmSuppliedActionBar._shadowDark,
+                      offset: Offset(6, 6),
+                      blurRadius: 12),
+                  BoxShadow(
+                      color: NmSuppliedActionBar._shadowLight,
+                      offset: Offset(-6, -6),
+                      blurRadius: 12)
+                ]),
+      child: Center(child: child),
+    );
+  }
 }
 
 class _ActionCircle extends StatelessWidget {
@@ -96,7 +177,10 @@ class _ActionCircle extends StatelessWidget {
         label: label,
         child: GestureDetector(
           onTap: onTap,
-          child: _NeoCircle(size: 40, child: Icon(icon, size: 18, color: NmSuppliedActionBar._textSecondary)),
+          child: _NeoCircle(
+              size: 40,
+              child: Icon(icon,
+                  size: 18, color: NmSuppliedActionBar._textSecondary)),
         ),
       );
 }
