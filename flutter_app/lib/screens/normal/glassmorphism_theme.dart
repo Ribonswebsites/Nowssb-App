@@ -55,18 +55,18 @@ class NormalGlassSection extends StatelessWidget {
         borderRadius: radius,
         boxShadow: const [
           BoxShadow(
-              color: Color(0x220B2447), blurRadius: 30, offset: Offset(0, 14)),
+              color: Color(0x160B2447), blurRadius: 38, offset: Offset(0, 16)),
           BoxShadow(
-              color: Color(0xE6FFFFFF), blurRadius: 20, offset: Offset(-6, -6)),
+              color: Color(0xF2FFFFFF), blurRadius: 30, offset: Offset(-8, -8)),
         ],
       ),
       child: ClipRRect(
         borderRadius: radius,
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+          filter: ImageFilter.blur(sigmaX: 42, sigmaY: 42),
           child: DecoratedBox(
             decoration: BoxDecoration(
-              color: const Color(0x66FFFFFF),
+              color: const Color(0x8CFFFFFF),
               borderRadius: radius,
               border: Border.all(color: const Color(0xF2FFFFFF), width: 1.5),
             ),
