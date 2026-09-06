@@ -52,6 +52,7 @@ import '../widgets/looping_logo_mark.dart';
 import 'normal/neomorphic_action_bar.dart';
 import 'normal/neomorphic_dashboard.dart';
 import 'personal_coach.dart';
+import 'normal/glassmorphism_theme.dart';
 import 'normal/neomorphic_essentials.dart';
 import 'normal/sections_bottom.dart';
 import 'normal/sections_top.dart';
@@ -120,6 +121,8 @@ class HomeNormal extends StatefulWidget {
 }
 
 class _HomeNormalState extends State<HomeNormal> {
+  bool _glassMode = false;
+
   @override
   void initState() {
     super.initState();
@@ -200,7 +203,12 @@ class _HomeNormalState extends State<HomeNormal> {
   List<(String, Widget?)> _sections() => [
         ('greet', NmGreeting(name: widget.name)),
         ('search', NmSearch(onSearch: (_) => _go(2))),
-        ('dashboard', NmSuppliedDashboard(onStart: _openDashboardSession, onProgress: _openDashboardProgress)),
+        (
+          'dashboard',
+          NmSuppliedDashboard(
+              onStart: _openDashboardSession,
+              onProgress: _openDashboardProgress)
+        ),
         ('essentials', const NmSuppliedEssentials()),
         ('streak', NmStreak(onTap: () => _go(1))),
         (
@@ -213,7 +221,12 @@ class _HomeNormalState extends State<HomeNormal> {
         ),
         ('practice', NmPractice(onTap: () => _go(1))),
         ('mainops', MainOptionsSection(onGo: _go, onAction: _openMainOption)),
-        ('actionbar', NmSuppliedActionBar(onSupport: () => _go(4), onCoach: () => _push(const PersonalCoachScreen()))),
+        (
+          'actionbar',
+          NmSuppliedActionBar(
+              onSupport: () => _go(4),
+              onCoach: () => _push(const PersonalCoachScreen()))
+        ),
         ('tiles', NmTiles(onTile: _go)),
         ('store', NmStore(onTap: () => _go(3))),
         ('reader', NmReader(onTap: () => _go(2))),
@@ -267,7 +280,8 @@ class _HomeNormalState extends State<HomeNormal> {
   @override
   Widget build(BuildContext context) {
     final built = _sections();
-    final bottomNavigationClearance = MediaQuery.paddingOf(context).bottom + 112;
+    final bottomNavigationClearance =
+        MediaQuery.paddingOf(context).bottom + 112;
     assert(
       built.map((e) => e.$1).toList().toString() ==
           kNormalSectionOrder.toString(),
@@ -282,39 +296,39 @@ class _HomeNormalState extends State<HomeNormal> {
 
     final shown = [
       for (final (k, w) in built)
-        if (w != null && !kNormalDefOff.contains(k)) w,
+        if (w != null && !kNormalDefOff.contains(k))
+          _glassMode ? NormalGlassSection(child: w) : w,
     ];
+
+    final page = SafeArea(
+      child: Column(
+        children: [
+          // `.nmh-toprow` — pinned to the top, never scrolls.
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
+            child: _TopRow(
+              onMenu: () => _openHomeMenu(context),
+              glassMode: _glassMode,
+              onGlassToggle: () => setState(() => _glassMode = !_glassMode),
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              padding: EdgeInsets.only(bottom: bottomNavigationClearance),
+              itemCount: shown.length,
+              itemBuilder: (context, i) => shown[i],
+            ),
+          ),
+        ],
+      ),
+    );
 
     return HomeSkinScope(
       skin: HomeSkin.normal,
       child: Scaffold(
-        backgroundColor: NwsbColors.surface,
-        body: SafeArea(
-          child: Column(
-            children: [
-              // `.nmh-toprow` — pinned to the top, never scrolls. It is
-              // outside the list rather than its first row, which is what
-              // "never scrolls" means.
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
-                child: _TopRow(onMenu: () => _openHomeMenu(context)),
-              ),
-              Expanded(
-                // No horizontal padding: the sections carry their own
-                // `margin: 16px 0` inside `.nmh-wrap`'s 20px, and a raised
-                // card needs room around it for its own shadow.
-                child: ListView.builder(
-                  // The navigation is a floating shell overlay. Reserve its
-                  // height plus the device inset so the last dashboard row can
-                  // always scroll completely above it instead of being hidden.
-                  padding: EdgeInsets.only(bottom: bottomNavigationClearance),
-                  itemCount: shown.length,
-                  itemBuilder: (context, i) => shown[i],
-                ),
-              ),
-            ],
-          ),
-        ),
+        backgroundColor:
+            _glassMode ? const Color(0xFFF7FAFF) : NwsbColors.surface,
+        body: _glassMode ? NormalGlassBackground(child: page) : page,
       ),
     );
   }
@@ -322,9 +336,15 @@ class _HomeNormalState extends State<HomeNormal> {
 
 /// .nmh-toprow — the logo, the wordmark, and the three embossed buttons.
 class _TopRow extends StatelessWidget {
-  const _TopRow({required this.onMenu});
+  const _TopRow({
+    required this.onMenu,
+    required this.glassMode,
+    required this.onGlassToggle,
+  });
 
   final VoidCallback onMenu;
+  final bool glassMode;
+  final VoidCallback onGlassToggle;
 
   @override
   Widget build(BuildContext context) {
@@ -341,8 +361,14 @@ class _TopRow extends StatelessWidget {
             shape: BoxShape.circle,
             color: NwsbColors.surface,
             boxShadow: const [
-              BoxShadow(color: Color(0xFFFFFFFF), blurRadius: 8, offset: Offset(-4, -4)),
-              BoxShadow(color: Color(0x33000000), blurRadius: 8, offset: Offset(4, 4)),
+              BoxShadow(
+                  color: Color(0xFFFFFFFF),
+                  blurRadius: 8,
+                  offset: Offset(-4, -4)),
+              BoxShadow(
+                  color: Color(0x33000000),
+                  blurRadius: 8,
+                  offset: Offset(4, 4)),
             ],
           ),
           child: const LoopingLogoMark(size: 46),
@@ -377,6 +403,8 @@ class _TopRow extends StatelessWidget {
           ),
         ),
         const Spacer(),
+        NormalGlassToggle(enabled: glassMode, onTap: onGlassToggle),
+        const SizedBox(width: 8),
         const _HeaderButton(icon: Icons.notifications_none, badge: 0),
         const SizedBox(width: 8),
         _HeaderButton(
@@ -468,14 +496,19 @@ class _NormalHomeMenu extends StatelessWidget {
                     borderRadius: BorderRadius.circular(16),
                     onTap: () => onSelect(tab),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 14),
                       child: Row(
                         children: [
                           Icon(icon, color: NwsbColors.ink, size: 22),
                           const SizedBox(width: 14),
-                          Text(label, style: const TextStyle(color: NwsbColors.ink, fontWeight: FontWeight.w700)),
+                          Text(label,
+                              style: const TextStyle(
+                                  color: NwsbColors.ink,
+                                  fontWeight: FontWeight.w700)),
                           const Spacer(),
-                          const Icon(Icons.chevron_right, color: NwsbColors.inkSoft),
+                          const Icon(Icons.chevron_right,
+                              color: NwsbColors.inkSoft),
                         ],
                       ),
                     ),
