@@ -295,8 +295,7 @@ class _HomeNormalState extends State<HomeNormal> {
 
     final shown = [
       for (final (k, w) in built)
-        if (w != null && !kNormalDefOff.contains(k))
-          _glassMode ? NormalGlassSection(child: w) : w,
+        if (w != null && !kNormalDefOff.contains(k)) w,
     ];
 
     final page = SafeArea(
@@ -305,22 +304,11 @@ class _HomeNormalState extends State<HomeNormal> {
           // `.nmh-toprow` — pinned to the top, never scrolls.
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
-            child: _glassMode
-                ? NormalGlassSection(
-                    header: true,
-                    child: _TopRow(
-                      onMenu: () => _openHomeMenu(context),
-                      glassMode: _glassMode,
-                      onGlassToggle: () =>
-                          setState(() => _glassMode = !_glassMode),
-                    ),
-                  )
-                : _TopRow(
-                    onMenu: () => _openHomeMenu(context),
-                    glassMode: _glassMode,
-                    onGlassToggle: () =>
-                        setState(() => _glassMode = !_glassMode),
-                  ),
+            child: _TopRow(
+              onMenu: () => _openHomeMenu(context),
+              glassMode: _glassMode,
+              onGlassToggle: () => setState(() => _glassMode = !_glassMode),
+            ),
           ),
           Expanded(
             child: ListView.builder(

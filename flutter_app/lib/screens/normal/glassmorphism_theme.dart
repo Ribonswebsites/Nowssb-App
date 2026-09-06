@@ -28,9 +28,19 @@ class NormalGlassBackground extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: const BoxDecoration(
-        color: Color(0xFFFFFFFF),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFFFFFFFF), Color(0xEEF7FBFF), Color(0xFFFFFFFF)],
+        ),
       ),
-      child: child,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          IgnorePointer(child: CustomPaint(painter: _GlassOrbsPainter())),
+          child,
+        ],
+      ),
     );
   }
 }
@@ -55,18 +65,18 @@ class NormalGlassSection extends StatelessWidget {
         borderRadius: radius,
         boxShadow: const [
           BoxShadow(
-              color: Color(0x160B2447), blurRadius: 38, offset: Offset(0, 16)),
+              color: Color(0x220B2447), blurRadius: 30, offset: Offset(0, 14)),
           BoxShadow(
-              color: Color(0xF2FFFFFF), blurRadius: 30, offset: Offset(-8, -8)),
+              color: Color(0xE6FFFFFF), blurRadius: 20, offset: Offset(-6, -6)),
         ],
       ),
       child: ClipRRect(
         borderRadius: radius,
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 42, sigmaY: 42),
+          filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
           child: DecoratedBox(
             decoration: BoxDecoration(
-              color: const Color(0x8CFFFFFF),
+              color: const Color(0x66FFFFFF),
               borderRadius: radius,
               border: Border.all(color: const Color(0xF2FFFFFF), width: 1.5),
             ),
@@ -126,4 +136,33 @@ class NormalGlassToggle extends StatelessWidget {
       ),
     );
   }
+}
+
+class _GlassOrbsPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final blobs = [
+      (
+        Offset(size.width * .10, size.height * .12),
+        170.0,
+        const Color(0x2447A7FF)
+      ),
+      (
+        Offset(size.width * .92, size.height * .34),
+        220.0,
+        const Color(0x1F9F7BFF)
+      ),
+      (
+        Offset(size.width * .30, size.height * .88),
+        260.0,
+        const Color(0x1F61D6C8)
+      ),
+    ];
+    for (final (center, radius, color) in blobs) {
+      canvas.drawCircle(center, radius, Paint()..color = color);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
