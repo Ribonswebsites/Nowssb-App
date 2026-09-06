@@ -48,7 +48,6 @@ import '../data/settings.dart';
 import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
 import '../widgets/home_skin.dart';
-import '../widgets/looping_logo_mark.dart';
 import 'normal/neomorphic_action_bar.dart';
 import 'normal/neomorphic_dashboard.dart';
 import 'personal_coach.dart';
@@ -296,7 +295,8 @@ class _HomeNormalState extends State<HomeNormal> {
 
     final shown = [
       for (final (k, w) in built)
-        if (w != null && !kNormalDefOff.contains(k)) w,
+        if (w != null && !kNormalDefOff.contains(k))
+          _glassMode ? NormalGlassSection(child: w) : w,
     ];
 
     final page = SafeArea(
@@ -305,11 +305,22 @@ class _HomeNormalState extends State<HomeNormal> {
           // `.nmh-toprow` — pinned to the top, never scrolls.
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
-            child: _TopRow(
-              onMenu: () => _openHomeMenu(context),
-              glassMode: _glassMode,
-              onGlassToggle: () => setState(() => _glassMode = !_glassMode),
-            ),
+            child: _glassMode
+                ? NormalGlassSection(
+                    header: true,
+                    child: _TopRow(
+                      onMenu: () => _openHomeMenu(context),
+                      glassMode: _glassMode,
+                      onGlassToggle: () =>
+                          setState(() => _glassMode = !_glassMode),
+                    ),
+                  )
+                : _TopRow(
+                    onMenu: () => _openHomeMenu(context),
+                    glassMode: _glassMode,
+                    onGlassToggle: () =>
+                        setState(() => _glassMode = !_glassMode),
+                  ),
           ),
           Expanded(
             child: ListView.builder(
@@ -377,7 +388,19 @@ class _TopRow extends StatelessWidget {
                         offset: Offset(4, 4)),
                   ],
           ),
-          child: const LoopingLogoMark(size: 46),
+          child: ClipOval(
+            child: Image.asset(
+              'assets/icons/logo-disc.webp',
+              width: 46,
+              height: 46,
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => const Icon(
+                Icons.auto_awesome,
+                color: Color(0xFFFFA21A),
+                size: 24,
+              ),
+            ),
+          ),
         ),
         const SizedBox(width: 12),
         // Flexible, not a bare Column: 'NOWSBANSIU EDITION' at 2pt of letter

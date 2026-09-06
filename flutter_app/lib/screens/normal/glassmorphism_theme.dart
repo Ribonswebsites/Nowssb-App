@@ -28,19 +28,9 @@ class NormalGlassBackground extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFFFFFFFF), Color(0xEEF7FBFF), Color(0xFFFFFFFF)],
-        ),
+        color: Color(0xFFFFFFFF),
       ),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          IgnorePointer(child: CustomPaint(painter: _GlassOrbsPainter())),
-          child,
-        ],
-      ),
+      child: child,
     );
   }
 }
@@ -136,33 +126,4 @@ class NormalGlassToggle extends StatelessWidget {
       ),
     );
   }
-}
-
-class _GlassOrbsPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final blobs = [
-      (
-        Offset(size.width * .10, size.height * .12),
-        170.0,
-        const Color(0x2447A7FF)
-      ),
-      (
-        Offset(size.width * .92, size.height * .34),
-        220.0,
-        const Color(0x1F9F7BFF)
-      ),
-      (
-        Offset(size.width * .30, size.height * .88),
-        260.0,
-        const Color(0x1F61D6C8)
-      ),
-    ];
-    for (final (center, radius, color) in blobs) {
-      canvas.drawCircle(center, radius, Paint()..color = color);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
