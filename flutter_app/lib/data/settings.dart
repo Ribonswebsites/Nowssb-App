@@ -69,8 +69,8 @@ class Settings extends ChangeNotifier {
     'eBooks',
   ];
 
-  bool _fashionPlus = false;
-  bool _fashionHome = false;
+  bool _fashionPlus = true;
+  bool _fashionHome = true;
   int _fashionVideo = 1;
   int _fashionImage = -1;
   int _backgroundTransition = 0;
@@ -88,7 +88,13 @@ class Settings extends ChangeNotifier {
   String _navShape = 'default';
   String _navColor = 'glass';
   String _navCorner = 'rounded';
-  List<String> _navSlots = ['connect', 'practice', 'library', 'store', 'profile'];
+  List<String> _navSlots = [
+    'connect',
+    'practice',
+    'library',
+    'store',
+    'profile'
+  ];
 
   /// Motion mode: do page backgrounds play, or hold their first frame?
   bool get fashionPlus => _fashionPlus;
@@ -121,8 +127,8 @@ class Settings extends ChangeNotifier {
   Future<void> load() async {
     try {
       final p = await SharedPreferences.getInstance();
-      _fashionPlus = p.getBool(_kPlus) ?? false;
-      _fashionHome = p.getBool(_kHome) ?? false;
+      _fashionPlus = p.getBool(_kPlus) ?? true;
+      _fashionHome = p.getBool(_kHome) ?? true;
       _fashionVideo = _validIndex(
         p.getInt(_kVideo) ?? _fashionVideo,
         fashionVideos.length,
@@ -192,24 +198,74 @@ class Settings extends ChangeNotifier {
   static int _validImageIndex(int index) =>
       index >= 0 && index < fashionImages.length ? index : -1;
 
-  Future<void> setEq(String value) async { _eq = value; await _saveString(_kEq, value); notifyListeners(); }
-  Future<void> setQuality(String value) async { _quality = value; await _saveString(_kQuality, value); notifyListeners(); }
+  Future<void> setEq(String value) async {
+    _eq = value;
+    await _saveString(_kEq, value);
+    notifyListeners();
+  }
+
+  Future<void> setQuality(String value) async {
+    _quality = value;
+    await _saveString(_kQuality, value);
+    notifyListeners();
+  }
+
   bool get qualityHigh => _quality.toLowerCase() == 'high';
-  Future<void> toggleQuality() async => setQuality(qualityHigh ? 'Normal' : 'High');
-  Future<void> toggleBass() async { _bassBoost = !_bassBoost; await _save(_kBass, _bassBoost); notifyListeners(); }
-  Future<void> setSpeed(double value) async { _speed = value; await _saveDouble(_kSpeed, value); notifyListeners(); }
-  Future<void> setCrossfade(String value) async { _crossfade = value; await _saveString(_kCrossfade, value); notifyListeners(); }
-  Future<void> setSleepTimer(String value) async { _sleepTimer = value; await _saveString(_kSleep, value); notifyListeners(); }
-  Future<void> toggleDownloadOnly() async { _downloadOnly = !_downloadOnly; await _save(_kDownload, _downloadOnly); notifyListeners(); }
-  Future<void> setPlaylist(String value) async { _playlist = value; await _saveString(_kPlaylist, value); notifyListeners(); }
-  Future<void> setNowPlaying(String value) async { _nowPlaying = value; await _saveString(_kNowPlaying, value); notifyListeners(); }
+  Future<void> toggleQuality() async =>
+      setQuality(qualityHigh ? 'Normal' : 'High');
+  Future<void> toggleBass() async {
+    _bassBoost = !_bassBoost;
+    await _save(_kBass, _bassBoost);
+    notifyListeners();
+  }
+
+  Future<void> setSpeed(double value) async {
+    _speed = value;
+    await _saveDouble(_kSpeed, value);
+    notifyListeners();
+  }
+
+  Future<void> setCrossfade(String value) async {
+    _crossfade = value;
+    await _saveString(_kCrossfade, value);
+    notifyListeners();
+  }
+
+  Future<void> setSleepTimer(String value) async {
+    _sleepTimer = value;
+    await _saveString(_kSleep, value);
+    notifyListeners();
+  }
+
+  Future<void> toggleDownloadOnly() async {
+    _downloadOnly = !_downloadOnly;
+    await _save(_kDownload, _downloadOnly);
+    notifyListeners();
+  }
+
+  Future<void> setPlaylist(String value) async {
+    _playlist = value;
+    await _saveString(_kPlaylist, value);
+    notifyListeners();
+  }
+
+  Future<void> setNowPlaying(String value) async {
+    _nowPlaying = value;
+    await _saveString(_kNowPlaying, value);
+    notifyListeners();
+  }
+
   Future<void> setLastTab(int value) async {
     _lastTab = _validIndex(value, 5, fallback: 0);
     await _saveInt(_kLastTab, _lastTab);
     notifyListeners();
   }
 
-  Future<void> setNavConfig({String? shape, String? color, String? corner, List<String>? slots}) async {
+  Future<void> setNavConfig(
+      {String? shape,
+      String? color,
+      String? corner,
+      List<String>? slots}) async {
     if (shape != null) _navShape = shape;
     if (color != null) _navColor = color;
     if (corner != null) _navCorner = corner;

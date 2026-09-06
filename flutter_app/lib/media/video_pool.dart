@@ -580,9 +580,21 @@ class VideoPool {
         // opening all of them at once is what caused one video to play while
         // the rest stopped. The remainder keeps its poster and is promoted
         // when scrolling brings it near the viewport.
-        final keep = _held
-            ? <VideoLease>{}
-            : want.take(maxLive).toSet();
+        final keep = <VideoLease>{};
+        if (!_held) {
+          // Do not re-rank and recreate controllers that are already visible.
+          // Their distances move as the page settles; ownership must remain
+          // stable or Android repeatedly tears down and restarts the same
+          // videos, producing the play-pause-play loop.
+          for (final l in _live) {
+            if (keep.length >= maxLive) break;
+            if (want.contains(l)) keep.add(l);
+          }
+          for (final l in want) {
+            if (keep.length >= maxLive) break;
+            keep.add(l);
+          }
+        }
 
         // GIVE BACK FIRST, AND WAIT FOR IT.
         //
