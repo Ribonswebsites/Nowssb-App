@@ -62,14 +62,16 @@ class SecWrap extends StatelessWidget {
         padding: padding,
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          color: glass ? const Color(0x66FFFFFF) : NwsbColors.surface,
+          color: glass ? const Color(0x4DFFFFFF) : NwsbColors.surface,
           borderRadius: BorderRadius.circular(radius),
-          border: glass ? Border.all(color: const Color(0xDFFFFFFF)) : null,
+          border: glass
+              ? Border.all(color: const Color(0xF2FFFFFF), width: 1.5)
+              : null,
           boxShadow: glass ? null : shadow,
         ),
         child: glass
             ? BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
                 child: _children(),
               )
             : _children(),
@@ -135,9 +137,11 @@ class WrapHead extends StatelessWidget {
             height: 42,
             clipBehavior: Clip.antiAlias,
             decoration: BoxDecoration(
-              color: glass ? const Color(0xAFFFFFFF) : NwsbColors.surface,
+              color: glass ? const Color(0x66FFFFFF) : NwsbColors.surface,
               shape: BoxShape.circle,
-              border: glass ? Border.all(color: const Color(0xDFFFFFFF)) : null,
+              border: glass
+                  ? Border.all(color: const Color(0xF2FFFFFF), width: 1.5)
+                  : null,
               boxShadow: glass ? null : NwsbShadows.raisedXs,
             ),
             child: art ??

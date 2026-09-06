@@ -45,13 +45,13 @@ class NeuCard extends StatelessWidget {
       final glass = ClipRRect(
         borderRadius: BorderRadius.circular(radius),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+          filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
           child: Container(
             padding: padding,
             decoration: BoxDecoration(
-              color: const Color(0xAFFFFFFF),
+              color: const Color(0x5CFFFFFF),
               borderRadius: BorderRadius.circular(radius),
-              border: Border.all(color: const Color(0xDFFFFFFF)),
+              border: Border.all(color: const Color(0xF2FFFFFF), width: 1.5),
             ),
             child: child,
           ),

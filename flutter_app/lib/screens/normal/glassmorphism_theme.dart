@@ -31,7 +31,7 @@ class NormalGlassBackground extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFFDFEFF), Color(0xFFF3F7FF), Color(0xFFFFFFFF)],
+          colors: [Color(0xFFFFFFFF), Color(0xEEF7FBFF), Color(0xFFFFFFFF)],
         ),
       ),
       child: Stack(
@@ -65,20 +65,20 @@ class NormalGlassSection extends StatelessWidget {
         borderRadius: radius,
         boxShadow: const [
           BoxShadow(
-              color: Color(0x180B2447), blurRadius: 24, offset: Offset(0, 12)),
+              color: Color(0x220B2447), blurRadius: 30, offset: Offset(0, 14)),
           BoxShadow(
-              color: Color(0xB8FFFFFF), blurRadius: 14, offset: Offset(-5, -5)),
+              color: Color(0xE6FFFFFF), blurRadius: 20, offset: Offset(-6, -6)),
         ],
       ),
       child: ClipRRect(
         borderRadius: radius,
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+          filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
           child: DecoratedBox(
             decoration: BoxDecoration(
-              color: const Color(0xAFFFFFFF),
+              color: const Color(0x66FFFFFF),
               borderRadius: radius,
-              border: Border.all(color: const Color(0xCFFFFFFF), width: 1.2),
+              border: Border.all(color: const Color(0xF2FFFFFF), width: 1.5),
             ),
             child: child,
           ),
