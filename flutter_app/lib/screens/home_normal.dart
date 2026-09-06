@@ -365,7 +365,7 @@ class _TopRow extends StatelessWidget {
     return Row(
       children: [
         _HamburgerButton(onTap: onMenu),
-        const SizedBox(width: 6),
+        const SizedBox(width: 12),
         // Normal home only: the static mark sits in a raised neumorphic disc.
         Container(
           width: 56,
@@ -402,7 +402,7 @@ class _TopRow extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(width: 6),
+        const SizedBox(width: 12),
         // Flexible, not a bare Column: 'NOWSBANSIU EDITION' at 2pt of letter
         // spacing is wider than it looks, and on a 412pt screen it pushed
         // the three header buttons clean off the right edge.
@@ -431,18 +431,18 @@ class _TopRow extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(width: 4),
+        const Spacer(),
         NormalGlassToggle(enabled: glassMode, onTap: onGlassToggle),
-        const SizedBox(width: 4),
+        const SizedBox(width: 8),
         const _HeaderButton(icon: Icons.notifications_none, badge: 0),
-        const SizedBox(width: 4),
+        const SizedBox(width: 8),
         _HeaderButton(
           icon: Icons.settings_outlined,
           onTap: () => Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => const WidgetsPage()),
           ),
         ),
-        const SizedBox(width: 4),
+        const SizedBox(width: 8),
         // The home button switches which home you are on. There are three
         // ways to reach the Fashion home now — this, the pill above the nav,
         // and Settings — because one that nobody finds is one that is not
