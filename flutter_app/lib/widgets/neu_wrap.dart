@@ -23,11 +23,14 @@
 /// surface language is.
 library;
 
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/material.dart';
 
 import 'nwsb_icon.dart';
 
 import '../theme/tokens.dart';
+import '../screens/normal/glassmorphism_theme.dart';
 
 class SecWrap extends StatelessWidget {
   const SecWrap({
@@ -52,27 +55,38 @@ class SecWrap extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final glass = NormalGlassMode.of(context);
     return Padding(
       padding: margin,
       child: Container(
         padding: padding,
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          color: NwsbColors.surface,
+          color: glass ? const Color(0x66FFFFFF) : NwsbColors.surface,
           borderRadius: BorderRadius.circular(radius),
-          boxShadow: shadow,
+          border: glass ? Border.all(color: const Color(0xDFFFFFFF)) : null,
+          boxShadow: glass ? null : shadow,
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            for (var i = 0; i < children.length; i++) ...[
-              if (i > 0) const SizedBox(height: 10),
-              children[i],
-            ],
-          ],
-        ),
+        child: glass
+            ? BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                child: _children(),
+              )
+            : _children(),
       ),
+    );
+  }
+
+  Widget _children() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (var i = 0; i < children.length; i++) ...[
+          if (i > 0) const SizedBox(height: 10),
+          children[i],
+        ],
+      ],
     );
   }
 }
@@ -110,6 +124,7 @@ class WrapHead extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final glass = NormalGlassMode.of(context);
     return Padding(
       // `margin: 2px 0 14px`, and `padding-right: 40px` to clear the cross.
       padding: const EdgeInsets.fromLTRB(0, 2, 40, 0),
@@ -119,10 +134,11 @@ class WrapHead extends StatelessWidget {
             width: 42,
             height: 42,
             clipBehavior: Clip.antiAlias,
-            decoration: const BoxDecoration(
-              color: NwsbColors.surface,
+            decoration: BoxDecoration(
+              color: glass ? const Color(0xAFFFFFFF) : NwsbColors.surface,
               shape: BoxShape.circle,
-              boxShadow: NwsbShadows.raisedXs,
+              border: glass ? Border.all(color: const Color(0xDFFFFFFF)) : null,
+              boxShadow: glass ? null : NwsbShadows.raisedXs,
             ),
             child: art ??
                 Center(

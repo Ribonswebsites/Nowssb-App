@@ -296,8 +296,7 @@ class _HomeNormalState extends State<HomeNormal> {
 
     final shown = [
       for (final (k, w) in built)
-        if (w != null && !kNormalDefOff.contains(k))
-          _glassMode ? NormalGlassSection(child: w) : w,
+        if (w != null && !kNormalDefOff.contains(k)) w,
     ];
 
     final page = SafeArea(
@@ -323,12 +322,15 @@ class _HomeNormalState extends State<HomeNormal> {
       ),
     );
 
-    return HomeSkinScope(
-      skin: HomeSkin.normal,
-      child: Scaffold(
-        backgroundColor:
-            _glassMode ? const Color(0xFFF7FAFF) : NwsbColors.surface,
-        body: _glassMode ? NormalGlassBackground(child: page) : page,
+    return NormalGlassMode(
+      enabled: _glassMode,
+      child: HomeSkinScope(
+        skin: HomeSkin.normal,
+        child: Scaffold(
+          backgroundColor:
+              _glassMode ? const Color(0xFFF7FAFF) : NwsbColors.surface,
+          body: _glassMode ? NormalGlassBackground(child: page) : page,
+        ),
       ),
     );
   }
@@ -348,6 +350,7 @@ class _TopRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final glass = NormalGlassMode.of(context);
     return Row(
       children: [
         _HamburgerButton(onTap: onMenu),
@@ -359,17 +362,20 @@ class _TopRow extends StatelessWidget {
           padding: const EdgeInsets.all(5),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: NwsbColors.surface,
-            boxShadow: const [
-              BoxShadow(
-                  color: Color(0xFFFFFFFF),
-                  blurRadius: 8,
-                  offset: Offset(-4, -4)),
-              BoxShadow(
-                  color: Color(0x33000000),
-                  blurRadius: 8,
-                  offset: Offset(4, 4)),
-            ],
+            color: glass ? const Color(0xAFFFFFFF) : NwsbColors.surface,
+            border: glass ? Border.all(color: const Color(0xDFFFFFFF)) : null,
+            boxShadow: glass
+                ? null
+                : const [
+                    BoxShadow(
+                        color: Color(0xFFFFFFFF),
+                        blurRadius: 8,
+                        offset: Offset(-4, -4)),
+                    BoxShadow(
+                        color: Color(0x33000000),
+                        blurRadius: 8,
+                        offset: Offset(4, 4)),
+                  ],
           ),
           child: const LoopingLogoMark(size: 46),
         ),
@@ -434,6 +440,7 @@ class _HamburgerButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final glass = NormalGlassMode.of(context);
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -441,9 +448,10 @@ class _HamburgerButton extends StatelessWidget {
         width: 48,
         height: 48,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: glass ? const Color(0xBFFFFFFF) : Colors.white,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: NwsbShadows.raisedSm,
+          border: glass ? Border.all(color: const Color(0xDFFFFFFF)) : null,
+          boxShadow: glass ? null : NwsbShadows.raisedSm,
         ),
         child: const Icon(Icons.menu_rounded, size: 25, color: NwsbColors.ink),
       ),
@@ -530,6 +538,7 @@ class _HeaderButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final glass = NormalGlassMode.of(context);
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -540,9 +549,10 @@ class _HeaderButton extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: NwsbColors.surface,
+              color: glass ? const Color(0xAFFFFFFF) : NwsbColors.surface,
               borderRadius: BorderRadius.circular(12),
-              boxShadow: NwsbShadows.raisedXs,
+              border: glass ? Border.all(color: const Color(0xDFFFFFFF)) : null,
+              boxShadow: glass ? null : NwsbShadows.raisedXs,
             ),
             child: Icon(icon, size: 21, color: NwsbColors.ink),
           ),

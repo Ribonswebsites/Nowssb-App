@@ -7,8 +7,11 @@
 /// changes, instead of forty.
 library;
 
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/material.dart';
 import '../theme/tokens.dart';
+import '../screens/normal/glassmorphism_theme.dart';
 
 enum NwsbElevation { sm, md, xs }
 
@@ -38,6 +41,26 @@ class NeuCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (NormalGlassMode.of(context)) {
+      final glass = ClipRRect(
+        borderRadius: BorderRadius.circular(radius),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+          child: Container(
+            padding: padding,
+            decoration: BoxDecoration(
+              color: const Color(0xAFFFFFFF),
+              borderRadius: BorderRadius.circular(radius),
+              border: Border.all(color: const Color(0xDFFFFFFF)),
+            ),
+            child: child,
+          ),
+        ),
+      );
+      return onTap == null
+          ? glass
+          : GestureDetector(onTap: onTap, child: glass);
+    }
     final body = Container(
       padding: padding,
       decoration: BoxDecoration(

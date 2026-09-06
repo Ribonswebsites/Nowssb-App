@@ -2,6 +2,21 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 
+class NormalGlassMode extends InheritedWidget {
+  const NormalGlassMode(
+      {super.key, required this.enabled, required super.child});
+
+  final bool enabled;
+
+  static bool of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<NormalGlassMode>()?.enabled ??
+      false;
+
+  @override
+  bool updateShouldNotify(NormalGlassMode oldWidget) =>
+      oldWidget.enabled != enabled;
+}
+
 /// White glassmorphism surfaces used only by Flutter's Normal Home.
 /// Fashion Plus and every other screen remain unchanged.
 class NormalGlassBackground extends StatelessWidget {
