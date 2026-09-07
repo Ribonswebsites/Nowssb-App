@@ -63,11 +63,20 @@ class PracticePlayerScreen extends StatefulWidget {
   State<PracticePlayerScreen> createState() => _PracticePlayerScreenState();
 }
 
-class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
+class _PracticePlayerScreenState extends State<PracticePlayerScreen> with TickerProviderStateMixin {
   static const _likedWordsKey = 'nwsb_liked_words';
   static const _shuffleKey = 'nwsb_player_shuffle';
+  static const _actionsTabVideo = 'assets/video/player-actions-tab.mp4';
+  static const _marqueeLines = <String>[
+    'NowssB · Words Without Dictionary',
+    'NowssB · The future of Meditation',
+    'NowssB · The New fashion Trend of meditation',
+  ];
 
   final FlutterTts _tts = FlutterTts();
+  late final PageController _bottomPageController;
+  Timer? _bottomAutoTimer;
+  late final AnimationController _marqueeController;
   var _index = 0;
   var _playing = false;
   var _completed = false;
@@ -76,6 +85,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
   var _repTarget = 7;
   var _shuffle = false;
   var _volume = 1.0;
+  var _bottomPage = 0;
   DateTime? _startedAt;
   String? _error;
 
@@ -85,6 +95,9 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
   @override
   void initState() {
     super.initState();
+    _bottomPageController = PageController();
+    _marqueeController = AnimationController(vsync: this, duration: const Duration(seconds: 18))..repeat();
+    _kickBottomAuto();
     PracticeProgress.instance.addListener(_onProgress);
     unawaited(PracticeProgress.instance.start());
     unawaited(_loadLiked());
@@ -92,8 +105,33 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
     unawaited(_prepareAndPlay());
   }
 
+  void _kickBottomAuto() {
+    _bottomAutoTimer?.cancel();
+    _bottomAutoTimer = Timer.periodic(const Duration(milliseconds: 5200), (_) {
+      if (!mounted || !_bottomPageController.hasClients) return;
+      final next = _bottomPage == 0 ? 1 : 0;
+      _bottomPageController.animateToPage(
+        next,
+        duration: const Duration(milliseconds: 480),
+        curve: Curves.easeOutCubic,
+      );
+    });
+  }
+
+  void _openSoundLibrary(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => const FractionallySizedBox(heightFactor: .96, child: AuraSoundLibraryScreen()),
+    );
+  }
+
   @override
   void dispose() {
+    _bottomAutoTimer?.cancel();
+    _bottomPageController.dispose();
+    _marqueeController.dispose();
     PracticeProgress.instance.removeListener(_onProgress);
     unawaited(_tts.stop());
     super.dispose();
@@ -487,10 +525,12 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
                         ),
                       ),
                       const SizedBox(height: 4),
-                      const Text(
-                        'NowssB  ·  Words Without Dictionary',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Color(0xFF8B8B90), fontSize: 14),
+                      SizedBox(
+                        height: 20,
+                        child: _SubtitleMarquee(
+                          lines: _marqueeLines,
+                          animation: _marqueeController,
+                        ),
                       ),
                     ]),
                   ),
@@ -525,55 +565,65 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
                   onRepeat: () => setState(() => _loop = !_loop),
                 ),
                 const SizedBox(height: 16),
-                GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onHorizontalDragEnd: (details) {
-                    final v = details.primaryVelocity ?? 0;
-                    if (v < -280) {
-                      _move(1);
-                    } else if (v > 280) {
-                      _move(-1);
-                    }
-                  },
-                  child: Column(children: [
-                    SizedBox(width: stageWidth, child: _NextUpCard(
-                      words: widget.words,
-                      index: _index,
-                      themes: _playerThemes,
-                      onPlayAt: (i) async {
-                        if (i == _index) {
+                if (_completed || _error != null) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    _error ?? 'Completed and added to your progress.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: _error == null ? Colors.white70 : const Color(0xFFFFB4B4), fontSize: 12, height: 1.4),
+                  ),
+                ],
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: stageWidth,
+                  height: 132,
+                  child: PageView(
+                    controller: _bottomPageController,
+                    onPageChanged: (p) {
+                      setState(() => _bottomPage = p);
+                      _kickBottomAuto();
+                    },
+                    children: [
+                      _WordActionStrip(
+                        accent: theme.accent,
+                        video: _actionsTabVideo,
+                        onSentence: _openInfo,
+                        onPractice: _prepareAndPlay,
+                        onStore: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const StoreScreen())),
+                      ),
+                      _NextUpCard(
+                        words: widget.words,
+                        index: _index,
+                        themes: _playerThemes,
+                        onPlayAt: (i) async {
+                          if (i == _index) {
+                            await _prepareAndPlay();
+                            return;
+                          }
+                          await _tts.stop();
+                          setState(() {
+                            _index = i;
+                            _liked = false;
+                            _completed = false;
+                            _error = null;
+                          });
+                          await _loadLiked();
                           await _prepareAndPlay();
-                          return;
-                        }
-                        await _tts.stop();
-                        setState(() {
-                          _index = i;
-                          _liked = false;
-                          _completed = false;
-                          _error = null;
-                        });
-                        await _loadLiked();
-                        await _prepareAndPlay();
-                      },
-                      onOpenQueue: () => _openQueueSheet(context),
-                    )),
-                    if (_completed || _error != null) ...[
-                      const SizedBox(height: 12),
-                      Text(
-                        _error ?? 'Completed and added to your progress.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: _error == null ? Colors.white70 : const Color(0xFFFFB4B4), fontSize: 12, height: 1.4),
+                        },
+                        onOpenSoundLibrary: () => _openSoundLibrary(context),
+                        onOpenQueue: () => _openQueueSheet(context),
                       ),
                     ],
-                    const SizedBox(height: 18),
-                    SizedBox(width: stageWidth, child: _WordActionStrip(
-                      accent: theme.accent,
-                      video: theme.video,
-                      onSentence: _openInfo,
-                      onPractice: _prepareAndPlay,
-                      onStore: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const StoreScreen())),
-                    )),
-                  ]),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _BottomDot(active: _bottomPage == 0),
+                    const SizedBox(width: 6),
+                    _BottomDot(active: _bottomPage == 1),
+                  ],
                 ),
               ]),
             ),
@@ -792,6 +842,7 @@ class _NextUpCard extends StatelessWidget {
     required this.themes,
     required this.onPlayAt,
     required this.onOpenQueue,
+    required this.onOpenSoundLibrary,
   });
 
   final List<Word> words;
@@ -799,6 +850,7 @@ class _NextUpCard extends StatelessWidget {
   final List<_PlayerTheme> themes;
   final ValueChanged<int> onPlayAt;
   final VoidCallback onOpenQueue;
+  final VoidCallback onOpenSoundLibrary;
 
   @override
   Widget build(BuildContext context) {
@@ -831,7 +883,7 @@ class _NextUpCard extends StatelessWidget {
                   child: Row(children: [
                     const Expanded(child: Text('UP NEXT', style: TextStyle(color: Color(0xFF8D8D92), fontSize: 11, fontWeight: FontWeight.w500, letterSpacing: 2.8))),
                     GestureDetector(
-                      onTap: onOpenQueue,
+                      onTap: onOpenSoundLibrary,
                       child: const SizedBox(width: 36, height: 36, child: Icon(Icons.queue_music_rounded, color: Color(0xFFCFCFD2), size: 20)),
                     ),
                   ]),
@@ -885,7 +937,7 @@ class _NextUpCard extends StatelessWidget {
   }
 }
 
-/// Glassmorphic full queue list — swipe-up / queue icon target (not Sound Library).
+/// YTM-style heavy glass queue — swipe-up target (queue icon opens Sound Library).
 class _QueueSheet extends StatelessWidget {
   const _QueueSheet({
     required this.words,
@@ -907,16 +959,16 @@ class _QueueSheet extends StatelessWidget {
       child: ClipRRect(
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 28, sigmaY: 28),
+          filter: ImageFilter.blur(sigmaX: 48, sigmaY: 48),
           child: Container(
             height: h,
             decoration: BoxDecoration(
-              color: const Color(0xE6111216),
+              color: const Color(0x8C121416),
               borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-              border: Border.all(color: const Color(0x28FFFFFF)),
+              border: Border.all(color: const Color(0x2EFFFFFF)),
               boxShadow: const [
-                BoxShadow(color: Color(0x80000000), blurRadius: 40, offset: Offset(0, -12)),
-                BoxShadow(color: Color(0x22FFFFFF), blurRadius: 0, spreadRadius: 1),
+                BoxShadow(color: Color(0xB3000000), blurRadius: 56, offset: Offset(0, -14)),
+                BoxShadow(color: Color(0x38FFFFFF), blurRadius: 0, spreadRadius: 1),
               ],
             ),
             child: Column(children: [
@@ -1689,15 +1741,37 @@ class _WordActionStrip extends StatelessWidget {
   @override
   Widget build(BuildContext context) => AspectRatio(
     aspectRatio: 1371 / 317,
-    child: Stack(fit: StackFit.expand, children: [
-      NwsbVideo(asset: video, priority: ClipPriority.decoration, autoplay: true),
-      IgnorePointer(child: Image.asset('assets/frames/word-acts-tab.webp', fit: BoxFit.fill)),
-      Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-        _WordAction(icon: Icons.chat_bubble_outline_rounded, label: 'Sentence', onTap: onSentence),
-        _WordAction(icon: Icons.mic_none_rounded, label: 'Practice', onTap: onPractice, accent: accent),
-        _WordAction(icon: Icons.shopping_bag_outlined, label: 'Store', onTap: onStore),
+    child: ClipRRect(
+      borderRadius: BorderRadius.circular(9),
+      child: Stack(fit: StackFit.expand, children: [
+        const ColoredBox(color: Colors.black),
+        NwsbVideo(asset: video, priority: ClipPriority.decoration, autoplay: true),
+        IgnorePointer(child: Image.asset('assets/frames/word-acts-tab.webp', fit: BoxFit.fill, errorBuilder: (_, __, ___) => const SizedBox.shrink())),
+        Row(children: [
+          Expanded(child: _WordAction(icon: Icons.chat_bubble_outline_rounded, label: 'Sentence', onTap: onSentence)),
+          Container(
+            width: 1.5,
+            height: 42,
+            margin: const EdgeInsets.symmetric(vertical: 18),
+            decoration: const BoxDecoration(
+              color: Color(0xB8FFFFFF),
+              boxShadow: [BoxShadow(color: Color(0x59FFFFFF), blurRadius: 6)],
+            ),
+          ),
+          Expanded(child: _WordAction(icon: Icons.mic_none_rounded, label: 'Practice', onTap: onPractice, accent: accent)),
+          Container(
+            width: 1.5,
+            height: 42,
+            margin: const EdgeInsets.symmetric(vertical: 18),
+            decoration: const BoxDecoration(
+              color: Color(0xB8FFFFFF),
+              boxShadow: [BoxShadow(color: Color(0x59FFFFFF), blurRadius: 6)],
+            ),
+          ),
+          Expanded(child: _WordAction(icon: Icons.shopping_bag_outlined, label: 'Store', onTap: onStore)),
+        ]),
       ]),
-    ]),
+    ),
   );
 }
 
@@ -1714,11 +1788,11 @@ class _WordAction extends StatelessWidget {
     label: label,
     child: GestureDetector(
       onTap: onTap,
-      child: SizedBox(width: 78, child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         Icon(icon, color: Colors.white, size: 25, shadows: [Shadow(color: (accent ?? Colors.black).withOpacity(.85), blurRadius: 12)]),
         const SizedBox(height: 3),
         Text(label.toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 8.5, fontWeight: FontWeight.w800, letterSpacing: 1.1)),
-      ])),
+      ]),
     ),
   );
 }
@@ -1879,6 +1953,59 @@ class _PlayerTheme {
   final String image;
   final String video;
   final Color accent;
+}
+
+
+class _BottomDot extends StatelessWidget {
+  const _BottomDot({required this.active});
+  final bool active;
+  @override
+  Widget build(BuildContext context) => AnimatedContainer(
+    duration: const Duration(milliseconds: 220),
+    width: 5,
+    height: 5,
+    decoration: BoxDecoration(
+      shape: BoxShape.circle,
+      color: active ? const Color(0xFFF5F5F7) : const Color(0x47FFFFFF),
+      boxShadow: active ? const [BoxShadow(color: Color(0x59FFFFFF), blurRadius: 8)] : null,
+    ),
+  );
+}
+
+class _SubtitleMarquee extends StatelessWidget {
+  const _SubtitleMarquee({required this.lines, required this.animation});
+  final List<String> lines;
+  final Animation<double> animation;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRect(
+      child: AnimatedBuilder(
+        animation: animation,
+        builder: (context, _) {
+          final t = animation.value;
+          return Align(
+            alignment: Alignment(-1.0 + t * 2.4, 0),
+            widthFactor: 1,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (var i = 0; i < lines.length; i++) ...[
+                  if (i > 0) const SizedBox(width: 48),
+                  Text(
+                    lines[i],
+                    maxLines: 1,
+                    softWrap: false,
+                    style: const TextStyle(color: Color(0xFF8B8B90), fontSize: 14),
+                  ),
+                ],
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
 }
 
 const _playerThemes = <_PlayerTheme>[
