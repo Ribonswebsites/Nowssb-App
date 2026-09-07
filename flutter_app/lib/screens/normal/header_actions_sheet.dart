@@ -1,8 +1,8 @@
 /// Glass header-actions sheet — flat Quick actions carousel for Normal home.
 ///
-/// Opens from the slim `_TopRow` SVG control. Outer sheet stays light/frosted;
-/// the icon row sits in an inner dark glass panel. Horizontal swipe only —
-/// no perspective, rotateY, or depth scaling.
+/// Opens from the slim `_TopRow` SVG control. Outer chrome matches the
+/// Notifications dark frosted glass sheet; the icon row sits in an inner
+/// darker panel. Horizontal swipe with spring snap — flat tiles, no 3D.
 library;
 
 import 'dart:ui' as ui;
@@ -56,8 +56,8 @@ Future<void> showHeaderActionsSheet(
     context: context,
     barrierDismissible: true,
     barrierLabel: 'Header actions',
-    barrierColor: const Color(0x99040A18),
-    transitionDuration: const Duration(milliseconds: 320),
+    barrierColor: const Color(0xB7040812),
+    transitionDuration: const Duration(milliseconds: 280),
     pageBuilder: (context, anim, secondary) {
       return HeaderActionsSheet(
         glassMode: glassMode,
@@ -76,12 +76,12 @@ Future<void> showHeaderActionsSheet(
       return FadeTransition(
         opacity: curved,
         child: BackdropFilter(
-          filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+          filter: ui.ImageFilter.blur(sigmaX: 6, sigmaY: 6),
           child: ScaleTransition(
-            scale: Tween<double>(begin: 0.96, end: 1).animate(curved),
+            scale: Tween<double>(begin: 0.98, end: 1).animate(curved),
             child: SlideTransition(
               position: Tween<Offset>(
-                begin: const Offset(0, -0.03),
+                begin: const Offset(0, 0.04),
                 end: Offset.zero,
               ).animate(curved),
               child: child,
@@ -338,7 +338,7 @@ class _HeaderActionsSheetState extends State<HeaderActionsSheet>
     final centerId = _ids.isEmpty ? _kAddId : _ids[_centerIndex];
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
         child: Align(
           alignment: Alignment.topCenter,
           child: ConstrainedBox(
@@ -348,63 +348,30 @@ class _HeaderActionsSheetState extends State<HeaderActionsSheet>
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(24),
                 child: BackdropFilter(
-                  filter: ui.ImageFilter.blur(sigmaX: 28, sigmaY: 28),
+                  filter: ui.ImageFilter.blur(sigmaX: 26, sigmaY: 26),
                   child: DecoratedBox(
                     decoration: BoxDecoration(
-                      color: const Color(0x72FFFFFF),
+                      // Same dark frosted glass as NotificationsSheet.
+                      color: const Color(0x0FFFFFFF),
                       borderRadius: BorderRadius.circular(24),
-                      border: Border.all(
-                        color: const Color(0xF2FFFFFF),
-                        width: 1.4,
-                      ),
+                      border: Border.all(color: const Color(0x24FFFFFF)),
                       boxShadow: const [
                         BoxShadow(
-                          color: Color(0x280B2447),
-                          blurRadius: 28,
-                          offset: Offset(0, 12),
-                        ),
-                        BoxShadow(
-                          color: Color(0xAAFFFFFF),
-                          blurRadius: 14,
-                          offset: Offset(-3, -3),
+                          color: Color(0x8C000000),
+                          blurRadius: 60,
+                          offset: Offset(0, 26),
                         ),
                       ],
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(14, 10, 14, 12),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          _SheetChrome(
-                            onClose: () => Navigator.of(context).pop(),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            'Quick actions',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleSmall
-                                ?.copyWith(
-                                  color: NwsbColors.ink,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: -0.2,
-                                ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            'Swipe · centre to open',
-                            style: Theme.of(context)
-                                .textTheme
-                                .labelSmall
-                                ?.copyWith(
-                                  color: NwsbColors.inkSoft,
-                                  letterSpacing: 0.4,
-                                  fontSize: 11,
-                                ),
-                          ),
-                          const SizedBox(height: 12),
-                          // Inner dark glass panel — wraps tiles + focus label.
-                          ClipRRect(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _SheetHead(
+                          onClose: () => Navigator.of(context).pop(),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(12, 4, 12, 14),
+                          child: ClipRRect(
                             borderRadius: BorderRadius.circular(18),
                             child: BackdropFilter(
                               filter: ui.ImageFilter.blur(
@@ -468,8 +435,8 @@ class _HeaderActionsSheetState extends State<HeaderActionsSheet>
                               ),
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -482,41 +449,61 @@ class _HeaderActionsSheetState extends State<HeaderActionsSheet>
   }
 }
 
-class _SheetChrome extends StatelessWidget {
-  const _SheetChrome({required this.onClose});
+class _SheetHead extends StatelessWidget {
+  const _SheetHead({required this.onClose});
 
   final VoidCallback onClose;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 32,
-          height: 3.5,
-          decoration: BoxDecoration(
-            color: const Color(0x55FFFFFF),
-            borderRadius: BorderRadius.circular(4),
-            border: Border.all(color: const Color(0x88FFFFFF)),
-          ),
-        ),
-        const Spacer(),
-        GestureDetector(
-          onTap: onClose,
-          behavior: HitTestBehavior.opaque,
-          child: Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: const Color(0x55FFFFFF),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: const Color(0xDFFFFFFF)),
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 18, 16, 14),
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: Color(0x1AFFFFFF))),
+      ),
+      child: Row(
+        children: [
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Quick actions',
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+                SizedBox(height: 3),
+                Text(
+                  'Swipe · centre to open',
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w300,
+                    color: Color(0x99FFFFFF),
+                  ),
+                ),
+              ],
             ),
-            child: const Icon(Icons.close_rounded,
-                size: 16, color: NwsbColors.ink),
           ),
-        ),
-      ],
+          GestureDetector(
+            onTap: onClose,
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              width: 38,
+              height: 38,
+              alignment: Alignment.center,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.close, size: 16, color: NwsbColors.deep),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -606,26 +593,31 @@ class _FlatCarousel extends StatelessWidget {
               final cx = constraints.maxWidth / 2;
               final cy = constraints.maxHeight / 2;
 
-              // Neighbours ±1 (and ±2 when list is long) — wrap so sides
-              // stay populated. Paint far → near so centre is on top.
-              final reach = n >= 5 ? 2 : 1;
-              final center = focus.round();
-              final slots = <int>[
-                for (var s = -reach; s <= reach; s++) s,
-              ]..sort((a, b) => b.abs().compareTo(a.abs()));
+              // Continuous circular offsets so tiles physically slide under
+              // the fixed centre focus as the user swipes / spring-snaps.
+              final reach = n >= 5 ? 2 : (n >= 3 ? 1 : 0);
+              final order = <int>[
+                for (var i = 0; i < n; i++) i,
+              ]..sort((a, b) {
+                  final da = _circularDelta(a.toDouble(), focus, n).abs();
+                  final db = _circularDelta(b.toDouble(), focus, n).abs();
+                  return db.compareTo(da); // far → near (centre on top)
+                });
 
               return ClipRect(
                 child: Stack(
                   clipBehavior: Clip.hardEdge,
                   children: [
-                    for (final slot in slots)
-                      _buildSlot(
-                        items: items,
-                        slot: slot,
-                        centerRound: center,
-                        cx: cx,
-                        cy: cy,
-                      ),
+                    for (final index in order)
+                      if (_circularDelta(index.toDouble(), focus, n)
+                              .abs() <=
+                          reach + 0.55)
+                        _buildItem(
+                          items: items,
+                          index: index,
+                          cx: cx,
+                          cy: cy,
+                        ),
                   ],
                 ),
               );
@@ -676,30 +668,27 @@ class _FlatCarousel extends StatelessWidget {
     }
   }
 
-  Widget _buildSlot({
+  Widget _buildItem({
     required List<_ActionSpec> items,
-    required int slot,
-    required int centerRound,
+    required int index,
     required double cx,
     required double cy,
   }) {
     final n = items.length;
-    final index = _wrapIndex(centerRound + slot, n);
-    final frac = focus - centerRound;
-    final visualOffset = slot - frac;
+    final visualOffset = _circularDelta(index.toDouble(), focus, n);
     final abs = visualOffset.abs().clamp(0.0, 2.2);
 
-    // Flat: equal size; only a soft opacity fade for far neighbours.
+    // Flat: equal size; soft opacity fade for far neighbours.
     final opacity = ui.lerpDouble(
       1.0,
-      0.55,
+      0.5,
       Curves.easeOut.transform((abs / 1.6).clamp(0.0, 1.0)),
     )!;
     final dx = visualOffset * gap;
     final emphasized = abs < 0.38;
 
     return Positioned(
-      key: ValueKey('slot-$slot-$index'),
+      key: ValueKey('tile-$index-${items[index].label}'),
       left: cx - tile / 2 + dx,
       top: cy - tile / 2,
       child: Opacity(
@@ -756,28 +745,35 @@ class _ActionTile extends StatelessWidget {
           height: size,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
-            color: spec.active
+            // Centre focus = solid white (Notifications MANAGE look);
+            // sides stay muted dark against the inner tray.
+            color: emphasized
                 ? const Color(0xFFFFFFFF)
-                : const Color(0xF2F5F8FC),
+                : (spec.active
+                    ? const Color(0x33FFFFFF)
+                    : const Color(0x22FFFFFF)),
             border: Border.all(
               color: emphasized
                   ? const Color(0xFFFFFFFF)
-                  : const Color(0xCCFFFFFF),
+                  : const Color(0x33FFFFFF),
               width: emphasized ? 1.6 : 1.0,
             ),
             boxShadow: [
-              BoxShadow(
-                color: Color(emphasized ? 0x40000000 : 0x28000000),
-                blurRadius: emphasized ? 12 : 8,
-                offset: const Offset(0, 4),
-              ),
+              if (emphasized)
+                const BoxShadow(
+                  color: Color(0x40000000),
+                  blurRadius: 12,
+                  offset: Offset(0, 4),
+                ),
             ],
           ),
           child: Center(
             child: NwsbIcon(
               spec.body,
               size: emphasized ? 24 : 22,
-              color: const Color(0xFF31577F),
+              color: emphasized
+                  ? NwsbColors.deep
+                  : const Color(0xB8FFFFFF),
               strokeWidth: emphasized ? 1.85 : 1.7,
             ),
           ),
@@ -867,9 +863,16 @@ class _CustomizeShortcutsSheetState extends State<_CustomizeShortcutsSheet> {
           filter: ui.ImageFilter.blur(sigmaX: 22, sigmaY: 22),
           child: DecoratedBox(
             decoration: BoxDecoration(
-              color: const Color(0xEEF7FAFF),
+              color: const Color(0x0FFFFFFF),
               borderRadius: BorderRadius.circular(22),
-              border: Border.all(color: const Color(0xDFFFFFFF)),
+              border: Border.all(color: const Color(0x24FFFFFF)),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x8C000000),
+                  blurRadius: 40,
+                  offset: Offset(0, 18),
+                ),
+              ],
             ),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
@@ -882,7 +885,7 @@ class _CustomizeShortcutsSheetState extends State<_CustomizeShortcutsSheet> {
                       width: 36,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: const Color(0x33000000),
+                        color: const Color(0x44FFFFFF),
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -892,17 +895,17 @@ class _CustomizeShortcutsSheetState extends State<_CustomizeShortcutsSheet> {
                     'Customize shortcuts',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: NwsbColors.ink,
+                      color: Colors.white,
                       fontWeight: FontWeight.w800,
                       fontSize: 16,
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(
+                  const Text(
                     'Choose up to 6 · Add stays at the end',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: NwsbColors.inkSoft,
+                      color: Color(0x99FFFFFF),
                       fontSize: 12,
                     ),
                   ),
@@ -913,11 +916,13 @@ class _CustomizeShortcutsSheetState extends State<_CustomizeShortcutsSheet> {
                       contentPadding: EdgeInsets.zero,
                       value: _selected.contains(id),
                       onChanged: (_) => _toggle(id),
-                      activeColor: const Color(0xFF31577F),
+                      activeColor: Colors.white,
+                      checkColor: NwsbColors.deep,
+                      side: const BorderSide(color: Color(0x66FFFFFF)),
                       title: Text(
                         _labels[id] ?? id,
                         style: const TextStyle(
-                          color: NwsbColors.ink,
+                          color: Colors.white,
                           fontWeight: FontWeight.w600,
                           fontSize: 14,
                         ),
@@ -927,8 +932,8 @@ class _CustomizeShortcutsSheetState extends State<_CustomizeShortcutsSheet> {
                   FilledButton(
                     onPressed: () => Navigator.of(context).pop(_selected),
                     style: FilledButton.styleFrom(
-                      backgroundColor: const Color(0xFF31577F),
-                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.white,
+                      foregroundColor: NwsbColors.deep,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),
