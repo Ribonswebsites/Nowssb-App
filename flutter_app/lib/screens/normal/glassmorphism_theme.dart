@@ -1,6 +1,7 @@
 import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 import '../../media/nwsb_video.dart';
+import '../../media/video_pool.dart';
 
 class NormalGlassMode extends InheritedWidget {
   const NormalGlassMode(
@@ -19,6 +20,8 @@ class NormalGlassMode extends InheritedWidget {
 
 /// Glassmorphism surfaces used only by Flutter's Normal Home.
 /// Fashion Plus and every other screen remain unchanged.
+///
+/// Background is the looping film only — no abstract painted orbs.
 class NormalGlassBackground extends StatelessWidget {
   const NormalGlassBackground({super.key, required this.child});
 
@@ -26,30 +29,27 @@ class NormalGlassBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFFFFFFFF), Color(0xEEF7FBFF), Color(0xFFFFFFFF)],
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        const Positioned.fill(
+          child: ColoredBox(color: Color(0xFFF7FAFF)),
         ),
-      ),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          const Positioned.fill(
-            child: IgnorePointer(
-              child: NwsbVideo(
-                asset: 'assets/video/normal-glass-background.mp4',
-                fit: BoxFit.cover,
-                showPoster: true,
-              ),
+        const Positioned.fill(
+          child: IgnorePointer(
+            child: NwsbVideo(
+              asset: 'assets/video/normal-glass-background.mp4',
+              fit: BoxFit.cover,
+              // Feature so the pool never steals this slot for a banner.
+              priority: ClipPriority.feature,
+              loop: true,
+              autoplay: true,
+              showPoster: true,
             ),
           ),
-          IgnorePointer(child: CustomPaint(painter: _GlassOrbsPainter())),
-          child,
-        ],
-      ),
+        ),
+        child,
+      ],
     );
   }
 }
@@ -145,33 +145,4 @@ class NormalGlassToggle extends StatelessWidget {
       ),
     );
   }
-}
-
-class _GlassOrbsPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final blobs = [
-      (
-        Offset(size.width * .10, size.height * .12),
-        170.0,
-        const Color(0x2447A7FF)
-      ),
-      (
-        Offset(size.width * .92, size.height * .34),
-        220.0,
-        const Color(0x1F9F7BFF)
-      ),
-      (
-        Offset(size.width * .30, size.height * .88),
-        260.0,
-        const Color(0x1F61D6C8)
-      ),
-    ];
-    for (final (center, radius, color) in blobs) {
-      canvas.drawCircle(center, radius, Paint()..color = color);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
