@@ -1,4 +1,8 @@
 /// Hero video, sticky header, and total-sessions orb for My Progress.
+///
+/// Page videos are full-bleed (edge-to-edge cover). The orb hero is a
+/// transparent overlay only — stats sit inside the ring, never cropped
+/// inside a letterboxed video card.
 library;
 
 import 'dart:math' as math;
@@ -11,11 +15,36 @@ import '../../media/video_pool.dart';
 import 'progress_tokens.dart';
 
 const kProgressScene1 = 'assets/video/my-progress-scene-1.mp4';
-const kProgressScene2 = 'assets/video/my-progress-scene-2.mp4';
-/// Same clip as progress-scroll-bg / my-progress-scene-2 — page backdrop after the hero.
+/// Scroll-up page backdrop (smoke / silk) — full bleed, not a card.
 const kProgressScrollBg = 'assets/video/player-bg-loop.mp4';
 
-/// Full-screen scroll backdrop (water / silk loop). Visible once the hero scrolls away.
+/// Full-screen hero (scene-1) backdrop. Crossfades out as user scrolls.
+class ProgressHeroBgVideo extends StatelessWidget {
+  const ProgressHeroBgVideo({super.key, this.opacity = 1});
+  final double opacity;
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned.fill(
+      child: IgnorePointer(
+        child: Opacity(
+          opacity: opacity.clamp(0.0, 1.0),
+          child: const ColoredBox(
+            color: MpColors.bg,
+            child: NwsbVideo(
+              asset: kProgressScene1,
+              fit: BoxFit.cover,
+              priority: ClipPriority.feature,
+              alignment: Alignment(0, -0.12),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Full-screen scroll backdrop. Fades in once the hero leaves.
 class ProgressScrollBgVideo extends StatelessWidget {
   const ProgressScrollBgVideo({super.key, this.opacity = 1});
   final double opacity;
@@ -119,23 +148,27 @@ class ProgressHeader extends StatelessWidget {
           ),
           child: Row(
             children: [
-              InkWell(
-                onTap: onBack,
-                customBorder: const CircleBorder(),
-                child: Container(
-                  width: 52,
-                  height: 52,
-                  alignment: Alignment.center,
-                  decoration: const BoxDecoration(
-                    color: Color(0xF2FFFFFF),
-                    shape: BoxShape.circle,
-                  ),
-                  child: SvgPicture.asset(
-                    'assets/icons/icon_01.svg',
-                    width: 22,
-                    height: 22,
-                    colorFilter: const ColorFilter.mode(Color(0xFF080909), BlendMode.srcIn),
-                    placeholderBuilder: (_) => const Icon(Icons.chevron_left, size: 28, color: Color(0xFF080909)),
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: onBack,
+                  customBorder: const CircleBorder(),
+                  child: Container(
+                    width: 52,
+                    height: 52,
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(
+                      color: Color(0xF2FFFFFF),
+                      shape: BoxShape.circle,
+                    ),
+                    child: SvgPicture.asset(
+                      'assets/icons/icon_01.svg',
+                      width: 22,
+                      height: 22,
+                      colorFilter: const ColorFilter.mode(Color(0xFF080909), BlendMode.srcIn),
+                      placeholderBuilder: (_) =>
+                          const Icon(Icons.chevron_left, size: 28, color: Color(0xFF080909)),
+                    ),
                   ),
                 ),
               ),
@@ -173,10 +206,7 @@ class ProgressHeader extends StatelessWidget {
   }
 }
 
-/// Scene-1 orb + centered stats + VIEW INSIGHTS.
-///
-/// Video lives *inside* this box (not full-screen) so the text stack stays
-/// locked to the bright orb core. Height is tight so YOUR NUMBERS sits close.
+/// Transparent orb overlay — NO video inside. Page bg shows through.
 class ProgressOrbHero extends StatelessWidget {
   const ProgressOrbHero({
     super.key,
@@ -189,128 +219,103 @@ class ProgressOrbHero extends StatelessWidget {
   final String timeLabel;
   final VoidCallback onViewInsights;
 
-  /// Compact hero — was 545; mock puts Your Numbers just under the CTA.
+  /// Compact hero matching Glass Orb mobile mock (~392).
   static const double height = 392;
 
-  /// Alignment of the bright orb core within the clipped scene-1 frame.
-  static const Alignment orbCore = Alignment(0, -0.42);
+  static const double _orbTopFrac = 0.38;
+  static const double _ringSize = 268;
 
   @override
   Widget build(BuildContext context) {
     final ringProgress =
         sessions == 0 ? 0.12 : (0.18 + (sessions % 40) / 50).clamp(0.18, 0.92);
+    final orbTop = height * _orbTopFrac - _ringSize / 2;
 
     return SizedBox(
       height: height,
       width: double.infinity,
       child: Stack(
-        clipBehavior: Clip.hardEdge,
+        clipBehavior: Clip.none,
         children: [
-          // Scene-1 orb video — framed to this hero only.
-          const Positioned.fill(
-            child: Opacity(
-              opacity: 0.96,
-              child: ColoredBox(
-                color: MpColors.bg,
-                child: NwsbVideo(
-                  asset: kProgressScene1,
-                  fit: BoxFit.cover,
-                  priority: ClipPriority.feature,
-                  alignment: Alignment(0, -0.15),
+          // Thin white progress ring around the bright orb core.
+          Positioned(
+            top: orbTop,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: SizedBox(
+                width: _ringSize,
+                height: _ringSize,
+                child: CustomPaint(painter: _OrbRingPainter(progress: ringProgress)),
+              ),
+            ),
+          ),
+          // Stats stack — locked inside the ring.
+          Positioned(
+            top: orbTop,
+            left: 0,
+            right: 0,
+            height: _ringSize,
+            child: Center(
+              child: SizedBox(
+                width: 210,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'TOTAL SESSIONS',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 9,
+                        letterSpacing: 2.8,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFFE6E6E2),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '$sessions',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 61,
+                        fontWeight: FontWeight.w300,
+                        letterSpacing: -3.5,
+                        height: 0.94,
+                        color: MpColors.white,
+                        shadows: [Shadow(blurRadius: 18, color: Colors.black)],
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      timeLabel,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w300,
+                        color: Color(0xFFF0F0ED),
+                        shadows: [Shadow(blurRadius: 12, color: Colors.black)],
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    const Text(
+                      'MEDITATION TIME',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 8,
+                        letterSpacing: 2.4,
+                        color: Color(0xFFBFC1C0),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
-          // Soft vignette so lower CTA / next section read cleanly.
-          const Positioned.fill(
-            child: IgnorePointer(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color(0x33000000),
-                      Color(0x00000000),
-                      Color(0x00000000),
-                      Color(0x99020304),
-                    ],
-                    stops: [0, 0.22, 0.62, 1],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          // Progress ring around the orb core.
-          Align(
-            alignment: orbCore,
-            child: SizedBox(
-              width: 268,
-              height: 268,
-              child: CustomPaint(painter: _OrbRingPainter(progress: ringProgress)),
-            ),
-          ),
-          // Stats stack — truly centered in the bright orb core.
-          Align(
-            alignment: orbCore,
-            child: SizedBox(
-              width: 210,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text(
-                    'TOTAL SESSIONS',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 9,
-                      letterSpacing: 2.8,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFFE6E6E2),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '$sessions',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 61,
-                      fontWeight: FontWeight.w300,
-                      letterSpacing: -3.5,
-                      height: 0.94,
-                      color: MpColors.white,
-                      shadows: [Shadow(blurRadius: 18, color: Colors.black)],
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    timeLabel,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w300,
-                      color: Color(0xFFF0F0ED),
-                      shadows: [Shadow(blurRadius: 12, color: Colors.black)],
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  const Text(
-                    'MEDITATION TIME',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 8,
-                      letterSpacing: 2.4,
-                      color: Color(0xFFBFC1C0),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          // CTA sits just under the orb — little dead space below.
+          // CTA under the orb.
           Positioned(
             left: 0,
             right: 0,
-            bottom: 18,
+            bottom: 16,
             child: Center(
               child: TextButton(
                 onPressed: onViewInsights,
@@ -358,13 +363,12 @@ class _OrbRingPainter extends CustomPainter {
       ..strokeWidth = 1.4
       ..strokeCap = StrokeCap.round;
     canvas.drawCircle(c, r, track);
-    canvas.drawArc(
-      Rect.fromCircle(center: c, radius: r),
-      -math.pi * 0.48,
-      math.pi * 2 * progress,
-      false,
-      arc,
-    );
+    final start = -math.pi * 0.48;
+    final sweep = math.pi * 2 * progress;
+    canvas.drawArc(Rect.fromCircle(center: c, radius: r), start, sweep, false, arc);
+    // Bright handle at the leading tip of the arc (matches mock).
+    final tip = Offset(c.dx + r * math.cos(start + sweep), c.dy + r * math.sin(start + sweep));
+    canvas.drawCircle(tip, 3.2, Paint()..color = Colors.white.withOpacity(0.95));
   }
 
   @override
@@ -372,47 +376,23 @@ class _OrbRingPainter extends CustomPainter {
       oldDelegate.progress != progress;
 }
 
-class ProgressSceneTwo extends StatelessWidget {
-  const ProgressSceneTwo({super.key});
+/// Tagline overlay only — NO empty video card. Page scroll bg shows through.
+class ProgressPracticeForward extends StatelessWidget {
+  const ProgressPracticeForward({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(22),
-      child: AspectRatio(
-        aspectRatio: 16 / 9,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            const NwsbVideo(
-              asset: kProgressScene2,
-              fit: BoxFit.cover,
-              priority: ClipPriority.decoration,
-            ),
-            const DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Colors.transparent, Color(0xCC020304)],
-                ),
-              ),
-            ),
-            const Positioned(
-              left: 16,
-              right: 16,
-              bottom: 14,
-              child: Text(
-                'Your practice, moving forward.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Color(0xFFEDEDEB),
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ],
+    return const Padding(
+      padding: EdgeInsets.fromLTRB(8, 8, 8, 4),
+      child: Text(
+        'Your practice, moving forward.',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: Color(0xFFEDEDEB),
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          height: 1.35,
+          shadows: [Shadow(blurRadius: 14, color: Colors.black)],
         ),
       ),
     );

@@ -1,14 +1,15 @@
-/// My Progress — `#sub-my-progress` Glass Orb layout.
+/// My Progress — Glass Orb layout with full-bleed page videos.
 ///
-/// Matches the live website shell in `index.html` (hero video + orb, stats,
-/// week grid, sessions, body map, insight, feedback) and fills numbers from
-/// [PracticeProgress] the same way `app/js/part006.js` does for real data.
+/// Matches website/WebView: scene-1 as edge-to-edge hero backdrop, scroll
+/// clip as full-page bg after the orb, stats inside the ring, HBM body map,
+/// and a working back control that pops (or returns home).
 library;
 
 import 'package:flutter/material.dart';
 
 import '../../data/models.dart';
 import '../../data/practice_progress.dart';
+import '../../shell/nav_shell.dart';
 import 'progress_body_map.dart';
 import 'progress_feedback.dart';
 import 'progress_hero.dart';
@@ -29,7 +30,7 @@ class PracticeProgressScreen extends StatefulWidget {
 class _PracticeProgressScreenState extends State<PracticeProgressScreen> {
   final _scroll = ScrollController();
   final _insightKey = GlobalKey();
-  /// 0 = hero (scene-1) dominant; 1 = scroll bg (player-bg-loop) fully on.
+  /// 0 = hero (scene-1) dominant; 1 = scroll bg fully on.
   double _scrollBg = 0;
 
   @override
@@ -53,11 +54,19 @@ class _PracticeProgressScreenState extends State<PracticeProgressScreen> {
   }
 
   void _onScroll() {
-    // Crossfade page backdrop once the user scrolls past most of the hero.
     final t = (_scroll.offset / (ProgressOrbHero.height * 0.72)).clamp(0.0, 1.0);
     if ((t - _scrollBg).abs() > 0.02) {
       setState(() => _scrollBg = t);
     }
+  }
+
+  void _handleBack() {
+    final nav = Navigator.of(context);
+    if (nav.canPop()) {
+      nav.pop();
+      return;
+    }
+    NavScope.goTo(context, 0);
   }
 
   void _scrollToInsight() {
@@ -69,6 +78,11 @@ class _PracticeProgressScreenState extends State<PracticeProgressScreen> {
       curve: Curves.easeOutCubic,
     );
   }
+
+  Widget _pad(Widget child) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: child,
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -83,47 +97,47 @@ class _PracticeProgressScreenState extends State<PracticeProgressScreen> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Scroll clip always under the hero; fades in as hero leaves.
-          ProgressScrollBgVideo(opacity: 0.35 + 0.65 * _scrollBg),
+          ProgressHeroBgVideo(opacity: (1.0 - _scrollBg).clamp(0.0, 1.0)),
+          ProgressScrollBgVideo(opacity: 0.15 + 0.85 * _scrollBg),
           const ProgressVideoShade(),
           const ProgressGrain(),
           Column(
             children: [
-              ProgressHeader(onBack: () => Navigator.of(context).maybePop()),
+              ProgressHeader(onBack: _handleBack),
               Expanded(
                 child: ListView(
                   controller: _scroll,
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 90),
+                  padding: const EdgeInsets.only(bottom: 90),
                   children: [
+                    // Full-bleed orb overlay (page video shows through).
                     ProgressOrbHero(
                       sessions: progress.totalSessions,
                       timeLabel: progress.timeLabel,
                       onViewInsights: _scrollToInsight,
                     ),
-                    // Pull Your Numbers tight under VIEW INSIGHTS.
-                    const ProgressEyebrow('Your Numbers', tightTop: true),
-                    ProgressStatsRow(progress: progress),
-                    const SizedBox(height: 18),
-                    const ProgressSceneTwo(),
-                    const ProgressEyebrow('This Week'),
-                    ProgressWeekGrid(progress: progress),
+                    _pad(const ProgressEyebrow('Your Numbers', tightTop: true)),
+                    _pad(ProgressStatsRow(progress: progress)),
+                    const SizedBox(height: 14),
+                    _pad(const ProgressPracticeForward()),
+                    _pad(const ProgressEyebrow('This Week')),
+                    _pad(ProgressWeekGrid(progress: progress)),
                     if (progress.lastPracticed != null) ...[
                       const SizedBox(height: 10),
-                      ProgressLastPracticed(date: progress.lastPracticed!),
+                      _pad(ProgressLastPracticed(date: progress.lastPracticed!)),
                     ],
-                    const ProgressEyebrow('Recent Sessions'),
-                    ProgressSessionsCard(
+                    _pad(const ProgressEyebrow('Recent Sessions')),
+                    _pad(ProgressSessionsCard(
                       sessions: progress.sessionsSnapshot.take(8).toList(),
                       organFor: organFor,
-                    ),
-                    const ProgressEyebrow('Body & Mind'),
-                    ProgressBodyMap(progress: progress, words: widget.words),
-                    const ProgressEyebrow('Milestones'),
-                    ProgressMilestones(progress: progress),
-                    ProgressEyebrow('Weekly Insight', key: _insightKey),
-                    ProgressInsight(progress: progress),
-                    const ProgressEyebrow('Your Feedback'),
-                    const ProgressFeedbackSection(),
+                    )),
+                    _pad(const ProgressEyebrow('Body & Mind')),
+                    _pad(ProgressBodyMap(progress: progress, words: widget.words)),
+                    _pad(const ProgressEyebrow('Milestones')),
+                    _pad(ProgressMilestones(progress: progress)),
+                    _pad(ProgressEyebrow('Weekly Insight', key: _insightKey)),
+                    _pad(ProgressInsight(progress: progress)),
+                    _pad(const ProgressEyebrow('Your Feedback')),
+                    _pad(const ProgressFeedbackSection()),
                   ],
                 ),
               ),

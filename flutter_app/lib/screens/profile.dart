@@ -9,7 +9,13 @@ import 'package:cached_network_image/cached_network_image.dart';
 
 import '../data/content.dart';
 import '../data/practice_progress.dart';
+import '../shell/nav_shell.dart';
+import 'library.dart';
+import 'player_settings.dart';
+import 'practice.dart';
 import 'progress/progress_screen.dart';
+import 'quick_access.dart';
+import 'store.dart';
 
 const _accent = Color(0xFFE3BD7D);
 const _text = Color(0xFFF5F5F3);
@@ -66,6 +72,45 @@ class _ProfileScreenState extends State<ProfileScreen> {
     PracticeProgress.instance.addListener(_onLiveProgress);
     PracticeProgress.instance.start();
     _load();
+  }
+
+  void _handleBack() {
+    final nav = Navigator.of(context);
+    if (nav.canPop()) {
+      nav.pop();
+      return;
+    }
+    // Profile is a bottom-nav root — go to Connect home.
+    NavScope.goTo(context, 0);
+  }
+
+  void _openQuick(String name) {
+    switch (name) {
+      case 'Sessions':
+        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PracticeScreen()));
+      case 'Saved':
+      case 'Liked':
+        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const LibraryScreen()));
+      case 'Journal':
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (_) => PracticeProgressScreen(words: ContentStore.instance.library),
+        ));
+      case 'Settings':
+        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PlayerSettingsScreen()));
+      default:
+        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const QuickAccessScreen()));
+    }
+  }
+
+  void _openShop(String label) {
+    switch (label) {
+      case 'Cart':
+      case 'Wishlist':
+      case 'Orders':
+        NavScope.goTo(context, 3);
+      default:
+        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const StoreScreen()));
+    }
   }
 
   Future<void> _load() async {
@@ -257,7 +302,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             else
               Image.asset('assets/profile_source/img-banner.png', fit: BoxFit.cover),
             DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.black.withOpacity(.02), Colors.black.withOpacity(.28), Colors.black.withOpacity(.82)]))),
-            Positioned(top: 14, left: 14, child: _circleButton(asset: 'assets/icons/icon_01.svg', onTap: () => Navigator.maybePop(context))),
+            Positioned(top: 14, left: 14, child: _circleButton(asset: 'assets/icons/icon_01.svg', onTap: _handleBack)),
             Positioned(top: 14, right: 14, child: _circleButton(asset: 'assets/icons/icon_26.svg', onTap: _pickBanner)),
             const Positioned(left: 22, right: 22, bottom: 24, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('My Profile', style: TextStyle(fontSize: 34, height: 1, fontWeight: FontWeight.w500, letterSpacing: -1.2, color: Colors.white)), SizedBox(height: 7), Text('YOUR PERSONAL SPACE', style: TextStyle(fontSize: 10, letterSpacing: 1.8, color: Color(0x9EFFFFFF)))])),
           ],
@@ -437,7 +482,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _quickAccess() => SectionBlock(
         marginBottom: 38,
         title: 'Quick Access',
-        trailing: _viewAll(icon: 'assets/icons/icon_05.svg', onTap: () => _showToast('Quick Access')),
+        trailing: _viewAll(icon: 'assets/icons/icon_05.svg', onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const QuickAccessScreen()))),
         child: GlassCard(
           padding: const EdgeInsets.all(16),
           image: 'assets/profile_source/img-qa.jpeg',
@@ -450,7 +495,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
 
   Widget _quickItem(String name, int iconIndex) => InkWell(
-        onTap: () => _showToast(name),
+        onTap: () => _openQuick(name),
         borderRadius: BorderRadius.circular(16),
         child: Container(
           padding: const EdgeInsets.fromLTRB(3, 14, 3, 11),
@@ -560,7 +605,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
 
   Widget _signOut() => InkWell(
-        onTap: () => _showToast('Signed out'),
+        onTap: () { _showToast('Signed out'); _handleBack(); },
         borderRadius: BorderRadius.circular(22),
         child: Container(margin: const EdgeInsets.only(bottom: 30), padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: const Color(0x08FFFFFF), border: const Border.fromBorderSide(BorderSide(color: _border)), borderRadius: BorderRadius.circular(22)), alignment: Alignment.center, child: const Text('Sign Out', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500))),
       );
@@ -569,7 +614,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _listRow(String label, {required Widget trailing, bool muted = false}) => Container(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16), decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: _borderSoft))), child: Row(children: [Expanded(child: Text(label, style: TextStyle(fontSize: 14.5, color: muted ? _faint : _text))), const SizedBox(width: 12), trailing]));
 
-  Widget _shopRow(String label, String count, int icon) => InkWell(onTap: () => _showToast(label), child: Container(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: _borderSoft))), child: Row(children: [Container(width: 34, height: 34, decoration: BoxDecoration(border: Border.all(color: _borderSoft), borderRadius: BorderRadius.circular(11)), child: Center(child: SvgPicture.asset('assets/icons/icon_${icon.toString().padLeft(2, '0')}.svg', width: 16, height: 16, colorFilter: const ColorFilter.mode(_text, BlendMode.srcIn)))), const SizedBox(width: 13), Expanded(child: Text(label, style: const TextStyle(fontSize: 14.5))), Text(count, style: const TextStyle(fontFamily: _mono, fontSize: 12.5, color: _faint)), const SizedBox(width: 6), SvgPicture.asset('assets/icons/icon_16.svg', width: 14, height: 14, colorFilter: const ColorFilter.mode(_faint, BlendMode.srcIn))])));
+  Widget _shopRow(String label, String count, int icon) => InkWell(onTap: () => _openShop(label), child: Container(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: _borderSoft))), child: Row(children: [Container(width: 34, height: 34, decoration: BoxDecoration(border: Border.all(color: _borderSoft), borderRadius: BorderRadius.circular(11)), child: Center(child: SvgPicture.asset('assets/icons/icon_${icon.toString().padLeft(2, '0')}.svg', width: 16, height: 16, colorFilter: const ColorFilter.mode(_text, BlendMode.srcIn)))), const SizedBox(width: 13), Expanded(child: Text(label, style: const TextStyle(fontSize: 14.5))), Text(count, style: const TextStyle(fontFamily: _mono, fontSize: 12.5, color: _faint)), const SizedBox(width: 6), SvgPicture.asset('assets/icons/icon_16.svg', width: 14, height: 14, colorFilter: const ColorFilter.mode(_faint, BlendMode.srcIn))])));
 
   Widget _viewAll({required String icon, required VoidCallback onTap, bool pill = false}) => InkWell(onTap: onTap, borderRadius: BorderRadius.circular(999), child: Container(padding: pill ? const EdgeInsets.symmetric(horizontal: 9, vertical: 6) : EdgeInsets.zero, decoration: pill ? BoxDecoration(color: const Color(0x08FFFFFF), border: const Border.fromBorderSide(BorderSide(color: _border)), borderRadius: BorderRadius.circular(999)) : null, child: Row(mainAxisSize: MainAxisSize.min, children: [const Text('View All', style: TextStyle(fontSize: 12, color: _dim)), const SizedBox(width: 5), SvgPicture.asset(icon, width: pill ? 16 : 13, height: pill ? 16 : 13, colorFilter: const ColorFilter.mode(_dim, BlendMode.srcIn))])));
 

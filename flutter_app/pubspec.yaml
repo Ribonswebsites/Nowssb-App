@@ -53,6 +53,7 @@ flutter:
     - assets/frames/
     - assets/coach/
     - assets/icons/
+    - assets/progress/
     - assets/store/
     - assets/profile/
     - assets/profile_source/
