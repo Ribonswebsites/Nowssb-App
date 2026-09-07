@@ -586,7 +586,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> with Ticker
                 const SizedBox(height: 12),
                 SizedBox(
                   width: stageWidth,
-                  height: 120,
+                  height: 128,
                   child: PageView(
                     controller: _bottomPageController,
                     physics: const BouncingScrollPhysics(),
@@ -2149,36 +2149,54 @@ class _WordActionStrip extends StatelessWidget {
   Widget _sep() => const Center(
     child: SizedBox(
       width: 1.5,
-      height: 24,
+      height: 34,
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: Color(0xB8FFFFFF),
           borderRadius: BorderRadius.all(Radius.circular(1)),
-          boxShadow: [BoxShadow(color: Color(0x40FFFFFF), blurRadius: 3)],
+          boxShadow: [BoxShadow(color: Color(0x59FFFFFF), blurRadius: 5)],
         ),
       ),
     ),
   );
 
   @override
-  Widget build(BuildContext context) => SizedBox(
-    height: double.infinity,
+  Widget build(BuildContext context) => AspectRatio(
+    aspectRatio: 1371 / 317,
     child: ClipRRect(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(9),
       clipBehavior: Clip.antiAlias,
       child: Stack(fit: StackFit.expand, clipBehavior: Clip.hardEdge, children: [
         const ColoredBox(color: Colors.black),
-        // Tab video fills the entire pill — no word-acts-tab.webp white frame overlay.
-        NwsbVideo(
-          asset: video,
-          fit: BoxFit.cover,
-          priority: ClipPriority.feature,
-          autoplay: true,
-          loop: true,
-          showPoster: false,
+        // Video only in the lit-tab aperture — keeps chrome crisp, no white haze.
+        Padding(
+          padding: const EdgeInsets.fromLTRB(6, 5, 6, 5),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(5),
+            child: NwsbVideo(
+              asset: video,
+              fit: BoxFit.cover,
+              priority: ClipPriority.feature,
+              autoplay: true,
+              loop: true,
+              showPoster: false,
+            ),
+          ),
         ),
-        // Soft dark scrim so white icons stay legible over bright frames of the clip.
-        const ColoredBox(color: Color(0x33000000)),
+        // Visible glass/border chrome frame (not invisible).
+        IgnorePointer(
+          child: Image.asset(
+            'assets/frames/word-acts-tab.webp',
+            fit: BoxFit.fill,
+            errorBuilder: (_, __, ___) => DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(9),
+                border: Border.all(color: const Color(0xA6FFFFFF), width: 1.4),
+                boxShadow: const [BoxShadow(color: Color(0x40FFFFFF), blurRadius: 8)],
+              ),
+            ),
+          ),
+        ),
         Row(children: [
           Expanded(child: _WordAction(icon: Icons.chat_bubble_outline_rounded, label: 'Sentence', onTap: onSentence)),
           _sep(),

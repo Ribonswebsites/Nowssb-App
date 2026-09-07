@@ -489,19 +489,21 @@
   margin-top:auto; margin-bottom:16px;
   flex-shrink:0;
 }
-/* Actions tab glass — short pill; video fills edge-to-edge (no white frame). */
+/* Actions tab — lit glass frame chrome + looping video in the aperture only.
+   Frame on the outside; video never under opaque chrome (that caused white haze). */
 .lgp .lgp-pr-glass {
   position:relative; width:100%;
-  height:clamp(88px, 14vw, 112px);
-  aspect-ratio:auto;
-  background:#000;
-  border-radius:12px !important;
-  overflow:hidden !important;
-  /* word-acts-tab.webp frame DISABLED — it painted a white haze over the tab video. */
+  aspect-ratio:1371/317;
+  height:auto;
+  background:url('./assets/frames/word-acts-tab.webp') center/100% 100% no-repeat;
+  border-radius:9px !important;
+  overflow:visible;
 }
 .lgp .lgp-pr-glass::before {
-  content:none !important;
-  display:none !important;
+  content:''; position:absolute;
+  left:1.823%; right:1.969%; top:5.994%; bottom:6.625%;
+  background:#000; border-radius:5px !important;
+  z-index:0; pointer-events:none;
 }
 /* the three sit over the clip */
 .lgp .lgp-practice-row > .lgp-sentence,
@@ -1428,11 +1430,12 @@
    REPLACED element — width:auto takes its intrinsic size and drops the
    `right` offset — so the aperture is an explicit width and height. */
 .lgp .lgp-wa-vid {
-  position:absolute; left:0; top:0; right:0; bottom:0;
-  width:100%; height:100%;
-  border-radius:0 !important; background:#000;
+  position:absolute; left:1.823%; top:5.994%;
+  width:96.208%; height:87.381%;
+  border-radius:5px !important; background:#000;
   object-fit:cover; object-position:center; display:block; pointer-events:none;
   transform:translateZ(0); backface-visibility:hidden;
+  z-index:1;
 }
 
 /* The hairline between the three. In the vertical rail it runs across
@@ -2879,12 +2882,16 @@
 }
 .lgp .lgp-bottom-actions .lgp-practice-row{
   width:100%; max-width:none; margin:0 auto !important;
-  /* Height comes only from the glass frame — never stretch with the carousel page
-     or absolute seps will be sized against a taller box and poke past the border. */
+  /* Height comes only from the glass frame aspect-ratio — never stretch with the
+     carousel page or absolute seps poke past the lit border. */
   height:auto !important;
+  min-height:72px;
   align-self:center;
-  overflow:hidden !important;
+  overflow:visible !important;
   border-radius:9px;
+  display:block !important;
+  visibility:visible !important;
+  opacity:1 !important;
 }
 .lgp .lgp-bottom-upnext .lgp-nextup{ width:100%; }
 .lgp .lgp-bottom-dots{
@@ -2902,33 +2909,37 @@
   transform:scale(1.15);
 }
 
-/* Actions tab: looping video fills the short pill — no white frame overlay */
+/* Actions tab: glass frame + looping video clipped INSIDE the aperture only */
 .lgp .lgp-pr-glass{
   display:block !important;
-  position:relative; overflow:hidden !important;
-  background:#000 !important;
-  border-radius:12px !important;
-  height:clamp(88px, 14vw, 112px) !important;
-  aspect-ratio:auto !important;
+  position:relative;
+  overflow:visible !important;
+  background:url('./assets/frames/word-acts-tab.webp') center/100% 100% no-repeat !important;
+  border-radius:9px !important;
+  height:auto !important;
+  aspect-ratio:1371/317 !important;
 }
 .lgp .lgp-wa-vid,
 .lgp .lgp-actions-tab-vid{
   display:block !important;
   position:absolute !important;
-  left:0 !important; top:0 !important; right:0 !important; bottom:0 !important;
-  width:100% !important; height:100% !important;
+  left:1.823% !important; top:5.994% !important; right:auto !important; bottom:auto !important;
+  width:96.208% !important; height:87.381% !important;
   object-fit:cover !important; object-position:center;
-  border-radius:0;
-  z-index:0; pointer-events:none; opacity:1;
+  border-radius:5px !important;
+  z-index:1 !important; pointer-events:none; opacity:1;
   background:#000;
 }
 .lgp .lgp-pr-glass::before{
-  content:none !important; display:none !important;
+  content:'' !important; display:block !important;
+  position:absolute !important;
+  left:1.823% !important; right:1.969% !important;
+  top:5.994% !important; bottom:6.625% !important;
+  background:#000 !important; border-radius:5px !important;
+  z-index:0 !important; pointer-events:none;
 }
 .lgp .lgp-pr-glass::after{
-  content:''; position:absolute; inset:0; z-index:1; pointer-events:none;
-  background:rgba(0,0,0,.22);
-  border-radius:inherit;
+  content:none !important; display:none !important;
 }
 .lgp .lgp-practice-row > .lgp-sentence,
 .lgp .lgp-practice-row > .lgp-practice,
@@ -3030,12 +3041,13 @@
   max-width:32px !important; max-height:32px !important;
 }
 .lgp .lgp-bottom-carousel{
-  max-height:calc(88px + 18px);
+  max-height:none;
+  min-height:128px;
 }
 .lgp .lgp-bottom-page{
   align-items:stretch !important;
-  min-height:72px;
-  max-height:88px;
+  min-height:84px;
+  max-height:none;
 }
 
 /* Compact Up Next peek — taller band so row + grab fit without clipping */
@@ -3044,7 +3056,4 @@
   height: auto !important;
   padding-bottom: 8px !important;
   box-sizing: border-box !important;
-}
-.lgp .lgp-bottom-carousel{
-  min-height: 120px;
 }
