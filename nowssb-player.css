@@ -492,7 +492,7 @@
 /* Actions tab glass — short pill; video fills edge-to-edge (no white frame). */
 .lgp .lgp-pr-glass {
   position:relative; width:100%;
-  height:clamp(72px, 12.5vw, 88px);
+  height:clamp(88px, 14vw, 112px);
   aspect-ratio:auto;
   background:#000;
   border-radius:12px !important;
@@ -1856,7 +1856,10 @@
   position: absolute !important; inset: 0 !important; z-index: 0 !important;
   width: 100% !important; height: 100% !important;
   object-fit: cover !important; pointer-events: none !important;
-  opacity: .82 !important;
+  opacity: .88 !important;
+  display: block !important;
+  visibility: visible !important;
+  background: #000;
 }
 .lgp .lgp-orbs { display: none !important; }
 
@@ -2755,7 +2758,7 @@
 
 .lgp-queue-panel{
   position:absolute;left:0;right:0;bottom:0;
-  top:48vh;
+  top:36vh;
   background:rgba(18,18,22,.48);
   border-radius:28px 28px 0 0;
   border:1px solid rgba(255,255,255,.16);
@@ -2767,7 +2770,7 @@
   -webkit-backdrop-filter:blur(48px) saturate(1.55);
 }
 .lgp-queue-sheet.is-open .lgp-queue-panel{transform:translateY(0)}
-.lgp-queue-sheet.is-mid .lgp-queue-panel{top:48vh}
+.lgp-queue-sheet.is-mid .lgp-queue-panel{top:36vh}
 .lgp-queue-sheet.is-full .lgp-queue-panel{top:12vh;background:rgba(18,18,22,.55)}
 .lgp-queue-panel.is-dragging{transition:none}
 
@@ -2797,10 +2800,19 @@
 .lgp-queue-chip{
   flex:0 0 auto;border:0;border-radius:999px;cursor:pointer;
   padding:8px 14px;font-size:13px;font-weight:600;
-  background:rgba(255,255,255,.14);color:#f5f5f7;
+  background:rgba(255,255,255,.22) !important;
+  color:#f5f5f7 !important;
+  -webkit-text-fill-color:#f5f5f7 !important;
   white-space:nowrap;
+  min-height:34px !important;
+  height:auto !important;
+  line-height:1.15;
 }
-.lgp-queue-chip.is-on{background:#f5f5f7;color:#0a0a0c}
+.lgp-queue-chip.is-on{
+  background:#f5f5f7 !important;
+  color:#0a0a0c !important;
+  -webkit-text-fill-color:#0a0a0c !important;
+}
 
 .lgp-queue-list{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;padding:4px 8px calc(28px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:2px}
 .lgp-queue-empty{margin:36px 12px;text-align:center;color:#8e8e93;font-size:13px}
@@ -2896,7 +2908,7 @@
   position:relative; overflow:hidden !important;
   background:#000 !important;
   border-radius:12px !important;
-  height:clamp(72px, 12.5vw, 88px) !important;
+  height:clamp(88px, 14vw, 112px) !important;
   aspect-ratio:auto !important;
 }
 .lgp .lgp-wa-vid,
@@ -2988,10 +3000,11 @@
   background:rgba(255,255,255,.14) !important;
 }
 
-/* Compact Up Next so both carousel pages share the short ~72–88px band */
+/* Compact Up Next peek — tall enough for grab + row without clipping */
 .lgp .lgp-bottom-upnext .lgp-nextup{
   margin:0 !important;
-  max-height:88px;
+  max-height:none;
+  min-height:112px !important;
   border-radius:18px !important;
   display:flex; flex-direction:column;
   overflow:hidden;
@@ -3025,3 +3038,13 @@
   max-height:88px;
 }
 
+/* Compact Up Next peek — taller band so row + grab fit without clipping */
+.lgp .lgp-bottom-upnext .lgp-nextup{
+  min-height: 112px !important;
+  height: auto !important;
+  padding-bottom: 8px !important;
+  box-sizing: border-box !important;
+}
+.lgp .lgp-bottom-carousel{
+  min-height: 120px;
+}

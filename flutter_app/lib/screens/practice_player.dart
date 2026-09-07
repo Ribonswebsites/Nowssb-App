@@ -476,7 +476,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> with Ticker
               child: NwsbVideo(
                 asset: pageBackgroundVideo,
                 fit: BoxFit.cover,
-                priority: ClipPriority.decoration,
+                priority: ClipPriority.feature,
                 autoplay: true,
                 loop: true,
                 showPoster: false,
@@ -586,7 +586,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> with Ticker
                 const SizedBox(height: 12),
                 SizedBox(
                   width: stageWidth,
-                  height: 88,
+                  height: 120,
                   child: PageView(
                     controller: _bottomPageController,
                     physics: const BouncingScrollPhysics(),
@@ -887,89 +887,92 @@ class _NextUpCard extends StatelessWidget {
             ? const Center(
                 child: Text('End of queue', style: TextStyle(color: Color(0xFF8E8E93), fontSize: 12)),
               )
-            : Column(children: [
-                const SizedBox(height: 4),
-                Center(
-                  child: Container(
-                    width: 36,
-                    height: 3,
-                    decoration: BoxDecoration(color: const Color(0x66FFFFFF), borderRadius: BorderRadius.circular(99)),
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 6),
+                  Center(
+                    child: Container(
+                      width: 36,
+                      height: 3,
+                      decoration: BoxDecoration(color: const Color(0x66FFFFFF), borderRadius: BorderRadius.circular(99)),
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 4, 4, 0),
-                  child: Row(children: [
-                    const Expanded(
-                      child: Text(
-                        'UP NEXT',
-                        style: TextStyle(color: Color(0xFF8D8D92), fontSize: 10, fontWeight: FontWeight.w500, letterSpacing: 2.4),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: onOpenSoundLibrary,
-                      child: const SizedBox(
-                        width: 30,
-                        height: 30,
-                        child: Icon(Icons.queue_music_rounded, color: Color(0xFFCFCFD2), size: 18),
-                      ),
-                    ),
-                  ]),
-                ),
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(12, 2, 12, 0),
-                  child: ColoredBox(color: Color(0x1AFFFFFF), child: SizedBox(width: double.infinity, height: 1)),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(10, 4, 10, 6),
-                    child: GestureDetector(
-                      onTap: () => onPlayAt(nextIndex),
-                      behavior: HitTestBehavior.opaque,
-                      child: Row(children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: SizedBox(
-                            width: 40,
-                            height: 40,
-                            child: art != null && art.isNotEmpty
-                                ? (art.startsWith('http')
-                                    ? Image.network(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111)))
-                                    : Image.asset(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111))))
-                                : const ColoredBox(color: Color(0xFF111111)),
-                          ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(14, 6, 6, 0),
+                    child: Row(children: [
+                      const Expanded(
+                        child: Text(
+                          'UP NEXT',
+                          style: TextStyle(color: Color(0xFF8D8D92), fontSize: 10, fontWeight: FontWeight.w500, letterSpacing: 2.4),
                         ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                next.word,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(color: Color(0xFFF5F5F7), fontSize: 14, fontWeight: FontWeight.w600, letterSpacing: -0.15),
-                              ),
-                              const SizedBox(height: 2),
-                              Text('NowssB  ·  ${_wordClock(next)}', style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 11)),
-                            ],
-                          ),
-                        ),
-                        Container(
+                      ),
+                      GestureDetector(
+                        onTap: onOpenSoundLibrary,
+                        child: const SizedBox(
                           width: 32,
                           height: 32,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFF5F5F7),
-                            shape: BoxShape.circle,
-                            boxShadow: [BoxShadow(color: Color(0x59000000), blurRadius: 12, offset: Offset(0, 4))],
-                          ),
-                          child: const Icon(Icons.play_arrow_rounded, color: Color(0xFF0A0A0C), size: 20),
+                          child: Icon(Icons.queue_music_rounded, color: Color(0xFFCFCFD2), size: 18),
                         ),
-                      ]),
+                      ),
+                    ]),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(14, 4, 14, 0),
+                    child: ColoredBox(color: Color(0x1AFFFFFF), child: SizedBox(width: double.infinity, height: 1)),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+                      child: GestureDetector(
+                        onTap: () => onPlayAt(nextIndex),
+                        behavior: HitTestBehavior.opaque,
+                        child: Row(children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: SizedBox(
+                              width: 44,
+                              height: 44,
+                              child: art != null && art.isNotEmpty
+                                  ? (art.startsWith('http')
+                                      ? Image.network(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111)))
+                                      : Image.asset(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111))))
+                                  : const ColoredBox(color: Color(0xFF111111)),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  next.word,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(color: Color(0xFFF5F5F7), fontSize: 15, fontWeight: FontWeight.w600, letterSpacing: -0.15),
+                                ),
+                                const SizedBox(height: 2),
+                                Text('NowssB  ·  ${_wordClock(next)}', style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 12)),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            width: 34,
+                            height: 34,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFF5F5F7),
+                              shape: BoxShape.circle,
+                              boxShadow: [BoxShadow(color: Color(0x59000000), blurRadius: 12, offset: Offset(0, 4))],
+                            ),
+                            child: const Icon(Icons.play_arrow_rounded, color: Color(0xFF0A0A0C), size: 20),
+                          ),
+                        ]),
+                      ),
                     ),
                   ),
-                ),
-              ]),
+                ],
+              ),
       ),
     );
   }
@@ -1007,7 +1010,7 @@ class _QueueSheetState extends State<_QueueSheet> {
   var _filter = _QueueFilter.all;
   late List<int> _order; // indices into widget.words
   var _saved = false;
-  var _sheetSize = 0.52;
+  var _sheetSize = 0.62;
   Set<String> _liked = {};
   Map<String, int> _playCounts = {};
 
@@ -1118,7 +1121,7 @@ class _QueueSheetState extends State<_QueueSheet> {
             setState(() => _sheetSize = n.extent);
           }
           // Drag below mid snap → dismiss (YTM collapse).
-          if (n.extent <= 0.40 && n.extent <= n.minExtent + 0.02) {
+          if (n.extent <= 0.46 && n.extent <= n.minExtent + 0.02) {
             Navigator.of(context).maybePop();
           }
           return false;
@@ -1145,11 +1148,11 @@ class _QueueSheetState extends State<_QueueSheet> {
           ),
           DraggableScrollableSheet(
             controller: _sheetCtrl,
-            initialChildSize: 0.52,
-            minChildSize: 0.38,
+            initialChildSize: 0.62,
+            minChildSize: 0.45,
             maxChildSize: 0.94,
             snap: true,
-            snapSizes: const [0.52, 0.92],
+            snapSizes: const [0.62, 0.92],
             builder: (context, scrollController) {
               return ClipRRect(
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
@@ -1235,21 +1238,10 @@ class _QueueSheetState extends State<_QueueSheet> {
                               ])
                                 Padding(
                                   padding: const EdgeInsets.only(right: 8),
-                                  child: ChoiceChip(
-                                    label: Text(entry.$2),
+                                  child: _QueueFilterPill(
+                                    label: entry.$2,
                                     selected: _filter == entry.$1,
-                                    onSelected: (_) => setState(() => _filter = entry.$1),
-                                    selectedColor: const Color(0xFFF5F5F7),
-                                    backgroundColor: const Color(0x33FFFFFF),
-                                    labelStyle: TextStyle(
-                                      color: _filter == entry.$1 ? const Color(0xFF0A0A0C) : const Color(0xFFF5F5F7),
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                    showCheckmark: false,
-                                    side: BorderSide.none,
-                                    padding: const EdgeInsets.symmetric(horizontal: 6),
-                                    visualDensity: VisualDensity.compact,
+                                    onTap: () => setState(() => _filter = entry.$1),
                                   ),
                                 ),
                             ],
@@ -2112,6 +2104,40 @@ class _TransportTube extends StatelessWidget {
   );
 }
 
+
+class _QueueFilterPill extends StatelessWidget {
+  const _QueueFilterPill({required this.label, required this.selected, required this.onTap});
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    // Custom pill — Material 3 ChoiceChip ignored selectedColor/backgroundColor
+    // under the app light theme and painted white-on-white for unselected chips.
+    return Material(
+      color: selected ? const Color(0xFFF5F5F7) : const Color(0x38FFFFFF),
+      borderRadius: BorderRadius.circular(99),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(99),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          child: Text(
+            label,
+            style: TextStyle(
+              color: selected ? const Color(0xFF0A0A0C) : const Color(0xFFF5F5F7),
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              height: 1.1,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _WordActionStrip extends StatelessWidget {
   const _WordActionStrip({required this.accent, required this.video, required this.onSentence, required this.onPractice, required this.onStore});
   final Color accent;
@@ -2146,7 +2172,7 @@ class _WordActionStrip extends StatelessWidget {
         NwsbVideo(
           asset: video,
           fit: BoxFit.cover,
-          priority: ClipPriority.decoration,
+          priority: ClipPriority.feature,
           autoplay: true,
           loop: true,
           showPoster: false,
