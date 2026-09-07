@@ -371,12 +371,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> with Ticker
   }
 
   void _openSettings() {
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      barrierColor: Colors.black.withOpacity(.62),
-      builder: (_) => const FractionallySizedBox(heightFactor: .96, child: PlayerSettingsScreen()),
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const PlayerSettingsScreen()),
     );
   }
 

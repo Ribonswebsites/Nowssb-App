@@ -1,7 +1,8 @@
-/// Native counterpart of the exact AURA `player-settings.html` page.
+/// Native counterpart of the AURA `player-settings.html` settings page.
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../data/settings.dart';
 
@@ -14,6 +15,7 @@ class PlayerSettingsScreen extends StatefulWidget {
 
 class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
   Settings get s => Settings.instance;
+  int? _batteryPct;
 
   static const _eqOptions = ['Flat', 'Bass', 'Treble', 'Vocal', 'Electronic'];
   static const _qualityOptions = ['Low', 'Normal', 'High', 'Lossless'];
@@ -22,11 +24,25 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
   static const _sleepOptions = ['Off', '15 Min', '30 Min', '45 Min', '1 Hour'];
   static const _playlistOptions = ['Classic', 'Grid', 'Compact'];
   static const _nowPlayingOptions = ['On', 'Mini Only', 'Off'];
+  static const _viewOptions = ['Classic', 'Minimal', 'Grid'];
 
   @override
   void initState() {
     super.initState();
     s.addListener(_refresh);
+    _readBattery();
+  }
+
+  Future<void> _readBattery() async {
+    try {
+      const ch = MethodChannel('nowssb/device');
+      final level = await ch.invokeMethod<num>('batteryLevel');
+      if (mounted && level != null) {
+        setState(() => _batteryPct = level.round().clamp(0, 100));
+      }
+    } catch (_) {
+      if (mounted) setState(() => _batteryPct = 52);
+    }
   }
 
   @override
@@ -59,8 +75,8 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
   }
 
   String get _speedLabel {
-    if (s.speed == 1) return 'Normal';
-    return '${s.speed}x';
+    if ((s.speed - 1).abs() < 0.01) return 'Normal';
+    return s.speed == s.speed.roundToDouble() ? '${s.speed.toInt()}x' : '${s.speed}x';
   }
 
   void _setSpeed(String label) {
@@ -94,7 +110,9 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
               for (final option in options)
                 ListTile(
                   title: Text(option, style: const TextStyle(color: Colors.white, letterSpacing: .8)),
-                  trailing: option == current ? const Icon(Icons.check, color: Colors.white) : null,
+                  trailing: option.toLowerCase() == current.toLowerCase()
+                      ? const Icon(Icons.check, color: Colors.white)
+                      : null,
                   onTap: () {
                     onPick(option);
                     Navigator.pop(context);
@@ -109,34 +127,61 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bottomInset = MediaQuery.paddingOf(context).bottom;
+    final batt = _batteryPct ?? 52;
+
     return Scaffold(
       backgroundColor: const Color(0xFF202731),
       body: SafeArea(
+        bottom: false,
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(12, 8, 16, 4),
+              padding: const EdgeInsets.fromLTRB(14, 8, 16, 4),
               child: Row(
                 children: [
-                  IconButton(
-                    onPressed: () => Navigator.maybePop(context),
-                    icon: const Icon(Icons.arrow_back, color: Color(0xFFF2F2EF)),
+                  Material(
+                    color: Colors.white,
+                    shape: const CircleBorder(),
+                    elevation: 2,
+                    shadowColor: Colors.black54,
+                    child: InkWell(
+                      customBorder: const CircleBorder(),
+                      onTap: () => Navigator.maybePop(context),
+                      child: const SizedBox(
+                        width: 40,
+                        height: 40,
+                        child: Icon(Icons.chevron_left_rounded, color: Color(0xFF202731), size: 28),
+                      ),
+                    ),
                   ),
                   const Spacer(),
-                  const Text('AURA', style: TextStyle(color: Color(0xFFF2F2EF), fontSize: 12, letterSpacing: 4, fontWeight: FontWeight.w500)),
+                  const Text(
+                    'AURA',
+                    style: TextStyle(color: Color(0xFFF2F2EF), fontSize: 12, letterSpacing: 4, fontWeight: FontWeight.w500),
+                  ),
                 ],
               ),
             ),
             const Align(
               alignment: Alignment.centerLeft,
               child: Padding(
-                padding: EdgeInsets.fromLTRB(24, 18, 24, 34),
-                child: Text('MUSIC PLAYER\nSETTINGS', style: TextStyle(color: Color(0xFFF2F2EF), fontSize: 29, fontWeight: FontWeight.w300, letterSpacing: 4.0, height: 1.28)),
+                padding: EdgeInsets.fromLTRB(24, 18, 24, 28),
+                child: Text(
+                  'MUSIC PLAYER\nSETTINGS',
+                  style: TextStyle(
+                    color: Color(0xFFF2F2EF),
+                    fontSize: 29,
+                    fontWeight: FontWeight.w300,
+                    letterSpacing: 4.0,
+                    height: 1.28,
+                  ),
+                ),
               ),
             ),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(24, 0, 24, 28),
+                padding: EdgeInsets.fromLTRB(16, 0, 16, 28 + bottomInset),
                 children: [
                   _nav(Icons.tune, 'Equalizer', _eqLabel, () => _choose('Equalizer', _eqOptions, _eqLabel, _setEq)),
                   _nav(Icons.graphic_eq, 'Audio Quality', s.quality, () => _choose('Audio Quality', _qualityOptions, s.quality, s.setQuality)),
@@ -145,28 +190,23 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
                   _nav(Icons.compare_arrows, 'Crossfade', s.crossfade, () => _choose('Crossfade', _crossfadeOptions, s.crossfade, s.setCrossfade)),
                   _nav(Icons.timer_outlined, 'Sleep Timer', s.sleepTimer, () => _choose('Sleep Timer', _sleepOptions, s.sleepTimer, s.setSleepTimer)),
                   _toggle(Icons.download_outlined, 'Download Only', s.downloadOnly, s.toggleDownloadOnly),
-                  _nav(Icons.queue_music, 'Playlist View', s.playlist, () => _choose('Playlist View', _playlistOptions, s.playlist, s.setPlaylist)),
+                  _nav(Icons.queue_music, 'Now Playing View', s.playlist, () => _choose('Now Playing View', _viewOptions, s.playlist, s.setPlaylist)),
+                  _nav(Icons.view_list_outlined, 'Playlist View', s.playlist == 'Classic' || s.playlist == 'Grid' || s.playlist == 'Compact' ? s.playlist : 'Classic', () => _choose('Playlist View', _playlistOptions, s.playlist, s.setPlaylist)),
                   _nav(Icons.notifications_none, 'Now Playing', s.nowPlaying, () => _choose('Now Playing', _nowPlayingOptions, s.nowPlaying, s.setNowPlaying)),
-                  _nav(Icons.more_horiz, 'Additional Settings', '', () {}),
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.battery_full, size: 14, color: Colors.white.withOpacity(0.55)),
+                      const SizedBox(width: 6),
+                      Text(
+                        '$batt%',
+                        style: TextStyle(color: Colors.white.withOpacity(0.55), fontSize: 12, letterSpacing: 0.6),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 12 + bottomInset),
                 ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-              child: Container(
-                height: 92,
-                padding: const EdgeInsets.symmetric(horizontal: 14),
-                decoration: BoxDecoration(color: const Color(0x0FFFFFFF), borderRadius: BorderRadius.circular(28), border: Border.all(color: const Color(0x1FFFFFFF))),
-                child: Row(
-                  children: [
-                    Container(width: 64, height: 64, alignment: Alignment.center, decoration: BoxDecoration(color: const Color(0xFF161920), borderRadius: BorderRadius.circular(14)), child: const Icon(Icons.graphic_eq, color: Colors.white70)),
-                    const SizedBox(width: 10),
-                    const Expanded(child: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.start, children: [Text('NOWSSB PLAYER', style: TextStyle(color: Colors.white, fontSize: 12, letterSpacing: 1.6, fontWeight: FontWeight.w600)), Text('AURA', style: TextStyle(color: Color(0x66FFFFFF), fontSize: 10, letterSpacing: 1.4))])),
-                    IconButton(onPressed: () {}, icon: const Icon(Icons.skip_previous, color: Colors.white)),
-                    Container(width: 40, height: 40, decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Colors.white70)), child: const Icon(Icons.play_arrow, color: Colors.white, size: 20)),
-                    IconButton(onPressed: () {}, icon: const Icon(Icons.skip_next, color: Colors.white)),
-                  ],
-                ),
               ),
             ),
           ],
@@ -176,12 +216,18 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
   }
 
   Widget _nav(IconData icon, String label, String value, VoidCallback onTap) => InkWell(
-        onTap: onTap,
+        onTap: () {
+          HapticFeedback.selectionClick();
+          onTap();
+        },
         borderRadius: BorderRadius.circular(10),
-        child: SizedBox(
+        child: Container(
           height: 56,
+          decoration: const BoxDecoration(
+            border: Border(bottom: BorderSide(color: Color(0x24F2F4F7))),
+          ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Row(
               children: [
                 Icon(icon, color: Colors.white.withOpacity(.9), size: 20),
@@ -197,12 +243,18 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
       );
 
   Widget _toggle(IconData icon, String label, bool value, VoidCallback onTap) => InkWell(
-        onTap: onTap,
+        onTap: () {
+          HapticFeedback.selectionClick();
+          onTap();
+        },
         borderRadius: BorderRadius.circular(10),
-        child: SizedBox(
+        child: Container(
           height: 56,
+          decoration: const BoxDecoration(
+            border: Border(bottom: BorderSide(color: Color(0x24F2F4F7))),
+          ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Row(
               children: [
                 Icon(icon, color: Colors.white.withOpacity(.9), size: 20),

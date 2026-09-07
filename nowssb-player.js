@@ -722,7 +722,7 @@
                 star + '<span class="lgp-stage-level-n">Level ' + cur + '</span>' +
               '</button>' +
               '<div class="lgp-stage-glass">' +
-                '<button type="button" onclick="window.lgpOpenIntegratedPage&&window.lgpOpenIntegratedPage(\'player-settings.html\',\'Music Player Settings\')" aria-label="Settings">' +
+                '<button type="button" onclick="window.lgpOpenIntegratedPage&&window.lgpOpenIntegratedPage(\'player-settings.html#settings\',\'Music Player Settings\')" aria-label="Settings">' +
                   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>' +
                 '</button>' +
                 '<button type="button" onclick="window.lgpToggleInfo&&window.lgpToggleInfo()" aria-label="Word info">' +
@@ -1241,11 +1241,11 @@
       if (gear) {
         e.preventDefault(); e.stopPropagation();
         try { sessionStorage.setItem('nwsb_return_to_player', JSON.stringify({ts:Date.now()})); } catch (_) {}
-        window.lgpOpenIntegratedPage&&window.lgpOpenIntegratedPage('player-settings.html','Music Player Settings');
+        window.lgpOpenIntegratedPage&&window.lgpOpenIntegratedPage('player-settings.html#settings','Music Player Settings');
         return;
       }
       var hit = t && (t.closest ? t.closest('.lgp-settings') : null);
-      if (hit) { e.preventDefault(); e.stopPropagation(); window.lgpOpenIntegratedPage&&window.lgpOpenIntegratedPage('aura-player.html','AURA Player'); }
+      if (hit) { e.preventDefault(); e.stopPropagation(); window.lgpOpenIntegratedPage&&window.lgpOpenIntegratedPage('player-settings.html','AURA Clock'); }
     }, true);
   }
 
@@ -1604,6 +1604,6 @@
 
 (function(){
   window.lgpCloseIntegratedPage=function(){var x=document.getElementById('lgpIntegratedPageSheet');if(!x)return;x.classList.remove('is-open');setTimeout(function(){x.remove();},360);};
-  window.lgpOpenIntegratedPage=function(file,title){window.lgpCloseIntegratedPage();var x=document.createElement('div');x.id='lgpIntegratedPageSheet';x.className='lgp-integrated-sheet';x.innerHTML='<div class="lgp-integrated-backdrop"></div><div class="lgp-integrated-panel" role="dialog" aria-label="'+title+'"><div class="lgp-integrated-grab"></div><button class="lgp-integrated-close" aria-label="Back to Player">‹</button><iframe title="'+title+'" src="'+file+'?from=player-sheet" loading="eager"></iframe></div>';document.body.appendChild(x);requestAnimationFrame(function(){x.classList.add('is-open');});x.querySelector('.lgp-integrated-close').onclick=window.lgpCloseIntegratedPage;x.querySelector('.lgp-integrated-backdrop').onclick=window.lgpCloseIntegratedPage;};
+  window.lgpOpenIntegratedPage=function(file,title){window.lgpCloseIntegratedPage();var src=file||'';var hash='';var hi=src.indexOf('#');if(hi>=0){hash=src.slice(hi);src=src.slice(0,hi);}if(src.indexOf('?')>=0)src+='&from=player-sheet';else src+='?from=player-sheet';src+=hash;var x=document.createElement('div');x.id='lgpIntegratedPageSheet';x.className='lgp-integrated-sheet';x.innerHTML='<div class="lgp-integrated-backdrop"></div><div class="lgp-integrated-panel" role="dialog" aria-label="'+title+'"><div class="lgp-integrated-grab"></div><button class="lgp-integrated-close" aria-label="Back to Player">‹</button><iframe title="'+title+'" src="'+src+'" loading="eager"></iframe></div>';document.body.appendChild(x);requestAnimationFrame(function(){x.classList.add('is-open');});x.querySelector('.lgp-integrated-close').onclick=window.lgpCloseIntegratedPage;x.querySelector('.lgp-integrated-backdrop').onclick=window.lgpCloseIntegratedPage;};
   window.addEventListener('message',function(e){if(e.data&&e.data.type==='close-player-sheet')window.lgpCloseIntegratedPage();});
 })();
