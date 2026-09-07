@@ -207,6 +207,26 @@ class VideoPool {
   /// posters and are reopened as they approach the viewport.
   static const int maxLive = 8;
 
+  /// Higher ceiling while Normal home glass mode wants every on-screen clip
+  /// moving. Still bounded — phones only have so many hardware decoders —
+  /// but generous enough that a scrolled glass home keeps banners alive
+  /// alongside the full-bleed background film.
+  static const int maxLiveGlassHome = 16;
+
+  /// When true, [_effectiveMaxLive] uses [maxLiveGlassHome]. Toggled from
+  /// Normal home's glassmorphism switch.
+  bool _glassHome = false;
+
+  /// Tell the pool Normal glass home is active so on-screen clips keep
+  /// decoders instead of freezing to posters.
+  void setGlassHomeMode(bool enabled) {
+    if (_glassHome == enabled) return;
+    _glassHome = enabled;
+    _rebalanceSoon();
+  }
+
+  int get _effectiveMaxLive => _glassHome ? maxLiveGlassHome : maxLive;
+
   /// How long a clip gets to open before it counts as failed.
   ///
   /// TWO NUMBERS, because the two cases are nothing alike. A remote clip can
@@ -587,11 +607,11 @@ class VideoPool {
           // stable or Android repeatedly tears down and restarts the same
           // videos, producing the play-pause-play loop.
           for (final l in _live) {
-            if (keep.length >= maxLive) break;
+            if (keep.length >= _effectiveMaxLive) break;
             if (want.contains(l)) keep.add(l);
           }
           for (final l in want) {
-            if (keep.length >= maxLive) break;
+            if (keep.length >= _effectiveMaxLive) break;
             keep.add(l);
           }
         }
