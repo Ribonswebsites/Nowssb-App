@@ -136,7 +136,7 @@ class _SignatureBody extends StatelessWidget {
             ],
           ),
         ],
-        const const RmCatBanner(
+        const RmCatBanner(
           title: 'Signature Meanings',
           sub: 'The full decoded origin, not the base entry',
         ),
