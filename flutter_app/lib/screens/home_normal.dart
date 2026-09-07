@@ -51,6 +51,7 @@ import '../widgets/home_skin.dart';
 import 'normal/neomorphic_action_bar.dart';
 import 'normal/neomorphic_dashboard.dart';
 import 'personal_coach.dart';
+import '../media/video_pool.dart';
 import 'normal/glassmorphism_theme.dart';
 import 'normal/neomorphic_essentials.dart';
 import 'normal/sections_bottom.dart';
@@ -134,6 +135,7 @@ class _HomeNormalState extends State<HomeNormal> {
   void dispose() {
     ContentStore.instance.removeListener(_onContent);
     PracticeProgress.instance.removeListener(_onContent);
+    VideoPool.instance.setGlassHomeMode(false);
     super.dispose();
   }
 
@@ -307,7 +309,11 @@ class _HomeNormalState extends State<HomeNormal> {
             child: _TopRow(
               onMenu: () => _openHomeMenu(context),
               glassMode: _glassMode,
-              onGlassToggle: () => setState(() => _glassMode = !_glassMode),
+              onGlassToggle: () => setState(() {
+                _glassMode = !_glassMode;
+                // Keep on-screen clips decoding while glass film is up.
+                VideoPool.instance.setGlassHomeMode(_glassMode);
+              }),
             ),
           ),
           Expanded(
