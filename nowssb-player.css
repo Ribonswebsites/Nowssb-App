@@ -1893,9 +1893,8 @@
 .lgp .lgp-tube-row,
 .lgp .lgp-t0,
 .lgp .lgp-t1,
-.lgp .lgp-visual-top,
-.lgp .lgp-pr-glass,
-.lgp .lgp-wa-vid { display: none !important; }
+.lgp .lgp-visual-top { display: none !important; }
+/* actions-tab glass + looping video stay visible in the bottom carousel */
 
 .lgp .lgp-visual {
   width: min(100%, 340px) !important;
@@ -2763,9 +2762,116 @@
 .lgp-queue-item.is-current .lgp-queue-play{background:#e8d5a3}
 .lgp-queue-play svg{width:14px;height:14px;margin-left:1px}
 
-/* Up Next + Sentence/Practice/Store rotate together */
-.lgp .lgp-bottom-stack{display:flex;flex-direction:column;width:100%;touch-action:pan-y}
-.lgp .lgp-bottom-stack .lgp-practice-row{margin-top:18px}
+/* ── Rotating Actions / Up Next bottom carousel ── */
+.lgp .lgp-bottom-carousel{
+  position:relative; width:100%; max-width:360px; margin:10px auto 0;
+  overflow:hidden; touch-action:pan-y; flex-shrink:0;
+  margin-top:auto; margin-bottom:calc(10px + env(safe-area-inset-bottom,0px));
+}
+.lgp .lgp-bottom-track{
+  display:flex; width:200%;
+  transition:transform .48s cubic-bezier(.16,1,.3,1);
+  will-change:transform;
+}
+.lgp .lgp-bottom-page{
+  width:50%; flex:0 0 50%;
+  display:flex; align-items:stretch; justify-content:center;
+  padding:0 2px; box-sizing:border-box;
+}
+.lgp .lgp-bottom-actions .lgp-practice-row{
+  width:100%; max-width:none; margin:0 auto !important;
+}
+.lgp .lgp-bottom-upnext .lgp-nextup{ width:100%; }
+.lgp .lgp-bottom-dots{
+  display:flex; justify-content:center; gap:6px; margin-top:8px;
+}
+.lgp .lgp-bottom-dots i{
+  width:5px; height:5px; border-radius:50%;
+  background:rgba(255,255,255,.28);
+  display:block;
+}
+.lgp .lgp-bottom-dots i.is-on{
+  background:#f5f5f7;
+  box-shadow:0 0 8px rgba(255,255,255,.35);
+}
 
-/* Ensure page backdrop video stays visible/looping */
-.lgp .lgp-page-bg-video{opacity:.78 !important}
+/* Actions tab: show glass frame + looping muted video behind Sentence|Practice|Store */
+.lgp .lgp-pr-glass{
+  display:block !important;
+  position:relative; overflow:hidden;
+  background:#000 url('./assets/frames/word-acts-tab.webp') center/100% 100% no-repeat;
+}
+.lgp .lgp-wa-vid,
+.lgp .lgp-actions-tab-vid{
+  display:block !important;
+  position:absolute !important;
+  left:1.823%; right:1.969%; top:5.994%; bottom:6.625%;
+  width:auto !important; height:auto !important;
+  object-fit:cover; border-radius:5px;
+  z-index:0; pointer-events:none; opacity:.92;
+}
+.lgp .lgp-pr-glass::before{
+  z-index:0; background:rgba(0,0,0,.18) !important;
+}
+.lgp .lgp-practice-row > .lgp-sentence,
+.lgp .lgp-practice-row > .lgp-practice,
+.lgp .lgp-practice-row > .lgp-store,
+.lgp .lgp-practice-sep { z-index:3 !important; }
+
+/* Vertical lines between Sentence, Practice, Store — bright and visible */
+.lgp .lgp-practice-sep{
+  position:absolute !important;
+  top:18% !important; height:64% !important; width:1.5px !important;
+  margin-left:-0.75px;
+  background:rgba(255,255,255,.72) !important;
+  box-shadow:0 0 6px rgba(255,255,255,.35), 0 0 1px rgba(0,0,0,.5);
+  border-radius:1px !important;
+  pointer-events:none;
+}
+.lgp .lgp-practice-sep:nth-of-type(1){ left:33.893% !important; }
+.lgp .lgp-practice-sep:nth-of-type(2){ left:65.962% !important; }
+
+/* Moving subtitle marquee under title */
+.lgp .lgp-np-sub.lgp-np-marquee{
+  position:relative; overflow:hidden; height:1.35em;
+  margin:6px auto 0 !important; max-width:280px;
+  mask-image:linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  -webkit-mask-image:linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+.lgp .lgp-np-marquee-track{
+  display:flex; gap:48px; width:max-content;
+  white-space:nowrap;
+  color:#8e8e93; font-size:14px; font-weight:400;
+}
+.lgp .lgp-np-marquee-track span{ flex:0 0 auto; }
+.lgp .lgp-np-marquee-track.is-running{
+  animation:lgpSubMarquee 18s linear infinite;
+}
+@keyframes lgpSubMarquee{
+  0%{ transform:translateX(12%); }
+  100%{ transform:translateX(-70%); }
+}
+
+/* YTM-style heavy glass queue — stronger blur / frost */
+.lgp-queue-backdrop{
+  background:rgba(0,0,0,.42) !important;
+  backdrop-filter:blur(28px) saturate(1.35) !important;
+  -webkit-backdrop-filter:blur(28px) saturate(1.35) !important;
+}
+.lgp-queue-panel{
+  background:rgba(18,18,22,.55) !important;
+  border:1px solid rgba(255,255,255,.18) !important;
+  box-shadow:0 -28px 90px rgba(0,0,0,.72), inset 0 1px 0 rgba(255,255,255,.22) !important;
+  backdrop-filter:blur(48px) saturate(1.55) !important;
+  -webkit-backdrop-filter:blur(48px) saturate(1.55) !important;
+}
+.lgp-queue-item{
+  background:rgba(255,255,255,.10) !important;
+  border:1px solid rgba(255,255,255,.08);
+  backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+}
+.lgp-queue-item.is-current{
+  background:rgba(255,255,255,.18) !important;
+  border-color:rgba(232,213,163,.35);
+}
+
