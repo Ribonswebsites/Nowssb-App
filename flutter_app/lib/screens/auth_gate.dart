@@ -241,40 +241,42 @@ class _AuthGateState extends State<AuthGate> {
   }
 
   Widget _buildAuthScreen({String? unavailable}) {
+    // Website `.lg-phone`: box is at least as wide as the viewport and tall
+    // enough to cover it, aspect 720/1264, centred — film fills the screen
+    // with no black letterbox bands (nowssb-nm.css login rules).
     return Scaffold(
       backgroundColor: Colors.black,
       body: LayoutBuilder(
         builder: (context, constraints) {
-          final maxWidth = constraints.maxWidth;
-          final maxHeight = constraints.maxHeight * .96;
-          final width = math.min(maxWidth, maxHeight * 720 / 1264);
+          final vw = constraints.maxWidth;
+          final vh = constraints.maxHeight;
+          final width = math.max(vw, vh * 720 / 1264);
           final height = width * 1264 / 720;
-          return Center(
-            child: SizedBox(
-              width: width,
-              height: height,
-              child: LayoutBuilder(
-                builder: (context, phoneConstraints) {
-                  final w = phoneConstraints.maxWidth;
-                  final h = phoneConstraints.maxHeight;
-                  return Stack(
+          return Stack(
+            fit: StackFit.expand,
+            children: [
+              const ColoredBox(color: Colors.black),
+              Center(
+                child: SizedBox(
+                  width: width,
+                  height: height,
+                  child: Stack(
                     fit: StackFit.expand,
                     children: [
                       _phoneFilm(),
-                      Positioned.fromRect(
-                        rect: Rect.fromLTWH(
-                          w * .18889,
-                          h * .1503,
-                          w * .628,
-                          h * .7722,
-                        ),
+                      // `.lg-glass { inset: 15.03% 18.333% 7.753% 18.889%; }`
+                      Positioned(
+                        top: height * 0.1503,
+                        left: width * 0.18889,
+                        right: width * 0.18333,
+                        bottom: height * 0.07753,
                         child: _glassContent(unavailable: unavailable),
                       ),
                     ],
-                  );
-                },
+                  ),
+                ),
               ),
-            ),
+            ],
           );
         },
       ),
@@ -282,14 +284,28 @@ class _AuthGateState extends State<AuthGate> {
   }
 
   Widget _phoneFilm() {
-    if (_videoReady) {
-      return VideoPlayer(_phoneVideo);
-    }
-    return Image.asset(
-      _posterAsset,
-      fit: BoxFit.cover,
-      errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black),
-    );
+    final film = _videoReady
+        ? FittedBox(
+            fit: BoxFit.contain,
+            child: SizedBox(
+              width: _phoneVideo.value.size.width == 0
+                  ? 720
+                  : _phoneVideo.value.size.width,
+              height: _phoneVideo.value.size.height == 0
+                  ? 1264
+                  : _phoneVideo.value.size.height,
+              child: VideoPlayer(_phoneVideo),
+            ),
+          )
+        : Image.asset(
+            _posterAsset,
+            fit: BoxFit.contain,
+            width: double.infinity,
+            height: double.infinity,
+            errorBuilder: (_, __, ___) =>
+                const ColoredBox(color: Colors.black),
+          );
+    return ColoredBox(color: Colors.black, child: film);
   }
 
   Widget _glassContent({String? unavailable}) {
@@ -369,7 +385,14 @@ class _AuthGateState extends State<AuthGate> {
                   TextButton(
                     onPressed: _busy ? null : () => setState(() => _guest = true),
                     style: TextButton.styleFrom(foregroundColor: const Color(0xFFE8D5A3)),
-                    child: const Text('Explore without account →'),
+                    child: const Text(
+                      'Explore without account →',
+                      style: TextStyle(
+                        color: Color(0xFFE8D5A3),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -608,17 +631,60 @@ class _AuthGateState extends State<AuthGate> {
   }
 }
 
+/// Official multicolor Google "G" mark (not a solid blue letter).
 class _GoogleMark extends StatelessWidget {
   const _GoogleMark();
   @override
-  Widget build(BuildContext context) => const Text(
-        'G',
-        style: TextStyle(
-          fontSize: 21,
-          fontWeight: FontWeight.w800,
-          color: Color(0xFF4285F4),
-        ),
-      );
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 22,
+      height: 22,
+      child: CustomPaint(painter: _GoogleGPainter()),
+    );
+  }
+}
+
+class _GoogleGPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final s = size.shortestSide;
+    final c = Offset(s / 2, s / 2);
+    final stroke = s * 0.18;
+    final r = (s - stroke) / 2;
+    final rect = Rect.fromCircle(center: c, radius: r);
+    const colors = [
+      Color(0xFF4285F4), // blue
+      Color(0xFF34A853), // green
+      Color(0xFFFBBC05), // yellow
+      Color(0xFFEA4335), // red
+    ];
+    // Four arc segments around the ring.
+    final sweeps = [1.7, 1.2, 1.2, 1.2];
+    var start = -0.2;
+    for (var i = 0; i < 4; i++) {
+      final paint = Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = stroke
+        ..strokeCap = StrokeCap.butt
+        ..color = colors[i];
+      canvas.drawArc(rect, start, sweeps[i], false, paint);
+      start += sweeps[i];
+    }
+    // Blue bar of the G (horizontal arm).
+    final bar = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = stroke
+      ..strokeCap = StrokeCap.butt
+      ..color = colors[0];
+    canvas.drawLine(
+      Offset(c.dx - stroke * 0.15, c.dy),
+      Offset(c.dx + r, c.dy),
+      bar,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class _AuthMessage implements Exception {
