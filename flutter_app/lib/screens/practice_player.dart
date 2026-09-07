@@ -505,13 +505,15 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> with Ticker
                   ),
                 ),
                 const SizedBox(height: 18),
-                Stack(children: [
+                Stack(clipBehavior: Clip.none, children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 48),
                     child: Column(children: [
                       Text(
                         _prettyTitle(_word.word),
                         textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           color: Color(0xFFF4F4F5),
                           fontSize: 20,
@@ -523,6 +525,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> with Ticker
                       const SizedBox(height: 4),
                       SizedBox(
                         height: 20,
+                        width: double.infinity,
                         child: _SubtitleMarquee(
                           lines: _marqueeLines,
                           animation: _marqueeController,
@@ -572,9 +575,10 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> with Ticker
                 const SizedBox(height: 12),
                 SizedBox(
                   width: stageWidth,
-                  height: 132,
+                  height: 128,
                   child: PageView(
                     controller: _bottomPageController,
+                    physics: const BouncingScrollPhysics(),
                     onPageChanged: (p) {
                       setState(() => _bottomPage = p);
                       _kickBottomAuto();
@@ -1734,36 +1738,48 @@ class _WordActionStrip extends StatelessWidget {
   final VoidCallback onPractice;
   final VoidCallback onStore;
 
+  Widget _sep() => const Center(
+    child: SizedBox(
+      width: 1.5,
+      height: 34,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: Color(0xB8FFFFFF),
+          borderRadius: BorderRadius.all(Radius.circular(1)),
+          boxShadow: [BoxShadow(color: Color(0x59FFFFFF), blurRadius: 5)],
+        ),
+      ),
+    ),
+  );
+
   @override
   Widget build(BuildContext context) => AspectRatio(
     aspectRatio: 1371 / 317,
     child: ClipRRect(
       borderRadius: BorderRadius.circular(9),
-      child: Stack(fit: StackFit.expand, children: [
+      clipBehavior: Clip.antiAlias,
+      child: Stack(fit: StackFit.expand, clipBehavior: Clip.hardEdge, children: [
         const ColoredBox(color: Colors.black),
-        NwsbVideo(asset: video, priority: ClipPriority.decoration, autoplay: true),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(6, 5, 6, 5),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(5),
+            child: NwsbVideo(
+              asset: video,
+              fit: BoxFit.cover,
+              priority: ClipPriority.decoration,
+              autoplay: true,
+              loop: true,
+              showPoster: false,
+            ),
+          ),
+        ),
         IgnorePointer(child: Image.asset('assets/frames/word-acts-tab.webp', fit: BoxFit.fill, errorBuilder: (_, __, ___) => const SizedBox.shrink())),
         Row(children: [
           Expanded(child: _WordAction(icon: Icons.chat_bubble_outline_rounded, label: 'Sentence', onTap: onSentence)),
-          Container(
-            width: 1.5,
-            height: 42,
-            margin: const EdgeInsets.symmetric(vertical: 18),
-            decoration: const BoxDecoration(
-              color: Color(0xB8FFFFFF),
-              boxShadow: [BoxShadow(color: Color(0x59FFFFFF), blurRadius: 6)],
-            ),
-          ),
+          _sep(),
           Expanded(child: _WordAction(icon: Icons.mic_none_rounded, label: 'Practice', onTap: onPractice, accent: accent)),
-          Container(
-            width: 1.5,
-            height: 42,
-            margin: const EdgeInsets.symmetric(vertical: 18),
-            decoration: const BoxDecoration(
-              color: Color(0xB8FFFFFF),
-              boxShadow: [BoxShadow(color: Color(0x59FFFFFF), blurRadius: 6)],
-            ),
-          ),
+          _sep(),
           Expanded(child: _WordAction(icon: Icons.shopping_bag_outlined, label: 'Store', onTap: onStore)),
         ]),
       ]),
@@ -1975,30 +1991,41 @@ class _SubtitleMarquee extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const style = TextStyle(color: Color(0xFF8B8B90), fontSize: 14, height: 1.2);
+    Widget rowFor(List<String> src) => Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (var i = 0; i < src.length; i++) ...[
+          if (i > 0) const SizedBox(width: 48),
+          Text(src[i], maxLines: 1, softWrap: false, style: style),
+        ],
+      ],
+    );
     return ClipRect(
-      child: AnimatedBuilder(
-        animation: animation,
-        builder: (context, _) {
-          final t = animation.value;
-          return Align(
-            alignment: Alignment(-1.0 + t * 2.4, 0),
-            widthFactor: 1,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                for (var i = 0; i < lines.length; i++) ...[
-                  if (i > 0) const SizedBox(width: 48),
-                  Text(
-                    lines[i],
-                    maxLines: 1,
-                    softWrap: false,
-                    style: const TextStyle(color: Color(0xFF8B8B90), fontSize: 14),
-                  ),
-                ],
-              ],
-            ),
-          );
-        },
+      child: ShaderMask(
+        blendMode: BlendMode.dstIn,
+        shaderCallback: (rect) => const LinearGradient(
+          colors: [Color(0x00FFFFFF), Color(0xFFFFFFFF), Color(0xFFFFFFFF), Color(0x00FFFFFF)],
+          stops: [0.0, 0.08, 0.92, 1.0],
+        ).createShader(rect),
+        child: AnimatedBuilder(
+          animation: animation,
+          builder: (context, child) {
+            final w = MediaQuery.sizeOf(context).width;
+            return Transform.translate(
+              offset: Offset(-w * animation.value * 0.55, 0),
+              child: child,
+            );
+          },
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              rowFor(lines),
+              const SizedBox(width: 48),
+              rowFor(lines),
+            ],
+          ),
+        ),
       ),
     );
   }

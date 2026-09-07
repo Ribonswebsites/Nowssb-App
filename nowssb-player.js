@@ -679,8 +679,7 @@
 
     body.innerHTML =
       '<div class="lgp' + (playing ? ' playing' : '') + '" style="--lg-bg:url(\'' + th.img + '\');--lg-accent:' + th.accent + ';">' +
-        /* page-bg video removed — looping clip lives only in actions tab */
-        '' +
+        '<video class="lgp-page-bg-video" autoplay loop muted playsinline webkit-playsinline preload="auto" aria-hidden="true" src="' + pageBgSrc + '"></video>' +
         '<div class="lgp-bg"></div><div class="lgp-scrim"></div><div class="lgp-orbs"></div>' +
         '<div class="lgp-top">' +
           '<button class="lgp-back lgp-now-btn" onclick="closeSub&&closeSub(\'practice\')" aria-label="Back">' +
@@ -786,6 +785,9 @@
               '<span>NowssB · Words Without Dictionary</span>' +
               '<span>NowssB · The future of Meditation</span>' +
               '<span>NowssB · The New fashion Trend of meditation</span>' +
+              '<span aria-hidden="true">NowssB · Words Without Dictionary</span>' +
+              '<span aria-hidden="true">NowssB · The future of Meditation</span>' +
+              '<span aria-hidden="true">NowssB · The New fashion Trend of meditation</span>' +
             '</div>' +
           '</div>' +
         '</div>' +
@@ -895,7 +897,7 @@
 
     /* Keep the small clips playing. Bind the resume listeners ONCE per
        element (not every render — that leaked handlers and caused jank). */
-    ['.lgp-wa-vid', '.lgp-page-bg-video'].forEach(function (sel) {
+    ['.lgp-wa-vid', '.lgp-actions-tab-vid', '.lgp-page-bg-video'].forEach(function (sel) {
       var v = body.querySelector(sel);
       if (!v) return;
       v.muted = true; v.setAttribute('muted', ''); v.playsInline = true; v.loop = true;
