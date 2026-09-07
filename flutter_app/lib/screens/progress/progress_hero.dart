@@ -4,6 +4,7 @@ library;
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
@@ -123,7 +124,13 @@ class ProgressHeader extends StatelessWidget {
                     color: Color(0xF2FFFFFF),
                     shape: BoxShape.circle,
                   ),
-                  child: const Text('‹', style: TextStyle(fontSize: 34, color: Color(0xFF080909), height: 1)),
+                  child: SvgPicture.asset(
+                    'assets/icons/icon_01.svg',
+                    width: 22,
+                    height: 22,
+                    colorFilter: const ColorFilter.mode(Color(0xFF080909), BlendMode.srcIn),
+                    placeholderBuilder: (_) => const Icon(Icons.chevron_left, size: 28, color: Color(0xFF080909)),
+                  ),
                 ),
               ),
               const SizedBox(width: 15),

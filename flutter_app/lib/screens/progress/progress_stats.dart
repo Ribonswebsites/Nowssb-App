@@ -12,32 +12,33 @@ class ProgressStatsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Match live website part006: streak / sessions / words.
     final streak = progress.streak;
-    final consistency = progress.weekConsistencyPercent;
-    final weekLabel = progress.weekTimeLabel;
+    final sessions = progress.totalSessions;
+    final words = progress.uniqueWords;
     return Row(
       children: [
         Expanded(
           child: _Stat(
             num: '$streak',
             name: 'Day Streak',
-            desc: streak == 0 ? 'Start today' : streak == 1 ? 'Started' : 'Days in a row',
+            desc: streak == 0 ? 'Start today' : streak == 1 ? 'Started' : 'consecutive',
           ),
         ),
         const SizedBox(width: 7),
         Expanded(
           child: _Stat(
-            num: '$consistency%',
-            name: 'Consistency',
-            desc: 'Practice consistency',
+            num: '$sessions',
+            name: 'Sessions',
+            desc: sessions == 0 ? 'None yet' : 'total logged',
           ),
         ),
         const SizedBox(width: 7),
         Expanded(
           child: _Stat(
-            num: weekLabel,
-            name: 'This Week',
-            desc: 'Meditation time',
+            num: '$words',
+            name: 'Words',
+            desc: words == 0 ? 'None yet' : 'practiced',
           ),
         ),
       ],

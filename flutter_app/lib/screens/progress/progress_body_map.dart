@@ -47,16 +47,19 @@ class ProgressBodyMap extends StatelessWidget {
             child: Stack(
               alignment: Alignment.center,
               children: [
+                // Plain SVG like website <img src=bodymap.svg> — no srcIn
+                // ColorFilter (that flattens multi-stop / organ fills).
                 Opacity(
-                  opacity: 0.92,
+                  opacity: organs.isEmpty ? 0.72 : 0.98,
                   child: SvgPicture.asset(
                     'assets/icons/bodymap.svg',
                     width: 170,
                     height: 270,
                     fit: BoxFit.contain,
-                    colorFilter: ColorFilter.mode(
-                      Colors.white.withOpacity(organs.isEmpty ? 0.35 : 0.72),
-                      BlendMode.srcIn,
+                    placeholderBuilder: (_) => const SizedBox(
+                      width: 170,
+                      height: 270,
+                      child: Center(child: Icon(Icons.accessibility_new, color: Color(0x66FFFFFF), size: 48)),
                     ),
                   ),
                 ),

@@ -2,13 +2,14 @@ import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
+import '../data/content.dart';
 import '../data/practice_progress.dart';
+import 'progress/progress_screen.dart';
 
 const _accent = Color(0xFFE3BD7D);
 const _text = Color(0xFFF5F5F3);
@@ -42,7 +43,7 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateMixin {
+class _ProfileScreenState extends State<ProfileScreen> {
   late SharedPreferences _prefs;
   final _nameController = TextEditingController();
   final _picker = ImagePicker();
@@ -58,11 +59,6 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
   bool _recentOpen = false;
   String _toast = '';
   OverlayEntry? _toastEntry;
-
-  late final AnimationController _bodyPulse = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 4200),
-  )..repeat(reverse: true);
 
   @override
   void initState() {
@@ -96,7 +92,6 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
   @override
   void dispose() {
     PracticeProgress.instance.removeListener(_onLiveProgress);
-    _bodyPulse.dispose();
     _nameController.dispose();
     _toastEntry?.remove();
     super.dispose();
@@ -227,7 +222,6 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                     _recentActivity(),
                     _motto(),
                     _weekTracker(today),
-                    _bodyMap(),
                     _preferences(),
                     _shop(),
                     _account(),
@@ -379,24 +373,50 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
 
   Widget _progress() {
     final p = PracticeProgress.instance;
+    void openProgress() {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => PracticeProgressScreen(words: ContentStore.instance.library),
+        ),
+      );
+    }
+
     return SectionBlock(
       title: 'Your Progress',
-      child: GlassCard(
-        margin: const EdgeInsets.only(bottom: 34),
-        padding: const EdgeInsets.fromLTRB(14, 16, 14, 16),
-        child: GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 2,
-          mainAxisSpacing: 10,
-          crossAxisSpacing: 10,
-          childAspectRatio: 1.55,
-          children: [
-            _Stat('${p.streak}', 'days', 'Day Streak'),
-            _Stat('${p.totalSessions}', 'total', 'Sessions'),
-            _Stat('${p.uniqueWords}', 'learned', 'Words Activated'),
-            _Stat('${p.weekConsistencyPercent}', '% week', 'Consistency'),
-          ],
+      trailing: _viewAll(icon: 'assets/icons/icon_05.svg', onTap: openProgress),
+      child: InkWell(
+        onTap: openProgress,
+        borderRadius: BorderRadius.circular(22),
+        child: GlassCard(
+          margin: const EdgeInsets.only(bottom: 0),
+          padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
+          child: Row(
+            children: [
+              Expanded(
+                child: Row(
+                  children: [
+                    _TeaserStat('${p.streak}', 'Streak'),
+                    const SizedBox(width: 10),
+                    _TeaserStat('${p.totalSessions}', 'Sessions'),
+                    const SizedBox(width: 10),
+                    _TeaserStat('${p.uniqueWords}', 'Words'),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: _borderSoft),
+                  color: const Color(0x14FFFFFF),
+                ),
+                alignment: Alignment.center,
+                child: _svgIcon('assets/icons/icon_16.svg', 14, _dim),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -507,16 +527,6 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
         })),
       );
 
-  Widget _bodyMap() => Container(
-        margin: const EdgeInsets.only(bottom: 44),
-        child: Column(children: [
-          const SectionLabel('Healing Body Map'),
-          AnimatedBuilder(animation: _bodyPulse, builder: (_, __) => Opacity(opacity: .65 + .35 * (0.5 + 0.5 * math.sin(_bodyPulse.value * math.pi * 2)), child: SvgPicture.asset('assets/icons/bodymap.svg', width: 250, height: 284))),
-          const SizedBox(height: 20),
-          Wrap(alignment: WrapAlignment.center, spacing: 18, runSpacing: 8, children: ['Brain','Throat','Lungs','Heart','Liver'].map((x) => Row(mainAxisSize: MainAxisSize.min, children: [Container(width: 5, height: 5, decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle, boxShadow: [BoxShadow(color: Colors.white, blurRadius: 6)])), const SizedBox(width: 6), Text(x, style: const TextStyle(fontSize: 12, color: _dim))])).toList()),
-        ]),
-      );
-
   Widget _preferences() => _sectionList('Preferences', [
         _listRow('Sound Feedback', trailing: ToggleSwitch(value: _soundOn, onChanged: (v) async { setState(() => _soundOn = v); await _prefs.setString('nowssb_sound', v ? 'on' : 'off'); })),
         _listRow('Practice Duration', trailing: Row(mainAxisSize: MainAxisSize.min, children: [_roundAction('assets/icons/icon_24.svg', () async { final v = math.max(5, _duration - 5).toInt(); setState(() => _duration = v); await _prefs.setInt('nowssb_duration', v); }), const SizedBox(width: 14), SizedBox(width: 56, child: Text('$_duration min', textAlign: TextAlign.center, style: const TextStyle(fontFamily: _mono, fontSize: 14))), const SizedBox(width: 14), _roundAction('assets/icons/icon_25.svg', () async { final v = math.min(60, _duration + 5).toInt(); setState(() => _duration = v); await _prefs.setInt('nowssb_duration', v); })])),
@@ -563,9 +573,17 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
 
   Widget _viewAll({required String icon, required VoidCallback onTap, bool pill = false}) => InkWell(onTap: onTap, borderRadius: BorderRadius.circular(999), child: Container(padding: pill ? const EdgeInsets.symmetric(horizontal: 9, vertical: 6) : EdgeInsets.zero, decoration: pill ? BoxDecoration(color: const Color(0x08FFFFFF), border: const Border.fromBorderSide(BorderSide(color: _border)), borderRadius: BorderRadius.circular(999)) : null, child: Row(mainAxisSize: MainAxisSize.min, children: [const Text('View All', style: TextStyle(fontSize: 12, color: _dim)), const SizedBox(width: 5), SvgPicture.asset(icon, width: pill ? 16 : 13, height: pill ? 16 : 13, colorFilter: const ColorFilter.mode(_dim, BlendMode.srcIn))])));
 
-  Widget _circleButton({required String asset, required VoidCallback onTap, double size = 38}) => Material(color: Colors.transparent, child: InkWell(onTap: onTap, customBorder: const CircleBorder(), child: Container(width: size, height: size, decoration: BoxDecoration(color: const Color(0x52000000), shape: BoxShape.circle, border: const Border.fromBorderSide(BorderSide(color: Color(0x29FFFFFF)))), child: Center(child: SvgPicture.asset(asset, width: size * .47, height: size * .47, colorFilter: const ColorFilter.mode(_text, BlendMode.srcIn))))));
+  Widget _svgIcon(String asset, double size, Color color) => SvgPicture.asset(
+        asset,
+        width: size,
+        height: size,
+        colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+        placeholderBuilder: (_) => Icon(Icons.circle_outlined, size: size, color: color.withOpacity(.45)),
+      );
 
-  Widget _roundAction(String asset, VoidCallback onTap) => Material(color: Colors.transparent, child: InkWell(onTap: onTap, customBorder: const CircleBorder(), child: Container(width: 28, height: 28, decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: _border)), child: Center(child: SvgPicture.asset(asset, width: 13, height: 13, colorFilter: const ColorFilter.mode(_text, BlendMode.srcIn))))));
+  Widget _circleButton({required String asset, required VoidCallback onTap, double size = 38}) => Material(color: Colors.transparent, child: InkWell(onTap: onTap, customBorder: const CircleBorder(), child: Container(width: size, height: size, decoration: BoxDecoration(color: const Color(0x52000000), shape: BoxShape.circle, border: const Border.fromBorderSide(BorderSide(color: Color(0x29FFFFFF)))), child: Center(child: _svgIcon(asset, size * .47, _text)))));
+
+  Widget _roundAction(String asset, VoidCallback onTap) => Material(color: Colors.transparent, child: InkWell(onTap: onTap, customBorder: const CircleBorder(), child: Container(width: 28, height: 28, decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: _border)), child: Center(child: _svgIcon(asset, 13, _text)))));
 
   Widget _recentSheet() => Stack(children: [
         Positioned.fill(child: GestureDetector(onTap: () => setState(() => _recentOpen = false), child: Container(color: Colors.black.withOpacity(.68)))),
@@ -633,10 +651,28 @@ class SectionBlock extends StatelessWidget {
   @override Widget build(BuildContext context) => Container(margin: EdgeInsets.only(bottom: marginBottom), child: Column(children: [Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [SectionLabel(title, bottom: 14), if (trailing != null) trailing!]), child]));
 }
 
-class _Stat extends StatelessWidget {
-  final String num, unit, label;
-  const _Stat(this.num, this.unit, this.label);
-  @override Widget build(BuildContext context) => Container(padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: const Color(0x570C0C0E), border: Border.all(color: const Color(0x1CFFFFFF)), borderRadius: BorderRadius.circular(20), boxShadow: const [BoxShadow(color: Color(0x0EFFFFFF), offset: Offset(0, -1), blurRadius: 0)]), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(num, style: const TextStyle(fontFamily: _mono, fontSize: 29, fontWeight: FontWeight.w600, height: 1)), const SizedBox(height: 6), Text(unit, style: const TextStyle(fontSize: 11, color: _faint)), const SizedBox(height: 2), Text(label, style: const TextStyle(fontSize: 12, height: 1.25, color: _dim))]));
+class _TeaserStat extends StatelessWidget {
+  final String value, label;
+  const _TeaserStat(this.value, this.label);
+  @override
+  Widget build(BuildContext context) => Expanded(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+          decoration: BoxDecoration(
+            color: const Color(0x570C0C0E),
+            border: Border.all(color: const Color(0x1CFFFFFF)),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(value, style: const TextStyle(fontFamily: _mono, fontSize: 22, fontWeight: FontWeight.w600, height: 1, color: _text)),
+              const SizedBox(height: 6),
+              Text(label.toUpperCase(), style: const TextStyle(fontSize: 9, letterSpacing: 1.1, color: _dim)),
+            ],
+          ),
+        ),
+      );
 }
 
 class ToggleSwitch extends StatelessWidget {

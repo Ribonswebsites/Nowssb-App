@@ -1,9 +1,9 @@
-<svg aria-label="Anatomical diagram showing brain, throat, lungs, heart and liver" class="bodymap-svg" fill="none" role="img" viewbox="0 0 300 340" xmlns="http://www.w3.org/2000/svg">
+<svg aria-label="Anatomical diagram showing brain, throat, lungs, heart and liver" class="bodymap-svg" fill="none" role="img" viewBox="0 0 300 340" xmlns="http://www.w3.org/2000/svg">
 <defs>
-<lineargradient id="bustGrad" x1="0" x2="0" y1="0" y2="1">
+<linearGradient id="bustGrad" x1="0" x2="0" y1="0" y2="1">
 <stop offset="0" stop-color="#fff" stop-opacity=".12"></stop>
 <stop offset="1" stop-color="#fff" stop-opacity=".02"></stop>
-</lineargradient>
+</linearGradient>
 </defs>
 <ellipse cx="150" cy="72" fill="url(#bustGrad)" rx="42" ry="48" stroke="rgba(255,255,255,.25)" stroke-width="1"></ellipse>
 <path d="M132 108h36v28h-36z" fill="url(#bustGrad)" stroke="rgba(255,255,255,.15)"></path>
