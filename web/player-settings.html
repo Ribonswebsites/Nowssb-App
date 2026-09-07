@@ -30,20 +30,20 @@ body{display:flex;justify-content:center;touch-action:manipulation}
 .icon-btn.nav-back{width:44px;height:44px;background:#fff;color:#202731;box-shadow:0 6px 14px rgba(0,0,0,.18)}
 .icon-btn.nav-back svg{width:24px;height:24px}
 
-/* CLOCK — the established AURA reference dial: compact, left-weighted, and clear of the settings rows */
-.clock-stage{flex:1 1 auto;min-height:0;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:0 0 4px;margin-top:-12px}
-.clock-frame{position:relative;width:100%;max-width:390px;aspect-ratio:390/355;margin:0 auto;transform:translateY(-8%)}
-.clock-svg{position:absolute;inset:0;width:100%;height:100%;color:var(--fg);overflow:visible}
-.time-lockup{position:absolute;left:0;top:48%;transform:translateY(-50%);display:flex;align-items:center;gap:10px;padding-left:86px;z-index:3}
-.hour{font-size:68px;font-weight:200;letter-spacing:-0.02em;line-height:1;background:transparent;padding:0;border-radius:0;margin-right:-4px}
-.minute-pill{display:flex;align-items:center;gap:8px;border:1px solid rgba(242,242,239,0.82);border-radius:999px;padding:6px 14px 6px 12px;background:transparent}
-.minute{font-size:26px;font-weight:300;letter-spacing:0.04em}
-.pill-div{width:1px;height:16px;background:rgba(242,242,239,0.62)}
-.ampm{font-size:12px;font-weight:400;letter-spacing:0.12em;opacity:.9}
-.date-lockup{position:absolute;right:10px;top:74%;transform:translateY(-50%);text-align:right;z-index:3;background:transparent;padding:0;border-radius:0}
-.date-top{font-size:11px;letter-spacing:0.18em;font-weight:400}
-.date-rule{width:170px;height:1px;background:rgba(242,242,239,0.52);margin:10px 0 10px auto}
-.date-day{font-size:11px;letter-spacing:0.22em;font-weight:400}
+/* CLOCK — target mock: left-weighted hour+pill, C-arc ticks 15–60, date in right opening */
+.clock-stage{flex:1 1 auto;min-height:0;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:0 0 4px;margin-top:-8px}
+.clock-frame{position:relative;width:100%;max-width:380px;aspect-ratio:380/320;margin:0 auto;transform:none}
+.clock-svg{position:absolute;inset:0;width:100%;height:100%;color:var(--fg);overflow:hidden}
+.time-lockup{position:absolute;left:0;top:48%;transform:translateY(-50%);display:flex;align-items:center;gap:8px;padding-left:58px;z-index:3}
+.hour{font-size:76px;font-weight:200;letter-spacing:-0.03em;line-height:.92;background:transparent;padding:0;border-radius:0;margin-right:-2px}
+.minute-pill{display:flex;align-items:center;gap:9px;border:1.15px solid rgba(242,242,239,0.85);border-radius:999px;padding:7px 14px 7px 12px;background:transparent}
+.minute{font-size:23px;font-weight:400;letter-spacing:0.02em}
+.pill-div{width:1px;height:14px;background:rgba(242,242,239,0.62)}
+.ampm{font-size:11px;font-weight:400;letter-spacing:0.18em;opacity:.9}
+.date-lockup{position:absolute;right:12px;top:50%;transform:translateY(-50%);text-align:right;z-index:3;background:transparent;padding:0;border-radius:0}
+.date-top{font-size:11px;letter-spacing:0.28em;font-weight:400}
+.date-rule{width:118px;height:1px;background:rgba(242,242,239,0.52);margin:9px 0 9px auto}
+.date-day{font-size:12px;letter-spacing:0.36em;font-weight:400}
 
 /* Bottom settings — like reference, with icons */
 .home-settings{padding:0 24px 0;flex-shrink:0}
@@ -140,7 +140,7 @@ body{display:flex;justify-content:center;touch-action:manipulation}
     </header>
     <div class="clock-stage">
       <div class="clock-frame">
-        <svg class="clock-svg" viewBox="0 0 390 360" aria-hidden="true">
+        <svg class="clock-svg" viewBox="0 0 380 320" aria-hidden="true">
           <g id="ring-float"><g id="ring-outer"></g><g id="ring-inner"></g></g>
           <g id="clock-numbers"></g>
         </svg>
@@ -338,59 +338,49 @@ function showScreen(name) {
   else batt.classList.add("hidden");
 }
 
-/* Clock */
-const CX=176, CY=186;
+/* Clock — C-arc (open right), labels 15–60, no clipped full double ring */
+const CX=152, CY=160, R=118;
 function polar(rad,deg){const a=(deg*Math.PI)/180;return{x:+(CX+rad*Math.cos(a)).toFixed(1),y:+(CY+rad*Math.sin(a)).toFixed(1)};}
-function buildArc(count,startDeg,spanDeg,radius,everyMajor,everyMid,lenMajor,lenMid,lenMin){
+const LABEL_DEGS={15:150,20:125,25:105,30:88,35:68,40:318,45:268,50:242,55:218,60:198};
+function buildArc(count,startDeg,spanDeg,radius,everyMajor,everyMid,lenMajor,lenMid,lenMin,opacityScale){
   const lines=[];
-  // Number guard zones — ticks stop before hitting labels
-  const numZones = [
-    {x:40,y:184,r:22},{x:58,y:56,r:16},{x:148,y:28,r:16},
-    {x:108,y:88,r:15},{x:300,y:72,r:16},{x:176,y:268,r:16},
-    {x:72,y:238,r:16},{x:268,y:308,r:15},{x:136,y:348,r:16},{x:44,y:308,r:15},
-  ];
+  const labelPts=Object.entries(LABEL_DEGS).map(([n,deg])=>{
+    const p=polar(radius+16,deg); return {x:p.x,y:p.y,r:14};
+  });
   for(let i=0;i<count;i++){
     const t=count===1?0:i/(count-1);
     const deg=startDeg+t*spanDeg;
     const major=i%everyMajor===0;
     const mid=!major&&i%everyMid===0;
     const len=major?lenMajor:mid?lenMid:lenMin;
-    const bump=major?2.2:mid?0.6:0;
+    const bump=major?1.5:0;
     const p1=polar(radius+bump,deg),p2=polar(radius-len,deg);
     const mx=(p1.x+p2.x)/2,my=(p1.y+p2.y)/2;
-    // Invisible barrier: no ticks through hour + minute pill
-    if(mx>78&&mx<268&&my>138&&my<238)continue;
-    // Invisible barrier: no ticks through date
-    if(mx>275&&my>145&&my<245)continue;
-    // Invisible barrier: no ticks through number labels
+    // Barriers: time lockup, date opening, labels
+    if(mx>CX-8&&mx<CX+R*0.95&&my>CY-R*0.28&&my<CY+R*0.28)continue;
+    if(mx>CX+R*0.55&&my>CY-R*0.35&&my<CY+R*0.45)continue;
     let hitNum=false;
-    for(const z of numZones){
+    for(const z of labelPts){
       const dx=mx-z.x, dy=my-z.y;
       if(dx*dx+dy*dy < z.r*z.r){hitNum=true;break;}
     }
     if(hitNum)continue;
-    const w=major?1.5:1.15,o=major?0.95:mid?0.72:0.42;
+    const w=major?1.45:1.05,o=(major?0.95:mid?0.70:0.40)*opacityScale;
     lines.push(`<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="currentColor" stroke-width="${w}" stroke-linecap="butt" opacity="${o}"/>`);
   }
   return lines.join("");
 }
 function initClock(){
-  // Dense C-arcs; ticks skip time/date/numbers via barriers above
-  document.getElementById("ring-outer").innerHTML=buildArc(72,48,285,152,6,3,18,11,6);
-  document.getElementById("ring-inner").innerHTML=buildArc(48,62,255,96,6,2,12,7,4.5);
-  // Numbers offset off the tick path (padding from arcs)
-  const nums=[
-    {n:"60",x:36,y:184,s:22},
-    {n:"55",x:54,y:52,s:15},
-    {n:"50",x:148,y:24,s:16},
-    {n:"45",x:104,y:84,s:14},
-    {n:"40",x:304,y:68,s:16},
-    {n:"35",x:176,y:268,s:14},
-    {n:"30",x:72,y:238,s:15},
-    {n:"25",x:272,y:308,s:14},
-    {n:"20",x:136,y:348,s:14},
-    {n:"15",x:40,y:308,s:14},
-  ];
+  document.getElementById("ring-outer").innerHTML=buildArc(64,48,286,R,6,3,15,9,5,1);
+  // Short inner accent only — not a second full ring clipped at edges
+  document.getElementById("ring-inner").innerHTML=buildArc(36,70,240,R*0.72,6,2,9,5.5,3.5,0.78);
+  const nums=[15,20,25,30,35,40,45,50,55,60].map(n=>{
+    const p=polar(R+15, LABEL_DEGS[n]);
+    const x=Math.min(366, Math.max(14, p.x));
+    const y=Math.min(306, Math.max(14, p.y));
+    const s=n===60?17:13;
+    return {n:String(n),x,y,s};
+  });
   document.getElementById("clock-numbers").innerHTML=nums.map(n=>
     `<text x="${n.x}" y="${n.y}" text-anchor="middle" dominant-baseline="middle" class="clock-number" font-size="${n.s}">${n.n}</text>`
   ).join("");
@@ -400,7 +390,7 @@ function startRingSpin(){
   const inner=document.getElementById("ring-inner");
   const floatG=document.getElementById("ring-float");
   if(!outer||!inner)return;
-  const OUTER_DPS=360/32, INNER_DPS=-360/22, OX=176, OY=186;
+  const OUTER_DPS=360/40, INNER_DPS=-360/28, OX=CX, OY=CY;
   let angleO=0,angleI=0,t0=performance.now(),last=t0,rafId=0,running=true;
   function frame(now){
     if(!running)return;
@@ -408,8 +398,8 @@ function startRingSpin(){
     const elapsed=(now-t0)/1000;
     angleO=(angleO+OUTER_DPS*dt)%360;
     angleI=(angleI+INNER_DPS*dt)%360;
-    const fy=Math.sin(elapsed*0.55)*2.4;
-    const fx=Math.sin(elapsed*0.37+1.2)*1.3;
+    const fy=Math.sin(elapsed*0.45)*1.4;
+    const fx=Math.sin(elapsed*0.33+1.2)*0.8;
     floatG.setAttribute("transform",`translate(${fx.toFixed(2)} ${fy.toFixed(2)})`);
     outer.setAttribute("transform",`rotate(${angleO.toFixed(2)} ${OX} ${OY})`);
     inner.setAttribute("transform",`rotate(${angleI.toFixed(2)} ${OX} ${OY})`);

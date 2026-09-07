@@ -575,7 +575,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> with Ticker
                 const SizedBox(height: 12),
                 SizedBox(
                   width: stageWidth,
-                  height: 128,
+                  height: 88,
                   child: PageView(
                     controller: _bottomPageController,
                     physics: const BouncingScrollPhysics(),
@@ -865,70 +865,97 @@ class _NextUpCard extends StatelessWidget {
         }
       },
       child: Container(
+        height: double.infinity,
         decoration: BoxDecoration(
           color: const Color(0xD1161618),
-          borderRadius: BorderRadius.circular(23),
+          borderRadius: BorderRadius.circular(18),
           border: Border.all(color: const Color(0x14FFFFFF)),
-          boxShadow: const [BoxShadow(color: Color(0x0DFFFFFF), blurRadius: 0, offset: Offset(0, 1))],
         ),
+        clipBehavior: Clip.hardEdge,
         child: next == null
-            ? const Padding(
-                padding: EdgeInsets.fromLTRB(16, 18, 16, 20),
-                child: Text('End of queue', textAlign: TextAlign.center, style: TextStyle(color: Color(0xFF8E8E93), fontSize: 13)),
+            ? const Center(
+                child: Text('End of queue', style: TextStyle(color: Color(0xFF8E8E93), fontSize: 12)),
               )
-            : Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Center(child: Container(width: 42, height: 4, margin: const EdgeInsets.only(top: 8, bottom: 2), decoration: BoxDecoration(color: const Color(0x7AFFFFFF), borderRadius: BorderRadius.circular(99)))),
+            : Column(children: [
+                const SizedBox(height: 4),
+                Center(
+                  child: Container(
+                    width: 36,
+                    height: 3,
+                    decoration: BoxDecoration(color: const Color(0x66FFFFFF), borderRadius: BorderRadius.circular(99)),
+                  ),
+                ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 8, 0),
+                  padding: const EdgeInsets.fromLTRB(12, 4, 4, 0),
                   child: Row(children: [
-                    const Expanded(child: Text('UP NEXT', style: TextStyle(color: Color(0xFF8D8D92), fontSize: 11, fontWeight: FontWeight.w500, letterSpacing: 2.8))),
+                    const Expanded(
+                      child: Text(
+                        'UP NEXT',
+                        style: TextStyle(color: Color(0xFF8D8D92), fontSize: 10, fontWeight: FontWeight.w500, letterSpacing: 2.4),
+                      ),
+                    ),
                     GestureDetector(
                       onTap: onOpenSoundLibrary,
-                      child: const SizedBox(width: 36, height: 36, child: Icon(Icons.queue_music_rounded, color: Color(0xFFCFCFD2), size: 20)),
+                      child: const SizedBox(
+                        width: 30,
+                        height: 30,
+                        child: Icon(Icons.queue_music_rounded, color: Color(0xFFCFCFD2), size: 18),
+                      ),
                     ),
                   ]),
                 ),
                 const Padding(
-                  padding: EdgeInsets.fromLTRB(16, 10, 16, 0),
+                  padding: EdgeInsets.fromLTRB(12, 2, 12, 0),
                   child: ColoredBox(color: Color(0x1AFFFFFF), child: SizedBox(width: double.infinity, height: 1)),
                 ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
-                  child: GestureDetector(
-                    onTap: () => onPlayAt(nextIndex),
-                    behavior: HitTestBehavior.opaque,
-                    child: Row(children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: SizedBox(
-                          width: 48,
-                          height: 48,
-                          child: art != null && art.isNotEmpty
-                              ? (art.startsWith('http')
-                                  ? Image.network(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111)))
-                                  : Image.asset(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111))))
-                              : const ColoredBox(color: Color(0xFF111111)),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(10, 4, 10, 6),
+                    child: GestureDetector(
+                      onTap: () => onPlayAt(nextIndex),
+                      behavior: HitTestBehavior.opaque,
+                      child: Row(children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: SizedBox(
+                            width: 40,
+                            height: 40,
+                            child: art != null && art.isNotEmpty
+                                ? (art.startsWith('http')
+                                    ? Image.network(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111)))
+                                    : Image.asset(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111))))
+                                : const ColoredBox(color: Color(0xFF111111)),
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          Text(next.word, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xFFF5F5F7), fontSize: 15, fontWeight: FontWeight.w600, letterSpacing: -0.15)),
-                          const SizedBox(height: 3),
-                          Text('NowssB  ·  ${_wordClock(next)}', style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 12)),
-                        ]),
-                      ),
-                      Container(
-                        width: 36,
-                        height: 36,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFF5F5F7),
-                          shape: BoxShape.circle,
-                          boxShadow: [BoxShadow(color: Color(0x59000000), blurRadius: 16, offset: Offset(0, 6))],
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                next.word,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(color: Color(0xFFF5F5F7), fontSize: 14, fontWeight: FontWeight.w600, letterSpacing: -0.15),
+                              ),
+                              const SizedBox(height: 2),
+                              Text('NowssB  ·  ${_wordClock(next)}', style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 11)),
+                            ],
+                          ),
                         ),
-                        child: const Icon(Icons.play_arrow_rounded, color: Color(0xFF0A0A0C), size: 22),
-                      ),
-                    ]),
+                        Container(
+                          width: 32,
+                          height: 32,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFF5F5F7),
+                            shape: BoxShape.circle,
+                            boxShadow: [BoxShadow(color: Color(0x59000000), blurRadius: 12, offset: Offset(0, 4))],
+                          ),
+                          child: const Icon(Icons.play_arrow_rounded, color: Color(0xFF0A0A0C), size: 20),
+                        ),
+                      ]),
+                    ),
                   ),
                 ),
               ]),
@@ -1741,40 +1768,36 @@ class _WordActionStrip extends StatelessWidget {
   Widget _sep() => const Center(
     child: SizedBox(
       width: 1.5,
-      height: 34,
+      height: 24,
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: Color(0xB8FFFFFF),
           borderRadius: BorderRadius.all(Radius.circular(1)),
-          boxShadow: [BoxShadow(color: Color(0x59FFFFFF), blurRadius: 5)],
+          boxShadow: [BoxShadow(color: Color(0x40FFFFFF), blurRadius: 3)],
         ),
       ),
     ),
   );
 
   @override
-  Widget build(BuildContext context) => AspectRatio(
-    aspectRatio: 1371 / 317,
+  Widget build(BuildContext context) => SizedBox(
+    height: double.infinity,
     child: ClipRRect(
-      borderRadius: BorderRadius.circular(9),
+      borderRadius: BorderRadius.circular(12),
       clipBehavior: Clip.antiAlias,
       child: Stack(fit: StackFit.expand, clipBehavior: Clip.hardEdge, children: [
         const ColoredBox(color: Colors.black),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(6, 5, 6, 5),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(5),
-            child: NwsbVideo(
-              asset: video,
-              fit: BoxFit.cover,
-              priority: ClipPriority.decoration,
-              autoplay: true,
-              loop: true,
-              showPoster: false,
-            ),
-          ),
+        // Tab video fills the entire pill — no word-acts-tab.webp white frame overlay.
+        NwsbVideo(
+          asset: video,
+          fit: BoxFit.cover,
+          priority: ClipPriority.decoration,
+          autoplay: true,
+          loop: true,
+          showPoster: false,
         ),
-        IgnorePointer(child: Image.asset('assets/frames/word-acts-tab.webp', fit: BoxFit.fill, errorBuilder: (_, __, ___) => const SizedBox.shrink())),
+        // Soft dark scrim so white icons stay legible over bright frames of the clip.
+        const ColoredBox(color: Color(0x33000000)),
         Row(children: [
           Expanded(child: _WordAction(icon: Icons.chat_bubble_outline_rounded, label: 'Sentence', onTap: onSentence)),
           _sep(),
@@ -1801,9 +1824,9 @@ class _WordAction extends StatelessWidget {
     child: GestureDetector(
       onTap: onTap,
       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        Icon(icon, color: Colors.white, size: 25, shadows: [Shadow(color: (accent ?? Colors.black).withOpacity(.85), blurRadius: 12)]),
-        const SizedBox(height: 3),
-        Text(label.toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 8.5, fontWeight: FontWeight.w800, letterSpacing: 1.1)),
+        Icon(icon, color: Colors.white, size: 22, shadows: [Shadow(color: (accent ?? Colors.black).withOpacity(.85), blurRadius: 10)]),
+        const SizedBox(height: 2),
+        Text(label.toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.w800, letterSpacing: 1.0)),
       ]),
     ),
   );
