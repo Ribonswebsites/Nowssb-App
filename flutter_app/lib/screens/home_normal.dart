@@ -336,8 +336,8 @@ class _HomeNormalState extends State<HomeNormal> {
   }
 }
 
-/// .nmh-toprow — essentials only: menu, logo, title, Settings, and one
-/// expanding SVG control that opens the glass 3D actions carousel.
+/// .nmh-toprow — logo + title on the left; Settings | Quick | Menu on the
+/// right. The expanding SVG control opens the glass 3D actions carousel.
 class _TopRow extends StatelessWidget {
   const _TopRow({
     required this.onMenu,
@@ -356,6 +356,22 @@ class _TopRow extends StatelessWidget {
       onGlassToggle: onGlassToggle,
       onNotifications: () => showNotificationsSheet(context),
       onFashionHome: () => Settings.instance.setFashionHome(true),
+      onStore: () => NavScope.goTo(context, 3),
+      onPlayer: () {
+        final words = ContentStore.instance.library;
+        if (words.isEmpty) {
+          NavScope.goTo(context, 1);
+          return;
+        }
+        Navigator.of(context).push(
+          MaterialPageRoute<void>(
+            builder: (_) => PracticePlayerScreen(
+              words: words,
+              title: 'Practice',
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -364,8 +380,6 @@ class _TopRow extends StatelessWidget {
     final glass = NormalGlassMode.of(context);
     return Row(
       children: [
-        _HamburgerButton(onTap: onMenu),
-        const SizedBox(width: 12),
         // Normal home only: the static mark sits in a raised neumorphic disc.
         Container(
           width: 56,
@@ -432,15 +446,42 @@ class _TopRow extends StatelessWidget {
           ),
         ),
         const Spacer(),
+        // Right cluster: Settings | Quick access | Hamburger
         _HeaderButton(
           icon: Icons.settings_outlined,
           onTap: () => Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => const WidgetsPage()),
           ),
         ),
-        const SizedBox(width: 8),
+        const _HeaderDivider(),
         _HeaderActionsSvgButton(onTap: () => _openActions(context)),
+        const _HeaderDivider(),
+        _HamburgerButton(onTap: onMenu),
       ],
+    );
+  }
+}
+
+
+/// Hairline between right-cluster header controls (Settings | Quick | Menu).
+class _HeaderDivider extends StatelessWidget {
+  const _HeaderDivider();
+
+  @override
+  Widget build(BuildContext context) {
+    final glass = NormalGlassMode.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      child: Container(
+        width: 1,
+        height: 22,
+        decoration: BoxDecoration(
+          color: glass
+              ? const Color(0x66FFFFFF)
+              : const Color(0x33244766),
+          borderRadius: BorderRadius.circular(1),
+        ),
+      ),
     );
   }
 }
@@ -492,15 +533,15 @@ class _HamburgerButton extends StatelessWidget {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
-        width: 48,
-        height: 48,
+        width: 44,
+        height: 44,
         decoration: BoxDecoration(
           color: glass ? const Color(0xBFFFFFFF) : Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           border: glass ? Border.all(color: const Color(0xDFFFFFFF)) : null,
-          boxShadow: glass ? null : NwsbShadows.raisedSm,
+          boxShadow: glass ? null : NwsbShadows.raisedXs,
         ),
-        child: const Icon(Icons.menu_rounded, size: 25, color: NwsbColors.ink),
+        child: const Icon(Icons.menu_rounded, size: 23, color: NwsbColors.ink),
       ),
     );
   }
