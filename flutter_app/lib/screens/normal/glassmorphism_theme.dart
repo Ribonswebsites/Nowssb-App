@@ -1,6 +1,6 @@
 import 'dart:ui' show ImageFilter;
-
 import 'package:flutter/material.dart';
+import '../../media/nwsb_video.dart';
 
 class NormalGlassMode extends InheritedWidget {
   const NormalGlassMode(
@@ -17,7 +17,7 @@ class NormalGlassMode extends InheritedWidget {
       oldWidget.enabled != enabled;
 }
 
-/// White glassmorphism surfaces used only by Flutter's Normal Home.
+/// Glassmorphism surfaces used only by Flutter's Normal Home.
 /// Fashion Plus and every other screen remain unchanged.
 class NormalGlassBackground extends StatelessWidget {
   const NormalGlassBackground({super.key, required this.child});
@@ -37,6 +37,15 @@ class NormalGlassBackground extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
+          const Positioned.fill(
+            child: IgnorePointer(
+              child: NwsbVideo(
+                asset: 'assets/video/normal-glass-background.mp4',
+                fit: BoxFit.cover,
+                showPoster: true,
+              ),
+            ),
+          ),
           IgnorePointer(child: CustomPaint(painter: _GlassOrbsPainter())),
           child,
         ],
