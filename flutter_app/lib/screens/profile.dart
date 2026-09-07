@@ -6,6 +6,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+
+import '../data/practice_progress.dart';
 
 const _accent = Color(0xFFE3BD7D);
 const _text = Color(0xFFF5F5F3);
@@ -15,6 +18,22 @@ const _border = Color(0x24FFFFFF);
 const _borderSoft = Color(0x14FFFFFF);
 const _surface = Color(0x0BFFFFFF);
 const _mono = 'Roboto Mono';
+
+/// Same prebuilt banner library as `nowssb-nm.js` `NWSB_BANNERS`.
+const kNwsbBanners = <String>[
+  'https://media.nowssb.com/migrated-images/fc3d4da65185cd05_grok_image_1782591933705_qq3l9g.jpg',
+  'https://media.nowssb.com/migrated-images/b0311b51f4665417_grok_image_1782591857840_tbznap.jpg',
+  'https://media.nowssb.com/migrated-images/e5c7f3703725755d_grok_image_1782592051446_womamz.jpg',
+  'https://media.nowssb.com/migrated-images/df58ad45365e63d0_grok_image_1782591669371_kqnaf9.jpg',
+  'https://media.nowssb.com/migrated-images/89c64c87db948180_grok_image_1782591627828_lmde11.jpg',
+  'https://media.nowssb.com/migrated-images/517802ba6a6c3a6c_grok_image_1782591559591_yxgud5.jpg',
+  'https://media.nowssb.com/migrated-images/671fd0928171078a_grok_image_1782591561380_ytpn3b.jpg',
+  'https://media.nowssb.com/migrated-images/58d0a40a97d4a693_grok_image_1782591732123_epmpiu.jpg',
+];
+
+const kDefaultAvatar =
+    'https://media.nowssb.com/migrated-images/1590b73b14f17aee_image-131_jyrnhx.jpg';
+
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -28,6 +47,8 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
   final _nameController = TextEditingController();
   final _picker = ImagePicker();
   File? _photo;
+  String? _bannerUrl;
+  String? _avatarUrl;
   bool _soundOn = true;
   int _duration = 15;
   TimeOfDay _reminder = const TimeOfDay(hour: 7, minute: 0);
@@ -46,6 +67,8 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
   @override
   void initState() {
     super.initState();
+    PracticeProgress.instance.addListener(_onLiveProgress);
+    PracticeProgress.instance.start();
     _load();
   }
 
@@ -61,6 +84,8 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
       _reminder = TimeOfDay(hour: int.tryParse(parts[0]) ?? 7, minute: int.tryParse(parts[1]) ?? 0);
     }
     _voice = _prefs.getString('nowssb_voice') ?? 'female';
+    _bannerUrl = _prefs.getString('nwsb_local_banner');
+    _avatarUrl = _prefs.getString('nwsb_local_photo');
     for (int i = 0; i < 7; i++) {
       final key = 'week_$i';
       if (_prefs.containsKey(key)) _weekDone[i] = _prefs.getBool(key) ?? false;
@@ -70,6 +95,7 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
 
   @override
   void dispose() {
+    PracticeProgress.instance.removeListener(_onLiveProgress);
     _bodyPulse.dispose();
     _nameController.dispose();
     _toastEntry?.remove();
@@ -159,6 +185,8 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
     setState(() {});
   }
 
+  void _onLiveProgress() { if (mounted) setState(() {}); }
+
   void _toggleWeek(int i, int today) async {
     if (i > today) return;
     final value = !(_weekDone[i] ?? (i < today));
@@ -217,23 +245,80 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
     );
   }
 
-  Widget _banner() => Container(
+  Widget _banner() {
+    final banner = _bannerUrl;
+    return Container(
         height: 150,
         margin: const EdgeInsets.only(top: 20, bottom: 22),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(28),
           border: const Border.fromBorderSide(BorderSide(color: _borderSoft)),
-          image: const DecorationImage(image: AssetImage('assets/profile_source/img-banner.png'), fit: BoxFit.cover),
         ),
         clipBehavior: Clip.antiAlias,
         child: Stack(
+          fit: StackFit.expand,
           children: [
-            Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.black.withOpacity(.02), Colors.black.withOpacity(.28), Colors.black.withOpacity(.82)])))),
+            if (banner != null && banner.startsWith('http'))
+              CachedNetworkImage(imageUrl: banner, fit: BoxFit.cover)
+            else
+              Image.asset('assets/profile_source/img-banner.png', fit: BoxFit.cover),
+            DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.black.withOpacity(.02), Colors.black.withOpacity(.28), Colors.black.withOpacity(.82)]))),
             Positioned(top: 14, left: 14, child: _circleButton(asset: 'assets/icons/icon_01.svg', onTap: () => Navigator.maybePop(context))),
+            Positioned(top: 14, right: 14, child: _circleButton(asset: 'assets/icons/icon_26.svg', onTap: _pickBanner)),
             const Positioned(left: 22, right: 22, bottom: 24, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('My Profile', style: TextStyle(fontSize: 34, height: 1, fontWeight: FontWeight.w500, letterSpacing: -1.2, color: Colors.white)), SizedBox(height: 7), Text('YOUR PERSONAL SPACE', style: TextStyle(fontSize: 10, letterSpacing: 1.8, color: Color(0x9EFFFFFF)))])),
           ],
         ),
       );
+  }
+
+  Future<void> _pickBanner() async {
+    final chosen = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: const Color(0xF00A0A0C),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 18, 16, 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Choose a banner', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 6),
+              const Text('Same prebuilt library as the website profile.', style: TextStyle(fontSize: 12, color: _dim)),
+              const SizedBox(height: 14),
+              SizedBox(
+                height: 210,
+                child: GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, mainAxisSpacing: 8, crossAxisSpacing: 8, childAspectRatio: 1.7),
+                  itemCount: kNwsbBanners.length,
+                  itemBuilder: (_, i) {
+                    final url = kNwsbBanners[i];
+                    final on = url == _bannerUrl;
+                    return InkWell(
+                      onTap: () => Navigator.pop(ctx, url),
+                      borderRadius: BorderRadius.circular(14),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: on ? _accent : _borderSoft, width: on ? 2 : 1),
+                          image: DecorationImage(image: CachedNetworkImageProvider(url), fit: BoxFit.cover),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (chosen == null) return;
+    await _prefs.setString('nwsb_local_banner', chosen);
+    setState(() => _bannerUrl = chosen);
+    _showToast('Banner updated');
+  }
 
   Widget _profileCard() => GlassCard(
         margin: const EdgeInsets.only(bottom: 34),
@@ -261,9 +346,13 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
                         border: Border.all(color: const Color(0x99E8D5A3), width: 1.2),
                         boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 8, offset: Offset(2, 3))],
                       ),
-                      child: _photo == null
-                          ? Center(child: Text((_nameController.text.trim().isEmpty ? 'P' : _nameController.text.trim().substring(0, 1)).toUpperCase(), style: const TextStyle(fontFamily: _mono, fontSize: 24, fontWeight: FontWeight.w600, color: _text)))
-                          : Image.file(_photo!, fit: BoxFit.cover),
+                      child: _photo != null
+                          ? Image.file(_photo!, fit: BoxFit.cover)
+                          : CachedNetworkImage(
+                              imageUrl: (_avatarUrl != null && _avatarUrl!.startsWith('http')) ? _avatarUrl! : kDefaultAvatar,
+                              fit: BoxFit.cover,
+                              errorWidget: (_, __, ___) => Center(child: Text((_nameController.text.trim().isEmpty ? 'P' : _nameController.text.trim().substring(0, 1)).toUpperCase(), style: const TextStyle(fontFamily: _mono, fontSize: 24, fontWeight: FontWeight.w600, color: _text))),
+                            ),
                     ),
                   ),
                   Positioned(right: 10, bottom: 10, child: _circleButton(asset: 'assets/icons/icon_02.svg', size: 28, onTap: _pickPhoto)),
@@ -288,27 +377,30 @@ class _ProfileScreenState extends State<ProfileScreen> with TickerProviderStateM
         ),
       );
 
-  Widget _progress() => GlassCard(
-        margin: const EdgeInsets.only(bottom: 40),
-        radius: 26,
-        padding: const EdgeInsets.fromLTRB(16, 22, 16, 16),
-        image: 'assets/profile_source/img-progress.png',
-        overlay: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xC2020204), Color(0x6B020204), Color(0xD1020204)]),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const SectionLabel('Your Progress', bottom: 18),
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-            childAspectRatio: 1.32,
-            children: const [
-              _Stat('12', 'days', 'Day Streak'), _Stat('47', 'total', 'Sessions'), _Stat('128', 'learned', 'Words Activated'), _Stat('5', 'of 5 mapped', 'Organs Reached'),
-            ],
-          ),
-        ]),
-      );
+  Widget _progress() {
+    final p = PracticeProgress.instance;
+    return SectionBlock(
+      title: 'Your Progress',
+      child: GlassCard(
+        margin: const EdgeInsets.only(bottom: 34),
+        padding: const EdgeInsets.fromLTRB(14, 16, 14, 16),
+        child: GridView.count(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: 2,
+          mainAxisSpacing: 10,
+          crossAxisSpacing: 10,
+          childAspectRatio: 1.55,
+          children: [
+            _Stat('${p.streak}', 'days', 'Day Streak'),
+            _Stat('${p.totalSessions}', 'total', 'Sessions'),
+            _Stat('${p.uniqueWords}', 'learned', 'Words Activated'),
+            _Stat('${p.weekConsistencyPercent}', '% week', 'Consistency'),
+          ],
+        ),
+      ),
+    );
+  }
 
   Widget _about() => GlassCard(
         margin: const EdgeInsets.only(bottom: 40),
