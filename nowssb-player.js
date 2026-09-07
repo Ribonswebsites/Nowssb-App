@@ -84,12 +84,9 @@
       accent:'#8fe6ff' },
   ];
 
-  /* Prayer/session clips alternate by active word index. Replaying a word
-     keeps its clip; Next/Previous selects the next indexed clip. */
-  var PRAYER_WORD_VIDEOS = [
-    'grok_video_2026-09-05-15-32-08.mp4',
-    'grok_video_2026-09-05-15-32-13.mp4'
-  ];
+  /* Full-page looping backdrop for the practice player (Flutter + WebView). */
+  var PLAYER_BG_VIDEO = 'assets/video/player-bg-loop.mp4';
+  var PRAYER_WORD_VIDEOS = [PLAYER_BG_VIDEO];
 
   /* Exposed so app/js/part051.js's background video pre-warmer (Cache
      Storage, same mechanism as every other decorative video in the app)
@@ -236,6 +233,19 @@
     try { localStorage.setItem('nwsb_player_level', String(n)); } catch (e) {}
     return n;
   }
+  window.lgpJumpTo = function (n) {
+    var list = (typeof PRACTICE_WORDS !== 'undefined') ? PRACTICE_WORDS : [];
+    if (!list.length) return;
+    n = Math.max(0, Math.min(list.length - 1, n | 0));
+    try { _pwIdx = n; } catch (e) {}
+    try {
+      if (typeof renderPractice === 'function') renderPractice();
+      if (typeof _pwPlaying !== 'undefined' && _pwPlaying && typeof pwPlay === 'function') {
+        if (typeof _pwPhase !== 'undefined') _pwPhase = 'idle';
+        pwPlay();
+      }
+    } catch (e) {}
+  };
   window.lgpPlayNext = function () {
     if (typeof pwNextWord === 'function') pwNextWord();
   };
@@ -287,8 +297,7 @@
     } catch (e) {}
   };
   window.lgpOpenQueue = function () {
-    if (typeof openWalkmanLib === 'function') openWalkmanLib();
-    else if (typeof openSub === 'function') openSub('practice');
+    if (typeof window.lgpOpenQueueSheet === 'function') window.lgpOpenQueueSheet();
   };
   window.lgpOpenLevel = function (force) {
     if (force === false) return;
@@ -405,7 +414,7 @@
        at all, only between sessions — not what was wanted. */
     var _thIdx = Math.abs(idx);
     var th = LGP_THEMES[_thIdx % LGP_THEMES.length];
-    var pageBgSrc = PRAYER_WORD_VIDEOS[_thIdx % PRAYER_WORD_VIDEOS.length];
+    var pageBgSrc = PLAYER_BG_VIDEO;
     var hr = new Date().getHours();
     var timeLabel = hr < 10 ? 'Morning' : hr < 13 ? 'Midday' : hr < 17 ? 'Afternoon' : hr < 20 ? 'Evening' : 'Night';
     var ar = (typeof getActiveRoutine === 'function') ? getActiveRoutine() : null;
@@ -781,24 +790,26 @@
           '<div class="lgp-times"><span class="lgp-time-now">00:00</span><span class="lgp-time-end">' + _dur + '</span></div>' +
         '</div>' +
         center +
+        '<div class="lgp-bottom-stack" id="lgpBottomStack">' +
         (function () {
           var next = words[idx + 1];
           if (!next) {
             return '<div class="lgp-nextup" id="lgpNextUp">' +
               '<div class="lgp-nextup-grab" aria-hidden="true"></div>' +
               '<div class="lgp-nextup-head"><span>Up Next</span>' +
-                '<button class="lgp-queue-btn" type="button" onclick="window.lgpOpenIntegratedPage&&window.lgpOpenIntegratedPage(\'sound-library-4-3.html\',\'Sound Library\')" aria-label="Queue">' + queueSvg + '</button>' +
+                '<button class="lgp-queue-btn" type="button" onclick="event.stopPropagation();window.lgpOpenQueue&&window.lgpOpenQueue()" aria-label="Queue">' + queueSvg + '</button>' +
               '</div>' +
               '<div class="lgp-nextup-line" aria-hidden="true"></div>' +
               '<p class="lgp-nextup-empty">End of queue</p>' +
             '</div>';
           }
-          var art = next.img || th.img || '';
+          var nextTheme = LGP_THEMES[(idx + 1) % LGP_THEMES.length] || th;
+          var art = next.img || nextTheme.img || th.img || '';
           var nextDur = lgpFmtClock(lgpWordSecs(next));
           return '<div class="lgp-nextup" id="lgpNextUp">' +
             '<div class="lgp-nextup-grab" aria-hidden="true"></div>' +
             '<div class="lgp-nextup-head"><span>Up Next</span>' +
-              '<button class="lgp-queue-btn" type="button" onclick="event.stopPropagation();window.lgpOpenIntegratedPage&&window.lgpOpenIntegratedPage(\'sound-library-4-3.html\',\'Sound Library\')" aria-label="Queue">' + queueSvg + '</button>' +
+              '<button class="lgp-queue-btn" type="button" onclick="event.stopPropagation();window.lgpOpenQueue&&window.lgpOpenQueue()" aria-label="Queue">' + queueSvg + '</button>' +
             '</div>' +
             '<div class="lgp-nextup-line" aria-hidden="true"></div>' +
             '<button class="lgp-nextup-item" type="button" onclick="window.lgpPlayNext&&window.lgpPlayNext()">' +
@@ -813,8 +824,9 @@
             '</button>' +
           '</div>';
         })() +
-        /* Sentence · Practice · Store — back at the bottom. */
+        /* Sentence · Practice · Store — stays below Up Next; rotates with it. */
         prow +
+        '</div>' +
       '</div>';
 
     /* Banner under the top bar — icon + divider + looping text (was two
@@ -877,7 +889,7 @@
 
     /* Keep the small clips playing. Bind the resume listeners ONCE per
        element (not every render — that leaked handlers and caused jank). */
-    ['.lgp-wa-vid'].forEach(function (sel) {
+    ['.lgp-wa-vid', '.lgp-page-bg-video'].forEach(function (sel) {
       var v = body.querySelector(sel);
       if (!v) return;
       v.muted = true; v.setAttribute('muted', ''); v.playsInline = true; v.loop = true;
@@ -1407,45 +1419,122 @@
   };
 })();
 
-/* UP NEXT grab handle: an upward swipe opens the future tab surface. */
+/* UP NEXT: swipe-up opens glassmorphic full queue (NOT Sound Library).
+   Horizontal swipe on Up Next + options rotates both together (prev/next word). */
 (function () {
   if (window._lgpNextUpSwipeBound) return;
   window._lgpNextUpSwipeBound = true;
-  var y0 = null;
+  var y0 = null, x0 = null, tracking = null;
   document.addEventListener('touchstart', function (e) {
-    var card = e.target && e.target.closest ? e.target.closest('.lgp-nextup') : null;
-    if (card) y0 = e.touches && e.touches[0] ? e.touches[0].clientY : null;
+    var stack = e.target && e.target.closest ? e.target.closest('.lgp-bottom-stack, .lgp-nextup') : null;
+    if (!stack) { tracking = null; y0 = x0 = null; return; }
+    tracking = stack;
+    var t = e.touches && e.touches[0];
+    y0 = t ? t.clientY : null;
+    x0 = t ? t.clientX : null;
   }, {passive: true});
   document.addEventListener('touchend', function (e) {
-    if (y0 == null) return;
-    var y1 = e.changedTouches && e.changedTouches[0] ? e.changedTouches[0].clientY : y0;
-    if (y0 - y1 > 48) {
-      var card = e.target && e.target.closest ? e.target.closest('.lgp-nextup') : document.getElementById('lgpNextUp');
-      if (card) window.lgpOpenIntegratedPage&&window.lgpOpenIntegratedPage('sound-library-4-3.html','Sound Library');
+    if (y0 == null || x0 == null || !tracking) { y0 = x0 = tracking = null; return; }
+    var t = e.changedTouches && e.changedTouches[0];
+    var y1 = t ? t.clientY : y0;
+    var x1 = t ? t.clientX : x0;
+    var dy = y0 - y1;
+    var dx = x1 - x0;
+    if (Math.abs(dy) > 48 && Math.abs(dy) > Math.abs(dx) * 1.15) {
+      if (dy > 0) window.lgpOpenQueue && window.lgpOpenQueue();
+    } else if (Math.abs(dx) > 56 && Math.abs(dx) > Math.abs(dy) * 1.15) {
+      if (dx < 0) {
+        if (typeof pwNextWord === 'function') pwNextWord();
+        else if (window.lgpPlayNext) window.lgpPlayNext();
+      } else {
+        if (typeof pwPrevWord === 'function') pwPrevWord();
+      }
     }
-    y0 = null;
+    y0 = x0 = tracking = null;
   }, {passive: true});
 })();
 
-
-/* Unified Sound Library 4-3 expansion panel for UP NEXT and its grab handle. */
+/* Glassmorphic full queue list with artwork — replaces Sound Library swipe target. */
 (function () {
-  if (window.lgpOpenSoundLibrary43) return;
-  window.lgpOpenSoundLibrary43 = function (origin) {
-    if (document.getElementById('lgpSoundLibrary43Sheet')) return;
+  if (window.lgpOpenQueueSheet) return;
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  window.lgpCloseQueueSheet = function () {
+    var sheet = document.getElementById('lgpQueueSheet');
+    if (!sheet) return;
+    sheet.classList.remove('is-open');
+    setTimeout(function () { sheet.remove(); }, 340);
+  };
+  window.lgpOpenQueueSheet = function () {
+    if (document.getElementById('lgpQueueSheet')) return;
+    var words = (typeof PRACTICE_WORDS !== 'undefined') ? PRACTICE_WORDS : [];
+    var idx = (typeof _pwIdx !== 'undefined') ? _pwIdx : 0;
+    var themes = (typeof LGP_THEMES !== 'undefined') ? LGP_THEMES : [];
+    var items = '';
+    for (var i = 0; i < words.length; i++) {
+      var w = words[i] || {};
+      var th = themes[i % Math.max(themes.length, 1)] || {};
+      var art = w.img || th.img || '';
+      var dur = (typeof lgpFmtClock === 'function' && typeof lgpWordSecs === 'function')
+        ? lgpFmtClock(lgpWordSecs(w)) : '00:12';
+      var isCur = i === idx;
+      items += '<button class="lgp-queue-item' + (isCur ? ' is-current' : '') + '" type="button" data-idx="' + i + '">' +
+        '<span class="lgp-queue-art"' + (art ? ' style="background-image:url(\'' + esc(art) + '\')"' : '') + '></span>' +
+        '<span class="lgp-queue-mid">' +
+          '<b>' + esc(w.word || '') + '</b>' +
+          '<em>' + (isCur ? 'Now playing' : 'NowssB') + '<span aria-hidden="true"> · </span>' + dur + '</em>' +
+        '</span>' +
+        '<span class="lgp-queue-play" aria-hidden="true">' +
+          (isCur
+            ? '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 9h4v6H4zm6 0h4v6h-4zm6 0h4v6h-4z"/></svg>'
+            : '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8.2 5.4v13.2L19 12z"/></svg>') +
+        '</span>' +
+      '</button>';
+    }
     var sheet = document.createElement('div');
-    sheet.id = 'lgpSoundLibrary43Sheet';
-    sheet.className = 'lgp-sound-library-43-sheet';
-    sheet.innerHTML = '<div class="lgp-sound-library-43-backdrop"></div>' +
-      '<div class="lgp-sound-library-43-panel" role="dialog" aria-label="Sound Library">' +
-      '<div class="lgp-sound-library-43-grab"></div>' +
-      '<button class="lgp-sound-library-43-close" aria-label="Close">×</button>' +
-      '<iframe title="Sound Library 4-3" src="sound-library-4-3.html?from=expanded" loading="eager"></iframe>' +
+    sheet.id = 'lgpQueueSheet';
+    sheet.className = 'lgp-queue-sheet';
+    sheet.innerHTML =
+      '<div class="lgp-queue-backdrop"></div>' +
+      '<div class="lgp-queue-panel" role="dialog" aria-label="Up Next queue">' +
+        '<div class="lgp-queue-grab" aria-hidden="true"></div>' +
+        '<div class="lgp-queue-head"><span>UP NEXT</span>' +
+          '<button class="lgp-queue-close" type="button" aria-label="Close">×</button>' +
+        '</div>' +
+        '<div class="lgp-queue-line" aria-hidden="true"></div>' +
+        '<div class="lgp-queue-list">' + (items || '<p class="lgp-nextup-empty">Queue is empty</p>') + '</div>' +
       '</div>';
     document.body.appendChild(sheet);
     requestAnimationFrame(function () { sheet.classList.add('is-open'); });
-    sheet.querySelector('.lgp-sound-library-43-close').onclick = function () { sheet.classList.remove('is-open'); setTimeout(function(){sheet.remove();}, 340); };
-    sheet.querySelector('.lgp-sound-library-43-backdrop').onclick = function () { sheet.querySelector('.lgp-sound-library-43-close').click(); };
+    sheet.querySelector('.lgp-queue-close').onclick = window.lgpCloseQueueSheet;
+    sheet.querySelector('.lgp-queue-backdrop').onclick = window.lgpCloseQueueSheet;
+    var list = sheet.querySelector('.lgp-queue-list');
+    if (list) {
+      list.addEventListener('click', function (ev) {
+        var btn = ev.target && ev.target.closest ? ev.target.closest('.lgp-queue-item') : null;
+        if (!btn) return;
+        var n = parseInt(btn.getAttribute('data-idx'), 10);
+        if (isNaN(n)) return;
+        window.lgpCloseQueueSheet();
+        if (typeof window.lgpJumpTo === 'function') window.lgpJumpTo(n);
+        else {
+          try { _pwIdx = n; } catch (e) {}
+          if (typeof renderPractice === 'function') renderPractice();
+          else if (typeof pwPlay === 'function') pwPlay();
+        }
+      });
+    }
+  };
+})();
+
+/* Keep Sound Library helper for other entry points; Up Next no longer calls it. */
+(function () {
+  if (window.lgpOpenSoundLibrary43) return;
+  window.lgpOpenSoundLibrary43 = function () {
+    window.lgpOpenIntegratedPage && window.lgpOpenIntegratedPage('sound-library-4-3.html', 'Sound Library');
   };
 })();
 
