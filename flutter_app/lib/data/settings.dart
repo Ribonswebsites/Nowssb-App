@@ -40,6 +40,7 @@ class Settings extends ChangeNotifier {
   static const _kNavColor = 'nwsb_nav_color';
   static const _kNavCorner = 'nwsb_nav_rect_corner';
   static const _kNavSlots = 'nwsb_nav_slots';
+  static const _kHero = 'nwsb_hero_style';
 
   /// One selected Fashion Plus film plays behind every primary page while
   /// motion mode is enabled.
@@ -95,6 +96,8 @@ class Settings extends ChangeNotifier {
     'store',
     'profile'
   ];
+  /// Website `heroStyle()` / `nwsb_hero_style`: `plain` | `full` | `tv`.
+  String _heroStyle = 'plain';
 
   /// Motion mode: do page backgrounds play, or hold their first frame?
   bool get fashionPlus => _fashionPlus;
@@ -123,6 +126,9 @@ class Settings extends ChangeNotifier {
   String get navColor => _navColor;
   String get navCorner => _navCorner;
   List<String> get navSlots => List.unmodifiable(_navSlots);
+
+  /// Fashion hero look — part082.js `heroStyle()`.
+  String get heroStyle => _heroStyle;
 
   Future<void> load() async {
     try {
@@ -153,6 +159,10 @@ class Settings extends ChangeNotifier {
       if (['rounded', 'edge'].contains(corner)) _navCorner = corner!;
       final slots = p.getStringList(_kNavSlots);
       if (slots != null && slots.isNotEmpty) _navSlots = slots.take(5).toList();
+      final hero = p.getString(_kHero);
+      if (hero == 'full' || hero == 'tv' || hero == 'plain') {
+        _heroStyle = hero!;
+      }
       _showSplash = !(p.getBool(_kLaunched) ?? false);
       await p.setBool(_kLaunched, true);
       notifyListeners();
@@ -197,6 +207,14 @@ class Settings extends ChangeNotifier {
 
   static int _validImageIndex(int index) =>
       index >= 0 && index < fashionImages.length ? index : -1;
+
+  Future<void> setHeroStyle(String value) async {
+    final next = (value == 'full' || value == 'tv') ? value : 'plain';
+    if (_heroStyle == next) return;
+    _heroStyle = next;
+    await _saveString(_kHero, next);
+    notifyListeners();
+  }
 
   Future<void> setEq(String value) async {
     _eq = value;
