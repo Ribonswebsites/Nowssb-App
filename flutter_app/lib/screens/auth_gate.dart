@@ -9,9 +9,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:video_player/video_player.dart';
 
 import '../data/firebase.dart';
+import '../media/nwsb_video.dart';
+import '../media/video_pool.dart';
 
 class AuthGate extends StatefulWidget {
   const AuthGate({super.key, required this.child});
@@ -35,8 +36,6 @@ class _AuthGateState extends State<AuthGate> {
     serverClientId: _googleWebClientId,
   );
 
-  late final VideoPlayerController _phoneVideo;
-  bool _videoReady = false;
   bool _busy = false;
   bool _createAccount = false;
   bool _showEmail = false;
@@ -47,27 +46,7 @@ class _AuthGateState extends State<AuthGate> {
   int? _resendToken;
 
   @override
-  void initState() {
-    super.initState();
-    _phoneVideo = VideoPlayerController.asset(_phoneAsset);
-    _preparePhoneVideo();
-  }
-
-  Future<void> _preparePhoneVideo() async {
-    try {
-      await _phoneVideo.initialize();
-      await _phoneVideo.setLooping(true);
-      await _phoneVideo.setVolume(0);
-      await _phoneVideo.play();
-      if (mounted) setState(() => _videoReady = true);
-    } catch (_) {
-      // The poster keeps the auth screen useful if a device cannot decode it.
-    }
-  }
-
-  @override
   void dispose() {
-    _phoneVideo.dispose();
     _email.dispose();
     _password.dispose();
     _phone.dispose();
@@ -300,24 +279,14 @@ class _AuthGateState extends State<AuthGate> {
   }
 
   Widget _phoneFilm() {
-    if (_videoReady && _phoneVideo.value.isInitialized) {
-      final size = _phoneVideo.value.size;
-      return FittedBox(
-        fit: BoxFit.cover,
-        clipBehavior: Clip.hardEdge,
-        child: SizedBox(
-          width: size.width == 0 ? 720 : size.width,
-          height: size.height == 0 ? 1264 : size.height,
-          child: VideoPlayer(_phoneVideo),
-        ),
-      );
-    }
-    return Image.asset(
-      _posterAsset,
+    // Central NwsbVideo path: muted loop, pool lease, resume on visibility.
+    return const NwsbVideo(
+      asset: _phoneAsset,
+      poster: _posterAsset,
       fit: BoxFit.cover,
-      width: double.infinity,
-      height: double.infinity,
-      errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black),
+      priority: ClipPriority.feature,
+      loop: true,
+      autoplay: true,
     );
   }
 

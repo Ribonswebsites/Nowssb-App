@@ -292,5 +292,37 @@
     prevBtn.classList.add('hidden-block');
   });
 </script>
+
+<script>
+(function () {
+  var v = document.querySelector('.orb-video');
+  if (!v) return;
+  v.muted = true; v.defaultMuted = true; v.loop = true; v.playsInline = true;
+  v.setAttribute('muted', ''); v.setAttribute('loop', '');
+  v.setAttribute('playsinline', ''); v.setAttribute('webkit-playsinline', '');
+  v.preload = 'auto';
+  function go() {
+    try {
+      if (document.hidden) return;
+      v.muted = true; v.loop = true;
+      var p = v.play(); if (p && p.catch) p.catch(function () {});
+    } catch (e) {}
+  }
+  ['loadeddata','canplay','stalled','suspend','ended'].forEach(function (ev) {
+    v.addEventListener(ev, function () {
+      if (ev === 'ended') { try { v.currentTime = 0; } catch (e) {} }
+      go();
+    });
+  });
+  v.addEventListener('pause', function () {
+    if (!document.hidden) setTimeout(go, 40);
+  });
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) go();
+  });
+  setInterval(function () { if (v.paused && !document.hidden) go(); }, 1200);
+  go();
+})();
+</script>
 </body>
 </html>

@@ -27,7 +27,7 @@ says so — not when a garbage collector decides the page has moved on.
 
 So the rule the whole app is built around:
 
-> **At most four decoders exist at any moment.** Not "are playing" — exist.
+> **At most eight decoders exist at any moment** (`VideoPool.maxLive`). Not "are playing" — exist.
 
 Everything else shows its poster, which is a picture and costs nothing. This
 is why every mp4 in `assets/video/` has a `-poster.webp` beside it, generated
@@ -36,6 +36,28 @@ and the app only looks right because that poster is the clip's own first
 frame.
 
 ---
+
+
+## Fast load + continuous seamless loops
+
+UI loops go through `NwsbVideo` → `VideoPool` (`loop: true`, muted, autoplay,
+restart-from-zero if a surface ends without looping, resume on app lifecycle).
+Feature clips (player page bg, actions tab, Select Level orb, Progress hero /
+scroll bg, login film, Fashion Plus backdrop) use `ClipPriority.feature` so
+they are not starved by decoration banners.
+
+**Large assets:** `assets/video/orb-loop.mp4` (~13MB, from `4a9c333`) and
+`player-actions-tab.mp4` (~8.7MB) are intentional content — do not replace them.
+Cold start delay is dominated by those sizes; optional follow-up is a smaller
+re-encoded `*-loop-lite.mp4` variant wired only if QA asks, while keeping the
+full clip as the default. Controllers for feature clips are opened first
+(queue priority) and keep their decoders while visible.
+
+Web/WebView: `app/js/part051.js` keeps decorative `<video>` at
+`autoplay muted loop playsinline`, upgrades `preload` to `auto` when near /
+feature, forces play on `ended` / unexpected `pause`, and resumes on
+`visibilitychange`. Feature clips are never unmounted (no src yank).
+
 
 ## What exists
 

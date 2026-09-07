@@ -49,6 +49,7 @@ class AppBackdrop extends StatelessWidget {
         asset: settings.fashionVideoAsset,
         priority: ClipPriority.feature,
         autoplay: true,
+        loop: true,
       );
     }
     final image = settings.fashionImageAsset;

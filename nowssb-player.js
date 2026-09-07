@@ -901,14 +901,21 @@
       var v = body.querySelector(sel);
       if (!v) return;
       v.muted = true; v.setAttribute('muted', ''); v.playsInline = true; v.loop = true;
+      v.setAttribute('loop', ''); v.setAttribute('playsinline', '');
+      try { v.preload = 'auto'; v.setAttribute('preload', 'auto'); } catch (e0) {}
       function go() { try { var p = v.play(); if (p && p.catch) p.catch(function () {}); } catch (e) {} }
       if (!v._lgpBound) {
         v._lgpBound = true;
         v.addEventListener('loadeddata', go);
         v.addEventListener('canplay', go);
         v.addEventListener('stalled', go);
+        v.addEventListener('ended', function () { try { v.currentTime = 0; } catch (e) {} go(); });
+        v.addEventListener('pause', function () {
+          var s = document.getElementById('sub-practice');
+          if (s && s.classList.contains('open')) setTimeout(go, 40);
+        });
       }
-      if (v.paused) go();
+      if (v.paused || v.ended) go();
     });
     (function () {
       var v = body.querySelector('.lgp-video');

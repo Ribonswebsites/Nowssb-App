@@ -268,13 +268,22 @@ class VideoPool {
   /// or so, one after another, instead of none of them coming up at all.
   /// The ceiling on how many EXIST is [maxLive] and is unchanged; this is
   /// only how many may be in the act of starting.
-  static const int _openAtOnce = 2;
+  /// Three at a time: feature clips (player bg, orb, Fashion film) come up
+  /// a beat sooner without returning to the all-at-once pile-up that used
+  /// to leave every slot occupied and nothing playing.
+  static const int _openAtOnce = 3;
 
   int _opening = 0;
   final List<VideoLease> _openQueue = [];
 
   void _queueOpen(VideoLease l) {
-    _openQueue.add(l);
+    // Feature clips jump the queue so the player bg / orb / page film are
+    // not waiting behind a strip of decorative banners.
+    if (l.priority == ClipPriority.feature) {
+      _openQueue.insert(0, l);
+    } else {
+      _openQueue.add(l);
+    }
     _drainOpenQueue();
   }
 
@@ -753,6 +762,7 @@ class VideoPool {
     // playing with sound is what put the website in Android's notification
     // shade next to a music player.
     await c.setVolume(0);
+    _armSeamlessLoop(l, c);
     if (l._wantsPlay) await l._ensurePlaying(c);
 
     l._changed();
@@ -761,6 +771,40 @@ class VideoPool {
     // not moving, and a single fire-and-forget play() is why. See
     // [_assertPlaying].
     _assertPlaying();
+  }
+
+  /// Belt under [VideoPlayerController.setLooping]: some Android surfaces
+  /// report the clip finished even when looping was requested, which leaves
+  /// a still frame until the next heartbeat. Restart from zero immediately.
+  void _armSeamlessLoop(VideoLease l, VideoPlayerController c) {
+    if (!l.loop) return;
+    void onTick() {
+      if (l._disposed || !identical(l._controller, c)) {
+        c.removeListener(onTick);
+        return;
+      }
+      if (!l._wantsPlay || !c.value.isInitialized) return;
+      if (c.value.isPlaying) return;
+      if (!_atEnd(c)) return;
+      unawaited(_restartLoop(l, c));
+    }
+    c.addListener(onTick);
+  }
+
+  static bool _atEnd(VideoPlayerController c) {
+    final v = c.value;
+    final dur = v.duration;
+    if (dur <= Duration.zero) return false;
+    return v.position >= dur - const Duration(milliseconds: 80);
+  }
+
+  Future<void> _restartLoop(VideoLease l, VideoPlayerController c) async {
+    if (l._disposed || !identical(l._controller, c)) return;
+    try {
+      await c.seekTo(Duration.zero);
+    } catch (_) {}
+    if (l._disposed || !identical(l._controller, c)) return;
+    if (l._wantsPlay) await l._ensurePlaying(c);
   }
 
   static bool _isRemote(String p) =>
@@ -822,6 +866,10 @@ class VideoPool {
       final c = l._controller;
       if (c == null || !c.value.isInitialized) continue;
       if (c.value.isPlaying) continue;
+      if (l.loop && _atEnd(c)) {
+        unawaited(_restartLoop(l, c));
+        continue;
+      }
       l._ensurePlaying(c);
     }
   }
@@ -834,7 +882,7 @@ class VideoPool {
   /// attached. Reasserting play keeps every live visible clip moving.
   Timer? _beat;
   void startHeartbeat() {
-    _beat ??= Timer.periodic(const Duration(milliseconds: 500), (_) {
+    _beat ??= Timer.periodic(const Duration(milliseconds: 400), (_) {
       if (_leases.isEmpty) return;
       // Do not rebalance here. Rebalancing can tear down and recreate a
       // controller while a home is laying out, which produced the visible

@@ -144,7 +144,20 @@
     v.id = 'fpBgVideo';
     v.muted = true; v.loop = true; v.playsInline = true;
     v.setAttribute('muted', ''); v.setAttribute('loop', '');
-    v.setAttribute('playsinline', ''); v.setAttribute('preload', 'auto');
+    v.setAttribute('playsinline', ''); v.preload = 'auto'; v.setAttribute('preload', 'auto');
+    if (!v._nwsbFpKeep) {
+      v._nwsbFpKeep = true;
+      function fpGo() {
+        try {
+          if (document.hidden) return;
+          v.muted = true; v.loop = true;
+          var p = v.play(); if (p && p.catch) p.catch(function () {});
+        } catch (e) {}
+      }
+      v.addEventListener('ended', function () { try { v.currentTime = 0; } catch (e) {} fpGo(); });
+      v.addEventListener('pause', function () { if (!document.hidden) setTimeout(fpGo, 40); });
+      document.addEventListener('visibilitychange', function () { if (!document.hidden) fpGo(); });
+    }
     v.src = FILMS[bgChoice()].vid;
     v.addEventListener('loadeddata', function () {
       if (isOn() && document.visibilityState === 'visible') {

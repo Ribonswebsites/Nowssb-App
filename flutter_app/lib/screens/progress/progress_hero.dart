@@ -35,6 +35,8 @@ class ProgressHeroBgVideo extends StatelessWidget {
               asset: kProgressScene1,
               fit: BoxFit.cover,
               priority: ClipPriority.feature,
+              loop: true,
+              autoplay: true,
               alignment: Alignment(0, -0.12),
             ),
           ),
@@ -60,7 +62,10 @@ class ProgressScrollBgVideo extends StatelessWidget {
             child: NwsbVideo(
               asset: kProgressScrollBg,
               fit: BoxFit.cover,
-              priority: ClipPriority.decoration,
+              // Page film — must not lose its decoder to a banner strip.
+              priority: ClipPriority.feature,
+              loop: true,
+              autoplay: true,
               alignment: Alignment.center,
             ),
           ),

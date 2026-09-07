@@ -208,7 +208,10 @@
   /* WebView and mobile browsers become unstable when many H.264 decoders run
      at once. Keep the visible page responsive while allowing the key background
      film plus a few nearby clips to play. */
-  var MAX_PLAYING = 4;
+  /* Eight matches Flutter's VideoPool.maxLive: enough for the page film
+     plus player/orb/login feature clips without starving nearby banners.
+     Four left most on-screen loops paused, which looked like stalling. */
+  var MAX_PLAYING = 8;
   var autoPaused = new WeakSet();
   var onScreen = new WeakSet();
   var shownCache = new WeakMap();   // element -> boolean, cleared on class changes
@@ -303,17 +306,79 @@
   var STASH = 'data-nwsb-src';
   var near = new WeakSet();     // clip is within a screen of the viewport
   var mine = false;             // this file is the one writing src right now
+  /* Feature / page films stay mounted with preload=auto so they load fast
+     and never drop their decoder when a scroll pass re-ranks the budget. */
+  var FEATURE_SEL = '.hero-bg-vid, .qa-tv-vid, .fpv-video, .gsel-bg-vid, ' +
+                    '.slm-head-vid, .feat-bgvid, .rd-hub-bgvid, .fp-page-vid, ' +
+                    '.wsg-bgvid, .lgp-info-video, .lgp-page-bg-video, ' +
+                    '.lgp-actions-tab-vid, .lgp-wa-vid, .orb-video, ' +
+                    '.lg-phone-vid, .mp-loading-video, #videoScrollBg, ' +
+                    '#videoBg, #videoBg2';
+  function isFeature(v) {
+    try { return !!(v && v.matches && v.matches(FEATURE_SEL)); } catch (e) { return false; }
+  }
+  function armLoop(v) {
+    if (!v || v._nwsbLoopArmed) return;
+    v._nwsbLoopArmed = true;
+    try {
+      v.muted = true; v.defaultMuted = true; v.loop = true; v.playsInline = true;
+      v.setAttribute('muted', ''); v.setAttribute('loop', '');
+      v.setAttribute('playsinline', ''); v.setAttribute('webkit-playsinline', '');
+      if (v.preload === 'none' || !v.preload) v.preload = 'auto';
+      v.setAttribute('preload', 'auto');
+    } catch (e) {}
+    function go() {
+      try {
+        if (document.hidden) return;
+        if (window._nwsbSplashOver === false && v.id !== 'splashVid') return;
+        v.muted = true; v.loop = true;
+        var p = v.play(); if (p && p.catch) p.catch(function () {});
+      } catch (e) {}
+    }
+    v.addEventListener('ended', function () {
+      try { v.currentTime = 0; } catch (e) {}
+      go();
+    });
+    v.addEventListener('pause', function () {
+      /* Only resume clips we are supposed to keep moving — unexpected
+         browser/WebView pauses, not deliberate budget pauses. */
+      if (v._nwsbBudgetPaused) return;
+      if (!v.isConnected) return;
+      if (document.hidden) return;
+      setTimeout(function () {
+        if (v._nwsbBudgetPaused || document.hidden) return;
+        if (v.paused) go();
+      }, 40);
+    });
+    v.addEventListener('stalled', go);
+    v.addEventListener('suspend', function () { if (v.paused && !v._nwsbBudgetPaused) go(); });
+  }
 
   function mount(v) {
     var src = v.getAttribute(STASH);
-    if (!src || v.getAttribute('src') === src) return;
+    if (!src || v.getAttribute('src') === src) {
+      try {
+        if (v.preload === 'none' || !v.preload) {
+          v.preload = 'auto';
+          v.setAttribute('preload', 'auto');
+        }
+      } catch (e) {}
+      return;
+    }
     mine = true;
     v.setAttribute('src', src);
+    try {
+      v.preload = 'auto';
+      v.setAttribute('preload', 'auto');
+    } catch (e) {}
     mine = false;
     try { v.load(); } catch (e) {}
   }
 
   function unmount(v) {
+    /* Feature films (player bg, orb, login, progress) must stay loaded —
+       yanking src is what made them take forever to come back. */
+    if (isFeature(v)) return;
     var cur = v.getAttribute('src');
     if (!cur) return;
     v.setAttribute(STASH, cur);
@@ -437,12 +502,20 @@
       /* Mount only clips near the viewport. Releasing the src from distant
          videos is the important memory fix: an idle video must not retain a
          demuxer, frame buffer, and decoder in WebView. */
+      armLoop(v);
       if (mountIo && manageable(v)) {
         var initialSrc = v.getAttribute('src');
         if (initialSrc && !v.getAttribute(STASH)) {
           v.setAttribute(STASH, initialSrc);
           poster(v);
-          if (!near.has(v)) {
+          /* Keep feature clips mounted + preloading from first paint. */
+          if (isFeature(v)) {
+            try {
+              v.preload = 'auto';
+              v.setAttribute('preload', 'auto');
+            } catch (e) {}
+            near.add(v);
+          } else if (!near.has(v)) {
             mine = true;
             v.removeAttribute('src');
             mine = false;
@@ -489,7 +562,10 @@
        missing from it. */
     var PRIORITY = '.hero-bg-vid, .qa-tv-vid, .fpv-video, .gsel-bg-vid, ' +
                    '.slm-head-vid, .feat-bgvid, .rd-hub-bgvid, .fp-page-vid, ' +
-                   '.wsg-bgvid, .lgp-info-video';
+                   '.wsg-bgvid, .lgp-info-video, .lgp-page-bg-video, ' +
+                   '.lgp-actions-tab-vid, .lgp-wa-vid, .orb-video, ' +
+                   '.lg-phone-vid, .mp-loading-video, #videoScrollBg, ' +
+                   '#videoBg, #videoBg2, .splash-bg-video';
     function prio(v) { return v.matches && v.matches(PRIORITY) ? 0 : 1; }
     if (live.length > MAX_PLAYING) {
       var mid = (window.innerHeight || 800) / 2;
@@ -504,13 +580,26 @@
     var playSet = new Set(play);
     tracked.forEach(function (v) {
       if (!playSet.has(v)) {
-        if (!v.paused) { try { v.pause(); } catch (e) {} autoPaused.add(v); }
+        if (!v.paused) {
+          v._nwsbBudgetPaused = true;
+          try { v.pause(); } catch (e) {}
+          autoPaused.add(v);
+        }
         return;
       }
-      if (manageable(v) && near.has(v)) mount(v);
-      if (v.paused && !v.classList.contains('lgp-video')) {
+      v._nwsbBudgetPaused = false;
+      if (manageable(v) && (near.has(v) || isFeature(v))) mount(v);
+      armLoop(v);
+      if (!v.classList.contains('lgp-video')) {
         autoPaused.delete(v);
-        var pr = v.play(); if (pr && pr.catch) pr.catch(function () {});
+        try {
+          v.muted = true; v.loop = true; v.playsInline = true;
+          if (v.preload === 'none') { v.preload = 'auto'; v.setAttribute('preload', 'auto'); }
+        } catch (e2) {}
+        if (v.paused || (v.ended && v.loop)) {
+          if (v.ended) { try { v.currentTime = 0; } catch (e3) {} }
+          var pr = v.play(); if (pr && pr.catch) pr.catch(function () {});
+        }
       }
     });
   }
@@ -551,14 +640,24 @@
   document.addEventListener('visibilitychange', function () {
     if (document.hidden) {
       tracked.forEach(function (v) {
-        if (!v.paused) { v.pause(); autoPaused.add(v); }
+        if (!v.paused) {
+          v._nwsbBudgetPaused = true;
+          try { v.pause(); } catch (e) {}
+          autoPaused.add(v);
+        }
       });
-    } else queue();
+    } else {
+      tracked.forEach(function (v) {
+        if (!v || !v.isConnected) return;
+        v._nwsbBudgetPaused = false;
+        armLoop(v);
+      });
+      queue();
+    }
   });
 
-  /* A slow heartbeat as a backstop for anything the observers miss —
-     seconds apart rather than twice a second, and it does no layout work
-     unless something actually needs to change. */
-  setInterval(queue, 4000);
+  /* Fast keep-alive: WebView occasionally pauses muted loops without an
+     ended event; a 1.2s pass restarts them without layout thrash. */
+  setInterval(queue, 1200);
   queue();
 })();

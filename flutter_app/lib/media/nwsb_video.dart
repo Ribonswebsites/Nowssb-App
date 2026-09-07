@@ -134,6 +134,12 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
     final c = _lease?.controller;
     final ready = _lease?.isReady ?? false;
     final sized = c != null && !c.value.size.isEmpty;
+    // A decoder that arrives mid-scroll must start moving immediately —
+    // waiting for the pool heartbeat left feature films (player bg, orb)
+    // on their poster for a visible beat.
+    if (ready && widget.autoplay) {
+      _lease?.play();
+    }
     if (ready == _wasReady && sized == _wasSized) return;
     _wasReady = ready;
     _wasSized = sized;
@@ -145,10 +151,12 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
     super.didUpdateWidget(old);
     // A changed clip, or the motion switch moving under it. Both are the
     // same thing here: let go of what was held, take what is now wanted.
-    if (old.asset != widget.asset) {
+    if (old.asset != widget.asset || old.loop != widget.loop) {
       _drop();
       _take();
       if (mounted) setState(() {});
+    } else if (widget.autoplay) {
+      _lease?.play();
     }
   }
 
