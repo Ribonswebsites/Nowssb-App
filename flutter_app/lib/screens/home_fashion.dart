@@ -46,6 +46,7 @@ import 'sound_library.dart';
 import 'widgets_page.dart';
 import '../widgets/home_menu_drawer.dart';
 import 'word_detail.dart';
+import 'progress/progress_screen.dart';
 
 /// `REG.fash.items` — app/js/part062.js:107-148, key for key and in order.
 ///
