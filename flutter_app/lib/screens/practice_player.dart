@@ -9,6 +9,7 @@ library;
 
 import 'dart:async';
 import 'dart:math' as math;
+import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -213,6 +214,35 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
     ));
   }
 
+  void _openQueueSheet(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _QueueSheet(
+        words: widget.words,
+        index: _index,
+        themes: _playerThemes,
+        onPlayAt: (i) async {
+          Navigator.of(context).pop();
+          if (i == _index) {
+            await _prepareAndPlay();
+            return;
+          }
+          await _tts.stop();
+          setState(() {
+            _index = i;
+            _liked = false;
+            _completed = false;
+            _error = null;
+          });
+          await _loadLiked();
+          await _prepareAndPlay();
+        },
+      ),
+    );
+  }
+
   Future<void> _move(int direction) async {
     if (widget.words.isEmpty) return;
     int next;
@@ -390,11 +420,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
     }
 
     final theme = _theme;
-    final nextIndex = widget.words.isEmpty ? 0 : (_index + 1) % widget.words.length;
-    final nextWord = widget.words.isEmpty ? null : widget.words[nextIndex];
-    final pageBackgroundVideo = _index.isEven
-        ? 'assets/video/grok_video_2026-09-05-15-32-08.mp4'
-        : 'assets/video/grok_video_2026-09-05-15-32-13.mp4';
+    final pageBackgroundVideo = 'assets/video/player-bg-loop.mp4';
     return Scaffold(
       backgroundColor: const Color(0xFF000000),
       body: Stack(children: [
@@ -406,6 +432,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
                 asset: pageBackgroundVideo,
                 fit: BoxFit.cover,
                 priority: ClipPriority.decoration,
+                autoplay: true,
+                loop: true,
                 showPoster: false,
               ),
             ),
@@ -497,28 +525,56 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> {
                   onRepeat: () => setState(() => _loop = !_loop),
                 ),
                 const SizedBox(height: 16),
-                SizedBox(width: stageWidth, child: _NextUpCard(
-                  next: nextWord,
-                  art: nextWord == null ? null : _playerThemes[(nextIndex) % _playerThemes.length].image,
-                  onPlay: () => _move(1),
-                  onAdd: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const AuraSoundLibraryScreen())),
-                )),
-                if (_completed || _error != null) ...[
-                  const SizedBox(height: 12),
-                  Text(
-                    _error ?? 'Completed and added to your progress.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: _error == null ? Colors.white70 : const Color(0xFFFFB4B4), fontSize: 12, height: 1.4),
-                  ),
-                ],
-                const SizedBox(height: 18),
-                SizedBox(width: stageWidth, child: _WordActionStrip(
-                  accent: theme.accent,
-                  video: theme.video,
-                  onSentence: _openInfo,
-                  onPractice: _prepareAndPlay,
-                  onStore: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const StoreScreen())),
-                )),
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onHorizontalDragEnd: (details) {
+                    final v = details.primaryVelocity ?? 0;
+                    if (v < -280) {
+                      _move(1);
+                    } else if (v > 280) {
+                      _move(-1);
+                    }
+                  },
+                  child: Column(children: [
+                    SizedBox(width: stageWidth, child: _NextUpCard(
+                      words: widget.words,
+                      index: _index,
+                      themes: _playerThemes,
+                      onPlayAt: (i) async {
+                        if (i == _index) {
+                          await _prepareAndPlay();
+                          return;
+                        }
+                        await _tts.stop();
+                        setState(() {
+                          _index = i;
+                          _liked = false;
+                          _completed = false;
+                          _error = null;
+                        });
+                        await _loadLiked();
+                        await _prepareAndPlay();
+                      },
+                      onOpenQueue: () => _openQueueSheet(context),
+                    )),
+                    if (_completed || _error != null) ...[
+                      const SizedBox(height: 12),
+                      Text(
+                        _error ?? 'Completed and added to your progress.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: _error == null ? Colors.white70 : const Color(0xFFFFB4B4), fontSize: 12, height: 1.4),
+                      ),
+                    ],
+                    const SizedBox(height: 18),
+                    SizedBox(width: stageWidth, child: _WordActionStrip(
+                      accent: theme.accent,
+                      video: theme.video,
+                      onSentence: _openInfo,
+                      onPractice: _prepareAndPlay,
+                      onStore: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const StoreScreen())),
+                    )),
+                  ]),
+                ),
               ]),
             ),
           );
@@ -730,94 +786,229 @@ class _LevelList extends StatelessWidget {
 }
 
 class _NextUpCard extends StatelessWidget {
-  const _NextUpCard({required this.next, required this.art, required this.onPlay, required this.onAdd});
-  final Word? next;
-  final String? art;
-  final VoidCallback onPlay;
-  final VoidCallback onAdd;
+  const _NextUpCard({
+    required this.words,
+    required this.index,
+    required this.themes,
+    required this.onPlayAt,
+    required this.onOpenQueue,
+  });
+
+  final List<Word> words;
+  final int index;
+  final List<_PlayerTheme> themes;
+  final ValueChanged<int> onPlayAt;
+  final VoidCallback onOpenQueue;
 
   @override
   Widget build(BuildContext context) {
-    final word = next;
+    final nextIndex = words.isEmpty ? 0 : (index + 1) % words.length;
+    final next = words.isEmpty ? null : words[nextIndex];
+    final art = next == null ? null : (next.img.isNotEmpty ? next.img : themes[nextIndex % themes.length].image);
+
     return GestureDetector(
       onVerticalDragEnd: (details) {
         if ((details.primaryVelocity ?? 0) < -250) {
-          showModalBottomSheet<void>(
-            context: context,
-            backgroundColor: const Color(0xFF14171E),
-            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-            builder: (_) => const SafeArea(child: AuraSoundLibraryScreen()),
-          );
+          onOpenQueue();
         }
       },
       child: Container(
-      decoration: BoxDecoration(
-        color: const Color(0xD1161618),
-        borderRadius: BorderRadius.circular(23),
-        border: Border.all(color: const Color(0x14FFFFFF)),
-        boxShadow: const [BoxShadow(color: Color(0x0DFFFFFF), blurRadius: 0, offset: Offset(0, 1))],
+        decoration: BoxDecoration(
+          color: const Color(0xD1161618),
+          borderRadius: BorderRadius.circular(23),
+          border: Border.all(color: const Color(0x14FFFFFF)),
+          boxShadow: const [BoxShadow(color: Color(0x0DFFFFFF), blurRadius: 0, offset: Offset(0, 1))],
+        ),
+        child: next == null
+            ? const Padding(
+                padding: EdgeInsets.fromLTRB(16, 18, 16, 20),
+                child: Text('End of queue', textAlign: TextAlign.center, style: TextStyle(color: Color(0xFF8E8E93), fontSize: 13)),
+              )
+            : Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Center(child: Container(width: 42, height: 4, margin: const EdgeInsets.only(top: 8, bottom: 2), decoration: BoxDecoration(color: const Color(0x7AFFFFFF), borderRadius: BorderRadius.circular(99)))),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 8, 0),
+                  child: Row(children: [
+                    const Expanded(child: Text('UP NEXT', style: TextStyle(color: Color(0xFF8D8D92), fontSize: 11, fontWeight: FontWeight.w500, letterSpacing: 2.8))),
+                    GestureDetector(
+                      onTap: onOpenQueue,
+                      child: const SizedBox(width: 36, height: 36, child: Icon(Icons.queue_music_rounded, color: Color(0xFFCFCFD2), size: 20)),
+                    ),
+                  ]),
+                ),
+                const Padding(
+                  padding: EdgeInsets.fromLTRB(16, 10, 16, 0),
+                  child: ColoredBox(color: Color(0x1AFFFFFF), child: SizedBox(width: double.infinity, height: 1)),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+                  child: GestureDetector(
+                    onTap: () => onPlayAt(nextIndex),
+                    behavior: HitTestBehavior.opaque,
+                    child: Row(children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: SizedBox(
+                          width: 48,
+                          height: 48,
+                          child: art != null && art.isNotEmpty
+                              ? (art.startsWith('http')
+                                  ? Image.network(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111)))
+                                  : Image.asset(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111))))
+                              : const ColoredBox(color: Color(0xFF111111)),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Text(next.word, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xFFF5F5F7), fontSize: 15, fontWeight: FontWeight.w600, letterSpacing: -0.15)),
+                          const SizedBox(height: 3),
+                          Text('NowssB  ·  ${_wordClock(next)}', style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 12)),
+                        ]),
+                      ),
+                      Container(
+                        width: 36,
+                        height: 36,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFFF5F5F7),
+                          shape: BoxShape.circle,
+                          boxShadow: [BoxShadow(color: Color(0x59000000), blurRadius: 16, offset: Offset(0, 6))],
+                        ),
+                        child: const Icon(Icons.play_arrow_rounded, color: Color(0xFF0A0A0C), size: 22),
+                      ),
+                    ]),
+                  ),
+                ),
+              ]),
       ),
-      child: word == null
-          ? const Padding(
-              padding: EdgeInsets.fromLTRB(16, 18, 16, 20),
-              child: Text('End of queue', textAlign: TextAlign.center, style: TextStyle(color: Color(0xFF8E8E93), fontSize: 13)),
-            )
-          : Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Center(child: Container(width: 42, height: 4, margin: const EdgeInsets.only(top: 8, bottom: 2), decoration: BoxDecoration(color: const Color(0x7AFFFFFF), borderRadius: BorderRadius.circular(99)))),
+    );
+  }
+}
+
+/// Glassmorphic full queue list — swipe-up / queue icon target (not Sound Library).
+class _QueueSheet extends StatelessWidget {
+  const _QueueSheet({
+    required this.words,
+    required this.index,
+    required this.themes,
+    required this.onPlayAt,
+  });
+
+  final List<Word> words;
+  final int index;
+  final List<_PlayerTheme> themes;
+  final ValueChanged<int> onPlayAt;
+
+  @override
+  Widget build(BuildContext context) {
+    final h = MediaQuery.sizeOf(context).height * 0.82;
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 28, sigmaY: 28),
+          child: Container(
+            height: h,
+            decoration: BoxDecoration(
+              color: const Color(0xE6111216),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+              border: Border.all(color: const Color(0x28FFFFFF)),
+              boxShadow: const [
+                BoxShadow(color: Color(0x80000000), blurRadius: 40, offset: Offset(0, -12)),
+                BoxShadow(color: Color(0x22FFFFFF), blurRadius: 0, spreadRadius: 1),
+              ],
+            ),
+            child: Column(children: [
+              const SizedBox(height: 10),
+              Container(width: 42, height: 4, decoration: BoxDecoration(color: const Color(0x7AFFFFFF), borderRadius: BorderRadius.circular(99))),
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 8, 0),
+                padding: const EdgeInsets.fromLTRB(18, 16, 10, 8),
                 child: Row(children: [
-                  const Expanded(child: Text('UP NEXT', style: TextStyle(color: Color(0xFF8D8D92), fontSize: 11, fontWeight: FontWeight.w500, letterSpacing: 2.8))),
-                  GestureDetector(
-                    onTap: onAdd,
-                    child: const SizedBox(width: 36, height: 36, child: Icon(Icons.queue_music_rounded, color: Color(0xFFCFCFD2), size: 20)),
+                  const Expanded(child: Text('UP NEXT', style: TextStyle(color: Color(0xFF8D8D92), fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 2.8))),
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.close_rounded, color: Color(0xFFCFCFD2), size: 22),
                   ),
                 ]),
               ),
               const Padding(
-                padding: EdgeInsets.fromLTRB(16, 10, 16, 0),
+                padding: EdgeInsets.symmetric(horizontal: 18),
                 child: ColoredBox(color: Color(0x1AFFFFFF), child: SizedBox(width: double.infinity, height: 1)),
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
-                child: GestureDetector(
-                  onTap: onPlay,
-                  behavior: HitTestBehavior.opaque,
-                  child: Row(children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: SizedBox(
-                        width: 48,
-                        height: 48,
-                        child: art != null && art!.isNotEmpty
-                            ? (art!.startsWith('http')
-                                ? Image.network(art!, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111)))
-                                : Image.asset(art!, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111))))
-                            : const ColoredBox(color: Color(0xFF111111)),
+              Expanded(
+                child: ListView.separated(
+                  padding: const EdgeInsets.fromLTRB(14, 12, 14, 28),
+                  itemCount: words.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 8),
+                  itemBuilder: (context, i) {
+                    final w = words[i];
+                    final art = w.img.isNotEmpty ? w.img : themes[i % themes.length].image;
+                    final isCurrent = i == index;
+                    return Material(
+                      color: isCurrent ? const Color(0x22FFFFFF) : const Color(0x14FFFFFF),
+                      borderRadius: BorderRadius.circular(18),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(18),
+                        onTap: () => onPlayAt(i),
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+                          child: Row(children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: SizedBox(
+                                width: 52,
+                                height: 52,
+                                child: art.startsWith('http')
+                                    ? Image.network(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111)))
+                                    : Image.asset(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111))),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                Text(
+                                  w.word,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: const Color(0xFFF5F5F7),
+                                    fontSize: 15,
+                                    fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w600,
+                                    letterSpacing: -0.15,
+                                  ),
+                                ),
+                                const SizedBox(height: 3),
+                                Text(
+                                  isCurrent ? 'Now playing  ·  ${_wordClock(w)}' : 'NowssB  ·  ${_wordClock(w)}',
+                                  style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 12),
+                                ),
+                              ]),
+                            ),
+                            Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                color: isCurrent ? const Color(0xFFE8D5A3) : const Color(0xFFF5F5F7),
+                                shape: BoxShape.circle,
+                                boxShadow: const [BoxShadow(color: Color(0x59000000), blurRadius: 16, offset: Offset(0, 6))],
+                              ),
+                              child: Icon(
+                                isCurrent ? Icons.equalizer_rounded : Icons.play_arrow_rounded,
+                                color: const Color(0xFF0A0A0C),
+                                size: 20,
+                              ),
+                            ),
+                          ]),
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(word.word, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xFFF5F5F7), fontSize: 15, fontWeight: FontWeight.w600, letterSpacing: -0.15)),
-                        const SizedBox(height: 3),
-                        Text('NowssB  ·  ${_wordClock(word)}', style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 12)),
-                      ]),
-                    ),
-                    Container(
-                      width: 36,
-                      height: 36,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFF5F5F7),
-                        shape: BoxShape.circle,
-                        boxShadow: [BoxShadow(color: Color(0x59000000), blurRadius: 16, offset: Offset(0, 6))],
-                      ),
-                      child: const Icon(Icons.play_arrow_rounded, color: Color(0xFF0A0A0C), size: 22),
-                    ),
-                  ]),
+                    );
+                  },
                 ),
               ),
             ]),
+          ),
+        ),
       ),
     );
   }
