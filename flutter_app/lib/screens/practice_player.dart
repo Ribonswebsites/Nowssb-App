@@ -257,10 +257,12 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> with Ticker
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      barrierColor: Colors.black54,
       builder: (_) => _QueueSheet(
         words: widget.words,
         index: _index,
         themes: _playerThemes,
+        mixTitle: widget.title,
         onPlayAt: (i) async {
           Navigator.of(context).pop();
           if (i == _index) {
@@ -277,8 +279,17 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> with Ticker
           await _loadLiked();
           await _prepareAndPlay();
         },
+        onReorderQueue: (ordered) {
+          // Persist order via SharedPreferences; player keeps current list.
+          unawaited(_persistQueueOrder(ordered));
+        },
       ),
     );
+  }
+
+  Future<void> _persistQueueOrder(List<String> orderedWords) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('nwsb_saved_upnext', orderedWords);
   }
 
   Future<void> _move(int direction) async {
@@ -964,129 +975,473 @@ class _NextUpCard extends StatelessWidget {
   }
 }
 
-/// YTM-style heavy glass queue — swipe-up target (queue icon opens Sound Library).
-class _QueueSheet extends StatelessWidget {
+/// YTM two-stage glass Up Next — swipe mid → full; queue icon stays Sound Library.
+class _QueueSheet extends StatefulWidget {
   const _QueueSheet({
     required this.words,
     required this.index,
     required this.themes,
+    required this.mixTitle,
     required this.onPlayAt,
+    required this.onReorderQueue,
   });
 
   final List<Word> words;
   final int index;
   final List<_PlayerTheme> themes;
+  final String mixTitle;
   final ValueChanged<int> onPlayAt;
+  final ValueChanged<List<String>> onReorderQueue;
+
+  @override
+  State<_QueueSheet> createState() => _QueueSheetState();
+}
+
+enum _QueueFilter { all, familiar, popular, discover, deepCuts }
+
+class _QueueSheetState extends State<_QueueSheet> {
+  static const _savedMixKey = 'nwsb_saved_upnext';
+  static const _likedWordsKey = 'nwsb_liked_words';
+
+  final _sheetCtrl = DraggableScrollableController();
+  var _filter = _QueueFilter.all;
+  late List<int> _order; // indices into widget.words
+  var _saved = false;
+  var _sheetSize = 0.52;
+  Set<String> _liked = {};
+  Map<String, int> _playCounts = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _order = List<int>.generate(widget.words.length, (i) => i);
+    unawaited(_hydrate());
+  }
+
+  @override
+  void dispose() {
+    _sheetCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _hydrate() async {
+    final prefs = await SharedPreferences.getInstance();
+    final liked = prefs.getStringList(_likedWordsKey) ?? const <String>[];
+    final counts = <String, int>{};
+    for (final session in PracticeProgress.instance.sessionsSnapshot) {
+      final w = '${session['word'] ?? ''}';
+      if (w.isEmpty) continue;
+      counts[w] = (counts[w] ?? 0) + 1;
+    }
+    if (!mounted) return;
+    setState(() {
+      _liked = liked.toSet();
+      _playCounts = counts;
+      _saved = (prefs.getStringList(_savedMixKey) ?? const <String>[]).isNotEmpty;
+    });
+  }
+
+  String get _mixLabel {
+    final t = widget.mixTitle.trim();
+    if (t.isEmpty) return 'NowssB Mix';
+    if (t.toLowerCase().endsWith(' mix')) return t;
+    return '$t Mix';
+  }
+
+  List<int> get _filtered {
+    bool practiced(Word w) => (_playCounts[w.word] ?? 0) > 0;
+    final all = List<int>.from(_order);
+    switch (_filter) {
+      case _QueueFilter.all:
+        return all;
+      case _QueueFilter.familiar:
+        return all.where((i) {
+          final w = widget.words[i];
+          return practiced(w) || _liked.contains(w.word);
+        }).toList();
+      case _QueueFilter.popular:
+        final scored = all.toList()
+          ..sort((a, b) {
+            final ca = _playCounts[widget.words[a].word] ?? 0;
+            final cb = _playCounts[widget.words[b].word] ?? 0;
+            if (cb != ca) return cb.compareTo(ca);
+            return a.compareTo(b);
+          });
+        if (scored.isEmpty) return scored;
+        final keep = math.max(1, (scored.length * 0.45).ceil());
+        final top = scored.take(keep).toSet();
+        return all.where(top.contains).toList();
+      case _QueueFilter.discover:
+        return all.where((i) => !practiced(widget.words[i])).toList();
+      case _QueueFilter.deepCuts:
+        return all.where((i) {
+          final w = widget.words[i];
+          final plays = _playCounts[w.word] ?? 0;
+          final long = _wordSecs(w) >= 16 || w.parts.length >= 4;
+          return plays <= 1 && long;
+        }).toList();
+    }
+  }
+
+  Future<void> _saveMix() async {
+    final prefs = await SharedPreferences.getInstance();
+    final ordered = _order.map((i) => widget.words[i].word).toList();
+    await prefs.setStringList(_savedMixKey, ordered);
+    // Also fold into liked/favorites so Save feels sticky.
+    final liked = (prefs.getStringList(_likedWordsKey) ?? const <String>[]).toSet();
+    for (final w in ordered) {
+      liked.add(w);
+    }
+    await prefs.setStringList(_likedWordsKey, liked.toList()..sort());
+    widget.onReorderQueue(ordered);
+    if (!mounted) return;
+    setState(() => _saved = true);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Saved to your library'),
+        duration: Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final h = MediaQuery.sizeOf(context).height * 0.82;
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: ClipRRect(
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 48, sigmaY: 48),
-          child: Container(
-            height: h,
-            decoration: BoxDecoration(
-              color: const Color(0x8C121416),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-              border: Border.all(color: const Color(0x2EFFFFFF)),
-              boxShadow: const [
-                BoxShadow(color: Color(0xB3000000), blurRadius: 56, offset: Offset(0, -14)),
-                BoxShadow(color: Color(0x38FFFFFF), blurRadius: 0, spreadRadius: 1),
-              ],
-            ),
-            child: Column(children: [
-              const SizedBox(height: 10),
-              Container(width: 42, height: 4, decoration: BoxDecoration(color: const Color(0x7AFFFFFF), borderRadius: BorderRadius.circular(99))),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(18, 16, 10, 8),
-                child: Row(children: [
-                  const Expanded(child: Text('UP NEXT', style: TextStyle(color: Color(0xFF8D8D92), fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 2.8))),
-                  IconButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(Icons.close_rounded, color: Color(0xFFCFCFD2), size: 22),
-                  ),
-                ]),
-              ),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 18),
-                child: ColoredBox(color: Color(0x1AFFFFFF), child: SizedBox(width: double.infinity, height: 1)),
-              ),
-              Expanded(
-                child: ListView.separated(
-                  padding: const EdgeInsets.fromLTRB(14, 12, 14, 28),
-                  itemCount: words.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 8),
-                  itemBuilder: (context, i) {
-                    final w = words[i];
-                    final art = w.img.isNotEmpty ? w.img : themes[i % themes.length].image;
-                    final isCurrent = i == index;
-                    return Material(
-                      color: isCurrent ? const Color(0x22FFFFFF) : const Color(0x14FFFFFF),
-                      borderRadius: BorderRadius.circular(18),
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(18),
-                        onTap: () => onPlayAt(i),
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-                          child: Row(children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: SizedBox(
-                                width: 52,
-                                height: 52,
-                                child: art.startsWith('http')
-                                    ? Image.network(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111)))
-                                    : Image.asset(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111))),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                Text(
-                                  w.word,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    color: const Color(0xFFF5F5F7),
-                                    fontSize: 15,
-                                    fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w600,
-                                    letterSpacing: -0.15,
-                                  ),
-                                ),
-                                const SizedBox(height: 3),
-                                Text(
-                                  isCurrent ? 'Now playing  ·  ${_wordClock(w)}' : 'NowssB  ·  ${_wordClock(w)}',
-                                  style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 12),
-                                ),
-                              ]),
-                            ),
-                            Container(
-                              width: 36,
-                              height: 36,
-                              decoration: BoxDecoration(
-                                color: isCurrent ? const Color(0xFFE8D5A3) : const Color(0xFFF5F5F7),
-                                shape: BoxShape.circle,
-                                boxShadow: const [BoxShadow(color: Color(0x59000000), blurRadius: 16, offset: Offset(0, 6))],
-                              ),
-                              child: Icon(
-                                isCurrent ? Icons.equalizer_rounded : Icons.play_arrow_rounded,
-                                color: const Color(0xFF0A0A0C),
-                                size: 20,
-                              ),
-                            ),
-                          ]),
-                        ),
-                      ),
-                    );
-                  },
+    final media = MediaQuery.of(context);
+    final filtered = _filtered;
+    final showMini = _sheetSize > 0.78;
+    return PopScope(
+      canPop: true,
+      child: NotificationListener<DraggableScrollableNotification>(
+        onNotification: (n) {
+          if ((n.extent - _sheetSize).abs() > 0.01) {
+            setState(() => _sheetSize = n.extent);
+          }
+          // Drag below mid snap → dismiss (YTM collapse).
+          if (n.extent <= 0.40 && n.extent <= n.minExtent + 0.02) {
+            Navigator.of(context).maybePop();
+          }
+          return false;
+        },
+        child: Stack(
+        children: [
+          // Mini-player strip peeks when sheet is near-full
+          Positioned(
+            top: media.padding.top + 6,
+            left: 12,
+            right: 12,
+            child: IgnorePointer(
+              ignoring: !showMini,
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 180),
+                opacity: showMini ? 1 : 0,
+                child: _YtmMiniPlayerBar(
+                  word: widget.words.isEmpty ? null : widget.words[widget.index.clamp(0, widget.words.length - 1)],
+                  theme: widget.themes[widget.index % math.max(widget.themes.length, 1)],
+                  onClose: () => Navigator.of(context).maybePop(),
                 ),
               ),
-            ]),
+            ),
           ),
+          DraggableScrollableSheet(
+            controller: _sheetCtrl,
+            initialChildSize: 0.52,
+            minChildSize: 0.38,
+            maxChildSize: 0.94,
+            snap: true,
+            snapSizes: const [0.52, 0.92],
+            builder: (context, scrollController) {
+              return ClipRRect(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 48, sigmaY: 48),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                      border: Border.all(color: const Color(0x2EFFFFFF)),
+                      boxShadow: const [
+                        BoxShadow(color: Color(0xB3000000), blurRadius: 56, offset: Offset(0, -14)),
+                        BoxShadow(color: Color(0x38FFFFFF), blurRadius: 0, spreadRadius: 1),
+                      ],
+                      gradient: const LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Color(0x8C18161C), Color(0xB3101014)],
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 10),
+                        Container(
+                          width: 42,
+                          height: 4,
+                          decoration: BoxDecoration(color: const Color(0x7AFFFFFF), borderRadius: BorderRadius.circular(99)),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(18, 14, 14, 4),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text('Playing from', style: TextStyle(color: Color(0xFF9A9AA0), fontSize: 12, fontWeight: FontWeight.w500)),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      _mixLabel,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(color: Color(0xFFF5F5F7), fontSize: 18, fontWeight: FontWeight.w700, letterSpacing: -0.2),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Material(
+                                color: _saved ? const Color(0x33E8D5A3) : const Color(0x33FFFFFF),
+                                borderRadius: BorderRadius.circular(99),
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(99),
+                                  onTap: _saveMix,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(_saved ? Icons.playlist_add_check_rounded : Icons.playlist_add_rounded, color: const Color(0xFFF5F5F7), size: 18),
+                                        const SizedBox(width: 6),
+                                        Text(_saved ? 'Saved' : 'Save', style: const TextStyle(color: Color(0xFFF5F5F7), fontSize: 13, fontWeight: FontWeight.w600)),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 44,
+                          child: ListView(
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.fromLTRB(14, 6, 14, 6),
+                            children: [
+                              for (final entry in const [
+                                (_QueueFilter.all, 'All'),
+                                (_QueueFilter.familiar, 'Familiar'),
+                                (_QueueFilter.popular, 'Popular'),
+                                (_QueueFilter.discover, 'Discover'),
+                                (_QueueFilter.deepCuts, 'Deep cuts'),
+                              ])
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 8),
+                                  child: ChoiceChip(
+                                    label: Text(entry.$2),
+                                    selected: _filter == entry.$1,
+                                    onSelected: (_) => setState(() => _filter = entry.$1),
+                                    selectedColor: const Color(0xFFF5F5F7),
+                                    backgroundColor: const Color(0x33FFFFFF),
+                                    labelStyle: TextStyle(
+                                      color: _filter == entry.$1 ? const Color(0xFF0A0A0C) : const Color(0xFFF5F5F7),
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    showCheckmark: false,
+                                    side: BorderSide.none,
+                                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                                    visualDensity: VisualDensity.compact,
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: filtered.isEmpty
+                              ? ListView(
+                                  controller: scrollController,
+                                  children: const [
+                                    SizedBox(height: 48),
+                                    Center(child: Text('No tracks in this filter', style: TextStyle(color: Color(0xFF8E8E93), fontSize: 13))),
+                                  ],
+                                )
+                              : ReorderableListView.builder(
+                                  scrollController: scrollController,
+                                  padding: const EdgeInsets.fromLTRB(10, 4, 10, 28),
+                                  itemCount: filtered.length,
+                                  buildDefaultDragHandles: false,
+                                  proxyDecorator: (child, index, animation) {
+                                    return Material(
+                                      elevation: 8,
+                                      color: Colors.transparent,
+                                      borderRadius: BorderRadius.circular(14),
+                                      child: child,
+                                    );
+                                  },
+                                  onReorder: (oldIndex, newIndex) {
+                                    // Operate on filtered indices mapped into _order
+                                    final vis = List<int>.from(filtered);
+                                    if (newIndex > oldIndex) newIndex -= 1;
+                                    final item = vis.removeAt(oldIndex);
+                                    vis.insert(newIndex.clamp(0, vis.length), item);
+                                    setState(() {
+                                      final visSet = vis.toSet();
+                                      final out = <int>[];
+                                      var vi = 0;
+                                      final base = List<int>.from(_order);
+                                      for (final idx in base) {
+                                        if (visSet.contains(idx)) {
+                                          if (vi < vis.length) out.add(vis[vi++]);
+                                        } else {
+                                          out.add(idx);
+                                        }
+                                      }
+                                      while (vi < vis.length) {
+                                        out.add(vis[vi++]);
+                                      }
+                                      final seen = <int>{};
+                                      _order = [for (final i in out) if (seen.add(i)) i];
+                                    });
+                                  },
+                                  itemBuilder: (context, i) {
+                                    final orig = filtered[i];
+                                    final w = widget.words[orig];
+                                    final art = w.img.isNotEmpty ? w.img : widget.themes[orig % widget.themes.length].image;
+                                    final isCurrent = orig == widget.index;
+                                    return Material(
+                                      key: ValueKey('q-$orig-${w.word}'),
+                                      color: isCurrent ? const Color(0x28FFFFFF) : Colors.transparent,
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: InkWell(
+                                        borderRadius: BorderRadius.circular(12),
+                                        onTap: () => widget.onPlayAt(orig),
+                                        child: Padding(
+                                          padding: const EdgeInsets.fromLTRB(8, 8, 4, 8),
+                                          child: Row(
+                                            children: [
+                                              ClipRRect(
+                                                borderRadius: BorderRadius.circular(6),
+                                                child: SizedBox(
+                                                  width: 48,
+                                                  height: 48,
+                                                  child: Stack(
+                                                    fit: StackFit.expand,
+                                                    children: [
+                                                      art.startsWith('http')
+                                                          ? Image.network(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111)))
+                                                          : Image.asset(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111))),
+                                                      if (isCurrent)
+                                                        const Align(
+                                                          alignment: Alignment.bottomRight,
+                                                          child: Padding(
+                                                            padding: EdgeInsets.all(3),
+                                                            child: Icon(Icons.equalizer_rounded, color: Color(0xFFF5F5F7), size: 16),
+                                                          ),
+                                                        ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 12),
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      w.word,
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow.ellipsis,
+                                                      style: TextStyle(
+                                                        color: const Color(0xFFF5F5F7),
+                                                        fontSize: 15,
+                                                        fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w600,
+                                                        letterSpacing: -0.15,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 2),
+                                                    Text(
+                                                      'NowssB · ${_wordClock(w)}',
+                                                      style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 12),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              ReorderableDragStartListener(
+                                                index: i,
+                                                child: const Padding(
+                                                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                                                  child: Icon(Icons.drag_handle_rounded, color: Color(0xFF8E8E93), size: 22),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+      ),
+    );
+  }
+}
+
+class _YtmMiniPlayerBar extends StatelessWidget {
+  const _YtmMiniPlayerBar({required this.word, required this.theme, required this.onClose});
+  final Word? word;
+  final _PlayerTheme theme;
+  final VoidCallback onClose;
+
+  @override
+  Widget build(BuildContext context) {
+    final art = (word?.img.isNotEmpty == true) ? word!.img : theme.image;
+    return Material(
+      color: const Color(0xCC0E0E10),
+      borderRadius: BorderRadius.circular(14),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: SizedBox(
+                width: 40,
+                height: 40,
+                child: art.startsWith('http')
+                    ? Image.network(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111)))
+                    : Image.asset(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111))),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    word?.word ?? 'NowssB',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Color(0xFFF5F5F7), fontSize: 14, fontWeight: FontWeight.w600),
+                  ),
+                  const Text('NowssB', style: TextStyle(color: Color(0xFF8E8E93), fontSize: 11)),
+                ],
+              ),
+            ),
+            IconButton(
+              onPressed: onClose,
+              icon: const Icon(Icons.close_rounded, color: Color(0xFFCFCFD2), size: 20),
+              visualDensity: VisualDensity.compact,
+            ),
+          ],
         ),
       ),
     );

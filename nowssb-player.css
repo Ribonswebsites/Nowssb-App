@@ -2723,48 +2723,131 @@
 .lgp-integrated-close{position:absolute;z-index:4;left:14px;top:12px;width:38px;height:38px;border:1px solid rgba(255,255,255,.22);border-radius:50%;background:rgba(255,255,255,.12);color:#fff;font-size:28px;line-height:30px;cursor:pointer}
 
 
-/* ── Glassmorphic full Up Next queue sheet (swipe-up target) ── */
+/* ── YTM two-stage glass Up Next queue sheet ── */
 .lgp-queue-sheet{position:fixed;inset:0;z-index:2147483600;opacity:0;pointer-events:none;transition:opacity .34s cubic-bezier(.16,1,.3,1)}
 .lgp-queue-sheet.is-open{opacity:1;pointer-events:auto}
-.lgp-queue-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.lgp-queue-backdrop{
+  position:absolute;inset:0;
+  background:rgba(0,0,0,.28);
+  backdrop-filter:blur(18px) saturate(1.2);
+  -webkit-backdrop-filter:blur(18px) saturate(1.2);
+  transition:background .35s ease;
+}
+.lgp-queue-sheet.is-full .lgp-queue-backdrop{background:rgba(0,0,0,.42)}
+
+/* Mini-player strip (visible in full stage) */
+.lgp-queue-mini{
+  position:absolute;left:12px;right:12px;top:max(10px, env(safe-area-inset-top,0px));
+  z-index:2;display:flex;align-items:center;gap:10px;
+  padding:8px 8px 8px 8px;border-radius:14px;
+  background:rgba(14,14,16,.82);
+  border:1px solid rgba(255,255,255,.12);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  opacity:0;transform:translateY(-8px);pointer-events:none;
+  transition:opacity .22s ease, transform .22s ease;
+}
+.lgp-queue-sheet.is-full .lgp-queue-mini{opacity:1;transform:translateY(0);pointer-events:auto}
+.lgp-queue-mini-art{width:40px;height:40px;border-radius:6px;flex-shrink:0;background:#111 center/cover no-repeat}
+.lgp-queue-mini-mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.lgp-queue-mini-mid b{font-size:14px;font-weight:600;color:#f5f5f7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lgp-queue-mini-mid em{font-style:normal;font-size:11px;color:#8e8e93}
+.lgp-queue-mini-close{width:34px;height:34px;border:0;border-radius:50%;background:transparent;color:#cfcfd2;font-size:22px;line-height:28px;cursor:pointer}
+
 .lgp-queue-panel{
-  position:absolute;left:0;right:0;bottom:0;top:12vh;
-  background:rgba(17,18,22,.92);
+  position:absolute;left:0;right:0;bottom:0;
+  top:48vh;
+  background:rgba(18,18,22,.48);
   border-radius:28px 28px 0 0;
-  border:1px solid rgba(255,255,255,.14);
-  box-shadow:0 -24px 80px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.16);
+  border:1px solid rgba(255,255,255,.16);
+  box-shadow:0 -24px 80px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.18);
   transform:translateY(105%);
-  transition:transform .48s cubic-bezier(.16,1,.3,1);
+  transition:transform .48s cubic-bezier(.16,1,.3,1), top .48s cubic-bezier(.16,1,.3,1), background .35s ease;
   display:flex;flex-direction:column;overflow:hidden;
-  backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
+  backdrop-filter:blur(48px) saturate(1.55);
+  -webkit-backdrop-filter:blur(48px) saturate(1.55);
 }
 .lgp-queue-sheet.is-open .lgp-queue-panel{transform:translateY(0)}
-.lgp-queue-grab{width:42px;height:4px;border-radius:99px;margin:10px auto 0;background:rgba(255,255,255,.48);box-shadow:0 0 0 1px rgba(255,255,255,.08);flex-shrink:0}
-.lgp-queue-head{display:flex;align-items:center;justify-content:space-between;padding:14px 14px 10px 18px;flex-shrink:0}
-.lgp-queue-head span{color:#8d8d92;font-size:11px;font-weight:600;letter-spacing:2.8px;text-transform:uppercase}
-.lgp-queue-close{width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.10);color:#fff;font-size:22px;line-height:30px;cursor:pointer}
-.lgp-queue-line{height:1px;margin:0 18px;background:rgba(255,255,255,.10);flex-shrink:0}
-.lgp-queue-list{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;padding:12px 14px calc(28px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:8px}
+.lgp-queue-sheet.is-mid .lgp-queue-panel{top:48vh}
+.lgp-queue-sheet.is-full .lgp-queue-panel{top:12vh;background:rgba(18,18,22,.55)}
+.lgp-queue-panel.is-dragging{transition:none}
+
+.lgp-queue-grab{width:42px;height:4px;border-radius:99px;margin:10px auto 0;background:rgba(255,255,255,.48);box-shadow:0 0 0 1px rgba(255,255,255,.08);flex-shrink:0;cursor:grab}
+
+.lgp-queue-ytm-head{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
+  padding:14px 14px 6px 18px;flex-shrink:0;
+}
+.lgp-queue-from{min-width:0;flex:1;display:flex;flex-direction:column;gap:2px}
+.lgp-queue-from > span{color:#9a9aa0;font-size:12px;font-weight:500}
+.lgp-queue-mix{color:#f5f5f7;font-size:18px;font-weight:700;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lgp-queue-save{
+  flex-shrink:0;display:inline-flex;align-items:center;gap:6px;
+  padding:8px 14px;border:0;border-radius:999px;cursor:pointer;
+  background:rgba(255,255,255,.18);color:#f5f5f7;
+  font-size:13px;font-weight:600;
+}
+.lgp-queue-save.is-saved{background:rgba(232,213,163,.28)}
+.lgp-queue-save svg{display:block}
+
+.lgp-queue-chips{
+  display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;
+  padding:6px 14px 8px;flex-shrink:0;scrollbar-width:none;
+}
+.lgp-queue-chips::-webkit-scrollbar{display:none}
+.lgp-queue-chip{
+  flex:0 0 auto;border:0;border-radius:999px;cursor:pointer;
+  padding:8px 14px;font-size:13px;font-weight:600;
+  background:rgba(255,255,255,.14);color:#f5f5f7;
+  white-space:nowrap;
+}
+.lgp-queue-chip.is-on{background:#f5f5f7;color:#0a0a0c}
+
+.lgp-queue-list{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;padding:4px 8px calc(28px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:2px}
+.lgp-queue-empty{margin:36px 12px;text-align:center;color:#8e8e93;font-size:13px}
 .lgp-queue-item{
   display:flex;align-items:center;gap:12px;width:100%;
-  padding:10px 12px;border:0;border-radius:18px;cursor:pointer;text-align:left;
-  background:rgba(255,255,255,.08);color:#f5f5f7;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+  padding:8px 8px;border:0;border-radius:12px;cursor:pointer;text-align:left;
+  background:transparent;color:#f5f5f7;
+  user-select:none;-webkit-user-select:none;
 }
-.lgp-queue-item.is-current{background:rgba(255,255,255,.14)}
+.lgp-queue-item.is-current{background:rgba(255,255,255,.12)}
+.lgp-queue-item.is-dragging{opacity:.55}
 .lgp-queue-item:active{transform:scale(.985)}
-.lgp-queue-art{width:52px;height:52px;border-radius:12px;flex-shrink:0;background:#111 center/cover no-repeat;box-shadow:0 6px 16px rgba(0,0,0,.35)}
-.lgp-queue-mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
-.lgp-queue-mid b{font-size:15px;font-weight:600;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.lgp-queue-mid em{font-style:normal;font-size:12px;color:#8e8e93}
-.lgp-queue-play{
-  width:36px;height:36px;border-radius:50%;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  background:#f5f5f7;color:#0a0a0c;
-  box-shadow:0 6px 16px rgba(0,0,0,.35);
+.lgp-queue-art{
+  position:relative;width:48px;height:48px;border-radius:6px;flex-shrink:0;
+  background:#111 center/cover no-repeat;box-shadow:0 4px 12px rgba(0,0,0,.28);
+  overflow:hidden;
 }
-.lgp-queue-item.is-current .lgp-queue-play{background:#e8d5a3}
-.lgp-queue-play svg{width:14px;height:14px;margin-left:1px}
+.lgp-queue-eq{
+  position:absolute;right:3px;bottom:3px;display:flex;align-items:flex-end;gap:2px;
+  height:12px;padding:2px 3px;border-radius:3px;background:rgba(0,0,0,.35);
+}
+.lgp-queue-eq b{
+  display:block;width:2.5px;border-radius:1px;background:#fff;
+  animation:lgpEqPulse 0.9s ease-in-out infinite;
+}
+.lgp-queue-eq b:nth-child(1){height:4px;animation-delay:0s}
+.lgp-queue-eq b:nth-child(2){height:10px;animation-delay:.15s}
+.lgp-queue-eq b:nth-child(3){height:6px;animation-delay:.3s}
+@keyframes lgpEqPulse{
+  0%,100%{transform:scaleY(.45)}
+  50%{transform:scaleY(1)}
+}
+.lgp-queue-mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.lgp-queue-mid b{font-size:15px;font-weight:600;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lgp-queue-item.is-current .lgp-queue-mid b{font-weight:700}
+.lgp-queue-mid em{font-style:normal;font-size:12px;color:#8e8e93}
+.lgp-queue-handle{
+  flex-shrink:0;width:40px;height:40px;display:flex;align-items:center;justify-content:center;
+  color:#8e8e93;cursor:grab;
+}
+.lgp-queue-handle:active{cursor:grabbing}
+
+/* legacy close/head kept harmless if referenced */
+.lgp-queue-head{display:none}
+.lgp-queue-close{display:none}
+.lgp-queue-line{display:none}
+.lgp-queue-play{display:none}
 
 /* ── Rotating Actions / Up Next bottom carousel ── */
 .lgp .lgp-bottom-carousel{
@@ -2885,27 +2968,24 @@
   100%{ transform:translateX(-50%); }
 }
 
-/* YTM-style heavy glass queue — stronger blur / frost */
+/* YTM glass intensity — translucent, never opaque purple/black */
 .lgp-queue-backdrop{
-  background:rgba(0,0,0,.42) !important;
-  backdrop-filter:blur(28px) saturate(1.35) !important;
-  -webkit-backdrop-filter:blur(28px) saturate(1.35) !important;
+  background:rgba(0,0,0,.28) !important;
+  backdrop-filter:blur(22px) saturate(1.25) !important;
+  -webkit-backdrop-filter:blur(22px) saturate(1.25) !important;
 }
 .lgp-queue-panel{
-  background:rgba(18,18,22,.55) !important;
+  background:rgba(18,18,22,.48) !important;
   border:1px solid rgba(255,255,255,.18) !important;
-  box-shadow:0 -28px 90px rgba(0,0,0,.72), inset 0 1px 0 rgba(255,255,255,.22) !important;
+  box-shadow:0 -28px 90px rgba(0,0,0,.58), inset 0 1px 0 rgba(255,255,255,.22) !important;
   backdrop-filter:blur(48px) saturate(1.55) !important;
   -webkit-backdrop-filter:blur(48px) saturate(1.55) !important;
 }
-.lgp-queue-item{
-  background:rgba(255,255,255,.10) !important;
-  border:1px solid rgba(255,255,255,.08);
-  backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+.lgp-queue-sheet.is-full .lgp-queue-panel{
+  background:rgba(18,18,22,.55) !important;
 }
 .lgp-queue-item.is-current{
-  background:rgba(255,255,255,.18) !important;
-  border-color:rgba(232,213,163,.35);
+  background:rgba(255,255,255,.14) !important;
 }
 
 /* Compact Up Next so both carousel pages share the short ~72–88px band */

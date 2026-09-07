@@ -1520,79 +1520,373 @@
   document.addEventListener('DOMContentLoaded', function () { setTimeout(_boot, 60); });
 })();
 
-/* Glassmorphic full queue list with artwork — replaces Sound Library swipe target. */
+/* YTM two-stage glass Up Next — mid sheet then near-full; chips + Save + reorder. */
 (function () {
   if (window.lgpOpenQueueSheet) return;
+
+  var FILTERS = ['all', 'familiar', 'popular', 'discover', 'deep'];
+  var FILTER_LABELS = { all: 'All', familiar: 'Familiar', popular: 'Popular', discover: 'Discover', deep: 'Deep cuts' };
+  var SAVE_KEY = 'nwsb_saved_upnext';
+  var LIKES_KEY = 'nwsb_liked_words';
+
   function esc(s) {
     return String(s == null ? '' : s)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
+
+  function likedSet() {
+    try {
+      var raw = JSON.parse(localStorage.getItem(LIKES_KEY) || '[]');
+      return new Set(Array.isArray(raw) ? raw.map(String) : []);
+    } catch (e) { return new Set(); }
+  }
+
+  function readSessions() {
+    var map = {};
+    function ingest(obj) {
+      if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return;
+      Object.keys(obj).forEach(function (k) {
+        var e = obj[k];
+        if (e && typeof e === 'object') map[k] = e;
+      });
+    }
+    ['nwsb_local_sessions', 'nwsb_native_sessions', 'nwsb_sessions_v1'].forEach(function (key) {
+      try { ingest(JSON.parse(localStorage.getItem(key) || '{}')); } catch (e) {}
+    });
+    try {
+      var ud = window._userDataCache || {};
+      ingest(ud.sessions);
+      if (window._mpData) ingest(window._mpData.sessions);
+    } catch (e) {}
+    return map;
+  }
+
+  function fmtClock(sec) {
+    sec = Math.max(0, Math.round(Number(sec) || 0));
+    var m = Math.floor(sec / 60);
+    var s = sec % 60;
+    return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+  }
+
+  function wordSecs(word) {
+    if (!word) return 12;
+    var parts = (word.parts && word.parts.length) ? word.parts : [];
+    var sec = 0;
+    for (var i = 0; i < parts.length; i++) {
+      var h = parseFloat(parts[i].hold);
+      if (h > 0) sec += h;
+    }
+    if (sec < 8 && word.syllables && word.syllables.length) sec = word.syllables.length * 4;
+    return sec < 8 ? 12 : Math.round(sec);
+  }
+
+  function playCounts() {
+    var map = readSessions();
+    var counts = {};
+    Object.keys(map).forEach(function (k) {
+      var e = map[k] || {};
+      var w = String(e.word || (k.indexOf('_') >= 0 ? k.slice(k.indexOf('_') + 1) : '') || '').trim();
+      if (!w) return;
+      counts[w] = (counts[w] || 0) + 1;
+    });
+    return counts;
+  }
+
+  function mixTitle() {
+    var t = '';
+    try {
+      var titleEl = document.querySelector('.lgp-np-title');
+      t = String((window._pwTitle || window.PRACTICE_TITLE || (titleEl && titleEl.textContent) || 'NowssB')).trim();
+    } catch (e) { t = 'NowssB'; }
+    if (!t) t = 'NowssB';
+    if (!/mix$/i.test(t)) t = t + ' Mix';
+    return t;
+  }
+
+  function wordMeta(w, i, themes) {
+    var th = themes[i % Math.max(themes.length, 1)] || {};
+    var art = w.img || th.img || '';
+    var secs = wordSecs(w);
+    var dur = fmtClock(secs);
+    var partsLen = (w.parts && w.parts.length) || (w.syllables && w.syllables.length) || 0;
+    return { art: art, dur: dur, secs: secs, partsLen: partsLen, word: String(w.word || '') };
+  }
+
+  function filterIndices(order, words, themes, filter, counts, liked) {
+    var all = order.slice();
+    function practiced(w) { return (counts[w] || 0) > 0; }
+    if (filter === 'all') return all;
+    if (filter === 'familiar') {
+      return all.filter(function (i) {
+        var name = String((words[i] || {}).word || '');
+        return practiced(name) || liked.has(name);
+      });
+    }
+    if (filter === 'popular') {
+      var scored = all.slice().sort(function (a, b) {
+        var ca = counts[String((words[a] || {}).word || '')] || 0;
+        var cb = counts[String((words[b] || {}).word || '')] || 0;
+        return cb - ca || a - b;
+      });
+      var keep = Math.max(1, Math.ceil(scored.length * 0.45));
+      var top = {};
+      scored.slice(0, keep).forEach(function (i) { top[i] = true; });
+      return all.filter(function (i) { return top[i]; });
+    }
+    if (filter === 'discover') {
+      return all.filter(function (i) {
+        return !practiced(String((words[i] || {}).word || ''));
+      });
+    }
+    // deep cuts
+    return all.filter(function (i) {
+      var w = words[i] || {};
+      var meta = wordMeta(w, i, themes);
+      var plays = counts[meta.word] || 0;
+      var long = meta.secs >= 16 || meta.partsLen >= 4;
+      return plays <= 1 && long;
+    });
+  }
+
+  function setStage(sheet, stage) {
+    if (!sheet) return;
+    sheet.setAttribute('data-stage', stage);
+    sheet.classList.toggle('is-mid', stage === 'mid');
+    sheet.classList.toggle('is-full', stage === 'full');
+  }
+
   window.lgpCloseQueueSheet = function () {
     var sheet = document.getElementById('lgpQueueSheet');
     if (!sheet) return;
-    sheet.classList.remove('is-open');
+    sheet.classList.remove('is-open', 'is-mid', 'is-full');
     setTimeout(function () { sheet.remove(); }, 340);
   };
+
   window.lgpOpenQueueSheet = function () {
     if (document.getElementById('lgpQueueSheet')) return;
-    var words = (typeof PRACTICE_WORDS !== 'undefined') ? PRACTICE_WORDS : [];
+    var words = (typeof PRACTICE_WORDS !== 'undefined') ? PRACTICE_WORDS.slice() : [];
     var idx = (typeof _pwIdx !== 'undefined') ? _pwIdx : 0;
     var themes = (typeof LGP_THEMES !== 'undefined') ? LGP_THEMES : [];
-    var items = '';
-    for (var i = 0; i < words.length; i++) {
-      var w = words[i] || {};
-      var th = themes[i % Math.max(themes.length, 1)] || {};
-      var art = w.img || th.img || '';
-      var dur = (typeof lgpFmtClock === 'function' && typeof lgpWordSecs === 'function')
-        ? lgpFmtClock(lgpWordSecs(w)) : '00:12';
-      var isCur = i === idx;
-      items += '<button class="lgp-queue-item' + (isCur ? ' is-current' : '') + '" type="button" data-idx="' + i + '">' +
-        '<span class="lgp-queue-art"' + (art ? ' style="background-image:url(\'' + esc(art) + '\')"' : '') + '></span>' +
-        '<span class="lgp-queue-mid">' +
-          '<b>' + esc(w.word || '') + '</b>' +
-          '<em>' + (isCur ? 'Now playing' : 'NowssB') + '<span aria-hidden="true"> · </span>' + dur + '</em>' +
-        '</span>' +
-        '<span class="lgp-queue-play" aria-hidden="true">' +
-          (isCur
-            ? '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 9h4v6H4zm6 0h4v6h-4zm6 0h4v6h-4z"/></svg>'
-            : '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8.2 5.4v13.2L19 12z"/></svg>') +
-        '</span>' +
-      '</button>';
+    var order = words.map(function (_, i) { return i; });
+    var filter = 'all';
+    var counts = playCounts();
+    var liked = likedSet();
+    var saved = false;
+    try {
+      var prev = JSON.parse(localStorage.getItem(SAVE_KEY) || '[]');
+      saved = Array.isArray(prev) && prev.length > 0;
+    } catch (e) {}
+
+    var cur = words[idx] || {};
+    var curMeta = wordMeta(cur, idx, themes);
+
+    function renderList(listEl) {
+      var visible = filterIndices(order, words, themes, filter, counts, liked);
+      if (!visible.length) {
+        listEl.innerHTML = '<p class="lgp-queue-empty">No tracks in this filter</p>';
+        return;
+      }
+      var html = '';
+      visible.forEach(function (i, row) {
+        var w = words[i] || {};
+        var meta = wordMeta(w, i, themes);
+        var isCur = i === idx;
+        html += '<div class="lgp-queue-item' + (isCur ? ' is-current' : '') + '" draggable="true" data-idx="' + i + '" data-row="' + row + '" role="button" tabindex="0">' +
+          '<span class="lgp-queue-art"' + (meta.art ? ' style="background-image:url(\'' + esc(meta.art) + '\')"' : '') + '>' +
+            (isCur ? '<i class="lgp-queue-eq" aria-hidden="true"><b></b><b></b><b></b></i>' : '') +
+          '</span>' +
+          '<span class="lgp-queue-mid">' +
+            '<b>' + esc(meta.word) + '</b>' +
+            '<em>NowssB<span aria-hidden="true"> · </span>' + meta.dur + '</em>' +
+          '</span>' +
+          '<span class="lgp-queue-handle" aria-label="Reorder" data-handle="1">' +
+            '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M4 8h16v2H4zm0 6h16v2H4z"/></svg>' +
+          '</span>' +
+        '</div>';
+      });
+      listEl.innerHTML = html;
     }
+
+    function renderChips(chipsEl) {
+      chipsEl.innerHTML = FILTERS.map(function (f) {
+        return '<button type="button" class="lgp-queue-chip' + (f === filter ? ' is-on' : '') + '" data-filter="' + f + '">' + FILTER_LABELS[f] + '</button>';
+      }).join('');
+    }
+
     var sheet = document.createElement('div');
     sheet.id = 'lgpQueueSheet';
     sheet.className = 'lgp-queue-sheet';
+    sheet.setAttribute('data-stage', 'mid');
     sheet.innerHTML =
       '<div class="lgp-queue-backdrop"></div>' +
+      '<div class="lgp-queue-mini" aria-hidden="true">' +
+        '<span class="lgp-queue-mini-art"' + (curMeta.art ? ' style="background-image:url(\'' + esc(curMeta.art) + '\')"' : '') + '></span>' +
+        '<span class="lgp-queue-mini-mid"><b>' + esc(curMeta.word || 'NowssB') + '</b><em>NowssB</em></span>' +
+        '<button type="button" class="lgp-queue-mini-close" aria-label="Close">×</button>' +
+      '</div>' +
       '<div class="lgp-queue-panel" role="dialog" aria-label="Up Next queue">' +
         '<div class="lgp-queue-grab" aria-hidden="true"></div>' +
-        '<div class="lgp-queue-head"><span>UP NEXT</span>' +
-          '<button class="lgp-queue-close" type="button" aria-label="Close">×</button>' +
+        '<div class="lgp-queue-ytm-head">' +
+          '<div class="lgp-queue-from">' +
+            '<span>Playing from</span>' +
+            '<b class="lgp-queue-mix">' + esc(mixTitle()) + '</b>' +
+          '</div>' +
+          '<button type="button" class="lgp-queue-save' + (saved ? ' is-saved' : '') + '" aria-label="Save mix">' +
+            '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M3 5h14v2H3zm0 4h14v2H3zm0 4h10v2H3zm14-1v6h2v-6h3l-4-4-4 4z"/></svg>' +
+            '<span>' + (saved ? 'Saved' : 'Save') + '</span>' +
+          '</button>' +
         '</div>' +
-        '<div class="lgp-queue-line" aria-hidden="true"></div>' +
-        '<div class="lgp-queue-list">' + (items || '<p class="lgp-nextup-empty">Queue is empty</p>') + '</div>' +
+        '<div class="lgp-queue-chips" role="tablist" aria-label="Queue filters"></div>' +
+        '<div class="lgp-queue-list"></div>' +
       '</div>';
+
     document.body.appendChild(sheet);
-    requestAnimationFrame(function () { sheet.classList.add('is-open'); });
-    sheet.querySelector('.lgp-queue-close').onclick = window.lgpCloseQueueSheet;
-    sheet.querySelector('.lgp-queue-backdrop').onclick = window.lgpCloseQueueSheet;
+    var panel = sheet.querySelector('.lgp-queue-panel');
     var list = sheet.querySelector('.lgp-queue-list');
-    if (list) {
-      list.addEventListener('click', function (ev) {
-        var btn = ev.target && ev.target.closest ? ev.target.closest('.lgp-queue-item') : null;
-        if (!btn) return;
-        var n = parseInt(btn.getAttribute('data-idx'), 10);
-        if (isNaN(n)) return;
-        window.lgpCloseQueueSheet();
-        if (typeof window.lgpJumpTo === 'function') window.lgpJumpTo(n);
-        else {
-          try { _pwIdx = n; } catch (e) {}
-          if (typeof renderPractice === 'function') renderPractice();
-          else if (typeof pwPlay === 'function') pwPlay();
-        }
-      });
+    var chips = sheet.querySelector('.lgp-queue-chips');
+    var saveBtn = sheet.querySelector('.lgp-queue-save');
+    renderChips(chips);
+    renderList(list);
+
+    requestAnimationFrame(function () {
+      sheet.classList.add('is-open', 'is-mid');
+      setStage(sheet, 'mid');
+    });
+
+    function close() { window.lgpCloseQueueSheet(); }
+
+    sheet.querySelector('.lgp-queue-backdrop').onclick = function () {
+      if (sheet.getAttribute('data-stage') === 'full') setStage(sheet, 'mid');
+      else close();
+    };
+    sheet.querySelector('.lgp-queue-mini-close').onclick = close;
+
+    chips.addEventListener('click', function (ev) {
+      var btn = ev.target && ev.target.closest ? ev.target.closest('[data-filter]') : null;
+      if (!btn) return;
+      filter = btn.getAttribute('data-filter') || 'all';
+      renderChips(chips);
+      renderList(list);
+    });
+
+    saveBtn.addEventListener('click', function () {
+      var ordered = order.map(function (i) { return String((words[i] || {}).word || ''); }).filter(Boolean);
+      try { localStorage.setItem(SAVE_KEY, JSON.stringify(ordered)); } catch (e) {}
+      try {
+        var set = likedSet();
+        ordered.forEach(function (w) { set.add(w); });
+        localStorage.setItem(LIKES_KEY, JSON.stringify(Array.from(set).sort()));
+        liked = set;
+      } catch (e) {}
+      saved = true;
+      saveBtn.classList.add('is-saved');
+      var label = saveBtn.querySelector('span');
+      if (label) label.textContent = 'Saved';
+      try {
+        if (typeof window.lgpToast === 'function') window.lgpToast('Saved to your library');
+      } catch (e) {}
+    });
+
+    list.addEventListener('click', function (ev) {
+      if (ev.target && ev.target.closest && ev.target.closest('[data-handle]')) return;
+      var row = ev.target && ev.target.closest ? ev.target.closest('.lgp-queue-item') : null;
+      if (!row) return;
+      var n = parseInt(row.getAttribute('data-idx'), 10);
+      if (isNaN(n)) return;
+      close();
+      if (typeof window.lgpJumpTo === 'function') window.lgpJumpTo(n);
+      else {
+        try { _pwIdx = n; } catch (e) {}
+        if (typeof renderPractice === 'function') renderPractice();
+        else if (typeof pwPlay === 'function') pwPlay();
+      }
+    });
+
+    // Drag reorder (HTML5)
+    var dragIdx = null;
+    list.addEventListener('dragstart', function (ev) {
+      var row = ev.target && ev.target.closest ? ev.target.closest('.lgp-queue-item') : null;
+      if (!row) return;
+      dragIdx = parseInt(row.getAttribute('data-idx'), 10);
+      row.classList.add('is-dragging');
+      try { ev.dataTransfer.setData('text/plain', String(dragIdx)); ev.dataTransfer.effectAllowed = 'move'; } catch (e) {}
+    });
+    list.addEventListener('dragend', function () {
+      var d = list.querySelector('.is-dragging');
+      if (d) d.classList.remove('is-dragging');
+      dragIdx = null;
+    });
+    list.addEventListener('dragover', function (ev) {
+      ev.preventDefault();
+      var row = ev.target && ev.target.closest ? ev.target.closest('.lgp-queue-item') : null;
+      if (!row || dragIdx == null) return;
+      var over = parseInt(row.getAttribute('data-idx'), 10);
+      if (isNaN(over) || over === dragIdx) return;
+      var from = order.indexOf(dragIdx);
+      var to = order.indexOf(over);
+      if (from < 0 || to < 0) return;
+      order.splice(from, 1);
+      order.splice(to, 0, dragIdx);
+      renderList(list);
+    });
+
+    // Two-stage drag on grab / panel header
+    var y0 = null, stage0 = null, dragging = false;
+    function onStart(y) {
+      y0 = y;
+      stage0 = sheet.getAttribute('data-stage') || 'mid';
+      dragging = true;
+      panel.classList.add('is-dragging');
     }
+    function onMove(y) {
+      if (!dragging || y0 == null) return;
+      var dy = y0 - y; // up positive
+      if (stage0 === 'mid' && dy > 56) setStage(sheet, 'full');
+      else if (stage0 === 'full' && dy < -48) setStage(sheet, 'mid');
+      else if (stage0 === 'mid' && dy < -64) { dragging = false; close(); }
+    }
+    function onEnd() {
+      dragging = false;
+      y0 = null;
+      panel.classList.remove('is-dragging');
+    }
+    var grab = sheet.querySelector('.lgp-queue-grab');
+    var head = sheet.querySelector('.lgp-queue-ytm-head');
+    [grab, head].forEach(function (el) {
+      if (!el) return;
+      el.addEventListener('touchstart', function (e) {
+        var t = e.touches && e.touches[0];
+        if (t) onStart(t.clientY);
+      }, { passive: true });
+      el.addEventListener('touchmove', function (e) {
+        var t = e.touches && e.touches[0];
+        if (t) onMove(t.clientY);
+      }, { passive: true });
+      el.addEventListener('touchend', onEnd, { passive: true });
+      el.addEventListener('mousedown', function (e) { onStart(e.clientY); });
+    });
+    window.addEventListener('mousemove', function (e) { if (dragging) onMove(e.clientY); });
+    window.addEventListener('mouseup', onEnd);
+
+    // Second swipe-up anywhere on panel (not on list scroll) expands
+    var py0 = null;
+    panel.addEventListener('touchstart', function (e) {
+      if (e.target && e.target.closest && e.target.closest('.lgp-queue-list')) { py0 = null; return; }
+      var t = e.touches && e.touches[0];
+      py0 = t ? t.clientY : null;
+    }, { passive: true });
+    panel.addEventListener('touchend', function (e) {
+      if (py0 == null) return;
+      var t = e.changedTouches && e.changedTouches[0];
+      var y1 = t ? t.clientY : py0;
+      var dy = py0 - y1;
+      var stage = sheet.getAttribute('data-stage') || 'mid';
+      if (dy > 48 && stage === 'mid') setStage(sheet, 'full');
+      else if (dy < -56 && stage === 'full') setStage(sheet, 'mid');
+      else if (dy < -72 && stage === 'mid') close();
+      py0 = null;
+    }, { passive: true });
   };
 })();
 
