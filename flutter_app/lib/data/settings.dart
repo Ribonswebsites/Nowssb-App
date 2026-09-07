@@ -148,7 +148,7 @@ class Settings extends ChangeNotifier {
   /// Fashion hero look — part082.js `heroStyle()`.
   String get heroStyle => _heroStyle;
 
-  /// Shortcut ids shown in the Normal home Quick actions cover-flow.
+  /// Shortcut ids shown in the Normal home Quick actions carousel.
   List<String> get quickActions => List.unmodifiable(_quickActions);
 
   Future<void> load() async {

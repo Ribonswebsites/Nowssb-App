@@ -1,16 +1,10 @@
-/// Glass header-actions sheet — cinematic 3D cover-flow of Normal home controls.
+/// Glass header-actions sheet — flat Quick actions carousel for Normal home.
 ///
-/// Opens from the slim `_TopRow` SVG control. Visual language matches
-/// [NormalGlassSection] / notifications sheet: blur, translucent fill,
-/// soft white rim. Options that used to crowd the header live here as
-/// rounded SVG tiles; the centred tile is larger and is the one that
-/// activates on tap.
-///
-/// Always shows neighbour | centre | neighbour (list wraps at both ends
-/// so the sides are never empty).
+/// Opens from the slim `_TopRow` SVG control. Outer sheet stays light/frosted;
+/// the icon row sits in an inner dark glass panel. Horizontal swipe only —
+/// no perspective, rotateY, or depth scaling.
 library;
 
-import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -38,7 +32,6 @@ double _circularDelta(double index, double focus, int n) {
   if (n <= 0) return 0;
   var d = index - focus;
   d = d - n * (d / n).roundToDouble();
-  // Keep in (-n/2, n/2]
   if (d > n / 2) d -= n;
   if (d <= -n / 2) d += n;
   return d;
@@ -123,15 +116,13 @@ class HeaderActionsSheet extends StatefulWidget {
 }
 
 class _HeaderActionsSheetState extends State<HeaderActionsSheet>
-    with TickerProviderStateMixin {
+    with SingleTickerProviderStateMixin {
   /// Fractional focus index into [_ids] (includes trailing Add).
   double _focus = 0;
 
-  late final AnimationController _drift;
   late final AnimationController _snap;
 
   double? _dragStartFocus;
-  double _snapFrom = 0;
   double _snapTo = 0;
   bool _snapping = false;
 
@@ -150,10 +141,6 @@ class _HeaderActionsSheetState extends State<HeaderActionsSheet>
     _ids = _buildIds(Settings.instance.quickActions);
     _focus = _defaultFocus(_ids);
     Settings.instance.addListener(_onSettings);
-    _drift = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 14),
-    )..repeat();
     _snap = AnimationController.unbounded(vsync: this)
       ..addListener(_onSnapTick);
   }
@@ -166,7 +153,6 @@ class _HeaderActionsSheetState extends State<HeaderActionsSheet>
   @override
   void dispose() {
     Settings.instance.removeListener(_onSettings);
-    _drift.dispose();
     _snap.dispose();
     super.dispose();
   }
@@ -208,20 +194,17 @@ class _HeaderActionsSheetState extends State<HeaderActionsSheet>
     final n = _itemCount;
     if (n <= 0) return;
     final from = _focus;
-    var delta = _circularDelta(target, from, n);
-    // Prefer landing on the unwrapped target near `from`.
+    final delta = _circularDelta(target, from, n);
     final to = from + delta;
     _snapping = true;
-    _snapFrom = from;
     _snapTo = to;
     _snap.stop();
     _snap.value = from;
 
-    // Springy cinematic snap — slight overshoot, settles cleanly.
     final spring = SpringDescription(
       mass: 1,
-      stiffness: 180,
-      damping: 18,
+      stiffness: 220,
+      damping: 22,
     );
     final sim = SpringSimulation(spring, from, to, velocity / _gap);
     _snap.animateWith(sim).whenCompleteOrCancel(() {
@@ -240,7 +223,6 @@ class _HeaderActionsSheetState extends State<HeaderActionsSheet>
   void _onDragUpdate(DragUpdateDetails d) {
     final start = _dragStartFocus ?? _focus;
     setState(() {
-      // Unbounded while dragging — wrap is applied when rendering.
       _focus = start - d.primaryDelta! / _gap;
       _dragStartFocus = _focus;
     });
@@ -251,7 +233,6 @@ class _HeaderActionsSheetState extends State<HeaderActionsSheet>
     final n = _itemCount;
     if (n <= 0) return;
     final velocity = d.primaryVelocity ?? 0;
-    // Project a bit with fling, then snap to nearest wrapped index.
     var projected = _focus - (velocity / _gap) * 0.18;
     var target = projected.roundToDouble();
     if (velocity.abs() > 240) {
@@ -259,7 +240,6 @@ class _HeaderActionsSheetState extends State<HeaderActionsSheet>
           ? (_focus + 0.45).ceilToDouble()
           : (_focus - 0.45).floorToDouble();
     }
-    // Convert unbounded target into nearest absolute index path.
     final nearest = _normalizeFocus(target);
     _animateTo(nearest, velocity: -velocity);
   }
@@ -277,7 +257,6 @@ class _HeaderActionsSheetState extends State<HeaderActionsSheet>
       case 'glass':
         setState(() => _glassOn = !_glassOn);
         widget.onGlassToggle();
-        // Stay open so the glass language behind the sheet updates live.
         break;
       case 'notifications':
         Navigator.of(context).pop();
@@ -423,31 +402,71 @@ class _HeaderActionsSheetState extends State<HeaderActionsSheet>
                                   fontSize: 11,
                                 ),
                           ),
-                          const SizedBox(height: 10),
-                          SizedBox(
-                            height: 112,
-                            child: AnimatedBuilder(
-                              animation: Listenable.merge([_drift, _snap]),
-                              builder: (context, _) => _CoverFlow(
-                                focus: _focus,
-                                drift: _drift.value,
-                                glassOn: _glassOn,
-                                ids: _ids,
-                                tile: _tile,
-                                gap: _gap,
-                                onDragStart: _onDragStart,
-                                onDragUpdate: _onDragUpdate,
-                                onDragEnd: _onDragEnd,
-                                onTileTap: _onTileTap,
+                          const SizedBox(height: 12),
+                          // Inner dark glass panel — wraps tiles + focus label.
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(18),
+                            child: BackdropFilter(
+                              filter: ui.ImageFilter.blur(
+                                sigmaX: 14,
+                                sigmaY: 14,
+                              ),
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  color: const Color(0xB7060C18),
+                                  borderRadius: BorderRadius.circular(18),
+                                  border: Border.all(
+                                    color: const Color(0x33FFFFFF),
+                                    width: 1,
+                                  ),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Color(0x33000000),
+                                      blurRadius: 16,
+                                      offset: Offset(0, 6),
+                                    ),
+                                  ],
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.fromLTRB(
+                                    8,
+                                    14,
+                                    8,
+                                    12,
+                                  ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      SizedBox(
+                                        height: 72,
+                                        child: AnimatedBuilder(
+                                          animation: _snap,
+                                          builder: (context, _) =>
+                                              _FlatCarousel(
+                                            focus: _focus,
+                                            glassOn: _glassOn,
+                                            ids: _ids,
+                                            tile: _tile,
+                                            gap: _gap,
+                                            onDragStart: _onDragStart,
+                                            onDragUpdate: _onDragUpdate,
+                                            onDragEnd: _onDragEnd,
+                                            onTileTap: _onTileTap,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      _CenterLabel(
+                                        focus: _focus,
+                                        itemCount: _itemCount,
+                                        label: _labelFor(centerId),
+                                        glassOn: _glassOn,
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(height: 4),
-                          _CenterLabel(
-                            focus: _focus,
-                            itemCount: _itemCount,
-                            label: _labelFor(centerId),
-                            glassOn: _glassOn,
                           ),
                         ],
                       ),
@@ -517,16 +536,15 @@ class _CenterLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final i = itemCount <= 0
-        ? 0
-        : _wrapIndex(focus.round(), itemCount);
+    final i = itemCount <= 0 ? 0 : _wrapIndex(focus.round(), itemCount);
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 220),
       child: Text(
         label,
         key: ValueKey('$i-$label-$glassOn'),
+        textAlign: TextAlign.center,
         style: const TextStyle(
-          color: NwsbColors.ink,
+          color: Color(0xF2FFFFFF),
           fontWeight: FontWeight.w700,
           fontSize: 13,
           letterSpacing: -0.1,
@@ -536,10 +554,10 @@ class _CenterLabel extends StatelessWidget {
   }
 }
 
-class _CoverFlow extends StatelessWidget {
-  const _CoverFlow({
+/// Flat horizontal carousel — equal tiles, translateX only, no 3D.
+class _FlatCarousel extends StatelessWidget {
+  const _FlatCarousel({
     required this.focus,
-    required this.drift,
     required this.glassOn,
     required this.ids,
     required this.tile,
@@ -551,7 +569,6 @@ class _CoverFlow extends StatelessWidget {
   });
 
   final double focus;
-  final double drift;
   final bool glassOn;
   final List<String> ids;
   final double tile;
@@ -563,10 +580,6 @@ class _CoverFlow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Subtle idle sway — yaw + parallax, never enough to hide a side.
-    final sway = math.sin(drift * math.pi * 2) * 0.028;
-    final lift = math.cos(drift * math.pi * 2) * 1.2;
-
     return GestureDetector(
       onHorizontalDragStart: onDragStart,
       onHorizontalDragUpdate: onDragUpdate,
@@ -593,50 +606,28 @@ class _CoverFlow extends StatelessWidget {
               final cx = constraints.maxWidth / 2;
               final cy = constraints.maxHeight / 2;
 
-              // Always paint at least ±1 neighbours (wrap). Also paint
-              // ±2 for depth when the list is long enough.
+              // Neighbours ±1 (and ±2 when list is long) — wrap so sides
+              // stay populated. Paint far → near so centre is on top.
               final reach = n >= 5 ? 2 : 1;
               final center = focus.round();
               final slots = <int>[
                 for (var s = -reach; s <= reach; s++) s,
-              ];
-              // Paint far → near so centre is on top.
-              slots.sort((a, b) => b.abs().compareTo(a.abs()));
+              ]..sort((a, b) => b.abs().compareTo(a.abs()));
 
-              return Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  // Soft stage shadow under the carousel.
-                  Positioned(
-                    left: cx - 70,
-                    top: cy + tile * 0.42,
-                    child: IgnorePointer(
-                      child: Container(
-                        width: 140,
-                        height: 18,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(40),
-                          gradient: RadialGradient(
-                            colors: [
-                              const Color(0x330B2447),
-                              const Color(0x000B2447),
-                            ],
-                          ),
-                        ),
+              return ClipRect(
+                child: Stack(
+                  clipBehavior: Clip.hardEdge,
+                  children: [
+                    for (final slot in slots)
+                      _buildSlot(
+                        items: items,
+                        slot: slot,
+                        centerRound: center,
+                        cx: cx,
+                        cy: cy,
                       ),
-                    ),
-                  ),
-                  for (final slot in slots)
-                    _buildSlot(
-                      items: items,
-                      slot: slot,
-                      centerRound: center,
-                      cx: cx,
-                      cy: cy,
-                      sway: sway,
-                      lift: lift,
-                    ),
-                ],
+                  ],
+                ),
               );
             },
           );
@@ -691,59 +682,34 @@ class _CoverFlow extends StatelessWidget {
     required int centerRound,
     required double cx,
     required double cy,
-    required double sway,
-    required double lift,
   }) {
     final n = items.length;
     final index = _wrapIndex(centerRound + slot, n);
-    // Slot-based offset keeps LEFT | CENTRE | RIGHT always populated,
-    // even when the list wraps or has only 1–2 items (sides may repeat).
     final frac = focus - centerRound;
-    final visualOffset = slot - frac + sway;
+    final visualOffset = slot - frac;
     final abs = visualOffset.abs().clamp(0.0, 2.2);
 
-    // Cinematic falloffs.
-    final t = (abs / 1.05).clamp(0.0, 1.0);
-    final scale = ui.lerpDouble(1.34, 0.78, Curves.easeOutCubic.transform(t))!;
+    // Flat: equal size; only a soft opacity fade for far neighbours.
     final opacity = ui.lerpDouble(
       1.0,
-      0.58,
-      Curves.easeOut.transform((abs / 1.35).clamp(0.0, 1.0)),
+      0.55,
+      Curves.easeOut.transform((abs / 1.6).clamp(0.0, 1.0)),
     )!;
     final dx = visualOffset * gap;
-    final dy = abs * abs * 6.5 + (abs < 0.35 ? -lift : lift * 0.35);
-    final yaw = visualOffset * 0.92;
-    final pitch = abs * 0.06;
-    final z = -abs * 36.0;
-
-    final matrix = Matrix4.identity()
-      ..setEntry(3, 2, 0.00235)
-      ..translate(dx, dy, z)
-      ..rotateY(yaw)
-      ..rotateX(pitch)
-      ..scale(scale, scale, 1.0);
-
-    final light = (1.0 - (visualOffset.clamp(-1.2, 1.2).abs() * 0.22))
-        .clamp(0.72, 1.0);
+    final emphasized = abs < 0.38;
 
     return Positioned(
       key: ValueKey('slot-$slot-$index'),
-      left: cx - tile / 2,
-      top: cy - tile / 2 - 8,
+      left: cx - tile / 2 + dx,
+      top: cy - tile / 2,
       child: Opacity(
         opacity: opacity,
-        child: Transform(
-          alignment: Alignment.center,
-          transform: matrix,
-          child: GestureDetector(
-            onTap: () => onTileTap(index),
-            child: _ActionTile(
-              spec: items[index],
-              emphasized: abs < 0.38,
-              size: tile,
-              light: light,
-              yaw: yaw,
-            ),
+        child: GestureDetector(
+          onTap: () => onTileTap(index),
+          child: _ActionTile(
+            spec: items[index],
+            emphasized: emphasized,
+            size: tile,
           ),
         ),
       ),
@@ -772,121 +738,48 @@ class _ActionTile extends StatelessWidget {
     required this.spec,
     required this.emphasized,
     required this.size,
-    required this.light,
-    required this.yaw,
   });
 
   final _ActionSpec spec;
   final bool emphasized;
   final double size;
-  final double light;
-  final double yaw;
 
   @override
   Widget build(BuildContext context) {
-    final shadowDx = (yaw * 10).clamp(-8.0, 8.0);
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        // Contact shadow — shifts with yaw for depth.
-        Positioned(
-          left: 4 + shadowDx,
-          right: 4 - shadowDx,
-          bottom: -6,
-          child: IgnorePointer(
-            child: Container(
-              height: emphasized ? 14 : 10,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Color(emphasized ? 0x3A0B2447 : 0x220B2447),
-                    blurRadius: emphasized ? 16 : 10,
-                    spreadRadius: -2,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
         AnimatedContainer(
           duration: const Duration(milliseconds: 180),
           curve: Curves.easeOutCubic,
           width: size,
           height: size,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18),
-            gradient: LinearGradient(
-              begin: Alignment(-0.8 - yaw * 0.4, -1),
-              end: Alignment(0.9 - yaw * 0.3, 1.1),
-              colors: [
-                Color.lerp(
-                  spec.active
-                      ? const Color(0xFFFFFFFF)
-                      : const Color(0xF2FFFFFF),
-                  const Color(0xFFD7E4F4),
-                  1.0 - light,
-                )!,
-                Color.lerp(
-                  spec.active
-                      ? const Color(0xD9FFFFFF)
-                      : const Color(0xA8FFFFFF),
-                  const Color(0xFFB8C9DE),
-                  (1.0 - light) * 0.85,
-                )!,
-              ],
-            ),
+            borderRadius: BorderRadius.circular(16),
+            color: spec.active
+                ? const Color(0xFFFFFFFF)
+                : const Color(0xF2F5F8FC),
             border: Border.all(
               color: emphasized
                   ? const Color(0xFFFFFFFF)
-                  : const Color(0xD8FFFFFF),
-              width: emphasized ? 1.85 : 1.1,
+                  : const Color(0xCCFFFFFF),
+              width: emphasized ? 1.6 : 1.0,
             ),
             boxShadow: [
               BoxShadow(
-                color: Color(emphasized ? 0x2E0B2447 : 0x1A0B2447),
-                blurRadius: emphasized ? 20 : 12,
-                offset: Offset(shadowDx * 0.35, emphasized ? 10 : 7),
-              ),
-              BoxShadow(
-                color: Color(emphasized ? 0xCCFFFFFF : 0x88FFFFFF),
-                blurRadius: emphasized ? 10 : 6,
-                offset: Offset(-2 - shadowDx * 0.15, -2),
+                color: Color(emphasized ? 0x40000000 : 0x28000000),
+                blurRadius: emphasized ? 12 : 8,
+                offset: const Offset(0, 4),
               ),
             ],
           ),
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              // Specular rim.
-              IgnorePointer(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(17),
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.center,
-                      colors: [
-                        Color(emphasized ? 0x66FFFFFF : 0x33FFFFFF),
-                        const Color(0x00FFFFFF),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Center(
-                child: NwsbIcon(
-                  spec.body,
-                  size: emphasized ? 25 : 20,
-                  color: Color.lerp(
-                    const Color(0xFF31577F),
-                    const Color(0xFF1E3A55),
-                    1.0 - light,
-                  )!,
-                  strokeWidth: emphasized ? 1.85 : 1.7,
-                ),
-              ),
-            ],
+          child: Center(
+            child: NwsbIcon(
+              spec.body,
+              size: emphasized ? 24 : 22,
+              color: const Color(0xFF31577F),
+              strokeWidth: emphasized ? 1.85 : 1.7,
+            ),
           ),
         ),
         if (spec.badge != null && spec.badge! > 0)
