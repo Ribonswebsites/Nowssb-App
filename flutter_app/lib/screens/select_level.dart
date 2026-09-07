@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../media/nwsb_video.dart';
+import '../media/video_pool.dart';
+
 class SelectLevelScreen extends StatefulWidget {
   const SelectLevelScreen({super.key, this.initialLevel = 3});
   final int initialLevel;
@@ -47,13 +50,19 @@ class _SelectLevelScreenState extends State<SelectLevelScreen> {
                     final orbSize = constraints.maxWidth.clamp(185.0, 220.0).toDouble();
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 4),
-                      child: Image.asset(
-                        'assets/content/select-level-orb.png',
+                      child: SizedBox(
                         width: orbSize,
                         height: orbSize,
-                        fit: BoxFit.contain,
-                        filterQuality: FilterQuality.high,
-                        semanticLabel: 'NowssB level ring',
+                        child: ClipOval(
+                          child: NwsbVideo(
+                            asset: 'assets/video/orb-loop.mp4',
+                            fit: BoxFit.cover,
+                            priority: ClipPriority.feature,
+                            autoplay: true,
+                            loop: true,
+                            showPoster: false,
+                          ),
+                        ),
                       ),
                     );
                   },
