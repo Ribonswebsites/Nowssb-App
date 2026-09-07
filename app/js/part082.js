@@ -863,20 +863,23 @@
 
     if (!filmOn()) {
       if (v) { try { v.pause(); v.removeAttribute('src'); v.load(); } catch (e) {} v.remove(); }
-      if (document.body.classList.contains('nm-mode')) { host.style.backgroundImage = ''; return; }
-      /* Their picture if they chose one. The custom background is held as a
-         CSS variable on <body>, so read it from there rather than from the
-         key — that is the value actually in force. */
-      var url = '';
-      if (document.body.classList.contains('nwsb-custom-fashion-bg')) {
-        try { url = getComputedStyle(document.body).getPropertyValue('--nwsb-custom-bg-url').trim(); } catch (e) {}
+      /* Normal home: neumorphic light page — no photograph, no film. */
+      if (document.body.classList.contains('nm-mode')) {
+        host.style.backgroundImage = '';
+        host.style.backgroundColor = '';
+        return;
       }
-      if (!url || url === 'none') url = "url('" + BG_STILL + "')";
-      host.style.backgroundImage = url;
+      /* Fashion Plus OFF: complete solid black — not fp-intro still, not a
+         custom photo mush behind Widgets Settings. */
+      host.style.backgroundImage = 'none';
+      host.style.backgroundColor = '#000';
       return;
     }
 
+    /* Fashion Plus ON: clear the local still so the shared #fpBgVideo (or a
+       page-local film below) can read as glass through .st-page. */
     host.style.backgroundImage = '';
+    host.style.backgroundColor = 'transparent';
     var src = window.fpBgVid();
     if (!v) {
       v = document.createElement('video');
@@ -899,6 +902,9 @@
   window.stOpen = function () {
     render();
     paintBg();
+    if (typeof window.nwsbFpSyncPageBackdrop === 'function') {
+      window.nwsbFpSyncPageBackdrop();
+    }
     var s = document.getElementById('sub-settings');
     if (s && typeof openSub === 'function') openSub('settings');
     haptic(24);

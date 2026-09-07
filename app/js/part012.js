@@ -1711,6 +1711,9 @@ function openMenu() {
   var drawer = document.getElementById('menuDrawer');
   drawer.classList.add('open');
   document.body.classList.add('nwsb-menu-open');
+  if (typeof window.nwsbFpSyncPageBackdrop === 'function') {
+    window.nwsbFpSyncPageBackdrop();
+  }
   // Explicit kick tied directly to the actual open action — same pattern as
   // meaning-store's banner video. preload="metadata" + autoplay isn't
   // reliably enough on its own to start playback for a video that's been
@@ -1722,6 +1725,9 @@ function closeMenu() {
   document.getElementById('menuOverlay').classList.remove('open');
   document.getElementById('menuDrawer').classList.remove('open');
   document.body.classList.remove('nwsb-menu-open');
+  if (typeof window.nwsbFpSyncPageBackdrop === 'function') {
+    window.nwsbFpSyncPageBackdrop();
+  }
 }
 // NowssB Connect intro — pops ONCE per session, and only via the Fashion-home
 // Connect section (which is the only caller). Any later tap goes straight in.

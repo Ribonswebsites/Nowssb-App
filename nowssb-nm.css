@@ -15196,8 +15196,8 @@ body.homecorner-round .hs-ban { border-radius: 22px !important; }
    No photograph, in either mode. It was a R2 jpg behind a 58–70%
    scrim; what is left is the scrim's own colour, which is what the rest of
    the dark app is wearing. */
-body:not(.nm-mode) #menuDrawer.menu-drawer {
-  background: rgba(6,10,20,0.94) !important;
+body:not(.nm-mode):not(.fashplus) #menuDrawer.menu-drawer {
+  background: #000 !important;
 }
 
 /* And with the switch on, the film — the same one the home is playing,
@@ -15280,7 +15280,7 @@ body.nwsb-custom-fashion-bg:not(.fashplus).nwsb-menu-open #appBg {
   z-index: 490 !important;
 }
 body.nwsb-custom-fashion-bg:not(.fashplus).nwsb-menu-open #menuDrawer.menu-drawer {
-  background: linear-gradient(rgba(6,10,20,0.62), rgba(6,10,20,0.76)) !important;
+  background: #000 !important;
 }
 body.nwsb-custom-fashion-bg:not(.fashplus):has(.sub-screen.open) .sub-screen.open,
 body.nwsb-custom-fashion-bg:not(.fashplus).nwsb-sub-open .sub-screen.open {
@@ -15785,7 +15785,7 @@ body.fashplus:not(.fp-bg-off) .sub-screen.open :is(
 }
 
 
-/* Normal Settings is deliberately not part of Fashion Plus cinema. Keep its
+/* Social Settings (#sub-social) is deliberately not Fashion Plus cinema. Keep its
    white neumorphic surface opaque and stop the shared film while it is open,
    even if the Fashion Plus master switch remains enabled for other pages. */
 body.nwsb-settings-open #fpBgVideo,
@@ -15811,6 +15811,23 @@ body.nwsb-settings-open #sub-social .sub-header * {
 }
 body.nwsb-settings-open #sub-social .sub-back svg {
   stroke: #1a1a2e !important;
+}
+
+/* Widgets Settings (#sub-settings) on Fashion home only.
+   Plus OFF: solid black. Plus ON: transparent shell so #fpBgVideo shows.
+   Never apply the white nwsb-settings-open treatment here. */
+body:not(.nm-mode):not(.fashplus) #sub-settings,
+body:not(.nm-mode):not(.fashplus) #sub-settings .st-bg {
+  background: #000 !important;
+  background-image: none !important;
+}
+body:not(.nm-mode):not(.fashplus) #sub-settings .st-page {
+  background: #000 !important;
+}
+body.fashplus:not(.nm-mode):not(.fp-bg-off) #sub-settings.open,
+body.fashplus:not(.nm-mode):not(.fp-bg-off) #sub-settings.open .st-bg {
+  background-color: transparent !important;
+  background-image: none !important;
 }
 
 

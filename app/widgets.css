@@ -662,3 +662,14 @@ body.nm-mode .stw-wcard.stw-hero .stw-pill.fixed.on {
   color: rgba(26,26,46,0.55);
   box-shadow: inset 3px 3px 7px rgba(0,0,0,0.14), inset -2px -2px 6px rgba(255,255,255,0.95);
 }
+
+/* Fashion Widgets Settings backdrop (nm-mode rules above stay untouched).
+   Plus OFF: solid black. Plus ON: transparent host so shared film shows. */
+body:not(.nm-mode):not(.fashplus) #sub-settings .st-bg {
+  background-color: #000 !important;
+  background-image: none !important;
+}
+body.fashplus:not(.nm-mode):not(.fp-bg-off) #sub-settings.open .st-bg {
+  background-color: transparent !important;
+  background-image: none !important;
+}

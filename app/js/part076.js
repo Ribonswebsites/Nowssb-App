@@ -330,29 +330,39 @@
      The body class avoids relying on CSS :has support in older WebViews. */
   function syncOpenPageBackdrop() {
     var on = isOn() && bgPartOn() && !batteryLow;
-    var settingsOpen = !!document.querySelector('#sub-social.sub-screen.open');
+    /* #sub-social is the older Social/Settings surface: white neumorphic,
+       cinema off. #sub-settings is Widgets Settings: Fashion glass over the
+       shared film when Plus is on, solid black when Plus is off. Never fold
+       Widgets Settings into the white "nwsb-settings-open" treatment. */
+    var socialSettingsOpen = !!document.querySelector('#sub-social.sub-screen.open');
+    var widgetsSettingsOpen = !!document.querySelector('#sub-settings.sub-screen.open');
     var storeOpen = !!document.querySelector('#sub-real-meaning.sub-screen.open, #sub-nowssb-store.sub-screen.open, #sub-meaning-store.sub-screen.open, #sub-ebooks-store.sub-screen.open, #sub-signature-store.sub-screen.open');
     var hasOpenPage = !!document.querySelector('.sub-screen.open');
-    document.body.classList.toggle('nwsb-settings-open', settingsOpen);
+    document.body.classList.toggle('nwsb-settings-open', socialSettingsOpen);
     document.body.classList.toggle('nwsb-store-open', storeOpen);
     document.body.classList.toggle('nwsb-sub-open', hasOpenPage);
     if (storeOpen) restoreStoreIntroArtwork();
     document.body.classList.toggle(
       'fp-sub-open',
-      on && hasOpenPage
+      on && hasOpenPage && !socialSettingsOpen
     );
     // Marking has no visual effect by itself. Doing it in both states lets
     // the off-mode black/image rules make the same decision for a page whose
     // own backdrop was created only when it opened.
     markImageBacked();
-    if (on && !settingsOpen && !storeOpen) {
+    if (on && !socialSettingsOpen && !storeOpen) {
       restoreIntroArtwork();
       bgVideo(true);
       playState();
-    } else if (settingsOpen || storeOpen) {
-      // Settings is the normal white neumorphic surface, never a Fashion Plus
-      // cinema. Stop the shared decoder while this screen is open.
+    } else if (socialSettingsOpen || storeOpen) {
+      // Social Settings is the normal white neumorphic surface, never a
+      // Fashion Plus cinema. Stop the shared decoder while this screen is open.
+      // Widgets Settings (#sub-settings) is NOT in this branch — it keeps the
+      // shared film when Plus is on.
       bgVideo(false);
+    } else if (widgetsSettingsOpen) {
+      /* Plus off path: no shared film to drive; paintBg() owns the black. */
+      playState();
     }
   }
   window.nwsbFpSyncPageBackdrop = syncOpenPageBackdrop;

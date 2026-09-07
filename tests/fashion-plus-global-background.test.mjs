@@ -70,7 +70,34 @@ test('WebView refreshes selected Fashion Plus video and image backgrounds for ev
   assert.match(css, /\.nwsb-menu-open #appBg/);
   assert.match(css, /nwsb-bg-fade-out/);
   assert.match(css, /body\.nwsb-custom-fashion-bg:not\(\.fashplus\) #appBg/);
-  assert.match(html, /nowssb-nm\.css\?v=792/);
-  assert.match(html, /part012\.js\?v=257/);
-  assert.match(html, /part076\.js\?v=114/);
+  assert.match(html, /nowssb-nm\.css\?v=802/);
+  assert.match(html, /part012\.js\?v=258/);
+  assert.match(html, /part076\.js\?v=121/);
+  assert.match(html, /part082\.js\?v=26/);
+  assert.match(html, /widgets\.css\?v=9/);
+  assert.match(fashion, /socialSettingsOpen/);
+  assert.match(fashion, /widgetsSettingsOpen/);
+  assert.match(fashion, /#sub-settings\.sub-screen\.open/);
+  assert.match(navigation, /nwsbFpSyncPageBackdrop/);
+  assert.match(css, /body:not\(\.nm-mode\):not\(\.fashplus\) #menuDrawer\.menu-drawer/);
+  assert.match(css, /background: #000 !important/);
+  assert.match(css, /Widgets Settings \(#sub-settings\) on Fashion home/);
+});
+
+test('Widgets Settings and Fashion menu use Plus film or solid black', () => {
+  const fashion = read('app/js/part076.js');
+  const settings = read('app/js/part082.js');
+  const navigation = read('app/js/part012.js');
+  const css = read('nowssb-nm.css');
+  const widgets = read('app/widgets.css');
+
+  assert.match(fashion, /var socialSettingsOpen = !!document\.querySelector\('#sub-social\.sub-screen\.open'\)/);
+  assert.match(fashion, /var widgetsSettingsOpen = !!document\.querySelector\('#sub-settings\.sub-screen\.open'\)/);
+  assert.doesNotMatch(fashion, /settingsOpen = !!document\.querySelector\('#sub-settings/);
+  assert.match(settings, /host\.style\.backgroundColor = '#000'/);
+  assert.match(settings, /window\.nwsbFpSyncPageBackdrop\(\)/);
+  assert.match(navigation, /function openMenu\(\)[\s\S]*nwsbFpSyncPageBackdrop/);
+  assert.match(css, /body:not\(\.nm-mode\):not\(\.fashplus\) #menuDrawer\.menu-drawer/);
+  assert.match(css, /body:not\(\.nm-mode\):not\(\.fashplus\) #sub-settings/);
+  assert.match(widgets, /Fashion Widgets Settings backdrop/);
 });
