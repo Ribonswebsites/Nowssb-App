@@ -11730,6 +11730,10 @@ body.fpoff-routines :is(#home, .stw-prev-stage) .rt-vid-banner { display: none !
   font-family: 'DM Sans', sans-serif; font-size: 9.5px; font-weight: 300;
   letter-spacing: 2.2px; text-transform: uppercase;
   color: rgba(255,255,255,0.42); margin-top: 5px;
+  /* No pill / stadium border — plain grey subtitle under NowssB. */
+  border: none !important; background: none !important;
+  padding: 0 !important; border-radius: 0 !important;
+  display: block; width: fit-content; max-width: 100%;
 }
 .lg-top-by .b { font-weight: 700; color: rgba(255,255,255,0.6); }
 .lg-top-by .t { font-weight: 300; }
@@ -11828,7 +11832,8 @@ body.fpoff-routines :is(#home, .stw-prev-stage) .rt-vid-banner { display: none !
 .lg-phone-vid {
   position: absolute; inset: 0; z-index: 0;
   width: 100%; height: 100%;
-  object-fit: contain;
+  object-fit: cover;            /* full-bleed — no letterbox inside the phone */
+  object-position: center;
   display: block;
   pointer-events: none;         /* the buttons above it stay tappable */
   background: #000;             /* the clip's own ground, before first paint */
@@ -11916,8 +11921,14 @@ body.fpoff-routines :is(#home, .stw-prev-stage) .rt-vid-banner { display: none !
   height: 52px !important; min-height: 0 !important;
   padding: 0 18px; margin: 0;
   font-size: 13.5px; font-weight: 600; gap: 12px; letter-spacing: 0;
+  min-width: 0; overflow: hidden;
 }
 #login .nm-auth-btn svg { width: 19px; height: 19px; flex-shrink: 0; }
+#login .nm-auth-btn-label {
+  flex: 1 1 auto; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  text-align: left;
+}
 #login .nm-auth-btn:active { background: #e9e9ef; transform: scale(0.985); }
 #login .nm-auth-btn + .nm-auth-btn { margin-top: 0; }
 
@@ -12037,7 +12048,7 @@ body.fpoff-routines :is(#home, .stw-prev-stage) .rt-vid-banner { display: none !
   display: block; width: 100%; margin-top: 16px; padding: 10px;
   background: transparent; border: none; cursor: pointer;
   font-family: 'DM Sans', sans-serif; font-size: 12.5px; font-weight: 500;
-  color: rgba(232,213,163,0.85); letter-spacing: 0.3px; text-align: center;
+  color: #d4af37; letter-spacing: 0.3px; text-align: center;
 }
 /* The auth note sits on black here too. */
 #login .nwsb-auth-note {
@@ -15196,8 +15207,8 @@ body.homecorner-round .hs-ban { border-radius: 22px !important; }
    No photograph, in either mode. It was a R2 jpg behind a 58–70%
    scrim; what is left is the scrim's own colour, which is what the rest of
    the dark app is wearing. */
-body:not(.nm-mode):not(.fashplus) #menuDrawer.menu-drawer {
-  background: #000 !important;
+body:not(.nm-mode) #menuDrawer.menu-drawer {
+  background: rgba(6,10,20,0.94) !important;
 }
 
 /* And with the switch on, the film — the same one the home is playing,
@@ -15280,7 +15291,7 @@ body.nwsb-custom-fashion-bg:not(.fashplus).nwsb-menu-open #appBg {
   z-index: 490 !important;
 }
 body.nwsb-custom-fashion-bg:not(.fashplus).nwsb-menu-open #menuDrawer.menu-drawer {
-  background: #000 !important;
+  background: linear-gradient(rgba(6,10,20,0.62), rgba(6,10,20,0.76)) !important;
 }
 body.nwsb-custom-fashion-bg:not(.fashplus):has(.sub-screen.open) .sub-screen.open,
 body.nwsb-custom-fashion-bg:not(.fashplus).nwsb-sub-open .sub-screen.open {
@@ -15785,7 +15796,7 @@ body.fashplus:not(.fp-bg-off) .sub-screen.open :is(
 }
 
 
-/* Social Settings (#sub-social) is deliberately not Fashion Plus cinema. Keep its
+/* Normal Settings is deliberately not part of Fashion Plus cinema. Keep its
    white neumorphic surface opaque and stop the shared film while it is open,
    even if the Fashion Plus master switch remains enabled for other pages. */
 body.nwsb-settings-open #fpBgVideo,
@@ -15811,23 +15822,6 @@ body.nwsb-settings-open #sub-social .sub-header * {
 }
 body.nwsb-settings-open #sub-social .sub-back svg {
   stroke: #1a1a2e !important;
-}
-
-/* Widgets Settings (#sub-settings) on Fashion home only.
-   Plus OFF: solid black. Plus ON: transparent shell so #fpBgVideo shows.
-   Never apply the white nwsb-settings-open treatment here. */
-body:not(.nm-mode):not(.fashplus) #sub-settings,
-body:not(.nm-mode):not(.fashplus) #sub-settings .st-bg {
-  background: #000 !important;
-  background-image: none !important;
-}
-body:not(.nm-mode):not(.fashplus) #sub-settings .st-page {
-  background: #000 !important;
-}
-body.fashplus:not(.nm-mode):not(.fp-bg-off) #sub-settings.open,
-body.fashplus:not(.nm-mode):not(.fp-bg-off) #sub-settings.open .st-bg {
-  background-color: transparent !important;
-  background-image: none !important;
 }
 
 
@@ -16068,19 +16062,16 @@ a:active,
 .customize-experience-arrow svg{width:22px;height:22px;}
 .customize-experience-banner.is-exiting{animation:customizeExperienceSlideOut 1200ms cubic-bezier(.7,0,.2,1) 5000ms both;}
 @keyframes customizeExperienceSlideOut{0%{transform:translateX(0);opacity:1}72%{transform:translateX(-110%);opacity:1}100%{transform:translateX(-110%);opacity:0;visibility:hidden}}
-/* My Progress FINAL Glass Orb: scene-1 orb in hero; player-bg-loop as scroll backdrop. */
-#sub-my-progress .mp-final-scene-one{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:.9;filter:brightness(.78) contrast(1.08);transition:opacity .35s ease;}
-#sub-my-progress .mp-scroll-bg{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:0;pointer-events:none;filter:brightness(.78) contrast(1.08);transition:opacity .35s ease;}
-#sub-my-progress.mp-scrolled .mp-scroll-bg{opacity:.92;}
-#sub-my-progress.mp-scrolled .mp-final-scene-one{opacity:0;}
+/* My Progress FINAL Glass Orb scenes: first video belongs only to the intro; second belongs to the dashboard. */
+#sub-my-progress .mp-final-scene-one{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:.9;filter:brightness(.78) contrast(1.08);}
 #sub-my-progress #mpIntroPage .sl-intro-bg{display:none;}
-#sub-my-progress .mp-orb-copy{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);width:230px;text-align:center;z-index:2;color:#f5f5f3;text-shadow:0 2px 18px #000,0 1px 3px #000;pointer-events:none;}
+#sub-my-progress .mp-orb-copy{position:absolute;left:50%;top:30%;transform:translate(-50%,-50%);width:230px;text-align:center;z-index:2;color:#f5f5f3;text-shadow:0 2px 18px #000,0 1px 3px #000;pointer-events:none;}
 #sub-my-progress .mp-orb-kicker{font-size:9px;letter-spacing:.28em;font-weight:700;}
 #sub-my-progress .mp-orb-total{font-size:66px;line-height:.94;font-weight:280;letter-spacing:-.065em;margin:9px 0 6px;}
 #sub-my-progress .mp-orb-time{font-size:18px;font-weight:330;}
 #sub-my-progress .mp-orb-label{font-size:8px;letter-spacing:.24em;color:#bfc1c0;margin-top:6px;}
-#sub-my-progress #mpBody>.sub-section-label:first-child,#sub-my-progress #mpBody>.mp-greeting{margin-top:-12px;position:relative;z-index:3;}
-#sub-my-progress #mpIntroPage>*:not(.mp-final-scene-one):not(.mp-scroll-bg){position:relative;z-index:1;}
+#sub-my-progress #mpBody>.sub-section-label:first-child,#sub-my-progress #mpBody>.mp-greeting{margin-top:-70px;position:relative;z-index:3;}
+#sub-my-progress #mpIntroPage>*:not(.mp-final-scene-one){position:relative;z-index:1;}
 #sub-my-progress .mp-final-scene-two{height:250px;margin:0 0 16px;border:1px solid rgba(255,255,255,.13);border-radius:24px;overflow:hidden;position:relative;background:#020304;}
 #sub-my-progress .mp-final-scene-two video{width:100%;height:100%;object-fit:cover;display:block;filter:brightness(.8) contrast(1.08);}
 #sub-my-progress .mp-final-scene-two:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 35%,rgba(0,0,0,.72));pointer-events:none;}
@@ -16088,9 +16079,5 @@ a:active,
 #sub-my-progress{--bg:#020304;--white:#f5f5f3;--muted:#9b9d9e;--gold:#d9c98f;--line:rgba(255,255,255,.13);}
 /* The host app's .sub-screen is a fixed, clipped shell. The supplied page must own its scroll area. */
 #sub-my-progress{position:fixed !important;inset:0 !important;width:100% !important;height:100dvh !important;max-height:none !important;overflow:hidden !important;background:#020304 !important;}
-#sub-my-progress .mp-final-shell{position:absolute !important;inset:0 !important;width:100% !important;height:100% !important;max-height:none !important;overflow-y:auto !important;overflow-x:hidden !important;-webkit-overflow-scrolling:touch !important;overscroll-behavior-y:contain !important;padding-bottom:100px !important;background:transparent !important;}
+#sub-my-progress .mp-final-shell{position:absolute !important;inset:0 !important;width:100% !important;height:100% !important;max-height:none !important;overflow-y:auto !important;overflow-x:hidden !important;-webkit-overflow-scrolling:touch !important;overscroll-behavior-y:contain !important;padding-bottom:100px !important;background:#020304 !important;}
 #sub-my-progress .mp-final-shell>header,#sub-my-progress .mp-final-shell>main{position:relative !important;z-index:5 !important;}
-#sub-my-progress .heroOrb{height:392px !important;position:relative;overflow:hidden;}
-#sub-my-progress .insights{top:auto !important;bottom:16px !important;}
-#sub-my-progress .orbCopy,#sub-my-progress .mp-orb-copy{top:38% !important;}
-

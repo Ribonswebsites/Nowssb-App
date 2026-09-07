@@ -7,6 +7,7 @@ import 'dart:math' as math;
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:video_player/video_player.dart';
 
@@ -241,38 +242,53 @@ class _AuthGateState extends State<AuthGate> {
   }
 
   Widget _buildAuthScreen({String? unavailable}) {
-    // Website `.lg-phone`: box is at least as wide as the viewport and tall
-    // enough to cover it, aspect 720/1264, centred — film fills the screen
-    // with no black letterbox bands (nowssb-nm.css login rules).
+    // Full-bleed film behind the glass: cover the whole viewport with no
+    // letterboxing. The phone-aperture percentages keep buttons on the
+    // screen of the login-phone clip the same way the website does.
     return Scaffold(
       backgroundColor: Colors.black,
       body: LayoutBuilder(
         builder: (context, constraints) {
-          final vw = constraints.maxWidth;
-          final vh = constraints.maxHeight;
-          final width = math.max(vw, vh * 720 / 1264);
+          final maxWidth = constraints.maxWidth;
+          final maxHeight = constraints.maxHeight;
+          // Cover the viewport with the clip's 720×1264 aspect (same trick
+          // as .lg-phone on the site): at least as wide and as tall as the
+          // screen, crop the overflow, never stretch.
+          final width = math.max(maxWidth, maxHeight * 720 / 1264);
           final height = width * 1264 / 720;
           return Stack(
             fit: StackFit.expand,
             children: [
-              const ColoredBox(color: Colors.black),
               Center(
                 child: SizedBox(
                   width: width,
                   height: height,
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      _phoneFilm(),
-                      // `.lg-glass { inset: 15.03% 18.333% 7.753% 18.889%; }`
-                      Positioned(
-                        top: height * 0.1503,
-                        left: width * 0.18889,
-                        right: width * 0.18333,
-                        bottom: height * 0.07753,
-                        child: _glassContent(unavailable: unavailable),
-                      ),
-                    ],
+                  child: _phoneFilm(),
+                ),
+              ),
+              Center(
+                child: SizedBox(
+                  width: width,
+                  height: height,
+                  child: LayoutBuilder(
+                    builder: (context, phoneConstraints) {
+                      final w = phoneConstraints.maxWidth;
+                      final h = phoneConstraints.maxHeight;
+                      return Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          Positioned.fromRect(
+                            rect: Rect.fromLTWH(
+                              w * .18889,
+                              h * .1503,
+                              w * .628,
+                              h * .7722,
+                            ),
+                            child: _glassContent(unavailable: unavailable),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ),
               ),
@@ -284,28 +300,25 @@ class _AuthGateState extends State<AuthGate> {
   }
 
   Widget _phoneFilm() {
-    final film = _videoReady
-        ? FittedBox(
-            fit: BoxFit.contain,
-            child: SizedBox(
-              width: _phoneVideo.value.size.width == 0
-                  ? 720
-                  : _phoneVideo.value.size.width,
-              height: _phoneVideo.value.size.height == 0
-                  ? 1264
-                  : _phoneVideo.value.size.height,
-              child: VideoPlayer(_phoneVideo),
-            ),
-          )
-        : Image.asset(
-            _posterAsset,
-            fit: BoxFit.contain,
-            width: double.infinity,
-            height: double.infinity,
-            errorBuilder: (_, __, ___) =>
-                const ColoredBox(color: Colors.black),
-          );
-    return ColoredBox(color: Colors.black, child: film);
+    if (_videoReady && _phoneVideo.value.isInitialized) {
+      final size = _phoneVideo.value.size;
+      return FittedBox(
+        fit: BoxFit.cover,
+        clipBehavior: Clip.hardEdge,
+        child: SizedBox(
+          width: size.width == 0 ? 720 : size.width,
+          height: size.height == 0 ? 1264 : size.height,
+          child: VideoPlayer(_phoneVideo),
+        ),
+      );
+    }
+    return Image.asset(
+      _posterAsset,
+      fit: BoxFit.cover,
+      width: double.infinity,
+      height: double.infinity,
+      errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black),
+    );
   }
 
   Widget _glassContent({String? unavailable}) {
@@ -384,14 +397,13 @@ class _AuthGateState extends State<AuthGate> {
                   const SizedBox(height: 18),
                   TextButton(
                     onPressed: _busy ? null : () => setState(() => _guest = true),
-                    style: TextButton.styleFrom(foregroundColor: const Color(0xFFE8D5A3)),
+                    style: TextButton.styleFrom(
+                      foregroundColor: const Color(0xFFD4AF37),
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                    ),
                     child: const Text(
                       'Explore without account →',
-                      style: TextStyle(
-                        color: Color(0xFFE8D5A3),
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500, letterSpacing: 0.3),
                     ),
                   ),
                 ],
@@ -404,6 +416,8 @@ class _AuthGateState extends State<AuthGate> {
   }
 
   Widget _brandHeader() {
+    // Match the site / target: logo + NowssB + plain grey BY NOWSSBANSIU
+    // subtitle. No bordered pill / stadium chrome around the byline.
     return Row(
       children: [
         ClipOval(
@@ -421,30 +435,34 @@ class _AuthGateState extends State<AuthGate> {
           margin: const EdgeInsets.symmetric(horizontal: 13),
           color: Colors.white24,
         ),
-        const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text.rich(
-              TextSpan(
-                children: [
-                  TextSpan(text: 'Nowss', style: TextStyle(fontWeight: FontWeight.w800)),
-                  TextSpan(text: 'B', style: TextStyle(fontWeight: FontWeight.w300, color: Colors.white70)),
-                ],
+        const Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(text: 'Nowss', style: TextStyle(fontWeight: FontWeight.w800)),
+                    TextSpan(text: 'B', style: TextStyle(fontWeight: FontWeight.w300, color: Colors.white70)),
+                  ],
+                ),
+                style: TextStyle(color: Colors.white, fontSize: 21, height: 1.05),
               ),
-              style: TextStyle(color: Colors.white, fontSize: 21, height: 1.05),
-            ),
-            SizedBox(height: 5),
-            Text.rich(
-              TextSpan(
-                children: [
-                  TextSpan(text: 'BY ', style: TextStyle(fontWeight: FontWeight.w300)),
-                  TextSpan(text: 'NOWSB', style: TextStyle(fontWeight: FontWeight.w700)),
-                  TextSpan(text: 'ANSIU', style: TextStyle(fontWeight: FontWeight.w300)),
-                ],
+              SizedBox(height: 5),
+              Text(
+                'BY NOWSSBANSIU',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: Color(0x6BFFFFFF),
+                  fontSize: 9.5,
+                  fontWeight: FontWeight.w300,
+                  letterSpacing: 2.2,
+                  height: 1.1,
+                ),
               ),
-              style: TextStyle(color: Colors.white54, fontSize: 8.5, letterSpacing: 1.7),
-            ),
-          ],
+            ],
+          ),
         ),
       ],
     );
@@ -454,11 +472,16 @@ class _AuthGateState extends State<AuthGate> {
     return _whiteButton(
       onPressed: _busy ? null : _googleLogin,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const _GoogleMark(),
           const SizedBox(width: 12),
-          const Text('Continue with Google'),
+          const Expanded(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text('Continue with Google'),
+            ),
+          ),
         ],
       ),
     );
@@ -631,60 +654,21 @@ class _AuthGateState extends State<AuthGate> {
   }
 }
 
-/// Official multicolor Google "G" mark (not a solid blue letter).
 class _GoogleMark extends StatelessWidget {
   const _GoogleMark();
+
+  static const _svg =
+      '<svg width="20" height="20" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">'
+      '<path d="M17.1 9.2c0-.6-.1-1.2-.2-1.8H9v3.3h4.6c-.2 1-.8 1.9-1.7 2.4v2h2.7c1.6-1.4 2.5-3.6 2.5-5.9z" fill="#4285F4"/>'
+      '<path d="M9 18c2.3 0 4.2-.8 5.6-2.1l-2.7-2c-.8.5-1.8.8-2.9.8-2.2 0-4.1-1.5-4.8-3.5H1.4v2.1C2.8 16.1 5.7 18 9 18z" fill="#34A853"/>'
+      '<path d="M4.2 11.2c-.2-.5-.3-1-.3-1.6s.1-1.1.3-1.6V5.9H1.4C.5 7.4 0 9.1 0 10.9s.5 3.5 1.4 5l2.8-4.7z" fill="#FBBC05"/>'
+      '<path d="M9 3.6c1.2 0 2.3.4 3.2 1.2L14.8 2C13.3.7 11.3 0 9 0 5.7 0 2.8 1.9 1.4 4.6l2.8 2.1C4.9 5.1 6.8 3.6 9 3.6z" fill="#EA4335"/>'
+      '</svg>';
+
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 22,
-      height: 22,
-      child: CustomPaint(painter: _GoogleGPainter()),
-    );
+    return SvgPicture.string(_svg, width: 20, height: 20);
   }
-}
-
-class _GoogleGPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final s = size.shortestSide;
-    final c = Offset(s / 2, s / 2);
-    final stroke = s * 0.18;
-    final r = (s - stroke) / 2;
-    final rect = Rect.fromCircle(center: c, radius: r);
-    const colors = [
-      Color(0xFF4285F4), // blue
-      Color(0xFF34A853), // green
-      Color(0xFFFBBC05), // yellow
-      Color(0xFFEA4335), // red
-    ];
-    // Four arc segments around the ring.
-    final sweeps = [1.7, 1.2, 1.2, 1.2];
-    var start = -0.2;
-    for (var i = 0; i < 4; i++) {
-      final paint = Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = stroke
-        ..strokeCap = StrokeCap.butt
-        ..color = colors[i];
-      canvas.drawArc(rect, start, sweeps[i], false, paint);
-      start += sweeps[i];
-    }
-    // Blue bar of the G (horizontal arm).
-    final bar = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = stroke
-      ..strokeCap = StrokeCap.butt
-      ..color = colors[0];
-    canvas.drawLine(
-      Offset(c.dx - stroke * 0.15, c.dy),
-      Offset(c.dx + r, c.dy),
-      bar,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class _AuthMessage implements Exception {
