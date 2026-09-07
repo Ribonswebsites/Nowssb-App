@@ -62,6 +62,7 @@ import 'shared_sections.dart';
 import 'sound_library.dart';
 import 'notifications_sheet.dart';
 import 'widgets_page.dart';
+import '../widgets/home_menu_drawer.dart';
 import 'practice_player.dart';
 import 'progress/progress_screen.dart';
 
@@ -162,17 +163,7 @@ class _HomeNormalState extends State<HomeNormal> {
   }
 
   void _openHomeMenu(BuildContext context) {
-    showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: Colors.transparent,
-      barrierColor: Colors.black26,
-      builder: (sheetContext) => _NormalHomeMenu(
-        onSelect: (tab) {
-          Navigator.of(sheetContext).pop();
-          _go(tab);
-        },
-      ),
-    );
+    showHomeMenuDrawer(context, goTab: _go);
   }
 
   void _openMainOption(String label, int tab) {
@@ -510,77 +501,6 @@ class _HamburgerButton extends StatelessWidget {
           boxShadow: glass ? null : NwsbShadows.raisedSm,
         ),
         child: const Icon(Icons.menu_rounded, size: 25, color: NwsbColors.ink),
-      ),
-    );
-  }
-}
-
-class _NormalHomeMenu extends StatelessWidget {
-  const _NormalHomeMenu({required this.onSelect});
-
-  final ValueChanged<int> onSelect;
-
-  @override
-  Widget build(BuildContext context) {
-    const items = <(String, IconData, int)>[
-      ('Home', Icons.home_outlined, 0),
-      ('Practice', Icons.record_voice_over_outlined, 1),
-      ('Library', Icons.menu_book_outlined, 2),
-      ('Store', Icons.storefront_outlined, 3),
-      ('Profile', Icons.person_outline, 4),
-    ];
-    return SafeArea(
-      child: Container(
-        margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-        padding: const EdgeInsets.fromLTRB(18, 18, 18, 10),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(28),
-          boxShadow: NwsbShadows.raised,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 38,
-              height: 4,
-              decoration: BoxDecoration(
-                color: NwsbColors.surfaceDim,
-                borderRadius: BorderRadius.circular(4),
-              ),
-            ),
-            const SizedBox(height: 12),
-            for (final (label, icon, tab) in items)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Material(
-                  color: NwsbColors.surface,
-                  borderRadius: BorderRadius.circular(16),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(16),
-                    onTap: () => onSelect(tab),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 14),
-                      child: Row(
-                        children: [
-                          Icon(icon, color: NwsbColors.ink, size: 22),
-                          const SizedBox(width: 14),
-                          Text(label,
-                              style: const TextStyle(
-                                  color: NwsbColors.ink,
-                                  fontWeight: FontWeight.w700)),
-                          const Spacer(),
-                          const Icon(Icons.chevron_right,
-                              color: NwsbColors.inkSoft),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-          ],
-        ),
       ),
     );
   }

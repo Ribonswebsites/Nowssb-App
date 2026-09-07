@@ -44,6 +44,7 @@ import 'notifications_sheet.dart';
 import 'practice_player.dart';
 import 'sound_library.dart';
 import 'widgets_page.dart';
+import '../widgets/home_menu_drawer.dart';
 import 'word_detail.dart';
 
 /// `REG.fash.items` — app/js/part062.js:107-148, key for key and in order.
@@ -307,7 +308,7 @@ class _HomeFashionState extends State<HomeFashion> {
                     onNotifications: () => showNotificationsSheet(context),
                     onNormalHome: () =>
                         Settings.instance.setFashionHome(false),
-                    onMenu: () => _push(const WidgetsPage()),
+                    onMenu: () => showHomeMenuDrawer(context, goTab: _go),
                   );
                 },
               ),
