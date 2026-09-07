@@ -165,7 +165,7 @@ class _HdrIcon extends StatelessWidget {
                   border: Border.all(color: NwsbColors.deep, width: 1.5),
                 ),
                 child: Text(
-                  '$badge',
+                  badge > 99 ? '99+' : '$badge',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 9.5,

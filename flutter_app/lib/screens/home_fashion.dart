@@ -28,6 +28,7 @@ library;
 import 'package:flutter/material.dart';
 
 import '../data/content.dart';
+import '../data/notifications.dart';
 import '../data/settings.dart';
 import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
@@ -39,6 +40,7 @@ import 'shared_sections.dart';
 import 'fashion/sections_mid.dart';
 import 'fashion/sections_top.dart';
 import 'fashion_plus.dart';
+import 'notifications_sheet.dart';
 import 'practice_player.dart';
 import 'sound_library.dart';
 import 'widgets_page.dart';
@@ -297,9 +299,17 @@ class _HomeFashionState extends State<HomeFashion> {
           // stopped short.
           Column(
             children: [
-              HomeHeader(
-                onNormalHome: () => Settings.instance.setFashionHome(false),
-                onMenu: () => _push(const WidgetsPage()),
+              ListenableBuilder(
+                listenable: NotifStore.instance,
+                builder: (context, _) {
+                  return HomeHeader(
+                    notifications: NotifStore.instance.unreadRaw,
+                    onNotifications: () => showNotificationsSheet(context),
+                    onNormalHome: () =>
+                        Settings.instance.setFashionHome(false),
+                    onMenu: () => _push(const WidgetsPage()),
+                  );
+                },
               ),
               Expanded(
                 // No horizontal padding on the list: the wrappers carry

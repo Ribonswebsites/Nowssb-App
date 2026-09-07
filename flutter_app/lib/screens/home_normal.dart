@@ -44,6 +44,7 @@ import 'package:flutter/material.dart';
 import '../data/content.dart';
 import '../data/models.dart';
 import '../data/practice_progress.dart';
+import '../data/notifications.dart';
 import '../data/settings.dart';
 import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
@@ -58,6 +59,7 @@ import 'normal/sections_bottom.dart';
 import 'normal/sections_top.dart';
 import 'shared_sections.dart';
 import 'sound_library.dart';
+import 'notifications_sheet.dart';
 import 'widgets_page.dart';
 import 'practice_player.dart';
 
@@ -428,7 +430,20 @@ class _TopRow extends StatelessWidget {
         const Spacer(),
         NormalGlassToggle(enabled: glassMode, onTap: onGlassToggle),
         const SizedBox(width: 8),
-        const _HeaderButton(icon: Icons.notifications_none, badge: 0),
+        ListenableBuilder(
+          listenable: NotifStore.instance,
+          builder: (context, _) {
+            final n = NotifStore.instance.unreadRaw;
+            return _HeaderButton(
+              icon: Icons.notifications_none,
+              badge: n > 0 ? (n > 99 ? 99 : n) : null,
+              badgeLabel: NotifStore.instance.badgeText.isEmpty
+                  ? null
+                  : NotifStore.instance.badgeText,
+              onTap: () => showNotificationsSheet(context),
+            );
+          },
+        ),
         const SizedBox(width: 8),
         _HeaderButton(
           icon: Icons.settings_outlined,
@@ -548,9 +563,15 @@ class _NormalHomeMenu extends StatelessWidget {
 }
 
 class _HeaderButton extends StatelessWidget {
-  const _HeaderButton({required this.icon, this.badge, this.onTap});
+  const _HeaderButton({
+    required this.icon,
+    this.badge,
+    this.badgeLabel,
+    this.onTap,
+  });
   final IconData icon;
   final int? badge;
+  final String? badgeLabel;
   final VoidCallback? onTap;
 
   @override
@@ -584,7 +605,7 @@ class _HeaderButton extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
-                  '$badge',
+                  badgeLabel ?? '$badge',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 10,
