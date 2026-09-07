@@ -245,7 +245,8 @@ class MainOptionsSection extends StatelessWidget {
     (NwsbMarks.word, 24, 'Word Science', 2),
     (NwsbMarks.bag, 24, 'The Store', 3),
     (NwsbMarks.people, 24, 'Connect', 0),
-    (NwsbMarks.trending, 22, 'My Progress', 4),
+    // Tab sentinel -1: Progress is a pushed screen, never Profile (tab 4).
+    (NwsbMarks.trending, 22, 'My Progress', -1),
   ];
 
   @override
@@ -352,7 +353,7 @@ class _Opt extends StatelessWidget {
       onTap: () {
         if (onAction != null) {
           onAction!(label, tab);
-        } else {
+        } else if (tab >= 0) {
           onGo?.call(tab);
         }
       },

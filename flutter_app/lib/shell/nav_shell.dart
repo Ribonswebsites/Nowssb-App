@@ -65,7 +65,20 @@ class _NavShellState extends State<NavShell> {
     if (mounted) setState(() {});
   }
 
+  /// Progress (and other sub-screens) are pushed on the shell navigator, so
+  /// they cover every tab. Without popping them, tapping Profile after opening
+  /// Progress still shows My Progress / orb / YOUR NUMBERS — the two feel like
+  /// the same screen. Always clear overlays when selecting a primary tab
+  /// (including re-tapping the current one).
+  void _popShellOverlays() {
+    final nav = Navigator.of(context);
+    if (nav.canPop()) {
+      nav.popUntil((route) => route.isFirst);
+    }
+  }
+
   void _goToTab(int tab) {
+    _popShellOverlays();
     if (tab == _i) return;
     Settings.instance.fadeBackgroundForNavigation();
     setState(() => _i = tab);
@@ -94,13 +107,20 @@ class _NavShellState extends State<NavShell> {
   int? _primaryTab(String id) => const {'connect': 0, 'practice': 1, 'library': 2, 'store': 3, 'profile': 4}[id];
   void _goToSlot(String id) {
     final tab = _primaryTab(id);
-    if (tab != null) { _goToTab(tab); return; }
+    if (tab != null) {
+      // Profile / Connect / Practice / Library / Store — never Progress.
+      _goToTab(tab);
+      return;
+    }
     if (id == 'progress') {
+      // Progress is NOT a tab root — push the dedicated screen only.
+      _popShellOverlays();
       Navigator.of(context).push(MaterialPageRoute(
         builder: (_) => PracticeProgressScreen(words: ContentStore.instance.library),
       ));
       return;
     }
+    _popShellOverlays();
     Navigator.of(context).push(MaterialPageRoute(builder: (_) => const QuickAccessScreen()));
   }
 
@@ -127,6 +147,7 @@ class _NavShellState extends State<NavShell> {
               const PracticeScreen(),
               const LibraryScreen(),
               const StoreScreen(),
+              // Tab 4 is always account Profile — never PracticeProgressScreen.
               const ProfileScreen(),
             ],
           ),

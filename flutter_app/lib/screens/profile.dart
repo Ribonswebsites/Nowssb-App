@@ -42,6 +42,11 @@ const kDefaultAvatar =
     'https://media.nowssb.com/migrated-images/1590b73b14f17aee_image-131_jyrnhx.jpg';
 
 
+/// Account / settings Profile — distinct from [PracticeProgressScreen].
+///
+/// Shows avatar, Quick Access, Shop, Preferences. The Progress teaser opens
+/// Progress as a pushed route; this widget must never return Progress as its
+/// own body (that made Profile and Progress feel identical).
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
@@ -92,9 +97,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       case 'Liked':
         Navigator.of(context).push(MaterialPageRoute(builder: (_) => const LibraryScreen()));
       case 'Journal':
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (_) => PracticeProgressScreen(words: ContentStore.instance.library),
-        ));
+        // Journal is account activity — not the My Progress orb screen.
+        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const QuickAccessScreen()));
       case 'Settings':
         Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PlayerSettingsScreen()));
       default:
