@@ -41,6 +41,7 @@ class Settings extends ChangeNotifier {
   static const _kNavCorner = 'nwsb_nav_rect_corner';
   static const _kNavSlots = 'nwsb_nav_slots';
   static const _kHero = 'nwsb_hero_style';
+  static const _kQuickActions = 'nwsb_quick_actions';
 
   /// One selected Fashion Plus film plays behind every primary page while
   /// motion mode is enabled.
@@ -99,6 +100,23 @@ class Settings extends ChangeNotifier {
   /// Website `heroStyle()` / `nwsb_hero_style`: `plain` | `full` | `tv`.
   String _heroStyle = 'plain';
 
+  /// Normal-home Quick actions carousel ids (Add tile is always appended in UI).
+  static const defaultQuickActions = <String>[
+    'notifications',
+    'store',
+    'player',
+    'glass',
+    'fashion',
+  ];
+  static const availableQuickActions = <String>[
+    'notifications',
+    'store',
+    'player',
+    'glass',
+    'fashion',
+  ];
+  List<String> _quickActions = List<String>.from(defaultQuickActions);
+
   /// Motion mode: do page backgrounds play, or hold their first frame?
   bool get fashionPlus => _fashionPlus;
 
@@ -129,6 +147,9 @@ class Settings extends ChangeNotifier {
 
   /// Fashion hero look — part082.js `heroStyle()`.
   String get heroStyle => _heroStyle;
+
+  /// Shortcut ids shown in the Normal home Quick actions cover-flow.
+  List<String> get quickActions => List.unmodifiable(_quickActions);
 
   Future<void> load() async {
     try {
@@ -162,6 +183,10 @@ class Settings extends ChangeNotifier {
       final hero = p.getString(_kHero);
       if (hero == 'full' || hero == 'tv' || hero == 'plain') {
         _heroStyle = hero!;
+      }
+      final qa = p.getStringList(_kQuickActions);
+      if (qa != null && qa.isNotEmpty) {
+        _quickActions = sanitizeQuickActions(qa);
       }
       _showSplash = !(p.getBool(_kLaunched) ?? false);
       await p.setBool(_kLaunched, true);
@@ -207,6 +232,29 @@ class Settings extends ChangeNotifier {
 
   static int _validImageIndex(int index) =>
       index >= 0 && index < fashionImages.length ? index : -1;
+
+
+  Future<void> setQuickActions(List<String> ids) async {
+    final next = sanitizeQuickActions(ids);
+    if (listEquals(_quickActions, next)) return;
+    _quickActions = next;
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.setStringList(_kQuickActions, _quickActions);
+    } catch (_) {}
+    notifyListeners();
+  }
+
+  static List<String> sanitizeQuickActions(List<String> ids) {
+    final seen = <String>{};
+    final out = <String>[];
+    for (final id in ids) {
+      if (!availableQuickActions.contains(id) || !seen.add(id)) continue;
+      out.add(id);
+      if (out.length >= 6) break;
+    }
+    return out.isEmpty ? List<String>.from(defaultQuickActions) : out;
+  }
 
   Future<void> setHeroStyle(String value) async {
     final next = (value == 'full' || value == 'tv') ? value : 'plain';
