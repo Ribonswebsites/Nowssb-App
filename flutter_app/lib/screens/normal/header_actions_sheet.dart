@@ -1,16 +1,20 @@
-/// Glass header-actions sheet — 3D cover-flow of Normal home controls.
+/// Glass header-actions sheet — cinematic 3D cover-flow of Normal home controls.
 ///
 /// Opens from the slim `_TopRow` SVG control. Visual language matches
 /// [NormalGlassSection] / notifications sheet: blur, translucent fill,
 /// soft white rim. Options that used to crowd the header live here as
 /// rounded SVG tiles; the centred tile is larger and is the one that
 /// activates on tap.
+///
+/// Always shows neighbour | centre | neighbour (list wraps at both ends
+/// so the sides are never empty).
 library;
 
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/physics.dart';
 import 'package:flutter/services.dart';
 
 import '../../data/notifications.dart';
@@ -28,6 +32,22 @@ const _kBlurMark =
 const _kPlusMark = '<path d="M12 5v14M5 12h14"/>';
 
 const _kAddId = 'add';
+
+/// Shortest signed distance on a circular list of [n] items.
+double _circularDelta(double index, double focus, int n) {
+  if (n <= 0) return 0;
+  var d = index - focus;
+  d = d - n * (d / n).roundToDouble();
+  // Keep in (-n/2, n/2]
+  if (d > n / 2) d -= n;
+  if (d <= -n / 2) d += n;
+  return d;
+}
+
+int _wrapIndex(int i, int n) {
+  if (n <= 0) return 0;
+  return ((i % n) + n) % n;
+}
 
 Future<void> showHeaderActionsSheet(
   BuildContext context, {
@@ -113,9 +133,10 @@ class _HeaderActionsSheetState extends State<HeaderActionsSheet>
   double? _dragStartFocus;
   double _snapFrom = 0;
   double _snapTo = 0;
+  bool _snapping = false;
 
   static const _tile = 56.0;
-  static const _gap = 68.0;
+  static const _gap = 72.0;
 
   late bool _glassOn;
   late List<String> _ids;
@@ -131,15 +152,15 @@ class _HeaderActionsSheetState extends State<HeaderActionsSheet>
     Settings.instance.addListener(_onSettings);
     _drift = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 10),
+      duration: const Duration(seconds: 14),
     )..repeat();
-    _snap = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 420),
-    )..addListener(() {
-        final t = Curves.easeOutCubic.transform(_snap.value);
-        setState(() => _focus = _snapFrom + (_snapTo - _snapFrom) * t);
-      });
+    _snap = AnimationController.unbounded(vsync: this)
+      ..addListener(_onSnapTick);
+  }
+
+  void _onSnapTick() {
+    if (!_snapping) return;
+    setState(() => _focus = _snap.value);
   }
 
   @override
@@ -155,7 +176,11 @@ class _HeaderActionsSheetState extends State<HeaderActionsSheet>
     final next = _buildIds(Settings.instance.quickActions);
     setState(() {
       _ids = next;
-      _focus = _focus.clamp(0.0, math.max(0, _itemCount - 1).toDouble());
+      if (_itemCount == 0) {
+        _focus = 0;
+      } else {
+        _focus = _normalizeFocus(_focus);
+      }
     });
   }
 
@@ -167,51 +192,86 @@ class _HeaderActionsSheetState extends State<HeaderActionsSheet>
   static double _defaultFocus(List<String> ids) {
     final i = ids.indexOf('notifications');
     if (i >= 0) return i.toDouble();
-    if (ids.length > 1) return 0;
     return 0;
   }
 
-  void _animateTo(double target) {
-    final max = math.max(0, _itemCount - 1).toDouble();
-    final wrapped = target.clamp(0.0, max);
+  double _normalizeFocus(double f) {
+    final n = _itemCount;
+    if (n <= 0) return 0;
+    var x = f % n;
+    if (x < 0) x += n;
+    return x;
+  }
+
+  /// Animate along the shortest circular path to [target] (integer index).
+  void _animateTo(double target, {double velocity = 0}) {
+    final n = _itemCount;
+    if (n <= 0) return;
+    final from = _focus;
+    var delta = _circularDelta(target, from, n);
+    // Prefer landing on the unwrapped target near `from`.
+    final to = from + delta;
+    _snapping = true;
+    _snapFrom = from;
+    _snapTo = to;
     _snap.stop();
-    _snapFrom = _focus;
-    _snapTo = wrapped;
-    _snap
-      ..value = 0
-      ..forward();
+    _snap.value = from;
+
+    // Springy cinematic snap — slight overshoot, settles cleanly.
+    final spring = SpringDescription(
+      mass: 1,
+      stiffness: 180,
+      damping: 18,
+    );
+    final sim = SpringSimulation(spring, from, to, velocity / _gap);
+    _snap.animateWith(sim).whenCompleteOrCancel(() {
+      if (!mounted) return;
+      _snapping = false;
+      setState(() => _focus = _normalizeFocus(_snapTo.roundToDouble()));
+    });
   }
 
   void _onDragStart(DragStartDetails _) {
     _snap.stop();
+    _snapping = false;
     _dragStartFocus = _focus;
   }
 
   void _onDragUpdate(DragUpdateDetails d) {
     final start = _dragStartFocus ?? _focus;
-    final max = math.max(0, _itemCount - 1).toDouble();
     setState(() {
-      _focus = (start - d.primaryDelta! / _gap).clamp(0.0, max);
+      // Unbounded while dragging — wrap is applied when rendering.
+      _focus = start - d.primaryDelta! / _gap;
       _dragStartFocus = _focus;
     });
   }
 
   void _onDragEnd(DragEndDetails d) {
     _dragStartFocus = null;
+    final n = _itemCount;
+    if (n <= 0) return;
     final velocity = d.primaryVelocity ?? 0;
-    var target = _focus.roundToDouble();
-    if (velocity.abs() > 280) {
+    // Project a bit with fling, then snap to nearest wrapped index.
+    var projected = _focus - (velocity / _gap) * 0.18;
+    var target = projected.roundToDouble();
+    if (velocity.abs() > 240) {
       target = velocity < 0
-          ? (_focus + 0.55).ceilToDouble()
-          : (_focus - 0.55).floorToDouble();
+          ? (_focus + 0.45).ceilToDouble()
+          : (_focus - 0.45).floorToDouble();
     }
-    final max = math.max(0, _itemCount - 1).toDouble();
-    _animateTo(target.clamp(0.0, max));
+    // Convert unbounded target into nearest absolute index path.
+    final nearest = _normalizeFocus(target);
+    _animateTo(nearest, velocity: -velocity);
+  }
+
+  int get _centerIndex {
+    final n = _itemCount;
+    if (n <= 0) return 0;
+    return _wrapIndex(_focus.round(), n);
   }
 
   void _activateCenter() {
-    final i = _focus.round().clamp(0, _itemCount - 1);
-    final id = _ids[i];
+    final id = _ids[_centerIndex];
     HapticFeedback.mediumImpact();
     switch (id) {
       case 'glass':
@@ -263,7 +323,10 @@ class _HeaderActionsSheetState extends State<HeaderActionsSheet>
   }
 
   void _onTileTap(int index) {
-    final centered = _focus.round() == index && (_focus - index).abs() < 0.18;
+    final n = _itemCount;
+    if (n <= 0) return;
+    final delta = _circularDelta(index.toDouble(), _focus, n);
+    final centered = delta.abs() < 0.22;
     if (centered) {
       _activateCenter();
     } else {
@@ -293,6 +356,7 @@ class _HeaderActionsSheetState extends State<HeaderActionsSheet>
 
   @override
   Widget build(BuildContext context) {
+    final centerId = _ids.isEmpty ? _kAddId : _ids[_centerIndex];
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
@@ -349,7 +413,7 @@ class _HeaderActionsSheetState extends State<HeaderActionsSheet>
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            'Scroll to centre · tap to open',
+                            'Swipe · centre to open',
                             style: Theme.of(context)
                                 .textTheme
                                 .labelSmall
@@ -361,7 +425,7 @@ class _HeaderActionsSheetState extends State<HeaderActionsSheet>
                           ),
                           const SizedBox(height: 10),
                           SizedBox(
-                            height: 104,
+                            height: 112,
                             child: AnimatedBuilder(
                               animation: Listenable.merge([_drift, _snap]),
                               builder: (context, _) => _CoverFlow(
@@ -382,9 +446,7 @@ class _HeaderActionsSheetState extends State<HeaderActionsSheet>
                           _CenterLabel(
                             focus: _focus,
                             itemCount: _itemCount,
-                            label: _labelFor(
-                              _ids[_focus.round().clamp(0, _itemCount - 1)],
-                            ),
+                            label: _labelFor(centerId),
                             glassOn: _glassOn,
                           ),
                         ],
@@ -455,7 +517,9 @@ class _CenterLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final i = focus.round().clamp(0, math.max(0, itemCount - 1));
+    final i = itemCount <= 0
+        ? 0
+        : _wrapIndex(focus.round(), itemCount);
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 220),
       child: Text(
@@ -499,7 +563,9 @@ class _CoverFlow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sway = math.sin(drift * math.pi * 2) * 0.045;
+    // Subtle idle sway — yaw + parallax, never enough to hide a side.
+    final sway = math.sin(drift * math.pi * 2) * 0.028;
+    final lift = math.cos(drift * math.pi * 2) * 1.2;
 
     return GestureDetector(
       onHorizontalDragStart: onDragStart,
@@ -516,30 +582,59 @@ class _CoverFlow extends StatelessWidget {
               : NotifStore.instance.badgeText;
 
           final items = <_ActionSpec>[
-            for (final id in ids) _specFor(id, badge: badge, badgeLabel: badgeLabel),
+            for (final id in ids)
+              _specFor(id, badge: badge, badgeLabel: badgeLabel),
           ];
+          final n = items.length;
+          if (n == 0) return const SizedBox.shrink();
 
           return LayoutBuilder(
             builder: (context, constraints) {
               final cx = constraints.maxWidth / 2;
               final cy = constraints.maxHeight / 2;
-              final order = List<int>.generate(items.length, (i) => i)
-                ..sort((a, b) {
-                  final da = (a - focus).abs();
-                  final db = (b - focus).abs();
-                  return db.compareTo(da);
-                });
+
+              // Always paint at least ±1 neighbours (wrap). Also paint
+              // ±2 for depth when the list is long enough.
+              final reach = n >= 5 ? 2 : 1;
+              final center = focus.round();
+              final slots = <int>[
+                for (var s = -reach; s <= reach; s++) s,
+              ];
+              // Paint far → near so centre is on top.
+              slots.sort((a, b) => b.abs().compareTo(a.abs()));
 
               return Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  for (final i in order)
-                    _buildTile(
-                      items[i],
-                      i,
-                      cx,
-                      cy,
-                      sway,
+                  // Soft stage shadow under the carousel.
+                  Positioned(
+                    left: cx - 70,
+                    top: cy + tile * 0.42,
+                    child: IgnorePointer(
+                      child: Container(
+                        width: 140,
+                        height: 18,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(40),
+                          gradient: RadialGradient(
+                            colors: [
+                              const Color(0x330B2447),
+                              const Color(0x000B2447),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  for (final slot in slots)
+                    _buildSlot(
+                      items: items,
+                      slot: slot,
+                      centerRound: center,
+                      cx: cx,
+                      cy: cy,
+                      sway: sway,
+                      lift: lift,
                     ),
                 ],
               );
@@ -590,30 +685,51 @@ class _CoverFlow extends StatelessWidget {
     }
   }
 
-  Widget _buildTile(
-    _ActionSpec spec,
-    int index,
-    double cx,
-    double cy,
-    double sway,
-  ) {
-    final offset = (index - focus) + sway;
-    final abs = offset.abs().clamp(0.0, 2.0);
-    final scale = ui.lerpDouble(1.28, 0.76, (abs / 1.15).clamp(0.0, 1.0))!;
-    final opacity = ui.lerpDouble(1.0, 0.42, (abs / 1.35).clamp(0.0, 1.0))!;
-    final dx = offset * gap;
-    final dy = abs * abs * 5;
-    final yaw = offset * 0.68;
+  Widget _buildSlot({
+    required List<_ActionSpec> items,
+    required int slot,
+    required int centerRound,
+    required double cx,
+    required double cy,
+    required double sway,
+    required double lift,
+  }) {
+    final n = items.length;
+    final index = _wrapIndex(centerRound + slot, n);
+    // Slot-based offset keeps LEFT | CENTRE | RIGHT always populated,
+    // even when the list wraps or has only 1–2 items (sides may repeat).
+    final frac = focus - centerRound;
+    final visualOffset = slot - frac + sway;
+    final abs = visualOffset.abs().clamp(0.0, 2.2);
+
+    // Cinematic falloffs.
+    final t = (abs / 1.05).clamp(0.0, 1.0);
+    final scale = ui.lerpDouble(1.34, 0.78, Curves.easeOutCubic.transform(t))!;
+    final opacity = ui.lerpDouble(
+      1.0,
+      0.58,
+      Curves.easeOut.transform((abs / 1.35).clamp(0.0, 1.0)),
+    )!;
+    final dx = visualOffset * gap;
+    final dy = abs * abs * 6.5 + (abs < 0.35 ? -lift : lift * 0.35);
+    final yaw = visualOffset * 0.92;
+    final pitch = abs * 0.06;
+    final z = -abs * 36.0;
 
     final matrix = Matrix4.identity()
-      ..setEntry(3, 2, 0.00185)
-      ..translate(dx, dy, -abs * 24)
+      ..setEntry(3, 2, 0.00235)
+      ..translate(dx, dy, z)
       ..rotateY(yaw)
+      ..rotateX(pitch)
       ..scale(scale, scale, 1.0);
 
+    final light = (1.0 - (visualOffset.clamp(-1.2, 1.2).abs() * 0.22))
+        .clamp(0.72, 1.0);
+
     return Positioned(
+      key: ValueKey('slot-$slot-$index'),
       left: cx - tile / 2,
-      top: cy - tile / 2 - 6,
+      top: cy - tile / 2 - 8,
       child: Opacity(
         opacity: opacity,
         child: Transform(
@@ -622,9 +738,11 @@ class _CoverFlow extends StatelessWidget {
           child: GestureDetector(
             onTap: () => onTileTap(index),
             child: _ActionTile(
-              spec: spec,
-              emphasized: abs < 0.35,
+              spec: items[index],
+              emphasized: abs < 0.38,
               size: tile,
+              light: light,
+              yaw: yaw,
             ),
           ),
         ),
@@ -654,52 +772,121 @@ class _ActionTile extends StatelessWidget {
     required this.spec,
     required this.emphasized,
     required this.size,
+    required this.light,
+    required this.yaw,
   });
 
   final _ActionSpec spec;
   final bool emphasized;
   final double size;
+  final double light;
+  final double yaw;
 
   @override
   Widget build(BuildContext context) {
+    final shadowDx = (yaw * 10).clamp(-8.0, 8.0);
     return Stack(
       clipBehavior: Clip.none,
       children: [
+        // Contact shadow — shifts with yaw for depth.
+        Positioned(
+          left: 4 + shadowDx,
+          right: 4 - shadowDx,
+          bottom: -6,
+          child: IgnorePointer(
+            child: Container(
+              height: emphasized ? 14 : 10,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Color(emphasized ? 0x3A0B2447 : 0x220B2447),
+                    blurRadius: emphasized ? 16 : 10,
+                    spreadRadius: -2,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
         AnimatedContainer(
-          duration: const Duration(milliseconds: 220),
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOutCubic,
           width: size,
           height: size,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
-            color: spec.active
-                ? const Color(0xD9FFFFFF)
-                : const Color(0xAFFFFFFF),
+            gradient: LinearGradient(
+              begin: Alignment(-0.8 - yaw * 0.4, -1),
+              end: Alignment(0.9 - yaw * 0.3, 1.1),
+              colors: [
+                Color.lerp(
+                  spec.active
+                      ? const Color(0xFFFFFFFF)
+                      : const Color(0xF2FFFFFF),
+                  const Color(0xFFD7E4F4),
+                  1.0 - light,
+                )!,
+                Color.lerp(
+                  spec.active
+                      ? const Color(0xD9FFFFFF)
+                      : const Color(0xA8FFFFFF),
+                  const Color(0xFFB8C9DE),
+                  (1.0 - light) * 0.85,
+                )!,
+              ],
+            ),
             border: Border.all(
               color: emphasized
                   ? const Color(0xFFFFFFFF)
-                  : const Color(0xDFFFFFFF),
-              width: emphasized ? 1.7 : 1.1,
+                  : const Color(0xD8FFFFFF),
+              width: emphasized ? 1.85 : 1.1,
             ),
             boxShadow: [
               BoxShadow(
-                color: Color(emphasized ? 0x2A0B2447 : 0x1A0B2447),
-                blurRadius: emphasized ? 18 : 12,
-                offset: const Offset(0, 8),
+                color: Color(emphasized ? 0x2E0B2447 : 0x1A0B2447),
+                blurRadius: emphasized ? 20 : 12,
+                offset: Offset(shadowDx * 0.35, emphasized ? 10 : 7),
               ),
-              const BoxShadow(
-                color: Color(0xBBFFFFFF),
-                blurRadius: 8,
-                offset: Offset(-2, -2),
+              BoxShadow(
+                color: Color(emphasized ? 0xCCFFFFFF : 0x88FFFFFF),
+                blurRadius: emphasized ? 10 : 6,
+                offset: Offset(-2 - shadowDx * 0.15, -2),
               ),
             ],
           ),
-          child: Center(
-            child: NwsbIcon(
-              spec.body,
-              size: emphasized ? 24 : 20,
-              color: const Color(0xFF31577F),
-              strokeWidth: 1.75,
-            ),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              // Specular rim.
+              IgnorePointer(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(17),
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.center,
+                      colors: [
+                        Color(emphasized ? 0x66FFFFFF : 0x33FFFFFF),
+                        const Color(0x00FFFFFF),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Center(
+                child: NwsbIcon(
+                  spec.body,
+                  size: emphasized ? 25 : 20,
+                  color: Color.lerp(
+                    const Color(0xFF31577F),
+                    const Color(0xFF1E3A55),
+                    1.0 - light,
+                  )!,
+                  strokeWidth: emphasized ? 1.85 : 1.7,
+                ),
+              ),
+            ],
           ),
         ),
         if (spec.badge != null && spec.badge! > 0)
@@ -711,6 +898,13 @@ class _ActionTile extends StatelessWidget {
               decoration: BoxDecoration(
                 color: const Color(0xFFE0342B),
                 borderRadius: BorderRadius.circular(10),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x44000000),
+                    blurRadius: 4,
+                    offset: Offset(0, 1),
+                  ),
+                ],
               ),
               child: Text(
                 spec.badgeLabel ?? '${spec.badge}',
