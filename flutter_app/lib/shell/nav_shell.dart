@@ -1,6 +1,8 @@
 /// The bottom nav — #ig-bottomnav. Five destinations, the active one gold.
 library;
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import '../theme/tokens.dart';
 import '../data/settings.dart';
@@ -10,11 +12,14 @@ import '../screens/home_normal.dart';
 import '../screens/library.dart';
 import '../screens/practice.dart';
 import '../screens/practice_player.dart';
+import '../screens/hearing_safety_player.dart';
 import '../screens/profile.dart';
 import '../screens/progress/progress_screen.dart';
 import '../screens/store.dart';
 import '../screens/quick_access.dart';
 import '../widgets/pool_hud.dart';
+import '../widgets/mini_player_pill.dart';
+import '../data/playback_session.dart';
 
 class NavShell extends StatefulWidget {
   const NavShell({super.key});
@@ -53,16 +58,26 @@ class _NavShellState extends State<NavShell> {
   void initState() {
     super.initState();
     Settings.instance.addListener(_onSettings);
+    PlaybackSession.instance.addListener(_onSettings);
+    unawaited(PlaybackSession.instance.ensureLoaded());
   }
 
   @override
   void dispose() {
     Settings.instance.removeListener(_onSettings);
+    PlaybackSession.instance.removeListener(_onSettings);
     super.dispose();
   }
 
   void _onSettings() {
     if (mounted) setState(() {});
+  }
+
+  void _openHearingSafety() {
+    if (!PlaybackSession.instance.active) return;
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const HearingSafetyPlayerScreen()),
+    );
   }
 
   /// Progress (and other sub-screens) are pushed on the shell navigator, so
@@ -157,7 +172,7 @@ class _NavShellState extends State<NavShell> {
           if (_i == 0)
             Positioned(
               left: 14,
-              bottom: 92,
+              bottom: PlaybackSession.instance.showPill ? 158 : 92,
               child: SafeArea(
                 top: false,
                 child: GestureDetector(
@@ -197,6 +212,19 @@ class _NavShellState extends State<NavShell> {
                     ),
                   ),
                 ),
+              ),
+            ),
+
+
+          // Mini player pill — above bottom nav on every tab (incl. both homes).
+          if (PlaybackSession.instance.showPill)
+            Positioned(
+              left: 12,
+              right: 12,
+              bottom: 88,
+              child: SafeArea(
+                top: false,
+                child: MiniPlayerPill(onOpen: _openHearingSafety),
               ),
             ),
 
@@ -272,10 +300,10 @@ class _NavShellState extends State<NavShell> {
                         ]),
                       );
                     }),
+                  ),
                 ),
               ),
             ),
-          ),
           ),
         ],
       ),

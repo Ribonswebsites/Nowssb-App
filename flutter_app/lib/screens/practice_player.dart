@@ -28,6 +28,7 @@ import 'store.dart';
 import 'player_settings.dart';
 import 'select_level.dart';
 import 'player_dial.dart';
+import '../data/playback_session.dart';
 
 String _fmtClock(num sec) {
   final s = sec.round().clamp(0, 24 * 3600);
@@ -85,6 +86,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> with Ticker
   var _repTarget = 7;
   var _shuffle = false;
   var _volume = 1.0;
+  var _handingOff = false;
   var _bottomPage = 0;
   DateTime? _startedAt;
   String? _error;
@@ -133,7 +135,10 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> with Ticker
     _bottomPageController.dispose();
     _marqueeController.dispose();
     PracticeProgress.instance.removeListener(_onProgress);
-    unawaited(_tts.stop());
+    // When minimizing to the floating pill, PlaybackSession owns audio.
+    if (!_handingOff) {
+      unawaited(_tts.stop());
+    }
     super.dispose();
   }
 
@@ -199,6 +204,25 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> with Ticker
     } finally {
       if (mounted) setState(() => _playing = false);
     }
+  }
+
+
+  Future<void> _minimizeToPill() async {
+    final theme = _theme;
+    final wasPlaying = _playing;
+    _handingOff = true;
+    try {
+      await _tts.stop();
+    } catch (_) {}
+    await PlaybackSession.instance.adoptFromPlayer(
+      words: widget.words,
+      title: widget.title,
+      index: _index,
+      wasPlaying: wasPlaying,
+      artwork: theme.image,
+    );
+    if (!mounted) return;
+    Navigator.of(context).pop();
   }
 
   Future<void> _togglePlay() async {
@@ -466,7 +490,13 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> with Ticker
 
     final theme = _theme;
     final pageBackgroundVideo = 'assets/video/player-bg-loop.mp4';
-    return Scaffold(
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) {
+        if (didPop) return;
+        unawaited(_minimizeToPill());
+      },
+      child: Scaffold(
       backgroundColor: const Color(0xFF000000),
       body: Stack(children: [
         Positioned.fill(
@@ -493,7 +523,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> with Ticker
             child: ConstrainedBox(
               constraints: BoxConstraints(minHeight: math.max(0, constraints.maxHeight - 28)),
               child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                _PlayerHeader(onBack: () => Navigator.of(context).pop(), onSettings: _openSettings, onMore: _openAuraClock),
+                _PlayerHeader(onBack: _minimizeToPill, onSettings: _openSettings, onMore: _openAuraClock),
                 const SizedBox(height: 12),
                 Center(
                   child: SizedBox(
@@ -642,6 +672,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> with Ticker
           }),
         ),
       ]),
+    ),
     );
   }
 }

@@ -105,6 +105,7 @@ does not throw, it just shows nothing, which is how a typo ships.
 | **Store** | Words, Meanings and eBooks as three tabs over the three documents. |
 | **Profile** | Says plainly whether content is live or bundled, how many words are loaded, and how many decoders are in use. |
 | **Word** | The screen the content model was built for — Devanagari, roman, the pronunciation boxes with hold times, and every fact the record carries. |
+| **Mini pill + Hearing Safety** | Back from the practice player keeps the session alive and shows a floating pill above the bottom nav on both homes. Tap opens Quiet→Loud→Danger hearing-safety UI (NIOSH-ish dB / safe time). |
 
 Every section on both homes is wired to a destination, and a test asserts
 that no black bar exists without one.

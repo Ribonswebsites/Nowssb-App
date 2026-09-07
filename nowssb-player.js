@@ -1910,3 +1910,340 @@
   window.lgpOpenIntegratedPage=function(file,title){window.lgpCloseIntegratedPage();var src=file||'';var hash='';var hi=src.indexOf('#');if(hi>=0){hash=src.slice(hi);src=src.slice(0,hi);}if(src.indexOf('?')>=0)src+='&from=player-sheet';else src+='?from=player-sheet';src+=hash;var x=document.createElement('div');x.id='lgpIntegratedPageSheet';x.className='lgp-integrated-sheet';x.innerHTML='<div class="lgp-integrated-backdrop"></div><div class="lgp-integrated-panel" role="dialog" aria-label="'+title+'"><div class="lgp-integrated-grab"></div><button class="lgp-integrated-close" aria-label="Back to Player">‹</button><iframe title="'+title+'" src="'+src+'" loading="eager"></iframe></div>';document.body.appendChild(x);requestAnimationFrame(function(){x.classList.add('is-open');});x.querySelector('.lgp-integrated-close').onclick=window.lgpCloseIntegratedPage;x.querySelector('.lgp-integrated-backdrop').onclick=window.lgpCloseIntegratedPage;};
   window.addEventListener('message',function(e){if(e.data&&e.data.type==='close-player-sheet')window.lgpCloseIntegratedPage();});
 })();
+
+/* ── Mini player pill + hearing-safety expanded UI (parity with Flutter) ── */
+(function () {
+  if (window._nwsbHearingPillBooted) return;
+  window._nwsbHearingPillBooted = true;
+
+  var MIN_DB = 40, MAX_DB = 120, DANGER_DB = 85;
+  var state = {
+    active: false,
+    db: 55,
+    dose: 0,
+    doseDay: '',
+    doseTimer: null
+  };
+
+  function today() {
+    var n = new Date();
+    return n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0') + '-' + String(n.getDate()).padStart(2, '0');
+  }
+
+  function loadDose() {
+    try {
+      state.doseDay = today();
+      state.dose = parseFloat(localStorage.getItem('nwsb_hearing_dose_' + state.doseDay) || '0') || 0;
+    } catch (e) { state.dose = 0; }
+  }
+
+  function saveDose() {
+    try { localStorage.setItem('nwsb_hearing_dose_' + state.doseDay, String(state.dose)); } catch (e) {}
+  }
+
+  function safeSeconds(db) {
+    if (db < DANGER_DB) return Infinity;
+    return 8 * 3600 / Math.pow(2, (db - DANGER_DB) / 3);
+  }
+
+  function tier(db) {
+    if (db >= 100) return 'danger';
+    if (db >= 70) return 'loud';
+    return 'quiet';
+  }
+
+  function tierMeta(t) {
+    if (t === 'danger') return { label: 'DANGER', scene: 'JET TURBINE', accent: '#FF3B4E', icon: '🌪️' };
+    if (t === 'loud') return { label: 'LOUD', scene: 'CONCERT SPEAKER STACK', accent: '#FF8A3D', icon: '🔊' };
+    return { label: 'QUIET', scene: 'QUIET OFFICE', accent: '#3DDC97', icon: '🎧' };
+  }
+
+  function fmtSafe(db) {
+    var s = safeSeconds(db);
+    if (!isFinite(s)) return 'No limit';
+    if (s >= 3600) { var h = s / 3600; return (h >= 10 ? Math.round(h) : h.toFixed(1)) + ' hr'; }
+    if (s >= 60) return Math.round(s / 60) + ' min';
+    return Math.round(s) + ' sec';
+  }
+
+  function currentWord() {
+    try {
+      var words = (typeof PRACTICE_WORDS !== 'undefined') ? PRACTICE_WORDS : [];
+      var idx = (typeof _pwIdx !== 'undefined') ? _pwIdx : 0;
+      return words[idx] || null;
+    } catch (e) { return null; }
+  }
+
+  function artFor(w) {
+    if (!w) return '';
+    if (w.img) return w.img;
+    try {
+      var themes = (typeof LGP_THEMES !== 'undefined') ? LGP_THEMES : [];
+      var idx = (typeof _pwIdx !== 'undefined') ? _pwIdx : 0;
+      return (themes[idx % themes.length] || {}).img || '';
+    } catch (e) { return ''; }
+  }
+
+  function ensurePill() {
+    var el = document.getElementById('nwsbMiniPill');
+    if (el) return el;
+    el = document.createElement('div');
+    el.id = 'nwsbMiniPill';
+    el.className = 'nwsb-mini-pill hidden';
+    el.innerHTML =
+      '<button type="button" class="nwsb-mini-pill__main" aria-label="Open hearing safety player">' +
+        '<img class="nwsb-mini-pill__art" alt="" />' +
+        '<span class="nwsb-mini-pill__meta">' +
+          '<span class="nwsb-mini-pill__title">NowssB</span>' +
+          '<span class="nwsb-mini-pill__sub">Playing · NowssB</span>' +
+        '</span>' +
+      '</button>' +
+      '<button type="button" class="nwsb-mini-pill__btn" data-act="toggle" aria-label="Play pause">▶</button>' +
+      '<button type="button" class="nwsb-mini-pill__btn" data-act="close" aria-label="Dismiss">✕</button>';
+    document.body.appendChild(el);
+    el.querySelector('.nwsb-mini-pill__main').onclick = function () { openHearing(); };
+    el.querySelector('[data-act="toggle"]').onclick = function (e) {
+      e.stopPropagation();
+      if (typeof pwPlay === 'function') {
+        if (typeof _pwPlaying !== 'undefined' && _pwPlaying) {
+          try { if ('speechSynthesis' in window) speechSynthesis.cancel(); } catch (err) {}
+          try { _pwPlaying = false; } catch (err) {}
+        } else {
+          try { if (typeof _pwPhase !== 'undefined') _pwPhase = 'idle'; } catch (err) {}
+          pwPlay();
+        }
+      }
+      paintPill();
+    };
+    el.querySelector('[data-act="close"]').onclick = function (e) {
+      e.stopPropagation();
+      dismissPill();
+    };
+    return el;
+  }
+
+  function paintPill() {
+    var el = ensurePill();
+    if (!state.active) {
+      el.classList.add('hidden');
+      document.body.classList.remove('nwsb-mini-pill-on');
+      return;
+    }
+    var w = currentWord();
+    var art = artFor(w);
+    var title = (w && (w.word || w.title)) || 'NowssB';
+    var playing = !!(typeof _pwPlaying !== 'undefined' && _pwPlaying);
+    el.classList.remove('hidden');
+    document.body.classList.add('nwsb-mini-pill-on');
+    var img = el.querySelector('.nwsb-mini-pill__art');
+    if (art) img.src = art;
+    el.querySelector('.nwsb-mini-pill__title').textContent = title;
+    el.querySelector('.nwsb-mini-pill__sub').textContent = playing ? 'Playing · NowssB' : 'Paused · NowssB';
+    el.querySelector('[data-act="toggle"]').textContent = playing ? '❚❚' : '▶';
+  }
+
+  function showPill() {
+    state.active = true;
+    loadDose();
+    paintPill();
+    startDoseClock();
+  }
+
+  function dismissPill() {
+    state.active = false;
+    stopDoseClock();
+    try { if ('speechSynthesis' in window) speechSynthesis.cancel(); } catch (e) {}
+    try { _pwPlaying = false; } catch (e) {}
+    paintPill();
+    closeHearing(true);
+  }
+
+  function startDoseClock() {
+    stopDoseClock();
+    state.doseTimer = setInterval(function () {
+      if (!state.active) return;
+      if (!(typeof _pwPlaying !== 'undefined' && _pwPlaying)) return;
+      if (state.doseDay !== today()) { state.doseDay = today(); state.dose = 0; }
+      var safe = safeSeconds(state.db);
+      var denom = isFinite(safe) ? safe : (8 * 3600);
+      state.dose = Math.min(100, state.dose + (100 / denom));
+      saveDose();
+      var sheet = document.getElementById('nwsbHearingSheet');
+      if (sheet) paintHearing(sheet);
+    }, 1000);
+  }
+
+  function stopDoseClock() {
+    if (state.doseTimer) { clearInterval(state.doseTimer); state.doseTimer = null; }
+  }
+
+  function openHearing() {
+    var existing = document.getElementById('nwsbHearingSheet');
+    if (existing) { existing.classList.add('is-open'); return; }
+    loadDose();
+    var w = currentWord();
+    var art = artFor(w);
+    var title = (w && (w.word || w.title)) || 'NowssB';
+    var t = tier(state.db);
+    var meta = tierMeta(t);
+    var volPct = Math.round(((state.db - MIN_DB) / (MAX_DB - MIN_DB)) * 100);
+    var sheet = document.createElement('div');
+    sheet.id = 'nwsbHearingSheet';
+    sheet.className = 'nwsb-hearing-sheet';
+    sheet.innerHTML =
+      '<div class="nwsb-hearing-backdrop"></div>' +
+      '<div class="nwsb-hearing-panel" role="dialog" aria-label="Hearing Safety">' +
+        '<div class="nwsb-hearing-top">' +
+          '<button type="button" class="nwsb-hearing-back" aria-label="Back">‹</button>' +
+          '<div class="nwsb-hearing-brand">NOWSSB</div>' +
+          '<span class="nwsb-hearing-hires">HI-RES</span>' +
+        '</div>' +
+        '<div class="nwsb-hearing-track">' +
+          '<img class="nwsb-hearing-art" src="' + (art || '') + '" alt="" />' +
+          '<div class="nwsb-hearing-track-meta">' +
+            '<div class="nwsb-hearing-title"></div>' +
+            '<div class="nwsb-hearing-sub">NowssB · Practice</div>' +
+            '<div class="nwsb-hearing-now"><span class="nwsb-hearing-eq"></span><span class="nwsb-hearing-now-lbl">PLAYING NOW</span></div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="nwsb-hearing-transport">' +
+          '<button type="button" data-hs="prev" aria-label="Previous">⏮</button>' +
+          '<button type="button" class="nwsb-hearing-play" data-hs="toggle" aria-label="Play">❚❚</button>' +
+          '<button type="button" data-hs="next" aria-label="Next">⏭</button>' +
+        '</div>' +
+        '<div class="nwsb-hearing-card">' +
+          '<div class="nwsb-hearing-card-head"><span>HEARING SAFETY</span><span class="nwsb-hearing-pill">• QUIET</span></div>' +
+          '<div class="nwsb-hearing-scene">' +
+            '<div class="nwsb-hearing-scene-label"></div>' +
+            '<div class="nwsb-hearing-db"></div>' +
+            '<div class="nwsb-hearing-icon"></div>' +
+          '</div>' +
+          '<div class="nwsb-hearing-safe-h"></div>' +
+          '<div class="nwsb-hearing-safe"></div>' +
+          '<div class="nwsb-hearing-safe-sub"></div>' +
+        '</div>' +
+        '<div class="nwsb-hearing-dose"><span>Today\'s dose <b>0%</b></span><div class="nwsb-hearing-dose-bar"><i></i></div></div>' +
+        '<div class="nwsb-hearing-vol">' +
+          '<span class="nwsb-hearing-vol-ico">🔈</span>' +
+          '<div class="nwsb-hearing-vol-rail">' +
+            '<div class="nwsb-hearing-vol-danger"></div>' +
+            '<div class="nwsb-hearing-vol-mark"><span>85 dB</span></div>' +
+            '<input type="range" min="40" max="120" step="1" value="55" />' +
+          '</div>' +
+          '<span class="nwsb-hearing-vol-pct">' + volPct + '%</span>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(sheet);
+    sheet.querySelector('.nwsb-hearing-title').textContent = title;
+    sheet.querySelector('.nwsb-hearing-back').onclick = function () { closeHearing(false); };
+    sheet.querySelector('.nwsb-hearing-backdrop').onclick = function () { closeHearing(false); };
+    sheet.querySelector('[data-hs="toggle"]').onclick = function () {
+      if (typeof pwPlay === 'function') {
+        if (typeof _pwPlaying !== 'undefined' && _pwPlaying) {
+          try { if ('speechSynthesis' in window) speechSynthesis.cancel(); } catch (e) {}
+          try { _pwPlaying = false; } catch (e) {}
+        } else {
+          try { if (typeof _pwPhase !== 'undefined') _pwPhase = 'idle'; } catch (e) {}
+          pwPlay();
+        }
+      }
+      paintHearing(sheet);
+      paintPill();
+    };
+    sheet.querySelector('[data-hs="next"]').onclick = function () {
+      if (typeof window.lgpGoNext === 'function') window.lgpGoNext();
+      else if (typeof pwPlay === 'function') pwPlay();
+      paintHearing(sheet); paintPill();
+    };
+    sheet.querySelector('[data-hs="prev"]').onclick = function () {
+      if (typeof window.lgpRewind === 'function') window.lgpRewind();
+      paintHearing(sheet); paintPill();
+    };
+    var range = sheet.querySelector('input[type=range]');
+    range.value = String(Math.round(state.db));
+    range.oninput = function () {
+      state.db = parseFloat(range.value) || 55;
+      try {
+        var v01 = (state.db - MIN_DB) / (MAX_DB - MIN_DB);
+        if (typeof window.lgpSetVolume === 'function') window.lgpSetVolume(v01);
+      } catch (e) {}
+      paintHearing(sheet);
+    };
+    requestAnimationFrame(function () { sheet.classList.add('is-open'); paintHearing(sheet); });
+  }
+
+  function paintHearing(sheet) {
+    if (!sheet) return;
+    var t = tier(state.db);
+    var meta = tierMeta(t);
+    var w = currentWord();
+    var playing = !!(typeof _pwPlaying !== 'undefined' && _pwPlaying);
+    sheet.dataset.tier = t;
+    sheet.style.setProperty('--hs-accent', meta.accent);
+    sheet.querySelector('.nwsb-hearing-pill').textContent = '• ' + meta.label;
+    sheet.querySelector('.nwsb-hearing-pill').style.color = meta.accent;
+    sheet.querySelector('.nwsb-hearing-scene-label').textContent = meta.scene;
+    sheet.querySelector('.nwsb-hearing-db').textContent = Math.round(state.db) + ' dB';
+    sheet.querySelector('.nwsb-hearing-icon').textContent = meta.icon;
+    var quiet = t === 'quiet';
+    sheet.querySelector('.nwsb-hearing-safe-h').textContent = quiet ? 'SAFE TO LISTEN FOR' : 'DAMAGE BEGINS AFTER';
+    sheet.querySelector('.nwsb-hearing-safe').textContent = fmtSafe(state.db);
+    sheet.querySelector('.nwsb-hearing-safe').style.color = meta.accent;
+    sheet.querySelector('.nwsb-hearing-safe-sub').textContent = quiet
+      ? 'Under 85 dB your ears can take it all day.'
+      : 'Past 85 dB every extra 3 dB halves the time you get.';
+    sheet.querySelector('.nwsb-hearing-dose b').textContent = Math.round(state.dose) + '%';
+    sheet.querySelector('.nwsb-hearing-dose-bar i').style.width = Math.min(100, state.dose) + '%';
+    sheet.querySelector('.nwsb-hearing-dose-bar i').style.background = meta.accent;
+    sheet.querySelector('.nwsb-hearing-vol-pct').textContent = Math.round(((state.db - MIN_DB) / (MAX_DB - MIN_DB)) * 100) + '%';
+    sheet.querySelector('.nwsb-hearing-title').textContent = (w && (w.word || w.title)) || 'NowssB';
+    sheet.querySelector('.nwsb-hearing-now-lbl').textContent = playing ? 'PLAYING NOW' : 'PAUSED';
+    sheet.querySelector('[data-hs="toggle"]').textContent = playing ? '❚❚' : '▶';
+    var art = artFor(w);
+    if (art) sheet.querySelector('.nwsb-hearing-art').src = art;
+    var mark = sheet.querySelector('.nwsb-hearing-vol-mark');
+    var danger = sheet.querySelector('.nwsb-hearing-vol-danger');
+    var pct = ((DANGER_DB - MIN_DB) / (MAX_DB - MIN_DB)) * 100;
+    if (mark) mark.style.left = pct + '%';
+    if (danger) danger.style.left = pct + '%';
+  }
+
+  function closeHearing(dismissing) {
+    var sheet = document.getElementById('nwsbHearingSheet');
+    if (!sheet) return;
+    sheet.classList.remove('is-open');
+    setTimeout(function () { sheet.remove(); }, 320);
+    if (!dismissing && state.active) paintPill();
+  }
+
+  // When leaving practice player, keep session + show pill (do not cancel speech).
+  (function patchCloseForPill() {
+    if (typeof window.closeSub !== 'function') { return setTimeout(patchCloseForPill, 200); }
+    var orig = window.closeSub;
+    window.closeSub = function (id) {
+      var ret = orig.apply(this, arguments);
+      if (id === 'practice') {
+        showPill();
+      }
+      return ret;
+    };
+  })();
+
+  // Opening practice hides the pill (full player owns the UI).
+  (function patchOpenForPill() {
+    if (typeof window.openSub !== 'function') { return setTimeout(patchOpenForPill, 200); }
+    var orig = window.openSub;
+    window.openSub = function (id) {
+      if (id === 'practice') {
+        state.active = false;
+        paintPill();
+        closeHearing(true);
+      }
+      return orig.apply(this, arguments);
+    };
+  })();
+
+  window.nwsbShowMiniPill = showPill;
+  window.nwsbOpenHearingSafety = openHearing;
+  window.nwsbDismissMiniPill = dismissPill;
+})();
