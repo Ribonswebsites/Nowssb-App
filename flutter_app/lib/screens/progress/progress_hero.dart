@@ -12,22 +12,28 @@ import 'progress_tokens.dart';
 
 const kProgressScene1 = 'assets/video/my-progress-scene-1.mp4';
 const kProgressScene2 = 'assets/video/my-progress-scene-2.mp4';
+/// Same clip as progress-scroll-bg / my-progress-scene-2 — page backdrop after the hero.
+const kProgressScrollBg = 'assets/video/player-bg-loop.mp4';
 
-class ProgressHeroVideo extends StatelessWidget {
-  const ProgressHeroVideo({super.key});
+/// Full-screen scroll backdrop (water / silk loop). Visible once the hero scrolls away.
+class ProgressScrollBgVideo extends StatelessWidget {
+  const ProgressScrollBgVideo({super.key, this.opacity = 1});
+  final double opacity;
 
   @override
   Widget build(BuildContext context) {
-    return const Positioned.fill(
-      child: Opacity(
-        opacity: 0.92,
-        child: ColoredBox(
-          color: MpColors.bg,
-          child: NwsbVideo(
-            asset: kProgressScene1,
-            fit: BoxFit.cover,
-            priority: ClipPriority.feature,
-            alignment: Alignment.center,
+    return Positioned.fill(
+      child: IgnorePointer(
+        child: Opacity(
+          opacity: opacity.clamp(0.0, 1.0),
+          child: const ColoredBox(
+            color: MpColors.bg,
+            child: NwsbVideo(
+              asset: kProgressScrollBg,
+              fit: BoxFit.cover,
+              priority: ClipPriority.decoration,
+              alignment: Alignment.center,
+            ),
           ),
         ),
       ),
@@ -167,6 +173,10 @@ class ProgressHeader extends StatelessWidget {
   }
 }
 
+/// Scene-1 orb + centered stats + VIEW INSIGHTS.
+///
+/// Video lives *inside* this box (not full-screen) so the text stack stays
+/// locked to the bright orb core. Height is tight so YOUR NUMBERS sits close.
 class ProgressOrbHero extends StatelessWidget {
   const ProgressOrbHero({
     super.key,
@@ -179,31 +189,78 @@ class ProgressOrbHero extends StatelessWidget {
   final String timeLabel;
   final VoidCallback onViewInsights;
 
+  /// Compact hero — was 545; mock puts Your Numbers just under the CTA.
+  static const double height = 392;
+
+  /// Alignment of the bright orb core within the clipped scene-1 frame.
+  static const Alignment orbCore = Alignment(0, -0.42);
+
   @override
   Widget build(BuildContext context) {
+    final ringProgress =
+        sessions == 0 ? 0.12 : (0.18 + (sessions % 40) / 50).clamp(0.18, 0.92);
+
     return SizedBox(
-      height: 545,
+      height: height,
+      width: double.infinity,
       child: Stack(
-        alignment: Alignment.topCenter,
+        clipBehavior: Clip.hardEdge,
         children: [
-          Positioned(
-            top: 545 * 0.295 - 140,
-            child: SizedBox(
-              width: 280,
-              height: 280,
-              child: CustomPaint(
-                painter: _OrbRingPainter(progress: sessions == 0 ? 0.12 : (0.18 + (sessions % 40) / 50).clamp(0.18, 0.92)),
+          // Scene-1 orb video — framed to this hero only.
+          const Positioned.fill(
+            child: Opacity(
+              opacity: 0.96,
+              child: ColoredBox(
+                color: MpColors.bg,
+                child: NwsbVideo(
+                  asset: kProgressScene1,
+                  fit: BoxFit.cover,
+                  priority: ClipPriority.feature,
+                  alignment: Alignment(0, -0.15),
+                ),
               ),
             ),
           ),
-          Positioned(
-            top: 545 * 0.295 - 70,
+          // Soft vignette so lower CTA / next section read cleanly.
+          const Positioned.fill(
+            child: IgnorePointer(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Color(0x33000000),
+                      Color(0x00000000),
+                      Color(0x00000000),
+                      Color(0x99020304),
+                    ],
+                    stops: [0, 0.22, 0.62, 1],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          // Progress ring around the orb core.
+          Align(
+            alignment: orbCore,
+            child: SizedBox(
+              width: 268,
+              height: 268,
+              child: CustomPaint(painter: _OrbRingPainter(progress: ringProgress)),
+            ),
+          ),
+          // Stats stack — truly centered in the bright orb core.
+          Align(
+            alignment: orbCore,
             child: SizedBox(
               width: 210,
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   const Text(
                     'TOTAL SESSIONS',
+                    textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 9,
                       letterSpacing: 2.8,
@@ -211,9 +268,10 @@ class ProgressOrbHero extends StatelessWidget {
                       color: Color(0xFFE6E6E2),
                     ),
                   ),
-                  const SizedBox(height: 9),
+                  const SizedBox(height: 8),
                   Text(
                     '$sessions',
+                    textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 61,
                       fontWeight: FontWeight.w300,
@@ -223,9 +281,10 @@ class ProgressOrbHero extends StatelessWidget {
                       shadows: [Shadow(blurRadius: 18, color: Colors.black)],
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 5),
                   Text(
                     timeLabel,
+                    textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w300,
@@ -233,9 +292,10 @@ class ProgressOrbHero extends StatelessWidget {
                       shadows: [Shadow(blurRadius: 12, color: Colors.black)],
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 5),
                   const Text(
                     'MEDITATION TIME',
+                    textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 8,
                       letterSpacing: 2.4,
@@ -246,25 +306,30 @@ class ProgressOrbHero extends StatelessWidget {
               ),
             ),
           ),
+          // CTA sits just under the orb — little dead space below.
           Positioned(
-            top: 545 * 0.51,
-            child: TextButton(
-              onPressed: onViewInsights,
-              style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFFEDEDEB),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
-                shape: StadiumBorder(
-                  side: BorderSide(color: Colors.white.withOpacity(0.2)),
+            left: 0,
+            right: 0,
+            bottom: 18,
+            child: Center(
+              child: TextButton(
+                onPressed: onViewInsights,
+                style: TextButton.styleFrom(
+                  foregroundColor: const Color(0xFFEDEDEB),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
+                  shape: StadiumBorder(
+                    side: BorderSide(color: Colors.white.withOpacity(0.2)),
+                  ),
+                  backgroundColor: const Color(0x7A050607),
                 ),
-                backgroundColor: const Color(0x7A050607),
-              ),
-              child: const Text.rich(
-                TextSpan(
-                  text: 'VIEW INSIGHTS ',
-                  style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, letterSpacing: 2.0),
-                  children: [
-                    TextSpan(text: '↗', style: TextStyle(fontSize: 13, letterSpacing: 0)),
-                  ],
+                child: const Text.rich(
+                  TextSpan(
+                    text: 'VIEW INSIGHTS ',
+                    style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, letterSpacing: 2.0),
+                    children: [
+                      TextSpan(text: '\u2197', style: TextStyle(fontSize: 13, letterSpacing: 0)),
+                    ],
+                  ),
                 ),
               ),
             ),

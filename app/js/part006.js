@@ -565,3 +565,6 @@ function mpGetOrgan(word) {
     return match ? (match.organ || '') : '';
   } catch(e) { return ''; }
 }
+
+// SCROLL BACKDROP
+(function mpInstallScrollBg(){function ensureScrollBg(){var host=document.getElementById("sub-my-progress");if(!host)return null;var v=host.querySelector("video.mp-scroll-bg");if(!v){v=document.createElement("video");v.className="mp-scroll-bg";v.muted=true;v.setAttribute("muted","");v.setAttribute("loop","");v.setAttribute("playsinline","");v.setAttribute("autoplay","");v.preload="auto";v.src="./assets/video/player-bg-loop.mp4";host.insertBefore(v,host.firstChild);}v.play&&v.play().catch(function(){});return v;}function bindScroll(){var host=document.getElementById("sub-my-progress");if(!host)return;ensureScrollBg();var scroller=host.querySelector(".mp-final-shell")||host.querySelector(".sub-body")||host;if(scroller._mpScrollBound)return;scroller._mpScrollBound=true;var onScroll=function(){host.classList.toggle("mp-scrolled",(scroller.scrollTop||0)>260);};scroller.addEventListener("scroll",onScroll,{passive:true});onScroll();}var prev=window.mpOnOpen;window.mpOnOpen=function(){if(typeof prev==="function")prev.apply(this,arguments);setTimeout(bindScroll,50);};var prevEnter=window.mpEnterFromIntro;if(typeof prevEnter==="function"){window.mpEnterFromIntro=function(){prevEnter.apply(this,arguments);setTimeout(bindScroll,80);};}})();

@@ -29,23 +29,35 @@ class PracticeProgressScreen extends StatefulWidget {
 class _PracticeProgressScreenState extends State<PracticeProgressScreen> {
   final _scroll = ScrollController();
   final _insightKey = GlobalKey();
+  /// 0 = hero (scene-1) dominant; 1 = scroll bg (player-bg-loop) fully on.
+  double _scrollBg = 0;
 
   @override
   void initState() {
     super.initState();
     PracticeProgress.instance.addListener(_onProgress);
     PracticeProgress.instance.start();
+    _scroll.addListener(_onScroll);
   }
 
   @override
   void dispose() {
     PracticeProgress.instance.removeListener(_onProgress);
+    _scroll.removeListener(_onScroll);
     _scroll.dispose();
     super.dispose();
   }
 
   void _onProgress() {
     if (mounted) setState(() {});
+  }
+
+  void _onScroll() {
+    // Crossfade page backdrop once the user scrolls past most of the hero.
+    final t = (_scroll.offset / (ProgressOrbHero.height * 0.72)).clamp(0.0, 1.0);
+    if ((t - _scrollBg).abs() > 0.02) {
+      setState(() => _scrollBg = t);
+    }
   }
 
   void _scrollToInsight() {
@@ -71,7 +83,8 @@ class _PracticeProgressScreenState extends State<PracticeProgressScreen> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          const ProgressHeroVideo(),
+          // Scroll clip always under the hero; fades in as hero leaves.
+          ProgressScrollBgVideo(opacity: 0.35 + 0.65 * _scrollBg),
           const ProgressVideoShade(),
           const ProgressGrain(),
           Column(
@@ -87,7 +100,8 @@ class _PracticeProgressScreenState extends State<PracticeProgressScreen> {
                       timeLabel: progress.timeLabel,
                       onViewInsights: _scrollToInsight,
                     ),
-                    const ProgressEyebrow('Your Numbers'),
+                    // Pull Your Numbers tight under VIEW INSIGHTS.
+                    const ProgressEyebrow('Your Numbers', tightTop: true),
                     ProgressStatsRow(progress: progress),
                     const SizedBox(height: 18),
                     const ProgressSceneTwo(),

@@ -16,13 +16,14 @@ class MpColors {
 }
 
 class ProgressEyebrow extends StatelessWidget {
-  const ProgressEyebrow(this.label, {super.key});
+  const ProgressEyebrow(this.label, {super.key, this.tightTop = false});
   final String label;
+  final bool tightTop;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 22, bottom: 13),
+      padding: EdgeInsets.only(top: tightTop ? 6 : 22, bottom: 13),
       child: Text(
         label.toUpperCase(),
         style: const TextStyle(
