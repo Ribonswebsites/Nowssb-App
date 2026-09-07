@@ -44,7 +44,6 @@ import 'package:flutter/material.dart';
 import '../data/content.dart';
 import '../data/models.dart';
 import '../data/practice_progress.dart';
-import '../data/notifications.dart';
 import '../data/settings.dart';
 import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
@@ -54,6 +53,8 @@ import 'normal/neomorphic_dashboard.dart';
 import 'personal_coach.dart';
 import '../media/video_pool.dart';
 import 'normal/glassmorphism_theme.dart';
+import 'normal/header_actions_sheet.dart';
+import '../widgets/nwsb_icon.dart';
 import 'normal/neomorphic_essentials.dart';
 import 'normal/sections_bottom.dart';
 import 'normal/sections_top.dart';
@@ -343,7 +344,8 @@ class _HomeNormalState extends State<HomeNormal> {
   }
 }
 
-/// .nmh-toprow — the logo, the wordmark, and the three embossed buttons.
+/// .nmh-toprow — essentials only: menu, logo, title, Settings, and one
+/// expanding SVG control that opens the glass 3D actions carousel.
 class _TopRow extends StatelessWidget {
   const _TopRow({
     required this.onMenu,
@@ -354,6 +356,16 @@ class _TopRow extends StatelessWidget {
   final VoidCallback onMenu;
   final bool glassMode;
   final VoidCallback onGlassToggle;
+
+  void _openActions(BuildContext context) {
+    showHeaderActionsSheet(
+      context,
+      glassMode: glassMode,
+      onGlassToggle: onGlassToggle,
+      onNotifications: () => showNotificationsSheet(context),
+      onFashionHome: () => Settings.instance.setFashionHome(true),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -401,7 +413,7 @@ class _TopRow extends StatelessWidget {
         const SizedBox(width: 12),
         // Flexible, not a bare Column: 'NOWSBANSIU EDITION' at 2pt of letter
         // spacing is wider than it looks, and on a 412pt screen it pushed
-        // the three header buttons clean off the right edge.
+        // the header buttons clean off the right edge.
         Flexible(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -428,23 +440,6 @@ class _TopRow extends StatelessWidget {
           ),
         ),
         const Spacer(),
-        NormalGlassToggle(enabled: glassMode, onTap: onGlassToggle),
-        const SizedBox(width: 8),
-        ListenableBuilder(
-          listenable: NotifStore.instance,
-          builder: (context, _) {
-            final n = NotifStore.instance.unreadRaw;
-            return _HeaderButton(
-              icon: Icons.notifications_none,
-              badge: n > 0 ? (n > 99 ? 99 : n) : null,
-              badgeLabel: NotifStore.instance.badgeText.isEmpty
-                  ? null
-                  : NotifStore.instance.badgeText,
-              onTap: () => showNotificationsSheet(context),
-            );
-          },
-        ),
-        const SizedBox(width: 8),
         _HeaderButton(
           icon: Icons.settings_outlined,
           onTap: () => Navigator.of(context).push(
@@ -452,15 +447,43 @@ class _TopRow extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8),
-        // The home button switches which home you are on. There are three
-        // ways to reach the Fashion home now — this, the pill above the nav,
-        // and Settings — because one that nobody finds is one that is not
-        // built.
-        _HeaderButton(
-          icon: Icons.dark_mode_outlined,
-          onTap: () => Settings.instance.setFashionHome(true),
-        ),
+        _HeaderActionsSvgButton(onTap: () => _openActions(context)),
       ],
+    );
+  }
+}
+
+/// Rounded header control — four-square [NwsbMarks.features] mark that
+/// expands into the glass cover-flow sheet.
+class _HeaderActionsSvgButton extends StatelessWidget {
+  const _HeaderActionsSvgButton({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final glass = NormalGlassMode.of(context);
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(
+          color: glass ? const Color(0xAFFFFFFF) : NwsbColors.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: glass ? Border.all(color: const Color(0xDFFFFFFF)) : null,
+          boxShadow: glass ? null : NwsbShadows.raisedXs,
+        ),
+        child: const Center(
+          child: NwsbIcon(
+            NwsbMarks.features,
+            size: 20,
+            color: NwsbColors.ink,
+            strokeWidth: 1.7,
+          ),
+        ),
+      ),
     );
   }
 }
