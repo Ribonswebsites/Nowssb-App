@@ -63,6 +63,7 @@ import 'sound_library.dart';
 import 'notifications_sheet.dart';
 import 'widgets_page.dart';
 import 'practice_player.dart';
+import 'progress/progress_screen.dart';
 
 /// `REG.norm.items` — app/js/part062.js:41-100, key for key and in order.
 const kNormalSectionOrder = <String>[

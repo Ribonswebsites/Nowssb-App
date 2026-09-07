@@ -11,6 +11,7 @@ import '../screens/library.dart';
 import '../screens/practice.dart';
 import '../screens/practice_player.dart';
 import '../screens/profile.dart';
+import '../screens/progress/progress_screen.dart';
 import '../screens/store.dart';
 import '../screens/quick_access.dart';
 import '../widgets/pool_hud.dart';

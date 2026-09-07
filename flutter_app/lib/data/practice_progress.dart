@@ -145,6 +145,53 @@ class PracticeProgress extends ChangeNotifier {
         .length;
   }
 
+
+  /// Mon→Sun of the current week with practiced flags (website week grid).
+  List<({String date, bool done, bool isToday, bool isFuture})> get thisWeekDays {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final monday = today.subtract(Duration(days: (today.weekday + 6) % 7));
+    final practiced = <String>{
+      for (final session in _sessions.values)
+        if (session['date'] is String) session['date'] as String,
+    };
+    final out = <({String date, bool done, bool isToday, bool isFuture})>[];
+    for (var i = 0; i < 7; i++) {
+      final d = monday.add(Duration(days: i));
+      final key = _day(d);
+      out.add((
+        date: key,
+        done: practiced.contains(key),
+        isToday: key == _day(today),
+        isFuture: d.isAfter(today),
+      ));
+    }
+    return out;
+  }
+
+  /// Days practiced this week / 7 as a percent (Glass Orb "Consistency").
+  int get weekConsistencyPercent {
+    final done = thisWeekDays.where((d) => d.done).length;
+    return ((done / 7) * 100).round();
+  }
+
+  /// Meditation time logged Mon→today.
+  String get weekTimeLabel {
+    final days = thisWeekDays.map((d) => d.date).toSet();
+    var seconds = 0;
+    for (final session in _sessions.values) {
+      if (!days.contains('${session['date'] ?? ''}')) continue;
+      final duration = session['durationSec'];
+      if (duration is num && duration > 0) seconds += duration.round();
+    }
+    if (seconds <= 0) return '0m';
+    final m = (seconds / 60).round();
+    if (m < 60) return '${m}m';
+    final h = m / 60;
+    if (h == h.roundToDouble()) return '${h.round()}h';
+    return '${h.toStringAsFixed(1)}h';
+  }
+
   Future<void> recordCompletedWord(Word word, {int durationSec = 0}) async {
     final today = _day(DateTime.now());
     final key = '${today}_${word.word}';
