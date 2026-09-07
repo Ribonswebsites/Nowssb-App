@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 
 import '../../data/content.dart';
 import '../../data/store_catalog.dart';
+import '../../media/nwsb_video.dart';
+import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
 import '../word_detail.dart';
 import 'store_cards.dart';
@@ -37,7 +39,6 @@ void openAtelierWord(BuildContext context, {required String word, required Strin
 }
 
 void openMeaningDetail(BuildContext context, MsMeaning m, {bool signature = false}) {
-  final live = ContentStore.instance.meanings.where((x) => x.key == m.key || x.name.toLowerCase() == m.word.toLowerCase()).toList();
   final blurb = kMsWordBlurb[m.key] ??
       'Every word carries a vibration that predates its dictionary definition. Unlock the true phonetic origin of ${m.word}.';
   Navigator.of(context).push(MaterialPageRoute<void>(
@@ -45,9 +46,11 @@ void openMeaningDetail(BuildContext context, MsMeaning m, {bool signature = fals
       kind: signature ? 'Signature Meaning' : 'Meaning · ${m.category}',
       title: signature ? m.word : m.word,
       root: m.root,
-      img: signature ? kMsSignatureImg : (live.isNotEmpty && live.first.img.isNotEmpty ? live.first.img : m.img),
+      // Always prefer catalogue / caller img — do not let live overlay swap art.
+      img: signature ? kMsSignatureImg : m.img,
       price: signature ? kMsSignaturePrice : m.price,
       about: blurb,
+      heroVideo: nwsbVideo(kMsMeaningVidFile),
       highlights: const [
         'Decoded phonetic origin',
         'Organ & vibration notes',
@@ -88,12 +91,16 @@ class StoreProductPage extends StatelessWidget {
     required this.about,
     required this.highlights,
     this.disclaimer,
+    this.heroVideo,
   });
 
   final String kind, title, root, img, about;
   final num price;
   final List<String> highlights;
   final String? disclaimer;
+
+  /// Meaning detail hero clip (MS_MEANING_VID) — remote HTTPS URL.
+  final String? heroVideo;
 
   @override
   Widget build(BuildContext context) {
@@ -121,6 +128,16 @@ class StoreProductPage extends StatelessWidget {
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(0, 8, 0, 40),
                 children: [
+                  if (heroVideo != null) ...[
+                    AspectRatio(
+                      aspectRatio: 16 / 9,
+                      child: NwsbVideo(
+                        asset: heroVideo!,
+                        priority: ClipPriority.feature,
+                      ),
+                    ),
+                    const SizedBox(height: 0),
+                  ],
                   AspectRatio(
                     aspectRatio: 1,
                     child: StoreNetImage(url: img),

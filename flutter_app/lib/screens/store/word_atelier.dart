@@ -1,4 +1,5 @@
-/// The Word Atelier — rich category banners + horizontal `.rm-word-card` rows.
+/// The Word Atelier — plain black `.rm-cat-banner` rows + `.rm-word-card`s.
+/// Media matches index.html / app/js/part010.js (no collection photo banners).
 library;
 
 import 'package:flutter/material.dart';
@@ -30,7 +31,7 @@ class WordAtelierScreen extends StatelessWidget {
         child: PageShell(
           eyebrow: 'NowssB Store',
           title: 'The Word Atelier',
-          film: 'assets/video/store-section.mp4',
+          film: nwsbVideo(kRmHeroVidFile),
           onBack: () => Navigator.of(context).pop(),
           slivers: [
             SliverPadding(
@@ -73,6 +74,72 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
   @override
   Widget build(BuildContext context) {
     final cats = _cats;
+    final sections = <Widget>[];
+    for (var i = 0; i < cats.length; i++) {
+      final cat = cats[i];
+      sections.add(RmCatBanner(
+        title: cat.label,
+        sub: cat.sub,
+        badge: cat.badge,
+        labelColor: cat.labelColor != null ? Color(cat.labelColor!) : null,
+        logoAsset: kRmCatLogoAsset,
+      ));
+      sections.add(Builder(builder: (context) {
+        final cards = <Widget>[];
+        for (final w in cat.words) {
+          if (!_match(w.word, w.root)) continue;
+          final name = w.word.isEmpty ? w.word : '${w.word[0].toUpperCase()}${w.word.substring(1)}';
+          // Live price when present; card art is always RM_WORD_IMG (part010).
+          final live = ContentStore.instance.library
+              .where((x) => x.word.toLowerCase() == w.word.toLowerCase())
+              .toList();
+          final price = live.isNotEmpty ? live.first.price : (cat.id == 'off50' ? 24.5 : 49);
+          const img = kRmWordImg;
+          cards.add(RmWordCard(
+            name: name,
+            root: w.root,
+            imgUrl: img,
+            price: price,
+            onTap: () => openAtelierWord(context, word: w.word, root: w.root, img: img, price: price),
+          ));
+        }
+        final sig = cat.signature;
+        if (sig != null && _match(sig.name, 'Most Exclusive')) {
+          cards.add(RmWordCard(
+            name: sig.name,
+            root: 'Most Exclusive',
+            imgUrl: sig.img,
+            signature: true,
+            price: kMsSignaturePrice,
+            onTap: () => openAtelierWord(
+              context,
+              word: sig.name,
+              root: 'Most Exclusive',
+              img: sig.img,
+              signature: true,
+            ),
+          ));
+        }
+        if (cards.isEmpty) {
+          return const Padding(
+            padding: EdgeInsets.symmetric(vertical: 18),
+            child: Text(
+              'No words match this search in this collection.',
+              style: TextStyle(color: Color(0x8CFFFFFF), fontSize: 12),
+            ),
+          );
+        }
+        return RmWordRow(children: cards);
+      }));
+      // Every fifth category row — same as part010 ROW_VIDS.
+      if (_chip == 'ALL' && (i + 1) % 5 == 0) {
+        final vidIdx = (i + 1) ~/ 5 - 1;
+        if (vidIdx >= 0 && vidIdx < kRmRowVids.length) {
+          sections.add(RmRowVid(url: nwsbVideo(kRmRowVids[vidIdx])));
+        }
+      }
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -84,9 +151,8 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                const NwsbVideo(
-                  asset: 'assets/video/store-word-library.mp4',
-                  poster: 'assets/video/store-word-library-poster.webp',
+                NwsbVideo(
+                  asset: nwsbVideo(kRmHeroVidFile),
                   priority: ClipPriority.feature,
                 ),
                 const DecoratedBox(
@@ -102,7 +168,10 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
                   padding: EdgeInsets.all(16),
                   child: Align(
                     alignment: Alignment.bottomLeft,
-                    child: Text('The Word Atelier', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w300, color: Colors.white)),
+                    child: Text(
+                      'The Word Atelier',
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.w300, color: Colors.white),
+                    ),
                   ),
                 ),
               ],
@@ -115,9 +184,15 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
           onChanged: (v) => setState(() => _query = v),
         ),
         const SizedBox(height: 16),
-        const Text('YOUR WORD LIBRARY', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 2.2, color: NwsbColors.gold)),
+        const Text(
+          'YOUR WORD LIBRARY',
+          style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 2.2, color: NwsbColors.gold),
+        ),
         const SizedBox(height: 6),
-        const Text('Every word carries a vibrational signature.', style: TextStyle(fontSize: 13, color: Color(0x99FFFFFF))),
+        const Text(
+          'Every word carries a vibrational signature.',
+          style: TextStyle(fontSize: 13, color: Color(0x99FFFFFF)),
+        ),
         const SizedBox(height: 12),
         SizedBox(
           height: 36,
@@ -138,53 +213,10 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
           ),
         ),
         const SizedBox(height: 8),
-        for (final cat in cats) ...[
-          RmCatBanner(
-            title: cat.label,
-            sub: cat.sub,
-            badge: cat.badge,
-            labelColor: cat.labelColor != null ? Color(cat.labelColor!) : null,
-            artAsset: kCollectionBanner[cat.id],
-          ),
-          Builder(builder: (context) {
-            final cards = <Widget>[];
-            for (final w in cat.words) {
-              if (!_match(w.word, w.root)) continue;
-              final name = w.word.isEmpty ? w.word : '${w.word[0].toUpperCase()}${w.word.substring(1)}';
-              // Prefer live ContentStore price/img when present.
-              final live = ContentStore.instance.library.where((x) => x.word.toLowerCase() == w.word.toLowerCase()).toList();
-              final price = live.isNotEmpty ? live.first.price : (cat.id == 'off50' ? 24.5 : 49);
-              final img = (live.isNotEmpty && live.first.img.isNotEmpty) ? live.first.img : kRmWordImg;
-              cards.add(RmWordCard(
-                name: name,
-                root: w.root,
-                imgUrl: img,
-                price: price,
-                onTap: () => openAtelierWord(context, word: w.word, root: w.root, img: img, price: price),
-              ));
-            }
-            final sig = cat.signature;
-            if (sig != null && _match(sig.name, 'Most Exclusive')) {
-              cards.add(RmWordCard(
-                name: sig.name,
-                root: 'Most Exclusive',
-                imgUrl: sig.img,
-                signature: true,
-                price: kMsSignaturePrice,
-                onTap: () => openAtelierWord(context, word: sig.name, root: 'Most Exclusive', img: sig.img, signature: true),
-              ));
-            }
-            if (cards.isEmpty) {
-              return const Padding(
-                padding: EdgeInsets.symmetric(vertical: 18),
-                child: Text('No words match this search in this collection.', style: TextStyle(color: Color(0x8CFFFFFF), fontSize: 12)),
-              );
-            }
-            return RmWordRow(children: cards);
-          }),
-        ],
+        ...sections,
         const StoreDisclaimer(
-          text: 'Words shared or sold here are for educational and wellness purposes only — nothing here is medical advice. Purchases are final once unlocked. Any information you share with us is kept strictly confidential and never sold or shared with third parties.',
+          text:
+              'Words shared or sold here are for educational and wellness purposes only — nothing here is medical advice. Purchases are final once unlocked. Any information you share with us is kept strictly confidential and never sold or shared with third parties.',
         ),
       ],
     );

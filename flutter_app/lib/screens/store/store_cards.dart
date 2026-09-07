@@ -5,6 +5,8 @@ library;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
+import '../../media/nwsb_video.dart';
+import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
 
 String inr(num value) {
@@ -30,7 +32,8 @@ class StoreNetImage extends StatelessWidget {
   }
 }
 
-/// Black category header with optional collection art (Word Atelier).
+/// Plain black `.rm-cat-banner` — logo + divider + title/sub.
+/// Matches part010/part026: no photo/character collection banners.
 class RmCatBanner extends StatelessWidget {
   const RmCatBanner({
     super.key,
@@ -38,18 +41,36 @@ class RmCatBanner extends StatelessWidget {
     required this.sub,
     this.badge,
     this.labelColor,
-    this.artAsset,
+    this.logoAsset = 'assets/icons/collection-icon.webp',
+    this.logoUrl,
   });
 
   final String title;
   final String sub;
   final String? badge;
   final Color? labelColor;
-  final String? artAsset;
+
+  /// Bundled collection disc (Word Atelier / web `./assets/icons/collection-icon.webp`).
+  final String logoAsset;
+
+  /// Optional remote logo (Meaning Store MS_CAT_LOGO). Wins over [logoAsset].
+  final String? logoUrl;
 
   @override
   Widget build(BuildContext context) {
     final titleColor = labelColor ?? NwsbColors.goldLight;
+    final Widget logo = logoUrl != null
+        ? Image.network(
+            logoUrl!,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => Image.asset(logoAsset, fit: BoxFit.cover),
+          )
+        : Image.asset(
+            logoAsset,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) =>
+                const Icon(Icons.auto_awesome, size: 16, color: NwsbColors.goldLight),
+          );
     return Container(
       margin: const EdgeInsets.only(top: 18, bottom: 10),
       clipBehavior: Clip.antiAlias,
@@ -58,97 +79,94 @@ class RmCatBanner extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: const Color(0x1AFFFFFF)),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          if (artAsset != null)
-            SizedBox(
-              height: 110,
-              child: Stack(
-                fit: StackFit.expand,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+        child: Row(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              clipBehavior: Clip.antiAlias,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: const Color(0x33E8D5A3)),
+                color: const Color(0x14E8D5A3),
+              ),
+              child: logo,
+            ),
+            Container(
+              width: 1,
+              height: 34,
+              margin: const EdgeInsets.symmetric(horizontal: 12),
+              color: const Color(0x26FFFFFF),
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Image.asset(artAsset!, fit: BoxFit.cover),
-                  const DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [Color(0x22060C18), Color(0xEE060C18)],
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          title,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: titleColor,
+                          ),
+                        ),
                       ),
-                    ),
+                      if (badge != null) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(color: titleColor.withOpacity(0.45)),
+                          ),
+                          child: Text(
+                            badge!,
+                            style: TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 1.2,
+                              color: titleColor,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    sub,
+                    style: const TextStyle(fontSize: 11, color: Color(0x66FFFFFF)),
                   ),
                 ],
               ),
             ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-            child: Row(
-              children: [
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: const Color(0x33E8D5A3)),
-                    color: const Color(0x14E8D5A3),
-                  ),
-                  child: const Icon(Icons.auto_awesome, size: 16, color: NwsbColors.goldLight),
-                ),
-                Container(
-                  width: 1,
-                  height: 34,
-                  margin: const EdgeInsets.symmetric(horizontal: 12),
-                  color: const Color(0x26FFFFFF),
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Flexible(
-                            child: Text(
-                              title,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: titleColor,
-                              ),
-                            ),
-                          ),
-                          if (badge != null) ...[
-                            const SizedBox(width: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(4),
-                                border: Border.all(color: titleColor.withOpacity(0.45)),
-                              ),
-                              child: Text(
-                                badge!,
-                                style: TextStyle(
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: 1.2,
-                                  color: titleColor,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        sub,
-                        style: const TextStyle(fontSize: 11, color: Color(0x66FFFFFF)),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Full-width looping row break video (part010 ROW_VIDS).
+class RmRowVid extends StatelessWidget {
+  const RmRowVid({super.key, required this.url});
+  final String url;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8, bottom: 14),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(14),
+        child: AspectRatio(
+          aspectRatio: 16 / 9,
+          child: NwsbVideo(asset: url, priority: ClipPriority.decoration),
+        ),
       ),
     );
   }

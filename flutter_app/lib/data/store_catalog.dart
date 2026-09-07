@@ -14,24 +14,43 @@ const kMsSignatureImg =
     "https://media.nowssb.com/migrated-images/a7c5f95b3e9029e5_file_000000008eb081fba87f16fe9146e413_mk9wbe.png";
 const kMsSignaturePrice = 299;
 
-/// Collection banner art — assets/store/collections/{id}.webp
-const Map<String, String> kCollectionBanner = {
-  "off50": 'assets/store/collections/sale.webp',
-  "elements": 'assets/store/collections/elements.webp',
-  "sacred": 'assets/store/collections/sacred.webp',
-  "identity": 'assets/store/collections/identity.webp',
-  "cosmos": 'assets/store/collections/cosmos.webp',
-  "nature": 'assets/store/collections/nature.webp',
-  "family": 'assets/store/collections/family.webp',
-  "elite": 'assets/store/collections/elite.webp',
-  "premium": 'assets/store/collections/premium.webp',
-  "mythical": 'assets/store/collections/mythical.webp',
-  "warriors": 'assets/store/collections/warriors.webp',
-  "ancient": 'assets/store/collections/ancient.webp',
-  "peace": 'assets/store/collections/peace.webp',
-  "white": 'assets/store/collections/white.webp',
-  "black": 'assets/store/collections/black.webp',
-};
+/// Live site plays these from the website origin (index / part010 / part026).
+/// Flutter opens them as remote NwsbVideo URLs — same files the browser uses.
+const kNowssbVideoOrigin = 'https://nowssb.com/assets/videos/';
+
+String nwsbVideo(String fileName) => '$kNowssbVideoOrigin$fileName';
+
+/// Word Atelier category logo — `./assets/icons/collection-icon.webp` on web.
+const kRmCatLogoAsset = 'assets/icons/collection-icon.webp';
+
+/// Meaning Store category logo — MS_CAT_LOGO in part026.js.
+const kMsCatLogoUrl =
+    'https://media.nowssb.com/migrated-images/1a5f669e63dbae9d_file_00000000854881fa9a548a68fae59c15_w1utya.png';
+
+/// ROW_VIDS from part010.js — inserted after every 5th category row.
+const List<String> kRmRowVids = [
+  '4fa2cc8a3160b945_grok_video_2026-07-31-15-36-41_blygoz.mp4',
+  'b1e2c78385f45657_grok_video_2026-07-31-20-44-13_jlsimw.mp4',
+  '8949dec81b7a28d7_grok_video_2026-07-31-20-40-30_vxozmt.mp4',
+];
+
+/// Atelier hero in index (`#sub-real-meaning`).
+const kRmHeroVidFile = '928f93861b9beb26_grok_video_2026-07-31-20-43-13_qh2qjg.mp4';
+
+/// Store hub word-library door (`#nssWordVid`).
+const kStoreWordDoorVidFile = 'e2280a594872a9f8_grok_video_2026-05-28-14-02-13_zaoxnl.mp4';
+
+/// Store hub meaning door + Meaning Store index hero (`#msBannerImg` / `#nssMeaningVid`).
+const kStoreMeaningDoorVidFile = '6ea45e8d75a96578_grok_video_2026-05-29-04-36-47_cze9bz.mp4';
+
+/// Meaning detail page hero clip — MS_MEANING_VID in part026.js.
+const kMsMeaningVidFile = '4c1c17d70f5656d4_grok_video_2026-07-31-15-41-50_oxszei.mp4';
+
+/// Subscribe banner on Meaning Store (index + detail) — part026 / index.
+const kMsSubscribeVidFile = '67e02704e83fbf19_grok_video_2026-07-19-08-55-10_omybbr.mp4';
+
+const kMsSubscribePillIcon =
+    'https://media.nowssb.com/migrated-images/86a1283688196499_ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png';
 
 class RmWordEntry {
   const RmWordEntry(this.word, this.root);

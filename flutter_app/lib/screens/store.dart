@@ -7,6 +7,7 @@ library;
 
 import 'package:flutter/material.dart';
 
+import '../data/store_catalog.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
@@ -52,7 +53,7 @@ class _StoreHomeContent extends StatelessWidget {
         height: 190,
       ),
       _StoreVideoSection(
-        asset: 'assets/video/store-section.mp4',
+        asset: nwsbVideo(kStoreWordDoorVidFile),
         eyebrow: 'THE WORD LIBRARY',
         title: 'Build Your\nPersonal Library',
         sub: 'Each word targets a specific organ. The more words you own, the more healing sentences you can build.',
@@ -66,7 +67,7 @@ class _StoreHomeContent extends StatelessWidget {
         margin: EdgeInsets.symmetric(vertical: 20),
       ),
       _StoreVideoSection(
-        asset: 'assets/video/store-meaning-library.mp4',
+        asset: nwsbVideo(kStoreMeaningDoorVidFile),
         eyebrow: 'THE MEANING LIBRARY',
         title: 'Unlock the\nTruth Behind Words',
         sub: 'Base meanings · Your purchased words · AI-decoded origins',

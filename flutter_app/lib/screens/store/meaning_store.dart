@@ -1,4 +1,5 @@
-/// The Meaning Store — `.ms-grid` of `.ms-card` tiles + category banners.
+/// The Meaning Store — `.ms-grid` of `.ms-card` tiles + plain black banners.
+/// Media matches index.html / app/js/part026.js (no collection photo banners).
 library;
 
 import 'package:flutter/material.dart';
@@ -30,7 +31,7 @@ class MeaningStoreScreen extends StatelessWidget {
         child: PageShell(
           eyebrow: 'NowssB Store',
           title: 'The Meaning Store',
-          film: 'assets/video/store-meaning-library.mp4',
+          film: nwsbVideo(kStoreMeaningDoorVidFile),
           onBack: () => Navigator.of(context).pop(),
           slivers: [
             SliverPadding(
@@ -59,21 +60,13 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
     super.dispose();
   }
 
+  /// Prefer MS_BASE_MEANINGS card art from the catalogue. Live ContentStore
+  /// may append unknown keys, but must not overwrite catalogue `img` URLs.
   List<MsMeaning> get _base {
-    // Live ContentStore meanings overlay / append when present.
     final live = ContentStore.instance.meanings;
     final byKey = {for (final m in kMsBaseMeanings) m.key: m};
     for (final m in live) {
-      if (!byKey.containsKey(m.key)) {
-        byKey[m.key] = MsMeaning(
-          word: m.name,
-          key: m.key,
-          root: m.sub.isNotEmpty ? m.sub : 'NowssB Meaning',
-          category: 'Studio',
-          price: m.price,
-          img: m.img.isNotEmpty ? m.img : kMsCardImg,
-        );
-      } else if (m.img.isNotEmpty) {
+      if (byKey.containsKey(m.key)) {
         final base = byKey[m.key]!;
         byKey[m.key] = MsMeaning(
           word: base.word,
@@ -81,7 +74,16 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
           root: base.root,
           category: base.category,
           price: m.price > 0 ? m.price : base.price,
-          img: m.img,
+          img: base.img, // keep part026 per-meaning art
+        );
+      } else {
+        byKey[m.key] = MsMeaning(
+          word: m.name,
+          key: m.key,
+          root: m.sub.isNotEmpty ? m.sub : 'NowssB Meaning',
+          category: 'Studio',
+          price: m.price,
+          img: m.img.isNotEmpty ? m.img : kMsCardImg,
         );
       }
     }
@@ -95,7 +97,9 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
     for (final m in all) {
       if (_query.isNotEmpty) {
         final q = _query.toLowerCase();
-        if (!m.word.toLowerCase().contains(q) && !m.root.toLowerCase().contains(q) && !m.category.toLowerCase().contains(q)) {
+        if (!m.word.toLowerCase().contains(q) &&
+            !m.root.toLowerCase().contains(q) &&
+            !m.category.toLowerCase().contains(q)) {
           continue;
         }
       }
@@ -122,9 +126,8 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                const NwsbVideo(
-                  asset: 'assets/video/store-meaning-library.mp4',
-                  poster: 'assets/video/store-meaning-library-poster.webp',
+                NwsbVideo(
+                  asset: nwsbVideo(kStoreMeaningDoorVidFile),
                   priority: ClipPriority.feature,
                 ),
                 const DecoratedBox(
@@ -140,7 +143,73 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
                   padding: EdgeInsets.all(16),
                   child: Align(
                     alignment: Alignment.bottomLeft,
-                    child: Text('The Meaning Store', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w300, color: Colors.white)),
+                    child: Text(
+                      'The Meaning Store',
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.w300, color: Colors.white),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 14),
+        // Subscribe video banner — same clip as index / part026.
+        ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: AspectRatio(
+            aspectRatio: 16 / 5,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                NwsbVideo(
+                  asset: nwsbVideo(kMsSubscribeVidFile),
+                  priority: ClipPriority.decoration,
+                ),
+                const DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: [Color(0xAA060C18), Color(0x22060C18)],
+                    ),
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 14),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xEE060C18),
+                        borderRadius: BorderRadius.circular(40),
+                        border: Border.all(color: const Color(0x33E8D5A3)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ClipOval(
+                            child: Image.network(
+                              kMsSubscribePillIcon,
+                              width: 22,
+                              height: 22,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => const SizedBox(width: 22, height: 22),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Subscribe Today',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: NwsbColors.goldLight,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -177,7 +246,8 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
             RmCatBanner(
               title: cat,
               sub: kMsCatSub[cat] ?? 'Decoded origins',
-              artAsset: _bannerFor(cat),
+              logoUrl: kMsCatLogoUrl,
+              logoAsset: kRmCatLogoAsset,
             ),
             MsGrid(
               children: [
@@ -218,20 +288,10 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
             child: Center(child: Text('No meanings match.', style: TextStyle(color: Color(0x8CFFFFFF)))),
           ),
         const StoreDisclaimer(
-          text: 'Meanings shared or sold here are for educational and wellness purposes only — nothing here is medical advice. Purchases are final once unlocked.',
+          text:
+              'Meanings shared or sold here are for educational and wellness purposes only — nothing here is medical advice. Purchases are final once unlocked.',
         ),
       ],
     );
-  }
-
-  String? _bannerFor(String cat) {
-    const map = {
-      'Elements': 'assets/store/collections/elements.webp',
-      'Human': 'assets/store/collections/identity.webp',
-      'Emotions': 'assets/store/collections/peace.webp',
-      'Cosmos': 'assets/store/collections/cosmos.webp',
-      'Nations & People': 'assets/store/collections/family.webp',
-    };
-    return map[cat];
   }
 }
