@@ -28,7 +28,8 @@ class DeviceFrame {
       required this.right,
       required this.bottom,
       required this.left,
-      this.verticalIsHeight = false});
+      this.verticalIsHeight = false,
+      this.opaqueAperture = false});
 
   /// True when this frame's aperture is placed by ABSOLUTE OFFSETS rather
   /// than by padding — `top`/`bottom` percentages on a positioned box
@@ -37,6 +38,14 @@ class DeviceFrame {
   /// a `<video>` is a replaced element and `width: auto` on one takes its
   /// intrinsic size and drops the `right` offset (nowssb-nm.css:14651).
   final bool verticalIsHeight;
+
+  /// True when the bezel render paints an OPAQUE screen (not a transparent
+  /// hole). `word-acts-tab.webp` is this kind: the website uses it as a
+  /// BACKGROUND and places the `<video>` ON TOP of the aperture. Stacking
+  /// the bezel over the clip (the transparent-frame path) hides the video
+  /// behind solid grey — the "dark blur" users see on Sentence/Practice/Store
+  /// and on the home Customize · Features · Earn strip.
+  final bool opaqueAperture;
 
   final String image;
 
@@ -89,6 +98,7 @@ class DeviceFrame {
     bottom: 0.06625,
     left: 0.01823,
     verticalIsHeight: true,
+    opaqueAperture: true,
   );
 
   /// `.dev-tabc-l` — padding: 1.752% 1.523% 4.570% 1.447%. Render 1313x807.
@@ -268,37 +278,42 @@ class TvFrame extends StatelessWidget {
         child: LayoutBuilder(
           builder: (context, c) {
             final box = Size(c.maxWidth, c.maxHeight);
-            return Stack(
-              fit: StackFit.expand,
-              children: [
-                // The screen, behind the glass. Black under it because a
-                // clip that has not opened yet should read as a dark screen
-                // rather than as a hole in the device.
-                Padding(
-                  padding: frame.insets(box),
-                  child: ClipRect(
-                    child: ColoredBox(
-                      color: Colors.black,
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          NwsbVideo(
-                            asset: asset,
-                            priority: priority,
-                            autoplay: autoplay,
-                            showPoster: false,
-                          ),
-                          if (overlay != null) overlay!,
-                        ],
+            final screen = Padding(
+              padding: frame.insets(box),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(frame.opaqueAperture ? 5 : 0),
+                clipBehavior: Clip.antiAlias,
+                child: ColoredBox(
+                  color: Colors.black,
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      NwsbVideo(
+                        asset: asset,
+                        priority: priority,
+                        autoplay: autoplay,
+                        showPoster: false,
                       ),
-                    ),
+                      if (overlay != null) overlay!,
+                    ],
                   ),
                 ),
-                // The bezel, over the top. IgnorePointer because it is
-                // decoration and must never eat a tap meant for the card.
-                IgnorePointer(child: _Bezel(frame: frame)),
-              ],
+              ),
             );
+            // Opaque-aperture bezels (word-acts-tab): frame is BACKGROUND,
+            // video paints on top in the aperture — same as nowssb-player.css
+            // `.lgp-pr-glass` / `.hhr-tab`. Transparent bezels keep the
+            // classic stack: video under the hole in the glass.
+            final children = frame.opaqueAperture
+                ? <Widget>[
+                    IgnorePointer(child: _Bezel(frame: frame)),
+                    screen,
+                  ]
+                : <Widget>[
+                    screen,
+                    IgnorePointer(child: _Bezel(frame: frame)),
+                  ];
+            return Stack(fit: StackFit.expand, children: children);
           },
         ),
       ),
@@ -421,27 +436,33 @@ class FramedSlot extends StatelessWidget {
         child: LayoutBuilder(
           builder: (context, c) {
             final box = Size(c.maxWidth, c.maxHeight);
-            return Stack(
-              fit: StackFit.expand,
-              children: [
-                Padding(
-                  padding: frame.insets(box),
-                  child: ClipRect(
-                    child: ColoredBox(
-                      color: Colors.black,
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          child,
-                          if (overlay != null) overlay!,
-                        ],
-                      ),
-                    ),
+            final screen = Padding(
+              padding: frame.insets(box),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(frame.opaqueAperture ? 5 : 0),
+                clipBehavior: Clip.antiAlias,
+                child: ColoredBox(
+                  color: Colors.black,
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      child,
+                      if (overlay != null) overlay!,
+                    ],
                   ),
                 ),
-                IgnorePointer(child: _Bezel(frame: frame)),
-              ],
+              ),
             );
+            final layers = frame.opaqueAperture
+                ? <Widget>[
+                    IgnorePointer(child: _Bezel(frame: frame)),
+                    screen,
+                  ]
+                : <Widget>[
+                    screen,
+                    IgnorePointer(child: _Bezel(frame: frame)),
+                  ];
+            return Stack(fit: StackFit.expand, children: layers);
           },
         ),
       ),

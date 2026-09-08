@@ -740,14 +740,19 @@ class VideoPool {
       lastError = '${l.assetPath.split('/').last}: $e';
       debugPrint('NowssB video: could not open ${l.assetPath} — $e');
       l._failures++;
-      // Back off, do not strike off. Five seconds, then ten, then fifteen,
-      // up to a minute — so a clip that failed because the phone had no
-      // route yet is playing a few seconds later instead of being dead for
-      // the session.
-      final wait = Duration(seconds: 5 * l._failures.clamp(1, 12));
+      // Soft fail: never let one PlatformException (e.g. fashion-plus-bg-6)
+      // monopolize open slots or pause siblings. Short backoff for the first
+      // couple of tries (network / MediaCodec blip), then a long cool-down so
+      // the pool keeps opening every other visible loop.
+      final wait = l._failures <= 2
+          ? Duration(seconds: 3 * l._failures)
+          : Duration(minutes: l._failures.clamp(2, 10));
       l._retryAt = DateTime.now().add(wait);
       l._controller = null;
       _live.remove(l);
+      // Drop any queued reopen for this lease so a bad clip does not keep
+      // occupying openAtOnce seats while siblings wait.
+      _openQueue.removeWhere((q) => identical(q, l));
       try {
         await _byThen(c.dispose(), _giveUp, 'dispose');
       } catch (_) {}
@@ -774,7 +779,13 @@ class VideoPool {
     // shade next to a music player.
     await c.setVolume(0);
     _armSeamlessLoop(l, c);
-    if (l._wantsPlay) await l._ensurePlaying(c);
+    if (l._wantsPlay) {
+      await l._ensurePlaying(c);
+      // Android sometimes accepts play() before the texture is attached and
+      // then sits paused on frame 0. A second nudge right after settles most
+      // "decoders N / playing 1" cases without waiting for the heartbeat.
+      if (!c.value.isPlaying) await l._ensurePlaying(c);
+    }
 
     l._changed();
     // Asking once is not the same as it having happened. The readout said
@@ -893,11 +904,13 @@ class VideoPool {
     'assets/video/player-actions-tab.mp4',
     'assets/video/orb-loop.mp4',
     'assets/video/player-bg-loop.mp4',
+    'assets/video/word-acts.mp4',
     'assets/video/login-phone.mp4',
     'assets/video/my-progress-scene-1.mp4',
     'assets/video/fashion-plus-bg-5.mp4',
-    'assets/video/fashion-plus-bg-6.mp4',
     'assets/video/normal-glass-background.mp4',
+    'assets/video/healing-path-bg.mp4',
+    'assets/video/sound-library-banner.mp4',
   ];
 
   /// Prefetch [featureWarmAssets] (or [assetPaths]) into the OS page cache
@@ -939,7 +952,7 @@ class VideoPool {
   /// attached. Reasserting play keeps every live visible clip moving.
   Timer? _beat;
   void startHeartbeat() {
-    _beat ??= Timer.periodic(const Duration(milliseconds: 400), (_) {
+    _beat ??= Timer.periodic(const Duration(milliseconds: 250), (_) {
       if (_leases.isEmpty) return;
       // Do not rebalance here. Rebalancing can tear down and recreate a
       // controller while a home is laying out, which produced the visible

@@ -10,7 +10,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../data/content.dart';
 import '../data/practice_progress.dart';
 import '../shell/nav_shell.dart';
-import 'library.dart';
+import 'sound_library.dart';
 import 'player_settings.dart';
 import 'practice.dart';
 import 'progress/progress_screen.dart';
@@ -95,7 +95,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PracticeScreen()));
       case 'Saved':
       case 'Liked':
-        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const LibraryScreen()));
+        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SoundLibraryScreen()));
       case 'Journal':
         // Journal is account activity — not the My Progress orb screen.
         Navigator.of(context).push(MaterialPageRoute(builder: (_) => const QuickAccessScreen()));

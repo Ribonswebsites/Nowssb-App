@@ -194,9 +194,19 @@ class _SoundLibraryScreenState extends State<SoundLibraryScreen> {
     );
 
     if (widget.embedded) {
+      // Bottom inset clears the floating nav pill when this is the Library
+      // tab root; pushed sheets still get SafeArea bottom from the modal.
+      final bottom = Navigator.of(context).canPop() ? 0.0 : 96.0;
       return Material(
         color: Colors.black,
-        child: SafeArea(top: false, child: feed),
+        child: SafeArea(
+          top: false,
+          bottom: false,
+          child: Padding(
+            padding: EdgeInsets.only(bottom: bottom),
+            child: feed,
+          ),
+        ),
       );
     }
 
@@ -1132,7 +1142,10 @@ class _SlmHead extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (embedded)
+                // Sheet grabber only when this screen was pushed/modaled
+                // (can pop). As the Library bottom-nav tab root it cannot —
+                // showing a grabber + dead back chevron looked broken.
+                if (embedded && Navigator.of(context).canPop())
                   Center(
                     child: Container(
                       width: 44,
@@ -1148,11 +1161,14 @@ class _SlmHead extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: Row(
                     children: [
-                      IconButton(
-                        onPressed: onBack,
-                        icon: const Icon(Icons.chevron_left_rounded,
-                            color: Colors.white, size: 28),
-                      ),
+                      if (Navigator.of(context).canPop())
+                        IconButton(
+                          onPressed: onBack,
+                          icon: const Icon(Icons.chevron_left_rounded,
+                              color: Colors.white, size: 28),
+                        )
+                      else
+                        const SizedBox(width: 12),
                       Container(
                         width: 26,
                         height: 26,

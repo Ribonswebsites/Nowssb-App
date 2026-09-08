@@ -77,7 +77,7 @@ class FashHeroRow extends StatelessWidget {
       child: TvFrame(
         asset: 'assets/video/word-acts.mp4',
         frame: DeviceFrame.wordActs,
-        priority: ClipPriority.decoration,
+        priority: ClipPriority.feature,
         overlay: Stack(
           fit: StackFit.expand,
           children: [

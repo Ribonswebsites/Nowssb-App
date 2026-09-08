@@ -21,6 +21,7 @@ import '../data/models.dart';
 import '../data/practice_progress.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
+import '../widgets/tv_frame.dart';
 import '../theme/tokens.dart';
 import 'sound_library.dart';
 import 'aura_sound_library.dart';
@@ -2192,58 +2193,24 @@ class _WordActionStrip extends StatelessWidget {
   );
 
   @override
-  Widget build(BuildContext context) => AspectRatio(
-    aspectRatio: 1371 / 317,
-    child: ClipRRect(
-      borderRadius: BorderRadius.circular(9),
-      clipBehavior: Clip.antiAlias,
-      child: Stack(fit: StackFit.expand, clipBehavior: Clip.hardEdge, children: [
-        const ColoredBox(color: Colors.black),
-        // Looping tab film (player-actions-tab.mp4) — must match WebView:
-        // visible motion inside the Sentence / Practice / Store strip frame.
-        // Feature priority + pool concurrency keep it playing with the page
-        // bg and card theme clip instead of losing the only decoder slot.
-        Positioned.fill(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(6, 5, 6, 5),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(5),
-              clipBehavior: Clip.antiAlias,
-              child: NwsbVideo(
-                asset: video,
-                fit: BoxFit.cover,
-                priority: ClipPriority.feature,
-                autoplay: true,
-                loop: true,
-                showPoster: false,
-              ),
-            ),
-          ),
-        ),
-        // Visible glass/border chrome frame (not invisible).
-        IgnorePointer(
-          child: Image.asset(
-            'assets/frames/word-acts-tab.webp',
-            fit: BoxFit.fill,
-            errorBuilder: (_, __, ___) => DecoratedBox(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(9),
-                border: Border.all(color: const Color(0xA6FFFFFF), width: 1.4),
-                boxShadow: const [BoxShadow(color: Color(0x40FFFFFF), blurRadius: 8)],
-              ),
-            ),
-          ),
-        ),
-        Row(children: [
-          Expanded(child: _WordAction(icon: Icons.chat_bubble_outline_rounded, label: 'Sentence', onTap: onSentence)),
-          _sep(),
-          Expanded(child: _WordAction(icon: Icons.mic_none_rounded, label: 'Practice', onTap: onPractice, accent: accent)),
-          _sep(),
-          Expanded(child: _WordAction(icon: Icons.shopping_bag_outlined, label: 'Store', onTap: onStore)),
-        ]),
+  Widget build(BuildContext context) {
+    // Match WebView `.lgp-pr-glass`: word-acts-tab is an OPAQUE background;
+    // the looping tab film paints ON TOP in the aperture (DeviceFrame.wordActs
+    // opaqueAperture). Stacking the bezel over the video hid it as a dark blur.
+    return TvFrame(
+      asset: video,
+      frame: DeviceFrame.wordActs,
+      priority: ClipPriority.feature,
+      autoplay: true,
+      overlay: Row(children: [
+        Expanded(child: _WordAction(icon: Icons.chat_bubble_outline_rounded, label: 'Sentence', onTap: onSentence)),
+        _sep(),
+        Expanded(child: _WordAction(icon: Icons.mic_none_rounded, label: 'Practice', onTap: onPractice, accent: accent)),
+        _sep(),
+        Expanded(child: _WordAction(icon: Icons.shopping_bag_outlined, label: 'Store', onTap: onStore)),
       ]),
-    ),
-  );
+    );
+  }
 }
 
 class _WordAction extends StatelessWidget {

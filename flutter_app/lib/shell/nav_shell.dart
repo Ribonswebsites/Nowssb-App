@@ -9,7 +9,7 @@ import '../data/settings.dart';
 import '../data/content.dart';
 import '../screens/home_fashion.dart';
 import '../screens/home_normal.dart';
-import '../screens/library.dart';
+import '../screens/sound_library.dart';
 import '../screens/practice.dart';
 import '../screens/practice_player.dart';
 import '../screens/hearing_safety_player.dart';
@@ -139,6 +139,20 @@ class _NavShellState extends State<NavShell> {
     Navigator.of(context).push(MaterialPageRoute(builder: (_) => const QuickAccessScreen()));
   }
 
+
+  /// Keep inactive tabs mounted (IndexedStack) but off-stage so their videos
+  /// do not claim VideoPool decoders. NwsbVideo already respects Offstage.
+  Widget _tabAlive(int index, Widget child) {
+    final on = _i == index;
+    return TickerMode(
+      enabled: on,
+      child: Offstage(
+        offstage: !on,
+        child: child,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return NavScope(
@@ -158,12 +172,17 @@ class _NavShellState extends State<NavShell> {
           IndexedStack(
             index: _i,
             children: [
-              _fashion ? const HomeFashion() : const HomeNormal(),
-              const PracticeScreen(),
-              const LibraryScreen(),
-              const StoreScreen(),
+              // Offstage + TickerMode: inactive IndexedStack tabs still layout,
+              // so without this their NwsbVideos keep claiming VideoPool seats
+              // and the visible tab (and player overlays) starve — "playing 1".
+              _tabAlive(0, _fashion ? const HomeFashion() : const HomeNormal()),
+              _tabAlive(1, const PracticeScreen()),
+              // Bottom-nav Library must be the media-rich Sound Library (website
+              // SLM), NOT the old plain letter list in library.dart.
+              _tabAlive(2, const SoundLibraryScreen(embedded: true)),
+              _tabAlive(3, const StoreScreen()),
               // Tab 4 is always account Profile — never PracticeProgressScreen.
-              const ProfileScreen(),
+              _tabAlive(4, const ProfileScreen()),
             ],
           ),
           // The switch between the two homes. On the website this lives in
