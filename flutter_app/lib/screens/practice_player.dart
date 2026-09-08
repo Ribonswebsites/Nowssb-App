@@ -2411,7 +2411,7 @@ class _PlayerInfoSheet extends StatelessWidget {
   }
 }
 
-class _InfoFactclass _InfoFact extends StatelessWidget {
+class _InfoFact extends StatelessWidget {
   const _InfoFact({required this.label, required this.value, required this.accent});
   final String label;
   final String value;
