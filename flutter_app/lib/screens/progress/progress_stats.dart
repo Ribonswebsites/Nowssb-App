@@ -112,7 +112,7 @@ class ProgressWeekGrid extends StatelessWidget {
                     color: days[i].done
                         ? Colors.white.withOpacity(0.095)
                         : MpColors.glass,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(22),
                     border: Border.all(
                       color: days[i].done || days[i].isToday
                           ? Colors.white.withOpacity(0.26)
@@ -206,7 +206,7 @@ class ProgressMilestones extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
             decoration: BoxDecoration(
               color: item.$3 ? Colors.white.withOpacity(0.10) : MpColors.glass,
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(22),
               border: Border.all(
                 color: item.$3 ? Colors.white.withOpacity(0.28) : MpColors.line,
               ),

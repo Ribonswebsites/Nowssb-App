@@ -10,7 +10,9 @@ class MpColors {
   static const muted = Color(0xFF9B9D9E);
   static const gold = Color(0xFFD9C98F);
   static const line = Color(0x21FFFFFF);
-  static const glass = Color(0x8F040506);
+  static const glass = Color(0x99040506);
+  /// Notifications-level backdrop blur sigma.
+  static const glassBlur = 13.0;
   static const dim = Color(0xFF858A8C);
   static const soft = Color(0xFFA8AFB1);
 }

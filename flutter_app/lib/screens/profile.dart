@@ -23,7 +23,7 @@ const _dim = Color(0xFF8C8C8C);
 const _faint = Color(0xFF565656);
 const _border = Color(0x24FFFFFF);
 const _borderSoft = Color(0x14FFFFFF);
-const _surface = Color(0x0BFFFFFF);
+const _surface = Color(0x14FFFFFF);
 const _mono = 'Roboto Mono';
 
 /// Same prebuilt banner library as `nowssb-nm.js` `NWSB_BANNERS`.

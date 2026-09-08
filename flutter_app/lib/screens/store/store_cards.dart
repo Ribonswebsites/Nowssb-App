@@ -76,7 +76,7 @@ class RmCatBanner extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: Colors.black,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(color: const Color(0x1AFFFFFF)),
       ),
       child: Padding(
@@ -162,7 +162,7 @@ class RmRowVid extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 8, bottom: 14),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(18),
         child: AspectRatio(
           aspectRatio: 16 / 9,
           child: NwsbVideo(asset: url, priority: ClipPriority.decoration),
