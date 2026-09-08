@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../data/settings.dart';
+import '../widgets/black_glass_banner.dart';
 
 class PlayerSettingsScreen extends StatefulWidget {
   const PlayerSettingsScreen({super.key});
@@ -131,7 +132,7 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
     final batt = _batteryPct ?? 52;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF202731),
+      backgroundColor: const Color(0xFF0A1018),
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -183,16 +184,24 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
               child: ListView(
                 padding: EdgeInsets.fromLTRB(16, 0, 16, 28 + bottomInset),
                 children: [
-                  _nav(Icons.tune, 'Equalizer', _eqLabel, () => _choose('Equalizer', _eqOptions, _eqLabel, _setEq)),
-                  _nav(Icons.graphic_eq, 'Audio Quality', s.quality, () => _choose('Audio Quality', _qualityOptions, s.quality, s.setQuality)),
-                  _toggle(Icons.multitrack_audio, 'Bass Boost', s.bassBoost, s.toggleBass),
-                  _nav(Icons.speed, 'Playback Speed', _speedLabel, () => _choose('Playback Speed', _speedOptions, _speedLabel, _setSpeed)),
-                  _nav(Icons.compare_arrows, 'Crossfade', s.crossfade, () => _choose('Crossfade', _crossfadeOptions, s.crossfade, s.setCrossfade)),
-                  _nav(Icons.timer_outlined, 'Sleep Timer', s.sleepTimer, () => _choose('Sleep Timer', _sleepOptions, s.sleepTimer, s.setSleepTimer)),
-                  _toggle(Icons.download_outlined, 'Download Only', s.downloadOnly, s.toggleDownloadOnly),
-                  _nav(Icons.queue_music, 'Now Playing View', s.playlist, () => _choose('Now Playing View', _viewOptions, s.playlist, s.setPlaylist)),
-                  _nav(Icons.view_list_outlined, 'Playlist View', s.playlist == 'Classic' || s.playlist == 'Grid' || s.playlist == 'Compact' ? s.playlist : 'Classic', () => _choose('Playlist View', _playlistOptions, s.playlist, s.setPlaylist)),
-                  _nav(Icons.notifications_none, 'Now Playing', s.nowPlaying, () => _choose('Now Playing', _nowPlayingOptions, s.nowPlaying, s.setNowPlaying)),
+                  HeavyGlassPanel(
+                    radius: 26,
+                    padding: const EdgeInsets.fromLTRB(8, 10, 8, 10),
+                    child: Column(
+                      children: [
+                        _nav(Icons.tune, 'Equalizer', _eqLabel, () => _choose('Equalizer', _eqOptions, _eqLabel, _setEq)),
+                        _nav(Icons.graphic_eq, 'Audio Quality', s.quality, () => _choose('Audio Quality', _qualityOptions, s.quality, s.setQuality)),
+                        _toggle(Icons.multitrack_audio, 'Bass Boost', s.bassBoost, s.toggleBass),
+                        _nav(Icons.speed, 'Playback Speed', _speedLabel, () => _choose('Playback Speed', _speedOptions, _speedLabel, _setSpeed)),
+                        _nav(Icons.compare_arrows, 'Crossfade', s.crossfade, () => _choose('Crossfade', _crossfadeOptions, s.crossfade, s.setCrossfade)),
+                        _nav(Icons.timer_outlined, 'Sleep Timer', s.sleepTimer, () => _choose('Sleep Timer', _sleepOptions, s.sleepTimer, s.setSleepTimer)),
+                        _toggle(Icons.download_outlined, 'Download Only', s.downloadOnly, s.toggleDownloadOnly),
+                        _nav(Icons.queue_music, 'Now Playing View', s.playlist, () => _choose('Now Playing View', _viewOptions, s.playlist, s.setPlaylist)),
+                        _nav(Icons.view_list_outlined, 'Playlist View', s.playlist == 'Classic' || s.playlist == 'Grid' || s.playlist == 'Compact' ? s.playlist : 'Classic', () => _choose('Playlist View', _playlistOptions, s.playlist, s.setPlaylist)),
+                        _nav(Icons.notifications_none, 'Now Playing', s.nowPlaying, () => _choose('Now Playing', _nowPlayingOptions, s.nowPlaying, s.setNowPlaying), last: true),
+                      ],
+                    ),
+                  ),
                   const SizedBox(height: 24),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -215,55 +224,33 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
     );
   }
 
-  Widget _nav(IconData icon, String label, String value, VoidCallback onTap) => InkWell(
-        onTap: () {
-          HapticFeedback.selectionClick();
-          onTap();
-        },
-        borderRadius: BorderRadius.circular(10),
-        child: Container(
-          height: 56,
-          decoration: const BoxDecoration(
-            border: Border(bottom: BorderSide(color: Color(0x24F2F4F7))),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Row(
-              children: [
-                Icon(icon, color: Colors.white.withOpacity(.9), size: 20),
-                const SizedBox(width: 14),
-                Expanded(child: Text(label.toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 13, letterSpacing: 2))),
-                if (value.isNotEmpty) Text(value.toUpperCase(), style: const TextStyle(color: Color(0xFF8B919A), fontSize: 12, letterSpacing: 1.4)),
-                const SizedBox(width: 6),
-                const Icon(Icons.chevron_right, color: Color(0x738B919A), size: 18),
-              ],
-            ),
-          ),
+  Widget _nav(IconData icon, String label, String value, VoidCallback onTap, {bool last = false}) => NestedDarkWrap(
+        margin: EdgeInsets.only(bottom: last ? 0 : 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+        onTap: onTap,
+        child: Row(
+          children: [
+            Icon(icon, color: Colors.white.withOpacity(.9), size: 20),
+            const SizedBox(width: 14),
+            Expanded(child: Text(label.toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 13, letterSpacing: 2))),
+            if (value.isNotEmpty) Text(value.toUpperCase(), style: const TextStyle(color: Color(0xFF8B919A), fontSize: 12, letterSpacing: 1.4)),
+            const SizedBox(width: 6),
+            const Icon(Icons.chevron_right, color: Color(0x738B919A), size: 18),
+          ],
         ),
       );
 
-  Widget _toggle(IconData icon, String label, bool value, VoidCallback onTap) => InkWell(
-        onTap: () {
-          HapticFeedback.selectionClick();
-          onTap();
-        },
-        borderRadius: BorderRadius.circular(10),
-        child: Container(
-          height: 56,
-          decoration: const BoxDecoration(
-            border: Border(bottom: BorderSide(color: Color(0x24F2F4F7))),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Row(
-              children: [
-                Icon(icon, color: Colors.white.withOpacity(.9), size: 20),
-                const SizedBox(width: 14),
-                Expanded(child: Text(label.toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 13, letterSpacing: 2))),
-                Switch.adaptive(value: value, onChanged: (_) => onTap(), activeColor: Colors.white),
-              ],
-            ),
-          ),
+  Widget _toggle(IconData icon, String label, bool value, VoidCallback onTap) => NestedDarkWrap(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        onTap: onTap,
+        child: Row(
+          children: [
+            Icon(icon, color: Colors.white.withOpacity(.9), size: 20),
+            const SizedBox(width: 14),
+            Expanded(child: Text(label.toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 13, letterSpacing: 2))),
+            Switch.adaptive(value: value, onChanged: (_) => onTap(), activeColor: Colors.white),
+          ],
         ),
       );
 }

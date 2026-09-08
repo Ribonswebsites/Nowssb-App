@@ -16178,8 +16178,8 @@ a:active,
   background: rgba(255,255,255,0.06);
   border: 1px solid rgba(255,255,255,0.14);
   border-radius: 22px !important;
-  -webkit-backdrop-filter: blur(26px) saturate(1.35);
-  backdrop-filter: blur(26px) saturate(1.35);
+  -webkit-backdrop-filter: blur(40px) saturate(1.4);
+  backdrop-filter: blur(40px) saturate(1.4);
   box-shadow: 0 16px 40px rgba(0,0,0,0.4);
   padding: 16px;
   margin-top: 8px;
@@ -16246,7 +16246,88 @@ a:active,
   line-height: 1.45; letter-spacing: -0.2px; color: #fff;
 }
 
-/* ── Glass boost: Profile / Progress / Word Science / Store words ──
+/
+#sub-sentence-builder .sb-glass.sb-heavy {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 28px !important;
+  -webkit-backdrop-filter: blur(40px) saturate(1.4);
+  backdrop-filter: blur(40px) saturate(1.4);
+  box-shadow: 0 20px 48px rgba(0,0,0,0.48);
+  padding: 12px;
+}
+.sb-top-banner {
+  width: 100%; min-height: 96px; margin: 0 0 14px; padding: 18px 18px 18px 22px;
+  display: flex; align-items: flex-end; justify-content: space-between; box-sizing: border-box;
+  background: #000 !important; border: 1px solid rgba(255,255,255,.16);
+  border-radius: 20px !important; cursor: pointer; text-align: left; color: #fff;
+}
+.sb-top-banner-title {
+  font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 800;
+  letter-spacing: -0.4px; line-height: 1.15; color: #fff;
+}
+.sb-top-banner-sub {
+  font-family: 'DM Sans', sans-serif; font-size: 12px; color: rgba(255,255,255,.6); margin-top: 6px;
+}
+.sb-top-banner-arrow {
+  width: 46px; height: 46px; border-radius: 50% !important; background: #fff;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #060c18;
+}
+.sb-top-banner-arrow svg { width: 16px; height: 16px; }
+.sb-nest {
+  display: flex; align-items: center; gap: 12px; width: 100%; box-sizing: border-box;
+  background: #000; border: 1px solid rgba(255,255,255,0.14); border-radius: 16px !important;
+  padding: 14px; margin: 0 0 10px; cursor: pointer; text-align: left; color: #fff;
+}
+.sb-nest-head { cursor: default; }
+.sb-nest-select { display: block; cursor: default; }
+.sb-nest-ico {
+  width: 38px; height: 38px; flex-shrink: 0; border-radius: 11px !important;
+  background: #0a0a12; border: 1px solid rgba(255,255,255,0.22);
+  display: flex; align-items: center; justify-content: center; color: #fff;
+}
+.sb-nest-ico svg { width: 18px; height: 18px; }
+.sb-nest-div { width: 1px; align-self: stretch; background: rgba(255,255,255,0.2); flex-shrink: 0; }
+.sb-nest-txt { flex: 1; min-width: 0; }
+.sb-nest-title { font-family: 'DM Sans', sans-serif; font-size: 13.5px; font-weight: 700; color: #fff; }
+.sb-nest-sub { font-family: 'DM Sans', sans-serif; font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 2px; line-height: 1.35; }
+.sb-nest-arrow {
+  width: 30px; height: 30px; border-radius: 50% !important; flex-shrink: 0;
+  border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.06);
+  display: flex; align-items: center; justify-content: center;
+}
+.sb-nest-arrow svg { width: 14px; height: 14px; }
+.sb-rewrite-btn {
+  width: 100%; height: 48px; margin-top: 14px; border: none; border-radius: 14px !important;
+  background: #fff; color: #0a0a12; font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 800; letter-spacing: 0.3px; cursor: pointer;
+}
+.sb-request-sheet {
+  position: fixed; inset: 0; z-index: 12000; display: flex; align-items: flex-end;
+  background: rgba(0,0,0,0.45); opacity: 0; transition: opacity .22s ease; pointer-events: none;
+}
+.sb-request-sheet.open { opacity: 1; pointer-events: auto; }
+.sb-request-panel {
+  width: 100%; box-sizing: border-box; padding: 16px 16px calc(16px + env(safe-area-inset-bottom,0px));
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 28px 28px 0 0 !important;
+  -webkit-backdrop-filter: blur(40px) saturate(1.4); backdrop-filter: blur(40px) saturate(1.4);
+  transform: translateY(24px); transition: transform .22s ease;
+}
+.sb-request-sheet.open .sb-request-panel { transform: translateY(0); }
+.sb-request-ta {
+  width: 100%; margin-top: 10px; box-sizing: border-box; min-height: 96px;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 14px !important; color: #fff; padding: 12px;
+  font-family: 'DM Sans', sans-serif; font-size: 14px; resize: vertical;
+}
+.sb-request-cancel {
+  width: 100%; margin-top: 10px; height: 44px; border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 14px !important; background: transparent; color: rgba(255,255,255,0.7);
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer;
+}
+#sub-sentence-builder .sb-result.sb-nest { display: block; }
+* ── Glass boost: Profile / Progress / Word Science / Store words ──
    More Notifications-like backdrop blur + rounded glass panels. */
 #sub-profile .glass,
 #sub-profile .progress-wrap,

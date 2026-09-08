@@ -12,11 +12,11 @@ import 'package:flutter/services.dart';
 import '../data/content.dart';
 import '../data/settings.dart';
 import '../media/nwsb_image.dart';
+import '../screens/app_settings.dart';
 import '../screens/notifications_settings.dart';
 import '../screens/progress/progress_screen.dart';
 import '../screens/sound_library.dart';
 import '../screens/store/meaning_store.dart';
-import '../screens/widgets_page.dart';
 import '../theme/tokens.dart';
 
 /// Opens the website hamburger (`#menuDrawer`) over the current route.
@@ -309,7 +309,7 @@ class HomeMenuDrawer extends StatelessWidget {
                             label: 'Settings',
                             sub: 'Preferences',
                             onTap: () =>
-                                _push(context, const WidgetsPage()),
+                                _push(context, const AppSettingsScreen()),
                           ),
                           _Row(
                             light: light,

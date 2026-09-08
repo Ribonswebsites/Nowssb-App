@@ -92,22 +92,44 @@
         String(w.word).replace(/"/g, '&quot;') + '" onclick="sbToggleWord(this)">' + w.word + '</button>';
     }).join('');
 
+    function nestRow(title, sub, ico, onclick) {
+      return '<button type="button" class="sb-nest" ' + (onclick ? 'onclick="' + onclick + '"' : '') + '>' +
+        '<div class="sb-nest-ico">' + ico + '</div>' +
+        '<div class="sb-nest-div" aria-hidden="true"></div>' +
+        '<div class="sb-nest-txt"><div class="sb-nest-title">' + title + '</div>' +
+        (sub ? '<div class="sb-nest-sub">' + sub + '</div>' : '') + '</div>' +
+        '<div class="sb-nest-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="rgba(255,255,255,0.55)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' +
+        '</button>';
+    }
     root.innerHTML =
-      sbBanner('Build your sentence', 'Combine owned words into one healing line', IC.sentence) +
-      sbBanner('All words owned', owned.length + ' words ready to weave', IC.book, 'sbScrollCombine()') +
-      sbBanner('Listen', 'Hear the words before you combine', IC.play, 'sbListen()') +
-      sbBanner('Request customized words', 'Ask for words tuned to your practice', IC.features, 'sbRequestCustom()') +
-      sbBanner('Buy / Shop words', 'Grow your library in the Store', IC.bag, 'sbOpenShop()') +
-      '<section class="sb-glass sb-combine" id="sbCombine">' +
-        '<div class="sb-combine-head"><span>Combine words</span><span class="sb-count" id="sbCount">' + _sel.size + ' / ' + max + '</span></div>' +
-        '<p class="sb-hint">Select at least 2 owned words. Your subconscious tier allows up to ' + max + '.</p>' +
-        '<div class="sb-chips" id="sbChips">' + chips + '</div>' +
-        '<button type="button" class="sb-combine-btn" id="sbCombineBtn" onclick="sbCombine()" ' +
-          (_sel.size < 2 || _building ? 'disabled' : '') + '>' +
-          IC.go + '<span>Combine into sentence</span></button>' +
-        '<div class="sb-result" id="sbResult" hidden>' +
+      '<button type="button" class="sb-top-banner" onclick="sbScrollCombine()">' +
+        '<div class="sb-top-banner-copy"><div class="sb-top-banner-title">Build your<br>sentence</div>' +
+        '<div class="sb-top-banner-sub">Combine owned words into one healing line</div></div>' +
+        '<div class="sb-top-banner-arrow">' + IC.go + '</div>' +
+      '</button>' +
+      '<section class="sb-glass sb-combine sb-heavy" id="sbCombine">' +
+        '<div class="sb-nest sb-nest-head">' +
+          '<div class="sb-nest-ico">' + IC.features + '</div>' +
+          '<div class="sb-nest-txt"><div class="sb-nest-title">Combine studio</div>' +
+          '<div class="sb-nest-sub">Pick words · weave · speak as one breath</div></div>' +
+          '<span class="sb-count" id="sbCount">' + _sel.size + ' / ' + max + '</span>' +
+        '</div>' +
+        nestRow('Listen', 'Hear the words before you combine', IC.play, 'sbListen()') +
+        nestRow('All words owned', owned.length + ' words ready to weave', IC.book, 'sbScrollCombine()') +
+        nestRow('Request customized words', 'Rewrite and Request for your practice', IC.features, 'sbRequestCustom()') +
+        nestRow('Buy / Shop words', 'Grow your library in the Store', IC.bag, 'sbOpenShop()') +
+        '<div class="sb-nest sb-nest-select">' +
+          '<div class="sb-combine-head"><span>Select words</span></div>' +
+          '<p class="sb-hint">Select at least 2 owned words. Your subconscious tier allows up to ' + max + '.</p>' +
+          '<div class="sb-chips" id="sbChips">' + chips + '</div>' +
+          '<button type="button" class="sb-combine-btn" id="sbCombineBtn" onclick="sbCombine()" ' +
+            (_sel.size < 2 || _building ? 'disabled' : '') + '>' +
+            IC.go + '<span>Combine into sentence</span></button>' +
+        '</div>' +
+        '<div class="sb-result sb-nest" id="sbResult" hidden>' +
           '<div class="sb-result-label">YOUR SENTENCE</div>' +
           '<div class="sb-result-text" id="sbResultText"></div>' +
+          '<button type="button" class="sb-rewrite-btn" onclick="sbRequestCustom()">Rewrite and Request</button>' +
         '</div>' +
       '</section>';
   }
@@ -152,9 +174,35 @@
   };
 
   window.sbRequestCustom = function () {
-    try {
-      if (window.SS && typeof window.SS.open === 'function') return window.SS.open('subscription');
-    } catch (e) {}
+    var existing = document.getElementById('sbRequestSheet');
+    if (existing) existing.remove();
+    var sheet = document.createElement('div');
+    sheet.id = 'sbRequestSheet';
+    sheet.className = 'sb-request-sheet';
+    var seed = Array.from(_sel).join(', ');
+    sheet.innerHTML =
+      '<div class="sb-request-panel">' +
+        '<button type="button" class="sb-top-banner" style="margin:0 0 12px">' +
+          '<div class="sb-top-banner-copy"><div class="sb-top-banner-title">Request customized<br>words</div>' +
+          '<div class="sb-top-banner-sub">Tuned to your practice · Frequency X</div></div>' +
+          '<div class="sb-top-banner-arrow">' + IC.go + '</div></button>' +
+        '<div class="sb-nest"><label class="sb-nest-title">Describe the words you need</label>' +
+        '<textarea id="sbRequestText" class="sb-request-ta" rows="4" placeholder="Organ focus, feeling, language…">' +
+        (seed ? ('Rewrite with: ' + seed) : '') + '</textarea></div>' +
+        '<button type="button" class="sb-rewrite-btn" id="sbRequestSubmit">Rewrite and Request</button>' +
+        '<button type="button" class="sb-request-cancel" id="sbRequestCancel">Cancel</button>' +
+      '</div>';
+    document.body.appendChild(sheet);
+    requestAnimationFrame(function () { sheet.classList.add('open'); });
+    function close() { sheet.classList.remove('open'); setTimeout(function () { sheet.remove(); }, 220); }
+    sheet.addEventListener('click', function (e) { if (e.target === sheet) close(); });
+    document.getElementById('sbRequestCancel').onclick = close;
+    document.getElementById('sbRequestSubmit').onclick = function () {
+      close();
+      try {
+        if (window.SS && typeof window.SS.open === 'function') window.SS.open('subscription');
+      } catch (e) {}
+    };
   };
 
   window.sbOpenShop = function () {

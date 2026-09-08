@@ -1,9 +1,8 @@
-/// Sentence builder — glassmorphic full page (Flutter surface).
+/// Sentence builder — Customized-language glass full page (Flutter surface).
 ///
-/// Mirrors website/WebView `#sub-sentence-builder`: black glass banners with
-/// white-circle SVG icons on the right, owned-word combine flow gated by
-/// subconscious tier (2…6 words), Notifications-level backdrop blur.
-/// No emoji.
+/// Black top banner (Customize experience), heavy glass combine card with
+/// nested dark wrappers, tiered combine (2…6), Request flow with
+/// "Rewrite and Request" CTA. No emoji.
 library;
 
 import 'dart:math' as math;
@@ -55,6 +54,7 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
   bool _building = false;
   late final AnimationController _pulse;
   late final AnimationController _reveal;
+  final _combineKey = GlobalKey();
 
   int get _max => sentenceTierMaxWords(tier: widget.tier);
 
@@ -119,7 +119,6 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
     HapticFeedback.mediumImpact();
     await Future<void>.delayed(const Duration(milliseconds: 520));
     final words = _selected.toList();
-    // Local polished compose — AI path lives on web; Flutter stays offline-safe.
     final woven = _composeLocal(words);
     if (!mounted) return;
     setState(() {
@@ -145,7 +144,6 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
 
   void _listen() {
     HapticFeedback.selectionClick();
-    // Play through existing practice entry when available.
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Listen opens from your owned words in Practice.'),
@@ -155,38 +153,75 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
     );
   }
 
+  void _scrollToCombine() {
+    final ctx = _combineKey.currentContext;
+    if (ctx != null) {
+      Scrollable.ensureVisible(
+        ctx,
+        duration: const Duration(milliseconds: 420),
+        curve: Curves.easeOutCubic,
+        alignment: 0.08,
+      );
+    }
+  }
+
+  void _openRequest() {
+    HapticFeedback.selectionClick();
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _RequestCustomSheet(
+        initialWords: _selected.toList(),
+        onSubmitted: (text) {
+          Navigator.of(context).pop();
+          ScaffoldMessenger.of(this.context).showSnackBar(
+            SnackBar(
+              content: Text(
+                text.trim().isEmpty
+                    ? 'Request saved. Frequency X unlocks team-crafted words.'
+                    : 'Rewrite and Request sent.',
+              ),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final owned = _owned;
     final top = MediaQuery.paddingOf(context).top;
+    final bottom = MediaQuery.paddingOf(context).bottom;
 
     return Scaffold(
       backgroundColor: const Color(0xFF060C18),
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Soft radial glass backdrop (Notifications-level language).
           const DecoratedBox(
             decoration: BoxDecoration(
               gradient: RadialGradient(
-                center: Alignment(-0.6, -0.75),
-                radius: 1.1,
-                colors: [Color(0x55E8D5A3), Color(0x00060C18)],
+                center: Alignment(-0.55, -0.7),
+                radius: 1.15,
+                colors: [Color(0x66A78BFA), Color(0x00060C18)],
               ),
             ),
           ),
           const DecoratedBox(
             decoration: BoxDecoration(
               gradient: RadialGradient(
-                center: Alignment(0.85, 0.9),
-                radius: 1.0,
+                center: Alignment(0.9, 0.85),
+                radius: 1.05,
                 colors: [Color(0x44C8E8F5), Color(0x00060C18)],
               ),
             ),
           ),
           BackdropFilter(
-            filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-            child: const ColoredBox(color: Color(0x66060C18)),
+            filter: ui.ImageFilter.blur(sigmaX: 22, sigmaY: 22),
+            child: const ColoredBox(color: Color(0x55060C18)),
           ),
           SafeArea(
             bottom: false,
@@ -223,174 +258,238 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
                 ),
                 Expanded(
                   child: ListView(
-                    padding: EdgeInsets.fromLTRB(16, 4, 16, 28 + MediaQuery.paddingOf(context).bottom),
+                    padding: EdgeInsets.fromLTRB(16, 4, 16, 28 + bottom),
                     children: [
-                      BlackGlassBanner(
-                        title: 'Build your sentence',
+                      CustomizeBlackBanner(
+                        title: 'Build your\nsentence',
                         subtitle: 'Combine owned words into one healing line',
-                        mark: NwsbMarks.sound,
-                        margin: const EdgeInsets.only(bottom: 14),
+                        onTap: _scrollToCombine,
                       ),
-                      BlackGlassBanner(
-                        title: 'All words owned',
-                        subtitle: '${owned.length} words ready to weave',
-                        mark: NwsbMarks.book,
-                        onTap: () => setState(() {}),
-                      ),
-                      BlackGlassBanner(
-                        title: 'Listen',
-                        subtitle: 'Hear the words before you combine',
-                        mark: NwsbMarks.play,
-                        onTap: _listen,
-                      ),
-                      BlackGlassBanner(
-                        title: 'Request customized words',
-                        subtitle: 'Ask for words tuned to your practice',
-                        mark: NwsbMarks.features,
-                        onTap: () {
-                          HapticFeedback.selectionClick();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Custom word requests open with Frequency X.'),
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
-                        },
-                      ),
-                      BlackGlassBanner(
-                        title: 'Buy / Shop words',
-                        subtitle: 'Grow your library in the Store',
-                        mark: NwsbMarks.bag,
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute<void>(
-                              builder: (_) => const WordAtelierScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 8),
-                      NotifGlassPanel(
-                        margin: const EdgeInsets.only(top: 6),
+                      KeyedSubtree(
+                        key: _combineKey,
+                        child: HeavyGlassPanel(
+                        margin: const EdgeInsets.only(top: 2),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              children: [
-                                const Expanded(
-                                  child: Text(
-                                    'Combine words',
-                                    style: TextStyle(
+                            NestedDarkWrap(
+                              padding: const EdgeInsets.fromLTRB(14, 14, 12, 14),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 38,
+                                    height: 38,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF0A0A12),
+                                      borderRadius: BorderRadius.circular(11),
+                                      border: Border.all(
+                                        color: const Color(0x38FFFFFF),
+                                      ),
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: NwsbIcon(
+                                      NwsbMarks.features,
+                                      size: 18,
                                       color: Colors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w800,
                                     ),
                                   ),
-                                ),
-                                Text(
-                                  '${_selected.length} / $_max',
-                                  style: const TextStyle(
-                                    color: Color(0xB8FFFFFF),
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w700,
+                                  const SizedBox(width: 12),
+                                  const Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Combine studio',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                        ),
+                                        SizedBox(height: 2),
+                                        Text(
+                                          'Pick words · weave · speak as one breath',
+                                          style: TextStyle(
+                                            color: Color(0x8CFFFFFF),
+                                            fontSize: 11,
+                                            height: 1.35,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              'Select at least 2 owned words. Your subconscious tier allows up to $_max.',
-                              style: const TextStyle(
-                                color: Color(0x8CFFFFFF),
-                                fontSize: 12,
-                                height: 1.4,
+                                  Text(
+                                    '${_selected.length} / $_max',
+                                    style: const TextStyle(
+                                      color: Color(0xB8FFFFFF),
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            const SizedBox(height: 14),
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: [
-                                for (final w in owned)
-                                  _WordChip(
-                                    label: w,
-                                    selected: _selected.contains(w),
-                                    onTap: () => _toggle(w),
-                                  ),
-                              ],
+                            NestedDarkWrap(
+                              onTap: _listen,
+                              child: _ActionRow(
+                                mark: NwsbMarks.play,
+                                title: 'Listen',
+                                sub: 'Hear the words before you combine',
+                              ),
                             ),
-                            const SizedBox(height: 18),
-                            AnimatedBuilder(
-                              animation: _pulse,
-                              builder: (context, child) {
-                                final glow = 0.35 + 0.25 * _pulse.value;
-                                final enabled = _selected.length >= 2 && !_building;
-                                return GestureDetector(
-                                  onTap: enabled ? _combine : null,
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 220),
-                                    height: 52,
-                                    alignment: Alignment.center,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(16),
-                                      color: enabled
-                                          ? Colors.white
-                                          : const Color(0x22FFFFFF),
-                                      boxShadow: enabled
-                                          ? [
-                                              BoxShadow(
-                                                color: Color.fromRGBO(
-                                                    255, 255, 255, glow * 0.45),
-                                                blurRadius: 22,
-                                                spreadRadius: 1,
-                                              ),
-                                            ]
-                                          : null,
-                                    ),
-                                    child: _building
-                                        ? const SizedBox(
-                                            width: 22,
-                                            height: 22,
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2.2,
-                                              color: Color(0xFF0A0A12),
-                                            ),
-                                          )
-                                        : Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              NwsbIcon(
-                                                NwsbMarks.enterArrow,
-                                                size: 14,
-                                                viewBox: 12,
-                                                color: enabled
-                                                    ? const Color(0xFF0A0A12)
-                                                    : const Color(0x66FFFFFF),
-                                                strokeWidth: 1.9,
-                                                cap: 'square',
-                                              ),
-                                              const SizedBox(width: 10),
-                                              Text(
-                                                'Combine into sentence',
-                                                style: TextStyle(
-                                                  color: enabled
-                                                      ? const Color(0xFF0A0A12)
-                                                      : const Color(0x66FFFFFF),
-                                                  fontSize: 13,
-                                                  fontWeight: FontWeight.w800,
-                                                  letterSpacing: 0.4,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
+                            NestedDarkWrap(
+                              onTap: _scrollToCombine,
+                              child: _ActionRow(
+                                mark: NwsbMarks.book,
+                                title: 'All words owned',
+                                sub: '${owned.length} words ready to weave',
+                              ),
+                            ),
+                            NestedDarkWrap(
+                              onTap: _openRequest,
+                              child: _ActionRow(
+                                mark: NwsbMarks.features,
+                                title: 'Request customized words',
+                                sub: 'Rewrite and Request for your practice',
+                              ),
+                            ),
+                            NestedDarkWrap(
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute<void>(
+                                    builder: (_) => const WordAtelierScreen(),
                                   ),
                                 );
                               },
+                              child: _ActionRow(
+                                mark: NwsbMarks.bag,
+                                title: 'Buy / Shop words',
+                                sub: 'Grow your library in the Store',
+                              ),
                             ),
-                            if (_sentence != null) ...[
-                              const SizedBox(height: 16),
+                            NestedDarkWrap(
+                              padding: const EdgeInsets.all(14),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Select words',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    'Select at least 2 owned words. Your subconscious tier allows up to $_max.',
+                                    style: const TextStyle(
+                                      color: Color(0x8CFFFFFF),
+                                      fontSize: 12,
+                                      height: 1.4,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 14),
+                                  Wrap(
+                                    spacing: 8,
+                                    runSpacing: 8,
+                                    children: [
+                                      for (final w in owned)
+                                        _WordChip(
+                                          label: w,
+                                          selected: _selected.contains(w),
+                                          onTap: () => _toggle(w),
+                                        ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 18),
+                                  AnimatedBuilder(
+                                    animation: _pulse,
+                                    builder: (context, child) {
+                                      final glow = 0.35 + 0.25 * _pulse.value;
+                                      final enabled =
+                                          _selected.length >= 2 && !_building;
+                                      return GestureDetector(
+                                        onTap: enabled ? _combine : null,
+                                        child: AnimatedContainer(
+                                          duration:
+                                              const Duration(milliseconds: 220),
+                                          height: 54,
+                                          alignment: Alignment.center,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(16),
+                                            color: enabled
+                                                ? Colors.white
+                                                : const Color(0x22FFFFFF),
+                                            boxShadow: enabled
+                                                ? [
+                                                    BoxShadow(
+                                                      color: Color.fromRGBO(
+                                                          255,
+                                                          255,
+                                                          255,
+                                                          glow * 0.45),
+                                                      blurRadius: 22,
+                                                      spreadRadius: 1,
+                                                    ),
+                                                  ]
+                                                : null,
+                                          ),
+                                          child: _building
+                                              ? const SizedBox(
+                                                  width: 22,
+                                                  height: 22,
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    strokeWidth: 2.2,
+                                                    color: Color(0xFF0A0A12),
+                                                  ),
+                                                )
+                                              : Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    NwsbIcon(
+                                                      NwsbMarks.enterArrow,
+                                                      size: 14,
+                                                      viewBox: 12,
+                                                      color: enabled
+                                                          ? const Color(
+                                                              0xFF0A0A12)
+                                                          : const Color(
+                                                              0x66FFFFFF),
+                                                      strokeWidth: 1.9,
+                                                      cap: 'square',
+                                                    ),
+                                                    const SizedBox(width: 10),
+                                                    Text(
+                                                      'Combine into sentence',
+                                                      style: TextStyle(
+                                                        color: enabled
+                                                            ? const Color(
+                                                                0xFF0A0A12)
+                                                            : const Color(
+                                                                0x66FFFFFF),
+                                                        fontSize: 13,
+                                                        fontWeight:
+                                                            FontWeight.w800,
+                                                        letterSpacing: 0.4,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                            if (_sentence != null)
                               FadeTransition(
                                 opacity: _reveal,
                                 child: SlideTransition(
@@ -401,55 +500,63 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
                                     parent: _reveal,
                                     curve: Curves.easeOutCubic,
                                   )),
-                                  child: ScaleTransition(
-                                    scale: Tween<double>(begin: 0.96, end: 1)
-                                        .animate(CurvedAnimation(
-                                      parent: _reveal,
-                                      curve: Curves.easeOutBack,
-                                    )),
-                                    child: Container(
-                                      width: double.infinity,
-                                      padding: const EdgeInsets.all(16),
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xCC000000),
-                                        borderRadius: BorderRadius.circular(18),
-                                        border: Border.all(
-                                          color: const Color(0x33FFFFFF),
+                                  child: NestedDarkWrap(
+                                    margin: EdgeInsets.zero,
+                                    padding: const EdgeInsets.all(16),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          'YOUR SENTENCE',
+                                          style: TextStyle(
+                                            color: Color(0xFFE8D5A3),
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w800,
+                                            letterSpacing: 1.8,
+                                          ),
                                         ),
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          const Text(
-                                            'YOUR SENTENCE',
-                                            style: TextStyle(
-                                              color: Color(0xFFE8D5A3),
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.w800,
-                                              letterSpacing: 1.8,
-                                            ),
+                                        const SizedBox(height: 10),
+                                        Text(
+                                          _sentence!,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.w500,
+                                            height: 1.45,
+                                            letterSpacing: -0.2,
                                           ),
-                                          const SizedBox(height: 10),
-                                          Text(
-                                            _sentence!,
-                                            style: const TextStyle(
+                                        ),
+                                        const SizedBox(height: 14),
+                                        GestureDetector(
+                                          onTap: _openRequest,
+                                          child: Container(
+                                            height: 48,
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
                                               color: Colors.white,
-                                              fontSize: 17,
-                                              fontWeight: FontWeight.w500,
-                                              height: 1.45,
-                                              letterSpacing: -0.2,
+                                              borderRadius:
+                                                  BorderRadius.circular(14),
+                                            ),
+                                            child: const Text(
+                                              'Rewrite and Request',
+                                              style: TextStyle(
+                                                color: Color(0xFF0A0A12),
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w800,
+                                                letterSpacing: 0.3,
+                                              ),
                                             ),
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
                               ),
-                            ],
                           ],
                         ),
+                      ),
                       ),
                       SizedBox(height: math.max(12, top * 0.05)),
                       TextButton(
@@ -470,6 +577,200 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _ActionRow extends StatelessWidget {
+  const _ActionRow({
+    required this.mark,
+    required this.title,
+    required this.sub,
+  });
+  final String mark;
+  final String title;
+  final String sub;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 38,
+          height: 38,
+          decoration: BoxDecoration(
+            color: const Color(0xFF0A0A12),
+            borderRadius: BorderRadius.circular(11),
+            border: Border.all(color: const Color(0x38FFFFFF)),
+          ),
+          alignment: Alignment.center,
+          child: NwsbIcon(mark, size: 18, color: Colors.white),
+        ),
+        Container(
+          width: 1,
+          height: 34,
+          margin: const EdgeInsets.symmetric(horizontal: 12),
+          color: const Color(0x33FFFFFF),
+        ),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                sub,
+                style: const TextStyle(
+                  color: Color(0x73FFFFFF),
+                  fontSize: 11,
+                  height: 1.35,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Container(
+          width: 30,
+          height: 30,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: const Color(0x33FFFFFF)),
+            color: const Color(0x14FFFFFF),
+          ),
+          alignment: Alignment.center,
+          child: const Icon(
+            Icons.chevron_right_rounded,
+            size: 18,
+            color: Colors.white70,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _RequestCustomSheet extends StatefulWidget {
+  const _RequestCustomSheet({
+    required this.initialWords,
+    required this.onSubmitted,
+  });
+  final List<String> initialWords;
+  final ValueChanged<String> onSubmitted;
+
+  @override
+  State<_RequestCustomSheet> createState() => _RequestCustomSheetState();
+}
+
+class _RequestCustomSheetState extends State<_RequestCustomSheet> {
+  late final TextEditingController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = TextEditingController(
+      text: widget.initialWords.isEmpty
+          ? ''
+          : 'Rewrite with: ${widget.initialWords.join(', ')}',
+    );
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bottom = MediaQuery.viewInsetsOf(context).bottom;
+    final safe = MediaQuery.paddingOf(context).bottom;
+    return Padding(
+      padding: EdgeInsets.only(bottom: bottom),
+      child: HeavyGlassPanel(
+        margin: EdgeInsets.fromLTRB(12, 0, 12, 12 + safe),
+        radius: 28,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            CustomizeBlackBanner(
+              title: 'Request customized\nwords',
+              subtitle: 'Tuned to your practice · Frequency X',
+              margin: const EdgeInsets.only(bottom: 12),
+            ),
+            NestedDarkWrap(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Describe the words you need',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: _ctrl,
+                    maxLines: 4,
+                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                    decoration: InputDecoration(
+                      hintText: 'Organ focus, feeling, language…',
+                      hintStyle: const TextStyle(color: Color(0x66FFFFFF)),
+                      filled: true,
+                      fillColor: const Color(0x14FFFFFF),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: const BorderSide(color: Color(0x33FFFFFF)),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: const BorderSide(color: Color(0x33FFFFFF)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: const BorderSide(color: Color(0x99E8D5A3)),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 4),
+            GestureDetector(
+              onTap: () {
+                HapticFeedback.mediumImpact();
+                widget.onSubmitted(_ctrl.text);
+              },
+              child: Container(
+                height: 54,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Text(
+                  'Rewrite and Request',
+                  style: TextStyle(
+                    color: Color(0xFF0A0A12),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.3,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -540,4 +841,3 @@ class _WordChip extends StatelessWidget {
     );
   }
 }
-

@@ -11,6 +11,7 @@ import '../data/store_catalog.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
+import '../widgets/black_glass_banner.dart';
 import '../widgets/intro_gate.dart';
 
 export 'store/ebooks_store.dart';
@@ -47,60 +48,120 @@ class _StoreHomeContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = <Widget>[
-      _StoreBanner(),
-      const _StoreRemoteBanner(
-        url: 'https://media.nowssb.com/migrated-images/ccadecda89d460a6_grok_image_1778521152376_il2xkh.jpg',
-        height: 190,
+      NestedDarkWrap(
+        margin: const EdgeInsets.fromLTRB(12, 8, 12, 10),
+        padding: EdgeInsets.zero,
+        radius: 22,
+        child: ClipRRect(borderRadius: BorderRadius.circular(22), child: _StoreBanner()),
       ),
-      _StoreVideoSection(
-        asset: nwsbVideo(kStoreWordDoorVidFile),
-        eyebrow: 'THE WORD LIBRARY',
-        title: 'Build Your\nPersonal Library',
-        sub: 'Each word targets a specific organ. The more words you own, the more healing sentences you can build.',
-        chips: const ['HEART HEALTH', 'IMMUNITY', 'MENTAL CLARITY', 'GUT HEALTH', 'SKIN & GLOW', 'LUNG & BREATH'],
-        button: 'Browse The Word Atelier',
-        onTap: () => _push(context, const WordAtelierScreen()),
+      NestedDarkWrap(
+        margin: const EdgeInsets.fromLTRB(12, 0, 12, 10),
+        padding: EdgeInsets.zero,
+        radius: 18,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(18),
+          child: const _StoreRemoteBanner(
+            url: 'https://media.nowssb.com/migrated-images/ccadecda89d460a6_grok_image_1778521152376_il2xkh.jpg',
+            height: 190,
+          ),
+        ),
       ),
-      const _StoreRemoteBanner(
-        url: 'https://media.nowssb.com/migrated-images/16c653d97f27f932_file_00000000c81c81fba2f7377fc71229be_uvvxfz.png',
-        height: 160,
-        margin: EdgeInsets.symmetric(vertical: 20),
+      HeavyGlassPanel(
+        margin: const EdgeInsets.fromLTRB(12, 4, 12, 10),
+        radius: 24,
+        padding: const EdgeInsets.all(10),
+        child: NestedDarkWrap(
+          margin: EdgeInsets.zero,
+          padding: EdgeInsets.zero,
+          radius: 18,
+          child: _StoreVideoSection(
+            asset: nwsbVideo(kStoreWordDoorVidFile),
+            eyebrow: 'THE WORD LIBRARY',
+            title: 'Build Your\nPersonal Library',
+            sub: 'Each word targets a specific organ. The more words you own, the more healing sentences you can build.',
+            chips: const ['HEART HEALTH', 'IMMUNITY', 'MENTAL CLARITY', 'GUT HEALTH', 'SKIN & GLOW', 'LUNG & BREATH'],
+            button: 'Browse The Word Atelier',
+            onTap: () => _push(context, const WordAtelierScreen()),
+          ),
+        ),
       ),
-      _StoreVideoSection(
-        asset: nwsbVideo(kStoreMeaningDoorVidFile),
-        eyebrow: 'THE MEANING LIBRARY',
-        title: 'Unlock the\nTruth Behind Words',
-        sub: 'Base meanings · Your purchased words · AI-decoded origins',
-        chips: const ['COUNTRY', 'EARTH', 'BODY', 'MIND', 'SOUL', 'BLOOD'],
-        button: 'Browse Meaning Store',
-        onTap: () => _push(context, const MeaningStoreScreen()),
+      NestedDarkWrap(
+        margin: const EdgeInsets.fromLTRB(12, 0, 12, 10),
+        padding: EdgeInsets.zero,
+        radius: 18,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(18),
+          child: const _StoreRemoteBanner(
+            url: 'https://media.nowssb.com/migrated-images/16c653d97f27f932_file_00000000c81c81fba2f7377fc71229be_uvvxfz.png',
+            height: 160,
+            margin: EdgeInsets.zero,
+          ),
+        ),
       ),
-      _SignatureDoor(onTap: () => _push(context, const SignatureStoreScreen())),
-      const _StoreVideoBanner(asset: 'assets/video/store-verify-banner.mp4', poster: 'assets/video/store-verify-banner-poster.webp'),
+      HeavyGlassPanel(
+        margin: const EdgeInsets.fromLTRB(12, 4, 12, 10),
+        radius: 24,
+        padding: const EdgeInsets.all(10),
+        child: NestedDarkWrap(
+          margin: EdgeInsets.zero,
+          padding: EdgeInsets.zero,
+          radius: 18,
+          child: _StoreVideoSection(
+            asset: nwsbVideo(kStoreMeaningDoorVidFile),
+            eyebrow: 'THE MEANING LIBRARY',
+            title: 'Unlock the\nTruth Behind Words',
+            sub: 'Base meanings · Your purchased words · AI-decoded origins',
+            chips: const ['COUNTRY', 'EARTH', 'BODY', 'MIND', 'SOUL', 'BLOOD'],
+            button: 'Browse Meaning Store',
+            onTap: () => _push(context, const MeaningStoreScreen()),
+          ),
+        ),
+      ),
+      NestedDarkWrap(
+        margin: const EdgeInsets.fromLTRB(12, 4, 12, 10),
+        padding: EdgeInsets.zero,
+        radius: 20,
+        child: _SignatureDoor(onTap: () => _push(context, const SignatureStoreScreen())),
+      ),
+      NestedDarkWrap(
+        margin: const EdgeInsets.fromLTRB(12, 0, 12, 10),
+        padding: EdgeInsets.zero,
+        radius: 18,
+        child: const _StoreVideoBanner(asset: 'assets/video/store-verify-banner.mp4', poster: 'assets/video/store-verify-banner-poster.webp'),
+      ),
       const Padding(
         padding: EdgeInsets.fromLTRB(20, 24, 20, 4),
         child: Text('Everything Else, In One Place', style: TextStyle(fontSize: 10, letterSpacing: 2.5, color: NwsbColors.gold)),
       ),
-      _MiniStoreCard(
-        eyebrow: 'Verified · Badges',
-        title: 'Get Verified',
-        sub: 'Blue, Silver, Gold or Diamond — stand out on your profile.',
-        icon: Icons.verified_outlined,
-        onTap: () {},
-      ),
-      _MiniStoreCard(
-        eyebrow: 'Read · Learn · Practice',
-        title: 'NowssB Ebooks',
-        sub: 'Deep-dive guides on word science and sound healing.',
-        icon: Icons.menu_book_outlined,
-        onTap: () => _push(context, const EbooksStoreScreen()),
-      ),
-      _MiniStoreCard(
-        eyebrow: 'Resonance · Frequency · X',
-        title: 'Subscription Plans',
-        sub: 'More words, more features — see every tier.',
-        icon: Icons.auto_awesome_outlined,
-        onTap: () {},
+      HeavyGlassPanel(
+        margin: const EdgeInsets.fromLTRB(12, 4, 12, 10),
+        radius: 22,
+        padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+        child: Column(
+          children: [
+            _MiniStoreCard(
+              eyebrow: 'Verified · Badges',
+              title: 'Get Verified',
+              sub: 'Blue, Silver, Gold or Diamond — stand out on your profile.',
+              icon: Icons.verified_outlined,
+              onTap: () {},
+            ),
+            _MiniStoreCard(
+              eyebrow: 'Read · Learn · Practice',
+              title: 'NowssB Ebooks',
+              sub: 'Deep-dive guides on word science and sound healing.',
+              icon: Icons.menu_book_outlined,
+              onTap: () => _push(context, const EbooksStoreScreen()),
+            ),
+            _MiniStoreCard(
+              eyebrow: 'Resonance · Frequency · X',
+              title: 'Subscription Plans',
+              sub: 'More words, more features — see every tier.',
+              icon: Icons.auto_awesome_outlined,
+              onTap: () {},
+            ),
+          ],
+        ),
       ),
       const Padding(
         padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
@@ -195,7 +256,7 @@ class _StoreVideoSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 470,
-      margin: const EdgeInsets.symmetric(horizontal: 20),
+      margin: EdgeInsets.zero,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(18), color: Colors.black),
       child: Stack(
@@ -268,7 +329,7 @@ class _SignatureDoor extends StatelessWidget {
       onTap: onTap,
       child: Container(
         height: 230,
-        margin: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+        margin: EdgeInsets.zero,
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(borderRadius: BorderRadius.circular(18), color: Colors.black),
         child: Stack(
@@ -315,7 +376,7 @@ class _StoreVideoBanner extends StatelessWidget {
   final String asset, poster;
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+        padding: EdgeInsets.zero,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(16),
           child: AspectRatio(
@@ -343,12 +404,12 @@ class _MiniStoreCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.fromLTRB(20, 10, 20, 0),
+        margin: const EdgeInsets.fromLTRB(0, 6, 0, 6),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: const Color(0x0AFFFFFF),
+          color: const Color(0xFF000000),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0x1FFFFFFF)),
+          border: Border.all(color: const Color(0x24FFFFFF)),
         ),
         child: Row(
           children: [

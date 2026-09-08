@@ -17,6 +17,7 @@ import '../media/nwsb_image.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
+import '../widgets/black_glass_banner.dart';
 import '../widgets/intro_gate.dart';
 import '../widgets/tv_frame.dart';
 import 'practice.dart';
@@ -332,31 +333,40 @@ class _SlmFeed extends StatelessWidget {
 
   Widget _section(String title, {Widget? trailing, required Widget child}) {
     return Padding(
-      padding: const EdgeInsets.only(top: 18, bottom: 6),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(14, 0, 10, 12),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    title,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.3,
+      padding: const EdgeInsets.fromLTRB(12, 14, 12, 6),
+      child: HeavyGlassPanel(
+        radius: 24,
+        padding: const EdgeInsets.fromLTRB(10, 12, 10, 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            NestedDarkWrap(
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.fromLTRB(12, 12, 8, 12),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.3,
+                      ),
                     ),
                   ),
-                ),
-                if (trailing != null) trailing,
-              ],
+                  if (trailing != null) trailing,
+                ],
+              ),
             ),
-          ),
-          child,
-        ],
+            NestedDarkWrap(
+              margin: EdgeInsets.zero,
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: child,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -392,12 +402,16 @@ class _SlmFeed extends StatelessWidget {
       pages.add(words.sublist(i, i + 9 > words.length ? words.length : i + 9));
     }
     return Padding(
-      padding: const EdgeInsets.only(top: 8),
-      child: Column(
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 4),
+      child: HeavyGlassPanel(
+        radius: 24,
+        padding: const EdgeInsets.fromLTRB(8, 10, 8, 12),
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(14, 8, 14, 12),
+          NestedDarkWrap(
+            margin: const EdgeInsets.only(bottom: 10),
+            padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
             child: Row(
               children: [
                 SizedBox(
@@ -439,7 +453,10 @@ class _SlmFeed extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(
+          NestedDarkWrap(
+            margin: EdgeInsets.zero,
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: SizedBox(
             height: 280,
             child: PageView.builder(
               itemCount: pages.length,
@@ -517,7 +534,9 @@ class _SlmFeed extends StatelessWidget {
               },
             ),
           ),
+          ),
         ],
+      ),
       ),
     );
   }
@@ -702,12 +721,18 @@ class _SlmFeed extends StatelessWidget {
 
   Widget _promo() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(14, 18, 14, 6),
-      child: GestureDetector(
-        onTap: onMeanings,
-        child: Container(
+      padding: const EdgeInsets.fromLTRB(12, 14, 12, 6),
+      child: HeavyGlassPanel(
+        radius: 22,
+        padding: const EdgeInsets.all(8),
+        child: NestedDarkWrap(
+          margin: EdgeInsets.zero,
+          padding: EdgeInsets.zero,
+          radius: 16,
+          onTap: onMeanings,
+          child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(16),
             gradient: const LinearGradient(
               colors: [Color(0xFFE8F4FA), Color(0xFFC5DCE8)],
             ),
@@ -768,6 +793,7 @@ class _SlmFeed extends StatelessWidget {
             ),
           ),
         ),
+      ),
       ),
     );
   }
