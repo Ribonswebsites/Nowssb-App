@@ -16089,3 +16089,221 @@ a:active,
 #sub-my-progress{position:fixed !important;inset:0 !important;width:100% !important;height:100dvh !important;max-height:none !important;overflow:hidden !important;background:#020304 !important;}
 #sub-my-progress .mp-final-shell{position:absolute !important;inset:0 !important;width:100% !important;height:100% !important;max-height:none !important;overflow-y:auto !important;overflow-x:hidden !important;-webkit-overflow-scrolling:touch !important;overscroll-behavior-y:contain !important;padding-bottom:100px !important;background:#020304 !important;}
 #sub-my-progress .mp-final-shell>header,#sub-my-progress .mp-final-shell>main{position:relative !important;z-index:5 !important;}
+
+
+/* ══════════════════════════════════════════════════════════════════
+   SHARED — black glass banners (icon RIGHT in white circle)
+   Notifications-level blur language for Sentence + action rows.
+   ══════════════════════════════════════════════════════════════════ */
+.nwsb-glass-banner,
+.sb-banner {
+  width: 100%; display: flex; align-items: center; gap: 0;
+  box-sizing: border-box; cursor: pointer; text-align: left;
+  background: rgba(0,0,0,0.72);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 22px !important;
+  padding: 16px 16px;
+  margin: 0 0 10px;
+  color: #fff;
+  -webkit-backdrop-filter: blur(26px) saturate(1.35);
+  backdrop-filter: blur(26px) saturate(1.35);
+  box-shadow: 0 14px 32px rgba(0,0,0,0.45);
+  font: inherit;
+}
+.nwsb-glass-banner:active,
+.sb-banner:active { transform: scale(0.985); }
+.sb-banner-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; padding-right: 12px; }
+.sb-banner-title {
+  font-family: 'DM Sans', sans-serif; font-size: 15.5px; font-weight: 800;
+  color: #fff; letter-spacing: -0.2px;
+}
+.sb-banner-sub {
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 400;
+  color: rgba(255,255,255,0.62); line-height: 1.35;
+}
+.sb-banner-div {
+  width: 1px; align-self: stretch; margin: 4px 14px 4px 0;
+  background: rgba(255,255,255,0.2); flex-shrink: 0;
+}
+.sb-banner-ico {
+  width: 46px; height: 46px; flex-shrink: 0; border-radius: 50% !important;
+  background: #fff; color: #0a0a12;
+  display: flex; align-items: center; justify-content: center;
+}
+.sb-banner-ico svg { width: 20px; height: 20px; display: block; }
+
+/* ── Sentence builder page ───────────────────────────────────────── */
+#sub-sentence-builder {
+  background:
+    radial-gradient(circle at 14% 8%, rgba(232,213,163,.18), transparent 42%),
+    radial-gradient(circle at 88% 86%, rgba(200,232,245,.20), transparent 46%),
+    #060c18 !important;
+}
+#sub-sentence-builder .sb-page {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  color: #fff;
+}
+#sub-sentence-builder .sb-top {
+  flex-shrink: 0; display: flex; align-items: center; gap: 12px;
+  padding: max(env(safe-area-inset-top, 12px), 12px) 16px 10px;
+  background: rgba(6,12,24,0.55);
+  border-bottom: 1px solid rgba(255,255,255,0.09);
+  -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+}
+#sub-sentence-builder .sb-back {
+  width: 44px; height: 44px; border: none; border-radius: 50% !important;
+  background: #fff; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; padding: 0;
+}
+#sub-sentence-builder .sb-back svg { width: 18px; height: 18px; display: block; }
+#sub-sentence-builder .sb-back:active { transform: scale(0.92); }
+#sub-sentence-builder .sb-top-txt { flex: 1; min-width: 0; }
+#sub-sentence-builder .sb-top-title {
+  font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 800;
+  letter-spacing: -0.3px; color: #fff;
+}
+#sub-sentence-builder .sb-top-sub {
+  font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500;
+  color: rgba(255,255,255,0.55); letter-spacing: 0.4px; margin-top: 2px;
+}
+#sub-sentence-builder .sb-tier {
+  font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 800;
+  letter-spacing: 1.6px; color: rgba(232,213,163,0.85);
+}
+#sub-sentence-builder .sb-scroll {
+  flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding: 14px 16px calc(28px + env(safe-area-inset-bottom, 0px));
+}
+#sub-sentence-builder .sb-glass {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 22px !important;
+  -webkit-backdrop-filter: blur(26px) saturate(1.35);
+  backdrop-filter: blur(26px) saturate(1.35);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+  padding: 16px;
+  margin-top: 8px;
+}
+#sub-sentence-builder .sb-combine-head {
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 800; color: #fff;
+}
+#sub-sentence-builder .sb-count {
+  font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.72);
+}
+#sub-sentence-builder .sb-hint {
+  margin: 8px 0 14px; font-family: 'DM Sans', sans-serif;
+  font-size: 12px; line-height: 1.4; color: rgba(255,255,255,0.55);
+}
+#sub-sentence-builder .sb-chips {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;
+}
+#sub-sentence-builder .sb-chip {
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.1);
+  color: #fff; border-radius: 999px !important;
+  padding: 10px 14px; font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  transition: background .18s ease, color .18s ease, transform .18s ease;
+}
+#sub-sentence-builder .sb-chip.on {
+  background: #fff; color: #0a0a12; border-color: #fff;
+}
+#sub-sentence-builder .sb-chip.sb-shake { animation: sbShake .42s ease; }
+@keyframes sbShake {
+  0%,100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+#sub-sentence-builder .sb-combine-btn {
+  width: 100%; height: 52px; border: none; border-radius: 16px !important;
+  background: #fff; color: #0a0a12; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 800;
+  letter-spacing: 0.4px;
+  box-shadow: 0 0 22px rgba(255,255,255,0.28);
+  transition: opacity .2s ease, transform .2s ease, box-shadow .4s ease;
+}
+#sub-sentence-builder .sb-combine-btn svg { width: 14px; height: 14px; }
+#sub-sentence-builder .sb-combine-btn:disabled {
+  opacity: 0.38; cursor: default; box-shadow: none; background: rgba(255,255,255,0.14); color: rgba(255,255,255,0.55);
+}
+#sub-sentence-builder .sb-combine-btn:not(:disabled):active { transform: scale(0.98); }
+#sub-sentence-builder .sb-result {
+  margin-top: 16px; padding: 16px;
+  background: rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 18px !important;
+  opacity: 0; transform: translateY(12px) scale(0.96);
+  transition: opacity .55s cubic-bezier(.22,1,.36,1), transform .55s cubic-bezier(.22,1,.36,1);
+}
+#sub-sentence-builder .sb-result.show { opacity: 1; transform: translateY(0) scale(1); }
+#sub-sentence-builder .sb-result-label {
+  font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 800;
+  letter-spacing: 1.8px; color: #e8d5a3; margin-bottom: 10px;
+}
+#sub-sentence-builder .sb-result-text {
+  font-family: 'DM Sans', sans-serif; font-size: 17px; font-weight: 500;
+  line-height: 1.45; letter-spacing: -0.2px; color: #fff;
+}
+
+/* ── Glass boost: Profile / Progress / Word Science / Store words ──
+   More Notifications-like backdrop blur + rounded glass panels. */
+#sub-profile .glass,
+#sub-profile .progress-wrap,
+#sub-profile .about-card,
+#sub-profile .motto-card,
+#sub-profile .quote-card,
+#sub-profile .qa-wrap,
+#sub-profile .activity-list,
+#sub-profile .list-card {
+  -webkit-backdrop-filter: blur(26px) saturate(1.3) !important;
+  backdrop-filter: blur(26px) saturate(1.3) !important;
+  border-radius: 22px !important;
+  border-color: rgba(255,255,255,0.14) !important;
+}
+
+#sub-my-progress .glass,
+#sub-my-progress .stat,
+#sub-my-progress .pill,
+#sub-my-progress .insight,
+#sub-my-progress .card {
+  -webkit-backdrop-filter: blur(26px) saturate(1.3) !important;
+  backdrop-filter: blur(26px) saturate(1.3) !important;
+  border-radius: 22px !important;
+}
+
+#sub-word-science .ws-info,
+#sub-word-science .ws-organ-card,
+#sub-word-science .ws-quote,
+#sub-word-science .ws-highlight,
+#sub-word-science .ws-effect-row,
+#sub-word-science .ws-action-tile {
+  -webkit-backdrop-filter: blur(26px) saturate(1.3) !important;
+  backdrop-filter: blur(26px) saturate(1.3) !important;
+  border-radius: 20px !important;
+  border: 1px solid rgba(255,255,255,0.14) !important;
+  background: rgba(255,255,255,0.06) !important;
+}
+
+#sub-nowssb-store .ws-store-section,
+#sub-nowssb-store .ms-home-card,
+#sub-real-meaning .rm-cat-banner,
+#sub-real-meaning .rm-word-card {
+  -webkit-backdrop-filter: blur(22px) saturate(1.25) !important;
+  backdrop-filter: blur(22px) saturate(1.25) !important;
+  border-radius: 20px !important;
+}
+
+/* Player info panel — glass sheet (was solid black) */
+.lgp-info-sheet {
+  background: rgba(6,12,24,0.78) !important;
+  -webkit-backdrop-filter: blur(26px) saturate(1.3) !important;
+  backdrop-filter: blur(26px) saturate(1.3) !important;
+}
+.lgp-info-card {
+  background: rgba(255,255,255,0.07) !important;
+  border: 1px solid rgba(255,255,255,0.14) !important;
+  border-radius: 18px !important;
+  -webkit-backdrop-filter: blur(18px) !important;
+  backdrop-filter: blur(18px) !important;
+}

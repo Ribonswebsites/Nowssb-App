@@ -22,11 +22,14 @@ import '../data/practice_progress.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../widgets/tv_frame.dart';
+import '../widgets/nwsb_icon.dart';
+import '../widgets/black_glass_banner.dart';
 import '../theme/tokens.dart';
 import 'sound_library.dart';
 import 'aura_sound_library.dart';
 import 'store.dart';
 import 'player_settings.dart';
+import 'sentence_builder.dart';
 import 'select_level.dart';
 import 'player_dial.dart';
 import '../data/playback_session.dart';
@@ -351,6 +354,12 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> with Ticker
     );
   }
 
+  void _openSentence() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const SentenceBuilderScreen()),
+    );
+  }
+
   void _openInfo() {
     showModalBottomSheet<void>(
       context: context,
@@ -629,7 +638,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> with Ticker
                       _WordActionStrip(
                         accent: theme.accent,
                         video: _actionsTabVideo,
-                        onSentence: _openInfo,
+                        onSentence: _openSentence,
                         onPractice: _prepareAndPlay,
                         onStore: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const StoreScreen())),
                       ),
@@ -2203,19 +2212,19 @@ class _WordActionStrip extends StatelessWidget {
       priority: ClipPriority.feature,
       autoplay: true,
       overlay: Row(children: [
-        Expanded(child: _WordAction(icon: Icons.chat_bubble_outline_rounded, label: 'Sentence', onTap: onSentence)),
+        Expanded(child: _WordAction(svg: '<path d="M4 5.5h16v10.5H9.5L5.5 19.5V16H4z"/><path d="M7.5 9.5h9M7.5 12.6h6"/>', label: 'Sentence', onTap: onSentence)),
         _sep(),
-        Expanded(child: _WordAction(icon: Icons.mic_none_rounded, label: 'Practice', onTap: onPractice, accent: accent)),
+        Expanded(child: _WordAction(svg: '<rect x="9" y="2.6" width="6" height="11.2" rx="3"/><path d="M5.5 11.4a6.5 6.5 0 0 0 13 0"/><path d="M12 17.9v3.5M8.6 21.4h6.8"/>', label: 'Practice', onTap: onPractice, accent: accent)),
         _sep(),
-        Expanded(child: _WordAction(icon: Icons.shopping_bag_outlined, label: 'Store', onTap: onStore)),
+        Expanded(child: _WordAction(svg: NwsbMarks.bag, label: 'Store', onTap: onStore)),
       ]),
     );
   }
 }
 
 class _WordAction extends StatelessWidget {
-  const _WordAction({required this.icon, required this.label, required this.onTap, this.accent});
-  final IconData icon;
+  const _WordAction({required this.svg, required this.label, required this.onTap, this.accent});
+  final String svg;
   final String label;
   final VoidCallback onTap;
   final Color? accent;
@@ -2227,7 +2236,7 @@ class _WordAction extends StatelessWidget {
     child: GestureDetector(
       onTap: onTap,
       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        Icon(icon, color: Colors.white, size: 22, shadows: [Shadow(color: (accent ?? Colors.black).withOpacity(.85), blurRadius: 10)]),
+        NwsbIcon(svg, size: 22, color: Colors.white, strokeWidth: 1.7),
         const SizedBox(height: 2),
         Text(label.toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.w800, letterSpacing: 1.0)),
       ]),
@@ -2358,32 +2367,57 @@ class _PlayerInfoSheet extends StatelessWidget {
   final Word word;
   final Color accent;
   @override
-  Widget build(BuildContext context) => SafeArea(top: false, child: Container(
-    constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * .78),
-    padding: const EdgeInsets.fromLTRB(24, 16, 24, 30),
-    decoration: const BoxDecoration(color: Color(0xF00B1321), borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
-    child: ListView(children: [
-      Center(child: Container(width: 38, height: 4, decoration: BoxDecoration(color: Colors.white38, borderRadius: BorderRadius.circular(99)))),
-      const SizedBox(height: 18),
-      Row(children: [Expanded(child: Text(word.word, style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w800))), Icon(Icons.spa_rounded, color: accent)]),
-      if (word.phonetic.isNotEmpty) Text(word.phonetic, style: const TextStyle(color: Colors.white60)),
-      const SizedBox(height: 20),
-      _InfoFact(label: 'WHAT’S HAPPENING', value: word.benefit.isEmpty ? 'Listen, then repeat at your own pace.' : word.benefit, accent: accent),
-      if (word.meaning.isNotEmpty) _InfoFact(label: 'MEANING', value: word.meaning, accent: accent),
-      if (word.organ.isNotEmpty) _InfoFact(label: 'TARGET ORGAN', value: word.organ, accent: accent),
-      if (word.resonance.isNotEmpty) _InfoFact(label: 'RESONANCE POINT', value: word.resonance, accent: accent),
-      if (word.mouthPos.isNotEmpty) _InfoFact(label: 'MOUTH POSITION', value: word.mouthPos, accent: accent),
-    ]),
-  ));
+  Widget build(BuildContext context) {
+    final r = const BorderRadius.vertical(top: Radius.circular(28));
+    return SafeArea(
+      top: false,
+      child: ClipRRect(
+        borderRadius: r,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 13, sigmaY: 13),
+          child: Container(
+            constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * .78),
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 30),
+            decoration: BoxDecoration(
+              color: const Color(0xCC0B1321),
+              borderRadius: r,
+              border: Border.all(color: const Color(0x24FFFFFF)),
+            ),
+            child: ListView(children: [
+              Center(child: Container(width: 38, height: 4, decoration: BoxDecoration(color: Colors.white38, borderRadius: BorderRadius.circular(99)))),
+              const SizedBox(height: 18),
+              Row(children: [
+                Expanded(child: Text(word.word, style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w800))),
+                Container(
+                  width: 42,
+                  height: 42,
+                  decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                  alignment: Alignment.center,
+                  child: Icon(Icons.info_outline_rounded, color: accent, size: 20),
+                ),
+              ]),
+              if (word.phonetic.isNotEmpty) Text(word.phonetic, style: const TextStyle(color: Colors.white60)),
+              const SizedBox(height: 20),
+              _InfoFact(label: "WHAT'S HAPPENING", value: word.benefit.isEmpty ? 'Listen, then repeat at your own pace.' : word.benefit, accent: accent),
+              if (word.meaning.isNotEmpty) _InfoFact(label: 'MEANING', value: word.meaning, accent: accent),
+              if (word.organ.isNotEmpty) _InfoFact(label: 'TARGET ORGAN', value: word.organ, accent: accent),
+              if (word.resonance.isNotEmpty) _InfoFact(label: 'RESONANCE POINT', value: word.resonance, accent: accent),
+              if (word.mouthPos.isNotEmpty) _InfoFact(label: 'MOUTH POSITION', value: word.mouthPos, accent: accent),
+            ]),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
-class _InfoFact extends StatelessWidget {
+class _InfoFactclass _InfoFact extends StatelessWidget {
   const _InfoFact({required this.label, required this.value, required this.accent});
   final String label;
   final String value;
   final Color accent;
   @override
-  Widget build(BuildContext context) => Container(margin: const EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: const Color(0x1AFFFFFF), borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0x24FFFFFF))), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(label, style: TextStyle(color: accent, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.2)), const SizedBox(height: 5), Text(value, style: const TextStyle(color: Colors.white, fontSize: 14, height: 1.35))]));
+  Widget build(BuildContext context) => Container(margin: const EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: const Color(0x28000000), borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0x28FFFFFF)), boxShadow: const [BoxShadow(color: Color(0x40000000), blurRadius: 18, offset: Offset(0, 8))]), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(label, style: TextStyle(color: accent, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.2)), const SizedBox(height: 5), Text(value, style: const TextStyle(color: Colors.white, fontSize: 14, height: 1.35))]));
 }
 
 class _PlayerTheme {

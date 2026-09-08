@@ -281,7 +281,7 @@ class TvFrame extends StatelessWidget {
             final screen = Padding(
               padding: frame.insets(box),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(frame.opaqueAperture ? 5 : 0),
+                borderRadius: BorderRadius.circular(frame.opaqueAperture ? 14 : 0),
                 clipBehavior: Clip.antiAlias,
                 child: ColoredBox(
                   color: Colors.black,
@@ -313,7 +313,17 @@ class TvFrame extends StatelessWidget {
                     screen,
                     IgnorePointer(child: _Bezel(frame: frame)),
                   ];
-            return Stack(fit: StackFit.expand, children: children);
+            final stack = Stack(fit: StackFit.expand, children: children);
+            // Opaque lit tabs (Sentence · Practice · Store): clip the whole
+            // bezel to a glass-card radius so corners are not a sharp rectangle.
+            if (frame.opaqueAperture) {
+              return ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                clipBehavior: Clip.antiAlias,
+                child: stack,
+              );
+            }
+            return stack;
           },
         ),
       ),
@@ -439,7 +449,7 @@ class FramedSlot extends StatelessWidget {
             final screen = Padding(
               padding: frame.insets(box),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(frame.opaqueAperture ? 5 : 0),
+                borderRadius: BorderRadius.circular(frame.opaqueAperture ? 14 : 0),
                 clipBehavior: Clip.antiAlias,
                 child: ColoredBox(
                   color: Colors.black,
@@ -462,7 +472,15 @@ class FramedSlot extends StatelessWidget {
                     screen,
                     IgnorePointer(child: _Bezel(frame: frame)),
                   ];
-            return Stack(fit: StackFit.expand, children: layers);
+            final stack = Stack(fit: StackFit.expand, children: layers);
+            if (frame.opaqueAperture) {
+              return ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                clipBehavior: Clip.antiAlias,
+                child: stack,
+              );
+            }
+            return stack;
           },
         ),
       ),

@@ -496,13 +496,13 @@
   aspect-ratio:1371/317;
   height:auto;
   background:url('./assets/frames/word-acts-tab.webp') center/100% 100% no-repeat;
-  border-radius:9px !important;
-  overflow:visible;
+  border-radius:20px !important;
+  overflow:hidden;
 }
 .lgp .lgp-pr-glass::before {
   content:''; position:absolute;
   left:1.823%; right:1.969%; top:5.994%; bottom:6.625%;
-  background:#000; border-radius:5px !important;
+  background:#000; border-radius:14px !important;
   z-index:0; pointer-events:none;
 }
 /* the three sit over the clip */
@@ -1005,10 +1005,9 @@
   width:100%; max-width:none; height:100%; max-height:none; overflow-y:auto; -webkit-overflow-scrolling:touch;
   padding:max(env(safe-area-inset-top,16px),16px) 20px calc(env(safe-area-inset-bottom,24px) + 24px); color:#fff;
   border-radius:0 !important;
-  /* Black, not a see-through slate — the player behind it was showing
-     through the page and the text sat on moving video. */
-  background:#000000;
-  -webkit-backdrop-filter:none; backdrop-filter:none;
+  /* Notifications-level black glass — blur the player behind, keep text readable. */
+  background:rgba(6,12,24,.82);
+  -webkit-backdrop-filter:blur(26px) saturate(1.3); backdrop-filter:blur(26px) saturate(1.3);
   border:none;
   transition:transform .4s cubic-bezier(.2,1,.3,1), opacity .3s;
 }
@@ -1054,7 +1053,8 @@
 .lgp-info-sec { margin-bottom:16px; }
 .lgp-info-sec-h { font-size:10px; font-weight:800; letter-spacing:2px; text-transform:uppercase; color:var(--lg-accent,#8fd); margin-bottom:8px; }
 .lgp-info-card {
-  border-radius:16px !important; padding:4px 14px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);
+  border-radius:18px !important; padding:4px 14px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.16);
+  -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px);
 }
 .lgp-info-row { display:flex; gap:12px; padding:9px 0; align-items:baseline; }
 .lgp-info-row + .lgp-info-row { border-top:1px solid rgba(255,255,255,.08); }
@@ -1785,13 +1785,14 @@
   margin:10px auto 0;
   aspect-ratio:1371/317;
   background:url('./assets/frames/word-acts-tab.webp') center/100% 100% no-repeat;
-  border-radius:9px !important;
+  border-radius:20px !important;
+  overflow:hidden;
   flex-shrink:0;
 }
 .lgp .lgp-stats-tab::before {
   content:''; position:absolute;
   left:1.823%; right:1.969%; top:5.994%; bottom:6.625%;
-  background:#000; border-radius:5px !important;
+  background:#000; border-radius:14px !important;
 }
 .lgp .lgp-stats-tab .lgp-stats {
   position:absolute;
@@ -1800,7 +1801,7 @@
   background:transparent; border:none; box-shadow:none;
   -webkit-backdrop-filter:none; backdrop-filter:none;
   padding:0 8px; z-index:1;
-  border-radius:5px !important;
+  border-radius:14px !important;
 }
 
 /* Video box is the glass pill — shorter, rounded, no tablet bezel */
@@ -2888,7 +2889,7 @@
   min-height:72px;
   align-self:center;
   overflow:visible !important;
-  border-radius:9px;
+  border-radius:20px;
   display:block !important;
   visibility:visible !important;
   opacity:1 !important;
@@ -2915,9 +2916,10 @@
   position:relative;
   overflow:visible !important;
   background:url('./assets/frames/word-acts-tab.webp') center/100% 100% no-repeat !important;
-  border-radius:9px !important;
+  border-radius:20px !important;
   height:auto !important;
   aspect-ratio:1371/317 !important;
+  overflow:hidden !important;
 }
 .lgp .lgp-wa-vid,
 .lgp .lgp-actions-tab-vid{
@@ -2926,7 +2928,7 @@
   left:1.823% !important; top:5.994% !important; right:auto !important; bottom:auto !important;
   width:96.208% !important; height:87.381% !important;
   object-fit:cover !important; object-position:center;
-  border-radius:5px !important;
+  border-radius:14px !important;
   z-index:1 !important; pointer-events:none; opacity:1;
   background:#000;
 }
@@ -2935,7 +2937,7 @@
   position:absolute !important;
   left:1.823% !important; right:1.969% !important;
   top:5.994% !important; bottom:6.625% !important;
-  background:#000 !important; border-radius:5px !important;
+  background:#000 !important; border-radius:14px !important;
   z-index:0 !important; pointer-events:none;
 }
 .lgp .lgp-pr-glass::after{

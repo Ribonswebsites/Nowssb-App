@@ -661,7 +661,7 @@
             : '<video class="lgp-wa-vid lgp-actions-tab-vid" muted playsinline autoplay loop preload="auto" aria-hidden="true"' +
                 ' src="' + PLAYER_ACTIONS_TAB_VIDEO + '"></video>') +
         '</div>' +
-        '<button class="lgp-sentence" onclick="openWalkmanLib&&openWalkmanLib();if(typeof wlSwitchTab===\'function\')setTimeout(function(){wlSwitchTab(\'build\')},90)" aria-label="Build your sentence">' +
+        '<button class="lgp-sentence" onclick="lgpOpenSentence&&lgpOpenSentence()" aria-label="Build your sentence">' +
           '<span class="lgp-pr-ico"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 5.5h16v10.5H9.5L5.5 19.5V16H4z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M7.5 9.5h9M7.5 12.6h6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>' +
           '<span class="lgp-pr-lbl">Sentence</span>' +
         '</button>' +
@@ -1153,6 +1153,18 @@
   /* Open the Store DIRECTLY from the player — no home flash, no intro flash.
      Open the store ON TOP of the player (higher z-index), skip its intro, then
      quietly close the player behind it. */
+
+  window.lgpOpenSentence = function () {
+    try {
+      if (typeof window.openSentenceBuilder === 'function') {
+        window.openSentenceBuilder();
+        return;
+      }
+      if (typeof openWalkmanLib === 'function') openWalkmanLib();
+      if (typeof wlSwitchTab === 'function') setTimeout(function () { wlSwitchTab('build'); }, 90);
+    } catch (e) {}
+  };
+
   window.lgpOpenStore = function () {
     try {
       if (typeof openSub === 'function') openSub('nowssb-store');   /* nssOpen — slides the store in */

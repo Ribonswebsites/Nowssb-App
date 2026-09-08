@@ -146,10 +146,10 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=267"></script>
 <link rel="stylesheet" href="app/app.css?v=317">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=801">
+<link rel="stylesheet" href="nowssb-nm.css?v=802">
 <link rel="stylesheet" href="app/widgets.css?v=8">
 <link rel="stylesheet" href="app/steps.css?v=9">
-<link rel="stylesheet" href="nowssb-player.css?v=235">
+<link rel="stylesheet" href="nowssb-player.css?v=236">
 </head>
 <body>
 <script src="app/js/part002.js?v=163"></script>
@@ -5840,6 +5840,24 @@ document.querySelectorAll('.option').forEach(b=>b.addEventListener('click',()=>b
   </div>
 </div>
 
+
+<!-- ══ SUB-SCREEN: SENTENCE BUILDER ══ -->
+<div class="sub-screen" id="sub-sentence-builder" aria-label="Sentence builder">
+  <div class="sb-page">
+    <header class="sb-top">
+      <button type="button" class="sb-back" onclick="sbClose()" aria-label="Back">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 6l-6 6 6 6" stroke="#0a0a12" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="sb-top-txt">
+        <div class="sb-top-title">Sentence</div>
+        <div class="sb-top-sub">Build · Combine · Heal</div>
+      </div>
+      <div class="sb-tier" id="sbTierPill">TIER</div>
+    </header>
+    <div class="sb-scroll" id="sbBody"><!-- rendered by part085 --></div>
+  </div>
+</div>
+
 <!-- ══ BUILT SENTENCE — centred card over a blurred page ══
      The sentence used to appear in a box appended under the Build button,
      below the fold, looking like a form error. It is the result of the
@@ -11352,7 +11370,8 @@ document.querySelectorAll('.option').forEach(b=>b.addEventListener('click',()=>b
 <script src="app/js/part078.js?v=2"></script><!-- ══ CERTIFICATES + INSTALLED APP UPDATE CHECK ══ -->
 <script src="nowssb-social.js?v=185" defer></script>
 <script src="nowssb-nm.js?v=180" defer></script>
-<script src="nowssb-player.js?v=328" defer></script>
+<script src="app/js/part085-sentence-builder.js?v=1"></script>
+<script src="nowssb-player.js?v=329" defer></script>
 <script src="app/js/part092-motion.js?v=1" defer></script><!-- APP-WIDE AURA MOTION -->
 <script src="app/js/part094-dashboard-live.js?v=1" defer></script>
 <script src="app/js/personal-coach-live.js?v=1" defer></script>
