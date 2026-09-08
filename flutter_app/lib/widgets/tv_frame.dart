@@ -187,6 +187,37 @@ class DeviceFrame {
     left: 0.01928,
   );
 
+
+  /// `.dev-tab4-l` — Sound Library 16:9 rails. Trimmed 1338x875.
+  static const tab4Landscape = DeviceFrame(
+    'assets/frames/tab4-landscape.webp',
+    1338 / 875,
+    top: 0.048580,
+    right: 0.034380,
+    bottom: 0.035874,
+    left: 0.034380,
+  );
+
+  /// `.dev-tab5-l` — mosaics and covers. Trimmed 1214x891.
+  static const tab5Landscape = DeviceFrame(
+    'assets/frames/tab5-landscape.webp',
+    1214 / 891,
+    top: 0.037891,
+    right: 0.025535,
+    bottom: 0.058484,
+    left: 0.024712,
+  );
+
+  /// `.dev-tab6-l` — speed-dial / row thumbs. Trimmed 1315x807.
+  static const tab6Landscape = DeviceFrame(
+    'assets/frames/tab6-landscape.webp',
+    1315 / 807,
+    top: 0.016730,
+    right: 0.014449,
+    bottom: 0.044867,
+    left: 0.014449,
+  );
+
   /// The bottom cap's height as a fraction of the box's HEIGHT — 124/831.
   /// The side rails stop here, and a percentage measured from the bottom of
   /// a positioned box is the one number on this frame that is vertical.
@@ -354,6 +385,66 @@ class _Bezel extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+}
+
+
+/// A tablet bezel around arbitrary content — image, mosaic, or video.
+///
+/// [TvFrame] is the video-specific convenience; Sound Library (and any feed
+/// that paints collection art inside a device) needs the same aperture with
+/// a child that is not always a clip.
+class FramedSlot extends StatelessWidget {
+  const FramedSlot({
+    super.key,
+    required this.child,
+    this.frame = DeviceFrame.tab6Landscape,
+    this.aspect,
+    this.onTap,
+    this.overlay,
+  });
+
+  final Widget child;
+  final DeviceFrame frame;
+  final double? aspect;
+  final VoidCallback? onTap;
+  final Widget? overlay;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: AspectRatio(
+        aspectRatio: aspect ?? frame.aspect,
+        child: LayoutBuilder(
+          builder: (context, c) {
+            final box = Size(c.maxWidth, c.maxHeight);
+            return Stack(
+              fit: StackFit.expand,
+              children: [
+                Padding(
+                  padding: frame.insets(box),
+                  child: ClipRect(
+                    child: ColoredBox(
+                      color: Colors.black,
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          child,
+                          if (overlay != null) overlay!,
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                IgnorePointer(child: _Bezel(frame: frame)),
+              ],
+            );
+          },
+        ),
+      ),
     );
   }
 }
