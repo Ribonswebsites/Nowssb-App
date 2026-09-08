@@ -58,6 +58,11 @@ Future<void> main() async {
   // when it finishes, and by the eight-second ceiling if it never does.
   if (Settings.instance.showSplash) VideoPool.instance.hold();
   VideoPool.instance.startHeartbeat();
+  // Prefetch feature UI loops (tab / orb / page bg / login / progress /
+  // fashion) into the page cache while the splash plays — throwaway
+  // controllers, not pool slots — so Level 1 / orb / tab are not blank on
+  // first open.
+  unawaited(VideoPool.instance.warm());
 
   runApp(const NowssbApp());
 }

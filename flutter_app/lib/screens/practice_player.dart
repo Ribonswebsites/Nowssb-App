@@ -2199,18 +2199,24 @@ class _WordActionStrip extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: Stack(fit: StackFit.expand, clipBehavior: Clip.hardEdge, children: [
         const ColoredBox(color: Colors.black),
-        // Video only in the lit-tab aperture — keeps chrome crisp, no white haze.
-        Padding(
-          padding: const EdgeInsets.fromLTRB(6, 5, 6, 5),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(5),
-            child: NwsbVideo(
-              asset: video,
-              fit: BoxFit.cover,
-              priority: ClipPriority.feature,
-              autoplay: true,
-              loop: true,
-              showPoster: false,
+        // Looping tab film (player-actions-tab.mp4) — must match WebView:
+        // visible motion inside the Sentence / Practice / Store strip frame.
+        // Feature priority + pool concurrency keep it playing with the page
+        // bg and card theme clip instead of losing the only decoder slot.
+        Positioned.fill(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(6, 5, 6, 5),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(5),
+              clipBehavior: Clip.antiAlias,
+              child: NwsbVideo(
+                asset: video,
+                fit: BoxFit.cover,
+                priority: ClipPriority.feature,
+                autoplay: true,
+                loop: true,
+                showPoster: false,
+              ),
             ),
           ),
         ),

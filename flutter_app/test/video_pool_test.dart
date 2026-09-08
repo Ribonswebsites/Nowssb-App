@@ -103,6 +103,32 @@ void main() {
     expect(far.controller, isNull);
   });
 
+  test('a late feature clip evicts a full set of decorations', () async {
+    // Sticky-keep used to retain whoever already held a slot, so a full home
+    // of banners starved the player tab / orb when those screens opened.
+    final decorations = [
+      for (var i = 0; i < VideoPool.maxLive; i++)
+        VideoPool.instance.lease('assets/video/banner-full-$i.mp4'),
+    ];
+    for (final l in decorations) {
+      l.reportDistance(20);
+    }
+    await pumpPool();
+    expect(VideoPool.instance.liveCount, VideoPool.maxLive);
+
+    final tab = VideoPool.instance.lease(
+      'assets/video/player-actions-tab.mp4',
+      priority: ClipPriority.feature,
+    );
+    tab.reportDistance(0);
+    await pumpPool();
+
+    expect(VideoPool.instance.debugLive, contains(tab),
+        reason: 'player tab / orb must take a seat from decorations');
+    expect(tab.controller, isNotNull);
+    expect(VideoPool.instance.liveCount, VideoPool.maxLive);
+  });
+
   test('a feature clip outranks decoration however far away it is', () async {
     final tv = VideoPool.instance
         .lease('assets/video/tv-screen.mp4', priority: ClipPriority.feature);
@@ -188,7 +214,7 @@ void main() {
     }
   });
 
-  test('clips are opened a couple at a time, not all at once', () async {
+  test('clips are opened in bounded batches, not all at once', () async {
     // `decoders 5/8  playing 1` on the phone: five slots taken, ONE clip
     // open. The other four were not refusing to play — they were still
     // opening, all four at the same instant, contending for one MediaCodec
@@ -206,8 +232,8 @@ void main() {
     }
     await pumpPool();
 
-    expect(platform.peakOpen, lessThanOrEqualTo(2),
-        reason: 'more than two clips were opening at once');
+    expect(platform.peakOpen, lessThanOrEqualTo(VideoPool.openAtOnce),
+        reason: 'more clips were opening at once than openAtOnce allows');
     // And they all still arrive.
     expect(VideoPool.instance.liveCount, VideoPool.maxLive);
     for (final l in leases) {

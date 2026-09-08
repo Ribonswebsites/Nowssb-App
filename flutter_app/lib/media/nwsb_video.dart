@@ -90,6 +90,28 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
     _pump();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Inherited route / Visibility are available here — promote feature
+    // clips (orb, tab, page bg) to distance 0 immediately so they open
+    // before layout settles, without letting hidden IndexedStack tabs steal
+    // slots first.
+    _promoteFeatureClaim();
+  }
+
+  void _promoteFeatureClaim() {
+    final lease = _lease;
+    if (lease == null) return;
+    if (!_shouldClaimDecoder()) {
+      lease.reportDistance(double.infinity);
+      return;
+    }
+    if (widget.priority == ClipPriority.feature) {
+      lease.reportDistance(0);
+    }
+  }
+
   void _take() {
     final l = VideoPool.instance.lease(
       widget.asset,
@@ -206,11 +228,19 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
     if (!mounted) return;
     final lease = _lease;
     if (lease == null) return; // a still has nothing to report
+
+    // Covered routes (practice player over NavShell) and inactive IndexedStack
+    // tabs still layout their videos. Without this they keep holding decoders
+    // and the on-screen player tab / orb / bg starve — "only one video plays".
+    if (!_shouldClaimDecoder()) {
+      lease.reportDistance(double.infinity);
+      return;
+    }
+
     final box = context.findRenderObject() as RenderBox?;
     if (box == null || !box.hasSize || !box.attached) {
-      // Not laid out YET is not the same as off screen. Saying "infinity"
-      // here would hand the decoder away on the one frame before the first
-      // layout, so this simply waits for the next.
+      // Not laid out YET is not the same as off screen. Features already
+      // claimed via didChangeDependencies; decorations wait for geometry.
       return;
     }
     final screen = MediaQuery.maybeOf(context)?.size;
@@ -226,6 +256,27 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
         top < screen.height * 2 && top + box.size.height > -screen.height;
     lease.reportDistance(
         visible ? (centre - screen.height / 2).abs() : double.infinity);
+  }
+
+  /// True when this clip is actually the thing the user can see.
+  bool _shouldClaimDecoder() {
+    final route = ModalRoute.of(context);
+    if (route != null && !route.isCurrent) return false;
+
+    var claim = true;
+    context.visitAncestorElements((el) {
+      final w = el.widget;
+      if (w is Offstage && w.offstage) {
+        claim = false;
+        return false;
+      }
+      if (w is Visibility && !w.visible) {
+        claim = false;
+        return false;
+      }
+      return true;
+    });
+    return claim;
   }
 
   @override

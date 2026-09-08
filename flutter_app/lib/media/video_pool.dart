@@ -199,13 +199,12 @@ class VideoPool {
   /// else has to change: every test asserts against this constant rather
   /// than against the literal, so the invariant holds at whatever it is set
   /// to.
-  /// Keep a bounded set of real decoders. The old value (128) was never
-  /// enforced consistently and allowed every mounted Fashion/Normal clip to
-  /// initialize at once; Android then let one clip play while the rest
-  /// stalled or stopped. Eight supports the visible home surfaces together
-  /// without exhausting hardware codecs. Off-screen clips retain their
-  /// posters and are reopened as they approach the viewport.
-  static const int maxLive = 8;
+  /// Keep a bounded set of real decoders. Decorative UI loops (page bg, tab,
+  /// Select Level orb, Progress, login, Fashion backdrop, home banners) must
+  /// run together — the phone has enough AVC slots for a dozen muted loops,
+  /// and serializing to one "playing" clip is the bug users see. Twelve is
+  /// the working target (6–12 simultaneous). Off-screen clips still release.
+  static const int maxLive = 12;
 
   /// Higher ceiling while Normal home glass mode wants every on-screen clip
   /// moving. Still bounded — phones only have so many hardware decoders —
@@ -268,10 +267,13 @@ class VideoPool {
   /// or so, one after another, instead of none of them coming up at all.
   /// The ceiling on how many EXIST is [maxLive] and is unchanged; this is
   /// only how many may be in the act of starting.
-  /// Three at a time: feature clips (player bg, orb, Fashion film) come up
-  /// a beat sooner without returning to the all-at-once pile-up that used
-  /// to leave every slot occupied and nothing playing.
-  static const int _openAtOnce = 3;
+  /// How many may initialize concurrently. The old 2–3 cap serialized bring-up
+  /// so hard that feature UI loops (orb / tab / bg) sat on black posters until
+  /// a kill-restart. Eight matches the "warm several feature clips at once"
+  /// goal without reopening the historical all-at-once MediaCodec stampede
+  /// that left every slot reserved and nothing playing.
+  static const int openAtOnce = 8;
+  static const int _openAtOnce = openAtOnce;
 
   int _opening = 0;
   final List<VideoLease> _openQueue = [];
@@ -611,12 +613,21 @@ class VideoPool {
         // when scrolling brings it near the viewport.
         final keep = <VideoLease>{};
         if (!_held) {
-          // Do not re-rank and recreate controllers that are already visible.
-          // Their distances move as the page settles; ownership must remain
-          // stable or Android repeatedly tears down and restarts the same
-          // videos, producing the play-pause-play loop.
+          // FEATURES FIRST. The previous pass kept whoever already held a
+          // slot, so a full home of decoration banners under an IndexedStack
+          // / covered route starved the player tab, orb, and page film — only
+          // one clip appeared to play. Visible features always take seats;
+          // decorations fill what remains. Already-live decorations that
+          // still want a seat are preferred next (stability: avoid tear-down
+          // play/pause fighting), then the rest by distance.
+          for (final l in want) {
+            if (l.priority != ClipPriority.feature) continue;
+            if (keep.length >= _effectiveMaxLive) break;
+            keep.add(l);
+          }
           for (final l in _live) {
             if (keep.length >= _effectiveMaxLive) break;
+            if (l.priority == ClipPriority.feature) continue;
             if (want.contains(l)) keep.add(l);
           }
           for (final l in want) {
@@ -795,7 +806,8 @@ class VideoPool {
     final v = c.value;
     final dur = v.duration;
     if (dur <= Duration.zero) return false;
-    return v.position >= dur - const Duration(milliseconds: 80);
+    // Restart a little early so the surface never sits on the last frame.
+    return v.position >= dur - const Duration(milliseconds: 120);
   }
 
   Future<void> _restartLoop(VideoLease l, VideoPlayerController c) async {
@@ -871,6 +883,51 @@ class VideoPool {
         continue;
       }
       l._ensurePlaying(c);
+    }
+  }
+
+
+  /// Feature UI loops warmed at startup so first paint is not a cold 8–13MB
+  /// asset read (player tab, orb, page bg, login, progress, fashion films).
+  static const List<String> featureWarmAssets = [
+    'assets/video/player-actions-tab.mp4',
+    'assets/video/orb-loop.mp4',
+    'assets/video/player-bg-loop.mp4',
+    'assets/video/login-phone.mp4',
+    'assets/video/my-progress-scene-1.mp4',
+    'assets/video/fashion-plus-bg-5.mp4',
+    'assets/video/fashion-plus-bg-6.mp4',
+    'assets/video/normal-glass-background.mp4',
+  ];
+
+  /// Prefetch [featureWarmAssets] (or [assetPaths]) into the OS page cache
+  /// with throwaway controllers — does NOT consume pool decoder slots.
+  Future<void> warm([List<String>? assetPaths]) async {
+    final paths = assetPaths ?? featureWarmAssets;
+    // A few at a time so MediaCodec init during splash stays calm.
+    const batch = 3;
+    for (var i = 0; i < paths.length; i += batch) {
+      var end = i + batch;
+      if (end > paths.length) end = paths.length;
+      final slice = paths.sublist(i, end);
+      await Future.wait(slice.map(_warmOne));
+    }
+  }
+
+  Future<void> _warmOne(String path) async {
+    if (_isRemote(path)) return;
+    VideoPlayerController? c;
+    try {
+      c = VideoPlayerController.asset(path);
+      await _byThen(c.initialize(), _openLocal, 'warm $path');
+      await c.setLooping(true);
+      await c.setVolume(0);
+    } catch (e) {
+      debugPrint('NowssB video: warm skipped $path — $e');
+    } finally {
+      try {
+        await c?.dispose();
+      } catch (_) {}
     }
   }
 

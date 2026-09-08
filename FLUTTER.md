@@ -27,7 +27,7 @@ says so — not when a garbage collector decides the page has moved on.
 
 So the rule the whole app is built around:
 
-> **At most eight decoders exist at any moment** (`VideoPool.maxLive`). Not "are playing" — exist.
+> **At most twelve decoders exist at any moment** (`VideoPool.maxLive = 12`). Not "are playing" — exist. Aim 6–12 simultaneous muted UI loops.
 
 Everything else shows its poster, which is a picture and costs nothing. This
 is why every mp4 in `assets/video/` has a `-poster.webp` beside it, generated
@@ -44,7 +44,17 @@ UI loops go through `NwsbVideo` → `VideoPool` (`loop: true`, muted, autoplay,
 restart-from-zero if a surface ends without looping, resume on app lifecycle).
 Feature clips (player page bg, actions tab, Select Level orb, Progress hero /
 scroll bg, login film, Fashion Plus backdrop) use `ClipPriority.feature` so
-they are not starved by decoration banners.
+they are not starved by decoration banners. Visible features **always** win
+decoder seats over decorations (home banners under an `IndexedStack` or a
+covered route no longer keep the only playing slot).
+
+**Concurrency:** `maxLive = 12`, `openAtOnce = 8`. Visible feature clips
+promote to distance 0 in `didChangeDependencies` so they open immediately.
+`NwsbVideo` releases when its route is not current or an ancestor
+`Visibility`/`Offstage` hides it, so pushed player / Select Level surfaces
+get decoders immediately without hidden IndexedStack tabs stealing seats.
+`VideoPool.warm()` prefetches `featureWarmAssets` at launch (throwaway
+controllers — not pool slots).
 
 **Large assets:** `assets/video/orb-loop.mp4` (~13MB, from `4a9c333`) and
 `player-actions-tab.mp4` (~8.7MB) are intentional content — do not replace them.
@@ -56,7 +66,9 @@ full clip as the default. Controllers for feature clips are opened first
 Web/WebView: `app/js/part051.js` keeps decorative `<video>` at
 `autoplay muted loop playsinline`, upgrades `preload` to `auto` when near /
 feature, forces play on `ended` / unexpected `pause`, and resumes on
-`visibilitychange`. Feature clips are never unmounted (no src yank).
+`visibilitychange`. Feature clips are never unmounted (no src yank). Flutter
+mirrors that keep-alive behaviour via feature priority + visibility gating;
+WebView itself is left alone.
 
 
 ## What exists
