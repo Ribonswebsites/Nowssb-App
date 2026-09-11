@@ -27,7 +27,6 @@ import '../media/nwsb_image.dart';
 import '../theme/tokens.dart';
 import 'nwsb_icon.dart';
 
-
 enum HeadingMotion { roll, flip, slide, float, shimmer }
 
 /// A continuously moving heading. The mode is intentionally varied so a long
@@ -52,46 +51,68 @@ class AnimatedHeading extends StatefulWidget {
   State<AnimatedHeading> createState() => _AnimatedHeadingState();
 }
 
-class _AnimatedHeadingState extends State<AnimatedHeading>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller = AnimationController(
-    vsync: this,
-    duration: Duration(milliseconds: 2600 + (widget.text.length % 5) * 240),
-  )..repeat(reverse: true);
+class _AnimatedHeadingState extends State<AnimatedHeading> {
+  Timer? _motionTimer;
+  double _phase = 0;
 
-  HeadingMotion get _motion => widget.mode ??
-      HeadingMotion.values[widget.text.codeUnitAt(0) % HeadingMotion.values.length];
+  @override
+  void initState() {
+    super.initState();
+    // A finite animation is deliberately retriggered by a timer rather than
+    // driven by an always-on ticker. This keeps the home lively in production
+    // while allowing widget tests and accessibility tooling to settle.
+    _motionTimer = Timer.periodic(
+      Duration(milliseconds: 3600 + (widget.text.length % 5) * 180),
+      (_) {
+        if (mounted) setState(() => _phase = _phase == 0 ? 1 : 0);
+      },
+    );
+  }
+
+  HeadingMotion get _motion =>
+      widget.mode ??
+      HeadingMotion
+          .values[widget.text.codeUnitAt(0) % HeadingMotion.values.length];
 
   @override
   void dispose() {
-    _controller.dispose();
+    _motionTimer?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-      builder: (_, child) {
-        final t = _controller.value * 2 - 1;
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: -1, end: _phase),
+      duration: const Duration(milliseconds: 900),
+      curve: Curves.easeInOut,
+      builder: (_, value, child) {
+        final t = value;
         switch (_motion) {
           case HeadingMotion.roll:
             return Transform.translate(offset: Offset(t * 3, 0), child: child);
           case HeadingMotion.flip:
             return Transform(
               alignment: Alignment.center,
-              transform: Matrix4.identity()..setEntry(3, 2, 0.001)..rotateX(t * 0.035),
+              transform: Matrix4.identity()
+                ..setEntry(3, 2, 0.001)
+                ..rotateX(t * 0.035),
               child: child,
             );
           case HeadingMotion.slide:
-            return Transform.translate(offset: Offset(0, t * 2.5), child: child);
+            return Transform.translate(
+                offset: Offset(0, t * 2.5), child: child);
           case HeadingMotion.float:
-            return Transform.translate(offset: Offset(t * 1.5, t * -2), child: child);
+            return Transform.translate(
+                offset: Offset(t * 1.5, t * -2), child: child);
           case HeadingMotion.shimmer:
-            return Opacity(opacity: 0.86 + (_controller.value * 0.14), child: child);
+            return Opacity(opacity: 0.86 + ((value + 1) * 0.07), child: child);
         }
       },
-      child: Text(widget.text, maxLines: widget.maxLines, overflow: widget.overflow, style: widget.style),
+      child: Text(widget.text,
+          maxLines: widget.maxLines,
+          overflow: widget.overflow,
+          style: widget.style),
     );
   }
 }
@@ -193,7 +214,8 @@ class Spill extends StatelessWidget {
                         label,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 12.5, color: Color(0xCCFFFFFF)),
+                        style: const TextStyle(
+                            fontSize: 12.5, color: Color(0xCCFFFFFF)),
                         mode: HeadingMotion.slide,
                       ),
                     ),
@@ -285,7 +307,10 @@ class SecBanner extends StatelessWidget {
                 children: [
                   AnimatedHeading(
                     title,
-                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white),
+                    style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white),
                     mode: HeadingMotion.flip,
                   ),
                   const SizedBox(height: 2),
@@ -497,7 +522,11 @@ class PhotoCard extends StatelessWidget {
                       title,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Colors.white, height: 1.15),
+                      style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                          height: 1.15),
                       mode: HeadingMotion.roll,
                     ),
                     const Spacer(),
