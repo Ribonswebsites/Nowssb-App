@@ -36,6 +36,47 @@ class SubscriptionSection extends StatelessWidget {
   const SubscriptionSection({super.key, this.onTap});
   final VoidCallback? onTap;
 
+  Widget _footerCard(int i) {
+    var offset = i - _index;
+    if (offset > _shots.length ~/ 2) offset -= _shots.length;
+    if (offset < -(_shots.length ~/ 2)) offset += _shots.length;
+    final distance = offset.abs();
+    final direction = offset < 0 ? -1.0 : 1.0;
+    final tx = distance == 0 ? 0.0 : distance == 1 ? direction * 172 : distance == 2 ? direction * 292 : direction * 362;
+    final tz = distance == 0 ? 200.0 : distance == 1 ? -10.0 : distance == 2 ? -155.0 : distance == 3 ? -285.0 : -600.0;
+    final angle = distance == 0 ? 0.0 : distance == 1 ? direction * -28 : distance == 2 ? direction * -50 : distance == 3 ? direction * -65 : 0.0;
+    final scale = distance == 0 ? 1.0 : distance == 1 ? 0.78 : distance == 2 ? 0.55 : distance == 3 ? 0.34 : 0.1;
+    final opacity = distance == 0 ? 1.0 : distance == 1 ? 0.68 : distance == 2 ? 0.36 : distance == 3 ? 0.12 : 0.0;
+    return IgnorePointer(
+      ignoring: opacity <= 0.05,
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 780),
+        opacity: opacity,
+        child: GestureDetector(
+          onTap: () => setState(() => _index = i),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 780),
+            curve: const Cubic(0.34, 1.08, 0.64, 1),
+            transformAlignment: Alignment.center,
+            transform: Matrix4.identity()
+              ..setEntry(3, 2, 0.001)
+              ..translate(tx, 0.0, tz)
+              ..rotateY(angle * 3.141592653589793 / 180)
+              ..scale(scale),
+            width: 162,
+            height: 228,
+            child: ClipRect(
+              child: NwsbImage(
+                url: _shots[i],
+                fallback: const ColoredBox(color: Color(0xFF0A0F1C)),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SectionPane(
@@ -972,29 +1013,21 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
     ('Profile', 'profile'),
   ];
 
-  final _rail = PageController(viewportFraction: 0.62);
   Timer? _timer;
   int _index = 0;
 
   @override
   void initState() {
     super.initState();
-    _timer = Timer.periodic(const Duration(milliseconds: 3600), (_) {
-      if (!mounted || !TickerMode.valuesOf(context).enabled || !_rail.hasClients) return;
-      _index = (_index + 1) % _shots.length;
-      _rail.animateToPage(
-        _index,
-        duration: const Duration(milliseconds: 620),
-        curve: Curves.easeOutCubic,
-      );
-      setState(() {});
+    _timer = Timer.periodic(const Duration(milliseconds: 2800), (_) {
+      if (!mounted || !TickerMode.valuesOf(context).enabled) return;
+      setState(() => _index = (_index + 1) % _shots.length);
     });
   }
 
   @override
   void dispose() {
     _timer?.cancel();
-    _rail.dispose();
     super.dispose();
   }
 
@@ -1002,16 +1035,35 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.only(bottom: 24),
-      decoration: BoxDecoration(
-        color: const Color(0xFF060C18),
-        image: DecorationImage(
-          image: NetworkImage(_shots[_index]),
-          fit: BoxFit.cover,
-          opacity: 0.08,
-        ),
-      ),
-      child: Column(
+      color: const Color(0xFF060C18),
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 600),
+              child: Image.network(
+                _shots[_index],
+                key: ValueKey(_shots[_index]),
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF060C18)),
+              ),
+            ),
+          ),
+          const Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0x26030814), Color(0x0D030814), Color(0x40030814), Color(0xBF030814)],
+                  stops: [0, 0.3, 0.7, 1],
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 24),
+            child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const Padding(
@@ -1039,34 +1091,20 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
           SizedBox(
             height: 300,
             child: Stack(
+              clipBehavior: Clip.none,
               alignment: Alignment.center,
               children: [
-                PageView.builder(
-                  controller: _rail,
-                  itemCount: _shots.length,
-                  onPageChanged: (i) => setState(() => _index = i),
-                  itemBuilder: (context, i) => AnimatedScale(
-                    duration: const Duration(milliseconds: 320),
-                    scale: i == _index ? 1 : 0.86,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 6),
-                      child: Center(
-                        child: SizedBox(
-                          width: 162,
-                          height: 228,
-                          child: ClipRect(
-                            child: NwsbImage(url: _shots[i], fallback: const ColoredBox(color: Color(0xFF0A0F1C))),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                for (var i = 0; i < _shots.length; i++)
+                  _footerCard(i),
                 IgnorePointer(
                   child: SizedBox(
                     width: 162 * 908 / 800,
                     height: 228 * 1408 / 1286,
-                    child: Image.asset('assets/frames/footer-frame.webp', fit: BoxFit.fill, errorBuilder: (_, __, ___) => const SizedBox.shrink()),
+                    child: Image.asset(
+                      'assets/frames/footer-frame.webp',
+                      fit: BoxFit.fill,
+                      errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                    ),
                   ),
                 ),
                 Positioned(
@@ -1080,7 +1118,9 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
                             duration: const Duration(milliseconds: 400),
                             width: i == _index ? 20 : 4,
                             height: 4,
-                            color: i == _index ? const Color(0xE6C8E8F5) : const Color(0x4DC8E8F5),
+                            color: i == _index
+                                ? const Color(0xE6C8E8F5)
+                                : const Color(0x4DC8E8F5),
                           ),
                         ),
                     ],
@@ -1119,6 +1159,8 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
                 const Text('© 2026 Adv. Sanjaykumar Gadge · Shabdapathy', textAlign: TextAlign.center, style: TextStyle(fontSize: 9, letterSpacing: 1, color: Color(0x73FFFFFF))),
               ],
             ),
+          ),
+            ],
           ),
         ],
       ),
