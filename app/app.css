@@ -1067,3 +1067,18 @@ body:not(.fi-ready) #fashionHomeIntro{display:none!important;visibility:hidden!i
   scroll-padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)) !important;
   -webkit-overflow-scrolling: touch !important;
 }
+
+/* ── Living headings: varied, restrained motion for website + WebView ── */
+@keyframes nwsbHeadingRoll { 0%,100% { transform: translate3d(-2px,0,0) rotate(-.15deg); } 50% { transform: translate3d(2px,-1px,0) rotate(.15deg); } }
+@keyframes nwsbHeadingFlip { 0%,100% { transform: perspective(700px) rotateX(-1.8deg); } 50% { transform: perspective(700px) rotateX(1.8deg); } }
+@keyframes nwsbHeadingSlide { 0%,100% { transform: translateY(-2px); } 50% { transform: translateY(2px); } }
+@keyframes nwsbHeadingFloat { 0%,100% { transform: translate3d(-1px,2px,0); } 50% { transform: translate3d(2px,-2px,0); } }
+@keyframes nwsbHeadingShimmer { 0%,100% { opacity:.84; filter:brightness(.96); } 50% { opacity:1; filter:brightness(1.12); } }
+.footer-intro-title,.expl-intro-title,.nwag-intro-title,.fpp-hero-title,.nss-banner-title,.ws-store-title,.sig-store-title { animation: nwsbHeadingRoll 4.6s ease-in-out infinite; transform-origin:left center; will-change:transform; }
+.nmh-sec-banner-title,.home-card-title,.expl-cards-banner-title,.nss-mini-card-title,.wsg-detail-title { animation: nwsbHeadingFlip 3.8s ease-in-out infinite; transform-origin:center center; will-change:transform; }
+.footer-brand,.sub-title,.wl-title,.sb-top-title,.hcpi-title { animation: nwsbHeadingSlide 3.2s ease-in-out infinite; will-change:transform; }
+.footer-tagline,.footer-intro-eyebrow,.expl-intro-eyebrow,.expl-cards-banner-eyebrow,.ws-store-eyebrow,.nss-banner-eyebrow { animation: nwsbHeadingShimmer 3.4s ease-in-out infinite; will-change:opacity,filter; }
+.nmh-sec-banner-sub,.home-card-sub,.nss-mini-card-eyebrow,.wsg-detail-sub { animation: nwsbHeadingFloat 5.2s ease-in-out infinite; will-change:transform; }
+@media (prefers-reduced-motion: reduce) {
+  .footer-intro-title,.expl-intro-title,.nwag-intro-title,.fpp-hero-title,.nss-banner-title,.ws-store-title,.sig-store-title,.nmh-sec-banner-title,.home-card-title,.expl-cards-banner-title,.nss-mini-card-title,.wsg-detail-title,.footer-brand,.sub-title,.wl-title,.sb-top-title,.hcpi-title,.footer-tagline,.footer-intro-eyebrow,.expl-intro-eyebrow,.expl-cards-banner-eyebrow,.ws-store-eyebrow,.nss-banner-eyebrow,.nmh-sec-banner-sub,.home-card-sub,.nss-mini-card-eyebrow,.wsg-detail-sub { animation:none; }
+}
