@@ -943,8 +943,6 @@ class _GenderSide extends StatelessWidget {
 class HomeFooterSection extends StatefulWidget {
   const HomeFooterSection({super.key, this.onLink});
 
-  /// Called with the link's key — about · word-science · sound-library ·
-  /// meaning-store · practice · profile.
   final void Function(String key)? onLink;
 
   @override
@@ -952,7 +950,6 @@ class HomeFooterSection extends StatefulWidget {
 }
 
 class _HomeFooterSectionState extends State<HomeFooterSection> {
-  /// The ten in `#footerTrack` — index.html:2596.
   static const _shots = [
     'https://media.nowssb.com/migrated-images/de6f1331af862c18_grok_image_1776931241446_2_oqn7z0.jpg',
     'https://media.nowssb.com/migrated-images/c63fd60894cef334_grok_image_1776931251298_2_nuhjin.jpg',
@@ -976,18 +973,17 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
   ];
 
   final _rail = PageController(viewportFraction: 0.62);
-  Timer? _t;
-  int _i = 0;
+  Timer? _timer;
+  int _index = 0;
 
   @override
   void initState() {
     super.initState();
-    _t = Timer.periodic(const Duration(milliseconds: 3600), (_) {
-      if (!mounted || !TickerMode.valuesOf(context).enabled) return;
-      if (!_rail.hasClients) return;
-      _i = (_i + 1) % _shots.length;
+    _timer = Timer.periodic(const Duration(milliseconds: 3600), (_) {
+      if (!mounted || !TickerMode.valuesOf(context).enabled || !_rail.hasClients) return;
+      _index = (_index + 1) % _shots.length;
       _rail.animateToPage(
-        _i,
+        _index,
         duration: const Duration(milliseconds: 620),
         curve: Curves.easeOutCubic,
       );
@@ -997,77 +993,49 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
 
   @override
   void dispose() {
-    _t?.cancel();
+    _timer?.cancel();
     _rail.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 18),
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.only(bottom: 24),
+      decoration: BoxDecoration(
+        color: const Color(0xFF060C18),
+        image: DecorationImage(
+          image: NetworkImage(_shots[_index]),
+          fit: BoxFit.cover,
+          opacity: 0.08,
+        ),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const Padding(
-            padding: EdgeInsets.fromLTRB(20, 0, 20, 18),
+            padding: EdgeInsets.fromLTRB(24, 44, 24, 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Across Every Language',
-                  style: TextStyle(
-                    fontSize: 11,
-                    letterSpacing: 2,
-                    fontWeight: FontWeight.w700,
-                    color: NwsbColors.goldLight,
-                  ),
-                ),
+                Text('Across Every Language', style: TextStyle(fontSize: 11, letterSpacing: 2, fontWeight: FontWeight.w700, color: Color(0xFFE8D5A3))),
                 SizedBox(height: 10),
                 Text.rich(
                   TextSpan(
                     style: TextStyle(fontSize: 25, height: 1.25),
                     children: [
-                      TextSpan(
-                        text: 'Every civilization\n',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w300,
-                          color: Color(0xE0FFFFFF),
-                        ),
-                      ),
-                      TextSpan(
-                        text: 'heard the same\n',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                        ),
-                      ),
-                      TextSpan(
-                        text: 'original sound.',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w800,
-                          color: NwsbColors.goldLight,
-                        ),
-                      ),
+                      TextSpan(text: 'Every civilization\n', style: TextStyle(fontWeight: FontWeight.w300, color: Color(0xE0FFFFFF))),
+                      TextSpan(text: 'heard the same\n', style: TextStyle(fontWeight: FontWeight.w800, color: Colors.white)),
+                      TextSpan(text: 'original sound.', style: TextStyle(fontWeight: FontWeight.w800, color: Color(0xFFE8D5A3))),
                     ],
                   ),
                 ),
                 SizedBox(height: 10),
-                Text(
-                  'Different words. One root. All languages descend from the '
-                  'same vibrational origin.',
-                  style: TextStyle(
-                    fontSize: 12.5,
-                    color: Color(0x99FFFFFF),
-                    height: 1.5,
-                  ),
-                ),
+                Text('Different words. One root. All languages descend from the same vibrational origin.', style: TextStyle(fontSize: 12.5, color: Color(0x99FFFFFF), height: 1.5)),
               ],
             ),
           ),
-          // The pictures move; the tablet does not. It is drawn over the
-          // middle of the rail rather than around any one card, which is
-          // what `.fc-tab` is on the web.
           SizedBox(
             height: 300,
             child: Stack(
@@ -1076,123 +1044,79 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
                 PageView.builder(
                   controller: _rail,
                   itemCount: _shots.length,
-                  onPageChanged: (i) => setState(() => _i = i),
+                  onPageChanged: (i) => setState(() => _index = i),
                   itemBuilder: (context, i) => AnimatedScale(
                     duration: const Duration(milliseconds: 320),
-                    scale: i == _i ? 1 : 0.86,
+                    scale: i == _index ? 1 : 0.86,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 6),
-                      child: ClipRect(
-                        child: NwsbImage(
-                          url: _shots[i],
-                          fallback: const ColoredBox(color: Color(0xFF0A0F1C)),
+                      child: Center(
+                        child: SizedBox(
+                          width: 162,
+                          height: 228,
+                          child: ClipRect(
+                            child: NwsbImage(url: _shots[i], fallback: const ColoredBox(color: Color(0xFF0A0F1C))),
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
                 IgnorePointer(
-                  child: FractionallySizedBox(
-                    widthFactor: 0.62,
-                    child: Image.asset(
-                      'assets/frames/tab-nowss8-portrait.webp',
-                      fit: BoxFit.contain,
-                      errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-                    ),
+                  child: SizedBox(
+                    width: 162 * 908 / 800,
+                    height: 228 * 1408 / 1286,
+                    child: Image.asset('assets/frames/footer-frame.webp', fit: BoxFit.fill, errorBuilder: (_, __, ___) => const SizedBox.shrink()),
+                  ),
+                ),
+                Positioned(
+                  bottom: -20,
+                  child: Row(
+                    children: [
+                      for (var i = 0; i < _shots.length; i++)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 3),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 400),
+                            width: i == _index ? 20 : 4,
+                            height: 4,
+                            color: i == _index ? const Color(0xE6C8E8F5) : const Color(0x4DC8E8F5),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 14),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              for (var i = 0; i < _shots.length; i++)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 3),
-                  child: Container(
-                    width: 6,
-                    height: 6,
-                    decoration: BoxDecoration(
-                      color: i == _i
-                          ? NwsbColors.goldLight
-                          : const Color(0x33FFFFFF),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 36),
           Container(
-            margin: const EdgeInsets.fromLTRB(16, 0, 16, 28),
-            padding: const EdgeInsets.all(22),
-            decoration: BoxDecoration(
-              color: const Color(0x0FFFFFFF),
-              border: Border.all(color: const Color(0x1AFFFFFF)),
+            margin: const EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.fromLTRB(22, 24, 22, 20),
+            decoration: const BoxDecoration(
+              color: Color(0x0FFFFFFF),
+              border: Border(top: BorderSide(color: Color(0x29FFFFFF)), left: BorderSide(color: Color(0x29FFFFFF)), right: BorderSide(color: Color(0x29FFFFFF)), bottom: BorderSide(color: Color(0x14FFFFFF))),
+              boxShadow: [BoxShadow(color: Color(0x80000000), blurRadius: 40, offset: Offset(0, -2)), BoxShadow(color: Color(0x66000000), blurRadius: 32, offset: Offset(0, 8))],
             ),
             child: Column(
               children: [
-                const Text.rich(
-                  TextSpan(
-                    style: TextStyle(fontSize: 26, color: Colors.white),
-                    children: [
-                      TextSpan(
-                        text: 'Nowsb',
-                        style: TextStyle(fontWeight: FontWeight.w800),
-                      ),
-                      TextSpan(
-                        text: 'ansiu',
-                        style: TextStyle(fontWeight: FontWeight.w200),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 6),
-                const Text.rich(
-                  TextSpan(
-                    style: TextStyle(fontSize: 12, color: Color(0x99FFFFFF)),
-                    children: [
-                      TextSpan(text: 'Natural Origin of '),
-                      TextSpan(
-                        text: 'Word Science',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xBFC8E8F5),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                const Text.rich(TextSpan(style: TextStyle(fontSize: 26, color: Colors.white, letterSpacing: 1), children: [TextSpan(text: 'Nowss', style: TextStyle(fontWeight: FontWeight.w600)), TextSpan(text: 'B', style: TextStyle(fontWeight: FontWeight.w200))])),
+                const SizedBox(height: 4),
+                const Text.rich(TextSpan(style: TextStyle(fontSize: 9, letterSpacing: 4, color: Color(0x99FFFFFF)), children: [TextSpan(text: 'THE NEW FASHION TREND OF '), TextSpan(text: 'MEDITATION', style: TextStyle(color: Color(0xBFC8E8F5))])),
                 const SizedBox(height: 18),
-                Container(height: 1, color: const Color(0x14FFFFFF)),
+                Container(width: 32, height: 1, decoration: const BoxDecoration(gradient: LinearGradient(colors: [Colors.transparent, Color(0x66C8E8F5), Colors.transparent]))),
                 const SizedBox(height: 18),
                 Wrap(
                   alignment: WrapAlignment.center,
-                  spacing: 18,
-                  runSpacing: 12,
+                  spacing: 16,
+                  runSpacing: 6,
                   children: [
                     for (final (label, key) in _links)
-                      GestureDetector(
-                        onTap: () => widget.onLink?.call(key),
-                        behavior: HitTestBehavior.opaque,
-                        child: Text(
-                          label,
-                          style: const TextStyle(
-                            fontSize: 12.5,
-                            color: Color(0xCCFFFFFF),
-                          ),
-                        ),
-                      ),
+                      GestureDetector(onTap: () => widget.onLink?.call(key), behavior: HitTestBehavior.opaque, child: Text(label, style: const TextStyle(fontSize: 11, color: Color(0xCCFFFFFF)))),
                   ],
                 ),
                 const SizedBox(height: 18),
-                const Text(
-                  '© 2026 Adv. Sanjaykumar Gadge · Shabdapathy',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 11, color: Color(0x73FFFFFF)),
-                ),
+                const Text('© 2026 Adv. Sanjaykumar Gadge · Shabdapathy', textAlign: TextAlign.center, style: TextStyle(fontSize: 9, letterSpacing: 1, color: Color(0x73FFFFFF))),
               ],
             ),
           ),
