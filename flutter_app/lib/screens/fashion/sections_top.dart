@@ -326,14 +326,10 @@ class FashReader extends StatelessWidget {
             behavior: HitTestBehavior.opaque,
             child: const AspectRatio(
               aspectRatio: 16 / 9,
-              child: ClipRect(
-                child: NwsbImage(
-                  url:
-                      'assets/videos/3a1f74f98d7a0d18_grok_video_2026-07-30-14-57-37_tbzpox.mp4',
-                  fallback: NwsbVideo(
-                    asset: 'assets/video/word-acts.mp4',
-                  ),
-                ),
+              child: NwsbVideo(
+                asset: 'assets/video/reader-section.mp4',
+                poster: 'assets/video/reader-section-poster.webp',
+                fit: BoxFit.cover,
               ),
             ),
           ),

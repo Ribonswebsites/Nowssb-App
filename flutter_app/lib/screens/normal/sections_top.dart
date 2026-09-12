@@ -1055,13 +1055,11 @@ class NmReader extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               child: const AspectRatio(
                 aspectRatio: 16 / 9,
-                child: NwsbImage(
-                  url:
-                      'assets/videos/3a1f74f98d7a0d18_grok_video_2026-07-30-14-57-37_tbzpox.mp4',
-                  fallback: NwsbVideo(
-                    asset: 'assets/video/word-acts.mp4',
-                    priority: ClipPriority.decoration,
-                  ),
+                child: NwsbVideo(
+                  asset: 'assets/video/reader-section.mp4',
+                  poster: 'assets/video/reader-section-poster.webp',
+                  priority: ClipPriority.decoration,
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
