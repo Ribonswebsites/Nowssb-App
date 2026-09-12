@@ -197,7 +197,6 @@ class DeviceFrame {
     left: 0.01928,
   );
 
-
   /// `.dev-tab4-l` — Sound Library 16:9 rails. Trimmed 1338x875.
   static const tab4Landscape = DeviceFrame(
     'assets/frames/tab4-landscape.webp',
@@ -244,6 +243,7 @@ class TvFrame extends StatelessWidget {
     this.autoplay = true,
     this.onTap,
     this.overlay,
+    this.showVideo = true,
   });
 
   /// The clip on the screen.
@@ -267,6 +267,7 @@ class TvFrame extends StatelessWidget {
   /// Quick Access row, a caption, a call to action. Clipped to the aperture
   /// like everything else on the screen is.
   final Widget? overlay;
+  final bool showVideo;
 
   @override
   Widget build(BuildContext context) {
@@ -281,19 +282,21 @@ class TvFrame extends StatelessWidget {
             final screen = Padding(
               padding: frame.insets(box),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(frame.opaqueAperture ? 14 : 0),
+                borderRadius:
+                    BorderRadius.circular(frame.opaqueAperture ? 14 : 0),
                 clipBehavior: Clip.antiAlias,
                 child: ColoredBox(
                   color: Colors.black,
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
-                      NwsbVideo(
-                        asset: asset,
-                        priority: priority,
-                        autoplay: autoplay,
-                        showPoster: false,
-                      ),
+                      if (showVideo)
+                        NwsbVideo(
+                          asset: asset,
+                          priority: priority,
+                          autoplay: autoplay,
+                          showPoster: false,
+                        ),
                       if (overlay != null) overlay!,
                     ],
                   ),
@@ -414,7 +417,6 @@ class _Bezel extends StatelessWidget {
   }
 }
 
-
 /// A tablet bezel around arbitrary content — image, mosaic, or video.
 ///
 /// [TvFrame] is the video-specific convenience; Sound Library (and any feed
@@ -449,7 +451,8 @@ class FramedSlot extends StatelessWidget {
             final screen = Padding(
               padding: frame.insets(box),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(frame.opaqueAperture ? 14 : 0),
+                borderRadius:
+                    BorderRadius.circular(frame.opaqueAperture ? 14 : 0),
                 clipBehavior: Clip.antiAlias,
                 child: ColoredBox(
                   color: Colors.black,

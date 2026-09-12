@@ -104,15 +104,15 @@ class EditionSection extends StatelessWidget {
             mark: NwsbMarks.crown,
           ),
           TvFrame(
-            asset: 'assets/video/subscription-promo.mp4',
+            asset: 'assets/video/subscription-tiers-bg.mp4',
             frame: DeviceFrame.kioskPortrait,
             priority: ClipPriority.decoration,
             onTap: onTap,
-            overlay: const Align(
-              alignment: Alignment.bottomLeft,
+            overlay: Align(
+              alignment: Alignment.center,
               child: Padding(
-                padding: EdgeInsets.fromLTRB(18, 0, 18, 18),
-                child: _PromoOffer(),
+                padding: const EdgeInsets.fromLTRB(16, 28, 16, 22),
+                child: _SubscriptionTierStack(onTap: onTap),
               ),
             ),
           ),
@@ -129,84 +129,161 @@ class EditionSection extends StatelessWidget {
   }
 }
 
-/// The offer — the mark, then the number, then the small print.
-///
-/// Typed the way this app types a headline, which is `.login-title`
-/// (app/app.css): one 42px DM Sans line split between weight 800 and weight
-/// 200, with a 9px letter-spaced-4 uppercase accent line under it. Not a new
-/// look — the same one the sign-in screen opens with.
-///
-/// The big line is scaled down to fit rather than allowed to wrap. This sits
-/// inside a tablet's aperture, which is narrower than the card that holds it,
-/// and "30 Days Free" at a fixed 44px runs to three lines in there.
-class _PromoOffer extends StatelessWidget {
-  const _PromoOffer();
+class _SubscriptionTierStack extends StatelessWidget {
+  const _SubscriptionTierStack({this.onTap});
+  final VoidCallback? onTap;
 
-  /// `text-shadow: 0 2px 20px rgba(0,0,0,0.85)`. The clip behind this is
-  /// bright in places, and the headline has to hold on all ten seconds of it.
-  static const _lift = [
-    Shadow(color: Color(0xD9000000), blurRadius: 20, offset: Offset(0, 2)),
+  static const _tiers = <(String, String, Color, String)>[
+    ('Free', 'NowssB Edition', Color(0xFFE8EAF0), NwsbMarks.crown),
+    ('Resonance', r'$4.99 / month', Color(0xFFC8E8F5), NwsbMarks.reader),
+    ('Frequency', r'$9.99 / month', Color(0xFFE8D5A3), NwsbMarks.sound),
+    ('Frequency X', r'$19.99 / month', Color(0xFFF0F0F0), NwsbMarks.signature),
   ];
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          'Join today for',
-          style: TextStyle(
-            fontSize: 19,
-            fontWeight: FontWeight.w700,
-            color: Color(0xE0FFFFFF),
-            height: 1.15,
-            shadows: _lift,
+        for (var i = 0; i < _tiers.length; i++) ...[
+          _SubscriptionTierRow(
+            name: _tiers[i].$1,
+            detail: _tiers[i].$2,
+            accent: _tiers[i].$3,
+            mark: _tiers[i].$4,
+            onTap: onTap,
           ),
-        ),
-        SizedBox(height: 2),
-        // `clamp(30px, 9vw, 44px)` on the web; here the same thing, done by
-        // shrinking to the width there actually is.
-        FittedBox(
-          fit: BoxFit.scaleDown,
-          alignment: Alignment.centerLeft,
-          child: Text.rich(
-            TextSpan(
-              style: TextStyle(
-                fontSize: 44,
-                fontWeight: FontWeight.w800,
-                height: 1.02,
-                letterSpacing: -1,
-                color: Colors.white,
-                shadows: _lift,
-              ),
-              children: [
-                TextSpan(text: '30 Days '),
-                TextSpan(
-                  text: 'Free',
-                  style: TextStyle(color: NwsbColors.goldLight),
-                ),
-              ],
-            ),
-          ),
-        ),
-        SizedBox(height: 8),
-        Opacity(
-          opacity: 0.85,
-          child: Text(
-            'SUBSCRIBE · CANCEL ANYTIME',
-            style: TextStyle(
-              fontSize: 9,
-              fontWeight: FontWeight.w300,
-              letterSpacing: 4,
-              color: NwsbColors.goldLight,
-              shadows: _lift,
-            ),
-          ),
-        ),
+          if (i != _tiers.length - 1) const SizedBox(height: 10),
+        ],
       ],
     );
   }
+}
+
+class _SubscriptionTierRow extends StatelessWidget {
+  const _SubscriptionTierRow({
+    required this.name,
+    required this.detail,
+    required this.accent,
+    required this.mark,
+    this.onTap,
+  });
+
+  final String name;
+  final String detail;
+  final Color accent;
+  final String mark;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Row(
+        children: [
+          _TierGlassCircle(
+            child: Container(
+              width: 42,
+              height: 42,
+              decoration: const BoxDecoration(
+                  color: Colors.white, shape: BoxShape.circle),
+              alignment: Alignment.center,
+              child: NwsbIcon(mark, size: 22, color: const Color(0xFF111827)),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: _TierGlassPill(
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 13, vertical: 9),
+                decoration: BoxDecoration(
+                  color: const Color(0xF20A0B10),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                  color: accent,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w800)),
+                          Text(detail,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                  color: Color(0xB3FFFFFF), fontSize: 10)),
+                        ],
+                      ),
+                    ),
+                    Container(
+                        width: 1, height: 26, color: const Color(0x66FFFFFF)),
+                    const SizedBox(width: 8),
+                    const _TierGlassCircle(
+                      size: 30,
+                      child: NwsbIcon(NwsbMarks.arrow,
+                          size: 16, color: Colors.white),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TierGlassCircle extends StatelessWidget {
+  const _TierGlassCircle({required this.child, this.size = 52});
+  final Widget child;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        width: size,
+        height: size,
+        padding: size > 40 ? const EdgeInsets.all(5) : const EdgeInsets.all(3),
+        decoration: BoxDecoration(
+          color: const Color(0x38FFFFFF),
+          shape: BoxShape.circle,
+          border: Border.all(color: const Color(0x99FFFFFF)),
+          boxShadow: const [
+            BoxShadow(
+                color: Color(0x55000000), blurRadius: 10, offset: Offset(0, 4))
+          ],
+        ),
+        child: child,
+      );
+}
+
+class _TierGlassPill extends StatelessWidget {
+  const _TierGlassPill({required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.all(3),
+        decoration: BoxDecoration(
+          color: const Color(0x42FFFFFF),
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: const Color(0x88FFFFFF)),
+          boxShadow: const [
+            BoxShadow(
+                color: Color(0x55000000), blurRadius: 10, offset: Offset(0, 4))
+          ],
+        ),
+        child: child,
+      );
 }
 
 /// THE SIX — every main door in the app, on one compact panel.
@@ -1050,9 +1127,9 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
             transformAlignment: Alignment.center,
             transform: Matrix4.identity()
               ..setEntry(3, 2, 0.001)
-              ..translate(tx, 0.0, tz)
+              ..translateByDouble(tx, 0.0, tz, 1.0)
               ..rotateY(angle * 3.141592653589793 / 180)
-              ..scale(scale),
+              ..scaleByDouble(scale, scale, scale, 1.0),
             width: 162,
             height: 228,
             child: ClipRect(

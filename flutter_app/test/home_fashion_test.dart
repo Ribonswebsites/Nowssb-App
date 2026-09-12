@@ -237,14 +237,17 @@ void main() {
     // ONE of them, not two — this card and the promo were both showing the
     // subscription film a few inches apart.
 
-    // The offer is set ON the clip, so it reads as part of the picture.
+    // The four subscription tiers are set ON the clip, so they read as part
+    // of the picture and not as a separate card above it.
     final tv = tester.getRect(find.descendant(
       of: find.byType(EditionSection),
       matching: find.byType(TvFrame),
     ));
-    final offer = tester.getRect(find.text('Join today for'));
-    expect(tv.contains(offer.topLeft), isTrue,
-        reason: 'the offer belongs on the screen, not above it');
+    for (final tier in ['Free', 'Resonance', 'Frequency', 'Frequency X']) {
+      final tierRect = tester.getRect(find.text(tier).first);
+      expect(tv.contains(tierRect.topLeft), isTrue,
+          reason: '$tier belongs inside the TV screen');
+    }
 
     // And the button is OUTSIDE the set, under it.
     final button = tester.getTopLeft(find.descendant(
@@ -254,14 +257,14 @@ void main() {
     expect(button.dy, greaterThanOrEqualTo(tv.bottom - 1),
         reason: 'the button belongs outside the set');
 
-    // Nothing else is on the screen.
+    // The old poster-promo content is gone from the screen.
     expect(
       find.descendant(
         of: find.byType(EditionSection),
         matching: find.text('Unlock your full healing potential'),
       ),
       findsNothing,
-      reason: 'the promo set is film and the offer, nothing else',
+      reason: 'the TV contains the tier rows, not the old promo content',
     );
 
     // And the promo sits on a pane like every other section.
