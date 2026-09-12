@@ -246,6 +246,20 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       var splashEl = document.getElementById('splash');
       if (splashEl) splashEl.classList.add('splash-clip');
       if (vid) {
+        var splashPlayedThisSession = false;
+        try { splashPlayedThisSession = sessionStorage.getItem('nwsb_splash_video_played') === '1'; } catch (e) {}
+        if (splashPlayedThisSession) {
+          /* A return to the splash in the same WebView session must not
+             restart the intro. Release the gate immediately and leave the
+             poster/background visible instead of showing a second video. */
+          window._splashHoldForClip = false;
+          window._splashClipDone = true;
+          window._nwsbSplashOver = true;
+          vid.removeAttribute('autoplay');
+          vid.removeAttribute('src');
+          vid.classList.remove('on', 'vis');
+          if (splashEl) splashEl.classList.remove('splash-clip');
+        } else {
         vid.src = VID;
         vid.classList.add('on');
         /* 2x. defaultPlaybackRate is the one that matters: playbackRate is
@@ -302,6 +316,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
         silence();
 
         var startIt = function () {
+          try { sessionStorage.setItem('nwsb_splash_video_played', '1'); } catch (e) {}
           vid.classList.add('vis');
           silence();
           var p = null;
@@ -339,6 +354,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
           }).observe(splashScreen, { attributes: true, attributeFilter: ['class'] });
         }
         setTimeout(startIt, 1000);
+        }
       }
       if (img) img.style.backgroundImage = 'none';
     } else if (img) {

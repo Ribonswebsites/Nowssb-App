@@ -13,6 +13,10 @@
    burning someone's mobile data in the background without asking. ── */
 (function () {
   if (typeof caches === 'undefined') return;
+  /* Capacitor ships these files locally. Background-warming the whole library
+     only duplicates a large bundle into Cache Storage and competes with the
+     visible clip; mount each clip when it is near the viewport instead. */
+  var IS_WEBVIEW = !!(window.Capacitor || /;\s*wv\)/i.test(navigator.userAgent || ''));
 
   /* MUST match VIDEO_CACHE in sw.js. The service worker deletes every
      nowssb-media-precache-* bucket that is not the current one, so if this
@@ -22,6 +26,7 @@
   var VIDEO_CACHE = 'nowssb-media-precache-v2';
 
   function shouldSkip() {
+    if (IS_WEBVIEW) return true;
     var c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
     if (!c) return false;
     if (c.saveData) return true;
@@ -99,6 +104,7 @@
   }
 
   function start() {
+    if (IS_WEBVIEW) return;
     if (shouldSkip()) return;
     var urls = collectVideoUrls();
     if (urls.length) warmAll(urls);
@@ -173,6 +179,7 @@
    ── */
 (function () {
   var MARK = 'data-nwsb-vis';
+  var IS_WEBVIEW = !!(window.Capacitor || /;\s*wv\)/i.test(navigator.userAgent || ''));
   /* 4 was leaving the smallest clips out. The section discs beside the
      player, the Reader and the eBooks rail are 40px and cost almost
      nothing to decode, but they queued behind full-width banners on the
@@ -376,6 +383,10 @@
   }
 
   function unmount(v) {
+    /* Capacitor reads bundled media from the app package. Releasing src on
+       every scroll-out makes Android reopen the file and show a black frame
+       when the user scrolls back. Keep it mounted once loaded in WebView. */
+    if (IS_WEBVIEW) return;
     /* Feature films (player bg, orb, login, progress) must stay loaded —
        yanking src is what made them take forever to come back. */
     if (isFeature(v)) return;

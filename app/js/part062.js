@@ -125,6 +125,7 @@
            something. */
         { k:'store',    sel:['.fash-store-wrap'],                                          t:S, label:'NowssB Store',          sub:'The tall card and its banner', always:1 },
         { k:'trendwd',  sel:['.fash-trend-wrap'],                                          t:S, label:"Today's Trending",      sub:'The clip and its black banner', vb:1 },
+        { k:'customexp',sel:['.customize-experience-banner'],                              t:S, label:'Customize prompt',        sub:'Open the customization panel' },
         { k:'custom',   sel:['.fash-cust-panel'],                                          t:S, label:'Customize',             sub:'Quick Access · Quick Links · Set As You Like' },
         /* Registered so it lands where it is meant to. Anything NOT in this
            table keeps its markup position while every registered section is
