@@ -339,24 +339,12 @@
       .catch(function (error) { console.warn('Personal Coach:', error.message); });
   };
 
-  function placeActionBar(host) {
-    var mainOps = document.querySelector('#home-nm .mainops-blk.nmh-sec-wrap');
-    if (!mainOps || !mainOps.parentNode) return;
-    host.hidden = false;
-    host.classList.remove('hl-off');
-    host.style.setProperty('display', 'block', 'important');
-    host.style.setProperty('visibility', 'visible', 'important');
-    if (mainOps.nextElementSibling === host) return;
-    host.classList.remove('hl-off');
-    mainOps.parentNode.insertBefore(host, mainOps.nextSibling);
-  }
-
   async function start() {
     var dashboardHost = document.querySelector('[data-direct-neomorphic="dashboard"]');
     var essentialsHost = document.querySelector('[data-direct-neomorphic="essentials"]');
-    var actionBarHost = document.querySelector('[data-direct-neomorphic="actionbar"]');
+    var actionBarHosts = Array.prototype.slice.call(document.querySelectorAll('[data-direct-neomorphic="actionbar"]'));
     var fashionHost = document.querySelector('[data-direct-neomorphic="fashion"]');
-    if (!dashboardHost || !essentialsHost || !actionBarHost || !fashionHost) return;
+    if (!dashboardHost || !essentialsHost || !actionBarHosts.length || !fashionHost) return;
     try {
       var sources = await Promise.all([
         fetch('app/widgets/neomorphic_dashboard.html').then(function (response) { return response.text(); }),
@@ -366,19 +354,14 @@
       ]);
       var dashboardRoot = mount(dashboardHost, sources[0]);
       var essentialsRoot = mount(essentialsHost, sources[1], true);
-      var actionBarRoot = mount(actionBarHost, sources[2]);
       var fashionRoot = mount(fashionHost, sources[3], true);
+      actionBarHosts.forEach(function (host) {
+        if (host.closest('#home')) host.dataset.homeTheme = 'fashion';
+        wireActionBar(mount(host, sources[2]));
+      });
       wireDashboard(dashboardRoot);
       wireEssentials(essentialsRoot);
-      wireActionBar(actionBarRoot);
       wireFashionMode(fashionRoot);
-      placeActionBar(actionBarHost);
-      window.addEventListener('load', function () { placeActionBar(actionBarHost); }, { once: true });
-      var mainOps = document.querySelector('#home-nm .mainops-blk.nmh-sec-wrap');
-      if (mainOps && mainOps.parentNode) {
-        new MutationObserver(function () { placeActionBar(actionBarHost); })
-          .observe(mainOps.parentNode, { childList: true });
-      }
       window.nowssbDirectDashboardRender = function (data) { renderDashboard(dashboardRoot, data); };
       if (typeof window.nowssbDashboardRefresh === 'function') window.nowssbDashboardRefresh();
     } catch (error) {

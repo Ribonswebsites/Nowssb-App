@@ -41,12 +41,13 @@ import 'fashion/sections_mid.dart';
 import 'fashion/sections_top.dart';
 import 'fashion_plus.dart';
 import 'notifications_sheet.dart';
-import 'practice_player.dart';
 import 'sound_library.dart';
 import 'widgets_page.dart';
 import '../widgets/home_menu_drawer.dart';
 import 'word_detail.dart';
 import 'progress/progress_screen.dart';
+import 'normal/neomorphic_action_bar.dart';
+import 'personal_coach.dart';
 
 /// `REG.fash.items` — app/js/part062.js:107-148, key for key and in order.
 ///
@@ -61,6 +62,7 @@ const kFashionSectionOrder = <String>[
   // Not on the website's registry. Six doors on one panel so the app can
   // be used without knowing where anything is — see MainOptionsSection.
   'mainops',
+  'actionbar',
   'reader',
   'herovid',
   'streak',
@@ -121,9 +123,8 @@ class _HomeFashionState extends State<HomeFashion> {
 
   void _go(int tab) => NavScope.goTo(context, tab);
 
-  void _push(Widget page) => Navigator.of(context).push(
-        MaterialPageRoute<void>(builder: (_) => page),
-      );
+  void _push(Widget page) =>
+      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => page));
 
   /// The prescription's word pills open the word itself, the way tapping one
   /// on the web does.
@@ -170,10 +171,18 @@ class _HomeFashionState extends State<HomeFashion> {
             onCustomize: () => _push(const WidgetsPage()),
             onFeatures: () => _push(const WidgetsPage()),
             onEarn: () => _go(4),
-          )
+          ),
         ),
         ('practice', FashPractice(onTap: () => _go(1))),
         ('mainops', MainOptionsSection(onGo: _go, onAction: _openMainOption)),
+        (
+          'actionbar',
+          NmSuppliedActionBar(
+            glassmorphism: true,
+            onSupport: () => _go(4),
+            onCoach: () => _push(const PersonalCoachScreen()),
+          ),
+        ),
         ('reader', FashReader(onTap: () => _go(2))),
         ('herovid', FashStreakVideo(onTap: () => _go(1))),
         ('streak', FashStreak(onTap: () => _go(1))),
@@ -185,10 +194,7 @@ class _HomeFashionState extends State<HomeFashion> {
           'fashplus',
           FashPlusMini(onTap: () => _push(const FashionPlusScreen()))
         ),
-        (
-          'rx',
-          FashPrescription(onTap: () => _go(1), onWord: _openWord),
-        ),
+        ('rx', FashPrescription(onTap: () => _go(1), onWord: _openWord)),
         ('connect', FashConnect(onTap: () => _go(0))),
         ('trendvid', FashShopNow(onTap: () => _go(3))),
         ('storeban', StoreBannerSection(onTap: () => _go(3))),
@@ -202,7 +208,7 @@ class _HomeFashionState extends State<HomeFashion> {
             onCart: () => _go(3),
             onWishlist: () => _go(3),
             onOrders: () => _go(4),
-          )
+          ),
         ),
         ('shabda', FashShabdapathy(onTap: () => _go(2))),
         ('ebooks', EbooksSection(onTap: () => _go(2))),
@@ -214,7 +220,7 @@ class _HomeFashionState extends State<HomeFashion> {
             onFemale: () => _go(2),
             onMale: () => _go(2),
             onTap: () => _go(2),
-          )
+          ),
         ),
         ('promovid', FashPromoVideo(onTap: () => _go(2))),
         ('wsearch', FashWordSearch(onOpen: (_) => _go(2))),
@@ -307,8 +313,7 @@ class _HomeFashionState extends State<HomeFashion> {
                   return HomeHeader(
                     notifications: NotifStore.instance.unreadRaw,
                     onNotifications: () => showNotificationsSheet(context),
-                    onNormalHome: () =>
-                        Settings.instance.setFashionHome(false),
+                    onNormalHome: () => Settings.instance.setFashionHome(false),
                     onMenu: () => showHomeMenuDrawer(context, goTab: _go),
                   );
                 },
