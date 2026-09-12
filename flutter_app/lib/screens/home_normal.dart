@@ -252,7 +252,6 @@ class _HomeNormalState extends State<HomeNormal> {
         ('trendshop', NmTrendShop(onTap: () => _go(3))),
         ('storeban', StoreBannerSection(onTap: () => _go(3), framed: true)),
         ('subvid', SubscriptionSection(onTap: () => _go(3))),
-        ('edition', EditionSection(onTap: () => _go(3))),
         ('ebooks', EbooksSection(onTap: () => _go(2))),
         ('connectban', ConnectBannerSection(onTap: () => _go(0))),
         ('healing', HealingSection(onTap: () => _go(2))),

@@ -30,8 +30,7 @@ import '../widgets/neu_wrap.dart';
 import '../widgets/home_skin.dart';
 import '../widgets/tv_frame.dart';
 
-/// 16 · subvid — index.html:2166. `.nsub-blk` — head, the tall clip on the
-/// slim landscape tablet with Subscribe Today on it, then the bar.
+/// 16 · subvid — the shared subscription tier page used by both homes.
 class SubscriptionSection extends StatelessWidget {
   const SubscriptionSection({super.key, this.onTap});
   final VoidCallback? onTap;
@@ -42,40 +41,45 @@ class SubscriptionSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const PaneHead(
-            eyebrow: 'The Full Library',
-            title: 'NowssB Subscription',
-            mark: NwsbMarks.crown,
-          ),
-          TvFrame(
-            asset: 'assets/video/subscription-a.mp4',
-            frame: DeviceFrame.tabletSlimLandscape,
+          GestureDetector(
             onTap: onTap,
-            overlay: Align(
-              alignment: Alignment.bottomRight,
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: ScreenCta(label: 'Subscribe Today', onTap: onTap),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+              decoration: BoxDecoration(
+                color: const Color(0xFF05070C),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('SUBSCRIPTION TIER UPGRADE', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.6)),
+                  const Icon(Icons.arrow_forward_rounded, color: Color(0xFFE8D5A3), size: 18),
+                ],
               ),
             ),
           ),
-          const SizedBox(height: 14),
-          NcbCarousel(
+          const SizedBox(height: 22),
+          const PaneHead(
+            eyebrow: 'The full library · choose your frequency',
+            title: 'Find your resonance',
+            mark: NwsbMarks.crown,
+          ),
+          const SizedBox(height: 4),
+          const Text('Unlock a deeper practice, one tier at a time.', style: TextStyle(color: Color(0x99FFFFFF), fontSize: 12)),
+          const SizedBox(height: 12),
+          _SubscriptionTierStack(onTap: onTap),
+          const SizedBox(height: 15),
+          SecBanner(
+            title: 'Subscribe Today',
+            sub: 'Every word and every frequency, unlocked',
+            mark: NwsbMarks.crown,
             onTap: onTap,
-            slides: const [
-              (
-                NwsbMarks.crown,
-                'Subscribe Today',
-                'Every word and every frequency, unlocked',
-              ),
-            ],
           ),
         ],
       ),
     );
   }
 }
-
 /// 17 · edition — index.html:2197. `.nedi-blk`.
 ///
 /// ONE SECTION, not two. This card and the promo were both showing the
