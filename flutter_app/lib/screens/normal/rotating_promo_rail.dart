@@ -175,7 +175,8 @@ class _PromoDoor extends StatelessWidget {
             child: AnimatedBuilder(
               animation: motion,
               builder: (context, _) => CustomPaint(
-                painter: _RippleDiscPainter(value: (motion.value + phase) % 1),
+                foregroundPainter:
+                    _RippleDiscPainter(value: (motion.value + phase) % 1),
                 child: Padding(
                   padding: const EdgeInsets.all(9),
                   child: DecoratedBox(
@@ -252,9 +253,9 @@ class _RippleDiscPainter extends CustomPainter {
       final wave = (value + i / 3) % 1;
       final paint = Paint()
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.8
-        ..color = Colors.white.withValues(alpha: .55 * (1 - wave));
-      canvas.drawCircle(center, radius * (.54 + wave * .52), paint);
+        ..strokeWidth = 2.2
+        ..color = Colors.white.withValues(alpha: .82 * (1 - wave));
+      canvas.drawCircle(center, radius * (.62 + wave * .48), paint);
     }
   }
 
