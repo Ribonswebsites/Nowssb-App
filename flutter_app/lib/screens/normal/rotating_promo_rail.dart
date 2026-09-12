@@ -11,6 +11,25 @@ import 'package:flutter/material.dart';
 
 import '../../theme/tokens.dart';
 
+List<Color> _shadeFamily(double progress) {
+  const seeds = [
+    Color(0xFFE34C62),
+    Color(0xFFE59A30),
+    Color(0xFF9A58C9),
+    Color(0xFF3EAD7B),
+    Color(0xFF467ED6),
+    Color(0xFF222633),
+  ];
+  final scaled = progress * seeds.length;
+  final index = scaled.floor() % seeds.length;
+  final next = (index + 1) % seeds.length;
+  final base = Color.lerp(seeds[index], seeds[next], scaled - scaled.floor())!;
+  return List.generate(
+    7,
+    (i) => Color.lerp(Colors.white, base, .22 + (i * .12).clamp(0, .78))!,
+  );
+}
+
 class NormalPromoRail extends StatefulWidget {
   const NormalPromoRail({
     super.key,
@@ -88,15 +107,7 @@ class _NormalPromoRailState extends State<NormalPromoRail>
                 gradient: LinearGradient(
                   begin: Alignment(-1 + _motion.value * 2, -0.3),
                   end: Alignment(1 - _motion.value * 2, 0.3),
-                  colors: const [
-                    Color(0xFFE84D68),
-                    Color(0xFFFFB340),
-                    Color(0xFFB45BDB),
-                    Color(0xFF4EBB8D),
-                    Color(0xFF4D8FE8),
-                    Color(0xFF11131C),
-                    Color(0xFFF2F3F7),
-                  ],
+                  colors: _shadeFamily(_motion.value),
                   stops: [0, .16, .33, .5, .67, .84, 1],
                 ),
                 boxShadow: const [

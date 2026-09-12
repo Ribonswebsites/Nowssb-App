@@ -56,6 +56,7 @@ import 'normal/glassmorphism_theme.dart';
 import 'normal/header_actions_sheet.dart';
 import '../widgets/nwsb_icon.dart';
 import 'normal/neomorphic_essentials.dart';
+import 'normal/horizontal_routine_cards.dart';
 import 'normal/sections_bottom.dart';
 import 'normal/sections_top.dart';
 import 'normal/rotating_promo_rail.dart';
@@ -75,6 +76,7 @@ const kNormalSectionOrder = <String>[
   'promoRail',
   'dashboard',
   'essentials',
+  'routineCards',
   'streak',
   'storedisc',
   'practice',
@@ -217,6 +219,7 @@ class _HomeNormalState extends State<HomeNormal> {
               onProgress: _openDashboardProgress)
         ),
         ('essentials', const NmSuppliedEssentials()),
+        ('routineCards', const NmHorizontalRoutineCards()),
         ('streak', NmStreak(onTap: () => _go(1))),
         (
           'storedisc',
