@@ -36,6 +36,7 @@ class FakeVideoPlatform extends VideoPlayerPlatform {
   final List<int> disposed = [];
 
   final Map<int, StreamController<VideoEvent>> _events = {};
+  final Set<int> playing = {};
 
   /// Players asked for and not yet returned — the number that matters.
   int get alive => created.length - disposed.length;
@@ -69,6 +70,7 @@ class FakeVideoPlatform extends VideoPlayerPlatform {
       c.close();
     }
     _events.clear();
+    playing.clear();
   }
 
   @override
@@ -124,6 +126,7 @@ class FakeVideoPlatform extends VideoPlayerPlatform {
   @override
   Future<void> dispose(int playerId) async {
     disposed.add(playerId);
+    playing.remove(playerId);
     await _events.remove(playerId)?.close();
   }
 
@@ -135,10 +138,22 @@ class FakeVideoPlatform extends VideoPlayerPlatform {
   Future<void> setLooping(int playerId, bool looping) async {}
 
   @override
-  Future<void> play(int playerId) async {}
+  Future<void> play(int playerId) async {
+    playing.add(playerId);
+    _events[playerId]?.add(VideoEvent(
+      eventType: VideoEventType.isPlayingStateUpdate,
+      isPlaying: true,
+    ));
+  }
 
   @override
-  Future<void> pause(int playerId) async {}
+  Future<void> pause(int playerId) async {
+    playing.remove(playerId);
+    _events[playerId]?.add(VideoEvent(
+      eventType: VideoEventType.isPlayingStateUpdate,
+      isPlaying: false,
+    ));
+  }
 
   @override
   Future<void> setVolume(int playerId, double volume) async {}

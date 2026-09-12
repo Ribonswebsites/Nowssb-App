@@ -161,6 +161,28 @@ void main() {
     expect(a.controller, isNull);
   });
 
+  test('visible clips outrank and bound next-up prefetch', () async {
+    final visible = [
+      for (var i = 0; i < VideoPool.maxLive; i++)
+        VideoPool.instance.lease('assets/video/visible-$i.mp4'),
+    ];
+    for (final l in visible) {
+      l.reportViewport(distance: 10, onScreen: true, prefetch: true);
+    }
+    final next = [
+      for (var i = 0; i < VideoPool.prefetchSlots + 3; i++)
+        VideoPool.instance.lease('assets/video/next-$i.mp4'),
+    ];
+    for (final l in next) {
+      l.reportViewport(distance: 800, onScreen: false, prefetch: true);
+    }
+    await pumpPool();
+
+    expect(VideoPool.instance.debugLive, containsAll(visible));
+    expect(next.where((l) => l.controller != null).length,
+        lessThanOrEqualTo(VideoPool.prefetchSlots));
+  });
+
   test('scrolling a long page never exceeds the ceiling at any point',
       () async {
     // Thirty clips down a page, scrolled past one at a time. This is the
@@ -203,6 +225,7 @@ void main() {
         VideoPool.instance.lease('assets/video/seen-\$i.mp4'),
     ];
     for (final l in leases) {
+      l.play();
       l.reportDistance(120);
     }
     await pumpPool();
@@ -212,6 +235,8 @@ void main() {
     for (final l in leases) {
       expect(l.controller, isNotNull);
     }
+    expect(platform.playing.length, visible,
+        reason: 'every visible clip must receive an active play command');
   });
 
   test('clips are opened in bounded batches, not all at once', () async {

@@ -249,13 +249,19 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
     final top = box.localToGlobal(Offset.zero).dy;
     final centre = top + box.size.height / 2;
 
-    // One viewport of slack on each side, so a clip is granted its decoder
-    // a screen's worth of travel before you reach it and keeps it a screen
-    // after — scrolling back up does not restart everything.
-    final visible =
-        top < screen.height * 2 && top + box.size.height > -screen.height;
-    lease.reportDistance(
-        visible ? (centre - screen.height / 2).abs() : double.infinity);
+    final bottom = top + box.size.height;
+    final intersection =
+        (bottom.clamp(0, screen.height) - top.clamp(0, screen.height)) /
+            box.size.height.clamp(1, double.infinity);
+    // A clip may prepare one viewport ahead, but only a clip with a real
+    // intersection is allowed to displace visible playback.
+    final prefetch =
+        top < screen.height * 1.25 && bottom > -screen.height * 0.75;
+    lease.reportViewport(
+      distance: prefetch ? (centre - screen.height / 2).abs() : double.infinity,
+      onScreen: intersection > 0.08,
+      prefetch: prefetch,
+    );
   }
 
   /// True when this clip is actually the thing the user can see.

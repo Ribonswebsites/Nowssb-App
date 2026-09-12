@@ -69,6 +69,11 @@ class VideoLease extends ChangeNotifier {
   bool _wantsPlay = false;
   bool _disposed = false;
   Future<void>? _playInFlight;
+  bool _onScreen = false;
+  bool _prefetch = false;
+  DateTime? _lastPlayingAt;
+  DateTime? _lastPlayRequest;
+  int _playAttempts = 0;
 
   /// How many times this clip has refused to open, and the earliest moment it
   /// may be tried again.
@@ -102,6 +107,10 @@ class VideoLease extends ChangeNotifier {
   /// of the viewport. The pool ranks by this: nearest keeps its decoder.
   /// [double.infinity] means off screen entirely.
   double get distance => _distance;
+  bool get onScreen => _onScreen;
+  bool get prefetching => _prefetch && !_onScreen;
+  DateTime? get lastPlayingAt => _lastPlayingAt;
+  int get playAttempts => _playAttempts;
 
   /// Called by the widget after every frame it is laid out in.
   ///
@@ -119,15 +128,33 @@ class VideoLease extends ChangeNotifier {
   double _reported = double.infinity;
 
   void reportDistance(double d) {
+    reportViewport(
+      distance: d,
+      onScreen: d != double.infinity,
+      prefetch: d != double.infinity,
+    );
+  }
+
+  /// Reports both actual viewport intersection and the look-ahead corridor.
+  /// Actual on-screen clips always outrank prefetch candidates.
+  void reportViewport({
+    required double distance,
+    required bool onScreen,
+    required bool prefetch,
+  }) {
     if (_disposed) return;
-    _distance = d;
+    _distance = distance;
+    _onScreen = onScreen;
+    _prefetch = prefetch;
 
     final wasOff = _reported == double.infinity;
-    final isOff = d == double.infinity;
-    if (wasOff == isOff && !isOff && (d - _reported).abs() < _reportSlop) {
+    final isOff = distance == double.infinity;
+    if (wasOff == isOff &&
+        !isOff &&
+        (distance - _reported).abs() < _reportSlop) {
       return;
     }
-    _reported = d;
+    _reported = distance;
     _pool._rebalanceSoon();
   }
 
@@ -144,7 +171,16 @@ class VideoLease extends ChangeNotifier {
   Future<void> _ensurePlaying(VideoPlayerController c) {
     final current = _playInFlight;
     if (current != null) return current;
-    final request = c.play().catchError((_) {});
+    final last = _lastPlayRequest;
+    if (last != null &&
+        DateTime.now().difference(last) < const Duration(milliseconds: 700)) {
+      return Future<void>.value();
+    }
+    _lastPlayRequest = DateTime.now();
+    _playAttempts++;
+    final request = c.play().then((_) {
+      _lastPlayingAt = DateTime.now();
+    }).catchError((_) {});
     _playInFlight = request;
     request.whenComplete(() {
       if (identical(_playInFlight, request)) _playInFlight = null;
@@ -272,8 +308,12 @@ class VideoPool {
   /// a kill-restart. Eight matches the "warm several feature clips at once"
   /// goal without reopening the historical all-at-once MediaCodec stampede
   /// that left every slot reserved and nothing playing.
-  static const int openAtOnce = 8;
+  static const int openAtOnce = 3;
   static const int _openAtOnce = openAtOnce;
+
+  /// Keep a small number of next-up controllers from competing with visible
+  /// playback. This is deliberately separate from the active decoder ceiling.
+  static const int prefetchSlots = 2;
 
   int _opening = 0;
   final List<VideoLease> _openQueue = [];
@@ -413,6 +453,20 @@ class VideoPool {
 
   @visibleForTesting
   List<VideoLease> get debugLeases => List.unmodifiable(_leases);
+
+  /// A compact snapshot suitable for a developer overlay or device log.
+  @visibleForTesting
+  Map<String, Object> get debugSnapshot => {
+        'leases': leaseCount,
+        'near': nearCount,
+        'live': liveCount,
+        'playing': playingCount,
+        'opening': _opening,
+        'visibleLive': _live.where((l) => l.onScreen).length,
+        'prefetchLive': _live.where((l) => l.prefetching).length,
+        'maxLive': _effectiveMaxLive,
+        'lastError': lastError ?? '',
+      };
 
   /// Empty the pool and wait until it is genuinely quiet.
   ///
@@ -596,9 +650,10 @@ class VideoPool {
         // is the whole point, and it is why a hundred idle clips now cost a
         // hundred pictures instead of a hundred ExoPlayers.
         final want = _leases
-            .where((l) => l._eligible && l._distance != double.infinity)
+            .where((l) => l._eligible && (l._onScreen || l._prefetch))
             .toList()
           ..sort((a, b) {
+            if (a._onScreen != b._onScreen) return a._onScreen ? -1 : 1;
             if (a.priority != b.priority) {
               return a.priority == ClipPriority.feature ? -1 : 1;
             }
@@ -620,7 +675,9 @@ class VideoPool {
           // decorations fill what remains. Already-live decorations that
           // still want a seat are preferred next (stability: avoid tear-down
           // play/pause fighting), then the rest by distance.
-          for (final l in want) {
+          final visibleWant = want.where((l) => l._onScreen).toList();
+          final prefetchWant = want.where((l) => !l._onScreen).toList();
+          for (final l in visibleWant) {
             if (l.priority != ClipPriority.feature) continue;
             if (keep.length >= _effectiveMaxLive) break;
             keep.add(l);
@@ -628,10 +685,15 @@ class VideoPool {
           for (final l in _live) {
             if (keep.length >= _effectiveMaxLive) break;
             if (l.priority == ClipPriority.feature) continue;
-            if (want.contains(l)) keep.add(l);
+            if (l._onScreen && want.contains(l)) keep.add(l);
           }
-          for (final l in want) {
+          for (final l in visibleWant) {
             if (keep.length >= _effectiveMaxLive) break;
+            keep.add(l);
+          }
+          final spare =
+              (_effectiveMaxLive - keep.length).clamp(0, prefetchSlots);
+          for (final l in prefetchWant.take(spare)) {
             keep.add(l);
           }
         }
@@ -810,6 +872,7 @@ class VideoPool {
       if (!_atEnd(c)) return;
       unawaited(_restartLoop(l, c));
     }
+
     c.addListener(onTick);
   }
 
@@ -896,7 +959,6 @@ class VideoPool {
       l._ensurePlaying(c);
     }
   }
-
 
   /// Feature UI loops warmed at startup so first paint is not a cold 8–13MB
   /// asset read (player tab, orb, page bg, login, progress, fashion films).
