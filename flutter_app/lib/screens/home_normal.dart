@@ -251,7 +251,7 @@ class _HomeNormalState extends State<HomeNormal> {
         ('herovid', NmStreakVideo(onTap: () => _go(1))),
         ('trendshop', NmTrendShop(onTap: () => _go(3))),
         ('storeban', StoreBannerSection(onTap: () => _go(3), framed: true)),
-        ('subvid', SubscriptionSection(onTap: () => _go(3))),
+        ('subvid', const SizedBox.shrink()),
         ('edition', EditionSection(onTap: () => _go(3))),
         ('ebooks', EbooksSection(onTap: () => _go(2))),
         ('connectban', ConnectBannerSection(onTap: () => _go(0))),
@@ -462,7 +462,6 @@ class _TopRow extends StatelessWidget {
   }
 }
 
-
 /// Hairline between right-cluster header controls (Settings | Quick | Menu).
 class _HeaderDivider extends StatelessWidget {
   const _HeaderDivider();
@@ -476,9 +475,7 @@ class _HeaderDivider extends StatelessWidget {
         width: 1,
         height: 22,
         decoration: BoxDecoration(
-          color: glass
-              ? const Color(0x66FFFFFF)
-              : const Color(0x33244766),
+          color: glass ? const Color(0x66FFFFFF) : const Color(0x33244766),
           borderRadius: BorderRadius.circular(1),
         ),
       ),

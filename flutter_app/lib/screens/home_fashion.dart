@@ -198,7 +198,7 @@ class _HomeFashionState extends State<HomeFashion> {
         ('connect', FashConnect(onTap: () => _go(0))),
         ('trendvid', FashShopNow(onTap: () => _go(3))),
         ('storeban', StoreBannerSection(onTap: () => _go(3))),
-        ('subvid', SubscriptionSection(onTap: () => _go(3))),
+        ('subvid', const SizedBox.shrink()),
         ('edition', EditionSection(onTap: () => _go(3))),
         ('routines', RoutinesSection(onTap: () => _go(1))),
         ('offer', FashOffer(onTap: () => _go(3))),

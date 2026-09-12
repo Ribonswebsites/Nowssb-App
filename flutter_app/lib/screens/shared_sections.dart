@@ -52,8 +52,14 @@ class SubscriptionSection extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('SUBSCRIPTION TIER UPGRADE', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.6)),
-                  const Icon(Icons.arrow_forward_rounded, color: Color(0xFFE8D5A3), size: 18),
+                  const Text('SUBSCRIPTION TIER UPGRADE',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.6)),
+                  const Icon(Icons.arrow_forward_rounded,
+                      color: Color(0xFFE8D5A3), size: 18),
                 ],
               ),
             ),
@@ -65,7 +71,8 @@ class SubscriptionSection extends StatelessWidget {
             mark: NwsbMarks.crown,
           ),
           const SizedBox(height: 4),
-          const Text('Unlock a deeper practice, one tier at a time.', style: TextStyle(color: Color(0x99FFFFFF), fontSize: 12)),
+          const Text('Unlock a deeper practice, one tier at a time.',
+              style: TextStyle(color: Color(0x99FFFFFF), fontSize: 12)),
           const SizedBox(height: 12),
           _SubscriptionTierStack(onTap: onTap),
           const SizedBox(height: 15),
@@ -80,6 +87,7 @@ class SubscriptionSection extends StatelessWidget {
     );
   }
 }
+
 /// 17 · edition — index.html:2197. `.nedi-blk`.
 ///
 /// ONE SECTION, not two. This card and the promo were both showing the
@@ -112,18 +120,36 @@ class EditionSection extends StatelessWidget {
             frame: DeviceFrame.kioskPortrait,
             priority: ClipPriority.decoration,
             onTap: onTap,
-            overlay: Align(
-              alignment: Alignment.center,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 28, 16, 22),
-                child: _SubscriptionTierStack(onTap: onTap),
+            overlay: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 18, 16, 18),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _SubscriptionBanner(onTap: onTap),
+                  _SubscriptionTierStack(onTap: onTap),
+                  Column(
+                    children: [
+                      const Text('Join NowssB',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w900)),
+                      const SizedBox(height: 3),
+                      const Text('Get your subscription today',
+                          style: TextStyle(
+                              color: Color(0xBBFFFFFF), fontSize: 11)),
+                      const SizedBox(height: 9),
+                      _SubscriptionCta(onTap: onTap),
+                    ],
+                  ),
+                ],
               ),
             ),
           ),
           const SizedBox(height: 14),
           SecBanner(
-            title: 'Upgrade Now',
-            sub: r'From $4.99 a month · every word and frequency unlocked',
+            title: 'Join NowssB',
+            sub: 'Get your subscription today',
             mark: NwsbMarks.crown,
             onTap: onTap,
           ),
@@ -131,6 +157,78 @@ class EditionSection extends StatelessWidget {
       ),
     );
   }
+}
+
+class _SubscriptionBanner extends StatelessWidget {
+  const _SubscriptionBanner({this.onTap});
+  final VoidCallback? onTap;
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 10),
+          decoration: BoxDecoration(
+              color: const Color(0xFF030303),
+              borderRadius: BorderRadius.circular(16)),
+          child: Row(children: [
+            const Expanded(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                  Text('Subscription',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w900)),
+                  Text('Join NowssB',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w900)),
+                  Text('Try it free for 30 days · Choose your frequency',
+                      style: TextStyle(color: Color(0x99FFFFFF), fontSize: 9)),
+                ])),
+            Container(
+                width: 28,
+                height: 28,
+                decoration: const BoxDecoration(
+                    color: Color(0x24FFFFFF), shape: BoxShape.circle),
+                child: const Icon(Icons.arrow_forward_rounded,
+                    color: Colors.white, size: 16)),
+          ]),
+        ),
+      );
+}
+
+class _SubscriptionCta extends StatelessWidget {
+  const _SubscriptionCta({this.onTap});
+  final VoidCallback? onTap;
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
+          decoration: BoxDecoration(
+              color: const Color(0xFFF4F4F4),
+              borderRadius: BorderRadius.circular(999)),
+          child: Row(children: [
+            const Expanded(
+              child: Text('Get Subscription Today',
+                  style: TextStyle(
+                      color: Color(0xFF090B11),
+                      fontSize: 11,
+                      fontWeight: FontWeight.w900),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis),
+            ),
+            const SizedBox(width: 8),
+            const Icon(Icons.arrow_forward_rounded,
+                color: Color(0xFF090B11), size: 18),
+          ]),
+        ),
+      );
 }
 
 class _SubscriptionTierStack extends StatelessWidget {
