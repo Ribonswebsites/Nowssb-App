@@ -65,6 +65,7 @@ import 'widgets_page.dart';
 import '../widgets/home_menu_drawer.dart';
 import 'practice_player.dart';
 import 'progress/progress_screen.dart';
+import 'subscription.dart';
 
 /// `REG.norm.items` — app/js/part062.js:41-100, key for key and in order.
 const kNormalSectionOrder = <String>[
@@ -252,7 +253,10 @@ class _HomeNormalState extends State<HomeNormal> {
         ('trendshop', NmTrendShop(onTap: () => _go(3))),
         ('storeban', StoreBannerSection(onTap: () => _go(3), framed: true)),
         ('subvid', const SizedBox.shrink()),
-        ('edition', EditionSection(onTap: () => _go(3))),
+        (
+          'edition',
+          EditionSection(onTap: () => _push(const SubscriptionScreen()))
+        ),
         ('ebooks', EbooksSection(onTap: () => _go(2))),
         ('connectban', ConnectBannerSection(onTap: () => _go(0))),
         ('healing', HealingSection(onTap: () => _go(2))),

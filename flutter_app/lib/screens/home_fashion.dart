@@ -48,6 +48,7 @@ import 'word_detail.dart';
 import 'progress/progress_screen.dart';
 import 'normal/neomorphic_action_bar.dart';
 import 'personal_coach.dart';
+import 'subscription.dart';
 
 /// `REG.fash.items` — app/js/part062.js:107-148, key for key and in order.
 ///
@@ -199,7 +200,10 @@ class _HomeFashionState extends State<HomeFashion> {
         ('trendvid', FashShopNow(onTap: () => _go(3))),
         ('storeban', StoreBannerSection(onTap: () => _go(3))),
         ('subvid', const SizedBox.shrink()),
-        ('edition', EditionSection(onTap: () => _go(3))),
+        (
+          'edition',
+          EditionSection(onTap: () => _push(const SubscriptionScreen()))
+        ),
         ('routines', RoutinesSection(onTap: () => _go(1))),
         ('offer', FashOffer(onTap: () => _go(3))),
         (
