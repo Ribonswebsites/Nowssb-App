@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../media/nwsb_video.dart';
@@ -13,6 +15,35 @@ class SubscriptionScreen extends StatefulWidget {
 class _SubscriptionScreenState extends State<SubscriptionScreen> {
   bool yearly = false;
   int selected = 0;
+  int bannerIndex = 0;
+  late final PageController planController;
+  Timer? bannerTimer;
+
+  static const bannerSlides = <(String, String)>[
+    (
+      'SUBSCRIPTION · JOIN NOWSSB',
+      'Try it free for 30 days · Choose your frequency'
+    ),
+    ('EVERY WORD · EVERY FREQUENCY', 'Unlock the full NowssB practice'),
+    ('JOIN NOWSSB', 'Get your subscription today'),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    planController = PageController(viewportFraction: .82);
+    bannerTimer = Timer.periodic(const Duration(seconds: 3), (_) {
+      if (mounted)
+        setState(() => bannerIndex = (bannerIndex + 1) % bannerSlides.length);
+    });
+  }
+
+  @override
+  void dispose() {
+    bannerTimer?.cancel();
+    planController.dispose();
+    super.dispose();
+  }
 
   static const plans = <({
     String name,
@@ -134,8 +165,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                   child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _blackBanner('SUBSCRIPTION  ·  JOIN NOWSSB',
-                            'Try it free for 30 days · Choose your frequency'),
+                        _rotatingBanner(),
                         const Spacer(),
                         const Align(
                             alignment: Alignment.bottomLeft,
@@ -154,7 +184,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
         ),
       );
 
-  Widget _blackBanner(String title, String subtitle) => Container(
+  Widget _blackBanner(String title, String subtitle, {Key? key}) => Container(
+        key: key,
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
         decoration: BoxDecoration(
@@ -226,12 +257,13 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                     fontWeight: FontWeight.w900))),
         SizedBox(
             height: 152,
-            child: ListView.separated(
-                padding: const EdgeInsets.symmetric(horizontal: 18),
-                scrollDirection: Axis.horizontal,
+            child: PageView.builder(
+                controller: planController,
                 itemCount: plans.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 10),
-                itemBuilder: (_, i) => _planCard(i, plans[i]))),
+                onPageChanged: (i) => setState(() => selected = i),
+                itemBuilder: (_, i) => Padding(
+                    padding: const EdgeInsets.only(right: 10),
+                    child: _planCard(i, plans[i])))),
       ]);
 
   Widget _planCard(
@@ -344,7 +376,20 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
             ])));
   }
 
-  Widget _bottomOffer() => Padding(
-      padding: const EdgeInsets.fromLTRB(18, 8, 18, 42),
-      child: _blackBanner('JOIN NOWSSB', 'Get your subscription today'));
+  Widget _rotatingBanner() {
+    final slide = bannerSlides[bannerIndex];
+    return AnimatedSwitcher(
+        duration: const Duration(milliseconds: 420),
+        child: _blackBanner(slide.$1, slide.$2, key: ValueKey(bannerIndex)));
+  }
+
+  Widget _bottomOffer() {
+    final slide = bannerSlides[selected % bannerSlides.length];
+    return Padding(
+        padding: const EdgeInsets.fromLTRB(18, 8, 18, 42),
+        child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 360),
+            child: _blackBanner(slide.$1, slide.$2,
+                key: ValueKey('bottom-$selected'))));
+  }
 }

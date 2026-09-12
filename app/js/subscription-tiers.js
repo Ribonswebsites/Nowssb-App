@@ -41,4 +41,41 @@
   function init() { document.querySelectorAll('.nsub-blk').forEach(render); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
   window.addEventListener('nwsb:home-ready', init);
+  var slides = [
+    ['SUBSCRIPTION · JOIN NOWSSB', 'Try it free for 30 days · Choose your frequency'],
+    ['EVERY WORD · EVERY FREQUENCY', 'Unlock the full NowssB practice'],
+    ['JOIN NOWSSB', 'Get your subscription today']
+  ];
+  var slideIndex = 0;
+  function rotateSubscriptionBanners() {
+    var bars = document.querySelectorAll('.nwsb-web-sub-black-banner');
+    if (!bars.length) return;
+    slideIndex = (slideIndex + 1) % slides.length;
+    bars.forEach(function (bar) {
+      var strong = bar.querySelector('strong');
+      var span = bar.querySelector('span');
+      if (strong) strong.textContent = slides[slideIndex][0];
+      if (span) span.textContent = slides[slideIndex][1];
+      bar.classList.remove('nwsb-banner-swap');
+      void bar.offsetWidth;
+      bar.classList.add('nwsb-banner-swap');
+    });
+  }
+  setInterval(rotateSubscriptionBanners, 3000);
+  document.addEventListener('scroll', function () {
+    var rail = document.getElementById('ss-plan-cards');
+    var bottom = document.querySelector('.nwsb-web-sub-bottom');
+    if (!rail || !bottom) return;
+    var cards = rail.querySelectorAll('.plan-card');
+    var best = null, bestDistance = Infinity;
+    cards.forEach(function (card) {
+      var d = Math.abs(card.getBoundingClientRect().left - rail.getBoundingClientRect().left);
+      if (d < bestDistance) { best = card; bestDistance = d; }
+    });
+    if (best) {
+      var name = best.querySelector('.plan-card-name');
+      var label = best.querySelector('strong');
+      if (name && label) label.textContent = 'JOIN NOWSSB · ' + name.textContent;
+    }
+  }, {passive:true});
 })();
