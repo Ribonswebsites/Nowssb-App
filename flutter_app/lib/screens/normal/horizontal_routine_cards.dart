@@ -189,15 +189,11 @@ class _EssentialCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final foreground =
-        glass || fashion ? Colors.white : const Color(0xFF30343B);
-    final surface = glass
-        ? const Color(0x42FFFFFF)
-        : fashion
-            ? const Color(0xB30B111B)
-            : const Color(0xFFECEEF2);
+    final foreground = const Color(0xFF263142);
+    final surface =
+        glass || fashion ? const Color(0xD9FFFFFF) : const Color(0xFFECEEF2);
     final border =
-        glass || fashion ? const Color(0xA6FFFFFF) : Colors.transparent;
+        glass || fashion ? const Color(0xFFFFFFFF) : Colors.transparent;
     return SizedBox(
       width: 330,
       child: Stack(
