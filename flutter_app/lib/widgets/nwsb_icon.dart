@@ -21,6 +21,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 /// One drawn mark, on the standard 24x24 box.
 class NwsbIcon extends StatelessWidget {
@@ -55,12 +56,15 @@ class NwsbIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Keep the source path data on the widget for platform parity and tests,
-    // but use a synchronous renderer in widget tests and constrained shells.
-    // flutter_svg parses asynchronously; malformed legacy marks then surface
-    // as uncaught StateErrors after a test has already completed. The native
-    // Material mark is deterministic and remains tintable at the same size.
-    return Icon(Icons.auto_awesome_outlined, size: size, color: color);
+    return SvgPicture.string(
+      '<svg xmlns="http://www.w3.org/2000/svg" '
+      'viewBox="0 0 $viewBox $viewBox" fill="none" '
+      'stroke="currentColor" stroke-width="$strokeWidth" '
+      'stroke-linecap="$cap" stroke-linejoin="round">$body</svg>',
+      width: size,
+      height: size,
+      colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+    );
   }
 }
 

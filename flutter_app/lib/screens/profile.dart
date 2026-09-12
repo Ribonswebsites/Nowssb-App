@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -15,16 +16,6 @@ import 'practice.dart';
 import 'progress/progress_screen.dart';
 import 'quick_access.dart';
 import 'store.dart';
-
-/// Synchronous adapter for the legacy profile marks. The profile assets are
-/// decorative; using a native glyph avoids asynchronous SVG parser failures
-/// during shell navigation tests while keeping the same dimensions and tint.
-class SvgPicture {
-  static Widget asset(String asset, {double? width, double? height, ColorFilter? colorFilter, Widget Function(BuildContext)? placeholderBuilder}) {
-    final iconSize = math.min(width ?? 24, height ?? width ?? 24).toDouble();
-    return Icon(Icons.auto_awesome_outlined, size: iconSize, color: _dim);
-  }
-}
 
 const _accent = Color(0xFFE3BD7D);
 const _text = Color(0xFFF5F5F3);

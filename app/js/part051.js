@@ -440,6 +440,7 @@
 
   function manageable(v) {
     if (v.id === 'splashVid') return false;
+    if (v.classList.contains('nwsb-sub-tv-video')) return false;
     if (v.id === 'chatCallRemoteVideo' || v.id === 'chatCallLocalVideo') return false;
     if (v.querySelector('source')) return false;   /* <source> children: not ours to move */
     /* The practice player and the word player are driven by a person, not
@@ -575,7 +576,7 @@
                    '.slm-head-vid, .feat-bgvid, .rd-hub-bgvid, .fp-page-vid, ' +
                    '.wsg-bgvid, .lgp-info-video, .lgp-page-bg-video, ' +
                    '.lgp-actions-tab-vid, .lgp-wa-vid, .orb-video, ' +
-                   '.lg-phone-vid, .mp-loading-video, #videoScrollBg, ' +
+                   '.lg-phone-vid, .mp-loading-video, .nwsb-sub-tv-video, #videoScrollBg, ' +
                    '#videoBg, #videoBg2, .splash-bg-video';
     function prio(v) { return v.matches && v.matches(PRIORITY) ? 0 : 1; }
     if (live.length > MAX_PLAYING) {
