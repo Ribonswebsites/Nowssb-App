@@ -180,7 +180,15 @@ class _HomeFashionState extends State<HomeFashion> {
         ),
         ('practice', FashPractice(onTap: () => _go(1))),
         ('routineCards', const NmHorizontalRoutineCards(fashion: true)),
-        ('useThisVideo', const NmUseThisVideoSection(fashion: true)),
+        (
+          'useThisVideo',
+          NmUseThisVideoSection(
+            fashion: true,
+            onPlayer: () => _go(1),
+            onSentence: () => _go(2),
+            onLibrary: () => _go(2),
+          ),
+        ),
         ('mainops', MainOptionsSection(onGo: _go, onAction: _openMainOption)),
         (
           'actionbar',

@@ -221,7 +221,14 @@ class _HomeNormalState extends State<HomeNormal> {
               onProgress: _openDashboardProgress)
         ),
         ('essentials', const NmSuppliedEssentials()),
-        ('useThisVideo', const NmUseThisVideoSection()),
+        (
+          'useThisVideo',
+          NmUseThisVideoSection(
+            onPlayer: () => _go(1),
+            onSentence: () => _go(2),
+            onLibrary: () => _go(2),
+          ),
+        ),
         ('routineCards', const NmHorizontalRoutineCards()),
         ('streak', NmStreak(onTap: () => _go(1))),
         (
