@@ -105,7 +105,7 @@
     { i: 'crown',   h: 'The Full Library',       t: 'NowssB Subscription',
       s: 'Every word and every frequency',
       sel: '#home .nsub-blk .vbs-screen video',
-      v: 'assets/videos/650223ca119ab936_grok_video_2026-07-24-17-46-41_vkxr4r.mp4',
+      v: 'assets/video/subscription-join-nowssb.mp4',
       go: function () { if (window.SS && SS.open) SS.open('subscription'); } },
     { i: 'word',    h: 'Where a word begins',    t: 'NowssB Word Store',
       s: 'Every root, every origin',
