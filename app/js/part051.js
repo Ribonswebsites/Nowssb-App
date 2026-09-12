@@ -315,7 +315,7 @@
   var mine = false;             // this file is the one writing src right now
   /* Feature / page films stay mounted with preload=auto so they load fast
      and never drop their decoder when a scroll pass re-ranks the budget. */
-  var FEATURE_SEL = '.hero-bg-vid, .qa-tv-vid, .fpv-video, .gsel-bg-vid, ' +
+  var FEATURE_SEL = '.hero-bg-vid, .qa-tv-vid, .fpv-video, .nwsb-sub-tv-video, .gsel-bg-vid, ' +
                     '.slm-head-vid, .feat-bgvid, .rd-hub-bgvid, .fp-page-vid, ' +
                     '.wsg-bgvid, .lgp-info-video, .lgp-page-bg-video, ' +
                     '.lgp-actions-tab-vid, .lgp-wa-vid, .orb-video, ' +
