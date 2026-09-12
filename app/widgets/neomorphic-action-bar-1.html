@@ -33,20 +33,26 @@
   .enter-btn:active { box-shadow: inset 3px 3px 7px var(--shadow-dark), inset -3px -3px 7px var(--shadow-light); transform: scale(0.96); }
   .icon-btn:focus-visible, .enter-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
   :host([data-home-theme="fashion"]) { color-scheme: dark; }
-  :host([data-home-theme="fashion"]) .card { max-width: none; }
+  :host([data-home-theme="fashion"]) .card { max-width: none; background: rgba(3,5,9,.82); border-radius: 28px; padding: 18px; }
   :host([data-home-theme="fashion"]) .heading { color: rgba(255,255,255,.94); }
   :host([data-home-theme="fashion"]) .neo-circle,
-  :host([data-home-theme="fashion"]) .action-wrapper,
   :host([data-home-theme="fashion"]) .enter-btn {
-    background: rgba(255,255,255,.09);
-    border: 1px solid rgba(255,255,255,.18);
-    box-shadow: 0 18px 42px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.10);
+    background: rgba(255,255,255,.92);
+    border: 1px solid rgba(255,255,255,.98);
+    box-shadow: 0 12px 28px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.98);
     backdrop-filter: blur(18px) saturate(140%);
     -webkit-backdrop-filter: blur(18px) saturate(140%);
   }
+  :host([data-home-theme="fashion"]) .action-wrapper {
+    background: rgba(7,10,17,.64);
+    border: 1px solid rgba(255,255,255,.16);
+    box-shadow: 0 18px 42px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.08);
+  }
   :host([data-home-theme="fashion"]) .coach-label,
   :host([data-home-theme="fashion"]) .enter-btn { color: rgba(255,255,255,.94); }
-  :host([data-home-theme="fashion"]) .icon-btn { color: rgba(232,213,163,.95); }
+  :host([data-home-theme="fashion"]) .icon-btn { color: #111827; }
+  :host([data-home-theme="fashion"]) .neo-circle svg,
+  :host([data-home-theme="fashion"]) .enter-btn svg { filter: none; }
 </style>
 </head>
 <body>

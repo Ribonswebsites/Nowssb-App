@@ -71,6 +71,8 @@ class VideoLease extends ChangeNotifier {
   Future<void>? _playInFlight;
   bool _onScreen = false;
   bool _prefetch = false;
+  bool _reportedOnScreen = false;
+  bool _reportedPrefetch = false;
   DateTime? _lastPlayingAt;
   DateTime? _lastPlayRequest;
   int _playAttempts = 0;
@@ -149,12 +151,17 @@ class VideoLease extends ChangeNotifier {
 
     final wasOff = _reported == double.infinity;
     final isOff = distance == double.infinity;
-    if (wasOff == isOff &&
+    final visibilityChanged =
+        _reportedOnScreen != onScreen || _reportedPrefetch != prefetch;
+    if (!visibilityChanged &&
+        wasOff == isOff &&
         !isOff &&
         (distance - _reported).abs() < _reportSlop) {
       return;
     }
     _reported = distance;
+    _reportedOnScreen = onScreen;
+    _reportedPrefetch = prefetch;
     _pool._rebalanceSoon();
   }
 

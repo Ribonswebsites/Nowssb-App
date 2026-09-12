@@ -183,6 +183,17 @@ void main() {
         lessThanOrEqualTo(VideoPool.prefetchSlots));
   });
 
+  test('intersection changes are not hidden by distance slop', () async {
+    final l = VideoPool.instance.lease('assets/video/intersection.mp4');
+    l.reportViewport(distance: 120, onScreen: false, prefetch: true);
+    await pumpPool();
+    expect(l.controller, isNotNull);
+    l.reportViewport(distance: 120, onScreen: true, prefetch: true);
+    await pumpPool();
+    expect(l.onScreen, isTrue);
+    expect(VideoPool.instance.debugSnapshot['visibleLive'], 1);
+  });
+
   test('scrolling a long page never exceeds the ceiling at any point',
       () async {
     // Thirty clips down a page, scrolled past one at a time. This is the

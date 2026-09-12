@@ -1,5 +1,4 @@
 /// Native Flutter translation of app/widgets/neomorphic-action-bar-1.html.
-/// It is a plain below-section action bar: no outer card and no reserved space.
 library;
 
 import 'package:flutter/material.dart';
@@ -24,6 +23,7 @@ class NmSuppliedActionBar extends StatelessWidget {
   static const _accent = Color(0xFF7B88EE);
   static const _shadowDark = Color(0x8CA3B1C6);
   static const _shadowLight = Color(0xE6FFFFFF);
+  static const _fashionInk = Color(0xFF111827);
 
   @override
   Widget build(BuildContext context) {
@@ -33,13 +33,15 @@ class NmSuppliedActionBar extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Row(
+          Row(
             children: [
               _NeoCircle(
                 size: 48,
-                child: Icon(Icons.auto_awesome, size: 21, color: _accent),
+                glass: glass,
+                child: Icon(Icons.auto_awesome,
+                    size: 21, color: glass ? _fashionInk : _accent),
               ),
-              SizedBox(width: 14),
+              const SizedBox(width: 14),
               Expanded(
                 child: Text(
                   'How can we help today?',
@@ -47,7 +49,7 @@ class NmSuppliedActionBar extends StatelessWidget {
                     fontSize: 20,
                     fontWeight: FontWeight.w800,
                     letterSpacing: -.2,
-                    color: _textPrimary,
+                    color: glass ? Colors.white : _textPrimary,
                   ),
                 ),
               ),
@@ -57,24 +59,25 @@ class NmSuppliedActionBar extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: _surface,
+              color: glass ? const Color(0xA4070A11) : _surface,
               borderRadius: BorderRadius.circular(999),
-              border: glass
-                  ? Border.all(color: const Color(0xF2FFFFFF), width: 1.5)
-                  : null,
+              border: glass ? Border.all(color: const Color(0x2AFFFFFF)) : null,
               boxShadow: glass
-                  ? null
+                  ? const [
+                      BoxShadow(
+                          color: Color(0x66000000),
+                          offset: Offset(0, 12),
+                          blurRadius: 28),
+                    ]
                   : const [
                       BoxShadow(
-                        color: _shadowDark,
-                        offset: Offset(8, 8),
-                        blurRadius: 18,
-                      ),
+                          color: _shadowDark,
+                          offset: Offset(8, 8),
+                          blurRadius: 18),
                       BoxShadow(
-                        color: _shadowLight,
-                        offset: Offset(-8, -8),
-                        blurRadius: 18,
-                      ),
+                          color: _shadowLight,
+                          offset: Offset(-8, -8),
+                          blurRadius: 18),
                     ],
             ),
             child: Row(
@@ -83,15 +86,17 @@ class NmSuppliedActionBar extends StatelessWidget {
                   icon: Icons.support_agent_outlined,
                   label: 'Help and support',
                   onTap: onSupport,
+                  glass: glass,
                 ),
                 const SizedBox(width: 8),
                 _ActionCircle(
                   icon: Icons.person_add_alt_1_outlined,
                   label: 'Personal coach',
                   onTap: onCoach,
+                  glass: glass,
                 ),
                 const SizedBox(width: 10),
-                const Expanded(
+                Expanded(
                   child: Text(
                     'Personal Coach',
                     maxLines: 1,
@@ -99,7 +104,7 @@ class NmSuppliedActionBar extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w800,
-                      color: _textPrimary,
+                      color: glass ? Colors.white : _textPrimary,
                     ),
                   ),
                 ),
@@ -107,34 +112,30 @@ class NmSuppliedActionBar extends StatelessWidget {
                   onTap: onCoach,
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 22,
-                      vertical: 13,
-                    ),
+                        horizontal: 22, vertical: 13),
                     decoration: BoxDecoration(
-                      color: _surface,
+                      color: glass ? const Color(0xEBFFFFFF) : _surface,
                       borderRadius: BorderRadius.circular(999),
-                      border: glass
-                          ? Border.all(
-                              color: const Color(0xF2FFFFFF),
-                              width: 1.5,
-                            )
-                          : null,
+                      border: glass ? Border.all(color: Colors.white) : null,
                       boxShadow: glass
-                          ? null
+                          ? const [
+                              BoxShadow(
+                                  color: Color(0x66000000),
+                                  offset: Offset(0, 8),
+                                  blurRadius: 18),
+                            ]
                           : const [
                               BoxShadow(
-                                color: _shadowDark,
-                                offset: Offset(5, 5),
-                                blurRadius: 11,
-                              ),
+                                  color: _shadowDark,
+                                  offset: Offset(5, 5),
+                                  blurRadius: 11),
                               BoxShadow(
-                                color: _shadowLight,
-                                offset: Offset(-5, -5),
-                                blurRadius: 11,
-                              ),
+                                  color: _shadowLight,
+                                  offset: Offset(-5, -5),
+                                  blurRadius: 11),
                             ],
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
@@ -142,14 +143,14 @@ class NmSuppliedActionBar extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
-                            color: _textPrimary,
+                            color: glass ? _fashionInk : _textPrimary,
                           ),
                         ),
-                        SizedBox(width: 6),
+                        const SizedBox(width: 6),
                         Icon(
                           Icons.arrow_forward_rounded,
                           size: 16,
-                          color: _textPrimary,
+                          color: glass ? _fashionInk : _textPrimary,
                         ),
                       ],
                     ),
@@ -165,35 +166,41 @@ class NmSuppliedActionBar extends StatelessWidget {
 }
 
 class _NeoCircle extends StatelessWidget {
-  const _NeoCircle({required this.size, required this.child});
+  const _NeoCircle(
+      {required this.size, required this.child, this.glass = false});
   final double size;
   final Widget child;
+  final bool glass;
 
   @override
   Widget build(BuildContext context) {
-    final glass = NormalGlassMode.of(context);
+    final activeGlass = glass || NormalGlassMode.of(context);
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: glass ? const Color(0x66FFFFFF) : NmSuppliedActionBar._surface,
+        color: activeGlass
+            ? const Color(0xEBFFFFFF)
+            : NmSuppliedActionBar._surface,
         shape: BoxShape.circle,
-        border: glass
-            ? Border.all(color: const Color(0xF2FFFFFF), width: 1.5)
-            : null,
-        boxShadow: glass
-            ? null
+        border:
+            activeGlass ? Border.all(color: Colors.white, width: 1.5) : null,
+        boxShadow: activeGlass
+            ? const [
+                BoxShadow(
+                    color: Color(0x66000000),
+                    offset: Offset(0, 6),
+                    blurRadius: 14)
+              ]
             : const [
                 BoxShadow(
-                  color: NmSuppliedActionBar._shadowDark,
-                  offset: Offset(6, 6),
-                  blurRadius: 12,
-                ),
+                    color: NmSuppliedActionBar._shadowDark,
+                    offset: Offset(6, 6),
+                    blurRadius: 12),
                 BoxShadow(
-                  color: NmSuppliedActionBar._shadowLight,
-                  offset: Offset(-6, -6),
-                  blurRadius: 12,
-                ),
+                    color: NmSuppliedActionBar._shadowLight,
+                    offset: Offset(-6, -6),
+                    blurRadius: 12),
               ],
       ),
       child: Center(child: child),
@@ -202,10 +209,15 @@ class _NeoCircle extends StatelessWidget {
 }
 
 class _ActionCircle extends StatelessWidget {
-  const _ActionCircle({required this.icon, required this.label, this.onTap});
+  const _ActionCircle(
+      {required this.icon,
+      required this.label,
+      this.onTap,
+      this.glass = false});
   final IconData icon;
   final String label;
   final VoidCallback? onTap;
+  final bool glass;
 
   @override
   Widget build(BuildContext context) => Semantics(
@@ -215,8 +227,14 @@ class _ActionCircle extends StatelessWidget {
           onTap: onTap,
           child: _NeoCircle(
             size: 40,
-            child:
-                Icon(icon, size: 18, color: NmSuppliedActionBar._textSecondary),
+            glass: glass,
+            child: Icon(
+              icon,
+              size: 18,
+              color: glass
+                  ? NmSuppliedActionBar._fashionInk
+                  : NmSuppliedActionBar._textSecondary,
+            ),
           ),
         ),
       );
