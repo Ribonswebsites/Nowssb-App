@@ -33,8 +33,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     super.initState();
     planController = PageController(viewportFraction: .82);
     bannerTimer = Timer.periodic(const Duration(seconds: 3), (_) {
-      if (mounted)
+      if (mounted) {
         setState(() => bannerIndex = (bannerIndex + 1) % bannerSlides.length);
+      }
     });
   }
 
@@ -114,28 +115,56 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        backgroundColor: NwsbColors.deep,
-        body: SafeArea(
-          child: CustomScrollView(slivers: [
-            SliverAppBar(
-              pinned: true,
-              backgroundColor: NwsbColors.deep.withValues(alpha: .94),
-              surfaceTintColor: Colors.transparent,
-              leading: IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.arrow_back_rounded,
-                      color: Colors.white)),
-              title: const Text('Subscription',
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.w800)),
-              centerTitle: true,
+        backgroundColor: Colors.transparent,
+        body: Stack(
+          fit: StackFit.expand,
+          children: [
+            const Positioned.fill(
+              child: NwsbVideo(
+                asset: 'assets/video/subscription-join-nowssb.mp4',
+                poster: 'assets/video/subscription-join-nowssb-poster.webp',
+                priority: ClipPriority.feature,
+                fit: BoxFit.cover,
+              ),
             ),
-            SliverToBoxAdapter(child: _videoBanner()),
-            SliverToBoxAdapter(child: _billing()),
-            SliverToBoxAdapter(child: _horizontalPlans()),
-            SliverToBoxAdapter(child: _benefits()),
-            SliverToBoxAdapter(child: _bottomOffer()),
-          ]),
+            const Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Color(0xB0060C18),
+                      Color(0x66060C18),
+                      Color(0xF0060C18),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SafeArea(
+              child: CustomScrollView(slivers: [
+                SliverAppBar(
+                  pinned: true,
+                  backgroundColor: Colors.transparent,
+                  surfaceTintColor: Colors.transparent,
+                  leading: IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(Icons.arrow_back_rounded,
+                          color: Colors.white)),
+                  title: const Text('Subscription',
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.w800)),
+                  centerTitle: true,
+                ),
+                SliverToBoxAdapter(child: _videoBanner()),
+                SliverToBoxAdapter(child: _billing()),
+                SliverToBoxAdapter(child: _horizontalPlans()),
+                SliverToBoxAdapter(child: _benefits()),
+                SliverToBoxAdapter(child: _bottomOffer()),
+              ]),
+            ),
+          ],
         ),
       );
 
@@ -143,8 +172,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(24),
-          child: SizedBox(
-            height: 390,
+          child: AspectRatio(
+            aspectRatio: 1,
             child: Stack(fit: StackFit.expand, children: [
               const NwsbVideo(
                   asset: 'assets/video/subscription-join-nowssb.mp4',
