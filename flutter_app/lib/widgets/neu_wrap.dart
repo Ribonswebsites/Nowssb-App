@@ -28,6 +28,7 @@ import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 
 import 'nwsb_icon.dart';
+import 'home_parts.dart';
 
 import '../theme/tokens.dart';
 import '../screens/normal/glassmorphism_theme.dart';
@@ -169,10 +170,8 @@ class WrapHead extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 1),
-                Text(
+                AnimatedHeading(
                   title,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.w800,
@@ -180,6 +179,7 @@ class WrapHead extends StatelessWidget {
                     color: NwsbColors.ink,
                     height: 1.15,
                   ),
+                  mode: HeadingMotion.marquee,
                 ),
               ],
             ),

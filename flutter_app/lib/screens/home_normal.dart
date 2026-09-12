@@ -60,6 +60,7 @@ import 'normal/horizontal_routine_cards.dart';
 import 'normal/sections_bottom.dart';
 import 'normal/sections_top.dart';
 import 'normal/rotating_promo_rail.dart';
+import 'normal/use_this_video_section.dart';
 import 'shared_sections.dart';
 import 'sound_library.dart';
 import 'notifications_sheet.dart';
@@ -76,6 +77,7 @@ const kNormalSectionOrder = <String>[
   'promoRail',
   'dashboard',
   'essentials',
+  'useThisVideo',
   'routineCards',
   'streak',
   'storedisc',
@@ -219,6 +221,7 @@ class _HomeNormalState extends State<HomeNormal> {
               onProgress: _openDashboardProgress)
         ),
         ('essentials', const NmSuppliedEssentials()),
+        ('useThisVideo', const NmUseThisVideoSection()),
         ('routineCards', const NmHorizontalRoutineCards()),
         ('streak', NmStreak(onTap: () => _go(1))),
         (

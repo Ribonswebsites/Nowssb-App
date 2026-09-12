@@ -27,7 +27,7 @@ import '../media/nwsb_image.dart';
 import '../theme/tokens.dart';
 import 'nwsb_icon.dart';
 
-enum HeadingMotion { roll, flip, slide, float, shimmer }
+enum HeadingMotion { roll, flip, slide, float, shimmer, marquee }
 
 /// A continuously moving heading. The mode is intentionally varied so a long
 /// home page feels alive without every heading moving in the same way.
@@ -51,9 +51,14 @@ class AnimatedHeading extends StatefulWidget {
   State<AnimatedHeading> createState() => _AnimatedHeadingState();
 }
 
-class _AnimatedHeadingState extends State<AnimatedHeading> {
+class _AnimatedHeadingState extends State<AnimatedHeading>
+    with SingleTickerProviderStateMixin {
   Timer? _motionTimer;
   double _phase = 0;
+  late final AnimationController _marquee = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 7600),
+  )..repeat();
 
   @override
   void initState() {
@@ -77,11 +82,67 @@ class _AnimatedHeadingState extends State<AnimatedHeading> {
   @override
   void dispose() {
     _motionTimer?.cancel();
+    _marquee.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final painter = TextPainter(
+          text: TextSpan(text: widget.text, style: widget.style),
+          textDirection: TextDirection.ltr,
+          maxLines: 1,
+        )..layout();
+        final needsMarquee = painter.width > constraints.maxWidth;
+        if (needsMarquee) {
+          final gap = 36.0;
+          final travel = painter.width + gap;
+          return SizedBox(
+            height: painter.height,
+            width: constraints.maxWidth,
+            child: AnimatedBuilder(
+              animation: _marquee,
+              builder: (_, __) {
+                final offset = -(_marquee.value * travel);
+                return ClipRect(
+                  child: Stack(
+                    clipBehavior: Clip.hardEdge,
+                    children: [
+                      Positioned(
+                        left: offset,
+                        top: 0,
+                        child: Row(
+                          children: [
+                            Text(widget.text,
+                                maxLines: 1,
+                                softWrap: false,
+                                style: widget.style),
+                            SizedBox(width: gap),
+                            Text(widget.text,
+                                maxLines: 1,
+                                softWrap: false,
+                                style: widget.style),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          );
+        }
+        return _animatedTransform(Text(widget.text,
+            maxLines: widget.maxLines,
+            overflow: widget.overflow,
+            style: widget.style));
+      },
+    );
+  }
+
+  Widget _animatedTransform(Widget child) {
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: -1, end: _phase),
       duration: const Duration(milliseconds: 900),
@@ -107,12 +168,16 @@ class _AnimatedHeadingState extends State<AnimatedHeading> {
                 offset: Offset(t * 1.5, t * -2), child: child);
           case HeadingMotion.shimmer:
             return Opacity(opacity: 0.86 + ((value + 1) * 0.07), child: child);
+          case HeadingMotion.marquee:
+            return child!;
         }
       },
-      child: Text(widget.text,
-          maxLines: widget.maxLines,
-          overflow: widget.overflow,
-          style: widget.style),
+      child: child is Text
+          ? child
+          : Text(widget.text,
+              maxLines: widget.maxLines,
+              overflow: widget.overflow,
+              style: widget.style),
     );
   }
 }
@@ -216,7 +281,7 @@ class Spill extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                             fontSize: 12.5, color: Color(0xCCFFFFFF)),
-                        mode: HeadingMotion.slide,
+                        mode: HeadingMotion.marquee,
                       ),
                     ),
                   ],
@@ -311,7 +376,7 @@ class SecBanner extends StatelessWidget {
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
                         color: Colors.white),
-                    mode: HeadingMotion.flip,
+                    mode: HeadingMotion.marquee,
                   ),
                   const SizedBox(height: 2),
                   Text(

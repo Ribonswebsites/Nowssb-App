@@ -55,8 +55,8 @@ void main() {
   }
 
   test('the registry is complete', () {
-    expect(kNormalSectionOrder, hasLength(35));
-    expect(kNormalSectionOrder.toSet(), hasLength(35),
+    expect(kNormalSectionOrder, hasLength(36));
+    expect(kNormalSectionOrder.toSet(), hasLength(36),
         reason: 'two sections share a key');
     expect(kNormalSectionOrder.indexOf('promoRail'),
         kNormalSectionOrder.indexOf('search') + 1,
@@ -90,7 +90,7 @@ void main() {
         .where((k) => !kNormalNoMarkup.contains(k))
         .where((k) => !kNormalDefOff.contains(k))
         .length;
-    expect(shown, 30);
+    expect(shown, 31);
   });
 
   testWidgets('the Normal home builds at phone size without overflowing',
