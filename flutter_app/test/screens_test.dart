@@ -42,7 +42,7 @@ void main() {
     tester.view.devicePixelRatio = 3.0;
     addTearDown(tester.view.reset);
     await tester.pumpWidget(MaterialApp(home: screen));
-    await tester.pump(const Duration(milliseconds: 50));
+    await tester.pumpAndSettle();
   }
 
   final screens = <String, Widget>{
@@ -71,7 +71,7 @@ void main() {
     expect(find.text('OPEN LIBRARY'), findsOneWidget);
 
     await tester.tap(find.text('OPEN LIBRARY'));
-    await tester.pump(const Duration(milliseconds: 60));
+    await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
     expect(find.text('OPEN LIBRARY'), findsNothing);
@@ -82,11 +82,11 @@ void main() {
     await pump(tester, const FashionPlusScreen());
 
     await tester.tap(find.text('ENTER FASHION PLUS'));
-    await tester.pump(const Duration(milliseconds: 60));
+    await tester.pumpAndSettle();
 
     expect(find.text('Motion is off'), findsOneWidget);
-    await tester.tap(find.text('Motion is off'));
-    await tester.pump(const Duration(milliseconds: 60));
+    await tester.tap(find.byType(Switch));
+    await tester.pumpAndSettle();
 
     expect(Settings.instance.fashionPlus, isTrue,
         reason: 'the switch has to change the app, not just itself');
@@ -107,19 +107,27 @@ void main() {
         reason: 'a still background must not hold a decoder');
   });
 
-  testWidgets('Flutter Store exposes the WebView Store departments', (tester) async {
+  testWidgets('Flutter Store exposes the WebView Store departments',
+      (tester) async {
     await pump(tester, const StoreScreen());
-    await tester.scrollUntilVisible(find.text('SIGNATURE STORE'), 260,
-        scrollable: find.byType(Scrollable).first);
-
-    expect(find.text('WORD ATELIER'), findsOneWidget);
-    expect(find.text('MEANING STORE'), findsOneWidget);
-    expect(find.text('SIGNATURE STORE'), findsOneWidget);
-    expect(find.text('SHABDAPATHY · LIBRARY'), findsOneWidget);
+    await tester.tap(find.text('Enter Store'));
+    await tester.pumpAndSettle();
+    final scrollable = find.byType(Scrollable).first;
+    for (final label in [
+      'WORD ATELIER',
+      'MEANING STORE',
+      'SIGNATURE STORE',
+      'SHABDAPATHY · LIBRARY',
+    ]) {
+      await tester.scrollUntilVisible(find.text(label), 260,
+          scrollable: scrollable);
+      expect(find.text(label), findsOneWidget);
+    }
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('Flutter Store department intros build with foreground artwork', (tester) async {
+  testWidgets('Flutter Store department intros build with foreground artwork',
+      (tester) async {
     for (final screen in <Widget>[
       const WordAtelierScreen(),
       const MeaningStoreScreen(),

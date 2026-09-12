@@ -112,61 +112,70 @@ class _Switch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => onChanged(!on),
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: on ? const Color(0x1FC8A96E) : const Color(0x14FFFFFF),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: on ? const Color(0x59C8A96E) : const Color(0x1FFFFFFF),
-          ),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              on ? Icons.play_circle : Icons.pause_circle_outline,
-              size: 32,
-              color: on ? NwsbColors.goldLight : const Color(0x8CFFFFFF),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    on ? 'Motion is on' : 'Motion is off',
-                    style: const TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    on
-                        ? 'Backgrounds are playing'
-                        : 'Backgrounds are holding their first frame',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Color(0x99FFFFFF),
-                      height: 1.4,
-                    ),
-                  ),
-                ],
+    return AnimatedBuilder(
+      animation: Settings.instance,
+      builder: (context, _) {
+        final currentOn = Settings.instance.fashionPlus;
+        return GestureDetector(
+          onTap: () => onChanged(!currentOn),
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color:
+                  currentOn ? const Color(0x1FC8A96E) : const Color(0x14FFFFFF),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: currentOn
+                    ? const Color(0x59C8A96E)
+                    : const Color(0x1FFFFFFF),
               ),
             ),
-            Switch(
-              value: on,
-              onChanged: onChanged,
-              activeThumbColor: NwsbColors.goldLight,
+            child: Row(
+              children: [
+                Icon(
+                  currentOn ? Icons.play_circle : Icons.pause_circle_outline,
+                  size: 32,
+                  color: on ? NwsbColors.goldLight : const Color(0x8CFFFFFF),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        currentOn ? 'Motion is on' : 'Motion is off',
+                        style: const TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        currentOn
+                            ? 'Backgrounds are playing'
+                            : 'Backgrounds are holding their first frame',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Color(0x99FFFFFF),
+                          height: 1.4,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Switch(
+                  value: currentOn,
+                  onChanged: onChanged,
+                  activeThumbColor: NwsbColors.goldLight,
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

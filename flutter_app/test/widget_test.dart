@@ -21,6 +21,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/shell/nav_shell.dart';
 import 'package:nowssb/widgets/home_parts.dart';
+import 'package:nowssb/data/settings.dart';
 
 import 'fake_video_platform.dart';
 
@@ -32,10 +33,17 @@ class _TestAssetBundle extends CachingAssetBundle {
   static final Uint8List _transparentPixel = base64Decode(
     'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScLqTwAAAABJRU5ErkJggg==',
   );
+  static final Uint8List _emptySvg = Uint8List.fromList(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1" viewBox="0 0 1 1"><path d="M0 0h1v1H0z" fill="none"/></svg>'
+        .codeUnits,
+  );
 
   @override
   Future<ByteData> load(String key) async {
     if (key.startsWith('assets/')) {
+      if (key.toLowerCase().endsWith('.svg')) {
+        return ByteData.sublistView(_emptySvg);
+      }
       return ByteData.sublistView(_transparentPixel);
     }
     return rootBundle.load(key);
@@ -61,7 +69,12 @@ void main() {
     // VideoPool.debugDeadlines.
     VideoPool.debugDeadlines = false;
   });
-  setUp(VideoPool.instance.debugDropAll);
+  setUp(() async {
+    await Settings.instance.setLastTab(0);
+    await Settings.instance.setFashionHome(false);
+    await Settings.instance.setFashionPlus(false);
+    VideoPool.instance.debugDropAll();
+  });
   tearDown(VideoPool.instance.debugDropAll);
 
   testWidgets('the shell builds and every destination is reachable',
@@ -140,7 +153,7 @@ void main() {
     // would be going TO, so it reads as an action rather than a status.
     expect(find.text('Fashion home'), findsOneWidget);
     await tester.tap(find.text('Fashion home'));
-    await tester.pump(const Duration(milliseconds: 60));
+    await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
     expect(find.text('Normal home'), findsOneWidget);

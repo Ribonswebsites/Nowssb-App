@@ -58,7 +58,6 @@ class _WidgetsPageState extends State<WidgetsPage> {
     Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => page));
   }
 
-
   @override
   Widget build(BuildContext context) {
     final s = Settings.instance;
@@ -89,8 +88,7 @@ class _WidgetsPageState extends State<WidgetsPage> {
                     : Image.asset(
                         'assets/fashion/fp-intro.webp',
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) =>
-                            const AppBackdrop(),
+                        errorBuilder: (_, __, ___) => const AppBackdrop(),
                       )),
           ),
           // .st-page scrim
@@ -185,17 +183,17 @@ class _WidgetsPageState extends State<WidgetsPage> {
                       sub: 'Screens that already exist',
                       child: _JumpRail(
                         onPractice: () => _push(const PracticeScreen()),
-                        onLibrary: () =>
-                            _push(const SoundLibraryScreen()),
+                        onLibrary: () => _push(const SoundLibraryScreen()),
                         onProgress: () => _push(
                           PracticeProgressScreen(
                             words: ContentStore.instance.library,
                           ),
                         ),
                         onStore: () => _push(const StoreScreen()),
-                        onMeaning: () =>
-                            _push(const MeaningStoreScreen()),
-                        onConnect: () { Navigator.of(context).maybePop(); },
+                        onMeaning: () => _push(const MeaningStoreScreen()),
+                        onConnect: () {
+                          Navigator.of(context).maybePop();
+                        },
                         onNotifs: () =>
                             _push(const NotificationsSettingsPage()),
                         onProfile: () => _push(const ProfileScreen()),
@@ -209,10 +207,8 @@ class _WidgetsPageState extends State<WidgetsPage> {
                         fashionHome: s.fashionHome,
                         onFashionPlusPage: () =>
                             _push(const FashionPlusScreen()),
-                        onQuickAccess: () =>
-                            _push(const QuickAccessScreen()),
-                        onPlayer: () =>
-                            _push(const PlayerSettingsScreen()),
+                        onQuickAccess: () => _push(const QuickAccessScreen()),
+                        onPlayer: () => _push(const PlayerSettingsScreen()),
                         onTogglePlus: s.setFashionPlus,
                         onToggleHome: s.setFashionHome,
                         onProfile: () => _push(const ProfileScreen()),
@@ -388,8 +384,7 @@ class _HeroCard extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: const Color(0xFF05070E),
                             borderRadius: BorderRadius.circular(8),
-                            border:
-                                Border.all(color: const Color(0x44FFFFFF)),
+                            border: Border.all(color: const Color(0x44FFFFFF)),
                             boxShadow: const [
                               BoxShadow(
                                 color: Color(0x88000000),
@@ -533,15 +528,27 @@ class _JumpRail extends StatelessWidget {
   Widget build(BuildContext context) {
     final items = <(IconData, String, String, VoidCallback)>[
       (Icons.mic_none_rounded, 'Practice', "Today's word ritual", onPractice),
-      (Icons.library_music_outlined, 'Sound Library', 'Every word you own',
-          onLibrary),
-      (Icons.insights_outlined, 'Progress', 'How far you have come',
-          onProgress),
+      (
+        Icons.library_music_outlined,
+        'Sound Library',
+        'Every word you own',
+        onLibrary
+      ),
+      (
+        Icons.insights_outlined,
+        'Progress',
+        'How far you have come',
+        onProgress
+      ),
       (Icons.storefront_outlined, 'Store', 'Words and frequencies', onStore),
       (Icons.menu_book_outlined, 'Meaning', 'What it truly means', onMeaning),
       (Icons.people_outline, 'Connect', 'The social space', onConnect),
-      (Icons.notifications_none, 'Notifications', 'What you have missed',
-          onNotifs),
+      (
+        Icons.notifications_none,
+        'Notifications',
+        'What you have missed',
+        onNotifs
+      ),
       (Icons.person_outline, 'Profile', 'Your account', onProfile),
     ];
     return SizedBox(
@@ -665,7 +672,7 @@ class _GoCard extends StatelessWidget {
       },
       child: Container(
         width: 148,
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: const Color(0x0EFFFFFF),
           borderRadius: BorderRadius.circular(18),
@@ -679,19 +686,20 @@ class _GoCard extends StatelessWidget {
           ],
         ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 Container(
-                  width: 40,
-                  height: 40,
+                  width: 28,
+                  height: 28,
                   decoration: BoxDecoration(
                     color: const Color(0x12FFFFFF),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: const Color(0x21FFFFFF)),
                   ),
-                  child: Icon(icon, size: 21, color: Colors.white),
+                  child: Icon(icon, size: 16, color: Colors.white),
                 ),
                 if (trailing != null) ...[
                   const Spacer(),
@@ -702,13 +710,12 @@ class _GoCard extends StatelessWidget {
                 ],
               ],
             ),
-            const Spacer(),
             Text(
               title,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
-                fontSize: 13.5,
+                fontSize: 11,
                 fontWeight: FontWeight.w800,
                 color: Colors.white,
               ),
@@ -716,11 +723,11 @@ class _GoCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               sub,
-              maxLines: 2,
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
-                fontSize: 11,
-                height: 1.35,
+                fontSize: 8,
+                height: 1.1,
                 color: Color(0x85FFFFFF),
               ),
             ),

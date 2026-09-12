@@ -58,6 +58,7 @@ import '../widgets/nwsb_icon.dart';
 import 'normal/neomorphic_essentials.dart';
 import 'normal/sections_bottom.dart';
 import 'normal/sections_top.dart';
+import 'normal/rotating_promo_rail.dart';
 import 'shared_sections.dart';
 import 'sound_library.dart';
 import 'notifications_sheet.dart';
@@ -71,6 +72,7 @@ import 'subscription.dart';
 const kNormalSectionOrder = <String>[
   'greet',
   'search',
+  'promoRail',
   'dashboard',
   'essentials',
   'streak',
@@ -200,6 +202,14 @@ class _HomeNormalState extends State<HomeNormal> {
   List<(String, Widget?)> _sections() => [
         ('greet', NmGreeting(name: widget.name)),
         ('search', NmSearch(onSearch: (_) => _go(2))),
+        (
+          'promoRail',
+          NormalPromoRail(
+            onStore: () => _go(3),
+            onPlayer: () => _go(1),
+            onEarn: () => _go(4),
+          ),
+        ),
         (
           'dashboard',
           NmSuppliedDashboard(

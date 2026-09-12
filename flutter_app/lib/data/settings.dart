@@ -71,8 +71,10 @@ class Settings extends ChangeNotifier {
     'eBooks',
   ];
 
-  bool _fashionPlus = true;
-  bool _fashionHome = true;
+  // First launch is intentionally still and pale; users opt into motion and
+  // the dark Fashion home from the visible controls.
+  bool _fashionPlus = false;
+  bool _fashionHome = false;
   int _fashionVideo = 1;
   int _fashionImage = -1;
   int _backgroundTransition = 0;
@@ -97,6 +99,7 @@ class Settings extends ChangeNotifier {
     'store',
     'profile'
   ];
+
   /// Website `heroStyle()` / `nwsb_hero_style`: `plain` | `full` | `tv`.
   String _heroStyle = 'plain';
 
@@ -154,8 +157,8 @@ class Settings extends ChangeNotifier {
   Future<void> load() async {
     try {
       final p = await SharedPreferences.getInstance();
-      _fashionPlus = p.getBool(_kPlus) ?? true;
-      _fashionHome = p.getBool(_kHome) ?? true;
+      _fashionPlus = p.getBool(_kPlus) ?? false;
+      _fashionHome = p.getBool(_kHome) ?? false;
       _fashionVideo = _validIndex(
         p.getInt(_kVideo) ?? _fashionVideo,
         fashionVideos.length,
@@ -202,6 +205,7 @@ class Settings extends ChangeNotifier {
     _fashionPlus = on;
     _advanceBackgroundTransition();
     await _save(_kPlus, on);
+    notifyListeners();
   }
 
   Future<void> setFashionHome(bool on) async {
@@ -209,6 +213,7 @@ class Settings extends ChangeNotifier {
     _fashionHome = on;
     _advanceBackgroundTransition();
     await _save(_kHome, on);
+    notifyListeners();
   }
 
   Future<void> setFashionVideo(int index) async {
@@ -232,7 +237,6 @@ class Settings extends ChangeNotifier {
 
   static int _validImageIndex(int index) =>
       index >= 0 && index < fashionImages.length ? index : -1;
-
 
   Future<void> setQuickActions(List<String> ids) async {
     final next = sanitizeQuickActions(ids);
