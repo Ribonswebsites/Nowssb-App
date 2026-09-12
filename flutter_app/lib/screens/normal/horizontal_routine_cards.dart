@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/tokens.dart';
 import 'glassmorphism_theme.dart';
+import 'essentials_process_line.dart';
 
 class NmHorizontalRoutineCards extends StatefulWidget {
   const NmHorizontalRoutineCards({super.key, this.fashion = false});
@@ -121,9 +122,10 @@ class _NmHorizontalRoutineCardsState extends State<NmHorizontalRoutineCards> {
               ],
             ),
           ),
+          if (widget.fashion) const _FashionRoutineBanner(),
           Padding(
-            padding: const EdgeInsets.only(right: 20, bottom: 16),
-            child: _ProcessLine(
+            padding: const EdgeInsets.only(right: 20, bottom: 16, top: 4),
+            child: NmEssentialsProcessLine(
                 glass: glass || widget.fashion, active: _activeCard),
           ),
           SizedBox(
@@ -144,29 +146,41 @@ class _NmHorizontalRoutineCardsState extends State<NmHorizontalRoutineCards> {
   }
 }
 
-class _ProcessLine extends StatelessWidget {
-  const _ProcessLine({required this.glass, required this.active});
-  final bool glass;
-  final int active;
+class _FashionRoutineBanner extends StatelessWidget {
+  const _FashionRoutineBanner();
 
   @override
-  Widget build(BuildContext context) {
-    final line = glass ? const Color(0x99FFFFFF) : const Color(0xFFC7CDD9);
-    return Row(children: [
-      for (var i = 0; i < 6; i++) ...[
-        Container(
-            width: 10,
-            height: 10,
-            decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: i == active
-                    ? const Color(0xFFB48BEA)
-                    : (glass ? Colors.white54 : const Color(0xFFE3E6EC)),
-                boxShadow: glass ? null : NwsbShadows.raisedXs)),
-        if (i != 5) Expanded(child: Container(height: 1.5, color: line)),
-      ],
-    ]);
-  }
+  Widget build(BuildContext context) => Container(
+        height: 96,
+        margin: const EdgeInsets.fromLTRB(0, 0, 20, 12),
+        padding: const EdgeInsets.fromLTRB(22, 18, 18, 18),
+        decoration: BoxDecoration(
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: const Color(0x29FFFFFF)),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text('My Routine\nCustomize your practice',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    height: 1.08,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -.3)),
+            Container(
+              width: 44,
+              height: 44,
+              decoration: const BoxDecoration(
+                  color: Colors.white, shape: BoxShape.circle),
+              child: const Icon(Icons.arrow_forward,
+                  color: Color(0xFF060C18), size: 22),
+            ),
+          ],
+        ),
+      );
 }
 
 class _EssentialCardData {
@@ -275,6 +289,28 @@ class _EssentialCard extends StatelessWidget {
                 ]),
               ),
             ],
+          ),
+          Positioned(
+            top: 16,
+            right: 16,
+            child: Container(
+              width: 74,
+              height: 74,
+              padding: const EdgeInsets.all(9),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: .82),
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 3),
+                boxShadow: const [
+                  BoxShadow(
+                      color: Color(0x55000000),
+                      blurRadius: 12,
+                      offset: Offset(0, 5)),
+                ],
+              ),
+              child: Image.asset('assets/banners/promo/store.png',
+                  fit: BoxFit.contain),
+            ),
           ),
           Positioned(
             left: 135,
