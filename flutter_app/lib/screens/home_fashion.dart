@@ -204,7 +204,7 @@ class _HomeFashionState extends State<HomeFashion> {
           'edition',
           EditionSection(onTap: () => _push(const SubscriptionScreen()))
         ),
-        ('routines', RoutinesSection(onTap: () => _go(1))),
+        ('routines', RoutinesSection(onTap: () => _go(1), fashion: true)),
         ('offer', FashOffer(onTap: () => _go(3))),
         (
           'cube',

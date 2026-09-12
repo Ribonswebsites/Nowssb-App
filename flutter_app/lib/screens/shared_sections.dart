@@ -630,8 +630,9 @@ class StoreBannerSection extends StatelessWidget {
 /// 18 · routines — index.html:2223. `defOff`. The Daily Practice card and
 /// the My Routines bar, in one wrapper.
 class RoutinesSection extends StatelessWidget {
-  const RoutinesSection({super.key, this.onTap});
+  const RoutinesSection({super.key, this.onTap, this.fashion = false});
   final VoidCallback? onTap;
+  final bool fashion;
 
   @override
   Widget build(BuildContext context) {
@@ -645,7 +646,7 @@ class RoutinesSection extends StatelessWidget {
                   'https://media.nowssb.com/migrated-images/4f13105270db8787_grok_image_1778070967319_ys14eq.jpg',
               fallback: ColoredBox(color: Color(0xFF060C18)),
             ),
-            label: 'My Routines',
+            label: fashion ? 'My Routine' : 'My Routines',
             title: 'Daily Practice System',
             sub: '5 customizable routines — Morning, Midday, Afternoon, '
                 'Evening, Night. Build your personal healing schedule.',
@@ -653,7 +654,7 @@ class RoutinesSection extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           SecBanner(
-            title: 'My Routines',
+            title: fashion ? 'My Routine' : 'My Routines',
             sub: 'Five routines — build your healing schedule',
             mark: NwsbMarks.play,
             markViewBox: 22,

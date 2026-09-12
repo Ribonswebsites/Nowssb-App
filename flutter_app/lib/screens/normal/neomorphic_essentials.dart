@@ -1,365 +1,297 @@
-/// Native Flutter translation of app/widgets/neumorphic-essentials.html.
+/// Six horizontal Get Started cards for Normal Home.
 ///
-/// This is a standalone Normal Home section. It deliberately has no phone or
-/// page frame around it; only the supplied timeline cards are surfaced.
+/// The card language follows the supplied Essentials reference: a wide image,
+/// compact metadata, a strong title, a centered Store mark that overlaps the
+/// lower edge, and a black action banner underneath. Normal mode uses white
+/// neumorphism; Normal Glass mode uses white glassmorphism.
 library;
+
+import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 
 import '../../theme/tokens.dart';
 import 'glassmorphism_theme.dart';
 
-class NmSuppliedEssentials extends StatefulWidget {
-  const NmSuppliedEssentials({super.key});
+class NmSuppliedEssentials extends StatelessWidget {
+  const NmSuppliedEssentials({super.key, this.fashion = false});
 
-  @override
-  State<NmSuppliedEssentials> createState() => _NmSuppliedEssentialsState();
-}
+  final bool fashion;
 
-class _NmSuppliedEssentialsState extends State<NmSuppliedEssentials> {
-  var _expanded = false;
-
-  static const _base = Color(0xFFECEEF2);
-  static const _text = Color(0xFF2B2D33);
-  static const _subtext = Color(0xFF8A8F9A);
+  static const _cards = <_EssentialCardData>[
+    _EssentialCardData(
+        'Get Started',
+        'Trusting the Breath',
+        'Mindfulness · 4 min',
+        'Listen to your first meditation',
+        'assets/profile_source/img-act1.jpeg',
+        Color(0xFFE9C1A5)),
+    _EssentialCardData(
+        'Life Coaching',
+        'Positive Self-Talk & Power',
+        'Life Coaching · 4 mins',
+        'Open life coaching',
+        'assets/profile_source/img-act2.jpeg',
+        Color(0xFFB9D5E8)),
+    _EssentialCardData(
+        'Story',
+        'What Your Body Knows',
+        'Story · 8 min',
+        'Listen to the story',
+        'assets/profile_source/img-act3.jpeg',
+        Color(0xFFCBBBE8)),
+    _EssentialCardData(
+        'Breathwork',
+        'Return to Stillness',
+        'Breathwork · 6 min',
+        'Begin breathwork',
+        'assets/profile_source/img-motto.jpeg',
+        Color(0xFFBFE2D1)),
+    _EssentialCardData(
+        'Sounds',
+        'A Softer Inner Voice',
+        'Sounds · 5 min',
+        'Play healing sounds',
+        'assets/profile_source/img-quote.jpeg',
+        Color(0xFFF0D39B)),
+    _EssentialCardData(
+        'Meditation',
+        'A Quiet Place Within',
+        'Meditation · 10 min',
+        'Start meditation',
+        'assets/profile_source/img-about.jpeg',
+        Color(0xFFD4C5E8)),
+  ];
 
   @override
   Widget build(BuildContext context) {
     final glass = NormalGlassMode.of(context);
+    final title = fashion ? 'My Routine' : 'Get Started';
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 18),
+      padding: const EdgeInsets.fromLTRB(20, 0, 0, 20),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.only(left: 4, bottom: 18),
-            child: Text('Your essentials',
-                style: TextStyle(
-                    fontSize: 21, fontWeight: FontWeight.w700, color: _text)),
-          ),
-          _TimelineEntry(
-            hero: true,
-            active: true,
-            icon: Icons.mic_none_rounded,
-            title: 'Preconceptions',
-            subtitle: "Today's Meditation",
-            duration: '3–20 min',
-          ),
-          const _TimelineEntry(
-              icon: Icons.bedtime_outlined,
-              title: 'Wind down for bed',
-              duration: '12 min'),
-          const _TimelineEntry(
-              icon: Icons.nightlight_round,
-              title: 'Fall asleep',
-              duration: '45 min'),
-          const _TimelineEntry(
-              icon: Icons.nights_stay_outlined,
-              title: 'Sleep through the night',
-              duration: '45–480 min',
-              last: true),
-          if (_expanded) ...const [
-            _TimelineEntry(
-                icon: Icons.wb_sunny_outlined,
-                title: 'Wake up gently',
-                duration: '8 min'),
-            _TimelineEntry(
-                icon: Icons.wb_sunny_rounded,
-                title: 'Morning intention',
-                duration: '5 min',
-                last: true),
-          ],
           Padding(
-            padding: const EdgeInsets.only(left: 38, top: 4, bottom: 6),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: GestureDetector(
-                onTap: () => setState(() => _expanded = !_expanded),
-                child: Container(
-                  padding: const EdgeInsets.fromLTRB(20, 10, 16, 10),
-                  decoration: BoxDecoration(
-                      color: glass ? const Color(0x66FFFFFF) : _base,
-                      borderRadius: BorderRadius.circular(22),
-                      border: glass
-                          ? Border.all(
-                              color: const Color(0xF2FFFFFF), width: 1.5)
-                          : null,
-                      boxShadow: glass ? null : NwsbShadows.raisedXs),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(_expanded ? 'See less' : 'See more',
-                          style: const TextStyle(
-                              fontSize: 14.5,
-                              fontWeight: FontWeight.w700,
-                              color: _subtext)),
-                      const SizedBox(width: 10),
-                      Container(
-                        width: 30,
-                        height: 30,
-                        decoration: BoxDecoration(
-                            color: glass ? const Color(0x66FFFFFF) : _base,
-                            shape: BoxShape.circle,
-                            border: glass
-                                ? Border.all(
-                                    color: const Color(0xF2FFFFFF), width: 1.5)
-                                : null,
-                            boxShadow: glass ? null : NwsbShadows.raisedXs),
-                        child: Icon(
-                            _expanded
-                                ? Icons.keyboard_arrow_up
-                                : Icons.keyboard_arrow_down,
-                            size: 18,
-                            color: _subtext),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _TimelineEntry extends StatelessWidget {
-  const _TimelineEntry({
-    required this.icon,
-    required this.title,
-    required this.duration,
-    this.subtitle,
-    this.hero = false,
-    this.active = false,
-    this.last = false,
-  });
-
-  final IconData icon;
-  final String title;
-  final String duration;
-  final String? subtitle;
-  final bool hero;
-  final bool active;
-  final bool last;
-
-  static const _base = Color(0xFFECEEF2);
-  static const _orange = Color(0xFFFF8A3D);
-  static const _orangeLight = Color(0xFFFFB44D);
-
-  @override
-  Widget build(BuildContext context) {
-    final card = hero
-        ? _HeroEssential(
-            icon: icon, title: title, subtitle: subtitle!, duration: duration)
-        : _PillEssential(icon: icon, title: title, duration: duration);
-    return IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          SizedBox(
-            width: 22,
-            child: Column(
+            padding: const EdgeInsets.only(right: 20, bottom: 14),
+            child: Row(
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 26),
-                  child: Container(
-                    width: 18,
-                    height: 18,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: active
-                          ? const LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [_orangeLight, _orange])
-                          : null,
-                      color: active ? null : _base,
-                      boxShadow: active
-                          ? const [
-                              BoxShadow(
-                                  color: Color(0x339C6B30),
-                                  blurRadius: 7,
-                                  spreadRadius: 3),
-                              BoxShadow(
-                                  color: Color(0x55000000),
-                                  offset: Offset(3, 3),
-                                  blurRadius: 6),
-                              BoxShadow(
-                                  color: Colors.white,
-                                  offset: Offset(-2, -2),
-                                  blurRadius: 6)
-                            ]
-                          : NwsbShadows.raisedXs,
-                    ),
-                  ),
-                ),
-                if (!last)
-                  Expanded(
-                      child: Container(
-                          width: 3,
-                          margin: const EdgeInsets.symmetric(vertical: 2),
-                          decoration: const BoxDecoration(
-                              border: Border(
-                                  left: BorderSide(
-                                      color: Color(0xFFC7CDD9),
-                                      width: 3,
-                                      style: BorderStyle.solid))))),
+                Expanded(
+                    child: Text(title,
+                        style: TextStyle(
+                            fontSize: 21,
+                            fontWeight: FontWeight.w700,
+                            color: glass || fashion
+                                ? Colors.white
+                                : const Color(0xFF2B2D33)))),
+                Text('6 cards',
+                    style: TextStyle(
+                        fontSize: 12,
+                        color: glass || fashion
+                            ? Colors.white70
+                            : const Color(0xFF8A8F9A))),
               ],
             ),
           ),
-          const SizedBox(width: 16),
-          Expanded(
-              child: Padding(
-                  padding: const EdgeInsets.only(bottom: 18), child: card)),
+          Padding(
+            padding: const EdgeInsets.only(right: 20, bottom: 16),
+            child: _ProcessLine(glass: glass || fashion),
+          ),
+          SizedBox(
+            height: 338,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.only(right: 20, bottom: 4),
+              itemCount: _cards.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 14),
+              itemBuilder: (context, index) => _EssentialCard(
+                  card: _cards[index], glass: glass, fashion: fashion),
+            ),
+          ),
         ],
       ),
     );
   }
 }
 
-class _HeroEssential extends StatelessWidget {
-  const _HeroEssential(
-      {required this.icon,
-      required this.title,
-      required this.subtitle,
-      required this.duration});
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final String duration;
+class _ProcessLine extends StatelessWidget {
+  const _ProcessLine({required this.glass});
+  final bool glass;
 
   @override
-  Widget build(BuildContext context) => Container(
-        constraints: const BoxConstraints(minHeight: 148),
-        padding: const EdgeInsets.all(22),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(26),
-          gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFFFFB44D), Color(0xFFFF8A3D)]),
-          boxShadow: NwsbShadows.raised,
-        ),
-        child: Stack(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(right: 42),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                            color: const Color(0x8CFFFFFF),
-                            borderRadius: BorderRadius.circular(20)),
-                        child: const Text('● ● ●  543',
-                            style: TextStyle(
-                                fontSize: 12.5,
-                                color: Color(0xFF6B3F13),
-                                fontWeight: FontWeight.w700)),
-                      ),
-                      const Spacer(),
-                      const Text('•••',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w800,
-                              color: Color(0xFF6B3F13))),
-                    ]),
-                    const SizedBox(height: 14),
-                    Row(children: [
-                      Icon(icon, size: 17, color: const Color(0xFF4A2A09)),
-                      const SizedBox(width: 8),
-                      Expanded(
-                          child: Text(title,
-                              style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w800,
-                                  color: Color(0xFF4A2A09))))
-                    ]),
-                    const SizedBox(height: 8),
-                    Row(children: [
-                      const Icon(Icons.volume_up_outlined,
-                          size: 15, color: Color(0xFF5C3812)),
-                      const SizedBox(width: 6),
-                      Expanded(
-                          child: Text(subtitle,
-                              style: const TextStyle(
-                                  fontSize: 14.5,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xFF5C3812))))
-                    ]),
-                    Padding(
-                        padding: const EdgeInsets.only(left: 22, top: 2),
-                        child: Text(duration,
-                            style: const TextStyle(
-                                fontSize: 14.5,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFF5C3812)))),
-                  ]),
-            ),
-            const Positioned(
-                right: 2,
-                bottom: 0,
-                child: Icon(Icons.face_2_outlined,
-                    size: 70, color: Color(0xA34A2A09))),
-          ],
-        ),
-      );
+  Widget build(BuildContext context) {
+    final line = glass ? const Color(0x99FFFFFF) : const Color(0xFFC7CDD9);
+    return Row(children: [
+      for (var i = 0; i < 6; i++) ...[
+        Container(
+            width: 10,
+            height: 10,
+            decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: i == 0
+                    ? const Color(0xFFB48BEA)
+                    : (glass ? Colors.white54 : const Color(0xFFE3E6EC)),
+                boxShadow: glass ? null : NwsbShadows.raisedXs)),
+        if (i != 5) Expanded(child: Container(height: 1.5, color: line)),
+      ],
+    ]);
+  }
 }
 
-class _PillEssential extends StatelessWidget {
-  const _PillEssential(
-      {required this.icon, required this.title, required this.duration});
-  final IconData icon;
+class _EssentialCardData {
+  const _EssentialCardData(this.category, this.title, this.meta, this.action,
+      this.image, this.circleColor);
+  final String category;
   final String title;
-  final String duration;
+  final String meta;
+  final String action;
+  final String image;
+  final Color circleColor;
+}
+
+class _EssentialCard extends StatelessWidget {
+  const _EssentialCard(
+      {required this.card, required this.glass, required this.fashion});
+  final _EssentialCardData card;
+  final bool glass;
+  final bool fashion;
 
   @override
-  Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-        decoration: BoxDecoration(
-            color: const Color(0xFFECEEF2),
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: NwsbShadows.raisedSm),
-        child: Row(children: [
-          Container(
-              width: 44,
-              height: 44,
-              decoration: const BoxDecoration(
-                  color: Color(0xFFECEEF2),
+  Widget build(BuildContext context) {
+    final foreground =
+        glass || fashion ? Colors.white : const Color(0xFF30343B);
+    final surface = glass
+        ? const Color(0x42FFFFFF)
+        : fashion
+            ? const Color(0xB30B111B)
+            : const Color(0xFFECEEF2);
+    final border =
+        glass || fashion ? const Color(0xA6FFFFFF) : Colors.transparent;
+    return SizedBox(
+      width: 330,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Column(
+            children: [
+              Container(
+                height: 249,
+                decoration: BoxDecoration(
+                  color: surface,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(
+                      color: border, width: glass || fashion ? 1.2 : 0),
+                  boxShadow: glass || fashion
+                      ? const [
+                          BoxShadow(
+                              color: Color(0x55000000),
+                              blurRadius: 18,
+                              offset: Offset(0, 9))
+                        ]
+                      : NwsbShadows.raised,
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(card.category,
+                              style: TextStyle(
+                                  color: foreground.withValues(alpha: .72),
+                                  fontSize: 12)),
+                          const SizedBox(height: 10),
+                          ClipRRect(
+                              borderRadius: BorderRadius.circular(16),
+                              child: Image.asset(card.image,
+                                  height: 104,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover)),
+                          const SizedBox(height: 12),
+                          Text(card.meta,
+                              style: TextStyle(
+                                  color: foreground.withValues(alpha: .7),
+                                  fontSize: 12)),
+                          const SizedBox(height: 4),
+                          Text(card.title,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                  color: foreground,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w800,
+                                  height: 1.15)),
+                        ]),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 38),
+              Container(
+                width: double.infinity,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: BoxDecoration(
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(18)),
+                child: Row(children: [
+                  Expanded(
+                      child: Text(card.action,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600))),
+                  const Icon(Icons.arrow_forward_rounded,
+                      color: Colors.white, size: 18)
+                ]),
+              ),
+            ],
+          ),
+          Positioned(
+            left: 135,
+            top: 221,
+            child: Container(
+              width: 60,
+              height: 60,
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                  color: card.circleColor,
                   shape: BoxShape.circle,
-                  boxShadow: NwsbShadows.raisedXs),
-              child: const Icon(Icons.lock_outline_rounded,
-                  color: Color(0xFF9AA0AB), size: 18)),
-          const SizedBox(width: 8),
-          Container(
-              width: 44,
-              height: 44,
-              decoration: const BoxDecoration(
-                  color: Color(0xFFECEEF2),
-                  shape: BoxShape.circle,
-                  boxShadow: NwsbShadows.raisedXs),
-              child: Icon(icon, color: const Color(0xFF9AA0AB), size: 20)),
-          const SizedBox(width: 14),
-          Expanded(
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                Text(title,
-                    style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF2B2D33))),
-                const SizedBox(height: 3),
-                Text(duration,
-                    style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF8A8F9A)))
-              ])),
-        ]),
+                  border: Border.all(color: Colors.white, width: 3),
+                  boxShadow: const [
+                    BoxShadow(
+                        color: Color(0x55000000),
+                        blurRadius: 12,
+                        offset: Offset(0, 5))
+                  ]),
+              child: Image.asset('assets/banners/promo/store.png',
+                  fit: BoxFit.contain),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Optional white-glass wrapper for callers that want the section framed.
+class EssentialsGlassFrame extends StatelessWidget {
+  const EssentialsGlassFrame({super.key, required this.child});
+  final Widget child;
+  @override
+  Widget build(BuildContext context) => ClipRRect(
+        borderRadius: BorderRadius.circular(28),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+                color: const Color(0x40FFFFFF),
+                border: Border.all(color: Colors.white70),
+                borderRadius: BorderRadius.circular(28)),
+            child: child,
+          ),
+        ),
       );
 }
