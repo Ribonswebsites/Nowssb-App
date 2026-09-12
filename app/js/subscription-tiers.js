@@ -27,7 +27,7 @@
     block.innerHTML = '<div class="nwsb-subscription-page"><div class="nwsb-sub-tv-frame"><div class="nwsb-sub-tv-screen">' +
       '<video class="nwsb-sub-tv-video" data-nwsb-auto muted loop playsinline autoplay preload="auto" poster="assets/video/subscription-promo-poster.webp" src="assets/video/subscription-promo.mp4"></video>' +
       '<div class="nwsb-sub-tv-shade" aria-hidden="true"></div><div class="nwsb-sub-tv-content">' +
-      '<button class="nwsb-sub-upgrade-banner" type="button" onclick="if(window.SS)SS.open(\'subscription\')"><span>SUBSCRIPTION TIER UPGRADE</span><span>' + arrow() + '</span></button>' +
+      '<button class="nwsb-sub-upgrade-banner" type="button" onclick="if(window.SS)SS.open(\'subscription\')"><span class="nwsb-sub-banner-copy"><strong>Subscription</strong><small>Choose your frequency</small></span><span>' + arrow() + '</span></button>' +
       '<div class="nwsb-sub-tier-list" aria-label="Subscription tiers">' + tiers.map(row).join('') + '</div>' +
       '<div class="nwsb-sub-trial-copy">Try your <strong>30 Days Free Trial</strong> today</div>' +
       '<button class="nwsb-subscribe-cta" type="button" onclick="if(window.SS)SS.open(\'subscription\')"><span>Subscribe Today</span><span>' + arrow() + '</span></button>' +
