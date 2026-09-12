@@ -11,23 +11,20 @@ import 'package:flutter/material.dart';
 
 import '../../theme/tokens.dart';
 
-List<Color> _shadeFamily(double progress) {
+Color _bannerColor(double progress) {
   const seeds = [
-    Color(0xFFE34C62),
-    Color(0xFFE59A30),
-    Color(0xFF9A58C9),
-    Color(0xFF3EAD7B),
-    Color(0xFF467ED6),
-    Color(0xFF222633),
+    Color(0xFFFF9A3D), // orange
+    Color(0xFFE94F83), // pink
+    Color(0xFF9A58C9), // purple
+    Color(0xFF3EAD7B), // green
+    Color(0xFF467ED6), // blue
+    Color(0xFF222633), // black
+    Color(0xFFF2F3F7), // white
   ];
   final scaled = progress * seeds.length;
   final index = scaled.floor() % seeds.length;
   final next = (index + 1) % seeds.length;
-  final base = Color.lerp(seeds[index], seeds[next], scaled - scaled.floor())!;
-  return List.generate(
-    7,
-    (i) => Color.lerp(Colors.white, base, .22 + (i * .12).clamp(0, .78))!,
-  );
+  return Color.lerp(seeds[index], seeds[next], scaled - scaled.floor())!;
 }
 
 class NormalPromoRail extends StatefulWidget {
@@ -104,12 +101,7 @@ class _NormalPromoRailState extends State<NormalPromoRail>
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(24),
-                gradient: LinearGradient(
-                  begin: Alignment(-1 + _motion.value * 2, -0.3),
-                  end: Alignment(1 - _motion.value * 2, 0.3),
-                  colors: _shadeFamily(_motion.value),
-                  stops: [0, .16, .33, .5, .67, .84, 1],
-                ),
+                color: _bannerColor(_motion.value),
                 boxShadow: const [
                   BoxShadow(
                       color: Color(0x23000000),
