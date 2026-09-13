@@ -79,19 +79,18 @@ void main() {
           reason: '$k is listed as absent but is not in the order');
     }
 
-    // Three rows with no markup, one hidden by default — so a fresh install
-    // shows thirty-two registered sections.
+    // Three rows with no markup, two hidden by default — so a fresh install
+    // shows twenty-five.
     //
     // It was twenty-three. `storeban` has left the no-markup set: this home
     // registers it (app/js/part062.js:82) and never had an element for it,
-    // so the store banner is a real section here rather than a bare clip
-    // dropped above the store card. Personalized Healing is intentionally
-    // visible because it is the native entry to the Healing Path selector.
+    // so the store banner is a real section here now rather than a bare clip
+    // dropped above the store card.
     final shown = kNormalSectionOrder
         .where((k) => !kNormalNoMarkup.contains(k))
         .where((k) => !kNormalDefOff.contains(k))
         .length;
-    expect(shown, 32);
+    expect(shown, 31);
   });
 
   testWidgets('the Normal home builds at phone size without overflowing',

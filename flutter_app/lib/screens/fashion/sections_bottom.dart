@@ -434,7 +434,7 @@ class FashShabdaVideo extends StatelessWidget {
                       ),
                       SizedBox(height: 10),
                       Text(
-                        'Natural Origin Word Science',
+                        'Natural Origin of Word Science',
                         style:
                             TextStyle(fontSize: 11, color: Color(0x99FFFFFF)),
                       ),

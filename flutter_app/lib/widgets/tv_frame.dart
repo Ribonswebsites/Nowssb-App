@@ -244,7 +244,6 @@ class TvFrame extends StatelessWidget {
     this.onTap,
     this.overlay,
     this.showVideo = true,
-    this.showPoster = false,
   });
 
   /// The clip on the screen.
@@ -269,7 +268,6 @@ class TvFrame extends StatelessWidget {
   /// like everything else on the screen is.
   final Widget? overlay;
   final bool showVideo;
-  final bool showPoster;
 
   @override
   Widget build(BuildContext context) {
@@ -297,7 +295,7 @@ class TvFrame extends StatelessWidget {
                           asset: asset,
                           priority: priority,
                           autoplay: autoplay,
-                          showPoster: showPoster,
+                          showPoster: false,
                         ),
                       if (overlay != null) overlay!,
                     ],

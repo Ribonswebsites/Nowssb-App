@@ -1,5 +1,5 @@
 name: nowssb
-description: NowssB — Shabdapathy. Natural Origin Word Science.
+description: NowssB — Shabdapathy. Natural Origin of Word Science.
 publish_to: 'none'
 version: 9.5.0+1
 
@@ -47,9 +47,7 @@ flutter:
 
   assets:
     # Every clip and its poster, on the phone after the download.
-    - assets/videos/
-    - assets/images/
-    - assets/healing/
+    - assets/video/
 
     # The app's own artwork and Store intro-page paintings.
     - assets/frames/

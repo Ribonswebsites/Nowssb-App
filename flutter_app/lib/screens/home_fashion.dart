@@ -50,7 +50,6 @@ import 'normal/neomorphic_action_bar.dart';
 import 'normal/horizontal_routine_cards.dart';
 import 'normal/use_this_video_section.dart';
 import 'personal_coach.dart';
-import 'healing_path.dart';
 import 'subscription.dart';
 
 /// `REG.fash.items` — app/js/part062.js:107-148, key for key and in order.
@@ -232,18 +231,13 @@ class _HomeFashionState extends State<HomeFashion> {
         ('shabda', FashShabdapathy(onTap: () => _go(2))),
         ('ebooks', EbooksSection(onTap: () => _go(2))),
         ('connectban', ConnectBannerSection(onTap: () => _go(0))),
-        (
-          'healing',
-          HealingSection(onTap: () => _push(const HealingPathScreen()))
-        ),
+        ('healing', HealingSection(onTap: () => _go(2))),
         (
           'genderpath',
           GenderPathSection(
-            onFemale: () => _push(
-                const HealingPathScreen(initialGender: HealingGender.female)),
-            onMale: () => _push(
-                const HealingPathScreen(initialGender: HealingGender.male)),
-            onTap: () => _push(const HealingPathScreen()),
+            onFemale: () => _go(2),
+            onMale: () => _go(2),
+            onTap: () => _go(2),
           ),
         ),
         ('promovid', FashPromoVideo(onTap: () => _go(2))),

@@ -39,8 +39,6 @@ import '../../widgets/nwsb_icon.dart';
 import '../../widgets/tv_frame.dart';
 import 'follow_steps.dart';
 
-const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
-
 /// One banner on the rail — RAIL, app/js/part083.js:106.
 ///
 /// `asset` is THE ADDRESS THE WEBSITE PLAYS, copied verbatim — a bundled
@@ -62,20 +60,36 @@ class _Rail {
 
 const _rail = [
   // The subscription block's own gold clip.
-  _Rail(NwsbMarks.crown, 'The Full Library', 'NowssB Subscription',
-      'assets/video/hero-subscription.mp4', 3),
+  _Rail(
+      NwsbMarks.crown,
+      'The Full Library',
+      'NowssB Subscription',
+      'assets/video/hero-subscription.mp4',
+      3),
   // The clip a word page opens with — NWSB_WORD_BANNER_VID.
-  _Rail(NwsbMarks.word, 'Where a word begins', 'NowssB Word Store',
-      'assets/video/hero-word-store.mp4', 3),
+  _Rail(
+      NwsbMarks.word,
+      'Where a word begins',
+      'NowssB Word Store',
+      'assets/video/hero-word-store.mp4',
+      3),
   // The clip every meaning's page opens with — MS_MEANING_VID.
-  _Rail(NwsbMarks.meaning, 'What a word truly means', 'NowssB Meaning Store',
-      'assets/video/hero-meaning-store.mp4', 3),
+  _Rail(
+      NwsbMarks.meaning,
+      'What a word truly means',
+      'NowssB Meaning Store',
+      'assets/video/hero-meaning-store.mp4',
+      3),
   _Rail(NwsbMarks.signature, 'The rarest word', 'The Signature',
       'assets/video/signature-banner.mp4', 3),
   // The eBooks banner clip — and NOT the little one spinning in the spill
   // disc, which is the mistake part083.js:130 records having made.
-  _Rail(NwsbMarks.book, 'Page by page', 'NowssB eBooks',
-      'assets/video/hero-ebooks.mp4', 2),
+  _Rail(
+      NwsbMarks.book,
+      'Page by page',
+      'NowssB eBooks',
+      'assets/video/hero-ebooks.mp4',
+      2),
   _Rail(NwsbMarks.sound, 'Every word you own', 'Sound Library',
       'assets/video/sound-library-banner.mp4', 2),
 ];
@@ -132,7 +146,6 @@ class _FashionHeroState extends State<FashionHero> {
   @override
   void initState() {
     super.initState();
-    if (_flutterTest) return;
     _t = Timer.periodic(_dwell, (_) {
       // `visible()` — :573. The rail stops when the home is not the screen
       // you are on and when the app is in the background. TickerMode is
@@ -739,7 +752,6 @@ class _ScreenState extends State<_Screen> {
   @override
   void initState() {
     super.initState();
-    if (_flutterTest) return;
     _wt = Timer.periodic(const Duration(seconds: 4), (_) {
       if (!mounted || !TickerMode.valuesOf(context).enabled) return;
       setState(() => _w = (_w + 1) % _words.length);
