@@ -151,6 +151,7 @@ class _FashionRoutineBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
+        width: 344,
         height: 96,
         margin: const EdgeInsets.fromLTRB(0, 0, 20, 12),
         padding: const EdgeInsets.fromLTRB(22, 18, 18, 18),
@@ -163,13 +164,17 @@ class _FashionRoutineBanner extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('My Routine\nCustomize your practice',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    height: 1.08,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -.3)),
+            const Expanded(
+              child: Text('My Routine\nCustomize your practice',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      height: 1.08,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -.3)),
+            ),
             Container(
               width: 44,
               height: 44,

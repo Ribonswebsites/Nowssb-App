@@ -6,8 +6,12 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
+import '../../widgets/home_parts.dart';
 import '../../widgets/home_skin.dart';
+import '../../widgets/tv_frame.dart';
 import 'glassmorphism_theme.dart';
+
+const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
 
 /// The video-backed three-ring component from the supplied WebView reference.
 /// It intentionally has no heading: the clip and rings are the entire section.
@@ -97,7 +101,13 @@ class _RingRowState extends State<_RingRow>
   late final AnimationController _motion = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 3600),
-  )..repeat();
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    if (!_flutterTest) _motion.repeat();
+  }
 
   @override
   void dispose() {

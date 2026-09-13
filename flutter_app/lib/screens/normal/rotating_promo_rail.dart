@@ -11,6 +11,8 @@ import 'package:flutter/material.dart';
 
 import '../../theme/tokens.dart';
 
+const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
+
 Color _bannerColor(double progress) {
   const seeds = [
     Color(0xFFFF9A3D), // orange
@@ -48,7 +50,13 @@ class _NormalPromoRailState extends State<NormalPromoRail>
   late final AnimationController _motion = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 4200),
-  )..repeat();
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    if (!_flutterTest) _motion.repeat();
+  }
 
   @override
   void dispose() {

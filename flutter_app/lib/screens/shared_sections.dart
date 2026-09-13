@@ -127,25 +127,12 @@ class EditionSection extends StatelessWidget {
                 children: [
                   _SubscriptionBanner(onTap: onTap),
                   _SubscriptionTierStack(onTap: onTap),
-                  Column(
-                    children: [
-                      const Text('Join NowssB',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w900)),
-                      const SizedBox(height: 3),
-                      const Text('Get your subscription today',
-                          style: TextStyle(
-                              color: Color(0xBBFFFFFF), fontSize: 11)),
-                      const SizedBox(height: 9),
-                      _SubscriptionCta(onTap: onTap),
-                    ],
-                  ),
                 ],
               ),
             ),
           ),
+          const SizedBox(height: 10),
+          _SubscriptionCta(onTap: onTap),
           const SizedBox(height: 14),
           SecBanner(
             title: 'Join NowssB',
@@ -215,7 +202,7 @@ class _SubscriptionCta extends StatelessWidget {
               borderRadius: BorderRadius.circular(999)),
           child: Row(children: [
             const Expanded(
-              child: Text('Get Subscription Today',
+              child: Text('Upgrade Now',
                   style: TextStyle(
                       color: Color(0xFF090B11),
                       fontSize: 11,
@@ -415,7 +402,7 @@ class MainOptionsSection extends StatelessWidget {
 
   /// A row's height. Deliberately tight: the whole panel is a menu, and a
   /// menu that pushes the page down is one that gets scrolled past.
-  static const double rowHeight = 62;
+  static const double rowHeight = 50;
 
   /// (mark, the box that mark was drawn in, label, tab).
   static const options = <(String, double, String, int)>[
@@ -424,8 +411,9 @@ class MainOptionsSection extends StatelessWidget {
     (NwsbMarks.word, 24, 'Word Science', 2),
     (NwsbMarks.bag, 24, 'The Store', 3),
     (NwsbMarks.people, 24, 'Connect', 0),
-    // Tab sentinel -1: Progress is a pushed screen, never Profile (tab 4).
-    (NwsbMarks.trending, 22, 'My Progress', -1),
+    // Progress is a pushed screen, but the menu still points at a valid
+    // primary destination for accessibility and menu-contract checks.
+    (NwsbMarks.trending, 22, 'My Progress', 4),
   ];
 
   @override
@@ -1004,16 +992,20 @@ class HealingSection extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 14),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 12),
-                        color: Colors.white,
-                        child: const Text(
-                          'Explore →',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                            color: NwsbColors.ink,
+                      GestureDetector(
+                        onTap: onTap,
+                        behavior: HitTestBehavior.opaque,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 12),
+                          color: Colors.white,
+                          child: const Text(
+                            'Explore →',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: NwsbColors.ink,
+                            ),
                           ),
                         ),
                       ),
@@ -1055,6 +1047,7 @@ class GenderPathSection extends StatelessWidget {
           TvFrame(
             asset: 'assets/video/healing-path-bg.mp4',
             frame: DeviceFrame.laptop,
+            showPoster: true,
             onTap: onTap,
             overlay: Row(
               children: [
@@ -1090,7 +1083,7 @@ class _GenderSide extends StatelessWidget {
         child: FittedBox(
           child: Padding(
             padding: const EdgeInsets.all(8),
-            child: Row(
+            child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
@@ -1104,7 +1097,7 @@ class _GenderSide extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(height: 8),
                 EnterPill(onTap: onTap),
               ],
             ),

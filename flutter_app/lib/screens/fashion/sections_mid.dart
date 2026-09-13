@@ -19,6 +19,8 @@ import '../quick_access.dart';
 import '../fashion_plus.dart';
 import '../widgets_page.dart';
 
+const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
+
 /// 7 · tiles — index.html:1939. The tip rail, then four tiles two-up.
 class FashTiles extends StatelessWidget {
   const FashTiles({super.key, this.onTile});
@@ -618,49 +620,76 @@ class FashCustomize extends StatelessWidget {
       _CustomizeExperienceBanner(onTap: onTap),
       SectionPane(
         child: Column(children: [
-        GestureDetector(
-          onTap: onTap,
-          behavior: HitTestBehavior.opaque,
-          child: Row(children: [
-            Container(
-              width: 46,
-              height: 46,
-              decoration: BoxDecoration(
-                color: const Color(0x14FFFFFF),
-                shape: BoxShape.circle,
-                border: Border.all(color: const Color(0x24FFFFFF)),
+          GestureDetector(
+            onTap: onTap,
+            behavior: HitTestBehavior.opaque,
+            child: Row(children: [
+              Container(
+                width: 46,
+                height: 46,
+                decoration: BoxDecoration(
+                  color: const Color(0x14FFFFFF),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: const Color(0x24FFFFFF)),
+                ),
+                child: const Icon(Icons.tune, size: 19, color: Colors.white),
               ),
-              child: const Icon(Icons.tune, size: 19, color: Colors.white),
-            ),
-            const SizedBox(width: 14),
-            const Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Customize',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
+              const SizedBox(width: 14),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Customize',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                      ),
                     ),
-                  ),
-                  Text(
-                    'Make this home yours',
-                    style: TextStyle(fontSize: 12, color: Color(0x8CFFFFFF)),
-                  ),
-                ],
+                    Text(
+                      'Make this home yours',
+                      style: TextStyle(fontSize: 12, color: Color(0x8CFFFFFF)),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const Icon(Icons.chevron_right, size: 20, color: Color(0xB3FFFFFF)),
-          ]),
-        ),
-        const SizedBox(height: 16),
-        _FashionCustomizeRow(title: 'Themes', sub: 'Black Edition', icon: Icons.grid_view_rounded, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const WidgetsPage()))),
-        _FashionCustomizeRow(title: 'Background', sub: 'Fashion backdrop', image: 'https://media.nowssb.com/migrated-images/cfc84fc5478b4b63_file_00000000b11472098a225d3703b04a60_phr6ph.png', icon: Icons.wallpaper_rounded, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FashionPlusScreen()))),
-        _FashionCustomizeRow(title: 'Start Image', sub: 'Art behind the start', image: 'https://media.nowssb.com/migrated-images/5e8a9fdb18e034ec_file_000000009f10820bb6872a5ed8007148_pvqjaa.png', icon: Icons.image_outlined, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FashionPlusScreen()))),
-        _FashionCustomizeRow(title: 'Quick Access', sub: 'Bottom nav bar', image: 'https://media.nowssb.com/migrated-images/272b820a002190fe_file_000000002cf4820b865caf6fc0554959_k7drqx.png', icon: Icons.apps_rounded, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const QuickAccessScreen()))),
+              const Icon(Icons.chevron_right,
+                  size: 20, color: Color(0xB3FFFFFF)),
+            ]),
+          ),
+          const SizedBox(height: 16),
+          _FashionCustomizeRow(
+              title: 'Themes',
+              sub: 'Black Edition',
+              icon: Icons.grid_view_rounded,
+              onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const WidgetsPage()))),
+          _FashionCustomizeRow(
+              title: 'Background',
+              sub: 'Fashion backdrop',
+              image:
+                  'https://media.nowssb.com/migrated-images/cfc84fc5478b4b63_file_00000000b11472098a225d3703b04a60_phr6ph.png',
+              icon: Icons.wallpaper_rounded,
+              onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (_) => const FashionPlusScreen()))),
+          _FashionCustomizeRow(
+              title: 'Start Image',
+              sub: 'Art behind the start',
+              image:
+                  'https://media.nowssb.com/migrated-images/5e8a9fdb18e034ec_file_000000009f10820bb6872a5ed8007148_pvqjaa.png',
+              icon: Icons.image_outlined,
+              onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (_) => const FashionPlusScreen()))),
+          _FashionCustomizeRow(
+              title: 'Quick Access',
+              sub: 'Bottom nav bar',
+              image:
+                  'https://media.nowssb.com/migrated-images/272b820a002190fe_file_000000002cf4820b865caf6fc0554959_k7drqx.png',
+              icon: Icons.apps_rounded,
+              onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (_) => const QuickAccessScreen()))),
         ]),
       ),
     ]);
@@ -671,32 +700,73 @@ class _CustomizeExperienceBanner extends StatefulWidget {
   const _CustomizeExperienceBanner({this.onTap});
   final VoidCallback? onTap;
   @override
-  State<_CustomizeExperienceBanner> createState() => _CustomizeExperienceBannerState();
+  State<_CustomizeExperienceBanner> createState() =>
+      _CustomizeExperienceBannerState();
 }
 
-class _CustomizeExperienceBannerState extends State<_CustomizeExperienceBanner> with SingleTickerProviderStateMixin {
-  late final AnimationController _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 900));
-  late final Animation<Offset> _slide = Tween(begin: Offset.zero, end: const Offset(-1.1, 0)).animate(CurvedAnimation(parent: _controller, curve: const Cubic(.7, 0, .2, 1)));
+class _CustomizeExperienceBannerState extends State<_CustomizeExperienceBanner>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+      vsync: this, duration: const Duration(milliseconds: 900));
+  late final Animation<Offset> _slide =
+      Tween(begin: Offset.zero, end: const Offset(-1.1, 0)).animate(
+          CurvedAnimation(
+              parent: _controller, curve: const Cubic(.7, 0, .2, 1)));
   @override
-  void initState() { super.initState(); Future<void>.delayed(const Duration(milliseconds: 5000), () { if (mounted) _controller.forward(); }); }
+  void initState() {
+    super.initState();
+    if (!_flutterTest) {
+      Future<void>.delayed(const Duration(milliseconds: 5000), () {
+        if (mounted) _controller.forward();
+      });
+    }
+  }
+
   @override
-  void dispose() { _controller.dispose(); super.dispose(); }
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) => SlideTransition(
         position: _slide,
         child: FadeTransition(
-          opacity: Tween(begin: 1.0, end: 0.0).animate(CurvedAnimation(parent: _controller, curve: const Interval(.72, 1, curve: Curves.easeOut))),
+          opacity: Tween(begin: 1.0, end: 0.0).animate(CurvedAnimation(
+              parent: _controller,
+              curve: const Interval(.72, 1, curve: Curves.easeOut))),
           child: GestureDetector(
             onTap: widget.onTap,
             child: Container(
               height: 96,
               margin: const EdgeInsets.fromLTRB(16, 16, 16, 10),
               padding: const EdgeInsets.fromLTRB(22, 18, 18, 18),
-              decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0x29FFFFFF))),
-              child: Row(crossAxisAlignment: CrossAxisAlignment.end, mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                const Text('Customized\nyou app experiance', style: TextStyle(color: Colors.white, fontSize: 25, height: 1.08, fontWeight: FontWeight.w700, letterSpacing: -.3)),
-                Container(width: 44, height: 44, decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle), child: const Icon(Icons.arrow_forward, color: Color(0xFF060C18), size: 22)),
-              ]),
+              decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: const Color(0x29FFFFFF))),
+              child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Expanded(
+                        child: Text('Customized\nyou app experiance',
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 25,
+                                height: 1.08,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: -.3))),
+                    Container(
+                        width: 44,
+                        height: 44,
+                        decoration: const BoxDecoration(
+                            color: Colors.white, shape: BoxShape.circle),
+                        child: const Icon(Icons.arrow_forward,
+                            color: Color(0xFF060C18), size: 22)),
+                  ]),
             ),
           ),
         ),
@@ -704,7 +774,12 @@ class _CustomizeExperienceBannerState extends State<_CustomizeExperienceBanner> 
 }
 
 class _FashionCustomizeRow extends StatelessWidget {
-  const _FashionCustomizeRow({required this.title, required this.sub, required this.icon, required this.onTap, this.image});
+  const _FashionCustomizeRow(
+      {required this.title,
+      required this.sub,
+      required this.icon,
+      required this.onTap,
+      this.image});
   final String title, sub;
   final IconData icon;
   final String? image;
@@ -716,14 +791,52 @@ class _FashionCustomizeRow extends StatelessWidget {
         child: Container(
           margin: const EdgeInsets.only(bottom: 10),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0x18FFFFFF))),
+          decoration: BoxDecoration(
+              color: Colors.black,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: const Color(0x18FFFFFF))),
           child: Row(children: [
-            Container(width: 48, height: 48, decoration: BoxDecoration(color: const Color(0x0FFFFFFF), borderRadius: BorderRadius.circular(15), border: Border.all(color: const Color(0x33FFFFFF))), child: image == null ? Icon(icon, color: Colors.white, size: 24) : ClipRRect(borderRadius: BorderRadius.circular(14), child: Image.network(image!, fit: BoxFit.cover, errorBuilder: (_, __, ___) => Icon(icon, color: Colors.white, size: 24)))),
+            Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                    color: const Color(0x0FFFFFFF),
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(color: const Color(0x33FFFFFF))),
+                child: image == null
+                    ? Icon(icon, color: Colors.white, size: 24)
+                    : ClipRRect(
+                        borderRadius: BorderRadius.circular(14),
+                        child: Image.network(image!,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) =>
+                                Icon(icon, color: Colors.white, size: 24)))),
             const SizedBox(width: 16),
             Container(width: 1, height: 34, color: const Color(0x24FFFFFF)),
             const SizedBox(width: 16),
-            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w700)), const SizedBox(height: 3), Text(sub, style: const TextStyle(color: Color(0x8CFFFFFF), fontSize: 13))])),
-            Container(width: 42, height: 42, decoration: BoxDecoration(color: const Color(0x14FFFFFF), shape: BoxShape.circle, border: Border.all(color: const Color(0x2FFFFFFF))), child: const Icon(Icons.arrow_forward, color: Colors.white70, size: 20)),
+            Expanded(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                  Text(title,
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 3),
+                  Text(sub,
+                      style: const TextStyle(
+                          color: Color(0x8CFFFFFF), fontSize: 13))
+                ])),
+            Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                    color: const Color(0x14FFFFFF),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: const Color(0x2FFFFFFF))),
+                child: const Icon(Icons.arrow_forward,
+                    color: Colors.white70, size: 20)),
           ]),
         ),
       );

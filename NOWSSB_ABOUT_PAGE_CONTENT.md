@@ -4,7 +4,7 @@
 **Brand:** NowssB by Nowsbansiu / Shabdapathy  
 **Suggested page URL:** `https://nowssb.com/about.html`  
 **Suggested SEO title:** `About NowssB — The New Fashion Trend of Meditation`  
-**Suggested meta description:** `Discover NowssB: a daily meditation and wellness experience combining Natural Origin of Word Science, sound practice, mindful routines, personal progress, and community.`
+**Suggested meta description:** `Discover NowssB: a daily meditation and wellness experience combining Natural Origin Word Science, sound practice, mindful routines, personal progress, and community.`
 
 ## 1. Recommended page purpose
 
@@ -18,13 +18,13 @@ The page should read as a clear product and brand explanation. It should not rea
 
 **NowssB is a new fashion trend of meditation.** It is a digital experience for people who want to make mindful practice part of everyday life through sound, words, routines, reflection, and personal progress.
 
-NowssB brings together **Natural Origin of Word Science**, sound practice, meditation routines, a personal healing journey, a growing Store, and the NowssB Connect community. Instead of treating meditation as a single isolated session, NowssB presents it as a daily path that can move with the user from a first word or sound to a complete personal routine.
+NowssB brings together **Natural Origin Word Science**, sound practice, meditation routines, a personal healing journey, a growing Store, and the NowssB Connect community. Instead of treating meditation as a single isolated session, NowssB presents it as a daily path that can move with the user from a first word or sound to a complete personal routine.
 
 The experience is designed around a simple idea: **practice can be personal, repeatable, visual, and meaningful**. Users can explore word origins and meanings, listen and practice with sound, follow daily routines, review progress, personalize the app, save content, browse the Store, and connect with other practitioners.
 
 ### Our point of view
 
-NowssB is built around the belief that sound, language, attention, and routine can be explored together. The product uses the language of **Shabdapathy** and **Natural Origin of Word Science** to create an experience that connects word exploration with mindful practice.
+NowssB is built around the belief that sound, language, attention, and routine can be explored together. The product uses the language of **Shabdapathy** and **Natural Origin Word Science** to create an experience that connects word exploration with mindful practice.
 
 NowssB presents this as an exploratory wellness experience. Content in the app should be understood as educational, reflective, and practice-oriented. It is not a substitute for medical diagnosis, treatment, or professional healthcare advice.
 
@@ -35,7 +35,7 @@ NowssB presents this as an exploratory wellness experience. Content in the app s
 | **NowssB** | The consumer-facing app and website experience: meditation, sound practice, word science, routines, progress, Store, and Connect. |
 | **Nowsbansiu** | The identity and creative system associated with the NowssB experience and its personalized journey. |
 | **Shabdapathy** | The product language used for the word-science and sound-oriented approach, including Shabdapathy Foundations and AI-assisted insight wording. |
-| **Natural Origin of Word Science** | The central phrase used by the brand to describe its exploration of word origins, sound, meaning, and language. |
+| **Natural Origin Word Science** | The central phrase used by the brand to describe its exploration of word origins, sound, meaning, and language. |
 | **The New Fashion Trend of Meditation** | The public-facing brand position: meditation presented as a modern, personal, visual, and everyday lifestyle experience. |
 
 ## 4. The NowssB experience at a glance
@@ -47,7 +47,7 @@ NowssB is organized as a connected set of spaces rather than a single tool. Each
 | **Home** | The starting point for the daily experience. | Begin the day’s practice, see featured content, access the main areas, and continue the personal journey from one screen. |
 | **Daily Practice** | A guided entry into a regular practice habit. | Return to a daily word ritual and practice in a way that fits the user’s day. |
 | **Sound Library** | A personal collection of saved sentences, subscription words, and purchased frequencies. | Keep the sounds, sentences, and practice material that matter to the user in one place. |
-| **Word Science** | Exploration of word origins, meanings, language, and sound. | Search and explore words, meanings, root sequences, and the brand’s Natural Origin of Word Science experience. |
+| **Word Science** | Exploration of word origins, meanings, language, and sound. | Search and explore words, meanings, root sequences, and the brand’s Natural Origin Word Science experience. |
 | **My Progress** | A visual record of the user’s practice journey. | See sessions, meditation time, streaks, consistency, weekly activity, recent sessions, Body & Mind areas, insights, and feedback. |
 | **My Routines** | A daily schedule system with five customizable routine slots. | Build a practice rhythm across Morning, Midday, Afternoon, Evening, and Night. |
 | **NowssB Store** | A marketplace for words, meanings, origins, frequencies, subscriptions, and related content. | Explore the library, subscription access, offers, collections, and content made available through the Store. |
@@ -84,9 +84,9 @@ The Store extends the content experience through word collections, meanings, ori
 
 ## 6. Detailed feature descriptions
 
-### Natural Origin of Word Science
+### Natural Origin Word Science
 
-Natural Origin of Word Science is the central explanatory language of NowssB. The experience focuses on the relationship among word origins, sound, meaning, language, and personal exploration. The About page should describe this as the organizing philosophy of the product, not as a promise that every word or sound produces a guaranteed health outcome.
+Natural Origin Word Science is the central explanatory language of NowssB. The experience focuses on the relationship among word origins, sound, meaning, language, and personal exploration. The About page should describe this as the organizing philosophy of the product, not as a promise that every word or sound produces a guaranteed health outcome.
 
 ### Sound practice
 
@@ -144,7 +144,7 @@ The final About page can follow this order:
 
 1. **Hero:** “NowssB — The New Fashion Trend of Meditation.”
 2. **Short introduction:** one paragraph explaining the combined experience of word science, sound, routines, progress, Store, and Connect.
-3. **Our point of view:** explain Natural Origin of Word Science and Shabdapathy in accessible language.
+3. **Our point of view:** explain Natural Origin Word Science and Shabdapathy in accessible language.
 4. **The journey:** show the flow from Home to Practice, Word Science, Sound Library, Progress, Store, and Connect.
 5. **Explore the experience:** present the major product areas in cards or sections.
 6. **Personal practice:** explain routines, progress, Body & Mind, feedback, and personalization.
@@ -157,7 +157,7 @@ The final About page can follow this order:
 
 ### One-sentence version
 
-**NowssB is a modern meditation and wellness experience combining Natural Origin of Word Science, sound practice, daily routines, personal progress, Store discovery, and community through NowssB Connect.**
+**NowssB is a modern meditation and wellness experience combining Natural Origin Word Science, sound practice, daily routines, personal progress, Store discovery, and community through NowssB Connect.**
 
 ### Short card version
 
@@ -189,9 +189,9 @@ NowssB is the future of meditation: a daily experience for exploring words, soun
 
 ### What is NowssB?
 
-NowssB is a digital meditation and wellness experience that combines Natural Origin of Word Science, sound practice, daily routines, personal progress, Store content, and the NowssB Connect community.
+NowssB is a digital meditation and wellness experience that combines Natural Origin Word Science, sound practice, daily routines, personal progress, Store content, and the NowssB Connect community.
 
-### What is Natural Origin of Word Science?
+### What is Natural Origin Word Science?
 
 It is the central NowssB approach to exploring word origins, sound, meaning, language, and personal practice. It gives the product a common language across Word Science, Sound Library, Store, and daily practice.
 

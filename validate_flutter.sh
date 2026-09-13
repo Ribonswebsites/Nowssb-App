@@ -34,5 +34,5 @@ run_step "Configure iOS" node tools/flutter-ios.mjs || exit 1
 cd "$APP"
 run_step "Resolve Flutter dependencies" flutter pub get || exit 1
 run_step "Analyze Flutter sources" flutter analyze --no-fatal-infos || exit 1
-run_step "Run Flutter tests" flutter test || exit 1
+run_step "Run Flutter tests" flutter test --dart-define=FLUTTER_TEST=true || exit 1
 printf '%s\n' 'ALL VALIDATION CHECKS PASSED'

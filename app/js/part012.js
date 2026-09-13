@@ -1576,7 +1576,7 @@ function openDlPopup() {
       if (installSub) installSub.textContent = 'Direct Android app download';
       if (androidNote) androidNote.style.display = 'none';
     } else {
-      if (installSub) installSub.textContent = 'Natural Origin of Word Science · Shabdapathy';
+      if (installSub) installSub.textContent = 'Natural Origin Word Science · Shabdapathy';
       if (androidNote) androidNote.style.display = 'none';
       // Keep the label as "Download App" regardless of native-prompt availability.
       if (!_getInstallPrompt() && installButton) {
