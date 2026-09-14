@@ -25,6 +25,7 @@ import '../../theme/tokens.dart';
 import '../../widgets/home_parts.dart';
 import '../../widgets/neu_wrap.dart';
 import '../../widgets/neumorphic.dart';
+import '../start_today_carousel.dart';
 
 /// The time-of-day greeting the home renders — app/js/part012.js.
 String nmGreetHello([DateTime? at]) {
@@ -548,6 +549,91 @@ class NmPractice extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // One section only: spill + 3-card carousel (art → Player → healing).
+    // Card 2 is the existing Normal player NeuCard, visually unchanged.
+    final playerCard = NeuCard(
+      onTap: onTap,
+      padding: const EdgeInsets.all(22),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "Today's Practice",
+            style: TextStyle(
+              fontSize: 11,
+              letterSpacing: 2,
+              fontWeight: FontWeight.w700,
+              color: NwsbColors.gold,
+            ),
+          ),
+          const SizedBox(height: 14),
+          Container(
+            width: 62,
+            height: 62,
+            decoration: BoxDecoration(
+              color: NwsbColors.surface,
+              borderRadius: BorderRadius.circular(NwsbRadius.pill),
+              boxShadow: NwsbShadows.raisedXs,
+            ),
+            child: const Icon(Icons.graphic_eq,
+                size: 28, color: NwsbColors.gold),
+          ),
+          const SizedBox(height: 16),
+          // No large practice-name headline (ANANDA / AAROGYA). Ritual
+          // line is the supporting copy under the media / icon area.
+          const Text(
+            'Your personalized word ritual for right now.',
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 15,
+              color: NwsbColors.inkSoft,
+              height: 1.45,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 18),
+          Align(
+            alignment: Alignment.centerRight,
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(14, 8, 8, 8),
+              decoration: BoxDecoration(
+                color: const Color(0xF2FFFFFF),
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: const Color(0x33FFFFFF)),
+                boxShadow: NwsbShadows.raisedXs,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Enter',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: NwsbColors.gold,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Container(
+                    width: 38,
+                    height: 38,
+                    decoration: const BoxDecoration(
+                      color: NwsbColors.surface,
+                      shape: BoxShape.circle,
+                      boxShadow: NwsbShadows.raisedXs,
+                    ),
+                    child: const NwsbIcon(NwsbMarks.arrow,
+                        size: 16, color: NwsbColors.ink),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       child: Column(
@@ -558,87 +644,10 @@ class NmPractice extends StatelessWidget {
             mark: NwsbMarks.play,
             onTap: onTap,
           ),
-          NeuCard(
+          PracticeCarousel(
             onTap: onTap,
-            padding: const EdgeInsets.all(22),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Today's Practice",
-                  style: TextStyle(
-                    fontSize: 11,
-                    letterSpacing: 2,
-                    fontWeight: FontWeight.w700,
-                    color: NwsbColors.gold,
-                  ),
-                ),
-                const SizedBox(height: 14),
-                Container(
-                  width: 62,
-                  height: 62,
-                  decoration: BoxDecoration(
-                    color: NwsbColors.surface,
-                    borderRadius: BorderRadius.circular(NwsbRadius.pill),
-                    boxShadow: NwsbShadows.raisedXs,
-                  ),
-                  child: const Icon(Icons.graphic_eq,
-                      size: 28, color: NwsbColors.gold),
-                ),
-                const SizedBox(height: 16),
-                // No large practice-name headline (ANANDA / AAROGYA). Ritual
-                // line is the supporting copy under the media / icon area.
-                const Text(
-                  'Your personalized word ritual for right now.',
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: NwsbColors.inkSoft,
-                    height: 1.45,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 18),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Container(
-                    padding: const EdgeInsets.fromLTRB(14, 8, 8, 8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xF2FFFFFF),
-                      borderRadius: BorderRadius.circular(999),
-                      border: Border.all(color: const Color(0x33FFFFFF)),
-                      boxShadow: NwsbShadows.raisedXs,
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Text(
-                          'Enter',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                            color: NwsbColors.gold,
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Container(
-                          width: 38,
-                          height: 38,
-                          decoration: const BoxDecoration(
-                            color: NwsbColors.surface,
-                            shape: BoxShape.circle,
-                            boxShadow: NwsbShadows.raisedXs,
-                          ),
-                          child: const NwsbIcon(NwsbMarks.arrow,
-                              size: 16, color: NwsbColors.ink),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            height: 268,
+            playerCard: playerCard,
           ),
         ],
       ),

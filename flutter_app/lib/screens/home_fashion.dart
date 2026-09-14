@@ -49,7 +49,6 @@ import 'progress/progress_screen.dart';
 import 'normal/neomorphic_action_bar.dart';
 import 'normal/horizontal_routine_cards.dart';
 import 'personal_coach.dart';
-import 'start_today_carousel.dart';
 import 'healing_path.dart';
 import 'subscription.dart';
 
@@ -63,7 +62,6 @@ const kFashionSectionOrder = <String>[
   'greet',
   'herorow',
   'practice',
-  'coachCards',
   'routineCards',
   // Not on the website's registry. Six doors on one panel so the app can
   // be used without knowing where anything is — see MainOptionsSection.
@@ -179,13 +177,6 @@ class _HomeFashionState extends State<HomeFashion> {
           ),
         ),
         ('practice', FashPractice(onTap: () => _go(1))),
-        (
-          'coachCards',
-          StartTodayCarousel(
-            fashion: true,
-            onTap: () => _go(1),
-          ),
-        ),
         ('routineCards', const NmHorizontalRoutineCards(fashion: true)),
         ('mainops', MainOptionsSection(onGo: _go, onAction: _openMainOption)),
         (

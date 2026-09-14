@@ -17,6 +17,7 @@ import '../../media/video_pool.dart';
 import '../../widgets/home_skin.dart';
 import '../../widgets/tv_frame.dart';
 import '../../widgets/home_parts.dart';
+import '../start_today_carousel.dart';
 
 /// 1 · greet — index.html:1758. Not wrapped; it sits loose under the hero.
 class FashGreeting extends StatelessWidget {
@@ -281,6 +282,7 @@ class FashPractice extends StatelessWidget {
   Widget build(BuildContext context) {
     // Word of the day still drives the destination; it is no longer painted
     // as a giant title over the film (ANANDA / AAROGYA etc.).
+    // One section only: spill + 3-card carousel (art → Player → healing).
     return SectionPane(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -291,85 +293,82 @@ class FashPractice extends StatelessWidget {
             markViewBox: 22,
             onTap: onTap,
           ),
-          ListenableBuilder(
-            listenable: Settings.instance,
-            builder: (context, _) {
-              final motion = Settings.instance.fashionPlus;
-              final media = motion
-                  ? const NwsbVideo(
-                      asset: practiceVid,
-                      priority: ClipPriority.feature,
-                      fit: BoxFit.cover,
-                    )
-                  : const NwsbImage(url: practiceStill);
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  GestureDetector(
-                    onTap: onTap,
-                    behavior: HitTestBehavior.opaque,
-                    child: AspectRatio(
-                      aspectRatio: 16 / 9,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(18),
-                        clipBehavior: Clip.antiAlias,
-                        child: Stack(
-                          fit: StackFit.expand,
-                          children: [
-                            Positioned.fill(child: media),
-                            // Light left-edge scrim only — keep the film readable.
-                            const DecoratedBox(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                  colors: [
-                                    Color(0x99060C18),
-                                    Color(0x33060C18),
-                                    Color(0x14060C18),
-                                  ],
-                                  stops: [0, 0.45, 1],
-                                ),
-                              ),
+          PracticeCarousel(
+            fashion: true,
+            onTap: onTap,
+            playerCard: ListenableBuilder(
+              listenable: Settings.instance,
+              builder: (context, _) {
+                final motion = Settings.instance.fashionPlus;
+                final media = motion
+                    ? const NwsbVideo(
+                        asset: practiceVid,
+                        priority: ClipPriority.feature,
+                        fit: BoxFit.cover,
+                      )
+                    : const NwsbImage(url: practiceStill);
+                // Card 2 — NowssB Player exactly as before (no redesign).
+                return GestureDetector(
+                  onTap: onTap,
+                  behavior: HitTestBehavior.opaque,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(18),
+                    clipBehavior: Clip.antiAlias,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Positioned.fill(child: media),
+                        // Light left-edge scrim only — keep the film readable.
+                        const DecoratedBox(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                              colors: [
+                                Color(0x99060C18),
+                                Color(0x33060C18),
+                                Color(0x14060C18),
+                              ],
+                              stops: [0, 0.45, 1],
                             ),
-                            const Positioned(
-                              left: 16,
-                              top: 14,
-                              child: Text(
-                                "TODAY'S PRACTICE",
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  letterSpacing: 2,
-                                  fontWeight: FontWeight.w700,
-                                  color: Color(0xFFE8D5A3),
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              right: 14,
-                              top: 0,
-                              bottom: 0,
-                              child: Center(
-                                child: GlassEnterPill(onTap: onTap),
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
+                        const Positioned(
+                          left: 16,
+                          top: 14,
+                          child: Text(
+                            "TODAY'S PRACTICE",
+                            style: TextStyle(
+                              fontSize: 11,
+                              letterSpacing: 2,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFFE8D5A3),
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          right: 14,
+                          top: 0,
+                          bottom: 0,
+                          child: Center(
+                            child: GlassEnterPill(onTap: onTap),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  Text(
-                    ritualLine,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: Color(0xB3FFFFFF),
-                      height: 1.45,
-                    ),
-                  ),
-                ],
-              );
-            },
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            ritualLine,
+            style: const TextStyle(
+              fontSize: 13,
+              color: Color(0xB3FFFFFF),
+              height: 1.45,
+            ),
           ),
         ],
       ),
