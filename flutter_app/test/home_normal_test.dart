@@ -55,9 +55,12 @@ void main() {
   }
 
   test('the registry is complete', () {
-    expect(kNormalSectionOrder, hasLength(37));
-    expect(kNormalSectionOrder.toSet(), hasLength(37),
+    expect(kNormalSectionOrder, hasLength(32));
+    expect(kNormalSectionOrder.toSet(), hasLength(32),
         reason: 'two sections share a key');
+    expect(kNormalSectionOrder.indexOf('herovid'),
+        kNormalSectionOrder.indexOf('streak') - 1,
+        reason: 'Streak+Store video carousel must sit directly above streak text');
     expect(kNormalSectionOrder.indexOf('promoRail'),
         kNormalSectionOrder.indexOf('search') + 1,
         reason: 'the promo rail must sit directly below search');
@@ -79,19 +82,13 @@ void main() {
           reason: '$k is listed as absent but is not in the order');
     }
 
-    // Three rows with no markup, one hidden by default — so a fresh install
-    // shows thirty-two registered sections.
-    //
-    // It was twenty-three. `storeban` has left the no-markup set: this home
-    // registers it (app/js/part062.js:82) and never had an element for it,
-    // so the store banner is a real section here rather than a bare clip
-    // dropped above the store card. Personalized Healing is intentionally
-    // visible because it is the native entry to the Healing Path selector.
+    // Three rows with no markup, one hidden by default (routines) — so a
+    // fresh install shows twenty-eight registered sections.
     final shown = kNormalSectionOrder
         .where((k) => !kNormalNoMarkup.contains(k))
         .where((k) => !kNormalDefOff.contains(k))
         .length;
-    expect(shown, 33);
+    expect(shown, 28);
   });
 
   testWidgets('the Normal home builds at phone size without overflowing',

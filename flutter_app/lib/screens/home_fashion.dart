@@ -188,7 +188,13 @@ class _HomeFashionState extends State<HomeFashion> {
           ),
         ),
         ('reader', FashReader(onTap: () => _go(2))),
-        ('herovid', FashStreakVideo(onTap: () => _go(1))),
+        (
+          'herovid',
+          FashStreakVideo(
+            onTap: () => _go(1),
+            onStoreTap: () => _go(3),
+          ),
+        ),
         ('streak', FashStreak(onTap: () => _go(1))),
         ('tiles', FashTiles(onTile: _go)),
         ('store', FashStore(onTap: () => _go(3))),

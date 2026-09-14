@@ -18,6 +18,7 @@ import '../../widgets/home_skin.dart';
 import '../../widgets/tv_frame.dart';
 import '../../widgets/home_parts.dart';
 import '../start_today_carousel.dart';
+import '../streak_store_carousel.dart';
 
 /// 1 · greet — index.html:1758. Not wrapped; it sits loose under the hero.
 class FashGreeting extends StatelessWidget {
@@ -446,22 +447,19 @@ class FashReader extends StatelessWidget {
   }
 }
 
-/// 5 · herovid — index.html:1903. `.nsvb-blk` — the streak clip, on the
-/// landscape tablet.
+/// 5 · herovid — Streak + Store video carousel (2 equal cards, snap + dots).
+/// Edge-to-edge film + banner (no tablet TvFrame). Text streak stays in
+/// [FashStreak].
 class FashStreakVideo extends StatelessWidget {
-  const FashStreakVideo({super.key, this.onTap});
+  const FashStreakVideo({super.key, this.onTap, this.onStoreTap});
   final VoidCallback? onTap;
+  final VoidCallback? onStoreTap;
 
   @override
   Widget build(BuildContext context) {
-    return SectionPane(
-      child: TvFrame(
-        asset:
-            'assets/videos/415dd447da33973b_grok_video_2026-07-30-14-35-05_q3tyzk.mp4',
-        frame: DeviceFrame.tabletLandscape,
-        priority: ClipPriority.feature,
-        onTap: onTap,
-      ),
+    return StreakStoreCarousel(
+      onStreakTap: onTap,
+      onStoreTap: onStoreTap ?? onTap,
     );
   }
 }

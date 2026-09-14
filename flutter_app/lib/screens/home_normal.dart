@@ -78,6 +78,8 @@ const kNormalSectionOrder = <String>[
   'dashboard',
   'essentials',
   'routineCards',
+  // Streak+Store video carousel (shared 2-card), then the streak text block.
+  'herovid',
   'streak',
   'practice',
   // Not on the website's registry. Six doors on one panel so the app can
@@ -94,10 +96,6 @@ const kNormalSectionOrder = <String>[
   'condisc',
   'feed',
   'quickrow',
-  // MOVED. It used to open the page directly above the streak card,
-  // which put a heading, a film and a second heading in a row all saying
-  // Streak. It sits with the other video banners now.
-  'herovid',
   'trendshop',
   'subvid',
   'edition',
@@ -218,6 +216,13 @@ class _HomeNormalState extends State<HomeNormal> {
         ),
         ('essentials', const NmSuppliedEssentials()),
         ('routineCards', const NmHorizontalRoutineCards()),
+        (
+          'herovid',
+          NmStreakVideo(
+            onTap: () => _go(1),
+            onStoreTap: () => _go(3),
+          ),
+        ),
         ('streak', NmStreak(onTap: () => _go(1))),
         ('practice', NmPractice(onTap: () => _go(1))),
         ('mainops', MainOptionsSection(onGo: _go, onAction: _openMainOption)),
@@ -251,7 +256,6 @@ class _HomeNormalState extends State<HomeNormal> {
             onOrders: () => _go(4),
           )
         ),
-        ('herovid', NmStreakVideo(onTap: () => _go(1))),
         ('trendshop', NmTrendShop(onTap: () => _go(3))),
         ('subvid', const SizedBox.shrink()),
         (
