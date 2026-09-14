@@ -21,6 +21,8 @@ library;
 
 import 'dart:async';
 
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/material.dart';
 
 import '../media/nwsb_image.dart';
@@ -523,6 +525,76 @@ class EnterPill extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Glass-wrapped Enter for Today's Practice / NowssB Player heroes.
+/// Middle-right overlay: frosted pill around the label + arrow disc.
+class GlassEnterPill extends StatelessWidget {
+  const GlassEnterPill({super.key, this.label = 'Enter', this.onTap});
+
+  final String label;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(999),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(14, 8, 8, 8),
+            decoration: BoxDecoration(
+              color: const Color(0x38FFFFFF),
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: const Color(0x59FFFFFF)),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x66000000),
+                  blurRadius: 18,
+                  offset: Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.2,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Container(
+                  width: 30,
+                  height: 30,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Center(
+                    child: NwsbIcon(
+                      NwsbMarks.enterArrow,
+                      size: 13,
+                      viewBox: 12,
+                      strokeWidth: 1.9,
+                      color: NwsbColors.ink,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

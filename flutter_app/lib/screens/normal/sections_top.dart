@@ -549,9 +549,6 @@ class NmPractice extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final words = ContentStore.instance.library;
-    final w = words.isEmpty ? null : words[DateTime.now().day % words.length];
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       child: Column(
@@ -590,55 +587,56 @@ class NmPractice extends StatelessWidget {
                       size: 28, color: NwsbColors.gold),
                 ),
                 const SizedBox(height: 16),
-                Text(
-                  w?.word ?? 'Loading...',
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w800,
-                    color: NwsbColors.ink,
-                    height: 1.1,
-                    letterSpacing: -0.6,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  (w?.meaning.isNotEmpty ?? false)
-                      ? w!.meaning
-                      : 'Your personalized word ritual for right now.',
+                // No large practice-name headline (ANANDA / AAROGYA). Ritual
+                // line is the supporting copy under the media / icon area.
+                const Text(
+                  'Your personalized word ritual for right now.',
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 13.5,
+                  style: TextStyle(
+                    fontSize: 15,
                     color: NwsbColors.inkSoft,
-                    height: 1.5,
+                    height: 1.45,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
                 const SizedBox(height: 18),
-                Row(
-                  children: [
-                    const Text(
-                      'Enter',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        color: NwsbColors.gold,
-                      ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(14, 8, 8, 8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xF2FFFFFF),
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(color: const Color(0x33FFFFFF)),
+                      boxShadow: NwsbShadows.raisedXs,
                     ),
-                    const Spacer(),
-                    Container(
-                      width: 38,
-                      height: 38,
-                      decoration: const BoxDecoration(
-                        color: NwsbColors.surface,
-                        shape: BoxShape.circle,
-                        boxShadow: NwsbShadows.raisedXs,
-                      ),
-                      child: const NwsbIcon(NwsbMarks.arrow,
-                          size: 16, color: NwsbColors.ink),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          'Enter',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: NwsbColors.gold,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Container(
+                          width: 38,
+                          height: 38,
+                          decoration: const BoxDecoration(
+                            color: NwsbColors.surface,
+                            shape: BoxShape.circle,
+                            boxShadow: NwsbShadows.raisedXs,
+                          ),
+                          child: const NwsbIcon(NwsbMarks.arrow,
+                              size: 16, color: NwsbColors.ink),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ],
             ),

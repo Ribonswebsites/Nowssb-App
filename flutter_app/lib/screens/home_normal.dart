@@ -51,6 +51,7 @@ import '../widgets/home_skin.dart';
 import 'normal/neomorphic_action_bar.dart';
 import 'normal/neomorphic_dashboard.dart';
 import 'personal_coach.dart';
+import 'personal_coach_carousel.dart';
 import 'healing_path.dart';
 import '../media/video_pool.dart';
 import 'normal/glassmorphism_theme.dart';
@@ -80,6 +81,7 @@ const kNormalSectionOrder = <String>[
   'routineCards',
   'streak',
   'practice',
+  'coachCards',
   // Not on the website's registry. Six doors on one panel so the app can
   // be used without knowing where anything is — see MainOptionsSection.
   'mainops',
@@ -221,6 +223,12 @@ class _HomeNormalState extends State<HomeNormal> {
         ('routineCards', const NmHorizontalRoutineCards()),
         ('streak', NmStreak(onTap: () => _go(1))),
         ('practice', NmPractice(onTap: () => _go(1))),
+        (
+          'coachCards',
+          PersonalCoachCarousel(
+            onTap: () => _push(const PersonalCoachScreen()),
+          ),
+        ),
         ('mainops', MainOptionsSection(onGo: _go, onAction: _openMainOption)),
         (
           'actionbar',

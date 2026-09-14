@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 
 import '../../widgets/nwsb_icon.dart';
 
-import '../../data/content.dart';
 import '../../data/settings.dart';
 import '../../media/nwsb_image.dart';
 import '../../media/nwsb_video.dart';
@@ -262,6 +261,9 @@ class _HhrButton extends StatelessWidget {
 /// 3 · practice — index.html:1842 + app/js/part066.js PRACTICE_VID.
 /// `.fash-plyr-wrap`: spill, then the card. With Fashion Plus on (the web
 /// default) the card's media is the looping practice film, not the still.
+///
+/// Cleanup: no large practice-name headline over the film. Supporting ritual
+/// copy sits *below* the media. Glass Enter sits middle-right over the video.
 class FashPractice extends StatelessWidget {
   const FashPractice({super.key, this.onTap});
   final VoidCallback? onTap;
@@ -273,13 +275,12 @@ class FashPractice extends StatelessWidget {
   static const practiceStill =
       'https://media.nowssb.com/migrated-images/4daad1a85b624fed_grok_image_1778052232385_qpdmgh.jpg';
 
+  static const ritualLine = 'Your personalized word ritual for right now.';
+
   @override
   Widget build(BuildContext context) {
-    final words = ContentStore.instance.library;
-    final word = words.isEmpty
-        ? 'Loading...'
-        : words[DateTime.now().day % words.length].word;
-
+    // Word of the day still drives the destination; it is no longer painted
+    // as a giant title over the film (ANANDA / AAROGYA etc.).
     return SectionPane(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -293,21 +294,80 @@ class FashPractice extends StatelessWidget {
           ListenableBuilder(
             listenable: Settings.instance,
             builder: (context, _) {
-              // Fashion Plus ships ON on the website (`localStorage !== '0'`).
-              // Match that: looping NwsbVideo is the player-section media.
               final motion = Settings.instance.fashionPlus;
-              return PhotoCard(
-                background: motion
-                    ? const NwsbVideo(
-                        asset: practiceVid,
-                        priority: ClipPriority.feature,
-                        fit: BoxFit.cover,
-                      )
-                    : const NwsbImage(url: practiceStill),
-                label: "TODAY'S PRACTICE",
-                title: word,
-                sub: 'Your personalized word ritual for right now.',
-                onTap: onTap,
+              final media = motion
+                  ? const NwsbVideo(
+                      asset: practiceVid,
+                      priority: ClipPriority.feature,
+                      fit: BoxFit.cover,
+                    )
+                  : const NwsbImage(url: practiceStill);
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  GestureDetector(
+                    onTap: onTap,
+                    behavior: HitTestBehavior.opaque,
+                    child: AspectRatio(
+                      aspectRatio: 16 / 9,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(18),
+                        clipBehavior: Clip.antiAlias,
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            Positioned.fill(child: media),
+                            // Light left-edge scrim only — keep the film readable.
+                            const DecoratedBox(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                  colors: [
+                                    Color(0x99060C18),
+                                    Color(0x33060C18),
+                                    Color(0x14060C18),
+                                  ],
+                                  stops: [0, 0.45, 1],
+                                ),
+                              ),
+                            ),
+                            const Positioned(
+                              left: 16,
+                              top: 14,
+                              child: Text(
+                                "TODAY'S PRACTICE",
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  letterSpacing: 2,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFFE8D5A3),
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              right: 14,
+                              top: 0,
+                              bottom: 0,
+                              child: Center(
+                                child: GlassEnterPill(onTap: onTap),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    ritualLine,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Color(0xB3FFFFFF),
+                      height: 1.45,
+                    ),
+                  ),
+                ],
               );
             },
           ),

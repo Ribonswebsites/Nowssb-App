@@ -56,6 +56,7 @@
         { k:'streak',   sel:['.nmh-streak-wrap'],                                          t:S, label:'Streak',                sub:'Your streak and its banner' },
         { k:'storedisc',sel:['.npc-card.npc-purple'],                                      t:B, label:'Store Disc',            sub:'Rotating store promo disc', vb:1, defOff:1 },
         { k:'practice', sel:['.nmh-plyr-wrap'],                                             t:S, label:"Today's Practice",      sub:'Your personalised word ritual', locked:1, after:'streak' },
+        { k:'coachCards', sel:['#home-nm .pc-coach-sec'],                                t:S, label:'Personal Coach',       sub:'Rotating practice cards', after:'practice' },
         { k:'mainops',  sel:['.mainops-blk'],                                               t:S, label:'Where to Begin',        sub:'Six doors on one panel', kind:'blk' },
         { k:'actionbar',sel:['.nmh-supplied-actionbar'],                                    t:S, label:'Help action bar',       sub:'Support and personal coach', locked:1, after:'mainops' },
         { k:'tiles',    sel:['.nmh-tiles-wrap'],                                    t:S, label:'Home Tiles',            sub:'The four buttons and their tip rail', always:1 },
@@ -113,6 +114,7 @@
         { k:'greet',    sel:['.home-greeting', '.home-tagline'],                           t:S, label:'Greeting',              sub:'Begin Your Healing Path · hero header', locked:1 },
         { k:'herorow',  sel:['.hhr-blk'],                                              t:S, label:'Customize · Features · Earn', sub:'The row under the greeting' , kind:'tab' },
         { k:'practice', sel:['.fash-plyr-wrap'],                                        t:S, label:"Today's Practice",      sub:'Morning word ritual', locked:1 },
+        { k:'coachCards', sel:['#home .pc-coach-sec'],                                   t:S, label:'Personal Coach',       sub:'Rotating practice cards', after:'practice' },
         { k:'mainops',  sel:['.mainops-blk'],                                               t:S, label:'Where to Begin',        sub:'Six doors on one panel', kind:'blk' },
         { k:'actionbar',sel:['.nmh-supplied-actionbar'],                                    t:S, label:'Help action bar',       sub:'Support and personal coach', locked:1, after:'mainops' },
         { k:'reader',   sel:['.fash-rdsec-wrap'],                                        t:S, label:'Reader',                sub:'Meanings and eBooks' },
@@ -184,7 +186,7 @@
   /* 5 — Home cleanup: Normal storedisc + actionbar off; Fashion Connect
          marketing card off; store bag banner above Store removed (part067).
      6 — Restore Normal Personal Coach / actionbar (locked again; not defOff). */
-  var LAYOUT_V = 6;
+  var LAYOUT_V = 7;
 
   function load(which) {
     var reg = REG[which], all = reg.items.filter(function (i) { return !i.locked; }).map(function (i) { return i.k; });
