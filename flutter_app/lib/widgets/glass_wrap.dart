@@ -85,14 +85,35 @@ class GlassWrap extends StatelessWidget {
                 borderRadius: r,
                 border: Border.all(color: line),
               ),
-              child: child,
+              child: _withSectionMotion(child),
             ),
           ),
         ),
       ),
     );
   }
+  static const _motionLines = <(String, String)>[
+    ('NowssB', 'Practice · heal · keep going'),
+    ('In motion', 'Your practice continues'),
+    ('Keep scrolling', 'Every section moves with you'),
+    ('Daily ritual', 'Words · breath · presence'),
+    ('Stay with it', 'Gentle motion · steady practice'),
+  ];
+
+  Widget _withSectionMotion(Widget child) {
+    final i = child.runtimeType.hashCode.abs() % _motionLines.length;
+    final (title, sub) = _motionLines[i];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SectionMotionBanner(title: title, sub: sub),
+        child,
+      ],
+    );
+  }
 }
+
 
 /// The head that introduces a section — `.qa-tv-head` and its siblings.
 ///
@@ -149,7 +170,7 @@ class SectionHead extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
+                GentleMarqueeText(
                   eyebrow,
                   style: const TextStyle(
                     fontSize: 15,
@@ -157,8 +178,9 @@ class SectionHead extends StatelessWidget {
                     color: Color(0xA6FFFFFF),
                     height: 1.35,
                   ),
+                  duration: const Duration(milliseconds: 4200),
                 ),
-                AnimatedHeading(
+                GentleMarqueeText(
                   title,
                   style: const TextStyle(
                     fontSize: 21,
@@ -166,7 +188,7 @@ class SectionHead extends StatelessWidget {
                     color: Colors.white,
                     height: 1.25,
                   ),
-                  mode: HeadingMotion.marquee,
+                  duration: const Duration(milliseconds: 3800),
                 ),
               ],
             ),

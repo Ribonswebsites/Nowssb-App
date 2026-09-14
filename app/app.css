@@ -1069,6 +1069,33 @@ body:not(.fi-ready) #fashionHomeIntro{display:none!important;visibility:hidden!i
 }
 
 /* ── Living headings: varied, restrained motion for website + WebView ── */
+/* Home section motion — gentle slide like subscription marquee so Normal /
+   Fashion sections do not read as static stills. Respects prefers-reduced-motion
+   via the existing heading reset below. */
+@keyframes nwsb-sub-marquee{from{transform:translateX(5px)}to{transform:translateX(-10px)}}
+#home .qa-tv-head-title,#home .qa-tv-head-sub,#home .nmh-sec-banner-title,#home .nmh-sec-banner-sub,
+#home-nm .nmh-wrap-head-title,#home-nm .nmh-wrap-head-sub,#home-nm .nmh-sec-banner-title,#home-nm .nmh-sec-banner-sub,
+#home .spill-pill-txt,#home-nm .spill-pill-txt,
+#home .home-card-title,#home-nm .home-card-title,
+#home .footer-intro-title,#home-nm .footer-intro-title {
+  animation: nwsb-sub-marquee 3.8s ease-in-out infinite alternate;
+  will-change: transform;
+}
+#home .qa-tv-head-sub,#home-nm .nmh-wrap-head-sub,#home .nmh-sec-banner-sub,#home-nm .nmh-sec-banner-sub {
+  animation-duration: 4.2s;
+}
+.nwsb-section-motion-banner{
+  display:flex;flex-direction:column;gap:2px;margin:0 0 10px;padding:8px 14px;
+  border-radius:12px;background:#030303;border:1px solid rgba(255,255,255,.16);
+  color:#fff;overflow:hidden;
+}
+.nwsb-section-motion-banner strong,.nwsb-section-motion-banner span{
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  animation:nwsb-sub-marquee 3.8s ease-in-out infinite alternate;
+}
+.nwsb-section-motion-banner strong{font-size:12px;font-weight:900;letter-spacing:.2px}
+.nwsb-section-motion-banner span{font-size:10px;color:rgba(255,255,255,.7);animation-duration:4.2s}
+
 @keyframes nwsbHeadingRoll { 0%,100% { transform: translate3d(-2px,0,0) rotate(-.15deg); } 50% { transform: translate3d(2px,-1px,0) rotate(.15deg); } }
 @keyframes nwsbHeadingFlip { 0%,100% { transform: perspective(700px) rotateX(-1.8deg); } 50% { transform: perspective(700px) rotateX(1.8deg); } }
 @keyframes nwsbHeadingSlide { 0%,100% { transform: translateY(-2px); } 50% { transform: translateY(2px); } }
@@ -1080,5 +1107,7 @@ body:not(.fi-ready) #fashionHomeIntro{display:none!important;visibility:hidden!i
 .footer-tagline,.footer-intro-eyebrow,.expl-intro-eyebrow,.expl-cards-banner-eyebrow,.ws-store-eyebrow,.nss-banner-eyebrow { animation: nwsbHeadingShimmer 3.4s ease-in-out infinite; will-change:opacity,filter; }
 .nmh-sec-banner-sub,.home-card-sub,.nss-mini-card-eyebrow,.wsg-detail-sub { animation: nwsbHeadingFloat 5.2s ease-in-out infinite; will-change:transform; }
 @media (prefers-reduced-motion: reduce) {
-  .footer-intro-title,.expl-intro-title,.nwag-intro-title,.fpp-hero-title,.nss-banner-title,.ws-store-title,.sig-store-title,.nmh-sec-banner-title,.home-card-title,.expl-cards-banner-title,.nss-mini-card-title,.wsg-detail-title,.footer-brand,.sub-title,.wl-title,.sb-top-title,.hcpi-title,.footer-tagline,.footer-intro-eyebrow,.expl-intro-eyebrow,.expl-cards-banner-eyebrow,.ws-store-eyebrow,.nss-banner-eyebrow,.nmh-sec-banner-sub,.home-card-sub,.nss-mini-card-eyebrow,.wsg-detail-sub { animation:none; }
+  .footer-intro-title,.expl-intro-title,.nwag-intro-title,.fpp-hero-title,.nss-banner-title,.ws-store-title,.sig-store-title,.nmh-sec-banner-title,.home-card-title,.expl-cards-banner-title,.nss-mini-card-title,.wsg-detail-title,.footer-brand,.sub-title,.wl-title,.sb-top-title,.hcpi-title,.footer-tagline,.footer-intro-eyebrow,.expl-intro-eyebrow,.expl-cards-banner-eyebrow,.ws-store-eyebrow,.nss-banner-eyebrow,.nmh-sec-banner-sub,.home-card-sub,.nss-mini-card-eyebrow,.wsg-detail-sub,
+  #home .qa-tv-head-title,#home .qa-tv-head-sub,#home-nm .nmh-wrap-head-title,#home-nm .nmh-wrap-head-sub,
+  #home .spill-pill-txt,#home-nm .spill-pill-txt,.nwsb-section-motion-banner strong,.nwsb-section-motion-banner span { animation:none; }
 }

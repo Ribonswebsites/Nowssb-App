@@ -247,13 +247,13 @@ class VideoPool {
   /// run together — the phone has enough AVC slots for a dozen muted loops,
   /// and serializing to one "playing" clip is the bug users see. Twelve is
   /// the working target (6–12 simultaneous). Off-screen clips still release.
-  static const int maxLive = 12;
+  static const int maxLive = 16;
 
   /// Higher ceiling while Normal home glass mode wants every on-screen clip
   /// moving. Still bounded — phones only have so many hardware decoders —
   /// but generous enough that a scrolled glass home keeps banners alive
   /// alongside the full-bleed background film.
-  static const int maxLiveGlassHome = 16;
+  static const int maxLiveGlassHome = 20;
 
   /// When true, [_effectiveMaxLive] uses [maxLiveGlassHome]. Toggled from
   /// Normal home's glassmorphism switch.
@@ -314,13 +314,15 @@ class VideoPool {
   /// so hard that feature UI loops (orb / tab / bg) sat on black posters until
   /// a kill-restart. Eight matches the "warm several feature clips at once"
   /// goal without reopening the historical all-at-once MediaCodec stampede
-  /// that left every slot reserved and nothing playing.
-  static const int openAtOnce = 3;
+  /// that left every slot reserved and nothing playing. Visible decorative
+  /// loops also need to come up together — serializing to one/few openers is
+  /// what left a home looking like only one video played.
+  static const int openAtOnce = 8;
   static const int _openAtOnce = openAtOnce;
 
   /// Keep a small number of next-up controllers from competing with visible
   /// playback. This is deliberately separate from the active decoder ceiling.
-  static const int prefetchSlots = 2;
+  static const int prefetchSlots = 3;
 
   int _opening = 0;
   final List<VideoLease> _openQueue = [];

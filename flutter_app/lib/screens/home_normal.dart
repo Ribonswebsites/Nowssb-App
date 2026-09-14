@@ -325,7 +325,7 @@ class _HomeNormalState extends State<HomeNormal> {
 
     final shown = [
       for (final (k, w) in built)
-        if (w != null && !kNormalDefOff.contains(k)) w,
+        if (w != null && !kNormalDefOff.contains(k)) (k, w),
     ];
 
     final page = SafeArea(
@@ -346,9 +346,15 @@ class _HomeNormalState extends State<HomeNormal> {
           ),
           Expanded(
             child: ListView.builder(
+              // Modest look-ahead: enough for smooth scroll, not enough to
+              // mount every video on the home at once (N+1 decoder churn).
+              cacheExtent: 480,
               padding: EdgeInsets.only(bottom: bottomNavigationClearance),
               itemCount: shown.length,
-              itemBuilder: (context, i) => shown[i],
+              itemBuilder: (context, i) {
+                final (k, w) = shown[i];
+                return KeyedSubtree(key: ValueKey('nm-$k'), child: w);
+              },
             ),
           ),
         ],

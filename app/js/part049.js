@@ -680,3 +680,34 @@ window.msCloseResult = function () { var p = document.getElementById('msResultPa
   }
   init();
 })();
+
+/* ── Home section motion banners (Normal + Fashion) ───────────────────────
+   Prepend a compact moving black banner inside each section wrap that does
+   not already have one, so every section has gentle marquee motion without
+   redesigning layouts. */
+(function () {
+  var LINES = [
+    ['NowssB', 'Practice · heal · keep going'],
+    ['In motion', 'Your practice continues'],
+    ['Keep scrolling', 'Every section moves with you'],
+    ['Daily ritual', 'Words · breath · presence'],
+    ['Stay with it', 'Gentle motion · steady practice']
+  ];
+  function paint() {
+    var wraps = document.querySelectorAll('#home .glass-wrap, #home-nm .nmh-sec-wrap');
+    wraps.forEach(function (w, i) {
+      if (w.querySelector('.nwsb-section-motion-banner')) return;
+      var line = LINES[i % LINES.length];
+      var bar = document.createElement('div');
+      bar.className = 'nwsb-section-motion-banner';
+      bar.setAttribute('aria-hidden', 'true');
+      bar.innerHTML = '<strong>' + line[0] + '</strong><span>' + line[1] + '</span>';
+      w.insertBefore(bar, w.firstChild);
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', paint);
+  else paint();
+  setTimeout(paint, 800);
+  setTimeout(paint, 2400);
+})();
+

@@ -264,7 +264,7 @@ class _HomeFashionState extends State<HomeFashion> {
 
     final shown = [
       for (final (k, w) in built)
-        if (!kFashionDefOff.contains(k)) w,
+        if (!kFashionDefOff.contains(k)) (k, w),
     ];
 
     return Scaffold(
@@ -346,6 +346,9 @@ class _HomeFashionState extends State<HomeFashion> {
                 // No horizontal padding on the list: the wrappers carry
                 // their own `margin: 18px 16px`.
                 child: ListView.builder(
+                  // Modest look-ahead so off-screen video sections stay
+                  // lazy-mounted instead of opening every decoder at once.
+                  cacheExtent: 480,
                   padding: const EdgeInsets.only(bottom: 108),
                   itemCount: shown.length + 1,
                   itemBuilder: (context, i) {
@@ -367,7 +370,8 @@ class _HomeFashionState extends State<HomeFashion> {
                         ],
                       );
                     }
-                    return shown[i - 1];
+                    final (k, w) = shown[i - 1];
+                    return KeyedSubtree(key: ValueKey('fash-$k'), child: w);
                   },
                 ),
               ),

@@ -169,9 +169,9 @@
      · The expensive part, "is this inside a screen that is currently
        shown", is cached per element and only recomputed when a class
        actually changes, not on every frame.
-     · At most MAX_PLAYING videos decode at once — the ones nearest the
-       middle of the viewport. Everything else stays paused even if it is
-       technically on screen. Decoders, not downloads, are the cost.
+     · ALL on-screen decorative videos play + loop together. Only fully
+       off-screen clips pause. MAX_PLAYING is a soft safety ceiling for
+       pathological overlap, not a reason to pause visible siblings.
 
    Behaviour is otherwise unchanged: only videos this script paused are ever
    resumed, WebRTC streams are never touched, the practice player keeps its
@@ -215,10 +215,12 @@
   /* WebView and mobile browsers become unstable when many H.264 decoders run
      at once. Keep the visible page responsive while allowing the key background
      film plus a few nearby clips to play. */
-  /* Eight matches Flutter's VideoPool.maxLive: enough for the page film
-     plus player/orb/login feature clips without starving nearby banners.
-     Four left most on-screen loops paused, which looked like stalling. */
-  var MAX_PLAYING = 8;
+  /* Soft safety ceiling only. ALL IntersectionObserver-visible clips must
+     play + loop together — pausing on-screen siblings to fit a small budget
+     is the "only one video plays" bug. Flutter VideoPool.maxLive is 16;
+     this soft cap is only for pathological pages with dozens of overlapping
+     videos in the same viewport (rare on phone). */
+  var MAX_PLAYING = 24;
   var autoPaused = new WeakSet();
   var onScreen = new WeakSet();
   var shownCache = new WeakMap();   // element -> boolean, cleared on class changes
@@ -559,19 +561,13 @@
     for (var i = tracked.length - 1; i >= 0; i--) {
       var v = tracked[i];
       if (!v.isConnected) { tracked.splice(i, 1); continue; }
-      if (shown(v)) live.push(v);
+      /* Only clips that are actually in the viewport (or feature films that
+         own their screen) compete to play. Fully off-screen clips pause —
+         that is the only pause rule. Pausing on-screen siblings to fit a
+         tiny budget made the UI look like a single video. */
+      var inView = !io || onScreen.has(v) || isFeature(v);
+      if (shown(v) && inView) live.push(v);
     }
-    /* Nearest the middle of the screen wins the decoders — except for a clip
-       that IS its section rather than decoration behind one. The television
-       screen is the whole point of the section it sits in, and on a home
-       with a dozen background loops it kept losing the budget to whichever
-       four happened to be nearer the middle: the clip loaded, played for a
-       moment, and was paused again, which looks exactly like a still. Those
-       sort first and therefore always get a slot while they are on screen.
-       Still at most MAX_PLAYING — this changes which four, not how many. */
-    /* .feat-bgvid and .rd-hub-bgvid are the same kind of thing as the rest of
-       this list — the film IS the page, not decoration on it — and were
-       missing from it. */
     var PRIORITY = '.hero-bg-vid, .qa-tv-vid, .fpv-video, .gsel-bg-vid, ' +
                    '.slm-head-vid, .feat-bgvid, .rd-hub-bgvid, .fp-page-vid, ' +
                    '.wsg-bgvid, .lgp-info-video, .lgp-page-bg-video, ' +
@@ -579,6 +575,8 @@
                    '.lg-phone-vid, .mp-loading-video, .nwsb-sub-tv-video, #videoScrollBg, ' +
                    '#videoBg, #videoBg2, .splash-bg-video';
     function prio(v) { return v.matches && v.matches(PRIORITY) ? 0 : 1; }
+    /* Soft ceiling only for pathological overlap. Prefer features, then
+       nearest-to-middle; never pause an ordinary on-screen set under ~24. */
     if (live.length > MAX_PLAYING) {
       var mid = (window.innerHeight || 800) / 2;
       live.sort(function (a, b) {
@@ -605,8 +603,11 @@
       if (!v.classList.contains('lgp-video')) {
         autoPaused.delete(v);
         try {
-          v.muted = true; v.loop = true; v.playsInline = true;
-          if (v.preload === 'none') { v.preload = 'auto'; v.setAttribute('preload', 'auto'); }
+          v.muted = true; v.defaultMuted = true; v.loop = true; v.playsInline = true;
+          v.setAttribute('muted', ''); v.setAttribute('loop', '');
+          v.setAttribute('playsinline', ''); v.setAttribute('webkit-playsinline', '');
+          v.preload = 'auto'; v.setAttribute('preload', 'auto');
+          v.setAttribute('autoplay', '');
         } catch (e2) {}
         if (v.paused || (v.ended && v.loop)) {
           if (v.ended) { try { v.currentTime = 0; } catch (e3) {} }
@@ -617,10 +618,21 @@
   }
 
   var queued = false;
+  var queueTimer = 0;
   function queue() {
     if (queued) return;
     queued = true;
-    requestAnimationFrame(function () { queued = false; track(); apply(); });
+    /* Debounce heavy track/apply under rapid scroll: one rAF + 48ms settle
+       so we do not re-rank on every scroll event while the finger moves. */
+    requestAnimationFrame(function () {
+      if (queueTimer) clearTimeout(queueTimer);
+      queueTimer = setTimeout(function () {
+        queued = false;
+        queueTimer = 0;
+        track();
+        apply();
+      }, 48);
+    });
   }
   window.nwsbVideoRefresh = queue;
   /* For the files that own their own clips and are therefore never tracked

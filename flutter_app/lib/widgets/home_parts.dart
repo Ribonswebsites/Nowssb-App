@@ -370,22 +370,22 @@ class SecBanner extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  AnimatedHeading(
+                  GentleMarqueeText(
                     title,
                     style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
                         color: Colors.white),
-                    mode: HeadingMotion.marquee,
                   ),
                   const SizedBox(height: 2),
-                  Text(
+                  GentleMarqueeText(
                     sub,
                     style: const TextStyle(
                       fontSize: 12,
                       color: Color(0x8CFFFFFF),
                       height: 1.35,
                     ),
+                    duration: const Duration(milliseconds: 4200),
                   ),
                 ],
               ),
@@ -671,3 +671,146 @@ class ScreenCta extends StatelessWidget {
     );
   }
 }
+
+/// Gentle horizontal slide — same motion as web `nwsb-sub-marquee` /
+/// Flutter subscription TV copy. Reuse on section heads and black banners
+/// so Normal / Fashion homes do not read as static stills.
+class GentleMarqueeText extends StatefulWidget {
+  const GentleMarqueeText(
+    this.text, {
+    super.key,
+    required this.style,
+    this.duration = const Duration(milliseconds: 3800),
+    this.maxLines = 1,
+  });
+
+  final String text;
+  final TextStyle style;
+  final Duration duration;
+  final int maxLines;
+
+  @override
+  State<GentleMarqueeText> createState() => _GentleMarqueeTextState();
+}
+
+class _GentleMarqueeTextState extends State<GentleMarqueeText>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(
+    vsync: this,
+    duration: widget.duration,
+  );
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _syncTicker();
+  }
+
+  void _syncTicker() {
+    final disabled = MediaQuery.maybeOf(context)?.disableAnimations ?? false;
+    final ticking = TickerMode.of(context);
+    if (disabled || !ticking) {
+      if (_c.isAnimating) _c.stop();
+      return;
+    }
+    if (!_c.isAnimating) _c.repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final disabled = MediaQuery.maybeOf(context)?.disableAnimations ?? false;
+    if (disabled || !TickerMode.of(context)) {
+      return Text(
+        widget.text,
+        maxLines: widget.maxLines,
+        softWrap: false,
+        overflow: TextOverflow.ellipsis,
+        style: widget.style,
+      );
+    }
+    return ClipRect(
+      child: AnimatedBuilder(
+        animation: _c,
+        builder: (_, child) {
+          final t = Curves.easeInOut.transform(_c.value);
+          return Transform.translate(
+            offset: Offset(5 - 15 * t, 0),
+            child: child,
+          );
+        },
+        child: Text(
+          widget.text,
+          maxLines: widget.maxLines,
+          softWrap: false,
+          overflow: TextOverflow.visible,
+          style: widget.style,
+        ),
+      ),
+    );
+  }
+}
+
+/// Thin moving black banner strip for section motion without layout redesign.
+/// Sits above or below existing section content; copy slides gently.
+class SectionMotionBanner extends StatelessWidget {
+  const SectionMotionBanner({
+    super.key,
+    required this.title,
+    this.sub,
+    this.compact = true,
+  });
+
+  final String title;
+  final String? sub;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      margin: EdgeInsets.only(bottom: compact ? 10 : 14),
+      padding: EdgeInsets.symmetric(
+        horizontal: 14,
+        vertical: compact ? 8 : 12,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.black,
+        borderRadius: BorderRadius.circular(compact ? 12 : 16),
+        border: Border.all(color: const Color(0x29FFFFFF)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          GentleMarqueeText(
+            title,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: compact ? 12 : 13,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 0.2,
+            ),
+          ),
+          if (sub != null && sub!.isNotEmpty) ...[
+            const SizedBox(height: 2),
+            GentleMarqueeText(
+              sub!,
+              style: TextStyle(
+                color: const Color(0xB3FFFFFF),
+                fontSize: compact ? 10 : 11,
+              ),
+              duration: const Duration(milliseconds: 4200),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
