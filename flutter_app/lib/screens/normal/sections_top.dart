@@ -219,7 +219,8 @@ class NmStreakVideo extends StatelessWidget {
             child: const AspectRatio(
               aspectRatio: 16 / 9,
               child: NwsbVideo(
-                asset: 'assets/video/tv-screen.mp4',
+                asset:
+                    'assets/videos/415dd447da33973b_grok_video_2026-07-30-14-35-05_q3tyzk.mp4',
                 priority: ClipPriority.decoration,
               ),
             ),
@@ -1038,64 +1039,55 @@ class NmReader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Spill(
-            label: 'Meanings and eBooks, in one place',
-            mark: NwsbMarks.reader,
-            onTap: onTap,
-          ),
-          GestureDetector(
-            onTap: onTap,
-            behavior: HitTestBehavior.opaque,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: const AspectRatio(
-                aspectRatio: 16 / 9,
-                child: NwsbVideo(
-                  asset: 'assets/video/reader-section.mp4',
-                  poster: 'assets/video/reader-section-poster.webp',
-                  priority: ClipPriority.decoration,
-                  fit: BoxFit.cover,
-                ),
+    return SecWrap(
+      children: [
+        Spill(
+          label: 'Meanings and eBooks, in one place',
+          mark: NwsbMarks.reader,
+          onTap: onTap,
+        ),
+        GestureDetector(
+          onTap: onTap,
+          behavior: HitTestBehavior.opaque,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: const AspectRatio(
+              aspectRatio: 16 / 9,
+              child: NwsbVideo(
+                asset: 'assets/video/reader-section.mp4',
+                poster: 'assets/video/reader-section-poster.webp',
+                priority: ClipPriority.decoration,
+                fit: BoxFit.cover,
               ),
             ),
           ),
-          const SizedBox(height: 14),
-          const Text(
-            'NowssB',
-            style: TextStyle(fontSize: 14, color: NwsbColors.inkSoft),
+        ),
+        const Text(
+          'NowssB',
+          style: TextStyle(fontSize: 14, color: NwsbColors.inkSoft),
+        ),
+        const Text(
+          'Reader',
+          style: TextStyle(
+            fontSize: 26,
+            fontWeight: FontWeight.w800,
+            color: NwsbColors.ink,
+            height: 1.15,
+            letterSpacing: -0.5,
           ),
-          const Text(
-            'Reader',
-            style: TextStyle(
-              fontSize: 26,
-              fontWeight: FontWeight.w800,
-              color: NwsbColors.ink,
-              height: 1.15,
-              letterSpacing: -0.5,
-            ),
-          ),
-          const SizedBox(height: 6),
-          const Text(
-            'Read every meaning, and every eBook.',
-            style: TextStyle(fontSize: 13, color: NwsbColors.inkSoft),
-          ),
-          const SizedBox(height: 14),
-          Align(
-              alignment: Alignment.centerLeft, child: EnterPill(onTap: onTap)),
-          const SizedBox(height: 16),
-          SecBanner(
-            title: 'Reader',
-            sub: 'Meanings and eBooks, in one place',
-            mark: NwsbMarks.reader,
-            onTap: onTap,
-          ),
-        ],
-      ),
+        ),
+        const Text(
+          'Read every meaning, and every eBook.',
+          style: TextStyle(fontSize: 13, color: NwsbColors.inkSoft),
+        ),
+        Align(alignment: Alignment.centerLeft, child: EnterPill(onTap: onTap)),
+        SecBanner(
+          title: 'Reader',
+          sub: 'Meanings and eBooks, in one place',
+          mark: NwsbMarks.reader,
+          onTap: onTap,
+        ),
+      ],
     );
   }
 }
@@ -1125,13 +1117,11 @@ class NmTrending extends StatelessWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  const NwsbImage(
-                    url:
+                  const NwsbVideo(
+                    asset:
                         'assets/videos/7e4d709136dc254a_grok_video_2026-07-18-15-53-02_ubjx5b.mp4',
-                    fallback: NwsbVideo(
-                      asset: 'assets/video/word-acts.mp4',
-                      priority: ClipPriority.decoration,
-                    ),
+                    priority: ClipPriority.decoration,
+                    fit: BoxFit.cover,
                   ),
                   const DecoratedBox(
                     decoration: BoxDecoration(

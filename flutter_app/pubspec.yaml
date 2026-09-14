@@ -48,6 +48,8 @@ flutter:
   assets:
     # Every clip and its poster, on the phone after the download.
     - assets/video/
+    - assets/videos/
+    - assets/healing/
 
     # The app's own artwork and Store intro-page paintings.
     - assets/frames/

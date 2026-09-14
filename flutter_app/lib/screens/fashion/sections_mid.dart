@@ -555,12 +555,10 @@ class FashTrending extends StatelessWidget {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    const NwsbImage(
-                      url:
+                    const NwsbVideo(
+                      asset:
                           'assets/videos/7e4d709136dc254a_grok_video_2026-07-18-15-53-02_ubjx5b.mp4',
-                      fallback: NwsbVideo(
-                        asset: 'assets/video/word-acts.mp4',
-                      ),
+                      fit: BoxFit.cover,
                     ),
                     const DecoratedBox(
                       decoration: BoxDecoration(

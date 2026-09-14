@@ -28,8 +28,8 @@
 /// its store card with no heading, no device and no bar under it, while the
 /// Fashion home carried the same thing as a proper block. Both build it now.
 ///
-/// Two more are `defOff` — My Routines and Personalised Healing. So a fresh
-/// install shows twenty-three sections.
+/// My Routines remains `defOff`; Personalized Healing is visible so its
+/// Explore action opens the native Healing Path gender selector.
 ///
 /// Nine of the sections here are the SAME widgets the Fashion home uses, out
 /// of lib/screens/shared_sections.dart. index.html writes each of them once
@@ -51,6 +51,7 @@ import '../widgets/home_skin.dart';
 import 'normal/neomorphic_action_bar.dart';
 import 'normal/neomorphic_dashboard.dart';
 import 'personal_coach.dart';
+import 'healing_path.dart';
 import '../media/video_pool.dart';
 import 'normal/glassmorphism_theme.dart';
 import 'normal/header_actions_sheet.dart';
@@ -121,7 +122,7 @@ const kNormalSectionOrder = <String>[
 const kNormalNoMarkup = <String>{'rx', 'wsearch', 'msearch'};
 
 /// The two `defOff` entries that DO have markup. Built, not placed.
-const kNormalDefOff = <String>{'routines', 'healing'};
+const kNormalDefOff = <String>{'routines'};
 
 class HomeNormal extends StatefulWidget {
   const HomeNormal({super.key, this.name = 'Healer'});
@@ -282,14 +283,19 @@ class _HomeNormalState extends State<HomeNormal> {
         ),
         ('ebooks', EbooksSection(onTap: () => _go(2))),
         ('connectban', ConnectBannerSection(onTap: () => _go(0))),
-        ('healing', HealingSection(onTap: () => _go(2))),
+        (
+          'healing',
+          HealingSection(onTap: () => _push(const HealingPathScreen()))
+        ),
         (
           'genderpath',
           GenderPathSection(
-            onFemale: () => _go(2),
-            onMale: () => _go(2),
-            onTap: () => _go(2),
-          )
+            onFemale: () => _push(
+                const HealingPathScreen(initialGender: HealingGender.female)),
+            onMale: () => _push(
+                const HealingPathScreen(initialGender: HealingGender.male)),
+            onTap: () => _push(const HealingPathScreen()),
+          ),
         ),
         ('wsearch', null),
         ('msearch', null),

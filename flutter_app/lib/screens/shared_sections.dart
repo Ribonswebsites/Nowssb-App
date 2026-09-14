@@ -877,8 +877,7 @@ class EbooksSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+    return SectionPane(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -894,13 +893,11 @@ class EbooksSection extends StatelessWidget {
             child: const AspectRatio(
               aspectRatio: 16 / 9,
               child: ClipRect(
-                child: NwsbImage(
-                  url:
+                child: NwsbVideo(
+                  asset:
                       'assets/videos/beaf11ea10561d43_grok_video_2026-07-30-15-35-40_xwm1ei.mp4',
-                  fallback: NwsbVideo(
-                    asset: 'assets/video/word-acts.mp4',
-                    priority: ClipPriority.decoration,
-                  ),
+                  priority: ClipPriority.decoration,
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
@@ -1002,8 +999,7 @@ class HealingSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+    return SectionPane(
       child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
@@ -1013,12 +1009,10 @@ class HealingSection extends StatelessWidget {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                const NwsbImage(
-                  url:
+                const NwsbVideo(
+                  asset:
                       'assets/videos/28eb0c85b5fd748e_grok_video_2026-07-24-15-42-55_lknomr.mp4',
-                  fallback: NwsbVideo(
-                    asset: 'assets/video/healing-path-bg.mp4',
-                  ),
+                  fit: BoxFit.cover,
                 ),
                 const DecoratedBox(
                   decoration: BoxDecoration(

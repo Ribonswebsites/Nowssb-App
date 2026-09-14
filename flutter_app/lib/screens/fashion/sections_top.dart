@@ -271,8 +271,7 @@ class FashPractice extends StatelessWidget {
         ? 'Loading...'
         : words[DateTime.now().day % words.length].word;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+    return SectionPane(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -310,8 +309,7 @@ class FashReader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+    return SectionPane(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -383,7 +381,8 @@ class FashStreakVideo extends StatelessWidget {
   Widget build(BuildContext context) {
     return SectionPane(
       child: TvFrame(
-        asset: 'assets/video/tv-screen.mp4',
+        asset:
+            'assets/videos/415dd447da33973b_grok_video_2026-07-30-14-35-05_q3tyzk.mp4',
         frame: DeviceFrame.tabletLandscape,
         priority: ClipPriority.feature,
         onTap: onTap,
