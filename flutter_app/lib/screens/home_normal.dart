@@ -48,7 +48,9 @@ import '../data/settings.dart';
 import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
 import '../widgets/home_skin.dart';
+import 'normal/neomorphic_action_bar.dart';
 import 'normal/neomorphic_dashboard.dart';
+import 'personal_coach.dart';
 import 'healing_path.dart';
 import '../media/video_pool.dart';
 import 'normal/glassmorphism_theme.dart';
@@ -81,6 +83,7 @@ const kNormalSectionOrder = <String>[
   // Not on the website's registry. Six doors on one panel so the app can
   // be used without knowing where anything is — see MainOptionsSection.
   'mainops',
+  'actionbar',
   'tiles',
   'store',
   'reader',
@@ -219,6 +222,12 @@ class _HomeNormalState extends State<HomeNormal> {
         ('streak', NmStreak(onTap: () => _go(1))),
         ('practice', NmPractice(onTap: () => _go(1))),
         ('mainops', MainOptionsSection(onGo: _go, onAction: _openMainOption)),
+        (
+          'actionbar',
+          NmSuppliedActionBar(
+              onSupport: () => _go(4),
+              onCoach: () => _push(const PersonalCoachScreen()))
+        ),
         ('tiles', NmTiles(onTile: _go)),
         ('store', NmStore(onTap: () => _go(3))),
         ('reader', NmReader(onTap: () => _go(2))),

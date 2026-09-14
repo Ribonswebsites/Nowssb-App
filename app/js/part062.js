@@ -57,7 +57,7 @@
         { k:'storedisc',sel:['.npc-card.npc-purple'],                                      t:B, label:'Store Disc',            sub:'Rotating store promo disc', vb:1, defOff:1 },
         { k:'practice', sel:['.nmh-plyr-wrap'],                                             t:S, label:"Today's Practice",      sub:'Your personalised word ritual', locked:1, after:'streak' },
         { k:'mainops',  sel:['.mainops-blk'],                                               t:S, label:'Where to Begin',        sub:'Six doors on one panel', kind:'blk' },
-        { k:'actionbar',sel:['.nmh-supplied-actionbar'],                                    t:S, label:'Help action bar',       sub:'Support and personal coach', defOff:1, after:'mainops' },
+        { k:'actionbar',sel:['.nmh-supplied-actionbar'],                                    t:S, label:'Help action bar',       sub:'Support and personal coach', locked:1, after:'mainops' },
         { k:'tiles',    sel:['.nmh-tiles-wrap'],                                    t:S, label:'Home Tiles',            sub:'The four buttons and their tip rail', always:1 },
         { k:'store',    sel:['.nmh-store-wrap'],                                          t:S, label:'NowssB Store',          sub:'Enter the store', always:1 },
         { k:'reader',   sel:['.nmh-rdsec-wrap'],                                         t:S, label:'Reader',                sub:'Meanings and eBooks' },
@@ -182,8 +182,9 @@
            on a card means — it means "not now". Anyone whose streak was
            taken away by the old behaviour gets it back here, once. */
   /* 5 — Home cleanup: Normal storedisc + actionbar off; Fashion Connect
-         marketing card off; store bag banner above Store removed (part067). */
-  var LAYOUT_V = 5;
+         marketing card off; store bag banner above Store removed (part067).
+     6 — Restore Normal Personal Coach / actionbar (locked again; not defOff). */
+  var LAYOUT_V = 6;
 
   function load(which) {
     var reg = REG[which], all = reg.items.filter(function (i) { return !i.locked; }).map(function (i) { return i.k; });
