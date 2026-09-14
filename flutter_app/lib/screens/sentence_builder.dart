@@ -1,8 +1,9 @@
 /// Sentence builder — Customized-language glass full page (Flutter surface).
 ///
-/// Black top banner (Customize experience), heavy glass combine card with
-/// nested dark wrappers, tiered combine (2…6), Request flow with
-/// "Rewrite and Request" CTA. No emoji.
+/// Black top banner, then "Building your sentence", then heavy glass
+/// combine studio with Owned / Not owned glass tabs. Word chips live
+/// BELOW the banner (never mixed into banner action rows). No emoji.
+/// No background video/image in the combine area.
 library;
 
 import 'dart:math' as math;
@@ -12,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../data/content.dart';
+import '../data/store_catalog.dart';
 import '../widgets/black_glass_banner.dart';
 import '../widgets/nwsb_icon.dart';
 import 'store.dart';
@@ -52,13 +54,15 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
   final Set<String> _selected = {};
   String? _sentence;
   bool _building = false;
+  /// 0 = Owned, 1 = Not owned
+  int _wordTab = 0;
   late final AnimationController _pulse;
   late final AnimationController _reveal;
   final _combineKey = GlobalKey();
 
   int get _max => sentenceTierMaxWords(tier: widget.tier);
 
-  static const _seed = <String>[
+  static const _seedOwned = <String>[
     'Peace', 'Breath', 'Light', 'Heart', 'Flow', 'Calm', 'Truth', 'Heal',
     'Dawn', 'Grace', 'Pulse', 'Still',
   ];
@@ -66,10 +70,39 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
   List<String> get _owned {
     final lib = ContentStore.instance.library;
     if (lib.isNotEmpty) {
-      return lib.map((w) => w.word).where((s) => s.trim().isNotEmpty).take(48).toList();
+      return lib
+          .map((w) => w.word)
+          .where((s) => s.trim().isNotEmpty)
+          .take(48)
+          .toList();
     }
-    return _seed;
+    return _seedOwned;
   }
+
+  List<String> get _notOwned {
+    final ownedLower = _owned.map((e) => e.toLowerCase()).toSet();
+    final fromCatalog = <String>[];
+    final seen = <String>{};
+    for (final cat in kRmCategories) {
+      for (final e in cat.words) {
+        final raw = e.word.trim();
+        if (raw.isEmpty) continue;
+        final key = raw.toLowerCase();
+        if (ownedLower.contains(key) || seen.contains(key)) continue;
+        seen.add(key);
+        fromCatalog.add(raw[0].toUpperCase() + raw.substring(1));
+        if (fromCatalog.length >= 48) break;
+      }
+      if (fromCatalog.length >= 48) break;
+    }
+    if (fromCatalog.isNotEmpty) return fromCatalog;
+    return const [
+      'Vitality', 'Balance', 'Clarity', 'Harmony', 'Courage', 'Wisdom',
+      'Nourish', 'Restore', 'Awaken', 'Ground', 'Radiance', 'Presence',
+    ].where((w) => !ownedLower.contains(w.toLowerCase())).toList();
+  }
+
+  List<String> get _activeWords => _wordTab == 0 ? _owned : _notOwned;
 
   @override
   void initState() {
@@ -193,6 +226,8 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
   @override
   Widget build(BuildContext context) {
     final owned = _owned;
+    final notOwned = _notOwned;
+    final active = _activeWords;
     final top = MediaQuery.paddingOf(context).top;
     final bottom = MediaQuery.paddingOf(context).bottom;
 
@@ -260,303 +295,409 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
                   child: ListView(
                     padding: EdgeInsets.fromLTRB(16, 4, 16, 28 + bottom),
                     children: [
+                      // 1) Black top banner — actions only, no word chips
                       CustomizeBlackBanner(
                         title: 'Build your\nsentence',
                         subtitle: 'Combine owned words into one healing line',
                         onTap: _scrollToCombine,
                       ),
+                      // Quick actions stay under the banner as nested rows
+                      // (not mixed with word select)
+                      NestedDarkWrap(
+                        onTap: _listen,
+                        child: _ActionRow(
+                          mark: NwsbMarks.play,
+                          title: 'Listen',
+                          sub: 'Hear the words before you combine',
+                        ),
+                      ),
+                      NestedDarkWrap(
+                        onTap: _openRequest,
+                        child: _ActionRow(
+                          mark: NwsbMarks.features,
+                          title: 'Request customized words',
+                          sub: 'Rewrite and Request for your practice',
+                        ),
+                      ),
+                      NestedDarkWrap(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => const WordAtelierScreen(),
+                            ),
+                          );
+                        },
+                        child: _ActionRow(
+                          mark: NwsbMarks.bag,
+                          title: 'Buy / Shop words',
+                          sub: 'Grow your library in the Store',
+                        ),
+                      ),
+                      // 2) Heading BELOW the black banner
+                      const Padding(
+                        padding: EdgeInsets.fromLTRB(4, 10, 4, 12),
+                        child: Text(
+                          'Building your sentence',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.35,
+                          ),
+                        ),
+                      ),
+                      // 3) Word select / combine studio — stronger glass
                       KeyedSubtree(
                         key: _combineKey,
                         child: HeavyGlassPanel(
-                        margin: const EdgeInsets.only(top: 2),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            NestedDarkWrap(
-                              padding: const EdgeInsets.fromLTRB(14, 14, 12, 14),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: 38,
-                                    height: 38,
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFF0A0A12),
-                                      borderRadius: BorderRadius.circular(11),
-                                      border: Border.all(
-                                        color: const Color(0x38FFFFFF),
+                          margin: EdgeInsets.zero,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              NestedDarkWrap(
+                                padding:
+                                    const EdgeInsets.fromLTRB(14, 14, 12, 14),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 38,
+                                      height: 38,
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF0A0A12),
+                                        borderRadius: BorderRadius.circular(11),
+                                        border: Border.all(
+                                          color: const Color(0x38FFFFFF),
+                                        ),
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: NwsbIcon(
+                                        NwsbMarks.features,
+                                        size: 18,
+                                        color: Colors.white,
                                       ),
                                     ),
-                                    alignment: Alignment.center,
-                                    child: NwsbIcon(
-                                      NwsbMarks.features,
-                                      size: 18,
-                                      color: Colors.white,
+                                    const SizedBox(width: 12),
+                                    const Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Combine studio',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w800,
+                                            ),
+                                          ),
+                                          SizedBox(height: 2),
+                                          Text(
+                                            'Pick words · weave · speak as one breath',
+                                            style: TextStyle(
+                                              color: Color(0x8CFFFFFF),
+                                              fontSize: 11,
+                                              height: 1.35,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
+                                    Text(
+                                      '${_selected.length} / $_max',
+                                      style: const TextStyle(
+                                        color: Color(0xB8FFFFFF),
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              // Owned / Not owned glass tabs
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 10),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: _WordPoolTab(
+                                        label: 'Owned',
+                                        count: owned.length,
+                                        selected: _wordTab == 0,
+                                        onTap: () =>
+                                            setState(() => _wordTab = 0),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: _WordPoolTab(
+                                        label: 'Not owned',
+                                        count: notOwned.length,
+                                        selected: _wordTab == 1,
+                                        onTap: () =>
+                                            setState(() => _wordTab = 1),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              // Active pool panel (glass)
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(18),
+                                child: BackdropFilter(
+                                  filter: ui.ImageFilter.blur(
+                                    sigmaX: kHeavyGlassSigma,
+                                    sigmaY: kHeavyGlassSigma,
                                   ),
-                                  const SizedBox(width: 12),
-                                  const Expanded(
+                                  child: Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.all(14),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0x18FFFFFF),
+                                      borderRadius: BorderRadius.circular(18),
+                                      border: Border.all(
+                                        color: const Color(0x2EFFFFFF),
+                                      ),
+                                    ),
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          'Combine studio',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w800,
-                                          ),
-                                        ),
-                                        SizedBox(height: 2),
-                                        Text(
-                                          'Pick words · weave · speak as one breath',
-                                          style: TextStyle(
-                                            color: Color(0x8CFFFFFF),
-                                            fontSize: 11,
-                                            height: 1.35,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Text(
-                                    '${_selected.length} / $_max',
-                                    style: const TextStyle(
-                                      color: Color(0xB8FFFFFF),
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            NestedDarkWrap(
-                              onTap: _listen,
-                              child: _ActionRow(
-                                mark: NwsbMarks.play,
-                                title: 'Listen',
-                                sub: 'Hear the words before you combine',
-                              ),
-                            ),
-                            NestedDarkWrap(
-                              onTap: _scrollToCombine,
-                              child: _ActionRow(
-                                mark: NwsbMarks.book,
-                                title: 'All words owned',
-                                sub: '${owned.length} words ready to weave',
-                              ),
-                            ),
-                            NestedDarkWrap(
-                              onTap: _openRequest,
-                              child: _ActionRow(
-                                mark: NwsbMarks.features,
-                                title: 'Request customized words',
-                                sub: 'Rewrite and Request for your practice',
-                              ),
-                            ),
-                            NestedDarkWrap(
-                              onTap: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute<void>(
-                                    builder: (_) => const WordAtelierScreen(),
-                                  ),
-                                );
-                              },
-                              child: _ActionRow(
-                                mark: NwsbMarks.bag,
-                                title: 'Buy / Shop words',
-                                sub: 'Grow your library in the Store',
-                              ),
-                            ),
-                            NestedDarkWrap(
-                              padding: const EdgeInsets.all(14),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text(
-                                    'Select words',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w800,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    'Select at least 2 owned words. Your subconscious tier allows up to $_max.',
-                                    style: const TextStyle(
-                                      color: Color(0x8CFFFFFF),
-                                      fontSize: 12,
-                                      height: 1.4,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 14),
-                                  Wrap(
-                                    spacing: 8,
-                                    runSpacing: 8,
-                                    children: [
-                                      for (final w in owned)
-                                        _WordChip(
-                                          label: w,
-                                          selected: _selected.contains(w),
-                                          onTap: () => _toggle(w),
-                                        ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 18),
-                                  AnimatedBuilder(
-                                    animation: _pulse,
-                                    builder: (context, child) {
-                                      final glow = 0.35 + 0.25 * _pulse.value;
-                                      final enabled =
-                                          _selected.length >= 2 && !_building;
-                                      return GestureDetector(
-                                        onTap: enabled ? _combine : null,
-                                        child: AnimatedContainer(
-                                          duration:
-                                              const Duration(milliseconds: 220),
-                                          height: 54,
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(16),
-                                            color: enabled
-                                                ? Colors.white
-                                                : const Color(0x22FFFFFF),
-                                            boxShadow: enabled
-                                                ? [
-                                                    BoxShadow(
-                                                      color: Color.fromRGBO(
-                                                          255,
-                                                          255,
-                                                          255,
-                                                          glow * 0.45),
-                                                      blurRadius: 22,
-                                                      spreadRadius: 1,
-                                                    ),
-                                                  ]
-                                                : null,
-                                          ),
-                                          child: _building
-                                              ? const SizedBox(
-                                                  width: 22,
-                                                  height: 22,
-                                                  child:
-                                                      CircularProgressIndicator(
-                                                    strokeWidth: 2.2,
-                                                    color: Color(0xFF0A0A12),
-                                                  ),
-                                                )
-                                              : Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  children: [
-                                                    NwsbIcon(
-                                                      NwsbMarks.enterArrow,
-                                                      size: 14,
-                                                      viewBox: 12,
-                                                      color: enabled
-                                                          ? const Color(
-                                                              0xFF0A0A12)
-                                                          : const Color(
-                                                              0x66FFFFFF),
-                                                      strokeWidth: 1.9,
-                                                      cap: 'square',
-                                                    ),
-                                                    const SizedBox(width: 10),
-                                                    Text(
-                                                      'Combine into sentence',
-                                                      style: TextStyle(
-                                                        color: enabled
-                                                            ? const Color(
-                                                                0xFF0A0A12)
-                                                            : const Color(
-                                                                0x66FFFFFF),
-                                                        fontSize: 13,
-                                                        fontWeight:
-                                                            FontWeight.w800,
-                                                        letterSpacing: 0.4,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
-                            if (_sentence != null)
-                              FadeTransition(
-                                opacity: _reveal,
-                                child: SlideTransition(
-                                  position: Tween<Offset>(
-                                    begin: const Offset(0, 0.12),
-                                    end: Offset.zero,
-                                  ).animate(CurvedAnimation(
-                                    parent: _reveal,
-                                    curve: Curves.easeOutCubic,
-                                  )),
-                                  child: NestedDarkWrap(
-                                    margin: EdgeInsets.zero,
-                                    padding: const EdgeInsets.all(16),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const Text(
-                                          'YOUR SENTENCE',
-                                          style: TextStyle(
-                                            color: Color(0xFFE8D5A3),
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.w800,
-                                            letterSpacing: 1.8,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 10),
-                                        Text(
-                                          _sentence!,
+                                          _wordTab == 0
+                                              ? 'Owned words'
+                                              : 'Not owned words',
                                           style: const TextStyle(
                                             color: Colors.white,
-                                            fontSize: 17,
-                                            fontWeight: FontWeight.w500,
-                                            height: 1.45,
-                                            letterSpacing: -0.2,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 6),
+                                        Text(
+                                          _wordTab == 0
+                                              ? 'Select at least 2 owned words. Your subconscious tier allows up to $_max.'
+                                              : 'Preview shop words. Tap Buy / Shop words to unlock them for combining.',
+                                          style: const TextStyle(
+                                            color: Color(0x8CFFFFFF),
+                                            fontSize: 12,
+                                            height: 1.4,
                                           ),
                                         ),
                                         const SizedBox(height: 14),
-                                        GestureDetector(
-                                          onTap: _openRequest,
-                                          child: Container(
-                                            height: 48,
-                                            alignment: Alignment.center,
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(14),
+                                        if (active.isEmpty)
+                                          const Text(
+                                            'No words in this pool yet.',
+                                            style: TextStyle(
+                                              color: Color(0x73FFFFFF),
+                                              fontSize: 12,
                                             ),
-                                            child: const Text(
-                                              'Rewrite and Request',
-                                              style: TextStyle(
-                                                color: Color(0xFF0A0A12),
-                                                fontSize: 13,
-                                                fontWeight: FontWeight.w800,
-                                                letterSpacing: 0.3,
-                                              ),
-                                            ),
+                                          )
+                                        else
+                                          Wrap(
+                                            spacing: 8,
+                                            runSpacing: 8,
+                                            children: [
+                                              for (final w in active)
+                                                _WordChip(
+                                                  label: w,
+                                                  selected:
+                                                      _selected.contains(w),
+                                                  locked: _wordTab == 1,
+                                                  onTap: () {
+                                                    if (_wordTab == 1) {
+                                                      HapticFeedback
+                                                          .selectionClick();
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                        const SnackBar(
+                                                          content: Text(
+                                                              'Unlock this word in the Store to combine it.'),
+                                                          behavior:
+                                                              SnackBarBehavior
+                                                                  .floating,
+                                                          duration: Duration(
+                                                              seconds: 2),
+                                                        ),
+                                                      );
+                                                      return;
+                                                    }
+                                                    _toggle(w);
+                                                  },
+                                                ),
+                                            ],
                                           ),
-                                        ),
+                                        if (_wordTab == 0) ...[
+                                          const SizedBox(height: 18),
+                                          AnimatedBuilder(
+                                            animation: _pulse,
+                                            builder: (context, child) {
+                                              final glow =
+                                                  0.35 + 0.25 * _pulse.value;
+                                              final enabled =
+                                                  _selected.length >= 2 &&
+                                                      !_building;
+                                              return GestureDetector(
+                                                onTap:
+                                                    enabled ? _combine : null,
+                                                child: AnimatedContainer(
+                                                  duration: const Duration(
+                                                      milliseconds: 220),
+                                                  height: 54,
+                                                  alignment: Alignment.center,
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            16),
+                                                    color: enabled
+                                                        ? Colors.white
+                                                        : const Color(
+                                                            0x22FFFFFF),
+                                                    boxShadow: enabled
+                                                        ? [
+                                                            BoxShadow(
+                                                              color: Color
+                                                                  .fromRGBO(
+                                                                      255,
+                                                                      255,
+                                                                      255,
+                                                                      glow *
+                                                                          0.45),
+                                                              blurRadius: 22,
+                                                              spreadRadius: 1,
+                                                            ),
+                                                          ]
+                                                        : null,
+                                                  ),
+                                                  child: _building
+                                                      ? const SizedBox(
+                                                          width: 22,
+                                                          height: 22,
+                                                          child:
+                                                              CircularProgressIndicator(
+                                                            strokeWidth: 2.2,
+                                                            color: Color(
+                                                                0xFF0A0A12),
+                                                          ),
+                                                        )
+                                                      : Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          children: [
+                                                            NwsbIcon(
+                                                              NwsbMarks
+                                                                  .enterArrow,
+                                                              size: 14,
+                                                              viewBox: 12,
+                                                              color: enabled
+                                                                  ? const Color(
+                                                                      0xFF0A0A12)
+                                                                  : const Color(
+                                                                      0x66FFFFFF),
+                                                              strokeWidth: 1.9,
+                                                              cap: 'square',
+                                                            ),
+                                                            const SizedBox(
+                                                                width: 10),
+                                                            Text(
+                                                              'Combine into sentence',
+                                                              style: TextStyle(
+                                                                color: enabled
+                                                                    ? const Color(
+                                                                        0xFF0A0A12)
+                                                                    : const Color(
+                                                                        0x66FFFFFF),
+                                                                fontSize: 13,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w800,
+                                                                letterSpacing:
+                                                                    0.4,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ],
                                       ],
                                     ),
                                   ),
                                 ),
                               ),
-                          ],
+                              if (_sentence != null)
+                                FadeTransition(
+                                  opacity: _reveal,
+                                  child: SlideTransition(
+                                    position: Tween<Offset>(
+                                      begin: const Offset(0, 0.12),
+                                      end: Offset.zero,
+                                    ).animate(CurvedAnimation(
+                                      parent: _reveal,
+                                      curve: Curves.easeOutCubic,
+                                    )),
+                                    child: NestedDarkWrap(
+                                      margin: const EdgeInsets.only(top: 10),
+                                      padding: const EdgeInsets.all(16),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          const Text(
+                                            'YOUR SENTENCE',
+                                            style: TextStyle(
+                                              color: Color(0xFFE8D5A3),
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.w800,
+                                              letterSpacing: 1.8,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 10),
+                                          Text(
+                                            _sentence!,
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.w500,
+                                              height: 1.45,
+                                              letterSpacing: -0.2,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 14),
+                                          GestureDetector(
+                                            onTap: _openRequest,
+                                            child: Container(
+                                              height: 48,
+                                              alignment: Alignment.center,
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius:
+                                                    BorderRadius.circular(14),
+                                              ),
+                                              child: const Text(
+                                                'Rewrite and Request',
+                                                style: TextStyle(
+                                                  color: Color(0xFF0A0A12),
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.w800,
+                                                  letterSpacing: 0.3,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
                         ),
-                      ),
                       ),
                       SizedBox(height: math.max(12, top * 0.05)),
                       TextButton(
@@ -577,6 +718,71 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _WordPoolTab extends StatelessWidget {
+  const _WordPoolTab({
+    required this.label,
+    required this.count,
+    required this.selected,
+    required this.onTap,
+  });
+  final String label;
+  final int count;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: BackdropFilter(
+          filter: ui.ImageFilter.blur(
+            sigmaX: kNotifGlassSigma,
+            sigmaY: kNotifGlassSigma,
+          ),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              color: selected
+                  ? const Color(0x28FFFFFF)
+                  : const Color(0x10FFFFFF),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: selected
+                    ? const Color(0x55FFFFFF)
+                    : const Color(0x24FFFFFF),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: selected ? Colors.white : const Color(0xB8FFFFFF),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '$count words',
+                  style: const TextStyle(
+                    color: Color(0x73FFFFFF),
+                    fontSize: 11,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -810,9 +1016,11 @@ class _WordChip extends StatelessWidget {
     required this.label,
     required this.selected,
     required this.onTap,
+    this.locked = false,
   });
   final String label;
   final bool selected;
+  final bool locked;
   final VoidCallback onTap;
 
   @override
@@ -823,16 +1031,28 @@ class _WordChip extends StatelessWidget {
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: selected ? Colors.white : const Color(0x1AFFFFFF),
+          color: selected
+              ? Colors.white
+              : locked
+                  ? const Color(0x12FFFFFF)
+                  : const Color(0x1AFFFFFF),
           borderRadius: BorderRadius.circular(999),
           border: Border.all(
-            color: selected ? Colors.white : const Color(0x33FFFFFF),
+            color: selected
+                ? Colors.white
+                : locked
+                    ? const Color(0x22FFFFFF)
+                    : const Color(0x33FFFFFF),
           ),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: selected ? const Color(0xFF0A0A12) : Colors.white,
+            color: selected
+                ? const Color(0xFF0A0A12)
+                : locked
+                    ? const Color(0x88FFFFFF)
+                    : Colors.white,
             fontSize: 13,
             fontWeight: FontWeight.w700,
           ),

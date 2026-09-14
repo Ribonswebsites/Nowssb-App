@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../media/nwsb_video.dart';
-import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 
 class SubscriptionScreen extends StatefulWidget {
@@ -115,101 +113,54 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        backgroundColor: Colors.transparent,
-        body: Stack(
-          fit: StackFit.expand,
-          children: [
-            const Positioned.fill(
-              child: NwsbVideo(
-                asset: 'assets/video/subscription-join-nowssb.mp4',
-                poster: 'assets/video/subscription-join-nowssb-poster.webp',
-                priority: ClipPriority.feature,
-                fit: BoxFit.cover,
-              ),
+        backgroundColor: const Color(0xFF060C18),
+        body: SafeArea(
+          child: CustomScrollView(slivers: [
+            const SliverAppBar(
+              pinned: true,
+              backgroundColor: Color(0xFF060C18),
+              surfaceTintColor: Colors.transparent,
+              title: Text('Subscription',
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.w800)),
+              centerTitle: true,
+              iconTheme: IconThemeData(color: Colors.white),
             ),
-            const Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color(0xB0060C18),
-                      Color(0x66060C18),
-                      Color(0xF0060C18),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            SafeArea(
-              child: CustomScrollView(slivers: [
-                SliverAppBar(
-                  pinned: true,
-                  backgroundColor: Colors.transparent,
-                  surfaceTintColor: Colors.transparent,
-                  leading: IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.arrow_back_rounded,
-                          color: Colors.white)),
-                  title: const Text('Subscription',
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.w800)),
-                  centerTitle: true,
-                ),
-                SliverToBoxAdapter(child: _videoBanner()),
-                SliverToBoxAdapter(child: _billing()),
-                SliverToBoxAdapter(child: _horizontalPlans()),
-                SliverToBoxAdapter(child: _benefits()),
-                SliverToBoxAdapter(child: _bottomOffer()),
-              ]),
-            ),
-          ],
+            SliverToBoxAdapter(child: _tierBannerList()),
+            SliverToBoxAdapter(child: _billing()),
+            SliverToBoxAdapter(child: _horizontalPlans()),
+            SliverToBoxAdapter(child: _benefits()),
+            SliverToBoxAdapter(child: _bottomOffer()),
+          ]),
         ),
       );
 
-  Widget _videoBanner() => Padding(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(24),
-          child: AspectRatio(
-            aspectRatio: 1,
-            child: Stack(fit: StackFit.expand, children: [
-              const NwsbVideo(
-                  asset: 'assets/video/subscription-join-nowssb.mp4',
-                  poster: 'assets/video/subscription-join-nowssb-poster.webp',
-                  priority: ClipPriority.feature),
-              DecoratedBox(
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                    Colors.black.withValues(alpha: .78),
-                    Colors.transparent,
-                    Colors.black.withValues(alpha: .84)
-                  ]))),
-              Padding(
-                  padding: const EdgeInsets.all(14),
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _rotatingBanner(),
-                        const Spacer(),
-                        const Align(
-                            alignment: Alignment.bottomLeft,
-                            child: Text('Choose your frequency',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 28,
-                                    height: 1.05,
-                                    fontWeight: FontWeight.w900))),
-                        const SizedBox(height: 8),
-                        _blackBanner(
-                            'JOIN NOWSSB', 'Get your subscription today'),
-                      ])),
-            ]),
-          ),
+  /// All four subscriptions as black banners with pricing — no video/image.
+  Widget _tierBannerList() => Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _rotatingBanner(),
+            const SizedBox(height: 10),
+            for (var i = 0; i < plans.length; i++) ...[
+              GestureDetector(
+                onTap: () => setState(() => selected = i),
+                child: _blackBanner(
+                  plans[i].name,
+                  yearly ? plans[i].yearly : plans[i].monthly,
+                  key: ValueKey('tier-$i-$yearly'),
+                ),
+              ),
+              if (i != plans.length - 1) const SizedBox(height: 8),
+            ],
+            const SizedBox(height: 8),
+            const Text('Choose your frequency',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w900)),
+          ],
         ),
       );
 
@@ -231,9 +182,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 11,
+                        fontSize: 12,
                         fontWeight: FontWeight.w900,
-                        letterSpacing: 1.1)),
+                        letterSpacing: 0.6)),
                 const SizedBox(height: 3),
                 Text(subtitle,
                     maxLines: 1,
@@ -246,7 +197,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       );
 
   Widget _billing() => Padding(
-      padding: const EdgeInsets.fromLTRB(18, 0, 18, 8),
+      padding: const EdgeInsets.fromLTRB(18, 8, 18, 8),
       child: Container(
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
@@ -278,11 +229,11 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   Widget _horizontalPlans() =>
       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         const Padding(
-            padding: EdgeInsets.fromLTRB(18, 20, 18, 10),
-            child: Text('Choose your frequency',
+            padding: EdgeInsets.fromLTRB(18, 12, 18, 10),
+            child: Text('Plan details',
                 style: TextStyle(
                     color: Colors.white,
-                    fontSize: 20,
+                    fontSize: 18,
                     fontWeight: FontWeight.w900))),
         SizedBox(
             height: 152,

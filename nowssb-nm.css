@@ -16256,15 +16256,59 @@ a:active,
   line-height: 1.45; letter-spacing: -0.2px; color: #fff;
 }
 
-/
+/* Heavy combine studio — Customized-level blur, no bg media */
 #sub-sentence-builder .sb-glass.sb-heavy {
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.20);
   border-radius: 28px !important;
+  -webkit-backdrop-filter: blur(44px) saturate(1.45);
+  backdrop-filter: blur(44px) saturate(1.45);
+  box-shadow: 0 22px 52px rgba(0,0,0,0.52);
+  padding: 12px;
+  background-image: none !important;
+}
+#sub-sentence-builder .sb-combine video,
+#sub-sentence-builder .sb-combine img.sb-bg,
+#sub-sentence-builder .sb-pool-panel video,
+#sub-sentence-builder .sb-pool-panel img[data-sb-bg] {
+  display: none !important;
+}
+.sb-section-heading {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 20px; font-weight: 800; letter-spacing: -0.35px;
+  color: #fff; margin: 10px 4px 12px; padding: 0;
+}
+.sb-pool-tabs {
+  display: flex; gap: 8px; margin: 0 0 10px;
+}
+.sb-pool-tab {
+  flex: 1; display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
+  padding: 12px 14px; border-radius: 16px !important; cursor: pointer; text-align: left;
+  font: inherit; color: rgba(255,255,255,0.72);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.14);
+  -webkit-backdrop-filter: blur(26px) saturate(1.35);
+  backdrop-filter: blur(26px) saturate(1.35);
+}
+.sb-pool-tab.on {
+  color: #fff; background: rgba(255,255,255,0.16);
+  border-color: rgba(255,255,255,0.34);
+}
+.sb-pool-tab span {
+  font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.45);
+}
+.sb-pool-tab.on span { color: rgba(255,255,255,0.55); }
+.sb-pool-panel {
+  padding: 14px; border-radius: 18px !important;
+  background: rgba(255,255,255,0.09);
+  border: 1px solid rgba(255,255,255,0.18);
   -webkit-backdrop-filter: blur(40px) saturate(1.4);
   backdrop-filter: blur(40px) saturate(1.4);
-  box-shadow: 0 20px 48px rgba(0,0,0,0.48);
-  padding: 12px;
+  background-image: none !important;
+}
+.sb-chip.sb-chip-locked {
+  opacity: 0.72; background: rgba(255,255,255,0.07);
+  border-color: rgba(255,255,255,0.14);
 }
 .sb-top-banner {
   width: 100%; min-height: 96px; margin: 0 0 14px; padding: 18px 18px 18px 22px;

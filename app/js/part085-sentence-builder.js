@@ -1,7 +1,7 @@
 /* ══ Sentence Builder — glass full page (#sub-sentence-builder)
-   Opens from the player Sentence tab. Black glass banners, white-circle
-   SVG icons on the right, combine owned words by subconscious tier (2–6).
-   No emoji. */
+   Black top banner → "Building your sentence" → heavy glass studio
+   with Owned / Not owned glass tabs. Word chips BELOW the banner.
+   No emoji. No bg video/image in the combine area. */
 (function () {
   'use strict';
 
@@ -45,8 +45,40 @@
     ];
   }
 
+  function sbNotOwnedWords() {
+    var owned = {};
+    sbOwnedWords().forEach(function (w) { owned[String(w.word).toLowerCase()] = true; });
+    var pool = [];
+    var seen = {};
+    var src = window.MASTER_WORD_LIBRARY || window.RM_WORDS || [];
+    if (Array.isArray(src) && src.length) {
+      src.forEach(function (w) {
+        var name = typeof w === 'string' ? w : (w && w.word);
+        if (!name) return;
+        var key = String(name).toLowerCase();
+        if (owned[key] || seen[key]) return;
+        seen[key] = true;
+        pool.push({ word: name, meaning: (w && w.meaning) || '', organ: (w && w.organ) || '' });
+      });
+    }
+    if (!pool.length) {
+      [
+        'Vitality', 'Balance', 'Clarity', 'Harmony', 'Courage', 'Wisdom',
+        'Nourish', 'Restore', 'Awaken', 'Ground', 'Radiance', 'Presence',
+        'Fire', 'Spirit', 'Warrior', 'Cosmos', 'Infinity', 'Thunder'
+      ].forEach(function (name) {
+        var key = name.toLowerCase();
+        if (owned[key] || seen[key]) return;
+        seen[key] = true;
+        pool.push({ word: name, meaning: '', organ: '' });
+      });
+    }
+    return pool.slice(0, 48);
+  }
+
   var _sel = new Set();
   var _building = false;
+  var _wordTab = 'owned'; // owned | not
 
   function sbComposeLocal(words) {
     if (words.length === 2) {
@@ -72,12 +104,13 @@
     go: sbIco('<path d="M2 6H10M7 3L10 6L7 9" stroke="currentColor" stroke-width="1.9" stroke-linecap="square"/>')
   };
 
-  function sbBanner(title, sub, ico, onclick) {
-    return '<button type="button" class="sb-banner" ' + (onclick ? 'onclick="' + onclick + '"' : '') + '>' +
-      '<div class="sb-banner-txt"><div class="sb-banner-title">' + title + '</div>' +
-      (sub ? '<div class="sb-banner-sub">' + sub + '</div>' : '') + '</div>' +
-      '<div class="sb-banner-div" aria-hidden="true"></div>' +
-      '<div class="sb-banner-ico">' + ico + '</div>' +
+  function nestRow(title, sub, ico, onclick) {
+    return '<button type="button" class="sb-nest" ' + (onclick ? 'onclick="' + onclick + '"' : '') + '>' +
+      '<div class="sb-nest-ico">' + ico + '</div>' +
+      '<div class="sb-nest-div" aria-hidden="true"></div>' +
+      '<div class="sb-nest-txt"><div class="sb-nest-title">' + title + '</div>' +
+      (sub ? '<div class="sb-nest-sub">' + sub + '</div>' : '') + '</div>' +
+      '<div class="sb-nest-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="rgba(255,255,255,0.55)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' +
       '</button>';
   }
 
@@ -86,27 +119,26 @@
     if (!root) return;
     var max = sbMaxWords();
     var owned = sbOwnedWords();
-    var chips = owned.map(function (w) {
+    var notOwned = sbNotOwnedWords();
+    var active = _wordTab === 'owned' ? owned : notOwned;
+    var locked = _wordTab !== 'owned';
+    var chips = active.map(function (w) {
       var on = _sel.has(w.word);
-      return '<button type="button" class="sb-chip' + (on ? ' on' : '') + '" data-word="' +
-        String(w.word).replace(/"/g, '&quot;') + '" onclick="sbToggleWord(this)">' + w.word + '</button>';
+      return '<button type="button" class="sb-chip' + (on ? ' on' : '') + (locked ? ' sb-chip-locked' : '') +
+        '" data-word="' + String(w.word).replace(/"/g, '&quot;') +
+        '" onclick="sbToggleWord(this,' + (locked ? 'true' : 'false') + ')">' + w.word + '</button>';
     }).join('');
 
-    function nestRow(title, sub, ico, onclick) {
-      return '<button type="button" class="sb-nest" ' + (onclick ? 'onclick="' + onclick + '"' : '') + '>' +
-        '<div class="sb-nest-ico">' + ico + '</div>' +
-        '<div class="sb-nest-div" aria-hidden="true"></div>' +
-        '<div class="sb-nest-txt"><div class="sb-nest-title">' + title + '</div>' +
-        (sub ? '<div class="sb-nest-sub">' + sub + '</div>' : '') + '</div>' +
-        '<div class="sb-nest-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="rgba(255,255,255,0.55)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' +
-        '</button>';
-    }
     root.innerHTML =
       '<button type="button" class="sb-top-banner" onclick="sbScrollCombine()">' +
         '<div class="sb-top-banner-copy"><div class="sb-top-banner-title">Build your<br>sentence</div>' +
         '<div class="sb-top-banner-sub">Combine owned words into one healing line</div></div>' +
         '<div class="sb-top-banner-arrow">' + IC.go + '</div>' +
       '</button>' +
+      nestRow('Listen', 'Hear the words before you combine', IC.play, 'sbListen()') +
+      nestRow('Request customized words', 'Rewrite and Request for your practice', IC.features, 'sbRequestCustom()') +
+      nestRow('Buy / Shop words', 'Grow your library in the Store', IC.bag, 'sbOpenShop()') +
+      '<h2 class="sb-section-heading">Building your sentence</h2>' +
       '<section class="sb-glass sb-combine sb-heavy" id="sbCombine">' +
         '<div class="sb-nest sb-nest-head">' +
           '<div class="sb-nest-ico">' + IC.features + '</div>' +
@@ -114,17 +146,25 @@
           '<div class="sb-nest-sub">Pick words · weave · speak as one breath</div></div>' +
           '<span class="sb-count" id="sbCount">' + _sel.size + ' / ' + max + '</span>' +
         '</div>' +
-        nestRow('Listen', 'Hear the words before you combine', IC.play, 'sbListen()') +
-        nestRow('All words owned', owned.length + ' words ready to weave', IC.book, 'sbScrollCombine()') +
-        nestRow('Request customized words', 'Rewrite and Request for your practice', IC.features, 'sbRequestCustom()') +
-        nestRow('Buy / Shop words', 'Grow your library in the Store', IC.bag, 'sbOpenShop()') +
-        '<div class="sb-nest sb-nest-select">' +
-          '<div class="sb-combine-head"><span>Select words</span></div>' +
-          '<p class="sb-hint">Select at least 2 owned words. Your subconscious tier allows up to ' + max + '.</p>' +
-          '<div class="sb-chips" id="sbChips">' + chips + '</div>' +
-          '<button type="button" class="sb-combine-btn" id="sbCombineBtn" onclick="sbCombine()" ' +
-            (_sel.size < 2 || _building ? 'disabled' : '') + '>' +
-            IC.go + '<span>Combine into sentence</span></button>' +
+        '<div class="sb-pool-tabs" role="tablist">' +
+          '<button type="button" role="tab" class="sb-pool-tab' + (_wordTab === 'owned' ? ' on' : '') +
+            '" onclick="sbSetWordTab(\'owned\')">Owned<span>' + owned.length + ' words</span></button>' +
+          '<button type="button" role="tab" class="sb-pool-tab' + (_wordTab === 'not' ? ' on' : '') +
+            '" onclick="sbSetWordTab(\'not\')">Not owned<span>' + notOwned.length + ' words</span></button>' +
+        '</div>' +
+        '<div class="sb-pool-panel">' +
+          '<div class="sb-combine-head"><span>' + (_wordTab === 'owned' ? 'Owned words' : 'Not owned words') + '</span></div>' +
+          '<p class="sb-hint">' +
+            (_wordTab === 'owned'
+              ? ('Select at least 2 owned words. Your subconscious tier allows up to ' + max + '.')
+              : 'Preview shop words. Unlock them in the Store to combine.') +
+          '</p>' +
+          '<div class="sb-chips" id="sbChips">' + (chips || '<span class="sb-hint">No words in this pool yet.</span>') + '</div>' +
+          (_wordTab === 'owned'
+            ? ('<button type="button" class="sb-combine-btn" id="sbCombineBtn" onclick="sbCombine()" ' +
+                (_sel.size < 2 || _building ? 'disabled' : '') + '>' +
+                IC.go + '<span>Combine into sentence</span></button>')
+            : '') +
         '</div>' +
         '<div class="sb-result sb-nest" id="sbResult" hidden>' +
           '<div class="sb-result-label">YOUR SENTENCE</div>' +
@@ -134,8 +174,21 @@
       '</section>';
   }
 
-  window.sbToggleWord = function (el) {
+  window.sbSetWordTab = function (tab) {
+    _wordTab = tab === 'not' ? 'not' : 'owned';
+    sbRender();
+  };
+
+  window.sbToggleWord = function (el, locked) {
     if (!el) return;
+    if (locked) {
+      el.classList.add('sb-shake');
+      setTimeout(function () { el.classList.remove('sb-shake'); }, 420);
+      try {
+        if (typeof openSub === 'function') { /* nudge shop */ }
+      } catch (e) {}
+      return;
+    }
     var w = el.getAttribute('data-word');
     var max = sbMaxWords();
     if (_sel.has(w)) _sel.delete(w);
@@ -221,7 +274,6 @@
     var words = Array.from(_sel);
     var text = sbComposeLocal(words);
 
-    // Prefer existing AI builder when available.
     try {
       if (typeof window.callAI === 'function') {
         var raw = await window.callAI(
@@ -262,6 +314,7 @@
     }
     _sel = new Set();
     _building = false;
+    _wordTab = 'owned';
     sbUpdateTierPill();
     sbRender();
   };
@@ -274,7 +327,6 @@
     }
   };
 
-  // Re-render when the sub opens via openSub('sentence-builder')
   function patchOpen() {
     if (typeof window.openSub !== 'function') return setTimeout(patchOpen, 120);
     if (window.openSub._sbPatched) return;
@@ -284,6 +336,7 @@
       if (id === 'sentence-builder') {
         _sel = new Set();
         _building = false;
+        _wordTab = 'owned';
         setTimeout(function () { sbUpdateTierPill(); sbRender(); }, 30);
       }
       return r;

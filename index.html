@@ -151,7 +151,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <link rel="stylesheet" href="app/app.css?v=318">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
 <link rel="stylesheet" href="nowssb-nm.css?v=803">
-<link rel="stylesheet" href="app/css/subscription-tiers.css?v=1">
+<link rel="stylesheet" href="app/css/subscription-tiers.css?v=2">
 <link rel="stylesheet" href="app/widgets.css?v=8">
 <link rel="stylesheet" href="app/steps.css?v=9">
 <link rel="stylesheet" href="nowssb-player.css?v=236">
@@ -1578,7 +1578,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </div>
       <div class="nmh-video-banner nmh-vb-tall nwsb-inframe dev-tabs-l" onclick="if(window.SS)SS.open('subscription')" style="cursor:pointer;">
         <div class="vbs-screen">
-          <video data-nwsb-auto muted loop playsinline preload="none" src="assets/video/subscription-join-nowssb.mp4"></video>
+          <!-- subscription TV aperture: black banners via subscription-tiers.js -->
           <button class="nmh-banner-cta nmh-banner-cta-r" onclick="event.stopPropagation();if(window.SS)SS.open('subscription')"><span class="nmh-cta-lbl">Subscribe Today</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
         </div>
       </div>
@@ -2285,7 +2285,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
     <div class="fash-video-banner fash-vb-tall nwsb-inframe dev-tabs-l" onclick="SS&&SS.open('subscription')" style="cursor:pointer;">
       <div class="vbs-screen">
-        <video data-nwsb-auto muted loop playsinline preload="none" src="assets/video/subscription-join-nowssb.mp4"></video>
+        <!-- subscription TV aperture: black banners via subscription-tiers.js -->
         <button class="fash-banner-cta fash-banner-cta-r" onclick="event.stopPropagation();SS&&SS.open('subscription')"><span class="nmh-cta-lbl">Subscribe Today</span><span class="nmh-cta-go"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6" stroke="rgba(255,255,255,0.92)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/><circle cx="17" cy="19" r="1.4" fill="rgba(255,255,255,0.92)"/></svg></span></button>
       </div>
     </div>
@@ -9563,7 +9563,7 @@ document.querySelectorAll('.option').forEach(b=>b.addEventListener('click',()=>b
 
   <!-- ── PANEL: SUBSCRIPTION ── -->
   <div class="ss-panel" id="ss-panel-subscription" style="padding:0 20px 80px;overflow:hidden;">
-    <video class="nwsb-sub-page-bg" autoplay muted loop playsinline preload="auto" poster="assets/video/subscription-join-nowssb-poster.webp" src="assets/video/subscription-join-nowssb.mp4"></video>
+    <!-- subscription page: no decorative bg video -->
 
     <!-- ── SUBSCRIPTION INTRO PAGE ── -->
     <div id="sub-intro-page" style="position:absolute;inset:0;z-index:30;display:flex;flex-direction:column;background:#060c18;overflow:hidden;transition:opacity 0.48s cubic-bezier(0.4,0,0.2,1);">
@@ -9620,11 +9620,14 @@ document.querySelectorAll('.option').forEach(b=>b.addEventListener('click',()=>b
         Yearly <span style="font-size:10px;background:rgba(110,231,183,.12);color:#6ee7b7;padding:2px 7px;border-radius:5px;font-weight:700;">Save 30%</span>
       </button>
     </div>
-    <!-- Plan banner — video, text on the right-middle like Today's Trending -->
-    <div class="ss-plan-banner" id="ssPlanBanner">
-      <video class="ss-plan-banner-vid" data-nwsb-auto muted loop playsinline preload="auto" src="assets/video/subscription-join-nowssb.mp4"></video>
-      <div class="ss-plan-banner-fade"></div>
-      <div class="ss-plan-banner-text" id="ssPlanBannerText"></div>
+    <!-- Plan tiers — black banners with pricing (no decorative video) -->
+    <div class="ss-plan-banner ss-plan-banner-static" id="ssPlanBanner">
+      <div class="nwsb-sub-plan-banner-list nwsb-sub-plan-banner-list-page" aria-label="Subscription tiers" id="ssPlanBannerTiers">
+        <button class="nwsb-sub-plan-banner" type="button" onclick="if(window.SS)SS.open('subscription')"><span class="nwsb-sub-plan-copy"><strong style="color:#f2f2f4">Free</strong><small>NowssB Edition · 30 days free</small></span><span class="nwsb-sub-plan-go">→</span></button>
+        <button class="nwsb-sub-plan-banner" type="button" onclick="if(window.SS)SS.open('subscription')"><span class="nwsb-sub-plan-copy"><strong style="color:#c8e8f5">Resonance</strong><small>$4.99 / month · $41.90 / year</small></span><span class="nwsb-sub-plan-go">→</span></button>
+        <button class="nwsb-sub-plan-banner" type="button" onclick="if(window.SS)SS.open('subscription')"><span class="nwsb-sub-plan-copy"><strong style="color:#e8d5a3">Frequency</strong><small>$9.99 / month · $83.90 / year</small></span><span class="nwsb-sub-plan-go">→</span></button>
+        <button class="nwsb-sub-plan-banner" type="button" onclick="if(window.SS)SS.open('subscription')"><span class="nwsb-sub-plan-copy"><strong style="color:#f2f2f4">Frequency X</strong><small>$19.99 / month · $167.90 / year</small></span><span class="nwsb-sub-plan-go">→</span></button>
+      </div>
     </div>
 
     <!-- Plan cards rendered by JS — plain horizontal swipe -->
@@ -11365,8 +11368,8 @@ document.querySelectorAll('.option').forEach(b=>b.addEventListener('click',()=>b
 <script src="app/js/part078.js?v=2"></script><!-- ══ CERTIFICATES + INSTALLED APP UPDATE CHECK ══ -->
 <script src="nowssb-social.js?v=185" defer></script>
 <script src="nowssb-nm.js?v=180" defer></script>
-<script src="app/js/part085-sentence-builder.js?v=2"></script>
-<script src="app/js/subscription-tiers.js?v=1"></script>
+<script src="app/js/part085-sentence-builder.js?v=3"></script>
+<script src="app/js/subscription-tiers.js?v=2"></script>
 <script src="nowssb-player.js?v=329" defer></script>
 <script src="app/js/part092-motion.js?v=1" defer></script><!-- APP-WIDE AURA MOTION -->
 <script src="app/js/part094-dashboard-live.js?v=1" defer></script>

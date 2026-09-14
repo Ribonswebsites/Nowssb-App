@@ -119,28 +119,20 @@ class EditionSection extends StatelessWidget {
             asset: 'assets/video/subscription-join-nowssb.mp4',
             frame: DeviceFrame.kioskPortrait,
             priority: ClipPriority.decoration,
+            showVideo: false,
             onTap: onTap,
             overlay: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 18, 16, 18),
+              padding: const EdgeInsets.fromLTRB(14, 16, 14, 16),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   _SubscriptionBanner(onTap: onTap),
-                  _SubscriptionTierStack(onTap: onTap),
-                  Column(
-                    children: [
-                      const Text('Join NowssB',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w900)),
-                      const SizedBox(height: 3),
-                      const Text('Get your subscription today',
-                          style: TextStyle(
-                              color: Color(0xBBFFFFFF), fontSize: 11)),
-                      const SizedBox(height: 9),
-                      _SubscriptionCta(onTap: onTap),
-                    ],
+                  const SizedBox(height: 10),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      child: _SubscriptionBlackBannerList(onTap: onTap),
+                    ),
                   ),
                 ],
               ),
@@ -196,6 +188,89 @@ class _SubscriptionBanner extends StatelessWidget {
                     color: Color(0x24FFFFFF), shape: BoxShape.circle),
                 child: const Icon(Icons.arrow_forward_rounded,
                     color: Colors.white, size: 16)),
+          ]),
+        ),
+      );
+}
+
+class _SubscriptionBlackBannerList extends StatelessWidget {
+  const _SubscriptionBlackBannerList({this.onTap});
+  final VoidCallback? onTap;
+
+  static const _tiers = <(String, String)>[
+    ('Free', 'NowssB Edition · 30 days free'),
+    ('Resonance', r'$4.99 / month · $41.90 / year'),
+    ('Frequency', r'$9.99 / month · $83.90 / year'),
+    ('Frequency X', r'$19.99 / month · $167.90 / year'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        for (var i = 0; i < _tiers.length; i++) ...[
+          _SubscriptionPlanBlackBanner(
+            title: _tiers[i].$1,
+            subtitle: _tiers[i].$2,
+            onTap: onTap,
+          ),
+          if (i != _tiers.length - 1) const SizedBox(height: 8),
+        ],
+      ],
+    );
+  }
+}
+
+class _SubscriptionPlanBlackBanner extends StatelessWidget {
+  const _SubscriptionPlanBlackBanner({
+    required this.title,
+    required this.subtitle,
+    this.onTap,
+  });
+  final String title;
+  final String subtitle;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 11),
+          decoration: BoxDecoration(
+            color: const Color(0xFF030303),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: const Color(0x3DFFFFFF)),
+          ),
+          child: Row(children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w900)),
+                  const SizedBox(height: 3),
+                  Text(subtitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                          color: Color(0x99FFFFFF), fontSize: 10)),
+                ],
+              ),
+            ),
+            Container(
+              width: 28,
+              height: 28,
+              decoration: const BoxDecoration(
+                  color: Color(0x24FFFFFF), shape: BoxShape.circle),
+              child: const Icon(Icons.arrow_forward_rounded,
+                  color: Colors.white, size: 16),
+            ),
           ]),
         ),
       );
