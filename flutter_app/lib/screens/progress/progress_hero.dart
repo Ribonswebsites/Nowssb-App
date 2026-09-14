@@ -1,7 +1,9 @@
 /// Hero video, sticky header, and total-sessions orb for My Progress.
 ///
-/// Scene-1 is positioned so its glowing orb midline coincides with the
-/// Glass Orb UI ring (268 / svg r=130). Overlay stats sit inside that ring.
+/// Scene-1 is positioned so its **outer glass/smoke sphere rim** coincides
+/// with the UI progress ring. The ring is painted near the full box edge and
+/// sized large enough to read as the orb's own rim — not a smaller circle
+/// floating in the dark core. Overlay stats sit at the shared center.
 library;
 
 import 'dart:math' as math;
@@ -26,16 +28,14 @@ class ProgressHeroBgVideo extends StatelessWidget {
   static const double _vidW = 640;
   static const double _vidH = 1408;
 
-  /// Glowing orb midline in video pixels (center-column ring peaks).
+  /// Orb center in video pixels.
   static const double _orbCx = 320;
   static const double _orbCy = 462.5;
-  static const double _orbR = 147.5;
 
-  /// Match Glass Orb HTML: .orbProgress 268px, svg viewBox 286, circle r=130.
-  static const double _ringBox = ProgressOrbHero.ringSize;
-  static const double _svgView = 286;
-  static const double _svgR = 130;
-  static double get uiRingRadius => _svgR * (_ringBox / _svgView);
+  /// Outer glass/smoke sphere rim in video pixels (NOT the bright core).
+  /// Prior "fix" locked to ~147.5 (core) which left the visible rim far
+  /// outside the UI ring — the floating-ring gap in screenshots.
+  static const double orbOuterR = 225;
 
   static const double _headerContentH = 88;
 
@@ -44,12 +44,12 @@ class ProgressHeroBgVideo extends StatelessWidget {
     final size = MediaQuery.sizeOf(context);
     final pad = MediaQuery.paddingOf(context);
     final headerH = pad.top + _headerContentH;
+    final ringBox = ProgressOrbHero.ringBoxForWidth(size.width);
     final ringCx = size.width / 2;
     final ringCy = headerH + ProgressOrbHero.height * ProgressOrbHero.orbTopFrac;
-    final targetR = uiRingRadius;
-    // Zoom so the video orb diameter matches the UI ring — stable across
-    // aspect ratios (plain BoxFit.cover left the orb too small / drifted).
-    final scale = targetR / _orbR;
+    // Lock the *outer* rim to the painted UI ring radius.
+    final targetR = ProgressOrbHero.paintedRadius(ringBox);
+    final scale = targetR / orbOuterR;
     final left = ringCx - _orbCx * scale;
     final top = ringCy - _orbCy * scale;
     final dw = _vidW * scale;
@@ -72,8 +72,8 @@ class ProgressHeroBgVideo extends StatelessWidget {
                     height: dh,
                     child: const NwsbVideo(
                       asset: kProgressScene1,
-                      // Box already matches video aspect; fill without
-                      // recompressing the asset.
+                      // Geometry is applied by the Positioned box — no
+                      // asset recompress; fill the laid-out rect.
                       fit: BoxFit.fill,
                       priority: ClipPriority.feature,
                       loop: true,
@@ -269,18 +269,30 @@ class ProgressOrbHero extends StatelessWidget {
   final String timeLabel;
   final VoidCallback onViewInsights;
 
-  /// Compact hero matching Glass Orb mobile mock (~392).
-  static const double height = 392;
+  /// Tall enough for a large rim-aligned ring + VIEW INSIGHTS CTA.
+  static const double height = 420;
 
-  /// Public so [ProgressHeroBgVideo] can lock the scene-1 orb to this ring.
+  /// Public so [ProgressHeroBgVideo] can lock the scene-1 outer rim here.
   static const double orbTopFrac = 0.38;
-  static const double ringSize = 268;
+
+  /// Legacy constant — prefer [ringBoxForWidth] for layout.
+  static const double ringSize = 328;
+
+  /// Responsive ring box: large enough to sit on the outer smoke rim.
+  static double ringBoxForWidth(double width) =>
+      (width * 0.84).clamp(300.0, 348.0);
+
+  /// Painted stroke radius — near the box edge (not the old 130/286 inset
+  /// that left a dark gap inside the sphere).
+  static double paintedRadius(double ringBox) => ringBox / 2 - 2.5;
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    final ringBox = ringBoxForWidth(width);
     final ringProgress =
         sessions == 0 ? 0.12 : (0.18 + (sessions % 40) / 50).clamp(0.18, 0.92);
-    const orbTop = height * orbTopFrac - ringSize / 2;
+    final orbTop = height * orbTopFrac - ringBox / 2;
 
     return SizedBox(
       height: height,
@@ -288,73 +300,126 @@ class ProgressOrbHero extends StatelessWidget {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          // Thin white progress ring around the bright orb core.
+          // Soft depth plate — reads as glass interior behind the copy.
+          Positioned(
+            top: orbTop + ringBox * 0.18,
+            left: 0,
+            right: 0,
+            height: ringBox * 0.64,
+            child: Center(
+              child: IgnorePointer(
+                child: Container(
+                  width: ringBox * 0.55,
+                  height: ringBox * 0.55,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        Colors.black.withOpacity(0.38),
+                        Colors.black.withOpacity(0.12),
+                        Colors.transparent,
+                      ],
+                      stops: const [0.0, 0.55, 1.0],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          // Thin white progress ring on the orb's outer rim.
           Positioned(
             top: orbTop,
             left: 0,
             right: 0,
             child: Center(
               child: SizedBox(
-                width: ringSize,
-                height: ringSize,
+                width: ringBox,
+                height: ringBox,
                 child: CustomPaint(painter: _OrbRingPainter(progress: ringProgress)),
               ),
             ),
           ),
-          // Stats stack — locked inside the ring.
+          // Stats stack — exact orb center, depth shadows for in-glass read.
           Positioned(
             top: orbTop,
             left: 0,
             right: 0,
-            height: ringSize,
+            height: ringBox,
             child: Center(
               child: SizedBox(
-                width: 210,
+                width: ringBox * 0.62,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
+                    Text(
                       'TOTAL SESSIONS',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 9,
                         letterSpacing: 2.8,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFFE6E6E2),
+                        color: const Color(0xFFE6E6E2),
+                        shadows: [
+                          Shadow(
+                            blurRadius: 10,
+                            color: Colors.black.withOpacity(0.85),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       '$sessions',
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 61,
+                      style: TextStyle(
+                        fontSize: 64,
                         fontWeight: FontWeight.w300,
                         letterSpacing: -3.5,
                         height: 0.94,
                         color: MpColors.white,
-                        shadows: [Shadow(blurRadius: 18, color: Colors.black)],
+                        shadows: [
+                          Shadow(
+                            blurRadius: 22,
+                            color: Colors.black.withOpacity(0.9),
+                          ),
+                          Shadow(
+                            blurRadius: 6,
+                            color: Colors.black.withOpacity(0.7),
+                            offset: const Offset(0, 1),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 5),
                     Text(
                       timeLabel,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w300,
-                        color: Color(0xFFF0F0ED),
-                        shadows: [Shadow(blurRadius: 12, color: Colors.black)],
+                        color: const Color(0xFFF0F0ED),
+                        shadows: [
+                          Shadow(
+                            blurRadius: 14,
+                            color: Colors.black.withOpacity(0.85),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 5),
-                    const Text(
+                    Text(
                       'MEDITATION TIME',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 8,
                         letterSpacing: 2.4,
-                        color: Color(0xFFBFC1C0),
+                        color: const Color(0xFFBFC1C0),
+                        shadows: [
+                          Shadow(
+                            blurRadius: 8,
+                            color: Colors.black.withOpacity(0.8),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -403,26 +468,37 @@ class _OrbRingPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final c = Offset(size.width / 2, size.height / 2);
-    // HTML: <svg viewBox="0 0 286 286"><circle r="130"/></svg> in a 268 box.
-    final r = size.width * (130 / 286);
+    // Sit on the box rim — traces the video's outer smoke/glass sphere.
+    final r = ProgressOrbHero.paintedRadius(size.width);
+    // Soft outer glow so the stroke reads as part of the glass highlight.
+    final glow = Paint()
+      ..color = Colors.white.withOpacity(0.18)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 4.5
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3.5);
+    canvas.drawCircle(c, r, glow);
     final track = Paint()
-      ..color = Colors.white.withOpacity(0.12)
+      ..color = Colors.white.withOpacity(0.16)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.4;
+      ..strokeWidth = 1.5;
     final arc = Paint()
-      ..color = Colors.white.withOpacity(0.82)
+      ..color = Colors.white.withOpacity(0.9)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.4
+      ..strokeWidth = 1.55
       ..strokeCap = StrokeCap.round
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 0.6);
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 0.55);
     canvas.drawCircle(c, r, track);
-    // HTML rotate(-86deg) ≈ -pi*0.478
     const start = -math.pi * 0.478;
     final sweep = math.pi * 2 * progress;
     canvas.drawArc(Rect.fromCircle(center: c, radius: r), start, sweep, false, arc);
-    // Bright handle at the leading tip of the arc (matches mock).
     final tip = Offset(c.dx + r * math.cos(start + sweep), c.dy + r * math.sin(start + sweep));
-    canvas.drawCircle(tip, 3.2, Paint()..color = Colors.white.withOpacity(0.95));
+    canvas.drawCircle(
+      tip,
+      3.4,
+      Paint()
+        ..color = Colors.white.withOpacity(0.96)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 0.8),
+    );
   }
 
   @override

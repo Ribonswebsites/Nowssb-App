@@ -1,24 +1,18 @@
 /// Normal-home promo rail — Store · Player · Earn · Streak.
 ///
-/// White neumorphism (or white glass when Normal Glass is on). One focused
-/// tile at a time, auto-advancing. Each tile is circle SVG | divider | copy.
-/// The Streak page also shows the streak film directly under its banner,
-/// outside any white section wrapper.
+/// White neumorphism (or white glass when Normal Glass is on). Horizontal
+/// auto-scroll carousel. Every tile uses the same layout:
+/// circle SVG | vertical divider | bold title + subtitle | arrow.
+/// Animation only changes scroll position — never colors or styles.
 library;
 
 import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../media/nwsb_video.dart';
-import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/nwsb_icon.dart';
 import 'glassmorphism_theme.dart';
-
-/// Streak film — same asset as [NmStreakVideo] / website herovid.
-const kStreakPromoVideo =
-    'assets/videos/415dd447da33973b_grok_video_2026-07-30-14-35-05_q3tyzk.mp4';
 
 class NormalPromoRail extends StatefulWidget {
   const NormalPromoRail({
@@ -68,7 +62,6 @@ class _NormalPromoRailState extends State<NormalPromoRail> {
           subtitle: 'Keep your healing streak alive',
           mark: NwsbMarks.flame,
           onTap: widget.onStreak,
-          showStreakVideo: true,
         ),
       ];
 
@@ -98,7 +91,6 @@ class _NormalPromoRailState extends State<NormalPromoRail> {
   Widget build(BuildContext context) {
     final glass = NormalGlassMode.of(context);
     final tiles = _tiles;
-    final focused = tiles[_index];
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
@@ -117,51 +109,19 @@ class _NormalPromoRailState extends State<NormalPromoRail> {
               ),
             ),
           ),
-          AnimatedSize(
-            duration: const Duration(milliseconds: 280),
-            curve: Curves.easeOutCubic,
-            alignment: Alignment.topCenter,
-            child: SizedBox(
-            height: focused.showStreakVideo ? 268 : 108,
+          SizedBox(
+            height: 108,
             child: PageView.builder(
               controller: _page,
               itemCount: tiles.length,
               onPageChanged: (i) => setState(() => _index = i),
               itemBuilder: (context, i) {
-                final tile = tiles[i];
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _WhitePromoBanner(tile: tile, glass: glass),
-                      if (tile.showStreakVideo) ...[
-                        const SizedBox(height: 12),
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: tile.onTap,
-                            behavior: HitTestBehavior.opaque,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(18),
-                              clipBehavior: Clip.antiAlias,
-                              child: const ColoredBox(
-                                color: Colors.black,
-                                child: NwsbVideo(
-                                  asset: kStreakPromoVideo,
-                                  priority: ClipPriority.decoration,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
+                  child: _WhitePromoBanner(tile: tiles[i], glass: glass),
                 );
               },
             ),
-          ),
           ),
           const SizedBox(height: 10),
           Row(
@@ -197,7 +157,6 @@ class _PromoTile {
     required this.mark,
     required this.onTap,
     this.markViewBox = 24,
-    this.showStreakVideo = false,
   });
 
   final String title;
@@ -205,15 +164,18 @@ class _PromoTile {
   final String mark;
   final double markViewBox;
   final VoidCallback onTap;
-  final bool showStreakVideo;
 }
 
 /// White neu / white glass banner — circle SVG | vertical rule | title+sub.
+/// Identical chrome for every tile (no rainbow / color-cycling rings).
 class _WhitePromoBanner extends StatelessWidget {
   const _WhitePromoBanner({required this.tile, required this.glass});
 
   final _PromoTile tile;
   final bool glass;
+
+  static const double _circle = 52;
+  static const double _icon = 22;
 
   @override
   Widget build(BuildContext context) {
@@ -246,25 +208,39 @@ class _WhitePromoBanner extends StatelessWidget {
         child: Row(
           children: [
             Container(
-              width: 52,
-              height: 52,
+              width: _circle,
+              height: _circle,
               decoration: BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.circle,
+                border: Border.all(
+                  color: glass
+                      ? const Color(0x33FFFFFF)
+                      : const Color(0x14FFFFFF),
+                ),
                 boxShadow: glass
-                    ? null
+                    ? const [
+                        BoxShadow(
+                          color: Color(0x14000000),
+                          blurRadius: 10,
+                          offset: Offset(0, 3),
+                        ),
+                      ]
                     : const [
                         BoxShadow(
-                            color: Color(0x1A000000),
+                            color: Color(0x1F000000),
+                            blurRadius: 10,
+                            offset: Offset(3, 3)),
+                        BoxShadow(
+                            color: Color(0xF2FFFFFF),
                             blurRadius: 8,
-                            offset: Offset(2, 2)),
+                            offset: Offset(-3, -3)),
                       ],
-                border: Border.all(color: const Color(0x14FFFFFF)),
               ),
               child: Center(
                 child: NwsbIcon(
                   tile.mark,
-                  size: 22,
+                  size: _icon,
                   viewBox: tile.markViewBox,
                   color: const Color(0xFF1A1A2E),
                 ),
