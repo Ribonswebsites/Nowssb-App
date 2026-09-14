@@ -447,66 +447,74 @@ class FashReader extends StatelessWidget {
   }
 }
 
-/// 5 · herovid — Streak + Store video carousel (2 equal cards, snap + dots).
-/// Edge-to-edge film + banner (no tablet TvFrame). Text streak stays in
-/// [FashStreak].
+/// 5 · herovid — Streak carousel: streak VIDEO + Start Building wrappers.
+/// Store video is NOT here — see [FashStore].
 class FashStreakVideo extends StatelessWidget {
   const FashStreakVideo({super.key, this.onTap, this.onStoreTap});
   final VoidCallback? onTap;
+  /// Kept for call-site compatibility; Store is restored on [FashStore].
   final VoidCallback? onStoreTap;
 
   @override
   Widget build(BuildContext context) {
     return StreakStoreCarousel(
       onStreakTap: onTap,
-      onStoreTap: onStoreTap ?? onTap,
+      secondCard: FashStreakBody(onTap: onTap),
     );
   }
 }
 
-/// 6 · streak — index.html:1910. The day count, "Keep Going", and the
-/// Daily Streak bar.
+/// Start Building Your Streak Today — full wrapper used as carousel page 2.
+class FashStreakBody extends StatelessWidget {
+  const FashStreakBody({super.key, this.days = 0, this.onTap});
+  final int days;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Text(
+          'Start Building Your Streak Today',
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.w800,
+            color: Colors.white,
+            height: 1.2,
+          ),
+        ),
+        const SizedBox(height: 8),
+        const Text(
+          'Practice daily to keep it alive — and unlock exclusive offers',
+          style: TextStyle(
+            fontSize: 13,
+            color: Color(0x99FFFFFF),
+            height: 1.45,
+          ),
+        ),
+        const SizedBox(height: 16),
+        _StreakBoxes(days: days, onTap: onTap),
+        const SizedBox(height: 12),
+        SecBanner(
+          title: 'Daily Streak',
+          sub: 'Practice daily to keep your healing streak alive',
+          mark: NwsbMarks.flame,
+          onTap: onTap,
+        ),
+      ],
+    );
+  }
+}
+
+/// 6 · streak — content moved into [StreakStoreCarousel] page 2 via
+/// [FashStreakBody]. Slot kept as shrink so registry order stays intact.
 class FashStreak extends StatelessWidget {
   const FashStreak({super.key, this.days = 0, this.onTap});
   final int days;
   final VoidCallback? onTap;
 
   @override
-  Widget build(BuildContext context) {
-    return SectionPane(
-      padding: const EdgeInsets.all(18),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const Text(
-            'Start Building Your Streak Today',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w800,
-              color: Colors.white,
-              height: 1.2,
-            ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Practice daily to keep it alive — and unlock exclusive offers',
-            style: TextStyle(
-              fontSize: 13,
-              color: Color(0x99FFFFFF),
-              height: 1.45,
-            ),
-          ),
-          const SizedBox(height: 20),
-          _StreakBoxes(days: days, onTap: onTap),
-          const SizedBox(height: 14),
-          SecBanner(
-            title: 'Daily Streak',
-            sub: 'Practice daily to keep your healing streak alive',
-            mark: NwsbMarks.flame,
-            onTap: onTap,
-          ),
-        ],
-      ),
-    );
-  }
+  Widget build(BuildContext context) => const SizedBox.shrink();
 }
+

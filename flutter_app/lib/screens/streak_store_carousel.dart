@@ -1,8 +1,10 @@
-/// Streak + Store — 2-card horizontal video carousel (snap + dots).
+/// Streak carousel — 2 full wrappers that rotate (video + Start Building).
 ///
-/// Used by [NmStreakVideo] / [FashStreakVideo]. The "Start Building Your
-/// Streak Today" text block stays a separate section outside this widget.
+/// Used by [NmStreakVideo] / [FashStreakVideo]. Store video is NOT in this
+/// carousel — Store lives in [NmStore] / [FashStore] on the home registry.
 library;
+
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
@@ -12,17 +14,21 @@ import '../widgets/home_parts.dart';
 import '../widgets/home_skin.dart';
 import '../widgets/nwsb_icon.dart';
 
-/// One section: wrap head + PageView of two equal video+banner cards.
+/// One section: wrap head + PageView of two equal-height cards.
+/// Card 1 = streak video + Keep Your Streak banner.
+/// Card 2 = complete "Start Building Your Streak Today" wrapper ([secondCard]).
 class StreakStoreCarousel extends StatefulWidget {
   const StreakStoreCarousel({
     super.key,
+    required this.secondCard,
     this.onStreakTap,
-    this.onStoreTap,
     this.showHead = true,
   });
 
+  /// Full "Start Building Your Streak Today" block (page 2).
+  final Widget secondCard;
+
   final VoidCallback? onStreakTap;
-  final VoidCallback? onStoreTap;
 
   /// "Today, on film / Streak" head above the carousel (shared for both cards).
   final bool showHead;
@@ -32,7 +38,6 @@ class StreakStoreCarousel extends StatefulWidget {
 
   static const streakAsset =
       'assets/videos/415dd447da33973b_grok_video_2026-07-30-14-35-05_q3tyzk.mp4';
-  static const storeAsset = 'assets/video/store-section.mp4';
 
   @override
   State<StreakStoreCarousel> createState() => _StreakStoreCarouselState();
@@ -44,7 +49,7 @@ class _StreakStoreCarouselState extends State<StreakStoreCarousel> {
 
   static const _cardCount = 2;
 
-  /// Fixed slot under the film so both pages share the same outer height.
+  /// Fixed slot under the film so page 1 height is stable.
   static const _bannerBlock = 78.0;
   static const _gap = 10.0;
 
@@ -68,7 +73,8 @@ class _StreakStoreCarouselState extends State<StreakStoreCarousel> {
       builder: (context, constraints) {
         final w = constraints.maxWidth;
         final videoH = w / StreakStoreCarousel.videoAspect;
-        final pageH = videoH + _gap + _bannerBlock;
+        // Equal viewport pages: tall enough for video card OR Start Building.
+        final pageH = math.max(videoH + _gap + _bannerBlock, 300.0);
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -85,14 +91,14 @@ class _StreakStoreCarouselState extends State<StreakStoreCarousel> {
                     bannerSub: 'Practice today and the run carries on',
                     mark: NwsbMarks.flame,
                     onTap: widget.onStreakTap,
+                    pageHeight: pageH,
                   ),
-                  _VideoBannerCard(
-                    asset: StreakStoreCarousel.storeAsset,
-                    priority: ClipPriority.decoration,
-                    bannerTitle: 'Shop Now',
-                    bannerSub: 'Word Library & Meaning Library, in one place',
-                    mark: NwsbMarks.bag,
-                    onTap: widget.onStoreTap,
+                  SizedBox(
+                    height: pageH,
+                    child: SingleChildScrollView(
+                      physics: const NeverScrollableScrollPhysics(),
+                      child: widget.secondCard,
+                    ),
                   ),
                 ],
               ),
@@ -150,6 +156,7 @@ class _VideoBannerCard extends StatelessWidget {
     required this.bannerTitle,
     required this.bannerSub,
     required this.mark,
+    required this.pageHeight,
     this.onTap,
   });
 
@@ -158,43 +165,47 @@ class _VideoBannerCard extends StatelessWidget {
   final String bannerTitle;
   final String bannerSub;
   final String mark;
+  final double pageHeight;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        GestureDetector(
-          onTap: onTap,
-          behavior: HitTestBehavior.opaque,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            clipBehavior: Clip.antiAlias,
-            child: AspectRatio(
-              aspectRatio: StreakStoreCarousel.videoAspect,
-              child: NwsbVideo(
-                asset: asset,
-                priority: priority,
-                fit: BoxFit.cover,
+    return SizedBox(
+      height: pageHeight,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          GestureDetector(
+            onTap: onTap,
+            behavior: HitTestBehavior.opaque,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              clipBehavior: Clip.antiAlias,
+              child: AspectRatio(
+                aspectRatio: StreakStoreCarousel.videoAspect,
+                child: NwsbVideo(
+                  asset: asset,
+                  priority: priority,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
           ),
-        ),
-        const SizedBox(height: _StreakStoreCarouselState._gap),
-        SizedBox(
-          height: _StreakStoreCarouselState._bannerBlock,
-          child: Align(
-            alignment: Alignment.topCenter,
-            child: SecBanner(
-              title: bannerTitle,
-              sub: bannerSub,
-              mark: mark,
-              onTap: onTap,
+          const SizedBox(height: _StreakStoreCarouselState._gap),
+          SizedBox(
+            height: _StreakStoreCarouselState._bannerBlock,
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: SecBanner(
+                title: bannerTitle,
+                sub: bannerSub,
+                mark: mark,
+                onTap: onTap,
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

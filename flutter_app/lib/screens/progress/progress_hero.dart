@@ -1,10 +1,10 @@
 /// Hero video, sticky header, and total-sessions orb for My Progress.
 ///
-/// Geometry contract (no zoom-only hacks, no second floating circle):
-/// - One shared orb stage: SizedBox(d,d) + ClipOval.
+/// Geometry contract (contained orb, concentric ring+stats):
+/// - One shared orb stage: SizedBox(d,d) + ClipOval with page margin.
 /// - Video is square-cropped around the glass orb then BoxFit.cover into that
-///   oval — smoke outer rim == oval edge == progress ring.
-/// - Stats share the exact same center. Ambient page bg paints no competing orb.
+///   oval — larger crop (orbOuterR~215) zooms out so smoke is not full-bleed.
+/// - Ring + stats share smoke center via a small down+right nudge.
 library;
 
 import 'dart:math' as math;
@@ -226,19 +226,23 @@ class ProgressOrbHero extends StatelessWidget {
 
   /// Orb center in video pixels — remeasured from my-progress-scene-1.mp4
   /// so the visible smoke outer rim coincides with the shared stage oval.
-  /// (Prior 320/462.5/225 left a smaller offset circle vs the smoke rim.)
   static const double orbCx = 318;
   static const double orbCy = 445;
-  /// Outer glass/smoke sphere radius in video pixels → crop square side 330.
-  static const double orbOuterR = 165;
+  /// Outer glass/smoke sphere radius in video pixels → crop square side 430.
+  /// Raised from 165 (too zoomed / full-bleed) toward prior ~225 so the
+  /// sphere reads as a contained circle with black margin around it.
+  static const double orbOuterR = 215;
+
+  /// Nudge ring + TOTAL SESSIONS text down+right vs smoke center only.
+  static const Offset ringStatsNudge = Offset(8, 10);
 
   /// Vertical anchor of the shared stage center inside [height] (0–1).
   static const double stageCenterFrac = 0.42;
 
   /// Responsive rendered diameter of the shared orb stage.
-  /// Ring and smoke both fill this box so they scale together.
+  /// Slightly under full-bleed so the oval has visible page margin.
   static double stageDiameterForWidth(double width) =>
-      (width * 0.90).clamp(320.0, 500.0);
+      (width * 0.74).clamp(280.0, 400.0);
 
   /// Painted stroke radius — traces outer rim of the SAME oval (inset 2px).
   static double paintedRadius(double diameter) => diameter / 2 - 2.0;
@@ -263,7 +267,7 @@ class ProgressOrbHero extends StatelessWidget {
     // Square-crop the video around the glass orb, then cover-fill the oval.
     // Crop square side = 2*orbOuterR centered on (orbCx, orbCy). Ring radius
     // = d/2 on that SAME oval → one center, rim on smoke, no second circle.
-    final crop = orbOuterR * 2; // 330
+    final crop = orbOuterR * 2; // 430
     final cropLeft = -(orbCx - orbOuterR);
     final cropTop = -(orbCy - orbOuterR);
 
@@ -340,14 +344,20 @@ class ProgressOrbHero extends StatelessWidget {
                         ),
                       ),
                     ),
-                    // Progress ring — same box; radius = % of SAME container.
+                    // Progress ring + stats — nudged down+right to match
+                    // visible smoke center (smoke crop stays put).
                     Positioned.fill(
-                      child: CustomPaint(
-                        painter: _OrbRingPainter(progress: ringProgress),
+                      child: Transform.translate(
+                        offset: ringStatsNudge,
+                        child: CustomPaint(
+                          painter: _OrbRingPainter(progress: ringProgress),
+                        ),
                       ),
                     ),
-                    // Stats — exact shared center.
-                    SizedBox(
+                    // Stats — shared center + same nudge as ring.
+                    Transform.translate(
+                      offset: ringStatsNudge,
+                      child: SizedBox(
                       width: d * 0.62,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -425,6 +435,7 @@ class ProgressOrbHero extends StatelessWidget {
                           ),
                         ],
                       ),
+                    ),
                     ),
                   ],
                 ),

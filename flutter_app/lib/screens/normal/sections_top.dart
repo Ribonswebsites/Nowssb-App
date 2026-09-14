@@ -194,37 +194,34 @@ class _SearchBarState extends State<_SearchBar> {
   }
 }
 
-/// 3 · herovid — Streak + Store video carousel (2 equal cards, snap + dots).
-/// Edge-to-edge film + banner; no tablet TvFrame. Text streak block stays
-/// separate in [NmStreak].
+/// 3 · herovid — Streak carousel: streak VIDEO wrapper + Start Building wrapper.
+/// Store video is NOT here — see [NmStore].
 class NmStreakVideo extends StatelessWidget {
   const NmStreakVideo({super.key, this.onTap, this.onStoreTap});
   final VoidCallback? onTap;
+  /// Kept for call-site compatibility; Store is restored on [NmStore].
   final VoidCallback? onStoreTap;
 
   @override
   Widget build(BuildContext context) {
     return StreakStoreCarousel(
       onStreakTap: onTap,
-      onStoreTap: onStoreTap ?? onTap,
+      secondCard: NmStreakBody(onTap: onTap),
     );
   }
 }
 
-/// 4 · streak — index.html:998. `.nmh-streak-wrap`: the head, the heading
-/// and its line, the streak bar, and the Daily Streak banner.
-class NmStreak extends StatelessWidget {
-  const NmStreak({super.key, this.days = 0, this.onTap});
+/// Start Building Your Streak Today — full wrapper used as carousel page 2.
+class NmStreakBody extends StatelessWidget {
+  const NmStreakBody({super.key, this.days = 0, this.onTap});
   final int days;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return SecWrap(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // No head. "Start Building Your Streak Today" is the heading of this
-        // card, and an orb with "Your Streak" over the top of it was the
-        // same thing said twice.
         const Text(
           'Start Building Your Streak Today',
           style: TextStyle(
@@ -235,6 +232,7 @@ class NmStreak extends StatelessWidget {
             letterSpacing: -0.4,
           ),
         ),
+        const SizedBox(height: 6),
         const Text(
           'Practice daily to keep it alive — and unlock exclusive offers',
           style: TextStyle(
@@ -243,8 +241,6 @@ class NmStreak extends StatelessWidget {
             height: 1.45,
           ),
         ),
-        // `.nmh-streak-bar` — pressed in, so the count reads as something
-        // filling up rather than another button.
         Container(
           margin: const EdgeInsets.only(top: 8),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -304,6 +300,7 @@ class NmStreak extends StatelessWidget {
             ],
           ),
         ),
+        const SizedBox(height: 10),
         SecBanner(
           title: 'Daily Streak',
           sub: 'Practice daily to keep your healing streak alive',
@@ -314,6 +311,18 @@ class NmStreak extends StatelessWidget {
     );
   }
 }
+
+/// 4 · streak — content moved into [StreakStoreCarousel] page 2 via
+/// [NmStreakBody]. Slot kept as shrink so registry order stays intact.
+class NmStreak extends StatelessWidget {
+  const NmStreak({super.key, this.days = 0, this.onTap});
+  final int days;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) => const SizedBox.shrink();
+}
+
 
 /// 5 · storedisc and 14 · condisc — index.html:1033 and :1358. `.npc-card`.
 ///
@@ -851,16 +860,148 @@ class _NmTile extends StatelessWidget {
   }
 }
 
-/// 8 · store — tall Explore Store video card removed; store film lives in
-/// [StreakStoreCarousel] (herovid). Slot kept as shrink so registry order
-/// stays intact. Other store entry points (trendshop, etc.) remain below.
+/// 8 · store — Explore Store video card (restored; no longer only in streak carousel).
 class NmStore extends StatelessWidget {
   const NmStore({super.key, this.onTap});
   final VoidCallback? onTap;
 
+  static const _pills = ['Word Library', 'Meaning Library', 'Organ Targeting'];
+
   @override
-  Widget build(BuildContext context) => const SizedBox.shrink();
+  Widget build(BuildContext context) {
+    return SecWrap(
+      children: [
+        GestureDetector(
+          onTap: onTap,
+          behavior: HitTestBehavior.opaque,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: AspectRatio(
+              aspectRatio: 3 / 4,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  const NwsbVideo(asset: 'assets/video/store-section.mp4'),
+                  const DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Color(0x99000000),
+                          Color(0x33000000),
+                          Color(0xF2000000),
+                        ],
+                        stops: [0, 0.42, 1],
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(18),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Shabdapathy · Collections',
+                          style: TextStyle(
+                            fontSize: 10.5,
+                            letterSpacing: 2,
+                            fontWeight: FontWeight.w700,
+                            color: NwsbColors.goldLight,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        const Text.rich(
+                          TextSpan(
+                            style: TextStyle(
+                              fontSize: 27,
+                              color: Colors.white,
+                              height: 1.15,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: 'Enter the\n',
+                                style: TextStyle(fontWeight: FontWeight.w300),
+                              ),
+                              TextSpan(
+                                text: 'NowssB Store',
+                                style: TextStyle(fontWeight: FontWeight.w800),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Spacer(),
+                        const Text(
+                          'Word Library & Meaning Library — own the sounds '
+                          'that heal, unlock the origins that were hidden.',
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            color: Color(0xB3FFFFFF),
+                            height: 1.5,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            for (final p in _pills)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 11, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: const Color(0x14FFFFFF),
+                                  borderRadius: BorderRadius.circular(14),
+                                  border: Border.all(
+                                      color: const Color(0x2EFFFFFF)),
+                                ),
+                                child: Text(
+                                  p,
+                                  style: const TextStyle(
+                                    fontSize: 10.5,
+                                    color: Color(0xD9FFFFFF),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 14),
+                        Container(
+                          padding: const EdgeInsets.symmetric(vertical: 13),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Explore Store',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                  color: NwsbColors.ink,
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                              NwsbIcon(NwsbMarks.arrow,
+                                  size: 14, color: NwsbColors.ink),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }
+
 
 /// 9 · reader — index.html:1250. `.nmh-rdsec-wrap`: the spill, the clip,
 /// the copy, and the bar. Nothing is laid over the clip.
