@@ -49,7 +49,7 @@ import 'progress/progress_screen.dart';
 import 'normal/neomorphic_action_bar.dart';
 import 'normal/horizontal_routine_cards.dart';
 import 'personal_coach.dart';
-import 'personal_coach_carousel.dart';
+import 'start_today_carousel.dart';
 import 'healing_path.dart';
 import 'subscription.dart';
 
@@ -181,9 +181,9 @@ class _HomeFashionState extends State<HomeFashion> {
         ('practice', FashPractice(onTap: () => _go(1))),
         (
           'coachCards',
-          PersonalCoachCarousel(
+          StartTodayCarousel(
             fashion: true,
-            onTap: () => _push(const PersonalCoachScreen()),
+            onTap: () => _go(1),
           ),
         ),
         ('routineCards', const NmHorizontalRoutineCards(fashion: true)),

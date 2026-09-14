@@ -51,7 +51,7 @@ import '../widgets/home_skin.dart';
 import 'normal/neomorphic_action_bar.dart';
 import 'normal/neomorphic_dashboard.dart';
 import 'personal_coach.dart';
-import 'personal_coach_carousel.dart';
+import 'start_today_carousel.dart';
 import 'healing_path.dart';
 import '../media/video_pool.dart';
 import 'normal/glassmorphism_theme.dart';
@@ -224,8 +224,8 @@ class _HomeNormalState extends State<HomeNormal> {
         ('practice', NmPractice(onTap: () => _go(1))),
         (
           'coachCards',
-          PersonalCoachCarousel(
-            onTap: () => _push(const PersonalCoachScreen()),
+          StartTodayCarousel(
+            onTap: () => _go(1),
           ),
         ),
         ('mainops', MainOptionsSection(onGo: _go, onAction: _openMainOption)),
