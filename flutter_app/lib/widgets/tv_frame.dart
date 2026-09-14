@@ -279,12 +279,14 @@ class TvFrame extends StatelessWidget {
         child: LayoutBuilder(
           builder: (context, c) {
             final box = Size(c.maxWidth, c.maxHeight);
+            // Clip to the bezel inset only — no extra media radius. A second
+            // ClipRRect here left white gaps in every tablet/laptop/TV corner
+            // (Connect, Store, Quick Access, etc.): the bezel already shapes
+            // the opening; the film must paint edge-to-edge inside it.
             final screen = Padding(
               padding: frame.insets(box),
-              child: ClipRRect(
-                // Keep the rectangular video inside the rounded TV opening.
-                borderRadius: BorderRadius.circular(14),
-                clipBehavior: Clip.antiAlias,
+              child: ClipRect(
+                clipBehavior: Clip.hardEdge,
                 child: ColoredBox(
                   color: Colors.black,
                   child: Stack(
@@ -296,6 +298,7 @@ class TvFrame extends StatelessWidget {
                           priority: priority,
                           autoplay: autoplay,
                           showPoster: false,
+                          fit: BoxFit.cover,
                         ),
                       if (overlay != null) overlay!,
                     ],
@@ -448,12 +451,11 @@ class FramedSlot extends StatelessWidget {
         child: LayoutBuilder(
           builder: (context, c) {
             final box = Size(c.maxWidth, c.maxHeight);
+            // Same rule as [TvFrame]: fill the aperture; do not double-round.
             final screen = Padding(
               padding: frame.insets(box),
-              child: ClipRRect(
-                borderRadius:
-                    BorderRadius.circular(frame.opaqueAperture ? 14 : 0),
-                clipBehavior: Clip.antiAlias,
+              child: ClipRect(
+                clipBehavior: Clip.hardEdge,
                 child: ColoredBox(
                   color: Colors.black,
                   child: Stack(

@@ -205,6 +205,7 @@ class _HomeNormalState extends State<HomeNormal> {
             onStore: () => _go(3),
             onPlayer: () => _go(1),
             onEarn: () => _go(4),
+            onStreak: () => _go(1),
           ),
         ),
         (

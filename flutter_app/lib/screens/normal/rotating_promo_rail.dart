@@ -1,31 +1,24 @@
-/// The Normal-home promo rail: three animated circular doors separated by hairline rules.
+/// Normal-home promo rail — Store · Player · Earn · Streak.
 ///
-/// The web version uses the `.npc-card` fabric, three expanding ripple waves,
-/// and a conic-gradient ring. Flutter keeps the same language while presenting
-/// the three requested doors together: Store, Player, and Earn.
+/// White neumorphism (or white glass when Normal Glass is on). One focused
+/// tile at a time, auto-advancing. Each tile is circle SVG | divider | copy.
+/// The Streak page also shows the streak film directly under its banner,
+/// outside any white section wrapper.
 library;
 
-import 'dart:math' as math;
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../media/nwsb_video.dart';
+import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
+import '../../widgets/nwsb_icon.dart';
+import 'glassmorphism_theme.dart';
 
-Color _bannerColor(double progress) {
-  const seeds = [
-    Color(0xFFFF9A3D), // orange
-    Color(0xFFE94F83), // pink
-    Color(0xFF9A58C9), // purple
-    Color(0xFF3EAD7B), // green
-    Color(0xFF467ED6), // blue
-    Color(0xFF222633), // black
-    Color(0xFFF2F3F7), // white
-  ];
-  final scaled = progress * seeds.length;
-  final index = scaled.floor() % seeds.length;
-  final next = (index + 1) % seeds.length;
-  return Color.lerp(seeds[index], seeds[next], scaled - scaled.floor())!;
-}
+/// Streak film — same asset as [NmStreakVideo] / website herovid.
+const kStreakPromoVideo =
+    'assets/videos/415dd447da33973b_grok_video_2026-07-30-14-35-05_q3tyzk.mp4';
 
 class NormalPromoRail extends StatefulWidget {
   const NormalPromoRail({
@@ -33,235 +26,296 @@ class NormalPromoRail extends StatefulWidget {
     required this.onStore,
     required this.onPlayer,
     required this.onEarn,
+    required this.onStreak,
   });
 
   final VoidCallback onStore;
   final VoidCallback onPlayer;
   final VoidCallback onEarn;
+  final VoidCallback onStreak;
 
   @override
   State<NormalPromoRail> createState() => _NormalPromoRailState();
 }
 
-class _NormalPromoRailState extends State<NormalPromoRail>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _motion = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 4200),
-  )..repeat();
+class _NormalPromoRailState extends State<NormalPromoRail> {
+  late final PageController _page;
+  Timer? _timer;
+  var _index = 0;
+
+  List<_PromoTile> get _tiles => [
+        _PromoTile(
+          title: 'Store',
+          subtitle: 'Words that heal',
+          mark: NwsbMarks.bag,
+          onTap: widget.onStore,
+        ),
+        _PromoTile(
+          title: 'Player',
+          subtitle: 'Your word ritual',
+          mark: NwsbMarks.play,
+          markViewBox: 22,
+          onTap: widget.onPlayer,
+        ),
+        _PromoTile(
+          title: 'Earn',
+          subtitle: 'Grow with NowssB',
+          mark: NwsbMarks.earn,
+          onTap: widget.onEarn,
+        ),
+        _PromoTile(
+          title: 'Streak',
+          subtitle: 'Keep your healing streak alive',
+          mark: NwsbMarks.flame,
+          onTap: widget.onStreak,
+          showStreakVideo: true,
+        ),
+      ];
+
+  @override
+  void initState() {
+    super.initState();
+    _page = PageController(viewportFraction: 0.92);
+    _timer = Timer.periodic(const Duration(milliseconds: 3800), (_) {
+      if (!mounted || !TickerMode.valuesOf(context).enabled) return;
+      final next = (_index + 1) % _tiles.length;
+      _page.animateToPage(
+        next,
+        duration: const Duration(milliseconds: 420),
+        curve: Curves.easeOutCubic,
+      );
+    });
+  }
 
   @override
   void dispose() {
-    _motion.dispose();
+    _timer?.cancel();
+    _page.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final doors =
-        <({String title, String subtitle, String icon, VoidCallback tap})>[
-      (
-        title: 'Store',
-        subtitle: 'Words that heal',
-        icon: 'assets/banners/promo/store.png',
-        tap: widget.onStore
-      ),
-      (
-        title: 'Player',
-        subtitle: 'Your word ritual',
-        icon: 'assets/banners/promo/player.png',
-        tap: widget.onPlayer
-      ),
-      (
-        title: 'Earn',
-        subtitle: 'Grow with NowssB',
-        icon: 'assets/banners/promo/earn.png',
-        tap: widget.onEarn
-      ),
-    ];
+    final glass = NormalGlassMode.of(context);
+    final tiles = _tiles;
+    final focused = tiles[_index];
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
+      padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'More ways to keep your rhythm',
-            style: TextStyle(
-              color: NwsbColors.inkSoft,
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              letterSpacing: .2,
+          const Padding(
+            padding: EdgeInsets.fromLTRB(20, 0, 20, 10),
+            child: Text(
+              'More ways to keep your rhythm',
+              style: TextStyle(
+                color: NwsbColors.inkSoft,
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                letterSpacing: .2,
+              ),
             ),
+          ),
+          AnimatedSize(
+            duration: const Duration(milliseconds: 280),
+            curve: Curves.easeOutCubic,
+            alignment: Alignment.topCenter,
+            child: SizedBox(
+            height: focused.showStreakVideo ? 268 : 108,
+            child: PageView.builder(
+              controller: _page,
+              itemCount: tiles.length,
+              onPageChanged: (i) => setState(() => _index = i),
+              itemBuilder: (context, i) {
+                final tile = tiles[i];
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _WhitePromoBanner(tile: tile, glass: glass),
+                      if (tile.showStreakVideo) ...[
+                        const SizedBox(height: 12),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: tile.onTap,
+                            behavior: HitTestBehavior.opaque,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(18),
+                              clipBehavior: Clip.antiAlias,
+                              child: const ColoredBox(
+                                color: Colors.black,
+                                child: NwsbVideo(
+                                  asset: kStreakPromoVideo,
+                                  priority: ClipPriority.decoration,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
           ),
           const SizedBox(height: 10),
-          AnimatedBuilder(
-            animation: _motion,
-            builder: (context, _) => Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(24),
-                color: _bannerColor(_motion.value),
-                boxShadow: const [
-                  BoxShadow(
-                      color: Color(0x23000000),
-                      blurRadius: 18,
-                      offset: Offset(0, 8)),
-                  BoxShadow(
-                      color: Colors.white,
-                      blurRadius: 12,
-                      offset: Offset(-4, -4)),
-                ],
-              ),
-              child: Row(
-                children: [
-                  for (var i = 0; i < doors.length; i++) ...[
-                    Expanded(
-                      child: _PromoDoor(
-                        phase: i / doors.length,
-                        motion: _motion,
-                        title: doors[i].title,
-                        subtitle: doors[i].subtitle,
-                        icon: doors[i].icon,
-                        onTap: doors[i].tap,
-                      ),
-                    ),
-                    if (i != doors.length - 1)
-                      Container(
-                        width: 1,
-                        height: 66,
-                        margin: const EdgeInsets.symmetric(horizontal: 5),
-                        color: Colors.white.withValues(alpha: .55),
-                      ),
-                  ],
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _PromoDoor extends StatelessWidget {
-  const _PromoDoor({
-    required this.phase,
-    required this.motion,
-    required this.title,
-    required this.subtitle,
-    required this.icon,
-    required this.onTap,
-  });
-
-  final double phase;
-  final Animation<double> motion;
-  final String title;
-  final String subtitle;
-  final String icon;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(
-            width: 72,
-            height: 72,
-            child: AnimatedBuilder(
-              animation: motion,
-              builder: (context, _) => CustomPaint(
-                foregroundPainter:
-                    _RippleDiscPainter(value: (motion.value + phase) % 1),
-                child: Padding(
-                  padding: const EdgeInsets.all(9),
-                  child: DecoratedBox(
-                    decoration: const BoxDecoration(
-                      color: Color(0xE9060C18),
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                            color: Color(0x55000000),
-                            blurRadius: 10,
-                            offset: Offset(0, 4))
-                      ],
-                    ),
-                    child: Center(
-                      child: Image.asset(
-                        icon,
-                        width: 25,
-                        height: 25,
-                        fit: BoxFit.contain,
-                        errorBuilder: (_, __, ___) => const Icon(
-                          Icons.auto_awesome,
-                          color: Colors.white,
-                          size: 25,
-                        ),
-                      ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              for (var i = 0; i < tiles.length; i++)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 3),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 220),
+                    width: i == _index ? 16 : 6,
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: i == _index
+                          ? NwsbColors.gold
+                          : const Color(0x332B2D33),
+                      borderRadius: BorderRadius.circular(3),
                     ),
                   ),
                 ),
-              ),
-            ),
+            ],
           ),
-          const SizedBox(height: 6),
-          Text(title,
-              style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w800)),
-          const SizedBox(height: 2),
-          Text(subtitle,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(color: Color(0xE6FFFFFF), fontSize: 8.5)),
         ],
       ),
     );
   }
 }
 
-class _RippleDiscPainter extends CustomPainter {
-  const _RippleDiscPainter({required this.value});
-  final double value;
+class _PromoTile {
+  const _PromoTile({
+    required this.title,
+    required this.subtitle,
+    required this.mark,
+    required this.onTap,
+    this.markViewBox = 24,
+    this.showStreakVideo = false,
+  });
+
+  final String title;
+  final String subtitle;
+  final String mark;
+  final double markViewBox;
+  final VoidCallback onTap;
+  final bool showStreakVideo;
+}
+
+/// White neu / white glass banner — circle SVG | vertical rule | title+sub.
+class _WhitePromoBanner extends StatelessWidget {
+  const _WhitePromoBanner({required this.tile, required this.glass});
+
+  final _PromoTile tile;
+  final bool glass;
 
   @override
-  void paint(Canvas canvas, Size size) {
-    final center = size.center(Offset.zero);
-    final radius = size.shortestSide / 2 - 3;
-    final ring = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3
-      ..shader = SweepGradient(
-        startAngle: value * math.pi * 2,
-        colors: const [
-          Color(0xFFFF4D77),
-          Color(0xFFFFC24D),
-          Color(0xFF71E3A6),
-          Color(0xFF55B8FF),
-          Color(0xFFB879FF),
-          Color(0xFFFF4D77),
-        ],
-      ).createShader(Offset.zero & size);
-    canvas.drawCircle(center, radius, ring);
-
-    for (var i = 0; i < 3; i++) {
-      final wave = (value + i / 3) % 1;
-      final paint = Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.2
-        ..color = Colors.white.withValues(alpha: .82 * (1 - wave));
-      canvas.drawCircle(center, radius * (.62 + wave * .48), paint);
-    }
+  Widget build(BuildContext context) {
+    final radius = BorderRadius.circular(22);
+    return GestureDetector(
+      onTap: tile.onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        height: 96,
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+        decoration: BoxDecoration(
+          color: glass ? const Color(0xD9FFFFFF) : const Color(0xFFF2F3F7),
+          borderRadius: radius,
+          border: glass
+              ? Border.all(color: const Color(0xF2FFFFFF), width: 1.5)
+              : null,
+          boxShadow: glass
+              ? null
+              : const [
+                  BoxShadow(
+                      color: Color(0x24000000),
+                      blurRadius: 16,
+                      offset: Offset(7, 7)),
+                  BoxShadow(
+                      color: Color(0xF7FFFFFF),
+                      blurRadius: 12,
+                      offset: Offset(-5, -5)),
+                ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 52,
+              height: 52,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                boxShadow: glass
+                    ? null
+                    : const [
+                        BoxShadow(
+                            color: Color(0x1A000000),
+                            blurRadius: 8,
+                            offset: Offset(2, 2)),
+                      ],
+                border: Border.all(color: const Color(0x14FFFFFF)),
+              ),
+              child: Center(
+                child: NwsbIcon(
+                  tile.mark,
+                  size: 22,
+                  viewBox: tile.markViewBox,
+                  color: const Color(0xFF1A1A2E),
+                ),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Container(width: 1, height: 36, color: const Color(0x332B2D33)),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    tile.title,
+                    style: const TextStyle(
+                      color: Color(0xFF1A1A2E),
+                      fontSize: 17,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    tile.subtitle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Color(0x992B2D33),
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              width: 36,
+              height: 36,
+              decoration: const BoxDecoration(
+                color: Color(0xFF060C18),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.arrow_forward,
+                  color: Colors.white, size: 18),
+            ),
+          ],
+        ),
+      ),
+    );
   }
-
-  @override
-  bool shouldRepaint(_RippleDiscPainter oldDelegate) =>
-      oldDelegate.value != value;
 }
 
 /// Small semantic hooks for focused widget tests.
@@ -269,4 +323,5 @@ class NormalPromoRailLabels {
   static const store = 'Store';
   static const player = 'Player';
   static const earn = 'Earn';
+  static const streak = 'Streak';
 }

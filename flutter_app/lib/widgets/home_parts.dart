@@ -556,11 +556,14 @@ class PhotoCard extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       child: AspectRatio(
         aspectRatio: aspect,
-        child: ClipRect(
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(18),
+          clipBehavior: Clip.antiAlias,
           child: Stack(
             fit: StackFit.expand,
             children: [
-              background,
+              // Ensure video/image paints edge-to-edge inside the rounded clip.
+              Positioned.fill(child: background),
               const DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(

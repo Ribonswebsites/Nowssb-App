@@ -382,3 +382,63 @@ class CustomizeBlackBanner extends StatelessWidget {
     );
   }
 }
+
+/// Fashion My Routine black banner — title + subtitle + white circle arrow.
+/// Lives OUTSIDE glass/white section wrappers.
+class RoutineStyleBlackBanner extends StatelessWidget {
+  const RoutineStyleBlackBanner({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    this.onTap,
+  });
+
+  final String title;
+  final String subtitle;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        height: 96,
+        padding: const EdgeInsets.fromLTRB(22, 18, 18, 18),
+        decoration: BoxDecoration(
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: const Color(0x29FFFFFF)),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
+                '$title\n$subtitle',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 22,
+                  height: 1.08,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -.3,
+                ),
+              ),
+            ),
+            Container(
+              width: 44,
+              height: 44,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.arrow_forward,
+                  color: Color(0xFF060C18), size: 22),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

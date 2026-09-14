@@ -199,42 +199,11 @@ class NmStreakVideo extends StatelessWidget {
   const NmStreakVideo({super.key, this.onTap});
   final VoidCallback? onTap;
 
+  /// Standalone herovid slot — content now lives in [NormalPromoRail] Streak
+  /// page (banner outside wrapper + video). Keep a zero-size placeholder so
+  /// the home registry order stays intact.
   @override
-  Widget build(BuildContext context) {
-    return SecWrap(
-      children: [
-        const WrapHead(
-          eyebrow: 'Today, on film',
-          title: 'Streak',
-          mark: NwsbMarks.flame,
-        ),
-        // No tablet round it. The clip runs to the pane's own edges, and the
-        // black bar under it says where it goes — the shape every other
-        // banner on this home has.
-        GestureDetector(
-          onTap: onTap,
-          behavior: HitTestBehavior.opaque,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: const AspectRatio(
-              aspectRatio: 16 / 9,
-              child: NwsbVideo(
-                asset:
-                    'assets/videos/415dd447da33973b_grok_video_2026-07-30-14-35-05_q3tyzk.mp4',
-                priority: ClipPriority.decoration,
-              ),
-            ),
-          ),
-        ),
-        SecBanner(
-          title: 'Keep Your Streak',
-          sub: 'Practice today and the run carries on',
-          mark: NwsbMarks.flame,
-          onTap: onTap,
-        ),
-      ],
-    );
-  }
+  Widget build(BuildContext context) => const SizedBox.shrink();
 }
 
 /// 4 · streak — index.html:998. `.nmh-streak-wrap`: the head, the heading

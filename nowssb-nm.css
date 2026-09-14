@@ -3511,6 +3511,47 @@ body.nm-mode #sub-health-male .hcat-item-icon, body.nm-mode #sub-health-female .
 .ig-explore-empty-title { font-size:14px; font-weight:700; color:#1a1a2e; font-family:'DM Sans',sans-serif; }
 .ig-explore-empty-sub { font-size:12px; color:rgba(0,0,0,.42); font-family:'DM Sans',sans-serif; max-width:220px; line-height:1.5; }
 
+/* Choose Your Path home banner — fill edge-to-edge (no laptop double-radius gaps). */
+.vb-path-fill.vb-banner,
+.nwsb-vbwrap.vb-path-fill > .vb-banner,
+.vb-path-fill {
+  border-radius: 18px !important;
+  overflow: hidden !important;
+}
+.vb-path-fill video,
+.vb-path-fill .vbf-screen,
+.vb-path-fill .vbf-screen video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 0 !important;
+}
+.nwsb-inframe .vbf-screen,
+.nwsb-inframe .vbf-screen video,
+.nwsb-inframe video {
+  border-radius: 0 !important;
+  object-fit: cover !important;
+}
+
+/* Device-frame aperture fill — no soft radius on the film (white corner gaps). */
+.nwsb-inframe .vbf-screen,
+.vb-banner.nwsb-inframe .vbf-screen,
+.nwsb-inframe > video,
+.vb-banner.nwsb-inframe > video {
+  border-radius: 0 !important;
+}
+.nwsb-inframe .vbf-screen > video,
+.vb-banner.nwsb-inframe .vbf-screen > video,
+.nwsb-inframe > video,
+.vb-banner.nwsb-inframe > video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 0 !important;
+  display: block !important;
+}
+
+
 /* ===== Choose Your Path (#sub-health-journey) — dark "Fashion" style, not white
    neumorphism. Matches the male/female lists. ===== */
 body.nm-mode #sub-health-journey, body.nm-night #sub-health-journey,

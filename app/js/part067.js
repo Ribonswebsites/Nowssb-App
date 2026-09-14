@@ -36,13 +36,13 @@
        app/js/part062.js as 'genderpath'; a direct child of the home wrap
        that the registry does not know about gets stranded at the top of the
        page while everything registered is re-appended around it. */
-    { after: '#home-nm .nmh-healing-wrap',         vid: './assets/video/healing-path-bg.mp4', gender: 1, frame: 'dev-laptop', wrap: 'nwsb-vbwrap',
+    { after: '#home-nm .nmh-healing-wrap',         vid: './assets/video/healing-path-bg.mp4', gender: 1, wrap: 'nwsb-vbwrap vb-path-fill',
       head: { hello:'Body, organ and mind', name:'Choose Your Path',
               icon:"<svg viewBox=\"0 0 24 24\" fill=\"none\"><path d=\"M12 3.2v17.6\" stroke=\"#fff\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><circle cx=\"7\" cy=\"8.4\" r=\"2.6\" stroke=\"#fff\" stroke-width=\"1.5\"/><circle cx=\"17\" cy=\"8.4\" r=\"2.6\" stroke=\"#fff\" stroke-width=\"1.5\"/><path d=\"M3 17.4v-.8a4 4 0 018 0v.8M13 17.4v-.8a4 4 0 018 0v.8\" stroke=\"#fff\" stroke-width=\"1.5\" stroke-linecap=\"round\"/></svg>",
               banName:'Female or Male', banSub:'Your wellness, decoded for your body',
               banGo: function () { if (typeof openHealingIntro === 'function') openHealingIntro();
                                    else if (typeof openSub === 'function') openSub('health-category'); } } },
-    { after: '#home .fash-healing-wrap',           vid: './assets/video/healing-path-bg.mp4', gender: 1, frame: 'dev-laptop', wrap: 'glass-wrap nwsb-vbwrap',
+    { after: '#home .fash-healing-wrap',           vid: './assets/video/healing-path-bg.mp4', gender: 1, wrap: 'glass-wrap nwsb-vbwrap vb-path-fill',
       head: { hello:'Body, organ and mind', name:'Choose Your Path',
               icon:"<svg viewBox=\"0 0 24 24\" fill=\"none\"><path d=\"M12 3.2v17.6\" stroke=\"#fff\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><circle cx=\"7\" cy=\"8.4\" r=\"2.6\" stroke=\"#fff\" stroke-width=\"1.5\"/><circle cx=\"17\" cy=\"8.4\" r=\"2.6\" stroke=\"#fff\" stroke-width=\"1.5\"/><path d=\"M3 17.4v-.8a4 4 0 018 0v.8M13 17.4v-.8a4 4 0 018 0v.8\" stroke=\"#fff\" stroke-width=\"1.5\" stroke-linecap=\"round\"/></svg>",
               banName:'Female or Male', banSub:'Your wellness, decoded for your body',
