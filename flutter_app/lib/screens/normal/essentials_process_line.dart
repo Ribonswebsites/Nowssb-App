@@ -34,22 +34,25 @@ class NmEssentialsProcessLine extends StatelessWidget {
               border: glass && i != active
                   ? Border.all(color: Colors.white, width: 1.2)
                   : null,
-              boxShadow: i == active
-                  ? const [
-                      BoxShadow(
-                          color: Color(0x339C6B30),
-                          blurRadius: 7,
-                          spreadRadius: 3),
-                      BoxShadow(
-                          color: Color(0x55000000),
-                          offset: Offset(3, 3),
-                          blurRadius: 6),
-                      BoxShadow(
-                          color: Colors.white,
-                          offset: Offset(-2, -2),
-                          blurRadius: 6),
-                    ]
-                  : (glass ? null : NwsbShadows.raisedXs),
+              // Fashion / glass: flat nodes — no soft dark drop-shadow glow.
+              boxShadow: glass
+                  ? null
+                  : (i == active
+                      ? const [
+                          BoxShadow(
+                              color: Color(0x339C6B30),
+                              blurRadius: 7,
+                              spreadRadius: 3),
+                          BoxShadow(
+                              color: Color(0x55000000),
+                              offset: Offset(3, 3),
+                              blurRadius: 6),
+                          BoxShadow(
+                              color: Colors.white,
+                              offset: Offset(-2, -2),
+                              blurRadius: 6),
+                        ]
+                      : NwsbShadows.raisedXs),
             ),
           ),
           if (i != 5)

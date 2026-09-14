@@ -1,9 +1,11 @@
-/// Six horizontal Get Started cards for Normal Home.
+/// Six horizontal Get Started / My Routine cards.
 ///
 /// The card language follows the supplied Essentials reference: a wide image,
 /// compact metadata, a strong title, a centered Store mark that overlaps the
 /// lower edge, and a black action banner underneath. Normal mode uses white
-/// neumorphism; Normal Glass mode uses white glassmorphism.
+/// neumorphism; Normal Glass mode uses white glassmorphism. Fashion My Routine
+/// uses Notifications / GlassWrap dark glass (semi-transparent + blur), not
+/// opaque white glass.
 library;
 
 import 'dart:ui' show ImageFilter;
@@ -53,42 +55,42 @@ class _NmHorizontalRoutineCardsState extends State<NmHorizontalRoutineCards> {
         'Trusting the Breath',
         'Mindfulness · 4 min',
         'Listen to your first meditation',
-        'assets/profile_source/img-act1.jpeg',
+        'assets/routine/trusting-the-breath.png',
         Color(0xFFE9C1A5)),
     _EssentialCardData(
         'Life Coaching',
         'Positive Self-Talk & Power',
         'Life Coaching · 4 mins',
         'Open life coaching',
-        'assets/profile_source/img-act2.jpeg',
+        'assets/routine/positive-self-talk.png',
         Color(0xFFB9D5E8)),
     _EssentialCardData(
         'Story',
         'What Your Body Knows',
         'Story · 8 min',
         'Listen to the story',
-        'assets/profile_source/img-act3.jpeg',
+        'assets/routine/your-body-knows.png',
         Color(0xFFCBBBE8)),
     _EssentialCardData(
         'Breathwork',
         'Return to Stillness',
         'Breathwork · 6 min',
         'Begin breathwork',
-        'assets/profile_source/img-motto.jpeg',
+        'assets/routine/stillness.png',
         Color(0xFFBFE2D1)),
     _EssentialCardData(
         'Sounds',
         'A Softer Inner Voice',
         'Sounds · 5 min',
         'Play healing sounds',
-        'assets/profile_source/img-quote.jpeg',
+        'assets/routine/softer-voice.png',
         Color(0xFFF0D39B)),
     _EssentialCardData(
         'Meditation',
         'A Quiet Place Within',
         'Meditation · 10 min',
         'Start meditation',
-        'assets/profile_source/img-about.jpeg',
+        'assets/routine/quiet-within.png',
         Color(0xFFD4C5E8)),
   ];
 
@@ -129,7 +131,7 @@ class _NmHorizontalRoutineCardsState extends State<NmHorizontalRoutineCards> {
                 glass: glass || widget.fashion, active: _activeCard),
           ),
           SizedBox(
-            height: 338,
+            height: 340,
             child: ListView.separated(
               controller: _cardsController,
               scrollDirection: Axis.horizontal,
@@ -201,13 +203,106 @@ class _EssentialCard extends StatelessWidget {
   final bool glass;
   final bool fashion;
 
+  /// Fashion My Routine — GlassWrap / Notifications dark glass, not white.
+  static const _darkGlassFill = Color(0x0EFFFFFF); // rgba(255,255,255,0.055)
+  static const _darkGlassLine = Color(0x21FFFFFF); // rgba(255,255,255,0.13)
+  static const _darkGlassBlur = 9.0; // CSS blur(18px) → sigma 9
+
   @override
   Widget build(BuildContext context) {
-    final foreground = const Color(0xFF263142);
-    final surface =
-        glass || fashion ? const Color(0xD9FFFFFF) : const Color(0xFFECEEF2);
-    final border =
-        glass || fashion ? const Color(0xFFFFFFFF) : Colors.transparent;
+    final darkGlass = fashion;
+    final foreground =
+        darkGlass ? Colors.white : const Color(0xFF263142);
+    final surface = darkGlass
+        ? _darkGlassFill
+        : (glass ? const Color(0xD9FFFFFF) : const Color(0xFFECEEF2));
+    final border = darkGlass
+        ? _darkGlassLine
+        : (glass ? const Color(0xFFFFFFFF) : Colors.transparent);
+    final radius = BorderRadius.circular(24);
+
+    Widget face = Padding(
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
+      child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(card.category,
+                style: TextStyle(
+                    color: foreground.withValues(alpha: darkGlass ? .78 : .72),
+                    fontSize: 12)),
+            const SizedBox(height: 10),
+            ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Image.asset(card.image,
+                    height: 104,
+                    width: double.infinity,
+                    fit: BoxFit.cover)),
+            const SizedBox(height: 12),
+            Text(card.meta,
+                style: TextStyle(
+                    color: foreground.withValues(alpha: darkGlass ? .75 : .7),
+                    fontSize: 12)),
+            const SizedBox(height: 4),
+            Text(card.title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                    color: foreground,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                    height: 1.15)),
+          ]),
+    );
+
+    Widget cardPane;
+    if (darkGlass) {
+      cardPane = DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: radius,
+          boxShadow: const [
+            BoxShadow(
+                color: Color(0x57000000),
+                blurRadius: 40,
+                offset: Offset(0, 16)),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: radius,
+          child: BackdropFilter(
+            filter: ImageFilter.blur(
+                sigmaX: _darkGlassBlur, sigmaY: _darkGlassBlur),
+            child: Container(
+              height: 249,
+              decoration: BoxDecoration(
+                color: surface,
+                borderRadius: radius,
+                border: Border.all(color: border),
+              ),
+              child: face,
+            ),
+          ),
+        ),
+      );
+    } else {
+      cardPane = Container(
+        height: 249,
+        decoration: BoxDecoration(
+          color: surface,
+          borderRadius: radius,
+          border: Border.all(color: border, width: glass ? 1.2 : 0),
+          boxShadow: glass
+              ? const [
+                  BoxShadow(
+                      color: Color(0x55000000),
+                      blurRadius: 18,
+                      offset: Offset(0, 9))
+                ]
+              : NwsbShadows.raised,
+        ),
+        child: ClipRRect(borderRadius: radius, child: face),
+      );
+    }
+
     return SizedBox(
       width: 330,
       child: Stack(
@@ -215,58 +310,7 @@ class _EssentialCard extends StatelessWidget {
         children: [
           Column(
             children: [
-              Container(
-                height: 249,
-                decoration: BoxDecoration(
-                  color: surface,
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(
-                      color: border, width: glass || fashion ? 1.2 : 0),
-                  boxShadow: glass || fashion
-                      ? const [
-                          BoxShadow(
-                              color: Color(0x55000000),
-                              blurRadius: 18,
-                              offset: Offset(0, 9))
-                        ]
-                      : NwsbShadows.raised,
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(24),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(card.category,
-                              style: TextStyle(
-                                  color: foreground.withValues(alpha: .72),
-                                  fontSize: 12)),
-                          const SizedBox(height: 10),
-                          ClipRRect(
-                              borderRadius: BorderRadius.circular(16),
-                              child: Image.asset(card.image,
-                                  height: 104,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover)),
-                          const SizedBox(height: 12),
-                          Text(card.meta,
-                              style: TextStyle(
-                                  color: foreground.withValues(alpha: .7),
-                                  fontSize: 12)),
-                          const SizedBox(height: 4),
-                          Text(card.title,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                  color: foreground,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w800,
-                                  height: 1.15)),
-                        ]),
-                  ),
-                ),
-              ),
+              cardPane,
               const SizedBox(height: 38),
               Container(
                 width: double.infinity,

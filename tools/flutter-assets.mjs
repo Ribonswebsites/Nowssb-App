@@ -35,6 +35,7 @@ const FOLDERS = [
   'icons',        // the logo disc, the search mark
   'store',        // the intro-page artwork, and the collection covers
   'fashion',      // the Fashion Plus intro and its icon
+  'routine',      // My Routine / Get Started editorial cards
   'player',       // the player's own artwork
   'signature',    // the Signature's marks
   'certificates',
