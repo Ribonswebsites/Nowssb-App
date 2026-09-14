@@ -247,13 +247,13 @@ class VideoPool {
   /// run together — the phone has enough AVC slots for a dozen muted loops,
   /// and serializing to one "playing" clip is the bug users see. Twelve is
   /// the working target (6–12 simultaneous). Off-screen clips still release.
-  static const int maxLive = 16;
+  static const int maxLive = 24;
 
   /// Higher ceiling while Normal home glass mode wants every on-screen clip
   /// moving. Still bounded — phones only have so many hardware decoders —
   /// but generous enough that a scrolled glass home keeps banners alive
   /// alongside the full-bleed background film.
-  static const int maxLiveGlassHome = 20;
+  static const int maxLiveGlassHome = 28;
 
   /// When true, [_effectiveMaxLive] uses [maxLiveGlassHome]. Toggled from
   /// Normal home's glassmorphism switch.
@@ -317,12 +317,12 @@ class VideoPool {
   /// that left every slot reserved and nothing playing. Visible decorative
   /// loops also need to come up together — serializing to one/few openers is
   /// what left a home looking like only one video played.
-  static const int openAtOnce = 8;
+  static const int openAtOnce = 12;
   static const int _openAtOnce = openAtOnce;
 
   /// Keep a small number of next-up controllers from competing with visible
   /// playback. This is deliberately separate from the active decoder ceiling.
-  static const int prefetchSlots = 3;
+  static const int prefetchSlots = 4;
 
   int _opening = 0;
   final List<VideoLease> _openQueue = [];
@@ -787,9 +787,14 @@ class VideoPool {
     // every remote clip had been quietly replaced with whatever local file
     // was nearest in meaning, and the app was playing the wrong film in
     // half its sections.
+    // mixWithOthers: without this Android audio-focus pauses every sibling
+    // when a second muted loop calls play(), which is exactly the
+    // "only one video plays on device" bug — even with plenty of decoder seats.
+    final opts = VideoPlayerOptions(mixWithOthers: true);
     final c = _isRemote(l.assetPath)
-        ? VideoPlayerController.networkUrl(Uri.parse(l.assetPath))
-        : VideoPlayerController.asset(l.assetPath);
+        ? VideoPlayerController.networkUrl(Uri.parse(l.assetPath),
+            videoPlayerOptions: opts)
+        : VideoPlayerController.asset(l.assetPath, videoPlayerOptions: opts);
     l._controller = c;
 
     try {
@@ -1002,7 +1007,8 @@ class VideoPool {
     if (_isRemote(path)) return;
     VideoPlayerController? c;
     try {
-      c = VideoPlayerController.asset(path);
+      c = VideoPlayerController.asset(path,
+          videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
       await _byThen(c.initialize(), _openLocal, 'warm $path');
       await c.setLooping(true);
       await c.setVolume(0);

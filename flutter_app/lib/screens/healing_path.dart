@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../data/content.dart';
 import '../data/models.dart';
+import '../media/nwsb_video.dart';
+import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 import 'practice_player.dart';
 
@@ -60,11 +62,23 @@ class _HealingCategory {
       _banner;
 }
 
-const _banner = 'assets/healing/01.jpg';
-const _maleHero = 'assets/healing/02.jpg';
-const _femaleHero = 'assets/healing/03.jpg';
-const _malePath = 'assets/healing/04.jpg';
-const _femalePath = 'assets/healing/05.jpg';
+// Website / WebView source of truth (index.html + app/js/part014.js).
+const _banner =
+    'https://media.nowssb.com/migrated-images/a2ad0fe279aaea00_grok_image_1777706360035_kdvj3e.jpg';
+const _maleHero =
+    'https://media.nowssb.com/migrated-images/a2ad0fe279aaea00_grok_image_1777706360035_kdvj3e.jpg';
+const _femaleHero =
+    'https://media.nowssb.com/migrated-images/1ecf1fbd58edba8e_grok_image_1777706116245_awevjm.jpg';
+const _malePath =
+    'https://media.nowssb.com/migrated-images/fef6237338f7014e_grok_image_1777632687913_2_t4jezy.jpg';
+const _femalePath =
+    'https://media.nowssb.com/migrated-images/123718eb8e7c98cd_grok_image_1777632677047_2_rnnm0k.jpg';
+const _maleBg =
+    'https://media.nowssb.com/migrated-images/ba5da0ee05062f98_1000035456-ezremove_ypc5qy.png';
+const _femaleBg =
+    'https://media.nowssb.com/migrated-images/f353049cd425c27d_1000035458-ezremove_qrzunf.png';
+const _healingBgVideo = 'assets/video/healing-path-bg.mp4';
+const _healingBgPoster = 'assets/video/healing-path-bg-poster.webp';
 
 final _categories = <_HealingCategory>[
   _HealingCategory(
@@ -74,7 +88,7 @@ final _categories = <_HealingCategory>[
       description:
           'Words that activate muscular frequency, physical strength, and endurance through correct phonetic resonance.',
       icon: _HealingIcon.fitness,
-      sharedImage: 'assets/healing/06.jpg'),
+      sharedImage: 'https://media.nowssb.com/migrated-images/bd9b98a787e4c6d8_grok_image_1778140366830_kr46gr.jpg'),
   _HealingCategory(
       name: 'Fitness & Tone',
       sub: 'Toning through phonetic vibration',
@@ -82,7 +96,7 @@ final _categories = <_HealingCategory>[
       description:
           'Words that activate toning frequency and body composition through targeted phonetic vibration.',
       icon: _HealingIcon.fitness,
-      sharedImage: 'assets/healing/07.jpg'),
+      sharedImage: 'https://media.nowssb.com/migrated-images/8b4991c73d213d0b_grok_image_1778140408500_ucsplo.jpg'),
   _HealingCategory(
       name: 'Heart Health',
       sub: 'Cardiac resonance & circulation',
@@ -90,8 +104,8 @@ final _categories = <_HealingCategory>[
       description:
           'Words that resonate with cardiac frequency, supporting circulation, rhythm, and heart vitality.',
       icon: _HealingIcon.heart,
-      maleImage: 'assets/healing/08.jpg',
-      femaleImage: 'assets/healing/09.jpg'),
+      maleImage: 'https://media.nowssb.com/migrated-images/d7e75968ace7a4e6_grok_image_1778140415087_mn2kog.jpg',
+      femaleImage: 'https://media.nowssb.com/migrated-images/8a7449638e86e1aa_grok_image_1778140433938_wvgmuz.jpg'),
   _HealingCategory(
       name: 'Skin & Glow',
       sub: 'Cellular renewal through sound',
@@ -99,8 +113,8 @@ final _categories = <_HealingCategory>[
       description:
           'Words that stimulate cellular renewal, collagen vibration, and radiant skin through sound science.',
       icon: _HealingIcon.skin,
-      maleImage: 'assets/healing/10.jpg',
-      femaleImage: 'assets/healing/11.jpg'),
+      maleImage: 'https://media.nowssb.com/migrated-images/ec9ef1fd9f2c43da_image-71_vamq5d.jpg',
+      femaleImage: 'https://media.nowssb.com/migrated-images/e3cbfb2aca9a7d83_image-169_c5i9mm.jpg'),
   _HealingCategory(
       name: 'Glass Skin',
       sub: 'Poreless clarity through sound',
@@ -108,8 +122,8 @@ final _categories = <_HealingCategory>[
       description:
           'Words that activate poreless skin clarity, deep hydration and mirror-like luminosity through phonetic sound resonance.',
       icon: _HealingIcon.skin,
-      maleImage: 'assets/healing/12.jpg',
-      femaleImage: 'assets/healing/13.jpg'),
+      maleImage: 'https://media.nowssb.com/migrated-images/f28e4187b788bfec_grok_image_1778140531353_onoaci.jpg',
+      femaleImage: 'https://media.nowssb.com/migrated-images/82c4044a0debe445_grok_image_1778140578685_cpiw6n.jpg'),
   _HealingCategory(
       name: 'Gut Health',
       sub: 'Digestive microbiome harmony',
@@ -117,8 +131,8 @@ final _categories = <_HealingCategory>[
       description:
           'Words that harmonize the gut microbiome and digestive organs through specific phonetic patterns.',
       icon: _HealingIcon.gut,
-      maleImage: 'assets/healing/14.jpg',
-      femaleImage: 'assets/healing/15.jpg'),
+      maleImage: 'https://media.nowssb.com/migrated-images/6808a654a3c7dfca_grok_image_1778140443107_b0z6fx.jpg',
+      femaleImage: 'https://media.nowssb.com/migrated-images/03dde1c40e1f4814_grok_image_1778140446573_w5qrvq.jpg'),
   _HealingCategory(
       name: 'Liver Detox',
       sub: 'Purification frequency activation',
@@ -126,8 +140,8 @@ final _categories = <_HealingCategory>[
       description:
           'Words that activate detoxification frequency, supporting liver purification and metabolic clarity.',
       icon: _HealingIcon.liver,
-      maleImage: 'assets/healing/16.jpg',
-      femaleImage: 'assets/healing/17.jpg'),
+      maleImage: 'https://media.nowssb.com/migrated-images/ec085c8220f8db56_grok_image_1778140452371_ufrjom.jpg',
+      femaleImage: 'https://media.nowssb.com/migrated-images/dc302eb10c7df6b4_grok_image_1778140457587_jdbnuo.jpg'),
   _HealingCategory(
       name: 'Mental Clarity',
       sub: 'Focus & cognitive resonance',
@@ -135,8 +149,8 @@ final _categories = <_HealingCategory>[
       description:
           'Words that enhance cognitive resonance, focus, and neural clarity through phonetic activation.',
       icon: _HealingIcon.mind,
-      maleImage: 'assets/healing/18.jpg',
-      femaleImage: 'assets/healing/19.jpg'),
+      maleImage: 'https://media.nowssb.com/migrated-images/561a09a2761920a6_grok_image_1778140614054_n3nbsy.jpg',
+      femaleImage: 'https://media.nowssb.com/migrated-images/8a69740277114f23_grok_image_1778140619655_asmvnn.jpg'),
   _HealingCategory(
       name: 'Testosterone & Hormones',
       sub: 'Endocrine balance through syllables',
@@ -144,7 +158,7 @@ final _categories = <_HealingCategory>[
       description:
           'Words that support endocrine balance, testosterone production, and hormonal harmony through syllabic frequency.',
       icon: _HealingIcon.hormone,
-      sharedImage: 'assets/healing/20.jpg'),
+      sharedImage: 'https://media.nowssb.com/migrated-images/8f24c24937a44995_grok_image_1778140862207_vid6oz.jpg'),
   _HealingCategory(
       name: 'Hormonal Balance',
       sub: 'Cycle harmony through syllables',
@@ -152,7 +166,7 @@ final _categories = <_HealingCategory>[
       description:
           'Words that support cycle harmony, hormonal regulation, and endocrine balance through sound vibration.',
       icon: _HealingIcon.hormone,
-      sharedImage: 'assets/healing/21.jpg'),
+      sharedImage: 'https://media.nowssb.com/migrated-images/8b8815efcc01dd9e_grok_image_1778140465237_rooq5n.jpg'),
   _HealingCategory(
       name: 'Anti-Aging',
       sub: 'Youth frequency restoration',
@@ -160,7 +174,7 @@ final _categories = <_HealingCategory>[
       description:
           'Words that activate cellular regeneration, collagen renewal and youth-frequency restoration through phonetic vibration.',
       icon: _HealingIcon.skin,
-      sharedImage: 'assets/healing/22.jpg'),
+      sharedImage: 'https://media.nowssb.com/migrated-images/8f749de37346ef70_grok_image_1778140574785_c5nkph.jpg'),
   _HealingCategory(
       name: 'Dark Spot & Pigmentation',
       sub: 'Even skin tone through sound',
@@ -168,7 +182,7 @@ final _categories = <_HealingCategory>[
       description:
           'Words that balance melanin production and support even skin tone through targeted sound resonance.',
       icon: _HealingIcon.skin,
-      sharedImage: 'assets/healing/23.jpg'),
+      sharedImage: 'https://media.nowssb.com/migrated-images/4ec3816eaaebce78_grok_image_1778140642487_bb8mes.jpg'),
   _HealingCategory(
       name: 'Immunity Boost',
       sub: 'Immune resonance activation',
@@ -176,8 +190,8 @@ final _categories = <_HealingCategory>[
       description:
           'Words that activate immune resonance, strengthening the body’s defense through phonetic frequency.',
       icon: _HealingIcon.shield,
-      maleImage: 'assets/healing/24.jpg',
-      femaleImage: 'assets/healing/25.jpg'),
+      maleImage: 'https://media.nowssb.com/migrated-images/0598afda8ea6defa_grok_image_1778140472572_epkcrs.jpg',
+      femaleImage: 'https://media.nowssb.com/migrated-images/f74abac052480172_grok_image_1778140482721_dwpsis.jpg'),
   _HealingCategory(
       name: 'Lung & Breath',
       sub: 'Respiratory phonetic healing',
@@ -185,7 +199,7 @@ final _categories = <_HealingCategory>[
       description:
           'Words that expand breath capacity and activate bronchial pathways through resonant phonetics.',
       icon: _HealingIcon.lung,
-      sharedImage: 'assets/healing/26.jpg'),
+      sharedImage: 'https://media.nowssb.com/migrated-images/54666109937c228b_grok_image_1778140492244_hkw4dr.jpg'),
   _HealingCategory(
       name: 'Kidney & Bladder',
       sub: 'Water-element sound science',
@@ -193,7 +207,7 @@ final _categories = <_HealingCategory>[
       description:
           'Words that resonate with water-element organs, supporting kidney filtration and fluid balance.',
       icon: _HealingIcon.kidney,
-      sharedImage: 'assets/healing/27.jpg'),
+      sharedImage: 'https://media.nowssb.com/migrated-images/9db6f6fec7955be3_image-168_ej7sa8.jpg'),
   _HealingCategory(
       name: 'Bone & Joint',
       sub: 'Skeletal frequency strengthening',
@@ -201,8 +215,8 @@ final _categories = <_HealingCategory>[
       description:
           'Words that strengthen bone density and joint resilience through deep phonetic vibration.',
       icon: _HealingIcon.bone,
-      maleImage: 'assets/healing/28.jpg',
-      femaleImage: 'assets/healing/29.jpg'),
+      maleImage: 'https://media.nowssb.com/migrated-images/e6d9277961f1ff15_grok_image_1778140508637_kacgmf.jpg',
+      femaleImage: 'https://media.nowssb.com/migrated-images/0cba8cc868f51108_image-94_gokqx5.jpg'),
   _HealingCategory(
       name: 'Sleep & Recovery',
       sub: 'Deep rest through word rituals',
@@ -210,8 +224,8 @@ final _categories = <_HealingCategory>[
       description:
           'Words that induce deep rest states, cellular recovery, and parasympathetic activation through sound.',
       icon: _HealingIcon.sleep,
-      maleImage: 'assets/healing/30.jpg',
-      femaleImage: 'assets/healing/31.jpg'),
+      maleImage: 'https://media.nowssb.com/migrated-images/04884250a8b9f5e5_grok_image_1778140553935_lpejkk.jpg',
+      femaleImage: 'https://media.nowssb.com/migrated-images/622fc1a4ec2e6408_grok_image_1778140560786_ls3czt.jpg'),
   _HealingCategory(
       name: 'Hair Health',
       sub: 'Scalp & follicle frequency care',
@@ -219,8 +233,8 @@ final _categories = <_HealingCategory>[
       description:
           'Words that stimulate scalp circulation and follicle activation through vibrational sound patterns.',
       icon: _HealingIcon.hair,
-      maleImage: 'assets/healing/32.jpg',
-      femaleImage: 'assets/healing/33.jpg'),
+      maleImage: 'https://media.nowssb.com/migrated-images/b028d145a11c3533_grok_image_1778140813647_otjm5m.jpg',
+      femaleImage: 'https://media.nowssb.com/migrated-images/1c00e00a2721b672_grok_image_1778140503138_vdaqrx.jpg'),
   _HealingCategory(
       name: 'Eye Sight Health',
       sub: 'Vision frequency activation',
@@ -228,8 +242,8 @@ final _categories = <_HealingCategory>[
       description:
           'Words that activate ocular frequency, strengthen vision clarity and support eye health through targeted phonetic resonance.',
       icon: _HealingIcon.eye,
-      maleImage: 'assets/healing/34.png',
-      femaleImage: 'assets/healing/35.png'),
+      maleImage: 'https://media.nowssb.com/migrated-images/1ef7a885b8fa6039_1000037180-ezremove_yors9c.png',
+      femaleImage: 'https://media.nowssb.com/migrated-images/3a1e78c61b3770a0_1000037181-ezremove_acyr0e.png'),
   _HealingCategory(
       name: 'Explorer & Courage',
       sub: 'Words that ignite boldness & direction',
@@ -237,7 +251,7 @@ final _categories = <_HealingCategory>[
       description:
           'Words that activate boldness, fearless direction, and the primal drive to move into the unknown.',
       icon: _HealingIcon.explorer,
-      sharedImage: 'assets/healing/36.jpg'),
+      sharedImage: 'https://media.nowssb.com/migrated-images/88a7b77448026f04_grok_image_1778140594588_bidu9r.jpg'),
   _HealingCategory(
       name: 'Power & Conquest',
       sub: 'Words that activate dominance & will',
@@ -245,7 +259,7 @@ final _categories = <_HealingCategory>[
       description:
           'Words that activate raw dominance, primal authority, and unbreakable will.',
       icon: _HealingIcon.power,
-      sharedImage: 'assets/healing/37.jpg'),
+      sharedImage: 'https://media.nowssb.com/migrated-images/7620e8c3204844c7_grok_image_1778140587120_ihuxzz.jpg'),
   _HealingCategory(
       name: 'Feminine Radiance',
       sub: 'Inner glow & divine confidence',
@@ -253,7 +267,7 @@ final _categories = <_HealingCategory>[
       description:
           'Words that unlock inner glow, divine confidence and feminine luminosity through deep vibrational sound activation.',
       icon: _HealingIcon.hormone,
-      sharedImage: 'assets/healing/38.png'),
+      sharedImage: 'https://media.nowssb.com/migrated-images/444687f82c4c8c84_fe50c080-49fb-11f1-9ed8-61ad086d2bba_ydglxe.png'),
 ];
 
 class _HealingPathScreenState extends State<HealingPathScreen> {
@@ -300,15 +314,27 @@ class _HealingPathScreenState extends State<HealingPathScreen> {
     return Scaffold(
         backgroundColor: const Color(0xFF060C18),
         body: Stack(children: [
-          Positioned.fill(
-              child: _Background(
-                  image: _stage == _HealingStage.gender
-                      ? 'assets/video/healing-path-bg-poster.webp'
-                      : _stage == _HealingStage.category
-                          ? _category!.image(_gender!)
-                          : (_gender == HealingGender.male
-                              ? _maleHero
-                              : _femaleHero))),
+          // Gender select: looping healing-path film like #sub-health-journey.
+          if (_stage == _HealingStage.gender) ...[
+            const Positioned.fill(
+              child: NwsbVideo(
+                asset: _healingBgVideo,
+                poster: _healingBgPoster,
+                priority: ClipPriority.feature,
+                fit: BoxFit.cover,
+              ),
+            ),
+            const Positioned.fill(
+              child: ColoredBox(color: Color(0x99060C18)),
+            ),
+          ] else
+            Positioned.fill(
+                child: _Background(
+                    image: _stage == _HealingStage.category
+                        ? _category!.image(_gender!)
+                        : (_gender == HealingGender.male
+                            ? _maleBg
+                            : _femaleBg))),
           SafeArea(
               child: Column(children: [
             _Header(
@@ -331,40 +357,50 @@ class _HealingPathScreenState extends State<HealingPathScreen> {
   }
 
   Widget _genderPage() =>
-      ListView(padding: const EdgeInsets.fromLTRB(20, 42, 20, 40), children: [
-        const Text('PERSONALISED FOR YOU',
+      ListView(padding: const EdgeInsets.fromLTRB(20, 28, 20, 40), children: [
+        const Text('Personalised For You',
             style: TextStyle(
-                color: Color(0xB3E8D5A3), fontSize: 11, letterSpacing: 2.4)),
-        const SizedBox(height: 12),
+                color: Color(0xB3E8D5A3), fontSize: 12, letterSpacing: 1.4)),
+        const SizedBox(height: 10),
         const Text('Choose Your\nPath',
             style: TextStyle(
                 color: Colors.white,
                 fontSize: 42,
                 height: .98,
                 fontWeight: FontWeight.w800)),
-        const SizedBox(height: 32),
+        const SizedBox(height: 28),
+        // Website `.gsel-glass-panel` / `.gsel-cards` — two cards side by side.
         Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
                 color: Colors.white.withOpacity(.08),
                 border: Border.all(color: Colors.white.withOpacity(.15)),
                 borderRadius: BorderRadius.circular(26)),
-            child: Column(children: [
-              _GenderCard(
-                  gender: HealingGender.male,
-                  image: _malePath,
-                  title: 'Male',
-                  subtitle: 'Strength · Vitality',
-                  onTap: () => _choose(HealingGender.male)),
-              const SizedBox(height: 12),
-              _GenderCard(
-                  gender: HealingGender.female,
-                  image: _femalePath,
-                  title: 'Female',
-                  subtitle: 'Balance · Radiance',
-                  onTap: () => _choose(HealingGender.female)),
-            ])),
-        const SizedBox(height: 12),
+            child: IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: _GenderCard(
+                        gender: HealingGender.male,
+                        image: _malePath,
+                        title: 'Male',
+                        subtitle: 'Strength · Vitality',
+                        onTap: () => _choose(HealingGender.male)),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _GenderCard(
+                        gender: HealingGender.female,
+                        image: _femalePath,
+                        title: 'Female',
+                        subtitle: 'Balance · Radiance',
+                        onTap: () => _choose(HealingGender.female)),
+                  ),
+                ],
+              ),
+            )),
+        const SizedBox(height: 14),
         const Center(
             child: Text('Tap to explore your categories',
                 style: TextStyle(
@@ -511,7 +547,7 @@ class _HealingPathScreenState extends State<HealingPathScreen> {
         SizedBox(
             height: 220,
             child: Stack(fit: StackFit.expand, children: [
-              _healImage(_banner, error: const SizedBox()),
+              _healImage(category.image(_gender!), error: const SizedBox()),
               const DecoratedBox(
                   decoration: BoxDecoration(
                       gradient: LinearGradient(
@@ -695,11 +731,11 @@ class _GenderCard extends StatelessWidget {
   final String title;
   final String subtitle;
   final VoidCallback onTap;
-  @override
+    @override
   Widget build(BuildContext context) => GestureDetector(
       onTap: onTap,
-      child: SizedBox(
-          height: 150,
+      child: AspectRatio(
+          aspectRatio: 0.72,
           child: ClipRRect(
               borderRadius: BorderRadius.circular(18),
               child: Stack(fit: StackFit.expand, children: [
@@ -710,35 +746,39 @@ class _GenderCard extends StatelessWidget {
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
                             colors: [Colors.transparent, Color(0xE6060C18)]))),
-                const Positioned(
-                    left: 16,
-                    right: 16,
-                    bottom: 15,
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Positioned(
+                    top: 12,
+                    left: 12,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(.45),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Text('For You',
+                          style: TextStyle(
+                              color: Color(0xFFE8D5A3),
+                              fontSize: 10,
+                              letterSpacing: 1.2)),
+                    )),
+                Positioned(
+                    left: 14,
+                    right: 14,
+                    bottom: 16,
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('For You',
-                              style: TextStyle(
-                                  color: Color(0xFFE8D5A3),
-                                  fontSize: 10,
-                                  letterSpacing: 1.6)),
-                          Icon(Icons.arrow_forward,
-                              color: Colors.white70, size: 17)
+                          Text(title,
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w700)),
+                          const SizedBox(height: 4),
+                          Text(subtitle,
+                              style: const TextStyle(
+                                  color: Colors.white70, fontSize: 11)),
                         ])),
-                Positioned(
-                    left: 16,
-                    bottom: 38,
-                    child: Text(title,
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 25,
-                            fontWeight: FontWeight.w700))),
-                Positioned(
-                    left: 17,
-                    bottom: 17,
-                    child: Text(subtitle,
-                        style: const TextStyle(
-                            color: Colors.white70, fontSize: 11)))
               ]))));
 }
 

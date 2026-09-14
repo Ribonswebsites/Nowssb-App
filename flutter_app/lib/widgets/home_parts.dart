@@ -297,9 +297,8 @@ class Spill extends StatelessWidget {
 
 /// `.nmh-sec-banner` — the black bar under a section.
 ///
-/// Square on the Fashion home, like everything else on it, and without the
-/// neumorphic shadow: that white half-shadow is light-home furniture and on
-/// dark glass it reads as a halo. Same lesson the website learned.
+/// Rounded black bar matching CustomizeBlackBanner / request-customized
+/// language (radius 20). Continuous marquee copy — never a sharp edge.
 class SecBanner extends StatelessWidget {
   const SecBanner({
     super.key,
@@ -333,7 +332,8 @@ class SecBanner extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
           color: Colors.black,
-          border: Border.all(color: const Color(0x14FFFFFF)),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: const Color(0x29FFFFFF)),
         ),
         child: Row(
           children: [
@@ -672,15 +672,15 @@ class ScreenCta extends StatelessWidget {
   }
 }
 
-/// Gentle horizontal slide — same motion as web `nwsb-sub-marquee` /
-/// Flutter subscription TV copy. Reuse on section heads and black banners
-/// so Normal / Fashion homes do not read as static stills.
+/// True continuous marquee — text repeats so glyphs never clip mid-letter.
+/// Used on section black banners and heads so motion matches the top
+/// Customize / request-customized black banner language without cutoff.
 class GentleMarqueeText extends StatefulWidget {
   const GentleMarqueeText(
     this.text, {
     super.key,
     required this.style,
-    this.duration = const Duration(milliseconds: 3800),
+    this.duration = const Duration(milliseconds: 9000),
     this.maxLines = 1,
   });
 
@@ -706,6 +706,15 @@ class _GentleMarqueeTextState extends State<GentleMarqueeText>
     _syncTicker();
   }
 
+  @override
+  void didUpdateWidget(GentleMarqueeText old) {
+    super.didUpdateWidget(old);
+    if (old.duration != widget.duration) {
+      _c.duration = widget.duration;
+      _syncTicker();
+    }
+  }
+
   void _syncTicker() {
     final disabled = MediaQuery.maybeOf(context)?.disableAnimations ?? false;
     final ticking = TickerMode.of(context);
@@ -713,7 +722,7 @@ class _GentleMarqueeTextState extends State<GentleMarqueeText>
       if (_c.isAnimating) _c.stop();
       return;
     }
-    if (!_c.isAnimating) _c.repeat(reverse: true);
+    if (!_c.isAnimating) _c.repeat(); // forward-only continuous scroll
   }
 
   @override
@@ -734,24 +743,60 @@ class _GentleMarqueeTextState extends State<GentleMarqueeText>
         style: widget.style,
       );
     }
-    return ClipRect(
-      child: AnimatedBuilder(
-        animation: _c,
-        builder: (_, child) {
-          final t = Curves.easeInOut.transform(_c.value);
-          return Transform.translate(
-            offset: Offset(5 - 15 * t, 0),
-            child: child,
-          );
-        },
-        child: Text(
-          widget.text,
-          maxLines: widget.maxLines,
-          softWrap: false,
-          overflow: TextOverflow.visible,
-          style: widget.style,
-        ),
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final painter = TextPainter(
+          text: TextSpan(text: widget.text, style: widget.style),
+          textDirection: TextDirection.ltr,
+          maxLines: 1,
+        )..layout();
+        // Always marquee with a repeated strip so short titles also move
+        // continuously and long titles never clip mid-glyph.
+        const gap = 48.0;
+        final unit = painter.width + gap;
+        final height = (painter.height * 1.35).clamp(16.0, 48.0);
+        return SizedBox(
+          height: height,
+          width: constraints.maxWidth.isFinite
+              ? constraints.maxWidth
+              : painter.width,
+          child: ClipRect(
+            child: AnimatedBuilder(
+              animation: _c,
+              builder: (_, __) {
+                final offset = -(_c.value * unit);
+                return Stack(
+                  clipBehavior: Clip.hardEdge,
+                  children: [
+                    Positioned(
+                      left: offset,
+                      top: (height - painter.height) / 2,
+                      child: Row(
+                        children: [
+                          Text(widget.text,
+                              maxLines: 1,
+                              softWrap: false,
+                              style: widget.style),
+                          const SizedBox(width: gap),
+                          Text(widget.text,
+                              maxLines: 1,
+                              softWrap: false,
+                              style: widget.style),
+                          const SizedBox(width: gap),
+                          Text(widget.text,
+                              maxLines: 1,
+                              softWrap: false,
+                              style: widget.style),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -777,11 +822,11 @@ class SectionMotionBanner extends StatelessWidget {
       margin: EdgeInsets.only(bottom: compact ? 10 : 14),
       padding: EdgeInsets.symmetric(
         horizontal: 14,
-        vertical: compact ? 8 : 12,
+        vertical: compact ? 11 : 14,
       ),
       decoration: BoxDecoration(
         color: Colors.black,
-        borderRadius: BorderRadius.circular(compact ? 12 : 16),
+        borderRadius: BorderRadius.circular(compact ? 16 : 20),
         border: Border.all(color: const Color(0x29FFFFFF)),
       ),
       child: Column(

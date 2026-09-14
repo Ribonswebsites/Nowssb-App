@@ -73,7 +73,7 @@ class Settings extends ChangeNotifier {
 
   // First launch is intentionally still and pale; users opt into motion and
   // the dark Fashion home from the visible controls.
-  bool _fashionPlus = false;
+  bool _fashionPlus = true;
   bool _fashionHome = false;
   int _fashionVideo = 1;
   int _fashionImage = -1;
@@ -157,7 +157,7 @@ class Settings extends ChangeNotifier {
   Future<void> load() async {
     try {
       final p = await SharedPreferences.getInstance();
-      _fashionPlus = p.getBool(_kPlus) ?? false;
+      _fashionPlus = p.getBool(_kPlus) ?? true;
       _fashionHome = p.getBool(_kHome) ?? false;
       _fashionVideo = _validIndex(
         p.getInt(_kVideo) ?? _fashionVideo,

@@ -7,10 +7,11 @@ const read = (relative) => readFileSync(`${root}/${relative}`, 'utf8');
 
 test('Flutter VideoPool raises concurrent live/open limits for simultaneous loops', () => {
   const pool = read('flutter_app/lib/media/video_pool.dart');
-  assert.match(pool, /static const int maxLive = 16/);
-  assert.match(pool, /static const int maxLiveGlassHome = 20/);
-  assert.match(pool, /static const int openAtOnce = 8/);
+  assert.match(pool, /static const int maxLive = 24/);
+  assert.match(pool, /static const int maxLiveGlassHome = 28/);
+  assert.match(pool, /static const int openAtOnce = 12/);
   assert.match(pool, /soft fail/i);
+  assert.match(pool, /mixWithOthers:\s*true/);
 });
 
 test('NwsbVideo keeps per-widget lease and does not singleton-pause siblings', () => {

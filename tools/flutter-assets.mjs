@@ -29,6 +29,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
    it is already in this repository; none of it needed downloading. */
 const FOLDERS = [
   'video',        // the clips and their posters
+  'videos',       // Fashion Plus / home section films (PRACTICE_VID, etc.)
   'frames',       // the device bezels — see lib/widgets/tv_frame.dart
   'coach',        // Personal Coach hero artwork
   'icons',        // the logo disc, the search mark

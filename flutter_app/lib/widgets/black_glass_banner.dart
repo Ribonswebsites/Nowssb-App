@@ -11,6 +11,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'home_parts.dart';
 import 'nwsb_icon.dart';
 
 /// Notifications-sheet blur (CSS blur(26px) → sigma ≈ 13).
@@ -332,7 +333,7 @@ class CustomizeBlackBanner extends StatelessWidget {
                 ),
                 if (subtitle != null && subtitle!.isNotEmpty) ...[
                   const SizedBox(height: 6),
-                  Text(
+                  GentleMarqueeText(
                     subtitle!,
                     style: const TextStyle(
                       color: Color(0x99FFFFFF),
@@ -340,6 +341,7 @@ class CustomizeBlackBanner extends StatelessWidget {
                       fontWeight: FontWeight.w400,
                       height: 1.35,
                     ),
+                    duration: const Duration(milliseconds: 11000),
                   ),
                 ],
               ],

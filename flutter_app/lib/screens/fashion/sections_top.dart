@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import '../../widgets/nwsb_icon.dart';
 
 import '../../data/content.dart';
+import '../../data/settings.dart';
 import '../../media/nwsb_image.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
@@ -258,11 +259,19 @@ class _HhrButton extends StatelessWidget {
   }
 }
 
-/// 3 · practice — index.html:1791. `.fash-plyr-wrap`: the spill, then the
-/// card. The title is the word for this hour, read from the library.
+/// 3 · practice — index.html:1842 + app/js/part066.js PRACTICE_VID.
+/// `.fash-plyr-wrap`: spill, then the card. With Fashion Plus on (the web
+/// default) the card's media is the looping practice film, not the still.
 class FashPractice extends StatelessWidget {
   const FashPractice({super.key, this.onTap});
   final VoidCallback? onTap;
+
+  /// Website `PRACTICE_VID` — part066.js. Bundled under assets/videos/.
+  static const practiceVid =
+      'assets/videos/09a50041065bdeab_grok_video_2026-07-30-14-54-07_ddjmrr.mp4';
+
+  static const practiceStill =
+      'https://media.nowssb.com/migrated-images/4daad1a85b624fed_grok_image_1778052232385_qpdmgh.jpg';
 
   @override
   Widget build(BuildContext context) {
@@ -281,19 +290,26 @@ class FashPractice extends StatelessWidget {
             markViewBox: 22,
             onTap: onTap,
           ),
-          PhotoCard(
-            background: const NwsbImage(
-              url:
-                  'https://media.nowssb.com/migrated-images/4daad1a85b624fed_grok_image_1778052232385_qpdmgh.jpg',
-              fallback: NwsbVideo(
-                asset: 'assets/video/player-liquid-splash.mp4',
-                autoplay: false,
-              ),
-            ),
-            label: "TODAY'S PRACTICE",
-            title: word,
-            sub: 'Your personalized word ritual for right now.',
-            onTap: onTap,
+          ListenableBuilder(
+            listenable: Settings.instance,
+            builder: (context, _) {
+              // Fashion Plus ships ON on the website (`localStorage !== '0'`).
+              // Match that: looping NwsbVideo is the player-section media.
+              final motion = Settings.instance.fashionPlus;
+              return PhotoCard(
+                background: motion
+                    ? const NwsbVideo(
+                        asset: practiceVid,
+                        priority: ClipPriority.feature,
+                        fit: BoxFit.cover,
+                      )
+                    : const NwsbImage(url: practiceStill),
+                label: "TODAY'S PRACTICE",
+                title: word,
+                sub: 'Your personalized word ritual for right now.',
+                onTap: onTap,
+              );
+            },
           ),
         ],
       ),
