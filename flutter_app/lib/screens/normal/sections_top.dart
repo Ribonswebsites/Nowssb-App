@@ -199,9 +199,8 @@ class NmStreakVideo extends StatelessWidget {
   const NmStreakVideo({super.key, this.onTap});
   final VoidCallback? onTap;
 
-  /// Standalone herovid slot — content now lives in [NormalPromoRail] Streak
-  /// page (banner outside wrapper + video). Keep a zero-size placeholder so
-  /// the home registry order stays intact.
+  /// Standalone herovid slot — zero-size placeholder so the home registry
+  /// order stays intact (streak film remains on the dedicated streak section).
   @override
   Widget build(BuildContext context) => const SizedBox.shrink();
 }
