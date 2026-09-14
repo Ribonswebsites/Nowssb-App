@@ -3,10 +3,10 @@
 /// Base: one rounded card, 3-up Store · Player · Earn (same icons, ripples,
 /// labels). Rings are plain white/neutral rotating strokes — never rainbow.
 ///
-/// Expanded: auto-cycles grid → Store → Player → Earn → grid. Each expanded
-/// row reuses that item's exact icon circle (glyph + white ring + ripple), a
-/// thin vertical divider, title + subtitle, and a small SVG in a white circle.
-/// Same card height as the grid. No play-triangle left icon, no black arrow.
+/// Expanded: auto-cycles grid → Store → Player → Earn → grid. Neutral /
+/// transparent card (no red/pink/purple fills). Each expanded row: left icon
+/// circle | divider | title+sub | extra SVG-in-white-circle | far-right arrow
+/// circle. Glyphs scaled up slightly inside the same circle size.
 library;
 
 import 'dart:async';
@@ -16,22 +16,6 @@ import 'package:flutter/material.dart';
 
 import '../../theme/tokens.dart';
 import '../../widgets/nwsb_icon.dart';
-
-Color _bannerColor(double progress) {
-  const seeds = [
-    Color(0xFFFF9A3D), // orange
-    Color(0xFFE94F83), // pink
-    Color(0xFF9A58C9), // purple
-    Color(0xFF3EAD7B), // green
-    Color(0xFF467ED6), // blue
-    Color(0xFF222633), // black
-    Color(0xFF6B5B95), // soft periwinkle (readable white type)
-  ];
-  final scaled = progress * seeds.length;
-  final index = scaled.floor() % seeds.length;
-  final next = (index + 1) % seeds.length;
-  return Color.lerp(seeds[index], seeds[next], scaled - scaled.floor())!;
-}
 
 /// Shared card height for grid and every expanded row.
 const double kRhythmCardHeight = 146;
@@ -130,17 +114,9 @@ class _NormalPromoRailState extends State<NormalPromoRail>
                     const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(24),
-                  color: _bannerColor(_motion.value),
-                  boxShadow: const [
-                    BoxShadow(
-                        color: Color(0x23000000),
-                        blurRadius: 18,
-                        offset: Offset(0, 8)),
-                    BoxShadow(
-                        color: Colors.white,
-                        blurRadius: 12,
-                        offset: Offset(-4, -4)),
-                  ],
+                  // Neutral / transparent matching home grid — no colored fills.
+                  color: NwsbColors.surface,
+                  boxShadow: NwsbShadows.raised,
                 ),
                 child: AnimatedSwitcher(
                   duration: const Duration(milliseconds: 420),
@@ -228,7 +204,7 @@ class _GridRow extends StatelessWidget {
               width: 1,
               height: 66,
               margin: const EdgeInsets.symmetric(horizontal: 5),
-              color: Colors.white.withValues(alpha: .55),
+              color: const Color(0x331A1A2E),
             ),
         ],
       ],
@@ -248,6 +224,19 @@ class _ExpandedRow extends StatelessWidget {
   final double phase;
   final Animation<double> motion;
 
+  String get _extraMark {
+    switch (door.title) {
+      case NormalPromoRailLabels.store:
+        return NwsbMarks.bag;
+      case NormalPromoRailLabels.player:
+        return NwsbMarks.play;
+      case NormalPromoRailLabels.earn:
+        return NwsbMarks.earn;
+      default:
+        return NwsbMarks.discover;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -260,7 +249,7 @@ class _ExpandedRow extends StatelessWidget {
           Container(
             width: 1,
             height: 66,
-            color: Colors.white.withValues(alpha: .55),
+            color: const Color(0x331A1A2E),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -271,7 +260,7 @@ class _ExpandedRow extends StatelessWidget {
                 Text(
                   door.title,
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: NwsbColors.ink,
                     fontSize: 17,
                     fontWeight: FontWeight.w800,
                     letterSpacing: -0.2,
@@ -283,7 +272,7 @@ class _ExpandedRow extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    color: Color(0xE6FFFFFF),
+                    color: NwsbColors.inkSoft,
                     fontSize: 12.5,
                     fontWeight: FontWeight.w500,
                   ),
@@ -291,33 +280,18 @@ class _ExpandedRow extends StatelessWidget {
               ],
             ),
           ),
+          const SizedBox(width: 6),
+          // Extra SVG-in-white-circle near/before the arrow (additional).
+          _WhiteSvgDisc(mark: _extraMark, size: 34, iconSize: 15),
           const SizedBox(width: 8),
-          // Additional small SVG in its own white circle — never a black CTA.
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x33000000),
-                  blurRadius: 8,
-                  offset: Offset(0, 2),
-                ),
-              ],
-              border: Border.all(color: const Color(0x22FFFFFF)),
-            ),
-            child: const Center(
-              child: NwsbIcon(
-                NwsbMarks.enterArrow,
-                size: 14,
-                viewBox: 12,
-                color: Color(0xFF1A1A2E),
-                strokeWidth: 1.7,
-                cap: 'square',
-              ),
-            ),
+          // Far-right arrow circle (kept).
+          const _WhiteSvgDisc(
+            mark: NwsbMarks.enterArrow,
+            size: 36,
+            iconSize: 14,
+            viewBox: 12,
+            strokeWidth: 1.7,
+            cap: 'square',
           ),
         ],
       ),
@@ -350,7 +324,7 @@ class _PromoDoor extends StatelessWidget {
           Text(
             door.title,
             style: const TextStyle(
-              color: Colors.white,
+              color: NwsbColors.ink,
               fontSize: 12,
               fontWeight: FontWeight.w800,
             ),
@@ -360,7 +334,7 @@ class _PromoDoor extends StatelessWidget {
             door.subtitle,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: Color(0xE6FFFFFF), fontSize: 8.5),
+            style: const TextStyle(color: NwsbColors.inkSoft, fontSize: 8.5),
           ),
         ],
       ),
@@ -393,7 +367,7 @@ class _IconDisc extends StatelessWidget {
           foregroundPainter:
               _NeutralRippleDiscPainter(value: (motion.value + phase) % 1),
           child: Padding(
-            padding: const EdgeInsets.all(9),
+            padding: const EdgeInsets.all(7),
             child: DecoratedBox(
               decoration: const BoxDecoration(
                 color: Color(0xE9060C18),
@@ -408,18 +382,67 @@ class _IconDisc extends StatelessWidget {
               child: Center(
                 child: Image.asset(
                   icon,
-                  width: 25,
-                  height: 25,
+                  width: 32,
+                  height: 32,
                   fit: BoxFit.contain,
                   errorBuilder: (_, __, ___) => const Icon(
                     Icons.auto_awesome,
                     color: Colors.white,
-                    size: 25,
+                    size: 32,
                   ),
                 ),
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+
+class _WhiteSvgDisc extends StatelessWidget {
+  const _WhiteSvgDisc({
+    required this.mark,
+    this.size = 36,
+    this.iconSize = 14,
+    this.viewBox = 24,
+    this.strokeWidth = 1.6,
+    this.cap = 'round',
+  });
+
+  final String mark;
+  final double size;
+  final double iconSize;
+  final double viewBox;
+  final double strokeWidth;
+  final String cap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        shape: BoxShape.circle,
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x33000000),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
+        border: Border.all(color: const Color(0x22FFFFFF)),
+      ),
+      child: Center(
+        child: NwsbIcon(
+          mark,
+          size: iconSize,
+          viewBox: viewBox,
+          color: const Color(0xFF1A1A2E),
+          strokeWidth: strokeWidth,
+          cap: cap,
         ),
       ),
     );

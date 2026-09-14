@@ -553,6 +553,9 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> with Ticker
                       onSettings: _openSettings,
                       onInfo: _openInfo,
                       onLevel: _openLevel,
+                      onStore: () => Navigator.of(context).push(
+                        MaterialPageRoute<void>(builder: (_) => const StoreScreen()),
+                      ),
                       onSyllable: (part) async {
                         await _tts.stop();
                         await _tts.speak(part.roman.isNotEmpty ? part.roman : part.deva);
@@ -628,20 +631,6 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> with Ticker
                     style: TextStyle(color: _error == null ? Colors.white70 : const Color(0xFFFFB4B4), fontSize: 12, height: 1.4),
                   ),
                 ],
-                const SizedBox(height: 12),
-                Center(
-                  child: SizedBox(
-                    width: stageWidth,
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: _StoreGlassVideoBox(
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute<void>(builder: (_) => const StoreScreen()),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
                 const SizedBox(height: 10),
                 SizedBox(
                   width: stageWidth,
@@ -1201,8 +1190,14 @@ class _QueueSheetState extends State<_QueueSheet> {
     final theme = _currentTheme;
     final art = (word?.img.isNotEmpty == true) ? word!.img : theme.image;
     final t = _collapse;
-    final controlsOpacity = (1.0 - (t / 0.55)).clamp(0.0, 1.0);
-    final miniOpacity = ((t - 0.35) / 0.45).clamp(0.0, 1.0);
+    // Hard 2-stage gate — stages never paint together:
+    // Stage 1 (t < 0.42): expanded art + transport; transport fully gone by 0.42
+    // Dead zone 0.42–0.58: only art/title + sticky Playing-from/Save/filters
+    // Stage 2 (t >= 0.58): sticky mini-bar only (thumb+title+cast+play)
+    const stage1End = 0.42;
+    const stage2Start = 0.58;
+    final controlsOpacity = t >= stage1End ? 0.0 : (1.0 - t / stage1End).clamp(0.0, 1.0);
+    final miniOpacity = t <= stage2Start ? 0.0 : ((t - stage2Start) / (1.0 - stage2Start)).clamp(0.0, 1.0);
 
     return PopScope(
       canPop: true,
@@ -1423,8 +1418,8 @@ class _QueueSheetState extends State<_QueueSheet> {
   }
 }
 
-/// Continuous scroll-driven hero: art scales + moves top-left; title reflows;
-/// primary controls fade; sticky mini-bar gets cast + play (YTM full state).
+/// 2-stage YTM hero: (1) art shrinks + transport fades out; (2) mini-bar only.
+/// Stages are hard-gated so transport never paints over Save/filters.
 class _YtmCollapsingHero extends StatelessWidget {
   const _YtmCollapsingHero({
     required this.topPad,
@@ -1463,8 +1458,13 @@ class _YtmCollapsingHero extends StatelessWidget {
     final artSize = expandedArt + (miniArt - expandedArt) * Curves.easeInOutCubic.transform(t);
     final artLeft = 24.0 + (12.0 - 24.0) * t;
     final artTop = topPad + 28.0 + ((8.0) - 28.0) * t;
-    final controlsOpacity = (1.0 - (t / 0.55)).clamp(0.0, 1.0);
-    final miniOpacity = ((t - 0.42) / 0.4).clamp(0.0, 1.0);
+    // Match sheet-level 2-stage gates (no mid-scroll transport-over-tabs mess).
+    const stage1End = 0.42;
+    const stage2Start = 0.58;
+    final controlsOpacity = t >= stage1End ? 0.0 : (1.0 - t / stage1End).clamp(0.0, 1.0);
+    final miniOpacity = t <= stage2Start ? 0.0 : ((t - stage2Start) / (1.0 - stage2Start)).clamp(0.0, 1.0);
+    // Title/artist visible through stage 1 handoff; full in stage 2 mini-bar.
+    final titleOpacity = t < 0.12 ? (0.25 + 0.75 * (t / 0.12)) : 1.0;
     final titleLeft = artLeft + artSize + 12;
     final titleTop = artTop + artSize * 0.15 * (1 - t) + 4 * t;
 
@@ -1485,7 +1485,8 @@ class _YtmCollapsingHero extends StatelessWidget {
     return ColoredBox(
       color: const Color(0xFF000000),
       child: Stack(
-        clipBehavior: Clip.none,
+        // Clip so transport cannot paint over sticky Playing-from / filters.
+        clipBehavior: Clip.hardEdge,
         children: [
           // Large → mini art (continuous)
           Positioned(
@@ -1499,7 +1500,7 @@ class _YtmCollapsingHero extends StatelessWidget {
             right: 88,
             top: titleTop.clamp(topPad + 6, artTop + artSize + 8),
             child: Opacity(
-              opacity: (0.35 + 0.65 * miniOpacity).clamp(0.0, 1.0),
+              opacity: titleOpacity.clamp(0.0, 1.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
@@ -1528,61 +1529,63 @@ class _YtmCollapsingHero extends StatelessWidget {
               ),
             ),
           ),
-          // Primary controls — fade out on scroll
-          Positioned(
-            left: 20,
-            right: 20,
-            top: artTop + artSize + 16,
-            child: IgnorePointer(
-              ignoring: controlsOpacity < 0.12,
+          // Stage 1 only — transport fully removed before sticky tabs (stage 2).
+          if (controlsOpacity > 0.01)
+            Positioned(
+              left: 20,
+              right: 20,
+              top: artTop + artSize + 16,
+              child: IgnorePointer(
+                ignoring: controlsOpacity < 0.12,
+                child: Opacity(
+                  opacity: controlsOpacity,
+                  child: Column(
+                    children: [
+                      _ProgressBar(playing: playing, durationSec: durationSec),
+                      const SizedBox(height: 4),
+                      _TransportRow(
+                        playing: playing,
+                        shuffle: shuffle,
+                        loop: loop,
+                        onShuffle: () {},
+                        onPrevious: () {},
+                        onPlay: onPlay,
+                        onNext: () {},
+                        onRepeat: () {},
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          // Stage 2 only — sticky mini-bar actions (never with transport).
+          if (miniOpacity > 0.01)
+            Positioned(
+              top: topPad + 10,
+              right: 10,
               child: Opacity(
-                opacity: controlsOpacity,
-                child: Column(
+                opacity: miniOpacity,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    _ProgressBar(playing: playing, durationSec: durationSec),
-                    const SizedBox(height: 4),
-                    _TransportRow(
-                      playing: playing,
-                      shuffle: shuffle,
-                      loop: loop,
-                      onShuffle: () {},
-                      onPrevious: () {},
-                      onPlay: onPlay,
-                      onNext: () {},
-                      onRepeat: () {},
+                    IconButton(
+                      onPressed: onCast,
+                      icon: const Icon(Icons.cast_rounded, color: Color(0xFFCFCFD2), size: 22),
+                      visualDensity: VisualDensity.compact,
+                    ),
+                    IconButton(
+                      onPressed: onPlay,
+                      icon: Icon(
+                        playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                        color: const Color(0xFFF5F5F7),
+                        size: 26,
+                      ),
+                      visualDensity: VisualDensity.compact,
                     ),
                   ],
                 ),
               ),
             ),
-          ),
-          // Sticky mini actions: cast + play (YTM full)
-          Positioned(
-            top: topPad + 10,
-            right: 10,
-            child: Opacity(
-              opacity: miniOpacity,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    onPressed: onCast,
-                    icon: const Icon(Icons.cast_rounded, color: Color(0xFFCFCFD2), size: 22),
-                    visualDensity: VisualDensity.compact,
-                  ),
-                  IconButton(
-                    onPressed: onPlay,
-                    icon: Icon(
-                      playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
-                      color: const Color(0xFFF5F5F7),
-                      size: 26,
-                    ),
-                    visualDensity: VisualDensity.compact,
-                  ),
-                ],
-              ),
-            ),
-          ),
           // Collapse chevron when expanded
           Positioned(
             top: topPad + 4,
@@ -1708,8 +1711,9 @@ class _QueueStickyHeadDelegate extends SliverPersistentHeaderDelegate {
 }
 
 class _StoreGlassVideoBox extends StatelessWidget {
-  const _StoreGlassVideoBox({required this.onTap});
+  const _StoreGlassVideoBox({required this.onTap, this.size = 84});
   final VoidCallback onTap;
+  final double size;
 
   static const _asset = 'assets/store/nowssb-bag-headphones.webp';
 
@@ -1719,8 +1723,8 @@ class _StoreGlassVideoBox extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: SizedBox(
-        width: 84,
-        height: 84,
+        width: size,
+        height: size,
         child: GlassWrap(
           margin: EdgeInsets.zero,
           padding: const EdgeInsets.all(6),
@@ -1755,7 +1759,8 @@ class _VisualStage extends StatelessWidget {
   const _VisualStage({
     required this.word, required this.theme, required this.playing,
     required this.accent, required this.onReplay, required this.onCopy,
-    required this.onSettings, required this.onInfo, required this.onLevel, required this.onSyllable,
+    required this.onSettings, required this.onInfo, required this.onLevel,
+    required this.onStore, required this.onSyllable,
   });
 
   final Word word;
@@ -1767,6 +1772,7 @@ class _VisualStage extends StatelessWidget {
   final VoidCallback onSettings;
   final VoidCallback onInfo;
   final VoidCallback onLevel;
+  final VoidCallback onStore;
   final ValueChanged<WordPart> onSyllable;
 
   @override
@@ -1809,12 +1815,21 @@ class _VisualStage extends StatelessWidget {
           Positioned(
             top: 10,
             left: 10,
-            child: AnimatedBuilder(
-              animation: PracticeProgress.instance,
-              builder: (context, _) => _LevelPill(
-                level: PracticeProgress.instance.level.clamp(1, 10),
-                onTap: onLevel,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AnimatedBuilder(
+                  animation: PracticeProgress.instance,
+                  builder: (context, _) => _LevelPill(
+                    level: PracticeProgress.instance.level.clamp(1, 10),
+                    onTap: onLevel,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                // Store bag square lives INSIDE the art card (below Level badge).
+                _StoreGlassVideoBox(onTap: onStore, size: 56),
+              ],
             ),
           ),
           Positioned(

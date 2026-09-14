@@ -1,9 +1,10 @@
 /// Hero video, sticky header, and total-sessions orb for My Progress.
 ///
-/// Scene-1 is positioned so its **outer glass/smoke sphere rim** coincides
-/// with the UI progress ring. The ring is painted near the full box edge and
-/// sized large enough to read as the orb's own rim — not a smaller circle
-/// floating in the dark core. Overlay stats sit at the shared center.
+/// Geometry contract (no zoom-only hacks):
+/// - One shared orb stage parent measures rendered box (cx, cy, d).
+/// - Smoke video + progress ring + stats share that SAME center and diameter.
+/// - Both are absolutely centered (top/left 50% + translate(-50%,-50%)) inside
+///   the stage so the white ring traces the glass/smoke outer rim.
 library;
 
 import 'dart:math' as math;
@@ -19,79 +20,26 @@ const kProgressScene1 = 'assets/video/my-progress-scene-1.mp4';
 /// Scroll-up page backdrop (smoke / silk) — full bleed, not a card.
 const kProgressScrollBg = 'assets/video/player-bg-loop.mp4';
 
-/// Full-screen hero (scene-1) backdrop. Crossfades out as user scrolls.
+/// Ambient plate behind the page — orb sphere is owned by ProgressOrbHero.
 class ProgressHeroBgVideo extends StatelessWidget {
   const ProgressHeroBgVideo({super.key, this.opacity = 1});
   final double opacity;
 
-  /// Scene-1 intrinsic size (my-progress-scene-1.mp4).
-  static const double _vidW = 640;
-  static const double _vidH = 1408;
-
-  /// Orb center in video pixels.
-  static const double _orbCx = 320;
-  static const double _orbCy = 462.5;
-
-  /// Outer glass/smoke sphere rim in video pixels (NOT the bright core).
-  /// Prior "fix" locked to ~147.5 (core) which left the visible rim far
-  /// outside the UI ring — the floating-ring gap in screenshots.
-  static const double orbOuterR = 225;
-
-  static const double _headerContentH = 88;
-
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.sizeOf(context);
-    final pad = MediaQuery.paddingOf(context);
-    final headerH = pad.top + _headerContentH;
-    final ringBox = ProgressOrbHero.ringBoxForWidth(size.width);
-    final ringCx = size.width / 2;
-    final ringCy = headerH + ProgressOrbHero.height * ProgressOrbHero.orbTopFrac;
-    // Lock the *outer* rim to the painted UI ring radius.
-    final targetR = ProgressOrbHero.paintedRadius(ringBox);
-    final scale = targetR / orbOuterR;
-    final left = ringCx - _orbCx * scale;
-    final top = ringCy - _orbCy * scale;
-    final dw = _vidW * scale;
-    final dh = _vidH * scale;
-
+    // Ambient plate only — the glass/smoke sphere lives INSIDE [ProgressOrbHero]
+    // so ring and orb share one measured parent (no second competing circle).
     return Positioned.fill(
       child: IgnorePointer(
         child: Opacity(
           opacity: opacity.clamp(0.0, 1.0),
-          child: ColoredBox(
-            color: MpColors.bg,
-            child: ClipRect(
-              child: Stack(
-                clipBehavior: Clip.hardEdge,
-                children: [
-                  Positioned(
-                    left: left,
-                    top: top,
-                    width: dw,
-                    height: dh,
-                    child: const NwsbVideo(
-                      asset: kProgressScene1,
-                      // Geometry is applied by the Positioned box — no
-                      // asset recompress; fill the laid-out rect.
-                      fit: BoxFit.fill,
-                      priority: ClipPriority.feature,
-                      loop: true,
-                      autoplay: true,
-                      alignment: Alignment.center,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          child: const ColoredBox(color: MpColors.bg),
         ),
       ),
     );
   }
 }
 
-/// Full-screen scroll backdrop. Fades in once the hero leaves.
 class ProgressScrollBgVideo extends StatelessWidget {
   const ProgressScrollBgVideo({super.key, this.opacity = 1});
   final double opacity;
@@ -256,7 +204,7 @@ class ProgressHeader extends StatelessWidget {
   }
 }
 
-/// Transparent orb overlay — NO video inside. Page bg shows through.
+/// Shared orb stage: smoke video + rim ring + stats — one parent, one center.
 class ProgressOrbHero extends StatelessWidget {
   const ProgressOrbHero({
     super.key,
@@ -269,30 +217,55 @@ class ProgressOrbHero extends StatelessWidget {
   final String timeLabel;
   final VoidCallback onViewInsights;
 
-  /// Tall enough for a large rim-aligned ring + VIEW INSIGHTS CTA.
-  static const double height = 420;
+  /// Tall enough for shared orb stage + VIEW INSIGHTS CTA.
+  static const double height = 460;
 
-  /// Public so [ProgressHeroBgVideo] can lock the scene-1 outer rim here.
-  static const double orbTopFrac = 0.38;
+  /// Scene-1 intrinsic size (my-progress-scene-1.mp4).
+  static const double vidW = 640;
+  static const double vidH = 1408;
 
-  /// Legacy constant — prefer [ringBoxForWidth] for layout.
-  static const double ringSize = 328;
+  /// Orb center in video pixels (measured from scene-1).
+  static const double orbCx = 320;
+  static const double orbCy = 462.5;
 
-  /// Responsive ring box: large enough to sit on the outer smoke rim.
-  static double ringBoxForWidth(double width) =>
-      (width * 0.84).clamp(300.0, 348.0);
+  /// Outer glass/smoke sphere radius in video pixels → diameter 450.
+  static const double orbOuterR = 225;
 
-  /// Painted stroke radius — near the box edge (not the old 130/286 inset
-  /// that left a dark gap inside the sphere).
-  static double paintedRadius(double ringBox) => ringBox / 2 - 2.5;
+  /// Vertical anchor of the shared stage center inside [height] (0–1).
+  static const double stageCenterFrac = 0.42;
+
+  /// Responsive rendered diameter of the shared orb stage.
+  /// Ring and smoke both fill this box so they scale together.
+  static double stageDiameterForWidth(double width) =>
+      (width * 0.90).clamp(320.0, 500.0);
+
+  /// Painted stroke radius — traces outer rim (≈ d/2, inset 1px for stroke).
+  /// Prefer d (rim) over d-20; 1px inset keeps stroke inside the box edge.
+  static double paintedRadius(double diameter) => diameter / 2 - 1.0;
+
+  /// Legacy aliases used by scroll math / callers.
+  static const double orbTopFrac = stageCenterFrac;
+  static const double ringSize = 360;
+
+  static double ringBoxForWidth(double width) => stageDiameterForWidth(width);
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    final ringBox = ringBoxForWidth(width);
+    final d = stageDiameterForWidth(width);
     final ringProgress =
         sessions == 0 ? 0.12 : (0.18 + (sessions % 40) / 50).clamp(0.18, 0.92);
-    final orbTop = height * orbTopFrac - ringBox / 2;
+
+    // Shared stage center inside this hero (absolute 50% / stageCenterFrac).
+    final cx = width / 2;
+    final cy = height * stageCenterFrac;
+
+    // Map scene-1 so video orb outer rim == stage box edge (diameter d).
+    final scale = d / (orbOuterR * 2); // d / 450
+    final dw = vidW * scale;
+    final dh = vidH * scale;
+    final vidLeft = d / 2 - orbCx * scale;
+    final vidTop = d / 2 - orbCy * scale;
 
     return SizedBox(
       height: height,
@@ -300,124 +273,145 @@ class ProgressOrbHero extends StatelessWidget {
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          // Soft depth plate — reads as glass interior behind the copy.
+          // —— SHARED PARENT: smoke + ring + text, same center & diameter ——
           Positioned(
-            top: orbTop + ringBox * 0.18,
-            left: 0,
-            right: 0,
-            height: ringBox * 0.64,
-            child: Center(
-              child: IgnorePointer(
-                child: Container(
-                  width: ringBox * 0.55,
-                  height: ringBox * 0.55,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: RadialGradient(
-                      colors: [
-                        Colors.black.withOpacity(0.38),
-                        Colors.black.withOpacity(0.12),
-                        Colors.transparent,
-                      ],
-                      stops: const [0.0, 0.55, 1.0],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          // Thin white progress ring on the orb's outer rim.
-          Positioned(
-            top: orbTop,
-            left: 0,
-            right: 0,
-            child: Center(
+            left: cx,
+            top: cy,
+            child: Transform.translate(
+              offset: Offset(-d / 2, -d / 2),
               child: SizedBox(
-                width: ringBox,
-                height: ringBox,
-                child: CustomPaint(painter: _OrbRingPainter(progress: ringProgress)),
-              ),
-            ),
-          ),
-          // Stats stack — exact orb center, depth shadows for in-glass read.
-          Positioned(
-            top: orbTop,
-            left: 0,
-            right: 0,
-            height: ringBox,
-            child: Center(
-              child: SizedBox(
-                width: ringBox * 0.62,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                width: d,
+                height: d,
+                child: Stack(
+                  alignment: Alignment.center,
+                  clipBehavior: Clip.hardEdge,
                   children: [
-                    Text(
-                      'TOTAL SESSIONS',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 9,
-                        letterSpacing: 2.8,
-                        fontWeight: FontWeight.w700,
-                        color: const Color(0xFFE6E6E2),
-                        shadows: [
-                          Shadow(
-                            blurRadius: 10,
-                            color: Colors.black.withOpacity(0.85),
+                    // Smoke / glass orb — fills the measured stage box.
+                    Positioned.fill(
+                      child: IgnorePointer(
+                        child: ClipOval(
+                          child: Stack(
+                            clipBehavior: Clip.hardEdge,
+                            children: [
+                              Positioned(
+                                left: vidLeft,
+                                top: vidTop,
+                                width: dw,
+                                height: dh,
+                                child: const NwsbVideo(
+                                  asset: kProgressScene1,
+                                  fit: BoxFit.fill,
+                                  priority: ClipPriority.feature,
+                                  loop: true,
+                                  autoplay: true,
+                                  alignment: Alignment.center,
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '$sessions',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 64,
-                        fontWeight: FontWeight.w300,
-                        letterSpacing: -3.5,
-                        height: 0.94,
-                        color: MpColors.white,
-                        shadows: [
-                          Shadow(
-                            blurRadius: 22,
-                            color: Colors.black.withOpacity(0.9),
+                    // Soft depth plate behind copy (same center).
+                    IgnorePointer(
+                      child: Container(
+                        width: d * 0.55,
+                        height: d * 0.55,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: RadialGradient(
+                            colors: [
+                              Colors.black.withOpacity(0.42),
+                              Colors.black.withOpacity(0.14),
+                              Colors.transparent,
+                            ],
+                            stops: const [0.0, 0.55, 1.0],
                           ),
-                          Shadow(
-                            blurRadius: 6,
-                            color: Colors.black.withOpacity(0.7),
-                            offset: const Offset(0, 1),
-                          ),
-                        ],
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 5),
-                    Text(
-                      timeLabel,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w300,
-                        color: const Color(0xFFF0F0ED),
-                        shadows: [
-                          Shadow(
-                            blurRadius: 14,
-                            color: Colors.black.withOpacity(0.85),
-                          ),
-                        ],
+                    // Progress ring — same box; radius = % of SAME container.
+                    Positioned.fill(
+                      child: CustomPaint(
+                        painter: _OrbRingPainter(progress: ringProgress),
                       ),
                     ),
-                    const SizedBox(height: 5),
-                    Text(
-                      'MEDITATION TIME',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 8,
-                        letterSpacing: 2.4,
-                        color: const Color(0xFFBFC1C0),
-                        shadows: [
-                          Shadow(
-                            blurRadius: 8,
-                            color: Colors.black.withOpacity(0.8),
+                    // Stats — exact shared center.
+                    SizedBox(
+                      width: d * 0.62,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'TOTAL SESSIONS',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 9,
+                              letterSpacing: 2.8,
+                              fontWeight: FontWeight.w700,
+                              color: const Color(0xFFE6E6E2),
+                              shadows: [
+                                Shadow(
+                                  blurRadius: 10,
+                                  color: Colors.black.withOpacity(0.85),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            '$sessions',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 64,
+                              fontWeight: FontWeight.w300,
+                              letterSpacing: -3.5,
+                              height: 0.94,
+                              color: MpColors.white,
+                              shadows: [
+                                Shadow(
+                                  blurRadius: 22,
+                                  color: Colors.black.withOpacity(0.9),
+                                ),
+                                Shadow(
+                                  blurRadius: 6,
+                                  color: Colors.black.withOpacity(0.7),
+                                  offset: const Offset(0, 1),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            timeLabel,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w300,
+                              color: const Color(0xFFF0F0ED),
+                              shadows: [
+                                Shadow(
+                                  blurRadius: 14,
+                                  color: Colors.black.withOpacity(0.85),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            'MEDITATION TIME',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 8,
+                              letterSpacing: 2.4,
+                              color: const Color(0xFFBFC1C0),
+                              shadows: [
+                                Shadow(
+                                  blurRadius: 8,
+                                  color: Colors.black.withOpacity(0.8),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
@@ -427,7 +421,7 @@ class ProgressOrbHero extends StatelessWidget {
               ),
             ),
           ),
-          // CTA under the orb.
+          // CTA under the shared stage.
           Positioned(
             left: 0,
             right: 0,
@@ -468,9 +462,8 @@ class _OrbRingPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final c = Offset(size.width / 2, size.height / 2);
-    // Sit on the box rim — traces the video's outer smoke/glass sphere.
+    // Radius as % of SAME shared container → outer rim of smoke orb.
     final r = ProgressOrbHero.paintedRadius(size.width);
-    // Soft outer glow so the stroke reads as part of the glass highlight.
     final glow = Paint()
       ..color = Colors.white.withOpacity(0.18)
       ..style = PaintingStyle.stroke
