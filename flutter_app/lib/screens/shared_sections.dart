@@ -119,20 +119,33 @@ class EditionSection extends StatelessWidget {
             asset: 'assets/video/subscription-join-nowssb.mp4',
             frame: DeviceFrame.kioskPortrait,
             priority: ClipPriority.decoration,
-            showVideo: false,
             onTap: onTap,
             overlay: Padding(
-              padding: const EdgeInsets.fromLTRB(14, 16, 14, 16),
+              padding: const EdgeInsets.fromLTRB(16, 18, 16, 18),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _SubscriptionBanner(onTap: onTap),
-                  const SizedBox(height: 10),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      physics: const BouncingScrollPhysics(),
-                      child: _SubscriptionBlackBannerList(onTap: onTap),
-                    ),
+                  _SubscriptionTierStack(onTap: onTap),
+                  Column(
+                    children: [
+                      const _SubMarqueeText(
+                        'Join NowssB',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w900),
+                      ),
+                      const SizedBox(height: 3),
+                      const _SubMarqueeText(
+                        'Get your subscription today',
+                        style: TextStyle(
+                            color: Color(0xBBFFFFFF), fontSize: 11),
+                        duration: Duration(milliseconds: 4200),
+                      ),
+                      const SizedBox(height: 9),
+                      _SubscriptionCta(onTap: onTap),
+                    ],
                   ),
                 ],
               ),
@@ -146,6 +159,58 @@ class EditionSection extends StatelessWidget {
             onTap: onTap,
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Gentle slide for subscription TV copy — matches web `nwsb-sub-marquee`.
+class _SubMarqueeText extends StatefulWidget {
+  const _SubMarqueeText(
+    this.text, {
+    required this.style,
+    this.duration = const Duration(milliseconds: 3800),
+  });
+  final String text;
+  final TextStyle style;
+  final Duration duration;
+
+  @override
+  State<_SubMarqueeText> createState() => _SubMarqueeTextState();
+}
+
+class _SubMarqueeTextState extends State<_SubMarqueeText>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(
+    vsync: this,
+    duration: widget.duration,
+  )..repeat(reverse: true);
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRect(
+      child: AnimatedBuilder(
+        animation: _c,
+        builder: (_, child) {
+          final t = Curves.easeInOut.transform(_c.value);
+          return Transform.translate(
+            offset: Offset(5 - 15 * t, 0),
+            child: child,
+          );
+        },
+        child: Text(
+          widget.text,
+          maxLines: 1,
+          softWrap: false,
+          overflow: TextOverflow.visible,
+          style: widget.style,
+        ),
       ),
     );
   }
@@ -168,18 +233,26 @@ class _SubscriptionBanner extends StatelessWidget {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                  Text('Subscription',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w900)),
-                  Text('Join NowssB',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w900)),
-                  Text('Try it free for 30 days · Choose your frequency',
-                      style: TextStyle(color: Color(0x99FFFFFF), fontSize: 9)),
+                  _SubMarqueeText(
+                    'Subscription',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w900),
+                  ),
+                  _SubMarqueeText(
+                    'Join NowssB',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w900),
+                    duration: Duration(milliseconds: 4100),
+                  ),
+                  _SubMarqueeText(
+                    'Try it free for 30 days · Choose your frequency',
+                    style: TextStyle(color: Color(0x99FFFFFF), fontSize: 9),
+                    duration: Duration(milliseconds: 4200),
+                  ),
                 ])),
             Container(
                 width: 28,
@@ -188,89 +261,6 @@ class _SubscriptionBanner extends StatelessWidget {
                     color: Color(0x24FFFFFF), shape: BoxShape.circle),
                 child: const Icon(Icons.arrow_forward_rounded,
                     color: Colors.white, size: 16)),
-          ]),
-        ),
-      );
-}
-
-class _SubscriptionBlackBannerList extends StatelessWidget {
-  const _SubscriptionBlackBannerList({this.onTap});
-  final VoidCallback? onTap;
-
-  static const _tiers = <(String, String)>[
-    ('Free', 'NowssB Edition · 30 days free'),
-    ('Resonance', r'$4.99 / month · $41.90 / year'),
-    ('Frequency', r'$9.99 / month · $83.90 / year'),
-    ('Frequency X', r'$19.99 / month · $167.90 / year'),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        for (var i = 0; i < _tiers.length; i++) ...[
-          _SubscriptionPlanBlackBanner(
-            title: _tiers[i].$1,
-            subtitle: _tiers[i].$2,
-            onTap: onTap,
-          ),
-          if (i != _tiers.length - 1) const SizedBox(height: 8),
-        ],
-      ],
-    );
-  }
-}
-
-class _SubscriptionPlanBlackBanner extends StatelessWidget {
-  const _SubscriptionPlanBlackBanner({
-    required this.title,
-    required this.subtitle,
-    this.onTap,
-  });
-  final String title;
-  final String subtitle;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) => GestureDetector(
-        onTap: onTap,
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 11),
-          decoration: BoxDecoration(
-            color: const Color(0xFF030303),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0x3DFFFFFF)),
-          ),
-          child: Row(children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w900)),
-                  const SizedBox(height: 3),
-                  Text(subtitle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                          color: Color(0x99FFFFFF), fontSize: 10)),
-                ],
-              ),
-            ),
-            Container(
-              width: 28,
-              height: 28,
-              decoration: const BoxDecoration(
-                  color: Color(0x24FFFFFF), shape: BoxShape.circle),
-              child: const Icon(Icons.arrow_forward_rounded,
-                  color: Colors.white, size: 16),
-            ),
           ]),
         ),
       );
@@ -386,13 +376,14 @@ class _SubscriptionTierRow extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(name,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                  color: accent,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w800)),
+                          _SubMarqueeText(
+                            name,
+                            style: TextStyle(
+                                color: accent,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w800),
+                            duration: const Duration(milliseconds: 3200),
+                          ),
                           Text(detail,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -1184,9 +1175,8 @@ class _GenderSide extends StatelessWidget {
   }
 }
 
-/// 30 · footer — index.html:2571. Across Every Language: the intro, the ten
-/// moving pictures with the tablet fixed at the centre of them, and the
-/// brand panel.
+/// 30 · footer — index.html Fashion `#homeFooter` / Normal `#homeFooterNm`.
+/// Layout, copy, links, and styling matched to current website/WebView.
 class HomeFooterSection extends StatefulWidget {
   const HomeFooterSection({super.key, this.onLink});
 
@@ -1218,6 +1208,10 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
     ('Practice', 'practice'),
     ('Profile', 'profile'),
   ];
+
+  /// Website `.footer-carousel { --fci-w:162; --fci-h:260 }` (nm override).
+  static const double _cardW = 162;
+  static const double _cardH = 260;
 
   Timer? _timer;
   int _index = 0;
@@ -1302,13 +1296,41 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
               ..translateByDouble(tx, 0.0, tz, 1.0)
               ..rotateY(angle * 3.141592653589793 / 180)
               ..scaleByDouble(scale, scale, scale, 1.0),
-            width: 162,
-            height: 228,
-            child: ClipRect(
-              child: NwsbImage(
-                url: _shots[i],
-                fallback: const ColoredBox(color: Color(0xFF0A0F1C)),
-              ),
+            width: _cardW,
+            height: _cardH,
+            decoration: BoxDecoration(
+              border: Border.all(color: const Color(0x2EFFFFFF)),
+              boxShadow: const [
+                BoxShadow(
+                    color: Color(0xB3000000),
+                    blurRadius: 60,
+                    offset: Offset(0, 24)),
+                BoxShadow(
+                    color: Color(0x80000000),
+                    blurRadius: 12,
+                    offset: Offset(0, 4)),
+              ],
+            ),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                ClipRect(
+                  child: NwsbImage(
+                    url: _shots[i],
+                    fallback: const ColoredBox(color: Color(0xFF0A0F1C)),
+                  ),
+                ),
+                const DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [Color(0x24FFFFFF), Color(0x00000000)],
+                      stops: [0, 0.55],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -1318,187 +1340,245 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
 
   @override
   Widget build(BuildContext context) {
+    final fashion = HomeSkinScope.of(context) == HomeSkin.fashion;
     return Container(
       width: double.infinity,
-      color: const Color(0xFF060C18),
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(24, 44, 24, 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Across Every Language',
-                      style: TextStyle(
-                          fontSize: 11,
-                          letterSpacing: 2,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFFE8D5A3))),
-                  SizedBox(height: 10),
-                  Text.rich(
-                    TextSpan(
-                      style: TextStyle(fontSize: 25, height: 1.25),
-                      children: [
-                        TextSpan(
-                            text: 'Every civilization\n',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w300,
-                                color: Color(0xE0FFFFFF))),
-                        TextSpan(
-                            text: 'heard the same\n',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w800,
-                                color: Colors.white)),
-                        TextSpan(
-                            text: 'original sound.',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w800,
-                                color: Color(0xFFE8D5A3))),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                      'Different words. One root. All languages descend from the same vibrational origin.',
-                      style: TextStyle(
-                          fontSize: 12.5,
-                          color: Color(0x99FFFFFF),
-                          height: 1.5)),
-                ],
+      color: const Color(0xFF000000),
+      constraints: const BoxConstraints(minHeight: 420),
+      child: Stack(
+        children: [
+          // Website: Fashion shows `.footer-bg-img`; Normal hides it
+          // (`#homeFooterNm .footer-bg-img { display:none }`).
+          if (fashion)
+            Positioned.fill(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 600),
+                child: Image.network(
+                  _shots[_index],
+                  key: ValueKey(_shots[_index]),
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) =>
+                      const ColoredBox(color: Color(0xFF060C18)),
+                ),
               ),
             ),
-            SizedBox(
-              height: 300,
-              child: Stack(
-                clipBehavior: Clip.none,
-                alignment: Alignment.center,
-                children: [
-                  for (var i = 0; i < _shots.length; i++) _footerCard(i),
-                  IgnorePointer(
-                    child: SizedBox(
-                      width: 162 * 908 / 800,
-                      height: 228 * 1408 / 1286,
-                      child: Image.asset(
-                        'assets/frames/footer-frame.webp',
-                        fit: BoxFit.fill,
-                        errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-                      ),
-                    ),
+          if (fashion)
+            const Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Color(0x26030814),
+                      Color(0x0D030814),
+                      Color(0x40030814),
+                      Color(0xBF030814),
+                    ],
+                    stops: [0, 0.3, 0.7, 1],
                   ),
-                  Positioned(
-                    bottom: -20,
-                    child: Row(
-                      children: [
-                        for (var i = 0; i < _shots.length; i++)
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 3),
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 400),
-                              width: i == _index ? 20 : 4,
-                              height: 4,
-                              color: i == _index
-                                  ? const Color(0xE6C8E8F5)
-                                  : const Color(0x4DC8E8F5),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
-            const SizedBox(height: 36),
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 20),
-              padding: const EdgeInsets.fromLTRB(22, 24, 22, 20),
-              decoration: const BoxDecoration(
-                color: Color(0x0FFFFFFF),
-                border: Border(
-                    top: BorderSide(color: Color(0x29FFFFFF)),
-                    left: BorderSide(color: Color(0x29FFFFFF)),
-                    right: BorderSide(color: Color(0x29FFFFFF)),
-                    bottom: BorderSide(color: Color(0x14FFFFFF))),
-                boxShadow: [
-                  BoxShadow(
-                      color: Color(0x80000000),
-                      blurRadius: 40,
-                      offset: Offset(0, -2)),
-                  BoxShadow(
-                      color: Color(0x66000000),
-                      blurRadius: 32,
-                      offset: Offset(0, 8))
-                ],
-              ),
-              child: Column(
-                children: [
-                  const Text.rich(TextSpan(
-                      style: TextStyle(
-                          fontSize: 26, color: Colors.white, letterSpacing: 1),
-                      children: [
-                        TextSpan(
-                            text: 'Nowss',
-                            style: TextStyle(fontWeight: FontWeight.w600)),
-                        TextSpan(
-                            text: 'B',
-                            style: TextStyle(fontWeight: FontWeight.w200))
-                      ])),
-                  const SizedBox(height: 4),
-                  const Text.rich(
-                    TextSpan(
-                      style: TextStyle(
-                        fontSize: 9,
-                        letterSpacing: 4,
-                        color: Color(0x99FFFFFF),
-                      ),
-                      children: [
-                        TextSpan(text: 'THE NEW FASHION TREND OF '),
-                        TextSpan(
-                          text: 'MEDITATION',
-                          style: TextStyle(color: Color(0xBFC8E8F5)),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                  Container(
-                      width: 32,
-                      height: 1,
-                      decoration: const BoxDecoration(
-                          gradient: LinearGradient(colors: [
-                        Colors.transparent,
-                        Color(0x66C8E8F5),
-                        Colors.transparent
-                      ]))),
-                  const SizedBox(height: 18),
-                  Wrap(
-                    alignment: WrapAlignment.center,
-                    spacing: 16,
-                    runSpacing: 6,
+          Padding(
+            padding: const EdgeInsets.only(bottom: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.fromLTRB(24, 44, 24, 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      for (final (label, key) in _links)
-                        GestureDetector(
-                            onTap: () => widget.onLink?.call(key),
-                            behavior: HitTestBehavior.opaque,
-                            child: Text(label,
-                                style: const TextStyle(
-                                    fontSize: 11, color: Color(0xCCFFFFFF)))),
+                      Text('Across Every Language',
+                          style: TextStyle(
+                              fontSize: 9,
+                              letterSpacing: 4,
+                              fontWeight: FontWeight.w300,
+                              color: Color(0x6BC8E8F5))),
+                      SizedBox(height: 14),
+                      Text.rich(
+                        TextSpan(
+                          style: TextStyle(
+                              fontSize: 40,
+                              height: 1.1,
+                              fontWeight: FontWeight.w200,
+                              color: Color(0xE6FFFFFF)),
+                          children: [
+                            TextSpan(text: 'Every civilization\n'),
+                            TextSpan(
+                                text: 'heard the same\n',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w800,
+                                    color: Colors.white)),
+                            TextSpan(
+                                text: 'original sound.',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w800,
+                                    color: Color(0xFFE8D5A3))),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 14),
+                      SizedBox(
+                        width: 260,
+                        child: Text(
+                            'Different words. One root. All languages descend from the same vibrational origin.',
+                            style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w300,
+                                letterSpacing: 0.2,
+                                color: Color(0x61FFFFFF),
+                                height: 1.65)),
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 18),
-                  const Text('© 2026 Adv. Sanjaykumar Gadge · Shabdapathy',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          fontSize: 9,
-                          letterSpacing: 1,
-                          color: Color(0x73FFFFFF))),
-                ],
-              ),
+                ),
+                SizedBox(
+                  height: 300,
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    alignment: Alignment.center,
+                    children: [
+                      for (var i = 0; i < _shots.length; i++) _footerCard(i),
+                      IgnorePointer(
+                        child: SizedBox(
+                          width: _cardW * 908 / 800,
+                          height: _cardH * 1408 / 1286,
+                          child: Image.asset(
+                            'assets/frames/footer-frame.webp',
+                            fit: BoxFit.fill,
+                            errorBuilder: (_, __, ___) =>
+                                const SizedBox.shrink(),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: -20,
+                        child: Row(
+                          children: [
+                            for (var i = 0; i < _shots.length; i++)
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 3),
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 400),
+                                  width: i == _index ? 20 : 4,
+                                  height: 4,
+                                  color: i == _index
+                                      ? const Color(0xE6C8E8F5)
+                                      : const Color(0x4DC8E8F5),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 36),
+                Center(
+                  child: Container(
+                    width: double.infinity,
+                    constraints: const BoxConstraints(maxWidth: 400),
+                    margin: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: const EdgeInsets.fromLTRB(22, 24, 22, 20),
+                    decoration: const BoxDecoration(
+                      color: Color(0x0FFFFFFF),
+                      border: Border(
+                          top: BorderSide(color: Color(0x29FFFFFF)),
+                          left: BorderSide(color: Color(0x29FFFFFF)),
+                          right: BorderSide(color: Color(0x29FFFFFF)),
+                          bottom: BorderSide(color: Color(0x14FFFFFF))),
+                      boxShadow: [
+                        BoxShadow(
+                            color: Color(0x80000000),
+                            blurRadius: 40,
+                            offset: Offset(0, -2)),
+                        BoxShadow(
+                            color: Color(0x66000000),
+                            blurRadius: 32,
+                            offset: Offset(0, 8)),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        const Text.rich(TextSpan(
+                            style: TextStyle(
+                                fontSize: 26,
+                                color: Colors.white,
+                                letterSpacing: 1),
+                            children: [
+                              TextSpan(
+                                  text: 'Nowss',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.w600)),
+                              TextSpan(
+                                  text: 'B',
+                                  style: TextStyle(fontWeight: FontWeight.w200))
+                            ])),
+                        const SizedBox(height: 4),
+                        const Text.rich(
+                          TextSpan(
+                            style: TextStyle(
+                              fontSize: 9,
+                              letterSpacing: 4,
+                              fontWeight: FontWeight.w400,
+                              color: Color(0x99FFFFFF),
+                            ),
+                            children: [
+                              TextSpan(text: 'THE NEW FASHION TREND OF '),
+                              TextSpan(
+                                text: 'MEDITATION',
+                                style: TextStyle(color: Color(0xBFC8E8F5)),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 18),
+                        Container(
+                            width: 32,
+                            height: 1,
+                            decoration: const BoxDecoration(
+                                gradient: LinearGradient(colors: [
+                              Colors.transparent,
+                              Color(0x66C8E8F5),
+                              Colors.transparent
+                            ]))),
+                        const SizedBox(height: 18),
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: 16,
+                          runSpacing: 6,
+                          children: [
+                            for (final (label, key) in _links)
+                              GestureDetector(
+                                  onTap: () => widget.onLink?.call(key),
+                                  behavior: HitTestBehavior.opaque,
+                                  child: Text(label.toUpperCase(),
+                                      style: const TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w400,
+                                          letterSpacing: 2,
+                                          color: Color(0xCCFFFFFF)))),
+                          ],
+                        ),
+                        const SizedBox(height: 18),
+                        const Text('© 2026 Adv. Sanjaykumar Gadge · Shabdapathy',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontSize: 9,
+                                fontWeight: FontWeight.w300,
+                                letterSpacing: 1,
+                                color: Color(0x73FFFFFF))),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
