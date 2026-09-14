@@ -282,8 +282,8 @@ class TvFrame extends StatelessWidget {
             final screen = Padding(
               padding: frame.insets(box),
               child: ClipRRect(
-                borderRadius:
-                    BorderRadius.circular(frame.opaqueAperture ? 14 : 0),
+                // Keep the rectangular video inside the rounded TV opening.
+                borderRadius: BorderRadius.circular(14),
                 clipBehavior: Clip.antiAlias,
                 child: ColoredBox(
                   color: Colors.black,
