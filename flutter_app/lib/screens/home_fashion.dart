@@ -230,18 +230,17 @@ class _HomeFashionState extends State<HomeFashion> {
         ('connectban', ConnectBannerSection(onTap: () => _go(0))),
         (
           'healing',
-          HealingSection(onTap: () => _push(const HealingPathScreen()))
-        ),
-        (
-          'genderpath',
-          GenderPathSection(
+          HealingSection(
+            onTap: () => _push(const HealingPathScreen()),
             onFemale: () => _push(
                 const HealingPathScreen(initialGender: HealingGender.female)),
             onMale: () => _push(
                 const HealingPathScreen(initialGender: HealingGender.male)),
-            onTap: () => _push(const HealingPathScreen()),
           ),
         ),
+        // Choose Your Path is slide 2 of HealingSection — do not inject a
+        // second banner/section (that caused stacked banners + blank pages).
+        ('genderpath', const SizedBox.shrink()),
         ('promovid', FashPromoVideo(onTap: () => _go(2))),
         ('wsearch', FashWordSearch(onOpen: (_) => _go(2))),
         ('msearch', FashMeaningSearch(onOpen: (_) => _go(2))),

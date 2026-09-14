@@ -244,6 +244,7 @@ class TvFrame extends StatelessWidget {
     this.onTap,
     this.overlay,
     this.showVideo = true,
+    this.showPoster = false,
   });
 
   /// The clip on the screen.
@@ -268,6 +269,10 @@ class TvFrame extends StatelessWidget {
   /// like everything else on the screen is.
   final Widget? overlay;
   final bool showVideo;
+
+  /// When true, soft-fail to the clip poster instead of an empty aperture
+  /// (needed when healing-path-bg.mp4 hits PlatformException).
+  final bool showPoster;
 
   @override
   Widget build(BuildContext context) {
@@ -297,7 +302,7 @@ class TvFrame extends StatelessWidget {
                           asset: asset,
                           priority: priority,
                           autoplay: autoplay,
-                          showPoster: false,
+                          showPoster: showPoster,
                           fit: BoxFit.cover,
                         ),
                       if (overlay != null) overlay!,

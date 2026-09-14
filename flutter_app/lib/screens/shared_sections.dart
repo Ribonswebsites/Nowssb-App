@@ -982,54 +982,60 @@ class ConnectBannerSection extends StatelessWidget {
   }
 }
 
-/// 24 · healing — horizontal auto-scroll of Health Journey cards.
-/// Black My Routine-style banner sits OUTSIDE the glass/white pane.
+/// 24 · healing — ONE Health Journey section: one My Routine-style black
+/// banner ABOVE a single horizontal carousel of equal full cards.
+///
+/// Slides:
+///   1. Your Health Journey / Personalised Healing (full-bleed media card)
+///   2. Choose Your Path laptop Female/Male (restored device-frame card)
+///
+/// Root cause of blank white pages (709ce6c): two separate sections each with
+/// their own RoutineStyleBlackBanner, PageView children wrapped in SectionPane
+/// (Normal SecWrap is white), and extra heal slides that only played the
+/// failing healing-path-bg.mp4 — so page 2+ looked like a floating banner over
+/// a white void. Banners are NEVER carousel pages.
 class HealingSection extends StatefulWidget {
-  const HealingSection({super.key, this.onTap});
+  const HealingSection({
+    super.key,
+    this.onTap,
+    this.onFemale,
+    this.onMale,
+  });
+
   final VoidCallback? onTap;
+  final VoidCallback? onFemale;
+  final VoidCallback? onMale;
 
   @override
   State<HealingSection> createState() => _HealingSectionState();
 }
 
 class _HealingSectionState extends State<HealingSection> {
+  static const _cardH = 420.0;
+  static const _autoMs = 4500;
+  static const _healVideo =
+      'assets/videos/28eb0c85b5fd748e_grok_video_2026-07-24-15-42-55_lknomr.mp4';
+  static const _pathVideo = 'assets/video/healing-path-bg.mp4';
+
   late final PageController _page;
   Timer? _timer;
   var _index = 0;
+  var _paused = false;
+  DateTime? _resumeAfter;
 
-  static const _slides = <_HealSlide>[
-    _HealSlide(
-      eyebrow: 'Personalised Healing',
-      title: 'Your Health\nJourney',
-      sub:
-          'Choose your path — body, organ & mind wellness decoded through word science.',
-      cta: 'Explore →',
-      video:
-          'assets/videos/28eb0c85b5fd748e_grok_video_2026-07-24-15-42-55_lknomr.mp4',
-    ),
-    _HealSlide(
-      eyebrow: 'Body wellness',
-      title: 'Body\nDecoded',
-      sub: 'Word science tuned to the systems that keep you moving.',
-      cta: 'Enter →',
-      video: 'assets/video/healing-path-bg.mp4',
-    ),
-    _HealSlide(
-      eyebrow: 'Organ & mind',
-      title: 'Organ &\nMind Path',
-      sub: 'Organs and mind, mapped through sound and meaning.',
-      cta: 'Enter →',
-      video: 'assets/video/healing-path-bg.mp4',
-    ),
-  ];
+  static const _slideCount = 2;
 
   @override
   void initState() {
     super.initState();
-    _page = PageController(viewportFraction: 0.88);
-    _timer = Timer.periodic(const Duration(milliseconds: 4200), (_) {
+    _page = PageController(viewportFraction: 0.92);
+    _timer = Timer.periodic(const Duration(milliseconds: _autoMs), (_) {
       if (!mounted || !TickerMode.valuesOf(context).enabled) return;
-      final next = (_index + 1) % _slides.length;
+      if (_paused) return;
+      if (_resumeAfter != null && DateTime.now().isBefore(_resumeAfter!)) {
+        return;
+      }
+      final next = (_index + 1) % _slideCount;
       _page.animateToPage(
         next,
         duration: const Duration(milliseconds: 480),
@@ -1043,6 +1049,15 @@ class _HealingSectionState extends State<HealingSection> {
     _timer?.cancel();
     _page.dispose();
     super.dispose();
+  }
+
+  void _onUserScroll(ScrollNotification n) {
+    if (n is ScrollStartNotification && n.dragDetails != null) {
+      _paused = true;
+    } else if (n is ScrollEndNotification) {
+      _paused = false;
+      _resumeAfter = DateTime.now().add(const Duration(seconds: 5));
+    }
   }
 
   @override
@@ -1061,49 +1076,80 @@ class _HealingSectionState extends State<HealingSection> {
             ),
           ),
           SizedBox(
-            height: 420,
-            child: PageView.builder(
-              controller: _page,
-              itemCount: _slides.length,
-              onPageChanged: (i) => setState(() => _index = i),
-              itemBuilder: (context, i) => Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: SectionPane(
-                  padding: EdgeInsets.zero,
-                  child: _HealJourneyCard(
-                    slide: _slides[i],
-                    onTap: widget.onTap,
+            height: _cardH,
+            child: NotificationListener<ScrollNotification>(
+              onNotification: (n) {
+                _onUserScroll(n);
+                return false;
+              },
+              child: PageView(
+                controller: _page,
+                padEnds: true,
+                onPageChanged: (i) => setState(() => _index = i),
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: _HealJourneyCard(
+                      eyebrow: 'Personalised Healing',
+                      title: 'Your Health\nJourney',
+                      sub:
+                          'Choose your path — body, organ & mind wellness decoded through word science.',
+                      cta: 'Explore →',
+                      video: _healVideo,
+                      onTap: widget.onTap,
+                    ),
                   ),
-                ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: _ChoosePathLaptopCard(
+                      video: _pathVideo,
+                      onFemale: widget.onFemale ?? widget.onTap,
+                      onMale: widget.onMale ?? widget.onTap,
+                      onTap: widget.onTap,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
           const SizedBox(height: 10),
-          _CarouselDots(count: _slides.length, index: _index),
+          _CarouselDots(count: _slideCount, index: _index),
         ],
       ),
     );
   }
 }
 
-class _HealSlide {
-  const _HealSlide({
+/// Kept so home registries can still name the slot — content lives in
+/// [HealingSection] slide 2. Rendering a second banner here was the bug.
+class GenderPathSection extends StatelessWidget {
+  const GenderPathSection({super.key, this.onFemale, this.onMale, this.onTap});
+
+  final VoidCallback? onFemale;
+  final VoidCallback? onMale;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) => const SizedBox.shrink();
+}
+
+class _HealJourneyCard extends StatelessWidget {
+  const _HealJourneyCard({
     required this.eyebrow,
     required this.title,
     required this.sub,
     required this.cta,
     required this.video,
+    this.poster,
+    this.onTap,
   });
+
   final String eyebrow;
   final String title;
   final String sub;
   final String cta;
   final String video;
-}
-
-class _HealJourneyCard extends StatelessWidget {
-  const _HealJourneyCard({required this.slide, this.onTap});
-  final _HealSlide slide;
+  final String? poster;
   final VoidCallback? onTap;
 
   @override
@@ -1117,10 +1163,13 @@ class _HealJourneyCard extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            const ColoredBox(color: Colors.black),
+            // Soft-fail plate — never leave a white void if the clip errors.
+            const ColoredBox(color: Color(0xFF060C18)),
             NwsbVideo(
-              asset: slide.video,
+              asset: video,
+              poster: poster,
               fit: BoxFit.cover,
+              showPoster: true,
             ),
             const DecoratedBox(
               decoration: BoxDecoration(
@@ -1150,7 +1199,7 @@ class _HealJourneyCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 10),
                       Text(
-                        slide.eyebrow,
+                        eyebrow,
                         style: const TextStyle(
                           fontSize: 12,
                           letterSpacing: 1.2,
@@ -1162,7 +1211,7 @@ class _HealJourneyCard extends StatelessWidget {
                   ),
                   const Spacer(),
                   Text(
-                    slide.title,
+                    title,
                     style: const TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.w800,
@@ -1172,7 +1221,7 @@ class _HealJourneyCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    slide.sub,
+                    sub,
                     style: const TextStyle(
                       fontSize: 12.5,
                       color: Color(0xB3FFFFFF),
@@ -1185,7 +1234,7 @@ class _HealJourneyCard extends StatelessWidget {
                         horizontal: 20, vertical: 12),
                     color: Colors.white,
                     child: Text(
-                      slide.cta,
+                      cta,
                       style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
@@ -1203,135 +1252,129 @@ class _HealJourneyCard extends StatelessWidget {
   }
 }
 
-/// 25 · genderpath — Choose Your Path as Female/Male carousel.
-/// Media matches WebView `#sub-health-journey` gsel cards (not the laptop still).
-class GenderPathSection extends StatefulWidget {
-  const GenderPathSection({super.key, this.onFemale, this.onMale, this.onTap});
+/// Equal-height carousel slide: restored laptop Female/Male Choose Your Path.
+class _ChoosePathLaptopCard extends StatelessWidget {
+  const _ChoosePathLaptopCard({
+    required this.video,
+    this.onFemale,
+    this.onMale,
+    this.onTap,
+  });
 
+  final String video;
   final VoidCallback? onFemale;
   final VoidCallback? onMale;
   final VoidCallback? onTap;
 
   @override
-  State<GenderPathSection> createState() => _GenderPathSectionState();
-}
-
-class _GenderPathSectionState extends State<GenderPathSection> {
-  late final PageController _page;
-  Timer? _timer;
-  var _index = 0;
-
-  static const _maleImg =
-      'https://media.nowssb.com/migrated-images/fef6237338f7014e_grok_image_1777632687913_2_t4jezy.jpg';
-  static const _femaleImg =
-      'https://media.nowssb.com/migrated-images/123718eb8e7c98cd_grok_image_1777632677047_2_rnnm0k.jpg';
-
-  @override
-  void initState() {
-    super.initState();
-    _page = PageController(viewportFraction: 0.88);
-    _timer = Timer.periodic(const Duration(milliseconds: 4000), (_) {
-      if (!mounted || !TickerMode.valuesOf(context).enabled) return;
-      final next = (_index + 1) % 2;
-      _page.animateToPage(
-        next,
-        duration: const Duration(milliseconds: 480),
-        curve: Curves.easeOutCubic,
-      );
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    _page.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final slides = [
-      (
-        'Female',
-        'Balance · Radiance',
-        _femaleImg,
-        widget.onFemale ?? widget.onTap,
-      ),
-      (
-        'Male',
-        'Strength · Vitality',
-        _maleImg,
-        widget.onMale ?? widget.onTap,
-      ),
-    ];
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-            child: RoutineStyleBlackBanner(
-              title: 'Choose Your Path',
-              subtitle: 'Female or Male — customise for your body',
-              onTap: widget.onTap,
-            ),
-          ),
-          SizedBox(
-            height: 390,
-            child: PageView.builder(
-              controller: _page,
-              itemCount: slides.length,
-              onPageChanged: (i) => setState(() => _index = i),
-              itemBuilder: (context, i) {
-                final (name, tag, img, tap) = slides[i];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: SectionPane(
-                    padding: const EdgeInsets.all(12),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(18),
+      clipBehavior: Clip.antiAlias,
+      child: ColoredBox(
+        color: const Color(0xFF060C18),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 34,
+                    height: 34,
+                    decoration: const BoxDecoration(
+                      color: Color(0x1FFFFFFF),
+                      shape: BoxShape.circle,
+                    ),
+                    alignment: Alignment.center,
+                    child: const NwsbIcon(
+                      NwsbMarks.gender,
+                      size: 16,
+                      color: NwsbColors.goldLight,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  const Expanded(
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const PaneHead(
-                          eyebrow: 'Body, organ and mind',
-                          title: 'Choose Your Path',
-                          mark: NwsbMarks.gender,
+                        Text(
+                          'Body, organ and mind',
+                          style: TextStyle(
+                            fontSize: 11,
+                            letterSpacing: 1.1,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xD9FFFFFF),
+                          ),
                         ),
-                        Expanded(
-                          child: _PathGenderCard(
-                            name: name,
-                            tag: tag,
-                            imageUrl: img,
-                            onTap: tap,
+                        SizedBox(height: 2),
+                        Text(
+                          'Choose Your Path',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                            height: 1.15,
                           ),
                         ),
                       ],
                     ),
                   ),
-                );
-              },
-            ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(14),
+                  clipBehavior: Clip.antiAlias,
+                  child: ColoredBox(
+                    color: Colors.black,
+                    child: TvFrame(
+                      asset: video,
+                      frame: DeviceFrame.laptop,
+                      showPoster: true,
+                      onTap: onTap,
+                      overlay: Row(
+                        children: [
+                          Expanded(
+                            child: _GenderSide(
+                              label: 'Female',
+                              onTap: onFemale,
+                            ),
+                          ),
+                          Expanded(
+                            child: _GenderSide(
+                              label: 'Male',
+                              onTap: onMale,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                'Female or Male — customise for your body',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Color(0xB3FFFFFF),
+                  height: 1.35,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 10),
-          _CarouselDots(count: slides.length, index: _index),
-        ],
+        ),
       ),
     );
   }
 }
 
-class _PathGenderCard extends StatelessWidget {
-  const _PathGenderCard({
-    required this.name,
-    required this.tag,
-    required this.imageUrl,
-    this.onTap,
-  });
-
-  final String name;
-  final String tag;
-  final String imageUrl;
+class _GenderSide extends StatelessWidget {
+  const _GenderSide({required this.label, this.onTap});
+  final String label;
   final VoidCallback? onTap;
 
   @override
@@ -1339,75 +1382,29 @@ class _PathGenderCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(18),
-        clipBehavior: Clip.antiAlias,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            const ColoredBox(color: Color(0xFF060C18)),
-            // Ambient film from WebView `#sub-health-journey`.
-            const NwsbVideo(
-              asset: 'assets/video/healing-path-bg.mp4',
-              poster: 'assets/video/healing-path-bg-poster.webp',
-              fit: BoxFit.cover,
-            ),
-            DecoratedBox(
-              decoration: BoxDecoration(color: Colors.black.withValues(alpha: .35)),
-            ),
-            // Gender card art from WebView gsel-card-img.
-            Align(
-              alignment: Alignment.center,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(18, 8, 18, 72),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  clipBehavior: Clip.antiAlias,
-                  child: AspectRatio(
-                    aspectRatio: 3 / 4,
-                    child: NwsbImage(
-                      url: imageUrl,
-                      fit: BoxFit.cover,
-                      fallback: const ColoredBox(color: Color(0xFF12121A)),
-                    ),
+      child: Center(
+        child: FittedBox(
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                    shadows: [
+                      Shadow(color: Color(0xCC000000), blurRadius: 10),
+                    ],
                   ),
                 ),
-              ),
+                const SizedBox(width: 8),
+                EnterPill(onTap: onTap),
+              ],
             ),
-            Positioned(
-              left: 16,
-              right: 16,
-              bottom: 16,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          name,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          tag,
-                          style: const TextStyle(
-                            color: Color(0xB3FFFFFF),
-                            fontSize: 12.5,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  EnterPill(label: 'Enter', onTap: onTap),
-                ],
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
