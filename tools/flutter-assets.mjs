@@ -15,8 +15,8 @@
 // It also writes the shipped content, by calling tools/export-content.mjs,
 // so one command puts everything the bundle needs in place.
 
-import { readdirSync, mkdirSync, copyFileSync, statSync, existsSync,
-         readFileSync, writeFileSync } from 'node:fs';
+import { readdirSync, mkdirSync, copyFileSync, statSync, lstatSync, existsSync,
+         readFileSync, writeFileSync, symlinkSync, unlinkSync, readlinkSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
@@ -29,7 +29,10 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
    it is already in this repository; none of it needed downloading. */
 const FOLDERS = [
   'video',        // the clips and their posters
-  'videos',       // Fashion Plus / home section films (PRACTICE_VID, etc.)
+  // NOTE: do NOT list 'videos' here. Copying assets/videos/ (~664MB library)
+  // into flutter_app/assets/videos ballooned the APK to ~1GB. Fashion /
+  // home only need a handful of those clips; ensureVideosAllowlist() below
+  // installs them as symlinks into the root library (same bytes, one copy).
   'frames',       // the device bezels — see lib/widgets/tv_frame.dart
   'coach',        // Personal Coach hero artwork
   'icons',        // the logo disc, the search mark
@@ -42,6 +45,17 @@ const FOLDERS = [
   'banners',      // the collection banners
 ];
 
+/* Local asset paths referenced by Flutter (assets/videos/...). Practice
+   player themes use https://nowssb.com/… and are NOT bundled. Posters that
+   only live under flutter_app/assets/videos/ are left alone. */
+const VIDEOS_ALLOWLIST = [
+  '09a50041065bdeab_grok_video_2026-07-30-14-54-07_ddjmrr.mp4',
+  '28eb0c85b5fd748e_grok_video_2026-07-24-15-42-55_lknomr.mp4',
+  '415dd447da33973b_grok_video_2026-07-30-14-35-05_q3tyzk.mp4',
+  '7e4d709136dc254a_grok_video_2026-07-18-15-53-02_ubjx5b.mp4',
+  'beaf11ea10561d43_grok_video_2026-07-30-15-35-40_xwm1ei.mp4',
+];
+
 const KEEP = /\.(mp4|webp|png|jpe?g|svg)$/i;
 
 let copied = 0, skipped = 0, bytes = 0;
@@ -50,6 +64,13 @@ function copyDir(rel) {
   const from = join(root, 'assets', rel);
   const to = join(root, 'flutter_app', 'assets', rel);
   if (!existsSync(from)) return;
+  // Prefer committed symlinks (single source of truth). Never materialize a
+  // second full tree on top of them — that is what ballooned the APK.
+  if (existsSync(to) && lstatSync(to).isSymbolicLink()) {
+    skipped++;
+    console.log(`skip ${rel}: already a symlink → ${readlinkSafe(to)}`);
+    return;
+  }
   mkdirSync(to, { recursive: true });
 
   for (const name of readdirSync(from)) {
@@ -59,6 +80,9 @@ function copyDir(rel) {
     if (!KEEP.test(name)) continue;
 
     const dst = join(to, name);
+    if (existsSync(dst) && lstatSync(dst).isSymbolicLink()) {
+      skipped++; bytes += s.size; continue;
+    }
     // Same size and not older: already there. Makes a re-run cheap, which
     // matters when this is 200 MB.
     if (existsSync(dst)) {
@@ -72,7 +96,46 @@ function copyDir(rel) {
   }
 }
 
+function readlinkSafe(p) {
+  try { return lstatSync(p).isSymbolicLink() ? readlinkSync(p) : p; }
+  catch { return p; }
+}
+
+/** Install only the Fashion/home clips as symlinks into assets/videos/. */
+function ensureVideosAllowlist() {
+  const fromDir = join(root, 'assets', 'videos');
+  const toDir = join(root, 'flutter_app', 'assets', 'videos');
+  if (!existsSync(fromDir)) return;
+  // If someone left a directory symlink to the FULL library, replace it —
+  // that would ship ~664MB into the APK.
+  try {
+    if (lstatSync(toDir).isSymbolicLink()) unlinkSync(toDir);
+  } catch { /* missing is fine */ }
+  mkdirSync(toDir, { recursive: true });
+  for (const name of VIDEOS_ALLOWLIST) {
+    const src = join(fromDir, name);
+    const dst = join(toDir, name);
+    if (!existsSync(src)) {
+      console.warn(`videos allowlist missing in assets/videos: ${name}`);
+      continue;
+    }
+    const target = `../../../assets/videos/${name}`;
+    let have = false;
+    try { lstatSync(dst); have = true; } catch { have = false; }
+    if (have) {
+      if (lstatSync(dst).isSymbolicLink() && readlinkSync(dst) === target) {
+        skipped++; bytes += statSync(src).size; continue;
+      }
+      // Replace a prior real copy with a symlink (same bytes, one tree).
+      unlinkSync(dst);
+    }
+    symlinkSync(target, dst);
+    copied++; bytes += statSync(src).size;
+  }
+}
+
 for (const f of FOLDERS) copyDir(f);
+ensureVideosAllowlist();
 
 console.log(
   `flutter_app/assets/  ${copied} copied, ${skipped} already current, ` +

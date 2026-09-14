@@ -21,7 +21,9 @@ assert.doesNotMatch(
   /fashion \? const Color\(0xD9FFFFFF\)/,
   "Fashion must not use opaque white glass",
 );
-assert.match(cards, /height: 340/, "carousel height leaves 1px headroom");
+assert.match(cards, /height: 392/, "carousel taller for editorial image headroom");
+assert.match(cards, /height: 152/, "card image area tall enough for heads/letters");
+assert.match(cards, /alignment: Alignment\.topCenter/, "top-safe cover keeps faces");
 assert.match(line, /boxShadow: glass\s*\n\s*\? null/, "glass process line has no drop-shadow");
 
 const names = [

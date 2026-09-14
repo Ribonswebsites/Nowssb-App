@@ -30,7 +30,6 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 
 import 'nwsb_icon.dart';
-import 'home_parts.dart';
 
 /// `body.fashcorner-rounded` — 18px, the Fashion home's default corner.
 const double kGlassRadius = 18;
@@ -85,31 +84,11 @@ class GlassWrap extends StatelessWidget {
                 borderRadius: r,
                 border: Border.all(color: line),
               ),
-              child: _withSectionMotion(child),
+              child: child,
             ),
           ),
         ),
       ),
-    );
-  }
-  static const _motionLines = <(String, String)>[
-    ('NowssB', 'Practice · heal · keep going'),
-    ('In motion', 'Your practice continues'),
-    ('Keep scrolling', 'Every section moves with you'),
-    ('Daily ritual', 'Words · breath · presence'),
-    ('Stay with it', 'Gentle motion · steady practice'),
-  ];
-
-  Widget _withSectionMotion(Widget child) {
-    final i = child.runtimeType.hashCode.abs() % _motionLines.length;
-    final (title, sub) = _motionLines[i];
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SectionMotionBanner(title: title, sub: sub),
-        child,
-      ],
     );
   }
 }
@@ -170,7 +149,7 @@ class SectionHead extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                GentleMarqueeText(
+                Text(
                   eyebrow,
                   style: const TextStyle(
                     fontSize: 15,
@@ -178,9 +157,8 @@ class SectionHead extends StatelessWidget {
                     color: Color(0xA6FFFFFF),
                     height: 1.35,
                   ),
-                  duration: const Duration(milliseconds: 4200),
                 ),
-                GentleMarqueeText(
+                Text(
                   title,
                   style: const TextStyle(
                     fontSize: 21,
@@ -188,7 +166,6 @@ class SectionHead extends StatelessWidget {
                     color: Colors.white,
                     height: 1.25,
                   ),
-                  duration: const Duration(milliseconds: 3800),
                 ),
               ],
             ),

@@ -32,20 +32,26 @@ test('Website decorative video controller plays all on-screen clips together', (
   assert.match(js, /Fully off-screen clips pause/);
 });
 
-test('Home section motion banners and gentle marquee exist on Flutter + website', () => {
+test('GentleMarqueeText exists; section wraps do NOT inject top black banners', () => {
   const parts = read('flutter_app/lib/widgets/home_parts.dart');
   assert.match(parts, /class GentleMarqueeText/);
   assert.match(parts, /class SectionMotionBanner/);
+  // SecBanner title is static; only the subtitle marquees.
+  assert.match(parts, /Text\(\s*title,/);
+  assert.match(parts, /GentleMarqueeText\(\s*sub,/);
   const glass = read('flutter_app/lib/widgets/glass_wrap.dart');
-  assert.match(glass, /SectionMotionBanner/);
-  assert.match(glass, /GentleMarqueeText/);
+  assert.doesNotMatch(glass, /SectionMotionBanner/);
+  assert.doesNotMatch(glass, /GentleMarqueeText/);
   const neu = read('flutter_app/lib/widgets/neu_wrap.dart');
-  assert.match(neu, /SectionMotionBanner/);
+  assert.doesNotMatch(neu, /SectionMotionBanner/);
+  assert.doesNotMatch(neu, /GentleMarqueeText/);
   const css = read('app/app.css');
   assert.match(css, /nwsb-section-motion-banner/);
   assert.match(css, /nwsb-sub-marquee/);
   const inject = read('app/js/part049.js');
-  assert.match(inject, /nwsb-section-motion-banner/);
+  // Must not auto-inject banners into every section wrap.
+  assert.doesNotMatch(inject, /querySelectorAll\('#home \.glass-wrap/);
+  assert.match(inject, /Intentionally NOT injected/);
 });
 
 test('Home lists key sections and bound cacheExtent to avoid video remount churn', () => {

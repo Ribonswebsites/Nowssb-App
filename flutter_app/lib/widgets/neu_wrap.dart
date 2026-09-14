@@ -28,7 +28,6 @@ import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 
 import 'nwsb_icon.dart';
-import 'home_parts.dart';
 
 import '../theme/tokens.dart';
 import '../screens/normal/glassmorphism_theme.dart';
@@ -80,26 +79,13 @@ class SecWrap extends StatelessWidget {
     );
   }
 
-  static const _motionLines = <(String, String)>[
-    ('NowssB', 'Practice · heal · keep going'),
-    ('In motion', 'Your practice continues'),
-    ('Keep scrolling', 'Every section moves with you'),
-    ('Daily ritual', 'Words · breath · presence'),
-    ('Stay with it', 'Gentle motion · steady practice'),
-  ];
-
   Widget _children() {
-    final seed = children.isEmpty
-        ? 0
-        : children.first.runtimeType.hashCode.abs();
-    final (title, sub) = _motionLines[seed % _motionLines.length];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: [
-        SectionMotionBanner(title: title, sub: sub),
         for (var i = 0; i < children.length; i++) ...[
-          const SizedBox(height: 10),
+          if (i > 0) const SizedBox(height: 10),
           children[i],
         ],
       ],
@@ -170,7 +156,7 @@ class WrapHead extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                GentleMarqueeText(
+                Text(
                   eyebrow,
                   style: const TextStyle(
                     fontSize: 15,
@@ -179,10 +165,9 @@ class WrapHead extends StatelessWidget {
                     color: Color(0x801A1A2E), // rgba(26,26,46,0.5)
                     height: 1.2,
                   ),
-                  duration: const Duration(milliseconds: 4200),
                 ),
                 const SizedBox(height: 1),
-                GentleMarqueeText(
+                Text(
                   title,
                   style: const TextStyle(
                     fontSize: 24,
@@ -191,7 +176,6 @@ class WrapHead extends StatelessWidget {
                     color: NwsbColors.ink,
                     height: 1.15,
                   ),
-                  duration: const Duration(milliseconds: 3800),
                 ),
               ],
             ),

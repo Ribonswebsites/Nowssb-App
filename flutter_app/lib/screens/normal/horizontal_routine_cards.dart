@@ -131,7 +131,7 @@ class _NmHorizontalRoutineCardsState extends State<NmHorizontalRoutineCards> {
                 glass: glass || widget.fashion, active: _activeCard),
           ),
           SizedBox(
-            height: 340,
+            height: 392,
             child: ListView.separated(
               controller: _cardsController,
               scrollDirection: Axis.horizontal,
@@ -234,9 +234,10 @@ class _EssentialCard extends StatelessWidget {
             ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: Image.asset(card.image,
-                    height: 104,
+                    height: 152,
                     width: double.infinity,
-                    fit: BoxFit.cover)),
+                    fit: BoxFit.cover,
+                    alignment: Alignment.topCenter)),
             const SizedBox(height: 12),
             Text(card.meta,
                 style: TextStyle(
@@ -272,7 +273,7 @@ class _EssentialCard extends StatelessWidget {
             filter: ImageFilter.blur(
                 sigmaX: _darkGlassBlur, sigmaY: _darkGlassBlur),
             child: Container(
-              height: 249,
+              height: 297,
               decoration: BoxDecoration(
                 color: surface,
                 borderRadius: radius,
@@ -285,7 +286,7 @@ class _EssentialCard extends StatelessWidget {
       );
     } else {
       cardPane = Container(
-        height: 249,
+        height: 297,
         decoration: BoxDecoration(
           color: surface,
           borderRadius: radius,
@@ -358,7 +359,7 @@ class _EssentialCard extends StatelessWidget {
           ),
           Positioned(
             left: 135,
-            top: 221,
+            top: 269,
             child: Container(
               width: 60,
               height: 60,

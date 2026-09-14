@@ -370,8 +370,10 @@ class SecBanner extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  GentleMarqueeText(
+                  Text(
                     title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
@@ -673,8 +675,8 @@ class ScreenCta extends StatelessWidget {
 }
 
 /// True continuous marquee — text repeats so glyphs never clip mid-letter.
-/// Used on section black banners and heads so motion matches the top
-/// Customize / request-customized black banner language without cutoff.
+/// Apply only to subtitle slots under a heading (not titles / body / every
+/// SecBanner title line). Customize banners keep subtitle motion.
 class GentleMarqueeText extends StatefulWidget {
   const GentleMarqueeText(
     this.text, {
@@ -833,8 +835,10 @@ class SectionMotionBanner extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          GentleMarqueeText(
+          Text(
             title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: Colors.white,
               fontSize: compact ? 12 : 13,
