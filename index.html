@@ -1103,7 +1103,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
     <!-- NowssB Store promo card (purple) — between the streak section and
          Today's Practice, tap opens the store -->
-    <div class="npc-card npc-purple" onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()">
+    <div class="npc-card npc-purple" hidden data-removed="storedisc" onclick="(function(){var s=document.getElementById('sub-nowssb-store');if(s){s.classList.add('open');}var iv=document.getElementById('nssIntroVid');if(iv){iv.muted=true;iv.play().catch(function(){});}})()">
       <div class="npc-fabric"></div>
       <div class="npc-ambient"></div>
       <div class="npc-ripples"><div class="npc-wave"></div><div class="npc-wave npc-w2"></div><div class="npc-wave npc-w3"></div></div>
@@ -1665,7 +1665,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div><!-- /nmh-store-wrap -->
 
     <!-- Personal Coach is shared with Fashion Home but mounted independently. -->
-    <section class="nmh-supplied-actionbar" aria-label="How can we help today?" data-direct-neomorphic="actionbar"></section>
+    <section class="nmh-supplied-actionbar" hidden data-removed="actionbar" aria-label="How can we help today?" data-direct-neomorphic="actionbar"></section>
 
     <!-- Supplied Fashion Mode control: direct in-page source, no outer wrapper. -->
     <section id="nmhFashSwitch" class="nmh-supplied-fashion-mode" aria-label="Experience Fashion Mode" data-direct-neomorphic="fashion"></section>
@@ -2200,7 +2200,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <!-- NowssB Connect — what it is (fashion, video bg) -->
   <!-- NowssB Connect and its community carousel share one glass wrapper. -->
-  <div class="glass-wrap connect-wrap fash-connect-wrap">
+  <div class="glass-wrap connect-wrap fash-connect-wrap" hidden data-removed="connect">
   <!-- The section on the portrait tablet. The frame classes go ON
        .nmh-connect-sec rather than in a wrapper around it, because that is
        the element app/js/part062.js matches on the Normal home — a wrapper

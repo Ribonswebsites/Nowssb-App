@@ -54,10 +54,10 @@
            its own now either: "Start Building Your Streak Today" is its
            heading and always was. */
         { k:'streak',   sel:['.nmh-streak-wrap'],                                          t:S, label:'Streak',                sub:'Your streak and its banner' },
-        { k:'storedisc',sel:['.npc-card.npc-purple'],                                      t:B, label:'Store Disc',            sub:'Rotating store promo disc', vb:1 },
+        { k:'storedisc',sel:['.npc-card.npc-purple'],                                      t:B, label:'Store Disc',            sub:'Rotating store promo disc', vb:1, defOff:1 },
         { k:'practice', sel:['.nmh-plyr-wrap'],                                             t:S, label:"Today's Practice",      sub:'Your personalised word ritual', locked:1, after:'streak' },
         { k:'mainops',  sel:['.mainops-blk'],                                               t:S, label:'Where to Begin',        sub:'Six doors on one panel', kind:'blk' },
-        { k:'actionbar',sel:['.nmh-supplied-actionbar'],                                    t:S, label:'Help action bar',       sub:'Support and personal coach', locked:1, after:'mainops' },
+        { k:'actionbar',sel:['.nmh-supplied-actionbar'],                                    t:S, label:'Help action bar',       sub:'Support and personal coach', defOff:1, after:'mainops' },
         { k:'tiles',    sel:['.nmh-tiles-wrap'],                                    t:S, label:'Home Tiles',            sub:'The four buttons and their tip rail', always:1 },
         { k:'store',    sel:['.nmh-store-wrap'],                                          t:S, label:'NowssB Store',          sub:'Enter the store', always:1 },
         { k:'reader',   sel:['.nmh-rdsec-wrap'],                                         t:S, label:'Reader',                sub:'Meanings and eBooks' },
@@ -85,7 +85,7 @@
         /* The store's video banner is its own block, and it sits here rather
            than on top of the store card — a banner and a section are
            different things and they are apart now. */
-        { k:'storeban', sel:['.fash-storeban-wrap'],                                       t:S, label:'Store Banner',          sub:'The clip and the Shop the Library bar', vb:1 , kind:'blk' },
+        { k:'storeban', sel:['.fash-storeban-wrap'],                                       t:S, label:'Store Banner',          sub:'The clip and the Shop the Library bar', vb:1 , kind:'blk', defOff:1 },
         { k:'subvid',   sel:['.nsub-blk'],                                                  t:S, label:'Subscription',          sub:'The clip, the heading and its banner', vb:1 },
         { k:'ebooks',   sel:['.nmh-ebsec-wrap'],                                         t:S, label:'eBooks',                sub:'Deep-dive guides, yours to keep' },
         { k:'connectban', sel:['.nc-blk'],                                              t:S, label:'Connect Banner',        sub:'The clip and what Connect offers', vb:1 },
@@ -134,7 +134,7 @@
            to this card. */
         { k:'fashplus', sel:['.fps-mini'],                                                 t:S, label:'Fashion Plus',          sub:'The door to the motion mode' , kind:'tab' },
         { k:'rx',       sel:['#rxCardWrap'],                                               t:S, label:'AI Prescription',       sub:'Your daily recommended words' },
-        { k:'connect',  sel:['.fash-connect-wrap'],                                      t:S, label:'NowssB Connect',        sub:'What the social space is' , kind:'sec' },
+        { k:'connect',  sel:['.fash-connect-wrap'],                                      t:S, label:'NowssB Connect',        sub:'What the social space is' , kind:'sec', defOff:1 },
         { k:'trendvid', sel:['.fash-storevid-wrap'],                                      t:S, label:'Trending Shop',        sub:'The clip and the Shop Now banner', vb:1 },
         /* The store's video banner is its own block, and it sits here rather
            than on top of the store card — a banner and a section are
@@ -181,7 +181,9 @@
            sets: gone, and gone across launches. That is not what a cross
            on a card means — it means "not now". Anyone whose streak was
            taken away by the old behaviour gets it back here, once. */
-  var LAYOUT_V = 4;
+  /* 5 — Home cleanup: Normal storedisc + actionbar off; Fashion Connect
+         marketing card off; store bag banner above Store removed (part067). */
+  var LAYOUT_V = 5;
 
   function load(which) {
     var reg = REG[which], all = reg.items.filter(function (i) { return !i.locked; }).map(function (i) { return i.k; });

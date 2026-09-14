@@ -48,9 +48,7 @@ import '../data/settings.dart';
 import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
 import '../widgets/home_skin.dart';
-import 'normal/neomorphic_action_bar.dart';
 import 'normal/neomorphic_dashboard.dart';
-import 'personal_coach.dart';
 import 'healing_path.dart';
 import '../media/video_pool.dart';
 import 'normal/glassmorphism_theme.dart';
@@ -61,7 +59,6 @@ import 'normal/horizontal_routine_cards.dart';
 import 'normal/sections_bottom.dart';
 import 'normal/sections_top.dart';
 import 'normal/rotating_promo_rail.dart';
-import 'normal/use_this_video_section.dart';
 import 'shared_sections.dart';
 import 'sound_library.dart';
 import 'notifications_sheet.dart';
@@ -78,15 +75,12 @@ const kNormalSectionOrder = <String>[
   'promoRail',
   'dashboard',
   'essentials',
-  'useThisVideo',
   'routineCards',
   'streak',
-  'storedisc',
   'practice',
   // Not on the website's registry. Six doors on one panel so the app can
   // be used without knowing where anything is — see MainOptionsSection.
   'mainops',
-  'actionbar',
   'tiles',
   'store',
   'reader',
@@ -95,7 +89,6 @@ const kNormalSectionOrder = <String>[
   'rx',
   'routines',
   'condisc',
-  'connect',
   'feed',
   'quickrow',
   // MOVED. It used to open the page directly above the streak card,
@@ -103,7 +96,6 @@ const kNormalSectionOrder = <String>[
   // Streak. It sits with the other video banners now.
   'herovid',
   'trendshop',
-  'storeban',
   'subvid',
   'edition',
   'ebooks',
@@ -222,32 +214,10 @@ class _HomeNormalState extends State<HomeNormal> {
               onProgress: _openDashboardProgress)
         ),
         ('essentials', const NmSuppliedEssentials()),
-        (
-          'useThisVideo',
-          NmUseThisVideoSection(
-            onPlayer: () => _go(1),
-            onSentence: () => _go(2),
-            onLibrary: () => _go(2),
-          ),
-        ),
         ('routineCards', const NmHorizontalRoutineCards()),
         ('streak', NmStreak(onTap: () => _go(1))),
-        (
-          'storedisc',
-          NmPromoDisc(
-            gradient: NmPromoDisc.purple,
-            slides: NmPromoDisc.storeSlides,
-            onTap: () => _go(3),
-          )
-        ),
         ('practice', NmPractice(onTap: () => _go(1))),
         ('mainops', MainOptionsSection(onGo: _go, onAction: _openMainOption)),
-        (
-          'actionbar',
-          NmSuppliedActionBar(
-              onSupport: () => _go(4),
-              onCoach: () => _push(const PersonalCoachScreen()))
-        ),
         ('tiles', NmTiles(onTile: _go)),
         ('store', NmStore(onTap: () => _go(3))),
         ('reader', NmReader(onTap: () => _go(2))),
@@ -263,7 +233,6 @@ class _HomeNormalState extends State<HomeNormal> {
             onTap: () => _go(0),
           )
         ),
-        ('connect', NmConnect(onTap: () => _go(0))),
         ('feed', NmFeed(onTap: () => _go(0))),
         (
           'quickrow',
@@ -275,7 +244,6 @@ class _HomeNormalState extends State<HomeNormal> {
         ),
         ('herovid', NmStreakVideo(onTap: () => _go(1))),
         ('trendshop', NmTrendShop(onTap: () => _go(3))),
-        ('storeban', StoreBannerSection(onTap: () => _go(3), framed: true)),
         ('subvid', const SizedBox.shrink()),
         (
           'edition',

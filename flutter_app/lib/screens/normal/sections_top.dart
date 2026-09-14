@@ -871,8 +871,8 @@ class _NmTile extends StatelessWidget {
   }
 }
 
-/// 8 · store — index.html:1572. `.nmh-store-wrap`: the banner clip that
-/// app/js/part067.js:25 drops in at the top, then the trigger card.
+/// 8 · store — index.html:1572. `.nmh-store-wrap`: the store trigger card
+/// only (top shopping-bag banner removed; keep store-section hero video).
 ///
 /// THREE pills here, not the Fashion home's four — the Normal card drops
 /// "AI-Decoded".
@@ -886,20 +886,6 @@ class NmStore extends StatelessWidget {
   Widget build(BuildContext context) {
     return SecWrap(
       children: [
-        GestureDetector(
-          onTap: onTap,
-          behavior: HitTestBehavior.opaque,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: const AspectRatio(
-              aspectRatio: 16 / 9,
-              child: NwsbVideo(
-                asset: 'assets/video/store-banner.mp4',
-                priority: ClipPriority.decoration,
-              ),
-            ),
-          ),
-        ),
         GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,

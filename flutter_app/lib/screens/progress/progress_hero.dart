@@ -1,8 +1,7 @@
 /// Hero video, sticky header, and total-sessions orb for My Progress.
 ///
-/// Page videos are full-bleed (edge-to-edge cover). The orb hero is a
-/// transparent overlay only — stats sit inside the ring, never cropped
-/// inside a letterboxed video card.
+/// Scene-1 is positioned so its glowing orb midline coincides with the
+/// Glass Orb UI ring (268 / svg r=130). Overlay stats sit inside that ring.
 library;
 
 import 'dart:math' as math;
@@ -23,21 +22,67 @@ class ProgressHeroBgVideo extends StatelessWidget {
   const ProgressHeroBgVideo({super.key, this.opacity = 1});
   final double opacity;
 
+  /// Scene-1 intrinsic size (my-progress-scene-1.mp4).
+  static const double _vidW = 640;
+  static const double _vidH = 1408;
+
+  /// Glowing orb midline in video pixels (center-column ring peaks).
+  static const double _orbCx = 320;
+  static const double _orbCy = 462.5;
+  static const double _orbR = 147.5;
+
+  /// Match Glass Orb HTML: .orbProgress 268px, svg viewBox 286, circle r=130.
+  static const double _ringBox = ProgressOrbHero.ringSize;
+  static const double _svgView = 286;
+  static const double _svgR = 130;
+  static double get uiRingRadius => _svgR * (_ringBox / _svgView);
+
+  static const double _headerContentH = 88;
+
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    final pad = MediaQuery.paddingOf(context);
+    final headerH = pad.top + _headerContentH;
+    final ringCx = size.width / 2;
+    final ringCy = headerH + ProgressOrbHero.height * ProgressOrbHero.orbTopFrac;
+    final targetR = uiRingRadius;
+    // Zoom so the video orb diameter matches the UI ring — stable across
+    // aspect ratios (plain BoxFit.cover left the orb too small / drifted).
+    final scale = targetR / _orbR;
+    final left = ringCx - _orbCx * scale;
+    final top = ringCy - _orbCy * scale;
+    final dw = _vidW * scale;
+    final dh = _vidH * scale;
+
     return Positioned.fill(
       child: IgnorePointer(
         child: Opacity(
           opacity: opacity.clamp(0.0, 1.0),
-          child: const ColoredBox(
+          child: ColoredBox(
             color: MpColors.bg,
-            child: NwsbVideo(
-              asset: kProgressScene1,
-              fit: BoxFit.cover,
-              priority: ClipPriority.feature,
-              loop: true,
-              autoplay: true,
-              alignment: Alignment(0, -0.12),
+            child: ClipRect(
+              child: Stack(
+                clipBehavior: Clip.hardEdge,
+                children: [
+                  Positioned(
+                    left: left,
+                    top: top,
+                    width: dw,
+                    height: dh,
+                    child: const NwsbVideo(
+                      asset: kProgressScene1,
+                      // Box already matches video aspect; fill without
+                      // recompressing the asset.
+                      fit: BoxFit.fill,
+                      priority: ClipPriority.feature,
+                      loop: true,
+                      autoplay: true,
+                      alignment: Alignment.center,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -227,14 +272,15 @@ class ProgressOrbHero extends StatelessWidget {
   /// Compact hero matching Glass Orb mobile mock (~392).
   static const double height = 392;
 
-  static const double _orbTopFrac = 0.38;
-  static const double _ringSize = 268;
+  /// Public so [ProgressHeroBgVideo] can lock the scene-1 orb to this ring.
+  static const double orbTopFrac = 0.38;
+  static const double ringSize = 268;
 
   @override
   Widget build(BuildContext context) {
     final ringProgress =
         sessions == 0 ? 0.12 : (0.18 + (sessions % 40) / 50).clamp(0.18, 0.92);
-    final orbTop = height * _orbTopFrac - _ringSize / 2;
+    const orbTop = height * orbTopFrac - ringSize / 2;
 
     return SizedBox(
       height: height,
@@ -249,8 +295,8 @@ class ProgressOrbHero extends StatelessWidget {
             right: 0,
             child: Center(
               child: SizedBox(
-                width: _ringSize,
-                height: _ringSize,
+                width: ringSize,
+                height: ringSize,
                 child: CustomPaint(painter: _OrbRingPainter(progress: ringProgress)),
               ),
             ),
@@ -260,7 +306,7 @@ class ProgressOrbHero extends StatelessWidget {
             top: orbTop,
             left: 0,
             right: 0,
-            height: _ringSize,
+            height: ringSize,
             child: Center(
               child: SizedBox(
                 width: 210,
@@ -357,7 +403,8 @@ class _OrbRingPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final c = Offset(size.width / 2, size.height / 2);
-    final r = size.width / 2 - 8;
+    // HTML: <svg viewBox="0 0 286 286"><circle r="130"/></svg> in a 268 box.
+    final r = size.width * (130 / 286);
     final track = Paint()
       ..color = Colors.white.withOpacity(0.12)
       ..style = PaintingStyle.stroke
@@ -366,9 +413,11 @@ class _OrbRingPainter extends CustomPainter {
       ..color = Colors.white.withOpacity(0.82)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.4
-      ..strokeCap = StrokeCap.round;
+      ..strokeCap = StrokeCap.round
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 0.6);
     canvas.drawCircle(c, r, track);
-    final start = -math.pi * 0.48;
+    // HTML rotate(-86deg) ≈ -pi*0.478
+    const start = -math.pi * 0.478;
     final sweep = math.pi * 2 * progress;
     canvas.drawArc(Rect.fromCircle(center: c, radius: r), start, sweep, false, arc);
     // Bright handle at the leading tip of the arc (matches mock).

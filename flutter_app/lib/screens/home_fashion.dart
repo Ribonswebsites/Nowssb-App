@@ -48,7 +48,6 @@ import 'word_detail.dart';
 import 'progress/progress_screen.dart';
 import 'normal/neomorphic_action_bar.dart';
 import 'normal/horizontal_routine_cards.dart';
-import 'normal/use_this_video_section.dart';
 import 'personal_coach.dart';
 import 'healing_path.dart';
 import 'subscription.dart';
@@ -64,7 +63,6 @@ const kFashionSectionOrder = <String>[
   'herorow',
   'practice',
   'routineCards',
-  'useThisVideo',
   // Not on the website's registry. Six doors on one panel so the app can
   // be used without knowing where anything is — see MainOptionsSection.
   'mainops',
@@ -78,7 +76,6 @@ const kFashionSectionOrder = <String>[
   'custom',
   'fashplus',
   'rx',
-  'connect',
   'trendvid',
   'storeban',
   'subvid',
@@ -181,15 +178,6 @@ class _HomeFashionState extends State<HomeFashion> {
         ),
         ('practice', FashPractice(onTap: () => _go(1))),
         ('routineCards', const NmHorizontalRoutineCards(fashion: true)),
-        (
-          'useThisVideo',
-          NmUseThisVideoSection(
-            fashion: true,
-            onPlayer: () => _go(1),
-            onSentence: () => _go(2),
-            onLibrary: () => _go(2),
-          ),
-        ),
         ('mainops', MainOptionsSection(onGo: _go, onAction: _openMainOption)),
         (
           'actionbar',
@@ -211,7 +199,6 @@ class _HomeFashionState extends State<HomeFashion> {
           FashPlusMini(onTap: () => _push(const FashionPlusScreen()))
         ),
         ('rx', FashPrescription(onTap: () => _go(1), onWord: _openWord)),
-        ('connect', FashConnect(onTap: () => _go(0))),
         ('trendvid', FashShopNow(onTap: () => _go(3))),
         ('storeban', StoreBannerSection(onTap: () => _go(3))),
         ('subvid', const SizedBox.shrink()),
