@@ -1,10 +1,10 @@
 /// Hero video, sticky header, and total-sessions orb for My Progress.
 ///
-/// Geometry contract (no zoom-only hacks):
-/// - One shared orb stage parent measures rendered box (cx, cy, d).
-/// - Smoke video + progress ring + stats share that SAME center and diameter.
-/// - Both are absolutely centered (top/left 50% + translate(-50%,-50%)) inside
-///   the stage so the white ring traces the glass/smoke outer rim.
+/// Geometry contract (no zoom-only hacks, no second floating circle):
+/// - One shared orb stage: SizedBox(d,d) + ClipOval.
+/// - Video is square-cropped around the glass orb then BoxFit.cover into that
+///   oval — smoke outer rim == oval edge == progress ring.
+/// - Stats share the exact same center. Ambient page bg paints no competing orb.
 library;
 
 import 'dart:math' as math;
@@ -224,12 +224,13 @@ class ProgressOrbHero extends StatelessWidget {
   static const double vidW = 640;
   static const double vidH = 1408;
 
-  /// Orb center in video pixels (measured from scene-1).
-  static const double orbCx = 320;
-  static const double orbCy = 462.5;
-
-  /// Outer glass/smoke sphere radius in video pixels → diameter 450.
-  static const double orbOuterR = 225;
+  /// Orb center in video pixels — remeasured from my-progress-scene-1.mp4
+  /// so the visible smoke outer rim coincides with the shared stage oval.
+  /// (Prior 320/462.5/225 left a smaller offset circle vs the smoke rim.)
+  static const double orbCx = 318;
+  static const double orbCy = 445;
+  /// Outer glass/smoke sphere radius in video pixels → crop square side 330.
+  static const double orbOuterR = 165;
 
   /// Vertical anchor of the shared stage center inside [height] (0–1).
   static const double stageCenterFrac = 0.42;
@@ -239,9 +240,8 @@ class ProgressOrbHero extends StatelessWidget {
   static double stageDiameterForWidth(double width) =>
       (width * 0.90).clamp(320.0, 500.0);
 
-  /// Painted stroke radius — traces outer rim (≈ d/2, inset 1px for stroke).
-  /// Prefer d (rim) over d-20; 1px inset keeps stroke inside the box edge.
-  static double paintedRadius(double diameter) => diameter / 2 - 1.0;
+  /// Painted stroke radius — traces outer rim of the SAME oval (inset 2px).
+  static double paintedRadius(double diameter) => diameter / 2 - 2.0;
 
   /// Legacy aliases used by scroll math / callers.
   static const double orbTopFrac = stageCenterFrac;
@@ -260,18 +260,18 @@ class ProgressOrbHero extends StatelessWidget {
     final cx = width / 2;
     final cy = height * stageCenterFrac;
 
-    // Map scene-1 so video orb outer rim == stage box edge (diameter d).
-    final scale = d / (orbOuterR * 2); // d / 450
-    final dw = vidW * scale;
-    final dh = vidH * scale;
-    final vidLeft = d / 2 - orbCx * scale;
-    final vidTop = d / 2 - orbCy * scale;
+    // Square-crop the video around the glass orb, then cover-fill the oval.
+    // Crop square side = 2*orbOuterR centered on (orbCx, orbCy). Ring radius
+    // = d/2 on that SAME oval → one center, rim on smoke, no second circle.
+    final crop = orbOuterR * 2; // 330
+    final cropLeft = -(orbCx - orbOuterR);
+    final cropTop = -(orbCy - orbOuterR);
 
     return SizedBox(
       height: height,
       width: double.infinity,
       child: Stack(
-        clipBehavior: Clip.none,
+        clipBehavior: Clip.hardEdge,
         children: [
           // —— SHARED PARENT: smoke + ring + text, same center & diameter ——
           Positioned(
@@ -286,46 +286,56 @@ class ProgressOrbHero extends StatelessWidget {
                   alignment: Alignment.center,
                   clipBehavior: Clip.hardEdge,
                   children: [
-                    // Smoke / glass orb — fills the measured stage box.
+                    // Smoke / glass orb — one ClipOval stage, crop→cover.
                     Positioned.fill(
                       child: IgnorePointer(
                         child: ClipOval(
-                          child: Stack(
+                          child: FittedBox(
+                            fit: BoxFit.cover,
+                            alignment: Alignment.center,
                             clipBehavior: Clip.hardEdge,
-                            children: [
-                              Positioned(
-                                left: vidLeft,
-                                top: vidTop,
-                                width: dw,
-                                height: dh,
-                                child: const NwsbVideo(
-                                  asset: kProgressScene1,
-                                  fit: BoxFit.fill,
-                                  priority: ClipPriority.feature,
-                                  loop: true,
-                                  autoplay: true,
-                                  alignment: Alignment.center,
-                                ),
+                            child: SizedBox(
+                              width: crop,
+                              height: crop,
+                              child: Stack(
+                                clipBehavior: Clip.hardEdge,
+                                children: [
+                                  Positioned(
+                                    left: cropLeft,
+                                    top: cropTop,
+                                    width: vidW,
+                                    height: vidH,
+                                    child: const NwsbVideo(
+                                      asset: kProgressScene1,
+                                      fit: BoxFit.fill,
+                                      priority: ClipPriority.feature,
+                                      loop: true,
+                                      autoplay: true,
+                                      alignment: Alignment.center,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
                         ),
                       ),
                     ),
-                    // Soft depth plate behind copy (same center).
+                    // Soft center vignette for stats legibility — NOT a second ring.
+                    // Full-stage radial fade (same center as oval); no hard circular edge.
                     IgnorePointer(
                       child: Container(
-                        width: d * 0.55,
-                        height: d * 0.55,
+                        width: d,
+                        height: d,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           gradient: RadialGradient(
                             colors: [
-                              Colors.black.withOpacity(0.42),
-                              Colors.black.withOpacity(0.14),
+                              Colors.black.withOpacity(0.38),
+                              Colors.black.withOpacity(0.12),
                               Colors.transparent,
                             ],
-                            stops: const [0.0, 0.55, 1.0],
+                            stops: const [0.0, 0.42, 0.78],
                           ),
                         ),
                       ),

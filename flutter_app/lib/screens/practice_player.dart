@@ -1069,8 +1069,12 @@ class _QueueSheetState extends State<_QueueSheet> {
   Set<String> _liked = {};
   Map<String, int> _playCounts = {};
 
-  static const _expandExtent = 320.0;
+  // Art + progress + glass tube must ALWAYS fit inside this extent.
+  // 24 top gap + 196 art + 10 gap + ~36 progress + 4 + 90 tube + 12 bottom = 372.
+  static const _expandExtent = 392.0;
   static const _collapseExtent = 64.0;
+  static const _heroArtMax = 196.0;
+  static const _heroTubeH = 90.0;
 
   @override
   void initState() {
@@ -1191,10 +1195,10 @@ class _QueueSheetState extends State<_QueueSheet> {
     final art = (word?.img.isNotEmpty == true) ? word!.img : theme.image;
     final t = _collapse;
     // Hard 2-stage gate — stages never paint together:
-    // Stage 1 (t < 0.42): expanded art + transport; transport fully gone by 0.42
-    // Dead zone 0.42–0.58: only art/title + sticky Playing-from/Save/filters
+    // Stage 1 (t < 0.40): expanded art + transport; transport ABSENT after 0.40
+    // Dead zone 0.40–0.58: only art/title + sticky Playing-from/Save/filters
     // Stage 2 (t >= 0.58): sticky mini-bar only (thumb+title+cast+play)
-    const stage1End = 0.42;
+    const stage1End = 0.40;
     const stage2Start = 0.58;
     final controlsOpacity = t >= stage1End ? 0.0 : (1.0 - t / stage1End).clamp(0.0, 1.0);
     final miniOpacity = t <= stage2Start ? 0.0 : ((t - stage2Start) / (1.0 - stage2Start)).clamp(0.0, 1.0);
@@ -1230,27 +1234,31 @@ class _QueueSheetState extends State<_QueueSheet> {
                         scrolledUnderElevation: 0,
                         toolbarHeight: 0,
                         expandedHeight: media.padding.top + _expandExtent,
-                        flexibleSpace: LayoutBuilder(
-                          builder: (context, constraints) {
-                            final maxH = media.padding.top + _expandExtent;
-                            final minH = media.padding.top + _collapseExtent;
-                            final h = constraints.maxHeight.clamp(minH, maxH);
-                            final localT = ((maxH - h) / (maxH - minH)).clamp(0.0, 1.0);
-                            return _YtmCollapsingHero(
-                              topPad: media.padding.top,
-                              collapse: localT,
-                              art: art,
-                              title: word?.word ?? 'NowssB',
-                              subtitle: 'NowssB',
-                              playing: widget.playing,
-                              durationSec: word == null ? 12.0 : _wordSecs(word),
-                              shuffle: false,
-                              loop: false,
-                              onPlay: widget.onTogglePlay,
-                              onCast: () {},
-                              onClose: () => Navigator.of(context).maybePop(),
-                            );
-                          },
+                        flexibleSpace: ClipRect(
+                          child: LayoutBuilder(
+                            builder: (context, constraints) {
+                              final maxH = media.padding.top + _expandExtent;
+                              final minH = media.padding.top + _collapseExtent;
+                              final h = constraints.maxHeight.clamp(minH, maxH);
+                              final localT = ((maxH - h) / (maxH - minH)).clamp(0.0, 1.0);
+                              return _YtmCollapsingHero(
+                                topPad: media.padding.top,
+                                collapse: localT,
+                                art: art,
+                                title: word?.word ?? 'NowssB',
+                                subtitle: 'NowssB',
+                                playing: widget.playing,
+                                durationSec: word == null ? 12.0 : _wordSecs(word),
+                                shuffle: false,
+                                loop: false,
+                                artMax: _heroArtMax,
+                                tubeHeight: _heroTubeH,
+                                onPlay: widget.onTogglePlay,
+                                onCast: () {},
+                                onClose: () => Navigator.of(context).maybePop(),
+                              );
+                            },
+                          ),
                         ),
                       ),
                     ),
@@ -1418,8 +1426,9 @@ class _QueueSheetState extends State<_QueueSheet> {
   }
 }
 
-/// 2-stage YTM hero: (1) art shrinks + transport fades out; (2) mini-bar only.
-/// Stages are hard-gated so transport never paints over Save/filters.
+/// 2-stage YTM hero: (1) art + transport inside expandedHeight; (2) mini-bar only.
+/// Transport is laid out with `bottom` so it cannot spill past flexibleSpace.
+/// Hard-gated: when collapse t >= 0.40 the tube is ABSENT from the tree.
 class _YtmCollapsingHero extends StatelessWidget {
   const _YtmCollapsingHero({
     required this.topPad,
@@ -1434,6 +1443,8 @@ class _YtmCollapsingHero extends StatelessWidget {
     required this.onPlay,
     required this.onCast,
     required this.onClose,
+    this.artMax = 196.0,
+    this.tubeHeight = 90.0,
   });
 
   final double topPad;
@@ -1448,22 +1459,27 @@ class _YtmCollapsingHero extends StatelessWidget {
   final VoidCallback onPlay;
   final VoidCallback onCast;
   final VoidCallback onClose;
+  final double artMax;
+  final double tubeHeight;
 
   @override
   Widget build(BuildContext context) {
     final t = collapse.clamp(0.0, 1.0);
     final w = MediaQuery.sizeOf(context).width;
-    final expandedArt = math.min(w - 48, 280.0);
+    final expandedArt = math.min(w - 56.0, artMax);
     final miniArt = 40.0;
     final artSize = expandedArt + (miniArt - expandedArt) * Curves.easeInOutCubic.transform(t);
     final artLeft = 24.0 + (12.0 - 24.0) * t;
-    final artTop = topPad + 28.0 + ((8.0) - 28.0) * t;
-    // Match sheet-level 2-stage gates (no mid-scroll transport-over-tabs mess).
-    const stage1End = 0.42;
+    final artTop = topPad + 24.0 + ((8.0) - 24.0) * t;
+
+    // Hard 2-stage gates — transport never paints over Save/filters.
+    const stage1End = 0.40;
     const stage2Start = 0.58;
-    final controlsOpacity = t >= stage1End ? 0.0 : (1.0 - t / stage1End).clamp(0.0, 1.0);
-    final miniOpacity = t <= stage2Start ? 0.0 : ((t - stage2Start) / (1.0 - stage2Start)).clamp(0.0, 1.0);
-    // Title/artist visible through stage 1 handoff; full in stage 2 mini-bar.
+    final showTransport = t < stage1End; // ABSENT from tree after gate
+    final controlsOpacity =
+        t >= stage1End ? 0.0 : (1.0 - t / stage1End).clamp(0.0, 1.0);
+    final miniOpacity =
+        t <= stage2Start ? 0.0 : ((t - stage2Start) / (1.0 - stage2Start)).clamp(0.0, 1.0);
     final titleOpacity = t < 0.12 ? (0.25 + 0.75 * (t / 0.12)) : 1.0;
     final titleLeft = artLeft + artSize + 12;
     final titleTop = artTop + artSize * 0.15 * (1 - t) + 4 * t;
@@ -1482,10 +1498,12 @@ class _YtmCollapsingHero extends StatelessWidget {
       );
     }
 
+    // Progress (~36) + gap + tube — kept INSIDE flexibleSpace via bottom anchor.
+    final transportBlockH = 36.0 + 4.0 + tubeHeight;
+
     return ColoredBox(
       color: const Color(0xFF000000),
       child: Stack(
-        // Clip so transport cannot paint over sticky Playing-from / filters.
         clipBehavior: Clip.hardEdge,
         children: [
           // Large → mini art (continuous)
@@ -1529,17 +1547,20 @@ class _YtmCollapsingHero extends StatelessWidget {
               ),
             ),
           ),
-          // Stage 1 only — transport fully removed before sticky tabs (stage 2).
-          if (controlsOpacity > 0.01)
+          // Stage 1 only — anchored to BOTTOM of flexibleSpace so it cannot
+          // overflow past expandedHeight into sticky Playing-from / filters.
+          if (showTransport)
             Positioned(
-              left: 20,
-              right: 20,
-              top: artTop + artSize + 16,
+              left: 16,
+              right: 16,
+              bottom: 10,
+              height: transportBlockH,
               child: IgnorePointer(
                 ignoring: controlsOpacity < 0.12,
                 child: Opacity(
                   opacity: controlsOpacity,
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       _ProgressBar(playing: playing, durationSec: durationSec),
                       const SizedBox(height: 4),
@@ -1547,6 +1568,7 @@ class _YtmCollapsingHero extends StatelessWidget {
                         playing: playing,
                         shuffle: shuffle,
                         loop: loop,
+                        tubeHeight: tubeHeight,
                         onShuffle: () {},
                         onPrevious: () {},
                         onPlay: onPlay,
@@ -2057,10 +2079,12 @@ class _TransportRow extends StatelessWidget {
   const _TransportRow({
     required this.playing, required this.shuffle, required this.loop,
     required this.onShuffle, required this.onPrevious, required this.onPlay, required this.onNext, required this.onRepeat,
+    this.tubeHeight = 118,
   });
   final bool playing;
   final bool shuffle;
   final bool loop;
+  final double tubeHeight;
   final VoidCallback onShuffle;
   final VoidCallback onPrevious;
   final VoidCallback onPlay;
@@ -2072,6 +2096,7 @@ class _TransportRow extends StatelessWidget {
     playing: playing,
     shuffle: shuffle,
     loop: loop,
+    height: tubeHeight,
     onShuffle: onShuffle,
     onPrevious: onPrevious,
     onPlay: onPlay,
@@ -2084,10 +2109,12 @@ class _GlassTube extends StatelessWidget {
   const _GlassTube({
     required this.playing, required this.shuffle, required this.loop,
     required this.onShuffle, required this.onPrevious, required this.onPlay, required this.onNext, required this.onRepeat,
+    this.height = 118,
   });
   final bool playing;
   final bool shuffle;
   final bool loop;
+  final double height;
   final VoidCallback onShuffle;
   final VoidCallback onPrevious;
   final VoidCallback onPlay;
@@ -2102,8 +2129,10 @@ class _GlassTube extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final playSize = height >= 110 ? 64.0 : 56.0;
+    final sideSize = height >= 110 ? 48.0 : 42.0;
     return SizedBox(
-      height: 118,
+      height: height,
       child: DecoratedBox(
         decoration: const BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(999)),
@@ -2113,35 +2142,42 @@ class _GlassTube extends StatelessWidget {
           ],
         ),
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(8, 8, 8, 10),
+          padding: EdgeInsets.fromLTRB(8, height >= 110 ? 8 : 6, 8, height >= 110 ? 10 : 8),
           child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
             _TubeIcon(icon: Icons.shuffle_rounded, on: shuffle, onTap: onShuffle, label: 'Shuffle'),
-            _ImageControl(asset: 'assets/player/lgp-prev.png', network: _prev, label: 'Previous', onTap: onPrevious, size: 48),
+            _ImageControl(asset: 'assets/player/lgp-prev.png', network: _prev, label: 'Previous', onTap: onPrevious, size: sideSize),
+            // Center play/pause — asset + Icon always visible (network chrome optional).
             Semantics(
               button: true,
               label: playing ? 'Pause' : 'Play',
               child: GestureDetector(
                 onTap: onPlay,
                 child: SizedBox(
-                  width: 64,
-                  height: 64,
-                  child: Image.network(
-                    playing ? _pause : _play,
-                    fit: BoxFit.contain,
-                    errorBuilder: (_, __, ___) => Image.asset(
-                      playing ? 'assets/player/lgp-pause.png' : 'assets/player/lgp-play.png',
-                      fit: BoxFit.contain,
-                      errorBuilder: (_, __, ___) => Icon(
+                  width: playSize,
+                  height: playSize,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Icon(
                         playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
                         color: Colors.white,
-                        size: 36,
+                        size: playSize * 0.56,
                       ),
-                    ),
+                      Image.asset(
+                        playing ? 'assets/player/lgp-pause.png' : 'assets/player/lgp-play.png',
+                        fit: BoxFit.contain,
+                        errorBuilder: (_, __, ___) => Image.network(
+                          playing ? _pause : _play,
+                          fit: BoxFit.contain,
+                          errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
-            _ImageControl(asset: 'assets/player/lgp-next.png', network: _next, label: 'Next', onTap: onNext, size: 48),
+            _ImageControl(asset: 'assets/player/lgp-next.png', network: _next, label: 'Next', onTap: onNext, size: sideSize),
             _TubeIcon(icon: Icons.repeat_rounded, on: loop, onTap: onRepeat, label: 'Repeat'),
           ]),
         ),
