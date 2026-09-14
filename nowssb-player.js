@@ -675,7 +675,12 @@
           '<span class="lgp-pr-ico"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4.4 7.6h15.2l-1.1 12.2a1.6 1.6 0 0 1-1.6 1.4H7.1a1.6 1.6 0 0 1-1.6-1.4z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8.8 10V6.4a3.2 3.2 0 0 1 6.4 0V10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>' +
           '<span class="lgp-pr-lbl">Store</span>' +
         '</button>' +
-      '</div>';
+      '</div>' +
+      '<button type="button" class="lgp-store-glass-box" onclick="lgpOpenStore&&lgpOpenStore()" aria-label="Open Store">' +
+        '<span class="lgp-store-glass-inner">' +
+          '<img src="./assets/store/nowssb-bag-headphones.webp" alt="" width="72" height="72" decoding="async"/>' +
+        '</span>' +
+      '</button>';
 
     body.innerHTML =
       '<div class="lgp' + (playing ? ' playing' : '') + '" style="--lg-bg:url(\'' + th.img + '\');--lg-accent:' + th.accent + ';">' +
@@ -1670,9 +1675,18 @@
 
   function setStage(sheet, stage) {
     if (!sheet) return;
-    sheet.setAttribute('data-stage', stage);
-    sheet.classList.toggle('is-mid', stage === 'mid');
-    sheet.classList.toggle('is-full', stage === 'full');
+    var t = stage === 'full' ? 1 : (stage === 'mid' ? 0.35 : 0);
+    setProgress(sheet, t);
+  }
+
+  function setProgress(sheet, t) {
+    if (!sheet) return;
+    t = Math.max(0, Math.min(1, Number(t) || 0));
+    sheet.style.setProperty('--lgp-q-t', String(t));
+    sheet.classList.toggle('is-collapsing', t > 0.08);
+    sheet.classList.toggle('is-full', t > 0.78);
+    sheet.classList.toggle('is-mid', t <= 0.78);
+    sheet.setAttribute('data-stage', t > 0.78 ? 'full' : 'mid');
   }
 
   window.lgpCloseQueueSheet = function () {
@@ -1739,10 +1753,20 @@
     sheet.setAttribute('data-stage', 'mid');
     sheet.innerHTML =
       '<div class="lgp-queue-backdrop"></div>' +
+      '<div class="lgp-queue-collapse" aria-hidden="true">' +
+        '<button type="button" class="lgp-queue-collapse-back" aria-label="Close queue">&#8964;</button>' +
+        '<div class="lgp-queue-collapse-art"' + (curMeta.art ? ' style="background-image:url(\'' + esc(curMeta.art) + '\')"' : '') + '></div>' +
+        '<div class="lgp-queue-collapse-meta"><b>' + esc(curMeta.word || 'NowssB') + '</b><em>NowssB</em></div>' +
+        '<div class="lgp-queue-collapse-acts">' +
+          '<button type="button" class="lgp-queue-cast" aria-label="Cast"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M2 16.5v2A2.5 2.5 0 0 0 4.5 21H6v-2H4.5a.5.5 0 0 1-.5-.5v-2zm0-4v2c2.5 0 4.5 2 4.5 4.5H9A6.5 6.5 0 0 0 2.5 12.5zm0-4v2A10.5 10.5 0 0 1 12.5 21H15A12.5 12.5 0 0 0 2.5 8.5zM20 3H4a1 1 0 0 0-1 1v3h2V5h14v12h-5v2h5a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1z"/></svg></button>' +
+          '<button type="button" class="lgp-queue-playmini" aria-label="Play"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button>' +
+        '</div>' +
+      '</div>' +
       '<div class="lgp-queue-mini" aria-hidden="true">' +
         '<span class="lgp-queue-mini-art"' + (curMeta.art ? ' style="background-image:url(\'' + esc(curMeta.art) + '\')"' : '') + '></span>' +
         '<span class="lgp-queue-mini-mid"><b>' + esc(curMeta.word || 'NowssB') + '</b><em>NowssB</em></span>' +
-        '<button type="button" class="lgp-queue-mini-close" aria-label="Close">×</button>' +
+        '<button type="button" class="lgp-queue-cast" aria-label="Cast"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M2 16.5v2A2.5 2.5 0 0 0 4.5 21H6v-2H4.5a.5.5 0 0 1-.5-.5v-2zm0-4v2c2.5 0 4.5 2 4.5 4.5H9A6.5 6.5 0 0 0 2.5 12.5zm0-4v2A10.5 10.5 0 0 1 12.5 21H15A12.5 12.5 0 0 0 2.5 8.5zM20 3H4a1 1 0 0 0-1 1v3h2V5h14v12h-5v2h5a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1z"/></svg></button>' +
+        '<button type="button" class="lgp-queue-playmini" aria-label="Play"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button>' +
       '</div>' +
       '<div class="lgp-queue-panel" role="dialog" aria-label="Up Next queue">' +
         '<div class="lgp-queue-grab" aria-hidden="true"></div>' +
@@ -1769,8 +1793,8 @@
     renderList(list);
 
     requestAnimationFrame(function () {
-      sheet.classList.add('is-open', 'is-mid');
-      setStage(sheet, 'mid');
+      sheet.classList.add('is-open', 'is-mid', 'is-collapsing');
+      setProgress(sheet, 0.35);
     });
 
     function close() { window.lgpCloseQueueSheet(); }
@@ -1779,7 +1803,18 @@
       if (sheet.getAttribute('data-stage') === 'full') setStage(sheet, 'mid');
       else close();
     };
-    sheet.querySelector('.lgp-queue-mini-close').onclick = close;
+    var backBtn = sheet.querySelector('.lgp-queue-collapse-back');
+    if (backBtn) backBtn.onclick = close;
+    sheet.querySelectorAll('.lgp-queue-playmini').forEach(function (btn) {
+      btn.onclick = function (e) {
+        e.stopPropagation();
+        try {
+          if (typeof window.lgpTogglePlay === 'function') window.lgpTogglePlay();
+          else if (typeof pwToggle === 'function') pwToggle();
+          else if (typeof pwPlay === 'function') pwPlay();
+        } catch (err) {}
+      };
+    });
 
     chips.addEventListener('click', function (ev) {
       var btn = ev.target && ev.target.closest ? ev.target.closest('[data-filter]') : null;
@@ -1850,25 +1885,34 @@
       renderList(list);
     });
 
-    // Two-stage drag on grab / panel header
-    var y0 = null, stage0 = null, dragging = false;
+    // Continuous scroll-driven collapse (YTM) — drag maps to --lgp-q-t
+    var y0 = null, t0 = 0.35, dragging = false;
+    function currentT() {
+      var raw = parseFloat(sheet.style.getPropertyValue('--lgp-q-t'));
+      return isNaN(raw) ? 0.35 : raw;
+    }
     function onStart(y) {
       y0 = y;
-      stage0 = sheet.getAttribute('data-stage') || 'mid';
+      t0 = currentT();
       dragging = true;
       panel.classList.add('is-dragging');
     }
     function onMove(y) {
       if (!dragging || y0 == null) return;
-      var dy = y0 - y; // up positive
-      if (stage0 === 'mid' && dy > 56) setStage(sheet, 'full');
-      else if (stage0 === 'full' && dy < -48) setStage(sheet, 'mid');
-      else if (stage0 === 'mid' && dy < -64) { dragging = false; close(); }
+      var dy = y0 - y; // up positive → collapse toward mini
+      var next = t0 + dy / (window.innerHeight * 0.55);
+      if (next < -0.08) { dragging = false; close(); return; }
+      setProgress(sheet, next);
     }
     function onEnd() {
+      if (!dragging) { y0 = null; panel.classList.remove('is-dragging'); return; }
       dragging = false;
       y0 = null;
       panel.classList.remove('is-dragging');
+      var t = currentT();
+      if (t < 0.12) close();
+      else if (t < 0.55) setProgress(sheet, 0.35);
+      else setProgress(sheet, 1);
     }
     var grab = sheet.querySelector('.lgp-queue-grab');
     var head = sheet.querySelector('.lgp-queue-ytm-head');
@@ -1888,6 +1932,15 @@
     window.addEventListener('mousemove', function (e) { if (dragging) onMove(e.clientY); });
     window.addEventListener('mouseup', onEnd);
 
+    list.addEventListener('scroll', function () {
+      if (list.scrollTop > 8) {
+        var max = Math.max(1, list.scrollHeight - list.clientHeight);
+        var ratio = Math.min(1, list.scrollTop / max);
+        setProgress(sheet, Math.min(1, 0.55 + ratio * 0.45));
+      }
+    }, { passive: true });
+
+
     // Second swipe-up anywhere on panel (not on list scroll) expands
     var py0 = null;
     panel.addEventListener('touchstart', function (e) {
@@ -1901,7 +1954,7 @@
       var y1 = t ? t.clientY : py0;
       var dy = py0 - y1;
       var stage = sheet.getAttribute('data-stage') || 'mid';
-      if (dy > 48 && stage === 'mid') setStage(sheet, 'full');
+      if (dy > 48 && stage === 'mid') setProgress(sheet, 1);
       else if (dy < -56 && stage === 'full') setStage(sheet, 'mid');
       else if (dy < -72 && stage === 'mid') close();
       py0 = null;

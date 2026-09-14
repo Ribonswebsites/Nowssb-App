@@ -22,6 +22,7 @@ import '../data/practice_progress.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../widgets/tv_frame.dart';
+import '../widgets/glass_wrap.dart';
 import '../widgets/nwsb_icon.dart';
 import '../widgets/black_glass_banner.dart';
 import '../theme/tokens.dart';
@@ -291,6 +292,10 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> with Ticker
         index: _index,
         themes: _playerThemes,
         mixTitle: widget.title,
+        playing: _playing,
+        onTogglePlay: () {
+          unawaited(_togglePlay());
+        },
         onPlayAt: (i) async {
           Navigator.of(context).pop();
           if (i == _index) {
@@ -624,6 +629,20 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> with Ticker
                   ),
                 ],
                 const SizedBox(height: 12),
+                Center(
+                  child: SizedBox(
+                    width: stageWidth,
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: _StoreGlassVideoBox(
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute<void>(builder: (_) => const StoreScreen()),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
                 SizedBox(
                   width: stageWidth,
                   height: 128,
@@ -1019,13 +1038,17 @@ class _NextUpCard extends StatelessWidget {
   }
 }
 
-/// YTM two-stage glass Up Next — swipe mid → full; queue icon stays Sound Library.
+/// YTM continuous scroll-driven Up Next — NestedScrollView / slivers.
+/// Large art shrinks + pins top-left; controls fade; filters stick; mini-bar
+/// shows cast + play. Queue icon on the peek card still opens Sound Library.
 class _QueueSheet extends StatefulWidget {
   const _QueueSheet({
     required this.words,
     required this.index,
     required this.themes,
     required this.mixTitle,
+    required this.playing,
+    required this.onTogglePlay,
     required this.onPlayAt,
     required this.onReorderQueue,
   });
@@ -1034,6 +1057,8 @@ class _QueueSheet extends StatefulWidget {
   final int index;
   final List<_PlayerTheme> themes;
   final String mixTitle;
+  final bool playing;
+  final VoidCallback onTogglePlay;
   final ValueChanged<int> onPlayAt;
   final ValueChanged<List<String>> onReorderQueue;
 
@@ -1047,25 +1072,39 @@ class _QueueSheetState extends State<_QueueSheet> {
   static const _savedMixKey = 'nwsb_saved_upnext';
   static const _likedWordsKey = 'nwsb_liked_words';
 
-  final _sheetCtrl = DraggableScrollableController();
+  final _scrollCtrl = ScrollController();
   var _filter = _QueueFilter.all;
   late List<int> _order; // indices into widget.words
   var _saved = false;
-  var _sheetSize = 0.62;
+  var _collapse = 0.0; // 0 expanded → 1 fully collapsed mini-header
   Set<String> _liked = {};
   Map<String, int> _playCounts = {};
+
+  static const _expandExtent = 320.0;
+  static const _collapseExtent = 64.0;
 
   @override
   void initState() {
     super.initState();
     _order = List<int>.generate(widget.words.length, (i) => i);
+    _scrollCtrl.addListener(_onScroll);
     unawaited(_hydrate());
   }
 
   @override
   void dispose() {
-    _sheetCtrl.dispose();
+    _scrollCtrl.removeListener(_onScroll);
+    _scrollCtrl.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    if (!_scrollCtrl.hasClients) return;
+    final range = (_expandExtent - _collapseExtent).clamp(1.0, 9999.0);
+    final next = (_scrollCtrl.offset / range).clamp(0.0, 1.0);
+    if ((next - _collapse).abs() > 0.008) {
+      setState(() => _collapse = next);
+    }
   }
 
   Future<void> _hydrate() async {
@@ -1131,7 +1170,6 @@ class _QueueSheetState extends State<_QueueSheet> {
     final prefs = await SharedPreferences.getInstance();
     final ordered = _order.map((i) => widget.words[i].word).toList();
     await prefs.setStringList(_savedMixKey, ordered);
-    // Also fold into liked/favorites so Save feels sticky.
     final liked = (prefs.getStringList(_likedWordsKey) ?? const <String>[]).toSet();
     for (final w in ordered) {
       liked.add(w);
@@ -1149,332 +1187,564 @@ class _QueueSheetState extends State<_QueueSheet> {
     );
   }
 
+  Word? get _currentWord =>
+      widget.words.isEmpty ? null : widget.words[widget.index.clamp(0, widget.words.length - 1)];
+
+  _PlayerTheme get _currentTheme =>
+      widget.themes[widget.index % math.max(widget.themes.length, 1)];
+
   @override
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context);
     final filtered = _filtered;
-    final showMini = _sheetSize > 0.78;
+    final word = _currentWord;
+    final theme = _currentTheme;
+    final art = (word?.img.isNotEmpty == true) ? word!.img : theme.image;
+    final t = _collapse;
+    final controlsOpacity = (1.0 - (t / 0.55)).clamp(0.0, 1.0);
+    final miniOpacity = ((t - 0.35) / 0.45).clamp(0.0, 1.0);
+
     return PopScope(
       canPop: true,
-      child: NotificationListener<DraggableScrollableNotification>(
-        onNotification: (n) {
-          if ((n.extent - _sheetSize).abs() > 0.01) {
-            setState(() => _sheetSize = n.extent);
-          }
-          // Drag below mid snap → dismiss (YTM collapse).
-          if (n.extent <= 0.46 && n.extent <= n.minExtent + 0.02) {
-            Navigator.of(context).maybePop();
-          }
-          return false;
-        },
+      child: Material(
+        color: const Color(0xFF000000),
         child: Stack(
-        children: [
-          // Mini-player strip peeks when sheet is near-full
-          Positioned(
-            top: media.padding.top + 6,
-            left: 12,
-            right: 12,
-            child: IgnorePointer(
-              ignoring: !showMini,
-              child: AnimatedOpacity(
-                duration: const Duration(milliseconds: 180),
-                opacity: showMini ? 1 : 0,
-                child: _YtmMiniPlayerBar(
-                  word: widget.words.isEmpty ? null : widget.words[widget.index.clamp(0, widget.words.length - 1)],
-                  theme: widget.themes[widget.index % math.max(widget.themes.length, 1)],
-                  onClose: () => Navigator.of(context).maybePop(),
-                ),
+          children: [
+            // Dimmed player backdrop — continuous with sheet rise
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: () => Navigator.of(context).maybePop(),
+                child: ColoredBox(color: Color.fromRGBO(0, 0, 0, 0.35 + 0.35 * t)),
               ),
             ),
-          ),
-          DraggableScrollableSheet(
-            controller: _sheetCtrl,
-            initialChildSize: 0.62,
-            minChildSize: 0.45,
-            maxChildSize: 0.94,
-            snap: true,
-            snapSizes: const [0.62, 0.92],
-            builder: (context, scrollController) {
-              return ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 48, sigmaY: 48),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-                      border: Border.all(color: const Color(0x2EFFFFFF)),
-                      boxShadow: const [
-                        BoxShadow(color: Color(0xB3000000), blurRadius: 56, offset: Offset(0, -14)),
-                        BoxShadow(color: Color(0x38FFFFFF), blurRadius: 0, spreadRadius: 1),
-                      ],
-                      gradient: const LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [Color(0x8C18161C), Color(0xB3101014)],
+            // Continuous NestedScrollView / CustomScrollView (YTM)
+            Positioned.fill(
+              child: NestedScrollView(
+                controller: _scrollCtrl,
+                physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+                headerSliverBuilder: (context, innerBoxIsScrolled) {
+                  return [
+                    SliverOverlapAbsorber(
+                      handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+                      sliver: SliverAppBar(
+                        pinned: true,
+                        stretch: true,
+                        automaticallyImplyLeading: false,
+                        backgroundColor: const Color(0xFF000000),
+                        elevation: 0,
+                        scrolledUnderElevation: 0,
+                        toolbarHeight: 0,
+                        expandedHeight: media.padding.top + _expandExtent,
+                        flexibleSpace: LayoutBuilder(
+                          builder: (context, constraints) {
+                            final maxH = media.padding.top + _expandExtent;
+                            final minH = media.padding.top + _collapseExtent;
+                            final h = constraints.maxHeight.clamp(minH, maxH);
+                            final localT = ((maxH - h) / (maxH - minH)).clamp(0.0, 1.0);
+                            return _YtmCollapsingHero(
+                              topPad: media.padding.top,
+                              collapse: localT,
+                              art: art,
+                              title: word?.word ?? 'NowssB',
+                              subtitle: 'NowssB',
+                              playing: widget.playing,
+                              durationSec: word == null ? 12.0 : _wordSecs(word),
+                              shuffle: false,
+                              loop: false,
+                              onPlay: widget.onTogglePlay,
+                              onCast: () {},
+                              onClose: () => Navigator.of(context).maybePop(),
+                            );
+                          },
+                        ),
                       ),
                     ),
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 10),
-                        Container(
-                          width: 42,
-                          height: 4,
-                          decoration: BoxDecoration(color: const Color(0x7AFFFFFF), borderRadius: BorderRadius.circular(99)),
+                    SliverPersistentHeader(
+                      pinned: true,
+                      delegate: _QueueStickyHeadDelegate(
+                        mixLabel: _mixLabel,
+                        saved: _saved,
+                        filter: _filter,
+                        onSave: _saveMix,
+                        onFilter: (f) => setState(() => _filter = f),
+                      ),
+                    ),
+                  ];
+                },
+                body: Builder(
+                  builder: (context) {
+                    return CustomScrollView(
+                      slivers: [
+                        SliverOverlapInjector(
+                          handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(18, 14, 14, 4),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text('Playing from', style: TextStyle(color: Color(0xFF9A9AA0), fontSize: 12, fontWeight: FontWeight.w500)),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      _mixLabel,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(color: Color(0xFFF5F5F7), fontSize: 18, fontWeight: FontWeight.w700, letterSpacing: -0.2),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Material(
-                                color: _saved ? const Color(0x33E8D5A3) : const Color(0x33FFFFFF),
-                                borderRadius: BorderRadius.circular(99),
-                                child: InkWell(
-                                  borderRadius: BorderRadius.circular(99),
-                                  onTap: _saveMix,
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(_saved ? Icons.playlist_add_check_rounded : Icons.playlist_add_rounded, color: const Color(0xFFF5F5F7), size: 18),
-                                        const SizedBox(width: 6),
-                                        Text(_saved ? 'Saved' : 'Save', style: const TextStyle(color: Color(0xFFF5F5F7), fontSize: 13, fontWeight: FontWeight.w600)),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(
-                          height: 44,
-                          child: ListView(
-                            scrollDirection: Axis.horizontal,
-                            padding: const EdgeInsets.fromLTRB(14, 6, 14, 6),
-                            children: [
-                              for (final entry in const [
-                                (_QueueFilter.all, 'All'),
-                                (_QueueFilter.familiar, 'Familiar'),
-                                (_QueueFilter.popular, 'Popular'),
-                                (_QueueFilter.discover, 'Discover'),
-                                (_QueueFilter.deepCuts, 'Deep cuts'),
-                              ])
-                                Padding(
-                                  padding: const EdgeInsets.only(right: 8),
-                                  child: _QueueFilterPill(
-                                    label: entry.$2,
-                                    selected: _filter == entry.$1,
-                                    onTap: () => setState(() => _filter = entry.$1),
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          child: filtered.isEmpty
-                              ? ListView(
-                                  controller: scrollController,
-                                  children: const [
-                                    SizedBox(height: 48),
-                                    Center(child: Text('No tracks in this filter', style: TextStyle(color: Color(0xFF8E8E93), fontSize: 13))),
-                                  ],
-                                )
-                              : ReorderableListView.builder(
-                                  scrollController: scrollController,
-                                  padding: const EdgeInsets.fromLTRB(10, 4, 10, 28),
-                                  itemCount: filtered.length,
-                                  buildDefaultDragHandles: false,
-                                  proxyDecorator: (child, index, animation) {
-                                    return Material(
-                                      elevation: 8,
-                                      color: Colors.transparent,
-                                      borderRadius: BorderRadius.circular(14),
-                                      child: child,
-                                    );
-                                  },
-                                  onReorder: (oldIndex, newIndex) {
-                                    // Operate on filtered indices mapped into _order
-                                    final vis = List<int>.from(filtered);
-                                    if (newIndex > oldIndex) newIndex -= 1;
-                                    final item = vis.removeAt(oldIndex);
-                                    vis.insert(newIndex.clamp(0, vis.length), item);
-                                    setState(() {
-                                      final visSet = vis.toSet();
-                                      final out = <int>[];
-                                      var vi = 0;
-                                      final base = List<int>.from(_order);
-                                      for (final idx in base) {
-                                        if (visSet.contains(idx)) {
-                                          if (vi < vis.length) out.add(vis[vi++]);
-                                        } else {
-                                          out.add(idx);
-                                        }
-                                      }
-                                      while (vi < vis.length) {
-                                        out.add(vis[vi++]);
-                                      }
-                                      final seen = <int>{};
-                                      _order = [for (final i in out) if (seen.add(i)) i];
-                                    });
-                                  },
-                                  itemBuilder: (context, i) {
-                                    final orig = filtered[i];
-                                    final w = widget.words[orig];
-                                    final art = w.img.isNotEmpty ? w.img : widget.themes[orig % widget.themes.length].image;
-                                    final isCurrent = orig == widget.index;
-                                    return Material(
-                                      key: ValueKey('q-$orig-${w.word}'),
-                                      color: isCurrent ? const Color(0x28FFFFFF) : Colors.transparent,
+                        if (filtered.isEmpty)
+                          const SliverFillRemaining(
+                            hasScrollBody: false,
+                            child: Center(
+                              child: Text('No tracks in this filter', style: TextStyle(color: Color(0xFF8E8E93), fontSize: 13)),
+                            ),
+                          )
+                        else
+                          SliverPadding(
+                            padding: EdgeInsets.fromLTRB(10, 4, 10, 28 + media.padding.bottom),
+                            sliver: SliverReorderableList(
+                              itemCount: filtered.length,
+                              onReorderItem: (oldIndex, newIndex) {
+                                final vis = List<int>.from(filtered);
+                                final item = vis.removeAt(oldIndex);
+                                vis.insert(newIndex.clamp(0, vis.length), item);
+                                setState(() {
+                                  final visSet = vis.toSet();
+                                  final out = <int>[];
+                                  var vi = 0;
+                                  final base = List<int>.from(_order);
+                                  for (final idx in base) {
+                                    if (visSet.contains(idx)) {
+                                      if (vi < vis.length) out.add(vis[vi++]);
+                                    } else {
+                                      out.add(idx);
+                                    }
+                                  }
+                                  while (vi < vis.length) {
+                                    out.add(vis[vi++]);
+                                  }
+                                  final seen = <int>{};
+                                  _order = [for (final i in out) if (seen.add(i)) i];
+                                });
+                              },
+                              itemBuilder: (context, i) {
+                                final orig = filtered[i];
+                                final w = widget.words[orig];
+                                final rowArt = w.img.isNotEmpty ? w.img : widget.themes[orig % widget.themes.length].image;
+                                final isCurrent = orig == widget.index;
+                                return ReorderableDelayedDragStartListener(
+                                  key: ValueKey('q-$orig-${w.word}'),
+                                  index: i,
+                                  child: Material(
+                                    color: isCurrent ? const Color(0x28FFFFFF) : Colors.transparent,
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: InkWell(
                                       borderRadius: BorderRadius.circular(12),
-                                      child: InkWell(
-                                        borderRadius: BorderRadius.circular(12),
-                                        onTap: () => widget.onPlayAt(orig),
-                                        child: Padding(
-                                          padding: const EdgeInsets.fromLTRB(8, 8, 4, 8),
-                                          child: Row(
-                                            children: [
-                                              ClipRRect(
-                                                borderRadius: BorderRadius.circular(6),
-                                                child: SizedBox(
-                                                  width: 48,
-                                                  height: 48,
-                                                  child: Stack(
-                                                    fit: StackFit.expand,
-                                                    children: [
-                                                      art.startsWith('http')
-                                                          ? Image.network(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111)))
-                                                          : Image.asset(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111))),
-                                                      if (isCurrent)
-                                                        const Align(
-                                                          alignment: Alignment.bottomRight,
-                                                          child: Padding(
-                                                            padding: EdgeInsets.all(3),
-                                                            child: Icon(Icons.equalizer_rounded, color: Color(0xFFF5F5F7), size: 16),
-                                                          ),
-                                                        ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                              const SizedBox(width: 12),
-                                              Expanded(
-                                                child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                      onTap: () => widget.onPlayAt(orig),
+                                      child: Padding(
+                                        padding: const EdgeInsets.fromLTRB(8, 8, 4, 8),
+                                        child: Row(
+                                          children: [
+                                            ClipRRect(
+                                              borderRadius: BorderRadius.circular(6),
+                                              child: SizedBox(
+                                                width: 48,
+                                                height: 48,
+                                                child: Stack(
+                                                  fit: StackFit.expand,
                                                   children: [
-                                                    Text(
-                                                      w.word,
-                                                      maxLines: 1,
-                                                      overflow: TextOverflow.ellipsis,
-                                                      style: TextStyle(
-                                                        color: const Color(0xFFF5F5F7),
-                                                        fontSize: 15,
-                                                        fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w600,
-                                                        letterSpacing: -0.15,
+                                                    rowArt.startsWith('http')
+                                                        ? Image.network(rowArt, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111)))
+                                                        : Image.asset(rowArt, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111))),
+                                                    if (isCurrent)
+                                                      const Align(
+                                                        alignment: Alignment.bottomRight,
+                                                        child: Padding(
+                                                          padding: EdgeInsets.all(3),
+                                                          child: Icon(Icons.equalizer_rounded, color: Color(0xFFF5F5F7), size: 16),
+                                                        ),
                                                       ),
-                                                    ),
-                                                    const SizedBox(height: 2),
-                                                    Text(
-                                                      'NowssB · ${_wordClock(w)}',
-                                                      style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 12),
-                                                    ),
                                                   ],
                                                 ),
                                               ),
-                                              ReorderableDragStartListener(
-                                                index: i,
-                                                child: const Padding(
-                                                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                                                  child: Icon(Icons.drag_handle_rounded, color: Color(0xFF8E8E93), size: 22),
-                                                ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    w.word,
+                                                    maxLines: 1,
+                                                    overflow: TextOverflow.ellipsis,
+                                                    style: TextStyle(
+                                                      color: const Color(0xFFF5F5F7),
+                                                      fontSize: 15,
+                                                      fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w600,
+                                                      letterSpacing: -0.15,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 2),
+                                                  Text(
+                                                    'NowssB · ${_wordClock(w)}',
+                                                    style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 12),
+                                                  ),
+                                                ],
                                               ),
-                                            ],
-                                          ),
+                                            ),
+                                            const Padding(
+                                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                                              child: Icon(Icons.drag_handle_rounded, color: Color(0xFF8E8E93), size: 22),
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                    );
-                                  },
-                                ),
-                        ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
                       ],
+                    );
+                  },
+                ),
+              ),
+            ),
+            // Grab affordance at mid open
+            Positioned(
+              top: media.padding.top + 6,
+              left: 0,
+              right: 0,
+              child: IgnorePointer(
+                ignoring: miniOpacity > 0.55,
+                child: Opacity(
+                  opacity: (1.0 - miniOpacity).clamp(0.0, 1.0) * controlsOpacity.clamp(0.4, 1.0),
+                  child: Center(
+                    child: Container(
+                      width: 42,
+                      height: 4,
+                      decoration: BoxDecoration(color: const Color(0x7AFFFFFF), borderRadius: BorderRadius.circular(99)),
                     ),
                   ),
                 ),
-              );
-            },
-          ),
-        ],
-      ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-class _YtmMiniPlayerBar extends StatelessWidget {
-  const _YtmMiniPlayerBar({required this.word, required this.theme, required this.onClose});
-  final Word? word;
-  final _PlayerTheme theme;
+/// Continuous scroll-driven hero: art scales + moves top-left; title reflows;
+/// primary controls fade; sticky mini-bar gets cast + play (YTM full state).
+class _YtmCollapsingHero extends StatelessWidget {
+  const _YtmCollapsingHero({
+    required this.topPad,
+    required this.collapse,
+    required this.art,
+    required this.title,
+    required this.subtitle,
+    required this.playing,
+    required this.durationSec,
+    required this.shuffle,
+    required this.loop,
+    required this.onPlay,
+    required this.onCast,
+    required this.onClose,
+  });
+
+  final double topPad;
+  final double collapse;
+  final String art;
+  final String title;
+  final String subtitle;
+  final bool playing;
+  final double durationSec;
+  final bool shuffle;
+  final bool loop;
+  final VoidCallback onPlay;
+  final VoidCallback onCast;
   final VoidCallback onClose;
 
   @override
   Widget build(BuildContext context) {
-    final art = (word?.img.isNotEmpty == true) ? word!.img : theme.image;
-    return Material(
-      color: const Color(0xCC0E0E10),
-      borderRadius: BorderRadius.circular(14),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(6),
-              child: SizedBox(
-                width: 40,
-                height: 40,
-                child: art.startsWith('http')
-                    ? Image.network(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111)))
-                    : Image.asset(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111))),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
+    final t = collapse.clamp(0.0, 1.0);
+    final w = MediaQuery.sizeOf(context).width;
+    final expandedArt = math.min(w - 48, 280.0);
+    final miniArt = 40.0;
+    final artSize = expandedArt + (miniArt - expandedArt) * Curves.easeInOutCubic.transform(t);
+    final artLeft = 24.0 + (12.0 - 24.0) * t;
+    final artTop = topPad + 28.0 + ((8.0) - 28.0) * t;
+    final controlsOpacity = (1.0 - (t / 0.55)).clamp(0.0, 1.0);
+    final miniOpacity = ((t - 0.42) / 0.4).clamp(0.0, 1.0);
+    final titleLeft = artLeft + artSize + 12;
+    final titleTop = artTop + artSize * 0.15 * (1 - t) + 4 * t;
+
+    Widget artBox(double size, {BorderRadius? radius}) {
+      final r = radius ?? BorderRadius.circular(6 + 18 * (1 - t));
+      return ClipRRect(
+        borderRadius: r,
+        child: SizedBox(
+          width: size,
+          height: size,
+          child: art.startsWith('http')
+              ? Image.network(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111)))
+              : Image.asset(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111))),
+        ),
+      );
+    }
+
+    return ColoredBox(
+      color: const Color(0xFF000000),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          // Large → mini art (continuous)
+          Positioned(
+            left: artLeft,
+            top: artTop,
+            child: artBox(artSize),
+          ),
+          // Title / artist reflow beside shrinking art
+          Positioned(
+            left: titleLeft.clamp(artLeft + miniArt + 10, w - 120),
+            right: 88,
+            top: titleTop.clamp(topPad + 6, artTop + artSize + 8),
+            child: Opacity(
+              opacity: (0.35 + 0.65 * miniOpacity).clamp(0.0, 1.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    word?.word ?? 'NowssB',
+                    title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: Color(0xFFF5F5F7), fontSize: 14, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      color: const Color(0xFFF5F5F7),
+                      fontSize: 22 - 8 * t,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.2,
+                    ),
                   ),
-                  const Text('NowssB', style: TextStyle(color: Color(0xFF8E8E93), fontSize: 11)),
+                  Text(
+                    subtitle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: const Color(0xFF8E8E93),
+                      fontSize: 14 - 3 * t,
+                    ),
+                  ),
                 ],
               ),
             ),
-            IconButton(
-              onPressed: onClose,
-              icon: const Icon(Icons.close_rounded, color: Color(0xFFCFCFD2), size: 20),
-              visualDensity: VisualDensity.compact,
+          ),
+          // Primary controls — fade out on scroll
+          Positioned(
+            left: 20,
+            right: 20,
+            top: artTop + artSize + 16,
+            child: IgnorePointer(
+              ignoring: controlsOpacity < 0.12,
+              child: Opacity(
+                opacity: controlsOpacity,
+                child: Column(
+                  children: [
+                    _ProgressBar(playing: playing, durationSec: durationSec),
+                    const SizedBox(height: 4),
+                    _TransportRow(
+                      playing: playing,
+                      shuffle: shuffle,
+                      loop: loop,
+                      onShuffle: () {},
+                      onPrevious: () {},
+                      onPlay: onPlay,
+                      onNext: () {},
+                      onRepeat: () {},
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ],
+          ),
+          // Sticky mini actions: cast + play (YTM full)
+          Positioned(
+            top: topPad + 10,
+            right: 10,
+            child: Opacity(
+              opacity: miniOpacity,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    onPressed: onCast,
+                    icon: const Icon(Icons.cast_rounded, color: Color(0xFFCFCFD2), size: 22),
+                    visualDensity: VisualDensity.compact,
+                  ),
+                  IconButton(
+                    onPressed: onPlay,
+                    icon: Icon(
+                      playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                      color: const Color(0xFFF5F5F7),
+                      size: 26,
+                    ),
+                    visualDensity: VisualDensity.compact,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // Collapse chevron when expanded
+          Positioned(
+            top: topPad + 4,
+            left: 4,
+            child: Opacity(
+              opacity: controlsOpacity,
+              child: IconButton(
+                onPressed: onClose,
+                icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFFCFCFD2), size: 28),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _QueueStickyHeadDelegate extends SliverPersistentHeaderDelegate {
+  _QueueStickyHeadDelegate({
+    required this.mixLabel,
+    required this.saved,
+    required this.filter,
+    required this.onSave,
+    required this.onFilter,
+  });
+
+  final String mixLabel;
+  final bool saved;
+  final _QueueFilter filter;
+  final VoidCallback onSave;
+  final ValueChanged<_QueueFilter> onFilter;
+
+  @override
+  double get minExtent => 108;
+  @override
+  double get maxExtent => 108;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Material(
+      color: const Color(0xF0101014),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(18, 8, 14, 4),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Playing from', style: TextStyle(color: Color(0xFF9A9AA0), fontSize: 12, fontWeight: FontWeight.w500)),
+                      const SizedBox(height: 2),
+                      Text(
+                        mixLabel,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(color: Color(0xFFF5F5F7), fontSize: 18, fontWeight: FontWeight.w700, letterSpacing: -0.2),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Material(
+                  color: saved ? const Color(0x33E8D5A3) : const Color(0x33FFFFFF),
+                  borderRadius: BorderRadius.circular(99),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(99),
+                    onTap: onSave,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(saved ? Icons.playlist_add_check_rounded : Icons.playlist_add_rounded, color: const Color(0xFFF5F5F7), size: 18),
+                          const SizedBox(width: 6),
+                          Text(saved ? 'Saved' : 'Save', style: const TextStyle(color: Color(0xFFF5F5F7), fontSize: 13, fontWeight: FontWeight.w600)),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(
+            height: 44,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.fromLTRB(14, 6, 14, 6),
+              children: [
+                for (final entry in const [
+                  (_QueueFilter.all, 'All'),
+                  (_QueueFilter.familiar, 'Familiar'),
+                  (_QueueFilter.popular, 'Popular'),
+                  (_QueueFilter.discover, 'Discover'),
+                  (_QueueFilter.deepCuts, 'Deep cuts'),
+                ])
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: _QueueFilterPill(
+                      label: entry.$2,
+                      selected: filter == entry.$1,
+                      onTap: () => onFilter(entry.$1),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  bool shouldRebuild(covariant _QueueStickyHeadDelegate oldDelegate) =>
+      oldDelegate.mixLabel != mixLabel ||
+      oldDelegate.saved != saved ||
+      oldDelegate.filter != filter;
+}
+
+class _StoreGlassVideoBox extends StatelessWidget {
+  const _StoreGlassVideoBox({required this.onTap});
+  final VoidCallback onTap;
+
+  static const _asset = 'assets/store/nowssb-bag-headphones.webp';
+
+  @override
+  Widget build(BuildContext context) {
+    // Small video-box style frame inside a glass wrapper (Store strip companion).
+    return GestureDetector(
+      onTap: onTap,
+      child: SizedBox(
+        width: 84,
+        height: 84,
+        child: GlassWrap(
+          margin: EdgeInsets.zero,
+          padding: const EdgeInsets.all(6),
+          radius: 14,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                const ColoredBox(color: Color(0xFF050505)),
+                Image.asset(
+                  _asset,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111)),
+                ),
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: const Color(0x33FFFFFF)),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
