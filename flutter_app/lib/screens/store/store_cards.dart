@@ -177,13 +177,17 @@ class RmWordRow extends StatelessWidget {
   const RmWordRow({super.key, required this.children});
   final List<Widget> children;
 
+  /// Card body is fixed at [RmWordCard.cardHeight]; keep a few px of slack
+  /// for the soft drop shadow so nothing clips or yellow-stripes.
+  static const double rowHeight = RmWordCard.cardHeight + 6;
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 210,
+      height: rowHeight,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.only(right: 4, bottom: 8),
+        padding: const EdgeInsets.only(right: 4),
         itemCount: children.length,
         separatorBuilder: (_, __) => const SizedBox(width: 12),
         itemBuilder: (_, i) => children[i],
@@ -210,12 +214,18 @@ class RmWordCard extends StatelessWidget {
   final num? price;
   final VoidCallback? onTap;
 
+  /// Fixed card height — image flexes, footer is compact. Prevents the
+  /// yellow/black "BOTTOM OVERFLOWED BY 25 PIXELS" stripes on every rail.
+  static const double cardHeight = 222;
+  static const double cardWidth = 148;
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 148,
+        width: cardWidth,
+        height: cardHeight,
         decoration: BoxDecoration(
           color: Colors.black,
           border: Border.all(
@@ -230,14 +240,14 @@ class RmWordCard extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                AspectRatio(
-                  aspectRatio: 1,
+                Expanded(
                   child: StoreNetImage(url: imgUrl),
                 ),
                 Container(
-                  padding: const EdgeInsets.fromLTRB(11, 10, 11, 11),
+                  padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
                   color: const Color(0xD9040A18),
                   child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
@@ -245,31 +255,33 @@ class RmWordCard extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                          fontSize: 16,
+                          fontSize: 15,
                           fontWeight: FontWeight.w600,
                           color: Colors.white,
-                          height: 1.1,
+                          height: 1.05,
                         ),
                       ),
-                      const SizedBox(height: 3),
+                      const SizedBox(height: 2),
                       Text(
                         root.toUpperCase(),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                          fontSize: 9,
+                          fontSize: 8,
                           fontWeight: FontWeight.w300,
                           letterSpacing: 1,
+                          height: 1.1,
                           color: Color(0x8CC8E8F5),
                         ),
                       ),
                       if (price != null) ...[
-                        const SizedBox(height: 6),
+                        const SizedBox(height: 4),
                         Text(
                           inr(price!),
                           style: const TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
+                            height: 1.1,
                             color: NwsbColors.goldLight,
                           ),
                         ),

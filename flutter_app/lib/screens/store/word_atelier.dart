@@ -13,6 +13,7 @@ import '../../widgets/intro_gate.dart';
 import '../../widgets/page_shell.dart';
 import 'product_detail.dart';
 import 'store_cards.dart';
+import 'store_home_sections.dart';
 
 class WordAtelierScreen extends StatelessWidget {
   const WordAtelierScreen({super.key});
@@ -71,10 +72,32 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
     return word.toLowerCase().contains(q) || root.toLowerCase().contains(q);
   }
 
+  void _browseAll() => setState(() {
+        _chip = 'ALL';
+        _query = '';
+        _search.clear();
+      });
+
+  void _viewCart() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Your cart is waiting in Profile → Cart'),
+        behavior: SnackBarBehavior.floating,
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _openWord(String word, String root, String img, num price) {
+    openAtelierWord(context, word: word, root: root, img: img, price: price);
+  }
+
   @override
   Widget build(BuildContext context) {
     final cats = _cats;
     final sections = <Widget>[];
+    // Count product rails actually emitted (search may empty some).
+    var productRailIndex = 0;
     for (var i = 0; i < cats.length; i++) {
       final cat = cats[i];
       sections.add(RmCatBanner(
@@ -131,6 +154,27 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
         }
         return RmWordRow(children: cards);
       }));
+      productRailIndex++;
+
+      // After the 4th existing product row → healing category grid.
+      if (_chip == 'ALL' && productRailIndex == 4) {
+        sections.add(StoreHealCategoryGrid(
+          onSelect: (id) => setState(() => _chip = id),
+        ));
+      }
+
+      // After the 7th existing product row → Recommended + Featured Bundle.
+      if (_chip == 'ALL' && productRailIndex == 7) {
+        sections.add(StoreRecommendedSection(
+          onSeeAll: _browseAll,
+          onOpenWord: _openWord,
+        ));
+        sections.add(StoreFeaturedBundleSection(
+          onSeeAll: _browseAll,
+          onOpenWord: _openWord,
+        ));
+      }
+
       // Every fifth category row — same as part010 ROW_VIDS.
       if (_chip == 'ALL' && (i + 1) % 5 == 0) {
         final vidIdx = (i + 1) ~/ 5 - 1;
@@ -143,42 +187,10 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(14),
-          child: SizedBox(
-            height: 170,
-            width: double.infinity,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                NwsbVideo(
-                  asset: nwsbVideo(kRmHeroVidFile),
-                  priority: ClipPriority.feature,
-                ),
-                const DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [Color(0x22060C18), Color(0xE6060C18)],
-                    ),
-                  ),
-                ),
-                const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Align(
-                    alignment: Alignment.bottomLeft,
-                    child: Text(
-                      'The Word Atelier',
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.w300, color: Colors.white),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+        StorePixelsHero(
+          onBrowseAll: _browseAll,
+          onViewCart: _viewCart,
         ),
-        const SizedBox(height: 14),
         StoreSearchBar(
           controller: _search,
           onChanged: (v) => setState(() => _query = v),
