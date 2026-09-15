@@ -1,4 +1,4 @@
-/// Today's Practice — 3-card horizontal carousel (Player → Healing → Device).
+/// Today's Practice — 3-card horizontal carousel (Player → Practice Today → Device).
 ///
 /// Used inside [FashPractice] / [NmPractice]. No separate "START TODAY" section.
 library;
@@ -12,7 +12,7 @@ import '../widgets/nwsb_icon.dart';
 /// Horizontal 3-card practice carousel for the single Today's Practice block.
 ///
 /// Card 1: [playerCard] — TODAY'S PRACTICE / NowssB Player (swirl + Enter).
-/// Card 2: healing kickoff copy with icon | divider | text rows.
+/// Card 2: PRACTICE TODAY lifestyle art (edge-to-edge, rounded, no stroke).
 /// Card 3: NowssB player device graphic + white-circle SVG (top-right).
 class PracticeCarousel extends StatefulWidget {
   const PracticeCarousel({
@@ -37,6 +37,9 @@ class PracticeCarousel extends StatefulWidget {
 
   /// Legacy art (demoted — no longer a carousel page).
   static const practiceArt = 'assets/coach/aarogya-personal-coach.png';
+
+  /// Card 2 — PRACTICE TODAY lifestyle (woman + headphones + phone).
+  static const practiceTodayArt = 'assets/coach/practice-today.png';
 
   /// Player / headphone device graphic used on Card 3.
   static const playerDeviceArt = 'assets/store/nowssb-bag-headphones.webp';
@@ -81,7 +84,7 @@ class _PracticeCarouselState extends State<PracticeCarousel> {
       onPageChanged: (i) => setState(() => _index = i),
       children: [
         widget.playerCard,
-        _HealingKickoffCard(onTap: widget.onTap, fashion: widget.fashion),
+        _PracticeTodayArtCard(onTap: widget.onTap),
         _PlayerDeviceCard(onTap: widget.onTap),
       ],
     );
@@ -121,91 +124,31 @@ class _PracticeCarouselState extends State<PracticeCarousel> {
   }
 }
 
-/// Card 2 — healing kickoff: icon | thin divider | text (not gold dots).
-class _HealingKickoffCard extends StatelessWidget {
-  const _HealingKickoffCard({this.onTap, this.fashion = false});
+/// Card 2 — PRACTICE TODAY lifestyle art, edge-to-edge, rounded, no stroke.
+class _PracticeTodayArtCard extends StatelessWidget {
+  const _PracticeTodayArtCard({this.onTap});
   final VoidCallback? onTap;
-  final bool fashion;
-
-  /// Share mark — simple node-and-paths glyph (24 box).
-  static const _share =
-      '<circle cx="18" cy="5" r="2.6"/>'
-      '<circle cx="6" cy="12" r="2.6"/>'
-      '<circle cx="18" cy="19" r="2.6"/>'
-      '<path d="M8.4 10.8l7.2-4.2M8.4 13.2l7.2 4.2"/>';
-
-  static const _lines = <(String mark, double viewBox, String text)>[
-    (NwsbMarks.flame, 24, 'Start your streak today'),
-    (NwsbMarks.trending, 22, 'Get your score'),
-    (_share, 24, 'Share your score'),
-  ];
 
   @override
   Widget build(BuildContext context) {
-    final ink = fashion ? Colors.white : const Color(0xFF1A1A2E);
-    final soft = fashion ? const Color(0xE6FFFFFF) : const Color(0xFF4A4E5A);
-    final divider = fashion ? const Color(0x33FFFFFF) : const Color(0x331A1A2E);
-    final iconColor = fashion ? const Color(0xFFE8D5A3) : const Color(0xFF9C7B3A);
-    final bg = fashion ? const Color(0xFF0A0A0E) : const Color(0xFFF4F5F8);
-
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(18),
         clipBehavior: Clip.antiAlias,
-        child: Container(
-          color: bg,
-          padding: const EdgeInsets.fromLTRB(18, 20, 18, 18),
-          alignment: Alignment.centerLeft,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                "Let's start your healing today",
-                style: TextStyle(
-                  color: ink,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w800,
-                  height: 1.25,
-                ),
-              ),
-              const SizedBox(height: 16),
-              for (final line in _lines) ...[
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    NwsbIcon(
-                      line.$1,
-                      size: 18,
-                      viewBox: line.$2,
-                      color: iconColor,
-                      strokeWidth: 1.7,
-                    ),
-                    const SizedBox(width: 12),
-                    Container(
-                      width: 1,
-                      height: 22,
-                      color: divider,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        line.$3,
-                        style: TextStyle(
-                          color: soft,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          height: 1.35,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-              ],
-            ],
+        child: Image.asset(
+          PracticeCarousel.practiceTodayArt,
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: double.infinity,
+          alignment: Alignment.center,
+          filterQuality: FilterQuality.high,
+          errorBuilder: (_, __, ___) => const ColoredBox(
+            color: Color(0xFF0A0A0E),
+            child: Center(
+              child: Icon(Icons.headphones, color: Colors.white54, size: 42),
+            ),
           ),
         ),
       ),

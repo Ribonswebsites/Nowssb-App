@@ -284,103 +284,111 @@ class FashPractice extends StatelessWidget {
   Widget build(BuildContext context) {
     // Word of the day still drives the destination; it is no longer painted
     // as a giant title over the film (ANANDA / AAROGYA etc.).
-    // Black My Routine–style banner OUTSIDE the cards, then 3-card carousel
-    // (Player → Healing → Device). Spill kept as ritual cue under banner.
-    return SectionPane(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          RoutineStyleBlackBanner(
+    // Black My Routine–style banner ABOVE/OUTSIDE the glass SectionPane
+    // (sibling, not nested), then Spill + 3-card carousel inside the pane
+    // (Player → Practice Today art → Device).
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 18, 16, 0),
+          child: RoutineStyleBlackBanner(
             title: "Today's Practice",
             subtitle: 'Begin your healing path',
             onTap: onTap,
           ),
-          const SizedBox(height: 12),
-          Spill(
-            label: 'Your daily word ritual',
-            mark: NwsbMarks.play,
-            markViewBox: 22,
-            onTap: onTap,
-          ),
-          PracticeCarousel(
-            fashion: true,
-            onTap: onTap,
-            playerCard: ListenableBuilder(
-              listenable: Settings.instance,
-              builder: (context, _) {
-                final motion = Settings.instance.fashionPlus;
-                final media = motion
-                    ? const NwsbVideo(
-                        asset: practiceVid,
-                        priority: ClipPriority.feature,
-                        fit: BoxFit.cover,
-                      )
-                    : const NwsbImage(url: practiceStill);
-                // Card 1 — NowssB Player exactly as before (no redesign).
-                return GestureDetector(
-                  onTap: onTap,
-                  behavior: HitTestBehavior.opaque,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(18),
-                    clipBehavior: Clip.antiAlias,
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        Positioned.fill(child: media),
-                        // Light left-edge scrim only — keep the film readable.
-                        const DecoratedBox(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                              colors: [
-                                Color(0x99060C18),
-                                Color(0x33060C18),
-                                Color(0x14060C18),
-                              ],
-                              stops: [0, 0.45, 1],
+        ),
+        SectionPane(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Spill(
+                label: 'Your daily word ritual',
+                mark: NwsbMarks.play,
+                markViewBox: 22,
+                onTap: onTap,
+              ),
+              PracticeCarousel(
+                fashion: true,
+                onTap: onTap,
+                playerCard: ListenableBuilder(
+                  listenable: Settings.instance,
+                  builder: (context, _) {
+                    final motion = Settings.instance.fashionPlus;
+                    final media = motion
+                        ? const NwsbVideo(
+                            asset: practiceVid,
+                            priority: ClipPriority.feature,
+                            fit: BoxFit.cover,
+                          )
+                        : const NwsbImage(url: practiceStill);
+                    // Card 1 — NowssB Player exactly as before (no redesign).
+                    return GestureDetector(
+                      onTap: onTap,
+                      behavior: HitTestBehavior.opaque,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(18),
+                        clipBehavior: Clip.antiAlias,
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            Positioned.fill(child: media),
+                            // Light left-edge scrim only — keep the film readable.
+                            const DecoratedBox(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                  colors: [
+                                    Color(0x99060C18),
+                                    Color(0x33060C18),
+                                    Color(0x14060C18),
+                                  ],
+                                  stops: [0, 0.45, 1],
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                        const Positioned(
-                          left: 16,
-                          top: 14,
-                          child: Text(
-                            "TODAY'S PRACTICE",
-                            style: TextStyle(
-                              fontSize: 11,
-                              letterSpacing: 2,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFFE8D5A3),
+                            const Positioned(
+                              left: 16,
+                              top: 14,
+                              child: Text(
+                                "TODAY'S PRACTICE",
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  letterSpacing: 2,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFFE8D5A3),
+                                ),
+                              ),
                             ),
-                          ),
+                            Positioned(
+                              right: 14,
+                              top: 0,
+                              bottom: 0,
+                              child: Center(
+                                child: GlassEnterPill(onTap: onTap),
+                              ),
+                            ),
+                          ],
                         ),
-                        Positioned(
-                          right: 14,
-                          top: 0,
-                          bottom: 0,
-                          child: Center(
-                            child: GlassEnterPill(onTap: onTap),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                ritualLine,
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: Color(0xB3FFFFFF),
+                  height: 1.45,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 12),
-          Text(
-            ritualLine,
-            style: const TextStyle(
-              fontSize: 13,
-              color: Color(0xB3FFFFFF),
-              height: 1.45,
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

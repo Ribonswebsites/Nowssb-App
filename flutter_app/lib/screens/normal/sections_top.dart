@@ -564,8 +564,9 @@ class NmPractice extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Black My Routine–style banner outside cards, then 3-card carousel
-    // (Player → Healing → Device). Card 1 is existing Normal player NeuCard.
+    // Black My Routine–style banner outside cards (already sibling above
+    // Spill + carousel — no SectionPane wrapper on Normal). 3-card carousel
+    // (Player → Practice Today art → Device). Card 1 = Normal player NeuCard.
     final playerCard = NeuCard(
       onTap: onTap,
       padding: const EdgeInsets.all(22),
