@@ -178,6 +178,22 @@ class NwsbMarks {
   static const trending = '<path d="M3 17l4-5 4 2 5-7 3 3"/>'
       '<path d="M15 8h4v4"/>';
 
+  /// Where to Begin · My Progress — index.html:1187. Bar chart, 24 box.
+  static const bars = '<path d="M4 20h16"/>'
+      '<path d="M6.8 20V13M11.4 20V7.2M16 20v-4.6"/>';
+
+  /// Where to Begin · Practice play — index.html:1161. 24 box triangle.
+  static const play24 = '<path d="M8 5.2 19 12 8 18.8z"/>';
+
+  /// Where to Begin · Word Science — index.html:1171. Bag + rule.
+  static const wordBag = '$_bag<path d="M9 12h6"/>';
+
+  /// Where to Begin · Connect — index.html:1182. Compact two-people.
+  static const connectPair =
+      '<circle cx="9.4" cy="8.4" r="3.4"/>'
+      '<path d="M3.4 19.4a6 6 0 0 1 12 0"/>'
+      '<path d="M16.4 5.4a3.4 3.4 0 0 1 0 6M17.6 19.4a6 6 0 0 0-1.6-4.1"/>';
+
   // Quick Access — index.html:1414-1434. All three on a 22 box.
 
   static const cart = '<path d="M3 3h1.5l2.5 7h9l2-5H7"/>'

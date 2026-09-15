@@ -18,6 +18,7 @@ import 'package:flutter/material.dart';
 import '../../widgets/nwsb_icon.dart';
 
 import '../../data/content.dart';
+import '../../data/settings.dart';
 import '../../media/nwsb_image.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
@@ -562,92 +563,97 @@ class NmPractice extends StatelessWidget {
   const NmPractice({super.key, this.onTap});
   final VoidCallback? onTap;
 
+  /// Same media as [FashPractice] / website Fashion Plus practice card.
+  static const practiceVid =
+      'assets/videos/09a50041065bdeab_grok_video_2026-07-30-14-54-07_ddjmrr.mp4';
+
+  static const practiceStill =
+      'https://media.nowssb.com/migrated-images/4daad1a85b624fed_grok_image_1778052232385_qpdmgh.jpg';
+
+  /// Website Normal `.nmh-practice-icon` / Fashion home-card icon — headphone-brain.
+  static const practiceIcon =
+      'https://media.nowssb.com/migrated-images/5271624481c39922_file_000000006bc871f484d039fa1139dc11_d6rlu8.png';
+
   @override
   Widget build(BuildContext context) {
-    // Black My Routine–style banner outside cards (already sibling above
-    // Spill + carousel — no SectionPane wrapper on Normal). 3-card carousel
-    // (Player → Practice Today art → Device). Card 1 = Normal player NeuCard.
-    final playerCard = NeuCard(
-      onTap: onTap,
-      padding: const EdgeInsets.all(22),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            "Today's Practice",
-            style: TextStyle(
-              fontSize: 11,
-              letterSpacing: 2,
-              fontWeight: FontWeight.w700,
-              color: NwsbColors.gold,
-            ),
-          ),
-          const SizedBox(height: 14),
-          Container(
-            width: 62,
-            height: 62,
-            decoration: BoxDecoration(
-              color: NwsbColors.surface,
-              borderRadius: BorderRadius.circular(NwsbRadius.pill),
-              boxShadow: NwsbShadows.raisedXs,
-            ),
-            child: const Icon(Icons.graphic_eq,
-                size: 28, color: NwsbColors.gold),
-          ),
-          const SizedBox(height: 16),
-          // No large practice-name headline (ANANDA / AAROGYA). Ritual
-          // line is the supporting copy under the media / icon area.
-          const Text(
-            'Your personalized word ritual for right now.',
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 15,
-              color: NwsbColors.inkSoft,
-              height: 1.45,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 18),
-          Align(
-            alignment: Alignment.centerRight,
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(14, 8, 8, 8),
-              decoration: BoxDecoration(
-                color: const Color(0xF2FFFFFF),
-                borderRadius: BorderRadius.circular(999),
-                border: Border.all(color: const Color(0x33FFFFFF)),
-                boxShadow: NwsbShadows.raisedXs,
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text(
-                    'Enter',
+    // Black My Routine–style banner outside cards (sibling above Spill +
+    // carousel). Card 1 = website Player treatment (swirl media + branding
+    // icon + glass Enter) — same as FashPractice / WebView.
+    final playerCard = ListenableBuilder(
+      listenable: Settings.instance,
+      builder: (context, _) {
+        final motion = Settings.instance.fashionPlus;
+        final media = motion
+            ? const NwsbVideo(
+                asset: practiceVid,
+                priority: ClipPriority.feature,
+                fit: BoxFit.cover,
+              )
+            : const NwsbImage(url: practiceStill);
+        return GestureDetector(
+          onTap: onTap,
+          behavior: HitTestBehavior.opaque,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(18),
+            clipBehavior: Clip.antiAlias,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Positioned.fill(child: media),
+                const DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: [
+                        Color(0x99060C18),
+                        Color(0x33060C18),
+                        Color(0x14060C18),
+                      ],
+                      stops: [0, 0.45, 1],
+                    ),
+                  ),
+                ),
+                const Positioned(
+                  left: 16,
+                  top: 14,
+                  child: Text(
+                    "TODAY'S PRACTICE",
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 11,
+                      letterSpacing: 2,
                       fontWeight: FontWeight.w700,
-                      color: NwsbColors.gold,
+                      color: Color(0xFFE8D5A3),
                     ),
                   ),
-                  const SizedBox(width: 10),
-                  Container(
-                    width: 38,
-                    height: 38,
-                    decoration: const BoxDecoration(
-                      color: NwsbColors.surface,
-                      shape: BoxShape.circle,
-                      boxShadow: NwsbShadows.raisedXs,
+                ),
+                const Positioned(
+                  left: 16,
+                  top: 36,
+                  child: SizedBox(
+                    width: 46,
+                    height: 46,
+                    child: NwsbImage(
+                      url: practiceIcon,
+                      fit: BoxFit.contain,
+                      fallback: Icon(Icons.headphones,
+                          color: Color(0xFFE8D5A3), size: 28),
                     ),
-                    child: const NwsbIcon(NwsbMarks.arrow,
-                        size: 16, color: NwsbColors.ink),
                   ),
-                ],
-              ),
+                ),
+                Positioned(
+                  right: 14,
+                  top: 0,
+                  bottom: 0,
+                  child: Center(
+                    child: GlassEnterPill(onTap: onTap),
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
-      ),
+        );
+      },
     );
 
     return Padding(
@@ -668,7 +674,7 @@ class NmPractice extends StatelessWidget {
           ),
           PracticeCarousel(
             onTap: onTap,
-            height: 268,
+            // 16:9 media card like Fashion / WebView — no NeuCard overflow.
             playerCard: playerCard,
           ),
         ],

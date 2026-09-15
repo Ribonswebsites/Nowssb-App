@@ -480,59 +480,70 @@ class MainOptionsSection extends StatelessWidget {
   /// usable page rather than only a broad tab category.
   final void Function(String label, int tab)? onAction;
 
-  /// A row's height. Deliberately tight: the whole panel is a menu, and a
-  /// menu that pushes the page down is one that gets scrolled past.
-  static const double rowHeight = 62;
+  /// Matches website `.mo-row { height: 62px }` with a little room so icons
+  /// + labels never paint into the next row or the bottom nav.
+  static const double rowHeight = 68;
 
-  /// (mark, the box that mark was drawn in, label, tab).
+  /// (mark, viewBox, label, tab) — paths from index.html `.mainops-blk`.
   static const options = <(String, double, String, int)>[
-    (NwsbMarks.play, 22, 'Practice', 1),
+    (NwsbMarks.play24, 24, 'Practice', 1),
     (NwsbMarks.sound, 24, 'Sound Library', 2),
-    (NwsbMarks.word, 24, 'Word Science', 2),
+    (NwsbMarks.wordBag, 24, 'Word Science', 2),
     (NwsbMarks.bag, 24, 'The Store', 3),
-    (NwsbMarks.people, 24, 'Connect', 0),
+    (NwsbMarks.connectPair, 24, 'Connect', 0),
     // Tab sentinel -1: Progress is a pushed screen, never Profile (tab 4).
-    (NwsbMarks.trending, 22, 'My Progress', -1),
+    (NwsbMarks.bars, 24, 'My Progress', -1),
   ];
 
   @override
   Widget build(BuildContext context) {
     final fashion = HomeSkinScope.of(context) == HomeSkin.fashion;
+    final rule = fashion ? const Color(0x1FFFFFFF) : const Color(0x141A1A2E);
+    final fill =
+        fashion ? const Color(0x0FFFFFFF) : const Color(0x081A1A2E);
+    final stroke =
+        fashion ? const Color(0x1FFFFFFF) : const Color(0x141A1A2E);
+
     return SectionPane(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
         children: [
           const PaneHead(
             eyebrow: 'Everything, one tap away',
             title: 'Where to Begin',
             mark: NwsbMarks.sliders,
           ),
-          Container(
+          // Stable 2×3 grid (website `.mo-box` / `.mo-row` / `.mo-cell`).
+          // Clip + fixed row heights so marks/labels cannot overflow or
+          // bleed under the bottom nav.
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
             clipBehavior: Clip.antiAlias,
-            decoration: BoxDecoration(
-              color:
-                  fashion ? const Color(0x0FFFFFFF) : const Color(0x081A1A2E),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color:
-                    fashion ? const Color(0x1FFFFFFF) : const Color(0x141A1A2E),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: fill,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: stroke),
               ),
-            ),
-            child: Column(
-              children: [
-                _OptRow(
-                  options.sublist(0, 3),
-                  fashion: fashion,
-                  onGo: onGo,
-                  onAction: onAction,
-                ),
-                _OptRow(
-                  options.sublist(3, 6),
-                  fashion: fashion,
-                  onGo: onGo,
-                  onAction: onAction,
-                ),
-              ],
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _OptRow(
+                    options.sublist(0, 3),
+                    fashion: fashion,
+                    onGo: onGo,
+                    onAction: onAction,
+                  ),
+                  Container(height: 1, color: rule),
+                  _OptRow(
+                    options.sublist(3, 6),
+                    fashion: fashion,
+                    onGo: onGo,
+                    onAction: onAction,
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 14),
@@ -548,7 +559,7 @@ class MainOptionsSection extends StatelessWidget {
   }
 }
 
-/// Three cells with a hairline between each.
+/// Three cells with a vertical hairline between each — website `.mo-row`.
 class _OptRow extends StatelessWidget {
   const _OptRow(this.items, {required this.fashion, this.onGo, this.onAction});
 
@@ -563,9 +574,14 @@ class _OptRow extends StatelessWidget {
     return SizedBox(
       height: MainOptionsSection.rowHeight,
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           for (var i = 0; i < items.length; i++) ...[
-            if (i > 0) Container(width: 1, height: 34, color: rule),
+            if (i > 0)
+              Align(
+                alignment: Alignment.center,
+                child: Container(width: 1, height: 34, color: rule),
+              ),
             Expanded(
               child: _Opt(
                 items[i],
@@ -581,7 +597,7 @@ class _OptRow extends StatelessWidget {
   }
 }
 
-/// One door: the mark, and the word under it.
+/// One door: SVG mark above label — website `.mo-cell` / `.mo-ic` / `.mo-lbl`.
 class _Opt extends StatelessWidget {
   const _Opt(this.item, {required this.fashion, this.onGo, this.onAction});
 
@@ -593,6 +609,9 @@ class _Opt extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (mark, box, label, tab) = item;
+    final markColor = fashion ? NwsbColors.goldLight : WrapHead.markGold;
+    final labelColor = fashion ? const Color(0xE6FFFFFF) : NwsbColors.ink;
+
     return GestureDetector(
       onTap: () {
         if (onAction != null) {
@@ -602,33 +621,39 @@ class _Opt extends StatelessWidget {
         }
       },
       behavior: HitTestBehavior.opaque,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          NwsbIcon(
-            mark,
-            size: 21,
-            viewBox: box,
-            color: fashion ? NwsbColors.goldLight : WrapHead.markGold,
-          ),
-          const SizedBox(height: 6),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 3),
-            child: Text(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 3),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 21,
+              height: 21,
+              child: NwsbIcon(
+                mark,
+                size: 21,
+                viewBox: box,
+                strokeWidth: 1.6,
+                color: markColor,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
               label,
               maxLines: 1,
+              softWrap: false,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 10.5,
+                height: 1.1,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 0.1,
-                color: fashion ? const Color(0xE6FFFFFF) : NwsbColors.ink,
+                color: labelColor,
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
