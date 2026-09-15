@@ -232,7 +232,8 @@ class _HomeNormalState extends State<HomeNormal> {
               onSupport: () => _go(4),
               onCoach: () => _push(const PersonalCoachScreen()))
         ),
-        ('tiles', NmTiles(onTile: _go)),
+        // Four-tile grid removed from Normal home (was between Personal Coach and Store).
+        ('tiles', const SizedBox.shrink()),
         ('store', NmStore(onTap: () => _go(3))),
         ('reader', NmReader(onTap: () => _go(2))),
         ('trendwd', NmTrending(onTap: () => _go(2))),
