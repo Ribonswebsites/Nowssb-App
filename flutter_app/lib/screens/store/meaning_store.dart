@@ -101,14 +101,8 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
 
 
   String _artForMeaningCat(String cat) {
-    final key = cat.toLowerCase();
-    if (key.contains('cosmos')) return storeCollectionArt('cosmos');
-    if (key.contains('element')) return storeCollectionArt('elements');
-    if (key.contains('emotion') || key.contains('sacred')) return storeCollectionArt('sacred');
-    if (key.contains('human') || key.contains('warrior')) return storeCollectionArt('warriors');
-    if (key.contains('nature')) return storeCollectionArt('nature');
-    if (key.contains('peace')) return storeCollectionArt('peace');
-    return storeCollectionArt(null);
+    // Notification pills use the store bag product — never fashion posters.
+    return storePillProductArt(cat);
   }
 
   void _openViewAll(String title) {
@@ -387,7 +381,7 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
         if (mid != null) out.add(mid);
       }
     }
-    // Ensure all 7 mid-rail banners appear even when few categories.
+    // Ensure all 6 mid-rail banners appear even when few categories.
     final placed = rail ~/ 2;
     for (var i = placed; i < kStoreMidRailBanners.length; i++) {
       out.add(StoreMidRailBanner(data: kStoreMidRailBanners[i]));

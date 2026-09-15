@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../data/word_requests.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/nwsb_icon.dart';
+import 'store_cards.dart';
 import 'store_home_sections.dart';
 
 void openRequestWords(BuildContext context) {
@@ -109,7 +110,7 @@ class _RequestWordsScreenState extends State<RequestWordsScreen> {
             StoreNotifBanner(
               heading: 'BUY REQUEST',
               svgBody: NwsbMarks.word,
-              artAsset: 'assets/store/nowssb-bag-headphones.webp',
+              artAsset: kStoreProductArt,
               accent: const Color(0xFFE8D5A3),
               sub: 'Tell us the word you need — we fulfill from the atelier.',
             ),

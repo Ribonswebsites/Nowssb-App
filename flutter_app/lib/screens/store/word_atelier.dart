@@ -36,7 +36,8 @@ class WordAtelierScreen extends StatelessWidget {
           eyebrow: 'NowssB Store',
           title: 'The Word Atelier',
           film: nwsbVideo(kRmHeroVidFile),
-          // Fashion-home AppBackdrop film (not a separate store page film).
+          // Fashion-home AppBackdrop film + PageShell Fashion vignette scrim
+          // so the background video is clearly visible (not a solid lid).
           usePageFilm: false,
           onBack: () => Navigator.of(context).pop(),
           onStorePicker: () => showStoreSelectSheet(
@@ -226,7 +227,7 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
       }
     }
 
-    // Ensure exactly 7 mid-rail banners when ALL chip (pad if <14 rails).
+    // Ensure exactly 6 mid-rail banners when ALL chip (pad if <12 rails).
     if (_chip == 'ALL') {
       final placed = productRailIndex ~/ 2;
       for (var i = placed; i < kStoreMidRailBanners.length; i++) {

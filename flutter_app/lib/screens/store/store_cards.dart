@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
+import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_icon.dart';
 
 String inr(num value) {
@@ -18,43 +19,19 @@ String inr(num value) {
   return '₹$n';
 }
 
-/// Real store collection / bag art keyed by category id.
+/// Clean NowssB bag + headphones product shot — NEVER fashion heels /
+/// meditation collection posters. Used in every notification pill.
+const kStoreProductArt = 'assets/store/nowssb-bag-headphones.webp';
+
+/// Pill / banner product art for a collection/word. Always the store bag
+/// product (collection posters contain fashion BS the user rejected).
+String storePillProductArt(String? id) => kStoreProductArt;
+
+/// Legacy collection poster map — only for non-pill decorative rails that
+/// still need a keyed asset. Prefer [storePillProductArt] for pills.
 String storeCollectionArt(String? id) {
-  switch (id) {
-    case 'off50':
-    case 'sale':
-      return 'assets/store/collections/sale.webp';
-    case 'elements':
-      return 'assets/store/collections/elements.webp';
-    case 'sacred':
-      return 'assets/store/collections/sacred.webp';
-    case 'cosmos':
-      return 'assets/store/collections/cosmos.webp';
-    case 'nature':
-      return 'assets/store/collections/nature.webp';
-    case 'warriors':
-      return 'assets/store/collections/warriors.webp';
-    case 'elite':
-      return 'assets/store/collections/elite.webp';
-    case 'mythical':
-      return 'assets/store/collections/mythical.webp';
-    case 'family':
-      return 'assets/store/collections/family.webp';
-    case 'identity':
-      return 'assets/store/collections/identity.webp';
-    case 'premium':
-      return 'assets/store/collections/premium.webp';
-    case 'ancient':
-      return 'assets/store/collections/ancient.webp';
-    case 'peace':
-      return 'assets/store/collections/peace.webp';
-    case 'black':
-      return 'assets/store/collections/black.webp';
-    case 'white':
-      return 'assets/store/collections/white.webp';
-    default:
-      return 'assets/store/nowssb-bag-headphones.webp';
-  }
+  // Pills and banners must never show fashion heels / meditation stock.
+  return storePillProductArt(id);
 }
 
 Color storeCardTint(String seed) {
@@ -95,8 +72,9 @@ class StoreNetImage extends StatelessWidget {
   }
 }
 
-/// Notification-style category banner — glass wrapper, heading above, taller
-/// black pill with SVG circle → separator → real collection/bag art.
+/// Notification-style category banner — Fashion [GlassWrap] tokens, heading
+/// above taller black pill: SVG circle → separator → bag-headphones product
+/// art with ripple (no fashion heels / meditation stock).
 class RmCatBanner extends StatelessWidget {
   const RmCatBanner({
     super.key,
@@ -122,7 +100,7 @@ class RmCatBanner extends StatelessWidget {
   /// Optional remote logo (Meaning Store MS_CAT_LOGO).
   final String? logoUrl;
 
-  /// Real collection / bag image shown inside the black pill.
+  /// Real store product image shown inside the black pill.
   final String? artAsset;
 
   /// Used to resolve [artAsset] when not provided.
@@ -134,141 +112,242 @@ class RmCatBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final titleColor = labelColor ?? NwsbColors.goldLight;
-    final art = artAsset ?? storeCollectionArt(categoryId);
+    final art = artAsset ?? storePillProductArt(categoryId);
     final mark = svgBody ?? NwsbMarks.bag;
+    final r = BorderRadius.circular(kGlassRadius);
     return Padding(
       padding: const EdgeInsets.only(top: 18, bottom: 10),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(22),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(22),
-              color: const Color(0x99101526),
-              border: Border.all(color: const Color(0x33FFFFFF)),
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Color(0xAA182038), Color(0x77101526)],
-              ),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: r,
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x57000000),
+              offset: Offset(0, 16),
+              blurRadius: 40,
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Flexible(
-                      child: Text(
-                        title,
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.6,
-                          color: titleColor,
-                        ),
-                      ),
-                    ),
-                    if (badge != null) ...[
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(4),
-                          border: Border.all(color: titleColor.withValues(alpha: 0.45)),
-                        ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: r,
+          child: BackdropFilter(
+            filter: ImageFilter.blur(
+              sigmaX: GlassWrap.blurSigma,
+              sigmaY: GlassWrap.blurSigma,
+            ),
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+              decoration: BoxDecoration(
+                borderRadius: r,
+                color: GlassWrap.fill,
+                border: Border.all(color: GlassWrap.line),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Flexible(
                         child: Text(
-                          badge!,
+                          title,
                           style: TextStyle(
-                            fontSize: 9,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 1.2,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.6,
                             color: titleColor,
                           ),
                         ),
                       ),
-                    ],
-                  ],
-                ),
-                if (sub.isNotEmpty) ...[
-                  const SizedBox(height: 3),
-                  Text(
-                    sub,
-                    style: const TextStyle(fontSize: 11, color: Color(0x88FFFFFF)),
-                  ),
-                ],
-                const SizedBox(height: 10),
-                Container(
-                  height: 68,
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(34),
-                    border: Border.all(color: const Color(0x22FFFFFF)),
-                  ),
-                  clipBehavior: Clip.antiAlias,
-                  child: Row(
-                    children: [
-                      const SizedBox(width: 10),
-                      Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: const Color(0x18E8D5A3),
-                          border: Border.all(color: titleColor.withValues(alpha: 0.45)),
-                        ),
-                        alignment: Alignment.center,
-                        child: NwsbIcon(mark, size: 20, color: titleColor),
-                      ),
-                      Container(
-                        width: 1,
-                        height: 36,
-                        margin: const EdgeInsets.symmetric(horizontal: 12),
-                        color: const Color(0x33FFFFFF),
-                      ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 10),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(18),
-                            child: SizedBox(
-                              height: 48,
-                              child: Image.asset(
-                                art,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) {
-                                  if (logoUrl != null) {
-                                    return Image.network(
-                                      logoUrl!,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (_, __, ___) =>
-                                          Image.asset(logoAsset, fit: BoxFit.cover),
-                                    );
-                                  }
-                                  return Image.asset(
-                                    logoAsset,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (_, __, ___) => const ColoredBox(
-                                      color: Color(0xFF0A0F1C),
-                                    ),
-                                  );
-                                },
-                              ),
+                      if (badge != null) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(color: titleColor.withValues(alpha: 0.45)),
+                          ),
+                          child: Text(
+                            badge!,
+                            style: TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 1.2,
+                              color: titleColor,
                             ),
                           ),
                         ),
-                      ),
+                      ],
                     ],
                   ),
-                ),
-              ],
+                  if (sub.isNotEmpty) ...[
+                    const SizedBox(height: 3),
+                    Text(
+                      sub,
+                      style: const TextStyle(fontSize: 11, color: Color(0x88FFFFFF)),
+                    ),
+                  ],
+                  const SizedBox(height: 10),
+                  Container(
+                    height: 72,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(36),
+                      border: Border.all(color: const Color(0x22FFFFFF)),
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: Row(
+                      children: [
+                        const SizedBox(width: 10),
+                        Container(
+                          width: 46,
+                          height: 46,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: const Color(0x18E8D5A3),
+                            border: Border.all(color: titleColor.withValues(alpha: 0.45)),
+                          ),
+                          alignment: Alignment.center,
+                          child: NwsbIcon(mark, size: 20, color: titleColor),
+                        ),
+                        Container(
+                          width: 1,
+                          height: 38,
+                          margin: const EdgeInsets.symmetric(horizontal: 12),
+                          color: const Color(0x33FFFFFF),
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 10),
+                            child: StorePillRippleArt(
+                              asset: art,
+                              height: 52,
+                              radius: 18,
+                              fallbackLogoUrl: logoUrl,
+                              fallbackLogoAsset: logoAsset,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
       ),
     );
   }
+}
+
+/// Soft expanding ripple over the store product image inside black pills.
+class StorePillRippleArt extends StatefulWidget {
+  const StorePillRippleArt({
+    super.key,
+    required this.asset,
+    this.height = 48,
+    this.radius = 16,
+    this.fallbackLogoUrl,
+    this.fallbackLogoAsset,
+    this.accent = const Color(0x66E8D5A3),
+  });
+
+  final String asset;
+  final double height;
+  final double radius;
+  final String? fallbackLogoUrl;
+  final String? fallbackLogoAsset;
+  final Color accent;
+
+  @override
+  State<StorePillRippleArt> createState() => _StorePillRippleArtState();
+}
+
+class _StorePillRippleArtState extends State<StorePillRippleArt>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 2200),
+  )..repeat();
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(widget.radius),
+      child: SizedBox(
+        height: widget.height,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.asset(
+              widget.asset,
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) {
+                if (widget.fallbackLogoUrl != null) {
+                  return Image.network(
+                    widget.fallbackLogoUrl!,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Image.asset(
+                      widget.fallbackLogoAsset ?? kStoreProductArt,
+                      fit: BoxFit.cover,
+                    ),
+                  );
+                }
+                return Image.asset(
+                  widget.fallbackLogoAsset ?? kStoreProductArt,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) =>
+                      const ColoredBox(color: Color(0xFF0A0F1C)),
+                );
+              },
+            ),
+            AnimatedBuilder(
+              animation: _c,
+              builder: (context, _) {
+                return CustomPaint(
+                  painter: _PillRipplePainter(
+                    progress: _c.value,
+                    color: widget.accent,
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PillRipplePainter extends CustomPainter {
+  _PillRipplePainter({required this.progress, required this.color});
+  final double progress;
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width * 0.72, size.height * 0.5);
+    final maxR = size.width * 0.55;
+    for (var i = 0; i < 3; i++) {
+      final t = (progress + i / 3) % 1.0;
+      final r = maxR * t;
+      final paint = Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.6
+        ..color = color.withValues(alpha: (1 - t) * 0.55);
+      canvas.drawCircle(center, r, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _PillRipplePainter old) =>
+      old.progress != progress || old.color != color;
 }
 
 /// Full-width looping row break video (part010 ROW_VIDS).
@@ -341,8 +420,8 @@ class RmWordCard extends StatelessWidget {
   final Color? tint;
 
   /// Thicker horizontal card: image left, text + actions right.
-  static const double cardHeight = 132;
-  static const double cardWidth = 292;
+  static const double cardHeight = 152;
+  static const double cardWidth = 310;
 
   void _toast(BuildContext context, String msg) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -378,8 +457,8 @@ class RmWordCard extends StatelessWidget {
           child: Row(
             children: [
               SizedBox(
-                width: 108,
-                height: 112,
+                width: 118,
+                height: 130,
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
@@ -406,7 +485,7 @@ class RmWordCard extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontSize: 18,
+                        fontSize: 20,
                         fontWeight: FontWeight.w800,
                         color: Colors.white,
                         height: 1.1,
@@ -418,8 +497,8 @@ class RmWordCard extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w500,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
                         letterSpacing: 0.8,
                         height: 1.1,
                         color: Color(0x8CC8E8F5),
@@ -431,7 +510,7 @@ class RmWordCard extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: FontWeight.w800,
                         height: 1.1,
                         color: NwsbColors.goldLight,

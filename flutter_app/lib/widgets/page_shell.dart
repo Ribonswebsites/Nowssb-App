@@ -81,27 +81,66 @@ class _PageShellState extends State<PageShell> {
                   )
                 : const AppBackdrop(),
           ),
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: widget.usePageFilm
-                      ? const [
-                          Color(0x99060C18),
-                          Color(0xCC060C18),
-                          Color(0xE6060C18),
-                        ]
-                      : const [
-                          Color(0xCC060C18),
-                          Color(0xF0060C18),
-                          Color(0xFA060C18),
-                        ],
+          // Fashion-home #fpBgVeil language so AppBackdrop / page film reads
+          // clearly — never the old solid lid that hid the video.
+          if (widget.usePageFilm)
+            const Positioned.fill(
+              child: IgnorePointer(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color(0x66060C18),
+                        Color(0x88060C18),
+                        Color(0xAA060C18),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            )
+          else ...[
+            const Positioned.fill(
+              child: IgnorePointer(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: RadialGradient(
+                      center: Alignment(0, -0.1),
+                      radius: 0.88,
+                      colors: [
+                        Color(0x00000000),
+                        Color(0x24000000),
+                        Color(0x57000000),
+                        Color(0x94000000),
+                      ],
+                      stops: [0.30, 0.58, 0.80, 1.0],
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
+            const Positioned.fill(
+              child: IgnorePointer(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color(0x42000000),
+                        Color(0x00000000),
+                        Color(0x00000000),
+                        Color(0x57000000),
+                      ],
+                      stops: [0, 0.20, 0.76, 1.0],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
           SafeArea(
             child: Center(
               child: ConstrainedBox(

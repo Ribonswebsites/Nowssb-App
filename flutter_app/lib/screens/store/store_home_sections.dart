@@ -12,6 +12,7 @@ import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/nwsb_icon.dart';
+import '../../widgets/glass_wrap.dart';
 import 'store_cards.dart';
 
 // ─── #2 Store hero video (Ribons Original copy block removed) ────────────────
@@ -103,7 +104,7 @@ class StoreRecommendedSection extends StatelessWidget {
       root: 'Old French',
       img: kRmWordImg,
       price: 0,
-      art: 'assets/store/collections/warriors.webp',
+      art: kStoreProductArt,
     ),
     _RecCardData(
       badge: 'Sale',
@@ -114,7 +115,7 @@ class StoreRecommendedSection extends StatelessWidget {
       root: 'Latin',
       img: kRmWordImg,
       price: 24.5,
-      art: 'assets/store/collections/sacred.webp',
+      art: kStoreProductArt,
     ),
     _RecCardData(
       badge: 'New',
@@ -125,7 +126,7 @@ class StoreRecommendedSection extends StatelessWidget {
       root: 'Greek',
       img: kRmWordImg,
       price: 49,
-      art: 'assets/store/collections/cosmos.webp',
+      art: kStoreProductArt,
     ),
   ];
 
@@ -281,9 +282,9 @@ class StoreFeaturedBundleSection extends StatelessWidget {
   final void Function(String word, String root, String img, num price) onOpenWord;
 
   static const _rows = <_BundleRow>[
-    _BundleRow('Earth', 'Elements · Proto-Germanic', 'earth', 'Proto-Germanic', 'assets/store/collections/elements.webp'),
-    _BundleRow('Dragon', 'Mythical · Greek', 'dragon', 'Greek', 'assets/store/collections/mythical.webp'),
-    _BundleRow('Peace', 'Peace Edition', 'peace', 'Latin', 'assets/store/collections/peace.webp'),
+    _BundleRow('Earth', 'Elements · Proto-Germanic', 'earth', 'Proto-Germanic', kStoreProductArt),
+    _BundleRow('Dragon', 'Mythical · Greek', 'dragon', 'Greek', kStoreProductArt),
+    _BundleRow('Peace', 'Peace Edition', 'peace', 'Latin', kStoreProductArt),
   ];
 
   @override
@@ -307,7 +308,7 @@ class StoreFeaturedBundleSection extends StatelessWidget {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12),
                         child: Image.asset(
-                          'assets/store/collections/warriors.webp',
+                          kStoreProductArt,
                           width: 78,
                           height: 78,
                           fit: BoxFit.cover,
@@ -491,7 +492,7 @@ class StoreGlassPanel extends StatelessWidget {
     super.key,
     required this.child,
     this.padding = const EdgeInsets.all(14),
-    this.radius = 22,
+    this.radius = kGlassRadius,
     this.width,
   });
 
@@ -500,26 +501,38 @@ class StoreGlassPanel extends StatelessWidget {
   final double radius;
   final double? width;
 
+  /// Exact Fashion-home [GlassWrap] blur / fill / border / shadow tokens.
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(radius),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-        child: Container(
-          width: width,
-          padding: padding,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(radius),
-            color: const Color(0x99101526),
-            border: Border.all(color: const Color(0x33FFFFFF)),
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xAA182038), Color(0x77101526)],
-            ),
+    final r = BorderRadius.circular(radius);
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: r,
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x57000000),
+            offset: Offset(0, 16),
+            blurRadius: 40,
           ),
-          child: child,
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: r,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(
+            sigmaX: GlassWrap.blurSigma,
+            sigmaY: GlassWrap.blurSigma,
+          ),
+          child: Container(
+            width: width,
+            padding: padding,
+            decoration: BoxDecoration(
+              borderRadius: r,
+              color: GlassWrap.fill,
+              border: Border.all(color: GlassWrap.line),
+            ),
+            child: child,
+          ),
         ),
       ),
     );
@@ -535,9 +548,9 @@ class StoreLimitedTimeFreeSection extends StatelessWidget {
   final VoidCallback? onRequestWords;
 
   static const _tracks = <(String, String, String, num)>[
-    ('Warrior', 'Old French', 'assets/store/collections/warriors.webp', 0),
-    ('Spirit', 'Latin', 'assets/store/collections/sacred.webp', 0),
-    ('Peace', 'Old French', 'assets/store/collections/peace.webp', 0),
+    ('Warrior', 'Old French', kStoreProductArt, 0),
+    ('Spirit', 'Latin', kStoreProductArt, 0),
+    ('Peace', 'Old French', kStoreProductArt, 0),
   ];
 
   @override
@@ -550,7 +563,7 @@ class StoreLimitedTimeFreeSection extends StatelessWidget {
           StoreNotifBanner(
             heading: 'LIMITED TIME OFFER',
             svgBody: NwsbMarks.flame,
-            artAsset: 'assets/store/nowssb-bag-headphones.webp',
+            artAsset: kStoreProductArt,
             accent: const Color(0xFFFF8A3D),
             sub: 'Free atelier picks — request a word if yours is missing.',
             trailing: onRequestWords == null
@@ -610,11 +623,11 @@ class StoreBrowseByGoalSection extends StatelessWidget {
   final ValueChanged<String>? onSelect;
 
   static const _goals = <(String, String, Color)>[
-    ('Focus', 'assets/store/collections/warriors.webp', Color(0xFF5CE1FF)),
-    ('Calm', 'assets/store/collections/peace.webp', Color(0xFF4DB6AC)),
-    ('Sacred', 'assets/store/collections/sacred.webp', Color(0xFFFFB74D)),
-    ('Nature', 'assets/store/collections/nature.webp', Color(0xFF81C784)),
-    ('Cosmos', 'assets/store/collections/cosmos.webp', Color(0xFFB388FF)),
+    ('Focus', kStoreProductArt, Color(0xFF5CE1FF)),
+    ('Calm', kStoreProductArt, Color(0xFF4DB6AC)),
+    ('Sacred', kStoreProductArt, Color(0xFFFFB74D)),
+    ('Nature', kStoreProductArt, Color(0xFF81C784)),
+    ('Cosmos', kStoreProductArt, Color(0xFFB388FF)),
   ];
 
   @override
@@ -726,9 +739,9 @@ class StoreFeaturedPlaylistSection extends StatelessWidget {
   final void Function(String word, String root, String img, num price) onOpenWord;
 
   static const _rows = <_BundleRow>[
-    _BundleRow('Deep Healing', 'Emotional & Physical', 'peace', 'Latin', 'assets/store/collections/peace.webp'),
-    _BundleRow('Healing Frequency', 'Healing Meditation', 'spirit', 'Latin', 'assets/store/collections/sacred.webp'),
-    _BundleRow('Remove Negative', 'Healing Reiki Music', 'earth', 'Proto-Germanic', 'assets/store/collections/elements.webp'),
+    _BundleRow('Deep Healing', 'Emotional & Physical', 'peace', 'Latin', kStoreProductArt),
+    _BundleRow('Healing Frequency', 'Healing Meditation', 'spirit', 'Latin', kStoreProductArt),
+    _BundleRow('Remove Negative', 'Healing Reiki Music', 'earth', 'Proto-Germanic', kStoreProductArt),
   ];
 
   @override
@@ -751,7 +764,7 @@ class StoreFeaturedPlaylistSection extends StatelessWidget {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12),
                         child: Image.asset(
-                          'assets/store/collections/peace.webp',
+                          kStoreProductArt,
                           width: 78,
                           height: 78,
                           fit: BoxFit.cover,
@@ -819,7 +832,7 @@ class StoreGlassPlaylistCarousel extends StatelessWidget {
       title: 'Warriors Edition',
       desc: 'Strength & courage words for daily practice.',
       count: '12 WORDS',
-      art: 'assets/store/collections/warriors.webp',
+      art: kStoreProductArt,
       rows: [
         ('Warrior', 'Old French'),
         ('Dragon', 'Greek'),
@@ -830,7 +843,7 @@ class StoreGlassPlaylistCarousel extends StatelessWidget {
       title: 'Sacred Frequency',
       desc: 'Divine codes and soft healing tones.',
       count: '8 SESSIONS',
-      art: 'assets/store/collections/sacred.webp',
+      art: kStoreProductArt,
       rows: [
         ('Spirit', 'Latin'),
         ('Peace', 'Latin'),
@@ -841,7 +854,7 @@ class StoreGlassPlaylistCarousel extends StatelessWidget {
       title: 'Nature Resonance',
       desc: 'Living elements for calm and clarity.',
       count: '10 WORDS',
-      art: 'assets/store/collections/nature.webp',
+      art: kStoreProductArt,
       rows: [
         ('Water', 'Proto-Germanic'),
         ('Fire', 'Proto-Germanic'),
@@ -998,7 +1011,7 @@ class _GlassPlaylistCardData {
 }
 
 
-// ─── Mid-rail notification glass banners (7 variants, between every 2 rows) ──
+// ─── Mid-rail notification glass banners (6 variants, between every 2 rows) ──
 
 class StoreMidRailBannerData {
   const StoreMidRailBannerData({
@@ -1016,55 +1029,50 @@ class StoreMidRailBannerData {
   final String sub;
 }
 
+/// Six black notification banners between product rows. Art is always the
+/// NowssB bag-headphones product — never fashion heels / meditation stock.
 const kStoreMidRailBanners = <StoreMidRailBannerData>[
   StoreMidRailBannerData(
     heading: 'COLLECTIONS',
-    artAsset: 'assets/store/collections/warriors.webp',
+    artAsset: kStoreProductArt,
     accent: Color(0xFF5CE1FF),
     svgBody: NwsbMarks.bag,
     sub: 'Sacred · Warrior · Elements',
   ),
   StoreMidRailBannerData(
     heading: 'CURATED RAILS',
-    artAsset: 'assets/store/collections/cosmos.webp',
+    artAsset: kStoreProductArt,
     accent: Color(0xFF26A69A),
     svgBody: NwsbMarks.flame,
     sub: 'Time & Cosmos picks',
   ),
   StoreMidRailBannerData(
     heading: 'FEATURED DROP',
-    artAsset: 'assets/store/collections/sale.webp',
+    artAsset: kStoreProductArt,
     accent: Color(0xFFFFB74D),
     svgBody: NwsbMarks.word,
     sub: 'Limited atelier editions',
   ),
   StoreMidRailBannerData(
     heading: 'WORD ATELIER',
-    artAsset: 'assets/store/nowssb-bag-headphones.webp',
+    artAsset: kStoreProductArt,
     accent: Color(0xFFB388FF),
     svgBody: NwsbMarks.sound,
     sub: 'Real bag · real sound',
   ),
   StoreMidRailBannerData(
     heading: 'ELEMENTS',
-    artAsset: 'assets/store/collections/elements.webp',
+    artAsset: kStoreProductArt,
     accent: Color(0xFFFF6BCB),
     svgBody: NwsbMarks.sound,
     sub: 'Earth · Water · Fire · Air',
   ),
   StoreMidRailBannerData(
     heading: 'ELITE WORDS',
-    artAsset: 'assets/store/collections/elite.webp',
+    artAsset: kStoreProductArt,
     accent: Color(0xFF7CFF6B),
     svgBody: NwsbMarks.crown,
     sub: 'Rarest catalogue entries',
-  ),
-  StoreMidRailBannerData(
-    heading: 'SALE RAIL',
-    artAsset: 'assets/store/collections/sale.webp',
-    accent: Color(0xFFE8D5A3),
-    svgBody: NwsbMarks.flame,
-    sub: 'Half-price vibrational words',
   ),
 ];
 
@@ -1094,7 +1102,7 @@ class StoreMidRailBanner extends StatelessWidget {
   }
 }
 
-/// Inserts banner [index] (0..6) — safe no-op if out of range.
+/// Inserts banner [index] (0..5) — safe no-op if out of range.
 Widget? storeMidRailBannerAt(int index) {
   if (index < 0 || index >= kStoreMidRailBanners.length) return null;
   return StoreMidRailBanner(data: kStoreMidRailBanners[index]);
@@ -1153,10 +1161,10 @@ class StoreNotifBanner extends StatelessWidget {
           ],
           const SizedBox(height: 10),
           Container(
-            height: 64,
+            height: 72,
             decoration: BoxDecoration(
               color: Colors.black,
-              borderRadius: BorderRadius.circular(32),
+              borderRadius: BorderRadius.circular(36),
               border: Border.all(color: accent.withValues(alpha: 0.35)),
               boxShadow: [
                 BoxShadow(
@@ -1190,18 +1198,11 @@ class StoreNotifBanner extends StatelessWidget {
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.only(right: 10),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: SizedBox(
-                        height: 44,
-                        child: Image.asset(
-                          artAsset,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => ColoredBox(
-                            color: accent.withValues(alpha: 0.2),
-                          ),
-                        ),
-                      ),
+                    child: StorePillRippleArt(
+                      asset: artAsset.isEmpty ? kStoreProductArt : artAsset,
+                      height: 48,
+                      radius: 16,
+                      accent: accent.withValues(alpha: 0.55),
                     ),
                   ),
                 ),
@@ -1270,12 +1271,12 @@ Future<void> showStoreViewAllPanel(
 
 List<StoreViewAllItem> storeDefaultViewAllItems() {
   const cats = <(String, String, String)>[
-    ('Sacred Divine', 'Consciousness', 'assets/store/collections/sacred.webp'),
-    ('Warrior', 'Strength', 'assets/store/collections/warriors.webp'),
-    ('Elements', 'Nature', 'assets/store/collections/elements.webp'),
-    ('Time & Cosmos', 'Infinity', 'assets/store/collections/cosmos.webp'),
-    ('Peace', 'Stillness', 'assets/store/collections/peace.webp'),
-    ('Mythical', 'Ancient forces', 'assets/store/collections/mythical.webp'),
+    ('Sacred Divine', 'Consciousness', kStoreProductArt),
+    ('Warrior', 'Strength', kStoreProductArt),
+    ('Elements', 'Nature', kStoreProductArt),
+    ('Time & Cosmos', 'Infinity', kStoreProductArt),
+    ('Peace', 'Stillness', kStoreProductArt),
+    ('Mythical', 'Ancient forces', kStoreProductArt),
   ];
   return [
     for (final c in cats)
@@ -1330,7 +1331,7 @@ class _StoreViewAllOverlayState extends State<_StoreViewAllOverlay> {
       return const StoreViewAllItem(
         title: 'Word',
         sub: 'Atelier',
-        art: 'assets/store/nowssb-bag-headphones.webp',
+        art: kStoreProductArt,
         word: 'word',
         root: 'NowssB',
         img: kRmWordImg,
