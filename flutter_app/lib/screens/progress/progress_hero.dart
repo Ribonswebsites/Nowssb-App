@@ -237,9 +237,9 @@ class ProgressOrbHero extends StatelessWidget {
   /// Vertical anchor of the text block center inside [height] (0–1).
   static const double textCenterFrac = 0.40;
 
-  /// Orb visual center sits slightly below + right of geometric center —
-  /// nudge the text stack into that natural dark void.
-  static const Offset textVoidNudge = Offset(12, 14);
+  /// Orb smoke void sits slightly below + right of geometric center —
+  /// nudge the text stack into that natural dark hole (dx right, dy down).
+  static const Offset textVoidNudge = Offset(20, 24);
 
   /// Legacy aliases used by scroll math / callers.
   static const double orbTopFrac = textCenterFrac;
