@@ -11,6 +11,8 @@ import '../../widgets/intro_gate.dart';
 import '../../widgets/page_shell.dart';
 import 'product_detail.dart';
 import 'store_cards.dart';
+import 'store_select_sheet.dart';
+import 'store_routes.dart';
 
 class SignatureStoreScreen extends StatelessWidget {
   const SignatureStoreScreen({super.key});
@@ -30,7 +32,12 @@ class SignatureStoreScreen extends StatelessWidget {
           eyebrow: 'NowssB Store',
           title: 'Words & Meanings',
           film: 'assets/video/signature-store.mp4',
+          usePageFilm: false,
           onBack: () => Navigator.of(context).pop(),
+          onStorePicker: () => showStoreSelectSheet(
+            context,
+            onSelect: (id) => openStoreFromPicker(context, id, current: 'signature'),
+          ),
           slivers: [
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 40),

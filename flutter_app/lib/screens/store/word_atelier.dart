@@ -14,6 +14,8 @@ import '../../widgets/page_shell.dart';
 import 'product_detail.dart';
 import 'store_cards.dart';
 import 'store_home_sections.dart';
+import 'store_select_sheet.dart';
+import 'store_routes.dart';
 
 class WordAtelierScreen extends StatelessWidget {
   const WordAtelierScreen({super.key});
@@ -33,8 +35,13 @@ class WordAtelierScreen extends StatelessWidget {
           eyebrow: 'NowssB Store',
           title: 'The Word Atelier',
           film: nwsbVideo(kRmHeroVidFile),
-          usePageFilm: true,
+          // Fashion-home AppBackdrop film (not a separate store page film).
+          usePageFilm: false,
           onBack: () => Navigator.of(context).pop(),
+          onStorePicker: () => showStoreSelectSheet(
+            context,
+            onSelect: (id) => openStoreFromPicker(context, id, current: 'word'),
+          ),
           slivers: [
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 40),

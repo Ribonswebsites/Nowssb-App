@@ -14,6 +14,8 @@ import '../../widgets/page_shell.dart';
 import 'product_detail.dart';
 import 'store_cards.dart';
 import 'store_home_sections.dart';
+import 'store_select_sheet.dart';
+import 'store_routes.dart';
 
 class MeaningStoreScreen extends StatelessWidget {
   const MeaningStoreScreen({super.key});
@@ -33,8 +35,12 @@ class MeaningStoreScreen extends StatelessWidget {
           eyebrow: 'NowssB Store',
           title: 'The Meaning Store',
           film: nwsbVideo(kStoreMeaningDoorVidFile),
-          usePageFilm: true,
+          usePageFilm: false,
           onBack: () => Navigator.of(context).pop(),
+          onStorePicker: () => showStoreSelectSheet(
+            context,
+            onSelect: (id) => openStoreFromPicker(context, id, current: 'meaning'),
+          ),
           slivers: [
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),

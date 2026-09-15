@@ -1,13 +1,11 @@
-/// Store browsing extras — Pixelskits-style hero (with restored video banner),
-/// frequency-style heal grid + Limited Time Free + Browse by Goal,
-/// Recommended / Featured Playlist glass, and tall glass playlist carousel.
+/// Store browsing extras — hero video banner (Ribons Original copy removed),
+/// Limited Time Free + Browse by Goal, Recommended / Featured Playlist glass,
+/// tall glass playlist carousel, and mid-rail collection strips.
 /// Shared by Word Atelier, Meaning Store, and Ebooks.
 library;
 
-import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../data/store_catalog.dart';
 import '../../media/nwsb_video.dart';
@@ -15,7 +13,7 @@ import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
 import 'store_cards.dart';
 
-// ─── #2 Pixelskits-style Store hero ──────────────────────────────────────────
+// ─── #2 Store hero video (Ribons Original copy block removed) ────────────────
 
 class StorePixelsHero extends StatelessWidget {
   const StorePixelsHero({
@@ -26,536 +24,60 @@ class StorePixelsHero extends StatelessWidget {
     this.videoTitle = 'The Word Atelier',
   });
 
+  /// Kept for call-site compatibility; branding CTAs were removed.
   final VoidCallback? onBrowseAll;
   final VoidCallback? onViewCart;
-  /// When set, restores the pre-bcfffd1 looping store hero video above the
-  /// elevated Pixelskits copy — never wipe the film for typography alone.
   final String? videoAsset;
   final String videoTitle;
 
-  static const _cyan = Color(0xFF5CE1FF);
-  static const _violet = Color(0xFFB388FF);
-  static const _pink = Color(0xFFFF6BCB);
-
   @override
   Widget build(BuildContext context) {
+    if (videoAsset == null || videoAsset!.isEmpty) {
+      return const SizedBox.shrink();
+    }
     return Padding(
       padding: const EdgeInsets.only(bottom: 18),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          if (videoAsset != null) ...[
-            ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: SizedBox(
-                height: 170,
-                width: double.infinity,
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    NwsbVideo(
-                      asset: videoAsset!,
-                      priority: ClipPriority.feature,
-                    ),
-                    const DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [Color(0x22060C18), Color(0xE6060C18)],
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Align(
-                        alignment: Alignment.bottomLeft,
-                        child: Text(
-                          videoTitle,
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w300,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-          ],
-          // Eyebrow
-          Row(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: SizedBox(
+          height: 170,
+          width: double.infinity,
+          child: Stack(
+            fit: StackFit.expand,
             children: [
-              const Expanded(child: Divider(color: Color(0x33FFFFFF), height: 1)),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Text(
-                  'A RIBONS ORIGINAL',
-                  style: TextStyle(
-                    fontSize: 9,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 2.4,
-                    color: _cyan.withValues(alpha: 0.92),
-                  ),
-                ),
+              NwsbVideo(
+                asset: videoAsset!,
+                priority: ClipPriority.feature,
               ),
-              const Expanded(child: Divider(color: Color(0x33FFFFFF), height: 1)),
-            ],
-          ),
-          const SizedBox(height: 14),
-          // Logo badge + title
-          Row(
-            children: [
-              Container(
-                width: 42,
-                height: 42,
+              const DecoratedBox(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [_cyan, _violet, _pink],
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: _violet.withValues(alpha: 0.35),
-                      blurRadius: 14,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                padding: const EdgeInsets.all(2),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Image.asset(
-                    'assets/icons/collection-icon.webp',
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => const ColoredBox(
-                      color: Color(0xFF0A0F1C),
-                      child: Icon(Icons.auto_awesome, color: Colors.white, size: 18),
-                    ),
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Color(0x22060C18), Color(0xE6060C18)],
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
-              const Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'NowssB',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                        height: 1.05,
-                      ),
-                    ),
-                    SizedBox(height: 2),
-                    Text(
-                      'STORE · A RIBONS WEBSITE',
-                      style: TextStyle(
-                        fontSize: 9,
-                        letterSpacing: 1.4,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0x66FFFFFF),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 18),
-          const _StoreHeroHeadline(),
-          const SizedBox(height: 12),
-          const Text(
-            'Own the words that heal — unlock vibrational origins, curated collections, and signature editions in one dark atelier.',
-            style: TextStyle(
-              fontSize: 12,
-              height: 1.55,
-              color: Color(0x8AFFFFFF),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _HeroPill(
-                  label: 'Browse All',
-                  icon: Icons.grid_view_rounded,
-                  filled: true,
-                  onTap: onBrowseAll,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _HeroPill(
-                  label: 'View Cart',
-                  icon: Icons.shopping_bag_outlined,
-                  filled: false,
-                  onTap: onViewCart,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _StoreHeroHeadline extends StatelessWidget {
-  const _StoreHeroHeadline();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'THE STORE',
-          style: TextStyle(
-            fontSize: 34,
-            fontWeight: FontWeight.w900,
-            letterSpacing: -0.5,
-            height: 1.05,
-            color: Colors.white,
-          ),
-        ),
-        ShaderMask(
-          blendMode: BlendMode.srcIn,
-          shaderCallback: (bounds) => const LinearGradient(
-            colors: [Color(0xFF5CE1FF), Color(0xFFB388FF), Color(0xFFFF6BCB)],
-          ).createShader(bounds),
-          child: const Text(
-            'FOR YOUR',
-            style: TextStyle(
-              fontSize: 34,
-              fontWeight: FontWeight.w900,
-              letterSpacing: -0.5,
-              height: 1.05,
-              color: Colors.white,
-            ),
-          ),
-        ),
-        Text(
-          'HEALING WORDS',
-          style: TextStyle(
-            fontSize: 30,
-            fontWeight: FontWeight.w900,
-            letterSpacing: 1.2,
-            height: 1.1,
-            foreground: Paint()
-              ..style = PaintingStyle.stroke
-              ..strokeWidth = 1.35
-              ..color = const Color(0xFFB388FF),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _HeroPill extends StatelessWidget {
-  const _HeroPill({
-    required this.label,
-    required this.icon,
-    required this.filled,
-    this.onTap,
-  });
-
-  final String label;
-  final IconData icon;
-  final bool filled;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final child = Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(icon, size: 15, color: filled ? const Color(0xFF060C18) : Colors.white),
-        const SizedBox(width: 7),
-        Text(
-          label.toUpperCase(),
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 1.1,
-            color: filled ? const Color(0xFF060C18) : Colors.white,
-          ),
-        ),
-      ],
-    );
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: 46,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(40),
-          gradient: filled
-              ? const LinearGradient(
-                  colors: [Color(0xFF5CE1FF), Color(0xFFB388FF)],
-                )
-              : null,
-          color: filled ? null : Colors.transparent,
-          border: filled ? null : Border.all(color: const Color(0x55FFFFFF)),
-        ),
-        child: child,
-      ),
-    );
-  }
-}
-
-// ─── #3 Two-column healing category grid ─────────────────────────────────────
-
-class StoreHealCategory {
-  const StoreHealCategory({
-    required this.id,
-    required this.title,
-    required this.accentTitle,
-    required this.stat,
-    required this.icon,
-    required this.border,
-    required this.accent,
-    required this.tint,
-  });
-
-  final String id;
-  final String title;
-  final String accentTitle;
-  final String stat;
-  final IconData icon;
-  final Color border;
-  final Color accent;
-  final Color tint;
-}
-
-const kStoreHealCategories = <StoreHealCategory>[
-  StoreHealCategory(
-    id: 'elements',
-    title: 'Elements',
-    accentTitle: 'Earth · Water · Fire',
-    stat: '15 Words',
-    icon: Icons.bolt_rounded,
-    border: Color(0xFF4FC3F7),
-    accent: Color(0xFF4FC3F7),
-    tint: Color(0x224FC3F7),
-  ),
-  StoreHealCategory(
-    id: 'sacred',
-    title: 'Sacred',
-    accentTitle: 'Divine Frequency',
-    stat: '15 Words',
-    icon: Icons.auto_awesome,
-    border: Color(0xFFFFB74D),
-    accent: Color(0xFFFFB74D),
-    tint: Color(0x22FFB74D),
-  ),
-  StoreHealCategory(
-    id: 'nature',
-    title: 'Nature',
-    accentTitle: 'Living Resonance',
-    stat: '15 Words',
-    icon: Icons.spa_outlined,
-    border: Color(0xFF26A69A),
-    accent: Color(0xFF4DB6AC),
-    tint: Color(0x2226A69A),
-  ),
-  StoreHealCategory(
-    id: 'warriors',
-    title: 'Warriors',
-    accentTitle: 'Strength Codes',
-    stat: 'Elite Set',
-    icon: Icons.shield_moon_outlined,
-    border: Color(0xFF9E9E9E),
-    accent: Color(0xFFBDBDBD),
-    tint: Color(0x229E9E9E),
-  ),
-];
-
-class StoreHealCategoryGrid extends StatelessWidget {
-  const StoreHealCategoryGrid({super.key, required this.onSelect});
-
-  final ValueChanged<String> onSelect;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(0, 10, 0, 18),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'HEAL BY CATEGORY',
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 2.2,
-              color: NwsbColors.gold,
-            ),
-          ),
-          const SizedBox(height: 4),
-          const Text(
-            'Explore word & sound healing collections',
-            style: TextStyle(fontSize: 12, color: Color(0x88FFFFFF)),
-          ),
-          const SizedBox(height: 12),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: kStoreHealCategories.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
-              childAspectRatio: 0.92,
-            ),
-            itemBuilder: (context, i) {
-              final c = kStoreHealCategories[i];
-              return _HealCategoryCard(cat: c, onTap: () => onSelect(c.id));
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _HealCategoryCard extends StatelessWidget {
-  const _HealCategoryCard({required this.cat, required this.onTap});
-  final StoreHealCategory cat;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: cat.border.withValues(alpha: 0.55), width: 1.2),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              const Color(0xFF0A0F1C),
-              cat.tint,
-              const Color(0xFF060C18),
-            ],
-          ),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: Stack(
-          children: [
-            Positioned.fill(child: CustomPaint(painter: _WaveformPainter(cat.accent))),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 30,
-                    height: 30,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(9),
-                      color: cat.accent.withValues(alpha: 0.18),
-                      border: Border.all(color: cat.accent.withValues(alpha: 0.4)),
-                    ),
-                    child: Icon(cat.icon, size: 16, color: cat.accent),
-                  ),
-                  const Spacer(),
-                  Text(
-                    cat.title,
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Text(
+                    videoTitle,
                     style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w300,
                       color: Colors.white,
-                      height: 1.05,
                     ),
                   ),
-                  const SizedBox(height: 3),
-                  Text(
-                    cat.accentTitle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: cat.accent,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: const Color(0xCC060C18),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: const Color(0x33FFFFFF)),
-                        ),
-                        child: Text(
-                          cat.stat,
-                          style: const TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      const Spacer(),
-                      Container(
-                        width: 30,
-                        height: 30,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: const Color(0xCC060C18),
-                          border: Border.all(color: cat.border.withValues(alpha: 0.5)),
-                        ),
-                        child: Icon(Icons.arrow_forward_rounded, size: 15, color: cat.accent),
-                      ),
-                    ],
-                  ),
-                ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
-}
-
-class _WaveformPainter extends CustomPainter {
-  _WaveformPainter(this.color);
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color.withValues(alpha: 0.18)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.4;
-    for (var w = 0; w < 3; w++) {
-      final path = Path();
-      final yBase = size.height * (0.35 + w * 0.18);
-      path.moveTo(0, yBase);
-      for (double x = 0; x <= size.width; x += 4) {
-        final y = yBase + math.sin((x / size.width) * math.pi * 4 + w) * (6.0 + w * 2);
-        path.lineTo(x, y);
-      }
-      canvas.drawPath(path, paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _WaveformPainter oldDelegate) => oldDelegate.color != color;
 }
 
 // ─── #4 Recommended + Featured Bundle ────────────────────────────────────────
@@ -1220,10 +742,10 @@ class StoreFrequencyPackage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // HEAL BY CATEGORY 2×2 grid removed — keep Limited Time Free + Browse by Goal.
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        StoreHealCategoryGrid(onSelect: onSelectCategory),
         StoreLimitedTimeFreeSection(onOpenWord: onOpenWord),
         StoreBrowseByGoalSection(onSeeAll: onSeeAll, onSelect: onSelectCategory),
       ],
@@ -1516,116 +1038,104 @@ class _GlassPlaylistCardData {
 }
 
 
-// ─── Mid-rail compact glass banners (7 variants, between every 2 rows) ───────
+// ─── Mid-rail notification glass banners (7 variants, between every 2 rows) ──
 
 class StoreMidRailBannerData {
   const StoreMidRailBannerData({
-    required this.svgAsset,
     required this.images,
-    required this.tileColors,
     required this.accent,
     required this.panelTint,
-    this.iconTint = const Color(0xFF060C18),
+    this.label = '',
   });
 
-  final String svgAsset;
   final List<String> images;
-  final List<Color> tileColors;
   final Color accent;
   final Color panelTint;
-  final Color iconTint;
+  final String label;
 }
 
 const kStoreMidRailBanners = <StoreMidRailBannerData>[
   StoreMidRailBannerData(
-    svgAsset: 'assets/icons/icon_08.svg',
     images: [
       'assets/store/collections/warriors.webp',
       'assets/store/collections/elements.webp',
       'assets/store/collections/sacred.webp',
       'assets/store/collections/nature.webp',
     ],
-    tileColors: [Color(0xFF1A237E), Color(0xFF004D40), Color(0xFF4A148C), Color(0xFFBF360C)],
     accent: Color(0xFF5CE1FF),
     panelTint: Color(0x332196F3),
+    label: 'Collections',
   ),
   StoreMidRailBannerData(
-    svgAsset: 'assets/icons/icon_12.svg',
     images: [
       'assets/store/collections/peace.webp',
       'assets/store/collections/cosmos.webp',
       'assets/store/collections/mythical.webp',
       'assets/store/collections/elite.webp',
     ],
-    tileColors: [Color(0xFF00695C), Color(0xFF4527A0), Color(0xFFAD1457), Color(0xFF37474F)],
     accent: Color(0xFF26A69A),
     panelTint: Color(0x3326A69A),
+    label: 'Curated',
   ),
   StoreMidRailBannerData(
-    svgAsset: 'assets/icons/icon_15.svg',
     images: [
       'assets/store/collections/sale.webp',
       'assets/store/collections/family.webp',
       'assets/store/collections/identity.webp',
       'assets/store/collections/premium.webp',
     ],
-    tileColors: [Color(0xFFE65100), Color(0xFF1565C0), Color(0xFF6A1B9A), Color(0xFF2E7D32)],
     accent: Color(0xFFFFB74D),
     panelTint: Color(0x33FFB74D),
+    label: 'Featured',
   ),
   StoreMidRailBannerData(
-    svgAsset: 'assets/icons/icon_19.svg',
     images: [
       'assets/store/collections/ancient.webp',
       'assets/store/collections/black.webp',
       'assets/store/collections/white.webp',
-      'assets/store/collections/warriors.webp',
+      'assets/store/nowssb-bag-headphones.webp',
     ],
-    tileColors: [Color(0xFF263238), Color(0xFF880E4F), Color(0xFF01579B), Color(0xFF33691E)],
     accent: Color(0xFFB388FF),
     panelTint: Color(0x33B388FF),
+    label: 'Atelier',
   ),
   StoreMidRailBannerData(
-    svgAsset: 'assets/icons/icon_22.svg',
     images: [
       'assets/store/collections/elements.webp',
       'assets/store/collections/nature.webp',
       'assets/store/collections/peace.webp',
       'assets/store/collections/sacred.webp',
     ],
-    tileColors: [Color(0xFF006064), Color(0xFFC62828), Color(0xFF283593), Color(0xFFF9A825)],
     accent: Color(0xFFFF6BCB),
     panelTint: Color(0x33FF6BCB),
-    iconTint: Color(0xFF1A0530),
+    label: 'Elements',
   ),
   StoreMidRailBannerData(
-    svgAsset: 'assets/icons/icon_26.svg',
     images: [
       'assets/store/collections/cosmos.webp',
       'assets/store/collections/elite.webp',
       'assets/store/collections/mythical.webp',
       'assets/store/collections/premium.webp',
     ],
-    tileColors: [Color(0xFF311B92), Color(0xFF004D40), Color(0xFFB71C1C), Color(0xFF0277BD)],
     accent: Color(0xFF7CFF6B),
     panelTint: Color(0x337CFF6B),
+    label: 'Elite',
   ),
   StoreMidRailBannerData(
-    svgAsset: 'assets/icons/icon_30.svg',
     images: [
       'assets/store/collections/family.webp',
       'assets/store/collections/identity.webp',
       'assets/store/collections/sale.webp',
       'assets/store/collections/ancient.webp',
     ],
-    tileColors: [Color(0xFF4E342E), Color(0xFF1B5E20), Color(0xFF4A148C), Color(0xFF00695C)],
     accent: Color(0xFFE8D5A3),
     panelTint: Color(0x33E8D5A3),
+    label: 'Sale',
   ),
 ];
 
-/// Compact mid-rail strip: glass wrapper → black rounded bar → white-circle SVG
-/// + 4 tinted store-image tiles. Keep height short.
+/// Taller notification-style glass strip: real collection / bag art tiles with
+/// thin vertical separators — no SVG-in-circle placeholder.
 class StoreMidRailBanner extends StatelessWidget {
   const StoreMidRailBanner({super.key, required this.data});
 
@@ -1634,58 +1144,58 @@ class StoreMidRailBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.symmetric(vertical: 12),
       child: StoreGlassPanel(
-        padding: const EdgeInsets.all(6),
-        radius: 18,
+        padding: const EdgeInsets.all(7),
+        radius: 20,
         child: Container(
-          height: 56,
+          height: 72,
           decoration: BoxDecoration(
-            color: const Color(0xF2000000),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: data.accent.withValues(alpha: 0.35)),
+            color: const Color(0xCC000000),
+            borderRadius: BorderRadius.circular(15),
+            border: Border.all(color: data.accent.withValues(alpha: 0.38)),
             boxShadow: [
               BoxShadow(
                 color: data.panelTint,
-                blurRadius: 16,
-                offset: const Offset(0, 4),
+                blurRadius: 18,
+                offset: const Offset(0, 5),
               ),
             ],
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 8),
+          clipBehavior: Clip.antiAlias,
           child: Row(
             children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                padding: const EdgeInsets.all(8),
-                child: SvgPicture.asset(
-                  data.svgAsset,
-                  fit: BoxFit.contain,
-                  colorFilter: ColorFilter.mode(data.iconTint, BlendMode.srcIn),
-                ),
-              ),
-              const SizedBox(width: 8),
               for (var i = 0; i < 4; i++) ...[
-                if (i > 0) const SizedBox(width: 6),
+                if (i > 0)
+                  Container(
+                    width: 1,
+                    height: double.infinity,
+                    color: Colors.white.withValues(alpha: 0.14),
+                  ),
                 Expanded(
-                  child: Container(
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: data.tileColors[i % data.tileColors.length],
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: const Color(0x22FFFFFF)),
-                    ),
-                    clipBehavior: Clip.antiAlias,
-                    child: Image.asset(
-                      data.images[i % data.images.length],
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-                    ),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Image.asset(
+                        data.images[i % data.images.length],
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => ColoredBox(
+                          color: data.accent.withValues(alpha: 0.18),
+                        ),
+                      ),
+                      DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.black.withValues(alpha: 0.15),
+                              Colors.black.withValues(alpha: 0.45),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],

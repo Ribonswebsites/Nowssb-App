@@ -23,13 +23,15 @@ class PageShell extends StatefulWidget {
     required this.slivers,
     this.onBack,
     this.usePageFilm = false,
+    this.onStorePicker,
   });
 
   final String eyebrow;
   final String title;
 
   /// The page's own film. When [usePageFilm] is true the film loops behind
-  /// the page (Store / Meaning / Ebooks). Otherwise AppBackdrop stays.
+  /// the page (Store / Meaning / Ebooks). Otherwise AppBackdrop stays
+  /// (Fashion-home film via Settings).
   final String film;
 
   /// Store pages set this so the looping NwsbVideo page film is visible
@@ -38,6 +40,9 @@ class PageShell extends StatefulWidget {
 
   final List<Widget> slivers;
   final VoidCallback? onBack;
+
+  /// Top button — opens AJIO-style “Please select the store” sheet.
+  final VoidCallback? onStorePicker;
 
   @override
   State<PageShell> createState() => _PageShellState();
@@ -152,6 +157,37 @@ class _PageShellState extends State<PageShell> {
                             ],
                           ),
                         ),
+                        if (widget.onStorePicker != null) ...[
+                          const SizedBox(width: 10),
+                          GestureDetector(
+                            onTap: widget.onStorePicker,
+                            behavior: HitTestBehavior.opaque,
+                            child: Container(
+                              height: 42,
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(21),
+                                color: const Color(0x33FFFFFF),
+                                border: Border.all(color: const Color(0x44FFFFFF)),
+                              ),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.storefront_outlined, size: 18, color: Colors.white),
+                                  SizedBox(width: 6),
+                                  Text(
+                                    'Stores',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ),

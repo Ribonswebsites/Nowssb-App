@@ -179,7 +179,7 @@ class RmWordRow extends StatelessWidget {
 
   /// Card body is fixed at [RmWordCard.cardHeight]; keep a few px of slack
   /// for the soft drop shadow so nothing clips or yellow-stripes.
-  static const double rowHeight = RmWordCard.cardHeight + 6;
+  static const double rowHeight = RmWordCard.cardHeight + 8;
 
   @override
   Widget build(BuildContext context) {
@@ -187,9 +187,9 @@ class RmWordRow extends StatelessWidget {
       height: rowHeight,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.only(right: 4),
+        padding: const EdgeInsets.only(right: 4, bottom: 2),
         itemCount: children.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 12),
+        separatorBuilder: (_, __) => const SizedBox(width: 14),
         itemBuilder: (_, i) => children[i],
       ),
     );
@@ -205,6 +205,9 @@ class RmWordCard extends StatelessWidget {
     this.signature = false,
     this.price,
     this.onTap,
+    this.onBuyNow,
+    this.onWishlist,
+    this.onAddCart,
   });
 
   final String name;
@@ -213,11 +216,25 @@ class RmWordCard extends StatelessWidget {
   final bool signature;
   final num? price;
   final VoidCallback? onTap;
+  final VoidCallback? onBuyNow;
+  final VoidCallback? onWishlist;
+  final VoidCallback? onAddCart;
 
-  /// Fixed card height — image flexes, footer is compact. Prevents the
-  /// yellow/black "BOTTOM OVERFLOWED BY 25 PIXELS" stripes on every rail.
-  static const double cardHeight = 222;
-  static const double cardWidth = 148;
+  /// Real-store card: larger art + title/origin/price + action row under price.
+  /// Fixed size keeps rails free of yellow overflow stripes.
+  static const double cardHeight = 286;
+  static const double cardWidth = 172;
+  static const double _footerH = 108;
+
+  void _toast(BuildContext context, String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(msg),
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -227,88 +244,181 @@ class RmWordCard extends StatelessWidget {
         width: cardWidth,
         height: cardHeight,
         decoration: BoxDecoration(
-          color: Colors.black,
+          color: const Color(0xFF05070F),
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: signature ? const Color(0x55E8D5A3) : const Color(0x2EFFFFFF),
           ),
           boxShadow: const [
-            BoxShadow(color: Color(0x7A000000), blurRadius: 18, offset: Offset(0, 6)),
+            BoxShadow(color: Color(0x99000000), blurRadius: 20, offset: Offset(0, 8)),
           ],
         ),
-        child: Stack(
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  child: StoreNetImage(url: imgUrl),
-                ),
-                Container(
-                  padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
-                  color: const Color(0xD9040A18),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                          height: 1.05,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        root.toUpperCase(),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 8,
-                          fontWeight: FontWeight.w300,
-                          letterSpacing: 1,
-                          height: 1.1,
-                          color: Color(0x8CC8E8F5),
-                        ),
-                      ),
-                      if (price != null) ...[
-                        const SizedBox(height: 4),
-                        Text(
-                          inr(price!),
-                          style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            height: 1.1,
-                            color: NwsbColors.goldLight,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            if (signature)
-              const Positioned(
-                top: 8,
-                left: 8,
-                child: _SignatureTag(),
-              ),
-            Positioned(
-              top: 8,
-              right: 8,
-              child: Column(
+            SizedBox(
+              height: cardHeight - _footerH,
+              child: Stack(
+                fit: StackFit.expand,
                 children: [
-                  _MiniChip(icon: Icons.favorite_border, color: const Color(0xB3FFFFFF)),
-                  const SizedBox(height: 6),
-                  _MiniChip(icon: Icons.shopping_bag_outlined, color: NwsbColors.goldLight),
+                  StoreNetImage(url: imgUrl),
+                  const DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Color(0x00000000), Color(0x66000000)],
+                      ),
+                    ),
+                  ),
+                  if (signature)
+                    const Positioned(
+                      top: 10,
+                      left: 10,
+                      child: _SignatureTag(),
+                    ),
                 ],
               ),
             ),
+            SizedBox(
+              height: _footerH,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                        height: 1.1,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      root.toUpperCase(),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 0.8,
+                        height: 1.1,
+                        color: Color(0x8CC8E8F5),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      price == null ? '—' : inr(price!),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                        height: 1.1,
+                        color: NwsbColors.goldLight,
+                      ),
+                    ),
+                    const Spacer(),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              if (onBuyNow != null) {
+                                onBuyNow!();
+                              } else if (onTap != null) {
+                                onTap!();
+                              } else {
+                                _toast(context, 'Opening $name…');
+                              }
+                            },
+                            child: Container(
+                              height: 28,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                gradient: const LinearGradient(
+                                  colors: [Color(0xFFE8D5A3), Color(0xFFC8A96E)],
+                                ),
+                              ),
+                              child: const Text(
+                                'Buy Now',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.4,
+                                  color: Color(0xFF060C18),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        _CardAction(
+                          icon: Icons.favorite_border,
+                          onTap: () {
+                            if (onWishlist != null) {
+                              onWishlist!();
+                            } else {
+                              _toast(context, 'Saved $name to wishlist');
+                            }
+                          },
+                        ),
+                        const SizedBox(width: 5),
+                        _CardAction(
+                          icon: Icons.shopping_bag_outlined,
+                          accent: true,
+                          onTap: () {
+                            if (onAddCart != null) {
+                              onAddCart!();
+                            } else {
+                              _toast(context, 'Added $name to cart');
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CardAction extends StatelessWidget {
+  const _CardAction({required this.icon, required this.onTap, this.accent = false});
+  final IconData icon;
+  final VoidCallback onTap;
+  final bool accent;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 28,
+        height: 28,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          color: const Color(0x22FFFFFF),
+          border: Border.all(
+            color: accent ? const Color(0x55E8D5A3) : const Color(0x33FFFFFF),
+          ),
+        ),
+        child: Icon(
+          icon,
+          size: 14,
+          color: accent ? NwsbColors.goldLight : const Color(0xCCFFFFFF),
         ),
       ),
     );

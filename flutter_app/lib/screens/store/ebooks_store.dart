@@ -13,6 +13,8 @@ import '../../widgets/page_shell.dart';
 import 'product_detail.dart';
 import 'store_cards.dart';
 import 'store_home_sections.dart';
+import 'store_select_sheet.dart';
+import 'store_routes.dart';
 
 class EbooksStoreScreen extends StatelessWidget {
   const EbooksStoreScreen({super.key});
@@ -32,8 +34,12 @@ class EbooksStoreScreen extends StatelessWidget {
           eyebrow: 'NowssB Store',
           title: 'The NowssB Ebooks',
           film: 'assets/video/store-verify-banner.mp4',
-          usePageFilm: true,
+          usePageFilm: false,
           onBack: () => Navigator.of(context).pop(),
+          onStorePicker: () => showStoreSelectSheet(
+            context,
+            onSelect: (id) => openStoreFromPicker(context, id, current: 'ebooks'),
+          ),
           slivers: [
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
@@ -115,11 +121,6 @@ class _EbooksBody extends StatelessWidget {
               ],
             ),
           ),
-        ),
-        StorePixelsHero(
-          onBrowseAll: () {},
-          onViewCart: () {},
-          videoTitle: 'The NowssB Ebooks',
         ),
         const Text(
           'Deep-dive guides on word science, phonetic origin and sound healing — yours to keep, read anywhere, forever.',
