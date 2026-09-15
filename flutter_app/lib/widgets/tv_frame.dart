@@ -286,14 +286,12 @@ class TvFrame extends StatelessWidget {
             final box = Size(c.maxWidth, c.maxHeight);
             // Transparent bezels: ClipRect only — the hole already shapes the
             // opening; a second radius left white gaps in tablet/TV corners.
-            // Opaque word-acts pills: video sits ON TOP of a solid aperture, so
-            // it must be ClipRRect'd to the stadium aperture or square corners
-            // spill past the white pill border (Sentence/Practice/Store +
-            // Customize/Features/Earn).
+            // Opaque word-acts frames: video sits ON TOP of a solid aperture, so
+            // clip video only to a modest rounded-rect (not stadium) so square
+            // corners don't poke past the inner aperture edge.
             final insets = frame.insets(box);
-            final apertureH = (box.height - insets.top - insets.bottom).clamp(0.0, box.height);
             final apertureR = frame.opaqueAperture
-                ? BorderRadius.circular(apertureH / 2) // stadium / pill
+                ? BorderRadius.circular(14) // modest rounded-rect, not pill
                 : BorderRadius.zero;
             final Widget clippedScreen = frame.opaqueAperture
                 ? ClipRRect(
@@ -356,11 +354,11 @@ class TvFrame extends StatelessWidget {
                   ];
             final stack = Stack(fit: StackFit.expand, children: children);
             // Opaque lit tabs (Sentence · Practice · Store / Customize ·
-            // Features · Earn): outer stadium clip matches the white pill
-            // bezel (~half height), not a sharp ~20 card radius.
+            // Features · Earn): outer rounded-rectangle white device frame
+            // (~20), NOT a stadium/pill (half height).
             if (frame.opaqueAperture) {
               return ClipRRect(
-                borderRadius: BorderRadius.circular(box.height / 2),
+                borderRadius: BorderRadius.circular(20),
                 clipBehavior: Clip.antiAlias,
                 child: stack,
               );
@@ -488,11 +486,10 @@ class FramedSlot extends StatelessWidget {
           builder: (context, c) {
             final box = Size(c.maxWidth, c.maxHeight);
             // Same rule as [TvFrame]: transparent = ClipRect fill; opaque
-            // word-acts = stadium ClipRRect so video cannot spill past the pill.
+            // word-acts = modest rounded-rect ClipRRect on video only (not stadium).
             final insets = frame.insets(box);
-            final apertureH = (box.height - insets.top - insets.bottom).clamp(0.0, box.height);
             final apertureR = frame.opaqueAperture
-                ? BorderRadius.circular(apertureH / 2)
+                ? BorderRadius.circular(14)
                 : BorderRadius.zero;
             final Widget clippedScreen = frame.opaqueAperture
                 ? ClipRRect(
@@ -538,7 +535,7 @@ class FramedSlot extends StatelessWidget {
             final stack = Stack(fit: StackFit.expand, children: layers);
             if (frame.opaqueAperture) {
               return ClipRRect(
-                borderRadius: BorderRadius.circular(box.height / 2),
+                borderRadius: BorderRadius.circular(20),
                 clipBehavior: Clip.antiAlias,
                 child: stack,
               );
