@@ -25,6 +25,7 @@ import '../../theme/tokens.dart';
 import '../../widgets/home_parts.dart';
 import '../../widgets/neu_wrap.dart';
 import '../../widgets/neumorphic.dart';
+import '../../widgets/black_glass_banner.dart';
 import '../start_today_carousel.dart';
 import '../streak_store_carousel.dart';
 
@@ -563,8 +564,8 @@ class NmPractice extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // One section only: spill + 3-card carousel (art → Player → healing).
-    // Card 2 is the existing Normal player NeuCard, visually unchanged.
+    // Black My Routine–style banner outside cards, then 3-card carousel
+    // (Player → Healing → Device). Card 1 is existing Normal player NeuCard.
     final playerCard = NeuCard(
       onTap: onTap,
       padding: const EdgeInsets.all(22),
@@ -653,6 +654,12 @@ class NmPractice extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          RoutineStyleBlackBanner(
+            title: "Today's Practice",
+            subtitle: 'Begin your healing path',
+            onTap: onTap,
+          ),
+          const SizedBox(height: 12),
           Spill(
             label: 'Your daily word ritual',
             mark: NwsbMarks.play,

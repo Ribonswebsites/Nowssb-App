@@ -1,7 +1,8 @@
 /// Shared hamburger menu — website `#menuDrawer` / `openMenu` (part012.js).
 ///
 /// Full-screen slide-in from the right, same sections and copy as index.html,
-/// same CDN icons. Fashion opens the dark glass look; Normal opens the
+/// same CDN icons. Fashion mirrors App Settings styling (solid deep + gold
+/// wash, HeavyGlassPanel groups, NestedDarkWrap rows). Normal opens the
 /// neumorphic light look (`body.nm-mode #menuDrawer`). Quick Links (part061)
 /// is a different sheet — this is only the hamburger.
 library;
@@ -18,6 +19,7 @@ import '../screens/progress/progress_screen.dart';
 import '../screens/sound_library.dart';
 import '../screens/store/meaning_store.dart';
 import '../theme/tokens.dart';
+import 'black_glass_banner.dart';
 
 /// Opens the website hamburger (`#menuDrawer`) over the current route.
 Future<void> showHomeMenuDrawer(
@@ -77,9 +79,6 @@ class HomeMenuDrawer extends StatelessWidget {
   final bool light;
   final void Function(int tab) goTab;
 
-  static const _bgFashion =
-      'https://media.nowssb.com/migrated-images/3590ce677702261a_grok_image_1784093977513_alcdo3.jpg';
-
   // Icon URLs — index.html `#menuDrawer` rows, verbatim.
   static const _ico = {
     'home':
@@ -127,10 +126,11 @@ class HomeMenuDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     final top = MediaQuery.paddingOf(context).top;
     final bottom = MediaQuery.paddingOf(context).bottom;
-    final bg = light ? const Color(0xFFEEF1F7) : const Color(0xB7060C18);
+    // Fashion menu mirrors AppSettingsScreen exactly (solid deep + gold wash,
+    // not the old photo backdrop). Normal keeps neumorphic light look.
+    final bg = light ? const Color(0xFFEEF1F7) : const Color(0xFF060C18);
     final headerBg = light ? const Color(0xFFEEF1F7) : const Color(0xEB060C18);
     final titleColor = light ? NwsbColors.ink : Colors.white;
-    final labelColor = light ? NwsbColors.gold : const Color(0x4DFFFFFF);
     final footerColor =
         light ? const Color(0x66000000) : const Color(0x4DFFFFFF);
 
@@ -141,11 +141,19 @@ class HomeMenuDrawer extends StatelessWidget {
           fit: StackFit.expand,
           children: [
             if (!light) ...[
-              Positioned.fill(
-                child: NwsbImage(url: _bgFashion, fit: BoxFit.cover),
+              const Positioned.fill(
+                child: ColoredBox(color: Color(0xFF060C18)),
               ),
               const Positioned.fill(
-                child: ColoredBox(color: Color(0xB3060A14)),
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: RadialGradient(
+                      center: Alignment(-0.6, -0.8),
+                      radius: 1.1,
+                      colors: [Color(0x44E8D5A3), Color(0x00060C18)],
+                    ),
+                  ),
+                ),
               ),
             ] else
               Positioned.fill(child: ColoredBox(color: bg)),
@@ -153,7 +161,12 @@ class HomeMenuDrawer extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Container(
-                  padding: EdgeInsets.fromLTRB(20, top + 14, 20, 16),
+                  padding: EdgeInsets.fromLTRB(
+                    light ? 20 : 12,
+                    top + (light ? 14 : 10),
+                    light ? 20 : 16,
+                    light ? 16 : 14,
+                  ),
                   decoration: BoxDecoration(
                     color: headerBg,
                     border: Border(
@@ -201,9 +214,14 @@ class HomeMenuDrawer extends StatelessWidget {
                 ),
                 Expanded(
                   child: ListView(
-                    padding: EdgeInsets.fromLTRB(0, 0, 0, bottom + 40),
+                    padding: EdgeInsets.fromLTRB(
+                      light ? 0 : 16,
+                      light ? 0 : 18,
+                      light ? 0 : 16,
+                      bottom + 40,
+                    ),
                     children: [
-                      _SectionLabel('Practice', color: labelColor),
+                      _SectionLabel('Practice', light: light),
                       _Group(
                         light: light,
                         children: [
@@ -231,7 +249,7 @@ class HomeMenuDrawer extends StatelessWidget {
                           ),
                         ],
                       ),
-                      _SectionLabel('Content', color: labelColor),
+                      _SectionLabel('Content', light: light),
                       _Group(
                         light: light,
                         children: [
@@ -259,7 +277,7 @@ class HomeMenuDrawer extends StatelessWidget {
                           ),
                         ],
                       ),
-                      _SectionLabel('Journey', color: labelColor),
+                      _SectionLabel('Journey', light: light),
                       _Group(
                         light: light,
                         children: [
@@ -292,7 +310,7 @@ class HomeMenuDrawer extends StatelessWidget {
                           ),
                         ],
                       ),
-                      _SectionLabel('Account', color: labelColor),
+                      _SectionLabel('Account', light: light),
                       _Group(
                         light: light,
                         children: [
@@ -358,7 +376,7 @@ class HomeMenuDrawer extends StatelessWidget {
                         ],
                       ),
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(24, 40, 24, 0),
+                        padding: EdgeInsets.fromLTRB(light ? 24 : 4, 40, light ? 24 : 4, 0),
                         child: Text(
                           'Shabdapathy · v9.5',
                           style: TextStyle(
@@ -395,11 +413,8 @@ class _BackBtn extends StatelessWidget {
         width: 42,
         height: 42,
         decoration: BoxDecoration(
-          color: light ? Colors.white : const Color(0x14FFFFFF),
+          color: Colors.white,
           shape: BoxShape.circle,
-          border: light
-              ? null
-              : Border.all(color: const Color(0x22FFFFFF)),
           boxShadow: light
               ? const [
                   BoxShadow(
@@ -411,9 +426,9 @@ class _BackBtn extends StatelessWidget {
               : null,
         ),
         child: Icon(
-          Icons.arrow_back_ios_new_rounded,
-          size: 16,
-          color: light ? NwsbColors.ink : Colors.white,
+          light ? Icons.arrow_back_ios_new_rounded : Icons.arrow_back,
+          size: light ? 16 : 19,
+          color: NwsbColors.ink,
         ),
       ),
     );
@@ -421,21 +436,24 @@ class _BackBtn extends StatelessWidget {
 }
 
 class _SectionLabel extends StatelessWidget {
-  const _SectionLabel(this.text, {required this.color});
+  const _SectionLabel(this.text, {required this.light});
   final String text;
-  final Color color;
+  final bool light;
 
   @override
   Widget build(BuildContext context) {
+    // Fashion uses settings _Sec label metrics; Normal keeps drawer inset.
     return Padding(
-      padding: const EdgeInsets.fromLTRB(32, 20, 20, 8),
+      padding: light
+          ? const EdgeInsets.fromLTRB(32, 20, 20, 8)
+          : const EdgeInsets.only(left: 4, bottom: 10, top: 4),
       child: Text(
         text.toUpperCase(),
         style: TextStyle(
-          fontSize: 9,
-          letterSpacing: 2.5,
-          fontWeight: FontWeight.w700,
-          color: color,
+          fontSize: light ? 9 : 10,
+          letterSpacing: light ? 2.5 : 1.6,
+          fontWeight: light ? FontWeight.w700 : FontWeight.w800,
+          color: light ? NwsbColors.gold : const Color(0x73FFFFFF),
         ),
       ),
     );
@@ -449,28 +467,34 @@ class _Group extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (!light) {
+      // Match AppSettingsScreen _Sec → HeavyGlassPanel.
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 22),
+        child: HeavyGlassPanel(
+          padding: const EdgeInsets.fromLTRB(8, 10, 8, 10),
+          radius: 22,
+          child: Column(children: children),
+        ),
+      );
+    }
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 24),
       decoration: BoxDecoration(
-        color: light ? const Color(0xFFF0F2F7) : const Color(0x09FFFFFF),
+        color: const Color(0xFFF0F2F7),
         borderRadius: BorderRadius.circular(20),
-        border: light
-            ? null
-            : Border.all(color: const Color(0x1AFFFFFF)),
-        boxShadow: light
-            ? const [
-                BoxShadow(
-                  color: Color(0x24000000),
-                  blurRadius: 18,
-                  offset: Offset(7, 7),
-                ),
-                BoxShadow(
-                  color: Color(0xF7FFFFFF),
-                  blurRadius: 14,
-                  offset: Offset(-5, -5),
-                ),
-              ]
-            : null,
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x24000000),
+            blurRadius: 18,
+            offset: Offset(7, 7),
+          ),
+          BoxShadow(
+            color: Color(0xF7FFFFFF),
+            blurRadius: 14,
+            offset: Offset(-5, -5),
+          ),
+        ],
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(children: children),
@@ -503,11 +527,60 @@ class _Row extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final labelColor = light ? NwsbColors.ink : Colors.white;
-    final subColor =
-        light ? const Color(0x73000000) : const Color(0x6BFFFFFF);
-    final chevColor =
-        light ? const Color(0x47000000) : const Color(0x2EFFFFFF);
+    if (!light) {
+      // Match AppSettingsScreen _NavRow → NestedDarkWrap.
+      final leading = icon ??
+          ClipRRect(
+            borderRadius: BorderRadius.circular(roundIcon ? 18 : 8),
+            child: SizedBox(
+              width: iconSize,
+              height: iconSize,
+              child: NwsbImage(url: iconUrl!, fit: BoxFit.contain),
+            ),
+          );
+      return NestedDarkWrap(
+        margin: EdgeInsets.only(bottom: last ? 0 : 8),
+        onTap: onTap,
+        child: Row(
+          children: [
+            leading,
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    sub,
+                    style: const TextStyle(
+                      color: Color(0x73FFFFFF),
+                      fontSize: 11,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              Icons.chevron_right,
+              size: 16,
+              color: Color(0x55FFFFFF),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final labelColor = NwsbColors.ink;
+    final subColor = const Color(0x73000000);
+    final chevColor = const Color(0x47000000);
 
     return Material(
       color: Colors.transparent,
@@ -521,12 +594,8 @@ class _Row extends StatelessWidget {
           decoration: BoxDecoration(
             border: last
                 ? null
-                : Border(
-                    bottom: BorderSide(
-                      color: light
-                          ? const Color(0x0F000000)
-                          : const Color(0x0DFFFFFF),
-                    ),
+                : const Border(
+                    bottom: BorderSide(color: Color(0x0F000000)),
                   ),
           ),
           child: Row(
@@ -535,24 +604,16 @@ class _Row extends StatelessWidget {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: light
-                      ? const Color(0xFFEEF1F7)
-                      : const Color(0x0FFFFFFF),
+                  color: const Color(0xFFEEF1F7),
                   borderRadius: BorderRadius.circular(roundIcon ? 18 : 8),
-                  border: light
-                      ? null
-                      : Border.all(color: const Color(0x14FFFFFF)),
-                  boxShadow: light
-                      ? const [
-                          BoxShadow(
-                            color: Color(0x21000000),
-                            blurRadius: 7,
-                            offset: Offset(3, 3),
-                            spreadRadius: -1,
-                            // inset feel approximated
-                          ),
-                        ]
-                      : null,
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x21000000),
+                      blurRadius: 7,
+                      offset: Offset(3, 3),
+                      spreadRadius: -1,
+                    ),
+                  ],
                 ),
                 alignment: Alignment.center,
                 child: icon ??

@@ -16,6 +16,7 @@ import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../widgets/home_skin.dart';
 import '../../widgets/tv_frame.dart';
+import '../../widgets/black_glass_banner.dart';
 import '../../widgets/home_parts.dart';
 import '../start_today_carousel.dart';
 import '../streak_store_carousel.dart';
@@ -283,11 +284,18 @@ class FashPractice extends StatelessWidget {
   Widget build(BuildContext context) {
     // Word of the day still drives the destination; it is no longer painted
     // as a giant title over the film (ANANDA / AAROGYA etc.).
-    // One section only: spill + 3-card carousel (art → Player → healing).
+    // Black My Routine–style banner OUTSIDE the cards, then 3-card carousel
+    // (Player → Healing → Device). Spill kept as ritual cue under banner.
     return SectionPane(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          RoutineStyleBlackBanner(
+            title: "Today's Practice",
+            subtitle: 'Begin your healing path',
+            onTap: onTap,
+          ),
+          const SizedBox(height: 12),
           Spill(
             label: 'Your daily word ritual',
             mark: NwsbMarks.play,
@@ -308,7 +316,7 @@ class FashPractice extends StatelessWidget {
                         fit: BoxFit.cover,
                       )
                     : const NwsbImage(url: practiceStill);
-                // Card 2 — NowssB Player exactly as before (no redesign).
+                // Card 1 — NowssB Player exactly as before (no redesign).
                 return GestureDetector(
                   onTap: onTap,
                   behavior: HitTestBehavior.opaque,

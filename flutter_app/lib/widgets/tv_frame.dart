@@ -284,32 +284,62 @@ class TvFrame extends StatelessWidget {
         child: LayoutBuilder(
           builder: (context, c) {
             final box = Size(c.maxWidth, c.maxHeight);
-            // Clip to the bezel inset only — no extra media radius. A second
-            // ClipRRect here left white gaps in every tablet/laptop/TV corner
-            // (Connect, Store, Quick Access, etc.): the bezel already shapes
-            // the opening; the film must paint edge-to-edge inside it.
+            // Transparent bezels: ClipRect only — the hole already shapes the
+            // opening; a second radius left white gaps in tablet/TV corners.
+            // Opaque word-acts pills: video sits ON TOP of a solid aperture, so
+            // it must be ClipRRect'd to the stadium aperture or square corners
+            // spill past the white pill border (Sentence/Practice/Store +
+            // Customize/Features/Earn).
+            final insets = frame.insets(box);
+            final apertureH = (box.height - insets.top - insets.bottom).clamp(0.0, box.height);
+            final apertureR = frame.opaqueAperture
+                ? BorderRadius.circular(apertureH / 2) // stadium / pill
+                : BorderRadius.zero;
+            final Widget clippedScreen = frame.opaqueAperture
+                ? ClipRRect(
+                    borderRadius: apertureR,
+                    clipBehavior: Clip.antiAlias,
+                    child: ColoredBox(
+                      color: Colors.black,
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          if (showVideo)
+                            NwsbVideo(
+                              asset: asset,
+                              priority: priority,
+                              autoplay: autoplay,
+                              showPoster: showPoster,
+                              fit: BoxFit.cover,
+                            ),
+                          if (overlay != null) overlay!,
+                        ],
+                      ),
+                    ),
+                  )
+                : ClipRect(
+                    clipBehavior: Clip.hardEdge,
+                    child: ColoredBox(
+                      color: Colors.black,
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          if (showVideo)
+                            NwsbVideo(
+                              asset: asset,
+                              priority: priority,
+                              autoplay: autoplay,
+                              showPoster: showPoster,
+                              fit: BoxFit.cover,
+                            ),
+                          if (overlay != null) overlay!,
+                        ],
+                      ),
+                    ),
+                  );
             final screen = Padding(
-              padding: frame.insets(box),
-              child: ClipRect(
-                clipBehavior: Clip.hardEdge,
-                child: ColoredBox(
-                  color: Colors.black,
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      if (showVideo)
-                        NwsbVideo(
-                          asset: asset,
-                          priority: priority,
-                          autoplay: autoplay,
-                          showPoster: showPoster,
-                          fit: BoxFit.cover,
-                        ),
-                      if (overlay != null) overlay!,
-                    ],
-                  ),
-                ),
-              ),
+              padding: insets,
+              child: clippedScreen,
             );
             // Opaque-aperture bezels (word-acts-tab): frame is BACKGROUND,
             // video paints on top in the aperture — same as nowssb-player.css
@@ -325,11 +355,12 @@ class TvFrame extends StatelessWidget {
                     IgnorePointer(child: _Bezel(frame: frame)),
                   ];
             final stack = Stack(fit: StackFit.expand, children: children);
-            // Opaque lit tabs (Sentence · Practice · Store): clip the whole
-            // bezel to a glass-card radius so corners are not a sharp rectangle.
+            // Opaque lit tabs (Sentence · Practice · Store / Customize ·
+            // Features · Earn): outer stadium clip matches the white pill
+            // bezel (~half height), not a sharp ~20 card radius.
             if (frame.opaqueAperture) {
               return ClipRRect(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(box.height / 2),
                 clipBehavior: Clip.antiAlias,
                 child: stack,
               );
@@ -456,22 +487,44 @@ class FramedSlot extends StatelessWidget {
         child: LayoutBuilder(
           builder: (context, c) {
             final box = Size(c.maxWidth, c.maxHeight);
-            // Same rule as [TvFrame]: fill the aperture; do not double-round.
+            // Same rule as [TvFrame]: transparent = ClipRect fill; opaque
+            // word-acts = stadium ClipRRect so video cannot spill past the pill.
+            final insets = frame.insets(box);
+            final apertureH = (box.height - insets.top - insets.bottom).clamp(0.0, box.height);
+            final apertureR = frame.opaqueAperture
+                ? BorderRadius.circular(apertureH / 2)
+                : BorderRadius.zero;
+            final Widget clippedScreen = frame.opaqueAperture
+                ? ClipRRect(
+                    borderRadius: apertureR,
+                    clipBehavior: Clip.antiAlias,
+                    child: ColoredBox(
+                      color: Colors.black,
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          child,
+                          if (overlay != null) overlay!,
+                        ],
+                      ),
+                    ),
+                  )
+                : ClipRect(
+                    clipBehavior: Clip.hardEdge,
+                    child: ColoredBox(
+                      color: Colors.black,
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          child,
+                          if (overlay != null) overlay!,
+                        ],
+                      ),
+                    ),
+                  );
             final screen = Padding(
-              padding: frame.insets(box),
-              child: ClipRect(
-                clipBehavior: Clip.hardEdge,
-                child: ColoredBox(
-                  color: Colors.black,
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      child,
-                      if (overlay != null) overlay!,
-                    ],
-                  ),
-                ),
-              ),
+              padding: insets,
+              child: clippedScreen,
             );
             final layers = frame.opaqueAperture
                 ? <Widget>[
@@ -485,7 +538,7 @@ class FramedSlot extends StatelessWidget {
             final stack = Stack(fit: StackFit.expand, children: layers);
             if (frame.opaqueAperture) {
               return ClipRRect(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(box.height / 2),
                 clipBehavior: Clip.antiAlias,
                 child: stack,
               );
