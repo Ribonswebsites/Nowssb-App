@@ -547,11 +547,14 @@ class StoreLimitedTimeFreeSection extends StatelessWidget {
   final void Function(String word, String root, String img, num price)? onOpenWord;
   final VoidCallback? onRequestWords;
 
-  static const _tracks = <(String, String, String, num)>[
-    ('Warrior', 'Old French', kStoreProductArt, 0),
-    ('Spirit', 'Latin', kStoreProductArt, 0),
-    ('Peace', 'Old French', kStoreProductArt, 0),
+  static const _tracks = <(String, String, String)>[
+    ('432 Hz', 'Relax Piano', 'assets/store/collections/peace.webp'),
+    ('528 Hz', 'Calming Tones', 'assets/store/collections/sacred.webp'),
+    ('639 Hz', 'Heart Open', 'assets/store/collections/nature.webp'),
   ];
+
+  static const _tealTop = Color(0xFF2EC4B6);
+  static const _tealBot = Color(0xFF0B1B3A);
 
   @override
   Widget build(BuildContext context) {
@@ -560,54 +563,145 @@ class StoreLimitedTimeFreeSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          StoreNotifBanner(
-            heading: 'LIMITED TIME OFFER',
-            svgBody: NwsbMarks.flame,
-            artAsset: kStoreProductArt,
-            accent: const Color(0xFFFF8A3D),
-            sub: 'Free atelier picks — request a word if yours is missing.',
-            trailing: onRequestWords == null
-                ? null
-                : GestureDetector(
-              onTap: onRequestWords,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: const Color(0x55E8D5A3)),
-                  color: const Color(0x22E8D5A3),
-                ),
-                child: const Text(
-                  'Request Words',
+          // Heading: SVG hourglass (NOT emoji) + title + Request Words CTA
+          Row(
+            children: [
+              const NwsbIcon(
+                NwsbMarks.hourglass,
+                size: 20,
+                color: NwsbColors.goldLight,
+              ),
+              const SizedBox(width: 8),
+              const Expanded(
+                child: Text(
+                  'Limited Time Free',
                   style: TextStyle(
-                    fontSize: 10,
+                    fontSize: 16,
                     fontWeight: FontWeight.w800,
-                    color: NwsbColors.goldLight,
+                    color: Colors.white,
                   ),
                 ),
               ),
-            ),
+              if (onRequestWords != null)
+                GestureDetector(
+                  onTap: onRequestWords,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: const Color(0x55E8D5A3)),
+                      color: const Color(0x22E8D5A3),
+                    ),
+                    child: const Text(
+                      'Request Words',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w800,
+                        color: NwsbColors.goldLight,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          // Optional Fashion-glass notif pill (SVG + bag art) — keeps frequencies card below
+          StoreNotifBanner(
+            heading: 'LIMITED TIME FREE',
+            svgBody: NwsbMarks.hourglass,
+            artAsset: kStoreProductArt,
+            accent: _tealTop,
+            sub: 'Free healing tracks — request a word if yours is missing.',
           ),
           const SizedBox(height: 12),
-          SizedBox(
-            height: RmWordCard.cardHeight + 4,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: _tracks.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 10),
-              itemBuilder: (context, i) {
-                final t = _tracks[i];
-                return RmWordCard(
-                  name: t.$1,
-                  root: t.$2,
-                  imgUrl: kRmWordImg,
-                  price: t.$4,
-                  tint: storeCardTint(t.$1),
-                  onTap: onOpenWord == null
-                      ? null
-                      : () => onOpenWord!(t.$1.toLowerCase(), t.$2, kRmWordImg, t.$4),
-                );
-              },
+          // Teal gradient glass frequencies card — DO NOT REMOVE
+          StoreGlassPanel(
+            padding: EdgeInsets.zero,
+            radius: 22,
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.fromLTRB(16, 18, 16, 16),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(22),
+                gradient: const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [_tealTop, _tealBot],
+                ),
+              ),
+              child: Column(
+                children: [
+                  const Text(
+                    'Listen to Healing Frequencies',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'Calm your mind with a free track.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 12, color: Color(0xCCFFFFFF)),
+                  ),
+                  const SizedBox(height: 14),
+                  Row(
+                    children: [
+                      for (var i = 0; i < _tracks.length; i++) ...[
+                        if (i > 0) const SizedBox(width: 10),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: onOpenWord == null
+                                ? null
+                                : () => onOpenWord!(
+                                      _tracks[i].$1,
+                                      _tracks[i].$2,
+                                      kRmWordImg,
+                                      0,
+                                    ),
+                            child: Column(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: AspectRatio(
+                                    aspectRatio: 1,
+                                    child: Image.asset(
+                                      _tracks[i].$3,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) =>
+                                          const ColoredBox(color: Color(0xFF0A0F1C)),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  _tracks[i].$1,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w800,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                Text(
+                                  _tracks[i].$2,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    color: Color(0xAAFFFFFF),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ],

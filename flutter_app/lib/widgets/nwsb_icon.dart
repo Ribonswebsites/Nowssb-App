@@ -168,6 +168,14 @@ class NwsbMarks {
 
   // ── Section marks ────────────────────────────────────────────────────
 
+  /// Limited Time Free — hourglass mark (24 box, stroke). Replaces emoji ⏳.
+  static const hourglass =
+      '<path d="M6.4 3.6h11.2"/>'
+      '<path d="M6.4 20.4h11.2"/>'
+      '<path d="M8 3.6v1.4c0 3.1 2.2 5.1 4 6.8 1.8-1.7 4-3.7 4-6.8V3.6"/>'
+      '<path d="M8 20.4v-1.4c0-3.1 2.2-5.1 4-6.8 1.8 1.7 4 3.7 4 6.8v1.4"/>'
+      '<path d="M10.2 12h3.6"/>';
+
   /// The streak flame — index.html:997. A 24 box.
   static const flame =
       '<path d="M12 2c1.2 3.6-3.4 4.9-3.4 8.7a3.4 3.4 0 0 0 6.8 0'
