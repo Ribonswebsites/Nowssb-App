@@ -4,7 +4,7 @@
 /// Meaning promo, sentences, Atelier collections, big cards, category mosaics,
 /// meanings, Currently Playing, Buy Request, banner) and ADDS YTM Global Hits
 /// rails, Trending rows, featured Play+Save card, and artist-style category
-/// hero. Full-page looping film under light scrim (Store `usePageFilm` pattern).
+/// hero. Full-page home AppBackdrop film under light scrim (match Normal/Fashion home).
 /// No first HeavyGlass cage around chips+header — full-bleed over page video.
 /// Artwork is Word Atelier collection renders in `assets/store/collections/`.
 library;
@@ -19,11 +19,14 @@ import '../media/nwsb_image.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
+import '../widgets/app_backdrop.dart';
 import '../widgets/black_glass_banner.dart';
 import '../widgets/intro_gate.dart';
 import '../widgets/tv_frame.dart';
+import 'notifications_sheet.dart';
 import 'practice.dart';
 import 'practice_player.dart';
+import 'profile.dart';
 import 'store.dart';
 import 'store/meaning_store.dart';
 import 'word_detail.dart';
@@ -258,7 +261,10 @@ class _SoundLibraryScreenState extends State<SoundLibraryScreen> {
     if (widget.embedded) {
       // Bottom inset clears the floating nav pill when this is the Library
       // tab root; pushed sheets still get SafeArea bottom from the modal.
-      final bottom = Navigator.of(context).canPop() ? 0.0 : 96.0;
+      // Match home_normal: safe-area + 112 so Buy Request clears the pill.
+      final bottom = Navigator.of(context).canPop()
+          ? 0.0
+          : MediaQuery.paddingOf(context).bottom + 112;
       return Material(
         color: Colors.transparent,
         child: SafeArea(
@@ -346,18 +352,9 @@ class _SlmFeed extends StatelessWidget {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Full-page looping film — Store usePageFilm pattern.
-          const Positioned.fill(
-            child: NwsbVideo(
-              asset: 'assets/video/sound-library-banner.mp4',
-              fit: BoxFit.cover,
-              priority: ClipPriority.decoration,
-              autoplay: true,
-              loop: true,
-              showPoster: true,
-            ),
-          ),
-          // Light scrim so content stays readable; film still visible.
+          // Same home backdrop film (Fashion Plus / still) — not SL banner.
+          const Positioned.fill(child: AppBackdrop()),
+          // Light scrim so content stays readable; home film still visible.
           const Positioned.fill(
             child: DecoratedBox(
               decoration: BoxDecoration(
@@ -382,10 +379,19 @@ class _SlmFeed extends StatelessWidget {
                 onChip: onChip,
                 onBack: onBack,
                 embedded: embedded,
+                onNotifications: () => showNotificationsSheet(context),
+                onProfile: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const ProfileScreen()),
+                ),
+                onPlayHeader: pool.isEmpty ? null : () => onPlayWord(pool.first),
               ),
               Expanded(
                 child: ListView(
-                  padding: const EdgeInsets.only(bottom: 48),
+                  // Extra scroll pad so last sections clear floating nav even
+                  // when outer embedded inset is zero (pushed routes).
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.paddingOf(context).bottom + 48,
+                  ),
                   children: [
                     if (chip == 'Sentences') ...[
                       _sentencesSec(),
@@ -1479,6 +1485,9 @@ class _SlmHead extends StatelessWidget {
     required this.onChip,
     required this.onBack,
     required this.embedded,
+    required this.onNotifications,
+    required this.onProfile,
+    this.onPlayHeader,
   });
 
   final List<String> chips;
@@ -1486,6 +1495,9 @@ class _SlmHead extends StatelessWidget {
   final ValueChanged<String> onChip;
   final VoidCallback onBack;
   final bool embedded;
+  final VoidCallback onNotifications;
+  final VoidCallback onProfile;
+  final VoidCallback? onPlayHeader;
 
   @override
   Widget build(BuildContext context) {
@@ -1520,15 +1532,19 @@ class _SlmHead extends StatelessWidget {
                   )
                 else
                   const SizedBox(width: 12),
-                Container(
-                  width: 26,
-                  height: 26,
-                  decoration: const BoxDecoration(
-                    color: NwsbColors.goldLight,
-                    shape: BoxShape.circle,
+                GestureDetector(
+                  onTap: onPlayHeader,
+                  behavior: HitTestBehavior.opaque,
+                  child: Container(
+                    width: 26,
+                    height: 26,
+                    decoration: const BoxDecoration(
+                      color: NwsbColors.goldLight,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.play_arrow_rounded,
+                        color: Color(0xFF060C18), size: 18),
                   ),
-                  child: const Icon(Icons.play_arrow_rounded,
-                      color: Color(0xFF060C18), size: 18),
                 ),
                 const SizedBox(width: 8),
                 const Expanded(
@@ -1546,18 +1562,27 @@ class _SlmHead extends StatelessWidget {
                     ),
                   ),
                 ),
-                const Icon(Icons.notifications_none_rounded,
-                    color: Colors.white, size: 22),
-                const SizedBox(width: 10),
-                CircleAvatar(
-                  radius: 14,
-                  backgroundColor: const Color(0x33FFFFFF),
-                  child: Text(
-                    'N',
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.9),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
+                IconButton(
+                  onPressed: onNotifications,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                  icon: const Icon(Icons.notifications_none_rounded,
+                      color: Colors.white, size: 22),
+                ),
+                const SizedBox(width: 4),
+                GestureDetector(
+                  onTap: onProfile,
+                  behavior: HitTestBehavior.opaque,
+                  child: CircleAvatar(
+                    radius: 14,
+                    backgroundColor: const Color(0x33FFFFFF),
+                    child: Text(
+                      'N',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.9),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                 ),
@@ -2006,7 +2031,7 @@ class _PlayAllPill extends StatelessWidget {
 
 
 
-class _CurrentlyPlayingRail extends StatelessWidget {
+class _CurrentlyPlayingRail extends StatefulWidget {
   const _CurrentlyPlayingRail({
     required this.words,
     required this.art,
@@ -2018,32 +2043,113 @@ class _CurrentlyPlayingRail extends StatelessWidget {
   final ValueChanged<Word> onTap;
 
   @override
+  State<_CurrentlyPlayingRail> createState() => _CurrentlyPlayingRailState();
+}
+
+class _CurrentlyPlayingRailState extends State<_CurrentlyPlayingRail>
+    with SingleTickerProviderStateMixin {
+  int _i = 0;
+  bool _playing = false;
+  late final AnimationController _scrub;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrub = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 48),
+    );
+  }
+
+  @override
+  void dispose() {
+    _scrub.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(covariant _CurrentlyPlayingRail oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.words.isEmpty) {
+      _i = 0;
+      return;
+    }
+    if (_i >= widget.words.length) {
+      _i = 0;
+    }
+  }
+
+  Word get _word => widget.words[_i.clamp(0, widget.words.length - 1)];
+
+  void _play() {
+    setState(() => _playing = true);
+    _scrub.forward(from: _scrub.value >= 0.98 ? 0 : _scrub.value);
+    widget.onTap(_word);
+  }
+
+  void _toggle() {
+    if (_playing) {
+      setState(() => _playing = false);
+      _scrub.stop();
+    } else {
+      _play();
+    }
+  }
+
+  void _next() {
+    if (widget.words.length <= 1) {
+      _play();
+      return;
+    }
+    setState(() {
+      _i = (_i + 1) % widget.words.length;
+      _playing = true;
+      _scrub.forward(from: 0);
+    });
+    widget.onTap(_word);
+  }
+
+  void _prev() {
+    if (widget.words.length <= 1) return;
+    setState(() {
+      _i = (_i - 1 + widget.words.length) % widget.words.length;
+      _playing = true;
+      _scrub.forward(from: 0);
+    });
+    widget.onTap(_word);
+  }
+
+  String _fmt(double t) {
+    final s = (t * 48).round().clamp(0, 48 * 60);
+    final m = s ~/ 60;
+    final r = s % 60;
+    return '$m:${r.toString().padLeft(2, '0')}';
+  }
+
+  @override
   Widget build(BuildContext context) {
-    const size = 128.0;
-    return SizedBox(
-      // +8 slack — kills 1px BOTTOM OVERFLOW on SOMA / rail cards.
-      height: size + 52,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 6),
-        itemCount: words.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 12),
-        itemBuilder: (_, i) {
-          final w = words[i];
-          return GestureDetector(
-            onTap: () => onTap(w),
+    if (widget.words.isEmpty) return const SizedBox.shrink();
+    const size = 118.0;
+    final w = _word;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          GestureDetector(
+            onTap: _play,
             child: SizedBox(
               width: size,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(10),
                     child: SizedBox(
                       width: size,
                       height: size,
                       child: Image.asset(
-                        art(w.word),
+                        widget.art(w.word),
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) =>
                             const ColoredBox(color: _kYtmCard),
@@ -2070,8 +2176,133 @@ class _CurrentlyPlayingRail extends StatelessWidget {
                 ],
               ),
             ),
-          );
-        },
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: SizedBox(
+              height: size + 36,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    w.word,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    w.origin.isNotEmpty
+                        ? w.origin
+                        : (w.organ.isNotEmpty ? w.organ : 'Practice queue'),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: _kYtmMuted, fontSize: 12),
+                  ),
+                  const Spacer(),
+                  AnimatedBuilder(
+                    animation: _scrub,
+                    builder: (_, __) {
+                      final v = _scrub.value;
+                      return Column(
+                        children: [
+                          SliderTheme(
+                            data: SliderTheme.of(context).copyWith(
+                              trackHeight: 3,
+                              thumbShape: const RoundSliderThumbShape(
+                                enabledThumbRadius: 6,
+                              ),
+                              overlayShape: const RoundSliderOverlayShape(
+                                overlayRadius: 12,
+                              ),
+                              activeTrackColor: Colors.white,
+                              inactiveTrackColor: const Color(0x44FFFFFF),
+                              thumbColor: Colors.white,
+                              overlayColor: const Color(0x33FFFFFF),
+                            ),
+                            child: Slider(
+                              value: v.clamp(0.0, 1.0),
+                              onChanged: (nv) {
+                                setState(() {
+                                  _scrub.value = nv;
+                                  _playing = true;
+                                });
+                                _scrub.forward(from: nv);
+                              },
+                              onChangeEnd: (_) => widget.onTap(_word),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 6),
+                            child: Row(
+                              children: [
+                                Text(
+                                  _fmt(v),
+                                  style: const TextStyle(
+                                    color: _kYtmMuted,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                                const Spacer(),
+                                Text(
+                                  _fmt(1),
+                                  style: const TextStyle(
+                                    color: _kYtmMuted,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        onPressed: _prev,
+                        icon: const Icon(Icons.skip_previous_rounded,
+                            color: Colors.white, size: 28),
+                      ),
+                      const SizedBox(width: 4),
+                      GestureDetector(
+                        onTap: _toggle,
+                        child: Container(
+                          width: 48,
+                          height: 48,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            _playing
+                                ? Icons.pause_rounded
+                                : Icons.play_arrow_rounded,
+                            color: Colors.black,
+                            size: 30,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      IconButton(
+                        onPressed: _next,
+                        icon: const Icon(Icons.skip_next_rounded,
+                            color: Colors.white, size: 28),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

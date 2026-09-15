@@ -163,7 +163,9 @@ class _NavShellState extends State<NavShell> {
 
   Widget _build(BuildContext context) {
     return Scaffold(
-      backgroundColor: NwsbColors.surface,
+      // Deep (not surface light) so the chin under the floating pill is never
+      // a stray white home-indicator / divider line on Library and dark tabs.
+      backgroundColor: NwsbColors.deep,
       body: Stack(
         children: [
           // IndexedStack rather than swapping the child: it keeps each tab's
@@ -251,6 +253,14 @@ class _NavShellState extends State<NavShell> {
           // count, live, so the ceiling is something you can watch rather
           // than something you have to take on trust.
           const Positioned(top: 4, right: 8, child: SafeArea(child: PoolHud())),
+          // Opaque chin under the pill — kills white system/home line.
+          const Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: 28,
+            child: ColoredBox(color: NwsbColors.deep),
+          ),
           Positioned(
             left: 0,
             right: 0,
