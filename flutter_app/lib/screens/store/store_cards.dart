@@ -2,18 +2,81 @@
 /// `.rm-cat-banner`, ebook rows, and gold Signature tags.
 library;
 
+import 'dart:ui' show ImageFilter;
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
+import '../../widgets/nwsb_icon.dart';
 
 String inr(num value) {
   if (value <= 0) return 'Included';
   final n = value is int ? value : value.round();
   return '₹$n';
 }
+
+/// Real store collection / bag art keyed by category id.
+String storeCollectionArt(String? id) {
+  switch (id) {
+    case 'off50':
+    case 'sale':
+      return 'assets/store/collections/sale.webp';
+    case 'elements':
+      return 'assets/store/collections/elements.webp';
+    case 'sacred':
+      return 'assets/store/collections/sacred.webp';
+    case 'cosmos':
+      return 'assets/store/collections/cosmos.webp';
+    case 'nature':
+      return 'assets/store/collections/nature.webp';
+    case 'warriors':
+      return 'assets/store/collections/warriors.webp';
+    case 'elite':
+      return 'assets/store/collections/elite.webp';
+    case 'mythical':
+      return 'assets/store/collections/mythical.webp';
+    case 'family':
+      return 'assets/store/collections/family.webp';
+    case 'identity':
+      return 'assets/store/collections/identity.webp';
+    case 'premium':
+      return 'assets/store/collections/premium.webp';
+    case 'ancient':
+      return 'assets/store/collections/ancient.webp';
+    case 'peace':
+      return 'assets/store/collections/peace.webp';
+    case 'black':
+      return 'assets/store/collections/black.webp';
+    case 'white':
+      return 'assets/store/collections/white.webp';
+    default:
+      return 'assets/store/nowssb-bag-headphones.webp';
+  }
+}
+
+Color storeCardTint(String seed) {
+  const palette = <Color>[
+    Color(0xFF1A1428),
+    Color(0xFF0F1F2E),
+    Color(0xFF1A2214),
+    Color(0xFF2A1520),
+    Color(0xFF142028),
+    Color(0xFF221A14),
+    Color(0xFF1A1828),
+    Color(0xFF14241C),
+    Color(0xFF281418),
+    Color(0xFF182028),
+  ];
+  var h = 0;
+  for (final c in seed.codeUnits) {
+    h = (h * 31 + c) & 0x7fffffff;
+  }
+  return palette[h % palette.length];
+}
+
 
 class StoreNetImage extends StatelessWidget {
   const StoreNetImage({super.key, required this.url, this.fit = BoxFit.cover});
@@ -32,8 +95,8 @@ class StoreNetImage extends StatelessWidget {
   }
 }
 
-/// Plain black `.rm-cat-banner` — logo + divider + title/sub.
-/// Matches part010/part026: no photo/character collection banners.
+/// Notification-style category banner — glass wrapper, heading above, taller
+/// black pill with SVG circle → separator → real collection/bag art.
 class RmCatBanner extends StatelessWidget {
   const RmCatBanner({
     super.key,
@@ -43,6 +106,9 @@ class RmCatBanner extends StatelessWidget {
     this.labelColor,
     this.logoAsset = 'assets/icons/collection-icon.webp',
     this.logoUrl,
+    this.artAsset,
+    this.categoryId,
+    this.svgBody,
   });
 
   final String title;
@@ -50,102 +116,155 @@ class RmCatBanner extends StatelessWidget {
   final String? badge;
   final Color? labelColor;
 
-  /// Bundled collection disc (Word Atelier / web `./assets/icons/collection-icon.webp`).
+  /// Bundled collection disc (legacy; SVG preferred).
   final String logoAsset;
 
-  /// Optional remote logo (Meaning Store MS_CAT_LOGO). Wins over [logoAsset].
+  /// Optional remote logo (Meaning Store MS_CAT_LOGO).
   final String? logoUrl;
+
+  /// Real collection / bag image shown inside the black pill.
+  final String? artAsset;
+
+  /// Used to resolve [artAsset] when not provided.
+  final String? categoryId;
+
+  /// NowssB SVG path body for the circular mark (defaults to bag).
+  final String? svgBody;
 
   @override
   Widget build(BuildContext context) {
     final titleColor = labelColor ?? NwsbColors.goldLight;
-    final Widget logo = logoUrl != null
-        ? Image.network(
-            logoUrl!,
-            fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => Image.asset(logoAsset, fit: BoxFit.cover),
-          )
-        : Image.asset(
-            logoAsset,
-            fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) =>
-                const Icon(Icons.auto_awesome, size: 16, color: NwsbColors.goldLight),
-          );
-    return Container(
-      margin: const EdgeInsets.only(top: 18, bottom: 10),
-      clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        color: Colors.black,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0x1AFFFFFF)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-        child: Row(
-          children: [
-            Container(
-              width: 36,
-              height: 36,
-              clipBehavior: Clip.antiAlias,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: const Color(0x33E8D5A3)),
-                color: const Color(0x14E8D5A3),
+    final art = artAsset ?? storeCollectionArt(categoryId);
+    final mark = svgBody ?? NwsbMarks.bag;
+    return Padding(
+      padding: const EdgeInsets.only(top: 18, bottom: 10),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(22),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(22),
+              color: const Color(0x99101526),
+              border: Border.all(color: const Color(0x33FFFFFF)),
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xAA182038), Color(0x77101526)],
               ),
-              child: logo,
             ),
-            Container(
-              width: 1,
-              height: 34,
-              margin: const EdgeInsets.symmetric(horizontal: 12),
-              color: const Color(0x26FFFFFF),
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.6,
+                          color: titleColor,
+                        ),
+                      ),
+                    ),
+                    if (badge != null) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: titleColor.withValues(alpha: 0.45)),
+                        ),
                         child: Text(
-                          title,
+                          badge!,
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 9,
                             fontWeight: FontWeight.w700,
+                            letterSpacing: 1.2,
                             color: titleColor,
                           ),
                         ),
                       ),
-                      if (badge != null) ...[
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(4),
-                            border: Border.all(color: titleColor.withOpacity(0.45)),
-                          ),
-                          child: Text(
-                            badge!,
-                            style: TextStyle(
-                              fontSize: 9,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 1.2,
-                              color: titleColor,
-                            ),
-                          ),
-                        ),
-                      ],
                     ],
-                  ),
+                  ],
+                ),
+                if (sub.isNotEmpty) ...[
                   const SizedBox(height: 3),
                   Text(
                     sub,
-                    style: const TextStyle(fontSize: 11, color: Color(0x66FFFFFF)),
+                    style: const TextStyle(fontSize: 11, color: Color(0x88FFFFFF)),
                   ),
                 ],
-              ),
+                const SizedBox(height: 10),
+                Container(
+                  height: 68,
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(34),
+                    border: Border.all(color: const Color(0x22FFFFFF)),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: Row(
+                    children: [
+                      const SizedBox(width: 10),
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: const Color(0x18E8D5A3),
+                          border: Border.all(color: titleColor.withValues(alpha: 0.45)),
+                        ),
+                        alignment: Alignment.center,
+                        child: NwsbIcon(mark, size: 20, color: titleColor),
+                      ),
+                      Container(
+                        width: 1,
+                        height: 36,
+                        margin: const EdgeInsets.symmetric(horizontal: 12),
+                        color: const Color(0x33FFFFFF),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 10),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(18),
+                            child: SizedBox(
+                              height: 48,
+                              child: Image.asset(
+                                art,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) {
+                                  if (logoUrl != null) {
+                                    return Image.network(
+                                      logoUrl!,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) =>
+                                          Image.asset(logoAsset, fit: BoxFit.cover),
+                                    );
+                                  }
+                                  return Image.asset(
+                                    logoAsset,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) => const ColoredBox(
+                                      color: Color(0xFF0A0F1C),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -177,8 +296,7 @@ class RmWordRow extends StatelessWidget {
   const RmWordRow({super.key, required this.children});
   final List<Widget> children;
 
-  /// Card body is fixed at [RmWordCard.cardHeight]; keep a few px of slack
-  /// for the soft drop shadow so nothing clips or yellow-stripes.
+  /// Horizontal thicker cards — fixed height avoids yellow overflow stripes.
   static const double rowHeight = RmWordCard.cardHeight + 8;
 
   @override
@@ -189,7 +307,7 @@ class RmWordRow extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.only(right: 4, bottom: 2),
         itemCount: children.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 14),
+        separatorBuilder: (_, __) => const SizedBox(width: 12),
         itemBuilder: (_, i) => children[i],
       ),
     );
@@ -208,6 +326,7 @@ class RmWordCard extends StatelessWidget {
     this.onBuyNow,
     this.onWishlist,
     this.onAddCart,
+    this.tint,
   });
 
   final String name;
@@ -219,12 +338,11 @@ class RmWordCard extends StatelessWidget {
   final VoidCallback? onBuyNow;
   final VoidCallback? onWishlist;
   final VoidCallback? onAddCart;
+  final Color? tint;
 
-  /// Real-store card: larger art + title/origin/price + action row under price.
-  /// Fixed size keeps rails free of yellow overflow stripes.
-  static const double cardHeight = 286;
-  static const double cardWidth = 172;
-  static const double _footerH = 108;
+  /// Thicker horizontal card: image left, text + actions right.
+  static const double cardHeight = 132;
+  static const double cardWidth = 292;
 
   void _toast(BuildContext context, String msg) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -238,53 +356,48 @@ class RmWordCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bg = tint ?? storeCardTint(name);
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: cardWidth,
         height: cardHeight,
         decoration: BoxDecoration(
-          color: const Color(0xFF05070F),
-          borderRadius: BorderRadius.circular(16),
+          color: bg,
+          borderRadius: BorderRadius.circular(18),
           border: Border.all(
             color: signature ? const Color(0x55E8D5A3) : const Color(0x2EFFFFFF),
           ),
           boxShadow: const [
-            BoxShadow(color: Color(0x99000000), blurRadius: 20, offset: Offset(0, 8)),
+            BoxShadow(color: Color(0x99000000), blurRadius: 18, offset: Offset(0, 6)),
           ],
         ),
         clipBehavior: Clip.antiAlias,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(
-              height: cardHeight - _footerH,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  StoreNetImage(url: imgUrl),
-                  const DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [Color(0x00000000), Color(0x66000000)],
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 108,
+                height: 112,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(14),
+                      child: StoreNetImage(url: imgUrl),
+                    ),
+                    if (signature)
+                      const Positioned(
+                        top: 6,
+                        left: 6,
+                        child: _SignatureTag(),
                       ),
-                    ),
-                  ),
-                  if (signature)
-                    const Positioned(
-                      top: 10,
-                      left: 10,
-                      child: _SignatureTag(),
-                    ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            SizedBox(
-              height: _footerH,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+              const SizedBox(width: 12),
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -293,19 +406,19 @@ class RmWordCard extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
                         color: Colors.white,
                         height: 1.1,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 3),
                     Text(
                       root.toUpperCase(),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontSize: 9,
+                        fontSize: 10,
                         fontWeight: FontWeight.w500,
                         letterSpacing: 0.8,
                         height: 1.1,
@@ -318,7 +431,7 @@ class RmWordCard extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontSize: 13,
+                        fontSize: 14,
                         fontWeight: FontWeight.w800,
                         height: 1.1,
                         color: NwsbColors.goldLight,
@@ -339,10 +452,10 @@ class RmWordCard extends StatelessWidget {
                               }
                             },
                             child: Container(
-                              height: 28,
+                              height: 30,
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius: BorderRadius.circular(9),
                                 gradient: const LinearGradient(
                                   colors: [Color(0xFFE8D5A3), Color(0xFFC8A96E)],
                                 ),
@@ -350,9 +463,9 @@ class RmWordCard extends StatelessWidget {
                               child: const Text(
                                 'Buy Now',
                                 style: TextStyle(
-                                  fontSize: 10,
+                                  fontSize: 11,
                                   fontWeight: FontWeight.w800,
-                                  letterSpacing: 0.4,
+                                  letterSpacing: 0.3,
                                   color: Color(0xFF060C18),
                                 ),
                               ),
@@ -387,8 +500,8 @@ class RmWordCard extends StatelessWidget {
                   ],
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

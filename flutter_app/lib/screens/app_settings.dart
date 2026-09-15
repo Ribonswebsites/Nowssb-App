@@ -16,6 +16,7 @@ import 'notifications_settings.dart';
 import 'player_settings.dart';
 import 'profile.dart';
 import 'quick_access.dart';
+import 'store/request_words.dart';
 import 'widgets_page.dart';
 
 class AppSettingsScreen extends StatefulWidget {
@@ -746,6 +747,20 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                               sub: 'Remove session logs — cannot be undone',
                               danger: true,
                               onTap: () => _confirmClearHistory(),
+                            ),
+                          if (_match('Request') || _match('Word'))
+                            _NavRow(
+                              icon: Icons.edit_note_outlined,
+                              title: 'Request Words',
+                              sub: 'Ask the atelier for a new word',
+                              onTap: () => openRequestWords(context),
+                            ),
+                          if (_match('Fulfill') || _match('Admin') || _match('Request'))
+                            _NavRow(
+                              icon: Icons.admin_panel_settings_outlined,
+                              title: 'Fulfill Word Requests',
+                              sub: 'Admin — mark requests fulfilled',
+                              onTap: () => openRequestWordsAdmin(context),
                             ),
                           if (_match('About'))
                             _NavRow(

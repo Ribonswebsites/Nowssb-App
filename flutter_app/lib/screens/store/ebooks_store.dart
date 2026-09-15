@@ -12,6 +12,7 @@ import '../../widgets/intro_gate.dart';
 import '../../widgets/page_shell.dart';
 import 'product_detail.dart';
 import 'store_cards.dart';
+import 'request_words.dart';
 import 'store_home_sections.dart';
 import 'store_select_sheet.dart';
 import 'store_routes.dart';
@@ -129,19 +130,40 @@ class _EbooksBody extends StatelessWidget {
         const SizedBox(height: 18),
         StoreFrequencyPackage(
           onSelectCategory: (_) {},
-          onSeeAll: () {},
+          onSeeAll: () => showStoreViewAllPanel(
+            context,
+            title: 'Browse by Goal',
+            items: storeDefaultViewAllItems(),
+            onOpenWord: (_, __, ___, ____) {},
+          ),
+          onRequestWords: () => openRequestWords(context),
           onOpenWord: (_, __, ___, ____) {},
         ),
         StoreRecommendedSection(
-          onSeeAll: () {},
+          onSeeAll: () => showStoreViewAllPanel(
+            context,
+            title: 'Recommended for You',
+            items: storeDefaultViewAllItems(),
+            onOpenWord: (_, __, ___, ____) {},
+          ),
           onOpenWord: (_, __, ___, ____) {},
         ),
         StoreFeaturedPlaylistSection(
-          onSeeAll: () {},
+          onSeeAll: () => showStoreViewAllPanel(
+            context,
+            title: 'Featured Playlist',
+            items: storeDefaultViewAllItems(),
+            onOpenWord: (_, __, ___, ____) {},
+          ),
           onOpenWord: (_, __, ___, ____) {},
         ),
         StoreGlassPlaylistCarousel(
-          onSeeAll: () {},
+          onSeeAll: () => showStoreViewAllPanel(
+            context,
+            title: 'Playlists',
+            items: storeDefaultViewAllItems(),
+            onOpenWord: (_, __, ___, ____) {},
+          ),
           onOpenWord: (_, __, ___, ____) {},
         ),
         ..._ebookRowsWithMidBanners(books),

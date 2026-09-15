@@ -15,6 +15,7 @@ import 'product_detail.dart';
 import 'store_cards.dart';
 import 'store_home_sections.dart';
 import 'store_select_sheet.dart';
+import 'request_words.dart';
 import 'store_routes.dart';
 
 class WordAtelierScreen extends StatelessWidget {
@@ -100,6 +101,15 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
     openAtelierWord(context, word: word, root: root, img: img, price: price);
   }
 
+  void _openViewAll(String title) {
+    showStoreViewAllPanel(
+      context,
+      title: title,
+      items: storeDefaultViewAllItems(),
+      onOpenWord: _openWord,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final cats = _cats;
@@ -114,6 +124,8 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
         badge: cat.badge,
         labelColor: cat.labelColor != null ? Color(cat.labelColor!) : null,
         logoAsset: kRmCatLogoAsset,
+        categoryId: cat.id,
+        artAsset: storeCollectionArt(cat.id),
       ));
       sections.add(Builder(builder: (context) {
         final cards = <Widget>[];
@@ -175,19 +187,20 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
       if (_chip == 'ALL' && productRailIndex == 4) {
         sections.add(StoreFrequencyPackage(
           onSelectCategory: (id) => setState(() => _chip = id),
-          onSeeAll: _browseAll,
+          onSeeAll: () => _openViewAll('Browse by Goal'),
           onOpenWord: _openWord,
+          onRequestWords: () => openRequestWords(context),
         ));
       }
 
       // After the 6th rail → Recommended + Featured Playlist glass (image-4).
       if (_chip == 'ALL' && productRailIndex == 6) {
         sections.add(StoreRecommendedSection(
-          onSeeAll: _browseAll,
+          onSeeAll: () => _openViewAll('Recommended for You'),
           onOpenWord: _openWord,
         ));
         sections.add(StoreFeaturedPlaylistSection(
-          onSeeAll: _browseAll,
+          onSeeAll: () => _openViewAll('Featured Playlist'),
           onOpenWord: _openWord,
         ));
       }
@@ -195,11 +208,11 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
       // After the 7th rail → Featured Bundle glass + tall 3-card carousel (image-5).
       if (_chip == 'ALL' && productRailIndex == 7) {
         sections.add(StoreFeaturedBundleSection(
-          onSeeAll: _browseAll,
+          onSeeAll: () => _openViewAll('Featured Bundle'),
           onOpenWord: _openWord,
         ));
         sections.add(StoreGlassPlaylistCarousel(
-          onSeeAll: _browseAll,
+          onSeeAll: () => _openViewAll('Playlists'),
           onOpenWord: _openWord,
         ));
       }

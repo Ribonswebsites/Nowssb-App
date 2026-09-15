@@ -11,6 +11,7 @@ import '../../data/store_catalog.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
+import '../../widgets/nwsb_icon.dart';
 import 'store_cards.dart';
 
 // ─── #2 Store hero video (Ribons Original copy block removed) ────────────────
@@ -469,7 +470,7 @@ class _SectionHeader extends StatelessWidget {
         GestureDetector(
           onTap: onSeeAll,
           child: const Text(
-            'See All',
+            'View all',
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -528,14 +529,15 @@ class StoreGlassPanel extends StatelessWidget {
 // ─── #3b Limited Time Free + Browse by Goal (frequency package) ──────────────
 
 class StoreLimitedTimeFreeSection extends StatelessWidget {
-  const StoreLimitedTimeFreeSection({super.key, this.onOpenWord});
+  const StoreLimitedTimeFreeSection({super.key, this.onOpenWord, this.onRequestWords});
 
   final void Function(String word, String root, String img, num price)? onOpenWord;
+  final VoidCallback? onRequestWords;
 
-  static const _tracks = <(String, String, String)>[
-    ('432 Hz', 'Relax Piano', 'assets/store/collections/peace.webp'),
-    ('528 Hz', 'Calming Tones', 'assets/store/collections/sacred.webp'),
-    ('639 Hz', 'Heart Open', 'assets/store/collections/nature.webp'),
+  static const _tracks = <(String, String, String, num)>[
+    ('Warrior', 'Old French', 'assets/store/collections/warriors.webp', 0),
+    ('Spirit', 'Latin', 'assets/store/collections/sacred.webp', 0),
+    ('Peace', 'Old French', 'assets/store/collections/peace.webp', 0),
   ];
 
   @override
@@ -545,98 +547,54 @@ class StoreLimitedTimeFreeSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            '⏳ Limited Time Free',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w800,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(16, 18, 16, 16),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(22),
-              gradient: const LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Color(0xFF2EC4B6), Color(0xFF0B1B3A)],
-              ),
-            ),
-            child: Column(
-              children: [
-                const Text(
-                  'Listen to Healing Frequencies',
-                  textAlign: TextAlign.center,
+          StoreNotifBanner(
+            heading: 'LIMITED TIME OFFER',
+            svgBody: NwsbMarks.flame,
+            artAsset: 'assets/store/nowssb-bag-headphones.webp',
+            accent: const Color(0xFFFF8A3D),
+            sub: 'Free atelier picks — request a word if yours is missing.',
+            trailing: onRequestWords == null
+                ? null
+                : GestureDetector(
+              onTap: onRequestWords,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: const Color(0x55E8D5A3)),
+                  color: const Color(0x22E8D5A3),
+                ),
+                child: const Text(
+                  'Request Words',
                   style: TextStyle(
-                    fontSize: 17,
+                    fontSize: 10,
                     fontWeight: FontWeight.w800,
-                    color: Colors.white,
+                    color: NwsbColors.goldLight,
                   ),
                 ),
-                const SizedBox(height: 4),
-                const Text(
-                  'Calm your mind with a free track.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 12, color: Color(0xCCFFFFFF)),
-                ),
-                const SizedBox(height: 14),
-                Row(
-                  children: [
-                    for (var i = 0; i < _tracks.length; i++) ...[
-                      if (i > 0) const SizedBox(width: 10),
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: onOpenWord == null
-                              ? null
-                              : () => onOpenWord!(
-                                    _tracks[i].$1,
-                                    _tracks[i].$2,
-                                    kRmWordImg,
-                                    0,
-                                  ),
-                          child: Column(
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: AspectRatio(
-                                  aspectRatio: 1,
-                                  child: Image.asset(
-                                    _tracks[i].$3,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (_, __, ___) =>
-                                        const ColoredBox(color: Color(0xFF0A0F1C)),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                _tracks[i].$1,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w800,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              Text(
-                                _tracks[i].$2,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontSize: 10,
-                                  color: Color(0xAAFFFFFF),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: RmWordCard.cardHeight + 4,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: _tracks.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 10),
+              itemBuilder: (context, i) {
+                final t = _tracks[i];
+                return RmWordCard(
+                  name: t.$1,
+                  root: t.$2,
+                  imgUrl: kRmWordImg,
+                  price: t.$4,
+                  tint: storeCardTint(t.$1),
+                  onTap: onOpenWord == null
+                      ? null
+                      : () => onOpenWord!(t.$1.toLowerCase(), t.$2, kRmWordImg, t.$4),
+                );
+              },
             ),
           ),
         ],
@@ -734,19 +692,21 @@ class StoreFrequencyPackage extends StatelessWidget {
     required this.onSelectCategory,
     required this.onSeeAll,
     this.onOpenWord,
+    this.onRequestWords,
   });
 
   final ValueChanged<String> onSelectCategory;
   final VoidCallback onSeeAll;
   final void Function(String word, String root, String img, num price)? onOpenWord;
+  final VoidCallback? onRequestWords;
 
   @override
   Widget build(BuildContext context) {
-    // HEAL BY CATEGORY 2×2 grid removed — keep Limited Time Free + Browse by Goal.
+    // HEAL BY CATEGORY 2×2 grid removed — keep Limited Time Offer + Browse by Goal.
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        StoreLimitedTimeFreeSection(onOpenWord: onOpenWord),
+        StoreLimitedTimeFreeSection(onOpenWord: onOpenWord, onRequestWords: onRequestWords),
         StoreBrowseByGoalSection(onSeeAll: onSeeAll, onSelect: onSelectCategory),
       ],
     );
@@ -1042,165 +1002,92 @@ class _GlassPlaylistCardData {
 
 class StoreMidRailBannerData {
   const StoreMidRailBannerData({
-    required this.images,
+    required this.heading,
+    required this.artAsset,
     required this.accent,
-    required this.panelTint,
-    this.label = '',
+    this.svgBody,
+    this.sub = '',
   });
 
-  final List<String> images;
+  final String heading;
+  final String artAsset;
   final Color accent;
-  final Color panelTint;
-  final String label;
+  final String? svgBody;
+  final String sub;
 }
 
 const kStoreMidRailBanners = <StoreMidRailBannerData>[
   StoreMidRailBannerData(
-    images: [
-      'assets/store/collections/warriors.webp',
-      'assets/store/collections/elements.webp',
-      'assets/store/collections/sacred.webp',
-      'assets/store/collections/nature.webp',
-    ],
+    heading: 'COLLECTIONS',
+    artAsset: 'assets/store/collections/warriors.webp',
     accent: Color(0xFF5CE1FF),
-    panelTint: Color(0x332196F3),
-    label: 'Collections',
+    svgBody: NwsbMarks.bag,
+    sub: 'Sacred · Warrior · Elements',
   ),
   StoreMidRailBannerData(
-    images: [
-      'assets/store/collections/peace.webp',
-      'assets/store/collections/cosmos.webp',
-      'assets/store/collections/mythical.webp',
-      'assets/store/collections/elite.webp',
-    ],
+    heading: 'CURATED RAILS',
+    artAsset: 'assets/store/collections/cosmos.webp',
     accent: Color(0xFF26A69A),
-    panelTint: Color(0x3326A69A),
-    label: 'Curated',
+    svgBody: NwsbMarks.flame,
+    sub: 'Time & Cosmos picks',
   ),
   StoreMidRailBannerData(
-    images: [
-      'assets/store/collections/sale.webp',
-      'assets/store/collections/family.webp',
-      'assets/store/collections/identity.webp',
-      'assets/store/collections/premium.webp',
-    ],
+    heading: 'FEATURED DROP',
+    artAsset: 'assets/store/collections/sale.webp',
     accent: Color(0xFFFFB74D),
-    panelTint: Color(0x33FFB74D),
-    label: 'Featured',
+    svgBody: NwsbMarks.word,
+    sub: 'Limited atelier editions',
   ),
   StoreMidRailBannerData(
-    images: [
-      'assets/store/collections/ancient.webp',
-      'assets/store/collections/black.webp',
-      'assets/store/collections/white.webp',
-      'assets/store/nowssb-bag-headphones.webp',
-    ],
+    heading: 'WORD ATELIER',
+    artAsset: 'assets/store/nowssb-bag-headphones.webp',
     accent: Color(0xFFB388FF),
-    panelTint: Color(0x33B388FF),
-    label: 'Atelier',
+    svgBody: NwsbMarks.sound,
+    sub: 'Real bag · real sound',
   ),
   StoreMidRailBannerData(
-    images: [
-      'assets/store/collections/elements.webp',
-      'assets/store/collections/nature.webp',
-      'assets/store/collections/peace.webp',
-      'assets/store/collections/sacred.webp',
-    ],
+    heading: 'ELEMENTS',
+    artAsset: 'assets/store/collections/elements.webp',
     accent: Color(0xFFFF6BCB),
-    panelTint: Color(0x33FF6BCB),
-    label: 'Elements',
+    svgBody: NwsbMarks.sound,
+    sub: 'Earth · Water · Fire · Air',
   ),
   StoreMidRailBannerData(
-    images: [
-      'assets/store/collections/cosmos.webp',
-      'assets/store/collections/elite.webp',
-      'assets/store/collections/mythical.webp',
-      'assets/store/collections/premium.webp',
-    ],
+    heading: 'ELITE WORDS',
+    artAsset: 'assets/store/collections/elite.webp',
     accent: Color(0xFF7CFF6B),
-    panelTint: Color(0x337CFF6B),
-    label: 'Elite',
+    svgBody: NwsbMarks.crown,
+    sub: 'Rarest catalogue entries',
   ),
   StoreMidRailBannerData(
-    images: [
-      'assets/store/collections/family.webp',
-      'assets/store/collections/identity.webp',
-      'assets/store/collections/sale.webp',
-      'assets/store/collections/ancient.webp',
-    ],
+    heading: 'SALE RAIL',
+    artAsset: 'assets/store/collections/sale.webp',
     accent: Color(0xFFE8D5A3),
-    panelTint: Color(0x33E8D5A3),
-    label: 'Sale',
+    svgBody: NwsbMarks.flame,
+    sub: 'Half-price vibrational words',
   ),
 ];
 
-/// Taller notification-style glass strip: real collection / bag art tiles with
-/// thin vertical separators — no SVG-in-circle placeholder.
+/// Taller notification-style glass strip: heading above black pill with
+/// SVG circle → separator → real collection/bag art.
 class StoreMidRailBanner extends StatelessWidget {
-  const StoreMidRailBanner({super.key, required this.data});
+  const StoreMidRailBanner({super.key, required this.data, this.onTap});
 
   final StoreMidRailBannerData data;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
-      child: StoreGlassPanel(
-        padding: const EdgeInsets.all(7),
-        radius: 20,
-        child: Container(
-          height: 72,
-          decoration: BoxDecoration(
-            color: const Color(0xCC000000),
-            borderRadius: BorderRadius.circular(15),
-            border: Border.all(color: data.accent.withValues(alpha: 0.38)),
-            boxShadow: [
-              BoxShadow(
-                color: data.panelTint,
-                blurRadius: 18,
-                offset: const Offset(0, 5),
-              ),
-            ],
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: Row(
-            children: [
-              for (var i = 0; i < 4; i++) ...[
-                if (i > 0)
-                  Container(
-                    width: 1,
-                    height: double.infinity,
-                    color: Colors.white.withValues(alpha: 0.14),
-                  ),
-                Expanded(
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      Image.asset(
-                        data.images[i % data.images.length],
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => ColoredBox(
-                          color: data.accent.withValues(alpha: 0.18),
-                        ),
-                      ),
-                      DecoratedBox(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.black.withValues(alpha: 0.15),
-                              Colors.black.withValues(alpha: 0.45),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ],
-          ),
+      child: GestureDetector(
+        onTap: onTap,
+        child: StoreNotifBanner(
+          heading: data.heading,
+          svgBody: data.svgBody ?? NwsbMarks.bag,
+          artAsset: data.artAsset,
+          accent: data.accent,
+          sub: data.sub,
         ),
       ),
     );
@@ -1211,4 +1098,487 @@ class StoreMidRailBanner extends StatelessWidget {
 Widget? storeMidRailBannerAt(int index) {
   if (index < 0 || index >= kStoreMidRailBanners.length) return null;
   return StoreMidRailBanner(data: kStoreMidRailBanners[index]);
+}
+
+// ─── Shared notification glass banner (Limited / mid-rails / section pills) ─
+
+class StoreNotifBanner extends StatelessWidget {
+  const StoreNotifBanner({
+    super.key,
+    required this.heading,
+    required this.svgBody,
+    required this.artAsset,
+    required this.accent,
+    this.sub = '',
+    this.trailing,
+  });
+
+  final String heading;
+  final String svgBody;
+  final String artAsset;
+  final Color accent;
+  final String sub;
+  final Widget? trailing;
+
+  @override
+  Widget build(BuildContext context) {
+    return StoreGlassPanel(
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+      radius: 22,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  heading,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.4,
+                    color: accent,
+                  ),
+                ),
+              ),
+              if (trailing != null) trailing!,
+            ],
+          ),
+          if (sub.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text(
+              sub,
+              style: const TextStyle(fontSize: 11, color: Color(0x88FFFFFF)),
+            ),
+          ],
+          const SizedBox(height: 10),
+          Container(
+            height: 64,
+            decoration: BoxDecoration(
+              color: Colors.black,
+              borderRadius: BorderRadius.circular(32),
+              border: Border.all(color: accent.withValues(alpha: 0.35)),
+              boxShadow: [
+                BoxShadow(
+                  color: accent.withValues(alpha: 0.18),
+                  blurRadius: 16,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: Row(
+              children: [
+                const SizedBox(width: 10),
+                Container(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: accent.withValues(alpha: 0.16),
+                    border: Border.all(color: accent.withValues(alpha: 0.45)),
+                  ),
+                  alignment: Alignment.center,
+                  child: NwsbIcon(svgBody, size: 18, color: accent),
+                ),
+                Container(
+                  width: 1,
+                  height: 34,
+                  margin: const EdgeInsets.symmetric(horizontal: 12),
+                  color: const Color(0x33FFFFFF),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 10),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: SizedBox(
+                        height: 44,
+                        child: Image.asset(
+                          artAsset,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => ColoredBox(
+                            color: accent.withValues(alpha: 0.2),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── View all → blur + 3D carousel glass panel ───────────────────────────────
+
+class StoreViewAllItem {
+  const StoreViewAllItem({
+    required this.title,
+    required this.sub,
+    required this.art,
+    required this.word,
+    required this.root,
+    required this.img,
+    required this.price,
+  });
+
+  final String title;
+  final String sub;
+  final String art;
+  final String word;
+  final String root;
+  final String img;
+  final num price;
+}
+
+Future<void> showStoreViewAllPanel(
+  BuildContext context, {
+  required String title,
+  required List<StoreViewAllItem> items,
+  required void Function(String word, String root, String img, num price) onOpenWord,
+}) {
+  return showGeneralDialog<void>(
+    context: context,
+    barrierDismissible: true,
+    barrierLabel: 'Close',
+    barrierColor: Colors.black.withValues(alpha: 0.45),
+    transitionDuration: const Duration(milliseconds: 260),
+    pageBuilder: (ctx, anim, secondary) {
+      return _StoreViewAllOverlay(
+        title: title,
+        items: items,
+        onOpenWord: onOpenWord,
+      );
+    },
+    transitionBuilder: (ctx, anim, secondary, child) {
+      final curved = CurvedAnimation(parent: anim, curve: Curves.easeOutCubic);
+      return FadeTransition(
+        opacity: curved,
+        child: ScaleTransition(
+          scale: Tween<double>(begin: 0.96, end: 1).animate(curved),
+          child: child,
+        ),
+      );
+    },
+  );
+}
+
+List<StoreViewAllItem> storeDefaultViewAllItems() {
+  const cats = <(String, String, String)>[
+    ('Sacred Divine', 'Consciousness', 'assets/store/collections/sacred.webp'),
+    ('Warrior', 'Strength', 'assets/store/collections/warriors.webp'),
+    ('Elements', 'Nature', 'assets/store/collections/elements.webp'),
+    ('Time & Cosmos', 'Infinity', 'assets/store/collections/cosmos.webp'),
+    ('Peace', 'Stillness', 'assets/store/collections/peace.webp'),
+    ('Mythical', 'Ancient forces', 'assets/store/collections/mythical.webp'),
+  ];
+  return [
+    for (final c in cats)
+      StoreViewAllItem(
+        title: c.$1,
+        sub: c.$2,
+        art: c.$3,
+        word: c.$1.split(' ').first.toLowerCase(),
+        root: c.$2,
+        img: kRmWordImg,
+        price: 49,
+      ),
+  ];
+}
+
+class _StoreViewAllOverlay extends StatefulWidget {
+  const _StoreViewAllOverlay({
+    required this.title,
+    required this.items,
+    required this.onOpenWord,
+  });
+
+  final String title;
+  final List<StoreViewAllItem> items;
+  final void Function(String word, String root, String img, num price) onOpenWord;
+
+  @override
+  State<_StoreViewAllOverlay> createState() => _StoreViewAllOverlayState();
+}
+
+class _StoreViewAllOverlayState extends State<_StoreViewAllOverlay> {
+  late final PageController _page;
+  double _pageValue = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _page = PageController(viewportFraction: 0.62);
+    _page.addListener(() {
+      setState(() => _pageValue = _page.page ?? 0);
+    });
+  }
+
+  @override
+  void dispose() {
+    _page.dispose();
+    super.dispose();
+  }
+
+  StoreViewAllItem get _current {
+    if (widget.items.isEmpty) {
+      return const StoreViewAllItem(
+        title: 'Word',
+        sub: 'Atelier',
+        art: 'assets/store/nowssb-bag-headphones.webp',
+        word: 'word',
+        root: 'NowssB',
+        img: kRmWordImg,
+        price: 49,
+      );
+    }
+    final i = _pageValue.round().clamp(0, widget.items.length - 1);
+    return widget.items[i];
+  }
+
+  void _toast(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(msg), behavior: SnackBarBehavior.floating, duration: const Duration(seconds: 2)),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      type: MaterialType.transparency,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+              child: GestureDetector(
+                onTap: () => Navigator.of(context).pop(),
+                child: Container(color: const Color(0x66060C18)),
+              ),
+            ),
+          ),
+          SafeArea(
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: StoreGlassPanel(
+                  radius: 26,
+                  padding: const EdgeInsets.fromLTRB(14, 16, 14, 18),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              widget.title,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => Navigator.of(context).pop(),
+                            child: Container(
+                              width: 32,
+                              height: 32,
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Color(0x22FFFFFF),
+                              ),
+                              child: const Icon(Icons.close, size: 16, color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 14),
+                      SizedBox(
+                        height: 220,
+                        child: PageView.builder(
+                          controller: _page,
+                          itemCount: widget.items.length,
+                          itemBuilder: (context, i) {
+                            final delta = (i - _pageValue);
+                            final abs = delta.abs().clamp(0.0, 1.5);
+                            final scale = 1 - (abs * 0.12);
+                            final rotY = delta * 0.55;
+                            final item = widget.items[i];
+                            return Transform(
+                              alignment: Alignment.center,
+                              transform: Matrix4.identity()
+                                ..setEntry(3, 2, 0.0014)
+                                ..rotateY(rotY)
+                                ..scaleByDouble(scale, scale, scale, 1.0),
+                              child: Opacity(
+                                opacity: (1 - abs * 0.35).clamp(0.45, 1.0),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.of(context).pop();
+                                    widget.onOpenWord(item.word, item.root, item.img, item.price);
+                                  },
+                                  child: Container(
+                                    margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(color: const Color(0x33FFFFFF)),
+                                      boxShadow: const [
+                                        BoxShadow(color: Color(0x88000000), blurRadius: 18, offset: Offset(0, 8)),
+                                      ],
+                                    ),
+                                    clipBehavior: Clip.antiAlias,
+                                    child: Stack(
+                                      fit: StackFit.expand,
+                                      children: [
+                                        Image.asset(
+                                          item.art,
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (_, __, ___) =>
+                                              const ColoredBox(color: Color(0xFF0A0F1C)),
+                                        ),
+                                        const DecoratedBox(
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              begin: Alignment.topCenter,
+                                              end: Alignment.bottomCenter,
+                                              colors: [Color(0x33060C18), Color(0xF2060C18)],
+                                            ),
+                                          ),
+                                        ),
+                                        Align(
+                                          alignment: Alignment.bottomLeft,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(14),
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  item.title,
+                                                  style: const TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.w800,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  item.sub,
+                                                  style: const TextStyle(
+                                                    fontSize: 12,
+                                                    color: Color(0xAAFFFFFF),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        _current.title,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xCCFFFFFF),
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _WhiteCircleAction(
+                            label: 'Buy Now',
+                            wide: true,
+                            onTap: () {
+                              final c = _current;
+                              Navigator.of(context).pop();
+                              widget.onOpenWord(c.word, c.root, c.img, c.price);
+                            },
+                          ),
+                          const SizedBox(width: 10),
+                          _WhiteCircleAction(
+                            icon: Icons.favorite_border,
+                            onTap: () => _toast('Saved ${_current.title} to wishlist'),
+                          ),
+                          const SizedBox(width: 10),
+                          _WhiteCircleAction(
+                            icon: Icons.thumb_up_alt_outlined,
+                            onTap: () => _toast('Liked ${_current.title}'),
+                          ),
+                          const SizedBox(width: 10),
+                          _WhiteCircleAction(
+                            icon: Icons.shopping_bag_outlined,
+                            onTap: () => _toast('Added ${_current.title} to cart'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _WhiteCircleAction extends StatelessWidget {
+  const _WhiteCircleAction({
+    this.icon,
+    this.label,
+    required this.onTap,
+    this.wide = false,
+  });
+
+  final IconData? icon;
+  final String? label;
+  final VoidCallback onTap;
+  final bool wide;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 46,
+        width: wide ? null : 46,
+        padding: wide ? const EdgeInsets.symmetric(horizontal: 16) : null,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          shape: wide ? BoxShape.rectangle : BoxShape.circle,
+          borderRadius: wide ? BorderRadius.circular(23) : null,
+          boxShadow: const [
+            BoxShadow(color: Color(0x55000000), blurRadius: 10, offset: Offset(0, 4)),
+          ],
+        ),
+        child: label != null
+            ? Text(
+                label!,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF060C18),
+                ),
+              )
+            : Icon(icon, size: 20, color: const Color(0xFF060C18)),
+      ),
+    );
+  }
 }

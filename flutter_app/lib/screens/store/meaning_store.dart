@@ -15,6 +15,7 @@ import 'product_detail.dart';
 import 'store_cards.dart';
 import 'store_home_sections.dart';
 import 'store_select_sheet.dart';
+import 'request_words.dart';
 import 'store_routes.dart';
 
 class MeaningStoreScreen extends StatelessWidget {
@@ -96,6 +97,30 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
       }
     }
     return byKey.values.toList();
+  }
+
+
+  String _artForMeaningCat(String cat) {
+    final key = cat.toLowerCase();
+    if (key.contains('cosmos')) return storeCollectionArt('cosmos');
+    if (key.contains('element')) return storeCollectionArt('elements');
+    if (key.contains('emotion') || key.contains('sacred')) return storeCollectionArt('sacred');
+    if (key.contains('human') || key.contains('warrior')) return storeCollectionArt('warriors');
+    if (key.contains('nature')) return storeCollectionArt('nature');
+    if (key.contains('peace')) return storeCollectionArt('peace');
+    return storeCollectionArt(null);
+  }
+
+  void _openViewAll(String title) {
+    showStoreViewAllPanel(
+      context,
+      title: title,
+      items: storeDefaultViewAllItems(),
+      onOpenWord: (word, root, img, price) {
+        final hit = _base.where((m) => m.word.toLowerCase() == word.toLowerCase()).toList();
+        if (hit.isNotEmpty) openMeaningDetail(context, hit.first);
+      },
+    );
   }
 
   @override
@@ -263,7 +288,8 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
             };
             setState(() => _chip = map[id] ?? 'ALL');
           },
-          onSeeAll: () => setState(() => _chip = 'ALL'),
+          onSeeAll: () => _openViewAll('Browse by Goal'),
+          onRequestWords: () => openRequestWords(context),
           onOpenWord: (word, root, img, price) {
             // Best-effort: open first matching meaning if present.
             final hit = _base.where((m) => m.word.toLowerCase() == word.toLowerCase()).toList();
@@ -273,21 +299,21 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
           },
         ),
         StoreRecommendedSection(
-          onSeeAll: () => setState(() => _chip = 'ALL'),
+          onSeeAll: () => _openViewAll('Recommended for You'),
           onOpenWord: (word, root, img, price) {
             final hit = _base.where((m) => m.word.toLowerCase() == word.toLowerCase()).toList();
             if (hit.isNotEmpty) openMeaningDetail(context, hit.first);
           },
         ),
         StoreFeaturedPlaylistSection(
-          onSeeAll: () => setState(() => _chip = 'ALL'),
+          onSeeAll: () => _openViewAll('Featured Playlist'),
           onOpenWord: (word, root, img, price) {
             final hit = _base.where((m) => m.word.toLowerCase() == word.toLowerCase()).toList();
             if (hit.isNotEmpty) openMeaningDetail(context, hit.first);
           },
         ),
         StoreGlassPlaylistCarousel(
-          onSeeAll: () => setState(() => _chip = 'ALL'),
+          onSeeAll: () => _openViewAll('Playlists'),
           onOpenWord: (word, root, img, price) {
             final hit = _base.where((m) => m.word.toLowerCase() == word.toLowerCase()).toList();
             if (hit.isNotEmpty) openMeaningDetail(context, hit.first);
@@ -321,6 +347,7 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
         sub: kMsCatSub[cat] ?? 'Decoded origins',
         logoUrl: kMsCatLogoUrl,
         logoAsset: kRmCatLogoAsset,
+        artAsset: _artForMeaningCat(cat),
       ));
       out.add(MsGrid(
         children: [
