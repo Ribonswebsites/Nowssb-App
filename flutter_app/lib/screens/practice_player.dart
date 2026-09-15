@@ -612,7 +612,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> with Ticker
                 const SizedBox(height: 16),
                 _ProgressBar(playing: _playing, durationSec: _wordSecs(_word)),
                 const SizedBox(height: 8),
-                _TransportRow(
+                _PlainTransportRow(
                   playing: _playing,
                   shuffle: _shuffle,
                   loop: _loop,
@@ -1030,7 +1030,7 @@ class _NextUpCard extends StatelessWidget {
 /// YTM continuous scroll-driven Up Next — NestedScrollView / slivers.
 /// Collapse t from FlexibleSpaceBarSettings; plain icons only (no glass tube).
 /// Large art shrinks + pins top-left; controls fade; filters stick; mini-bar
-/// shows cast + play. Queue icon on the peek card still opens Sound Library.
+/// shows play (no Cast). Queue icon on the peek card still opens Sound Library.
 class _QueueSheet extends StatefulWidget {
   const _QueueSheet({
     required this.words,
@@ -1194,7 +1194,10 @@ class _QueueSheetState extends State<_QueueSheet> {
     final word = _currentWord;
     final theme = _currentTheme;
     final art = (word?.img.isNotEmpty == true) ? word!.img : theme.image;
-    final video = theme.video;
+    // Always have a looping hero video — remote theme clip, else local bg loop.
+    final video = theme.video.trim().isNotEmpty
+        ? theme.video
+        : 'assets/video/player-bg-loop.mp4';
     final t = _collapse;
     // Continuous collapse — no stage jump-cuts. Hero owns geometry via localT.
     final controlsOpacity = (1.0 - t / 0.55).clamp(0.0, 1.0);
@@ -1230,7 +1233,7 @@ class _QueueSheetState extends State<_QueueSheet> {
                         backgroundColor: const Color(0xFF000000),
                         elevation: 0,
                         scrolledUnderElevation: 0,
-                        // Collapsed height = sticky mini row (thumb + title + cast + play).
+                        // Collapsed height = sticky mini row (thumb + title + play).
                         toolbarHeight: _collapseExtent,
                         expandedHeight: media.padding.top + _expandExtent,
                         flexibleSpace: ClipRect(
@@ -1262,7 +1265,15 @@ class _QueueSheetState extends State<_QueueSheet> {
                                 loop: false,
                                 artMax: _heroArtMax,
                                 onPlay: widget.onTogglePlay,
-                                onCast: () {},
+                                onPrevious: () {
+                                  if (widget.words.isEmpty) return;
+                                  final i = (widget.index - 1) % widget.words.length;
+                                  widget.onPlayAt(i < 0 ? widget.words.length - 1 : i);
+                                },
+                                onNext: () {
+                                  if (widget.words.isEmpty) return;
+                                  widget.onPlayAt((widget.index + 1) % widget.words.length);
+                                },
                                 onClose: () => Navigator.of(context).maybePop(),
                               );
                             },
@@ -1437,7 +1448,7 @@ class _QueueSheetState extends State<_QueueSheet> {
 /// Continuous YTM Up Next hero — one collapse t ∈ [0,1] every frame.
 /// t≈0: full-width art/video, title+artist below (untruncated), progress, plain
 ///       Material transport (large white circular play) — NO glass tube.
-/// t≈1: sticky mini row — small thumb + title + artist + cast + play.
+/// t≈1: sticky mini row — small thumb + title + artist + play (no Cast).
 /// Mid: geometry/opacity lerp only (Curves.easeInOutCubic). No stage jump-cuts.
 class _YtmCollapsingHero extends StatelessWidget {
   const _YtmCollapsingHero({
@@ -1453,7 +1464,8 @@ class _YtmCollapsingHero extends StatelessWidget {
     required this.shuffle,
     required this.loop,
     required this.onPlay,
-    required this.onCast,
+    required this.onPrevious,
+    required this.onNext,
     required this.onClose,
     this.artMax = 300.0,
   });
@@ -1470,7 +1482,8 @@ class _YtmCollapsingHero extends StatelessWidget {
   final bool shuffle;
   final bool loop;
   final VoidCallback onPlay;
-  final VoidCallback onCast;
+  final VoidCallback onPrevious;
+  final VoidCallback onNext;
   final VoidCallback onClose;
   final double artMax;
 
@@ -1584,7 +1597,51 @@ class _YtmCollapsingHero extends StatelessWidget {
 
     return SizedBox(
       height: h,
-      child: Column(
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Full-bleed looping video/art behind controls (YTM-style hero).
+          if (video.isNotEmpty)
+            Positioned.fill(
+              child: Opacity(
+                opacity: (1.0 - et * 0.85).clamp(0.15, 1.0),
+                child: NwsbVideo(
+                  asset: video,
+                  poster: art,
+                  fit: BoxFit.cover,
+                  alignment: const Alignment(0, -0.15),
+                  priority: ClipPriority.feature,
+                  autoplay: true,
+                  loop: true,
+                  showPoster: true,
+                ),
+              ),
+            )
+          else
+            Positioned.fill(
+              child: Opacity(
+                opacity: (1.0 - et * 0.85).clamp(0.15, 1.0),
+                child: art.startsWith('http')
+                    ? Image.network(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111)))
+                    : Image.asset(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111))),
+              ),
+            ),
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color.fromRGBO(0, 0, 0, 0.25 + 0.35 * et),
+                    Color.fromRGBO(0, 0, 0, 0.15 + 0.2 * et),
+                    Color.fromRGBO(0, 0, 0, 0.72 + 0.2 * et),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           SizedBox(height: topPad),
@@ -1601,10 +1658,6 @@ class _YtmCollapsingHero extends StatelessWidget {
                     ),
                     const Spacer(),
                     IconButton(
-                      onPressed: onCast,
-                      icon: const Icon(Icons.cast_rounded, color: Color(0xFFCFCFD2), size: 22),
-                    ),
-                    IconButton(
                       onPressed: () {},
                       icon: const Icon(Icons.more_vert_rounded, color: Color(0xFFCFCFD2), size: 22),
                     ),
@@ -1615,9 +1668,13 @@ class _YtmCollapsingHero extends StatelessWidget {
           if (gapAfterChrome > 0.5) SizedBox(height: gapAfterChrome),
           SizedBox(
             height: artBudget,
-            child: Center(
-              child: artSize > 1 ? _artBox(artSize, radius: radius) : const SizedBox.shrink(),
-            ),
+            // When looping video fills the hero, skip the duplicate square so the
+            // motion stays visible (user: video must be there).
+            child: video.isEmpty
+                ? Center(
+                    child: artSize > 1 ? _artBox(artSize, radius: radius) : const SizedBox.shrink(),
+                  )
+                : const SizedBox.shrink(),
           ),
           if (gapAfterArt > 0.5) SizedBox(height: gapAfterArt),
           if (titleBlockH > 0.5)
@@ -1685,15 +1742,17 @@ class _YtmCollapsingHero extends StatelessWidget {
                     shuffle: shuffle,
                     loop: loop,
                     onShuffle: () {},
-                    onPrevious: () {},
+                    onPrevious: onPrevious,
                     onPlay: onPlay,
-                    onNext: () {},
+                    onNext: onNext,
                     onRepeat: () {},
                   ),
                 ),
               ),
             ),
           if (slack > 0.5) SizedBox(height: slack),
+        ],
+      ),
         ],
       ),
     );
@@ -1733,11 +1792,6 @@ class _YtmCollapsingHero extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
-            IconButton(
-              onPressed: onCast,
-              icon: const Icon(Icons.cast_rounded, color: Color(0xFFCFCFD2), size: 22),
-              visualDensity: VisualDensity.compact,
             ),
             IconButton(
               onPressed: onPlay,
@@ -1816,7 +1870,7 @@ class _QueueStickyHeadDelegate extends SliverPersistentHeaderDelegate {
                         children: [
                           Icon(saved ? Icons.playlist_add_check_rounded : Icons.playlist_add_rounded, color: const Color(0xFFF5F5F7), size: 18),
                           const SizedBox(width: 6),
-                          Text(saved ? 'Saved' : 'Save', style: const TextStyle(color: Color(0xFFF5F5F7), fontSize: 13, fontWeight: FontWeight.w600)),
+                          Text(saved ? 'Saved' : '+ Save', style: const TextStyle(color: Color(0xFFF5F5F7), fontSize: 13, fontWeight: FontWeight.w600)),
                         ],
                       ),
                     ),
