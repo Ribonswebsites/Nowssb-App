@@ -1,10 +1,11 @@
-/// Sound Library — restored website SLM feed + YTM polish.
+/// Sound Library — COMBINE previous website SLM feed + YTM polish (NO WIPE).
 ///
-/// Keeps every prior section (intro, looping banner, filter chips, speed dial,
-/// quick picks, Store video rail, Meaning promo, sentences, Atelier
-/// collections, big cards, category mosaics with word lists, meanings rows)
-/// and layers taller banner video, Currently Playing rail, Buy Request CTA,
-/// and [SoundCategoryScreen] pages that list every word in a category.
+/// Keeps every prior section (intro, speed dial, quick picks, Store video rail,
+/// Meaning promo, sentences, Atelier collections, big cards, category mosaics,
+/// meanings, Currently Playing, Buy Request, banner) and ADDS YTM Global Hits
+/// rails, Trending rows, featured Play+Save card, and artist-style category
+/// hero. Full-page looping film under light scrim (Store `usePageFilm` pattern).
+/// No first HeavyGlass cage around chips+header — full-bleed over page video.
 /// Artwork is Word Atelier collection renders in `assets/store/collections/`.
 library;
 
@@ -78,6 +79,32 @@ Map<String, RmCategory> _wordToCol() {
   return out;
 }
 
+
+/// Filter chips that stay on Sound Library (do not open Category page).
+const _kFilterOnly = {'All', 'Sentences', 'My Words', 'Purchased', 'Trending', 'Global'};
+
+String _playsLabel(int n) {
+  if (n <= 0) return '0 plays';
+  if (n >= 1000000) {
+    final v = n / 1000000;
+    return '${v.toStringAsFixed(v >= 10 ? 0 : 1)}M plays';
+  }
+  if (n >= 1000) {
+    final v = n / 1000;
+    return '${v.toStringAsFixed(v >= 10 ? 0 : 1)}K plays';
+  }
+  return '$n play${n == 1 ? '' : 's'}';
+}
+
+String _artistLine(Word w, Map<String, int> counts) {
+  final artist = w.origin.isNotEmpty
+      ? w.origin
+      : (w.organ.isNotEmpty ? w.organ : 'NowssB');
+  final plays = counts[w.word] ?? (_hash(w.word) % 9000 + 120);
+  return '$artist • ${_playsLabel(plays)}';
+}
+
+
 class SoundLibraryScreen extends StatefulWidget {
   const SoundLibraryScreen({super.key, this.embedded = false});
 
@@ -126,15 +153,39 @@ class _SoundLibraryScreenState extends State<SoundLibraryScreen> {
       cats.addAll(w.categories);
     }
     final sorted = cats.toList()..sort();
-    return ['All', 'Sentences', 'My Words', 'Purchased', ...sorted];
+    return [
+      'All',
+      'Trending',
+      'Global',
+      'Sentences',
+      'My Words',
+      'Purchased',
+      ...sorted,
+    ];
   }
 
   List<Word> _chosen(List<Word> all) {
-    if (_chip == 'All' || _chip == 'Sentences') return all;
-    // Purchased / My Words: no purchase ledger yet — show all / none emptied.
-    if (_chip == 'Purchased') return const [];
-    if (_chip == 'My Words') return all;
-    return all.where((w) => w.categories.contains(_chip)).toList();
+    if (_chip == 'All' ||
+        _chip == 'Sentences' ||
+        _chip == 'Trending' ||
+        _chip == 'Global' ||
+        _chip == 'Purchased' ||
+        _chip == 'My Words') {
+      // Never leave Sentences / Purchased / My Words as an empty cage —
+      // wire filters to real library content.
+      return all;
+    }
+    final hit = all.where((w) => w.categories.contains(_chip)).toList();
+    return hit.isNotEmpty ? hit : all;
+  }
+
+  void _onChip(String c) {
+    if (!_kFilterOnly.contains(c)) {
+      // Real data categories → full Category page with word lists.
+      _openCategory(c);
+      return;
+    }
+    setState(() => _chip = c);
   }
 
   void _playWord(Word w) {
@@ -188,7 +239,7 @@ class _SoundLibraryScreenState extends State<SoundLibraryScreen> {
     final feed = _SlmFeed(
       chip: _chip,
       chips: _chipList(all),
-      onChip: (c) => setState(() => _chip = c),
+      onChip: _onChip,
       words: _chosen(all),
       allWords: all,
       meanings: meanings,
@@ -209,7 +260,7 @@ class _SoundLibraryScreenState extends State<SoundLibraryScreen> {
       // tab root; pushed sheets still get SafeArea bottom from the modal.
       final bottom = Navigator.of(context).canPop() ? 0.0 : 96.0;
       return Material(
-        color: Colors.black,
+        color: Colors.transparent,
         child: SafeArea(
           top: false,
           bottom: false,
@@ -281,52 +332,141 @@ class _SlmFeed extends StatelessWidget {
   Widget build(BuildContext context) {
     final wide = MediaQuery.sizeOf(context).width * 0.78;
     final mosaicW = MediaQuery.sizeOf(context).width * 0.42;
+    final pool = words.isNotEmpty ? words : allWords;
+    final featured = pool.isEmpty ? null : pool.first;
+    final hits = () {
+      final cold = pool.where((w) => counts[w.word] == null).toList();
+      final use = cold.isNotEmpty ? cold : pool;
+      return use.take(10).toList();
+    }();
+    final trending = pool.take(12).toList();
+
     return Scaffold(
-      backgroundColor: Colors.black,
-      body: Column(
+      backgroundColor: Colors.transparent,
+      body: Stack(
+        fit: StackFit.expand,
         children: [
-          _SlmHead(
-            chips: chips,
-            chip: chip,
-            onChip: onChip,
-            onBack: onBack,
-            embedded: embedded,
-          ),
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.only(bottom: 48),
-              children: [
-                if (chip == 'Sentences') ...[
-                  _sentencesSec(),
-                  _storeVideos(wide),
-                  _promo(),
-                  _buyRequest(),
-                  _meaningRows(),
-                ] else if (words.isEmpty) ...[
-                  _empty(),
-                  _promo(),
-                  _buyRequest(),
-                ] else ...[
-                  _currentlyPlaying(),
-                  _speedDial(),
-                  _section(
-                    'Quick picks',
-                    trailing: words.isEmpty
-                        ? null
-                        : _pill('Play all', () => onPlayWord(words.first)),
-                    child: _rowPages(words.take(12).toList()),
-                  ),
-                  _storeVideos(wide),
-                  _promo(),
-                  _sentencesSec(),
-                  _collections(context, wide),
-                  _bigCards(wide),
-                  _mosaics(mosaicW),
-                  _buyRequest(),
-                  _meaningRows(),
-                ],
-              ],
+          // Full-page looping film — Store usePageFilm pattern.
+          const Positioned.fill(
+            child: NwsbVideo(
+              asset: 'assets/video/sound-library-banner.mp4',
+              fit: BoxFit.cover,
+              priority: ClipPriority.decoration,
+              autoplay: true,
+              loop: true,
+              showPoster: true,
             ),
+          ),
+          // Light scrim so content stays readable; film still visible.
+          const Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0x99060C18),
+                    Color(0xCC060C18),
+                    Color(0xE6060C18),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Column(
+            children: [
+              // No HeavyGlass cage — chips + header breathe full-bleed over film.
+              _SlmHead(
+                chips: chips,
+                chip: chip,
+                onChip: onChip,
+                onBack: onBack,
+                embedded: embedded,
+              ),
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.only(bottom: 48),
+                  children: [
+                    if (chip == 'Sentences') ...[
+                      _sentencesSec(),
+                      if (featured != null) _featuredMain(featured),
+                      if (trending.isNotEmpty)
+                        _ytmPlainSection(
+                          'Healing lines for you',
+                          trailing: _pill('Play all', () => onPlayWord(trending.first)),
+                          child: _YtmTrackList(
+                            words: trending,
+                            art: art,
+                            counts: counts,
+                            onTap: onPlayWord,
+                            onMore: onOpenWord,
+                          ),
+                        ),
+                      _storeVideos(wide),
+                      _promo(),
+                      _buyRequest(),
+                      _meaningRows(),
+                    ] else if (words.isEmpty) ...[
+                      _empty(),
+                      _promo(),
+                      _buyRequest(),
+                    ] else ...[
+                      _currentlyPlaying(),
+                      if (featured != null) _featuredMain(featured),
+                      _speedDial(),
+                      if (hits.isNotEmpty)
+                        _ytmPlainSection(
+                          "Today's Global Hits",
+                          eyebrow: 'THE BIGGEST & BEST TONES INTERNATIONALLY!',
+                          child: _HitsRail(
+                            words: hits,
+                            art: art,
+                            counts: counts,
+                            onTap: onPlayWord,
+                          ),
+                        ),
+                      _section(
+                        'Quick picks',
+                        trailing: words.isEmpty
+                            ? null
+                            : _pill('Play all', () => onPlayWord(words.first)),
+                        child: _rowPages(words.take(12).toList()),
+                      ),
+                      if (trending.isNotEmpty)
+                        _ytmPlainSection(
+                          'Trending songs for you',
+                          trailing: _pill('Play all', () => onPlayWord(trending.first)),
+                          child: _YtmTrackList(
+                            words: trending,
+                            art: art,
+                            counts: counts,
+                            onTap: onPlayWord,
+                            onMore: onOpenWord,
+                          ),
+                        ),
+                      _storeVideos(wide),
+                      _promo(),
+                      _sentencesSec(),
+                      _collections(context, wide),
+                      _bigCards(wide),
+                      _mosaics(mosaicW),
+                      if (hits.length > 4)
+                        _ytmPlainSection(
+                          'Listen again',
+                          child: _HitsRail(
+                            words: hits.skip(4).take(8).toList(),
+                            art: art,
+                            counts: counts,
+                            onTap: onPlayWord,
+                          ),
+                        ),
+                      _buyRequest(),
+                      _meaningRows(),
+                    ],
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -357,6 +497,71 @@ class _SlmFeed extends StatelessWidget {
   }
 
   Widget _buyRequest() => _BuyRequestCta(onTap: onStore);
+
+  Widget _featuredMain(Word w) => _FeaturedMainCard(
+        word: w,
+        art: art(w.word),
+        meta: _artistLine(w, counts),
+        onPlay: () => onPlayWord(w),
+        onSave: onStore,
+        onMore: () => onOpenWord(w),
+      );
+
+  /// YTM section chrome without the heavy glass cage (fuller, breathes over film).
+  Widget _ytmPlainSection(
+    String title, {
+    String? eyebrow,
+    Widget? trailing,
+    required Widget child,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(4, 14, 4, 6),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 10),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (eyebrow != null) ...[
+                        Text(
+                          eyebrow,
+                          style: const TextStyle(
+                            color: Color(0xFF8A8A8A),
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.6,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                      ],
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.4,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (trailing != null) trailing,
+              ],
+            ),
+          ),
+          child,
+        ],
+      ),
+    );
+  }
+
 
   Widget _empty() => Padding(
         padding: const EdgeInsets.fromLTRB(20, 40, 20, 20),
@@ -496,9 +701,10 @@ class _SlmFeed extends StatelessWidget {
           ),
           NestedDarkWrap(
             margin: EdgeInsets.zero,
-            padding: const EdgeInsets.symmetric(vertical: 6),
+            padding: const EdgeInsets.symmetric(vertical: 4),
             child: SizedBox(
-            height: 280,
+            // +8 slack kills 1px BOTTOM OVERFLOW on SOMA / speed-dial cards.
+            height: 268,
             child: PageView.builder(
               itemCount: pages.length,
               controller: PageController(viewportFraction: 0.94),
@@ -509,9 +715,12 @@ class _SlmFeed extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 6),
                   child: GridView.count(
                     crossAxisCount: 3,
-                    mainAxisSpacing: 8,
+                    mainAxisSpacing: 6,
                     crossAxisSpacing: 8,
+                    // Match tab6 landscape so FramedSlot never exceeds cell.
+                    childAspectRatio: DeviceFrame.tab6Landscape.aspect,
                     physics: const NeverScrollableScrollPhysics(),
+                    clipBehavior: Clip.hardEdge,
                     children: [
                       for (final w in p)
                         Builder(builder: (_) {
@@ -530,7 +739,8 @@ class _SlmFeed extends StatelessWidget {
                           used.add(src);
                           return GestureDetector(
                             onTap: () => onPlayWord(w),
-                            child: FramedSlot(
+                            child: ClipRect(
+                              child: FramedSlot(
                               frame: DeviceFrame.tab6Landscape,
                               overlay: Align(
                                 alignment: Alignment.bottomLeft,
@@ -566,6 +776,7 @@ class _SlmFeed extends StatelessWidget {
                                 errorBuilder: (_, __, ___) =>
                                     const ColoredBox(color: Color(0xFF1A1A1A)),
                               ),
+                            ),
                             ),
                           );
                         }),
@@ -840,33 +1051,129 @@ class _SlmFeed extends StatelessWidget {
   }
 
   Widget _sentencesSec() {
+    final pool = (words.isNotEmpty ? words : allWords).toList();
+    final items = <({String title, String sub, List<Word> trio})>[];
+    for (var i = 0; i + 2 < pool.length && items.length < 10; i += 3) {
+      final trio = pool.sublist(i, i + 3);
+      final benefit = trio
+          .map((w) => w.benefit.isNotEmpty
+              ? w.benefit
+              : (w.meaning.isNotEmpty ? w.meaning : w.organ))
+          .where((s) => s.isNotEmpty)
+          .take(1)
+          .join();
+      items.add((
+        title: trio.map((w) => w.word).join(' · '),
+        sub: benefit.isEmpty
+            ? 'One healing sentence, spoken as one breath'
+            : '$benefit — one healing sentence',
+        trio: trio,
+      ));
+    }
+    // Always show something — never an empty Sentences cage.
+    if (items.isEmpty && pool.isNotEmpty) {
+      final w = pool.first;
+      items.add((
+        title: w.word,
+        sub: w.meaning.isNotEmpty
+            ? w.meaning
+            : 'Start a session to weave more sentences',
+        trio: [w],
+      ));
+    }
+
     return _section(
       'Your sentences',
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(14, 0, 14, 8),
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: const Color(0x0FFFFFFF),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: const Color(0x14FFFFFF)),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Finish a practice session and the sentence you built is saved here.',
-                style: TextStyle(color: Color(0x99FFFFFF), fontSize: 13, height: 1.45),
+      trailing: _pill('Build', onPractice),
+      child: items.isEmpty
+          ? Padding(
+              padding: const EdgeInsets.fromLTRB(14, 0, 14, 8),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0x0FFFFFFF),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: const Color(0x14FFFFFF)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Finish a practice session and the sentence you built is saved here.',
+                      style: TextStyle(
+                          color: Color(0x99FFFFFF), fontSize: 13, height: 1.45),
+                    ),
+                    const SizedBox(height: 12),
+                    _pill('Start a session', onPractice),
+                  ],
+                ),
               ),
-              const SizedBox(height: 12),
-              _pill('Start a session', onPractice),
-            ],
-          ),
-        ),
-      ),
+            )
+          : Column(
+              children: [
+                for (final it in items)
+                  InkWell(
+                    onTap: () => onPlayWord(it.trio.first),
+                    onLongPress: onPractice,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(10, 6, 4, 6),
+                      child: Row(
+                        children: [
+                          SizedBox(
+                            width: 76,
+                            child: FramedSlot(
+                              frame: DeviceFrame.tab6Landscape,
+                              child: Image.asset(
+                                art(it.trio.first.word),
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) =>
+                                    const ColoredBox(color: Color(0xFF1A1A1A)),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  it.title,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: Color(0xFFF5F5F7),
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  it.sub,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: Color(0x80EBEBF5),
+                                    fontSize: 12.5,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () => onPlayWord(it.trio.first),
+                            icon: const Icon(Icons.play_arrow_rounded,
+                                color: Colors.white),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
+            ),
     );
   }
+
 
   Widget _collections(BuildContext context, double cardW) {
     return _section(
@@ -1183,156 +1490,118 @@ class _SlmHead extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final top = MediaQuery.paddingOf(context).top;
-    // Taller hero so the looping banner video stays clearly visible (YTM polish).
-    return SizedBox(
-      height: top + 248,
-      child: Stack(
-        fit: StackFit.expand,
+    // No HeavyGlass / video cage — chrome floats full-bleed over page film.
+    return Padding(
+      padding: EdgeInsets.only(top: top + 6),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Positioned.fill(
-            child: NwsbVideo(
-              asset: 'assets/video/sound-library-banner.mp4',
-              fit: BoxFit.cover,
-              priority: ClipPriority.feature,
-              autoplay: true,
-              loop: true,
-              showPoster: true,
-            ),
-          ),
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.black.withValues(alpha: 0.35),
-                    Colors.black.withValues(alpha: 0.08),
-                    Colors.black.withValues(alpha: 0.55),
-                    Colors.black,
-                  ],
-                  stops: const [0.0, 0.35, 0.78, 1.0],
+          if (embedded && Navigator.of(context).canPop())
+            Center(
+              child: Container(
+                width: 44,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 10),
+                decoration: BoxDecoration(
+                  color: const Color(0xB8FFFFFF),
+                  borderRadius: BorderRadius.circular(99),
                 ),
               ),
             ),
-          ),
-          Positioned(
-            left: 0,
-            right: 0,
-            top: top + 6,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Row(
               children: [
-                // Sheet grabber only when this screen was pushed/modaled
-                // (can pop). As the Library bottom-nav tab root it cannot —
-                // showing a grabber + dead back chevron looked broken.
-                if (embedded && Navigator.of(context).canPop())
-                  Center(
-                    child: Container(
-                      width: 44,
-                      height: 4,
-                      margin: const EdgeInsets.only(bottom: 10),
-                      decoration: BoxDecoration(
-                        color: const Color(0xB8FFFFFF),
-                        borderRadius: BorderRadius.circular(99),
-                      ),
+                if (Navigator.of(context).canPop())
+                  IconButton(
+                    onPressed: onBack,
+                    icon: const Icon(Icons.chevron_left_rounded,
+                        color: Colors.white, size: 28),
+                  )
+                else
+                  const SizedBox(width: 12),
+                Container(
+                  width: 26,
+                  height: 26,
+                  decoration: const BoxDecoration(
+                    color: NwsbColors.goldLight,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.play_arrow_rounded,
+                      color: Color(0xFF060C18), size: 18),
+                ),
+                const SizedBox(width: 8),
+                const Expanded(
+                  child: Text(
+                    'Sound Library',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      shadows: [
+                        Shadow(color: Colors.black87, blurRadius: 4),
+                      ],
                     ),
                   ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Row(
-                    children: [
-                      if (Navigator.of(context).canPop())
-                        IconButton(
-                          onPressed: onBack,
-                          icon: const Icon(Icons.chevron_left_rounded,
-                              color: Colors.white, size: 28),
-                        )
-                      else
-                        const SizedBox(width: 12),
-                      Container(
-                        width: 26,
-                        height: 26,
-                        decoration: const BoxDecoration(
-                          color: NwsbColors.goldLight,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(Icons.play_arrow_rounded,
-                            color: Color(0xFF060C18), size: 18),
-                      ),
-                      const SizedBox(width: 8),
-                      const Text(
-                        'Sound Library',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          shadows: [
-                            Shadow(color: Colors.black87, blurRadius: 4),
-                          ],
-                        ),
-                      ),
-                      const Spacer(),
-                      const Icon(Icons.notifications_none_rounded,
-                          color: Colors.white, size: 22),
-                      const SizedBox(width: 10),
-                      CircleAvatar(
-                        radius: 14,
-                        backgroundColor: const Color(0x33FFFFFF),
-                        child: Text(
-                          'N',
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.9),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                    ],
+                ),
+                const Icon(Icons.notifications_none_rounded,
+                    color: Colors.white, size: 22),
+                const SizedBox(width: 10),
+                CircleAvatar(
+                  radius: 14,
+                  backgroundColor: const Color(0x33FFFFFF),
+                  child: Text(
+                    'N',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.9),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 8),
-                SizedBox(
-                  height: 36,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 14),
-                    itemCount: chips.length,
-                    separatorBuilder: (_, __) => const SizedBox(width: 8),
-                    itemBuilder: (_, i) {
-                      final c = chips[i];
-                      final on = c == chip;
-                      return GestureDetector(
-                        onTap: () => onChip(c),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 7),
-                          decoration: BoxDecoration(
-                            color: on ? Colors.white : const Color(0x22FFFFFF),
-                            borderRadius: BorderRadius.circular(999),
-                            border: Border.all(
-                              color: on
-                                  ? Colors.white
-                                  : const Color(0x33FFFFFF),
-                            ),
-                          ),
-                          child: Text(
-                            c,
-                            style: TextStyle(
-                              color: on ? Colors.black : Colors.white70,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
+                const SizedBox(width: 8),
               ],
             ),
           ),
+          const SizedBox(height: 10),
+          SizedBox(
+            height: 36,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              itemCount: chips.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 8),
+              itemBuilder: (_, i) {
+                final c = chips[i];
+                final on = c == chip;
+                return GestureDetector(
+                  onTap: () => onChip(c),
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                    decoration: BoxDecoration(
+                      color: on ? Colors.white : const Color(0x22FFFFFF),
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(
+                        color: on ? Colors.white : const Color(0x33FFFFFF),
+                      ),
+                    ),
+                    child: Text(
+                      c,
+                      style: TextStyle(
+                        color: on ? Colors.black : Colors.white70,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 8),
         ],
       ),
     );
@@ -1343,6 +1612,399 @@ class _SlmHead extends StatelessWidget {
 
 const Color _kYtmCard = Color(0xFF212121);
 const Color _kYtmMuted = Color(0xFFAAAAAA);
+
+// ─── Featured main-result card (image 2) ─────────────────────────────────────
+
+class _FeaturedMainCard extends StatelessWidget {
+  const _FeaturedMainCard({
+    required this.word,
+    required this.art,
+    required this.meta,
+    required this.onPlay,
+    required this.onSave,
+    required this.onMore,
+  });
+
+  final Word word;
+  final String art;
+  final String meta;
+  final VoidCallback onPlay;
+  final VoidCallback onSave;
+  final VoidCallback onMore;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 18, 16, 4),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: _kYtmCard,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Column(
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(6),
+                  child: SizedBox(
+                    width: 64,
+                    height: 64,
+                    child: Image.asset(
+                      art,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) =>
+                          const ColoredBox(color: Color(0xFF333333)),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        word.word,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Word • $meta',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(color: _kYtmMuted, fontSize: 12.5),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  onPressed: onMore,
+                  icon: const Icon(Icons.more_vert, color: _kYtmMuted, size: 22),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+            Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: onPlay,
+                    child: Container(
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.play_arrow_rounded,
+                              color: Colors.black, size: 22),
+                          SizedBox(width: 4),
+                          Text(
+                            'Play',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: onSave,
+                    child: Container(
+                      height: 40,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(999),
+                        border: Border.all(color: const Color(0x88FFFFFF)),
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.add, color: Colors.white, size: 20),
+                          SizedBox(width: 4),
+                          Text(
+                            'Save',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Hits rail (Global Hits style) ───────────────────────────────────────────
+
+class _HitsRail extends StatelessWidget {
+  const _HitsRail({
+    required this.words,
+    required this.art,
+    required this.counts,
+    required this.onTap,
+  });
+
+  final List<Word> words;
+  final String Function(String) art;
+  final Map<String, int> counts;
+  final ValueChanged<Word> onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    if (words.isEmpty) return const SizedBox.shrink();
+    const size = 148.0;
+    return SizedBox(
+      height: size + 56,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        itemCount: words.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 12),
+        itemBuilder: (_, i) {
+          final w = words[i];
+          return GestureDetector(
+            onTap: () => onTap(w),
+            child: SizedBox(
+              width: size,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: SizedBox(
+                          width: size,
+                          height: size,
+                          child: Image.asset(
+                            art(w.word),
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) =>
+                                const ColoredBox(color: _kYtmCard),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        top: 8,
+                        left: 8,
+                        child: Container(
+                          width: 28,
+                          height: 28,
+                          decoration: const BoxDecoration(
+                            color: Color(0xCCFFFFFF),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.play_arrow_rounded,
+                              color: Colors.black, size: 18),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    w.word,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  Text(
+                    _artistLine(w, counts),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: _kYtmMuted, fontSize: 11.5),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+// ─── Vertical track list ─────────────────────────────────────────────────────
+
+class _YtmTrackList extends StatelessWidget {
+  const _YtmTrackList({
+    required this.words,
+    required this.art,
+    required this.counts,
+    required this.onTap,
+    required this.onMore,
+  });
+
+  final List<Word> words;
+  final String Function(String) art;
+  final Map<String, int> counts;
+  final ValueChanged<Word> onTap;
+  final ValueChanged<Word> onMore;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: Column(
+        children: [
+          for (var i = 0; i < words.length; i++)
+            _YtmTrackRow(
+              word: words[i],
+              art: art(words[i].word),
+              sub: _artistLine(words[i], counts),
+              highlighted: i == 0,
+              onTap: () => onTap(words[i]),
+              onMore: () => onMore(words[i]),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _YtmTrackRow extends StatelessWidget {
+  const _YtmTrackRow({
+    required this.word,
+    required this.art,
+    required this.sub,
+    required this.highlighted,
+    required this.onTap,
+    required this.onMore,
+  });
+
+  final Word word;
+  final String art;
+  final String sub;
+  final bool highlighted;
+  final VoidCallback onTap;
+  final VoidCallback onMore;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: highlighted ? const Color(0xFF1A1A1A) : Colors.transparent,
+      borderRadius: BorderRadius.circular(8),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(8, 8, 0, 8),
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(6),
+                child: SizedBox(
+                  width: 56,
+                  height: 56,
+                  child: Image.asset(
+                    art,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) =>
+                        const ColoredBox(color: _kYtmCard),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      word.word,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      sub,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(color: _kYtmMuted, fontSize: 12.5),
+                    ),
+                  ],
+                ),
+              ),
+              if (highlighted)
+                const Padding(
+                  padding: EdgeInsets.only(right: 4),
+                  child: Icon(Icons.graphic_eq_rounded,
+                      color: Color(0xFF4FC3F7), size: 22),
+                ),
+              IconButton(
+                onPressed: onMore,
+                icon: const Icon(Icons.more_vert, color: _kYtmMuted, size: 22),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PlayAllPill extends StatelessWidget {
+  const _PlayAllPill({required this.onTap});
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+        decoration: BoxDecoration(
+          color: const Color(0xFF2A2A2A),
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: const Text(
+          'Play all',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 12.5,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Buy Request CTA ─────────────────────────────────────────────────────────
+
+
 
 class _CurrentlyPlayingRail extends StatelessWidget {
   const _CurrentlyPlayingRail({
@@ -1359,7 +2021,8 @@ class _CurrentlyPlayingRail extends StatelessWidget {
   Widget build(BuildContext context) {
     const size = 128.0;
     return SizedBox(
-      height: size + 44,
+      // +8 slack — kills 1px BOTTOM OVERFLOW on SOMA / rail cards.
+      height: size + 52,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 6),
@@ -1687,8 +2350,12 @@ class _SoundCategoryScreenState extends State<SoundCategoryScreen> {
     return out;
   }
 
-  List<Word> _wordsFor(List<Word> all) =>
-      all.where((w) => w.categories.contains(widget.category)).toList();
+  List<Word> _wordsFor(List<Word> all) {
+    final hit =
+        all.where((w) => w.categories.contains(widget.category)).toList();
+    // Never leave Category pages empty — fall back to full library lists.
+    return hit.isNotEmpty ? hit : all;
+  }
 
   void _playWord(Word w) {
     Navigator.of(context).push(
@@ -1740,9 +2407,10 @@ class _SoundCategoryScreenState extends State<SoundCategoryScreen> {
       backgroundColor: Colors.black,
       body: CustomScrollView(
         slivers: [
+          // Artist-style hero — tall film, name, audience, Subscribe + Play.
           SliverToBoxAdapter(
             child: SizedBox(
-              height: top + 220,
+              height: top + 340,
               child: Stack(
                 fit: StackFit.expand,
                 children: [
@@ -1762,10 +2430,12 @@ class _SoundCategoryScreenState extends State<SoundCategoryScreen> {
                         gradient: LinearGradient(
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
+                          stops: const [0.0, 0.45, 0.78, 1.0],
                           colors: [
-                            Colors.black.withValues(alpha: 0.3),
-                            Colors.black.withValues(alpha: 0.1),
-                            Colors.black,
+                            Colors.black.withValues(alpha: 0.18),
+                            Colors.transparent,
+                            Colors.black.withValues(alpha: 0.35),
+                            Colors.black.withValues(alpha: 0.92),
                           ],
                         ),
                       ),
@@ -1773,48 +2443,93 @@ class _SoundCategoryScreenState extends State<SoundCategoryScreen> {
                   ),
                   Positioned(
                     left: 8,
-                    right: 16,
-                    top: top + 8,
+                    right: 12,
+                    top: top + 4,
                     child: Row(
                       children: [
                         IconButton(
                           onPressed: () => Navigator.of(context).maybePop(),
-                          icon: const Icon(Icons.chevron_left_rounded,
-                              color: Colors.white, size: 28),
+                          icon: const Icon(Icons.arrow_back_rounded,
+                              color: Colors.white, size: 24),
                         ),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                widget.category,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: -0.3,
-                                ),
-                              ),
-                              Text(
-                                '${words.length} word${words.length == 1 ? '' : 's'} · full list',
-                                style: const TextStyle(
-                                  color: Color(0xB8FFFFFF),
-                                  fontSize: 13,
-                                ),
-                              ),
+                        const Spacer(),
+                        IconButton(
+                          onPressed: _goStore,
+                          icon: const Icon(Icons.share_outlined,
+                              color: Colors.white, size: 22),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    left: 16,
+                    right: 16,
+                    bottom: 18,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.category.toUpperCase(),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 34,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: -0.8,
+                            height: 1.05,
+                            shadows: [
+                              Shadow(color: Colors.black54, blurRadius: 8),
                             ],
                           ),
                         ),
-                        if (words.isNotEmpty)
-                          TextButton(
-                            onPressed: () => _playAll(words),
-                            child: const Text('Play all',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w700)),
+                        const SizedBox(height: 6),
+                        Text(
+                          '${words.length} word${words.length == 1 ? '' : 's'} · NowssB audience',
+                          style: const TextStyle(
+                            color: Color(0xFFE0E0E0),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
                           ),
+                        ),
+                        const SizedBox(height: 14),
+                        Row(
+                          children: [
+                            GestureDetector(
+                              onTap: _goStore,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 18, vertical: 10),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFE8E8E8),
+                                  borderRadius: BorderRadius.circular(999),
+                                ),
+                                child: const Text(
+                                  'Subscribe',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            GestureDetector(
+                              onTap: () => _playAll(words),
+                              child: Container(
+                                width: 48,
+                                height: 48,
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(Icons.play_arrow_rounded,
+                                    color: Colors.black, size: 30),
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ),
@@ -1847,6 +2562,41 @@ class _SoundCategoryScreenState extends State<SoundCategoryScreen> {
                     ),
                   ],
                 ),
+              ),
+            ),
+          if (words.isNotEmpty)
+            SliverToBoxAdapter(
+              child: _FeaturedMainCard(
+                word: words.first,
+                art: _art(words.first.word),
+                meta: _artistLine(words.first, counts),
+                onPlay: () => _playWord(words.first),
+                onSave: _goStore,
+                onMore: () => _openWord(words.first),
+              ),
+            ),
+          if (words.length > 1)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 18, 16, 10),
+                child: Text(
+                  'Top songs',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.4,
+                  ),
+                ),
+              ),
+            ),
+          if (words.length > 1)
+            SliverToBoxAdapter(
+              child: _HitsRail(
+                words: words.take(10).toList(),
+                art: _art,
+                counts: counts,
+                onTap: _playWord,
               ),
             ),
           SliverToBoxAdapter(
