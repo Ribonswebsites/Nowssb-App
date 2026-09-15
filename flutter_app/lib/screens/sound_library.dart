@@ -492,12 +492,40 @@ class _SlmFeed extends StatelessWidget {
   Widget _currentlyPlaying() {
     final list = _playingRail;
     if (list.isEmpty) return const SizedBox.shrink();
-    return _section(
-      'Currently Playing',
-      child: _CurrentlyPlayingRail(
-        words: list,
-        art: art,
-        onTap: onPlayWord,
+    // Dedicated section chrome: even inset so the inner black player card
+    // never kisses the outer HeavyGlassPanel edges (L/R/T/B).
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 14, 12, 6),
+      child: HeavyGlassPanel(
+        radius: 24,
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            NestedDarkWrap(
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+              child: const Text(
+                'Currently Playing',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.3,
+                ),
+              ),
+            ),
+            NestedDarkWrap(
+              margin: EdgeInsets.zero,
+              padding: const EdgeInsets.all(14),
+              child: _CurrentlyPlayingRail(
+                words: list,
+                art: art,
+                onTap: onPlayWord,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -2131,11 +2159,10 @@ class _CurrentlyPlayingRailState extends State<_CurrentlyPlayingRail>
     if (widget.words.isEmpty) return const SizedBox.shrink();
     const size = 118.0;
     final w = _word;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+    // Parent NestedDarkWrap supplies even inset on all sides.
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
           GestureDetector(
             onTap: _play,
             child: SizedBox(
@@ -2302,8 +2329,7 @@ class _CurrentlyPlayingRailState extends State<_CurrentlyPlayingRail>
               ),
             ),
           ),
-        ],
-      ),
+      ],
     );
   }
 }
@@ -2786,10 +2812,13 @@ class _SoundCategoryScreenState extends State<SoundCategoryScreen> {
                         ),
                       ),
                     ),
-                    _CurrentlyPlayingRail(
-                      words: playing,
-                      art: _art,
-                      onTap: _playWord,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: _CurrentlyPlayingRail(
+                        words: playing,
+                        art: _art,
+                        onTap: _playWord,
+                      ),
                     ),
                   ],
                 ),
