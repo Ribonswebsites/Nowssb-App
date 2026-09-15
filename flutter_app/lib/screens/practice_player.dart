@@ -9,7 +9,7 @@ library;
 
 import 'dart:async';
 import 'dart:math' as math;
-import 'dart:ui' show ImageFilter;
+import 'dart:ui' show ImageFilter, lerpDouble;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -1028,6 +1028,7 @@ class _NextUpCard extends StatelessWidget {
 }
 
 /// YTM continuous scroll-driven Up Next — NestedScrollView / slivers.
+/// Collapse t from FlexibleSpaceBarSettings; plain icons only (no glass tube).
 /// Large art shrinks + pins top-left; controls fade; filters stick; mini-bar
 /// shows cast + play. Queue icon on the peek card still opens Sound Library.
 class _QueueSheet extends StatefulWidget {
@@ -1069,13 +1070,11 @@ class _QueueSheetState extends State<_QueueSheet> {
   Set<String> _liked = {};
   Map<String, int> _playCounts = {};
 
-  // Art + title-below + progress + plain/glass transport must fit.
-  // Big art (~300) + title (~50) + progress (~36) + row (~56) + gaps ≈ 510.
-  // +8px slack kills the 3px BOTTOM OVERFLOW banner above Playing-from.
-  static const _expandExtent = 520.0;
+  // Full YTM hero budget (below status pad): chrome + art + title + progress +
+  // plain transport + ≥4px slack. Collapsed bar is toolbarHeight mini-row.
+  static const _expandExtent = 528.0;
   static const _collapseExtent = 64.0;
   static const _heroArtMax = 300.0;
-  static const _heroTubeH = 72.0;
 
   @override
   void initState() {
@@ -1094,9 +1093,10 @@ class _QueueSheetState extends State<_QueueSheet> {
 
   void _onScroll() {
     if (!_scrollCtrl.hasClients) return;
+    // Backdrop dim only — hero geometry uses FlexibleSpaceBarSettings every frame.
     final range = (_expandExtent - _collapseExtent).clamp(1.0, 9999.0);
     final next = (_scrollCtrl.offset / range).clamp(0.0, 1.0);
-    if ((next - _collapse).abs() > 0.008) {
+    if ((next - _collapse).abs() > 0.04) {
       setState(() => _collapse = next);
     }
   }
@@ -1194,18 +1194,11 @@ class _QueueSheetState extends State<_QueueSheet> {
     final word = _currentWord;
     final theme = _currentTheme;
     final art = (word?.img.isNotEmpty == true) ? word!.img : theme.image;
+    final video = theme.video;
     final t = _collapse;
-    // 3-stage gate — stages never paint together:
-    // t < ~0.22: expanded YTM (big art, title below, plain icons, NO glass)
-    // mid: art shrinks; glass tube with SVG icons may appear
-    // t high: mini header only (thumb+title+cast+play); glass gone
-    const glassStart = 0.22;
-    const stage1End = 0.42;
-    const stage2Start = 0.55;
-    final controlsOpacity = t >= stage1End ? 0.0 : (1.0 - t / stage1End).clamp(0.0, 1.0);
-    final miniOpacity = t <= stage2Start ? 0.0 : ((t - stage2Start) / (1.0 - stage2Start)).clamp(0.0, 1.0);
-    // ignore: unused_local_variable — gates mirrored in _YtmCollapsingHero
-    final _ = glassStart;
+    // Continuous collapse — no stage jump-cuts. Hero owns geometry via localT.
+    final controlsOpacity = (1.0 - t / 0.55).clamp(0.0, 1.0);
+    final miniOpacity = ((t - 0.4) / 0.6).clamp(0.0, 1.0);
 
     return PopScope(
       canPop: true,
@@ -1232,23 +1225,35 @@ class _QueueSheetState extends State<_QueueSheet> {
                       sliver: SliverAppBar(
                         pinned: true,
                         stretch: true,
+                        primary: true,
                         automaticallyImplyLeading: false,
                         backgroundColor: const Color(0xFF000000),
                         elevation: 0,
                         scrolledUnderElevation: 0,
-                        toolbarHeight: 0,
+                        // Collapsed height = sticky mini row (thumb + title + cast + play).
+                        toolbarHeight: _collapseExtent,
                         expandedHeight: media.padding.top + _expandExtent,
                         flexibleSpace: ClipRect(
                           child: LayoutBuilder(
                             builder: (context, constraints) {
-                              final maxH = media.padding.top + _expandExtent;
-                              final minH = media.padding.top + _collapseExtent;
-                              final h = constraints.maxHeight.clamp(minH, maxH);
-                              final localT = ((maxH - h) / (maxH - minH)).clamp(0.0, 1.0);
+                              // Source of truth: FlexibleSpaceBarSettings every frame.
+                              final settings = context.dependOnInheritedWidgetOfExactType<FlexibleSpaceBarSettings>();
+                              double localT;
+                              if (settings != null) {
+                                final range = (settings.maxExtent - settings.minExtent).clamp(1.0, 10000.0);
+                                localT = ((settings.maxExtent - settings.currentExtent) / range).clamp(0.0, 1.0);
+                              } else {
+                                final maxH = media.padding.top + _expandExtent;
+                                final minH = media.padding.top + _collapseExtent;
+                                final h = constraints.maxHeight.clamp(minH, maxH);
+                                localT = ((maxH - h) / (maxH - minH)).clamp(0.0, 1.0);
+                              }
                               return _YtmCollapsingHero(
                                 topPad: media.padding.top,
                                 collapse: localT,
+                                maxHeight: constraints.maxHeight,
                                 art: art,
+                                video: video,
                                 title: word?.word ?? 'NowssB',
                                 subtitle: 'NowssB',
                                 playing: widget.playing,
@@ -1256,7 +1261,6 @@ class _QueueSheetState extends State<_QueueSheet> {
                                 shuffle: false,
                                 loop: false,
                                 artMax: _heroArtMax,
-                                tubeHeight: _heroTubeH,
                                 onPlay: widget.onTogglePlay,
                                 onCast: () {},
                                 onClose: () => Navigator.of(context).maybePop(),
@@ -1430,16 +1434,18 @@ class _QueueSheetState extends State<_QueueSheet> {
   }
 }
 
-/// 3-stage YTM hero:
-/// (1) t≈0 expanded: full-width art, title+artist below, progress, plain SVG icons (NO glass)
-/// (2) mid-scroll: art shrinks; glass tube with SVG icons appears
-/// (3) t high: mini bar only — glass ABSENT
-/// Transport is bottom-anchored inside flexibleSpace so it cannot spill into Playing-from.
+/// Continuous YTM Up Next hero — one collapse t ∈ [0,1] every frame.
+/// t≈0: full-width art/video, title+artist below (untruncated), progress, plain
+///       Material transport (large white circular play) — NO glass tube.
+/// t≈1: sticky mini row — small thumb + title + artist + cast + play.
+/// Mid: geometry/opacity lerp only (Curves.easeInOutCubic). No stage jump-cuts.
 class _YtmCollapsingHero extends StatelessWidget {
   const _YtmCollapsingHero({
     required this.topPad,
     required this.collapse,
+    required this.maxHeight,
     required this.art,
+    required this.video,
     required this.title,
     required this.subtitle,
     required this.playing,
@@ -1450,12 +1456,13 @@ class _YtmCollapsingHero extends StatelessWidget {
     required this.onCast,
     required this.onClose,
     this.artMax = 300.0,
-    this.tubeHeight = 72.0,
   });
 
   final double topPad;
   final double collapse;
+  final double maxHeight;
   final String art;
+  final String video;
   final String title;
   final String subtitle;
   final bool playing;
@@ -1466,165 +1473,185 @@ class _YtmCollapsingHero extends StatelessWidget {
   final VoidCallback onCast;
   final VoidCallback onClose;
   final double artMax;
-  final double tubeHeight;
 
   @override
   Widget build(BuildContext context) {
     final t = collapse.clamp(0.0, 1.0);
+    final et = Curves.easeInOutCubic.transform(t);
     final w = MediaQuery.sizeOf(context).width;
-    // Nearly full-width at t≈0 (YTM), mini thumb when collapsed.
-    final expandedArt = math.min(w - 40.0, artMax);
-    final miniArt = 40.0;
-    final artSize = expandedArt + (miniArt - expandedArt) * Curves.easeInOutCubic.transform(t);
+    final h = maxHeight;
 
-    // Centered when expanded → left-aligned mini when collapsed.
-    final artLeftExpanded = (w - expandedArt) / 2;
-    final artLeft = artLeftExpanded + (12.0 - artLeftExpanded) * t;
-    final artTop = topPad + 20.0 + ((8.0) - 20.0) * t;
-
-    // Gates
-    const glassStart = 0.22;
-    const stage1End = 0.42;
-    const stage2Start = 0.55;
-    final showPlain = t < glassStart;
-    final showGlass = t >= glassStart && t < stage1End;
-    final showTransport = showPlain || showGlass;
-    final controlsOpacity =
-        t >= stage1End ? 0.0 : (1.0 - t / stage1End).clamp(0.0, 1.0);
-    final plainOpacity = showPlain ? 1.0 : (t < glassStart + 0.06 ? ((glassStart + 0.06 - t) / 0.06).clamp(0.0, 1.0) : 0.0);
-    final glassOpacity = !showGlass
-        ? 0.0
-        : (t < glassStart + 0.08
-            ? ((t - glassStart) / 0.08).clamp(0.0, 1.0)
-            : (t > stage1End - 0.06 ? ((stage1End - t) / 0.06).clamp(0.0, 1.0) : 1.0));
-    final miniOpacity =
-        t <= stage2Start ? 0.0 : ((t - stage2Start) / (1.0 - stage2Start)).clamp(0.0, 1.0);
-
-    // Title: below art when expanded, beside art when collapsed.
-    final titleBelowT = (1.0 - (t / 0.35)).clamp(0.0, 1.0);
-    final titleLeftBeside = artLeft + artSize + 12;
-    final titleLeftBelow = artLeft;
-    final titleLeft = titleLeftBelow + (titleLeftBeside - titleLeftBelow) * (1.0 - titleBelowT);
-    final titleTopBelow = artTop + artSize + 12;
-    final titleTopBeside = artTop + artSize * 0.12;
-    final titleTop = titleTopBelow + (titleTopBeside - titleTopBelow) * (1.0 - titleBelowT);
-    final titleRightPad = 24.0 + (88.0 - 24.0) * (1.0 - titleBelowT);
-
-    Widget artBox(double size) {
-      final r = BorderRadius.circular(6 + 14 * (1 - t));
-      return ClipRRect(
-        borderRadius: r,
-        child: SizedBox(
-          width: size,
-          height: size,
-          child: art.startsWith('http')
-              ? Image.network(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111)))
-              : Image.asset(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111))),
-        ),
-      );
-    }
-
-    // Progress (~36) + gap + transport row — kept INSIDE flexibleSpace.
-    final transportH = showGlass ? tubeHeight : 56.0;
-    final transportBlockH = 36.0 + 6.0 + transportH;
+    // Continuous crossfades — overlapping, no hard dead-zones / stage cuts.
+    final fullOpacity = (1.0 - (t / 0.72)).clamp(0.0, 1.0);
+    final miniOpacity = ((t - 0.38) / 0.62).clamp(0.0, 1.0);
 
     return ColoredBox(
       color: const Color(0xFF000000),
       child: Stack(
+        fit: StackFit.expand,
         clipBehavior: Clip.hardEdge,
         children: [
-          // Large → mini art
-          Positioned(
-            left: artLeft,
-            top: artTop,
-            child: artBox(artSize),
-          ),
-          // Title / artist — below art (expanded) → beside (collapsed)
-          Positioned(
-            left: titleLeft.clamp(12.0, w - 120),
-            right: titleRightPad,
-            top: titleTop.clamp(topPad + 6, artTop + artSize + 56),
-            child: Opacity(
-              opacity: (0.55 + 0.45 * titleBelowT).clamp(0.0, 1.0) * (miniOpacity > 0.85 ? 1.0 : 1.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    title,
-                    maxLines: titleBelowT > 0.5 ? 2 : 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: const Color(0xFFF5F5F7),
-                      fontSize: 22 - 7 * t,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.2,
-                    ),
-                  ),
-                  Text(
-                    subtitle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: const Color(0xFF8E8E93),
-                      fontSize: 14 - 2.5 * t,
-                    ),
-                  ),
-                ],
+          if (fullOpacity > 0.01)
+            Positioned.fill(
+              child: IgnorePointer(
+                ignoring: fullOpacity < 0.12,
+                child: Opacity(
+                  opacity: fullOpacity,
+                  child: _buildFull(context, w, h, t, et),
+                ),
               ),
             ),
-          ),
-          // Stage 1 — progress + plain icons and/or glass tube (SVG)
-          if (showTransport)
+          if (miniOpacity > 0.01)
             Positioned(
-              left: 16,
-              right: 16,
-              bottom: 10,
-              height: transportBlockH,
+              top: 0,
+              left: 0,
+              right: 0,
+              height: topPad + 64,
               child: IgnorePointer(
-                ignoring: controlsOpacity < 0.12,
+                ignoring: miniOpacity < 0.12,
                 child: Opacity(
-                  opacity: controlsOpacity,
+                  opacity: miniOpacity,
+                  child: Padding(
+                    padding: EdgeInsets.only(top: topPad),
+                    child: _buildMini(w),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _artBox(double size, {required double radius}) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(radius),
+      child: SizedBox(
+        width: size,
+        height: size,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            const ColoredBox(color: Color(0xFF050505)),
+            if (video.isNotEmpty)
+              NwsbVideo(
+                asset: video,
+                poster: art,
+                fit: BoxFit.cover,
+                alignment: const Alignment(0, -0.2),
+                priority: ClipPriority.feature,
+                autoplay: true,
+                loop: true,
+                showPoster: true,
+              )
+            else if (art.startsWith('http'))
+              Image.network(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111)))
+            else
+              Image.asset(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111))),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Expanded column sized to [h] so content never exceeds flexibleSpace
+  /// (kills BOTTOM OVERFLOW). Fixed sections lerp down with et; art takes rest.
+  Widget _buildFull(BuildContext context, double w, double h, double t, double et) {
+    final chromeH = lerpDouble(44.0, 0.0, et)!;
+    final titleBlockH = lerpDouble(58.0, 0.0, et)!;
+    final progressH = lerpDouble(38.0, 0.0, et)!;
+    final transportH = lerpDouble(60.0, 0.0, et)!;
+    final slack = lerpDouble(8.0, 0.0, et)!; // ≥4px when expanded
+    final gapAfterChrome = lerpDouble(6.0, 0.0, et)!;
+    final gapAfterArt = lerpDouble(10.0, 0.0, et)!;
+    final gapAfterTitle = lerpDouble(6.0, 0.0, et)!;
+    final gapAfterProgress = lerpDouble(4.0, 0.0, et)!;
+
+    final reserved = topPad +
+        chromeH +
+        gapAfterChrome +
+        titleBlockH +
+        gapAfterArt +
+        progressH +
+        gapAfterTitle +
+        transportH +
+        gapAfterProgress +
+        slack;
+    final artBudget = math.max(0.0, h - reserved);
+    final artSize = math.min(math.min(w - 48.0, artMax), artBudget);
+    final radius = lerpDouble(18.0, 8.0, et)!;
+    final controlsFade = (1.0 - et * 1.15).clamp(0.0, 1.0);
+
+    return SizedBox(
+      height: h,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SizedBox(height: topPad),
+          if (chromeH > 0.5)
+            SizedBox(
+              height: chromeH,
+              child: Opacity(
+                opacity: controlsFade,
+                child: Row(
+                  children: [
+                    IconButton(
+                      onPressed: onClose,
+                      icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFFCFCFD2), size: 28),
+                    ),
+                    const Spacer(),
+                    IconButton(
+                      onPressed: onCast,
+                      icon: const Icon(Icons.cast_rounded, color: Color(0xFFCFCFD2), size: 22),
+                    ),
+                    IconButton(
+                      onPressed: () {},
+                      icon: const Icon(Icons.more_vert_rounded, color: Color(0xFFCFCFD2), size: 22),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          if (gapAfterChrome > 0.5) SizedBox(height: gapAfterChrome),
+          SizedBox(
+            height: artBudget,
+            child: Center(
+              child: artSize > 1 ? _artBox(artSize, radius: radius) : const SizedBox.shrink(),
+            ),
+          ),
+          if (gapAfterArt > 0.5) SizedBox(height: gapAfterArt),
+          if (titleBlockH > 0.5)
+            SizedBox(
+              height: titleBlockH,
+              child: Opacity(
+                opacity: controlsFade,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _ProgressBar(playing: playing, durationSec: durationSec),
-                      const SizedBox(height: 6),
-                      SizedBox(
-                        height: transportH,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            if (plainOpacity > 0.01)
-                              Opacity(
-                                opacity: plainOpacity,
-                                child: _PlainTransportRow(
-                                  playing: playing,
-                                  shuffle: shuffle,
-                                  loop: loop,
-                                  onShuffle: () {},
-                                  onPrevious: () {},
-                                  onPlay: onPlay,
-                                  onNext: () {},
-                                  onRepeat: () {},
-                                ),
-                              ),
-                            if (glassOpacity > 0.01)
-                              Opacity(
-                                opacity: glassOpacity,
-                                child: _GlassTube(
-                                  playing: playing,
-                                  shuffle: shuffle,
-                                  loop: loop,
-                                  height: tubeHeight,
-                                  onShuffle: () {},
-                                  onPrevious: () {},
-                                  onPlay: onPlay,
-                                  onNext: () {},
-                                  onRepeat: () {},
-                                ),
-                              ),
-                          ],
+                      Text(
+                        title,
+                        maxLines: 2,
+                        overflow: TextOverflow.fade,
+                        softWrap: true,
+                        style: TextStyle(
+                          color: const Color(0xFFF5F5F7),
+                          fontSize: lerpDouble(24, 16, et)!,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.2,
+                          height: 1.15,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: const Color(0xFF8E8E93),
+                          fontSize: lerpDouble(14, 12, et)!,
                         ),
                       ),
                     ],
@@ -1632,47 +1659,97 @@ class _YtmCollapsingHero extends StatelessWidget {
                 ),
               ),
             ),
-          // Stage 2 — mini-bar actions
-          if (miniOpacity > 0.01)
-            Positioned(
-              top: topPad + 10,
-              right: 10,
-              child: Opacity(
-                opacity: miniOpacity,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      onPressed: onCast,
-                      icon: const Icon(Icons.cast_rounded, color: Color(0xFFCFCFD2), size: 22),
-                      visualDensity: VisualDensity.compact,
-                    ),
-                    IconButton(
-                      onPressed: onPlay,
-                      icon: Icon(
-                        playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
-                        color: const Color(0xFFF5F5F7),
-                        size: 26,
-                      ),
-                      visualDensity: VisualDensity.compact,
-                    ),
-                  ],
+          if (gapAfterTitle > 0.5) SizedBox(height: gapAfterTitle),
+          if (progressH > 0.5)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: SizedBox(
+                height: progressH,
+                child: Opacity(
+                  opacity: controlsFade,
+                  child: ClipRect(
+                    child: _ProgressBar(playing: playing, durationSec: durationSec),
+                  ),
                 ),
               ),
             ),
-          // Collapse chevron when expanded
-          Positioned(
-            top: topPad + 4,
-            left: 4,
-            child: Opacity(
-              opacity: controlsOpacity,
-              child: IconButton(
-                onPressed: onClose,
-                icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFFCFCFD2), size: 28),
+          if (gapAfterProgress > 0.5) SizedBox(height: gapAfterProgress),
+          if (transportH > 0.5)
+            SizedBox(
+              height: transportH,
+              child: Opacity(
+                opacity: controlsFade,
+                child: ClipRect(
+                  child: _PlainTransportRow(
+                    playing: playing,
+                    shuffle: shuffle,
+                    loop: loop,
+                    onShuffle: () {},
+                    onPrevious: () {},
+                    onPlay: onPlay,
+                    onNext: () {},
+                    onRepeat: () {},
+                  ),
+                ),
               ),
             ),
-          ),
+          if (slack > 0.5) SizedBox(height: slack),
         ],
+      ),
+    );
+  }
+
+  Widget _buildMini(double w) {
+    return SizedBox(
+      height: 64,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
+        child: Row(
+          children: [
+            _artBox(44, radius: 6),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Color(0xFFF5F5F7),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.15,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            IconButton(
+              onPressed: onCast,
+              icon: const Icon(Icons.cast_rounded, color: Color(0xFFCFCFD2), size: 22),
+              visualDensity: VisualDensity.compact,
+            ),
+            IconButton(
+              onPressed: onPlay,
+              icon: Icon(
+                playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                color: const Color(0xFFF5F5F7),
+                size: 28,
+              ),
+              visualDensity: VisualDensity.compact,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -2095,34 +2172,41 @@ class _ProgressBarState extends State<_ProgressBar> with SingleTickerProviderSta
     animation: _c,
     builder: (context, _) {
       final t = _c.value.clamp(0.0, 1.0);
-      return Column(children: [
-        SizedBox(
-          height: 14,
-          child: LayoutBuilder(builder: (context, constraints) {
-            final x = t * constraints.maxWidth;
-            return Stack(alignment: Alignment.centerLeft, children: [
-              Container(height: 3, decoration: BoxDecoration(color: const Color(0xFF2C2C2E), borderRadius: BorderRadius.circular(99))),
-              Container(width: x, height: 3, decoration: BoxDecoration(color: const Color(0xFFF5F5F7), borderRadius: BorderRadius.circular(99))),
-              Positioned(
-                left: (x - 5.5).clamp(0.0, math.max(0.0, constraints.maxWidth - 11)),
-                child: Container(
-                  width: 12, height: 12,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFF5F5F7),
-                    shape: BoxShape.circle,
-                    boxShadow: [BoxShadow(color: Color(0xFF050505), blurRadius: 0, spreadRadius: 3)],
+      // Fixed 38px envelope — matches hero progressH, no overflow.
+      return SizedBox(
+        height: 38,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              height: 14,
+              child: LayoutBuilder(builder: (context, constraints) {
+                final x = t * constraints.maxWidth;
+                return Stack(alignment: Alignment.centerLeft, children: [
+                  Container(height: 3, decoration: BoxDecoration(color: const Color(0xFF2C2C2E), borderRadius: BorderRadius.circular(99))),
+                  Container(width: x, height: 3, decoration: BoxDecoration(color: const Color(0xFFF5F5F7), borderRadius: BorderRadius.circular(99))),
+                  Positioned(
+                    left: (x - 5.5).clamp(0.0, math.max(0.0, constraints.maxWidth - 11)),
+                    child: Container(
+                      width: 12, height: 12,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFF5F5F7),
+                        shape: BoxShape.circle,
+                        boxShadow: [BoxShadow(color: Color(0xFF050505), blurRadius: 0, spreadRadius: 3)],
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            ]);
-          }),
+                ]);
+              }),
+            ),
+            const SizedBox(height: 6),
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              Text(_fmtClock(widget.durationSec * t), style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 11, height: 1.1)),
+              Text(_fmtClock(widget.durationSec), style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 11, height: 1.1)),
+            ]),
+          ],
         ),
-        const SizedBox(height: 8),
-        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Text(_fmtClock(widget.durationSec * t), style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 11)),
-          Text(_fmtClock(widget.durationSec), style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 11)),
-        ]),
-      ]);
+      );
     },
   );
 }
@@ -2144,24 +2228,29 @@ class _PlainTransportRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Height 60 + play 56 → no BOTTOM OVERFLOW (old 56/58 spilled by ~2–3px).
     return SizedBox(
-      height: 56,
+      height: 60,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           IconButton(
             onPressed: onShuffle,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
             icon: Icon(Icons.shuffle_rounded, color: shuffle ? Colors.white : const Color(0xFFCFCFD2), size: 22),
           ),
           IconButton(
             onPressed: onPrevious,
-            icon: const Icon(Icons.skip_previous_rounded, color: Color(0xFFF5F5F7), size: 30),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+            icon: const Icon(Icons.skip_previous_rounded, color: Color(0xFFF5F5F7), size: 32),
           ),
           GestureDetector(
             onTap: onPlay,
             child: Container(
-              width: 58,
-              height: 58,
+              width: 56,
+              height: 56,
               decoration: const BoxDecoration(
                 shape: BoxShape.circle,
                 color: Color(0xFFF5F5F7),
@@ -2175,10 +2264,14 @@ class _PlainTransportRow extends StatelessWidget {
           ),
           IconButton(
             onPressed: onNext,
-            icon: const Icon(Icons.skip_next_rounded, color: Color(0xFFF5F5F7), size: 30),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+            icon: const Icon(Icons.skip_next_rounded, color: Color(0xFFF5F5F7), size: 32),
           ),
           IconButton(
             onPressed: onRepeat,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
             icon: Icon(Icons.repeat_rounded, color: loop ? Colors.white : const Color(0xFFCFCFD2), size: 22),
           ),
         ],
