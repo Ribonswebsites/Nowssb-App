@@ -33,6 +33,7 @@ class WordAtelierScreen extends StatelessWidget {
           eyebrow: 'NowssB Store',
           title: 'The Word Atelier',
           film: nwsbVideo(kRmHeroVidFile),
+          usePageFilm: true,
           onBack: () => Navigator.of(context).pop(),
           slivers: [
             SliverPadding(
@@ -156,20 +157,41 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
       }));
       productRailIndex++;
 
-      // After the 4th existing product row → healing category grid.
+      // Compact mid-rail glass banners between every 2 product rows (exactly 7).
+      if (_chip == 'ALL' && productRailIndex % 2 == 0) {
+        final midIdx = (productRailIndex ~/ 2) - 1;
+        final mid = storeMidRailBannerAt(midIdx);
+        if (mid != null) sections.add(mid);
+      }
+
+      // After the 4th rail → frequency package (grid + Limited Time Free + Browse by Goal).
       if (_chip == 'ALL' && productRailIndex == 4) {
-        sections.add(StoreHealCategoryGrid(
-          onSelect: (id) => setState(() => _chip = id),
+        sections.add(StoreFrequencyPackage(
+          onSelectCategory: (id) => setState(() => _chip = id),
+          onSeeAll: _browseAll,
+          onOpenWord: _openWord,
         ));
       }
 
-      // After the 7th existing product row → Recommended + Featured Bundle.
-      if (_chip == 'ALL' && productRailIndex == 7) {
+      // After the 6th rail → Recommended + Featured Playlist glass (image-4).
+      if (_chip == 'ALL' && productRailIndex == 6) {
         sections.add(StoreRecommendedSection(
           onSeeAll: _browseAll,
           onOpenWord: _openWord,
         ));
+        sections.add(StoreFeaturedPlaylistSection(
+          onSeeAll: _browseAll,
+          onOpenWord: _openWord,
+        ));
+      }
+
+      // After the 7th rail → Featured Bundle glass + tall 3-card carousel (image-5).
+      if (_chip == 'ALL' && productRailIndex == 7) {
         sections.add(StoreFeaturedBundleSection(
+          onSeeAll: _browseAll,
+          onOpenWord: _openWord,
+        ));
+        sections.add(StoreGlassPlaylistCarousel(
           onSeeAll: _browseAll,
           onOpenWord: _openWord,
         ));
@@ -184,12 +206,22 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
       }
     }
 
+    // Ensure exactly 7 mid-rail banners when ALL chip (pad if <14 rails).
+    if (_chip == 'ALL') {
+      final placed = productRailIndex ~/ 2;
+      for (var i = placed; i < kStoreMidRailBanners.length; i++) {
+        sections.add(StoreMidRailBanner(data: kStoreMidRailBanners[i]));
+      }
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         StorePixelsHero(
           onBrowseAll: _browseAll,
           onViewCart: _viewCart,
+          videoAsset: nwsbVideo(kRmHeroVidFile),
+          videoTitle: 'The Word Atelier',
         ),
         StoreSearchBar(
           controller: _search,

@@ -5,11 +5,14 @@ import 'package:flutter/material.dart';
 
 import '../../data/content.dart';
 import '../../data/store_catalog.dart';
+import '../../media/nwsb_video.dart';
+import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/intro_gate.dart';
 import '../../widgets/page_shell.dart';
 import 'product_detail.dart';
 import 'store_cards.dart';
+import 'store_home_sections.dart';
 
 class EbooksStoreScreen extends StatelessWidget {
   const EbooksStoreScreen({super.key});
@@ -29,6 +32,7 @@ class EbooksStoreScreen extends StatelessWidget {
           eyebrow: 'NowssB Store',
           title: 'The NowssB Ebooks',
           film: 'assets/video/store-verify-banner.mp4',
+          usePageFilm: true,
           onBack: () => Navigator.of(context).pop(),
           slivers: [
             SliverPadding(
@@ -71,24 +75,27 @@ class _EbooksBody extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Hero banner — website uses 4/3 cover art
+        // Restored looping hero-ebooks film (keep elevated copy overlay).
         Container(
           margin: const EdgeInsets.only(bottom: 16),
           clipBehavior: Clip.antiAlias,
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(4), color: Colors.black),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(16), color: Colors.black),
           child: AspectRatio(
-            aspectRatio: 4 / 3,
+            aspectRatio: 16 / 9,
             child: Stack(
               fit: StackFit.expand,
               children: [
-                StoreNetImage(url: kEbHeroImg),
+                const NwsbVideo(
+                  asset: 'assets/video/hero-ebooks.mp4',
+                  poster: 'assets/video/hero-ebooks-poster.webp',
+                  priority: ClipPriority.feature,
+                ),
                 const DecoratedBox(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
-                      colors: [Color(0x0D060C18), Color(0xD9060C18)],
-                      stops: [0.4, 1],
+                      colors: [Color(0x22060C18), Color(0xE6060C18)],
                     ),
                   ),
                 ),
@@ -109,15 +116,55 @@ class _EbooksBody extends StatelessWidget {
             ),
           ),
         ),
+        StorePixelsHero(
+          onBrowseAll: () {},
+          onViewCart: () {},
+          videoTitle: 'The NowssB Ebooks',
+        ),
         const Text(
           'Deep-dive guides on word science, phonetic origin and sound healing — yours to keep, read anywhere, forever.',
           style: TextStyle(fontSize: 13, height: 1.6, color: Color(0x80FFFFFF)),
         ),
         const SizedBox(height: 18),
-        for (final b in books) _EbookRow(book: b),
+        StoreFrequencyPackage(
+          onSelectCategory: (_) {},
+          onSeeAll: () {},
+          onOpenWord: (_, __, ___, ____) {},
+        ),
+        StoreRecommendedSection(
+          onSeeAll: () {},
+          onOpenWord: (_, __, ___, ____) {},
+        ),
+        StoreFeaturedPlaylistSection(
+          onSeeAll: () {},
+          onOpenWord: (_, __, ___, ____) {},
+        ),
+        StoreGlassPlaylistCarousel(
+          onSeeAll: () {},
+          onOpenWord: (_, __, ___, ____) {},
+        ),
+        ..._ebookRowsWithMidBanners(books),
         StoreDisclaimer(text: kEbDisclaimer),
       ],
     );
+  }
+
+  List<Widget> _ebookRowsWithMidBanners(List<EbBook> books) {
+    final out = <Widget>[];
+    var rail = 0;
+    for (final b in books) {
+      out.add(_EbookRow(book: b));
+      rail++;
+      if (rail % 2 == 0) {
+        final mid = storeMidRailBannerAt((rail ~/ 2) - 1);
+        if (mid != null) out.add(mid);
+      }
+    }
+    final placed = rail ~/ 2;
+    for (var i = placed; i < kStoreMidRailBanners.length; i++) {
+      out.add(StoreMidRailBanner(data: kStoreMidRailBanners[i]));
+    }
+    return out;
   }
 }
 

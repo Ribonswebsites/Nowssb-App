@@ -10,6 +10,8 @@ import 'package:flutter/material.dart';
 
 import '../data/settings.dart';
 import '../theme/tokens.dart';
+import '../media/nwsb_video.dart';
+import '../media/video_pool.dart';
 import 'app_backdrop.dart';
 
 class PageShell extends StatefulWidget {
@@ -20,15 +22,19 @@ class PageShell extends StatefulWidget {
     required this.film,
     required this.slivers,
     this.onBack,
+    this.usePageFilm = false,
   });
 
   final String eyebrow;
   final String title;
 
-  /// The page's own film. It IS the page rather than decoration on it, so it
-  /// takes a feature lease and holds its decoder while the cards below come
-  /// and go.
+  /// The page's own film. When [usePageFilm] is true the film loops behind
+  /// the page (Store / Meaning / Ebooks). Otherwise AppBackdrop stays.
   final String film;
+
+  /// Store pages set this so the looping NwsbVideo page film is visible
+  /// again under a light scrim — never wipe store films for a flat backdrop.
+  final bool usePageFilm;
 
   final List<Widget> slivers;
   final VoidCallback? onBack;
@@ -61,19 +67,32 @@ class _PageShellState extends State<PageShell> {
       body: Stack(
         children: [
           Positioned.fill(
-            child: const AppBackdrop(),
+            child: widget.usePageFilm && widget.film.isNotEmpty
+                ? NwsbVideo(
+                    asset: widget.film,
+                    priority: ClipPriority.decoration,
+                    autoplay: true,
+                    loop: true,
+                  )
+                : const AppBackdrop(),
           ),
-          const Positioned.fill(
+          Positioned.fill(
             child: DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0xCC060C18),
-                    Color(0xF0060C18),
-                    Color(0xFA060C18),
-                  ],
+                  colors: widget.usePageFilm
+                      ? const [
+                          Color(0x99060C18),
+                          Color(0xCC060C18),
+                          Color(0xE6060C18),
+                        ]
+                      : const [
+                          Color(0xCC060C18),
+                          Color(0xF0060C18),
+                          Color(0xFA060C18),
+                        ],
                 ),
               ),
             ),

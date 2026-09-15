@@ -13,6 +13,7 @@ import '../../widgets/intro_gate.dart';
 import '../../widgets/page_shell.dart';
 import 'product_detail.dart';
 import 'store_cards.dart';
+import 'store_home_sections.dart';
 
 class MeaningStoreScreen extends StatelessWidget {
   const MeaningStoreScreen({super.key});
@@ -32,6 +33,7 @@ class MeaningStoreScreen extends StatelessWidget {
           eyebrow: 'NowssB Store',
           title: 'The Meaning Store',
           film: nwsbVideo(kStoreMeaningDoorVidFile),
+          usePageFilm: true,
           onBack: () => Navigator.of(context).pop(),
           slivers: [
             SliverPadding(
@@ -241,47 +243,51 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
           ),
         ),
         const SizedBox(height: 8),
-        for (final cat in order)
-          if (cats[cat]?.isNotEmpty == true) ...[
-            RmCatBanner(
-              title: cat,
-              sub: kMsCatSub[cat] ?? 'Decoded origins',
-              logoUrl: kMsCatLogoUrl,
-              logoAsset: kRmCatLogoAsset,
-            ),
-            MsGrid(
-              children: [
-                for (final m in cats[cat]!)
-                  MsCard(
-                    word: m.word,
-                    root: m.root,
-                    imgUrl: m.img,
-                    price: m.price,
-                    onTap: () => openMeaningDetail(context, m),
-                  ),
-                if (kMsSignature.containsKey(cat) && _query.isEmpty)
-                  MsCard(
-                    word: kMsSignature[cat]!.word,
-                    root: kMsSignature[cat]!.root,
-                    imgUrl: kMsSignatureImg,
-                    price: kMsSignaturePrice,
-                    signature: true,
-                    onTap: () => openMeaningDetail(
-                      context,
-                      MsMeaning(
-                        word: kMsSignature[cat]!.word,
-                        key: kMsSignature[cat]!.key,
-                        root: kMsSignature[cat]!.root,
-                        category: cat,
-                        price: kMsSignaturePrice,
-                        img: kMsSignatureImg,
-                      ),
-                      signature: true,
-                    ),
-                  ),
-              ],
-            ),
-          ],
+        StoreFrequencyPackage(
+          onSelectCategory: (id) {
+            // Map heal-grid ids → meaning category chips when possible.
+            const map = {
+              'elements': 'Elements',
+              'sacred': 'Emotions',
+              'nature': 'Elements',
+              'warriors': 'Human',
+              'focus': 'Emotions',
+              'calm': 'Emotions',
+              'cosmos': 'Cosmos',
+            };
+            setState(() => _chip = map[id] ?? 'ALL');
+          },
+          onSeeAll: () => setState(() => _chip = 'ALL'),
+          onOpenWord: (word, root, img, price) {
+            // Best-effort: open first matching meaning if present.
+            final hit = _base.where((m) => m.word.toLowerCase() == word.toLowerCase()).toList();
+            if (hit.isNotEmpty) {
+              openMeaningDetail(context, hit.first);
+            }
+          },
+        ),
+        StoreRecommendedSection(
+          onSeeAll: () => setState(() => _chip = 'ALL'),
+          onOpenWord: (word, root, img, price) {
+            final hit = _base.where((m) => m.word.toLowerCase() == word.toLowerCase()).toList();
+            if (hit.isNotEmpty) openMeaningDetail(context, hit.first);
+          },
+        ),
+        StoreFeaturedPlaylistSection(
+          onSeeAll: () => setState(() => _chip = 'ALL'),
+          onOpenWord: (word, root, img, price) {
+            final hit = _base.where((m) => m.word.toLowerCase() == word.toLowerCase()).toList();
+            if (hit.isNotEmpty) openMeaningDetail(context, hit.first);
+          },
+        ),
+        StoreGlassPlaylistCarousel(
+          onSeeAll: () => setState(() => _chip = 'ALL'),
+          onOpenWord: (word, root, img, price) {
+            final hit = _base.where((m) => m.word.toLowerCase() == word.toLowerCase()).toList();
+            if (hit.isNotEmpty) openMeaningDetail(context, hit.first);
+          },
+        ),
+        ..._meaningCollectionSections(context, order, cats),
         if (cats.isEmpty)
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 48),
@@ -293,5 +299,66 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
         ),
       ],
     );
+  }
+
+  List<Widget> _meaningCollectionSections(
+    BuildContext context,
+    List<String> order,
+    Map<String, List<MsMeaning>> cats,
+  ) {
+    final out = <Widget>[];
+    var rail = 0;
+    for (final cat in order) {
+      if (cats[cat]?.isNotEmpty != true) continue;
+      out.add(RmCatBanner(
+        title: cat,
+        sub: kMsCatSub[cat] ?? 'Decoded origins',
+        logoUrl: kMsCatLogoUrl,
+        logoAsset: kRmCatLogoAsset,
+      ));
+      out.add(MsGrid(
+        children: [
+          for (final m in cats[cat]!)
+            MsCard(
+              word: m.word,
+              root: m.root,
+              imgUrl: m.img,
+              price: m.price,
+              onTap: () => openMeaningDetail(context, m),
+            ),
+          if (kMsSignature.containsKey(cat) && _query.isEmpty)
+            MsCard(
+              word: kMsSignature[cat]!.word,
+              root: kMsSignature[cat]!.root,
+              imgUrl: kMsSignatureImg,
+              price: kMsSignaturePrice,
+              signature: true,
+              onTap: () => openMeaningDetail(
+                context,
+                MsMeaning(
+                  word: kMsSignature[cat]!.word,
+                  key: kMsSignature[cat]!.key,
+                  root: kMsSignature[cat]!.root,
+                  category: cat,
+                  price: kMsSignaturePrice,
+                  img: kMsSignatureImg,
+                ),
+                signature: true,
+              ),
+            ),
+        ],
+      ));
+      rail++;
+      if (rail % 2 == 0) {
+        final mid = storeMidRailBannerAt((rail ~/ 2) - 1);
+        if (mid != null) out.add(mid);
+      }
+    }
+    // Ensure all 7 mid-rail banners appear even when few categories.
+    final placed = rail ~/ 2;
+    for (var i = placed; i < kStoreMidRailBanners.length; i++) {
+      out.add(StoreMidRailBanner(data: kStoreMidRailBanners[i]));
+    }
+    return out;
   }
 }

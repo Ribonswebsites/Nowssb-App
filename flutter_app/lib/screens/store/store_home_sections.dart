@@ -1,12 +1,17 @@
-/// Store browsing extras — Pixelskits-style hero, healing category grid,
-/// Recommended rail + Featured Bundle. Used by the Word Atelier (Store
-/// product rails) only.
+/// Store browsing extras — Pixelskits-style hero (with restored video banner),
+/// frequency-style heal grid + Limited Time Free + Browse by Goal,
+/// Recommended / Featured Playlist glass, and tall glass playlist carousel.
+/// Shared by Word Atelier, Meaning Store, and Ebooks.
 library;
 
 import 'dart:math' as math;
+import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../data/store_catalog.dart';
+import '../../media/nwsb_video.dart';
+import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
 import 'store_cards.dart';
 
@@ -17,10 +22,16 @@ class StorePixelsHero extends StatelessWidget {
     super.key,
     this.onBrowseAll,
     this.onViewCart,
+    this.videoAsset,
+    this.videoTitle = 'The Word Atelier',
   });
 
   final VoidCallback? onBrowseAll;
   final VoidCallback? onViewCart;
+  /// When set, restores the pre-bcfffd1 looping store hero video above the
+  /// elevated Pixelskits copy — never wipe the film for typography alone.
+  final String? videoAsset;
+  final String videoTitle;
 
   static const _cyan = Color(0xFF5CE1FF);
   static const _violet = Color(0xFFB388FF);
@@ -33,6 +44,48 @@ class StorePixelsHero extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          if (videoAsset != null) ...[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: SizedBox(
+                height: 170,
+                width: double.infinity,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    NwsbVideo(
+                      asset: videoAsset!,
+                      priority: ClipPriority.feature,
+                    ),
+                    const DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [Color(0x22060C18), Color(0xE6060C18)],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Align(
+                        alignment: Alignment.bottomLeft,
+                        child: Text(
+                          videoTitle,
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w300,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
           // Eyebrow
           Row(
             children: [
@@ -117,7 +170,6 @@ class StorePixelsHero extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 18),
-          // Big multi-line headline
           const _StoreHeroHeadline(),
           const SizedBox(height: 12),
           const Text(
@@ -129,7 +181,6 @@ class StorePixelsHero extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          // Twin pills
           Row(
             children: [
               Expanded(
@@ -721,12 +772,7 @@ class StoreFeaturedBundleSection extends StatelessWidget {
         children: [
           _SectionHeader(title: 'Featured Bundle', onSeeAll: onSeeAll),
           const SizedBox(height: 12),
-          Container(
-            decoration: BoxDecoration(
-              color: const Color(0xFF101526),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: const Color(0x22FFFFFF)),
-            ),
+          StoreGlassPanel(
             padding: const EdgeInsets.all(12),
             child: Column(
               children: [
@@ -912,4 +958,747 @@ class _SectionHeader extends StatelessWidget {
       ],
     );
   }
+}
+
+
+// ─── Shared glass panel ──────────────────────────────────────────────────────
+
+class StoreGlassPanel extends StatelessWidget {
+  const StoreGlassPanel({
+    super.key,
+    required this.child,
+    this.padding = const EdgeInsets.all(14),
+    this.radius = 22,
+    this.width,
+  });
+
+  final Widget child;
+  final EdgeInsets padding;
+  final double radius;
+  final double? width;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(radius),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        child: Container(
+          width: width,
+          padding: padding,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(radius),
+            color: const Color(0x99101526),
+            border: Border.all(color: const Color(0x33FFFFFF)),
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xAA182038), Color(0x77101526)],
+            ),
+          ),
+          child: child,
+        ),
+      ),
+    );
+  }
+}
+
+// ─── #3b Limited Time Free + Browse by Goal (frequency package) ──────────────
+
+class StoreLimitedTimeFreeSection extends StatelessWidget {
+  const StoreLimitedTimeFreeSection({super.key, this.onOpenWord});
+
+  final void Function(String word, String root, String img, num price)? onOpenWord;
+
+  static const _tracks = <(String, String, String)>[
+    ('432 Hz', 'Relax Piano', 'assets/store/collections/peace.webp'),
+    ('528 Hz', 'Calming Tones', 'assets/store/collections/sacred.webp'),
+    ('639 Hz', 'Heart Open', 'assets/store/collections/nature.webp'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '⏳ Limited Time Free',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(16, 18, 16, 16),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(22),
+              gradient: const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xFF2EC4B6), Color(0xFF0B1B3A)],
+              ),
+            ),
+            child: Column(
+              children: [
+                const Text(
+                  'Listen to Healing Frequencies',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'Calm your mind with a free track.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 12, color: Color(0xCCFFFFFF)),
+                ),
+                const SizedBox(height: 14),
+                Row(
+                  children: [
+                    for (var i = 0; i < _tracks.length; i++) ...[
+                      if (i > 0) const SizedBox(width: 10),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: onOpenWord == null
+                              ? null
+                              : () => onOpenWord!(
+                                    _tracks[i].$1,
+                                    _tracks[i].$2,
+                                    kRmWordImg,
+                                    0,
+                                  ),
+                          child: Column(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: AspectRatio(
+                                  aspectRatio: 1,
+                                  child: Image.asset(
+                                    _tracks[i].$3,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) =>
+                                        const ColoredBox(color: Color(0xFF0A0F1C)),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                _tracks[i].$1,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              Text(
+                                _tracks[i].$2,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  color: Color(0xAAFFFFFF),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class StoreBrowseByGoalSection extends StatelessWidget {
+  const StoreBrowseByGoalSection({super.key, required this.onSeeAll, this.onSelect});
+
+  final VoidCallback onSeeAll;
+  final ValueChanged<String>? onSelect;
+
+  static const _goals = <(String, String, Color)>[
+    ('Focus', 'assets/store/collections/warriors.webp', Color(0xFF5CE1FF)),
+    ('Calm', 'assets/store/collections/peace.webp', Color(0xFF4DB6AC)),
+    ('Sacred', 'assets/store/collections/sacred.webp', Color(0xFFFFB74D)),
+    ('Nature', 'assets/store/collections/nature.webp', Color(0xFF81C784)),
+    ('Cosmos', 'assets/store/collections/cosmos.webp', Color(0xFFB388FF)),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionHeader(title: 'Browse by Goal', onSeeAll: onSeeAll),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 108,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: _goals.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 12),
+              itemBuilder: (context, i) {
+                final g = _goals[i];
+                return GestureDetector(
+                  onTap: onSelect == null ? null : () => onSelect!(g.$1.toLowerCase()),
+                  child: SizedBox(
+                    width: 86,
+                    child: Column(
+                      children: [
+                        Container(
+                          width: 72,
+                          height: 72,
+                          padding: const EdgeInsets.all(3),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: g.$3, width: 2.5),
+                            boxShadow: [
+                              BoxShadow(
+                                color: g.$3.withValues(alpha: 0.35),
+                                blurRadius: 12,
+                              ),
+                            ],
+                          ),
+                          child: ClipOval(
+                            child: Image.asset(
+                              g.$2,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) =>
+                                  const ColoredBox(color: Color(0xFF0A0F1C)),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          g.$1,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Image-3 package: frequency grid + Limited Time Free + Browse by Goal.
+class StoreFrequencyPackage extends StatelessWidget {
+  const StoreFrequencyPackage({
+    super.key,
+    required this.onSelectCategory,
+    required this.onSeeAll,
+    this.onOpenWord,
+  });
+
+  final ValueChanged<String> onSelectCategory;
+  final VoidCallback onSeeAll;
+  final void Function(String word, String root, String img, num price)? onOpenWord;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        StoreHealCategoryGrid(onSelect: onSelectCategory),
+        StoreLimitedTimeFreeSection(onOpenWord: onOpenWord),
+        StoreBrowseByGoalSection(onSeeAll: onSeeAll, onSelect: onSelectCategory),
+      ],
+    );
+  }
+}
+
+// ─── #4b Featured Playlist glass (exact layout from ref) ─────────────────────
+
+class StoreFeaturedPlaylistSection extends StatelessWidget {
+  const StoreFeaturedPlaylistSection({
+    super.key,
+    required this.onSeeAll,
+    required this.onOpenWord,
+  });
+
+  final VoidCallback onSeeAll;
+  final void Function(String word, String root, String img, num price) onOpenWord;
+
+  static const _rows = <_BundleRow>[
+    _BundleRow('Deep Healing', 'Emotional & Physical', 'peace', 'Latin', 'assets/store/collections/peace.webp'),
+    _BundleRow('Healing Frequency', 'Healing Meditation', 'spirit', 'Latin', 'assets/store/collections/sacred.webp'),
+    _BundleRow('Remove Negative', 'Healing Reiki Music', 'earth', 'Proto-Germanic', 'assets/store/collections/elements.webp'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8, bottom: 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionHeader(title: 'Featured Playlist', onSeeAll: onSeeAll),
+          const SizedBox(height: 12),
+          StoreGlassPanel(
+            child: Column(
+              children: [
+                GestureDetector(
+                  onTap: () => onOpenWord('balance', 'Inner', kRmWordImg, 0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.asset(
+                          'assets/store/collections/peace.webp',
+                          width: 78,
+                          height: 78,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) =>
+                              const SizedBox(width: 78, height: 78, child: ColoredBox(color: Color(0xFF0A0F1C))),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Inner Balance',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              'If you\'re looking for some chill tones to restore balance and deep focus…',
+                              style: TextStyle(fontSize: 11, height: 1.4, color: Color(0x88FFFFFF)),
+                            ),
+                            SizedBox(height: 8),
+                            _ItemCountPill(label: '4 SESSIONS'),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                for (final r in _rows) ...[
+                  _BundleListRow(
+                    row: r,
+                    onTap: () => onOpenWord(r.word, r.root, kRmWordImg, 49),
+                  ),
+                  if (r != _rows.last) const SizedBox(height: 8),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── #5 Tall 3-card horizontal glass playlist carousel ───────────────────────
+
+class StoreGlassPlaylistCarousel extends StatelessWidget {
+  const StoreGlassPlaylistCarousel({
+    super.key,
+    required this.onSeeAll,
+    required this.onOpenWord,
+  });
+
+  final VoidCallback onSeeAll;
+  final void Function(String word, String root, String img, num price) onOpenWord;
+
+  static const _cards = <_GlassPlaylistCardData>[
+    _GlassPlaylistCardData(
+      title: 'Warriors Edition',
+      desc: 'Strength & courage words for daily practice.',
+      count: '12 WORDS',
+      art: 'assets/store/collections/warriors.webp',
+      rows: [
+        ('Warrior', 'Old French'),
+        ('Dragon', 'Greek'),
+        ('Earth', 'Proto-Germanic'),
+      ],
+    ),
+    _GlassPlaylistCardData(
+      title: 'Sacred Frequency',
+      desc: 'Divine codes and soft healing tones.',
+      count: '8 SESSIONS',
+      art: 'assets/store/collections/sacred.webp',
+      rows: [
+        ('Spirit', 'Latin'),
+        ('Peace', 'Latin'),
+        ('Om', 'Sanskrit'),
+      ],
+    ),
+    _GlassPlaylistCardData(
+      title: 'Nature Resonance',
+      desc: 'Living elements for calm and clarity.',
+      count: '10 WORDS',
+      art: 'assets/store/collections/nature.webp',
+      rows: [
+        ('Water', 'Proto-Germanic'),
+        ('Fire', 'Proto-Germanic'),
+        ('Wind', 'Proto-Germanic'),
+      ],
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 4, bottom: 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionHeader(title: 'Featured Collections', onSeeAll: onSeeAll),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 292,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: _cards.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 14),
+              itemBuilder: (context, i) {
+                final c = _cards[i];
+                return StoreGlassPanel(
+                  width: 268,
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      GestureDetector(
+                        onTap: () => onOpenWord(c.rows.first.$1.toLowerCase(), c.rows.first.$2, kRmWordImg, 49),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.asset(
+                                c.art,
+                                width: 70,
+                                height: 70,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) =>
+                                    const SizedBox(width: 70, height: 70, child: ColoredBox(color: Color(0xFF0A0F1C))),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    c.title,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w800,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    c.desc,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      height: 1.35,
+                                      color: Color(0x88FFFFFF),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  _ItemCountPill(label: c.count),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      for (var r = 0; r < c.rows.length; r++) ...[
+                        GestureDetector(
+                          onTap: () => onOpenWord(
+                            c.rows[r].$1.toLowerCase(),
+                            c.rows[r].$2,
+                            kRmWordImg,
+                            49,
+                          ),
+                          child: Row(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.asset(
+                                  c.art,
+                                  width: 40,
+                                  height: 40,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) =>
+                                      const SizedBox(width: 40, height: 40, child: ColoredBox(color: Color(0xFF0A0F1C))),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      c.rows[r].$1,
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    Text(
+                                      c.rows[r].$2,
+                                      style: const TextStyle(fontSize: 11, color: Color(0x77FFFFFF)),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (r != c.rows.length - 1) const SizedBox(height: 10),
+                      ],
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _GlassPlaylistCardData {
+  const _GlassPlaylistCardData({
+    required this.title,
+    required this.desc,
+    required this.count,
+    required this.art,
+    required this.rows,
+  });
+  final String title;
+  final String desc;
+  final String count;
+  final String art;
+  final List<(String, String)> rows;
+}
+
+
+// ─── Mid-rail compact glass banners (7 variants, between every 2 rows) ───────
+
+class StoreMidRailBannerData {
+  const StoreMidRailBannerData({
+    required this.svgAsset,
+    required this.images,
+    required this.tileColors,
+    required this.accent,
+    required this.panelTint,
+    this.iconTint = const Color(0xFF060C18),
+  });
+
+  final String svgAsset;
+  final List<String> images;
+  final List<Color> tileColors;
+  final Color accent;
+  final Color panelTint;
+  final Color iconTint;
+}
+
+const kStoreMidRailBanners = <StoreMidRailBannerData>[
+  StoreMidRailBannerData(
+    svgAsset: 'assets/icons/icon_08.svg',
+    images: [
+      'assets/store/collections/warriors.webp',
+      'assets/store/collections/elements.webp',
+      'assets/store/collections/sacred.webp',
+      'assets/store/collections/nature.webp',
+    ],
+    tileColors: [Color(0xFF1A237E), Color(0xFF004D40), Color(0xFF4A148C), Color(0xFFBF360C)],
+    accent: Color(0xFF5CE1FF),
+    panelTint: Color(0x332196F3),
+  ),
+  StoreMidRailBannerData(
+    svgAsset: 'assets/icons/icon_12.svg',
+    images: [
+      'assets/store/collections/peace.webp',
+      'assets/store/collections/cosmos.webp',
+      'assets/store/collections/mythical.webp',
+      'assets/store/collections/elite.webp',
+    ],
+    tileColors: [Color(0xFF00695C), Color(0xFF4527A0), Color(0xFFAD1457), Color(0xFF37474F)],
+    accent: Color(0xFF26A69A),
+    panelTint: Color(0x3326A69A),
+  ),
+  StoreMidRailBannerData(
+    svgAsset: 'assets/icons/icon_15.svg',
+    images: [
+      'assets/store/collections/sale.webp',
+      'assets/store/collections/family.webp',
+      'assets/store/collections/identity.webp',
+      'assets/store/collections/premium.webp',
+    ],
+    tileColors: [Color(0xFFE65100), Color(0xFF1565C0), Color(0xFF6A1B9A), Color(0xFF2E7D32)],
+    accent: Color(0xFFFFB74D),
+    panelTint: Color(0x33FFB74D),
+  ),
+  StoreMidRailBannerData(
+    svgAsset: 'assets/icons/icon_19.svg',
+    images: [
+      'assets/store/collections/ancient.webp',
+      'assets/store/collections/black.webp',
+      'assets/store/collections/white.webp',
+      'assets/store/collections/warriors.webp',
+    ],
+    tileColors: [Color(0xFF263238), Color(0xFF880E4F), Color(0xFF01579B), Color(0xFF33691E)],
+    accent: Color(0xFFB388FF),
+    panelTint: Color(0x33B388FF),
+  ),
+  StoreMidRailBannerData(
+    svgAsset: 'assets/icons/icon_22.svg',
+    images: [
+      'assets/store/collections/elements.webp',
+      'assets/store/collections/nature.webp',
+      'assets/store/collections/peace.webp',
+      'assets/store/collections/sacred.webp',
+    ],
+    tileColors: [Color(0xFF006064), Color(0xFFC62828), Color(0xFF283593), Color(0xFFF9A825)],
+    accent: Color(0xFFFF6BCB),
+    panelTint: Color(0x33FF6BCB),
+    iconTint: Color(0xFF1A0530),
+  ),
+  StoreMidRailBannerData(
+    svgAsset: 'assets/icons/icon_26.svg',
+    images: [
+      'assets/store/collections/cosmos.webp',
+      'assets/store/collections/elite.webp',
+      'assets/store/collections/mythical.webp',
+      'assets/store/collections/premium.webp',
+    ],
+    tileColors: [Color(0xFF311B92), Color(0xFF004D40), Color(0xFFB71C1C), Color(0xFF0277BD)],
+    accent: Color(0xFF7CFF6B),
+    panelTint: Color(0x337CFF6B),
+  ),
+  StoreMidRailBannerData(
+    svgAsset: 'assets/icons/icon_30.svg',
+    images: [
+      'assets/store/collections/family.webp',
+      'assets/store/collections/identity.webp',
+      'assets/store/collections/sale.webp',
+      'assets/store/collections/ancient.webp',
+    ],
+    tileColors: [Color(0xFF4E342E), Color(0xFF1B5E20), Color(0xFF4A148C), Color(0xFF00695C)],
+    accent: Color(0xFFE8D5A3),
+    panelTint: Color(0x33E8D5A3),
+  ),
+];
+
+/// Compact mid-rail strip: glass wrapper → black rounded bar → white-circle SVG
+/// + 4 tinted store-image tiles. Keep height short.
+class StoreMidRailBanner extends StatelessWidget {
+  const StoreMidRailBanner({super.key, required this.data});
+
+  final StoreMidRailBannerData data;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: StoreGlassPanel(
+        padding: const EdgeInsets.all(6),
+        radius: 18,
+        child: Container(
+          height: 56,
+          decoration: BoxDecoration(
+            color: const Color(0xF2000000),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: data.accent.withValues(alpha: 0.35)),
+            boxShadow: [
+              BoxShadow(
+                color: data.panelTint,
+                blurRadius: 16,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                padding: const EdgeInsets.all(8),
+                child: SvgPicture.asset(
+                  data.svgAsset,
+                  fit: BoxFit.contain,
+                  colorFilter: ColorFilter.mode(data.iconTint, BlendMode.srcIn),
+                ),
+              ),
+              const SizedBox(width: 8),
+              for (var i = 0; i < 4; i++) ...[
+                if (i > 0) const SizedBox(width: 6),
+                Expanded(
+                  child: Container(
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: data.tileColors[i % data.tileColors.length],
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: const Color(0x22FFFFFF)),
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: Image.asset(
+                      data.images[i % data.images.length],
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Inserts banner [index] (0..6) — safe no-op if out of range.
+Widget? storeMidRailBannerAt(int index) {
+  if (index < 0 || index >= kStoreMidRailBanners.length) return null;
+  return StoreMidRailBanner(data: kStoreMidRailBanners[index]);
 }
