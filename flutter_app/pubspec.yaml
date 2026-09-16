@@ -61,6 +61,7 @@ flutter:
     - assets/profile_source/
     - assets/routine/
     - assets/store/collections/
+    - assets/store/store-rotator/
     - assets/fashion/
     - assets/player/
     - assets/signature/

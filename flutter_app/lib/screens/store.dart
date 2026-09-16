@@ -9,7 +9,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../data/store_catalog.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
@@ -70,8 +69,8 @@ class _StoreHomeContent extends StatelessWidget {
       const _StoreDepartmentLabel('WORD ATELIER'),
       _StoreGlassSection(
         children: [
-          _StoreCompactVideoBanner(
-            asset: nwsbVideo(kRmHeroVidFile),
+          const _StoreCompactVideoBanner(
+            asset: 'assets/video/hero-word-store.mp4',
           ),
           _MiniStoreCard(
             eyebrow: 'THE WORD LIBRARY · PERSONAL COLLECTIONS',
@@ -86,8 +85,8 @@ class _StoreHomeContent extends StatelessWidget {
       const _StoreDepartmentLabel('MEANING STORE'),
       _StoreGlassSection(
         children: [
-          _StoreCompactVideoBanner(
-            asset: nwsbVideo(kStoreMeaningDoorVidFile),
+          const _StoreCompactVideoBanner(
+            asset: 'assets/video/hero-meaning-store.mp4',
           ),
           _MiniStoreCard(
             eyebrow: 'THE MEANING LIBRARY · AI-DECODED ORIGINS',
