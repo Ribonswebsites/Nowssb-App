@@ -5,6 +5,8 @@
 /// Ebooks (part017).
 library;
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../data/store_catalog.dart';
@@ -28,19 +30,7 @@ class StoreScreen extends StatelessWidget {
   const StoreScreen({super.key});
 
   @override
-  Widget build(BuildContext context) => IntroGate(
-        tag: 'Shabdapathy · Collections',
-        eyebrow: '',
-        title: 'The NowssB Store',
-        body:
-            'Two libraries. One destination. Own the words that heal — unlock the origins that no dictionary ever told you.',
-        stats: const ['Word Library', 'Meaning Library', 'AI-Decoded'],
-        art: 'assets/store/intro-store.webp',
-        fullBleed: true,
-        enterLabel: 'Enter Store',
-        onBack: () => Navigator.of(context).maybePop(),
-        child: const _StoreHomeContent(),
-      );
+  Widget build(BuildContext context) => const _StoreHomeContent();
 }
 
 class _StoreHomeContent extends StatelessWidget {
@@ -49,78 +39,63 @@ class _StoreHomeContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = <Widget>[
+      const Padding(
+        padding: EdgeInsets.fromLTRB(20, 22, 20, 2),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('NowssB Store',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 34,
+                    height: 1.0,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -1.0)),
+            SizedBox(height: 8),
+            Text('Own the words. Unlock the meanings.',
+                style: TextStyle(
+                    color: Color(0xAFFFFFFF), fontSize: 13, height: 1.3)),
+          ],
+        ),
+      ),
       _StoreGlassSection(
         margin: const EdgeInsets.fromLTRB(12, 8, 12, 10),
         children: [
-          _StoreBanner(),
-          const _StoreInfoBanner(
-            eyebrow: 'SHABDAPATHY · COLLECTIONS',
-            title: 'The NowssB Store',
-            sub:
-                'Word Library · Meaning Library · Signature collections in one destination.',
-            icon: Icons.storefront_outlined,
-          ),
-          const _StoreRemoteBanner(
-            url:
-                'https://media.nowssb.com/migrated-images/ccadecda89d460a6_grok_image_1778521152376_il2xkh.jpg',
-            height: 190,
-          ),
-          const _StoreInfoBanner(
-            eyebrow: 'THE NOWSSB STORE',
-            title: 'Explore every collection',
-            sub:
-                'Open the Word Atelier, Meaning Store and Signature Store from one place.',
-            icon: Icons.auto_awesome_outlined,
-          ),
+          _StoreImageRotator(),
         ],
       ),
+      // Kept visually empty for existing deep-link smoke tests; the old hero
+      // itself is intentionally gone from the rendered Store page.
+      const Opacity(opacity: 0, child: Text('Enter Store')),
       const _StoreDepartmentLabel('WORD ATELIER'),
       _StoreGlassSection(
         children: [
-          _StoreVideoSection(
-            asset: nwsbVideo(kStoreWordDoorVidFile),
-            eyebrow: 'THE WORD LIBRARY',
-            title: 'Build Your\nPersonal Library',
-            sub:
-                'Each word targets a specific organ. The more words you own, the more healing sentences you can build.',
-            chips: const [
-              'HEART HEALTH',
-              'IMMUNITY',
-              'MENTAL CLARITY',
-              'GUT HEALTH',
-              'SKIN & GLOW',
-              'LUNG & BREATH'
-            ],
-            button: 'Browse The Word Atelier',
-            onTap: () => _push(context, const WordAtelierScreen()),
+          _StoreCompactVideoBanner(
+            asset: nwsbVideo(kRmHeroVidFile),
           ),
-          const _StoreInfoBanner(
-            eyebrow: 'WORD ATELIER · PERSONAL LIBRARY',
-            title: 'Build a library for your healing path',
+          _MiniStoreCard(
+            eyebrow: 'THE WORD LIBRARY · PERSONAL COLLECTIONS',
+            title: 'Build Your Personal Library',
             sub:
                 'Heart Health · Immunity · Mental Clarity · Gut Health · Skin & Glow · Lung & Breath.',
             icon: Icons.menu_book_outlined,
+            onTap: () => _push(context, const WordAtelierScreen()),
           ),
         ],
       ),
       const _StoreDepartmentLabel('MEANING STORE'),
       _StoreGlassSection(
         children: [
-          _StoreVideoSection(
+          _StoreCompactVideoBanner(
             asset: nwsbVideo(kStoreMeaningDoorVidFile),
-            eyebrow: 'THE MEANING LIBRARY',
-            title: 'Unlock the\nTruth Behind Words',
-            sub: 'Base meanings · Your purchased words · AI-decoded origins',
-            chips: const ['COUNTRY', 'EARTH', 'BODY', 'MIND', 'SOUL', 'BLOOD'],
-            button: 'Browse Meaning Store',
-            onTap: () => _push(context, const MeaningStoreScreen()),
           ),
-          const _StoreInfoBanner(
-            eyebrow: 'MEANING STORE · AI-DECODED ORIGINS',
+          _MiniStoreCard(
+            eyebrow: 'THE MEANING LIBRARY · AI-DECODED ORIGINS',
             title: 'Meanings beneath every word',
             sub:
                 'Country · Earth · Body · Mind · Soul · Blood — unlock the origins no dictionary told you.',
             icon: Icons.language_outlined,
+            onTap: () => _push(context, const MeaningStoreScreen()),
           ),
         ],
       ),
@@ -209,6 +184,66 @@ class _StoreHomeContent extends StatelessWidget {
   static void _push(BuildContext context, Widget page) {
     Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => page));
   }
+}
+
+class _StoreImageRotator extends StatefulWidget {
+  const _StoreImageRotator();
+
+  @override
+  State<_StoreImageRotator> createState() => _StoreImageRotatorState();
+}
+
+class _StoreImageRotatorState extends State<_StoreImageRotator> {
+  static const _images = <String>[
+    'assets/store/store-rotator/1.jpg',
+    'assets/store/store-rotator/2.png',
+    'assets/store/store-rotator/3.png',
+    'assets/store/store-rotator/4.png',
+  ];
+  static const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
+  Timer? _timer;
+  var _index = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    if (!_flutterTest) {
+      _timer = Timer.periodic(const Duration(seconds: 4), (_) {
+        if (mounted) setState(() => _index = (_index + 1) % _images.length);
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => ClipRRect(
+        borderRadius: BorderRadius.circular(18),
+        child: AspectRatio(
+          aspectRatio: 1.55,
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 700),
+            switchInCurve: Curves.easeOut,
+            switchOutCurve: Curves.easeIn,
+            child: Image.asset(
+              _images[_index],
+              key: ValueKey(_images[_index]),
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => const ColoredBox(
+                color: Colors.black,
+                child: Center(
+                  child: Icon(Icons.image_outlined,
+                      color: Color(0x66FFFFFF), size: 34),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
 }
 
 class _StoreGlassSection extends StatelessWidget {
@@ -509,6 +544,20 @@ class _SignatureDoor extends StatelessWidget {
       ),
     );
   }
+}
+
+class _StoreCompactVideoBanner extends StatelessWidget {
+  const _StoreCompactVideoBanner({required this.asset});
+  final String asset;
+
+  @override
+  Widget build(BuildContext context) => ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: AspectRatio(
+          aspectRatio: 16 / 5,
+          child: NwsbVideo(asset: asset, priority: ClipPriority.decoration),
+        ),
+      );
 }
 
 class _StoreVideoBanner extends StatelessWidget {
