@@ -468,17 +468,7 @@ class _SectionHeader extends StatelessWidget {
             ),
           ),
         ),
-        GestureDetector(
-          onTap: onSeeAll,
-          child: const Text(
-            'View all',
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: Color(0x88FFFFFF),
-            ),
-          ),
-        ),
+        StoreViewAllControl(onTap: onSeeAll),
       ],
     );
   }
@@ -612,6 +602,7 @@ class StoreLimitedTimeFreeSection extends StatelessWidget {
             artAsset: kStoreProductArt,
             accent: _tealTop,
             sub: 'Free healing tracks — request a word if yours is missing.',
+            pillLabel: 'FREE NOW',
           ),
           const SizedBox(height: 12),
           // Teal gradient glass frequencies card — DO NOT REMOVE
@@ -1114,6 +1105,7 @@ class StoreMidRailBannerData {
     required this.accent,
     this.svgBody,
     this.sub = '',
+    this.pillLabel,
   });
 
   final String heading;
@@ -1121,6 +1113,7 @@ class StoreMidRailBannerData {
   final Color accent;
   final String? svgBody;
   final String sub;
+  final String? pillLabel;
 }
 
 /// Six black notification banners between product rows. Art is always the
@@ -1132,6 +1125,7 @@ const kStoreMidRailBanners = <StoreMidRailBannerData>[
     accent: Color(0xFF5CE1FF),
     svgBody: NwsbMarks.bag,
     sub: 'Sacred · Warrior · Elements',
+    pillLabel: 'COLLECTIONS',
   ),
   StoreMidRailBannerData(
     heading: 'CURATED RAILS',
@@ -1139,6 +1133,7 @@ const kStoreMidRailBanners = <StoreMidRailBannerData>[
     accent: Color(0xFF26A69A),
     svgBody: NwsbMarks.flame,
     sub: 'Time & Cosmos picks',
+    pillLabel: '50% OFF',
   ),
   StoreMidRailBannerData(
     heading: 'FEATURED DROP',
@@ -1146,6 +1141,7 @@ const kStoreMidRailBanners = <StoreMidRailBannerData>[
     accent: Color(0xFFFFB74D),
     svgBody: NwsbMarks.word,
     sub: 'Limited atelier editions',
+    pillLabel: 'FEATURED',
   ),
   StoreMidRailBannerData(
     heading: 'WORD ATELIER',
@@ -1153,6 +1149,7 @@ const kStoreMidRailBanners = <StoreMidRailBannerData>[
     accent: Color(0xFFB388FF),
     svgBody: NwsbMarks.sound,
     sub: 'Real bag · real sound',
+    pillLabel: 'ATELIER',
   ),
   StoreMidRailBannerData(
     heading: 'ELEMENTS',
@@ -1160,6 +1157,7 @@ const kStoreMidRailBanners = <StoreMidRailBannerData>[
     accent: Color(0xFFFF6BCB),
     svgBody: NwsbMarks.sound,
     sub: 'Earth · Water · Fire · Air',
+    pillLabel: 'ELEMENTS',
   ),
   StoreMidRailBannerData(
     heading: 'ELITE WORDS',
@@ -1167,11 +1165,12 @@ const kStoreMidRailBanners = <StoreMidRailBannerData>[
     accent: Color(0xFF7CFF6B),
     svgBody: NwsbMarks.crown,
     sub: 'Rarest catalogue entries',
+    pillLabel: 'ELITE',
   ),
 ];
 
 /// Taller notification-style glass strip: heading above black pill with
-/// SVG circle → separator → real collection/bag art.
+/// LEFT text | separator | RIGHT small circular bag/word image + ripple.
 class StoreMidRailBanner extends StatelessWidget {
   const StoreMidRailBanner({super.key, required this.data, this.onTap});
 
@@ -1190,6 +1189,7 @@ class StoreMidRailBanner extends StatelessWidget {
           artAsset: data.artAsset,
           accent: data.accent,
           sub: data.sub,
+          pillLabel: data.pillLabel ?? data.heading,
         ),
       ),
     );
@@ -1213,6 +1213,7 @@ class StoreNotifBanner extends StatelessWidget {
     required this.accent,
     this.sub = '',
     this.trailing,
+    this.pillLabel,
   });
 
   final String heading;
@@ -1222,8 +1223,12 @@ class StoreNotifBanner extends StatelessWidget {
   final String sub;
   final Widget? trailing;
 
+  /// Short label inside the black pill (defaults to [heading]).
+  final String? pillLabel;
+
   @override
   Widget build(BuildContext context) {
+    final left = (pillLabel ?? heading).trim();
     return StoreGlassPanel(
       padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
       radius: 22,
@@ -1254,54 +1259,11 @@ class StoreNotifBanner extends StatelessWidget {
             ),
           ],
           const SizedBox(height: 10),
-          Container(
-            height: 72,
-            decoration: BoxDecoration(
-              color: Colors.black,
-              borderRadius: BorderRadius.circular(36),
-              border: Border.all(color: accent.withValues(alpha: 0.35)),
-              boxShadow: [
-                BoxShadow(
-                  color: accent.withValues(alpha: 0.18),
-                  blurRadius: 16,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: Row(
-              children: [
-                const SizedBox(width: 10),
-                Container(
-                  width: 42,
-                  height: 42,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: accent.withValues(alpha: 0.16),
-                    border: Border.all(color: accent.withValues(alpha: 0.45)),
-                  ),
-                  alignment: Alignment.center,
-                  child: NwsbIcon(svgBody, size: 18, color: accent),
-                ),
-                Container(
-                  width: 1,
-                  height: 34,
-                  margin: const EdgeInsets.symmetric(horizontal: 12),
-                  color: const Color(0x33FFFFFF),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 10),
-                    child: StorePillRippleArt(
-                      asset: artAsset.isEmpty ? kStoreProductArt : artAsset,
-                      height: 48,
-                      radius: 16,
-                      accent: accent.withValues(alpha: 0.55),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+          StoreBlackPill(
+            label: left.isEmpty ? 'STORE' : left,
+            artAsset: artAsset.isEmpty ? kStoreProductArt : artAsset,
+            accent: accent,
+            svgBody: svgBody,
           ),
         ],
       ),

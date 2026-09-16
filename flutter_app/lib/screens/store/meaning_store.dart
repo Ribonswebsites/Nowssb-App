@@ -342,6 +342,8 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
         logoUrl: kMsCatLogoUrl,
         logoAsset: kRmCatLogoAsset,
         artAsset: _artForMeaningCat(cat),
+        pillLabel: cat,
+        onViewAll: () => _openViewAll(cat),
       ));
       out.add(MsGrid(
         children: [

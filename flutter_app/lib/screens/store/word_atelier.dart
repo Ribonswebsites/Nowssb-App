@@ -127,6 +127,8 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
         logoAsset: kRmCatLogoAsset,
         categoryId: cat.id,
         artAsset: storeCollectionArt(cat.id),
+        pillLabel: cat.badge ?? cat.label,
+        onViewAll: () => _openViewAll(cat.label),
       ));
       sections.add(Builder(builder: (context) {
         final cards = <Widget>[];

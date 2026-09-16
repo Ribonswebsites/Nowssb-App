@@ -11,6 +11,7 @@ import '../../widgets/intro_gate.dart';
 import '../../widgets/page_shell.dart';
 import 'product_detail.dart';
 import 'store_cards.dart';
+import 'store_home_sections.dart';
 import 'store_select_sheet.dart';
 import 'store_routes.dart';
 
@@ -41,7 +42,7 @@ class SignatureStoreScreen extends StatelessWidget {
           slivers: [
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 40),
-              sliver: SliverList.list(children: const [_SignatureBody()]),
+              sliver: SliverList.list(children: [_SignatureBody()]),
             ),
           ],
         ),
@@ -107,9 +108,17 @@ class _SignatureBody extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        const RmCatBanner(
+        RmCatBanner(
           title: 'Signature Words',
           sub: 'One per collection — the rarest word each one has',
+          pillLabel: 'SIGNATURE',
+          onViewAll: () => showStoreViewAllPanel(
+            context,
+            title: 'Signature Words',
+            items: storeDefaultViewAllItems(),
+            onOpenWord: (w, r, i, p) =>
+                openAtelierWord(context, word: w, root: r, img: i, price: p, signature: true),
+          ),
         ),
         RmWordRow(
           children: [
@@ -125,9 +134,17 @@ class _SignatureBody extends StatelessWidget {
           ],
         ),
         if (w2.isNotEmpty) ...[
-          const RmCatBanner(
+          RmCatBanner(
             title: 'Signature Words · II',
             sub: 'The rest of the collection',
+            pillLabel: 'RARE II',
+            onViewAll: () => showStoreViewAllPanel(
+              context,
+              title: 'Signature Words · II',
+              items: storeDefaultViewAllItems(),
+              onOpenWord: (w, r, i, p) =>
+                  openAtelierWord(context, word: w, root: r, img: i, price: p, signature: true),
+            ),
           ),
           RmWordRow(
             children: [
@@ -143,9 +160,17 @@ class _SignatureBody extends StatelessWidget {
             ],
           ),
         ],
-        const RmCatBanner(
+        RmCatBanner(
           title: 'Signature Meanings',
           sub: 'The full decoded origin, not the base entry',
+          pillLabel: 'MEANINGS',
+          onViewAll: () => showStoreViewAllPanel(
+            context,
+            title: 'Signature Meanings',
+            items: storeDefaultViewAllItems(),
+            onOpenWord: (w, r, i, p) =>
+                openAtelierWord(context, word: w, root: r, img: i, price: p, signature: true),
+          ),
         ),
         MsGrid(
           children: [
@@ -172,9 +197,17 @@ class _SignatureBody extends StatelessWidget {
           ],
         ),
         if (m2.isNotEmpty) ...[
-          const RmCatBanner(
+          RmCatBanner(
             title: 'Signature Meanings · II',
             sub: 'The rest of the collection',
+            pillLabel: 'DECODED',
+            onViewAll: () => showStoreViewAllPanel(
+              context,
+              title: 'Signature Meanings · II',
+              items: storeDefaultViewAllItems(),
+              onOpenWord: (w, r, i, p) =>
+                  openAtelierWord(context, word: w, root: r, img: i, price: p, signature: true),
+            ),
           ),
           MsGrid(
             children: [

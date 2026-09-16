@@ -35,18 +35,38 @@ String storeCollectionArt(String? id) {
 }
 
 Color storeCardTint(String seed) {
+  // Visually distinct per-word tints (Fire ≠ Earth ≠ Water ≠ Air…).
   const palette = <Color>[
-    Color(0xFF1A1428),
-    Color(0xFF0F1F2E),
-    Color(0xFF1A2214),
-    Color(0xFF2A1520),
-    Color(0xFF142028),
-    Color(0xFF221A14),
-    Color(0xFF1A1828),
-    Color(0xFF14241C),
-    Color(0xFF281418),
-    Color(0xFF182028),
+    Color(0xFF5A1E12), // fire / ember
+    Color(0xFF1B3D24), // earth / forest
+    Color(0xFF123A5C), // water / deep sea
+    Color(0xFF3A2A08), // air / amber dusk
+    Color(0xFF3D1450), // violet cosmos
+    Color(0xFF0E3D3A), // teal healing
+    Color(0xFF5A1230), // rose / passion
+    Color(0xFF2A3D0E), // olive / nature
+    Color(0xFF14285A), // indigo night
+    Color(0xFF4A2E0E), // bronze / warrior
+    Color(0xFF0E2A40), // steel blue
+    Color(0xFF4A1840), // magenta dusk
   ];
+  final key = seed.trim().toLowerCase();
+  // Named element words get locked hues so Fire vs Earth never collide.
+  const named = <String, Color>{
+    'fire': Color(0xFF5A1E12),
+    'earth': Color(0xFF1B3D24),
+    'water': Color(0xFF123A5C),
+    'air': Color(0xFF3A2A08),
+    'aether': Color(0xFF3D1450),
+    'peace': Color(0xFF0E3D3A),
+    'warrior': Color(0xFF4A2E0E),
+    'sacred': Color(0xFF3D1450),
+    'divine': Color(0xFF14285A),
+    'mythical': Color(0xFF4A1840),
+  };
+  for (final e in named.entries) {
+    if (key == e.key || key.contains(e.key)) return e.value;
+  }
   var h = 0;
   for (final c in seed.codeUnits) {
     h = (h * 31 + c) & 0x7fffffff;
@@ -73,8 +93,8 @@ class StoreNetImage extends StatelessWidget {
 }
 
 /// Notification-style category banner — Fashion [GlassWrap] tokens, heading
-/// above taller black pill: SVG circle → separator → bag-headphones product
-/// art with ripple (no fashion heels / meditation stock).
+/// above taller black pill: LEFT text label | separator | RIGHT one small
+/// circular store bag/word image with ripple (never a wide stretched strip).
 class RmCatBanner extends StatelessWidget {
   const RmCatBanner({
     super.key,
@@ -87,6 +107,8 @@ class RmCatBanner extends StatelessWidget {
     this.artAsset,
     this.categoryId,
     this.svgBody,
+    this.onViewAll,
+    this.pillLabel,
   });
 
   final String title;
@@ -100,20 +122,27 @@ class RmCatBanner extends StatelessWidget {
   /// Optional remote logo (Meaning Store MS_CAT_LOGO).
   final String? logoUrl;
 
-  /// Real store product image shown inside the black pill.
+  /// Real store product image shown inside the black pill circle.
   final String? artAsset;
 
   /// Used to resolve [artAsset] when not provided.
   final String? categoryId;
 
-  /// NowssB SVG path body for the circular mark (defaults to bag).
+  /// NowssB SVG path body for optional circle chrome (defaults to bag).
   final String? svgBody;
+
+  /// Opens blur + 3D View-all carousel when set.
+  final VoidCallback? onViewAll;
+
+  /// Short label inside the black pill (defaults to badge or title).
+  final String? pillLabel;
 
   @override
   Widget build(BuildContext context) {
     final titleColor = labelColor ?? NwsbColors.goldLight;
     final art = artAsset ?? storePillProductArt(categoryId);
     final mark = svgBody ?? NwsbMarks.bag;
+    final leftLabel = (pillLabel ?? badge ?? title).trim();
     final r = BorderRadius.circular(kGlassRadius);
     return Padding(
       padding: const EdgeInsets.only(top: 18, bottom: 10),
@@ -177,6 +206,10 @@ class RmCatBanner extends StatelessWidget {
                           ),
                         ),
                       ],
+                      if (onViewAll != null) ...[
+                        const SizedBox(width: 8),
+                        StoreViewAllControl(onTap: onViewAll!),
+                      ],
                     ],
                   ),
                   if (sub.isNotEmpty) ...[
@@ -187,48 +220,13 @@ class RmCatBanner extends StatelessWidget {
                     ),
                   ],
                   const SizedBox(height: 10),
-                  Container(
-                    height: 72,
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.circular(36),
-                      border: Border.all(color: const Color(0x22FFFFFF)),
-                    ),
-                    clipBehavior: Clip.antiAlias,
-                    child: Row(
-                      children: [
-                        const SizedBox(width: 10),
-                        Container(
-                          width: 46,
-                          height: 46,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: const Color(0x18E8D5A3),
-                            border: Border.all(color: titleColor.withValues(alpha: 0.45)),
-                          ),
-                          alignment: Alignment.center,
-                          child: NwsbIcon(mark, size: 20, color: titleColor),
-                        ),
-                        Container(
-                          width: 1,
-                          height: 38,
-                          margin: const EdgeInsets.symmetric(horizontal: 12),
-                          color: const Color(0x33FFFFFF),
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: 10),
-                            child: StorePillRippleArt(
-                              asset: art,
-                              height: 52,
-                              radius: 18,
-                              fallbackLogoUrl: logoUrl,
-                              fallbackLogoAsset: logoAsset,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                  StoreBlackPill(
+                    label: leftLabel.isEmpty ? title : leftLabel,
+                    artAsset: art,
+                    accent: titleColor,
+                    svgBody: mark,
+                    fallbackLogoUrl: logoUrl,
+                    fallbackLogoAsset: logoAsset,
                   ),
                 ],
               ),
@@ -240,24 +238,108 @@ class RmCatBanner extends StatelessWidget {
   }
 }
 
-/// Soft expanding ripple over the store product image inside black pills.
+/// Taller black pill: LEFT text | vertical sep | RIGHT one small circular
+/// store image with ripple animation on that circle.
+class StoreBlackPill extends StatelessWidget {
+  const StoreBlackPill({
+    super.key,
+    required this.label,
+    required this.artAsset,
+    required this.accent,
+    this.svgBody,
+    this.fallbackLogoUrl,
+    this.fallbackLogoAsset,
+    this.height = 76,
+  });
+
+  final String label;
+  final String artAsset;
+  final Color accent;
+  final String? svgBody;
+  final String? fallbackLogoUrl;
+  final String? fallbackLogoAsset;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    final circle = height - 18;
+    return Container(
+      height: height,
+      decoration: BoxDecoration(
+        color: Colors.black,
+        borderRadius: BorderRadius.circular(height / 2),
+        border: Border.all(color: accent.withValues(alpha: 0.35)),
+        boxShadow: [
+          BoxShadow(
+            color: accent.withValues(alpha: 0.16),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Row(
+        children: [
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(18, 8, 10, 8),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  label,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.8,
+                    height: 1.15,
+                    color: accent,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Container(
+            width: 1,
+            height: height * 0.52,
+            color: const Color(0x44FFFFFF),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: StorePillRippleArt(
+              asset: artAsset.isEmpty ? kStoreProductArt : artAsset,
+              size: circle,
+              accent: accent.withValues(alpha: 0.65),
+              svgBody: svgBody,
+              fallbackLogoUrl: fallbackLogoUrl,
+              fallbackLogoAsset: fallbackLogoAsset,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Soft expanding ripple over a SMALL circular store product image.
 class StorePillRippleArt extends StatefulWidget {
   const StorePillRippleArt({
     super.key,
     required this.asset,
-    this.height = 48,
-    this.radius = 16,
+    this.size = 52,
     this.fallbackLogoUrl,
     this.fallbackLogoAsset,
     this.accent = const Color(0x66E8D5A3),
+    this.svgBody,
   });
 
   final String asset;
-  final double height;
-  final double radius;
+  final double size;
   final String? fallbackLogoUrl;
   final String? fallbackLogoAsset;
   final Color accent;
+  final String? svgBody;
 
   @override
   State<StorePillRippleArt> createState() => _StorePillRippleArtState();
@@ -278,48 +360,93 @@ class _StorePillRippleArtState extends State<StorePillRippleArt>
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(widget.radius),
-      child: SizedBox(
-        height: widget.height,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            Image.asset(
-              widget.asset,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) {
-                if (widget.fallbackLogoUrl != null) {
-                  return Image.network(
-                    widget.fallbackLogoUrl!,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Image.asset(
-                      widget.fallbackLogoAsset ?? kStoreProductArt,
-                      fit: BoxFit.cover,
+    final d = widget.size;
+    return SizedBox(
+      width: d,
+      height: d,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // Soft chrome ring (optional SVG sits in the ring language).
+          Container(
+            width: d,
+            height: d,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: widget.accent.withValues(alpha: 0.55), width: 1.4),
+              boxShadow: [
+                BoxShadow(
+                  color: widget.accent.withValues(alpha: 0.22),
+                  blurRadius: 10,
+                ),
+              ],
+            ),
+          ),
+          ClipOval(
+            child: SizedBox(
+              width: d - 6,
+              height: d - 6,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  ColoredBox(color: const Color(0xFF0A0F1C)),
+                  Padding(
+                    padding: EdgeInsets.all(d * 0.16),
+                    child: Image.asset(
+                      widget.asset,
+                      fit: BoxFit.contain,
+                      errorBuilder: (_, __, ___) {
+                        if (widget.fallbackLogoUrl != null) {
+                          return Image.network(
+                            widget.fallbackLogoUrl!,
+                            fit: BoxFit.contain,
+                            errorBuilder: (_, __, ___) => Image.asset(
+                              widget.fallbackLogoAsset ?? kStoreProductArt,
+                              fit: BoxFit.contain,
+                            ),
+                          );
+                        }
+                        return Image.asset(
+                          widget.fallbackLogoAsset ?? kStoreProductArt,
+                          fit: BoxFit.contain,
+                          errorBuilder: (_, __, ___) =>
+                              const ColoredBox(color: Color(0xFF0A0F1C)),
+                        );
+                      },
                     ),
-                  );
-                }
-                return Image.asset(
-                  widget.fallbackLogoAsset ?? kStoreProductArt,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) =>
-                      const ColoredBox(color: Color(0xFF0A0F1C)),
-                );
-              },
-            ),
-            AnimatedBuilder(
-              animation: _c,
-              builder: (context, _) {
-                return CustomPaint(
-                  painter: _PillRipplePainter(
-                    progress: _c.value,
-                    color: widget.accent,
                   ),
-                );
-              },
+                  AnimatedBuilder(
+                    animation: _c,
+                    builder: (context, _) {
+                      return CustomPaint(
+                        painter: _PillRipplePainter(
+                          progress: _c.value,
+                          color: widget.accent,
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
+          ),
+          if (widget.svgBody != null)
+            Positioned(
+              right: 0,
+              bottom: 0,
+              child: Container(
+                width: d * 0.34,
+                height: d * 0.34,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0xEE060C18),
+                  border: Border.all(color: widget.accent.withValues(alpha: 0.55)),
+                ),
+                alignment: Alignment.center,
+                child: NwsbIcon(widget.svgBody!, size: d * 0.16, color: widget.accent),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -332,15 +459,15 @@ class _PillRipplePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width * 0.72, size.height * 0.5);
-    final maxR = size.width * 0.55;
+    final center = Offset(size.width * 0.5, size.height * 0.5);
+    final maxR = size.shortestSide * 0.58;
     for (var i = 0; i < 3; i++) {
       final t = (progress + i / 3) % 1.0;
       final r = maxR * t;
       final paint = Paint()
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.6
-        ..color = color.withValues(alpha: (1 - t) * 0.55);
+        ..strokeWidth = 1.5
+        ..color = color.withValues(alpha: (1 - t) * 0.6);
       canvas.drawCircle(center, r, paint);
     }
   }
@@ -348,6 +475,60 @@ class _PillRipplePainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _PillRipplePainter old) =>
       old.progress != progress || old.color != color;
+}
+
+/// Premium 3D "View all" control — opens blur + carousel panel.
+class StoreViewAllControl extends StatelessWidget {
+  const StoreViewAllControl({super.key, required this.onTap, this.label = 'View all'});
+
+  final VoidCallback onTap;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Transform(
+        alignment: Alignment.center,
+        transform: Matrix4.identity()
+          ..setEntry(3, 2, 0.0022)
+          ..rotateX(-0.12)
+          ..rotateY(0.08),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xEEFFFFFF), Color(0xCCE8D5A3)],
+            ),
+            border: Border.all(color: const Color(0x66FFFFFF)),
+            boxShadow: const [
+              BoxShadow(color: Color(0x88000000), blurRadius: 12, offset: Offset(0, 5)),
+              BoxShadow(color: Color(0x55E8D5A3), blurRadius: 8, offset: Offset(0, 0)),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.3,
+                  color: Color(0xFF060C18),
+                ),
+              ),
+              const SizedBox(width: 4),
+              const Icon(Icons.arrow_forward_rounded, size: 14, color: Color(0xFF060C18)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 /// Full-width looping row break video (part010 ROW_VIDS).
@@ -485,10 +666,10 @@ class RmWordCard extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontSize: 20,
+                        fontSize: 23,
                         fontWeight: FontWeight.w800,
                         color: Colors.white,
-                        height: 1.1,
+                        height: 1.08,
                       ),
                     ),
                     const SizedBox(height: 3),

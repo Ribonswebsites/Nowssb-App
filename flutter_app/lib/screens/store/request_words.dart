@@ -113,6 +113,7 @@ class _RequestWordsScreenState extends State<RequestWordsScreen> {
               artAsset: kStoreProductArt,
               accent: const Color(0xFFE8D5A3),
               sub: 'Tell us the word you need — we fulfill from the atelier.',
+              pillLabel: 'REQUEST',
             ),
             const SizedBox(height: 18),
             StoreGlassPanel(
