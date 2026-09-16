@@ -63,6 +63,7 @@ const kFashionSectionOrder = <String>[
   'herorow',
   'practice',
   'routineCards',
+  'coachCards',
   // Not on the website's registry. Six doors on one panel so the app can
   // be used without knowing where anything is — see MainOptionsSection.
   'mainops',
@@ -87,6 +88,8 @@ const kFashionSectionOrder = <String>[
   'ebooks',
   'connectban',
   'healing',
+  'journey',
+  'personalCoach',
   'genderpath',
   'promovid',
   'wsearch',
@@ -178,6 +181,7 @@ class _HomeFashionState extends State<HomeFashion> {
         ),
         ('practice', FashPractice(onTap: () => _go(1))),
         ('routineCards', const NmHorizontalRoutineCards(fashion: true)),
+        ('coachCards', const SizedBox.shrink()),
         ('mainops', MainOptionsSection(onGo: _go, onAction: _openMainOption)),
         (
           'actionbar',
@@ -235,6 +239,8 @@ class _HomeFashionState extends State<HomeFashion> {
                 const HealingPathScreen(initialGender: HealingGender.male)),
           ),
         ),
+        ('journey', const SizedBox.shrink()),
+        ('personalCoach', const SizedBox.shrink()),
         // Choose Your Path is slide 2 of HealingSection — do not inject a
         // second banner/section (that caused stacked banners + blank pages).
         ('genderpath', const SizedBox.shrink()),

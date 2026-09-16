@@ -271,9 +271,9 @@ class FashPractice extends StatelessWidget {
   const FashPractice({super.key, this.onTap});
   final VoidCallback? onTap;
 
-  /// Website `PRACTICE_VID` — part066.js. Bundled under assets/videos/.
+  /// Website `PRACTICE_VID` — part066.js. Bundled under assets/video/.
   static const practiceVid =
-      'assets/videos/09a50041065bdeab_grok_video_2026-07-30-14-54-07_ddjmrr.mp4';
+      'assets/video/09a50041065bdeab_grok_video_2026-07-30-14-54-07_ddjmrr.mp4';
 
   static const practiceStill =
       'https://media.nowssb.com/migrated-images/4daad1a85b624fed_grok_image_1778052232385_qpdmgh.jpg';

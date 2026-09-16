@@ -17,28 +17,8 @@ import 'package:flutter/material.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/nwsb_icon.dart';
 
-<<<<<<< HEAD
 /// Shared card height for grid and every expanded row.
 const double kRhythmCardHeight = 146;
-=======
-const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
-
-Color _bannerColor(double progress) {
-  const seeds = [
-    Color(0xFFFF9A3D), // orange
-    Color(0xFFE94F83), // pink
-    Color(0xFF9A58C9), // purple
-    Color(0xFF3EAD7B), // green
-    Color(0xFF467ED6), // blue
-    Color(0xFF222633), // black
-    Color(0xFFF2F3F7), // white
-  ];
-  final scaled = progress * seeds.length;
-  final index = scaled.floor() % seeds.length;
-  final next = (index + 1) % seeds.length;
-  return Color.lerp(seeds[index], seeds[next], scaled - scaled.floor())!;
-}
->>>>>>> 17fc5c7 (Restructure Store sections into glass cards)
 
 class NormalPromoRail extends StatefulWidget {
   const NormalPromoRail({
@@ -65,13 +45,7 @@ class _NormalPromoRailState extends State<NormalPromoRail>
   late final AnimationController _motion = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 4200),
-  );
-
-  @override
-  void initState() {
-    super.initState();
-    if (!_flutterTest) _motion.repeat();
-  }
+  )..repeat();
 
   List<_PromoDoorData> get _doors => [
         _PromoDoorData(

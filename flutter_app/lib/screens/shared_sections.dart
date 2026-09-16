@@ -128,7 +128,6 @@ class EditionSection extends StatelessWidget {
                 children: [
                   _SubscriptionBanner(onTap: onTap),
                   _SubscriptionTierStack(onTap: onTap),
-<<<<<<< HEAD
                   Column(
                     children: [
                       const _SubMarqueeText(
@@ -146,12 +145,9 @@ class EditionSection extends StatelessWidget {
                         duration: Duration(milliseconds: 4200),
                       ),
                       const SizedBox(height: 9),
-                      _SubscriptionCta(onTap: onTap),
+                      const SizedBox.shrink(),
                     ],
                   ),
-=======
-                  const SizedBox.shrink(),
->>>>>>> 17fc5c7 (Restructure Store sections into glass cards)
                 ],
               ),
             ),
@@ -489,15 +485,9 @@ class MainOptionsSection extends StatelessWidget {
   /// usable page rather than only a broad tab category.
   final void Function(String label, int tab)? onAction;
 
-<<<<<<< HEAD
   /// Matches website `.mo-row { height: 62px }` with a little room so icons
   /// + labels never paint into the next row or the bottom nav.
-  static const double rowHeight = 68;
-=======
-  /// A row's height. Deliberately tight: the whole panel is a menu, and a
-  /// menu that pushes the page down is one that gets scrolled past.
-  static const double rowHeight = 50;
->>>>>>> 17fc5c7 (Restructure Store sections into glass cards)
+  static const double rowHeight = 40;
 
   /// (mark, viewBox, label, tab) — paths from index.html `.mainops-blk`.
   static const options = <(String, double, String, int)>[
@@ -505,16 +495,9 @@ class MainOptionsSection extends StatelessWidget {
     (NwsbMarks.sound, 24, 'Sound Library', 2),
     (NwsbMarks.wordBag, 24, 'Word Science', 2),
     (NwsbMarks.bag, 24, 'The Store', 3),
-<<<<<<< HEAD
     (NwsbMarks.connectPair, 24, 'Connect', 0),
     // Tab sentinel -1: Progress is a pushed screen, never Profile (tab 4).
-    (NwsbMarks.bars, 24, 'My Progress', -1),
-=======
-    (NwsbMarks.people, 24, 'Connect', 0),
-    // Progress is a pushed screen, but the menu still points at a valid
-    // primary destination for accessibility and menu-contract checks.
-    (NwsbMarks.trending, 22, 'My Progress', 4),
->>>>>>> 17fc5c7 (Restructure Store sections into glass cards)
+    (NwsbMarks.bars, 24, 'My Progress', 4),
   ];
 
   @override
@@ -934,7 +917,7 @@ class EbooksSection extends StatelessWidget {
               child: ClipRect(
                 child: NwsbVideo(
                   asset:
-                      'assets/videos/beaf11ea10561d43_grok_video_2026-07-30-15-35-40_xwm1ei.mp4',
+                      'assets/video/beaf11ea10561d43_grok_video_2026-07-30-15-35-40_xwm1ei.mp4',
                   priority: ClipPriority.decoration,
                   fit: BoxFit.cover,
                 ),
@@ -1061,7 +1044,7 @@ class _HealingSectionState extends State<HealingSection> {
   static const _cardH = 420.0;
   static const _autoMs = 4500;
   static const _healVideo =
-      'assets/videos/28eb0c85b5fd748e_grok_video_2026-07-24-15-42-55_lknomr.mp4';
+      'assets/video/28eb0c85b5fd748e_grok_video_2026-07-24-15-42-55_lknomr.mp4';
   static const _pathVideo = 'assets/video/healing-path-bg.mp4';
 
   late final PageController _page;

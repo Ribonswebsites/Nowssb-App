@@ -37,7 +37,7 @@ class StreakStoreCarousel extends StatefulWidget {
   static const videoAspect = 16 / 9;
 
   static const streakAsset =
-      'assets/videos/415dd447da33973b_grok_video_2026-07-30-14-35-05_q3tyzk.mp4';
+      'assets/video/415dd447da33973b_grok_video_2026-07-30-14-35-05_q3tyzk.mp4';
 
   @override
   State<StreakStoreCarousel> createState() => _StreakStoreCarouselState();

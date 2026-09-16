@@ -16,7 +16,7 @@ const kMsSignaturePrice = 299;
 
 /// Live site plays these from the website origin (index / part010 / part026).
 /// Flutter opens them as remote NwsbVideo URLs — same files the browser uses.
-const kNowssbVideoOrigin = 'https://nowssb.com/assets/videos/';
+const kNowssbVideoOrigin = 'https://nowssb.com/assets/video/';
 
 String nwsbVideo(String fileName) => '$kNowssbVideoOrigin$fileName';
 
