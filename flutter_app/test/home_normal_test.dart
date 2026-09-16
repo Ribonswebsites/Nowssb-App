@@ -97,12 +97,12 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('the Normal home is pale neumorphism with no film backdrop',
+  testWidgets('the Normal home plays the Fashion film behind the page',
       (tester) async {
     await pump(tester);
-    expect(find.byType(AppBackdrop), findsNothing);
+    expect(find.byType(AppBackdrop), findsOneWidget);
     final scaffold = tester.widget<Scaffold>(find.byType(Scaffold).first);
-    expect(scaffold.backgroundColor, NwsbColors.surface);
+    expect(scaffold.backgroundColor, NwsbColors.deep);
   });
 
   testWidgets('the whole page scrolls end to end', (tester) async {

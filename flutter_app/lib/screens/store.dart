@@ -221,9 +221,10 @@ class _StoreImageRotatorState extends State<_StoreImageRotator> {
 
   @override
   Widget build(BuildContext context) => ClipRRect(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(16),
         child: AspectRatio(
-          aspectRatio: 1.55,
+          // Same compact black-banner crop as Word Atelier / Meaning Store.
+          aspectRatio: 16 / 5,
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 700),
             switchInCurve: Curves.easeOut,
@@ -232,6 +233,7 @@ class _StoreImageRotatorState extends State<_StoreImageRotator> {
               _images[_index],
               key: ValueKey(_images[_index]),
               fit: BoxFit.cover,
+              alignment: Alignment.center,
               errorBuilder: (_, __, ___) => const ColoredBox(
                 color: Colors.black,
                 child: Center(
