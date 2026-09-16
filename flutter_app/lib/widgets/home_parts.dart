@@ -29,6 +29,8 @@ import '../media/nwsb_image.dart';
 import '../theme/tokens.dart';
 import 'nwsb_icon.dart';
 
+const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
+
 enum HeadingMotion { roll, flip, slide, float, shimmer, marquee }
 
 /// A continuously moving heading. The mode is intentionally varied so a long
@@ -60,11 +62,13 @@ class _AnimatedHeadingState extends State<AnimatedHeading>
   late final AnimationController _marquee = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 7600),
-  )..repeat();
+  );
 
   @override
   void initState() {
     super.initState();
+    if (_flutterTest) return;
+    _marquee.repeat();
     // A finite animation is deliberately retriggered by a timer rather than
     // driven by an always-on ticker. This keeps the home lively in production
     // while allowing widget tests and accessibility tooling to settle.
@@ -426,6 +430,7 @@ class _NcbCarouselState extends State<NcbCarousel> {
   @override
   void initState() {
     super.initState();
+    if (_flutterTest) return;
     if (widget.slides.length > 1) {
       _t = Timer.periodic(const Duration(milliseconds: 3200), (_) {
         // `if (document.hidden) return` — a bar nobody is looking at does

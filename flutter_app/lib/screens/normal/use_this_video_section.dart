@@ -9,6 +9,8 @@ import '../../theme/tokens.dart';
 import '../../widgets/home_skin.dart';
 import 'glassmorphism_theme.dart';
 
+const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
+
 /// The video-backed three-ring component from the supplied WebView reference.
 /// It intentionally has no heading: the clip and rings are the entire section.
 class NmUseThisVideoSection extends StatelessWidget {
@@ -97,7 +99,13 @@ class _RingRowState extends State<_RingRow>
   late final AnimationController _motion = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 3600),
-  )..repeat();
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    if (!_flutterTest) _motion.repeat();
+  }
 
   @override
   void dispose() {

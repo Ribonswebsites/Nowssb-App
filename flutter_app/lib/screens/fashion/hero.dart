@@ -39,6 +39,8 @@ import '../../widgets/nwsb_icon.dart';
 import '../../widgets/tv_frame.dart';
 import 'follow_steps.dart';
 
+const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
+
 /// One banner on the rail — RAIL, app/js/part083.js:106.
 ///
 /// `asset` is THE ADDRESS THE WEBSITE PLAYS, copied verbatim — a bundled
@@ -146,6 +148,7 @@ class _FashionHeroState extends State<FashionHero> {
   @override
   void initState() {
     super.initState();
+    if (_flutterTest) return;
     _t = Timer.periodic(_dwell, (_) {
       // `visible()` — :573. The rail stops when the home is not the screen
       // you are on and when the app is in the background. TickerMode is
@@ -752,6 +755,7 @@ class _ScreenState extends State<_Screen> {
   @override
   void initState() {
     super.initState();
+    if (_flutterTest) return;
     _wt = Timer.periodic(const Duration(seconds: 4), (_) {
       if (!mounted || !TickerMode.valuesOf(context).enabled) return;
       setState(() => _w = (_w + 1) % _words.length);

@@ -19,6 +19,8 @@ import '../quick_access.dart';
 import '../fashion_plus.dart';
 import '../widgets_page.dart';
 
+const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
+
 /// 7 · tiles — index.html:1939. The tip rail, then four tiles two-up.
 class FashTiles extends StatelessWidget {
   const FashTiles({super.key, this.onTile});
@@ -670,7 +672,7 @@ class _CustomizeExperienceBannerState extends State<_CustomizeExperienceBanner> 
   late final AnimationController _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 900));
   late final Animation<Offset> _slide = Tween(begin: Offset.zero, end: const Offset(-1.1, 0)).animate(CurvedAnimation(parent: _controller, curve: const Cubic(.7, 0, .2, 1)));
   @override
-  void initState() { super.initState(); Future<void>.delayed(const Duration(milliseconds: 5000), () { if (mounted) _controller.forward(); }); }
+  void initState() { super.initState(); if (_flutterTest) return; Future<void>.delayed(const Duration(milliseconds: 5000), () { if (mounted) _controller.forward(); }); }
   @override
   void dispose() { _controller.dispose(); super.dispose(); }
   @override
@@ -686,7 +688,7 @@ class _CustomizeExperienceBannerState extends State<_CustomizeExperienceBanner> 
               padding: const EdgeInsets.fromLTRB(22, 18, 18, 18),
               decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0x29FFFFFF))),
               child: Row(crossAxisAlignment: CrossAxisAlignment.end, mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                const Text('Customized\nyou app experiance', style: TextStyle(color: Colors.white, fontSize: 25, height: 1.08, fontWeight: FontWeight.w700, letterSpacing: -.3)),
+                const SizedBox(width: 230, child: Text('Customized\nyou app experiance', maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.white, fontSize: 25, height: 1.08, fontWeight: FontWeight.w700, letterSpacing: -.3))),
                 Container(width: 44, height: 44, decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle), child: const Icon(Icons.arrow_forward, color: Color(0xFF060C18), size: 22)),
               ]),
             ),

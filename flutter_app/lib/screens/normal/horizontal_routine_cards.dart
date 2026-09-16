@@ -156,6 +156,52 @@ class _NmHorizontalRoutineCardsState extends State<NmHorizontalRoutineCards> {
   }
 }
 
+<<<<<<< HEAD
+=======
+class _FashionRoutineBanner extends StatelessWidget {
+  const _FashionRoutineBanner();
+
+  @override
+  Widget build(BuildContext context) => Container(
+        width: 344,
+        height: 96,
+        margin: const EdgeInsets.fromLTRB(0, 0, 20, 12),
+        padding: const EdgeInsets.fromLTRB(22, 18, 18, 18),
+        decoration: BoxDecoration(
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: const Color(0x29FFFFFF)),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const SizedBox(
+              width: 230,
+              child: Text('My Routine\nCustomize your practice',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      height: 1.08,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -.3)),
+            ),
+            Container(
+              width: 44,
+              height: 44,
+              decoration: const BoxDecoration(
+                  color: Colors.white, shape: BoxShape.circle),
+              child: const Icon(Icons.arrow_forward,
+                  color: Color(0xFF060C18), size: 22),
+            ),
+          ],
+        ),
+      );
+}
+
+>>>>>>> 17fc5c7 (Restructure Store sections into glass cards)
 class _EssentialCardData {
   const _EssentialCardData(this.category, this.title, this.meta, this.action,
       this.image, this.circleColor);

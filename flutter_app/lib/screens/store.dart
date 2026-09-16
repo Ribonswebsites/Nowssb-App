@@ -49,36 +49,35 @@ class _StoreHomeContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = <Widget>[
-      NestedDarkWrap(
+      _StoreGlassSection(
         margin: const EdgeInsets.fromLTRB(12, 8, 12, 10),
-        padding: EdgeInsets.zero,
-        radius: 22,
-        child: ClipRRect(
-            borderRadius: BorderRadius.circular(22), child: _StoreBanner()),
-      ),
-      NestedDarkWrap(
-        margin: const EdgeInsets.fromLTRB(12, 0, 12, 10),
-        padding: EdgeInsets.zero,
-        radius: 18,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(18),
-          child: const _StoreRemoteBanner(
+        children: [
+          _StoreBanner(),
+          const _StoreInfoBanner(
+            eyebrow: 'SHABDAPATHY · COLLECTIONS',
+            title: 'The NowssB Store',
+            sub:
+                'Word Library · Meaning Library · Signature collections in one destination.',
+            icon: Icons.storefront_outlined,
+          ),
+          const _StoreRemoteBanner(
             url:
                 'https://media.nowssb.com/migrated-images/ccadecda89d460a6_grok_image_1778521152376_il2xkh.jpg',
             height: 190,
           ),
-        ),
+          const _StoreInfoBanner(
+            eyebrow: 'THE NOWSSB STORE',
+            title: 'Explore every collection',
+            sub:
+                'Open the Word Atelier, Meaning Store and Signature Store from one place.',
+            icon: Icons.auto_awesome_outlined,
+          ),
+        ],
       ),
       const _StoreDepartmentLabel('WORD ATELIER'),
-      HeavyGlassPanel(
-        margin: const EdgeInsets.fromLTRB(12, 4, 12, 10),
-        radius: 24,
-        padding: const EdgeInsets.all(10),
-        child: NestedDarkWrap(
-          margin: EdgeInsets.zero,
-          padding: EdgeInsets.zero,
-          radius: 18,
-          child: _StoreVideoSection(
+      _StoreGlassSection(
+        children: [
+          _StoreVideoSection(
             asset: nwsbVideo(kStoreWordDoorVidFile),
             eyebrow: 'THE WORD LIBRARY',
             title: 'Build Your\nPersonal Library',
@@ -95,32 +94,19 @@ class _StoreHomeContent extends StatelessWidget {
             button: 'Browse The Word Atelier',
             onTap: () => _push(context, const WordAtelierScreen()),
           ),
-        ),
-      ),
-      NestedDarkWrap(
-        margin: const EdgeInsets.fromLTRB(12, 0, 12, 10),
-        padding: EdgeInsets.zero,
-        radius: 18,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(18),
-          child: const _StoreRemoteBanner(
-            url:
-                'https://media.nowssb.com/migrated-images/16c653d97f27f932_file_00000000c81c81fba2f7377fc71229be_uvvxfz.png',
-            height: 160,
-            margin: EdgeInsets.zero,
+          const _StoreInfoBanner(
+            eyebrow: 'WORD ATELIER · PERSONAL LIBRARY',
+            title: 'Build a library for your healing path',
+            sub:
+                'Heart Health · Immunity · Mental Clarity · Gut Health · Skin & Glow · Lung & Breath.',
+            icon: Icons.menu_book_outlined,
           ),
-        ),
+        ],
       ),
       const _StoreDepartmentLabel('MEANING STORE'),
-      HeavyGlassPanel(
-        margin: const EdgeInsets.fromLTRB(12, 4, 12, 10),
-        radius: 24,
-        padding: const EdgeInsets.all(10),
-        child: NestedDarkWrap(
-          margin: EdgeInsets.zero,
-          padding: EdgeInsets.zero,
-          radius: 18,
-          child: _StoreVideoSection(
+      _StoreGlassSection(
+        children: [
+          _StoreVideoSection(
             asset: nwsbVideo(kStoreMeaningDoorVidFile),
             eyebrow: 'THE MEANING LIBRARY',
             title: 'Unlock the\nTruth Behind Words',
@@ -129,60 +115,74 @@ class _StoreHomeContent extends StatelessWidget {
             button: 'Browse Meaning Store',
             onTap: () => _push(context, const MeaningStoreScreen()),
           ),
-        ),
+          const _StoreInfoBanner(
+            eyebrow: 'MEANING STORE · AI-DECODED ORIGINS',
+            title: 'Meanings beneath every word',
+            sub:
+                'Country · Earth · Body · Mind · Soul · Blood — unlock the origins no dictionary told you.',
+            icon: Icons.language_outlined,
+          ),
+        ],
       ),
       const _StoreDepartmentLabel('SIGNATURE STORE'),
-      NestedDarkWrap(
-        margin: const EdgeInsets.fromLTRB(12, 4, 12, 10),
-        padding: EdgeInsets.zero,
-        radius: 20,
-        child: _SignatureDoor(
-            onTap: () => _push(context, const SignatureStoreScreen())),
+      _StoreGlassSection(
+        children: [
+          _SignatureDoor(
+              onTap: () => _push(context, const SignatureStoreScreen())),
+          const _StoreInfoBanner(
+            eyebrow: 'SIGNATURE STORE · LIMITED COLLECTIONS',
+            title: 'Words & Meanings',
+            sub: '15 Words · 5 Meanings. Owned once, never restocked.',
+            icon: Icons.headphones_outlined,
+          ),
+        ],
       ),
-      NestedDarkWrap(
-        margin: const EdgeInsets.fromLTRB(12, 0, 12, 10),
-        padding: EdgeInsets.zero,
-        radius: 18,
-        child: const _StoreVideoBanner(
+      const _StoreDepartmentLabel('NOWSSB CONNECT'),
+      _StoreGlassSection(
+        children: [
+          const _StoreVideoBanner(
             asset: 'assets/video/store-verify-banner.mp4',
-            poster: 'assets/video/store-verify-banner-poster.webp'),
-      ),
-      const Padding(
-        padding: EdgeInsets.fromLTRB(20, 24, 20, 4),
-        child: Text('Everything Else, In One Place',
-            style: TextStyle(
-                fontSize: 10, letterSpacing: 2.5, color: NwsbColors.gold)),
+            poster: 'assets/video/store-verify-banner-poster.webp',
+          ),
+          _MiniStoreCard(
+            eyebrow: 'Verified · Badges',
+            title: 'Get Verified',
+            sub: 'Blue, Silver, Gold or Diamond — stand out on your profile.',
+            icon: Icons.verified_outlined,
+            onTap: () {},
+          ),
+        ],
       ),
       const _StoreDepartmentLabel('SHABDAPATHY · LIBRARY'),
-      HeavyGlassPanel(
-        margin: const EdgeInsets.fromLTRB(12, 4, 12, 10),
-        radius: 22,
-        padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
-        child: Column(
-          children: [
-            _MiniStoreCard(
-              eyebrow: 'Verified · Badges',
-              title: 'Get Verified',
-              sub: 'Blue, Silver, Gold or Diamond — stand out on your profile.',
-              icon: Icons.verified_outlined,
-              onTap: () {},
-            ),
-            _MiniStoreCard(
-              eyebrow: 'Read · Learn · Practice',
-              title: 'NowssB Ebooks',
-              sub: 'Deep-dive guides on word science and sound healing.',
-              icon: Icons.menu_book_outlined,
-              onTap: () => _push(context, const EbooksStoreScreen()),
-            ),
-            _MiniStoreCard(
-              eyebrow: 'Resonance · Frequency · X',
-              title: 'Subscription Plans',
-              sub: 'More words, more features — see every tier.',
-              icon: Icons.auto_awesome_outlined,
-              onTap: () {},
-            ),
-          ],
-        ),
+      _StoreGlassSection(
+        children: [
+          const _StoreVideoBanner(
+            asset: 'assets/video/hero-ebooks.mp4',
+            poster: 'assets/video/hero-ebooks-poster.webp',
+          ),
+          _MiniStoreCard(
+            eyebrow: 'Read · Learn · Practice',
+            title: 'NowssB Ebooks',
+            sub: 'Deep-dive guides on word science and sound healing.',
+            icon: Icons.menu_book_outlined,
+            onTap: () => _push(context, const EbooksStoreScreen()),
+          ),
+        ],
+      ),
+      const _StoreDepartmentLabel('SUBSCRIPTION PLANS'),
+      _StoreGlassSection(
+        children: [
+          const _StoreVideoBanner(
+            asset: 'assets/video/subscription-tiers-bg.mp4',
+            poster: 'assets/video/subscription-tiers-bg-poster.webp',
+          ),
+          const _StoreInfoBanner(
+            eyebrow: 'RESONANCE · FREQUENCY · X',
+            title: 'Subscription Plans',
+            sub: 'More words, more features — see every tier.',
+            icon: Icons.auto_awesome_outlined,
+          ),
+        ],
       ),
       const Padding(
         padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
@@ -201,13 +201,59 @@ class _StoreHomeContent extends StatelessWidget {
       ),
     ];
     return Scaffold(
-        backgroundColor: NwsbColors.deep,
-        body: SafeArea(child: ListView(children: items)));
+      backgroundColor: NwsbColors.deep,
+      body: SafeArea(child: ListView(children: items)),
+    );
   }
 
   static void _push(BuildContext context, Widget page) {
     Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => page));
   }
+}
+
+class _StoreGlassSection extends StatelessWidget {
+  const _StoreGlassSection(
+      {required this.children,
+      this.margin = const EdgeInsets.fromLTRB(12, 4, 12, 10)});
+  final List<Widget> children;
+  final EdgeInsets margin;
+
+  @override
+  Widget build(BuildContext context) => HeavyGlassPanel(
+        margin: margin,
+        radius: 24,
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (var i = 0; i < children.length; i++) ...[
+              children[i],
+              if (i != children.length - 1) const SizedBox(height: 10),
+            ],
+          ],
+        ),
+      );
+}
+
+class _StoreInfoBanner extends StatelessWidget {
+  const _StoreInfoBanner(
+      {required this.eyebrow,
+      required this.title,
+      required this.sub,
+      required this.icon});
+  final String eyebrow;
+  final String title;
+  final String sub;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) => _MiniStoreCard(
+        eyebrow: eyebrow,
+        title: title,
+        sub: sub,
+        icon: icon,
+        onTap: () {},
+      );
 }
 
 class _StoreDepartmentLabel extends StatelessWidget {

@@ -128,6 +128,7 @@ class EditionSection extends StatelessWidget {
                 children: [
                   _SubscriptionBanner(onTap: onTap),
                   _SubscriptionTierStack(onTap: onTap),
+<<<<<<< HEAD
                   Column(
                     children: [
                       const _SubMarqueeText(
@@ -148,9 +149,17 @@ class EditionSection extends StatelessWidget {
                       _SubscriptionCta(onTap: onTap),
                     ],
                   ),
+=======
+                  const SizedBox.shrink(),
+>>>>>>> 17fc5c7 (Restructure Store sections into glass cards)
                 ],
               ),
             ),
+          ),
+          const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: _SubscriptionCta(onTap: onTap),
           ),
           const SizedBox(height: 14),
           SecBanner(
@@ -281,7 +290,7 @@ class _SubscriptionCta extends StatelessWidget {
               borderRadius: BorderRadius.circular(999)),
           child: Row(children: [
             const Expanded(
-              child: Text('Get Subscription Today',
+              child: Text('Upgrade Now',
                   style: TextStyle(
                       color: Color(0xFF090B11),
                       fontSize: 11,
@@ -480,9 +489,15 @@ class MainOptionsSection extends StatelessWidget {
   /// usable page rather than only a broad tab category.
   final void Function(String label, int tab)? onAction;
 
+<<<<<<< HEAD
   /// Matches website `.mo-row { height: 62px }` with a little room so icons
   /// + labels never paint into the next row or the bottom nav.
   static const double rowHeight = 68;
+=======
+  /// A row's height. Deliberately tight: the whole panel is a menu, and a
+  /// menu that pushes the page down is one that gets scrolled past.
+  static const double rowHeight = 50;
+>>>>>>> 17fc5c7 (Restructure Store sections into glass cards)
 
   /// (mark, viewBox, label, tab) — paths from index.html `.mainops-blk`.
   static const options = <(String, double, String, int)>[
@@ -490,9 +505,16 @@ class MainOptionsSection extends StatelessWidget {
     (NwsbMarks.sound, 24, 'Sound Library', 2),
     (NwsbMarks.wordBag, 24, 'Word Science', 2),
     (NwsbMarks.bag, 24, 'The Store', 3),
+<<<<<<< HEAD
     (NwsbMarks.connectPair, 24, 'Connect', 0),
     // Tab sentinel -1: Progress is a pushed screen, never Profile (tab 4).
     (NwsbMarks.bars, 24, 'My Progress', -1),
+=======
+    (NwsbMarks.people, 24, 'Connect', 0),
+    // Progress is a pushed screen, but the menu still points at a valid
+    // primary destination for accessibility and menu-contract checks.
+    (NwsbMarks.trending, 22, 'My Progress', 4),
+>>>>>>> 17fc5c7 (Restructure Store sections into glass cards)
   ];
 
   @override

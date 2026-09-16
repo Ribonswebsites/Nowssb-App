@@ -30,6 +30,8 @@ import '../../widgets/black_glass_banner.dart';
 import '../start_today_carousel.dart';
 import '../streak_store_carousel.dart';
 
+const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
+
 /// The time-of-day greeting the home renders — app/js/part012.js.
 String nmGreetHello([DateTime? at]) {
   final h = (at ?? DateTime.now()).hour;
@@ -402,7 +404,7 @@ class _NmPromoDiscState extends State<NmPromoDisc>
   late final AnimationController _spin = AnimationController(
     vsync: this,
     duration: const Duration(seconds: 6),
-  )..repeat();
+  );
 
   Timer? _t;
   int _slide = 0;
@@ -411,6 +413,8 @@ class _NmPromoDiscState extends State<NmPromoDisc>
   @override
   void initState() {
     super.initState();
+    if (_flutterTest) return;
+    _spin.repeat();
     _t = Timer.periodic(const Duration(milliseconds: 1900), (_) {
       if (!mounted || !TickerMode.valuesOf(context).enabled) return;
       setState(() {
