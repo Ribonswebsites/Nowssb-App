@@ -10,6 +10,7 @@ import '../../data/cart_bag.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
+import '../../widgets/cart_add_animation.dart';
 import '../word_detail.dart';
 import 'bag_ui.dart';
 import 'cart_pages.dart';
@@ -83,7 +84,7 @@ String _titleCase(String s) {
   return s[0].toUpperCase() + s.substring(1);
 }
 
-class StoreProductPage extends StatelessWidget {
+class StoreProductPage extends StatefulWidget {
   const StoreProductPage({
     super.key,
     required this.kind,
@@ -115,6 +116,33 @@ class StoreProductPage extends StatelessWidget {
       );
 
   @override
+  State<StoreProductPage> createState() => _StoreProductPageState();
+}
+
+class _StoreProductPageState extends State<StoreProductPage> {
+  final _addCartKey = GlobalKey();
+  final _cartTargetKey = GlobalKey();
+
+  String get kind => widget.kind;
+  String get title => widget.title;
+  String get root => widget.root;
+  String get img => widget.img;
+  num get price => widget.price;
+  String get about => widget.about;
+  List<String> get highlights => widget.highlights;
+  String? get disclaimer => widget.disclaimer;
+  String? get heroVideo => widget.heroVideo;
+
+  BagItem get _bagItem => BagItem(
+        id: '${kind.toLowerCase()}:${title.toLowerCase()}',
+        title: title,
+        subtitle: root,
+        image: img,
+        price: price,
+        kind: kind,
+      );
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: NwsbColors.deep,
@@ -133,7 +161,7 @@ class StoreProductPage extends StatelessWidget {
                     child: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis,
                         style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white)),
                   ),
-                  const StoreBagBar(),
+                  StoreBagBar(key: _cartTargetKey),
                 ],
               ),
             ),
@@ -189,11 +217,18 @@ class StoreProductPage extends StatelessWidget {
                             const SizedBox(width: 10),
                             Expanded(
                               child: _ActBtn(
+                                key: _addCartKey,
                                 label: 'Add to Cart',
                                 icon: Icons.shopping_bag_outlined,
                                 filled: false,
                                 onTap: () {
                                   CartBag.instance.addCart(_bagItem);
+                                  CartAddAnimation.play(
+                                    context,
+                                    fromKey: _addCartKey,
+                                    targetKey: _cartTargetKey,
+                                    item: _bagItem,
+                                  );
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text('Added $title to cart'),
@@ -256,7 +291,7 @@ class StoreProductPage extends StatelessWidget {
 }
 
 class _ActBtn extends StatelessWidget {
-  const _ActBtn({required this.label, required this.icon, required this.filled, required this.onTap});
+  const _ActBtn({super.key, required this.label, required this.icon, required this.filled, required this.onTap});
   final String label;
   final IconData icon;
   final bool filled;
