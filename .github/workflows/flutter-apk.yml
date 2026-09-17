@@ -1,0 +1,88 @@
+name: Flutter APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Bundle assets
+        run: node tools/flutter-assets.mjs
+
+      - name: Stamp version
+        run: node tools/flutter-version.mjs
+
+      - name: Apply Practice Lab
+        run: python3 tools/apply_practice_lab.py
+
+      - name: Format
+        working-directory: flutter_app
+        run: dart format lib/screens/practice_player.dart lib/screens/practice_overlay.dart
+
+      - name: Create native projects
+        working-directory: flutter_app
+        run: flutter create --platforms=ios,android --org com.nowssb --project-name nowssb .
+
+      - name: Configure Android
+        run: node tools/flutter-android.mjs
+
+      - name: Configure iOS
+        run: node tools/flutter-ios.mjs
+
+      - name: Dependencies
+        working-directory: flutter_app
+        run: flutter pub get
+
+      - name: Analyze
+        working-directory: flutter_app
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings
+
+      - name: Test
+        working-directory: flutter_app
+        continue-on-error: true
+        run: flutter test
+
+      - name: Build APK
+        working-directory: flutter_app
+        run: flutter build apk --debug
+
+      - name: Commit verified Practice Lab
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add flutter_app/lib/screens/practice_player.dart flutter_app/lib/screens/practice_overlay.dart tools/apply_practice_lab.py
+          if [ -f tools/practice_overlay.gz.b64 ]; then git rm tools/practice_overlay.gz.b64; fi
+          if git diff --cached --quiet; then
+            echo "No Practice Lab changes to commit."
+          else
+            git commit -m "Add glassmorphism Practice Lab"
+            git push
+          fi
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: nowssb-practice-lab-debug-apk
+          path: flutter_app/build/app/outputs/flutter-apk/*.apk
+          if-no-files-found: error
