@@ -42,18 +42,48 @@ class _Beat {
 const _beats = <_Beat>[
   _Beat(0, 2, 'Listening', null, 'Talking head with the first large caption'),
   _Beat(
-      2, 4, 'Practicing', 0, 'Talking head plus the small inset — mouth shape'),
-  _Beat(4, 7, 'Practicing', 1,
-      'Product motion. The syllable replaces the last word.'),
-  _Beat(7, 10, 'Listening', null,
-      'Dark UI. Slow motion inside, hard cut outside.'),
-  _Beat(10, 14, 'Recording', 2,
-      'Close-up with changing captions, timed to the voice'),
-  _Beat(14, 18, 'Thinking', null,
-      'More UI examples. The three cuts in one frame.'),
+    2,
+    4,
+    'Practicing',
+    0,
+    'Talking head plus the small inset — mouth shape',
+  ),
+  _Beat(
+    4,
+    7,
+    'Practicing',
+    1,
+    'Product motion. The syllable replaces the last word.',
+  ),
+  _Beat(
+    7,
+    10,
+    'Listening',
+    null,
+    'Dark UI. Slow motion inside, hard cut outside.',
+  ),
+  _Beat(
+    10,
+    14,
+    'Recording',
+    2,
+    'Close-up with changing captions, timed to the voice',
+  ),
+  _Beat(
+    14,
+    18,
+    'Thinking',
+    null,
+    'More UI examples. The three cuts in one frame.',
+  ),
   _Beat(18, 22, 'Recording', null, 'Feature detail. You take the word.'),
-  _Beat(22, 26, 'Solving', null,
-      'Return to the full word with the repository of the mouth'),
+  _Beat(
+    22,
+    26,
+    'Solving',
+    null,
+    'Return to the full word with the repository of the mouth',
+  ),
   _Beat(26, 29, 'Locked', null, 'Final screen. Closing word. Hold.'),
 ];
 
@@ -74,34 +104,90 @@ class _CraftStep {
 }
 
 const _craftSteps = <_CraftStep>[
-  _CraftStep('01', 'Create the project', 'Canvas',
-      'Practice is a vertical edit, not a looping meditation video. Set the session as 9:16, 1080 × 1920, 30 fps. Import only the voice, the mouth inset, the dark UI stills.'),
-  _CraftStep('02', 'Record the talking head', 'Voice',
-      'Shoot vertical, subject centered, chest-up. Soft front light. Record the full word in one take, then cut it into the syllables you will emphasize.'),
-  _CraftStep('03', 'Build the timeline', '29 seconds',
-      'Most shots live between 0.5 and 2 seconds. Nothing should sit long enough to become wallpaper. The 29-second practice is the cut, not the lecture.'),
-  _CraftStep('04', 'The text style', 'Typography',
-      'High-contrast serif. White. Large. Centered. Slightly tight tracking. No box behind it. Never set the whole sentence as one caption. Split it. Each word appears at the moment it is spoken.'),
-  _CraftStep('05', 'Animate each word', 'Kinetic',
-      'A separate layer per word, parked on the spoken moment. Entrance is 0.08–0.15s — fade or a tiny pop, scale 95 → 100, ease-out. Then the word is replaced, not faded like a subtitle.'),
-  _CraftStep('06', 'The inset', 'Demo card',
-      'A small horizontal rectangle over the talking head — 60–75% of the width, lower-middle, slightly rounded, a small shadow. It must keep moving while the head remains visible.'),
-  _CraftStep('07', 'Match-cut the inset', 'Edit',
-      'Do not use decorative transitions. Match shapes and positions. Most cuts are 1 frame. Occasionally a 2–4 frame dissolve. A slight zoom makes the cut feel chosen.'),
-  _CraftStep('08', 'Screen recordings', 'Evidence',
-      'Short clips of the dark interface, a loader, a button changing state, the word locking into progress. Crop to 9:16. Kill browser chrome. Raise contrast.'),
-  _CraftStep('09', 'Dark UI shots', 'Punctuation',
-      'Near-black fields. White or light-gray marks. A soft glow only on the live element. Circular loaders move slowly. The edit cuts quickly; the UI inside does not.'),
-  _CraftStep('10', 'Subtle camera', 'Push-in',
-      'Talking head: scale 100 → 103–106 over the shot, with a slight drift. It should only keep the frame from dying.'),
-  _CraftStep('11', 'Speed', 'Ramps',
-      'Normal is 100%. Emphasis 85–95%. Transition 110–125%. Timing of the cut does more work than the ramp.'),
-  _CraftStep('12', 'Grade', 'Color',
-      'Talking head: slightly brighter, contrast up a little, highlights down. Product UI: contrast up, blacks a little lower, a very small glow. No cinematic LUT soup.'),
-  _CraftStep('13', 'Sound', 'Mix',
-      'Voice is the spine. Soft music under it. A small whoosh on major cuts. Quiet clicks on interface. Almost inaudible taps when the kinetic word changes.'),
-  _CraftStep('14', 'Captions by hand', 'Timing',
-      'Split into words, rebuild each word in the large serif, and park it on the speaker’s timing. Change the word on the cut or the gesture.'),
+  _CraftStep(
+    '01',
+    'Create the project',
+    'Canvas',
+    'Practice is a vertical edit, not a looping meditation video. Set the session as 9:16, 1080 × 1920, 30 fps. Import only the voice, the mouth inset, the dark UI stills.',
+  ),
+  _CraftStep(
+    '02',
+    'Record the talking head',
+    'Voice',
+    'Shoot vertical, subject centered, chest-up. Soft front light. Record the full word in one take, then cut it into the syllables you will emphasize.',
+  ),
+  _CraftStep(
+    '03',
+    'Build the timeline',
+    '29 seconds',
+    'Most shots live between 0.5 and 2 seconds. Nothing should sit long enough to become wallpaper. The 29-second practice is the cut, not the lecture.',
+  ),
+  _CraftStep(
+    '04',
+    'The text style',
+    'Typography',
+    'High-contrast serif. White. Large. Centered. Slightly tight tracking. No box behind it. Never set the whole sentence as one caption. Split it. Each word appears at the moment it is spoken.',
+  ),
+  _CraftStep(
+    '05',
+    'Animate each word',
+    'Kinetic',
+    'A separate layer per word, parked on the spoken moment. Entrance is 0.08–0.15s — fade or a tiny pop, scale 95 → 100, ease-out. Then the word is replaced, not faded like a subtitle.',
+  ),
+  _CraftStep(
+    '06',
+    'The inset',
+    'Demo card',
+    'A small horizontal rectangle over the talking head — 60–75% of the width, lower-middle, slightly rounded, a small shadow. It must keep moving while the head remains visible.',
+  ),
+  _CraftStep(
+    '07',
+    'Match-cut the inset',
+    'Edit',
+    'Do not use decorative transitions. Match shapes and positions. Most cuts are 1 frame. Occasionally a 2–4 frame dissolve. A slight zoom makes the cut feel chosen.',
+  ),
+  _CraftStep(
+    '08',
+    'Screen recordings',
+    'Evidence',
+    'Short clips of the dark interface, a loader, a button changing state, the word locking into progress. Crop to 9:16. Kill browser chrome. Raise contrast.',
+  ),
+  _CraftStep(
+    '09',
+    'Dark UI shots',
+    'Punctuation',
+    'Near-black fields. White or light-gray marks. A soft glow only on the live element. Circular loaders move slowly. The edit cuts quickly; the UI inside does not.',
+  ),
+  _CraftStep(
+    '10',
+    'Subtle camera',
+    'Push-in',
+    'Talking head: scale 100 → 103–106 over the shot, with a slight drift. It should only keep the frame from dying.',
+  ),
+  _CraftStep(
+    '11',
+    'Speed',
+    'Ramps',
+    'Normal is 100%. Emphasis 85–95%. Transition 110–125%. Timing of the cut does more work than the ramp.',
+  ),
+  _CraftStep(
+    '12',
+    'Grade',
+    'Color',
+    'Talking head: slightly brighter, contrast up a little, highlights down. Product UI: contrast up, blacks a little lower, a very small glow. No cinematic LUT soup.',
+  ),
+  _CraftStep(
+    '13',
+    'Sound',
+    'Mix',
+    'Voice is the spine. Soft music under it. A small whoosh on major cuts. Quiet clicks on interface. Almost inaudible taps when the kinetic word changes.',
+  ),
+  _CraftStep(
+    '14',
+    'Captions by hand',
+    'Timing',
+    'Split into words, rebuild each word in the large serif, and park it on the speaker’s timing. Change the word on the cut or the gesture.',
+  ),
 ];
 
 const _formula = <String>[
@@ -581,8 +667,10 @@ class _PracticeTab extends StatelessWidget {
                       ),
                       IconButton(
                         onPressed: onClose,
-                        icon: const Icon(Icons.close_rounded,
-                            color: Colors.white70),
+                        icon: const Icon(
+                          Icons.close_rounded,
+                          color: Colors.white70,
+                        ),
                       ),
                     ],
                   ),
@@ -777,8 +865,9 @@ class _PracticeTab extends StatelessWidget {
                                 side: BorderSide(
                                   color: Colors.white.withOpacity(.2),
                                 ),
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 14),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
                                 shape: const StadiumBorder(),
                               ),
                               child: const Text('Replay session'),
@@ -792,8 +881,9 @@ class _PracticeTab extends StatelessWidget {
                               style: FilledButton.styleFrom(
                                 backgroundColor: Colors.white,
                                 foregroundColor: const Color(0xFF050506),
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 14),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
                                 shape: const StadiumBorder(),
                               ),
                               child: Text(
@@ -1061,11 +1151,7 @@ class _WordBreakdown extends StatelessWidget {
 }
 
 class _PartCard extends StatelessWidget {
-  const _PartCard({
-    required this.index,
-    required this.part,
-    required this.on,
-  });
+  const _PartCard({required this.index, required this.part, required this.on});
   final int index;
   final WordPart part;
   final bool on;
@@ -1079,9 +1165,7 @@ class _PartCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: on ? const Color(0xFF16161A) : const Color(0xFF0B0B0D),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: Colors.white.withOpacity(on ? .28 : .12),
-        ),
+        border: Border.all(color: Colors.white.withOpacity(on ? .28 : .12)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1156,7 +1240,7 @@ class _SessionCraftState extends State<_SessionCraft> {
       'feel',
       'native',
       'and',
-      'polished'
+      'polished',
     ];
     final dark = ['Solving…', 'Thinking…', 'Listening…', 'Paused'];
     final ki = _kineticLock ?? (widget.elapsed * 7 ~/ 5) % kinetic.length;
@@ -1205,8 +1289,8 @@ class _SessionCraftState extends State<_SessionCraft> {
                         alignment: Alignment.center,
                         color:
                             widget.elapsed >= b.at && widget.elapsed < b.until
-                                ? Colors.white12
-                                : const Color(0xFF080808),
+                            ? Colors.white12
+                            : const Color(0xFF080808),
                         child: Text(
                           b.state,
                           overflow: TextOverflow.ellipsis,
@@ -1304,9 +1388,8 @@ class _SessionCraftState extends State<_SessionCraft> {
                   side: BorderSide(color: Colors.white.withOpacity(.12)),
                 ),
                 child: InkWell(
-                  onTap: () => setState(
-                    () => _open = _open == step.n ? '' : step.n,
-                  ),
+                  onTap: () =>
+                      setState(() => _open = _open == step.n ? '' : step.n),
                   borderRadius: BorderRadius.circular(16),
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
@@ -1591,7 +1674,8 @@ class _WaterRipplePainter extends CustomPainter {
     final a1 = back ? math.pi * 2 : math.pi;
     var started = false;
     for (var a = a0; a <= a1 + .04; a += .07) {
-      final wave = math.sin(a * 7 + progress * math.pi * 2) * 5.2 * fade +
+      final wave =
+          math.sin(a * 7 + progress * math.pi * 2) * 5.2 * fade +
           math.sin(a * 3 - progress * math.pi * 1.4 + age * 6) * 2.2 * fade;
       final z = math.cos(a * 4 + progress * math.pi * 1.6) * 4.2 * fade;
       final p = Offset(
