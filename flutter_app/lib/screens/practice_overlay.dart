@@ -311,13 +311,14 @@ class _PracticeTab extends StatelessWidget {
                         label: parts[i].roman.isNotEmpty
                             ? parts[i].roman
                             : parts[i].deva,
-                        active: heard.isNotEmpty &&
+                        active:
+                            heard.isNotEmpty &&
                             heard.toLowerCase().contains(
-                                  (parts[i].roman.isNotEmpty
-                                          ? parts[i].roman
-                                          : parts[i].deva)
-                                      .toLowerCase(),
-                                ),
+                              (parts[i].roman.isNotEmpty
+                                      ? parts[i].roman
+                                      : parts[i].deva)
+                                  .toLowerCase(),
+                            ),
                       ),
                   ],
                 ),
@@ -489,8 +490,10 @@ class _LiquidPulsePainter extends CustomPainter {
         final wave =
             math.sin(a * 3 + progress * math.pi * 2) * (1.2 + 3.5 * (1 - t));
         final rr = radius + wave;
-        final p =
-            Offset(c.dx + math.cos(a) * rr, c.dy + math.sin(a) * rr * .64);
+        final p = Offset(
+          c.dx + math.cos(a) * rr,
+          c.dy + math.sin(a) * rr * .64,
+        );
         if (a == 0) {
           path.moveTo(p.dx, p.dy);
         } else {
@@ -502,8 +505,11 @@ class _LiquidPulsePainter extends CustomPainter {
         Paint()
           ..style = PaintingStyle.stroke
           ..strokeWidth = 1.1 + fade * 1.8
-          ..color = Color.lerp(Colors.white, accent, .35)!
-              .withOpacity(.025 + fade * .18),
+          ..color = Color.lerp(
+            Colors.white,
+            accent,
+            .35,
+          )!.withOpacity(.025 + fade * .18),
       );
     }
 

@@ -391,77 +391,19 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
   }
 
   void _openInfo() {
-    showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (context) =>
-          _PlayerInfoSheet(word: _word, accent: _theme.accent),
-    );
+    _openNotes();
   }
 
   void _openNotes() {
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: const Color(0xF10A101B),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      builder: (context) => SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 22, 24, 34),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                'PRONUNCIATION NOTES',
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1.7,
-                ),
-              ),
-              const SizedBox(height: 14),
-              Text(
-                _word.word,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 28,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              if (_word.tip.isNotEmpty) ...[
-                const SizedBox(height: 10),
-                Text(
-                  _word.tip,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Color(0xCCFFFFFF),
-                    height: 1.45,
-                  ),
-                ),
-              ],
-              if (_word.parts.isNotEmpty) ...[
-                const SizedBox(height: 18),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  alignment: WrapAlignment.center,
-                  children: _word.parts
-                      .map(
-                        (part) => _PronunciationChip(
-                          part: part,
-                          accent: _theme.accent,
-                        ),
-                      )
-                      .toList(),
-                ),
-              ],
-            ],
-          ),
-        ),
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      barrierColor: Colors.transparent,
+      builder: (sheetContext) => _PracticeNotesSheet(
+        word: _word,
+        accent: _theme.accent,
+        onClose: () => Navigator.of(sheetContext).pop(),
       ),
     );
   }
@@ -485,7 +427,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      barrierColor: Colors.black.withOpacity(.76),
+      barrierColor: Colors.transparent,
       builder: (_) => PracticeLabSheet(
         word: _word,
         accent: _theme.accent,
@@ -4441,3 +4383,184 @@ const _playerThemes = <_PlayerTheme>[
     accent: Color(0xFF8FE6FF),
   ),
 ];
+
+class _PracticeNotesSheet extends StatelessWidget {
+  const _PracticeNotesSheet({
+    required this.word,
+    required this.accent,
+    required this.onClose,
+  });
+
+  final Word word;
+  final Color accent;
+  final VoidCallback onClose;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(34),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 32, sigmaY: 32),
+            child: Container(
+              constraints: const BoxConstraints(maxHeight: 650),
+              decoration: BoxDecoration(
+                color: const Color(0xCC080A0E),
+                borderRadius: BorderRadius.circular(34),
+                border: Border.all(color: Colors.white.withOpacity(.16)),
+                boxShadow: [
+                  BoxShadow(color: accent.withOpacity(.16), blurRadius: 70),
+                ],
+              ),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(22, 12, 22, 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 38,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(.24),
+                          borderRadius: BorderRadius.circular(99),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        const Expanded(
+                          child: Text(
+                            'NOTES',
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 2.4,
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: onClose,
+                          child: const Icon(
+                            Icons.close_rounded,
+                            color: Colors.white70,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      word.word,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 34,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -1,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      word.meaning,
+                      style: const TextStyle(
+                        color: Colors.white54,
+                        fontSize: 13,
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    _noteBlock(
+                      'PRONUNCIATION',
+                      word.tip.isEmpty
+                          ? 'Follow the reference sound slowly and keep the resonance steady through the hold.'
+                          : word.tip,
+                    ),
+                    if (word.organ.isNotEmpty)
+                      _noteBlock('BODY FOCUS', word.organ),
+                    if (word.parts.isNotEmpty)
+                      _noteBlock(
+                        'SOUND MAP',
+                        word.parts
+                            .map((p) => p.roman.isNotEmpty ? p.roman : p.deva)
+                            .join('  ·  '),
+                      ),
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: const EdgeInsets.all(15),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(.045),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(.08),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.auto_awesome_rounded,
+                            color: accent,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 10),
+                          const Expanded(
+                            child: Text(
+                              'Play the reference. Speak naturally. The practice engine compares your spoken word with the target sound.',
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 12,
+                                height: 1.45,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _noteBlock(String title, String body) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(.035),
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: Colors.white.withOpacity(.075)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                color: Colors.white54,
+                fontSize: 10,
+                letterSpacing: 1.8,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 7),
+            Text(
+              body,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                height: 1.45,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
