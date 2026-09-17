@@ -344,13 +344,14 @@ class _PracticeTab extends StatelessWidget {
                         label: parts[i].roman.isNotEmpty
                             ? parts[i].roman
                             : parts[i].deva,
-                        active: heard.isNotEmpty &&
+                        active:
+                            heard.isNotEmpty &&
                             heard.toLowerCase().contains(
-                                  (parts[i].roman.isNotEmpty
-                                          ? parts[i].roman
-                                          : parts[i].deva)
-                                      .toLowerCase(),
-                                ),
+                              (parts[i].roman.isNotEmpty
+                                      ? parts[i].roman
+                                      : parts[i].deva)
+                                  .toLowerCase(),
+                            ),
                       ),
                   ],
                 ),
@@ -541,8 +542,7 @@ class _LiquidPulsePainter extends CustomPainter {
             Colors.white,
             accent,
             .35,
-          )!
-              .withOpacity(.025 + fade * .18),
+          )!.withOpacity(.025 + fade * .18),
       );
     }
 
