@@ -24,8 +24,6 @@ for (const path of [runner, project, info, iconSource, firebaseConfig]) {
   }
 }
 
-// The AppIcon catalog is cut from assets/icons/app-icon-512.png, the exact
-// site/PWA/WebView image. It has no extra container or alternative artwork.
 cpSync(iconSource, iconDestination, { recursive: true, force: true });
 copyFileSync(firebaseConfig, join(runner, 'GoogleService-Info.plist'));
 
@@ -54,10 +52,24 @@ if (!infoText.includes(reversedClientId)) {
 if (!infoText.includes('<key>CFBundleDisplayName</key>')) {
   infoText = infoText.replace('<dict>', '<dict>\n\t<key>CFBundleDisplayName</key>\n\t<string>NowssB</string>');
 }
+
+// Native Practice needs the same microphone/speech permissions on every
+// generated iOS target. The UI intentionally contains no recorder chrome;
+// these are the unavoidable system privacy descriptions shown by iOS.
+if (!infoText.includes('<key>NSMicrophoneUsageDescription</key>')) {
+  infoText = infoText.replace(
+    '<dict>',
+    '<dict>\n\t<key>NSMicrophoneUsageDescription</key>\n\t<string>NowssB uses the microphone to analyse your spoken word practice.</string>',
+  );
+}
+if (!infoText.includes('<key>NSSpeechRecognitionUsageDescription</key>')) {
+  infoText = infoText.replace(
+    '<dict>',
+    '<dict>\n\t<key>NSSpeechRecognitionUsageDescription</key>\n\t<string>NowssB uses speech recognition to compare your spoken word with the practice sound.</string>',
+  );
+}
 writeFileSync(info, infoText);
 
-// Flutter's generated project does not know about this configuration file.
-// Add it to the Runner resource phase so Firebase can discover it at runtime.
 const fileRef = 'F10A55B0C0DE000000000001';
 const buildRef = 'F10A55B0C0DE000000000002';
 let pbx = readFileSync(project, 'utf8');
@@ -81,4 +93,4 @@ if (!pbx.includes('GoogleService-Info.plist')) {
 pbx = pbx.replace(/PRODUCT_BUNDLE_IDENTIFIER = [^;]+;/g, `PRODUCT_BUNDLE_IDENTIFIER = ${appId};`);
 writeFileSync(project, pbx);
 
-console.log('configured Flutter iOS: canonical icon, NowssB, Firebase, and Google callback');
+console.log('configured Flutter iOS: canonical icon, NowssB, Firebase, Google callback, and Practice audio permissions');
