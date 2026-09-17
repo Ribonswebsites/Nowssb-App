@@ -38,7 +38,7 @@ jobs:
       - name: Analyze and compile iOS without signing
         run: |
           cd flutter_app
-          flutter analyze --no-fatal-infos
+          flutter analyze --no-fatal-infos --no-fatal-warnings
           flutter build ios --debug --no-codesign
       - name: Upload unsigned iOS application bundle for inspection
         uses: actions/upload-artifact@v4

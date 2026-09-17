@@ -18,6 +18,7 @@ import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 import '../data/models.dart';
 import '../media/nwsb_video.dart';
+import '../media/video_pool.dart';
 
 class PracticeLabSheet extends StatefulWidget {
   const PracticeLabSheet({
@@ -93,8 +94,10 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
       }
 
       final dir = await getTemporaryDirectory();
-      final file = '${dir.path}/nwsb-practice-${DateTime.now().millisecondsSinceEpoch}.m4a';
-      _recordedPath = await _recorder.start(
+      final file =
+          '${dir.path}/nwsb-practice-${DateTime.now().millisecondsSinceEpoch}.m4a';
+      _recordedPath = file;
+      await _recorder.start(
         const RecordConfig(
           encoder: AudioEncoder.aacLc,
           bitRate: 96000,
@@ -128,7 +131,7 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
               _matched = _similarEnough(heard, widget.word.word);
             });
           },
-          listenOptions: const stt.SpeechListenOptions(
+          listenOptions: stt.SpeechListenOptions(
             partialResults: true,
             cancelOnError: false,
             autoPunctuation: false,
@@ -377,11 +380,11 @@ class _PracticeTab extends StatelessWidget {
                             : parts[i].deva,
                         active: heard.isNotEmpty &&
                             heard.toLowerCase().contains(
-                              (parts[i].roman.isNotEmpty
-                                      ? parts[i].roman
-                                      : parts[i].deva)
-                                  .toLowerCase(),
-                            ),
+                                  (parts[i].roman.isNotEmpty
+                                          ? parts[i].roman
+                                          : parts[i].deva)
+                                      .toLowerCase(),
+                                ),
                       ),
                   ],
                 ),
@@ -490,9 +493,11 @@ class _LiquidPulsePainter extends CustomPainter {
       final fade = math.pow(1 - t, 1.45).toDouble();
       final path = Path();
       for (var a = 0.0; a <= math.pi * 2 + .08; a += .08) {
-        final wave = math.sin(a * 3 + progress * math.pi * 2) * (1.2 + 3.5 * (1 - t));
+        final wave =
+            math.sin(a * 3 + progress * math.pi * 2) * (1.2 + 3.5 * (1 - t));
         final rr = radius + wave;
-        final p = Offset(c.dx + math.cos(a) * rr, c.dy + math.sin(a) * rr * .64);
+        final p =
+            Offset(c.dx + math.cos(a) * rr, c.dy + math.sin(a) * rr * .64);
         if (a == 0) {
           path.moveTo(p.dx, p.dy);
         } else {
@@ -504,7 +509,8 @@ class _LiquidPulsePainter extends CustomPainter {
         Paint()
           ..style = PaintingStyle.stroke
           ..strokeWidth = 1.1 + fade * 1.8
-          ..color = Color.lerp(Colors.white, accent, .35)!.withOpacity(.025 + fade * .18),
+          ..color = Color.lerp(Colors.white, accent, .35)!
+              .withOpacity(.025 + fade * .18),
       );
     }
 
