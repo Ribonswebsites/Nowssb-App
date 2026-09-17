@@ -1,3 +1,4 @@
+# Idempotent Practice Lab materializer used by the verified Flutter build.
 import base64
 import gzip
 from pathlib import Path
