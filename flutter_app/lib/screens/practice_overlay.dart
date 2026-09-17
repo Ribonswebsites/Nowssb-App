@@ -16,6 +16,8 @@ import 'package:record/record.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 import '../data/models.dart';
+import '../media/nwsb_video.dart';
+import '../media/video_pool.dart';
 
 enum _PracticeStatus {
   ready,
@@ -32,12 +34,14 @@ class PracticeLabSheet extends StatefulWidget {
     required this.word,
     required this.onSpeak,
     required this.onClose,
+    required this.video,
     this.accent = const Color(0xFFB8C9FF),
   });
 
   final Word word;
   final Future<void> Function() onSpeak;
   final VoidCallback onClose;
+  final String video;
   final Color accent;
 
   @override
@@ -232,6 +236,17 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
         fit: StackFit.expand,
         children: [
           Positioned.fill(
+            child: Opacity(
+              opacity: .28,
+              child: NwsbVideo(
+                asset: widget.video,
+                priority: ClipPriority.feature,
+                autoplay: true,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          Positioned.fill(
             child: IgnorePointer(
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
@@ -246,7 +261,10 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
                 animation: _entry,
                 builder: (context, child) => Transform.translate(
                   offset: Offset(0, 36 * (1 - _entry.value)),
-                  child: Opacity(opacity: _entry.value, child: child),
+                  child: Transform.scale(
+                    scale: .96 + _entry.value * .04,
+                    child: Opacity(opacity: _entry.value, child: child),
+                  ),
                 ),
                 child: _PracticeTab(
                   word: widget.word,
