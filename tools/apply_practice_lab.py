@@ -1,5 +1,5 @@
 # Idempotent Practice Lab materializer used by the verified Flutter build.
-# Trigger marker: practice-build-v3
+# Trigger marker: practice-build-v4
 import base64
 import gzip
 import re
@@ -58,9 +58,6 @@ else:
         flags=re.S,
     )
 
-# The old info action was a generic dark sheet. View More now opens the notes
-# treatment: liquid glass, the word's pronunciation facts, and the practice
-# guidance, while the player remains visible behind it.
 info_replacement = '''  void _openInfo() {
     _openNotes();
   }
@@ -97,8 +94,6 @@ text = re.sub(
     flags=re.S,
 )
 
-# Keep the notes sheet in the same player file so it shares the current word,
-# theme accent and generated background video without introducing another route.
 notes_class = r'''
 class _PracticeNotesSheet extends StatelessWidget {
   const _PracticeNotesSheet({
@@ -249,5 +244,12 @@ class _PracticeNotesSheet extends StatelessWidget {
 if '_PracticeNotesSheet extends StatelessWidget' not in text:
     text += notes_class
 
+# speech_to_text 7.4.0 exposes SpeechListenOptions as a regular constructor;
+# remove const so the app remains compatible with the repository's Dart 3.4 floor.
+text = text.replace(
+    'listenOptions: const stt.SpeechListenOptions(',
+    'listenOptions: stt.SpeechListenOptions(',
+)
+
 player.write_text(text)
-print('Practice Lab UI materialized, wired, and View More notes upgraded.')
+print('Practice Lab UI materialized, wired, notes upgraded, and speech options normalized.')
