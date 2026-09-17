@@ -66,7 +66,6 @@ import 'sound_library.dart';
 import 'notifications_sheet.dart';
 import 'widgets_page.dart';
 import '../widgets/home_menu_drawer.dart';
-import '../widgets/app_backdrop.dart';
 import 'practice_player.dart';
 import 'progress/progress_screen.dart';
 import 'subscription.dart';
@@ -348,52 +347,9 @@ class _HomeNormalState extends State<HomeNormal> {
       child: HomeSkinScope(
         skin: HomeSkin.normal,
         child: Scaffold(
-          backgroundColor: NwsbColors.deep,
-          body: Stack(
-            children: [
-              // Same Fashion Plus film the dark home uses, full-page.
-              const Positioned.fill(child: AppBackdrop()),
-              const Positioned.fill(
-                child: IgnorePointer(
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: RadialGradient(
-                        center: Alignment(0, -0.1),
-                        radius: 0.88,
-                        colors: [
-                          Color(0x00000000),
-                          Color(0x24000000),
-                          Color(0x57000000),
-                          Color(0x94000000),
-                        ],
-                        stops: [0.30, 0.58, 0.80, 1.0],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const Positioned.fill(
-                child: IgnorePointer(
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Color(0x42000000),
-                          Color(0x00000000),
-                          Color(0x00000000),
-                          Color(0x57000000),
-                        ],
-                        stops: [0, 0.20, 0.76, 1.0],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              page,
-            ],
-          ),
+          backgroundColor:
+              _glassMode ? const Color(0xFFF7FAFF) : NwsbColors.surface,
+          body: _glassMode ? NormalGlassBackground(child: page) : page,
         ),
       ),
     );
@@ -495,7 +451,6 @@ class _TopRow extends StatelessWidget {
                       fontSize: 15,
                       fontWeight: FontWeight.w800,
                       letterSpacing: -0.3,
-                      color: Colors.white,
                     ),
               ),
               Text(
@@ -505,7 +460,6 @@ class _TopRow extends StatelessWidget {
                 style: Theme.of(context).textTheme.labelSmall!.copyWith(
                       fontSize: 9,
                       letterSpacing: 2,
-                      color: const Color(0xB3FFFFFF),
                     ),
               ),
             ],

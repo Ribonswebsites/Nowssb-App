@@ -8,6 +8,7 @@ import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 
 import '../../data/store_catalog.dart';
+import '../../data/cart_bag.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
@@ -1569,7 +1570,17 @@ class _StoreViewAllOverlayState extends State<_StoreViewAllOverlay> {
                           const SizedBox(width: 10),
                           _WhiteCircleAction(
                             icon: Icons.favorite_border,
-                            onTap: () => _toast('Saved ${_current.title} to wishlist'),
+                            onTap: () {
+                              CartBag.instance.addWishlist(BagItem(
+                                id: 'word:${_current.word.toLowerCase()}',
+                                title: _current.title,
+                                subtitle: _current.root,
+                                image: _current.img,
+                                price: _current.price,
+                                kind: 'Word',
+                              ));
+                              _toast('Saved ${_current.title} to wishlist');
+                            },
                           ),
                           const SizedBox(width: 10),
                           _WhiteCircleAction(
@@ -1579,7 +1590,17 @@ class _StoreViewAllOverlayState extends State<_StoreViewAllOverlay> {
                           const SizedBox(width: 10),
                           _WhiteCircleAction(
                             icon: Icons.shopping_bag_outlined,
-                            onTap: () => _toast('Added ${_current.title} to cart'),
+                            onTap: () {
+                              CartBag.instance.addCart(BagItem(
+                                id: 'word:${_current.word.toLowerCase()}',
+                                title: _current.title,
+                                subtitle: _current.root,
+                                image: _current.img,
+                                price: _current.price,
+                                kind: 'Word',
+                              ));
+                              _toast('Added ${_current.title} to cart');
+                            },
                           ),
                         ],
                       ),

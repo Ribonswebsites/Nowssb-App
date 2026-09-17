@@ -12,8 +12,10 @@ import 'package:flutter/material.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
+import '../widgets/app_backdrop.dart';
 import '../widgets/black_glass_banner.dart';
 import '../widgets/intro_gate.dart';
+import 'store/bag_ui.dart';
 
 export 'store/ebooks_store.dart';
 export 'store/meaning_store.dart';
@@ -38,22 +40,31 @@ class _StoreHomeContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = <Widget>[
-      const Padding(
-        padding: EdgeInsets.fromLTRB(20, 22, 20, 2),
-        child: Column(
+      Padding(
+        padding: const EdgeInsets.fromLTRB(20, 22, 12, 2),
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('NowssB Store',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 34,
-                    height: 1.0,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -1.0)),
-            SizedBox(height: 8),
-            Text('Own the words. Unlock the meanings.',
-                style: TextStyle(
-                    color: Color(0xAFFFFFFF), fontSize: 13, height: 1.3)),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('NowssB Store',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 34,
+                          height: 1.0,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -1.0)),
+                  SizedBox(height: 8),
+                  Text('Own the words. Unlock the meanings.',
+                      style: TextStyle(
+                          color: Color(0xAFFFFFFF), fontSize: 13, height: 1.3)),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            const StoreBagBar(),
           ],
         ),
       ),
@@ -176,7 +187,50 @@ class _StoreHomeContent extends StatelessWidget {
     ];
     return Scaffold(
       backgroundColor: NwsbColors.deep,
-      body: SafeArea(child: ListView(children: items)),
+      body: Stack(
+        children: [
+          const Positioned.fill(child: AppBackdrop()),
+          const Positioned.fill(
+            child: IgnorePointer(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: RadialGradient(
+                    center: Alignment(0, -0.1),
+                    radius: 0.88,
+                    colors: [
+                      Color(0x00000000),
+                      Color(0x24000000),
+                      Color(0x57000000),
+                      Color(0x94000000),
+                    ],
+                    stops: [0.30, 0.58, 0.80, 1.0],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const Positioned.fill(
+            child: IgnorePointer(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Color(0x42000000),
+                      Color(0x00000000),
+                      Color(0x00000000),
+                      Color(0x57000000),
+                    ],
+                    stops: [0, 0.20, 0.76, 1.0],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          SafeArea(child: ListView(children: items)),
+        ],
+      ),
     );
   }
 
@@ -221,19 +275,27 @@ class _StoreImageRotatorState extends State<_StoreImageRotator> {
 
   @override
   Widget build(BuildContext context) => ClipRRect(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(18),
         child: AspectRatio(
-          // Same compact black-banner crop as Word Atelier / Meaning Store.
-          aspectRatio: 16 / 5,
+          aspectRatio: 1.55,
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 700),
             switchInCurve: Curves.easeOut,
             switchOutCurve: Curves.easeIn,
+            layoutBuilder: (current, previous) => Stack(
+              fit: StackFit.expand,
+              alignment: Alignment.center,
+              children: [
+                ...previous,
+                if (current != null) current,
+              ],
+            ),
             child: Image.asset(
               _images[_index],
               key: ValueKey(_images[_index]),
               fit: BoxFit.cover,
-              alignment: Alignment.center,
+              width: double.infinity,
+              height: double.infinity,
               errorBuilder: (_, __, ___) => const ColoredBox(
                 color: Colors.black,
                 child: Center(

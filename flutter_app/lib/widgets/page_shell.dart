@@ -13,6 +13,7 @@ import '../theme/tokens.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import 'app_backdrop.dart';
+import '../screens/store/bag_ui.dart';
 
 class PageShell extends StatefulWidget {
   const PageShell({
@@ -197,7 +198,9 @@ class _PageShellState extends State<PageShell> {
                           ),
                         ),
                         if (widget.onStorePicker != null) ...[
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 8),
+                          const StoreBagBar(),
+                          const SizedBox(width: 8),
                           GestureDetector(
                             onTap: widget.onStorePicker,
                             behavior: HitTestBehavior.opaque,

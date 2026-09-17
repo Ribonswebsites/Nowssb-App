@@ -6,10 +6,13 @@ import 'package:flutter/material.dart';
 
 import '../../data/content.dart';
 import '../../data/store_catalog.dart';
+import '../../data/cart_bag.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
 import '../word_detail.dart';
+import 'bag_ui.dart';
+import 'cart_pages.dart';
 import 'store_cards.dart';
 
 void openAtelierWord(BuildContext context, {required String word, required String root, required String img, bool signature = false, num price = 49}) {
@@ -102,6 +105,15 @@ class StoreProductPage extends StatelessWidget {
   /// Meaning detail hero clip (MS_MEANING_VID) — remote HTTPS URL.
   final String? heroVideo;
 
+  BagItem get _bagItem => BagItem(
+        id: '${kind.toLowerCase()}:${title.toLowerCase()}',
+        title: title,
+        subtitle: root,
+        image: img,
+        price: price,
+        kind: kind,
+      );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -121,6 +133,7 @@ class StoreProductPage extends StatelessWidget {
                     child: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis,
                         style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white)),
                   ),
+                  const StoreBagBar(),
                 ],
               ),
             ),
@@ -157,13 +170,55 @@ class StoreProductPage extends StatelessWidget {
                         const SizedBox(height: 16),
                         Row(
                           children: [
-                            Expanded(child: _ActBtn(label: 'Wishlist', icon: Icons.favorite_border, filled: false, onTap: () {})),
+                            Expanded(
+                              child: _ActBtn(
+                                label: 'Wishlist',
+                                icon: Icons.favorite_border,
+                                filled: false,
+                                onTap: () {
+                                  CartBag.instance.addWishlist(_bagItem);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Saved $title to wishlist'),
+                                      behavior: SnackBarBehavior.floating,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
                             const SizedBox(width: 10),
-                            Expanded(child: _ActBtn(label: 'Add to Cart', icon: Icons.shopping_bag_outlined, filled: false, onTap: () {})),
+                            Expanded(
+                              child: _ActBtn(
+                                label: 'Add to Cart',
+                                icon: Icons.shopping_bag_outlined,
+                                filled: false,
+                                onTap: () {
+                                  CartBag.instance.addCart(_bagItem);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Added $title to cart'),
+                                      behavior: SnackBarBehavior.floating,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
                           ],
                         ),
                         const SizedBox(height: 10),
-                        _ActBtn(label: 'Buy Now', icon: Icons.lock_open, filled: true, onTap: () {}),
+                        _ActBtn(
+                          label: 'Buy Now',
+                          icon: Icons.lock_open,
+                          filled: true,
+                          onTap: () {
+                            CartBag.instance.addCart(_bagItem);
+                            Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (_) => const CheckoutPage(),
+                              ),
+                            );
+                          },
+                        ),
                         const SizedBox(height: 22),
                         const Text('ABOUT', style: TextStyle(fontSize: 9, letterSpacing: 1.6, fontWeight: FontWeight.w700, color: Color(0x66FFFFFF))),
                         const SizedBox(height: 8),

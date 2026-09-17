@@ -23,6 +23,7 @@ import 'app_update.dart';
 import 'data/content.dart';
 import 'data/firebase.dart';
 import 'data/notifications.dart';
+import 'data/cart_bag.dart';
 import 'data/settings.dart';
 import 'media/video_pool.dart';
 import 'screens/auth_gate.dart';
@@ -52,6 +53,7 @@ Future<void> main() async {
   // the Firestore watch running behind them when there is one.
   await Settings.instance.load();
   await NotifStore.instance.load();
+  await CartBag.instance.load();
   await ContentStore.instance.start();
 
   // Nothing decodes underneath the start animation. Released by the splash

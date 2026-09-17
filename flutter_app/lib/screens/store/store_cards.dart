@@ -7,6 +7,7 @@ import 'dart:ui' show ImageFilter;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
+import '../../data/cart_bag.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
@@ -739,6 +740,14 @@ class RmWordCard extends StatelessWidget {
                             if (onWishlist != null) {
                               onWishlist!();
                             } else {
+                              CartBag.instance.addWishlist(BagItem(
+                                id: 'word:${name.toLowerCase()}',
+                                title: name,
+                                subtitle: root,
+                                image: imgUrl,
+                                price: price ?? 49,
+                                kind: signature ? 'Signature' : 'Word',
+                              ));
                               _toast(context, 'Saved $name to wishlist');
                             }
                           },
@@ -751,6 +760,14 @@ class RmWordCard extends StatelessWidget {
                             if (onAddCart != null) {
                               onAddCart!();
                             } else {
+                              CartBag.instance.addCart(BagItem(
+                                id: 'word:${name.toLowerCase()}',
+                                title: name,
+                                subtitle: root,
+                                image: imgUrl,
+                                price: price ?? 49,
+                                kind: signature ? 'Signature' : 'Word',
+                              ));
                               _toast(context, 'Added $name to cart');
                             }
                           },
@@ -822,20 +839,24 @@ class _SignatureTag extends StatelessWidget {
 }
 
 class _MiniChip extends StatelessWidget {
-  const _MiniChip({required this.icon, required this.color});
+  const _MiniChip({required this.icon, required this.color, this.onTap});
   final IconData icon;
   final Color color;
+  final VoidCallback? onTap;
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 28,
-      height: 28,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: const Color(0xD1060C18),
-        border: Border.all(color: const Color(0x1FFFFFFF)),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 28,
+        height: 28,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: const Color(0xD1060C18),
+          border: Border.all(color: const Color(0x1FFFFFFF)),
+        ),
+        child: Icon(icon, size: 13, color: color),
       ),
-      child: Icon(icon, size: 13, color: color),
     );
   }
 }
@@ -898,9 +919,47 @@ class MsCard extends StatelessWidget {
                 right: 6,
                 child: Column(
                   children: [
-                    _MiniChip(icon: Icons.favorite_border, color: const Color(0xB3FFFFFF)),
+                    _MiniChip(
+                      icon: Icons.favorite_border,
+                      color: const Color(0xB3FFFFFF),
+                      onTap: () {
+                        CartBag.instance.addWishlist(BagItem(
+                          id: 'meaning:${word.toLowerCase()}',
+                          title: word,
+                          subtitle: root,
+                          image: imgUrl,
+                          price: price,
+                          kind: signature ? 'Signature Meaning' : 'Meaning',
+                        ));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Saved $word to wishlist'),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      },
+                    ),
                     const SizedBox(height: 5),
-                    _MiniChip(icon: Icons.shopping_bag_outlined, color: NwsbColors.goldLight),
+                    _MiniChip(
+                      icon: Icons.shopping_bag_outlined,
+                      color: NwsbColors.goldLight,
+                      onTap: () {
+                        CartBag.instance.addCart(BagItem(
+                          id: 'meaning:${word.toLowerCase()}',
+                          title: word,
+                          subtitle: root,
+                          image: imgUrl,
+                          price: price,
+                          kind: signature ? 'Signature Meaning' : 'Meaning',
+                        ));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Added $word to cart'),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      },
+                    ),
                   ],
                 ),
               ),
