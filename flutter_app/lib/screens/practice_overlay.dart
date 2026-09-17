@@ -1,9 +1,8 @@
 /// Premium Practice tab opened from the NowssB player.
 ///
-/// The reference track is played first, then the microphone session begins.
-/// The microphone is intentionally represented only by the visual language of
-/// the product: a white mic orb, liquid-glass shell and pulse field. There is
-/// no "recording" label, red dot, waveform or recorder chrome.
+/// The lab is deliberately self-contained: the reference is played first, then
+/// the learner holds the mic to make a take. A take is written to the app's
+/// documents directory so it survives the session and can be replayed locally.
 library;
 
 import 'dart:async';
@@ -17,6 +16,15 @@ import 'package:record/record.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 import '../data/models.dart';
+
+enum _PracticeStatus {
+  ready,
+  listening,
+  recording,
+  practicing,
+  locked,
+  complete
+}
 
 class PracticeLabSheet extends StatefulWidget {
   const PracticeLabSheet({
@@ -38,15 +46,20 @@ class PracticeLabSheet extends StatefulWidget {
 
 class _PracticeLabSheetState extends State<PracticeLabSheet>
     with TickerProviderStateMixin {
+  static const _sessionLength = 29;
   final AudioRecorder _recorder = AudioRecorder();
   final stt.SpeechToText _speech = stt.SpeechToText();
   late final AnimationController _pulse;
   late final AnimationController _entry;
 
+  Timer? _clock;
   String _heard = '';
+  String? _takePath;
   bool _speechReady = false;
-  bool _busy = true;
+  bool _holding = false;
   bool _matched = false;
+  int _elapsed = 0;
+  _PracticeStatus _status = _PracticeStatus.listening;
 
   @override
   void initState() {
@@ -59,11 +72,12 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
       vsync: this,
       duration: const Duration(milliseconds: 520),
     )..forward();
-    unawaited(_beginPractice());
+    unawaited(_playReference());
   }
 
   @override
   void dispose() {
+    _clock?.cancel();
     unawaited(_finishCapture());
     _pulse.dispose();
     _entry.dispose();
@@ -71,28 +85,32 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
     super.dispose();
   }
 
-  Future<void> _beginPractice() async {
-    // The reference audio remains whatever the player supplies. Nothing in
-    // this UI assumes the current TTS placeholder will be the shipped audio.
+  Future<void> _playReference() async {
     try {
       await widget.onSpeak();
     } catch (_) {}
-
-    if (!mounted) return;
-    await _startCapture();
+    if (mounted) setState(() => _status = _PracticeStatus.ready);
   }
 
-  Future<void> _startCapture() async {
+  Future<void> _beginTake() async {
+    if (_holding || _status == _PracticeStatus.recording) return;
+    _clock?.cancel();
+    setState(() {
+      _holding = true;
+      _elapsed = 0;
+      _heard = '';
+      _matched = false;
+      _status = _PracticeStatus.listening;
+    });
+
     try {
       final permitted = await _recorder.hasPermission();
       if (!permitted) {
-        if (mounted) setState(() => _busy = false);
+        if (mounted) setState(() => _holding = false);
         return;
       }
-
-      final dir = await getTemporaryDirectory();
-      final file =
-          '${dir.path}/nwsb-practice-${DateTime.now().millisecondsSinceEpoch}.m4a';
+      final dir = await getApplicationDocumentsDirectory();
+      _takePath = '${dir.path}/nwsb-practice-${widget.word.key}.m4a';
       await _recorder.start(
         const RecordConfig(
           encoder: AudioEncoder.aacLc,
@@ -103,19 +121,17 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
           echoCancel: true,
           noiseSuppress: true,
         ),
-        path: file,
+        path: _takePath!,
       );
-
       _speechReady = await _speech.initialize(
         onStatus: (status) {
-          if (!mounted) return;
+          if (!mounted || !_holding) return;
           if (status == 'done' || status == 'notListening') {
-            unawaited(_finishCapture());
+            setState(() => _status = _PracticeStatus.practicing);
           }
         },
         onError: (_) {},
       );
-
       if (_speechReady) {
         await _speech.listen(
           onResult: (result) {
@@ -125,21 +141,44 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
             setState(() {
               _heard = heard;
               _matched = _similarEnough(heard, widget.word.word);
+              _status = _PracticeStatus.practicing;
             });
           },
           listenOptions: stt.SpeechListenOptions(
             partialResults: true,
             cancelOnError: false,
             autoPunctuation: false,
-            listenFor: Duration(seconds: 9),
-            pauseFor: Duration(seconds: 2),
+            listenFor: Duration(seconds: _sessionLength),
+            pauseFor: Duration(seconds: 4),
           ),
         );
       }
-      if (mounted) setState(() => _busy = false);
+      if (!mounted) return;
+      setState(() => _status = _PracticeStatus.recording);
+      _clock = Timer.periodic(const Duration(seconds: 1), (_) {
+        if (!mounted || !_holding) return;
+        if (_elapsed >= _sessionLength - 1) {
+          unawaited(_endTake());
+        } else {
+          setState(() => _elapsed++);
+        }
+      });
     } catch (_) {
-      if (mounted) setState(() => _busy = false);
+      if (mounted) setState(() => _holding = false);
     }
+  }
+
+  Future<void> _endTake() async {
+    if (!_holding && _status != _PracticeStatus.recording) return;
+    _clock?.cancel();
+    await _finishCapture();
+    if (!mounted) return;
+    setState(() {
+      _holding = false;
+      _status = _elapsed >= _sessionLength - 1
+          ? _PracticeStatus.complete
+          : _PracticeStatus.locked;
+    });
   }
 
   Future<void> _finishCapture() async {
@@ -147,10 +186,23 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
       if (_speechReady && _speech.isListening) await _speech.stop();
     } catch (_) {}
     try {
-      if (await _recorder.isRecording()) {
-        await _recorder.stop();
-      }
+      if (await _recorder.isRecording()) await _recorder.stop();
     } catch (_) {}
+  }
+
+  Future<void> _replay() async {
+    _clock?.cancel();
+    await _finishCapture();
+    if (!mounted) return;
+    setState(() {
+      _takePath = null;
+      _heard = '';
+      _matched = false;
+      _elapsed = 0;
+      _holding = false;
+      _status = _PracticeStatus.listening;
+    });
+    await _playReference();
   }
 
   bool _similarEnough(String heard, String target) {
@@ -163,6 +215,14 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
   }
 
   List<WordPart> get _parts => widget.word.parts;
+  String get _statusLabel => switch (_status) {
+        _PracticeStatus.ready => 'Ready',
+        _PracticeStatus.listening => 'Listening',
+        _PracticeStatus.recording => 'Recording',
+        _PracticeStatus.practicing => 'Practicing',
+        _PracticeStatus.locked => 'Take locked',
+        _PracticeStatus.complete => '29s complete',
+      };
 
   @override
   Widget build(BuildContext context) {
@@ -175,7 +235,7 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
             child: IgnorePointer(
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-                child: ColoredBox(color: Color(0x22080B10)),
+                child: const ColoredBox(color: Color(0x22080B10)),
               ),
             ),
           ),
@@ -194,10 +254,14 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
                   accent: widget.accent,
                   pulse: _pulse,
                   heard: _heard,
-                  busy: _busy,
+                  elapsed: _elapsed,
+                  status: _statusLabel,
                   matched: _matched,
+                  takeLocked: _takePath != null && !_holding,
                   onClose: widget.onClose,
-                  onReplay: () => unawaited(_beginPractice()),
+                  onHoldStart: _beginTake,
+                  onHoldEnd: _endTake,
+                  onReplay: () => unawaited(_replay()),
                 ),
               ),
             ),
@@ -215,9 +279,13 @@ class _PracticeTab extends StatelessWidget {
     required this.accent,
     required this.pulse,
     required this.heard,
-    required this.busy,
+    required this.elapsed,
+    required this.status,
     required this.matched,
+    required this.takeLocked,
     required this.onClose,
+    required this.onHoldStart,
+    required this.onHoldEnd,
     required this.onReplay,
   });
 
@@ -226,25 +294,30 @@ class _PracticeTab extends StatelessWidget {
   final Color accent;
   final Animation<double> pulse;
   final String heard;
-  final bool busy;
+  final int elapsed;
+  final String status;
   final bool matched;
+  final bool takeLocked;
   final VoidCallback onClose;
+  final VoidCallback onHoldStart;
+  final VoidCallback onHoldEnd;
   final VoidCallback onReplay;
 
   @override
   Widget build(BuildContext context) {
+    final target = word.word.isEmpty ? word.translit : word.word;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(30),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
           child: Container(
-            constraints: const BoxConstraints(maxWidth: 430),
+            constraints: const BoxConstraints(maxWidth: 440),
             padding: const EdgeInsets.fromLTRB(18, 14, 18, 16),
             decoration: BoxDecoration(
               color: const Color(0xE20B0F14),
-              borderRadius: BorderRadius.circular(28),
+              borderRadius: BorderRadius.circular(30),
               border: Border.all(color: Colors.white.withOpacity(.14)),
               boxShadow: [
                 BoxShadow(
@@ -254,137 +327,241 @@ class _PracticeTab extends StatelessWidget {
                 ),
               ],
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 38,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(.28),
-                    borderRadius: BorderRadius.circular(99),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.keyboard_arrow_down_rounded,
+                          color: Colors.white60),
+                      const Expanded(
+                        child: Text('PRACTICE LAB',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 2.2)),
+                      ),
+                      _SmallButton(icon: Icons.close_rounded, onTap: onClose),
+                    ],
                   ),
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    const Expanded(
-                      child: Text(
-                        'PRACTICE',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 2.5,
-                        ),
+                  const SizedBox(height: 4),
+                  Text(
+                      '$status  •  ${elapsed.toString().padLeft(2, '0')} / 29s',
+                      style: const TextStyle(
+                          color: Colors.white54,
+                          fontSize: 10,
+                          letterSpacing: 1.1)),
+                  const SizedBox(height: 10),
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: Text(
+                      target,
+                      key: ValueKey(target),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 36,
+                        height: .98,
+                        fontFamily: 'serif',
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    _SmallButton(icon: Icons.close_rounded, onTap: onClose),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  word.word,
-                  style: const TextStyle(
-                    color: Color(0xCCFFFFFF),
-                    fontSize: 12,
-                    letterSpacing: 2.2,
-                    fontWeight: FontWeight.w500,
                   ),
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  height: 126,
-                  child: AnimatedBuilder(
-                    animation: pulse,
-                    builder: (context, _) => CustomPaint(
-                      painter: _LiquidPulsePainter(
-                        progress: pulse.value,
-                        accent: accent,
-                      ),
-                      child: Center(
-                        child: SizedBox.square(
-                          dimension: 104,
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              CustomPaint(
-                                size: const Size.square(104),
-                                painter: _OrbPainter(
-                                  progress: pulse.value,
-                                  accent: accent,
-                                ),
-                              ),
-                              SizedBox(
-                                width: 34,
-                                height: 42,
-                                child: SvgPicture.asset(
-                                  'assets/icons/microphone.svg',
-                                  colorFilter: const ColorFilter.mode(
-                                    Colors.white,
-                                    BlendMode.srcIn,
+                  if (word.translit.isNotEmpty && word.translit != target)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 6),
+                      child: Text(word.translit,
+                          style: const TextStyle(
+                              color: Colors.white54,
+                              fontSize: 12,
+                              letterSpacing: 1.4)),
+                    ),
+                  const SizedBox(height: 8),
+                  _Timeline(elapsed: elapsed, accent: accent),
+                  const SizedBox(height: 4),
+                  GestureDetector(
+                    onLongPressStart: (_) => onHoldStart(),
+                    onLongPressEnd: (_) => onHoldEnd(),
+                    onTapDown: (_) => onHoldStart(),
+                    onTapUp: (_) => onHoldEnd(),
+                    onTapCancel: onHoldEnd,
+                    child: SizedBox(
+                      height: 170,
+                      child: AnimatedBuilder(
+                        animation: pulse,
+                        builder: (context, _) => CustomPaint(
+                          painter: _LiquidPulsePainter(
+                              progress: pulse.value, accent: accent),
+                          child: Center(
+                            child: SizedBox.square(
+                              dimension: 124,
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  CustomPaint(
+                                      size: const Size.square(124),
+                                      painter: _OrbPainter(
+                                          progress: pulse.value,
+                                          accent: accent)),
+                                  Container(
+                                    width: 62,
+                                    height: 62,
+                                    decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Colors.white.withOpacity(.96),
+                                        boxShadow: [
+                                          BoxShadow(
+                                              color: accent.withOpacity(.55),
+                                              blurRadius: 24,
+                                              spreadRadius: 4)
+                                        ]),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(16),
+                                      child: SvgPicture.asset(
+                                          'assets/icons/microphone.svg',
+                                          colorFilter: const ColorFilter.mode(
+                                              Color(0xFF11151B),
+                                              BlendMode.srcIn)),
+                                    ),
                                   ),
-                                ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                Wrap(
-                  alignment: WrapAlignment.center,
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    for (var i = 0; i < parts.length; i++)
-                      _SoundPill(
-                        label: parts[i].roman.isNotEmpty
-                            ? parts[i].roman
-                            : parts[i].deva,
-                        active:
-                            heard.isNotEmpty &&
-                            heard.toLowerCase().contains(
+                  Text(
+                      takeLocked
+                          ? 'Take saved on this device'
+                          : 'Hold to speak',
+                      style: TextStyle(
+                          color: takeLocked ? Colors.white : Colors.white60,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: .7)),
+                  if (heard.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    Text(heard,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 13,
+                            fontStyle: FontStyle.italic)),
+                  ],
+                  const SizedBox(height: 12),
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 7,
+                    runSpacing: 7,
+                    children: [
+                      for (var i = 0; i < parts.length; i++)
+                        _SoundPill(
+                          label: parts[i].roman.isNotEmpty
+                              ? parts[i].roman
+                              : parts[i].deva,
+                          active: heard.toLowerCase().contains(
                               (parts[i].roman.isNotEmpty
                                       ? parts[i].roman
                                       : parts[i].deva)
-                                  .toLowerCase(),
-                            ),
-                      ),
-                  ],
-                ),
-                if (heard.isNotEmpty) ...[
-                  const SizedBox(height: 10),
-                  Text(
-                    matched ? '✓' : '•',
-                    style: TextStyle(
-                      color: matched ? Colors.white : Colors.white38,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                    ),
+                                  .toLowerCase()),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  _MouthCard(word: word, matched: matched),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextButton.icon(
+                          onPressed: onReplay,
+                          icon: const Icon(Icons.replay_rounded, size: 17),
+                          label: const Text('Replay reference')),
+                      const SizedBox(width: 8),
+                      TextButton.icon(
+                          onPressed: onClose,
+                          icon: const Icon(Icons.keyboard_arrow_down_rounded,
+                              size: 18),
+                          label: const Text('Now Playing')),
+                    ],
                   ),
                 ],
-                const SizedBox(height: 4),
-                GestureDetector(
-                  onTap: onReplay,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: Text(
-                      busy ? '' : 'tap to hear again',
-                      style: const TextStyle(
-                        color: Colors.white38,
-                        fontSize: 10,
-                        letterSpacing: 1.1,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _Timeline extends StatelessWidget {
+  const _Timeline({required this.elapsed, required this.accent});
+  final int elapsed;
+  final Color accent;
+  @override
+  Widget build(BuildContext context) {
+    return LinearProgressIndicator(
+      value: elapsed / 29,
+      minHeight: 3,
+      backgroundColor: Colors.white12,
+      valueColor: AlwaysStoppedAnimation<Color>(accent),
+      borderRadius: BorderRadius.circular(99),
+    );
+  }
+}
+
+class _MouthCard extends StatelessWidget {
+  const _MouthCard({required this.word, required this.matched});
+  final Word word;
+  final bool matched;
+  @override
+  Widget build(BuildContext context) {
+    final hint = word.mouthPos.isNotEmpty
+        ? word.mouthPos
+        : (word.tip.isNotEmpty
+            ? word.tip
+            : 'Relax the jaw and let the sound resonate.');
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+          color: Colors.white.withOpacity(.06),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: Colors.white.withOpacity(.1))),
+      child: Row(
+        children: [
+          Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(.1),
+                  borderRadius: BorderRadius.circular(13)),
+              child: const Icon(Icons.face_retouching_natural_outlined,
+                  color: Colors.white70)),
+          const SizedBox(width: 10),
+          Expanded(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                Text(matched ? 'Sound matched' : 'Mouth shape',
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800)),
+                const SizedBox(height: 3),
+                Text(hint,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        color: Colors.white54, fontSize: 11, height: 1.25)),
+              ])),
+        ],
       ),
     );
   }
@@ -394,29 +571,22 @@ class _SoundPill extends StatelessWidget {
   const _SoundPill({required this.label, required this.active});
   final String label;
   final bool active;
-
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 260),
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 9),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-        color: active ? Colors.white : const Color(0xFF090A0D),
-        borderRadius: BorderRadius.circular(99),
-        border: Border.all(color: Colors.white.withOpacity(active ? .75 : .16)),
-        boxShadow: active
-            ? [BoxShadow(color: Colors.white.withOpacity(.12), blurRadius: 18)]
-            : null,
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: active ? Colors.black : Colors.white,
-          fontSize: 13,
-          fontWeight: FontWeight.w700,
-          letterSpacing: .4,
-        ),
-      ),
+          color: active ? Colors.white : const Color(0xFF090A0D),
+          borderRadius: BorderRadius.circular(99),
+          border:
+              Border.all(color: Colors.white.withOpacity(active ? .75 : .16))),
+      child: Text(label,
+          style: TextStyle(
+              color: active ? Colors.black : Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              letterSpacing: .3)),
     );
   }
 }
@@ -425,135 +595,110 @@ class _SmallButton extends StatelessWidget {
   const _SmallButton({required this.icon, required this.onTap});
   final IconData icon;
   final VoidCallback onTap;
-
   @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 38,
-        height: 38,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: Colors.white.withOpacity(.06),
-          border: Border.all(color: Colors.white.withOpacity(.12)),
-        ),
-        child: Icon(icon, color: Colors.white70, size: 19),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => GestureDetector(
+        onTap: onTap,
+        child: Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(.06),
+                border: Border.all(color: Colors.white.withOpacity(.12))),
+            child: Icon(icon, color: Colors.white70, size: 19)),
+      );
 }
 
 class _OrbPainter extends CustomPainter {
   const _OrbPainter({required this.progress, required this.accent});
-
   final double progress;
   final Color accent;
-
   @override
   void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = math.min(size.width, size.height) * .42;
-    final sphere = Rect.fromCircle(center: center, radius: radius);
-
-    canvas.drawCircle(
-      center,
-      radius,
-      Paint()
-        ..shader = RadialGradient(
-          center: const Alignment(-.25, -.35),
-          radius: 1.05,
-          colors: [
-            Colors.white.withOpacity(.98),
-            accent.withOpacity(.64),
-            const Color(0xFF15171B),
-            Colors.black,
-          ],
-          stops: const [.02, .27, .62, 1],
-        ).createShader(sphere),
-    );
-
+    final c = Offset(size.width / 2, size.height / 2);
+    final r = math.min(size.width, size.height) * .42;
+    final sphere = Rect.fromCircle(center: c, radius: r);
     canvas.save();
-    canvas.clipPath(Path()..addOval(sphere));
-    for (var x = -radius; x <= radius; x += 3.5) {
-      final width = math.sqrt(math.max(0, radius * radius - x * x));
-      final wave = math.sin(progress * math.pi * 2 + x / radius * math.pi * 2);
-      final bend = wave * 3.4;
-      final light = (.5 + .5 * math.cos(x / radius * math.pi)).clamp(0.0, 1.0);
-      final opacity = (.12 + light * .78).clamp(0.0, 1.0);
-      canvas.drawLine(
-        Offset(center.dx + x + bend, center.dy - width),
-        Offset(center.dx + x - bend, center.dy + width),
+    canvas.translate(c.dx, c.dy);
+    canvas.rotate(-.12);
+    canvas.translate(-c.dx, -c.dy);
+    canvas.drawOval(
+        sphere,
         Paint()
-          ..color = Colors.white.withOpacity(opacity)
-          ..strokeWidth = .9 + light * 1.4
-          ..strokeCap = StrokeCap.round,
-      );
+          ..shader = RadialGradient(
+            center: const Alignment(-.25, -.35),
+            radius: 1.05,
+            colors: [
+              Colors.white.withOpacity(.98),
+              accent.withOpacity(.64),
+              const Color(0xFF15171B),
+              Colors.black
+            ],
+            stops: const [.02, .27, .62, 1],
+          ).createShader(sphere));
+    canvas.clipPath(Path()..addOval(sphere));
+    for (var x = -r; x <= r; x += 3.5) {
+      final width = math.sqrt(math.max(0, r * r - x * x));
+      final wave = math.sin(progress * math.pi * 2 + x / r * math.pi * 2);
+      final bend = wave * 4.5;
+      final light = (.5 + .5 * math.cos(x / r * math.pi)).clamp(0.0, 1.0);
+      canvas.drawLine(
+          Offset(c.dx + x + bend, c.dy - width),
+          Offset(c.dx + x - bend, c.dy + width),
+          Paint()
+            ..color = Colors.white.withOpacity(.12 + light * .75)
+            ..strokeWidth = .9 + light * 1.4
+            ..strokeCap = StrokeCap.round);
     }
     canvas.restore();
-
-    canvas.drawCircle(
-      Offset(center.dx - radius * .28, center.dy - radius * .34),
-      radius * .12,
-      Paint()..color = Colors.white.withOpacity(.32),
-    );
   }
 
   @override
-  bool shouldRepaint(covariant _OrbPainter oldDelegate) =>
-      oldDelegate.progress != progress || oldDelegate.accent != accent;
+  bool shouldRepaint(covariant _OrbPainter old) =>
+      old.progress != progress || old.accent != accent;
 }
 
 class _LiquidPulsePainter extends CustomPainter {
   const _LiquidPulsePainter({required this.progress, required this.accent});
   final double progress;
   final Color accent;
-
   @override
   void paint(Canvas canvas, Size size) {
     final c = Offset(size.width / 2, size.height / 2);
-    final maxRadius = math.min(size.width, size.height) * .46;
-
-    for (var i = 0; i < 9; i++) {
-      final t = (progress + i / 9) % 1.0;
-      final radius = 48 + t * maxRadius;
+    final maxR = math.min(size.width, size.height) * .46;
+    for (var i = 0; i < 11; i++) {
+      final t = (progress + i / 11) % 1.0;
+      final radius = 48 + t * maxR;
       final fade = math.pow(1 - t, 1.45).toDouble();
       final path = Path();
       for (var a = 0.0; a <= math.pi * 2 + .08; a += .08) {
         final wave =
-            math.sin(a * 3 + progress * math.pi * 2) * (1.2 + 3.5 * (1 - t));
-        final rr = radius + wave;
-        final p = Offset(
-          c.dx + math.cos(a) * rr,
-          c.dy + math.sin(a) * rr * .64,
-        );
-        if (a == 0) {
+            math.sin(a * 3 + progress * math.pi * 2) * (1.4 + 4 * (1 - t));
+        final p = Offset(c.dx + math.cos(a) * (radius + wave),
+            c.dy + math.sin(a) * (radius + wave) * .62);
+        if (a == 0)
           path.moveTo(p.dx, p.dy);
-        } else {
+        else
           path.lineTo(p.dx, p.dy);
-        }
       }
       canvas.drawPath(
-        path,
-        Paint()
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 1.1 + fade * 1.8
-          ..color = Color.lerp(
-            Colors.white,
-            accent,
-            .35,
-          )!.withOpacity(.025 + fade * .18),
-      );
+          path,
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 1.1 + fade * 1.9
+            ..color = Color.lerp(Colors.white, accent, .35)!
+                .withOpacity(.025 + fade * .2));
     }
-
-    final glow = Paint()
-      ..shader = RadialGradient(
-        colors: [accent.withOpacity(.16), Colors.transparent],
-      ).createShader(Rect.fromCircle(center: c, radius: 62));
-    canvas.drawCircle(c, 62, glow);
+    canvas.drawCircle(
+        c,
+        64,
+        Paint()
+          ..shader = RadialGradient(
+            colors: [accent.withOpacity(.18), Colors.transparent],
+          ).createShader(Rect.fromCircle(center: c, radius: 64)));
   }
 
   @override
-  bool shouldRepaint(covariant _LiquidPulsePainter oldDelegate) =>
-      oldDelegate.progress != progress || oldDelegate.accent != accent;
+  bool shouldRepaint(covariant _LiquidPulsePainter old) =>
+      old.progress != progress || old.accent != accent;
 }
