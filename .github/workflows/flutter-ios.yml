@@ -40,10 +40,10 @@ jobs:
           cd flutter_app
           flutter analyze --no-fatal-infos --no-fatal-warnings
           flutter build ios --debug --config-only --no-codesign
-          xcodebuild -workspace ios/Runner.xcworkspace -scheme Runner -configuration Debug -sdk iphoneos CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build
+          xcodebuild -workspace ios/Runner.xcworkspace -scheme Runner -configuration Debug -sdk iphoneos -derivedDataPath build/ios CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build
       - name: Upload unsigned iOS application bundle for inspection
         uses: actions/upload-artifact@v4
         with:
           name: nowssb-flutter-ios-unsigned-app
-          path: flutter_app/build/ios/iphoneos/Runner.app
+          path: flutter_app/build/ios/Build/Products/Debug-iphoneos/Runner.app
           if-no-files-found: error
