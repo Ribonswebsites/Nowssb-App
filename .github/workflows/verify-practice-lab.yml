@@ -32,6 +32,13 @@ jobs:
         working-directory: flutter_app
         run: flutter analyze --no-fatal-infos --no-fatal-warnings lib/screens/practice_player.dart lib/screens/practice_overlay.dart
 
+      - name: Create the Android project
+        working-directory: flutter_app
+        run: flutter create --platforms=android --org com.nowssb --project-name nowssb .
+
+      - name: Configure the Android project
+        run: node tools/flutter-android.mjs
+
       - name: Build debug APK
         working-directory: flutter_app
         run: flutter build apk --debug
