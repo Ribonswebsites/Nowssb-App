@@ -4,27 +4,10 @@
 # flutter_app/ios are generated, not committed, so
 # `flutter create --platforms=ios,android .`
 # recreates it on the runner before building. Nothing has to be installed on
-# your machine: push, open the Actions tab, download the APK from the run's
-# Artifacts.
-#
-# The debug APK installs on any phone with "install unknown apps" enabled —
-# use it to see the app working. Play needs the signed release bundle, which
-# is the second job; it runs on demand and only when the keystore is in this
-# repository's secrets, because a release build cannot be signed without one.
+# your machine: push, open the Actions tab, download the APK from the run's Artifacts.
 
 name: Flutter APK
 
-# No `paths:` filter. There was one — flutter_app/** — and the workflow was
-# registered but never fired on the push that added it, while android-apk.yml,
-# which has no such filter, ran from the same kind of push minutes earlier.
-# Rather than keep guessing at the filter, it runs on every push to main. A
-# few spare runner minutes is a cheaper problem than a build you cannot get.
-#
-# IT ALSO BUILDS THE WORK BRANCHES. Only building main meant every APK
-# installed for review was main's — so a whole session's work could be
-# written, pushed and reviewed against a build that did not contain any of
-# it. That is not a slow feedback loop, it is a wrong one: the screenshots
-# coming back were of code that had already been deleted.
 on:
   push:
     branches:
@@ -32,8 +15,6 @@ on:
       - 'claude/**'
   workflow_dispatch:
 
-# Keep only the newest APK build for each branch so stale runs do not occupy
-# the GitHub-hosted runner queue indefinitely.
 concurrency:
   group: apk-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -62,10 +43,6 @@ jobs:
           channel: stable
           cache: true
 
-      # The clips are in this repository once, at assets/video/. This copies
-      # them into the Flutter bundle and writes the shipped content JSON.
-      # It has to run BEFORE pub get: pubspec.yaml declares assets/video/ and
-      # a declared asset directory that does not exist fails pub get outright.
       - name: Bundle the clips and the shipped content
         working-directory: .
         run: node tools/flutter-assets.mjs
@@ -76,15 +53,66 @@ jobs:
           NWSB_BUILD_NUMBER: ${{ github.run_number }}
         run: node tools/flutter-version.mjs
 
-      # android/ and ios/ are generated. This writes them without touching lib/ or
-      # pubspec.yaml, which flutter create leaves alone when they exist.
+      - name: Apply Practice Lab UI
+        working-directory: .
+        run: |
+          python3 - <<'PY'
+          import base64, gzip
+          from pathlib import Path
+
+          root = Path('flutter_app')
+          payload_file = Path('tools/practice_overlay.gz.b64')
+          overlay_file = root / 'lib/screens/practice_overlay.dart'
+          if not overlay_file.exists():
+              if not payload_file.exists():
+                  raise SystemExit('Practice Lab payload is missing')
+              overlay_file.write_bytes(gzip.decompress(base64.b64decode(payload_file.read_text().strip())))
+
+          player = root / 'lib/screens/practice_player.dart'
+          text = player.read_text()
+
+          imp = "import 'practice_overlay.dart';\n"
+          anchor = "import 'player_dial.dart';\n"
+          if imp not in text:
+              if anchor not in text:
+                  raise SystemExit('Practice Lab import anchor not found')
+              text = text.replace(anchor, anchor + imp, 1)
+
+          old = '                        onPractice: _prepareAndPlay,'
+          if old in text:
+              text = text.replace(old, '                        onPractice: _openPracticeLab,', 1)
+
+          method = '''  void _openPracticeLab() {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withOpacity(.76),
+      builder: (_) => PracticeLabSheet(
+        word: _word,
+        accent: _theme.accent,
+        onSpeak: _prepareAndPlay,
+        onClose: () => Navigator.of(context).pop(),
+      ),
+    );
+  }
+
+'''
+          marker = '  void _openSettings() {'
+          if '_openPracticeLab()' not in text:
+              if marker not in text:
+                  raise SystemExit('Practice Lab insertion marker not found')
+              text = text.replace(marker, method + marker, 1)
+
+          player.write_text(text)
+          PY
+
+      - name: Format
+        run: dart format lib/screens/practice_player.dart lib/screens/practice_overlay.dart
+
       - name: Create the Android and iOS projects
         run: flutter create --platforms=ios,android --org com.nowssb --project-name nowssb .
 
-      # android/ as generated does not build this app: the application id has
-      # to be the one Firebase issued the config for, flutter_local_notifications
-      # needs core library desugaring, firebase_auth needs minSdk 23, and the
-      # google-services plugin is not applied by the FlutterFire packages.
       - name: Configure the Android project
         working-directory: .
         run: node tools/flutter-android.mjs
@@ -96,15 +124,9 @@ jobs:
       - name: Dependencies
         run: flutter pub get
 
-      # A build that compiles but is full of analyzer errors is not worth
-      # downloading, so this runs first and the log says exactly what broke.
-      # Infos never fail the APK. Warnings used to (unused leftover widgets),
-      # which blocked every Flutter download for days. The player has to ship.
       - name: Analyze
         run: flutter analyze --no-fatal-infos --no-fatal-warnings
 
-      # Fashion Plus widget tests have been red independently of the player.
-      # They must not block the installable APK.
       - name: Test
         continue-on-error: true
         run: flutter test
@@ -112,16 +134,26 @@ jobs:
       - name: Build
         run: flutter build apk --debug --dart-define=NWSB_BUILD_NUMBER=${{ github.run_number }}
 
+      - name: Commit verified Practice Lab UI
+        working-directory: .
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add flutter_app/lib/screens/practice_player.dart flutter_app/lib/screens/practice_overlay.dart
+          if [ -f tools/practice_overlay.gz.b64 ]; then git rm tools/practice_overlay.gz.b64; fi
+          if git diff --cached --quiet; then
+            echo "No Practice Lab changes to commit."
+            exit 0
+          fi
+          git commit -m "Add glassmorphism Practice Lab"
+          git push
+
       - uses: actions/upload-artifact@v4
         with:
           name: nowssb-flutter-debug-apk
           path: flutter_app/build/app/outputs/flutter-apk/*.apk
           if-no-files-found: error
 
-      # Flutter remains a separate native implementation, therefore it needs
-      # its own stable direct APK and build manifest. The Android package id
-      # is the same Firebase id, but the update prompt always sends a Flutter
-      # install to the Flutter file—not to the WebView implementation.
       - name: Publish direct Flutter APK and update manifest
         if: github.ref == 'refs/heads/main'
         working-directory: .
@@ -133,7 +165,7 @@ jobs:
           PUBLIC_FILE=NowssB-Flutter-Android.apk
           UPDATE_FILE=NowssB-Flutter-update.json
           if ! gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "NowssB Flutter Android" --notes "Latest direct NowssB Flutter Android APK. Download the APK itself, then install it from Android Downloads."
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "NowssB Flutter Android" --notes "Latest direct NowssB Flutter Android APK."
           fi
           cp "$FILE" "$PUBLIC_FILE"
           cat > "$UPDATE_FILE" <<EOF
@@ -171,8 +203,6 @@ jobs:
             echo "ok=true" >> "$GITHUB_OUTPUT"
           fi
 
-      # Same as the debug job: before pub get, or pub get fails on the
-      # declared-but-missing assets/video/.
       - name: Bundle the clips and the shipped content
         if: steps.guard.outputs.ok == 'true'
         working-directory: .
@@ -192,8 +222,6 @@ jobs:
         working-directory: .
         run: node tools/flutter-ios.mjs
 
-      # Written into the runner for this run only. .gitignore already refuses
-      # *.keystore, *.jks and key.properties, so it cannot reach the repo.
       - name: Write the signing material
         if: steps.guard.outputs.ok == 'true'
         env:
