@@ -5,6 +5,10 @@
 /// windows here as `getTimeSlot` in app/js/part037.js, and the words are
 /// filtered by the `time` field every word already carries — which is the
 /// point of having ported the model rather than a list of names.
+///
+/// The player owns the glassmorphism Practice Lab entry point; keeping this
+/// screen focused on session selection means the Lab opens over the player
+/// with its live blur, word breakdown, and sound-ripple experience intact.
 library;
 
 import 'package:flutter/material.dart';
