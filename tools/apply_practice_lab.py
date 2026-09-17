@@ -37,6 +37,7 @@ method = '''  void _openPracticeLab() {
       builder: (_) => PracticeLabSheet(
         word: _word,
         accent: _theme.accent,
+        video: _theme.video,
         onSpeak: _prepareAndPlay,
         onClose: () => Navigator.of(context).pop(),
       ),
