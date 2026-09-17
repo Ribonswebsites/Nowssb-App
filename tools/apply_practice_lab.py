@@ -1,4 +1,5 @@
 # Idempotent Practice Lab materializer used by the verified Flutter build.
+# Trigger marker: practice-build-v2
 import base64
 import gzip
 from pathlib import Path
