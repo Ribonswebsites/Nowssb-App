@@ -1,15 +1,23 @@
-/// Glassmorphism practice lab opened from the NowssB player.
+/// Premium Practice tab opened from the NowssB player.
 ///
-/// This is intentionally a sheet rather than a separate route so the player
-/// remains visible underneath a real-time blur while the user drills one word.
+/// The reference track is played first, then the microphone session begins.
+/// The microphone is intentionally represented only by the visual language of
+/// the product: a white mic orb, liquid-glass shell and pulse field. There is
+/// no "recording" label, red dot, waveform or recorder chrome.
+library;
 
+import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:record/record.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 import '../data/models.dart';
+import '../media/nwsb_video.dart';
 
 class PracticeLabSheet extends StatefulWidget {
   const PracticeLabSheet({
@@ -17,7 +25,7 @@ class PracticeLabSheet extends StatefulWidget {
     required this.word,
     required this.onSpeak,
     required this.onClose,
-    this.accent = const Color(0xFFE8D5A3),
+    this.accent = const Color(0xFFB8C9FF),
   });
 
   final Word word;
@@ -31,731 +39,483 @@ class PracticeLabSheet extends StatefulWidget {
 
 class _PracticeLabSheetState extends State<PracticeLabSheet>
     with TickerProviderStateMixin {
-  late final AnimationController _ripple;
+  final AudioRecorder _recorder = AudioRecorder();
+  final stt.SpeechToText _speech = stt.SpeechToText();
+  late final AnimationController _pulse;
   late final AnimationController _entry;
-  var _activePart = 0;
-  var _showScience = true;
+
+  String _heard = '';
+  bool _speechReady = false;
+  bool _busy = true;
+  bool _matched = false;
+  String? _recordedPath;
 
   @override
   void initState() {
     super.initState();
-    _ripple = AnimationController(
+    _pulse = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2600),
+      duration: const Duration(milliseconds: 2200),
     )..repeat();
     _entry = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 700),
+      duration: const Duration(milliseconds: 520),
     )..forward();
+    unawaited(_beginPractice());
   }
 
   @override
   void dispose() {
-    _ripple.dispose();
+    unawaited(_finishCapture());
+    _pulse.dispose();
     _entry.dispose();
+    _recorder.dispose();
     super.dispose();
+  }
+
+  Future<void> _beginPractice() async {
+    // The reference audio remains whatever the player supplies. Nothing in
+    // this UI assumes the current TTS placeholder will be the shipped audio.
+    try {
+      await widget.onSpeak();
+    } catch (_) {}
+
+    if (!mounted) return;
+    await _startCapture();
+  }
+
+  Future<void> _startCapture() async {
+    try {
+      final permitted = await _recorder.hasPermission();
+      if (!permitted) {
+        if (mounted) setState(() => _busy = false);
+        return;
+      }
+
+      final dir = await getTemporaryDirectory();
+      final file = '${dir.path}/nwsb-practice-${DateTime.now().millisecondsSinceEpoch}.m4a';
+      _recordedPath = await _recorder.start(
+        const RecordConfig(
+          encoder: AudioEncoder.aacLc,
+          bitRate: 96000,
+          sampleRate: 44100,
+          numChannels: 1,
+          autoGain: true,
+          echoCancel: true,
+          noiseSuppress: true,
+        ),
+        path: file,
+      );
+
+      _speechReady = await _speech.initialize(
+        onStatus: (status) {
+          if (!mounted) return;
+          if (status == 'done' || status == 'notListening') {
+            unawaited(_finishCapture());
+          }
+        },
+        onError: (_) {},
+      );
+
+      if (_speechReady) {
+        await _speech.listen(
+          onResult: (result) {
+            if (!mounted) return;
+            final heard = result.recognizedWords.trim();
+            if (heard.isEmpty) return;
+            setState(() {
+              _heard = heard;
+              _matched = _similarEnough(heard, widget.word.word);
+            });
+          },
+          listenOptions: const stt.SpeechListenOptions(
+            partialResults: true,
+            cancelOnError: false,
+            autoPunctuation: false,
+            listenFor: Duration(seconds: 9),
+            pauseFor: Duration(seconds: 2),
+          ),
+        );
+      }
+      if (mounted) setState(() => _busy = false);
+    } catch (_) {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _finishCapture() async {
+    try {
+      if (_speechReady && _speech.isListening) await _speech.stop();
+    } catch (_) {}
+    try {
+      if (await _recorder.isRecording()) {
+        await _recorder.stop();
+      }
+    } catch (_) {}
+  }
+
+  bool _similarEnough(String heard, String target) {
+    final a = heard.toLowerCase().replaceAll(RegExp(r'[^a-z0-9 ]'), '').trim();
+    final b = target.toLowerCase().replaceAll(RegExp(r'[^a-z0-9 ]'), '').trim();
+    if (a.isEmpty || b.isEmpty) return false;
+    if (a == b) return true;
+    final heardWords = a.split(RegExp(r'\s+'));
+    return heardWords.any((w) => w == b) || a.contains(b);
   }
 
   List<WordPart> get _parts => widget.word.parts;
 
   @override
   Widget build(BuildContext context) {
-    final bottom = MediaQuery.viewInsetsOf(context).bottom;
-    return ClipRRect(
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(36)),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 28, sigmaY: 28),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: const Color(0xF20A0B0E),
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(36)),
-            border: Border.all(color: Colors.white.withOpacity(.14)),
-            boxShadow: [
-              BoxShadow(
-                color: widget.accent.withOpacity(.12),
-                blurRadius: 50,
-                spreadRadius: -8,
+    return Material(
+      color: Colors.transparent,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          const Positioned.fill(
+            child: IgnorePointer(
+              child: Opacity(
+                opacity: .92,
+                child: NwsbVideo(
+                  asset: 'assets/video/player-bg-loop.mp4',
+                  fit: BoxFit.cover,
+                  priority: ClipPriority.feature,
+                  autoplay: true,
+                  loop: true,
+                  showPoster: false,
+                ),
               ),
-            ],
+            ),
           ),
-          child: SafeArea(
-            top: false,
-            child: AnimatedBuilder(
-              animation: _entry,
-              builder: (context, child) => Transform.translate(
-                offset: Offset(0, 28 * (1 - _entry.value)),
-                child: Opacity(opacity: _entry.value, child: child),
-              ),
-              child: SingleChildScrollView(
-                padding: EdgeInsets.fromLTRB(18, 12, 18, 24 + bottom),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Center(
-                      child: Container(
-                        width: 42,
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(.24),
-                          borderRadius: BorderRadius.circular(99),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    _topBar(),
-                    const SizedBox(height: 12),
-                    _hero(),
-                    const SizedBox(height: 14),
-                    _wordIdentity(),
-                    const SizedBox(height: 14),
-                    _partBreakdown(),
-                    const SizedBox(height: 14),
-                    _scienceCard(),
-                    const SizedBox(height: 14),
-                    _practiceControls(),
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withOpacity(.34),
+                    Colors.black.withOpacity(.60),
+                    Colors.black.withOpacity(.78),
                   ],
                 ),
               ),
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _topBar() {
-    return Row(
-      children: [
-        const Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'PRACTICE LAB',
-                style: TextStyle(
-                  color: Color(0xFF9C9CA2),
-                  fontSize: 10,
-                  letterSpacing: 2.8,
-                  fontWeight: FontWeight.w700,
+          SafeArea(
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: AnimatedBuilder(
+                animation: _entry,
+                builder: (context, child) => Transform.translate(
+                  offset: Offset(0, 70 * (1 - _entry.value)),
+                  child: Opacity(opacity: _entry.value, child: child),
+                ),
+                child: _PracticeTab(
+                  word: widget.word,
+                  parts: _parts,
+                  accent: widget.accent,
+                  pulse: _pulse,
+                  heard: _heard,
+                  busy: _busy,
+                  matched: _matched,
+                  onClose: widget.onClose,
+                  onReplay: () => unawaited(_beginPractice()),
                 ),
               ),
-              SizedBox(height: 3),
-              Text(
-                'Sound • Breath • Meaning',
-                style: TextStyle(
-                  color: Color(0xFFF5F5F7),
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ),
-        _CircleButton(icon: Icons.close_rounded, onTap: widget.onClose),
-      ],
-    );
-  }
-
-  Widget _hero() {
-    return Container(
-      height: 246,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(30),
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF18212A), Color(0xFF07080B)],
-        ),
-        border: Border.all(color: Colors.white.withOpacity(.13)),
-      ),
-      clipBehavior: Clip.hardEdge,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Positioned.fill(
-            child: CustomPaint(
-              painter: _AmbientLinesPainter(progress: _ripple.value),
-            ),
-          ),
-          AnimatedBuilder(
-            animation: _ripple,
-            builder: (context, _) => CustomPaint(
-              size: const Size(230, 230),
-              painter: _RipplePainter(progress: _ripple.value),
-              child: SizedBox(
-                width: 126,
-                height: 126,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: widget.accent.withOpacity(.20),
-                        blurRadius: 34,
-                        spreadRadius: 2,
-                      ),
-                    ],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(26),
-                    child: SvgPicture.asset(
-                      'assets/icons/icon_01.svg',
-                      fit: BoxFit.contain,
-                      colorFilter: const ColorFilter.mode(
-                        Color(0xFF111217),
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            left: 18,
-            top: 16,
-            child: _GlassLabel(
-              icon: Icons.graphic_eq_rounded,
-              text: 'LIVE RIPPLE',
-            ),
-          ),
-          Positioned(
-            right: 18,
-            bottom: 16,
-            child: _GlassLabel(
-              icon: Icons.waves_rounded,
-              text: '${_parts.length} PARTS',
             ),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _wordIdentity() {
-    final meaning = widget.word.meaning.trim();
-    final organ = widget.word.organ.trim();
-    final deva = widget.word.deva.trim();
-    return _GlassCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Expanded(
-                child: Text(
-                  widget.word.word,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 34,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -1.2,
-                    height: 1,
-                  ),
-                ),
-              ),
-              if (deva.isNotEmpty)
-                Text(
-                  deva,
-                  style: TextStyle(
-                    color: widget.accent,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              if (organ.isNotEmpty) _MetaPill(label: organ.toUpperCase()),
-              if (organ.isNotEmpty && meaning.isNotEmpty)
-                const SizedBox(width: 8),
-              if (meaning.isNotEmpty)
-                Expanded(
-                  child: Text(
-                    meaning,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Color(0xB8FFFFFF),
-                      fontSize: 13,
-                      height: 1.35,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _partBreakdown() {
-    return _GlassCard(
-      padding: const EdgeInsets.fromLTRB(14, 14, 14, 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const _SectionLabel(
-            label: 'WORD BREAKDOWN',
-            icon: Icons.account_tree_rounded,
-          ),
-          const SizedBox(height: 12),
-          if (_parts.isEmpty)
-            const Text(
-              'No syllable data available for this word.',
-              style: TextStyle(color: Colors.white54, fontSize: 12),
-            )
-          else
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (var i = 0; i < _parts.length; i++)
-                  GestureDetector(
-                    onTap: () => setState(() => _activePart = i),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 220),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 13,
-                        vertical: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        color: i == _activePart
-                            ? Colors.white
-                            : Colors.white.withOpacity(.055),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: i == _activePart
-                              ? Colors.white
-                              : Colors.white.withOpacity(.10),
-                        ),
-                      ),
-                      child: Text(
-                        _parts[i].roman.isNotEmpty
-                            ? _parts[i].roman
-                            : _parts[i].deva,
-                        style: TextStyle(
-                          color: i == _activePart ? Colors.black : Colors.white,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          if (_parts.isNotEmpty) ...[
-            const SizedBox(height: 14),
-            _detailRow('ACTIVE SOUND', _displayPart(_parts[_activePart])),
-            const SizedBox(height: 8),
-            _detailRow(
-              'HOLD',
-              '${_parts[_activePart].hold.toStringAsFixed(1)} sec',
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  String _displayPart(WordPart part) {
-    if (part.roman.isNotEmpty && part.deva.isNotEmpty) {
-      return '${part.roman}  ·  ${part.deva}';
-    }
-    return part.roman.isNotEmpty ? part.roman : part.deva;
-  }
-
-  Widget _scienceCard() {
-    final tip = widget.word.tip.trim();
-    return _GlassCard(
-      padding: EdgeInsets.zero,
-      child: Column(
-        children: [
-          InkWell(
-            onTap: () => setState(() => _showScience = !_showScience),
-            borderRadius: BorderRadius.circular(22),
-            child: Padding(
-              padding: const EdgeInsets.all(15),
-              child: Row(
-                children: [
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: widget.accent.withOpacity(.12),
-                      border: Border.all(color: widget.accent.withOpacity(.28)),
-                    ),
-                    child: Icon(
-                      Icons.spa_rounded,
-                      color: widget.accent,
-                      size: 18,
-                    ),
-                  ),
-                  const SizedBox(width: 11),
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'WHY THIS SOUND',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 1.1,
-                          ),
-                        ),
-                        SizedBox(height: 3),
-                        Text(
-                          'Pronunciation guidance & body focus',
-                          style: TextStyle(color: Colors.white54, fontSize: 11),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Icon(
-                    _showScience
-                        ? Icons.keyboard_arrow_up_rounded
-                        : Icons.keyboard_arrow_down_rounded,
-                    color: Colors.white54,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          if (_showScience)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(15, 0, 15, 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Divider(color: Color(0x14FFFFFF), height: 1),
-                  const SizedBox(height: 12),
-                  Text(
-                    tip.isEmpty
-                        ? 'Say the sound gently on the exhale. Let the final resonance settle before moving to the next part.'
-                        : tip,
-                    style: const TextStyle(
-                      color: Color(0xBFFFFFFF),
-                      fontSize: 12,
-                      height: 1.55,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-
-  Widget _practiceControls() {
-    return Row(
-      children: [
-        Expanded(
-          child: _ActionButton(
-            icon: Icons.replay_rounded,
-            label: 'REPLAY',
-            onTap: () => widget.onSpeak(),
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          flex: 2,
-          child: _ActionButton(
-            icon: Icons.graphic_eq_rounded,
-            label: 'PRACTICE SOUND',
-            filled: true,
-            onTap: () => widget.onSpeak(),
-          ),
-        ),
-      ],
     );
   }
 }
 
-class _RipplePainter extends CustomPainter {
-  const _RipplePainter({required this.progress});
+class _PracticeTab extends StatelessWidget {
+  const _PracticeTab({
+    required this.word,
+    required this.parts,
+    required this.accent,
+    required this.pulse,
+    required this.heard,
+    required this.busy,
+    required this.matched,
+    required this.onClose,
+    required this.onReplay,
+  });
+
+  final Word word;
+  final List<WordPart> parts;
+  final Color accent;
+  final Animation<double> pulse;
+  final String heard;
+  final bool busy;
+  final bool matched;
+  final VoidCallback onClose;
+  final VoidCallback onReplay;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(34),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 32, sigmaY: 32),
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 520),
+            padding: const EdgeInsets.fromLTRB(18, 12, 18, 18),
+            decoration: BoxDecoration(
+              color: const Color(0xB80A0B0E),
+              borderRadius: BorderRadius.circular(34),
+              border: Border.all(color: Colors.white.withOpacity(.18)),
+              boxShadow: [
+                BoxShadow(
+                  color: accent.withOpacity(.18),
+                  blurRadius: 70,
+                  spreadRadius: -18,
+                ),
+                const BoxShadow(
+                  color: Colors.black54,
+                  blurRadius: 36,
+                  offset: Offset(0, 18),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 38,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(.28),
+                    borderRadius: BorderRadius.circular(99),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    const Expanded(
+                      child: Text(
+                        'PRACTICE',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 2.5,
+                        ),
+                      ),
+                    ),
+                    _SmallButton(icon: Icons.close_rounded, onTap: onClose),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  word.word,
+                  style: const TextStyle(
+                    color: Color(0xCCFFFFFF),
+                    fontSize: 12,
+                    letterSpacing: 2.2,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  height: 146,
+                  child: AnimatedBuilder(
+                    animation: pulse,
+                    builder: (context, _) => CustomPaint(
+                      painter: _LiquidPulsePainter(
+                        progress: pulse.value,
+                        accent: accent,
+                      ),
+                      child: Center(
+                        child: Container(
+                          width: 92,
+                          height: 92,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.white.withOpacity(.42),
+                                blurRadius: 30,
+                                spreadRadius: 1,
+                              ),
+                              BoxShadow(
+                                color: accent.withOpacity(.35),
+                                blurRadius: 54,
+                                spreadRadius: 4,
+                              ),
+                            ],
+                          ),
+                          padding: const EdgeInsets.all(27),
+                          child: SvgPicture.asset(
+                            'assets/icons/microphone.svg',
+                            fit: BoxFit.contain,
+                            colorFilter: const ColorFilter.mode(
+                              Color(0xFF090A0D),
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (var i = 0; i < parts.length; i++)
+                      _SoundPill(
+                        label: parts[i].roman.isNotEmpty
+                            ? parts[i].roman
+                            : parts[i].deva,
+                        active: heard.isNotEmpty &&
+                            heard.toLowerCase().contains(
+                              (parts[i].roman.isNotEmpty
+                                      ? parts[i].roman
+                                      : parts[i].deva)
+                                  .toLowerCase(),
+                            ),
+                      ),
+                  ],
+                ),
+                if (heard.isNotEmpty) ...[
+                  const SizedBox(height: 10),
+                  Text(
+                    matched ? '✓' : '•',
+                    style: TextStyle(
+                      color: matched ? Colors.white : Colors.white38,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 4),
+                GestureDetector(
+                  onTap: onReplay,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Text(
+                      busy ? '' : 'tap to hear again',
+                      style: const TextStyle(
+                        color: Colors.white38,
+                        fontSize: 10,
+                        letterSpacing: 1.1,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SoundPill extends StatelessWidget {
+  const _SoundPill({required this.label, required this.active});
+  final String label;
+  final bool active;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 260),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 9),
+      decoration: BoxDecoration(
+        color: active ? Colors.white : const Color(0xFF090A0D),
+        borderRadius: BorderRadius.circular(99),
+        border: Border.all(color: Colors.white.withOpacity(active ? .75 : .16)),
+        boxShadow: active
+            ? [BoxShadow(color: Colors.white.withOpacity(.12), blurRadius: 18)]
+            : null,
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: active ? Colors.black : Colors.white,
+          fontSize: 13,
+          fontWeight: FontWeight.w700,
+          letterSpacing: .4,
+        ),
+      ),
+    );
+  }
+}
+
+class _SmallButton extends StatelessWidget {
+  const _SmallButton({required this.icon, required this.onTap});
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 38,
+        height: 38,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.white.withOpacity(.06),
+          border: Border.all(color: Colors.white.withOpacity(.12)),
+        ),
+        child: Icon(icon, color: Colors.white70, size: 19),
+      ),
+    );
+  }
+}
+
+class _LiquidPulsePainter extends CustomPainter {
+  const _LiquidPulsePainter({required this.progress, required this.accent});
   final double progress;
+  final Color accent;
 
   @override
   void paint(Canvas canvas, Size size) {
     final c = Offset(size.width / 2, size.height / 2);
-    final base = size.shortestSide * .29;
-    for (var i = 0; i < 6; i++) {
-      final t = (progress + i / 6) % 1.0;
-      final radius = base + t * size.shortestSide * .40;
-      final opacity = (1 - t) * .25;
-      final paint = Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.2 + (1 - t) * 1.6
-        ..color = Colors.white.withOpacity(opacity);
-      canvas.drawOval(
-        Rect.fromCenter(
-          center: c,
-          width: radius * 2.0,
-          height: radius * (1.0 + .18 * math.sin(t * math.pi)),
-        ),
-        paint,
+    final maxRadius = math.min(size.width, size.height) * .46;
+
+    for (var i = 0; i < 9; i++) {
+      final t = (progress + i / 9) % 1.0;
+      final radius = 48 + t * maxRadius;
+      final fade = math.pow(1 - t, 1.45).toDouble();
+      final path = Path();
+      for (var a = 0.0; a <= math.pi * 2 + .08; a += .08) {
+        final wave = math.sin(a * 3 + progress * math.pi * 2) * (1.2 + 3.5 * (1 - t));
+        final rr = radius + wave;
+        final p = Offset(c.dx + math.cos(a) * rr, c.dy + math.sin(a) * rr * .64);
+        if (a == 0) {
+          path.moveTo(p.dx, p.dy);
+        } else {
+          path.lineTo(p.dx, p.dy);
+        }
+      }
+      canvas.drawPath(
+        path,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.1 + fade * 1.8
+          ..color = Color.lerp(Colors.white, accent, .35)!.withOpacity(.025 + fade * .18),
       );
     }
 
     final glow = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2
-      ..color = const Color(0xFFE8F5FF)
-          .withOpacity(.18 + .10 * math.sin(progress * math.pi * 2));
-    canvas.drawCircle(
-      c,
-      base * (1.06 + .04 * math.sin(progress * math.pi * 2)),
-      glow,
-    );
+      ..shader = RadialGradient(
+        colors: [accent.withOpacity(.16), Colors.transparent],
+      ).createShader(Rect.fromCircle(center: c, radius: 62));
+    canvas.drawCircle(c, 62, glow);
   }
 
   @override
-  bool shouldRepaint(covariant _RipplePainter oldDelegate) =>
-      oldDelegate.progress != progress;
-}
-
-class _AmbientLinesPainter extends CustomPainter {
-  const _AmbientLinesPainter({required this.progress});
-  final double progress;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1
-      ..color = Colors.white.withOpacity(.035);
-    for (var row = 0; row < 7; row++) {
-      final path = Path();
-      for (var x = -20.0; x <= size.width + 20; x += 8) {
-        final y =
-            size.height * (.25 + row * .08) +
-            math.sin(x / 38 + progress * math.pi * 2 + row) * (3 + row * .7);
-        if (x == -20) {
-          path.moveTo(x, y);
-        } else {
-          path.lineTo(x, y);
-        }
-      }
-      canvas.drawPath(path, paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _AmbientLinesPainter oldDelegate) =>
-      oldDelegate.progress != progress;
-}
-
-class _GlassCard extends StatelessWidget {
-  const _GlassCard({
-    required this.child,
-    this.padding = const EdgeInsets.all(16),
-  });
-  final Widget child;
-  final EdgeInsets padding;
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(22),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-        child: Container(
-          padding: padding,
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(.055),
-            borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: Colors.white.withOpacity(.105)),
-          ),
-          child: child,
-        ),
-      ),
-    );
-  }
-}
-
-class _CircleButton extends StatelessWidget {
-  const _CircleButton({required this.icon, required this.onTap});
-  final IconData icon;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) => GestureDetector(
-    onTap: onTap,
-    child: Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(.06),
-        shape: BoxShape.circle,
-        border: Border.all(color: Colors.white.withOpacity(.10)),
-      ),
-      child: Icon(icon, color: Colors.white70, size: 19),
-    ),
-  );
-}
-
-class _GlassLabel extends StatelessWidget {
-  const _GlassLabel({required this.icon, required this.text});
-  final IconData icon;
-  final String text;
-
-  @override
-  Widget build(BuildContext context) => DecoratedBox(
-    decoration: BoxDecoration(
-      color: Colors.black.withOpacity(.28),
-      borderRadius: BorderRadius.circular(99),
-      border: Border.all(color: Colors.white.withOpacity(.10)),
-    ),
-    child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 12, color: Colors.white70),
-          const SizedBox(width: 5),
-          Text(
-            text,
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 8.5,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 1.2,
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
-}
-
-class _MetaPill extends StatelessWidget {
-  const _MetaPill({required this.label});
-  final String label;
-
-  @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
-    decoration: BoxDecoration(
-      color: Colors.white.withOpacity(.07),
-      borderRadius: BorderRadius.circular(99),
-      border: Border.all(color: Colors.white.withOpacity(.10)),
-    ),
-    child: Text(
-      label,
-      style: const TextStyle(
-        color: Colors.white70,
-        fontSize: 8.5,
-        fontWeight: FontWeight.w800,
-        letterSpacing: 1.1,
-      ),
-    ),
-  );
-}
-
-class _SectionLabel extends StatelessWidget {
-  const _SectionLabel({required this.label, required this.icon});
-  final String label;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) => Row(
-    children: [
-      Icon(icon, size: 15, color: Colors.white54),
-      const SizedBox(width: 7),
-      Text(
-        label,
-        style: const TextStyle(
-          color: Colors.white60,
-          fontSize: 9,
-          fontWeight: FontWeight.w800,
-          letterSpacing: 1.7,
-        ),
-      ),
-    ],
-  );
-}
-
-class _detailRow extends StatelessWidget {
-  const _detailRow(this.label, this.value);
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) => Row(
-    children: [
-      SizedBox(
-        width: 100,
-        child: Text(
-          label,
-          style: const TextStyle(
-            color: Colors.white38,
-            fontSize: 8,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 1.4,
-          ),
-        ),
-      ),
-      Expanded(
-        child: Text(
-          value,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
-    ],
-  );
-}
-
-class _ActionButton extends StatelessWidget {
-  const _ActionButton({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-    this.filled = false,
-  });
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-  final bool filled;
-
-  @override
-  Widget build(BuildContext context) => GestureDetector(
-    onTap: onTap,
-    child: AnimatedContainer(
-      duration: const Duration(milliseconds: 180),
-      height: 54,
-      decoration: BoxDecoration(
-        color: filled ? Colors.white : Colors.white.withOpacity(.055),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.white.withOpacity(filled ? .9 : .12)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 18, color: filled ? Colors.black : Colors.white),
-          const SizedBox(width: 7),
-          Text(
-            label,
-            style: TextStyle(
-              color: filled ? Colors.black : Colors.white,
-              fontSize: 9,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 1.1,
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
+  bool shouldRepaint(covariant _LiquidPulsePainter oldDelegate) =>
+      oldDelegate.progress != progress || oldDelegate.accent != accent;
 }
