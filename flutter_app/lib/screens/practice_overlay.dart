@@ -11,6 +11,7 @@ import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
@@ -167,28 +168,41 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
   Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
-      child: SafeArea(
-        child: Align(
-          alignment: Alignment.center,
-          child: AnimatedBuilder(
-            animation: _entry,
-            builder: (context, child) => Transform.translate(
-              offset: Offset(0, 36 * (1 - _entry.value)),
-              child: Opacity(opacity: _entry.value, child: child),
-            ),
-            child: _PracticeTab(
-              word: widget.word,
-              parts: _parts,
-              accent: widget.accent,
-              pulse: _pulse,
-              heard: _heard,
-              busy: _busy,
-              matched: _matched,
-              onClose: widget.onClose,
-              onReplay: () => unawaited(_beginPractice()),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Positioned.fill(
+            child: IgnorePointer(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                child: ColoredBox(color: Color(0x22080B10)),
+              ),
             ),
           ),
-        ),
+          SafeArea(
+            child: Align(
+              alignment: Alignment.center,
+              child: AnimatedBuilder(
+                animation: _entry,
+                builder: (context, child) => Transform.translate(
+                  offset: Offset(0, 36 * (1 - _entry.value)),
+                  child: Opacity(opacity: _entry.value, child: child),
+                ),
+                child: _PracticeTab(
+                  word: widget.word,
+                  parts: _parts,
+                  accent: widget.accent,
+                  pulse: _pulse,
+                  heard: _heard,
+                  busy: _busy,
+                  matched: _matched,
+                  onClose: widget.onClose,
+                  onReplay: () => unawaited(_beginPractice()),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -229,7 +243,7 @@ class _PracticeTab extends StatelessWidget {
             constraints: const BoxConstraints(maxWidth: 430),
             padding: const EdgeInsets.fromLTRB(18, 14, 18, 16),
             decoration: BoxDecoration(
-              color: const Color(0xFF090A0C),
+              color: const Color(0xE20B0F14),
               borderRadius: BorderRadius.circular(28),
               border: Border.all(color: Colors.white.withOpacity(.14)),
               boxShadow: [
@@ -289,11 +303,30 @@ class _PracticeTab extends StatelessWidget {
                         accent: accent,
                       ),
                       child: Center(
-                        child: CustomPaint(
-                          size: const Size.square(104),
-                          painter: _OrbPainter(
-                            progress: pulse.value,
-                            accent: accent,
+                        child: SizedBox.square(
+                          dimension: 104,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              CustomPaint(
+                                size: const Size.square(104),
+                                painter: _OrbPainter(
+                                  progress: pulse.value,
+                                  accent: accent,
+                                ),
+                              ),
+                              SizedBox(
+                                width: 34,
+                                height: 42,
+                                child: SvgPicture.asset(
+                                  'assets/icons/microphone.svg',
+                                  colorFilter: const ColorFilter.mode(
+                                    Colors.white,
+                                    BlendMode.srcIn,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -311,14 +344,13 @@ class _PracticeTab extends StatelessWidget {
                         label: parts[i].roman.isNotEmpty
                             ? parts[i].roman
                             : parts[i].deva,
-                        active:
-                            heard.isNotEmpty &&
+                        active: heard.isNotEmpty &&
                             heard.toLowerCase().contains(
-                              (parts[i].roman.isNotEmpty
-                                      ? parts[i].roman
-                                      : parts[i].deva)
-                                  .toLowerCase(),
-                            ),
+                                  (parts[i].roman.isNotEmpty
+                                          ? parts[i].roman
+                                          : parts[i].deva)
+                                      .toLowerCase(),
+                                ),
                       ),
                   ],
                 ),
@@ -509,7 +541,8 @@ class _LiquidPulsePainter extends CustomPainter {
             Colors.white,
             accent,
             .35,
-          )!.withOpacity(.025 + fade * .18),
+          )!
+              .withOpacity(.025 + fade * .18),
       );
     }
 
