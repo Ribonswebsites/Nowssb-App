@@ -34,6 +34,8 @@ dependencies:
   flutter_tts: ^4.2.5
   flutter_svg: ^2.0.10
   google_fonts: ^6.2.1
+  record: ^5.2.1
+  speech_to_text: ^7.4.0
 
 dev_dependencies:
   flutter_test:
