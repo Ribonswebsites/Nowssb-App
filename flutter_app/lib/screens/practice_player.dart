@@ -33,6 +33,7 @@ import 'player_settings.dart';
 import 'sentence_builder.dart';
 import 'select_level.dart';
 import 'player_dial.dart';
+import 'practice_overlay.dart';
 import '../data/playback_session.dart';
 
 String _fmtClock(num sec) {
@@ -60,7 +61,11 @@ String _prettyTitle(String title) {
 }
 
 class PracticePlayerScreen extends StatefulWidget {
-  const PracticePlayerScreen({super.key, required this.words, required this.title});
+  const PracticePlayerScreen({
+    super.key,
+    required this.words,
+    required this.title,
+  });
 
   final List<Word> words;
   final String title;
@@ -69,7 +74,8 @@ class PracticePlayerScreen extends StatefulWidget {
   State<PracticePlayerScreen> createState() => _PracticePlayerScreenState();
 }
 
-class _PracticePlayerScreenState extends State<PracticePlayerScreen> with TickerProviderStateMixin {
+class _PracticePlayerScreenState extends State<PracticePlayerScreen>
+    with TickerProviderStateMixin {
   static const _likedWordsKey = 'nwsb_liked_words';
   static const _shuffleKey = 'nwsb_player_shuffle';
   static const _actionsTabVideo = 'assets/video/player-actions-tab.mp4';
@@ -103,7 +109,10 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> with Ticker
   void initState() {
     super.initState();
     _bottomPageController = PageController();
-    _marqueeController = AnimationController(vsync: this, duration: const Duration(seconds: 18))..repeat();
+    _marqueeController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 18),
+    )..repeat();
     _kickBottomAuto();
     PracticeProgress.instance.addListener(_onProgress);
     unawaited(PracticeProgress.instance.start());
@@ -130,7 +139,10 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> with Ticker
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => const FractionallySizedBox(heightFactor: .96, child: AuraSoundLibraryScreen()),
+      builder: (_) => const FractionallySizedBox(
+        heightFactor: .96,
+        child: AuraSoundLibraryScreen(),
+      ),
     );
   }
 
@@ -171,7 +183,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> with Ticker
 
   Future<void> _toggleLike() async {
     final prefs = await SharedPreferences.getInstance();
-    final liked = (prefs.getStringList(_likedWordsKey) ?? const <String>[]).toSet();
+    final liked = (prefs.getStringList(_likedWordsKey) ?? const <String>[])
+        .toSet();
     if (liked.contains(_word.word)) {
       liked.remove(_word.word);
     } else {
@@ -199,18 +212,21 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> with Ticker
       final started = DateTime.now();
       await _tts.speak(_word.word);
       final elapsed = DateTime.now().difference(started).inSeconds;
-      await PracticeProgress.instance.recordCompletedWord(_word, durationSec: elapsed > 0 ? elapsed : 1);
+      await PracticeProgress.instance.recordCompletedWord(
+        _word,
+        durationSec: elapsed > 0 ? elapsed : 1,
+      );
       if (mounted) setState(() => _completed = true);
     } catch (_) {
       if (mounted) {
-        setState(() => _error =
-            'Your device could not start voice playback. Check that text-to-speech is enabled.');
+        setState(
+          () => _error = 'Your device could not start voice playback. Check that text-to-speech is enabled.',
+        );
       }
     } finally {
       if (mounted) setState(() => _playing = false);
     }
   }
-
 
   Future<void> _minimizeToPill() async {
     final theme = _theme;
@@ -245,7 +261,11 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> with Ticker
         : DateTime.now().difference(_startedAt!).inMilliseconds / 1000;
     if (elapsed > 1.5) {
       await _tts.stop();
-      if (mounted) setState(() { _playing = false; _completed = false; });
+      if (mounted)
+        setState(() {
+          _playing = false;
+          _completed = false;
+        });
       await _prepareAndPlay();
       return;
     }
@@ -275,10 +295,12 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> with Ticker
 
   Future<void> _copyWord() async {
     final syllables = _word.syllables.join(' · ');
-    final organ = _word.organ.trim().isEmpty ? '' : ' — ${_word.organ.toUpperCase()}';
-    await Clipboard.setData(ClipboardData(
-      text: '${_word.word}$organ\n$syllables\n${_word.meaning}',
-    ));
+    final organ = _word.organ.trim().isEmpty
+        ? ''
+        : ' — ${_word.organ.toUpperCase()}';
+    await Clipboard.setData(
+      ClipboardData(text: '${_word.word}$organ\n$syllables\n${_word.meaning}'),
+    );
   }
 
   void _openQueueSheet(BuildContext context) {
@@ -355,7 +377,10 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> with Ticker
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       barrierColor: Colors.black.withOpacity(.62),
-      builder: (_) => const FractionallySizedBox(heightFactor: .96, child: SelectLevelScreen()),
+      builder: (_) => const FractionallySizedBox(
+        heightFactor: .96,
+        child: SelectLevelScreen(),
+      ),
     );
   }
 
@@ -370,7 +395,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> with Ticker
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (context) => _PlayerInfoSheet(word: _word, accent: _theme.accent),
+      builder: (context) =>
+          _PlayerInfoSheet(word: _word, accent: _theme.accent),
     );
   }
 
@@ -385,39 +411,88 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> with Ticker
         top: false,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(24, 22, 24, 34),
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            const Text('PRONUNCIATION NOTES', style: TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.7)),
-            const SizedBox(height: 14),
-            Text(_word.word, style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w800)),
-            if (_word.tip.isNotEmpty) ...[
-              const SizedBox(height: 10),
-              Text(_word.tip, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xCCFFFFFF), height: 1.45)),
-            ],
-            if (_word.parts.isNotEmpty) ...[
-              const SizedBox(height: 18),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                alignment: WrapAlignment.center,
-                children: _word.parts
-                    .map((part) => _PronunciationChip(part: part, accent: _theme.accent))
-                    .toList(),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'PRONUNCIATION NOTES',
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.7,
+                ),
               ),
+              const SizedBox(height: 14),
+              Text(
+                _word.word,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 28,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              if (_word.tip.isNotEmpty) ...[
+                const SizedBox(height: 10),
+                Text(
+                  _word.tip,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Color(0xCCFFFFFF),
+                    height: 1.45,
+                  ),
+                ),
+              ],
+              if (_word.parts.isNotEmpty) ...[
+                const SizedBox(height: 18),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  alignment: WrapAlignment.center,
+                  children: _word.parts
+                      .map(
+                        (part) => _PronunciationChip(
+                          part: part,
+                          accent: _theme.accent,
+                        ),
+                      )
+                      .toList(),
+                ),
+              ],
             ],
-          ]),
+          ),
         ),
       ),
     );
   }
 
   void _openAuraClock() {
-    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => PlayerDial(
-      word: _word.word,
-      playing: _playing,
-      onPlay: _togglePlay,
-      onClose: () => Navigator.of(context).pop(),
-      onSettings: _openSettings,
-    )));
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => PlayerDial(
+          word: _word.word,
+          playing: _playing,
+          onPlay: _togglePlay,
+          onClose: () => Navigator.of(context).pop(),
+          onSettings: _openSettings,
+        ),
+      ),
+    );
+  }
+
+  void _openPracticeLab() {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withOpacity(.76),
+      builder: (_) => PracticeLabSheet(
+        word: _word,
+        accent: _theme.accent,
+        onSpeak: _prepareAndPlay,
+        onClose: () => Navigator.of(context).pop(),
+      ),
+    );
   }
 
   void _openSettings() {
@@ -437,57 +512,180 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> with Ticker
         child: SizedBox(
           width: 360,
           height: 560,
-          child: Stack(children: [
-            Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: const Color(0xE6060C18),
-                  borderRadius: BorderRadius.circular(28),
-                  border: Border.all(color: const Color(0x44C8E8F5)),
-                  boxShadow: [BoxShadow(color: _theme.accent.withOpacity(.26), blurRadius: 42)],
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: const Color(0xE6060C18),
+                    borderRadius: BorderRadius.circular(28),
+                    border: Border.all(color: const Color(0x44C8E8F5)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: _theme.accent.withOpacity(.26),
+                        blurRadius: 42,
+                      ),
+                    ],
+                  ),
+                  child: CustomPaint(
+                    painter: _AuraSettingsPainter(accent: _theme.accent),
+                  ),
                 ),
-                child: CustomPaint(painter: _AuraSettingsPainter(accent: _theme.accent)),
               ),
-            ),
-            Positioned(
-              top: 18,
-              left: 22,
-              right: 22,
-              child: Row(children: [
-                IconButton(
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints.tightFor(width: 36, height: 36),
-                  onPressed: () => Navigator.of(dialogContext).pop(),
-                  icon: const Icon(Icons.close_rounded, color: Colors.white70, size: 22),
+              Positioned(
+                top: 18,
+                left: 22,
+                right: 22,
+                child: Row(
+                  children: [
+                    IconButton(
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints.tightFor(
+                        width: 36,
+                        height: 36,
+                      ),
+                      onPressed: () => Navigator.of(dialogContext).pop(),
+                      icon: const Icon(
+                        Icons.close_rounded,
+                        color: Colors.white70,
+                        size: 22,
+                      ),
+                    ),
+                    const Expanded(
+                      child: Text(
+                        'NowssB Player',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: .2,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 36),
+                  ],
                 ),
-                const Expanded(child: Text('NowssB Player', textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w800, letterSpacing: .2))),
-                const SizedBox(width: 36),
-              ]),
-            ),
-            Center(
-              child: Container(
-                width: 112,
-                height: 112,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: const Color(0x331D3448),
-                  border: Border.all(color: _theme.accent.withOpacity(.75), width: 1.2),
-                  boxShadow: [BoxShadow(color: _theme.accent.withOpacity(.18), blurRadius: 26)],
-                ),
-                child: const Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Icon(Icons.settings_rounded, color: Colors.white, size: 30),
-                  SizedBox(height: 5),
-                  Text('SETTINGS', style: TextStyle(color: Colors.white70, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 1.8)),
-                ]),
               ),
-            ),
-            _RadialOption(alignment: const Alignment(0, -.62), label: 'VOICE', value: 'Device', icon: Icons.record_voice_over_rounded, accent: _theme.accent, onTap: () => ScaffoldMessenger.of(this.context).showSnackBar(const SnackBar(content: Text('NowssB uses your selected device voice.')))),
-            _RadialOption(alignment: const Alignment(.72, -.2), label: 'LOOP', value: _loop ? 'On' : 'Off', icon: Icons.all_inclusive_rounded, accent: _theme.accent, onTap: () => setState(() => _loop = !_loop)),
-            _RadialOption(alignment: const Alignment(.45, .62), label: 'REPS', value: '${_repTarget}×', icon: Icons.repeat_rounded, accent: _theme.accent, onTap: () => setState(() => _repTarget = _repTarget == 3 ? 7 : _repTarget == 7 ? 11 : _repTarget == 11 ? 21 : 3)),
-            _RadialOption(alignment: const Alignment(-.45, .62), label: 'LIBRARY', value: 'Open', icon: Icons.library_music_rounded, accent: _theme.accent, onTap: () { Navigator.of(dialogContext).pop(); showModalBottomSheet<void>(context: this.context, isScrollControlled: true, backgroundColor: Colors.transparent, builder: (_) => const FractionallySizedBox(heightFactor: .96, child: AuraSoundLibraryScreen())); }),
-            _RadialOption(alignment: const Alignment(-.72, -.2), label: 'REPLAY', value: 'Word', icon: Icons.replay_rounded, accent: _theme.accent, onTap: _prepareAndPlay),
-            const Positioned(left: 24, right: 24, bottom: 20, child: Text('Choose a player control', textAlign: TextAlign.center, style: TextStyle(color: Colors.white38, fontSize: 10, letterSpacing: 1.4))),
-          ]),
+              Center(
+                child: Container(
+                  width: 112,
+                  height: 112,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: const Color(0x331D3448),
+                    border: Border.all(
+                      color: _theme.accent.withOpacity(.75),
+                      width: 1.2,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: _theme.accent.withOpacity(.18),
+                        blurRadius: 26,
+                      ),
+                    ],
+                  ),
+                  child: const Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.settings_rounded,
+                        color: Colors.white,
+                        size: 30,
+                      ),
+                      SizedBox(height: 5),
+                      Text(
+                        'SETTINGS',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 9,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.8,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              _RadialOption(
+                alignment: const Alignment(0, -.62),
+                label: 'VOICE',
+                value: 'Device',
+                icon: Icons.record_voice_over_rounded,
+                accent: _theme.accent,
+                onTap: () => ScaffoldMessenger.of(this.context).showSnackBar(
+                  const SnackBar(
+                    content: Text('NowssB uses your selected device voice.'),
+                  ),
+                ),
+              ),
+              _RadialOption(
+                alignment: const Alignment(.72, -.2),
+                label: 'LOOP',
+                value: _loop ? 'On' : 'Off',
+                icon: Icons.all_inclusive_rounded,
+                accent: _theme.accent,
+                onTap: () => setState(() => _loop = !_loop),
+              ),
+              _RadialOption(
+                alignment: const Alignment(.45, .62),
+                label: 'REPS',
+                value: '${_repTarget}×',
+                icon: Icons.repeat_rounded,
+                accent: _theme.accent,
+                onTap: () => setState(
+                  () => _repTarget = _repTarget == 3
+                      ? 7
+                      : _repTarget == 7
+                      ? 11
+                      : _repTarget == 11
+                      ? 21
+                      : 3,
+                ),
+              ),
+              _RadialOption(
+                alignment: const Alignment(-.45, .62),
+                label: 'LIBRARY',
+                value: 'Open',
+                icon: Icons.library_music_rounded,
+                accent: _theme.accent,
+                onTap: () {
+                  Navigator.of(dialogContext).pop();
+                  showModalBottomSheet<void>(
+                    context: this.context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (_) => const FractionallySizedBox(
+                      heightFactor: .96,
+                      child: AuraSoundLibraryScreen(),
+                    ),
+                  );
+                },
+              ),
+              _RadialOption(
+                alignment: const Alignment(-.72, -.2),
+                label: 'REPLAY',
+                value: 'Word',
+                icon: Icons.replay_rounded,
+                accent: _theme.accent,
+                onTap: _prepareAndPlay,
+              ),
+              const Positioned(
+                left: 24,
+                right: 24,
+                bottom: 20,
+                child: Text(
+                  'Choose a player control',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white38,
+                    fontSize: 10,
+                    letterSpacing: 1.4,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -498,8 +696,17 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> with Ticker
     if (widget.words.isEmpty) {
       return Scaffold(
         backgroundColor: NwsbColors.deep,
-        appBar: AppBar(backgroundColor: NwsbColors.deep, foregroundColor: Colors.white),
-        body: const Center(child: Text('Choose words for your routine before starting a session.', textAlign: TextAlign.center, style: TextStyle(color: Colors.white70))),
+        appBar: AppBar(
+          backgroundColor: NwsbColors.deep,
+          foregroundColor: Colors.white,
+        ),
+        body: const Center(
+          child: Text(
+            'Choose words for your routine before starting a session.',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.white70),
+          ),
+        ),
       );
     }
 
@@ -512,185 +719,229 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen> with Ticker
         unawaited(_minimizeToPill());
       },
       child: Scaffold(
-      backgroundColor: const Color(0xFF000000),
-      body: Stack(children: [
-        Positioned.fill(
-          child: IgnorePointer(
-            child: Opacity(
-              opacity: .78,
-              child: NwsbVideo(
-                asset: pageBackgroundVideo,
-                fit: BoxFit.cover,
-                priority: ClipPriority.feature,
-                autoplay: true,
-                loop: true,
-                showPoster: false,
+        backgroundColor: const Color(0xFF000000),
+        body: Stack(
+          children: [
+            Positioned.fill(
+              child: IgnorePointer(
+                child: Opacity(
+                  opacity: .78,
+                  child: NwsbVideo(
+                    asset: pageBackgroundVideo,
+                    fit: BoxFit.cover,
+                    priority: ClipPriority.feature,
+                    autoplay: true,
+                    loop: true,
+                    showPoster: false,
+                  ),
+                ),
               ),
             ),
-          ),
-        ),
-        const Positioned.fill(child: ColoredBox(color: Color(0x55000000))),
-        SafeArea(
-          child: LayoutBuilder(builder: (context, constraints) {
-          final stageWidth = math.min(constraints.maxWidth - 24, 340.0);
-          return SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: math.max(0, constraints.maxHeight - 28)),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                _PlayerHeader(onBack: _minimizeToPill, onSettings: _openSettings, onMore: _openAuraClock),
-                const SizedBox(height: 12),
-                Center(
-                  child: SizedBox(
-                    width: stageWidth,
-                    child: _VisualStage(
-                      word: _word,
-                      theme: theme,
-                      playing: _playing,
-                      accent: theme.accent,
-                      onReplay: _prepareAndPlay,
-                      onCopy: _copyWord,
-                      onSettings: _openSettings,
-                      onInfo: _openInfo,
-                      onLevel: _openLevel,
-                      onStore: () => Navigator.of(context).push(
-                        MaterialPageRoute<void>(builder: (_) => const StoreScreen()),
+            const Positioned.fill(child: ColoredBox(color: Color(0x55000000))),
+            SafeArea(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final stageWidth = math.min(constraints.maxWidth - 24, 340.0);
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: math.max(0, constraints.maxHeight - 28),
                       ),
-                      onSyllable: (part) async {
-                        await _tts.stop();
-                        await _tts.speak(part.roman.isNotEmpty ? part.roman : part.deva);
-                      },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _PlayerHeader(
+                            onBack: _minimizeToPill,
+                            onSettings: _openSettings,
+                            onMore: _openAuraClock,
+                          ),
+                          const SizedBox(height: 12),
+                          Center(
+                            child: SizedBox(
+                              width: stageWidth,
+                              child: _VisualStage(
+                                word: _word,
+                                theme: theme,
+                                playing: _playing,
+                                accent: theme.accent,
+                                onReplay: _prepareAndPlay,
+                                onCopy: _copyWord,
+                                onSettings: _openSettings,
+                                onInfo: _openInfo,
+                                onLevel: _openLevel,
+                                onStore: () => Navigator.of(context).push(
+                                  MaterialPageRoute<void>(
+                                    builder: (_) => const StoreScreen(),
+                                  ),
+                                ),
+                                onSyllable: (part) async {
+                                  await _tts.stop();
+                                  await _tts.speak(
+                                    part.roman.isNotEmpty
+                                        ? part.roman
+                                        : part.deva,
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+                          Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 48,
+                                ),
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      _prettyTitle(_word.word),
+                                      textAlign: TextAlign.center,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        color: Color(0xFFF4F4F5),
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w500,
+                                        height: 1.15,
+                                        letterSpacing: -0.3,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    SizedBox(
+                                      height: 20,
+                                      width: double.infinity,
+                                      child: _SubtitleMarquee(
+                                        lines: _marqueeLines,
+                                        animation: _marqueeController,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Positioned(
+                                right: 0,
+                                top: 0,
+                                child: GestureDetector(
+                                  onTap: _toggleLike,
+                                  child: SizedBox(
+                                    width: 44,
+                                    height: 44,
+                                    child: Icon(
+                                      _liked
+                                          ? Icons.favorite_rounded
+                                          : Icons.favorite_border_rounded,
+                                      color: _liked
+                                          ? const Color(0xFFF5F5F7)
+                                          : const Color(0xFF8B8B90),
+                                      size: 22,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          _ProgressBar(
+                            playing: _playing,
+                            durationSec: _wordSecs(_word),
+                          ),
+                          const SizedBox(height: 8),
+                          _PlainTransportRow(
+                            playing: _playing,
+                            shuffle: _shuffle,
+                            loop: _loop,
+                            onShuffle: _toggleShuffle,
+                            onPrevious: _skipPrev,
+                            onPlay: _togglePlay,
+                            onNext: () => _move(1),
+                            onRepeat: () => setState(() => _loop = !_loop),
+                          ),
+                          const SizedBox(height: 16),
+                          if (_completed || _error != null) ...[
+                            const SizedBox(height: 8),
+                            Text(
+                              _error ?? 'Completed and added to your progress.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: _error == null
+                                    ? Colors.white70
+                                    : const Color(0xFFFFB4B4),
+                                fontSize: 12,
+                                height: 1.4,
+                              ),
+                            ),
+                          ],
+                          const SizedBox(height: 10),
+                          SizedBox(
+                            width: stageWidth,
+                            height: 128,
+                            child: PageView(
+                              controller: _bottomPageController,
+                              physics: const BouncingScrollPhysics(),
+                              onPageChanged: (p) {
+                                setState(() => _bottomPage = p);
+                                _kickBottomAuto();
+                              },
+                              children: [
+                                _WordActionStrip(
+                                  accent: theme.accent,
+                                  video: _actionsTabVideo,
+                                  onSentence: _openSentence,
+                                  onPractice: _openPracticeLab,
+                                  onStore: () => Navigator.of(context).push(
+                                    MaterialPageRoute<void>(
+                                      builder: (_) => const StoreScreen(),
+                                    ),
+                                  ),
+                                ),
+                                _NextUpCard(
+                                  words: widget.words,
+                                  index: _index,
+                                  themes: _playerThemes,
+                                  onPlayAt: (i) async {
+                                    if (i == _index) {
+                                      await _prepareAndPlay();
+                                      return;
+                                    }
+                                    await _tts.stop();
+                                    setState(() {
+                                      _index = i;
+                                      _liked = false;
+                                      _completed = false;
+                                      _error = null;
+                                    });
+                                    await _loadLiked();
+                                    await _prepareAndPlay();
+                                  },
+                                  onOpenSoundLibrary: () =>
+                                      _openSoundLibrary(context),
+                                  onOpenQueue: () => _openQueueSheet(context),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              _BottomDot(active: _bottomPage == 0),
+                              const SizedBox(width: 6),
+                              _BottomDot(active: _bottomPage == 1),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ),
-                const SizedBox(height: 18),
-                Stack(clipBehavior: Clip.none, children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 48),
-                    child: Column(children: [
-                      Text(
-                        _prettyTitle(_word.word),
-                        textAlign: TextAlign.center,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Color(0xFFF4F4F5),
-                          fontSize: 20,
-                          fontWeight: FontWeight.w500,
-                          height: 1.15,
-                          letterSpacing: -0.3,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      SizedBox(
-                        height: 20,
-                        width: double.infinity,
-                        child: _SubtitleMarquee(
-                          lines: _marqueeLines,
-                          animation: _marqueeController,
-                        ),
-                      ),
-                    ]),
-                  ),
-                  Positioned(
-                    right: 0,
-                    top: 0,
-                    child: GestureDetector(
-                      onTap: _toggleLike,
-                      child: SizedBox(
-                        width: 44,
-                        height: 44,
-                        child: Icon(
-                          _liked ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                          color: _liked ? const Color(0xFFF5F5F7) : const Color(0xFF8B8B90),
-                          size: 22,
-                        ),
-                      ),
-                    ),
-                  ),
-                ]),
-                const SizedBox(height: 16),
-                _ProgressBar(playing: _playing, durationSec: _wordSecs(_word)),
-                const SizedBox(height: 8),
-                _PlainTransportRow(
-                  playing: _playing,
-                  shuffle: _shuffle,
-                  loop: _loop,
-                  onShuffle: _toggleShuffle,
-                  onPrevious: _skipPrev,
-                  onPlay: _togglePlay,
-                  onNext: () => _move(1),
-                  onRepeat: () => setState(() => _loop = !_loop),
-                ),
-                const SizedBox(height: 16),
-                if (_completed || _error != null) ...[
-                  const SizedBox(height: 8),
-                  Text(
-                    _error ?? 'Completed and added to your progress.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: _error == null ? Colors.white70 : const Color(0xFFFFB4B4), fontSize: 12, height: 1.4),
-                  ),
-                ],
-                const SizedBox(height: 10),
-                SizedBox(
-                  width: stageWidth,
-                  height: 128,
-                  child: PageView(
-                    controller: _bottomPageController,
-                    physics: const BouncingScrollPhysics(),
-                    onPageChanged: (p) {
-                      setState(() => _bottomPage = p);
-                      _kickBottomAuto();
-                    },
-                    children: [
-                      _WordActionStrip(
-                        accent: theme.accent,
-                        video: _actionsTabVideo,
-                        onSentence: _openSentence,
-                        onPractice: _prepareAndPlay,
-                        onStore: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const StoreScreen())),
-                      ),
-                      _NextUpCard(
-                        words: widget.words,
-                        index: _index,
-                        themes: _playerThemes,
-                        onPlayAt: (i) async {
-                          if (i == _index) {
-                            await _prepareAndPlay();
-                            return;
-                          }
-                          await _tts.stop();
-                          setState(() {
-                            _index = i;
-                            _liked = false;
-                            _completed = false;
-                            _error = null;
-                          });
-                          await _loadLiked();
-                          await _prepareAndPlay();
-                        },
-                        onOpenSoundLibrary: () => _openSoundLibrary(context),
-                        onOpenQueue: () => _openQueueSheet(context),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _BottomDot(active: _bottomPage == 0),
-                    const SizedBox(width: 6),
-                    _BottomDot(active: _bottomPage == 1),
-                  ],
-                ),
-              ]),
+                  );
+                },
+              ),
             ),
-          );
-          }),
+          ],
         ),
-      ]),
-    ),
+      ),
     );
   }
 }
@@ -702,14 +953,26 @@ class _PlayerThemeArtwork extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (theme.image.startsWith('http')) {
-      return Image.network(theme.image, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: NwsbColors.deep));
+      return Image.network(
+        theme.image,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => const ColoredBox(color: NwsbColors.deep),
+      );
     }
-    return Image.asset(theme.image, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: NwsbColors.deep));
+    return Image.asset(
+      theme.image,
+      fit: BoxFit.cover,
+      errorBuilder: (_, __, ___) => const ColoredBox(color: NwsbColors.deep),
+    );
   }
 }
 
 class _PlayerHeader extends StatelessWidget {
-  const _PlayerHeader({required this.onBack, required this.onSettings, required this.onMore});
+  const _PlayerHeader({
+    required this.onBack,
+    required this.onSettings,
+    required this.onMore,
+  });
   final VoidCallback onBack;
   final VoidCallback onSettings;
   final VoidCallback onMore;
@@ -717,15 +980,42 @@ class _PlayerHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) => SizedBox(
     height: 46,
-    child: Stack(alignment: Alignment.center, children: [
-      Align(alignment: Alignment.centerLeft, child: _BareIconButton(icon: Icons.keyboard_arrow_down_rounded, onTap: onBack)),
-      const Column(mainAxisSize: MainAxisSize.min, children: [
-        Text('NOW PLAYING', style: TextStyle(color: Color(0xFF9A9A9E), fontSize: 10, fontWeight: FontWeight.w500, letterSpacing: 3.8)),
-        SizedBox(height: 6),
-        SizedBox(width: 28, height: 1, child: ColoredBox(color: Color(0x8CF4F4F5))),
-      ]),
-      Align(alignment: Alignment.centerRight, child: _BareIconButton(icon: Icons.more_horiz_rounded, onTap: onMore)),
-    ]),
+    child: Stack(
+      alignment: Alignment.center,
+      children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: _BareIconButton(
+            icon: Icons.keyboard_arrow_down_rounded,
+            onTap: onBack,
+          ),
+        ),
+        const Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'NOW PLAYING',
+              style: TextStyle(
+                color: Color(0xFF9A9A9E),
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
+                letterSpacing: 3.8,
+              ),
+            ),
+            SizedBox(height: 6),
+            SizedBox(
+              width: 28,
+              height: 1,
+              child: ColoredBox(color: Color(0x8CF4F4F5)),
+            ),
+          ],
+        ),
+        Align(
+          alignment: Alignment.centerRight,
+          child: _BareIconButton(icon: Icons.more_horiz_rounded, onTap: onMore),
+        ),
+      ],
+    ),
   );
 }
 
@@ -737,41 +1027,85 @@ class _StatsRow extends StatelessWidget {
     final progress = PracticeProgress.instance;
     return AspectRatio(
       aspectRatio: 1371 / 317,
-      child: Stack(fit: StackFit.expand, children: [
-        const ColoredBox(color: Colors.black),
-        IgnorePointer(child: Image.asset('assets/frames/word-acts-tab.webp', fit: BoxFit.fill)),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
-          child: Row(children: [
-            _StatCell(icon: Icons.local_fire_department_outlined, value: '${progress.streak}', label: 'Days Streak'),
-            _statDivider(),
-            _StatCell(icon: Icons.graphic_eq_rounded, value: '${progress.totalSessions}', label: 'Sessions'),
-            _statDivider(),
-            _StatCell(icon: Icons.schedule_rounded, value: progress.timeLabel, label: 'Time Meditated'),
-          ]),
-        ),
-      ]),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          const ColoredBox(color: Colors.black),
+          IgnorePointer(
+            child: Image.asset(
+              'assets/frames/word-acts-tab.webp',
+              fit: BoxFit.fill,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
+            child: Row(
+              children: [
+                _StatCell(
+                  icon: Icons.local_fire_department_outlined,
+                  value: '${progress.streak}',
+                  label: 'Days Streak',
+                ),
+                _statDivider(),
+                _StatCell(
+                  icon: Icons.graphic_eq_rounded,
+                  value: '${progress.totalSessions}',
+                  label: 'Sessions',
+                ),
+                _statDivider(),
+                _StatCell(
+                  icon: Icons.schedule_rounded,
+                  value: progress.timeLabel,
+                  label: 'Time Meditated',
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _statDivider() => Container(width: 1, height: 28, color: const Color(0x24FFFFFF));
+  Widget _statDivider() =>
+      Container(width: 1, height: 28, color: const Color(0x24FFFFFF));
 }
 
 class _StatCell extends StatelessWidget {
-  const _StatCell({required this.icon, required this.value, required this.label});
+  const _StatCell({
+    required this.icon,
+    required this.value,
+    required this.label,
+  });
   final IconData icon;
   final String value;
   final String label;
 
   @override
   Widget build(BuildContext context) => Expanded(
-    child: Column(children: [
-      Icon(icon, color: const Color(0xFFE8D5A3), size: 16),
-      const SizedBox(height: 4),
-      Text(value, style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w700)),
-      const SizedBox(height: 2),
-      Text(label.toUpperCase(), style: const TextStyle(color: Color(0x80FFFFFF), fontSize: 8.5, fontWeight: FontWeight.w700, letterSpacing: 1)),
-    ]),
+    child: Column(
+      children: [
+        Icon(icon, color: const Color(0xFFE8D5A3), size: 16),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 17,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label.toUpperCase(),
+          style: const TextStyle(
+            color: Color(0x80FFFFFF),
+            fontSize: 8.5,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 1,
+          ),
+        ),
+      ],
+    ),
   );
 }
 
@@ -784,50 +1118,110 @@ class _ProfileHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final progress = PracticeProgress.instance;
     final avatar = compact ? 56.0 : 72.0;
-    return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Container(
-        width: avatar,
-        height: avatar,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: const LinearGradient(colors: [Color(0xFFE8D5A3), Color(0xFFC8E8F5)]),
-          border: Border.all(color: const Color(0xB3E8D5A3), width: 2),
-          boxShadow: const [
-            BoxShadow(color: Color(0x6BE8D5A3), blurRadius: 22),
-            BoxShadow(color: Color(0x66000000), blurRadius: 18, offset: Offset(0, 8)),
-          ],
-        ),
-        alignment: Alignment.center,
-        child: Text('H', style: TextStyle(color: const Color(0xFF0A0A12), fontSize: compact ? 18 : 22, fontWeight: FontWeight.w800)),
-      ),
-      SizedBox(width: compact ? 10 : 14),
-      Expanded(
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('Healer', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.white, fontSize: compact ? 18 : 22, fontWeight: FontWeight.w700, height: 1.15, shadows: const [Shadow(color: Color(0xCC000000), blurRadius: 10)])),
-          const SizedBox(height: 2),
-          Text('Healing through words', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: const Color(0xB8FFFFFF), fontSize: compact ? 11 : 12, fontWeight: FontWeight.w500, shadows: const [Shadow(color: Color(0xCC000000), blurRadius: 8)])),
-          const SizedBox(height: 6),
-          GestureDetector(
-            onTap: onLevel,
-            child: Container(
-              height: 26,
-              padding: const EdgeInsets.fromLTRB(10, 0, 12, 0),
-              decoration: BoxDecoration(
-                color: const Color(0x29E8D5A3),
-                borderRadius: BorderRadius.circular(99),
-                border: Border.all(color: const Color(0x73E8D5A3)),
-                boxShadow: const [BoxShadow(color: Color(0x47E8D5A3), blurRadius: 12)],
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: avatar,
+          height: avatar,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: const LinearGradient(
+              colors: [Color(0xFFE8D5A3), Color(0xFFC8E8F5)],
+            ),
+            border: Border.all(color: const Color(0xB3E8D5A3), width: 2),
+            boxShadow: const [
+              BoxShadow(color: Color(0x6BE8D5A3), blurRadius: 22),
+              BoxShadow(
+                color: Color(0x66000000),
+                blurRadius: 18,
+                offset: Offset(0, 8),
               ),
-              child: Row(mainAxisSize: MainAxisSize.min, children: [
-                const Icon(Icons.star_rounded, color: Color(0xFFE8D5A3), size: 12),
-                const SizedBox(width: 6),
-                Text('Level ${progress.level}  ›', style: const TextStyle(color: Color(0xFFE8D5A3), fontSize: 12, fontWeight: FontWeight.w700)),
-              ]),
+            ],
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            'H',
+            style: TextStyle(
+              color: const Color(0xFF0A0A12),
+              fontSize: compact ? 18 : 22,
+              fontWeight: FontWeight.w800,
             ),
           ),
-        ]),
-      ),
-    ]);
+        ),
+        SizedBox(width: compact ? 10 : 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Healer',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: compact ? 18 : 22,
+                  fontWeight: FontWeight.w700,
+                  height: 1.15,
+                  shadows: const [
+                    Shadow(color: Color(0xCC000000), blurRadius: 10),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                'Healing through words',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: const Color(0xB8FFFFFF),
+                  fontSize: compact ? 11 : 12,
+                  fontWeight: FontWeight.w500,
+                  shadows: const [
+                    Shadow(color: Color(0xCC000000), blurRadius: 8),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 6),
+              GestureDetector(
+                onTap: onLevel,
+                child: Container(
+                  height: 26,
+                  padding: const EdgeInsets.fromLTRB(10, 0, 12, 0),
+                  decoration: BoxDecoration(
+                    color: const Color(0x29E8D5A3),
+                    borderRadius: BorderRadius.circular(99),
+                    border: Border.all(color: const Color(0x73E8D5A3)),
+                    boxShadow: const [
+                      BoxShadow(color: Color(0x47E8D5A3), blurRadius: 12),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.star_rounded,
+                        color: Color(0xFFE8D5A3),
+                        size: 12,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Level ${progress.level}  ›',
+                        style: const TextStyle(
+                          color: Color(0xFFE8D5A3),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 }
 
@@ -854,7 +1248,10 @@ class _LevelList extends StatelessWidget {
               itemCount: 10,
               separatorBuilder: (_, __) => const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 14),
-                child: ColoredBox(color: Color(0x1FFFFFFF), child: SizedBox(height: 1, width: double.infinity)),
+                child: ColoredBox(
+                  color: Color(0x1FFFFFFF),
+                  child: SizedBox(height: 1, width: double.infinity),
+                ),
               ),
               itemBuilder: (context, index) {
                 final n = index + 1;
@@ -866,24 +1263,31 @@ class _LevelList extends StatelessWidget {
                   },
                   behavior: HitTestBehavior.opaque,
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    child: Row(children: [
-                      Icon(
-                        Icons.star_rounded,
-                        color: on ? const Color(0xFFE8D5A3) : const Color(0xFFF4F4F5),
-                        size: 18,
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        'Level $n',
-                        style: TextStyle(
-                          color: on ? const Color(0xFFE8D5A3) : Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: .2,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.star_rounded,
+                          color: on
+                              ? const Color(0xFFE8D5A3)
+                              : const Color(0xFFF4F4F5),
+                          size: 18,
                         ),
-                      ),
-                    ]),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Level $n',
+                          style: TextStyle(
+                            color: on ? const Color(0xFFE8D5A3) : Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: .2,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
@@ -916,7 +1320,11 @@ class _NextUpCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final nextIndex = words.isEmpty ? 0 : (index + 1) % words.length;
     final next = words.isEmpty ? null : words[nextIndex];
-    final art = next == null ? null : (next.img.isNotEmpty ? next.img : themes[nextIndex % themes.length].image);
+    final art = next == null
+        ? null
+        : (next.img.isNotEmpty
+              ? next.img
+              : themes[nextIndex % themes.length].image);
 
     return GestureDetector(
       onVerticalDragEnd: (details) {
@@ -934,7 +1342,10 @@ class _NextUpCard extends StatelessWidget {
         clipBehavior: Clip.hardEdge,
         child: next == null
             ? const Center(
-                child: Text('End of queue', style: TextStyle(color: Color(0xFF8E8E93), fontSize: 12)),
+                child: Text(
+                  'End of queue',
+                  style: TextStyle(color: Color(0xFF8E8E93), fontSize: 12),
+                ),
               )
             : Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -944,31 +1355,48 @@ class _NextUpCard extends StatelessWidget {
                     child: Container(
                       width: 36,
                       height: 3,
-                      decoration: BoxDecoration(color: const Color(0x66FFFFFF), borderRadius: BorderRadius.circular(99)),
+                      decoration: BoxDecoration(
+                        color: const Color(0x66FFFFFF),
+                        borderRadius: BorderRadius.circular(99),
+                      ),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(14, 6, 6, 0),
-                    child: Row(children: [
-                      const Expanded(
-                        child: Text(
-                          'UP NEXT',
-                          style: TextStyle(color: Color(0xFF8D8D92), fontSize: 10, fontWeight: FontWeight.w500, letterSpacing: 2.4),
+                    child: Row(
+                      children: [
+                        const Expanded(
+                          child: Text(
+                            'UP NEXT',
+                            style: TextStyle(
+                              color: Color(0xFF8D8D92),
+                              fontSize: 10,
+                              fontWeight: FontWeight.w500,
+                              letterSpacing: 2.4,
+                            ),
+                          ),
                         ),
-                      ),
-                      GestureDetector(
-                        onTap: onOpenSoundLibrary,
-                        child: const SizedBox(
-                          width: 32,
-                          height: 32,
-                          child: Icon(Icons.queue_music_rounded, color: Color(0xFFCFCFD2), size: 18),
+                        GestureDetector(
+                          onTap: onOpenSoundLibrary,
+                          child: const SizedBox(
+                            width: 32,
+                            height: 32,
+                            child: Icon(
+                              Icons.queue_music_rounded,
+                              color: Color(0xFFCFCFD2),
+                              size: 18,
+                            ),
+                          ),
                         ),
-                      ),
-                    ]),
+                      ],
+                    ),
                   ),
                   const Padding(
                     padding: EdgeInsets.fromLTRB(14, 4, 14, 0),
-                    child: ColoredBox(color: Color(0x1AFFFFFF), child: SizedBox(width: double.infinity, height: 1)),
+                    child: ColoredBox(
+                      color: Color(0x1AFFFFFF),
+                      child: SizedBox(width: double.infinity, height: 1),
+                    ),
                   ),
                   Expanded(
                     child: Padding(
@@ -976,47 +1404,86 @@ class _NextUpCard extends StatelessWidget {
                       child: GestureDetector(
                         onTap: () => onPlayAt(nextIndex),
                         behavior: HitTestBehavior.opaque,
-                        child: Row(children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: SizedBox(
-                              width: 44,
-                              height: 44,
-                              child: art != null && art.isNotEmpty
-                                  ? (art.startsWith('http')
-                                      ? Image.network(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111)))
-                                      : Image.asset(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111))))
-                                  : const ColoredBox(color: Color(0xFF111111)),
+                        child: Row(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: SizedBox(
+                                width: 44,
+                                height: 44,
+                                child: art != null && art.isNotEmpty
+                                    ? (art.startsWith('http')
+                                          ? Image.network(
+                                              art,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (_, __, ___) =>
+                                                  const ColoredBox(
+                                                    color: Color(0xFF111111),
+                                                  ),
+                                            )
+                                          : Image.asset(
+                                              art,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (_, __, ___) =>
+                                                  const ColoredBox(
+                                                    color: Color(0xFF111111),
+                                                  ),
+                                            ))
+                                    : const ColoredBox(
+                                        color: Color(0xFF111111),
+                                      ),
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  next.word,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(color: Color(0xFFF5F5F7), fontSize: 15, fontWeight: FontWeight.w600, letterSpacing: -0.15),
-                                ),
-                                const SizedBox(height: 2),
-                                Text('NowssB  ·  ${_wordClock(next)}', style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 12)),
-                              ],
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    next.word,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      color: Color(0xFFF5F5F7),
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                      letterSpacing: -0.15,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'NowssB  ·  ${_wordClock(next)}',
+                                    style: const TextStyle(
+                                      color: Color(0xFF8E8E93),
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          Container(
-                            width: 34,
-                            height: 34,
-                            decoration: const BoxDecoration(
-                              color: Color(0xFFF5F5F7),
-                              shape: BoxShape.circle,
-                              boxShadow: [BoxShadow(color: Color(0x59000000), blurRadius: 12, offset: Offset(0, 4))],
+                            Container(
+                              width: 34,
+                              height: 34,
+                              decoration: const BoxDecoration(
+                                color: Color(0xFFF5F5F7),
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Color(0x59000000),
+                                    blurRadius: 12,
+                                    offset: Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: const Icon(
+                                Icons.play_arrow_rounded,
+                                color: Color(0xFF0A0A0C),
+                                size: 20,
+                              ),
                             ),
-                            child: const Icon(Icons.play_arrow_rounded, color: Color(0xFF0A0A0C), size: 20),
-                          ),
-                        ]),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -1114,7 +1581,8 @@ class _QueueSheetState extends State<_QueueSheet> {
     setState(() {
       _liked = liked.toSet();
       _playCounts = counts;
-      _saved = (prefs.getStringList(_savedMixKey) ?? const <String>[]).isNotEmpty;
+      _saved =
+          (prefs.getStringList(_savedMixKey) ?? const <String>[]).isNotEmpty;
     });
   }
 
@@ -1164,7 +1632,8 @@ class _QueueSheetState extends State<_QueueSheet> {
     final prefs = await SharedPreferences.getInstance();
     final ordered = _order.map((i) => widget.words[i].word).toList();
     await prefs.setStringList(_savedMixKey, ordered);
-    final liked = (prefs.getStringList(_likedWordsKey) ?? const <String>[]).toSet();
+    final liked = (prefs.getStringList(_likedWordsKey) ?? const <String>[])
+        .toSet();
     for (final w in ordered) {
       liked.add(w);
     }
@@ -1181,8 +1650,9 @@ class _QueueSheetState extends State<_QueueSheet> {
     );
   }
 
-  Word? get _currentWord =>
-      widget.words.isEmpty ? null : widget.words[widget.index.clamp(0, widget.words.length - 1)];
+  Word? get _currentWord => widget.words.isEmpty
+      ? null
+      : widget.words[widget.index.clamp(0, widget.words.length - 1)];
 
   _PlayerTheme get _currentTheme =>
       widget.themes[widget.index % math.max(widget.themes.length, 1)];
@@ -1213,18 +1683,24 @@ class _QueueSheetState extends State<_QueueSheet> {
             Positioned.fill(
               child: GestureDetector(
                 onTap: () => Navigator.of(context).maybePop(),
-                child: ColoredBox(color: Color.fromRGBO(0, 0, 0, 0.35 + 0.35 * t)),
+                child: ColoredBox(
+                  color: Color.fromRGBO(0, 0, 0, 0.35 + 0.35 * t),
+                ),
               ),
             ),
             // Continuous NestedScrollView / CustomScrollView (YTM)
             Positioned.fill(
               child: NestedScrollView(
                 controller: _scrollCtrl,
-                physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+                physics: const BouncingScrollPhysics(
+                  parent: AlwaysScrollableScrollPhysics(),
+                ),
                 headerSliverBuilder: (context, innerBoxIsScrolled) {
                   return [
                     SliverOverlapAbsorber(
-                      handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+                      handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
+                        context,
+                      ),
                       sliver: SliverAppBar(
                         pinned: true,
                         stretch: true,
@@ -1240,16 +1716,32 @@ class _QueueSheetState extends State<_QueueSheet> {
                           child: LayoutBuilder(
                             builder: (context, constraints) {
                               // Source of truth: FlexibleSpaceBarSettings every frame.
-                              final settings = context.dependOnInheritedWidgetOfExactType<FlexibleSpaceBarSettings>();
+                              final settings = context
+                                  .dependOnInheritedWidgetOfExactType<
+                                    FlexibleSpaceBarSettings
+                                  >();
                               double localT;
                               if (settings != null) {
-                                final range = (settings.maxExtent - settings.minExtent).clamp(1.0, 10000.0);
-                                localT = ((settings.maxExtent - settings.currentExtent) / range).clamp(0.0, 1.0);
+                                final range =
+                                    (settings.maxExtent - settings.minExtent)
+                                        .clamp(1.0, 10000.0);
+                                localT =
+                                    ((settings.maxExtent -
+                                                settings.currentExtent) /
+                                            range)
+                                        .clamp(0.0, 1.0);
                               } else {
                                 final maxH = media.padding.top + _expandExtent;
-                                final minH = media.padding.top + _collapseExtent;
-                                final h = constraints.maxHeight.clamp(minH, maxH);
-                                localT = ((maxH - h) / (maxH - minH)).clamp(0.0, 1.0);
+                                final minH =
+                                    media.padding.top + _collapseExtent;
+                                final h = constraints.maxHeight.clamp(
+                                  minH,
+                                  maxH,
+                                );
+                                localT = ((maxH - h) / (maxH - minH)).clamp(
+                                  0.0,
+                                  1.0,
+                                );
                               }
                               return _YtmCollapsingHero(
                                 topPad: media.padding.top,
@@ -1260,19 +1752,26 @@ class _QueueSheetState extends State<_QueueSheet> {
                                 title: word?.word ?? 'NowssB',
                                 subtitle: 'NowssB',
                                 playing: widget.playing,
-                                durationSec: word == null ? 12.0 : _wordSecs(word),
+                                durationSec: word == null
+                                    ? 12.0
+                                    : _wordSecs(word),
                                 shuffle: false,
                                 loop: false,
                                 artMax: _heroArtMax,
                                 onPlay: widget.onTogglePlay,
                                 onPrevious: () {
                                   if (widget.words.isEmpty) return;
-                                  final i = (widget.index - 1) % widget.words.length;
-                                  widget.onPlayAt(i < 0 ? widget.words.length - 1 : i);
+                                  final i =
+                                      (widget.index - 1) % widget.words.length;
+                                  widget.onPlayAt(
+                                    i < 0 ? widget.words.length - 1 : i,
+                                  );
                                 },
                                 onNext: () {
                                   if (widget.words.isEmpty) return;
-                                  widget.onPlayAt((widget.index + 1) % widget.words.length);
+                                  widget.onPlayAt(
+                                    (widget.index + 1) % widget.words.length,
+                                  );
                                 },
                                 onClose: () => Navigator.of(context).maybePop(),
                               );
@@ -1298,18 +1797,32 @@ class _QueueSheetState extends State<_QueueSheet> {
                     return CustomScrollView(
                       slivers: [
                         SliverOverlapInjector(
-                          handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+                          handle:
+                              NestedScrollView.sliverOverlapAbsorberHandleFor(
+                                context,
+                              ),
                         ),
                         if (filtered.isEmpty)
                           const SliverFillRemaining(
                             hasScrollBody: false,
                             child: Center(
-                              child: Text('No tracks in this filter', style: TextStyle(color: Color(0xFF8E8E93), fontSize: 13)),
+                              child: Text(
+                                'No tracks in this filter',
+                                style: TextStyle(
+                                  color: Color(0xFF8E8E93),
+                                  fontSize: 13,
+                                ),
+                              ),
                             ),
                           )
                         else
                           SliverPadding(
-                            padding: EdgeInsets.fromLTRB(10, 4, 10, 28 + media.padding.bottom),
+                            padding: EdgeInsets.fromLTRB(
+                              10,
+                              4,
+                              10,
+                              28 + media.padding.bottom,
+                            ),
                             sliver: SliverReorderableList(
                               itemCount: filtered.length,
                               onReorderItem: (oldIndex, newIndex) {
@@ -1332,29 +1845,44 @@ class _QueueSheetState extends State<_QueueSheet> {
                                     out.add(vis[vi++]);
                                   }
                                   final seen = <int>{};
-                                  _order = [for (final i in out) if (seen.add(i)) i];
+                                  _order = [
+                                    for (final i in out)
+                                      if (seen.add(i)) i,
+                                  ];
                                 });
                               },
                               itemBuilder: (context, i) {
                                 final orig = filtered[i];
                                 final w = widget.words[orig];
-                                final rowArt = w.img.isNotEmpty ? w.img : widget.themes[orig % widget.themes.length].image;
+                                final rowArt = w.img.isNotEmpty
+                                    ? w.img
+                                    : widget
+                                          .themes[orig % widget.themes.length]
+                                          .image;
                                 final isCurrent = orig == widget.index;
                                 return ReorderableDelayedDragStartListener(
                                   key: ValueKey('q-$orig-${w.word}'),
                                   index: i,
                                   child: Material(
-                                    color: isCurrent ? const Color(0x28FFFFFF) : Colors.transparent,
+                                    color: isCurrent
+                                        ? const Color(0x28FFFFFF)
+                                        : Colors.transparent,
                                     borderRadius: BorderRadius.circular(12),
                                     child: InkWell(
                                       borderRadius: BorderRadius.circular(12),
                                       onTap: () => widget.onPlayAt(orig),
                                       child: Padding(
-                                        padding: const EdgeInsets.fromLTRB(8, 8, 4, 8),
+                                        padding: const EdgeInsets.fromLTRB(
+                                          8,
+                                          8,
+                                          4,
+                                          8,
+                                        ),
                                         child: Row(
                                           children: [
                                             ClipRRect(
-                                              borderRadius: BorderRadius.circular(6),
+                                              borderRadius:
+                                                  BorderRadius.circular(6),
                                               child: SizedBox(
                                                 width: 48,
                                                 height: 48,
@@ -1362,14 +1890,49 @@ class _QueueSheetState extends State<_QueueSheet> {
                                                   fit: StackFit.expand,
                                                   children: [
                                                     rowArt.startsWith('http')
-                                                        ? Image.network(rowArt, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111)))
-                                                        : Image.asset(rowArt, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111))),
+                                                        ? Image.network(
+                                                            rowArt,
+                                                            fit: BoxFit.cover,
+                                                            errorBuilder:
+                                                                (
+                                                                  _,
+                                                                  __,
+                                                                  ___,
+                                                                ) => const ColoredBox(
+                                                                  color: Color(
+                                                                    0xFF111111,
+                                                                  ),
+                                                                ),
+                                                          )
+                                                        : Image.asset(
+                                                            rowArt,
+                                                            fit: BoxFit.cover,
+                                                            errorBuilder:
+                                                                (
+                                                                  _,
+                                                                  __,
+                                                                  ___,
+                                                                ) => const ColoredBox(
+                                                                  color: Color(
+                                                                    0xFF111111,
+                                                                  ),
+                                                                ),
+                                                          ),
                                                     if (isCurrent)
                                                       const Align(
-                                                        alignment: Alignment.bottomRight,
+                                                        alignment: Alignment
+                                                            .bottomRight,
                                                         child: Padding(
-                                                          padding: EdgeInsets.all(3),
-                                                          child: Icon(Icons.equalizer_rounded, color: Color(0xFFF5F5F7), size: 16),
+                                                          padding:
+                                                              EdgeInsets.all(3),
+                                                          child: Icon(
+                                                            Icons
+                                                                .equalizer_rounded,
+                                                            color: Color(
+                                                              0xFFF5F5F7,
+                                                            ),
+                                                            size: 16,
+                                                          ),
                                                         ),
                                                       ),
                                                   ],
@@ -1379,30 +1942,46 @@ class _QueueSheetState extends State<_QueueSheet> {
                                             const SizedBox(width: 12),
                                             Expanded(
                                               child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
                                                     w.word,
                                                     maxLines: 1,
-                                                    overflow: TextOverflow.ellipsis,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
                                                     style: TextStyle(
-                                                      color: const Color(0xFFF5F5F7),
+                                                      color: const Color(
+                                                        0xFFF5F5F7,
+                                                      ),
                                                       fontSize: 15,
-                                                      fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w600,
+                                                      fontWeight: isCurrent
+                                                          ? FontWeight.w700
+                                                          : FontWeight.w600,
                                                       letterSpacing: -0.15,
                                                     ),
                                                   ),
                                                   const SizedBox(height: 2),
                                                   Text(
                                                     'NowssB · ${_wordClock(w)}',
-                                                    style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 12),
+                                                    style: const TextStyle(
+                                                      color: Color(0xFF8E8E93),
+                                                      fontSize: 12,
+                                                    ),
                                                   ),
                                                 ],
                                               ),
                                             ),
                                             const Padding(
-                                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                                              child: Icon(Icons.drag_handle_rounded, color: Color(0xFF8E8E93), size: 22),
+                                              padding: EdgeInsets.symmetric(
+                                                horizontal: 10,
+                                                vertical: 10,
+                                              ),
+                                              child: Icon(
+                                                Icons.drag_handle_rounded,
+                                                color: Color(0xFF8E8E93),
+                                                size: 22,
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -1427,12 +2006,17 @@ class _QueueSheetState extends State<_QueueSheet> {
               child: IgnorePointer(
                 ignoring: miniOpacity > 0.55,
                 child: Opacity(
-                  opacity: (1.0 - miniOpacity).clamp(0.0, 1.0) * controlsOpacity.clamp(0.4, 1.0),
+                  opacity:
+                      (1.0 - miniOpacity).clamp(0.0, 1.0) *
+                      controlsOpacity.clamp(0.4, 1.0),
                   child: Center(
                     child: Container(
                       width: 42,
                       height: 4,
-                      decoration: BoxDecoration(color: const Color(0x7AFFFFFF), borderRadius: BorderRadius.circular(99)),
+                      decoration: BoxDecoration(
+                        color: const Color(0x7AFFFFFF),
+                        borderRadius: BorderRadius.circular(99),
+                      ),
                     ),
                   ),
                 ),
@@ -1558,9 +2142,19 @@ class _YtmCollapsingHero extends StatelessWidget {
                 showPoster: true,
               )
             else if (art.startsWith('http'))
-              Image.network(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111)))
+              Image.network(
+                art,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) =>
+                    const ColoredBox(color: Color(0xFF111111)),
+              )
             else
-              Image.asset(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111))),
+              Image.asset(
+                art,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) =>
+                    const ColoredBox(color: Color(0xFF111111)),
+              ),
           ],
         ),
       ),
@@ -1569,7 +2163,13 @@ class _YtmCollapsingHero extends StatelessWidget {
 
   /// Expanded column sized to [h] so content never exceeds flexibleSpace
   /// (kills BOTTOM OVERFLOW). Fixed sections lerp down with et; art takes rest.
-  Widget _buildFull(BuildContext context, double w, double h, double t, double et) {
+  Widget _buildFull(
+    BuildContext context,
+    double w,
+    double h,
+    double t,
+    double et,
+  ) {
     final chromeH = lerpDouble(44.0, 0.0, et)!;
     final titleBlockH = lerpDouble(58.0, 0.0, et)!;
     final progressH = lerpDouble(38.0, 0.0, et)!;
@@ -1580,7 +2180,8 @@ class _YtmCollapsingHero extends StatelessWidget {
     final gapAfterTitle = lerpDouble(6.0, 0.0, et)!;
     final gapAfterProgress = lerpDouble(4.0, 0.0, et)!;
 
-    final reserved = topPad +
+    final reserved =
+        topPad +
         chromeH +
         gapAfterChrome +
         titleBlockH +
@@ -1622,8 +2223,18 @@ class _YtmCollapsingHero extends StatelessWidget {
               child: Opacity(
                 opacity: (1.0 - et * 0.85).clamp(0.15, 1.0),
                 child: art.startsWith('http')
-                    ? Image.network(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111)))
-                    : Image.asset(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111))),
+                    ? Image.network(
+                        art,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) =>
+                            const ColoredBox(color: Color(0xFF111111)),
+                      )
+                    : Image.asset(
+                        art,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) =>
+                            const ColoredBox(color: Color(0xFF111111)),
+                      ),
               ),
             ),
           Positioned.fill(
@@ -1642,117 +2253,130 @@ class _YtmCollapsingHero extends StatelessWidget {
             ),
           ),
           Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          SizedBox(height: topPad),
-          if (chromeH > 0.5)
-            SizedBox(
-              height: chromeH,
-              child: Opacity(
-                opacity: controlsFade,
-                child: Row(
-                  children: [
-                    IconButton(
-                      onPressed: onClose,
-                      icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFFCFCFD2), size: 28),
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(height: topPad),
+              if (chromeH > 0.5)
+                SizedBox(
+                  height: chromeH,
+                  child: Opacity(
+                    opacity: controlsFade,
+                    child: Row(
+                      children: [
+                        IconButton(
+                          onPressed: onClose,
+                          icon: const Icon(
+                            Icons.keyboard_arrow_down_rounded,
+                            color: Color(0xFFCFCFD2),
+                            size: 28,
+                          ),
+                        ),
+                        const Spacer(),
+                        IconButton(
+                          onPressed: () {},
+                          icon: const Icon(
+                            Icons.more_vert_rounded,
+                            color: Color(0xFFCFCFD2),
+                            size: 22,
+                          ),
+                        ),
+                      ],
                     ),
-                    const Spacer(),
-                    IconButton(
-                      onPressed: () {},
-                      icon: const Icon(Icons.more_vert_rounded, color: Color(0xFFCFCFD2), size: 22),
-                    ),
-                  ],
+                  ),
                 ),
+              if (gapAfterChrome > 0.5) SizedBox(height: gapAfterChrome),
+              SizedBox(
+                height: artBudget,
+                // When looping video fills the hero, skip the duplicate square so the
+                // motion stays visible (user: video must be there).
+                child: video.isEmpty
+                    ? Center(
+                        child: artSize > 1
+                            ? _artBox(artSize, radius: radius)
+                            : const SizedBox.shrink(),
+                      )
+                    : const SizedBox.shrink(),
               ),
-            ),
-          if (gapAfterChrome > 0.5) SizedBox(height: gapAfterChrome),
-          SizedBox(
-            height: artBudget,
-            // When looping video fills the hero, skip the duplicate square so the
-            // motion stays visible (user: video must be there).
-            child: video.isEmpty
-                ? Center(
-                    child: artSize > 1 ? _artBox(artSize, radius: radius) : const SizedBox.shrink(),
-                  )
-                : const SizedBox.shrink(),
+              if (gapAfterArt > 0.5) SizedBox(height: gapAfterArt),
+              if (titleBlockH > 0.5)
+                SizedBox(
+                  height: titleBlockH,
+                  child: Opacity(
+                    opacity: controlsFade,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            title,
+                            maxLines: 2,
+                            overflow: TextOverflow.fade,
+                            softWrap: true,
+                            style: TextStyle(
+                              color: const Color(0xFFF5F5F7),
+                              fontSize: lerpDouble(24, 16, et)!,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: -0.2,
+                              height: 1.15,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            subtitle,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: const Color(0xFF8E8E93),
+                              fontSize: lerpDouble(14, 12, et)!,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              if (gapAfterTitle > 0.5) SizedBox(height: gapAfterTitle),
+              if (progressH > 0.5)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: SizedBox(
+                    height: progressH,
+                    child: Opacity(
+                      opacity: controlsFade,
+                      child: ClipRect(
+                        child: _ProgressBar(
+                          playing: playing,
+                          durationSec: durationSec,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              if (gapAfterProgress > 0.5) SizedBox(height: gapAfterProgress),
+              if (transportH > 0.5)
+                SizedBox(
+                  height: transportH,
+                  child: Opacity(
+                    opacity: controlsFade,
+                    child: ClipRect(
+                      child: _PlainTransportRow(
+                        playing: playing,
+                        shuffle: shuffle,
+                        loop: loop,
+                        onShuffle: () {},
+                        onPrevious: onPrevious,
+                        onPlay: onPlay,
+                        onNext: onNext,
+                        onRepeat: () {},
+                      ),
+                    ),
+                  ),
+                ),
+              if (slack > 0.5) SizedBox(height: slack),
+            ],
           ),
-          if (gapAfterArt > 0.5) SizedBox(height: gapAfterArt),
-          if (titleBlockH > 0.5)
-            SizedBox(
-              height: titleBlockH,
-              child: Opacity(
-                opacity: controlsFade,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        title,
-                        maxLines: 2,
-                        overflow: TextOverflow.fade,
-                        softWrap: true,
-                        style: TextStyle(
-                          color: const Color(0xFFF5F5F7),
-                          fontSize: lerpDouble(24, 16, et)!,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: -0.2,
-                          height: 1.15,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        subtitle,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: const Color(0xFF8E8E93),
-                          fontSize: lerpDouble(14, 12, et)!,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          if (gapAfterTitle > 0.5) SizedBox(height: gapAfterTitle),
-          if (progressH > 0.5)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: SizedBox(
-                height: progressH,
-                child: Opacity(
-                  opacity: controlsFade,
-                  child: ClipRect(
-                    child: _ProgressBar(playing: playing, durationSec: durationSec),
-                  ),
-                ),
-              ),
-            ),
-          if (gapAfterProgress > 0.5) SizedBox(height: gapAfterProgress),
-          if (transportH > 0.5)
-            SizedBox(
-              height: transportH,
-              child: Opacity(
-                opacity: controlsFade,
-                child: ClipRect(
-                  child: _PlainTransportRow(
-                    playing: playing,
-                    shuffle: shuffle,
-                    loop: loop,
-                    onShuffle: () {},
-                    onPrevious: onPrevious,
-                    onPlay: onPlay,
-                    onNext: onNext,
-                    onRepeat: () {},
-                  ),
-                ),
-              ),
-            ),
-          if (slack > 0.5) SizedBox(height: slack),
-        ],
-      ),
         ],
       ),
     );
@@ -1788,7 +2412,10 @@ class _YtmCollapsingHero extends StatelessWidget {
                     subtitle,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 12),
+                    style: const TextStyle(
+                      color: Color(0xFF8E8E93),
+                      fontSize: 12,
+                    ),
                   ),
                 ],
               ),
@@ -1830,7 +2457,11 @@ class _QueueStickyHeadDelegate extends SliverPersistentHeaderDelegate {
   double get maxExtent => 108;
 
   @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
     return Material(
       color: const Color(0xF0101014),
       child: Column(
@@ -1845,32 +2476,62 @@ class _QueueStickyHeadDelegate extends SliverPersistentHeaderDelegate {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Playing from', style: TextStyle(color: Color(0xFF9A9AA0), fontSize: 12, fontWeight: FontWeight.w500)),
+                      const Text(
+                        'Playing from',
+                        style: TextStyle(
+                          color: Color(0xFF9A9AA0),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                       const SizedBox(height: 2),
                       Text(
                         mixLabel,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(color: Color(0xFFF5F5F7), fontSize: 18, fontWeight: FontWeight.w700, letterSpacing: -0.2),
+                        style: const TextStyle(
+                          color: Color(0xFFF5F5F7),
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.2,
+                        ),
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(width: 10),
                 Material(
-                  color: saved ? const Color(0x33E8D5A3) : const Color(0x33FFFFFF),
+                  color: saved
+                      ? const Color(0x33E8D5A3)
+                      : const Color(0x33FFFFFF),
                   borderRadius: BorderRadius.circular(99),
                   child: InkWell(
                     borderRadius: BorderRadius.circular(99),
                     onTap: onSave,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 8,
+                      ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(saved ? Icons.playlist_add_check_rounded : Icons.playlist_add_rounded, color: const Color(0xFFF5F5F7), size: 18),
+                          Icon(
+                            saved
+                                ? Icons.playlist_add_check_rounded
+                                : Icons.playlist_add_rounded,
+                            color: const Color(0xFFF5F5F7),
+                            size: 18,
+                          ),
                           const SizedBox(width: 6),
-                          Text(saved ? 'Saved' : '+ Save', style: const TextStyle(color: Color(0xFFF5F5F7), fontSize: 13, fontWeight: FontWeight.w600)),
+                          Text(
+                            saved ? 'Saved' : '+ Save',
+                            style: const TextStyle(
+                              color: Color(0xFFF5F5F7),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -1943,7 +2604,8 @@ class _StoreGlassVideoBox extends StatelessWidget {
                 Image.asset(
                   _asset,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111)),
+                  errorBuilder: (_, __, ___) =>
+                      const ColoredBox(color: Color(0xFF111111)),
                 ),
                 DecoratedBox(
                   decoration: BoxDecoration(
@@ -1962,10 +2624,17 @@ class _StoreGlassVideoBox extends StatelessWidget {
 
 class _VisualStage extends StatelessWidget {
   const _VisualStage({
-    required this.word, required this.theme, required this.playing,
-    required this.accent, required this.onReplay, required this.onCopy,
-    required this.onSettings, required this.onInfo, required this.onLevel,
-    required this.onStore, required this.onSyllable,
+    required this.word,
+    required this.theme,
+    required this.playing,
+    required this.accent,
+    required this.onReplay,
+    required this.onCopy,
+    required this.onSettings,
+    required this.onInfo,
+    required this.onLevel,
+    required this.onStore,
+    required this.onSyllable,
   });
 
   final Word word;
@@ -1989,80 +2658,106 @@ class _VisualStage extends StatelessWidget {
         borderRadius: BorderRadius.circular(34),
         border: Border.all(color: const Color(0x38FFFFFF)),
         boxShadow: const [
-          BoxShadow(color: Color(0x8C000000), blurRadius: 28, offset: Offset(0, 18)),
+          BoxShadow(
+            color: Color(0x8C000000),
+            blurRadius: 28,
+            offset: Offset(0, 18),
+          ),
           BoxShadow(color: Color(0x24FFFFFF), blurRadius: 0, spreadRadius: 1),
         ],
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(34),
-        child: Stack(fit: StackFit.expand, children: [
-          const ColoredBox(color: Colors.black),
-          NwsbVideo(
-            asset: theme.video,
-            poster: theme.image,
-            fit: BoxFit.cover,
-            alignment: const Alignment(0, -0.24),
-            priority: ClipPriority.feature,
-            autoplay: true,
-            loop: true,
-            showPoster: true,
-          ),
-          const DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Color(0x00000000), Color(0x00000000), Color(0xD9000000)],
-                stops: [0, 0.42, 1],
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            const ColoredBox(color: Colors.black),
+            NwsbVideo(
+              asset: theme.video,
+              poster: theme.image,
+              fit: BoxFit.cover,
+              alignment: const Alignment(0, -0.24),
+              priority: ClipPriority.feature,
+              autoplay: true,
+              loop: true,
+              showPoster: true,
+            ),
+            const DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0x00000000),
+                    Color(0x00000000),
+                    Color(0xD9000000),
+                  ],
+                  stops: [0, 0.42, 1],
+                ),
               ),
             ),
-          ),
-          Positioned(
-            top: 10,
-            left: 10,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                AnimatedBuilder(
-                  animation: PracticeProgress.instance,
-                  builder: (context, _) => _LevelPill(
-                    level: PracticeProgress.instance.level.clamp(1, 10),
-                    onTap: onLevel,
+            Positioned(
+              top: 10,
+              left: 10,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  AnimatedBuilder(
+                    animation: PracticeProgress.instance,
+                    builder: (context, _) => _LevelPill(
+                      level: PracticeProgress.instance.level.clamp(1, 10),
+                      onTap: onLevel,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 8),
-                // Store bag square lives INSIDE the art card (below Level badge).
-                _StoreGlassVideoBox(onTap: onStore, size: 56),
-              ],
+                  const SizedBox(height: 8),
+                  // Store bag square lives INSIDE the art card (below Level badge).
+                  _StoreGlassVideoBox(onTap: onStore, size: 56),
+                ],
+              ),
             ),
-          ),
-          Positioned(
-            top: 10,
-            right: 10,
-            child: _StageGlassChip(onSettings: onSettings, onInfo: onInfo),
-          ),
-          Positioned(
-            left: 0, right: 0, bottom: 0,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 40, 16, 14),
-              child: Column(mainAxisSize: MainAxisSize.min, children: [
-                Text(
-                  word.word.toUpperCase(),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: Color(0xE6F4F4F5), fontSize: 11, fontWeight: FontWeight.w500, letterSpacing: 6),
-                ),
-                const SizedBox(height: 8),
-                _WordOverlay(
-                  word: word, accent: accent, playing: playing, liked: false,
-                  onReplay: onReplay, onNotes: onCopy, onLike: () {},
-                  onSyllable: onSyllable,
-                  embedded: true,
-                ),
-              ]),
+            Positioned(
+              top: 10,
+              right: 10,
+              child: _StageGlassChip(onSettings: onSettings, onInfo: onInfo),
             ),
-          ),
-        ]),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 40, 16, 14),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      word.word.toUpperCase(),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Color(0xE6F4F4F5),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 6,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    _WordOverlay(
+                      word: word,
+                      accent: accent,
+                      playing: playing,
+                      liked: false,
+                      onReplay: onReplay,
+                      onNotes: onCopy,
+                      onLike: () {},
+                      onSyllable: onSyllable,
+                      embedded: true,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     ),
   );
@@ -2085,20 +2780,31 @@ class _LevelPill extends StatelessWidget {
           colors: [Color(0x8C46464E), Color(0xB80C0C0E)],
         ),
         boxShadow: const [
-          BoxShadow(color: Color(0x59000000), blurRadius: 18, offset: Offset(0, 8)),
+          BoxShadow(
+            color: Color(0x59000000),
+            blurRadius: 18,
+            offset: Offset(0, 8),
+          ),
           BoxShadow(color: Color(0x29FFFFFF), blurRadius: 0, spreadRadius: 1),
         ],
       ),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(8, 6, 12, 6),
-        child: Row(mainAxisSize: MainAxisSize.min, children: [
-          const Icon(Icons.star_rounded, color: Color(0xFFE8D5A3), size: 14),
-          const SizedBox(width: 6),
-          Text(
-            'Level $level',
-            style: const TextStyle(color: Color(0xFFF4F4F5), fontSize: 12, fontWeight: FontWeight.w500),
-          ),
-        ]),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.star_rounded, color: Color(0xFFE8D5A3), size: 14),
+            const SizedBox(width: 6),
+            Text(
+              'Level $level',
+              style: const TextStyle(
+                color: Color(0xFFF4F4F5),
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
       ),
     ),
   );
@@ -2119,22 +2825,41 @@ class _StageGlassChip extends StatelessWidget {
         colors: [Color(0x8C46464E), Color(0xB80C0C0E)],
       ),
       boxShadow: const [
-        BoxShadow(color: Color(0x59000000), blurRadius: 18, offset: Offset(0, 8)),
+        BoxShadow(
+          color: Color(0x59000000),
+          blurRadius: 18,
+          offset: Offset(0, 8),
+        ),
         BoxShadow(color: Color(0x29FFFFFF), blurRadius: 0, spreadRadius: 1),
       ],
     ),
     child: Padding(
       padding: const EdgeInsets.all(4),
-      child: Row(mainAxisSize: MainAxisSize.min, children: [
-        _StageGlassBtn(icon: Icons.settings_rounded, label: 'Settings', onTap: onSettings),
-        _StageGlassBtn(icon: Icons.help_outline_rounded, label: 'Word info', onTap: onInfo),
-      ]),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _StageGlassBtn(
+            icon: Icons.settings_rounded,
+            label: 'Settings',
+            onTap: onSettings,
+          ),
+          _StageGlassBtn(
+            icon: Icons.help_outline_rounded,
+            label: 'Word info',
+            onTap: onInfo,
+          ),
+        ],
+      ),
     ),
   );
 }
 
 class _StageGlassBtn extends StatelessWidget {
-  const _StageGlassBtn({required this.icon, required this.label, required this.onTap});
+  const _StageGlassBtn({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
   final IconData icon;
   final String label;
   final VoidCallback onTap;
@@ -2182,7 +2907,8 @@ class _ArtWavePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _ArtWavePainter oldDelegate) => oldDelegate.active != active;
+  bool shouldRepaint(covariant _ArtWavePainter oldDelegate) =>
+      oldDelegate.active != active;
 }
 
 class _ProgressBar extends StatefulWidget {
@@ -2194,20 +2920,28 @@ class _ProgressBar extends StatefulWidget {
   State<_ProgressBar> createState() => _ProgressBarState();
 }
 
-class _ProgressBarState extends State<_ProgressBar> with SingleTickerProviderStateMixin {
+class _ProgressBarState extends State<_ProgressBar>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _c;
 
   @override
   void initState() {
     super.initState();
-    _c = AnimationController(vsync: this, duration: Duration(milliseconds: (widget.durationSec * 1000).round().clamp(400, 120000)));
+    _c = AnimationController(
+      vsync: this,
+      duration: Duration(
+        milliseconds: (widget.durationSec * 1000).round().clamp(400, 120000),
+      ),
+    );
     if (widget.playing) _c.forward();
   }
 
   @override
   void didUpdateWidget(covariant _ProgressBar oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _c.duration = Duration(milliseconds: (widget.durationSec * 1000).round().clamp(400, 120000));
+    _c.duration = Duration(
+      milliseconds: (widget.durationSec * 1000).round().clamp(400, 120000),
+    );
     if (widget.playing && !oldWidget.playing) {
       _c.forward(from: 0);
     } else if (!widget.playing && oldWidget.playing) {
@@ -2234,30 +2968,75 @@ class _ProgressBarState extends State<_ProgressBar> with SingleTickerProviderSta
           children: [
             SizedBox(
               height: 14,
-              child: LayoutBuilder(builder: (context, constraints) {
-                final x = t * constraints.maxWidth;
-                return Stack(alignment: Alignment.centerLeft, children: [
-                  Container(height: 3, decoration: BoxDecoration(color: const Color(0xFF2C2C2E), borderRadius: BorderRadius.circular(99))),
-                  Container(width: x, height: 3, decoration: BoxDecoration(color: const Color(0xFFF5F5F7), borderRadius: BorderRadius.circular(99))),
-                  Positioned(
-                    left: (x - 5.5).clamp(0.0, math.max(0.0, constraints.maxWidth - 11)),
-                    child: Container(
-                      width: 12, height: 12,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFF5F5F7),
-                        shape: BoxShape.circle,
-                        boxShadow: [BoxShadow(color: Color(0xFF050505), blurRadius: 0, spreadRadius: 3)],
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final x = t * constraints.maxWidth;
+                  return Stack(
+                    alignment: Alignment.centerLeft,
+                    children: [
+                      Container(
+                        height: 3,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF2C2C2E),
+                          borderRadius: BorderRadius.circular(99),
+                        ),
                       ),
-                    ),
-                  ),
-                ]);
-              }),
+                      Container(
+                        width: x,
+                        height: 3,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF5F5F7),
+                          borderRadius: BorderRadius.circular(99),
+                        ),
+                      ),
+                      Positioned(
+                        left: (x - 5.5).clamp(
+                          0.0,
+                          math.max(0.0, constraints.maxWidth - 11),
+                        ),
+                        child: Container(
+                          width: 12,
+                          height: 12,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFF5F5F7),
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Color(0xFF050505),
+                                blurRadius: 0,
+                                spreadRadius: 3,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
             const SizedBox(height: 6),
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              Text(_fmtClock(widget.durationSec * t), style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 11, height: 1.1)),
-              Text(_fmtClock(widget.durationSec), style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 11, height: 1.1)),
-            ]),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  _fmtClock(widget.durationSec * t),
+                  style: const TextStyle(
+                    color: Color(0xFF8E8E93),
+                    fontSize: 11,
+                    height: 1.1,
+                  ),
+                ),
+                Text(
+                  _fmtClock(widget.durationSec),
+                  style: const TextStyle(
+                    color: Color(0xFF8E8E93),
+                    fontSize: 11,
+                    height: 1.1,
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       );
@@ -2268,8 +3047,14 @@ class _ProgressBarState extends State<_ProgressBar> with SingleTickerProviderSta
 /// Expanded YTM transport — plain Material icons, NO glass pill/tube.
 class _PlainTransportRow extends StatelessWidget {
   const _PlainTransportRow({
-    required this.playing, required this.shuffle, required this.loop,
-    required this.onShuffle, required this.onPrevious, required this.onPlay, required this.onNext, required this.onRepeat,
+    required this.playing,
+    required this.shuffle,
+    required this.loop,
+    required this.onShuffle,
+    required this.onPrevious,
+    required this.onPlay,
+    required this.onNext,
+    required this.onRepeat,
   });
   final bool playing;
   final bool shuffle;
@@ -2292,13 +3077,21 @@ class _PlainTransportRow extends StatelessWidget {
             onPressed: onShuffle,
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
-            icon: Icon(Icons.shuffle_rounded, color: shuffle ? Colors.white : const Color(0xFFCFCFD2), size: 22),
+            icon: Icon(
+              Icons.shuffle_rounded,
+              color: shuffle ? Colors.white : const Color(0xFFCFCFD2),
+              size: 22,
+            ),
           ),
           IconButton(
             onPressed: onPrevious,
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
-            icon: const Icon(Icons.skip_previous_rounded, color: Color(0xFFF5F5F7), size: 32),
+            icon: const Icon(
+              Icons.skip_previous_rounded,
+              color: Color(0xFFF5F5F7),
+              size: 32,
+            ),
           ),
           GestureDetector(
             onTap: onPlay,
@@ -2320,13 +3113,21 @@ class _PlainTransportRow extends StatelessWidget {
             onPressed: onNext,
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
-            icon: const Icon(Icons.skip_next_rounded, color: Color(0xFFF5F5F7), size: 32),
+            icon: const Icon(
+              Icons.skip_next_rounded,
+              color: Color(0xFFF5F5F7),
+              size: 32,
+            ),
           ),
           IconButton(
             onPressed: onRepeat,
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
-            icon: Icon(Icons.repeat_rounded, color: loop ? Colors.white : const Color(0xFFCFCFD2), size: 22),
+            icon: Icon(
+              Icons.repeat_rounded,
+              color: loop ? Colors.white : const Color(0xFFCFCFD2),
+              size: 22,
+            ),
           ),
         ],
       ),
@@ -2336,8 +3137,14 @@ class _PlainTransportRow extends StatelessWidget {
 
 class _TransportRow extends StatelessWidget {
   const _TransportRow({
-    required this.playing, required this.shuffle, required this.loop,
-    required this.onShuffle, required this.onPrevious, required this.onPlay, required this.onNext, required this.onRepeat,
+    required this.playing,
+    required this.shuffle,
+    required this.loop,
+    required this.onShuffle,
+    required this.onPrevious,
+    required this.onPlay,
+    required this.onNext,
+    required this.onRepeat,
     this.tubeHeight = 118,
   });
   final bool playing;
@@ -2366,8 +3173,14 @@ class _TransportRow extends StatelessWidget {
 
 class _GlassTube extends StatelessWidget {
   const _GlassTube({
-    required this.playing, required this.shuffle, required this.loop,
-    required this.onShuffle, required this.onPrevious, required this.onPlay, required this.onNext, required this.onRepeat,
+    required this.playing,
+    required this.shuffle,
+    required this.loop,
+    required this.onShuffle,
+    required this.onPrevious,
+    required this.onPlay,
+    required this.onNext,
+    required this.onRepeat,
     this.height = 72,
   });
   final bool playing;
@@ -2380,7 +3193,8 @@ class _GlassTube extends StatelessWidget {
   final VoidCallback onNext;
   final VoidCallback onRepeat;
 
-  static const _tube = 'https://media.nowssb.com/migrated-images/19432211f0f348fc_file_0000000016bc71fab1ae5a054ac772af_gwttc6.png';
+  static const _tube =
+      'https://media.nowssb.com/migrated-images/19432211f0f348fc_file_0000000016bc71fab1ae5a054ac772af_gwttc6.png';
 
   @override
   Widget build(BuildContext context) {
@@ -2392,41 +3206,75 @@ class _GlassTube extends StatelessWidget {
           borderRadius: BorderRadius.all(Radius.circular(999)),
           image: DecorationImage(image: NetworkImage(_tube), fit: BoxFit.fill),
           boxShadow: [
-            BoxShadow(color: Color(0x8C000000), blurRadius: 40, offset: Offset(0, 18)),
+            BoxShadow(
+              color: Color(0x8C000000),
+              blurRadius: 40,
+              offset: Offset(0, 18),
+            ),
           ],
         ),
         child: Padding(
-          padding: EdgeInsets.fromLTRB(8, height >= 110 ? 8 : 4, 8, height >= 110 ? 10 : 6),
-          child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-            _TubeIcon(icon: Icons.shuffle_rounded, on: shuffle, onTap: onShuffle, label: 'Shuffle'),
-            _TubeIcon(icon: Icons.skip_previous_rounded, onTap: onPrevious, label: 'Previous'),
-            // Center play — simple circular Material icon (no headphone image assets).
-            Semantics(
-              button: true,
-              label: playing ? 'Pause' : 'Play',
-              child: GestureDetector(
-                onTap: onPlay,
-                child: Container(
-                  width: playSize,
-                  height: playSize,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Color(0xFFF5F5F7),
-                    boxShadow: [
-                      BoxShadow(color: Color(0x66000000), blurRadius: 12, offset: Offset(0, 4)),
-                    ],
-                  ),
-                  child: Icon(
-                    playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
-                    color: const Color(0xFF0A0A0C),
-                    size: playSize * 0.55,
+          padding: EdgeInsets.fromLTRB(
+            8,
+            height >= 110 ? 8 : 4,
+            8,
+            height >= 110 ? 10 : 6,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _TubeIcon(
+                icon: Icons.shuffle_rounded,
+                on: shuffle,
+                onTap: onShuffle,
+                label: 'Shuffle',
+              ),
+              _TubeIcon(
+                icon: Icons.skip_previous_rounded,
+                onTap: onPrevious,
+                label: 'Previous',
+              ),
+              // Center play — simple circular Material icon (no headphone image assets).
+              Semantics(
+                button: true,
+                label: playing ? 'Pause' : 'Play',
+                child: GestureDetector(
+                  onTap: onPlay,
+                  child: Container(
+                    width: playSize,
+                    height: playSize,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Color(0xFFF5F5F7),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Color(0x66000000),
+                          blurRadius: 12,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                      color: const Color(0xFF0A0A0C),
+                      size: playSize * 0.55,
+                    ),
                   ),
                 ),
               ),
-            ),
-            _TubeIcon(icon: Icons.skip_next_rounded, onTap: onNext, label: 'Next'),
-            _TubeIcon(icon: Icons.repeat_rounded, on: loop, onTap: onRepeat, label: 'Repeat'),
-          ]),
+              _TubeIcon(
+                icon: Icons.skip_next_rounded,
+                onTap: onNext,
+                label: 'Next',
+              ),
+              _TubeIcon(
+                icon: Icons.repeat_rounded,
+                on: loop,
+                onTap: onRepeat,
+                label: 'Repeat',
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -2434,7 +3282,12 @@ class _GlassTube extends StatelessWidget {
 }
 
 class _TubeIcon extends StatelessWidget {
-  const _TubeIcon({required this.icon, required this.onTap, required this.label, this.on = false});
+  const _TubeIcon({
+    required this.icon,
+    required this.onTap,
+    required this.label,
+    this.on = false,
+  });
   final IconData icon;
   final VoidCallback onTap;
   final String label;
@@ -2464,8 +3317,12 @@ class _TubeIcon extends StatelessWidget {
 
 class _GlassOrb extends StatelessWidget {
   const _GlassOrb({
-    required this.icon, required this.onTap, required this.label,
-    this.on = false, this.filled = false, this.play = false,
+    required this.icon,
+    required this.onTap,
+    required this.label,
+    this.on = false,
+    this.filled = false,
+    this.play = false,
   });
   final IconData icon;
   final VoidCallback onTap;
@@ -2493,11 +3350,23 @@ class _GlassOrb extends StatelessWidget {
               colors: [Color(0xB346464E), Color(0xE60A0A0C)],
             ),
             boxShadow: [
-              const BoxShadow(color: Color(0x59000000), blurRadius: 14, offset: Offset(0, 6)),
-              BoxShadow(color: on ? const Color(0x47DCE6FF) : const Color(0x1FFFFFFF), blurRadius: on ? 16 : 0, spreadRadius: 1),
+              const BoxShadow(
+                color: Color(0x59000000),
+                blurRadius: 14,
+                offset: Offset(0, 6),
+              ),
+              BoxShadow(
+                color: on ? const Color(0x47DCE6FF) : const Color(0x1FFFFFFF),
+                blurRadius: on ? 16 : 0,
+                spreadRadius: 1,
+              ),
             ],
           ),
-          child: Icon(icon, color: const Color(0xFFF4F4F5), size: play ? 26 : 18),
+          child: Icon(
+            icon,
+            color: const Color(0xFFF4F4F5),
+            size: play ? 26 : 18,
+          ),
         ),
       ),
     );
@@ -2521,8 +3390,13 @@ class _ModeBtn extends StatelessWidget {
 
 class _WordOverlay extends StatelessWidget {
   const _WordOverlay({
-    required this.word, required this.accent, required this.playing,
-    required this.liked, required this.onReplay, required this.onNotes, required this.onLike,
+    required this.word,
+    required this.accent,
+    required this.playing,
+    required this.liked,
+    required this.onReplay,
+    required this.onNotes,
+    required this.onLike,
     this.onSyllable,
     this.embedded = false,
   });
@@ -2539,64 +3413,114 @@ class _WordOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
     width: double.infinity,
-    padding: embedded ? EdgeInsets.zero : const EdgeInsets.fromLTRB(14, 16, 14, 14),
-    decoration: embedded ? null : BoxDecoration(
-      color: const Color(0xD1161618),
-      borderRadius: BorderRadius.circular(23),
-      border: Border.all(color: const Color(0x14FFFFFF)),
-    ),
-    child: Column(mainAxisSize: MainAxisSize.min, children: [
-      if (word.parts.isNotEmpty)
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          alignment: WrapAlignment.center,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            for (var i = 0; i < word.parts.length; i++) ...[
-              if (i > 0) Container(width: 4, height: 4, decoration: const BoxDecoration(color: Color(0xCCF4F4F5), shape: BoxShape.circle)),
-              _SyllablePill(part: word.parts[i], onTap: onSyllable == null ? null : () => onSyllable!(word.parts[i])),
-            ],
-          ],
-        )
-      else if (word.syllables.isNotEmpty)
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          alignment: WrapAlignment.center,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            for (var i = 0; i < word.syllables.length; i++) ...[
-              if (i > 0) Container(width: 4, height: 4, decoration: const BoxDecoration(color: Color(0xCCF4F4F5), shape: BoxShape.circle)),
-              _SyllablePill(label: word.syllables[i]),
-            ],
-          ],
-        ),
-      if (word.organ.isNotEmpty) ...[
-        const SizedBox(height: 8),
-        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          const SizedBox(width: 28, height: 1, child: ColoredBox(color: Color(0x2EFFFFFF))),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Text(word.organ.toUpperCase(), style: const TextStyle(color: Color(0xFF8B8B90), fontSize: 10, fontWeight: FontWeight.w500, letterSpacing: 4.2)),
+    padding: embedded
+        ? EdgeInsets.zero
+        : const EdgeInsets.fromLTRB(14, 16, 14, 14),
+    decoration: embedded
+        ? null
+        : BoxDecoration(
+            color: const Color(0xD1161618),
+            borderRadius: BorderRadius.circular(23),
+            border: Border.all(color: const Color(0x14FFFFFF)),
           ),
-          const SizedBox(width: 28, height: 1, child: ColoredBox(color: Color(0x2EFFFFFF))),
-        ]),
-      ],
-      const SizedBox(height: 8),
-      Container(
-        padding: const EdgeInsets.symmetric(horizontal: 4),
-        decoration: BoxDecoration(
-          color: const Color(0xE6222226),
-          borderRadius: BorderRadius.circular(99),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (word.parts.isNotEmpty)
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              for (var i = 0; i < word.parts.length; i++) ...[
+                if (i > 0)
+                  Container(
+                    width: 4,
+                    height: 4,
+                    decoration: const BoxDecoration(
+                      color: Color(0xCCF4F4F5),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                _SyllablePill(
+                  part: word.parts[i],
+                  onTap: onSyllable == null
+                      ? null
+                      : () => onSyllable!(word.parts[i]),
+                ),
+              ],
+            ],
+          )
+        else if (word.syllables.isNotEmpty)
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              for (var i = 0; i < word.syllables.length; i++) ...[
+                if (i > 0)
+                  Container(
+                    width: 4,
+                    height: 4,
+                    decoration: const BoxDecoration(
+                      color: Color(0xCCF4F4F5),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                _SyllablePill(label: word.syllables[i]),
+              ],
+            ],
+          ),
+        if (word.organ.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(
+                width: 28,
+                height: 1,
+                child: ColoredBox(color: Color(0x2EFFFFFF)),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Text(
+                  word.organ.toUpperCase(),
+                  style: const TextStyle(
+                    color: Color(0xFF8B8B90),
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: 4.2,
+                  ),
+                ),
+              ),
+              const SizedBox(
+                width: 28,
+                height: 1,
+                child: ColoredBox(color: Color(0x2EFFFFFF)),
+              ),
+            ],
+          ),
+        ],
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          decoration: BoxDecoration(
+            color: const Color(0xE6222226),
+            borderRadius: BorderRadius.circular(99),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _ActBtn(icon: Icons.replay_rounded, onTap: onReplay),
+              Container(width: 1, height: 16, color: const Color(0x2EFFFFFF)),
+              _ActBtn(icon: Icons.copy_rounded, onTap: onNotes),
+            ],
+          ),
         ),
-        child: Row(mainAxisSize: MainAxisSize.min, children: [
-          _ActBtn(icon: Icons.replay_rounded, onTap: onReplay),
-          Container(width: 1, height: 16, color: const Color(0x2EFFFFFF)),
-          _ActBtn(icon: Icons.copy_rounded, onTap: onNotes),
-        ]),
-      ),
-    ]),
+      ],
+    ),
   );
 }
 
@@ -2621,7 +3545,12 @@ class _SyllablePill extends StatelessWidget {
         ),
         child: Text(
           text,
-          style: const TextStyle(color: Color(0xFF0A0A0B), fontSize: 14, fontWeight: FontWeight.w500, letterSpacing: 0.1),
+          style: const TextStyle(
+            color: Color(0xFF0A0A0B),
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            letterSpacing: 0.1,
+          ),
         ),
       ),
     );
@@ -2638,36 +3567,88 @@ class _ActBtn extends StatelessWidget {
   Widget build(BuildContext context) => GestureDetector(
     onTap: onTap,
     child: SizedBox(
-      width: 40, height: 40,
+      width: 40,
+      height: 40,
       child: Icon(icon, color: color ?? Colors.white, size: 20),
     ),
   );
 }
 
 class _PronunciationChip extends StatelessWidget {
-  const _PronunciationChip({required this.part, required this.accent, this.compact = false});
+  const _PronunciationChip({
+    required this.part,
+    required this.accent,
+    this.compact = false,
+  });
   final WordPart part;
   final Color accent;
   final bool compact;
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: EdgeInsets.symmetric(horizontal: compact ? 13 : 13, vertical: compact ? 8 : 8),
+    padding: EdgeInsets.symmetric(
+      horizontal: compact ? 13 : 13,
+      vertical: compact ? 8 : 8,
+    ),
     decoration: BoxDecoration(
       color: Colors.white,
       borderRadius: BorderRadius.circular(99),
-      boxShadow: const [BoxShadow(color: Color(0x47000000), blurRadius: 16, offset: Offset(0, 6))],
+      boxShadow: const [
+        BoxShadow(
+          color: Color(0x47000000),
+          blurRadius: 16,
+          offset: Offset(0, 6),
+        ),
+      ],
     ),
-    child: Column(mainAxisSize: MainAxisSize.min, children: [
-      if (part.deva.isNotEmpty) Text(part.deva, style: TextStyle(color: const Color(0xFF0A0A12), fontSize: compact ? 12 : 16, height: 1.2)),
-      Text(part.roman.isEmpty ? part.deva : part.roman, style: TextStyle(color: const Color(0xFF0A0A12), fontSize: compact ? 10 : 13, fontWeight: FontWeight.w800, letterSpacing: .4)),
-      if (!compact) Text('${part.hold.toStringAsFixed(part.hold.truncateToDouble() == part.hold ? 0 : 1)}s', style: const TextStyle(color: Color(0x8C0A0A12), fontSize: 9, fontWeight: FontWeight.w800)),
-    ]),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (part.deva.isNotEmpty)
+          Text(
+            part.deva,
+            style: TextStyle(
+              color: const Color(0xFF0A0A12),
+              fontSize: compact ? 12 : 16,
+              height: 1.2,
+            ),
+          ),
+        Text(
+          part.roman.isEmpty ? part.deva : part.roman,
+          style: TextStyle(
+            color: const Color(0xFF0A0A12),
+            fontSize: compact ? 10 : 13,
+            fontWeight: FontWeight.w800,
+            letterSpacing: .4,
+          ),
+        ),
+        if (!compact)
+          Text(
+            '${part.hold.toStringAsFixed(part.hold.truncateToDouble() == part.hold ? 0 : 1)}s',
+            style: const TextStyle(
+              color: Color(0x8C0A0A12),
+              fontSize: 9,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+      ],
+    ),
   );
 }
 
 class _TransportTube extends StatelessWidget {
-  const _TransportTube({required this.playing, required this.hasPrevious, required this.hasNext, required this.durationLabel, required this.onLibrary, required this.onPrevious, required this.onPlay, required this.onNext, required this.onReplay, required this.onRewind});
+  const _TransportTube({
+    required this.playing,
+    required this.hasPrevious,
+    required this.hasNext,
+    required this.durationLabel,
+    required this.onLibrary,
+    required this.onPrevious,
+    required this.onPlay,
+    required this.onNext,
+    required this.onReplay,
+    required this.onRewind,
+  });
   final bool playing;
   final bool hasPrevious;
   final bool hasNext;
@@ -2679,11 +3660,16 @@ class _TransportTube extends StatelessWidget {
   final VoidCallback onReplay;
   final VoidCallback onRewind;
 
-  static const _tube = 'https://media.nowssb.com/migrated-images/19432211f0f348fc_file_0000000016bc71fab1ae5a054ac772af_gwttc6.png';
-  static const _play = 'https://media.nowssb.com/migrated-images/74d38b3c7b69b30b_e06d2880-7389-11f1-8c74-0593c060acc9_jy24tl.png';
-  static const _pause = 'https://media.nowssb.com/migrated-images/f073aa60452e1cb9_e0723190-7389-11f1-8c74-0593c060acc9_e0lcl6.png';
-  static const _prev = 'https://media.nowssb.com/migrated-images/2f091c1083cd0b65_ad77f630-7389-11f1-8c74-0593c060acc9_pe0zco.png';
-  static const _next = 'https://media.nowssb.com/migrated-images/71a2d8954b5e6209_c5576970-7389-11f1-8c74-0593c060acc9_c4epec.png';
+  static const _tube =
+      'https://media.nowssb.com/migrated-images/19432211f0f348fc_file_0000000016bc71fab1ae5a054ac772af_gwttc6.png';
+  static const _play =
+      'https://media.nowssb.com/migrated-images/74d38b3c7b69b30b_e06d2880-7389-11f1-8c74-0593c060acc9_jy24tl.png';
+  static const _pause =
+      'https://media.nowssb.com/migrated-images/f073aa60452e1cb9_e0723190-7389-11f1-8c74-0593c060acc9_e0lcl6.png';
+  static const _prev =
+      'https://media.nowssb.com/migrated-images/2f091c1083cd0b65_ad77f630-7389-11f1-8c74-0593c060acc9_pe0zco.png';
+  static const _next =
+      'https://media.nowssb.com/migrated-images/71a2d8954b5e6209_c5576970-7389-11f1-8c74-0593c060acc9_c4epec.png';
 
   @override
   Widget build(BuildContext context) => Container(
@@ -2692,30 +3678,73 @@ class _TransportTube extends StatelessWidget {
     decoration: const BoxDecoration(
       image: DecorationImage(image: NetworkImage(_tube), fit: BoxFit.fill),
     ),
-    child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-      GestureDetector(onTap: onRewind, child: const SizedBox(width: 32, height: 32, child: Icon(Icons.fast_rewind_rounded, color: Color(0xFFF5F5F7), size: 22))),
-      _ImageControl(asset: 'assets/player/lgp-prev.png', network: _prev, label: 'Previous', onTap: hasPrevious ? onPrevious : null, size: 44),
-      GestureDetector(
-        onTap: onPlay,
-        child: SizedBox(
-          width: 58,
-          height: 58,
-          child: Image.asset(
-            playing ? 'assets/player/lgp-pause.png' : 'assets/player/lgp-play.png',
-            fit: BoxFit.contain,
-            errorBuilder: (_, __, ___) => Image.network(playing ? _pause : _play, fit: BoxFit.contain),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        GestureDetector(
+          onTap: onRewind,
+          child: const SizedBox(
+            width: 32,
+            height: 32,
+            child: Icon(
+              Icons.fast_rewind_rounded,
+              color: Color(0xFFF5F5F7),
+              size: 22,
+            ),
           ),
         ),
-      ),
-      _ImageControl(asset: 'assets/player/lgp-next.png', network: _next, label: 'Next', onTap: hasNext ? onNext : null, size: 44),
-      GestureDetector(onTap: onReplay, child: const SizedBox(width: 32, height: 32, child: Icon(Icons.replay_rounded, color: Color(0xFFF5F5F7), size: 22))),
-    ]),
+        _ImageControl(
+          asset: 'assets/player/lgp-prev.png',
+          network: _prev,
+          label: 'Previous',
+          onTap: hasPrevious ? onPrevious : null,
+          size: 44,
+        ),
+        GestureDetector(
+          onTap: onPlay,
+          child: SizedBox(
+            width: 58,
+            height: 58,
+            child: Image.asset(
+              playing
+                  ? 'assets/player/lgp-pause.png'
+                  : 'assets/player/lgp-play.png',
+              fit: BoxFit.contain,
+              errorBuilder: (_, __, ___) =>
+                  Image.network(playing ? _pause : _play, fit: BoxFit.contain),
+            ),
+          ),
+        ),
+        _ImageControl(
+          asset: 'assets/player/lgp-next.png',
+          network: _next,
+          label: 'Next',
+          onTap: hasNext ? onNext : null,
+          size: 44,
+        ),
+        GestureDetector(
+          onTap: onReplay,
+          child: const SizedBox(
+            width: 32,
+            height: 32,
+            child: Icon(
+              Icons.replay_rounded,
+              color: Color(0xFFF5F5F7),
+              size: 22,
+            ),
+          ),
+        ),
+      ],
+    ),
   );
 }
 
-
 class _QueueFilterPill extends StatelessWidget {
-  const _QueueFilterPill({required this.label, required this.selected, required this.onTap});
+  const _QueueFilterPill({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
   final String label;
   final bool selected;
   final VoidCallback onTap;
@@ -2735,7 +3764,9 @@ class _QueueFilterPill extends StatelessWidget {
           child: Text(
             label,
             style: TextStyle(
-              color: selected ? const Color(0xFF0A0A0C) : const Color(0xFFF5F5F7),
+              color: selected
+                  ? const Color(0xFF0A0A0C)
+                  : const Color(0xFFF5F5F7),
               fontSize: 13,
               fontWeight: FontWeight.w600,
               height: 1.1,
@@ -2748,7 +3779,13 @@ class _QueueFilterPill extends StatelessWidget {
 }
 
 class _WordActionStrip extends StatelessWidget {
-  const _WordActionStrip({required this.accent, required this.video, required this.onSentence, required this.onPractice, required this.onStore});
+  const _WordActionStrip({
+    required this.accent,
+    required this.video,
+    required this.onSentence,
+    required this.onPractice,
+    required this.onStore,
+  });
   final Color accent;
   final String video;
   final VoidCallback onSentence;
@@ -2779,19 +3816,45 @@ class _WordActionStrip extends StatelessWidget {
       frame: DeviceFrame.wordActs,
       priority: ClipPriority.feature,
       autoplay: true,
-      overlay: Row(children: [
-        Expanded(child: _WordAction(svg: '<path d="M4 5.5h16v10.5H9.5L5.5 19.5V16H4z"/><path d="M7.5 9.5h9M7.5 12.6h6"/>', label: 'Sentence', onTap: onSentence)),
-        _sep(),
-        Expanded(child: _WordAction(svg: '<rect x="9" y="2.6" width="6" height="11.2" rx="3"/><path d="M5.5 11.4a6.5 6.5 0 0 0 13 0"/><path d="M12 17.9v3.5M8.6 21.4h6.8"/>', label: 'Practice', onTap: onPractice, accent: accent)),
-        _sep(),
-        Expanded(child: _WordAction(svg: NwsbMarks.bag, label: 'Store', onTap: onStore)),
-      ]),
+      overlay: Row(
+        children: [
+          Expanded(
+            child: _WordAction(
+              svg: '<path d="M4 5.5h16v10.5H9.5L5.5 19.5V16H4z"/><path d="M7.5 9.5h9M7.5 12.6h6"/>',
+              label: 'Sentence',
+              onTap: onSentence,
+            ),
+          ),
+          _sep(),
+          Expanded(
+            child: _WordAction(
+              svg: '<rect x="9" y="2.6" width="6" height="11.2" rx="3"/><path d="M5.5 11.4a6.5 6.5 0 0 0 13 0"/><path d="M12 17.9v3.5M8.6 21.4h6.8"/>',
+              label: 'Practice',
+              onTap: onPractice,
+              accent: accent,
+            ),
+          ),
+          _sep(),
+          Expanded(
+            child: _WordAction(
+              svg: NwsbMarks.bag,
+              label: 'Store',
+              onTap: onStore,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
 
 class _WordAction extends StatelessWidget {
-  const _WordAction({required this.svg, required this.label, required this.onTap, this.accent});
+  const _WordAction({
+    required this.svg,
+    required this.label,
+    required this.onTap,
+    this.accent,
+  });
   final String svg;
   final String label;
   final VoidCallback onTap;
@@ -2803,17 +3866,32 @@ class _WordAction extends StatelessWidget {
     label: label,
     child: GestureDetector(
       onTap: onTap,
-      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        NwsbIcon(svg, size: 22, color: Colors.white, strokeWidth: 1.7),
-        const SizedBox(height: 2),
-        Text(label.toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.w800, letterSpacing: 1.0)),
-      ]),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          NwsbIcon(svg, size: 22, color: Colors.white, strokeWidth: 1.7),
+          const SizedBox(height: 2),
+          Text(
+            label.toUpperCase(),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 8,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.0,
+            ),
+          ),
+        ],
+      ),
     ),
   );
 }
 
 class _RoundIconButton extends StatelessWidget {
-  const _RoundIconButton({required this.icon, required this.onTap, this.size = 42});
+  const _RoundIconButton({
+    required this.icon,
+    required this.onTap,
+    this.size = 42,
+  });
   final IconData icon;
   final VoidCallback onTap;
   final double size;
@@ -2822,7 +3900,15 @@ class _RoundIconButton extends StatelessWidget {
   Widget build(BuildContext context) => Material(
     color: const Color(0x2EFFFFFF),
     shape: const CircleBorder(side: BorderSide(color: Color(0x66FFFFFF))),
-    child: InkWell(customBorder: const CircleBorder(), onTap: onTap, child: SizedBox(width: size, height: size, child: Icon(icon, color: Colors.white, size: size * .48))),
+    child: InkWell(
+      customBorder: const CircleBorder(),
+      onTap: onTap,
+      child: SizedBox(
+        width: size,
+        height: size,
+        child: Icon(icon, color: Colors.white, size: size * .48),
+      ),
+    ),
   );
 }
 
@@ -2835,7 +3921,11 @@ class _BareIconButton extends StatelessWidget {
   Widget build(BuildContext context) => GestureDetector(
     onTap: onTap,
     behavior: HitTestBehavior.opaque,
-    child: SizedBox(width: 42, height: 42, child: Icon(icon, color: Colors.white, size: 26)),
+    child: SizedBox(
+      width: 42,
+      height: 42,
+      child: Icon(icon, color: Colors.white, size: 26),
+    ),
   );
 }
 
@@ -2844,7 +3934,24 @@ class _Equalizer extends StatelessWidget {
   final bool active;
   final Color accent;
   @override
-  Widget build(BuildContext context) => Row(crossAxisAlignment: CrossAxisAlignment.center, children: List.generate(4, (i) => AnimatedContainer(duration: Duration(milliseconds: active ? 300 + i * 90 : 180), curve: Curves.easeInOut, width: 2.5, height: active ? 8.0 + (i.isEven ? 8 : 3) : 7.0 + i * 2, margin: const EdgeInsets.symmetric(horizontal: 1), decoration: BoxDecoration(color: accent, borderRadius: BorderRadius.circular(3), boxShadow: [BoxShadow(color: accent.withOpacity(.7), blurRadius: 5)]))));
+  Widget build(BuildContext context) => Row(
+    crossAxisAlignment: CrossAxisAlignment.center,
+    children: List.generate(
+      4,
+      (i) => AnimatedContainer(
+        duration: Duration(milliseconds: active ? 300 + i * 90 : 180),
+        curve: Curves.easeInOut,
+        width: 2.5,
+        height: active ? 8.0 + (i.isEven ? 8 : 3) : 7.0 + i * 2,
+        margin: const EdgeInsets.symmetric(horizontal: 1),
+        decoration: BoxDecoration(
+          color: accent,
+          borderRadius: BorderRadius.circular(3),
+          boxShadow: [BoxShadow(color: accent.withOpacity(.7), blurRadius: 5)],
+        ),
+      ),
+    ),
+  );
 }
 
 class _VolumeRail extends StatelessWidget {
@@ -2852,29 +3959,102 @@ class _VolumeRail extends StatelessWidget {
   final double value;
   final ValueChanged<double> onChanged;
   @override
-  Widget build(BuildContext context) => Container(width: 36, height: 128, decoration: BoxDecoration(color: const Color(0x2BFFFFFF), borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0x55FFFFFF))), child: Column(children: [
-    const SizedBox(height: 4),
-    Expanded(child: RotatedBox(quarterTurns: 3, child: Slider(value: value, onChanged: onChanged, activeColor: Colors.white, inactiveColor: const Color(0x55FFFFFF))),),
-    Icon(value == 0 ? Icons.volume_off_rounded : Icons.volume_up_rounded, color: Colors.white, size: 17),
-    const SizedBox(height: 8),
-  ]));
+  Widget build(BuildContext context) => Container(
+    width: 36,
+    height: 128,
+    decoration: BoxDecoration(
+      color: const Color(0x2BFFFFFF),
+      borderRadius: BorderRadius.circular(18),
+      border: Border.all(color: const Color(0x55FFFFFF)),
+    ),
+    child: Column(
+      children: [
+        const SizedBox(height: 4),
+        Expanded(
+          child: RotatedBox(
+            quarterTurns: 3,
+            child: Slider(
+              value: value,
+              onChanged: onChanged,
+              activeColor: Colors.white,
+              inactiveColor: const Color(0x55FFFFFF),
+            ),
+          ),
+        ),
+        Icon(
+          value == 0 ? Icons.volume_off_rounded : Icons.volume_up_rounded,
+          color: Colors.white,
+          size: 17,
+        ),
+        const SizedBox(height: 8),
+      ],
+    ),
+  );
 }
 
 class _ImageControl extends StatelessWidget {
-  const _ImageControl({required this.asset, required this.label, required this.onTap, required this.size, this.network});
+  const _ImageControl({
+    required this.asset,
+    required this.label,
+    required this.onTap,
+    required this.size,
+    this.network,
+  });
   final String asset;
   final String label;
   final VoidCallback? onTap;
   final double size;
   final String? network;
   @override
-  Widget build(BuildContext context) => Semantics(button: true, label: label, child: Opacity(opacity: onTap == null ? .35 : 1, child: InkResponse(onTap: onTap, radius: size * .62, child: SizedBox(width: size, height: size, child: Image.asset(asset, fit: BoxFit.contain, errorBuilder: (_, __, ___) => network != null
-    ? Image.network(network!, fit: BoxFit.contain, errorBuilder: (_, __, ___) => Icon(label == 'Play' ? Icons.play_arrow_rounded : Icons.circle_outlined, color: Colors.white, size: size * .68))
-    : Icon(label == 'Play' ? Icons.play_arrow_rounded : Icons.circle_outlined, color: Colors.white, size: size * .68))))));
+  Widget build(BuildContext context) => Semantics(
+    button: true,
+    label: label,
+    child: Opacity(
+      opacity: onTap == null ? .35 : 1,
+      child: InkResponse(
+        onTap: onTap,
+        radius: size * .62,
+        child: SizedBox(
+          width: size,
+          height: size,
+          child: Image.asset(
+            asset,
+            fit: BoxFit.contain,
+            errorBuilder: (_, __, ___) => network != null
+                ? Image.network(
+                    network!,
+                    fit: BoxFit.contain,
+                    errorBuilder: (_, __, ___) => Icon(
+                      label == 'Play'
+                          ? Icons.play_arrow_rounded
+                          : Icons.circle_outlined,
+                      color: Colors.white,
+                      size: size * .68,
+                    ),
+                  )
+                : Icon(
+                    label == 'Play'
+                        ? Icons.play_arrow_rounded
+                        : Icons.circle_outlined,
+                    color: Colors.white,
+                    size: size * .68,
+                  ),
+          ),
+        ),
+      ),
+    ),
+  );
 }
 
 class _RadialOption extends StatelessWidget {
-  const _RadialOption({required this.alignment, required this.label, required this.value, required this.icon, required this.accent, required this.onTap});
+  const _RadialOption({
+    required this.alignment,
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.accent,
+    required this.onTap,
+  });
   final Alignment alignment;
   final String label;
   final String value;
@@ -2896,14 +4076,34 @@ class _RadialOption extends StatelessWidget {
             shape: BoxShape.circle,
             color: const Color(0x241D3448),
             border: Border.all(color: accent.withOpacity(.62)),
-            boxShadow: [BoxShadow(color: accent.withOpacity(.10), blurRadius: 16)],
+            boxShadow: [
+              BoxShadow(color: accent.withOpacity(.10), blurRadius: 16),
+            ],
           ),
-          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Icon(icon, color: accent, size: 20),
-            const SizedBox(height: 4),
-            Text(label, style: const TextStyle(color: Colors.white70, fontSize: 8, fontWeight: FontWeight.w800, letterSpacing: 1)),
-            Text(value, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w800)),
-          ]),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: accent, size: 20),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 8,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1,
+                ),
+              ),
+              Text(
+                value,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     ),
@@ -2917,19 +4117,36 @@ class _AuraSettingsPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final center = size.center(Offset.zero);
     final radius = size.shortestSide * .34;
-    final paint = Paint()..style = PaintingStyle.stroke..strokeWidth = 1;
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1;
     for (var i = 0; i < 4; i++) {
       paint.color = accent.withOpacity(.12 - i * .02);
       canvas.drawCircle(center, radius + i * 27, paint);
     }
     paint.color = accent.withOpacity(.32);
     paint.strokeWidth = 2;
-    canvas.drawArc(Rect.fromCircle(center: center, radius: radius + 82), -.8, 1.35, false, paint);
-    canvas.drawArc(Rect.fromCircle(center: center, radius: radius + 82), 2.4, 1.05, false, paint);
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius + 82),
+      -.8,
+      1.35,
+      false,
+      paint,
+    );
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius + 82),
+      2.4,
+      1.05,
+      false,
+      paint,
+    );
   }
+
   @override
-  bool shouldRepaint(covariant _AuraSettingsPainter oldDelegate) => oldDelegate.accent != accent;
+  bool shouldRepaint(covariant _AuraSettingsPainter oldDelegate) =>
+      oldDelegate.accent != accent;
 }
+
 class _PlayerInfoSheet extends StatelessWidget {
   const _PlayerInfoSheet({required this.word, required this.accent});
   final Word word;
@@ -2944,34 +4161,95 @@ class _PlayerInfoSheet extends StatelessWidget {
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 13, sigmaY: 13),
           child: Container(
-            constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * .78),
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.sizeOf(context).height * .78,
+            ),
             padding: const EdgeInsets.fromLTRB(24, 16, 24, 30),
             decoration: BoxDecoration(
               color: const Color(0xCC0B1321),
               borderRadius: r,
               border: Border.all(color: const Color(0x24FFFFFF)),
             ),
-            child: ListView(children: [
-              Center(child: Container(width: 38, height: 4, decoration: BoxDecoration(color: Colors.white38, borderRadius: BorderRadius.circular(99)))),
-              const SizedBox(height: 18),
-              Row(children: [
-                Expanded(child: Text(word.word, style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w800))),
-                Container(
-                  width: 42,
-                  height: 42,
-                  decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                  alignment: Alignment.center,
-                  child: Icon(Icons.info_outline_rounded, color: accent, size: 20),
+            child: ListView(
+              children: [
+                Center(
+                  child: Container(
+                    width: 38,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.white38,
+                      borderRadius: BorderRadius.circular(99),
+                    ),
+                  ),
                 ),
-              ]),
-              if (word.phonetic.isNotEmpty) Text(word.phonetic, style: const TextStyle(color: Colors.white60)),
-              const SizedBox(height: 20),
-              _InfoFact(label: "WHAT'S HAPPENING", value: word.benefit.isEmpty ? 'Listen, then repeat at your own pace.' : word.benefit, accent: accent),
-              if (word.meaning.isNotEmpty) _InfoFact(label: 'MEANING', value: word.meaning, accent: accent),
-              if (word.organ.isNotEmpty) _InfoFact(label: 'TARGET ORGAN', value: word.organ, accent: accent),
-              if (word.resonance.isNotEmpty) _InfoFact(label: 'RESONANCE POINT', value: word.resonance, accent: accent),
-              if (word.mouthPos.isNotEmpty) _InfoFact(label: 'MOUTH POSITION', value: word.mouthPos, accent: accent),
-            ]),
+                const SizedBox(height: 18),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        word.word,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 26,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: 42,
+                      height: 42,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      alignment: Alignment.center,
+                      child: Icon(
+                        Icons.info_outline_rounded,
+                        color: accent,
+                        size: 20,
+                      ),
+                    ),
+                  ],
+                ),
+                if (word.phonetic.isNotEmpty)
+                  Text(
+                    word.phonetic,
+                    style: const TextStyle(color: Colors.white60),
+                  ),
+                const SizedBox(height: 20),
+                _InfoFact(
+                  label: "WHAT'S HAPPENING",
+                  value: word.benefit.isEmpty
+                      ? 'Listen, then repeat at your own pace.'
+                      : word.benefit,
+                  accent: accent,
+                ),
+                if (word.meaning.isNotEmpty)
+                  _InfoFact(
+                    label: 'MEANING',
+                    value: word.meaning,
+                    accent: accent,
+                  ),
+                if (word.organ.isNotEmpty)
+                  _InfoFact(
+                    label: 'TARGET ORGAN',
+                    value: word.organ,
+                    accent: accent,
+                  ),
+                if (word.resonance.isNotEmpty)
+                  _InfoFact(
+                    label: 'RESONANCE POINT',
+                    value: word.resonance,
+                    accent: accent,
+                  ),
+                if (word.mouthPos.isNotEmpty)
+                  _InfoFact(
+                    label: 'MOUTH POSITION',
+                    value: word.mouthPos,
+                    accent: accent,
+                  ),
+              ],
+            ),
           ),
         ),
       ),
@@ -2980,21 +4258,66 @@ class _PlayerInfoSheet extends StatelessWidget {
 }
 
 class _InfoFact extends StatelessWidget {
-  const _InfoFact({required this.label, required this.value, required this.accent});
+  const _InfoFact({
+    required this.label,
+    required this.value,
+    required this.accent,
+  });
   final String label;
   final String value;
   final Color accent;
   @override
-  Widget build(BuildContext context) => Container(margin: const EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: const Color(0x28000000), borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0x28FFFFFF)), boxShadow: const [BoxShadow(color: Color(0x40000000), blurRadius: 18, offset: Offset(0, 8))]), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(label, style: TextStyle(color: accent, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.2)), const SizedBox(height: 5), Text(value, style: const TextStyle(color: Colors.white, fontSize: 14, height: 1.35))]));
+  Widget build(BuildContext context) => Container(
+    margin: const EdgeInsets.only(bottom: 10),
+    padding: const EdgeInsets.all(14),
+    decoration: BoxDecoration(
+      color: const Color(0x28000000),
+      borderRadius: BorderRadius.circular(18),
+      border: Border.all(color: const Color(0x28FFFFFF)),
+      boxShadow: const [
+        BoxShadow(
+          color: Color(0x40000000),
+          blurRadius: 18,
+          offset: Offset(0, 8),
+        ),
+      ],
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: accent,
+            fontSize: 10,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1.2,
+          ),
+        ),
+        const SizedBox(height: 5),
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 14,
+            height: 1.35,
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 class _PlayerTheme {
-  const _PlayerTheme({required this.image, required this.video, required this.accent});
+  const _PlayerTheme({
+    required this.image,
+    required this.video,
+    required this.accent,
+  });
   final String image;
   final String video;
   final Color accent;
 }
-
 
 class _BottomDot extends StatelessWidget {
   const _BottomDot({required this.active});
@@ -3007,7 +4330,9 @@ class _BottomDot extends StatelessWidget {
     decoration: BoxDecoration(
       shape: BoxShape.circle,
       color: active ? const Color(0xFFF5F5F7) : const Color(0x47FFFFFF),
-      boxShadow: active ? const [BoxShadow(color: Color(0x59FFFFFF), blurRadius: 8)] : null,
+      boxShadow: active
+          ? const [BoxShadow(color: Color(0x59FFFFFF), blurRadius: 8)]
+          : null,
     ),
   );
 }
@@ -3019,7 +4344,11 @@ class _SubtitleMarquee extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const style = TextStyle(color: Color(0xFF8B8B90), fontSize: 14, height: 1.2);
+    const style = TextStyle(
+      color: Color(0xFF8B8B90),
+      fontSize: 14,
+      height: 1.2,
+    );
     Widget rowFor(List<String> src) => Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -3033,7 +4362,12 @@ class _SubtitleMarquee extends StatelessWidget {
       child: ShaderMask(
         blendMode: BlendMode.dstIn,
         shaderCallback: (rect) => const LinearGradient(
-          colors: [Color(0x00FFFFFF), Color(0xFFFFFFFF), Color(0xFFFFFFFF), Color(0x00FFFFFF)],
+          colors: [
+            Color(0x00FFFFFF),
+            Color(0xFFFFFFFF),
+            Color(0xFFFFFFFF),
+            Color(0x00FFFFFF),
+          ],
           stops: [0.0, 0.08, 0.92, 1.0],
         ).createShader(rect),
         child: AnimatedBuilder(
@@ -3047,11 +4381,7 @@ class _SubtitleMarquee extends StatelessWidget {
           },
           child: Row(
             mainAxisSize: MainAxisSize.min,
-            children: [
-              rowFor(lines),
-              const SizedBox(width: 48),
-              rowFor(lines),
-            ],
+            children: [rowFor(lines), const SizedBox(width: 48), rowFor(lines)],
           ),
         ),
       ),
@@ -3060,15 +4390,54 @@ class _SubtitleMarquee extends StatelessWidget {
 }
 
 const _playerThemes = <_PlayerTheme>[
-  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/d694cb3157c4e58f_grok_image_1782656710977_nj5r6x.jpg', video: 'https://nowssb.com/assets/video/79d7c93a6734ed8d_grok_video_2026-06-28-19-55-09_otgbxd.mp4', accent: Color(0xFF9BB8FF)),
-  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/3670d1e477f48c31_grok_image_1782656676834_rzp2cz.jpg', video: 'https://nowssb.com/assets/video/a1b0a1b513ec57f6_grok_video_2026-06-28-19-54-38_wrxkgr.mp4', accent: Color(0xFF7FE9DA)),
-  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/fd380f5670852d0c_grok_image_1782656704854_cfsah3.jpg', video: 'https://nowssb.com/assets/video/dc68caaf51e87003_grok_video_2026-06-28-19-55-02_of5fwh.mp4', accent: Color(0xFFBD7BFF)),
-  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/e8bb832f2815c15a_grok_image_1782656684101_o9vc93.jpg', video: 'https://nowssb.com/assets/video/d8ac259577c403f3_grok_video_2026-06-28-19-54-43_it2bur.mp4', accent: Color(0xFFA6DCFF)),
-  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/48ad23ade254b2d7_grok_image_1782795582310_llvpix.jpg', video: 'https://nowssb.com/assets/video/3b63edc1485a45e2_grok_video_2026-06-30-10-29-43_hzxyun.mp4', accent: Color(0xFFB9A6FF)),
-  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/20314fda05d34b49_grok_image_1782796537731_vzyhwn.jpg', video: 'https://nowssb.com/assets/video/a779a65872bf917c_grok_video_2026-06-30-10-45-45_dg2ohg.mp4', accent: Color(0xFFA6C8FF)),
-  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/f734c819e92db433_grok_image_1782796641824_izkh09.jpg', video: 'https://nowssb.com/assets/video/da4159578099ee48_grok_video_2026-06-30-10-47-20_rljghs.mp4', accent: Color(0xFFB9A6FF)),
-  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/e103480a2c87d55b_grok_image_1782796519587_thrrws.jpg', video: 'https://nowssb.com/assets/video/e55e1f1f879d8074_grok_video_2026-06-30-10-45-34_pg2y2j.mp4', accent: Color(0xFFE8D5A3)),
-  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/122962572090895c_grok_image_1782796924745_nmksmi.jpg', video: 'https://nowssb.com/assets/video/7a0e0cf6903f3b16_grok_video_2026-06-30-10-52-07_gvffol.mp4', accent: Color(0xFFF0D9A8)),
-  _PlayerTheme(image: 'https://media.nowssb.com/migrated-images/28b7b32c97232472_grok_image_1782796933792_qwzfgx.jpg', video: 'https://nowssb.com/assets/video/39905d27bd778cff_grok_video_2026-06-30-10-52-20_zk87yh.mp4', accent: Color(0xFF8FE6FF)),
+  _PlayerTheme(
+    image: 'https://media.nowssb.com/migrated-images/d694cb3157c4e58f_grok_image_1782656710977_nj5r6x.jpg',
+    video: 'https://nowssb.com/assets/video/79d7c93a6734ed8d_grok_video_2026-06-28-19-55-09_otgbxd.mp4',
+    accent: Color(0xFF9BB8FF),
+  ),
+  _PlayerTheme(
+    image: 'https://media.nowssb.com/migrated-images/3670d1e477f48c31_grok_image_1782656676834_rzp2cz.jpg',
+    video: 'https://nowssb.com/assets/video/a1b0a1b513ec57f6_grok_video_2026-06-28-19-54-38_wrxkgr.mp4',
+    accent: Color(0xFF7FE9DA),
+  ),
+  _PlayerTheme(
+    image: 'https://media.nowssb.com/migrated-images/fd380f5670852d0c_grok_image_1782656704854_cfsah3.jpg',
+    video: 'https://nowssb.com/assets/video/dc68caaf51e87003_grok_video_2026-06-28-19-55-02_of5fwh.mp4',
+    accent: Color(0xFFBD7BFF),
+  ),
+  _PlayerTheme(
+    image: 'https://media.nowssb.com/migrated-images/e8bb832f2815c15a_grok_image_1782656684101_o9vc93.jpg',
+    video: 'https://nowssb.com/assets/video/d8ac259577c403f3_grok_video_2026-06-28-19-54-43_it2bur.mp4',
+    accent: Color(0xFFA6DCFF),
+  ),
+  _PlayerTheme(
+    image: 'https://media.nowssb.com/migrated-images/48ad23ade254b2d7_grok_image_1782795582310_llvpix.jpg',
+    video: 'https://nowssb.com/assets/video/3b63edc1485a45e2_grok_video_2026-06-30-10-29-43_hzxyun.mp4',
+    accent: Color(0xFFB9A6FF),
+  ),
+  _PlayerTheme(
+    image: 'https://media.nowssb.com/migrated-images/20314fda05d34b49_grok_image_1782796537731_vzyhwn.jpg',
+    video: 'https://nowssb.com/assets/video/a779a65872bf917c_grok_video_2026-06-30-10-45-45_dg2ohg.mp4',
+    accent: Color(0xFFA6C8FF),
+  ),
+  _PlayerTheme(
+    image: 'https://media.nowssb.com/migrated-images/f734c819e92db433_grok_image_1782796641824_izkh09.jpg',
+    video: 'https://nowssb.com/assets/video/da4159578099ee48_grok_video_2026-06-30-10-47-20_rljghs.mp4',
+    accent: Color(0xFFB9A6FF),
+  ),
+  _PlayerTheme(
+    image: 'https://media.nowssb.com/migrated-images/e103480a2c87d55b_grok_image_1782796519587_thrrws.jpg',
+    video: 'https://nowssb.com/assets/video/e55e1f1f879d8074_grok_video_2026-06-30-10-45-34_pg2y2j.mp4',
+    accent: Color(0xFFE8D5A3),
+  ),
+  _PlayerTheme(
+    image: 'https://media.nowssb.com/migrated-images/122962572090895c_grok_image_1782796924745_nmksmi.jpg',
+    video: 'https://nowssb.com/assets/video/7a0e0cf6903f3b16_grok_video_2026-06-30-10-52-07_gvffol.mp4',
+    accent: Color(0xFFF0D9A8),
+  ),
+  _PlayerTheme(
+    image: 'https://media.nowssb.com/migrated-images/28b7b32c97232472_grok_image_1782796933792_qwzfgx.jpg',
+    video: 'https://nowssb.com/assets/video/39905d27bd778cff_grok_video_2026-06-30-10-52-20_zk87yh.mp4',
+    accent: Color(0xFF8FE6FF),
+  ),
 ];
-
