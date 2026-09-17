@@ -1,0 +1,94 @@
+name: Verify NowssB Practice Lab
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  verify-practice-lab:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Materialize Practice Lab UI
+        run: |
+          python3 - <<'PY'
+          import base64, gzip
+          from pathlib import Path
+
+          root = Path("flutter_app")
+          payload = Path("tools/practice_overlay.gz.b64").read_text().strip()
+          (root / "lib/screens/practice_overlay.dart").write_bytes(
+              gzip.decompress(base64.b64decode(payload))
+          )
+
+          player = root / "lib/screens/practice_player.dart"
+          text = player.read_text()
+
+          imp = "import 'practice_overlay.dart';\n"
+          anchor = "import 'player_dial.dart';\n"
+          if imp not in text:
+              text = text.replace(anchor, anchor + imp, 1)
+
+          old = "                        onPractice: _prepareAndPlay,"
+          if old not in text:
+              raise SystemExit("Practice action hook not found")
+          text = text.replace(old, "                        onPractice: _openPracticeLab,", 1)
+
+          method = """  void _openPracticeLab() {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withOpacity(.76),
+      builder: (_) => PracticeLabSheet(
+        word: _word,
+        accent: _theme.accent,
+        onSpeak: _prepareAndPlay,
+        onClose: () => Navigator.of(context).pop(),
+      ),
+    );
+  }
+
+"""
+          marker = "  void _openSettings() {"
+          if "_openPracticeLab()" not in text:
+              text = text.replace(marker, method + marker, 1)
+
+          player.write_text(text)
+          PY
+
+      - name: Format
+        run: |
+          dart format flutter_app/lib/screens/practice_player.dart flutter_app/lib/screens/practice_overlay.dart
+
+      - name: Resolve dependencies
+        working-directory: flutter_app
+        run: flutter pub get
+
+      - name: Analyze changed screens
+        working-directory: flutter_app
+        run: flutter analyze --no-fatal-infos lib/screens/practice_player.dart lib/screens/practice_overlay.dart
+
+      - name: Build debug APK
+        working-directory: flutter_app
+        run: flutter build apk --debug
+
+      - name: Commit only after verification passes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/verify-practice-lab.yml tools/practice_overlay.gz.b64
+          git add flutter_app/lib/screens/practice_player.dart flutter_app/lib/screens/practice_overlay.dart
+          git commit -m "Add glassmorphism practice lab"
+          git push
