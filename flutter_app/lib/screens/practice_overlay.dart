@@ -1,8 +1,8 @@
 /// Premium Practice tab opened from the NowssB player.
 ///
-/// The lab is deliberately self-contained: the reference is played first, then
-/// the learner holds the mic to make a take. A take is written to the app's
-/// documents directory so it survives the session and can be replayed locally.
+/// Glass over the player film. A white microphone in a circle sits on a
+/// tilted 3D water plane. Hold to speak writes a take. Below the orb: the
+/// word broken into parts, then the 29-second vertical-edit craft.
 library;
 
 import 'dart:async';
@@ -28,6 +28,180 @@ enum _PracticeStatus {
   complete,
 }
 
+const _sessionLength = 29;
+
+class _Beat {
+  const _Beat(this.at, this.until, this.state, this.part, this.note);
+  final int at;
+  final int until;
+  final String state;
+  final int? part;
+  final String note;
+}
+
+const _beats = <_Beat>[
+  _Beat(0, 2, 'Listening', null, 'Talking head with the first large caption'),
+  _Beat(
+      2, 4, 'Practicing', 0, 'Talking head plus the small inset — mouth shape'),
+  _Beat(4, 7, 'Practicing', 1,
+      'Product motion. The syllable replaces the last word.'),
+  _Beat(7, 10, 'Listening', null,
+      'Dark UI. Slow motion inside, hard cut outside.'),
+  _Beat(10, 14, 'Recording', 2,
+      'Close-up with changing captions, timed to the voice'),
+  _Beat(14, 18, 'Thinking', null,
+      'More UI examples. The three cuts in one frame.'),
+  _Beat(18, 22, 'Recording', null, 'Feature detail. You take the word.'),
+  _Beat(22, 26, 'Solving', null,
+      'Return to the full word with the repository of the mouth'),
+  _Beat(26, 29, 'Locked', null, 'Final screen. Closing word. Hold.'),
+];
+
+_Beat _beatAt(int t) {
+  final n = ((t % _sessionLength) + _sessionLength) % _sessionLength;
+  return _beats.firstWhere(
+    (b) => n >= b.at && n < b.until,
+    orElse: () => _beats.last,
+  );
+}
+
+class _CraftStep {
+  const _CraftStep(this.n, this.title, this.kicker, this.body);
+  final String n;
+  final String title;
+  final String kicker;
+  final String body;
+}
+
+const _craftSteps = <_CraftStep>[
+  _CraftStep('01', 'Create the project', 'Canvas',
+      'Practice is a vertical edit, not a looping meditation video. Set the session as 9:16, 1080 × 1920, 30 fps. Import only the voice, the mouth inset, the dark UI stills.'),
+  _CraftStep('02', 'Record the talking head', 'Voice',
+      'Shoot vertical, subject centered, chest-up. Soft front light. Record the full word in one take, then cut it into the syllables you will emphasize.'),
+  _CraftStep('03', 'Build the timeline', '29 seconds',
+      'Most shots live between 0.5 and 2 seconds. Nothing should sit long enough to become wallpaper. The 29-second practice is the cut, not the lecture.'),
+  _CraftStep('04', 'The text style', 'Typography',
+      'High-contrast serif. White. Large. Centered. Slightly tight tracking. No box behind it. Never set the whole sentence as one caption. Split it. Each word appears at the moment it is spoken.'),
+  _CraftStep('05', 'Animate each word', 'Kinetic',
+      'A separate layer per word, parked on the spoken moment. Entrance is 0.08–0.15s — fade or a tiny pop, scale 95 → 100, ease-out. Then the word is replaced, not faded like a subtitle.'),
+  _CraftStep('06', 'The inset', 'Demo card',
+      'A small horizontal rectangle over the talking head — 60–75% of the width, lower-middle, slightly rounded, a small shadow. It must keep moving while the head remains visible.'),
+  _CraftStep('07', 'Match-cut the inset', 'Edit',
+      'Do not use decorative transitions. Match shapes and positions. Most cuts are 1 frame. Occasionally a 2–4 frame dissolve. A slight zoom makes the cut feel chosen.'),
+  _CraftStep('08', 'Screen recordings', 'Evidence',
+      'Short clips of the dark interface, a loader, a button changing state, the word locking into progress. Crop to 9:16. Kill browser chrome. Raise contrast.'),
+  _CraftStep('09', 'Dark UI shots', 'Punctuation',
+      'Near-black fields. White or light-gray marks. A soft glow only on the live element. Circular loaders move slowly. The edit cuts quickly; the UI inside does not.'),
+  _CraftStep('10', 'Subtle camera', 'Push-in',
+      'Talking head: scale 100 → 103–106 over the shot, with a slight drift. It should only keep the frame from dying.'),
+  _CraftStep('11', 'Speed', 'Ramps',
+      'Normal is 100%. Emphasis 85–95%. Transition 110–125%. Timing of the cut does more work than the ramp.'),
+  _CraftStep('12', 'Grade', 'Color',
+      'Talking head: slightly brighter, contrast up a little, highlights down. Product UI: contrast up, blacks a little lower, a very small glow. No cinematic LUT soup.'),
+  _CraftStep('13', 'Sound', 'Mix',
+      'Voice is the spine. Soft music under it. A small whoosh on major cuts. Quiet clicks on interface. Almost inaudible taps when the kinetic word changes.'),
+  _CraftStep('14', 'Captions by hand', 'Timing',
+      'Split into words, rebuild each word in the large serif, and park it on the speaker’s timing. Change the word on the cut or the gesture.'),
+];
+
+const _formula = <String>[
+  'Talking head',
+  'Large serif word',
+  'Small moving inset',
+  'Hard cut',
+  'Dark UI example',
+  'New word',
+  'Screen recording',
+  'Subtle zoom',
+  'Another hard cut',
+];
+
+const _formulaLaws = <String>[
+  'Change the large word in sync with speech.',
+  'Keep the inset demo visible over the talking head.',
+  'Use high-contrast serif typography.',
+  'Cut quickly between real product examples.',
+  'Use hard cuts instead of flashy transitions.',
+  'Keep all movement subtle and intentional.',
+  'Use dark UI screens as visual punctuation.',
+];
+
+/// Compact 3D-ripple microphone used in the Now Playing dock.
+class PracticeDockOrb extends StatefulWidget {
+  const PracticeDockOrb({
+    super.key,
+    required this.onTap,
+    this.accent = const Color(0xFFF4F4F5),
+  });
+
+  final VoidCallback onTap;
+  final Color accent;
+
+  @override
+  State<PracticeDockOrb> createState() => _PracticeDockOrbState();
+}
+
+class _PracticeDockOrbState extends State<PracticeDockOrb>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _pulse;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulse = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2400),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _pulse.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: 'Practice',
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 52,
+              height: 52,
+              child: AnimatedBuilder(
+                animation: _pulse,
+                builder: (context, child) => CustomPaint(
+                  painter: _WaterRipplePainter(
+                    progress: _pulse.value,
+                    accent: widget.accent,
+                    intensity: 1.05,
+                  ),
+                  child: Center(child: child),
+                ),
+                child: _MicDisc(size: 28, iconSize: 14),
+              ),
+            ),
+            const Text(
+              'PRACTICE',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 8,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.0,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class PracticeLabSheet extends StatefulWidget {
   const PracticeLabSheet({
     super.key,
@@ -50,13 +224,13 @@ class PracticeLabSheet extends StatefulWidget {
 
 class _PracticeLabSheetState extends State<PracticeLabSheet>
     with TickerProviderStateMixin {
-  static const _sessionLength = 29;
   final AudioRecorder _recorder = AudioRecorder();
   final stt.SpeechToText _speech = stt.SpeechToText();
   late final AnimationController _pulse;
   late final AnimationController _entry;
 
   Timer? _clock;
+  Timer? _session;
   String _heard = '';
   String? _takePath;
   bool _speechReady = false;
@@ -76,12 +250,17 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
       vsync: this,
       duration: const Duration(milliseconds: 520),
     )..forward();
+    _session = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted || _holding) return;
+      setState(() => _elapsed = (_elapsed + 1) % _sessionLength);
+    });
     unawaited(_playReference());
   }
 
   @override
   void dispose() {
     _clock?.cancel();
+    _session?.cancel();
     unawaited(_finishCapture());
     _pulse.dispose();
     _entry.dispose();
@@ -152,8 +331,8 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
             partialResults: true,
             cancelOnError: false,
             autoPunctuation: false,
-            listenFor: Duration(seconds: _sessionLength),
-            pauseFor: Duration(seconds: 4),
+            listenFor: const Duration(seconds: _sessionLength),
+            pauseFor: const Duration(seconds: 4),
           ),
         );
       }
@@ -219,50 +398,68 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
   }
 
   List<WordPart> get _parts => widget.word.parts;
-  String get _statusLabel => switch (_status) {
-    _PracticeStatus.ready => 'Ready',
-    _PracticeStatus.listening => 'Listening',
-    _PracticeStatus.recording => 'Recording',
-    _PracticeStatus.practicing => 'Practicing',
-    _PracticeStatus.locked => 'Take locked',
-    _PracticeStatus.complete => '29s complete',
-  };
+
+  String get _statusLabel {
+    if (_holding) return 'Recording';
+    return switch (_status) {
+      _PracticeStatus.ready => 'Ready',
+      _PracticeStatus.listening => 'Listening',
+      _PracticeStatus.recording => 'Recording',
+      _PracticeStatus.practicing => 'Practicing',
+      _PracticeStatus.locked => 'Locked',
+      _PracticeStatus.complete => 'Locked',
+    };
+  }
+
+  String _kinetic() {
+    if (_holding) return widget.word.word;
+    final beat = _beatAt(_elapsed);
+    final parts = widget.word.syllables;
+    if (beat.part != null && beat.part! < parts.length) {
+      return parts[beat.part!];
+    }
+    if (beat.state == 'Thinking') return parts.join(' · ');
+    if (beat.state == 'Locked') return 'locked';
+    if (beat.state == 'Recording' && beat.part == null) return 'speak';
+    return widget.word.word.isEmpty ? widget.word.translit : widget.word.word;
+  }
 
   @override
   Widget build(BuildContext context) {
+    final h = MediaQuery.sizeOf(context).height;
     return Material(
       color: Colors.transparent,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          Positioned.fill(
-            child: Opacity(
-              opacity: .28,
-              child: NwsbVideo(
-                asset: widget.video,
-                priority: ClipPriority.feature,
-                autoplay: true,
-                fit: BoxFit.cover,
+      child: SizedBox(
+        height: h,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Positioned.fill(
+              child: Opacity(
+                opacity: .34,
+                child: NwsbVideo(
+                  asset: widget.video,
+                  priority: ClipPriority.feature,
+                  autoplay: true,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
-          ),
-          Positioned.fill(
-            child: IgnorePointer(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-                child: const ColoredBox(color: Color(0x22080B10)),
+            Positioned.fill(
+              child: IgnorePointer(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                  child: const ColoredBox(color: Color(0x66050506)),
+                ),
               ),
             ),
-          ),
-          SafeArea(
-            child: Align(
-              alignment: Alignment.center,
+            SafeArea(
               child: AnimatedBuilder(
                 animation: _entry,
                 builder: (context, child) => Transform.translate(
-                  offset: Offset(0, 36 * (1 - _entry.value)),
+                  offset: Offset(0, 28 * (1 - _entry.value)),
                   child: Transform.scale(
-                    scale: .96 + _entry.value * .04,
+                    scale: .97 + _entry.value * .03,
                     child: Opacity(opacity: _entry.value, child: child),
                   ),
                 ),
@@ -274,7 +471,11 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
                   heard: _heard,
                   elapsed: _elapsed,
                   status: _statusLabel,
+                  kinetic: _kinetic(),
+                  note: _beatAt(_elapsed).note,
+                  activePart: _holding ? null : _beatAt(_elapsed).part,
                   matched: _matched,
+                  holding: _holding,
                   takeLocked: _takePath != null && !_holding,
                   onClose: widget.onClose,
                   onHoldStart: _beginTake,
@@ -283,8 +484,8 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -299,7 +500,11 @@ class _PracticeTab extends StatelessWidget {
     required this.heard,
     required this.elapsed,
     required this.status,
+    required this.kinetic,
+    required this.note,
+    required this.activePart,
     required this.matched,
+    required this.holding,
     required this.takeLocked,
     required this.onClose,
     required this.onHoldStart,
@@ -314,46 +519,53 @@ class _PracticeTab extends StatelessWidget {
   final String heard;
   final int elapsed;
   final String status;
+  final String kinetic;
+  final String note;
+  final int? activePart;
   final bool matched;
+  final bool holding;
   final bool takeLocked;
   final VoidCallback onClose;
   final VoidCallback onHoldStart;
   final VoidCallback onHoldEnd;
   final VoidCallback onReplay;
 
+  static const _verbs = [
+    'Ready',
+    'Listening',
+    'Practicing',
+    'Recording',
+    'Thinking',
+    'Solving',
+    'Locked',
+  ];
+
   @override
   Widget build(BuildContext context) {
-    final target = word.word.isEmpty ? word.translit : word.word;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.fromLTRB(12, 6, 12, 8),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(30),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
           child: Container(
-            constraints: const BoxConstraints(maxWidth: 440),
-            padding: const EdgeInsets.fromLTRB(18, 14, 18, 16),
             decoration: BoxDecoration(
-              color: const Color(0xE20B0F14),
+              color: const Color(0xD20B0F14),
               borderRadius: BorderRadius.circular(30),
               border: Border.all(color: Colors.white.withOpacity(.14)),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(.58),
-                  blurRadius: 34,
-                  offset: const Offset(0, 18),
-                ),
-              ],
             ),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 10, 8, 0),
+                  child: Row(
                     children: [
-                      const Icon(
-                        Icons.keyboard_arrow_down_rounded,
-                        color: Colors.white60,
+                      IconButton(
+                        onPressed: onClose,
+                        icon: const Icon(
+                          Icons.keyboard_arrow_down_rounded,
+                          color: Colors.white,
+                        ),
                       ),
                       const Expanded(
                         child: Text(
@@ -361,181 +573,270 @@ class _PracticeTab extends StatelessWidget {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 12,
+                            fontSize: 11,
                             fontWeight: FontWeight.w800,
-                            letterSpacing: 2.2,
+                            letterSpacing: 2.4,
                           ),
                         ),
                       ),
-                      _SmallButton(icon: Icons.close_rounded, onTap: onClose),
+                      IconButton(
+                        onPressed: onClose,
+                        icon: const Icon(Icons.close_rounded,
+                            color: Colors.white70),
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '$status  •  ${elapsed.toString().padLeft(2, '0')} / 29s',
-                    style: const TextStyle(
-                      color: Colors.white54,
-                      fontSize: 10,
-                      letterSpacing: 1.1,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 300),
-                    child: Text(
-                      target,
-                      key: ValueKey(target),
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 36,
-                        height: .98,
-                        fontFamily: 'serif',
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  if (word.translit.isNotEmpty && word.translit != target)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 6),
-                      child: Text(
-                        word.translit,
-                        style: const TextStyle(
-                          color: Colors.white54,
-                          fontSize: 12,
-                          letterSpacing: 1.4,
-                        ),
-                      ),
-                    ),
-                  const SizedBox(height: 8),
-                  _Timeline(elapsed: elapsed, accent: accent),
-                  const SizedBox(height: 4),
-                  GestureDetector(
-                    onLongPressStart: (_) => onHoldStart(),
-                    onLongPressEnd: (_) => onHoldEnd(),
-                    onTapDown: (_) => onHoldStart(),
-                    onTapUp: (_) => onHoldEnd(),
-                    onTapCancel: onHoldEnd,
-                    child: SizedBox(
-                      height: 170,
-                      child: AnimatedBuilder(
-                        animation: pulse,
-                        builder: (context, _) => CustomPaint(
-                          painter: _LiquidPulsePainter(
-                            progress: pulse.value,
-                            accent: accent,
-                          ),
-                          child: Center(
-                            child: SizedBox.square(
-                              dimension: 124,
-                              child: Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  CustomPaint(
-                                    size: const Size.square(124),
-                                    painter: _OrbPainter(
-                                      progress: pulse.value,
-                                      accent: accent,
-                                    ),
-                                  ),
-                                  Container(
-                                    width: 62,
-                                    height: 62,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Colors.white.withOpacity(.96),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: accent.withOpacity(.55),
-                                          blurRadius: 24,
-                                          spreadRadius: 4,
-                                        ),
-                                      ],
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(16),
-                                      child: SvgPicture.asset(
-                                        'assets/icons/microphone.svg',
-                                        colorFilter: const ColorFilter.mode(
-                                          Color(0xFF11151B),
-                                          BlendMode.srcIn,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                ),
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 28),
+                    children: [
+                      const SizedBox(height: 4),
+                      SizedBox(
+                        height: 230,
+                        child: GestureDetector(
+                          onLongPressStart: (_) => onHoldStart(),
+                          onLongPressEnd: (_) => onHoldEnd(),
+                          onTapDown: (_) => onHoldStart(),
+                          onTapUp: (_) => onHoldEnd(),
+                          onTapCancel: onHoldEnd,
+                          child: AnimatedBuilder(
+                            animation: pulse,
+                            builder: (context, _) => CustomPaint(
+                              painter: _WaterRipplePainter(
+                                progress: pulse.value,
+                                accent: accent,
+                                intensity: holding ? 1.55 : 1.0,
+                              ),
+                              child: const Center(
+                                child: _MicDisc(size: 92, iconSize: 34),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ),
-                  Text(
-                    takeLocked ? 'Take saved on this device' : 'Hold to speak',
-                    style: TextStyle(
-                      color: takeLocked ? Colors.white : Colors.white60,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: .7,
-                    ),
-                  ),
-                  if (heard.isNotEmpty) ...[
-                    const SizedBox(height: 8),
-                    Text(
-                      heard,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 13,
-                        fontStyle: FontStyle.italic,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 7,
+                            height: 7,
+                            margin: const EdgeInsets.only(right: 8),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(
+                                holding || status == 'Recording' ? 1 : .45,
+                              ),
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          Text(
+                            status.toUpperCase(),
+                            style: const TextStyle(
+                              color: Colors.white54,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 2.8,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                  const SizedBox(height: 12),
-                  Wrap(
-                    alignment: WrapAlignment.center,
-                    spacing: 7,
-                    runSpacing: 7,
-                    children: [
-                      for (var i = 0; i < parts.length; i++)
-                        _SoundPill(
-                          label: parts[i].roman.isNotEmpty
-                              ? parts[i].roman
-                              : parts[i].deva,
-                          active: heard.toLowerCase().contains(
-                            (parts[i].roman.isNotEmpty
-                                    ? parts[i].roman
-                                    : parts[i].deva)
-                                .toLowerCase(),
+                      const SizedBox(height: 10),
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 140),
+                        child: Text(
+                          kinetic,
+                          key: ValueKey(kinetic),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 48,
+                            height: .95,
+                            fontFamily: 'serif',
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  _MouthCard(word: word, matched: matched),
-                  const SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      TextButton.icon(
-                        onPressed: onReplay,
-                        icon: const Icon(Icons.replay_rounded, size: 17),
-                        label: const Text('Replay reference'),
                       ),
-                      const SizedBox(width: 8),
-                      TextButton.icon(
-                        onPressed: onClose,
-                        icon: const Icon(
-                          Icons.keyboard_arrow_down_rounded,
-                          size: 18,
+                      const SizedBox(height: 8),
+                      Text(
+                        note,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.white54,
+                          fontSize: 12,
+                          height: 1.35,
                         ),
-                        label: const Text('Now Playing'),
                       ),
+                      const SizedBox(height: 14),
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 7,
+                        runSpacing: 7,
+                        children: [
+                          for (var i = 0; i < parts.length; i++)
+                            _SoundPill(
+                              label: parts[i].roman.isNotEmpty
+                                  ? parts[i].roman
+                                  : parts[i].deva,
+                              active: holding || activePart == i,
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 14),
+                      _InsetCard(
+                        glyph: () {
+                          if (activePart != null &&
+                              activePart! < parts.length) {
+                            final p = parts[activePart!];
+                            return p.roman.isNotEmpty ? p.roman : p.deva;
+                          }
+                          return word.word;
+                        }(),
+                        mouth: () {
+                          if (activePart != null &&
+                              activePart! < parts.length &&
+                              parts[activePart!].say.isNotEmpty) {
+                            return parts[activePart!].say;
+                          }
+                          return word.mouthPos.isNotEmpty
+                              ? word.mouthPos
+                              : note;
+                        }(),
+                      ),
+                      const SizedBox(height: 16),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(99),
+                        child: LinearProgressIndicator(
+                          value: elapsed / _sessionLength,
+                          minHeight: 2,
+                          backgroundColor: Colors.white12,
+                          valueColor: const AlwaysStoppedAnimation<Color>(
+                            Colors.white,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            '00:${elapsed.toString().padLeft(2, '0')}',
+                            style: const TextStyle(
+                              color: Colors.white38,
+                              fontSize: 11,
+                            ),
+                          ),
+                          const Text(
+                            '00:29',
+                            style: TextStyle(
+                              color: Colors.white38,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 6,
+                        runSpacing: 6,
+                        children: [
+                          for (final v in _verbs)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 5,
+                              ),
+                              decoration: BoxDecoration(
+                                color: status == v
+                                    ? Colors.white
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(99),
+                              ),
+                              child: Text(
+                                v.toUpperCase(),
+                                style: TextStyle(
+                                  color: status == v
+                                      ? const Color(0xFF050506)
+                                      : Colors.white38,
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: .8,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: onReplay,
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.white,
+                                side: BorderSide(
+                                  color: Colors.white.withOpacity(.2),
+                                ),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 14),
+                                shape: const StadiumBorder(),
+                              ),
+                              child: const Text('Replay session'),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: FilledButton(
+                              onPressed: onHoldStart,
+                              onLongPress: onHoldStart,
+                              style: FilledButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                foregroundColor: const Color(0xFF050506),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 14),
+                                shape: const StadiumBorder(),
+                              ),
+                              child: Text(
+                                holding ? 'Recording…' : 'Hold to speak',
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        takeLocked
+                            ? 'Take saved on this device.'
+                            : 'Nothing locked yet. Hold the word once.',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.white38,
+                          fontSize: 11,
+                        ),
+                      ),
+                      if (heard.isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          heard,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 13,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ],
+                      _WordBreakdown(
+                        word: word,
+                        parts: parts,
+                        active: activePart,
+                        matched: matched,
+                      ),
+                      _SessionCraft(elapsed: elapsed),
                     ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
@@ -544,80 +845,114 @@ class _PracticeTab extends StatelessWidget {
   }
 }
 
-class _Timeline extends StatelessWidget {
-  const _Timeline({required this.elapsed, required this.accent});
-  final int elapsed;
-  final Color accent;
+class _MicDisc extends StatelessWidget {
+  const _MicDisc({required this.size, required this.iconSize});
+  final double size;
+  final double iconSize;
+
   @override
   Widget build(BuildContext context) {
-    return LinearProgressIndicator(
-      value: elapsed / 29,
-      minHeight: 3,
-      backgroundColor: Colors.white12,
-      valueColor: AlwaysStoppedAnimation<Color>(accent),
-      borderRadius: BorderRadius.circular(99),
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: const Color(0xFFF4F4F5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.white.withOpacity(.22),
+            blurRadius: 28,
+            spreadRadius: 2,
+          ),
+          const BoxShadow(
+            color: Color(0x33000000),
+            blurRadius: 16,
+            offset: Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Container(
+            margin: const EdgeInsets.all(7),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: const Color(0x14050506)),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.all(size * .18),
+            child: SvgPicture.asset(
+              'assets/icons/microphone.svg',
+              width: iconSize,
+              height: iconSize,
+              colorFilter: const ColorFilter.mode(
+                Color(0xFF11151B),
+                BlendMode.srcIn,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
 
-class _MouthCard extends StatelessWidget {
-  const _MouthCard({required this.word, required this.matched});
-  final Word word;
-  final bool matched;
+class _InsetCard extends StatelessWidget {
+  const _InsetCard({required this.glyph, required this.mouth});
+  final String glyph;
+  final String mouth;
+
   @override
   Widget build(BuildContext context) {
-    final hint = word.mouthPos.isNotEmpty
-        ? word.mouthPos
-        : (word.tip.isNotEmpty
-              ? word.tip
-              : 'Relax the jaw and let the sound resonate.');
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(.06),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.white.withOpacity(.1)),
+        color: const Color(0xFF080808),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withOpacity(.12)),
       ),
-      child: Row(
+      child: Column(
         children: [
-          Container(
-            width: 42,
-            height: 42,
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(.1),
-              borderRadius: BorderRadius.circular(13),
-            ),
-            child: const Icon(
-              Icons.face_retouching_natural_outlined,
-              color: Colors.white70,
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 8, 12, 6),
+            child: Row(
               children: [
-                Text(
-                  matched ? 'Sound matched' : 'Mouth shape',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w800,
+                const Text(
+                  'INSET',
+                  style: TextStyle(
+                    color: Colors.white38,
+                    fontSize: 9,
+                    letterSpacing: 1.8,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
-                const SizedBox(height: 3),
+                const Spacer(),
                 Text(
-                  hint,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+                  glyph,
                   style: const TextStyle(
-                    color: Colors.white54,
-                    fontSize: 11,
-                    height: 1.25,
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontFamily: 'serif',
                   ),
                 ),
               ],
+            ),
+          ),
+          Divider(height: 1, color: Colors.white.withOpacity(.1)),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 8, 12, 10),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                mouth,
+                style: const TextStyle(
+                  color: Colors.white54,
+                  fontSize: 12,
+                  height: 1.35,
+                ),
+              ),
             ),
           ),
         ],
@@ -633,7 +968,7 @@ class _SoundPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 260),
+      duration: const Duration(milliseconds: 220),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
         color: active ? Colors.white : const Color(0xFF090A0D),
@@ -646,132 +981,644 @@ class _SoundPill extends StatelessWidget {
           color: active ? Colors.black : Colors.white,
           fontSize: 12,
           fontWeight: FontWeight.w700,
-          letterSpacing: .3,
         ),
       ),
     );
   }
 }
 
-class _SmallButton extends StatelessWidget {
-  const _SmallButton({required this.icon, required this.onTap});
-  final IconData icon;
-  final VoidCallback onTap;
+class _WordBreakdown extends StatelessWidget {
+  const _WordBreakdown({
+    required this.word,
+    required this.parts,
+    required this.active,
+    required this.matched,
+  });
+  final Word word;
+  final List<WordPart> parts;
+  final int? active;
+  final bool matched;
+
   @override
-  Widget build(BuildContext context) => GestureDetector(
-    onTap: onTap,
-    child: Container(
-      width: 38,
-      height: 38,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Colors.white.withOpacity(.06),
-        border: Border.all(color: Colors.white.withOpacity(.12)),
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 28),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'THE WORD',
+            style: TextStyle(
+              color: Colors.white38,
+              fontSize: 10,
+              letterSpacing: 2.4,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            word.word,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 32,
+              fontFamily: 'serif',
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          if (word.origin.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Text(
+                word.origin,
+                style: const TextStyle(color: Colors.white54, fontSize: 12),
+              ),
+            ),
+          if (word.meaning.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(
+                word.meaning,
+                style: const TextStyle(color: Colors.white70, fontSize: 13),
+              ),
+            ),
+          const SizedBox(height: 16),
+          for (var i = 0; i < parts.length; i++)
+            _PartCard(index: i, part: parts[i], on: active == i),
+          if (word.mouthPos.isNotEmpty || word.tip.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Text(
+                matched
+                    ? 'Sound matched.'
+                    : (word.mouthPos.isNotEmpty ? word.mouthPos : word.tip),
+                style: const TextStyle(color: Colors.white54, fontSize: 12),
+              ),
+            ),
+        ],
       ),
-      child: Icon(icon, color: Colors.white70, size: 19),
-    ),
-  );
+    );
+  }
 }
 
-class _OrbPainter extends CustomPainter {
-  const _OrbPainter({required this.progress, required this.accent});
-  final double progress;
-  final Color accent;
+class _PartCard extends StatelessWidget {
+  const _PartCard({
+    required this.index,
+    required this.part,
+    required this.on,
+  });
+  final int index;
+  final WordPart part;
+  final bool on;
+
   @override
-  void paint(Canvas canvas, Size size) {
-    final c = Offset(size.width / 2, size.height / 2);
-    final r = math.min(size.width, size.height) * .42;
-    final sphere = Rect.fromCircle(center: c, radius: r);
-    canvas.save();
-    canvas.translate(c.dx, c.dy);
-    canvas.rotate(-.12);
-    canvas.translate(-c.dx, -c.dy);
-    canvas.drawOval(
-      sphere,
-      Paint()
-        ..shader = RadialGradient(
-          center: const Alignment(-.25, -.35),
-          radius: 1.05,
-          colors: [
-            Colors.white.withOpacity(.98),
-            accent.withOpacity(.64),
-            const Color(0xFF15171B),
-            Colors.black,
+  Widget build(BuildContext context) {
+    final glyph = part.roman.isNotEmpty ? part.roman : part.deva;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+      decoration: BoxDecoration(
+        color: on ? const Color(0xFF16161A) : const Color(0xFF0B0B0D),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: Colors.white.withOpacity(on ? .28 : .12),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                glyph,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 26,
+                  fontFamily: 'serif',
+                ),
+              ),
+              if (on)
+                const Padding(
+                  padding: EdgeInsets.only(left: 10),
+                  child: Text(
+                    'NOW',
+                    style: TextStyle(
+                      color: Colors.white38,
+                      fontSize: 9,
+                      letterSpacing: 1.8,
+                    ),
+                  ),
+                ),
+              const Spacer(),
+              Text(
+                '${(index + 1).toString().padLeft(2, '0')}  ·  ${part.hold.toStringAsFixed(2)}s',
+                style: const TextStyle(color: Colors.white38, fontSize: 11),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          LinearProgressIndicator(
+            value: on ? 1 : (part.hold / 2).clamp(0.2, .85),
+            minHeight: 1,
+            backgroundColor: Colors.white12,
+            valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+          ),
+          if (part.say.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Text(
+              part.say,
+              style: const TextStyle(color: Colors.white70, fontSize: 13),
+            ),
           ],
-          stops: const [.02, .27, .62, 1],
-        ).createShader(sphere),
+        ],
+      ),
     );
-    canvas.clipPath(Path()..addOval(sphere));
-    for (var x = -r; x <= r; x += 3.5) {
-      final width = math.sqrt(math.max(0, r * r - x * x));
-      final wave = math.sin(progress * math.pi * 2 + x / r * math.pi * 2);
-      final bend = wave * 4.5;
-      final light = (.5 + .5 * math.cos(x / r * math.pi)).clamp(0.0, 1.0);
-      canvas.drawLine(
-        Offset(c.dx + x + bend, c.dy - width),
-        Offset(c.dx + x - bend, c.dy + width),
-        Paint()
-          ..color = Colors.white.withOpacity(.12 + light * .75)
-          ..strokeWidth = .9 + light * 1.4
-          ..strokeCap = StrokeCap.round,
-      );
-    }
-    canvas.restore();
   }
-
-  @override
-  bool shouldRepaint(covariant _OrbPainter old) =>
-      old.progress != progress || old.accent != accent;
 }
 
-class _LiquidPulsePainter extends CustomPainter {
-  const _LiquidPulsePainter({required this.progress, required this.accent});
+class _SessionCraft extends StatefulWidget {
+  const _SessionCraft({required this.elapsed});
+  final int elapsed;
+
+  @override
+  State<_SessionCraft> createState() => _SessionCraftState();
+}
+
+class _SessionCraftState extends State<_SessionCraft> {
+  String _open = '05';
+  int? _kineticLock;
+  String? _darkLock;
+
+  @override
+  Widget build(BuildContext context) {
+    final kinetic = [
+      'these',
+      'animations',
+      'feel',
+      'native',
+      'and',
+      'polished'
+    ];
+    final dark = ['Solving…', 'Thinking…', 'Listening…', 'Paused'];
+    final ki = _kineticLock ?? (widget.elapsed * 7 ~/ 5) % kinetic.length;
+    final di = _darkLock ?? dark[widget.elapsed ~/ 3 % dark.length];
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 32),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'SESSION CRAFT',
+            style: TextStyle(
+              color: Colors.white38,
+              fontSize: 10,
+              letterSpacing: 2.4,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'A 29-second vertical edit',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 28,
+              fontFamily: 'serif',
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Practice is not one complicated 3D animation. It is a fast-paced cut: talking head, product stills, a small inset, large white serif words, hard cuts, short zooms, and screen recordings timed to the voice.',
+            style: TextStyle(color: Colors.white54, fontSize: 13, height: 1.45),
+          ),
+          const SizedBox(height: 16),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(99),
+            child: SizedBox(
+              height: 36,
+              child: Row(
+                children: [
+                  for (final b in _beats)
+                    Expanded(
+                      flex: b.until - b.at,
+                      child: Container(
+                        alignment: Alignment.center,
+                        color:
+                            widget.elapsed >= b.at && widget.elapsed < b.until
+                                ? Colors.white12
+                                : const Color(0xFF080808),
+                        child: Text(
+                          b.state,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.white38,
+                            fontSize: 8,
+                            letterSpacing: .4,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 6),
+          const Text(
+            '29s · 9:16 · 1080 × 1920 · 30 fps',
+            style: TextStyle(color: Colors.white38, fontSize: 11),
+          ),
+          const SizedBox(height: 16),
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: Colors.white.withOpacity(.12)),
+              color: const Color(0xFF0B0B0D),
+            ),
+            child: Column(
+              children: [
+                for (final b in _beats)
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 10,
+                    ),
+                    color: widget.elapsed >= b.at && widget.elapsed < b.until
+                        ? const Color(0xFF16161A)
+                        : null,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          width: 58,
+                          child: Text(
+                            '${b.at}–${b.until}s',
+                            style: const TextStyle(
+                              color: Colors.white38,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            b.note,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+          const Text(
+            'CAPCUT WORKFLOW',
+            style: TextStyle(
+              color: Colors.white38,
+              fontSize: 10,
+              letterSpacing: 2.4,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Fourteen cuts that make the word feel native',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 22,
+              fontFamily: 'serif',
+            ),
+          ),
+          const SizedBox(height: 12),
+          for (final step in _craftSteps)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Material(
+                color: const Color(0xFF0B0B0D),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  side: BorderSide(color: Colors.white.withOpacity(.12)),
+                ),
+                child: InkWell(
+                  onTap: () => setState(
+                    () => _open = _open == step.n ? '' : step.n,
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              step.n,
+                              style: const TextStyle(
+                                color: Colors.white38,
+                                fontSize: 11,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    step.title,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  Text(
+                                    step.kicker.toUpperCase(),
+                                    style: const TextStyle(
+                                      color: Colors.white38,
+                                      fontSize: 10,
+                                      letterSpacing: 1.4,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Text(
+                              _open == step.n ? '–' : '+',
+                              style: const TextStyle(color: Colors.white38),
+                            ),
+                          ],
+                        ),
+                        if (_open == step.n) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            step.body,
+                            style: const TextStyle(
+                              color: Colors.white54,
+                              fontSize: 13,
+                              height: 1.4,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          const SizedBox(height: 16),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(16, 22, 16, 18),
+            decoration: BoxDecoration(
+              color: const Color(0xFF080808),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: Colors.white.withOpacity(.12)),
+            ),
+            child: Column(
+              children: [
+                const Text(
+                  'DARK UI SHOTS',
+                  style: TextStyle(
+                    color: Colors.white38,
+                    fontSize: 10,
+                    letterSpacing: 2.2,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  di,
+                  key: ValueKey(di),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 32,
+                    fontFamily: 'serif',
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Wrap(
+                  spacing: 8,
+                  children: [
+                    for (final s in dark)
+                      GestureDetector(
+                        onTap: () => setState(() => _darkLock = s),
+                        child: Text(
+                          s.replaceAll('…', ''),
+                          style: TextStyle(
+                            color: di == s ? Colors.white : Colors.white38,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(16, 22, 16, 18),
+            decoration: BoxDecoration(
+              color: const Color(0xFF0B0B0D),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: Colors.white.withOpacity(.12)),
+            ),
+            child: Column(
+              children: [
+                const Text(
+                  'WORD REPLACEMENT',
+                  style: TextStyle(
+                    color: Colors.white38,
+                    fontSize: 10,
+                    letterSpacing: 2.2,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  kinetic[ki],
+                  key: ValueKey(kinetic[ki]),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 40,
+                    fontFamily: 'serif',
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Wrap(
+                  spacing: 8,
+                  children: [
+                    for (var i = 0; i < kinetic.length; i++)
+                      GestureDetector(
+                        onTap: () => setState(() => _kineticLock = i),
+                        child: Text(
+                          kinetic[i],
+                          style: TextStyle(
+                            color: ki == i ? Colors.white : Colors.white38,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+          const Text(
+            'THE FORMULA',
+            style: TextStyle(
+              color: Colors.white38,
+              fontSize: 10,
+              letterSpacing: 2.4,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 8),
+          for (var i = 0; i < _formula.length; i++)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Row(
+                children: [
+                  Text(
+                    (i + 1).toString().padLeft(2, '0'),
+                    style: const TextStyle(color: Colors.white38, fontSize: 11),
+                  ),
+                  const SizedBox(width: 14),
+                  Text(
+                    _formula[i],
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontFamily: 'serif',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          const SizedBox(height: 12),
+          for (final law in _formulaLaws)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Text(
+                law,
+                style: const TextStyle(
+                  color: Colors.white54,
+                  fontSize: 13,
+                  height: 1.4,
+                ),
+              ),
+            ),
+          const SizedBox(height: 8),
+          const Text(
+            'Recreate the editing system, not just the appearance: narration-driven word changes, product-demo inserts, screen-recording montage, and minimal editorial motion.',
+            style: TextStyle(color: Colors.white70, fontSize: 13, height: 1.45),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _WaterRipplePainter extends CustomPainter {
+  const _WaterRipplePainter({
+    required this.progress,
+    required this.accent,
+    this.intensity = 1,
+  });
   final double progress;
   final Color accent;
+  final double intensity;
+
   @override
   void paint(Canvas canvas, Size size) {
-    final c = Offset(size.width / 2, size.height / 2);
+    final c = Offset(size.width / 2, size.height * .58);
     final maxR = math.min(size.width, size.height) * .46;
-    for (var i = 0; i < 11; i++) {
-      final t = (progress + i / 11) % 1.0;
-      final radius = 48 + t * maxR;
-      final fade = math.pow(1 - t, 1.45).toDouble();
-      final path = Path();
-      for (var a = 0.0; a <= math.pi * 2 + .08; a += .08) {
-        final wave =
-            math.sin(a * 3 + progress * math.pi * 2) * (1.4 + 4 * (1 - t));
-        final p = Offset(
-          c.dx + math.cos(a) * (radius + wave),
-          c.dy + math.sin(a) * (radius + wave) * .62,
-        );
-        if (a == 0)
-          path.moveTo(p.dx, p.dy);
-        else
-          path.lineTo(p.dx, p.dy);
-      }
-      canvas.drawPath(
-        path,
-        Paint()
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 1.1 + fade * 1.9
-          ..color = Color.lerp(
-            Colors.white,
-            accent,
-            .35,
-          )!.withOpacity(.025 + fade * .2),
+    const tilt = .3;
+
+    final floor = Paint()
+      ..shader = RadialGradient(
+        colors: [
+          Colors.white.withOpacity(.14 * intensity.clamp(0.4, 1.8)),
+          Colors.white.withOpacity(.04),
+          Colors.transparent,
+        ],
+        stops: const [0, .45, 1],
+      ).createShader(Rect.fromCircle(center: c, radius: maxR));
+    canvas.drawOval(
+      Rect.fromCenter(center: c, width: maxR * 2, height: maxR * 2 * tilt),
+      floor,
+    );
+
+    final radar = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1
+      ..color = Colors.white.withOpacity(.07);
+    for (final f in [0.28, 0.5, 0.74]) {
+      canvas.drawOval(
+        Rect.fromCenter(
+          center: c,
+          width: maxR * 2 * f,
+          height: maxR * 2 * f * tilt,
+        ),
+        radar,
       );
     }
-    canvas.drawCircle(
-      c,
-      64,
+
+    for (var i = 0; i < 10; i++) {
+      final t = (progress + i / 10) % 1.0;
+      final radius = 28 + t * maxR * 1.15 * intensity;
+      final fade = math.pow(1 - t, 1.35).toDouble();
+      _ring(canvas, c, radius, t, fade * intensity, tilt, back: true);
+      _ring(canvas, c, radius, t, fade * intensity, tilt, back: false);
+    }
+  }
+
+  void _ring(
+    Canvas canvas,
+    Offset c,
+    double radius,
+    double age,
+    double fade,
+    double tilt, {
+    required bool back,
+  }) {
+    final path = Path();
+    final a0 = back ? math.pi : 0.0;
+    final a1 = back ? math.pi * 2 : math.pi;
+    var started = false;
+    for (var a = a0; a <= a1 + .04; a += .07) {
+      final wave = math.sin(a * 7 + progress * math.pi * 2) * 5.2 * fade +
+          math.sin(a * 3 - progress * math.pi * 1.4 + age * 6) * 2.2 * fade;
+      final z = math.cos(a * 4 + progress * math.pi * 1.6) * 4.2 * fade;
+      final p = Offset(
+        c.dx + math.cos(a) * (radius + wave),
+        c.dy + math.sin(a) * (radius + wave) * tilt - z * .45,
+      );
+      if (!started) {
+        path.moveTo(p.dx, p.dy);
+        started = true;
+      } else {
+        path.lineTo(p.dx, p.dy);
+      }
+    }
+    canvas.drawPath(
+      path,
       Paint()
-        ..shader = RadialGradient(
-          colors: [accent.withOpacity(.18), Colors.transparent],
-        ).createShader(Rect.fromCircle(center: c, radius: 64)),
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeWidth = back ? 1.05 : (1.4 + fade * 1.8)
+        ..color = Colors.white.withOpacity(back ? .18 * fade : .62 * fade)
+        ..maskFilter = back ? null : const MaskFilter.blur(BlurStyle.normal, 6),
     );
   }
 
   @override
-  bool shouldRepaint(covariant _LiquidPulsePainter old) =>
-      old.progress != progress || old.accent != accent;
+  bool shouldRepaint(covariant _WaterRipplePainter old) =>
+      old.progress != progress ||
+      old.accent != accent ||
+      old.intensity != intensity;
 }

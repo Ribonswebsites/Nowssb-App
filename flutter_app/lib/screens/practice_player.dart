@@ -183,8 +183,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
 
   Future<void> _toggleLike() async {
     final prefs = await SharedPreferences.getInstance();
-    final liked = (prefs.getStringList(_likedWordsKey) ?? const <String>[])
-        .toSet();
+    final liked =
+        (prefs.getStringList(_likedWordsKey) ?? const <String>[]).toSet();
     if (liked.contains(_word.word)) {
       liked.remove(_word.word);
     } else {
@@ -220,7 +220,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     } catch (_) {
       if (mounted) {
         setState(
-          () => _error = 'Your device could not start voice playback. Check that text-to-speech is enabled.',
+          () => _error =
+              'Your device could not start voice playback. Check that text-to-speech is enabled.',
         );
       }
     } finally {
@@ -295,9 +296,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
 
   Future<void> _copyWord() async {
     final syllables = _word.syllables.join(' · ');
-    final organ = _word.organ.trim().isEmpty
-        ? ''
-        : ' — ${_word.organ.toUpperCase()}';
+    final organ =
+        _word.organ.trim().isEmpty ? '' : ' — ${_word.organ.toUpperCase()}';
     await Clipboard.setData(
       ClipboardData(text: '${_word.word}$organ\n$syllables\n${_word.meaning}'),
     );
@@ -580,10 +580,10 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                   () => _repTarget = _repTarget == 3
                       ? 7
                       : _repTarget == 7
-                      ? 11
-                      : _repTarget == 11
-                      ? 21
-                      : 3,
+                          ? 11
+                          : _repTarget == 11
+                              ? 21
+                              : 3,
                 ),
               ),
               _RadialOption(
@@ -922,44 +922,45 @@ class _PlayerHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SizedBox(
-    height: 46,
-    child: Stack(
-      alignment: Alignment.center,
-      children: [
-        Align(
-          alignment: Alignment.centerLeft,
-          child: _BareIconButton(
-            icon: Icons.keyboard_arrow_down_rounded,
-            onTap: onBack,
-          ),
-        ),
-        const Column(
-          mainAxisSize: MainAxisSize.min,
+        height: 46,
+        child: Stack(
+          alignment: Alignment.center,
           children: [
-            Text(
-              'NOW PLAYING',
-              style: TextStyle(
-                color: Color(0xFF9A9A9E),
-                fontSize: 10,
-                fontWeight: FontWeight.w500,
-                letterSpacing: 3.8,
+            Align(
+              alignment: Alignment.centerLeft,
+              child: _BareIconButton(
+                icon: Icons.keyboard_arrow_down_rounded,
+                onTap: onBack,
               ),
             ),
-            SizedBox(height: 6),
-            SizedBox(
-              width: 28,
-              height: 1,
-              child: ColoredBox(color: Color(0x8CF4F4F5)),
+            const Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'NOW PLAYING',
+                  style: TextStyle(
+                    color: Color(0xFF9A9A9E),
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: 3.8,
+                  ),
+                ),
+                SizedBox(height: 6),
+                SizedBox(
+                  width: 28,
+                  height: 1,
+                  child: ColoredBox(color: Color(0x8CF4F4F5)),
+                ),
+              ],
+            ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: _BareIconButton(
+                  icon: Icons.more_horiz_rounded, onTap: onMore),
             ),
           ],
         ),
-        Align(
-          alignment: Alignment.centerRight,
-          child: _BareIconButton(icon: Icons.more_horiz_rounded, onTap: onMore),
-        ),
-      ],
-    ),
-  );
+      );
 }
 
 class _StatsRow extends StatelessWidget {
@@ -1025,31 +1026,31 @@ class _StatCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Expanded(
-    child: Column(
-      children: [
-        Icon(icon, color: const Color(0xFFE8D5A3), size: 16),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 17,
-            fontWeight: FontWeight.w700,
-          ),
+        child: Column(
+          children: [
+            Icon(icon, color: const Color(0xFFE8D5A3), size: 16),
+            const SizedBox(height: 4),
+            Text(
+              value,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              label.toUpperCase(),
+              style: const TextStyle(
+                color: Color(0x80FFFFFF),
+                fontSize: 8.5,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 1,
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 2),
-        Text(
-          label.toUpperCase(),
-          style: const TextStyle(
-            color: Color(0x80FFFFFF),
-            fontSize: 8.5,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 1,
-          ),
-        ),
-      ],
-    ),
-  );
+      );
 }
 
 class _ProfileHeader extends StatelessWidget {
@@ -1266,8 +1267,8 @@ class _NextUpCard extends StatelessWidget {
     final art = next == null
         ? null
         : (next.img.isNotEmpty
-              ? next.img
-              : themes[nextIndex % themes.length].image);
+            ? next.img
+            : themes[nextIndex % themes.length].image);
 
     return GestureDetector(
       onVerticalDragEnd: (details) {
@@ -1356,22 +1357,22 @@ class _NextUpCard extends StatelessWidget {
                                 height: 44,
                                 child: art != null && art.isNotEmpty
                                     ? (art.startsWith('http')
-                                          ? Image.network(
-                                              art,
-                                              fit: BoxFit.cover,
-                                              errorBuilder: (_, __, ___) =>
-                                                  const ColoredBox(
-                                                    color: Color(0xFF111111),
-                                                  ),
-                                            )
-                                          : Image.asset(
-                                              art,
-                                              fit: BoxFit.cover,
-                                              errorBuilder: (_, __, ___) =>
-                                                  const ColoredBox(
-                                                    color: Color(0xFF111111),
-                                                  ),
-                                            ))
+                                        ? Image.network(
+                                            art,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (_, __, ___) =>
+                                                const ColoredBox(
+                                              color: Color(0xFF111111),
+                                            ),
+                                          )
+                                        : Image.asset(
+                                            art,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (_, __, ___) =>
+                                                const ColoredBox(
+                                              color: Color(0xFF111111),
+                                            ),
+                                          ))
                                     : const ColoredBox(
                                         color: Color(0xFF111111),
                                       ),
@@ -1575,8 +1576,8 @@ class _QueueSheetState extends State<_QueueSheet> {
     final prefs = await SharedPreferences.getInstance();
     final ordered = _order.map((i) => widget.words[i].word).toList();
     await prefs.setStringList(_savedMixKey, ordered);
-    final liked = (prefs.getStringList(_likedWordsKey) ?? const <String>[])
-        .toSet();
+    final liked =
+        (prefs.getStringList(_likedWordsKey) ?? const <String>[]).toSet();
     for (final w in ordered) {
       liked.add(w);
     }
@@ -1659,20 +1660,18 @@ class _QueueSheetState extends State<_QueueSheet> {
                           child: LayoutBuilder(
                             builder: (context, constraints) {
                               // Source of truth: FlexibleSpaceBarSettings every frame.
-                              final settings = context
-                                  .dependOnInheritedWidgetOfExactType<
-                                    FlexibleSpaceBarSettings
-                                  >();
+                              final settings =
+                                  context.dependOnInheritedWidgetOfExactType<
+                                      FlexibleSpaceBarSettings>();
                               double localT;
                               if (settings != null) {
                                 final range =
                                     (settings.maxExtent - settings.minExtent)
                                         .clamp(1.0, 10000.0);
-                                localT =
-                                    ((settings.maxExtent -
-                                                settings.currentExtent) /
-                                            range)
-                                        .clamp(0.0, 1.0);
+                                localT = ((settings.maxExtent -
+                                            settings.currentExtent) /
+                                        range)
+                                    .clamp(0.0, 1.0);
                               } else {
                                 final maxH = media.padding.top + _expandExtent;
                                 final minH =
@@ -1695,9 +1694,8 @@ class _QueueSheetState extends State<_QueueSheet> {
                                 title: word?.word ?? 'NowssB',
                                 subtitle: 'NowssB',
                                 playing: widget.playing,
-                                durationSec: word == null
-                                    ? 12.0
-                                    : _wordSecs(word),
+                                durationSec:
+                                    word == null ? 12.0 : _wordSecs(word),
                                 shuffle: false,
                                 loop: false,
                                 artMax: _heroArtMax,
@@ -1742,8 +1740,8 @@ class _QueueSheetState extends State<_QueueSheet> {
                         SliverOverlapInjector(
                           handle:
                               NestedScrollView.sliverOverlapAbsorberHandleFor(
-                                context,
-                              ),
+                            context,
+                          ),
                         ),
                         if (filtered.isEmpty)
                           const SliverFillRemaining(
@@ -1799,9 +1797,8 @@ class _QueueSheetState extends State<_QueueSheet> {
                                 final w = widget.words[orig];
                                 final rowArt = w.img.isNotEmpty
                                     ? w.img
-                                    : widget
-                                          .themes[orig % widget.themes.length]
-                                          .image;
+                                    : widget.themes[orig % widget.themes.length]
+                                        .image;
                                 final isCurrent = orig == widget.index;
                                 return ReorderableDelayedDragStartListener(
                                   key: ValueKey('q-$orig-${w.word}'),
@@ -1836,30 +1833,30 @@ class _QueueSheetState extends State<_QueueSheet> {
                                                         ? Image.network(
                                                             rowArt,
                                                             fit: BoxFit.cover,
-                                                            errorBuilder:
-                                                                (
-                                                                  _,
-                                                                  __,
-                                                                  ___,
-                                                                ) => const ColoredBox(
-                                                                  color: Color(
-                                                                    0xFF111111,
-                                                                  ),
-                                                                ),
+                                                            errorBuilder: (
+                                                              _,
+                                                              __,
+                                                              ___,
+                                                            ) =>
+                                                                const ColoredBox(
+                                                              color: Color(
+                                                                0xFF111111,
+                                                              ),
+                                                            ),
                                                           )
                                                         : Image.asset(
                                                             rowArt,
                                                             fit: BoxFit.cover,
-                                                            errorBuilder:
-                                                                (
-                                                                  _,
-                                                                  __,
-                                                                  ___,
-                                                                ) => const ColoredBox(
-                                                                  color: Color(
-                                                                    0xFF111111,
-                                                                  ),
-                                                                ),
+                                                            errorBuilder: (
+                                                              _,
+                                                              __,
+                                                              ___,
+                                                            ) =>
+                                                                const ColoredBox(
+                                                              color: Color(
+                                                                0xFF111111,
+                                                              ),
+                                                            ),
                                                           ),
                                                     if (isCurrent)
                                                       const Align(
@@ -1949,8 +1946,7 @@ class _QueueSheetState extends State<_QueueSheet> {
               child: IgnorePointer(
                 ignoring: miniOpacity > 0.55,
                 child: Opacity(
-                  opacity:
-                      (1.0 - miniOpacity).clamp(0.0, 1.0) *
+                  opacity: (1.0 - miniOpacity).clamp(0.0, 1.0) *
                       controlsOpacity.clamp(0.4, 1.0),
                   child: Center(
                     child: Container(
@@ -2123,8 +2119,7 @@ class _YtmCollapsingHero extends StatelessWidget {
     final gapAfterTitle = lerpDouble(6.0, 0.0, et)!;
     final gapAfterProgress = lerpDouble(4.0, 0.0, et)!;
 
-    final reserved =
-        topPad +
+    final reserved = topPad +
         chromeH +
         gapAfterChrome +
         titleBlockH +
@@ -2444,9 +2439,8 @@ class _QueueStickyHeadDelegate extends SliverPersistentHeaderDelegate {
                 ),
                 const SizedBox(width: 10),
                 Material(
-                  color: saved
-                      ? const Color(0x33E8D5A3)
-                      : const Color(0x33FFFFFF),
+                  color:
+                      saved ? const Color(0x33E8D5A3) : const Color(0x33FFFFFF),
                   borderRadius: BorderRadius.circular(99),
                   child: InkWell(
                     borderRadius: BorderRadius.circular(99),
@@ -2594,116 +2588,118 @@ class _VisualStage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AspectRatio(
-    aspectRatio: 1,
-    child: DecoratedBox(
-      decoration: BoxDecoration(
-        color: Colors.black,
-        borderRadius: BorderRadius.circular(34),
-        border: Border.all(color: const Color(0x38FFFFFF)),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x8C000000),
-            blurRadius: 28,
-            offset: Offset(0, 18),
-          ),
-          BoxShadow(color: Color(0x24FFFFFF), blurRadius: 0, spreadRadius: 1),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(34),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            const ColoredBox(color: Colors.black),
-            NwsbVideo(
-              asset: theme.video,
-              poster: theme.image,
-              fit: BoxFit.cover,
-              alignment: const Alignment(0, -0.24),
-              priority: ClipPriority.feature,
-              autoplay: true,
-              loop: true,
-              showPoster: true,
-            ),
-            const DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0x00000000),
-                    Color(0x00000000),
-                    Color(0xD9000000),
-                  ],
-                  stops: [0, 0.42, 1],
-                ),
+        aspectRatio: 1,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: Colors.black,
+            borderRadius: BorderRadius.circular(34),
+            border: Border.all(color: const Color(0x38FFFFFF)),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x8C000000),
+                blurRadius: 28,
+                offset: Offset(0, 18),
               ),
-            ),
-            Positioned(
-              top: 10,
-              left: 10,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  AnimatedBuilder(
-                    animation: PracticeProgress.instance,
-                    builder: (context, _) => _LevelPill(
-                      level: PracticeProgress.instance.level.clamp(1, 10),
-                      onTap: onLevel,
+              BoxShadow(
+                  color: Color(0x24FFFFFF), blurRadius: 0, spreadRadius: 1),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(34),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                const ColoredBox(color: Colors.black),
+                NwsbVideo(
+                  asset: theme.video,
+                  poster: theme.image,
+                  fit: BoxFit.cover,
+                  alignment: const Alignment(0, -0.24),
+                  priority: ClipPriority.feature,
+                  autoplay: true,
+                  loop: true,
+                  showPoster: true,
+                ),
+                const DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color(0x00000000),
+                        Color(0x00000000),
+                        Color(0xD9000000),
+                      ],
+                      stops: [0, 0.42, 1],
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  // Store bag square lives INSIDE the art card (below Level badge).
-                  _StoreGlassVideoBox(onTap: onStore, size: 56),
-                ],
-              ),
-            ),
-            Positioned(
-              top: 10,
-              right: 10,
-              child: _StageGlassChip(onSettings: onSettings, onInfo: onInfo),
-            ),
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 40, 16, 14),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      word.word.toUpperCase(),
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Color(0xE6F4F4F5),
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                        letterSpacing: 6,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    _WordOverlay(
-                      word: word,
-                      accent: accent,
-                      playing: playing,
-                      liked: false,
-                      onReplay: onReplay,
-                      onNotes: onCopy,
-                      onLike: () {},
-                      onSyllable: onSyllable,
-                      embedded: true,
-                    ),
-                  ],
                 ),
-              ),
+                Positioned(
+                  top: 10,
+                  left: 10,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      AnimatedBuilder(
+                        animation: PracticeProgress.instance,
+                        builder: (context, _) => _LevelPill(
+                          level: PracticeProgress.instance.level.clamp(1, 10),
+                          onTap: onLevel,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      // Store bag square lives INSIDE the art card (below Level badge).
+                      _StoreGlassVideoBox(onTap: onStore, size: 56),
+                    ],
+                  ),
+                ),
+                Positioned(
+                  top: 10,
+                  right: 10,
+                  child:
+                      _StageGlassChip(onSettings: onSettings, onInfo: onInfo),
+                ),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 40, 16, 14),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          word.word.toUpperCase(),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Color(0xE6F4F4F5),
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 6,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        _WordOverlay(
+                          word: word,
+                          accent: accent,
+                          playing: playing,
+                          liked: false,
+                          onReplay: onReplay,
+                          onNotes: onCopy,
+                          onLike: () {},
+                          onSyllable: onSyllable,
+                          embedded: true,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
-      ),
-    ),
-  );
+      );
 }
 
 class _LevelPill extends StatelessWidget {
@@ -2713,44 +2709,46 @@ class _LevelPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => GestureDetector(
-    onTap: onTap,
-    child: DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(999),
-        gradient: const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0x8C46464E), Color(0xB80C0C0E)],
-        ),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x59000000),
-            blurRadius: 18,
-            offset: Offset(0, 8),
-          ),
-          BoxShadow(color: Color(0x29FFFFFF), blurRadius: 0, spreadRadius: 1),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(8, 6, 12, 6),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.star_rounded, color: Color(0xFFE8D5A3), size: 14),
-            const SizedBox(width: 6),
-            Text(
-              'Level $level',
-              style: const TextStyle(
-                color: Color(0xFFF4F4F5),
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
+        onTap: onTap,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(999),
+            gradient: const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0x8C46464E), Color(0xB80C0C0E)],
             ),
-          ],
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x59000000),
+                blurRadius: 18,
+                offset: Offset(0, 8),
+              ),
+              BoxShadow(
+                  color: Color(0x29FFFFFF), blurRadius: 0, spreadRadius: 1),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(8, 6, 12, 6),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.star_rounded,
+                    color: Color(0xFFE8D5A3), size: 14),
+                const SizedBox(width: 6),
+                Text(
+                  'Level $level',
+                  style: const TextStyle(
+                    color: Color(0xFFF4F4F5),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
-      ),
-    ),
-  );
+      );
 }
 
 class _StageGlassChip extends StatelessWidget {
@@ -2760,41 +2758,41 @@ class _StageGlassChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DecoratedBox(
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(999),
-      gradient: const LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [Color(0x8C46464E), Color(0xB80C0C0E)],
-      ),
-      boxShadow: const [
-        BoxShadow(
-          color: Color(0x59000000),
-          blurRadius: 18,
-          offset: Offset(0, 8),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(999),
+          gradient: const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0x8C46464E), Color(0xB80C0C0E)],
+          ),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x59000000),
+              blurRadius: 18,
+              offset: Offset(0, 8),
+            ),
+            BoxShadow(color: Color(0x29FFFFFF), blurRadius: 0, spreadRadius: 1),
+          ],
         ),
-        BoxShadow(color: Color(0x29FFFFFF), blurRadius: 0, spreadRadius: 1),
-      ],
-    ),
-    child: Padding(
-      padding: const EdgeInsets.all(4),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _StageGlassBtn(
-            icon: Icons.settings_rounded,
-            label: 'Settings',
-            onTap: onSettings,
+        child: Padding(
+          padding: const EdgeInsets.all(4),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _StageGlassBtn(
+                icon: Icons.settings_rounded,
+                label: 'Settings',
+                onTap: onSettings,
+              ),
+              _StageGlassBtn(
+                icon: Icons.help_outline_rounded,
+                label: 'Word info',
+                onTap: onInfo,
+              ),
+            ],
           ),
-          _StageGlassBtn(
-            icon: Icons.help_outline_rounded,
-            label: 'Word info',
-            onTap: onInfo,
-          ),
-        ],
-      ),
-    ),
-  );
+        ),
+      );
 }
 
 class _StageGlassBtn extends StatelessWidget {
@@ -2809,17 +2807,17 @@ class _StageGlassBtn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Semantics(
-    button: true,
-    label: label,
-    child: GestureDetector(
-      onTap: onTap,
-      child: SizedBox(
-        width: 32,
-        height: 32,
-        child: Icon(icon, color: const Color(0xFFF4F4F5), size: 16),
-      ),
-    ),
-  );
+        button: true,
+        label: label,
+        child: GestureDetector(
+          onTap: onTap,
+          child: SizedBox(
+            width: 32,
+            height: 32,
+            child: Icon(icon, color: const Color(0xFFF4F4F5), size: 16),
+          ),
+        ),
+      );
 }
 
 class _ArtWavePainter extends CustomPainter {
@@ -2900,91 +2898,91 @@ class _ProgressBarState extends State<_ProgressBar>
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
-    animation: _c,
-    builder: (context, _) {
-      final t = _c.value.clamp(0.0, 1.0);
-      // Fixed 38px envelope — matches hero progressH, no overflow.
-      return SizedBox(
-        height: 38,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              height: 14,
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final x = t * constraints.maxWidth;
-                  return Stack(
-                    alignment: Alignment.centerLeft,
-                    children: [
-                      Container(
-                        height: 3,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF2C2C2E),
-                          borderRadius: BorderRadius.circular(99),
-                        ),
-                      ),
-                      Container(
-                        width: x,
-                        height: 3,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF5F5F7),
-                          borderRadius: BorderRadius.circular(99),
-                        ),
-                      ),
-                      Positioned(
-                        left: (x - 5.5).clamp(
-                          0.0,
-                          math.max(0.0, constraints.maxWidth - 11),
-                        ),
-                        child: Container(
-                          width: 12,
-                          height: 12,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFF5F5F7),
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Color(0xFF050505),
-                                blurRadius: 0,
-                                spreadRadius: 3,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ),
-            const SizedBox(height: 6),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        animation: _c,
+        builder: (context, _) {
+          final t = _c.value.clamp(0.0, 1.0);
+          // Fixed 38px envelope — matches hero progressH, no overflow.
+          return SizedBox(
+            height: 38,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  _fmtClock(widget.durationSec * t),
-                  style: const TextStyle(
-                    color: Color(0xFF8E8E93),
-                    fontSize: 11,
-                    height: 1.1,
+                SizedBox(
+                  height: 14,
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final x = t * constraints.maxWidth;
+                      return Stack(
+                        alignment: Alignment.centerLeft,
+                        children: [
+                          Container(
+                            height: 3,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF2C2C2E),
+                              borderRadius: BorderRadius.circular(99),
+                            ),
+                          ),
+                          Container(
+                            width: x,
+                            height: 3,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF5F5F7),
+                              borderRadius: BorderRadius.circular(99),
+                            ),
+                          ),
+                          Positioned(
+                            left: (x - 5.5).clamp(
+                              0.0,
+                              math.max(0.0, constraints.maxWidth - 11),
+                            ),
+                            child: Container(
+                              width: 12,
+                              height: 12,
+                              decoration: const BoxDecoration(
+                                color: Color(0xFFF5F5F7),
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Color(0xFF050505),
+                                    blurRadius: 0,
+                                    spreadRadius: 3,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ),
-                Text(
-                  _fmtClock(widget.durationSec),
-                  style: const TextStyle(
-                    color: Color(0xFF8E8E93),
-                    fontSize: 11,
-                    height: 1.1,
-                  ),
+                const SizedBox(height: 6),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      _fmtClock(widget.durationSec * t),
+                      style: const TextStyle(
+                        color: Color(0xFF8E8E93),
+                        fontSize: 11,
+                        height: 1.1,
+                      ),
+                    ),
+                    Text(
+                      _fmtClock(widget.durationSec),
+                      style: const TextStyle(
+                        color: Color(0xFF8E8E93),
+                        fontSize: 11,
+                        height: 1.1,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
-        ),
+          );
+        },
       );
-    },
-  );
 }
 
 /// Expanded YTM transport — plain Material icons, NO glass pill/tube.
@@ -3102,16 +3100,16 @@ class _TransportRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => _GlassTube(
-    playing: playing,
-    shuffle: shuffle,
-    loop: loop,
-    height: tubeHeight,
-    onShuffle: onShuffle,
-    onPrevious: onPrevious,
-    onPlay: onPlay,
-    onNext: onNext,
-    onRepeat: onRepeat,
-  );
+        playing: playing,
+        shuffle: shuffle,
+        loop: loop,
+        height: tubeHeight,
+        onShuffle: onShuffle,
+        onPrevious: onPrevious,
+        onPlay: onPlay,
+        onNext: onNext,
+        onRepeat: onRepeat,
+      );
 }
 
 class _GlassTube extends StatelessWidget {
@@ -3238,24 +3236,24 @@ class _TubeIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Semantics(
-    button: true,
-    label: label,
-    child: GestureDetector(
-      onTap: onTap,
-      child: SizedBox(
-        width: 44,
-        height: 44,
-        child: Icon(
-          icon,
-          color: on ? const Color(0xFFFFFFFF) : const Color(0xFFF4F4F5),
-          size: 22,
-          shadows: on
-              ? const [Shadow(color: Color(0x8CDCE6FF), blurRadius: 12)]
-              : const [Shadow(color: Color(0x8C000000), blurRadius: 8)],
+        button: true,
+        label: label,
+        child: GestureDetector(
+          onTap: onTap,
+          child: SizedBox(
+            width: 44,
+            height: 44,
+            child: Icon(
+              icon,
+              color: on ? const Color(0xFFFFFFFF) : const Color(0xFFF4F4F5),
+              size: 22,
+              shadows: on
+                  ? const [Shadow(color: Color(0x8CDCE6FF), blurRadius: 12)]
+                  : const [Shadow(color: Color(0x8C000000), blurRadius: 8)],
+            ),
+          ),
         ),
-      ),
-    ),
-  );
+      );
 }
 
 class _GlassOrb extends StatelessWidget {
@@ -3324,11 +3322,11 @@ class _ModeBtn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => IconButton(
-    onPressed: onTap,
-    iconSize: 22,
-    color: on ? const Color(0xFFF5F5F7) : const Color(0xFFCFCFD2),
-    icon: Icon(icon),
-  );
+        onPressed: onTap,
+        iconSize: 22,
+        color: on ? const Color(0xFFF5F5F7) : const Color(0xFFCFCFD2),
+        icon: Icon(icon),
+      );
 }
 
 class _WordOverlay extends StatelessWidget {
@@ -3355,116 +3353,117 @@ class _WordOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    width: double.infinity,
-    padding: embedded
-        ? EdgeInsets.zero
-        : const EdgeInsets.fromLTRB(14, 16, 14, 14),
-    decoration: embedded
-        ? null
-        : BoxDecoration(
-            color: const Color(0xD1161618),
-            borderRadius: BorderRadius.circular(23),
-            border: Border.all(color: const Color(0x14FFFFFF)),
-          ),
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (word.parts.isNotEmpty)
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              for (var i = 0; i < word.parts.length; i++) ...[
-                if (i > 0)
-                  Container(
-                    width: 4,
-                    height: 4,
-                    decoration: const BoxDecoration(
-                      color: Color(0xCCF4F4F5),
-                      shape: BoxShape.circle,
+        width: double.infinity,
+        padding: embedded
+            ? EdgeInsets.zero
+            : const EdgeInsets.fromLTRB(14, 16, 14, 14),
+        decoration: embedded
+            ? null
+            : BoxDecoration(
+                color: const Color(0xD1161618),
+                borderRadius: BorderRadius.circular(23),
+                border: Border.all(color: const Color(0x14FFFFFF)),
+              ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (word.parts.isNotEmpty)
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                alignment: WrapAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  for (var i = 0; i < word.parts.length; i++) ...[
+                    if (i > 0)
+                      Container(
+                        width: 4,
+                        height: 4,
+                        decoration: const BoxDecoration(
+                          color: Color(0xCCF4F4F5),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    _SyllablePill(
+                      part: word.parts[i],
+                      onTap: onSyllable == null
+                          ? null
+                          : () => onSyllable!(word.parts[i]),
+                    ),
+                  ],
+                ],
+              )
+            else if (word.syllables.isNotEmpty)
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                alignment: WrapAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  for (var i = 0; i < word.syllables.length; i++) ...[
+                    if (i > 0)
+                      Container(
+                        width: 4,
+                        height: 4,
+                        decoration: const BoxDecoration(
+                          color: Color(0xCCF4F4F5),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    _SyllablePill(label: word.syllables[i]),
+                  ],
+                ],
+              ),
+            if (word.organ.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const SizedBox(
+                    width: 28,
+                    height: 1,
+                    child: ColoredBox(color: Color(0x2EFFFFFF)),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Text(
+                      word.organ.toUpperCase(),
+                      style: const TextStyle(
+                        color: Color(0xFF8B8B90),
+                        fontSize: 10,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 4.2,
+                      ),
                     ),
                   ),
-                _SyllablePill(
-                  part: word.parts[i],
-                  onTap: onSyllable == null
-                      ? null
-                      : () => onSyllable!(word.parts[i]),
-                ),
-              ],
+                  const SizedBox(
+                    width: 28,
+                    height: 1,
+                    child: ColoredBox(color: Color(0x2EFFFFFF)),
+                  ),
+                ],
+              ),
             ],
-          )
-        else if (word.syllables.isNotEmpty)
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              for (var i = 0; i < word.syllables.length; i++) ...[
-                if (i > 0)
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              decoration: BoxDecoration(
+                color: const Color(0xE6222226),
+                borderRadius: BorderRadius.circular(99),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _ActBtn(icon: Icons.replay_rounded, onTap: onReplay),
                   Container(
-                    width: 4,
-                    height: 4,
-                    decoration: const BoxDecoration(
-                      color: Color(0xCCF4F4F5),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                _SyllablePill(label: word.syllables[i]),
-              ],
-            ],
-          ),
-        if (word.organ.isNotEmpty) ...[
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const SizedBox(
-                width: 28,
-                height: 1,
-                child: ColoredBox(color: Color(0x2EFFFFFF)),
+                      width: 1, height: 16, color: const Color(0x2EFFFFFF)),
+                  _ActBtn(icon: Icons.copy_rounded, onTap: onNotes),
+                ],
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Text(
-                  word.organ.toUpperCase(),
-                  style: const TextStyle(
-                    color: Color(0xFF8B8B90),
-                    fontSize: 10,
-                    fontWeight: FontWeight.w500,
-                    letterSpacing: 4.2,
-                  ),
-                ),
-              ),
-              const SizedBox(
-                width: 28,
-                height: 1,
-                child: ColoredBox(color: Color(0x2EFFFFFF)),
-              ),
-            ],
-          ),
-        ],
-        const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 4),
-          decoration: BoxDecoration(
-            color: const Color(0xE6222226),
-            borderRadius: BorderRadius.circular(99),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _ActBtn(icon: Icons.replay_rounded, onTap: onReplay),
-              Container(width: 1, height: 16, color: const Color(0x2EFFFFFF)),
-              _ActBtn(icon: Icons.copy_rounded, onTap: onNotes),
-            ],
-          ),
+            ),
+          ],
         ),
-      ],
-    ),
-  );
+      );
 }
 
 class _SyllablePill extends StatelessWidget {
@@ -3508,13 +3507,13 @@ class _ActBtn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => GestureDetector(
-    onTap: onTap,
-    child: SizedBox(
-      width: 40,
-      height: 40,
-      child: Icon(icon, color: color ?? Colors.white, size: 20),
-    ),
-  );
+        onTap: onTap,
+        child: SizedBox(
+          width: 40,
+          height: 40,
+          child: Icon(icon, color: color ?? Colors.white, size: 20),
+        ),
+      );
 }
 
 class _PronunciationChip extends StatelessWidget {
@@ -3529,54 +3528,54 @@ class _PronunciationChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: EdgeInsets.symmetric(
-      horizontal: compact ? 13 : 13,
-      vertical: compact ? 8 : 8,
-    ),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(99),
-      boxShadow: const [
-        BoxShadow(
-          color: Color(0x47000000),
-          blurRadius: 16,
-          offset: Offset(0, 6),
+        padding: EdgeInsets.symmetric(
+          horizontal: compact ? 13 : 13,
+          vertical: compact ? 8 : 8,
         ),
-      ],
-    ),
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (part.deva.isNotEmpty)
-          Text(
-            part.deva,
-            style: TextStyle(
-              color: const Color(0xFF0A0A12),
-              fontSize: compact ? 12 : 16,
-              height: 1.2,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(99),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x47000000),
+              blurRadius: 16,
+              offset: Offset(0, 6),
             ),
-          ),
-        Text(
-          part.roman.isEmpty ? part.deva : part.roman,
-          style: TextStyle(
-            color: const Color(0xFF0A0A12),
-            fontSize: compact ? 10 : 13,
-            fontWeight: FontWeight.w800,
-            letterSpacing: .4,
-          ),
+          ],
         ),
-        if (!compact)
-          Text(
-            '${part.hold.toStringAsFixed(part.hold.truncateToDouble() == part.hold ? 0 : 1)}s',
-            style: const TextStyle(
-              color: Color(0x8C0A0A12),
-              fontSize: 9,
-              fontWeight: FontWeight.w800,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (part.deva.isNotEmpty)
+              Text(
+                part.deva,
+                style: TextStyle(
+                  color: const Color(0xFF0A0A12),
+                  fontSize: compact ? 12 : 16,
+                  height: 1.2,
+                ),
+              ),
+            Text(
+              part.roman.isEmpty ? part.deva : part.roman,
+              style: TextStyle(
+                color: const Color(0xFF0A0A12),
+                fontSize: compact ? 10 : 13,
+                fontWeight: FontWeight.w800,
+                letterSpacing: .4,
+              ),
             ),
-          ),
-      ],
-    ),
-  );
+            if (!compact)
+              Text(
+                '${part.hold.toStringAsFixed(part.hold.truncateToDouble() == part.hold ? 0 : 1)}s',
+                style: const TextStyle(
+                  color: Color(0x8C0A0A12),
+                  fontSize: 9,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+          ],
+        ),
+      );
 }
 
 class _TransportTube extends StatelessWidget {
@@ -3616,70 +3615,71 @@ class _TransportTube extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    constraints: const BoxConstraints(minHeight: 88, maxWidth: 268),
-    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-    decoration: const BoxDecoration(
-      image: DecorationImage(image: NetworkImage(_tube), fit: BoxFit.fill),
-    ),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        GestureDetector(
-          onTap: onRewind,
-          child: const SizedBox(
-            width: 32,
-            height: 32,
-            child: Icon(
-              Icons.fast_rewind_rounded,
-              color: Color(0xFFF5F5F7),
-              size: 22,
+        constraints: const BoxConstraints(minHeight: 88, maxWidth: 268),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: const BoxDecoration(
+          image: DecorationImage(image: NetworkImage(_tube), fit: BoxFit.fill),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            GestureDetector(
+              onTap: onRewind,
+              child: const SizedBox(
+                width: 32,
+                height: 32,
+                child: Icon(
+                  Icons.fast_rewind_rounded,
+                  color: Color(0xFFF5F5F7),
+                  size: 22,
+                ),
+              ),
             ),
-          ),
-        ),
-        _ImageControl(
-          asset: 'assets/player/lgp-prev.png',
-          network: _prev,
-          label: 'Previous',
-          onTap: hasPrevious ? onPrevious : null,
-          size: 44,
-        ),
-        GestureDetector(
-          onTap: onPlay,
-          child: SizedBox(
-            width: 58,
-            height: 58,
-            child: Image.asset(
-              playing
-                  ? 'assets/player/lgp-pause.png'
-                  : 'assets/player/lgp-play.png',
-              fit: BoxFit.contain,
-              errorBuilder: (_, __, ___) =>
-                  Image.network(playing ? _pause : _play, fit: BoxFit.contain),
+            _ImageControl(
+              asset: 'assets/player/lgp-prev.png',
+              network: _prev,
+              label: 'Previous',
+              onTap: hasPrevious ? onPrevious : null,
+              size: 44,
             ),
-          ),
-        ),
-        _ImageControl(
-          asset: 'assets/player/lgp-next.png',
-          network: _next,
-          label: 'Next',
-          onTap: hasNext ? onNext : null,
-          size: 44,
-        ),
-        GestureDetector(
-          onTap: onReplay,
-          child: const SizedBox(
-            width: 32,
-            height: 32,
-            child: Icon(
-              Icons.replay_rounded,
-              color: Color(0xFFF5F5F7),
-              size: 22,
+            GestureDetector(
+              onTap: onPlay,
+              child: SizedBox(
+                width: 58,
+                height: 58,
+                child: Image.asset(
+                  playing
+                      ? 'assets/player/lgp-pause.png'
+                      : 'assets/player/lgp-play.png',
+                  fit: BoxFit.contain,
+                  errorBuilder: (_, __, ___) => Image.network(
+                      playing ? _pause : _play,
+                      fit: BoxFit.contain),
+                ),
+              ),
             ),
-          ),
+            _ImageControl(
+              asset: 'assets/player/lgp-next.png',
+              network: _next,
+              label: 'Next',
+              onTap: hasNext ? onNext : null,
+              size: 44,
+            ),
+            GestureDetector(
+              onTap: onReplay,
+              child: const SizedBox(
+                width: 32,
+                height: 32,
+                child: Icon(
+                  Icons.replay_rounded,
+                  color: Color(0xFFF5F5F7),
+                  size: 22,
+                ),
+              ),
+            ),
+          ],
         ),
-      ],
-    ),
-  );
+      );
 }
 
 class _QueueFilterPill extends StatelessWidget {
@@ -3707,9 +3707,8 @@ class _QueueFilterPill extends StatelessWidget {
           child: Text(
             label,
             style: TextStyle(
-              color: selected
-                  ? const Color(0xFF0A0A0C)
-                  : const Color(0xFFF5F5F7),
+              color:
+                  selected ? const Color(0xFF0A0A0C) : const Color(0xFFF5F5F7),
               fontSize: 13,
               fontWeight: FontWeight.w600,
               height: 1.1,
@@ -3736,18 +3735,18 @@ class _WordActionStrip extends StatelessWidget {
   final VoidCallback onStore;
 
   Widget _sep() => const Center(
-    child: SizedBox(
-      width: 1.5,
-      height: 34,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: Color(0xB8FFFFFF),
-          borderRadius: BorderRadius.all(Radius.circular(1)),
-          boxShadow: [BoxShadow(color: Color(0x59FFFFFF), blurRadius: 5)],
+        child: SizedBox(
+          width: 1.5,
+          height: 34,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: Color(0xB8FFFFFF),
+              borderRadius: BorderRadius.all(Radius.circular(1)),
+              boxShadow: [BoxShadow(color: Color(0x59FFFFFF), blurRadius: 5)],
+            ),
+          ),
         ),
-      ),
-    ),
-  );
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -3763,19 +3762,15 @@ class _WordActionStrip extends StatelessWidget {
         children: [
           Expanded(
             child: _WordAction(
-              svg: '<path d="M4 5.5h16v10.5H9.5L5.5 19.5V16H4z"/><path d="M7.5 9.5h9M7.5 12.6h6"/>',
+              svg:
+                  '<path d="M4 5.5h16v10.5H9.5L5.5 19.5V16H4z"/><path d="M7.5 9.5h9M7.5 12.6h6"/>',
               label: 'Sentence',
               onTap: onSentence,
             ),
           ),
           _sep(),
           Expanded(
-            child: _WordAction(
-              svg: '<rect x="9" y="2.6" width="6" height="11.2" rx="3"/><path d="M5.5 11.4a6.5 6.5 0 0 0 13 0"/><path d="M12 17.9v3.5M8.6 21.4h6.8"/>',
-              label: 'Practice',
-              onTap: onPractice,
-              accent: accent,
-            ),
+            child: PracticeDockOrb(onTap: onPractice, accent: accent),
           ),
           _sep(),
           Expanded(
@@ -3805,28 +3800,28 @@ class _WordAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Semantics(
-    button: true,
-    label: label,
-    child: GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          NwsbIcon(svg, size: 22, color: Colors.white, strokeWidth: 1.7),
-          const SizedBox(height: 2),
-          Text(
-            label.toUpperCase(),
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 8,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 1.0,
-            ),
+        button: true,
+        label: label,
+        child: GestureDetector(
+          onTap: onTap,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              NwsbIcon(svg, size: 22, color: Colors.white, strokeWidth: 1.7),
+              const SizedBox(height: 2),
+              Text(
+                label.toUpperCase(),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 8,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.0,
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-    ),
-  );
+        ),
+      );
 }
 
 class _RoundIconButton extends StatelessWidget {
@@ -3841,18 +3836,18 @@ class _RoundIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Material(
-    color: const Color(0x2EFFFFFF),
-    shape: const CircleBorder(side: BorderSide(color: Color(0x66FFFFFF))),
-    child: InkWell(
-      customBorder: const CircleBorder(),
-      onTap: onTap,
-      child: SizedBox(
-        width: size,
-        height: size,
-        child: Icon(icon, color: Colors.white, size: size * .48),
-      ),
-    ),
-  );
+        color: const Color(0x2EFFFFFF),
+        shape: const CircleBorder(side: BorderSide(color: Color(0x66FFFFFF))),
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: onTap,
+          child: SizedBox(
+            width: size,
+            height: size,
+            child: Icon(icon, color: Colors.white, size: size * .48),
+          ),
+        ),
+      );
 }
 
 class _BareIconButton extends StatelessWidget {
@@ -3862,14 +3857,14 @@ class _BareIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => GestureDetector(
-    onTap: onTap,
-    behavior: HitTestBehavior.opaque,
-    child: SizedBox(
-      width: 42,
-      height: 42,
-      child: Icon(icon, color: Colors.white, size: 26),
-    ),
-  );
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: SizedBox(
+          width: 42,
+          height: 42,
+          child: Icon(icon, color: Colors.white, size: 26),
+        ),
+      );
 }
 
 class _Equalizer extends StatelessWidget {
@@ -3878,23 +3873,25 @@ class _Equalizer extends StatelessWidget {
   final Color accent;
   @override
   Widget build(BuildContext context) => Row(
-    crossAxisAlignment: CrossAxisAlignment.center,
-    children: List.generate(
-      4,
-      (i) => AnimatedContainer(
-        duration: Duration(milliseconds: active ? 300 + i * 90 : 180),
-        curve: Curves.easeInOut,
-        width: 2.5,
-        height: active ? 8.0 + (i.isEven ? 8 : 3) : 7.0 + i * 2,
-        margin: const EdgeInsets.symmetric(horizontal: 1),
-        decoration: BoxDecoration(
-          color: accent,
-          borderRadius: BorderRadius.circular(3),
-          boxShadow: [BoxShadow(color: accent.withOpacity(.7), blurRadius: 5)],
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: List.generate(
+          4,
+          (i) => AnimatedContainer(
+            duration: Duration(milliseconds: active ? 300 + i * 90 : 180),
+            curve: Curves.easeInOut,
+            width: 2.5,
+            height: active ? 8.0 + (i.isEven ? 8 : 3) : 7.0 + i * 2,
+            margin: const EdgeInsets.symmetric(horizontal: 1),
+            decoration: BoxDecoration(
+              color: accent,
+              borderRadius: BorderRadius.circular(3),
+              boxShadow: [
+                BoxShadow(color: accent.withOpacity(.7), blurRadius: 5)
+              ],
+            ),
+          ),
         ),
-      ),
-    ),
-  );
+      );
 }
 
 class _VolumeRail extends StatelessWidget {
@@ -3903,36 +3900,36 @@ class _VolumeRail extends StatelessWidget {
   final ValueChanged<double> onChanged;
   @override
   Widget build(BuildContext context) => Container(
-    width: 36,
-    height: 128,
-    decoration: BoxDecoration(
-      color: const Color(0x2BFFFFFF),
-      borderRadius: BorderRadius.circular(18),
-      border: Border.all(color: const Color(0x55FFFFFF)),
-    ),
-    child: Column(
-      children: [
-        const SizedBox(height: 4),
-        Expanded(
-          child: RotatedBox(
-            quarterTurns: 3,
-            child: Slider(
-              value: value,
-              onChanged: onChanged,
-              activeColor: Colors.white,
-              inactiveColor: const Color(0x55FFFFFF),
+        width: 36,
+        height: 128,
+        decoration: BoxDecoration(
+          color: const Color(0x2BFFFFFF),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: const Color(0x55FFFFFF)),
+        ),
+        child: Column(
+          children: [
+            const SizedBox(height: 4),
+            Expanded(
+              child: RotatedBox(
+                quarterTurns: 3,
+                child: Slider(
+                  value: value,
+                  onChanged: onChanged,
+                  activeColor: Colors.white,
+                  inactiveColor: const Color(0x55FFFFFF),
+                ),
+              ),
             ),
-          ),
+            Icon(
+              value == 0 ? Icons.volume_off_rounded : Icons.volume_up_rounded,
+              color: Colors.white,
+              size: 17,
+            ),
+            const SizedBox(height: 8),
+          ],
         ),
-        Icon(
-          value == 0 ? Icons.volume_off_rounded : Icons.volume_up_rounded,
-          color: Colors.white,
-          size: 17,
-        ),
-        const SizedBox(height: 8),
-      ],
-    ),
-  );
+      );
 }
 
 class _ImageControl extends StatelessWidget {
@@ -3950,43 +3947,43 @@ class _ImageControl extends StatelessWidget {
   final String? network;
   @override
   Widget build(BuildContext context) => Semantics(
-    button: true,
-    label: label,
-    child: Opacity(
-      opacity: onTap == null ? .35 : 1,
-      child: InkResponse(
-        onTap: onTap,
-        radius: size * .62,
-        child: SizedBox(
-          width: size,
-          height: size,
-          child: Image.asset(
-            asset,
-            fit: BoxFit.contain,
-            errorBuilder: (_, __, ___) => network != null
-                ? Image.network(
-                    network!,
-                    fit: BoxFit.contain,
-                    errorBuilder: (_, __, ___) => Icon(
-                      label == 'Play'
-                          ? Icons.play_arrow_rounded
-                          : Icons.circle_outlined,
-                      color: Colors.white,
-                      size: size * .68,
-                    ),
-                  )
-                : Icon(
-                    label == 'Play'
-                        ? Icons.play_arrow_rounded
-                        : Icons.circle_outlined,
-                    color: Colors.white,
-                    size: size * .68,
-                  ),
+        button: true,
+        label: label,
+        child: Opacity(
+          opacity: onTap == null ? .35 : 1,
+          child: InkResponse(
+            onTap: onTap,
+            radius: size * .62,
+            child: SizedBox(
+              width: size,
+              height: size,
+              child: Image.asset(
+                asset,
+                fit: BoxFit.contain,
+                errorBuilder: (_, __, ___) => network != null
+                    ? Image.network(
+                        network!,
+                        fit: BoxFit.contain,
+                        errorBuilder: (_, __, ___) => Icon(
+                          label == 'Play'
+                              ? Icons.play_arrow_rounded
+                              : Icons.circle_outlined,
+                          color: Colors.white,
+                          size: size * .68,
+                        ),
+                      )
+                    : Icon(
+                        label == 'Play'
+                            ? Icons.play_arrow_rounded
+                            : Icons.circle_outlined,
+                        color: Colors.white,
+                        size: size * .68,
+                      ),
+              ),
+            ),
           ),
         ),
-      ),
-    ),
-  );
+      );
 }
 
 class _RadialOption extends StatelessWidget {
@@ -4006,51 +4003,51 @@ class _RadialOption extends StatelessWidget {
   final VoidCallback onTap;
   @override
   Widget build(BuildContext context) => Align(
-    alignment: alignment,
-    child: InkResponse(
-      onTap: onTap,
-      customBorder: const CircleBorder(),
-      radius: 48,
-      child: SizedBox(
-        width: 86,
-        height: 86,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: const Color(0x241D3448),
-            border: Border.all(color: accent.withOpacity(.62)),
-            boxShadow: [
-              BoxShadow(color: accent.withOpacity(.10), blurRadius: 16),
-            ],
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, color: accent, size: 20),
-              const SizedBox(height: 4),
-              Text(
-                label,
-                style: const TextStyle(
-                  color: Colors.white70,
-                  fontSize: 8,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1,
-                ),
+        alignment: alignment,
+        child: InkResponse(
+          onTap: onTap,
+          customBorder: const CircleBorder(),
+          radius: 48,
+          child: SizedBox(
+            width: 86,
+            height: 86,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: const Color(0x241D3448),
+                border: Border.all(color: accent.withOpacity(.62)),
+                boxShadow: [
+                  BoxShadow(color: accent.withOpacity(.10), blurRadius: 16),
+                ],
               ),
-              Text(
-                value,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w800,
-                ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(icon, color: accent, size: 20),
+                  const SizedBox(height: 4),
+                  Text(
+                    label,
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 8,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                  Text(
+                    value,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
-      ),
-    ),
-  );
+      );
 }
 
 class _AuraSettingsPainter extends CustomPainter {
@@ -4211,44 +4208,44 @@ class _InfoFact extends StatelessWidget {
   final Color accent;
   @override
   Widget build(BuildContext context) => Container(
-    margin: const EdgeInsets.only(bottom: 10),
-    padding: const EdgeInsets.all(14),
-    decoration: BoxDecoration(
-      color: const Color(0x28000000),
-      borderRadius: BorderRadius.circular(18),
-      border: Border.all(color: const Color(0x28FFFFFF)),
-      boxShadow: const [
-        BoxShadow(
-          color: Color(0x40000000),
-          blurRadius: 18,
-          offset: Offset(0, 8),
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: const Color(0x28000000),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: const Color(0x28FFFFFF)),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x40000000),
+              blurRadius: 18,
+              offset: Offset(0, 8),
+            ),
+          ],
         ),
-      ],
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            color: accent,
-            fontSize: 10,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 1.2,
-          ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                color: accent,
+                fontSize: 10,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.2,
+              ),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              value,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                height: 1.35,
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 5),
-        Text(
-          value,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-            height: 1.35,
-          ),
-        ),
-      ],
-    ),
-  );
+      );
 }
 
 class _PlayerTheme {
@@ -4267,17 +4264,17 @@ class _BottomDot extends StatelessWidget {
   final bool active;
   @override
   Widget build(BuildContext context) => AnimatedContainer(
-    duration: const Duration(milliseconds: 220),
-    width: 5,
-    height: 5,
-    decoration: BoxDecoration(
-      shape: BoxShape.circle,
-      color: active ? const Color(0xFFF5F5F7) : const Color(0x47FFFFFF),
-      boxShadow: active
-          ? const [BoxShadow(color: Color(0x59FFFFFF), blurRadius: 8)]
-          : null,
-    ),
-  );
+        duration: const Duration(milliseconds: 220),
+        width: 5,
+        height: 5,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: active ? const Color(0xFFF5F5F7) : const Color(0x47FFFFFF),
+          boxShadow: active
+              ? const [BoxShadow(color: Color(0x59FFFFFF), blurRadius: 8)]
+              : null,
+        ),
+      );
 }
 
 class _SubtitleMarquee extends StatelessWidget {
@@ -4293,14 +4290,14 @@ class _SubtitleMarquee extends StatelessWidget {
       height: 1.2,
     );
     Widget rowFor(List<String> src) => Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        for (var i = 0; i < src.length; i++) ...[
-          if (i > 0) const SizedBox(width: 48),
-          Text(src[i], maxLines: 1, softWrap: false, style: style),
-        ],
-      ],
-    );
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (var i = 0; i < src.length; i++) ...[
+              if (i > 0) const SizedBox(width: 48),
+              Text(src[i], maxLines: 1, softWrap: false, style: style),
+            ],
+          ],
+        );
     return ClipRect(
       child: ShaderMask(
         blendMode: BlendMode.dstIn,
@@ -4334,53 +4331,73 @@ class _SubtitleMarquee extends StatelessWidget {
 
 const _playerThemes = <_PlayerTheme>[
   _PlayerTheme(
-    image: 'https://media.nowssb.com/migrated-images/d694cb3157c4e58f_grok_image_1782656710977_nj5r6x.jpg',
-    video: 'https://nowssb.com/assets/video/79d7c93a6734ed8d_grok_video_2026-06-28-19-55-09_otgbxd.mp4',
+    image:
+        'https://media.nowssb.com/migrated-images/d694cb3157c4e58f_grok_image_1782656710977_nj5r6x.jpg',
+    video:
+        'https://nowssb.com/assets/video/79d7c93a6734ed8d_grok_video_2026-06-28-19-55-09_otgbxd.mp4',
     accent: Color(0xFF9BB8FF),
   ),
   _PlayerTheme(
-    image: 'https://media.nowssb.com/migrated-images/3670d1e477f48c31_grok_image_1782656676834_rzp2cz.jpg',
-    video: 'https://nowssb.com/assets/video/a1b0a1b513ec57f6_grok_video_2026-06-28-19-54-38_wrxkgr.mp4',
+    image:
+        'https://media.nowssb.com/migrated-images/3670d1e477f48c31_grok_image_1782656676834_rzp2cz.jpg',
+    video:
+        'https://nowssb.com/assets/video/a1b0a1b513ec57f6_grok_video_2026-06-28-19-54-38_wrxkgr.mp4',
     accent: Color(0xFF7FE9DA),
   ),
   _PlayerTheme(
-    image: 'https://media.nowssb.com/migrated-images/fd380f5670852d0c_grok_image_1782656704854_cfsah3.jpg',
-    video: 'https://nowssb.com/assets/video/dc68caaf51e87003_grok_video_2026-06-28-19-55-02_of5fwh.mp4',
+    image:
+        'https://media.nowssb.com/migrated-images/fd380f5670852d0c_grok_image_1782656704854_cfsah3.jpg',
+    video:
+        'https://nowssb.com/assets/video/dc68caaf51e87003_grok_video_2026-06-28-19-55-02_of5fwh.mp4',
     accent: Color(0xFFBD7BFF),
   ),
   _PlayerTheme(
-    image: 'https://media.nowssb.com/migrated-images/e8bb832f2815c15a_grok_image_1782656684101_o9vc93.jpg',
-    video: 'https://nowssb.com/assets/video/d8ac259577c403f3_grok_video_2026-06-28-19-54-43_it2bur.mp4',
+    image:
+        'https://media.nowssb.com/migrated-images/e8bb832f2815c15a_grok_image_1782656684101_o9vc93.jpg',
+    video:
+        'https://nowssb.com/assets/video/d8ac259577c403f3_grok_video_2026-06-28-19-54-43_it2bur.mp4',
     accent: Color(0xFFA6DCFF),
   ),
   _PlayerTheme(
-    image: 'https://media.nowssb.com/migrated-images/48ad23ade254b2d7_grok_image_1782795582310_llvpix.jpg',
-    video: 'https://nowssb.com/assets/video/3b63edc1485a45e2_grok_video_2026-06-30-10-29-43_hzxyun.mp4',
+    image:
+        'https://media.nowssb.com/migrated-images/48ad23ade254b2d7_grok_image_1782795582310_llvpix.jpg',
+    video:
+        'https://nowssb.com/assets/video/3b63edc1485a45e2_grok_video_2026-06-30-10-29-43_hzxyun.mp4',
     accent: Color(0xFFB9A6FF),
   ),
   _PlayerTheme(
-    image: 'https://media.nowssb.com/migrated-images/20314fda05d34b49_grok_image_1782796537731_vzyhwn.jpg',
-    video: 'https://nowssb.com/assets/video/a779a65872bf917c_grok_video_2026-06-30-10-45-45_dg2ohg.mp4',
+    image:
+        'https://media.nowssb.com/migrated-images/20314fda05d34b49_grok_image_1782796537731_vzyhwn.jpg',
+    video:
+        'https://nowssb.com/assets/video/a779a65872bf917c_grok_video_2026-06-30-10-45-45_dg2ohg.mp4',
     accent: Color(0xFFA6C8FF),
   ),
   _PlayerTheme(
-    image: 'https://media.nowssb.com/migrated-images/f734c819e92db433_grok_image_1782796641824_izkh09.jpg',
-    video: 'https://nowssb.com/assets/video/da4159578099ee48_grok_video_2026-06-30-10-47-20_rljghs.mp4',
+    image:
+        'https://media.nowssb.com/migrated-images/f734c819e92db433_grok_image_1782796641824_izkh09.jpg',
+    video:
+        'https://nowssb.com/assets/video/da4159578099ee48_grok_video_2026-06-30-10-47-20_rljghs.mp4',
     accent: Color(0xFFB9A6FF),
   ),
   _PlayerTheme(
-    image: 'https://media.nowssb.com/migrated-images/e103480a2c87d55b_grok_image_1782796519587_thrrws.jpg',
-    video: 'https://nowssb.com/assets/video/e55e1f1f879d8074_grok_video_2026-06-30-10-45-34_pg2y2j.mp4',
+    image:
+        'https://media.nowssb.com/migrated-images/e103480a2c87d55b_grok_image_1782796519587_thrrws.jpg',
+    video:
+        'https://nowssb.com/assets/video/e55e1f1f879d8074_grok_video_2026-06-30-10-45-34_pg2y2j.mp4',
     accent: Color(0xFFE8D5A3),
   ),
   _PlayerTheme(
-    image: 'https://media.nowssb.com/migrated-images/122962572090895c_grok_image_1782796924745_nmksmi.jpg',
-    video: 'https://nowssb.com/assets/video/7a0e0cf6903f3b16_grok_video_2026-06-30-10-52-07_gvffol.mp4',
+    image:
+        'https://media.nowssb.com/migrated-images/122962572090895c_grok_image_1782796924745_nmksmi.jpg',
+    video:
+        'https://nowssb.com/assets/video/7a0e0cf6903f3b16_grok_video_2026-06-30-10-52-07_gvffol.mp4',
     accent: Color(0xFFF0D9A8),
   ),
   _PlayerTheme(
-    image: 'https://media.nowssb.com/migrated-images/28b7b32c97232472_grok_image_1782796933792_qwzfgx.jpg',
-    video: 'https://nowssb.com/assets/video/39905d27bd778cff_grok_video_2026-06-30-10-52-20_zk87yh.mp4',
+    image:
+        'https://media.nowssb.com/migrated-images/28b7b32c97232472_grok_image_1782796933792_qwzfgx.jpg',
+    video:
+        'https://nowssb.com/assets/video/39905d27bd778cff_grok_video_2026-06-30-10-52-20_zk87yh.mp4',
     accent: Color(0xFF8FE6FF),
   ),
 ];
