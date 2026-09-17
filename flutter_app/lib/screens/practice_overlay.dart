@@ -25,7 +25,7 @@ enum _PracticeStatus {
   recording,
   practicing,
   locked,
-  complete
+  complete,
 }
 
 class PracticeLabSheet extends StatefulWidget {
@@ -220,13 +220,13 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
 
   List<WordPart> get _parts => widget.word.parts;
   String get _statusLabel => switch (_status) {
-        _PracticeStatus.ready => 'Ready',
-        _PracticeStatus.listening => 'Listening',
-        _PracticeStatus.recording => 'Recording',
-        _PracticeStatus.practicing => 'Practicing',
-        _PracticeStatus.locked => 'Take locked',
-        _PracticeStatus.complete => '29s complete',
-      };
+    _PracticeStatus.ready => 'Ready',
+    _PracticeStatus.listening => 'Listening',
+    _PracticeStatus.recording => 'Recording',
+    _PracticeStatus.practicing => 'Practicing',
+    _PracticeStatus.locked => 'Take locked',
+    _PracticeStatus.complete => '29s complete',
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -351,27 +351,34 @@ class _PracticeTab extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.keyboard_arrow_down_rounded,
-                          color: Colors.white60),
+                      const Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        color: Colors.white60,
+                      ),
                       const Expanded(
-                        child: Text('PRACTICE LAB',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: 2.2)),
+                        child: Text(
+                          'PRACTICE LAB',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 2.2,
+                          ),
+                        ),
                       ),
                       _SmallButton(icon: Icons.close_rounded, onTap: onClose),
                     ],
                   ),
                   const SizedBox(height: 4),
                   Text(
-                      '$status  •  ${elapsed.toString().padLeft(2, '0')} / 29s',
-                      style: const TextStyle(
-                          color: Colors.white54,
-                          fontSize: 10,
-                          letterSpacing: 1.1)),
+                    '$status  •  ${elapsed.toString().padLeft(2, '0')} / 29s',
+                    style: const TextStyle(
+                      color: Colors.white54,
+                      fontSize: 10,
+                      letterSpacing: 1.1,
+                    ),
+                  ),
                   const SizedBox(height: 10),
                   AnimatedSwitcher(
                     duration: const Duration(milliseconds: 300),
@@ -391,11 +398,14 @@ class _PracticeTab extends StatelessWidget {
                   if (word.translit.isNotEmpty && word.translit != target)
                     Padding(
                       padding: const EdgeInsets.only(top: 6),
-                      child: Text(word.translit,
-                          style: const TextStyle(
-                              color: Colors.white54,
-                              fontSize: 12,
-                              letterSpacing: 1.4)),
+                      child: Text(
+                        word.translit,
+                        style: const TextStyle(
+                          color: Colors.white54,
+                          fontSize: 12,
+                          letterSpacing: 1.4,
+                        ),
+                      ),
                     ),
                   const SizedBox(height: 8),
                   _Timeline(elapsed: elapsed, accent: accent),
@@ -412,7 +422,9 @@ class _PracticeTab extends StatelessWidget {
                         animation: pulse,
                         builder: (context, _) => CustomPaint(
                           painter: _LiquidPulsePainter(
-                              progress: pulse.value, accent: accent),
+                            progress: pulse.value,
+                            accent: accent,
+                          ),
                           child: Center(
                             child: SizedBox.square(
                               dimension: 124,
@@ -420,29 +432,35 @@ class _PracticeTab extends StatelessWidget {
                                 alignment: Alignment.center,
                                 children: [
                                   CustomPaint(
-                                      size: const Size.square(124),
-                                      painter: _OrbPainter(
-                                          progress: pulse.value,
-                                          accent: accent)),
+                                    size: const Size.square(124),
+                                    painter: _OrbPainter(
+                                      progress: pulse.value,
+                                      accent: accent,
+                                    ),
+                                  ),
                                   Container(
                                     width: 62,
                                     height: 62,
                                     decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: Colors.white.withOpacity(.96),
-                                        boxShadow: [
-                                          BoxShadow(
-                                              color: accent.withOpacity(.55),
-                                              blurRadius: 24,
-                                              spreadRadius: 4)
-                                        ]),
+                                      shape: BoxShape.circle,
+                                      color: Colors.white.withOpacity(.96),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: accent.withOpacity(.55),
+                                          blurRadius: 24,
+                                          spreadRadius: 4,
+                                        ),
+                                      ],
+                                    ),
                                     child: Padding(
                                       padding: const EdgeInsets.all(16),
                                       child: SvgPicture.asset(
-                                          'assets/icons/microphone.svg',
-                                          colorFilter: const ColorFilter.mode(
-                                              Color(0xFF11151B),
-                                              BlendMode.srcIn)),
+                                        'assets/icons/microphone.svg',
+                                        colorFilter: const ColorFilter.mode(
+                                          Color(0xFF11151B),
+                                          BlendMode.srcIn,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -454,22 +472,25 @@ class _PracticeTab extends StatelessWidget {
                     ),
                   ),
                   Text(
-                      takeLocked
-                          ? 'Take saved on this device'
-                          : 'Hold to speak',
-                      style: TextStyle(
-                          color: takeLocked ? Colors.white : Colors.white60,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: .7)),
+                    takeLocked ? 'Take saved on this device' : 'Hold to speak',
+                    style: TextStyle(
+                      color: takeLocked ? Colors.white : Colors.white60,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: .7,
+                    ),
+                  ),
                   if (heard.isNotEmpty) ...[
                     const SizedBox(height: 8),
-                    Text(heard,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                            color: Colors.white70,
-                            fontSize: 13,
-                            fontStyle: FontStyle.italic)),
+                    Text(
+                      heard,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 13,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
                   ],
                   const SizedBox(height: 12),
                   Wrap(
@@ -483,10 +504,11 @@ class _PracticeTab extends StatelessWidget {
                               ? parts[i].roman
                               : parts[i].deva,
                           active: heard.toLowerCase().contains(
-                              (parts[i].roman.isNotEmpty
-                                      ? parts[i].roman
-                                      : parts[i].deva)
-                                  .toLowerCase()),
+                            (parts[i].roman.isNotEmpty
+                                    ? parts[i].roman
+                                    : parts[i].deva)
+                                .toLowerCase(),
+                          ),
                         ),
                     ],
                   ),
@@ -497,15 +519,19 @@ class _PracticeTab extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       TextButton.icon(
-                          onPressed: onReplay,
-                          icon: const Icon(Icons.replay_rounded, size: 17),
-                          label: const Text('Replay reference')),
+                        onPressed: onReplay,
+                        icon: const Icon(Icons.replay_rounded, size: 17),
+                        label: const Text('Replay reference'),
+                      ),
                       const SizedBox(width: 8),
                       TextButton.icon(
-                          onPressed: onClose,
-                          icon: const Icon(Icons.keyboard_arrow_down_rounded,
-                              size: 18),
-                          label: const Text('Now Playing')),
+                        onPressed: onClose,
+                        icon: const Icon(
+                          Icons.keyboard_arrow_down_rounded,
+                          size: 18,
+                        ),
+                        label: const Text('Now Playing'),
+                      ),
                     ],
                   ),
                 ],
@@ -543,42 +569,57 @@ class _MouthCard extends StatelessWidget {
     final hint = word.mouthPos.isNotEmpty
         ? word.mouthPos
         : (word.tip.isNotEmpty
-            ? word.tip
-            : 'Relax the jaw and let the sound resonate.');
+              ? word.tip
+              : 'Relax the jaw and let the sound resonate.');
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-          color: Colors.white.withOpacity(.06),
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: Colors.white.withOpacity(.1))),
+        color: Colors.white.withOpacity(.06),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.white.withOpacity(.1)),
+      ),
       child: Row(
         children: [
           Container(
-              width: 42,
-              height: 42,
-              decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(.1),
-                  borderRadius: BorderRadius.circular(13)),
-              child: const Icon(Icons.face_retouching_natural_outlined,
-                  color: Colors.white70)),
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(.1),
+              borderRadius: BorderRadius.circular(13),
+            ),
+            child: const Icon(
+              Icons.face_retouching_natural_outlined,
+              color: Colors.white70,
+            ),
+          ),
           const SizedBox(width: 10),
           Expanded(
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                Text(matched ? 'Sound matched' : 'Mouth shape',
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  matched ? 'Sound matched' : 'Mouth shape',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
                 const SizedBox(height: 3),
-                Text(hint,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                        color: Colors.white54, fontSize: 11, height: 1.25)),
-              ])),
+                Text(
+                  hint,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white54,
+                    fontSize: 11,
+                    height: 1.25,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -595,16 +636,19 @@ class _SoundPill extends StatelessWidget {
       duration: const Duration(milliseconds: 260),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-          color: active ? Colors.white : const Color(0xFF090A0D),
-          borderRadius: BorderRadius.circular(99),
-          border:
-              Border.all(color: Colors.white.withOpacity(active ? .75 : .16))),
-      child: Text(label,
-          style: TextStyle(
-              color: active ? Colors.black : Colors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-              letterSpacing: .3)),
+        color: active ? Colors.white : const Color(0xFF090A0D),
+        borderRadius: BorderRadius.circular(99),
+        border: Border.all(color: Colors.white.withOpacity(active ? .75 : .16)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: active ? Colors.black : Colors.white,
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
+          letterSpacing: .3,
+        ),
+      ),
     );
   }
 }
@@ -615,16 +659,18 @@ class _SmallButton extends StatelessWidget {
   final VoidCallback onTap;
   @override
   Widget build(BuildContext context) => GestureDetector(
-        onTap: onTap,
-        child: Container(
-            width: 38,
-            height: 38,
-            decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withOpacity(.06),
-                border: Border.all(color: Colors.white.withOpacity(.12))),
-            child: Icon(icon, color: Colors.white70, size: 19)),
-      );
+    onTap: onTap,
+    child: Container(
+      width: 38,
+      height: 38,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Colors.white.withOpacity(.06),
+        border: Border.all(color: Colors.white.withOpacity(.12)),
+      ),
+      child: Icon(icon, color: Colors.white70, size: 19),
+    ),
+  );
 }
 
 class _OrbPainter extends CustomPainter {
@@ -641,19 +687,20 @@ class _OrbPainter extends CustomPainter {
     canvas.rotate(-.12);
     canvas.translate(-c.dx, -c.dy);
     canvas.drawOval(
-        sphere,
-        Paint()
-          ..shader = RadialGradient(
-            center: const Alignment(-.25, -.35),
-            radius: 1.05,
-            colors: [
-              Colors.white.withOpacity(.98),
-              accent.withOpacity(.64),
-              const Color(0xFF15171B),
-              Colors.black
-            ],
-            stops: const [.02, .27, .62, 1],
-          ).createShader(sphere));
+      sphere,
+      Paint()
+        ..shader = RadialGradient(
+          center: const Alignment(-.25, -.35),
+          radius: 1.05,
+          colors: [
+            Colors.white.withOpacity(.98),
+            accent.withOpacity(.64),
+            const Color(0xFF15171B),
+            Colors.black,
+          ],
+          stops: const [.02, .27, .62, 1],
+        ).createShader(sphere),
+    );
     canvas.clipPath(Path()..addOval(sphere));
     for (var x = -r; x <= r; x += 3.5) {
       final width = math.sqrt(math.max(0, r * r - x * x));
@@ -661,12 +708,13 @@ class _OrbPainter extends CustomPainter {
       final bend = wave * 4.5;
       final light = (.5 + .5 * math.cos(x / r * math.pi)).clamp(0.0, 1.0);
       canvas.drawLine(
-          Offset(c.dx + x + bend, c.dy - width),
-          Offset(c.dx + x - bend, c.dy + width),
-          Paint()
-            ..color = Colors.white.withOpacity(.12 + light * .75)
-            ..strokeWidth = .9 + light * 1.4
-            ..strokeCap = StrokeCap.round);
+        Offset(c.dx + x + bend, c.dy - width),
+        Offset(c.dx + x - bend, c.dy + width),
+        Paint()
+          ..color = Colors.white.withOpacity(.12 + light * .75)
+          ..strokeWidth = .9 + light * 1.4
+          ..strokeCap = StrokeCap.round,
+      );
     }
     canvas.restore();
   }
@@ -692,28 +740,35 @@ class _LiquidPulsePainter extends CustomPainter {
       for (var a = 0.0; a <= math.pi * 2 + .08; a += .08) {
         final wave =
             math.sin(a * 3 + progress * math.pi * 2) * (1.4 + 4 * (1 - t));
-        final p = Offset(c.dx + math.cos(a) * (radius + wave),
-            c.dy + math.sin(a) * (radius + wave) * .62);
+        final p = Offset(
+          c.dx + math.cos(a) * (radius + wave),
+          c.dy + math.sin(a) * (radius + wave) * .62,
+        );
         if (a == 0)
           path.moveTo(p.dx, p.dy);
         else
           path.lineTo(p.dx, p.dy);
       }
       canvas.drawPath(
-          path,
-          Paint()
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = 1.1 + fade * 1.9
-            ..color = Color.lerp(Colors.white, accent, .35)!
-                .withOpacity(.025 + fade * .2));
+        path,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.1 + fade * 1.9
+          ..color = Color.lerp(
+            Colors.white,
+            accent,
+            .35,
+          )!.withOpacity(.025 + fade * .2),
+      );
     }
     canvas.drawCircle(
-        c,
-        64,
-        Paint()
-          ..shader = RadialGradient(
-            colors: [accent.withOpacity(.18), Colors.transparent],
-          ).createShader(Rect.fromCircle(center: c, radius: 64)));
+      c,
+      64,
+      Paint()
+        ..shader = RadialGradient(
+          colors: [accent.withOpacity(.18), Colors.transparent],
+        ).createShader(Rect.fromCircle(center: c, radius: 64)),
+    );
   }
 
   @override
