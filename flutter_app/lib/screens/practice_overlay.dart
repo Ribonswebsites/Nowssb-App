@@ -11,14 +11,11 @@ import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 import '../data/models.dart';
-import '../media/nwsb_video.dart';
-import '../media/video_pool.dart';
 
 class PracticeLabSheet extends StatefulWidget {
   const PracticeLabSheet({
@@ -49,7 +46,6 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
   bool _speechReady = false;
   bool _busy = true;
   bool _matched = false;
-  String? _recordedPath;
 
   @override
   void initState() {
@@ -96,7 +92,6 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
       final dir = await getTemporaryDirectory();
       final file =
           '${dir.path}/nwsb-practice-${DateTime.now().millisecondsSinceEpoch}.m4a';
-      _recordedPath = file;
       await _recorder.start(
         const RecordConfig(
           encoder: AudioEncoder.aacLc,
@@ -172,63 +167,28 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
   Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          const Positioned.fill(
-            child: IgnorePointer(
-              child: Opacity(
-                opacity: .92,
-                child: NwsbVideo(
-                  asset: 'assets/video/player-bg-loop.mp4',
-                  fit: BoxFit.cover,
-                  priority: ClipPriority.feature,
-                  autoplay: true,
-                  loop: true,
-                  showPoster: false,
-                ),
-              ),
+      child: SafeArea(
+        child: Align(
+          alignment: Alignment.center,
+          child: AnimatedBuilder(
+            animation: _entry,
+            builder: (context, child) => Transform.translate(
+              offset: Offset(0, 36 * (1 - _entry.value)),
+              child: Opacity(opacity: _entry.value, child: child),
+            ),
+            child: _PracticeTab(
+              word: widget.word,
+              parts: _parts,
+              accent: widget.accent,
+              pulse: _pulse,
+              heard: _heard,
+              busy: _busy,
+              matched: _matched,
+              onClose: widget.onClose,
+              onReplay: () => unawaited(_beginPractice()),
             ),
           ),
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.black.withOpacity(.34),
-                    Colors.black.withOpacity(.60),
-                    Colors.black.withOpacity(.78),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          SafeArea(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: AnimatedBuilder(
-                animation: _entry,
-                builder: (context, child) => Transform.translate(
-                  offset: Offset(0, 70 * (1 - _entry.value)),
-                  child: Opacity(opacity: _entry.value, child: child),
-                ),
-                child: _PracticeTab(
-                  word: widget.word,
-                  parts: _parts,
-                  accent: widget.accent,
-                  pulse: _pulse,
-                  heard: _heard,
-                  busy: _busy,
-                  matched: _matched,
-                  onClose: widget.onClose,
-                  onReplay: () => unawaited(_beginPractice()),
-                ),
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -260,28 +220,23 @@ class _PracticeTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(34),
+        borderRadius: BorderRadius.circular(28),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 32, sigmaY: 32),
+          filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
           child: Container(
-            constraints: const BoxConstraints(maxWidth: 520),
-            padding: const EdgeInsets.fromLTRB(18, 12, 18, 18),
+            constraints: const BoxConstraints(maxWidth: 430),
+            padding: const EdgeInsets.fromLTRB(18, 14, 18, 16),
             decoration: BoxDecoration(
-              color: const Color(0xB80A0B0E),
-              borderRadius: BorderRadius.circular(34),
-              border: Border.all(color: Colors.white.withOpacity(.18)),
+              color: const Color(0xFF090A0C),
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(color: Colors.white.withOpacity(.14)),
               boxShadow: [
                 BoxShadow(
-                  color: accent.withOpacity(.18),
-                  blurRadius: 70,
-                  spreadRadius: -18,
-                ),
-                const BoxShadow(
-                  color: Colors.black54,
-                  blurRadius: 36,
-                  offset: Offset(0, 18),
+                  color: Colors.black.withOpacity(.58),
+                  blurRadius: 34,
+                  offset: const Offset(0, 18),
                 ),
               ],
             ),
@@ -325,7 +280,7 @@ class _PracticeTab extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 SizedBox(
-                  height: 146,
+                  height: 126,
                   child: AnimatedBuilder(
                     animation: pulse,
                     builder: (context, _) => CustomPaint(
@@ -334,33 +289,11 @@ class _PracticeTab extends StatelessWidget {
                         accent: accent,
                       ),
                       child: Center(
-                        child: Container(
-                          width: 92,
-                          height: 92,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.white.withOpacity(.42),
-                                blurRadius: 30,
-                                spreadRadius: 1,
-                              ),
-                              BoxShadow(
-                                color: accent.withOpacity(.35),
-                                blurRadius: 54,
-                                spreadRadius: 4,
-                              ),
-                            ],
-                          ),
-                          padding: const EdgeInsets.all(27),
-                          child: SvgPicture.asset(
-                            'assets/icons/microphone.svg',
-                            fit: BoxFit.contain,
-                            colorFilter: const ColorFilter.mode(
-                              Color(0xFF090A0D),
-                              BlendMode.srcIn,
-                            ),
+                        child: CustomPaint(
+                          size: const Size.square(104),
+                          painter: _OrbPainter(
+                            progress: pulse.value,
+                            accent: accent,
                           ),
                         ),
                       ),
@@ -475,6 +408,66 @@ class _SmallButton extends StatelessWidget {
       ),
     );
   }
+}
+
+class _OrbPainter extends CustomPainter {
+  const _OrbPainter({required this.progress, required this.accent});
+
+  final double progress;
+  final Color accent;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = math.min(size.width, size.height) * .42;
+    final sphere = Rect.fromCircle(center: center, radius: radius);
+
+    canvas.drawCircle(
+      center,
+      radius,
+      Paint()
+        ..shader = RadialGradient(
+          center: const Alignment(-.25, -.35),
+          radius: 1.05,
+          colors: [
+            Colors.white.withOpacity(.98),
+            accent.withOpacity(.64),
+            const Color(0xFF15171B),
+            Colors.black,
+          ],
+          stops: const [.02, .27, .62, 1],
+        ).createShader(sphere),
+    );
+
+    canvas.save();
+    canvas.clipPath(Path()..addOval(sphere));
+    for (var x = -radius; x <= radius; x += 3.5) {
+      final width = math.sqrt(math.max(0, radius * radius - x * x));
+      final wave = math.sin(progress * math.pi * 2 + x / radius * math.pi * 2);
+      final bend = wave * 3.4;
+      final light = (.5 + .5 * math.cos(x / radius * math.pi)).clamp(0.0, 1.0);
+      final opacity = (.12 + light * .78).clamp(0.0, 1.0);
+      canvas.drawLine(
+        Offset(center.dx + x + bend, center.dy - width),
+        Offset(center.dx + x - bend, center.dy + width),
+        Paint()
+          ..color = Colors.white.withOpacity(opacity)
+          ..strokeWidth = .9 + light * 1.4
+          ..strokeCap = StrokeCap.round,
+      );
+    }
+    canvas.restore();
+
+    canvas.drawCircle(
+      Offset(center.dx - radius * .28, center.dy - radius * .34),
+      radius * .12,
+      Paint()..color = Colors.white.withOpacity(.32),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _OrbPainter oldDelegate) =>
+      oldDelegate.progress != progress || oldDelegate.accent != accent;
 }
 
 class _LiquidPulsePainter extends CustomPainter {

@@ -39,7 +39,7 @@ jobs:
         run: |
           cd flutter_app
           flutter analyze --no-fatal-infos --no-fatal-warnings
-          flutter build ios --debug --config-only
+          flutter build ios --debug --config-only --no-codesign
           xcodebuild -workspace ios/Runner.xcworkspace -scheme Runner -configuration Debug -sdk iphoneos CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build
       - name: Upload unsigned iOS application bundle for inspection
         uses: actions/upload-artifact@v4
