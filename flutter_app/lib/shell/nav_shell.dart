@@ -87,6 +87,45 @@ class _NavShellState extends State<NavShell> {
     );
   }
 
+  Widget _fashionHomeChip() {
+    return GestureDetector(
+      onTap: () => Settings.instance.setFashionHome(!_fashion),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: _fashion ? Colors.white : Colors.black,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x33000000),
+              blurRadius: 14,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              _fashion ? Icons.light_mode : Icons.dark_mode,
+              size: 14,
+              color: _fashion ? Colors.black : Colors.white,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              _fashion ? 'Normal home' : 'Fashion home',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                color: _fashion ? Colors.black : Colors.white,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   /// Progress (and other sub-screens) are pushed on the shell navigator, so
   /// they cover every tab. Without popping them, tapping Profile after opening
   /// Progress still shows My Progress / orb / YOUR NUMBERS — the two feel like
@@ -281,64 +320,32 @@ class _NavShellState extends State<NavShell> {
               _tabAlive(4, const ProfileScreen()),
             ],
           ),
-          // The switch between the two homes. On the website this lives in
-          // Customize; until that screen is ported it is here, because a
-          // home you cannot reach may as well not be built.
-          if (_i == 0)
-            Positioned(
-              left: 14,
-              bottom: PlaybackSession.instance.showPill ? 158 : 92,
-              child: SafeArea(
-                top: false,
-                child: GestureDetector(
-                  onTap: () => Settings.instance.setFashionHome(!_fashion),
-                  child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-                    decoration: BoxDecoration(
-                      color: _fashion ? Colors.white : Colors.black,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Color(0x33000000),
-                          blurRadius: 14,
-                          offset: Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          _fashion ? Icons.light_mode : Icons.dark_mode,
-                          size: 15,
-                          color: _fashion ? Colors.black : Colors.white,
-                        ),
-                        const SizedBox(width: 7),
-                        Text(
-                          _fashion ? 'Normal home' : 'Fashion home',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            color: _fashion ? Colors.black : Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-          // Mini player pill — above bottom nav on every tab (incl. both homes).
-          if (PlaybackSession.instance.showPill)
+          // Fashion-home switch + mini player share one row above the nav.
+          if (_i == 0 || PlaybackSession.instance.showPill)
             Positioned(
               left: 12,
               right: 12,
               bottom: 88,
               child: SafeArea(
                 top: false,
-                child: MiniPlayerPill(onOpen: _openMiniPlayer),
+                child: Row(
+                  children: [
+                    if (_i == 0) _fashionHomeChip(),
+                    if (_i == 0 && PlaybackSession.instance.showPill) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        width: 1,
+                        height: 22,
+                        color: const Color(0x66FFFFFF),
+                      ),
+                      const SizedBox(width: 8),
+                    ],
+                    if (PlaybackSession.instance.showPill)
+                      Expanded(
+                        child: MiniPlayerPill(onOpen: _openMiniPlayer),
+                      ),
+                  ],
+                ),
               ),
             ),
 

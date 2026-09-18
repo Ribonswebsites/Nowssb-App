@@ -744,18 +744,6 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                           const SizedBox(height: 18),
                           Row(
                             children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: Image.asset(
-                                  'assets/store/nowssb-bag-headphones.webp',
-                                  width: 28,
-                                  height: 28,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) =>
-                                      const SizedBox.shrink(),
-                                ),
-                              ),
-                              const SizedBox(width: 10),
                               Expanded(
                                 child: Text(
                                   _prettyTitle(_word.word),
@@ -4347,52 +4335,52 @@ class _SubtitleMarquee extends StatelessWidget {
 const _playerThemes = <_PlayerTheme>[
   _PlayerTheme(
     image: 'https://media.nowssb.com/migrated-images/d694cb3157c4e58f_grok_image_1782656710977_nj5r6x.jpg',
-    video: 'https://nowssb.com/assets/video/79d7c93a6734ed8d_grok_video_2026-06-28-19-55-09_otgbxd.mp4',
+    video: 'assets/video/player-liquid-splash.mp4',
     accent: Color(0xFF9BB8FF),
   ),
   _PlayerTheme(
     image: 'https://media.nowssb.com/migrated-images/3670d1e477f48c31_grok_image_1782656676834_rzp2cz.jpg',
-    video: 'https://nowssb.com/assets/video/a1b0a1b513ec57f6_grok_video_2026-06-28-19-54-38_wrxkgr.mp4',
+    video: 'assets/video/grok-video-use-this.mp4',
     accent: Color(0xFF7FE9DA),
   ),
   _PlayerTheme(
     image: 'https://media.nowssb.com/migrated-images/fd380f5670852d0c_grok_image_1782656704854_cfsah3.jpg',
-    video: 'https://nowssb.com/assets/video/dc68caaf51e87003_grok_video_2026-06-28-19-55-02_of5fwh.mp4',
+    video: 'assets/video/grok_video_2026-09-05-15-32-08.mp4',
     accent: Color(0xFFBD7BFF),
   ),
   _PlayerTheme(
     image: 'https://media.nowssb.com/migrated-images/e8bb832f2815c15a_grok_image_1782656684101_o9vc93.jpg',
-    video: 'https://nowssb.com/assets/video/d8ac259577c403f3_grok_video_2026-06-28-19-54-43_it2bur.mp4',
+    video: 'assets/video/grok_video_2026-09-05-15-32-13.mp4',
     accent: Color(0xFFA6DCFF),
   ),
   _PlayerTheme(
     image: 'https://media.nowssb.com/migrated-images/48ad23ade254b2d7_grok_image_1782795582310_llvpix.jpg',
-    video: 'https://nowssb.com/assets/video/3b63edc1485a45e2_grok_video_2026-06-30-10-29-43_hzxyun.mp4',
+    video: 'assets/video/09a50041065bdeab_grok_video_2026-07-30-14-54-07_ddjmrr.mp4',
     accent: Color(0xFFB9A6FF),
   ),
   _PlayerTheme(
     image: 'https://media.nowssb.com/migrated-images/20314fda05d34b49_grok_image_1782796537731_vzyhwn.jpg',
-    video: 'https://nowssb.com/assets/video/a779a65872bf917c_grok_video_2026-06-30-10-45-45_dg2ohg.mp4',
+    video: 'assets/video/28eb0c85b5fd748e_grok_video_2026-07-24-15-42-55_lknomr.mp4',
     accent: Color(0xFFA6C8FF),
   ),
   _PlayerTheme(
     image: 'https://media.nowssb.com/migrated-images/f734c819e92db433_grok_image_1782796641824_izkh09.jpg',
-    video: 'https://nowssb.com/assets/video/da4159578099ee48_grok_video_2026-06-30-10-47-20_rljghs.mp4',
+    video: 'assets/video/415dd447da33973b_grok_video_2026-07-30-14-35-05_q3tyzk.mp4',
     accent: Color(0xFFB9A6FF),
   ),
   _PlayerTheme(
     image: 'https://media.nowssb.com/migrated-images/e103480a2c87d55b_grok_image_1782796519587_thrrws.jpg',
-    video: 'https://nowssb.com/assets/video/e55e1f1f879d8074_grok_video_2026-06-30-10-45-34_pg2y2j.mp4',
+    video: 'assets/video/7e4d709136dc254a_grok_video_2026-07-18-15-53-02_ubjx5b.mp4',
     accent: Color(0xFFE8D5A3),
   ),
   _PlayerTheme(
     image: 'https://media.nowssb.com/migrated-images/122962572090895c_grok_image_1782796924745_nmksmi.jpg',
-    video: 'https://nowssb.com/assets/video/7a0e0cf6903f3b16_grok_video_2026-06-30-10-52-07_gvffol.mp4',
+    video: 'assets/video/beaf11ea10561d43_grok_video_2026-07-30-15-35-40_xwm1ei.mp4',
     accent: Color(0xFFF0D9A8),
   ),
   _PlayerTheme(
     image: 'https://media.nowssb.com/migrated-images/28b7b32c97232472_grok_image_1782796933792_qwzfgx.jpg',
-    video: 'https://nowssb.com/assets/video/39905d27bd778cff_grok_video_2026-06-30-10-52-20_zk87yh.mp4',
+    video: 'assets/video/player-actions-tab.mp4',
     accent: Color(0xFF8FE6FF),
   ),
 ];

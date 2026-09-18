@@ -797,8 +797,8 @@ class RmRowVid extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(18),
         child: AspectRatio(
-          aspectRatio: 16 / 9,
-          child: NwsbVideo(asset: url, priority: ClipPriority.decoration),
+          aspectRatio: 16 / 6.4,
+          child: NwsbVideo(asset: url, priority: ClipPriority.feature),
         ),
       ),
     );
@@ -926,13 +926,25 @@ class RmWordCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
+                    const NwsbIcon(
+                      NwsbMarks.bag,
+                      size: 18,
+                      color: Color(0xFFE8D5A3),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      width: 1,
+                      height: 16,
+                      color: const Color(0x66FFFFFF),
+                    ),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         name,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                          fontSize: 20,
+                          fontSize: 24,
                           fontWeight: FontWeight.w800,
                           color: Colors.white,
                           height: 1.05,
@@ -1005,12 +1017,6 @@ class RmWordCard extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            if (price != null)
-                              _CenteredPrice(
-                                price: price!,
-                                originalPrice: originalPrice,
-                              ),
-                            const SizedBox(height: 4),
                             Text(
                               root.toUpperCase(),
                               maxLines: 1,
@@ -1022,7 +1028,7 @@ class RmWordCard extends StatelessWidget {
                                 color: Color(0x99C8E8F5),
                               ),
                             ),
-                            const SizedBox(height: 6),
+                            const SizedBox(height: 4),
                             Text(
                               wordVibrationTag(name),
                               maxLines: 2,
@@ -1033,6 +1039,12 @@ class RmWordCard extends StatelessWidget {
                                 color: Color(0xB8FFFFFF),
                               ),
                             ),
+                            const SizedBox(height: 6),
+                            if (price != null)
+                              _CenteredPrice(
+                                price: price!,
+                                originalPrice: originalPrice,
+                              ),
                             const Spacer(),
                             const SizedBox(height: 4),
                             FittedBox(
@@ -1179,7 +1191,7 @@ class _CenteredPrice extends StatelessWidget {
           sale,
           textAlign: TextAlign.left,
           style: const TextStyle(
-            fontSize: 34,
+            fontSize: 28,
             fontWeight: FontWeight.w900,
             color: Colors.white,
             height: 1.0,
@@ -1658,6 +1670,62 @@ class StoreDisclaimer extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class StoreViewMoreTap extends StatelessWidget {
+  const StoreViewMoreTap({
+    super.key,
+    required this.leftover,
+    required this.onTap,
+  });
+
+  final int leftover;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 8, 0, 16),
+      child: GestureDetector(
+        onTap: onTap,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(22),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              decoration: BoxDecoration(
+                color: const Color(0x330C0C0E),
+                borderRadius: BorderRadius.circular(22),
+                border: Border.all(color: const Color(0x22FFFFFF)),
+              ),
+              child: Row(
+                children: [
+                  const NwsbIcon(
+                    NwsbMarks.bag,
+                    size: 18,
+                    color: Color(0xFFE8D5A3),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'View more · $leftover collections',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  const Icon(Icons.expand_more_rounded, color: Colors.white),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

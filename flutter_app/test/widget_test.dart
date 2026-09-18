@@ -155,7 +155,8 @@ void main() {
     // would be going TO, so it reads as an action rather than a status.
     expect(find.text('Fashion home'), findsOneWidget);
     await tester.tap(find.text('Fashion home'));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 80));
 
     expect(tester.takeException(), isNull);
     expect(find.text('Normal home'), findsOneWidget);

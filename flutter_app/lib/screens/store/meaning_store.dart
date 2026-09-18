@@ -64,6 +64,7 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
   final _search = TextEditingController();
   String _query = '';
   String _chip = 'ALL';
+  var _allRows = false;
 
   @override
   void dispose() {
@@ -370,7 +371,6 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
   ) {
     final out = <Widget>[];
     final banners = <Widget>[];
-    var rail = 0;
     for (final cat in order) {
       if (cats[cat]?.isNotEmpty != true) continue;
       banners.add(RmCatBanner(
@@ -385,8 +385,11 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
       ));
     }
     if (banners.isNotEmpty) out.add(RmBannerRail(banners: banners));
+    var shown = 0;
     for (final cat in order) {
       if (cats[cat]?.isNotEmpty != true) continue;
+      if (!_allRows && _chip == 'ALL' && shown >= 10) continue;
+      shown++;
       out.add(RmRowHeader(
         title: cat,
         onViewAll: () => _openViewAll(cat),
@@ -423,16 +426,15 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
             ),
         ],
       ));
-      rail++;
-      if (rail % 2 == 0) {
-        final mid = storeMidRailBannerAt((rail ~/ 2) - 1);
-        if (mid != null) out.add(mid);
-      }
     }
-    // Ensure all 6 mid-rail banners appear even when few categories.
-    final placed = rail ~/ 2;
-    for (var i = placed; i < kStoreMidRailBanners.length; i++) {
-      out.add(StoreMidRailBanner(data: kStoreMidRailBanners[i]));
+    if (!_allRows && _chip == 'ALL') {
+      final total = order.where((c) => cats[c]?.isNotEmpty == true).length;
+      if (total > 10) {
+        out.add(StoreViewMoreTap(
+          leftover: total - 10,
+          onTap: () => setState(() => _allRows = true),
+        ));
+      }
     }
     return out;
   }

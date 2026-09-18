@@ -26,13 +26,22 @@ void main() {
     );
   });
 
-  test('mini player is a rounded glass stadium with white circle buttons', () {
+  test(
+      'mini player is a black rounded rectangle inside glass, beside Fashion home',
+      () {
     final src = File('lib/widgets/mini_player_pill.dart').readAsStringSync();
     expect(src, contains('assets/store/nowssb-bag-headphones.webp'));
     expect(src, contains('_WhiteCircleBtn'));
-    expect(src, contains('BorderRadius.circular(35)'));
-    expect(src, contains('height: 70'));
+    expect(src, contains('BorderRadius.circular(18)'));
+    expect(src, contains('height: 56'));
+    expect(src, contains('Color(0xF00C0C0E)'));
     expect(src, contains('BackdropFilter'));
     expect(src, isNot(contains('HearingSafety')));
+    expect(src, isNot(contains('BorderRadius.circular(35)')));
+
+    final nav = File('lib/shell/nav_shell.dart').readAsStringSync();
+    expect(nav, contains('_fashionHomeChip'));
+    expect(nav, contains('Expanded('));
+    expect(nav, contains('MiniPlayerPill'));
   });
 }

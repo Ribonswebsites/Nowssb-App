@@ -14,11 +14,29 @@ const kMsSignatureImg =
     "https://media.nowssb.com/migrated-images/a7c5f95b3e9029e5_file_000000008eb081fba87f16fe9146e413_mk9wbe.png";
 const kMsSignaturePrice = 299;
 
-/// Live site plays these from the website origin (index / part010 / part026).
-/// Flutter opens them as remote NwsbVideo URLs — same files the browser uses.
+/// Live site plays these from the website origin. Flutter maps them onto
+/// bundled `assets/video/` clips so banners actually move on device —
+/// remote nowssb.com URLs were dying with PlatformException VideoError.
 const kNowssbVideoOrigin = 'https://nowssb.com/assets/video/';
 
-String nwsbVideo(String fileName) => '$kNowssbVideoOrigin$fileName';
+String nwsbVideo(String fileName) {
+  switch (fileName) {
+    case kRmHeroVidFile:
+    case kStoreWordDoorVidFile:
+      return 'assets/video/hero-word-store.mp4';
+    case kStoreMeaningDoorVidFile:
+    case kMsMeaningVidFile:
+      return 'assets/video/hero-meaning-store.mp4';
+    case kMsSubscribeVidFile:
+      return 'assets/video/hero-subscription.mp4';
+    default:
+      final row = kRmRowVids.indexOf(fileName);
+      if (row == 0) return 'assets/video/connect-banner.mp4';
+      if (row == 1) return 'assets/video/signature-banner.mp4';
+      if (row == 2) return 'assets/video/hero-ebooks.mp4';
+      return 'assets/video/hero-word-store.mp4';
+  }
+}
 
 /// Word Atelier category logo — `./assets/icons/collection-icon.webp` on web.
 const kRmCatLogoAsset = 'assets/icons/collection-icon.webp';

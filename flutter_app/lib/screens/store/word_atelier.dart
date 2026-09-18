@@ -64,6 +64,7 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
   final _search = TextEditingController();
   String _query = '';
   String _chip = 'ALL';
+  var _allRows = false;
 
   @override
   void dispose() {
@@ -114,6 +115,9 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
   @override
   Widget build(BuildContext context) {
     final cats = _cats;
+    final rowCats = (_chip == 'ALL' && !_allRows && cats.length > 10)
+        ? cats.take(10).toList()
+        : cats;
     final sections = <Widget>[];
     if (cats.isNotEmpty) {
       sections.add(RmBannerRail(
@@ -137,8 +141,8 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
     }
     // Count product rails actually emitted (search may empty some).
     var productRailIndex = 0;
-    for (var i = 0; i < cats.length; i++) {
-      final cat = cats[i];
+    for (var i = 0; i < rowCats.length; i++) {
+      final cat = rowCats[i];
       sections.add(RmRowHeader(
         title: cat.label,
         onViewAll: () => _openViewAll(cat.label),
@@ -193,13 +197,6 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
       }));
       productRailIndex++;
 
-      // Compact mid-rail glass banners between every 2 product rows (exactly 7).
-      if (_chip == 'ALL' && productRailIndex % 2 == 0) {
-        final midIdx = (productRailIndex ~/ 2) - 1;
-        final mid = storeMidRailBannerAt(midIdx);
-        if (mid != null) sections.add(mid);
-      }
-
       // After the 4th rail → frequency package (grid + Limited Time Free + Browse by Goal).
       if (_chip == 'ALL' && productRailIndex == 4) {
         sections.add(StoreFrequencyPackage(
@@ -243,12 +240,11 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
       }
     }
 
-    // Ensure exactly 6 mid-rail banners when ALL chip (pad if <12 rails).
-    if (_chip == 'ALL') {
-      final placed = productRailIndex ~/ 2;
-      for (var i = placed; i < kStoreMidRailBanners.length; i++) {
-        sections.add(StoreMidRailBanner(data: kStoreMidRailBanners[i]));
-      }
+    if (_chip == 'ALL' && !_allRows && cats.length > 10) {
+      sections.add(StoreViewMoreTap(
+        leftover: cats.length - 10,
+        onTap: () => setState(() => _allRows = true),
+      ));
     }
 
     return Column(

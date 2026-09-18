@@ -33,6 +33,8 @@ void main() {
       expect(cards, contains('TextDecoration.lineThrough'));
       expect(cards, contains('shape: BoxShape.circle'));
       expect(cards, contains('NwsbMarks.wishlist'));
+      expect(cards, contains('StoreViewMoreTap'));
+      expect(cards, contains('fontSize: 24'));
 
       final atelier =
           File('lib/screens/store/word_atelier.dart').readAsStringSync();
@@ -40,9 +42,18 @@ void main() {
       expect(atelier, contains('RmRowHeader'));
       expect(atelier, contains('kWordSaleInr'));
       expect(atelier, contains('originalPrice'));
+      expect(atelier, contains('cats.take(10)'));
+      expect(atelier, contains('StoreViewMoreTap'));
+      expect(atelier, isNot(contains('storeMidRailBannerAt')));
 
       final storeHome = File('lib/screens/store.dart').readAsStringSync();
       expect(storeHome, contains('16 / 6.4'));
+      expect(storeHome, contains('_StoreQuickMosaic'));
+      expect(storeHome, contains('ClipPriority.feature'));
+
+      final catalog = File('lib/data/store_catalog.dart').readAsStringSync();
+      expect(catalog, contains("return 'assets/video/hero-word-store.mp4'"));
+      expect(catalog, isNot(contains("=> '\$kNowssbVideoOrigin\$fileName'")));
 
       final detail =
           File('lib/screens/store/product_detail.dart').readAsStringSync();
