@@ -10,10 +10,10 @@ import '../../data/cart_bag.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
-import '../../widgets/cart_add_animation.dart';
+import '../../widgets/nwsb_icon.dart';
 import '../word_detail.dart';
 import 'bag_ui.dart';
-import 'cart_pages.dart';
+import 'store_actions.dart';
 import 'store_cards.dart';
 
 void openAtelierWord(
@@ -248,7 +248,7 @@ class _StoreProductPageState extends State<StoreProductPage> {
                             Expanded(
                               child: _ActBtn(
                                 label: 'Wishlist',
-                                icon: Icons.favorite_border,
+                                mark: NwsbMarks.wishlist,
                                 filled: false,
                                 onTap: () {
                                   CartBag.instance.addWishlist(_bagItem);
@@ -266,14 +266,14 @@ class _StoreProductPageState extends State<StoreProductPage> {
                               child: _ActBtn(
                                 key: _addCartKey,
                                 label: 'Add to Cart',
-                                icon: Icons.shopping_cart_outlined,
+                                mark: NwsbMarks.cart,
                                 filled: false,
                                 onTap: () {
-                                  CartAddAnimation.playForContext(
+                                  storeAddToCart(
                                     context,
-                                    item: _bagItem,
-                                    pressedKey: _addCartKey,
-                                    cartTargetKey: _cartTargetKey,
+                                    _bagItem,
+                                    origin: _addCartKey,
+                                    cartTarget: _cartTargetKey,
                                   );
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
@@ -289,23 +289,14 @@ class _StoreProductPageState extends State<StoreProductPage> {
                         const SizedBox(height: 10),
                         _ActBtn(
                           label: 'Buy Now',
-                          icon: Icons.flash_on_outlined,
+                          mark: NwsbMarks.bag,
                           filled: true,
                           onTap: () {
-                            CartAddAnimation.playForContext(
+                            storeBuyNow(
                               context,
-                              item: _bagItem,
-                              pressedContext: context,
-                              cartTargetKey: _cartTargetKey,
-                              openCartAfter: true,
-                              onComplete: () {
-                                if (!mounted) return;
-                                Navigator.of(context).push(
-                                  MaterialPageRoute<void>(
-                                    builder: (_) => const CheckoutPage(),
-                                  ),
-                                );
-                              },
+                              _bagItem,
+                              origin: _addCartKey,
+                              cartTarget: _cartTargetKey,
                             );
                           },
                         ),
@@ -387,99 +378,68 @@ class _StoreProductPageState extends State<StoreProductPage> {
   }
 }
 
-class _ActBtn extends StatefulWidget {
+class _ActBtn extends StatelessWidget {
   const _ActBtn({
     super.key,
     required this.label,
-    required this.icon,
+    required this.mark,
     required this.filled,
     required this.onTap,
   });
   final String label;
-  final IconData icon;
+  final String mark;
   final bool filled;
   final VoidCallback onTap;
-
-  @override
-  State<_ActBtn> createState() => _ActBtnState();
-}
-
-class _ActBtnState extends State<_ActBtn> {
-  bool _pressed = false;
-
-  Future<void> _tap() async {
-    setState(() => _pressed = true);
-    widget.onTap();
-    await Future<void>.delayed(const Duration(milliseconds: 150));
-    if (mounted) setState(() => _pressed = false);
-  }
-
   @override
   Widget build(BuildContext context) {
+    final ink = filled ? NwsbColors.ink : const Color(0xB8FFFFFF);
     return GestureDetector(
-      onTap: _tap,
-      child: AnimatedScale(
-        scale: _pressed ? .96 : 1,
-        duration: const Duration(milliseconds: 130),
-        curve: Curves.easeOutCubic,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 130),
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 15),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(widget.filled ? 14 : 12),
-            gradient: widget.filled
-                ? const LinearGradient(
-                    colors: [Color(0xF2E8D5A3), Color(0xE6C8A96E)],
-                  )
-                : null,
-            color: widget.filled ? null : const Color(0x14FFFFFF),
-            border: widget.filled
-                ? null
-                : Border.all(color: const Color(0x24FFFFFF)),
-            boxShadow: widget.filled && _pressed
-                ? const [
-                    BoxShadow(
-                      color: Color(0x66E8D5A3),
-                      blurRadius: 18,
-                      spreadRadius: 2,
-                    ),
-                  ]
-                : null,
-          ),
-          child: Row(
-            mainAxisAlignment: widget.filled
-                ? MainAxisAlignment.spaceBetween
-                : MainAxisAlignment.center,
-            children: [
-              if (widget.filled) const SizedBox(width: 8),
-              if (!widget.filled)
-                Icon(widget.icon, size: 16, color: const Color(0xB8FFFFFF)),
-              if (!widget.filled) const SizedBox(width: 8),
-              Text(
-                widget.label,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: widget.filled
-                      ? NwsbColors.ink
-                      : const Color(0xB8FFFFFF),
-                ),
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(
+          vertical: filled ? 8 : 15,
+          horizontal: filled ? 8 : 0,
+        ),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          gradient: filled
+              ? const LinearGradient(
+                  colors: [Color(0xF2E8D5A3), Color(0xE6C8A96E)],
+                )
+              : null,
+          color: filled ? null : const Color(0x14FFFFFF),
+          border: filled ? null : Border.all(color: const Color(0x24FFFFFF)),
+        ),
+        child: Row(
+          mainAxisAlignment: filled
+              ? MainAxisAlignment.spaceBetween
+              : MainAxisAlignment.center,
+          children: [
+            if (filled) const SizedBox(width: 8),
+            if (!filled) NwsbIcon(mark, size: 16, color: ink),
+            if (!filled) const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: filled ? NwsbColors.ink : const Color(0xB8FFFFFF),
               ),
-              if (!widget.filled) const SizedBox.shrink(),
-              if (widget.filled)
-                Container(
-                  width: 32,
-                  height: 32,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(widget.icon, size: 16, color: NwsbColors.ink),
+            ),
+            if (!filled) const SizedBox.shrink(),
+            if (filled)
+              Container(
+                width: 32,
+                height: 32,
+                alignment: Alignment.center,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
                 ),
-              if (widget.filled) const SizedBox(width: 4),
-            ],
-          ),
+                child: NwsbIcon(mark, size: 16, color: NwsbColors.ink),
+              ),
+          ],
         ),
       ),
     );

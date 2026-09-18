@@ -9,8 +9,10 @@ import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/intro_gate.dart';
+import '../../widgets/nwsb_icon.dart';
 import '../../widgets/page_shell.dart';
 import 'product_detail.dart';
+import 'store_actions.dart';
 import 'store_cards.dart';
 import 'request_words.dart';
 import 'store_home_sections.dart';
@@ -22,33 +24,33 @@ class EbooksStoreScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => IntroGate(
-        tag: 'Shabdapathy · Library',
-        eyebrow: 'Read · Learn · Practice',
-        title: 'The NowssB\nEbooks.',
-        body: 'Deep-dive guides on word science, phonetic origin and sound healing — yours to keep, read anywhere, forever.',
-        stats: const ['3 Titles', 'Instant Access', 'Read Forever'],
-        art: 'assets/store/intro-ebooks.webp',
-        fullBleed: true,
-        enterLabel: 'Browse Ebooks',
-        onBack: () => Navigator.of(context).pop(),
-        child: PageShell(
-          eyebrow: 'NowssB Store',
-          title: 'The NowssB Ebooks',
-          film: 'assets/video/store-verify-banner.mp4',
-          usePageFilm: false,
-          onBack: () => Navigator.of(context).pop(),
-          onStorePicker: () => showStoreSelectSheet(
-            context,
-            onSelect: (id) => openStoreFromPicker(context, id, current: 'ebooks'),
-          ),
-          slivers: [
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
-              sliver: SliverList.list(children: const [_EbooksBody()]),
-            ),
-          ],
+    tag: 'Shabdapathy · Library',
+    eyebrow: 'Read · Learn · Practice',
+    title: 'The NowssB\nEbooks.',
+    body: 'Deep-dive guides on word science, phonetic origin and sound healing — yours to keep, read anywhere, forever.',
+    stats: const ['3 Titles', 'Instant Access', 'Read Forever'],
+    art: 'assets/store/intro-ebooks.webp',
+    fullBleed: true,
+    enterLabel: 'Browse Ebooks',
+    onBack: () => Navigator.of(context).pop(),
+    child: PageShell(
+      eyebrow: 'NowssB Store',
+      title: 'The NowssB Ebooks',
+      film: 'assets/video/store-verify-banner.mp4',
+      usePageFilm: false,
+      onBack: () => Navigator.of(context).pop(),
+      onStorePicker: () => showStoreSelectSheet(
+        context,
+        onSelect: (id) => openStoreFromPicker(context, id, current: 'ebooks'),
+      ),
+      slivers: [
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
+          sliver: SliverList.list(children: const [_EbooksBody()]),
         ),
-      );
+      ],
+    ),
+  );
 }
 
 class _EbooksBody extends StatelessWidget {
@@ -62,15 +64,17 @@ class _EbooksBody extends StatelessWidget {
     final merged = [...kEbBooks];
     for (final b in live) {
       if (!keys.contains(b.key)) {
-        merged.add(EbBook(
-          key: b.key,
-          title: b.title,
-          sub: b.sub,
-          price: b.price,
-          cover: b.cover.isNotEmpty ? b.cover : kEbBooks.first.cover,
-          about: b.sub,
-          contents: const ['Published from the NowssB studio'],
-        ));
+        merged.add(
+          EbBook(
+            key: b.key,
+            title: b.title,
+            sub: b.sub,
+            price: b.price,
+            cover: b.cover.isNotEmpty ? b.cover : kEbBooks.first.cover,
+            about: b.sub,
+            contents: const ['Published from the NowssB studio'],
+          ),
+        );
       }
     }
     return merged;
@@ -86,7 +90,10 @@ class _EbooksBody extends StatelessWidget {
         Container(
           margin: const EdgeInsets.only(bottom: 16),
           clipBehavior: Clip.antiAlias,
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(16), color: Colors.black),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            color: Colors.black,
+          ),
           child: AspectRatio(
             aspectRatio: 16 / 9,
             child: Stack(
@@ -113,9 +120,24 @@ class _EbooksBody extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('READ · LEARN · PRACTICE', style: TextStyle(fontSize: 10, letterSpacing: 3, fontWeight: FontWeight.w700, color: NwsbColors.goldLight)),
+                      Text(
+                        'READ · LEARN · PRACTICE',
+                        style: TextStyle(
+                          fontSize: 10,
+                          letterSpacing: 3,
+                          fontWeight: FontWeight.w700,
+                          color: NwsbColors.goldLight,
+                        ),
+                      ),
                       SizedBox(height: 6),
-                      Text('The NowssB Ebooks', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Colors.white)),
+                      Text(
+                        'The NowssB Ebooks',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -233,11 +255,33 @@ class _EbookRow extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(book.title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Colors.white, height: 1.15)),
+                        Text(
+                          book.title,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                            height: 1.15,
+                          ),
+                        ),
                         const SizedBox(height: 6),
-                        Text(book.sub, style: const TextStyle(fontSize: 12, height: 1.4, color: Color(0x8CFFFFFF))),
+                        Text(
+                          book.sub,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            height: 1.4,
+                            color: Color(0x8CFFFFFF),
+                          ),
+                        ),
                         const Spacer(),
-                        Text(inr(book.price), style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: NwsbColors.goldLight)),
+                        Text(
+                          inr(book.price),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: NwsbColors.goldLight,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -249,19 +293,97 @@ class _EbookRow extends StatelessWidget {
               book.about,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 12, height: 1.55, color: Color(0x73FFFFFF)),
+              style: const TextStyle(
+                fontSize: 12,
+                height: 1.55,
+                color: Color(0x73FFFFFF),
+              ),
             ),
             const SizedBox(height: 12),
-            Align(
-              alignment: Alignment.centerRight,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
+            Row(
+              children: [
+                Semantics(
+                  button: true,
+                  label: 'Add to Cart',
+                  child: GestureDetector(
+                    onTap: () {
+                      storeAddToCart(
+                        context,
+                        ebookBagItem(
+                          title: book.title,
+                          sub: book.sub,
+                          img: book.cover,
+                          price: book.price,
+                        ),
+                      );
+                    },
+                    child: Container(
+                      width: 42,
+                      height: 42,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: const Color(0xE60A101C),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: const Color(0x66E8D5A3)),
+                      ),
+                      child: const NwsbIcon(
+                        NwsbMarks.cart,
+                        size: 18,
+                        color: Color(0xFFE8D5A3),
+                      ),
+                    ),
+                  ),
                 ),
-                child: const Text('Get It', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: NwsbColors.ink)),
-              ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Semantics(
+                    button: true,
+                    label: 'Buy Now',
+                    child: GestureDetector(
+                      onTap: () {
+                        storeBuyNow(
+                          context,
+                          ebookBagItem(
+                            title: book.title,
+                            sub: book.sub,
+                            img: book.cover,
+                            price: book.price,
+                          ),
+                        );
+                      },
+                      child: Container(
+                        height: 42,
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFFF3E4B7), Color(0xFFC8A96E)],
+                          ),
+                        ),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Buy Now',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w800,
+                                color: NwsbColors.ink,
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            NwsbIcon(
+                              NwsbMarks.bag,
+                              size: 16,
+                              color: NwsbColors.ink,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

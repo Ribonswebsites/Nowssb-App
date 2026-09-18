@@ -13,9 +13,9 @@ import '../../data/cart_bag.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
-import '../../widgets/cart_add_animation.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/glass_wrap.dart';
+import 'store_actions.dart';
 import 'store_cards.dart';
 
 // ─── #2 Store hero video (Ribons Original copy block removed) ────────────────
@@ -93,7 +93,7 @@ class StoreRecommendedSection extends StatelessWidget {
 
   final VoidCallback onSeeAll;
   final void Function(String word, String root, String img, num price)
-      onOpenWord;
+  onOpenWord;
 
   static const _cards = <_RecCardData>[
     _RecCardData(
@@ -282,7 +282,7 @@ class StoreFeaturedBundleSection extends StatelessWidget {
 
   final VoidCallback onSeeAll;
   final void Function(String word, String root, String img, num price)
-      onOpenWord;
+  onOpenWord;
 
   static const _rows = <_BundleRow>[
     _BundleRow(
@@ -571,7 +571,7 @@ class StoreLimitedTimeFreeSection extends StatelessWidget {
   });
 
   final void Function(String word, String root, String img, num price)?
-      onOpenWord;
+  onOpenWord;
   final VoidCallback? onRequestWords;
 
   static const _tracks = <(String, String, String)>[
@@ -687,11 +687,11 @@ class StoreLimitedTimeFreeSection extends StatelessWidget {
                             onTap: onOpenWord == null
                                 ? null
                                 : () => onOpenWord!(
-                                      _tracks[i].$1,
-                                      _tracks[i].$2,
-                                      kRmWordImg,
-                                      0,
-                                    ),
+                                    _tracks[i].$1,
+                                    _tracks[i].$2,
+                                    kRmWordImg,
+                                    0,
+                                  ),
                             child: Column(
                               children: [
                                 ClipRRect(
@@ -703,8 +703,8 @@ class StoreLimitedTimeFreeSection extends StatelessWidget {
                                       fit: BoxFit.cover,
                                       errorBuilder: (_, __, ___) =>
                                           const ColoredBox(
-                                        color: Color(0xFF0A0F1C),
-                                      ),
+                                            color: Color(0xFF0A0F1C),
+                                          ),
                                     ),
                                   ),
                                 ),
@@ -844,7 +844,7 @@ class StoreFrequencyPackage extends StatelessWidget {
   final ValueChanged<String> onSelectCategory;
   final VoidCallback onSeeAll;
   final void Function(String word, String root, String img, num price)?
-      onOpenWord;
+  onOpenWord;
   final VoidCallback? onRequestWords;
 
   @override
@@ -877,7 +877,7 @@ class StoreFeaturedPlaylistSection extends StatelessWidget {
 
   final VoidCallback onSeeAll;
   final void Function(String word, String root, String img, num price)
-      onOpenWord;
+  onOpenWord;
 
   static const _rows = <_BundleRow>[
     _BundleRow(
@@ -992,7 +992,7 @@ class StoreGlassPlaylistCarousel extends StatelessWidget {
 
   final VoidCallback onSeeAll;
   final void Function(String word, String root, String img, num price)
-      onOpenWord;
+  onOpenWord;
 
   static const _cards = <_GlassPlaylistCardData>[
     _GlassPlaylistCardData(
@@ -1389,7 +1389,7 @@ Future<void> showStoreViewAllPanel(
   required String title,
   required List<StoreViewAllItem> items,
   required void Function(String word, String root, String img, num price)
-      onOpenWord,
+  onOpenWord,
 }) {
   return showGeneralDialog<void>(
     context: context,
@@ -1450,7 +1450,7 @@ class _StoreViewAllOverlay extends StatefulWidget {
   final String title;
   final List<StoreViewAllItem> items;
   final void Function(String word, String root, String img, num price)
-      onOpenWord;
+  onOpenWord;
 
   @override
   State<_StoreViewAllOverlay> createState() => _StoreViewAllOverlayState();
@@ -1613,8 +1613,8 @@ class _StoreViewAllOverlayState extends State<_StoreViewAllOverlay> {
                                           fit: BoxFit.cover,
                                           errorBuilder: (_, __, ___) =>
                                               const ColoredBox(
-                                            color: Color(0xFF0A0F1C),
-                                          ),
+                                                color: Color(0xFF0A0F1C),
+                                              ),
                                         ),
                                         const DecoratedBox(
                                           decoration: BoxDecoration(
@@ -1680,25 +1680,31 @@ class _StoreViewAllOverlayState extends State<_StoreViewAllOverlay> {
                         children: [
                           _WhiteCircleAction(
                             label: 'Buy Now',
+                            mark: NwsbMarks.bag,
                             wide: true,
                             onTap: () {
                               final c = _current;
-                              Navigator.of(context).pop();
-                              widget.onOpenWord(c.word, c.root, c.img, c.price);
+                              storeBuyNow(
+                                context,
+                                wordBagItem(
+                                  name: c.title,
+                                  root: c.root,
+                                  img: c.img,
+                                  price: c.price,
+                                ),
+                              );
                             },
                           ),
                           const SizedBox(width: 10),
                           _WhiteCircleAction(
-                            icon: Icons.favorite_border,
+                            mark: NwsbMarks.wishlist,
                             onTap: () {
                               CartBag.instance.addWishlist(
-                                BagItem(
-                                  id: 'word:${_current.word.toLowerCase()}',
-                                  title: _current.title,
-                                  subtitle: _current.root,
-                                  image: _current.img,
+                                wordBagItem(
+                                  name: _current.title,
+                                  root: _current.root,
+                                  img: _current.img,
                                   price: _current.price,
-                                  kind: 'Word',
                                 ),
                               );
                               _toast('Saved ${_current.title} to wishlist');
@@ -1711,17 +1717,15 @@ class _StoreViewAllOverlayState extends State<_StoreViewAllOverlay> {
                           ),
                           const SizedBox(width: 10),
                           _WhiteCircleAction(
-                            icon: Icons.shopping_cart_outlined,
+                            mark: NwsbMarks.cart,
                             onTap: () {
-                              CartAddAnimation.playForContext(
+                              storeAddToCart(
                                 context,
-                                item: BagItem(
-                                  id: 'word:${_current.word.toLowerCase()}',
-                                  title: _current.title,
-                                  subtitle: _current.root,
-                                  image: _current.img,
+                                wordBagItem(
+                                  name: _current.title,
+                                  root: _current.root,
+                                  img: _current.img,
                                   price: _current.price,
-                                  kind: 'Word',
                                 ),
                               );
                               _toast('Added ${_current.title} to cart');
@@ -1744,18 +1748,41 @@ class _StoreViewAllOverlayState extends State<_StoreViewAllOverlay> {
 class _WhiteCircleAction extends StatelessWidget {
   const _WhiteCircleAction({
     this.icon,
+    this.mark,
     this.label,
     required this.onTap,
     this.wide = false,
   });
 
   final IconData? icon;
+  final String? mark;
   final String? label;
   final VoidCallback onTap;
   final bool wide;
 
   @override
   Widget build(BuildContext context) {
+    final child = label != null
+        ? Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (mark != null) ...[
+                NwsbIcon(mark!, size: 15, color: const Color(0xFF060C18)),
+                const SizedBox(width: 6),
+              ],
+              Text(
+                label!,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF060C18),
+                ),
+              ),
+            ],
+          )
+        : (mark != null
+              ? NwsbIcon(mark!, size: 18, color: const Color(0xFF060C18))
+              : Icon(icon, size: 20, color: const Color(0xFF060C18)));
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -1775,16 +1802,7 @@ class _WhiteCircleAction extends StatelessWidget {
             ),
           ],
         ),
-        child: label != null
-            ? Text(
-                label!,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w800,
-                  color: Color(0xFF060C18),
-                ),
-              )
-            : Icon(icon, size: 20, color: const Color(0xFF060C18)),
+        child: child,
       ),
     );
   }

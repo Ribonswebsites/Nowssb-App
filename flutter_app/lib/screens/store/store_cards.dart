@@ -11,9 +11,9 @@ import '../../data/cart_bag.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
-import '../../widgets/cart_add_animation.dart';
 import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_icon.dart';
+import 'store_actions.dart';
 
 String inr(num value) {
   if (value <= 0) return 'Included';
@@ -650,8 +650,16 @@ class RmWordCard extends StatelessWidget {
   final Color? tint;
 
   /// Thicker horizontal card: image left, text + actions right.
-  static const double cardHeight = 188;
-  static const double cardWidth = 330;
+  static const double cardHeight = 196;
+  static const double cardWidth = 338;
+
+  BagItem get _item => wordBagItem(
+        name: name,
+        root: root,
+        img: imgUrl,
+        price: price ?? 49,
+        signature: signature,
+      );
 
   void _toast(BuildContext context, String msg) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -768,22 +776,13 @@ class RmWordCard extends StatelessWidget {
                               if (onWishlist != null) {
                                 onWishlist!();
                               } else {
-                                CartBag.instance.addWishlist(
-                                  BagItem(
-                                    id: 'word:${name.toLowerCase()}',
-                                    title: name,
-                                    subtitle: root,
-                                    image: imgUrl,
-                                    price: price ?? 49,
-                                    kind: signature ? 'Signature' : 'Word',
-                                  ),
-                                );
+                                CartBag.instance.addWishlist(_item);
                                 _toast(context, 'Saved $name to wishlist');
                               }
                             },
-                            child: const Icon(
-                              Icons.favorite_border,
-                              size: 19,
+                            child: const NwsbIcon(
+                              NwsbMarks.wishlist,
+                              size: 18,
                               color: Color(0xB3FFFFFF),
                             ),
                           ),
@@ -822,76 +821,89 @@ class RmWordCard extends StatelessWidget {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
-                                fontSize: 17,
+                                fontSize: 16,
                                 fontWeight: FontWeight.w800,
                                 color: NwsbColors.goldLight,
                               ),
                             ),
                           ),
-                          GestureDetector(
-                            onTap: () {
-                              if (onBuyNow != null) {
-                                onBuyNow!();
-                              } else if (onAddCart != null) {
-                                onAddCart!();
-                              } else if (onTap != null) {
-                                onTap!();
-                              } else {
-                                CartAddAnimation.playForContext(
-                                  context,
-                                  item: BagItem(
-                                    id: 'word:${name.toLowerCase()}',
-                                    title: name,
-                                    subtitle: root,
-                                    image: imgUrl,
-                                    price: price ?? 49,
-                                    kind: signature ? 'Signature' : 'Word',
+                          Semantics(
+                            button: true,
+                            container: true,
+                            excludeSemantics: true,
+                            label: 'Add to Cart',
+                            child: GestureDetector(
+                              onTap: () {
+                                if (onAddCart != null) {
+                                  onAddCart!();
+                                } else {
+                                  storeAddToCart(context, _item);
+                                  _toast(context, 'Added $name to cart');
+                                }
+                              },
+                              child: Container(
+                                width: 36,
+                                height: 36,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xE60A101C),
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: const Color(0x66E8D5A3),
                                   ),
-                                );
-                                _toast(context, 'Added $name to cart');
-                              }
-                            },
-                            child: Container(
-                              height: 38,
-                              padding: const EdgeInsets.only(
-                                left: 14,
-                                right: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                gradient: const LinearGradient(
-                                  colors: [
-                                    Color(0xFFF3E4B7),
-                                    Color(0xFFC8A96E),
-                                  ],
+                                ),
+                                child: const NwsbIcon(
+                                  NwsbMarks.cart,
+                                  size: 16,
+                                  color: Color(0xFFE8D5A3),
                                 ),
                               ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Text(
-                                    'Buy Now',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w800,
-                                      color: Color(0xFF060C18),
-                                    ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Semantics(
+                            button: true,
+                            container: true,
+                            excludeSemantics: true,
+                            label: 'Buy Now',
+                            child: GestureDetector(
+                              onTap: () {
+                                if (onBuyNow != null) {
+                                  onBuyNow!();
+                                } else {
+                                  storeBuyNow(context, _item);
+                                }
+                              },
+                              child: Container(
+                                height: 36,
+                                padding: const EdgeInsets.only(
+                                  left: 12,
+                                  right: 3,
+                                ),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(18),
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color(0xFFF3E4B7),
+                                      Color(0xFFC8A96E),
+                                    ],
                                   ),
-                                  const SizedBox(width: 8),
-                                  Container(
-                                    width: 30,
-                                    height: 30,
-                                    decoration: const BoxDecoration(
-                                      color: Colors.white,
-                                      shape: BoxShape.circle,
+                                ),
+                                child: const Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      'Buy Now',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w800,
+                                        color: Color(0xFF060C18),
+                                      ),
                                     ),
-                                    child: const Icon(
-                                      Icons.shopping_cart_outlined,
-                                      size: 16,
-                                      color: Color(0xFF060C18),
-                                    ),
-                                  ),
-                                ],
+                                    SizedBox(width: 7),
+                                    _BagMarkDisc(),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -934,24 +946,54 @@ class _SignatureTag extends StatelessWidget {
   }
 }
 
-class _MiniChip extends StatelessWidget {
-  const _MiniChip({required this.icon, required this.color, this.onTap});
-  final IconData icon;
-  final Color color;
-  final VoidCallback? onTap;
+class _BagMarkDisc extends StatelessWidget {
+  const _BagMarkDisc();
+
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 28,
-        height: 28,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: const Color(0xD1060C18),
-          border: Border.all(color: const Color(0x1FFFFFFF)),
+    return Container(
+      width: 30,
+      height: 30,
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        shape: BoxShape.circle,
+      ),
+      child: const NwsbIcon(NwsbMarks.bag, size: 15, color: Color(0xFF060C18)),
+    );
+  }
+}
+
+class _SvgChip extends StatelessWidget {
+  const _SvgChip({
+    required this.mark,
+    required this.color,
+    this.onTap,
+    this.label,
+  });
+  final String mark;
+  final Color color;
+  final VoidCallback? onTap;
+  final String? label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: label,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: 28,
+          height: 28,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: const Color(0xD1060C18),
+            border: Border.all(color: const Color(0x1FFFFFFF)),
+          ),
+          child: NwsbIcon(mark, size: 13, color: color),
         ),
-        child: Icon(icon, size: 13, color: color),
       ),
     );
   }
@@ -967,6 +1009,9 @@ class MsCard extends StatelessWidget {
     required this.price,
     this.signature = false,
     this.onTap,
+    this.onAddCart,
+    this.onBuyNow,
+    this.onWishlist,
   });
 
   final String word;
@@ -975,6 +1020,17 @@ class MsCard extends StatelessWidget {
   final num price;
   final bool signature;
   final VoidCallback? onTap;
+  final VoidCallback? onAddCart;
+  final VoidCallback? onBuyNow;
+  final VoidCallback? onWishlist;
+
+  BagItem get _item => meaningBagItem(
+        word: word,
+        root: root,
+        img: imgUrl,
+        price: price,
+        signature: signature,
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -1013,20 +1069,16 @@ class MsCard extends StatelessWidget {
                 right: 6,
                 child: Column(
                   children: [
-                    _MiniChip(
-                      icon: Icons.favorite_border,
+                    _SvgChip(
+                      mark: NwsbMarks.wishlist,
                       color: const Color(0xB3FFFFFF),
+                      label: 'Wishlist',
                       onTap: () {
-                        CartBag.instance.addWishlist(
-                          BagItem(
-                            id: 'meaning:${word.toLowerCase()}',
-                            title: word,
-                            subtitle: root,
-                            image: imgUrl,
-                            price: price,
-                            kind: signature ? 'Signature Meaning' : 'Meaning',
-                          ),
-                        );
+                        if (onWishlist != null) {
+                          onWishlist!();
+                          return;
+                        }
+                        CartBag.instance.addWishlist(_item);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text('Saved $word to wishlist'),
@@ -1036,27 +1088,35 @@ class MsCard extends StatelessWidget {
                       },
                     ),
                     const SizedBox(height: 5),
-                    _MiniChip(
-                      icon: Icons.shopping_cart_outlined,
+                    _SvgChip(
+                      mark: NwsbMarks.cart,
                       color: NwsbColors.goldLight,
+                      label: 'Add to Cart',
                       onTap: () {
-                        CartAddAnimation.playForContext(
-                          context,
-                          item: BagItem(
-                            id: 'meaning:${word.toLowerCase()}',
-                            title: word,
-                            subtitle: root,
-                            image: imgUrl,
-                            price: price,
-                            kind: signature ? 'Signature Meaning' : 'Meaning',
-                          ),
-                        );
+                        if (onAddCart != null) {
+                          onAddCart!();
+                          return;
+                        }
+                        storeAddToCart(context, _item);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text('Added $word to cart'),
                             behavior: SnackBarBehavior.floating,
                           ),
                         );
+                      },
+                    ),
+                    const SizedBox(height: 5),
+                    _SvgChip(
+                      mark: NwsbMarks.bag,
+                      color: NwsbColors.goldLight,
+                      label: 'Buy Now',
+                      onTap: () {
+                        if (onBuyNow != null) {
+                          onBuyNow!();
+                          return;
+                        }
+                        storeBuyNow(context, _item);
                       },
                     ),
                   ],

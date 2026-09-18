@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 
 import '../data/cart_bag.dart';
 import '../theme/tokens.dart';
+import 'nwsb_icon.dart';
 
 /// Recreates the reference micro-interaction: the product pops out of the
 /// pressed button, the cart rolls in to catch it, then exits toward the cart
@@ -54,14 +55,13 @@ class CartAddAnimation {
     GlobalKey? fromKey,
     BuildContext? fromContext,
     GlobalKey? targetKey,
-  }) =>
-      playForContext(
-        context,
-        item: item,
-        pressedKey: fromKey,
-        pressedContext: fromContext,
-        cartTargetKey: targetKey,
-      );
+  }) => playForContext(
+    context,
+    item: item,
+    pressedKey: fromKey,
+    pressedContext: fromContext,
+    cartTargetKey: targetKey,
+  );
 
   static void play(
     BuildContext context, {
@@ -73,8 +73,9 @@ class CartAddAnimation {
     final from = fromKey == null
         ? _rectForContext(fromContext ?? context)
         : _rectFor(fromKey);
-    final target =
-        targetKey == null ? _fallbackTarget(context) : _rectFor(targetKey);
+    final target = targetKey == null
+        ? _fallbackTarget(context)
+        : _rectFor(targetKey);
     if (from == null || target == null) return;
     final overlay = Overlay.of(context, rootOverlay: true);
     late OverlayEntry entry;
@@ -163,7 +164,7 @@ class _CartFlightState extends State<_CartFlight>
           final arc = math.sin(math.pi * travel) * -78;
           final itemCenter =
               Offset.lerp(widget.from.center, widget.target.center, travel)! +
-                  Offset(0, arc);
+              Offset(0, arc);
           final itemSize = math.max(26.0, math.min(widget.from.width, 72.0));
           final itemScale = value < .16
               ? Curves.easeOutBack.transform(
@@ -176,7 +177,8 @@ class _CartFlightState extends State<_CartFlight>
           final cartProgress = Curves.easeOutCubic.transform(
             ((value - .56) / .18).clamp(0.0, 1.0).toDouble(),
           );
-          final cartScale = .52 +
+          final cartScale =
+              .52 +
               cartProgress * .48 +
               (value > .74 ? math.sin((value - .74) * math.pi / .26) * .14 : 0);
           final cartOpacity = ((value - .50) / .14).clamp(0.0, 1.0).toDouble();
@@ -265,11 +267,7 @@ class _RollingCart extends StatelessWidget {
           BoxShadow(color: Color(0xB3000000), blurRadius: 18, spreadRadius: 2),
         ],
       ),
-      child: Icon(
-        Icons.shopping_cart_outlined,
-        color: NwsbColors.ink,
-        size: 25,
-      ),
+      child: const NwsbIcon(NwsbMarks.cart, size: 24, color: NwsbColors.ink),
     );
   }
 }
