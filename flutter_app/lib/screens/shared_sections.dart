@@ -140,8 +140,8 @@ class EditionSection extends StatelessWidget {
                       const SizedBox(height: 3),
                       const _SubMarqueeText(
                         'Get your subscription today',
-                        style: TextStyle(
-                            color: Color(0xBBFFFFFF), fontSize: 11),
+                        style:
+                            TextStyle(color: Color(0xBBFFFFFF), fontSize: 11),
                         duration: Duration(milliseconds: 4200),
                       ),
                       const SizedBox(height: 9),
@@ -472,9 +472,8 @@ class _TierGlassPill extends StatelessWidget {
 /// the heading a white disc on the first and a neumorphic disc on the second
 /// — so the two looks come from the skin rather than from two copies of this.
 ///
-/// Kept SHORT on purpose. A cell is a mark, a word and the air around them;
-/// the whole panel is about the height of one banner, because a menu that
-/// pushes the page down is a menu that gets scrolled past.
+/// Rows are tall enough for a real tap (icon + label + air). A 40pt row
+/// read as a squeezed strip; 72pt is still one menu, not a page.
 class MainOptionsSection extends StatelessWidget {
   const MainOptionsSection({super.key, this.onGo, this.onAction});
 
@@ -485,9 +484,10 @@ class MainOptionsSection extends StatelessWidget {
   /// usable page rather than only a broad tab category.
   final void Function(String label, int tab)? onAction;
 
-  /// Matches website `.mo-row { height: 62px }` with a little room so icons
-  /// + labels never paint into the next row or the bottom nav.
-  static const double rowHeight = 40;
+  /// Icon + gap + label + air. 40pt crushed the marks into the words;
+  /// 72pt is a real tap target on both homes without turning the menu into
+  /// a page. Website `.mo-row` follows the same height.
+  static const double rowHeight = 72;
 
   /// (mark, viewBox, label, tab) — paths from index.html `.mainops-blk`.
   static const options = <(String, double, String, int)>[
@@ -504,10 +504,8 @@ class MainOptionsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final fashion = HomeSkinScope.of(context) == HomeSkin.fashion;
     final rule = fashion ? const Color(0x1FFFFFFF) : const Color(0x141A1A2E);
-    final fill =
-        fashion ? const Color(0x0FFFFFFF) : const Color(0x081A1A2E);
-    final stroke =
-        fashion ? const Color(0x1FFFFFFF) : const Color(0x141A1A2E);
+    final fill = fashion ? const Color(0x0FFFFFFF) : const Color(0x081A1A2E);
+    final stroke = fashion ? const Color(0x1FFFFFFF) : const Color(0x141A1A2E);
 
     return SectionPane(
       child: Column(
@@ -585,7 +583,7 @@ class _OptRow extends StatelessWidget {
             if (i > 0)
               Align(
                 alignment: Alignment.center,
-                child: Container(width: 1, height: 34, color: rule),
+                child: Container(width: 1, height: 48, color: rule),
               ),
             Expanded(
               child: _Opt(
@@ -632,17 +630,17 @@ class _Opt extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(
-              width: 21,
-              height: 21,
+              width: 26,
+              height: 26,
               child: NwsbIcon(
                 mark,
-                size: 21,
+                size: 26,
                 viewBox: box,
                 strokeWidth: 1.6,
                 color: markColor,
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
             Text(
               label,
               maxLines: 1,
@@ -650,8 +648,8 @@ class _Opt extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 10.5,
-                height: 1.1,
+                fontSize: 12,
+                height: 1.15,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 0.1,
                 color: labelColor,
@@ -1861,7 +1859,8 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
                           ],
                         ),
                         const SizedBox(height: 18),
-                        const Text('© 2026 Adv. Sanjaykumar Gadge · Shabdapathy',
+                        const Text(
+                            '© 2026 Adv. Sanjaykumar Gadge · Shabdapathy',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                                 fontSize: 9,

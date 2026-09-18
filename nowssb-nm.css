@@ -15559,10 +15559,9 @@ body:not(.fashplus):not(.nwsb-custom-fashion-bg)
 /* ══════════════════════════════════════════════════════════════════
    THE SIX — every main door on one compact panel.
 
-   Three across and two down, a hairline standing between each. It is a menu,
-   so it is SHORT: a cell is a mark, a word and the air round them, and the
-   two rows together cost less than the black bar under them. A menu that
-   pushes the page down is a menu that gets scrolled past.
+   Three across and two down, a hairline standing between each. Each
+   row is 72px so the mark and the word have air and a real tap target
+   on both homes. The panel is still one menu, not a page.
 
    The panel itself takes its look from the home it is on — `.glass-wrap` on
    the Fashion home, `.nmh-sec-wrap` on the Normal one — so only the box
@@ -15573,23 +15572,23 @@ body:not(.fashplus):not(.nwsb-custom-fashion-bg)
   overflow: hidden;
   margin-bottom: 14px;
 }
-.mo-row { display: flex; align-items: stretch; height: 62px; }
+.mo-row { display: flex; align-items: stretch; height: 72px; }
 .mo-cell {
   flex: 1 1 0; min-width: 0;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 6px; padding: 0 3px;
+  gap: 8px; padding: 0 3px;
   background: none; border: none; cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
 .mo-cell:active { opacity: 0.6; }
-.mo-ic { display: block; width: 21px; height: 21px; flex-shrink: 0; }
+.mo-ic { display: block; width: 26px; height: 26px; flex-shrink: 0; }
 .mo-ic svg { width: 100%; height: 100%; display: block; }
 .mo-lbl {
-  font-family: 'DM Sans', sans-serif; font-size: 10.5px; font-weight: 700;
-  letter-spacing: 0.1px; line-height: 1.1;
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700;
+  letter-spacing: 0.1px; line-height: 1.15;
   max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.mo-rule { flex: 0 0 1px; align-self: center; height: 34px; }
+.mo-rule { flex: 0 0 1px; align-self: center; height: 48px; }
 
 /* Fashion — glass over the film, gold marks, white words. */
 :is(#home, .stw-prev-stage) .mo-box {

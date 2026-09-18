@@ -301,22 +301,22 @@ void main() {
     // whole point of it.
     expect(MainOptionsSection.options.map((o) => o.$4).toSet(), hasLength(5));
 
-    // SHORT. A menu that pushes the page down is a menu that gets scrolled
-    // past, so the two rows are held to a height rather than left to grow.
-    // SHORT. Six doors cost 2 x rowHeight — 124pt for the lot, which is
-    // less than the black bar underneath them takes on its own. The head and
-    // the bar are the app's standard furniture, shared with every section on
-    // both homes, and they are 228 of the total; the grid is the part this
-    // widget controls and it is the small part.
-    expect(MainOptionsSection.rowHeight, lessThanOrEqualTo(64));
+    // Tall enough to tap. A 40pt row crushed the marks into the labels;
+    // 72pt is a real door on both homes without turning the panel into a
+    // page. The head and the bar under it stay the shared furniture.
+    expect(MainOptionsSection.rowHeight, 72);
+    expect(MainOptionsSection.rowHeight, greaterThanOrEqualTo(68));
+    expect(MainOptionsSection.rowHeight, lessThanOrEqualTo(80));
     final panel = tester.getRect(find.byType(MainOptionsSection));
-    final bar = tester.getRect(find.descendant(
-      of: find.byType(MainOptionsSection),
-      matching: find.byType(SecBanner),
-    ));
-    expect(MainOptionsSection.rowHeight * 2, lessThan(bar.height + 10),
-        reason: 'six doors should not cost more than one banner');
-    expect(panel.height, lessThan(440),
+    expect(
+        find.descendant(
+          of: find.byType(MainOptionsSection),
+          matching: find.byType(SecBanner),
+        ),
+        findsOneWidget);
+    expect(MainOptionsSection.rowHeight * 2, greaterThan(120),
+        reason: 'two rows must be tall enough to tap');
+    expect(panel.height, lessThan(480),
         reason: 'the panel got tall — it is meant to read as one menu');
     expect(tester.takeException(), isNull);
   });
