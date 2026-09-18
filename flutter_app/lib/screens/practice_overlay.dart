@@ -60,7 +60,7 @@ _Beat _beatAt(int t) {
 }
 
 /// Compact 3D-ripple microphone used in the Now Playing dock.
-class PracticeDockOrb extends StatefulWidget {
+class PracticeDockOrb extends StatelessWidget {
   const PracticeDockOrb({
     super.key,
     required this.onTap,
@@ -71,52 +71,28 @@ class PracticeDockOrb extends StatefulWidget {
   final Color accent;
 
   @override
-  State<PracticeDockOrb> createState() => _PracticeDockOrbState();
-}
-
-class _PracticeDockOrbState extends State<PracticeDockOrb>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _pulse;
-
-  @override
-  void initState() {
-    super.initState();
-    _pulse = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 2400),
-    )..repeat();
-  }
-
-  @override
-  void dispose() {
-    _pulse.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
       label: 'Practice',
       child: GestureDetector(
-        onTap: widget.onTap,
+        onTap: onTap,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(
               width: 52,
-              height: 52,
-              child: AnimatedBuilder(
-                animation: _pulse,
-                builder: (context, child) => CustomPaint(
-                  painter: _WaterRipplePainter(
-                    progress: _pulse.value,
-                    accent: widget.accent,
-                    intensity: 1.05,
+              height: 38,
+              child: Center(
+                child: SvgPicture.asset(
+                  'assets/icons/microphone.svg',
+                  width: 22,
+                  height: 22,
+                  colorFilter: const ColorFilter.mode(
+                    Colors.white,
+                    BlendMode.srcIn,
                   ),
-                  child: Center(child: child),
                 ),
-                child: const _MicDisc(size: 28, iconSize: 14),
               ),
             ),
             const Text(

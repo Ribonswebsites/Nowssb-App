@@ -791,7 +791,11 @@ class RmWordCard extends StatelessWidget {
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(15),
-                          child: StoreNetImage(url: imgUrl),
+                          child: Padding(
+                            padding: const EdgeInsets.all(7),
+                            child:
+                                StoreNetImage(url: imgUrl, fit: BoxFit.contain),
+                          ),
                         ),
                       ),
                       if (signature)
@@ -893,7 +897,7 @@ class RmWordCard extends StatelessWidget {
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
-                                          fontSize: 10,
+                                          fontSize: 12,
                                           color: Color(0x80FFFFFF),
                                           decoration:
                                               TextDecoration.lineThrough,
@@ -902,7 +906,7 @@ class RmWordCard extends StatelessWidget {
                                       const Text(
                                         '50% OFF',
                                         style: TextStyle(
-                                          fontSize: 8,
+                                          fontSize: 9,
                                           fontWeight: FontWeight.w800,
                                           color: NwsbColors.goldLight,
                                         ),
@@ -913,7 +917,7 @@ class RmWordCard extends StatelessWidget {
                                   Text(
                                     localizedMoney(context, price!),
                                     style: const TextStyle(
-                                        fontSize: 17,
+                                        fontSize: 21,
                                         fontWeight: FontWeight.w900,
                                         color: NwsbColors.goldLight),
                                   ),
@@ -923,90 +927,101 @@ class RmWordCard extends StatelessWidget {
                           ),
                         ),
                       const SizedBox(height: 7),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Semantics(
-                            button: true,
-                            container: true,
-                            excludeSemantics: true,
-                            label: 'Add to Cart',
-                            child: GestureDetector(
-                              onTap: () {
-                                if (onAddCart != null) {
-                                  onAddCart!();
-                                } else {
-                                  storeAddToCart(context, _item);
-                                  _toast(context, 'Added $name to cart');
-                                }
-                              },
-                              child: Container(
-                                width: 36,
-                                height: 36,
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xE60A101C),
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: const Color(0x66E8D5A3),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Semantics(
+                              button: true,
+                              container: true,
+                              excludeSemantics: true,
+                              label: 'Add to Cart',
+                              child: GestureDetector(
+                                onTap: () {
+                                  if (onAddCart != null) {
+                                    onAddCart!();
+                                  } else {
+                                    storeAddToCart(context, _item);
+                                    _toast(context, 'Added $name to cart');
+                                  }
+                                },
+                                child: Container(
+                                  width: 36,
+                                  height: 36,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xE60A101C),
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: const Color(0x66E8D5A3),
+                                    ),
                                   ),
-                                ),
-                                child: const NwsbIcon(
-                                  NwsbMarks.cart,
-                                  size: 16,
-                                  color: Color(0xFFE8D5A3),
+                                  child: const NwsbIcon(
+                                    NwsbMarks.cart,
+                                    size: 16,
+                                    color: Color(0xFFE8D5A3),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 8),
-                          Semantics(
-                            button: true,
-                            container: true,
-                            excludeSemantics: true,
-                            label: 'Buy Now',
-                            child: GestureDetector(
-                              onTap: () {
-                                if (onBuyNow != null) {
-                                  onBuyNow!();
-                                } else {
-                                  storeBuyNow(context, _item);
-                                }
-                              },
-                              child: Container(
-                                height: 36,
-                                padding: const EdgeInsets.only(
-                                  left: 12,
-                                  right: 3,
-                                ),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(18),
-                                  gradient: const LinearGradient(
-                                    colors: [
-                                      Color(0xFFF3E4B7),
-                                      Color(0xFFC8A96E),
+                            const SizedBox(width: 8),
+                            Container(
+                              width: 1,
+                              height: 28,
+                              color: const Color(0x66FFFFFF),
+                            ),
+                            const SizedBox(width: 8),
+                            Semantics(
+                              button: true,
+                              container: true,
+                              excludeSemantics: true,
+                              label: 'Buy Now',
+                              child: GestureDetector(
+                                onTap: () {
+                                  if (onBuyNow != null) {
+                                    onBuyNow!();
+                                  } else {
+                                    storeBuyNow(context, _item);
+                                  }
+                                },
+                                child: Container(
+                                  height: 36,
+                                  padding: const EdgeInsets.only(
+                                    left: 12,
+                                    right: 3,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(18),
+                                    gradient: const LinearGradient(
+                                      colors: [
+                                        Color(0xFFF3E4B7),
+                                        Color(0xFFC8A96E),
+                                      ],
+                                    ),
+                                  ),
+                                  child: const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        'Buy Now',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w800,
+                                          color: Color(0xFF060C18),
+                                        ),
+                                      ),
+                                      SizedBox(width: 7),
+                                      _BagMarkDisc(),
                                     ],
                                   ),
                                 ),
-                                child: const Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      'Buy Now',
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w800,
-                                        color: Color(0xFF060C18),
-                                      ),
-                                    ),
-                                    SizedBox(width: 7),
-                                    _BagMarkDisc(),
-                                  ],
-                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -1319,27 +1334,23 @@ class StoreFilterChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
         decoration: BoxDecoration(
-          color: selected ? Colors.white : const Color(0x16FFFFFF),
+          color: Colors.white,
           border: Border.all(
-            color: selected ? Colors.white : const Color(0x38FFFFFF),
+            color: const Color(0xCCFFFFFF),
           ),
           borderRadius: BorderRadius.circular(40),
-          boxShadow: selected
-              ? const [
-                  BoxShadow(
-                      color: Color(0x33000000),
-                      blurRadius: 8,
-                      offset: Offset(0, 3))
-                ]
-              : null,
+          boxShadow: const [
+            BoxShadow(
+                color: Color(0x33000000), blurRadius: 8, offset: Offset(0, 3)),
+          ],
         ),
         child: Text(
           label,
           style: TextStyle(
             fontSize: 9,
             letterSpacing: 1.4,
-            fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-            color: selected ? const Color(0xFF080A10) : const Color(0xD9FFFFFF),
+            fontWeight: FontWeight.w700,
+            color: const Color(0xFF080A10),
           ),
         ),
       ),
