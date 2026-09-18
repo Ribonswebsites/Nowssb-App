@@ -46,9 +46,6 @@ class NavScope extends InheritedWidget {
 
 class _NavShellState extends State<NavShell> {
   int _i = Settings.instance.lastTab;
-  Timer? _tabTransitionTimer;
-  bool _tabTransitioning = false;
-  int _transitionTarget = 0;
 
   /// Which home. The website keeps both in the DOM and switches a class;
   /// here it is two different screens rather than two skins — see
@@ -67,7 +64,6 @@ class _NavShellState extends State<NavShell> {
 
   @override
   void dispose() {
-    _tabTransitionTimer?.cancel();
     Settings.instance.removeListener(_onSettings);
     PlaybackSession.instance.removeListener(_onSettings);
     super.dispose();
@@ -80,7 +76,8 @@ class _NavShellState extends State<NavShell> {
   void _openHearingSafety() {
     if (!PlaybackSession.instance.active) return;
     Navigator.of(context).push(
-      MaterialPageRoute<void>(builder: (_) => const HearingSafetyPlayerScreen()),
+      MaterialPageRoute<void>(
+          builder: (_) => const HearingSafetyPlayerScreen()),
     );
   }
 
@@ -99,48 +96,105 @@ class _NavShellState extends State<NavShell> {
   void _goToTab(int tab) {
     _popShellOverlays();
     if (tab == _i) return;
-    _tabTransitionTimer?.cancel();
-    final reduced = MediaQuery.maybeOf(context)?.disableAnimations ?? false;
-    if (!reduced) {
-      setState(() {
-        _tabTransitioning = true;
-        _transitionTarget = tab;
-      });
-      _tabTransitionTimer = Timer(const Duration(milliseconds: 110), () {
-        if (!mounted) return;
-        setState(() => _i = tab);
-        Settings.instance.setLastTab(tab);
-        _tabTransitionTimer = Timer(const Duration(milliseconds: 360), () {
-          if (mounted) setState(() => _tabTransitioning = false);
-        });
-      });
-      return;
-    }
     Settings.instance.fadeBackgroundForNavigation();
     setState(() => _i = tab);
     Settings.instance.setLastTab(tab);
   }
 
   static const _navFeatures = <String, Map<String, String>>{
-    'connect': {'label': 'Connect', 'img': 'https://media.nowssb.com/migrated-images/ea559460014dd8d9_file_00000000b84c7209ab496862cacd6a7f_kagsie.png'},
-    'practice': {'label': 'Practice', 'img': 'https://media.nowssb.com/migrated-images/44ed38a222535b9c_38538b80-56d8-11f1-8fad-095787cce754_xam2bb.png'},
-    'library': {'label': 'Library', 'img': 'https://media.nowssb.com/migrated-images/62e5d0908e54a2a6_c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png'},
-    'store': {'label': 'Store', 'img': 'https://media.nowssb.com/migrated-images/86a1283688196499_ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png'},
-    'profile': {'label': 'Profile', 'img': 'https://media.nowssb.com/migrated-images/3979b9fa35b579e6_62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png'},
-    'progress': {'label': 'Progress', 'img': 'https://media.nowssb.com/migrated-images/0480c10b8a8d79dd_file_00000000ae607208aa51504989648920_ml2czc.png'},
-    'wordscience': {'label': 'Word Sci', 'img': 'https://media.nowssb.com/migrated-images/dd44cf9fc35b783c_file_0000000086d872089ce376674620d5f3_mtfftb.png'},
-    'meaningstore': {'label': 'Meaning', 'img': 'https://media.nowssb.com/migrated-images/1a5f669e63dbae9d_file_00000000854881fa9a548a68fae59c15_w1utya.png'},
-    'search': {'label': 'Search', 'img': 'https://media.nowssb.com/migrated-images/8d85320f63c3e176_file_00000000029c7208b5e915d9af2c480c_tuccwo.png'},
-    'cart': {'label': 'Cart', 'img': 'https://media.nowssb.com/migrated-images/311c26afee2bc52c_file_00000000f02c72088cd128f3f4b08af5_vskoom.png'},
-    'wishlist': {'label': 'Wishlist', 'img': 'https://media.nowssb.com/migrated-images/a74a9935fb237eb8_file_0000000055d8720895f7ba98c4a7bf4a_s2lzab.png'},
-    'routines': {'label': 'Routines', 'img': 'https://media.nowssb.com/migrated-images/307233cd22669455_file_00000000f740820ba6aaa761133e8889_fitm0p.png'},
-    'chat': {'label': 'Chat', 'img': 'https://media.nowssb.com/migrated-images/db15f3026ea179dc_1ae1b990-5bf2-11f1-8248-b91d5cd919c2_z3xi3j.png'},
-    'ai': {'label': 'AI Rx', 'img': 'https://media.nowssb.com/migrated-images/41c9ed21b2822c90_file_0000000062a882089abd27eb90ea3945_ngqyu6.png'},
-    'streak': {'label': 'Streak', 'img': 'https://media.nowssb.com/migrated-images/f82047a0e727766b_file_0000000010fc820891f9e15a38316d2b_ffffhq.png'},
-    'settings': {'label': 'Settings', 'img': 'https://media.nowssb.com/migrated-images/523b5889d13cb14a_260480b0-56d8-11f1-8fad-095787cce754_rz6zbi.png'},
-    'everything': {'label': 'Everything', 'img': 'https://media.nowssb.com/migrated-images/47f9e2c9fad5a78f_file_00000000be547207aaa56f43cfef4f67_nxhvw0.png'},
+    'connect': {
+      'label': 'Connect',
+      'img':
+          'https://media.nowssb.com/migrated-images/ea559460014dd8d9_file_00000000b84c7209ab496862cacd6a7f_kagsie.png'
+    },
+    'practice': {
+      'label': 'Practice',
+      'img':
+          'https://media.nowssb.com/migrated-images/44ed38a222535b9c_38538b80-56d8-11f1-8fad-095787cce754_xam2bb.png'
+    },
+    'library': {
+      'label': 'Library',
+      'img':
+          'https://media.nowssb.com/migrated-images/62e5d0908e54a2a6_c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png'
+    },
+    'store': {
+      'label': 'Store',
+      'img':
+          'https://media.nowssb.com/migrated-images/86a1283688196499_ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png'
+    },
+    'profile': {
+      'label': 'Profile',
+      'img':
+          'https://media.nowssb.com/migrated-images/3979b9fa35b579e6_62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png'
+    },
+    'progress': {
+      'label': 'Progress',
+      'img':
+          'https://media.nowssb.com/migrated-images/0480c10b8a8d79dd_file_00000000ae607208aa51504989648920_ml2czc.png'
+    },
+    'wordscience': {
+      'label': 'Word Sci',
+      'img':
+          'https://media.nowssb.com/migrated-images/dd44cf9fc35b783c_file_0000000086d872089ce376674620d5f3_mtfftb.png'
+    },
+    'meaningstore': {
+      'label': 'Meaning',
+      'img':
+          'https://media.nowssb.com/migrated-images/1a5f669e63dbae9d_file_00000000854881fa9a548a68fae59c15_w1utya.png'
+    },
+    'search': {
+      'label': 'Search',
+      'img':
+          'https://media.nowssb.com/migrated-images/8d85320f63c3e176_file_00000000029c7208b5e915d9af2c480c_tuccwo.png'
+    },
+    'cart': {
+      'label': 'Cart',
+      'img':
+          'https://media.nowssb.com/migrated-images/311c26afee2bc52c_file_00000000f02c72088cd128f3f4b08af5_vskoom.png'
+    },
+    'wishlist': {
+      'label': 'Wishlist',
+      'img':
+          'https://media.nowssb.com/migrated-images/a74a9935fb237eb8_file_0000000055d8720895f7ba98c4a7bf4a_s2lzab.png'
+    },
+    'routines': {
+      'label': 'Routines',
+      'img':
+          'https://media.nowssb.com/migrated-images/307233cd22669455_file_00000000f740820ba6aaa761133e8889_fitm0p.png'
+    },
+    'chat': {
+      'label': 'Chat',
+      'img':
+          'https://media.nowssb.com/migrated-images/db15f3026ea179dc_1ae1b990-5bf2-11f1-8248-b91d5cd919c2_z3xi3j.png'
+    },
+    'ai': {
+      'label': 'AI Rx',
+      'img':
+          'https://media.nowssb.com/migrated-images/41c9ed21b2822c90_file_0000000062a882089abd27eb90ea3945_ngqyu6.png'
+    },
+    'streak': {
+      'label': 'Streak',
+      'img':
+          'https://media.nowssb.com/migrated-images/f82047a0e727766b_file_0000000010fc820891f9e15a38316d2b_ffffhq.png'
+    },
+    'settings': {
+      'label': 'Settings',
+      'img':
+          'https://media.nowssb.com/migrated-images/523b5889d13cb14a_260480b0-56d8-11f1-8fad-095787cce754_rz6zbi.png'
+    },
+    'everything': {
+      'label': 'Everything',
+      'img':
+          'https://media.nowssb.com/migrated-images/47f9e2c9fad5a78f_file_00000000be547207aaa56f43cfef4f67_nxhvw0.png'
+    },
   };
-  int? _primaryTab(String id) => const {'connect': 0, 'practice': 1, 'library': 2, 'store': 3, 'profile': 4}[id];
+  int? _primaryTab(String id) => const {
+        'connect': 0,
+        'practice': 1,
+        'library': 2,
+        'store': 3,
+        'profile': 4
+      }[id];
   void _goToSlot(String id) {
     final tab = _primaryTab(id);
     if (tab != null) {
@@ -152,14 +206,15 @@ class _NavShellState extends State<NavShell> {
       // Progress is NOT a tab root — push the dedicated screen only.
       _popShellOverlays();
       Navigator.of(context).push(MaterialPageRoute(
-        builder: (_) => PracticeProgressScreen(words: ContentStore.instance.library),
+        builder: (_) =>
+            PracticeProgressScreen(words: ContentStore.instance.library),
       ));
       return;
     }
     _popShellOverlays();
-    Navigator.of(context).push(MaterialPageRoute(builder: (_) => const QuickAccessScreen()));
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (_) => const QuickAccessScreen()));
   }
-
 
   /// Keep inactive tabs mounted (IndexedStack) but off-stage so their videos
   /// do not claim VideoPool decoders. NwsbVideo already respects Offstage.
@@ -208,61 +263,6 @@ class _NavShellState extends State<NavShell> {
               _tabAlive(4, const ProfileScreen()),
             ],
           ),
-          if (_tabTransitioning)
-            Positioned.fill(
-              child: IgnorePointer(
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 320),
-                  switchInCurve: Curves.easeOutCubic,
-                  switchOutCurve: Curves.easeInCubic,
-                  child: Center(
-                    key: ValueKey(_transitionTarget),
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: const Color(0xE6060C18),
-                        borderRadius: BorderRadius.circular(26),
-                        border: Border.all(color: const Color(0x66E8D5A3)),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Color(0x66000000),
-                            blurRadius: 26,
-                            spreadRadius: 5,
-                          ),
-                        ],
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 22,
-                          vertical: 13,
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.auto_awesome,
-                              color: NwsbColors.goldLight,
-                              size: 17,
-                            ),
-                            const SizedBox(width: 9),
-                            Text(
-                              _transitionTarget == 1
-                                  ? 'Practice'
-                                  : (_navFeatures.values.elementAt(_transitionTarget)['label'] ?? 'Opening'),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: .4,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
           // The switch between the two homes. On the website this lives in
           // Customize; until that screen is ported it is here, because a
           // home you cannot reach may as well not be built.
@@ -311,7 +311,6 @@ class _NavShellState extends State<NavShell> {
                 ),
               ),
             ),
-
 
           // Mini player pill — above bottom nav on every tab (incl. both homes).
           if (PlaybackSession.instance.showPill)
@@ -382,7 +381,8 @@ class _NavShellState extends State<NavShell> {
                                       errorBuilder: (_, __, ___) => Icon(
                                         Icons.circle_outlined,
                                         size: 22,
-                                        color: id == 'connect' || _primaryTab(id) == _i
+                                        color: id == 'connect' ||
+                                                _primaryTab(id) == _i
                                             ? NwsbColors.goldLight
                                             : const Color(0x99FFFFFF),
                                       ),
@@ -394,8 +394,12 @@ class _NavShellState extends State<NavShell> {
                                       overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                         fontSize: 9,
-                                        fontWeight: _primaryTab(id) == _i ? FontWeight.w700 : FontWeight.w400,
-                                        color: _primaryTab(id) == _i ? NwsbColors.goldLight : const Color(0x99FFFFFF),
+                                        fontWeight: _primaryTab(id) == _i
+                                            ? FontWeight.w700
+                                            : FontWeight.w400,
+                                        color: _primaryTab(id) == _i
+                                            ? NwsbColors.goldLight
+                                            : const Color(0x99FFFFFF),
                                       ),
                                     ),
                                   ],
