@@ -303,12 +303,15 @@ class TvFrame extends StatelessWidget {
                         fit: StackFit.expand,
                         children: [
                           if (showVideo)
-                            NwsbVideo(
-                              asset: asset,
-                              priority: priority,
-                              autoplay: autoplay,
-                              showPoster: showPoster,
-                              fit: BoxFit.cover,
+                            IgnorePointer(
+                              ignoring: overlay != null,
+                              child: NwsbVideo(
+                                asset: asset,
+                                priority: priority,
+                                autoplay: autoplay,
+                                showPoster: showPoster,
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           if (overlay != null) overlay!,
                         ],
@@ -323,12 +326,15 @@ class TvFrame extends StatelessWidget {
                         fit: StackFit.expand,
                         children: [
                           if (showVideo)
-                            NwsbVideo(
-                              asset: asset,
-                              priority: priority,
-                              autoplay: autoplay,
-                              showPoster: showPoster,
-                              fit: BoxFit.cover,
+                            IgnorePointer(
+                              ignoring: overlay != null,
+                              child: NwsbVideo(
+                                asset: asset,
+                                priority: priority,
+                                autoplay: autoplay,
+                                showPoster: showPoster,
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           if (overlay != null) overlay!,
                         ],

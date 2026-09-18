@@ -17,6 +17,7 @@ void main() {
     expect(src, contains("'Replace'"));
     expect(src, contains("'Start'"));
     expect(src, contains("'PRACTICE'"));
+    expect(src, contains('HitTestBehavior.opaque'));
     expect(src, contains('BackdropFilter'));
     expect(src, contains('ImageFilter.blur'));
     expect(src, contains('PracticeDockOrb'));
@@ -36,6 +37,8 @@ void main() {
     final src = File('lib/screens/practice_player.dart').readAsStringSync();
     expect(src, contains('PracticeDockOrb(onTap: onPractice'));
     expect(src, contains('onPractice: _openPracticeLab'));
+    expect(src, contains('showGeneralDialog'));
+    expect(src, contains('_practiceOpen'));
   });
 }
 

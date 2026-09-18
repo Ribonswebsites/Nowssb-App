@@ -50,6 +50,7 @@ class PracticeDockOrb extends StatelessWidget {
       button: true,
       label: 'Practice',
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -115,6 +116,10 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
   late final AnimationController _entry;
   late final AnimationController _spin;
   late final AnimationController _ripple;
+  late final CurvedAnimation _open;
+  late final CurvedAnimation _punch;
+  late final Animation<Offset> _slide;
+  late final Animation<double> _cardScale;
 
   Timer? _clock;
   String? _takePath;
@@ -129,23 +134,36 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
     super.initState();
     _entry = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 280),
-    )..forward();
+      duration: const Duration(milliseconds: 160),
+    );
     _spin = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 420),
-    )..forward();
+      duration: const Duration(milliseconds: 180),
+    );
     _ripple = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2400),
     )..repeat();
-    unawaited(_playReference());
+    _open = CurvedAnimation(parent: _entry, curve: Curves.easeOutCubic);
+    _punch = CurvedAnimation(parent: _spin, curve: Curves.easeOutCubic);
+    _slide = Tween<Offset>(
+      begin: const Offset(0, 0.06),
+      end: Offset.zero,
+    ).animate(_open);
+    _cardScale = Tween<double>(begin: 0.96, end: 1).animate(_punch);
+    _entry.addStatusListener((status) {
+      if (status == AnimationStatus.completed) unawaited(_playReference());
+    });
+    _entry.forward();
+    _spin.forward();
   }
 
   @override
   void dispose() {
     _clock?.cancel();
     unawaited(_finishCapture());
+    _open.dispose();
+    _punch.dispose();
     _entry.dispose();
     _spin.dispose();
     _ripple.dispose();
@@ -246,9 +264,8 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
     await Future<void>.delayed(const Duration(milliseconds: 720));
     if (mounted) {
       setState(
-        () => _status = _matched
-            ? _PracticeStatus.complete
-            : _PracticeStatus.results,
+        () => _status =
+            _matched ? _PracticeStatus.complete : _PracticeStatus.results,
       );
     }
   }
@@ -302,58 +319,48 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
     assert(widget.video.isNotEmpty || widget.video.isEmpty);
     return Material(
       color: Colors.transparent,
-      child: AnimatedBuilder(
-        animation: Listenable.merge([_entry, _spin, _ripple]),
-        builder: (context, _) {
-          final open = Curves.easeOutCubic.transform(_entry.value);
-          final punch = _spin.isCompleted
-              ? 1.0
-              : Curves.easeOutBack.transform(_spin.value.clamp(0.0, 1.0));
-          return Stack(
-            children: [
-              Positioned.fill(
-                child: GestureDetector(
-                  onTap: widget.onClose,
-                  behavior: HitTestBehavior.opaque,
-                  child: Opacity(
-                    opacity: open,
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
-                      child: const ColoredBox(color: Color(0x66000000)),
-                    ),
-                  ),
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: FadeTransition(
+              opacity: _open,
+              child: GestureDetector(
+                onTap: widget.onClose,
+                behavior: HitTestBehavior.opaque,
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+                  child: const ColoredBox(color: Color(0x59000000)),
                 ),
               ),
-              Align(
-                alignment: const Alignment(0, -0.06),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: GestureDetector(
-                    onTap: () {},
-                    child: Transform.translate(
-                      offset: Offset(0, 40 * (1 - open)),
-                      child: Transform.scale(
-                        scale: 0.86 + 0.14 * punch,
-                        child: Opacity(
-                          opacity: open,
-                          child: _BlackTab(
-                            status: _statusLabel,
-                            holding: _holding,
-                            orbScale: 0.22 + punch * 0.78,
-                            ripple: _ripple.value,
-                            onStart: _beginTake,
-                            onReplace: () => unawaited(_replay()),
-                            onClose: widget.onClose,
-                          ),
-                        ),
+            ),
+          ),
+          Align(
+            alignment: const Alignment(0, -0.06),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: FadeTransition(
+                opacity: _open,
+                child: SlideTransition(
+                  position: _slide,
+                  child: ScaleTransition(
+                    scale: _cardScale,
+                    child: GestureDetector(
+                      onTap: () {},
+                      child: _BlackTab(
+                        status: _statusLabel,
+                        holding: _holding,
+                        ripple: _ripple,
+                        onStart: _beginTake,
+                        onReplace: () => unawaited(_replay()),
+                        onClose: widget.onClose,
                       ),
                     ),
                   ),
                 ),
               ),
-            ],
-          );
-        },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -363,7 +370,6 @@ class _BlackTab extends StatelessWidget {
   const _BlackTab({
     required this.status,
     required this.holding,
-    required this.orbScale,
     required this.ripple,
     required this.onStart,
     required this.onReplace,
@@ -372,8 +378,7 @@ class _BlackTab extends StatelessWidget {
 
   final String status;
   final bool holding;
-  final double orbScale;
-  final double ripple;
+  final Animation<double> ripple;
   final VoidCallback onStart;
   final VoidCallback onReplace;
   final VoidCallback onClose;
@@ -430,14 +435,19 @@ class _BlackTab extends StatelessWidget {
             child: Stack(
               alignment: Alignment.center,
               children: [
-                CustomPaint(
-                  size: const Size(196, 196),
-                  painter: _RippleRingsPainter(
-                    progress: ripple,
-                    listening: holding,
-                  ),
+                AnimatedBuilder(
+                  animation: ripple,
+                  builder: (context, _) {
+                    return CustomPaint(
+                      size: const Size(196, 196),
+                      painter: _RippleRingsPainter(
+                        progress: ripple.value,
+                        listening: holding,
+                      ),
+                    );
+                  },
                 ),
-                Transform.scale(scale: orbScale, child: const _OrbFilm()),
+                const _OrbFilm(),
               ],
             ),
           ),

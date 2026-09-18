@@ -28,20 +28,38 @@ old = '                        onPractice: _prepareAndPlay,'
 if old in text:
     text = text.replace(old, '                        onPractice: _openPracticeLab,', 1)
 
+if 'var _practiceOpen = false;' not in text:
+    text = text.replace(
+        '  var _handingOff = false;\n',
+        '  var _handingOff = false;\n  var _practiceOpen = false;\n',
+        1,
+    )
+
 method = '''  void _openPracticeLab() {
-    showModalBottomSheet<void>(
+    if (!mounted || _practiceOpen) return;
+    _practiceOpen = true;
+    showGeneralDialog<void>(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      barrierDismissible: true,
+      barrierLabel: 'Practice',
       barrierColor: Colors.transparent,
-      builder: (_) => PracticeLabSheet(
+      transitionDuration: const Duration(milliseconds: 80),
+      pageBuilder: (ctx, _, __) => PracticeLabSheet(
         word: _word,
         accent: _theme.accent,
         video: _theme.video,
         onSpeak: _prepareAndPlay,
-        onClose: () => Navigator.of(context).pop(),
+        onClose: () => Navigator.of(ctx).pop(),
       ),
-    );
+      transitionBuilder: (context, anim, _, child) {
+        return FadeTransition(
+          opacity: CurvedAnimation(parent: anim, curve: Curves.easeOutCubic),
+          child: child,
+        );
+      },
+    ).whenComplete(() {
+      _practiceOpen = false;
+    });
   }
 
 '''
@@ -50,7 +68,7 @@ if '_openPracticeLab()' not in text:
     if marker not in text:
         raise SystemExit('Practice Lab insertion marker not found')
     text = text.replace(marker, method + marker, 1)
-else:
+elif 'showGeneralDialog<void>(' not in text.split('void _openPracticeLab()')[1][:1200]:
     text = re.sub(
         r"  void _openPracticeLab\(\) \{.*?\n  \}\n\n(?=  void _openSettings\(\) \{)",
         method,
