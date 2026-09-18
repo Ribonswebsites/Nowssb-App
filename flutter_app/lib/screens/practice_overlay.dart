@@ -370,48 +370,58 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
     assert(widget.video.isNotEmpty || widget.video.isEmpty);
     return Material(
       color: Colors.transparent,
-      child: GestureDetector(
-        onTap: widget.onClose,
-        behavior: HitTestBehavior.translucent,
-        child: Align(
-          alignment: Alignment.bottomCenter,
-          child: GestureDetector(
-            onTap: () {},
-            child: AnimatedBuilder(
-              animation: _entry,
-              builder: (context, child) => Transform.translate(
-                offset: Offset(0, 36 * (1 - _entry.value)),
-                child: Opacity(opacity: _entry.value, child: child),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(maxHeight: h * 0.62),
-                  child: _GlassShell(
-                    child: _PracticeTab(
-                      word: widget.word,
-                      parts: _parts,
-                      accent: widget.accent,
-                      pulse: _pulse,
-                      heard: _heard,
-                      elapsed: _elapsed,
-                      status: _statusLabel,
-                      kinetic: _kinetic(),
-                      activePart: _holding ? null : _beatAt(_elapsed).part,
-                      matched: _matched,
-                      holding: _holding,
-                      takeLocked: _takePath != null && !_holding,
-                      onClose: widget.onClose,
-                      onHoldStart: _beginTake,
-                      onHoldEnd: _endTake,
-                      onReplay: () => unawaited(_replay()),
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+              child: const ColoredBox(color: Color(0x66000000)),
+            ),
+          ),
+          GestureDetector(
+            onTap: widget.onClose,
+            behavior: HitTestBehavior.translucent,
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: GestureDetector(
+                onTap: () {},
+                child: AnimatedBuilder(
+                  animation: _entry,
+                  builder: (context, child) => Transform.translate(
+                    offset: Offset(0, 36 * (1 - _entry.value)),
+                    child: Opacity(opacity: _entry.value, child: child),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(maxHeight: h * 0.48),
+                      child: _GlassShell(
+                        child: _PracticeTab(
+                          word: widget.word,
+                          parts: _parts,
+                          accent: widget.accent,
+                          pulse: _pulse,
+                          heard: _heard,
+                          elapsed: _elapsed,
+                          status: _statusLabel,
+                          kinetic: _kinetic(),
+                          activePart: _holding ? null : _beatAt(_elapsed).part,
+                          matched: _matched,
+                          holding: _holding,
+                          takeLocked: _takePath != null && !_holding,
+                          onClose: widget.onClose,
+                          onHoldStart: _beginTake,
+                          onHoldEnd: _endTake,
+                          onReplay: () => unawaited(_replay()),
+                        ),
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

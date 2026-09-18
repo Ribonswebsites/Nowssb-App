@@ -13,7 +13,8 @@ void main() {
       expect(src, contains('assets/icons/microphone.svg'));
       expect(src, contains('PracticeDockOrb'));
       expect(src, contains('_GlassShell'));
-      expect(src, contains('maxHeight: h * 0.62'));
+      expect(src, contains('maxHeight: h * 0.48'));
+      expect(src, contains('ImageFilter.blur(sigmaX: 12, sigmaY: 12)'));
       expect(src, isNot(contains('SESSION CRAFT')));
       expect(
         src,

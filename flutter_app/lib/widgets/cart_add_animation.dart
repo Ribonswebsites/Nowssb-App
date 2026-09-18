@@ -162,36 +162,38 @@ class _CartFlightState extends State<_CartFlight>
           final value = _controller.value;
           final itemSize =
               math.max(28.0, math.min(widget.from.width * .72, 68.0));
-          final origin = widget.from.center;
-          final catchPoint = Offset(origin.dx, origin.dy - 2);
-          final itemTravel = Curves.easeInOutCubic.transform(
-            ((value - .34) / .24).clamp(0.0, 1.0).toDouble(),
+          final button = widget.from.center;
+          final target = widget.target.center;
+          final catchPoint = Offset(button.dx, button.dy);
+          final itemPop = Curves.easeOutBack.transform(
+            (value / .18).clamp(0.0, 1.0).toDouble(),
           );
-          final itemCenter = value < .34
-              ? origin
-              : Offset.lerp(catchPoint, widget.target.center, itemTravel)!;
-          final itemScale = value < .18
-              ? Curves.easeOutBack
-                  .transform((value / .18).clamp(0.0, 1.0).toDouble())
-              : (value < .58 ? 1.0 : .82);
-          final itemOpacity = value < .55
+          final itemCenter = value < .22
+              ? button + Offset(0, -10 * itemPop)
+              : Offset.lerp(
+                  catchPoint,
+                  target,
+                  Curves.easeInOutCubic.transform(
+                    ((value - .22) / .78).clamp(0.0, 1.0).toDouble(),
+                  ))!;
+          final itemScale = value < .18 ? itemPop : .92;
+          final itemOpacity = value < .70
               ? 1.0
-              : (1 - ((value - .55) / .18)).clamp(0.0, 1.0).toDouble();
-          final cartStart = Offset(widget.target.right + 70, catchPoint.dy);
+              : (1 - ((value - .70) / .18)).clamp(0.0, 1.0).toDouble();
           final cartIn = Curves.easeOutCubic.transform(
-            ((value - .16) / .28).clamp(0.0, 1.0).toDouble(),
+            ((value - .16) / .30).clamp(0.0, 1.0).toDouble(),
           );
-          final cartOut = Curves.easeInOutCubic.transform(
-            ((value - .48) / .52).clamp(0.0, 1.0).toDouble(),
+          final cartOut = Curves.easeInCubic.transform(
+            ((value - .52) / .48).clamp(0.0, 1.0).toDouble(),
           );
-          final cartCenter = value < .48
+          final cartStart = Offset(button.dx + 110, button.dy);
+          final cartCenter = value < .52
               ? Offset.lerp(cartStart, catchPoint, cartIn)!
-              : Offset.lerp(catchPoint, widget.target.center, cartOut)!;
+              : Offset.lerp(catchPoint, target, cartOut)!;
           final cartOpacity = ((value - .08) / .12).clamp(0.0, 1.0).toDouble();
-          final cartScale = .78 + (value < .48 ? cartIn * .22 : .22);
-          final cartRotation = value < .48
-              ? -math.pi * 1.7 * cartIn
-              : -math.pi * 1.7 - math.pi * 1.4 * cartOut;
+          final cartRotation =
+              -math.pi * 2.0 * (value < .52 ? cartIn : 1 + cartOut);
+          final cartScale = .76 + (value < .52 ? cartIn * .24 : .24);
           return Stack(
             children: [
               Positioned(
