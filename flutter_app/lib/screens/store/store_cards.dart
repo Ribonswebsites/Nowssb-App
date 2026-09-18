@@ -75,7 +75,7 @@ String localizedMoney(BuildContext context, num inrValue) {
       rate = 1.0;
       break;
   }
-  final converted = (inrValue * rate).round();
+  final converted = (inrValue * rate).round().clamp(1, 999999);
   return '$symbol$converted';
 }
 
@@ -873,55 +873,59 @@ class RmWordCard extends StatelessWidget {
                         ),
                       ),
                       const Spacer(),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Expanded(
-                            child: price == null
-                                ? const Text('—',
-                                    style:
-                                        TextStyle(color: NwsbColors.goldLight))
-                                : Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
+                      if (price != null)
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Wrap(
+                                    spacing: 5,
+                                    runSpacing: 1,
                                     children: [
-                                      Wrap(
-                                        spacing: 5,
-                                        runSpacing: 1,
-                                        children: [
-                                          Text(
-                                            saleOriginalMoney(context, price!),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
-                                              fontSize: 10,
-                                              color: Color(0x80FFFFFF),
-                                              decoration:
-                                                  TextDecoration.lineThrough,
-                                            ),
-                                          ),
-                                          const Text(
-                                            '50% OFF',
-                                            style: TextStyle(
-                                              fontSize: 8,
-                                              fontWeight: FontWeight.w800,
-                                              color: NwsbColors.goldLight,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 2),
                                       Text(
-                                        localizedMoney(context, price!),
+                                        saleOriginalMoney(context, price!),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
-                                            fontSize: 17,
-                                            fontWeight: FontWeight.w900,
-                                            color: NwsbColors.goldLight),
+                                          fontSize: 10,
+                                          color: Color(0x80FFFFFF),
+                                          decoration:
+                                              TextDecoration.lineThrough,
+                                        ),
+                                      ),
+                                      const Text(
+                                        '50% OFF',
+                                        style: TextStyle(
+                                          fontSize: 8,
+                                          fontWeight: FontWeight.w800,
+                                          color: NwsbColors.goldLight,
+                                        ),
                                       ),
                                     ],
                                   ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    localizedMoney(context, price!),
+                                    style: const TextStyle(
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.w900,
+                                        color: NwsbColors.goldLight),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
+                        ),
+                      const SizedBox(height: 7),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
                           Semantics(
                             button: true,
                             container: true,

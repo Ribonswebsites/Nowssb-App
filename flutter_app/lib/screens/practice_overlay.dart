@@ -454,7 +454,16 @@ class _GlassShell extends StatelessWidget {
             padding: const EdgeInsets.all(1.4),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(26.4),
-              child: ColoredBox(color: const Color(0xF2050508), child: child),
+              child: DecoratedBox(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Color(0xCC0B0D12), Color(0x5C87909F)],
+                  ),
+                ),
+                child: child,
+              ),
             ),
           ),
         ),
@@ -514,7 +523,7 @@ class _PracticeTab extends StatelessWidget {
               gradient: const LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [Color(0xE40B0D12), Color(0x8CCFD4DE)],
+                colors: [Color(0xE80A0C12), Color(0xB8AEB7C4)],
                 stops: [0.0, 1.0],
               ),
               border: Border.all(color: Colors.white.withOpacity(.22)),
@@ -672,9 +681,9 @@ class _ThinkingDotOrbPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = size.center(Offset.zero);
-    final radius = math.min(size.width, size.height) * .31;
+    final radius = math.min(size.width, size.height) * .34;
     final glow = Paint()
-      ..color = accent.withOpacity(.10 * intensity)
+      ..color = const Color(0x66FFFFFF).withOpacity(.22 * intensity)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 22);
     canvas.drawCircle(center, radius * 1.05, glow);
     final dot = Paint()..style = PaintingStyle.fill;
@@ -688,18 +697,17 @@ class _ThinkingDotOrbPainter extends CustomPainter {
         final longitude = (column / columns) * math.pi * 2;
         final drift =
             math.sin(progress * math.pi * 2 + row * .48 + column * .18) * .045;
-        final x =
-            center.dx +
+        final x = center.dx +
             math.sin(longitude + progress * math.pi * 1.4 + drift) *
                 radius *
                 ring;
-        final depth =
-            .35 +
+        final depth = .35 +
             .65 * ((math.cos(longitude + progress * math.pi * 1.4) + 1) / 2);
-        dot.color = accent.withOpacity(
-          (.20 + .64 * depth) * intensity.clamp(.7, 1.0),
+        dot.color =
+            Color.lerp(const Color(0x88FFFFFF), accent, depth)!.withOpacity(
+          (.42 + .52 * depth) * intensity.clamp(.7, 1.0),
         );
-        final size = .65 + 1.15 * depth;
+        final size = .8 + 1.45 * depth;
         canvas.drawCircle(Offset(x, y), size, dot);
       }
     }
@@ -1006,8 +1014,7 @@ class _WaterRipplePainter extends CustomPainter {
     final a1 = back ? math.pi * 2 : math.pi;
     var started = false;
     for (var a = a0; a <= a1 + .04; a += .07) {
-      final wave =
-          math.sin(a * 9 + progress * math.pi * 2) * 4.4 * fade +
+      final wave = math.sin(a * 9 + progress * math.pi * 2) * 4.4 * fade +
           math.sin(a * 4 - progress * math.pi * 1.4 + age * 6) * 2.0 * fade;
       final z = math.cos(a * 5 + progress * math.pi * 1.6) * 5.2 * fade;
       final p = Offset(
