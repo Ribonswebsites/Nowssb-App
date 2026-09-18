@@ -26,7 +26,8 @@ class MeaningStoreScreen extends StatelessWidget {
         tag: 'Shabdapathy · Origins',
         eyebrow: '',
         title: 'The Meaning Store',
-        body: 'Base meanings, purchased words and AI-decoded origins — the truth behind the sound.',
+        body:
+            'Base meanings, purchased words and AI-decoded origins — the truth behind the sound.',
         stats: const ['Base Meanings', 'AI-Decoded', 'Owned Forever'],
         art: 'assets/store/intro-meanings.webp',
         fullBleed: true,
@@ -40,7 +41,8 @@ class MeaningStoreScreen extends StatelessWidget {
           onBack: () => Navigator.of(context).pop(),
           onStorePicker: () => showStoreSelectSheet(
             context,
-            onSelect: (id) => openStoreFromPicker(context, id, current: 'meaning'),
+            onSelect: (id) =>
+                openStoreFromPicker(context, id, current: 'meaning'),
           ),
           slivers: [
             SliverPadding(
@@ -99,7 +101,6 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
     return byKey.values.toList();
   }
 
-
   String _artForMeaningCat(String cat) {
     // Notification pills use the store bag product — never fashion posters.
     return storePillProductArt(cat);
@@ -111,7 +112,9 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
       title: title,
       items: storeDefaultViewAllItems(),
       onOpenWord: (word, root, img, price) {
-        final hit = _base.where((m) => m.word.toLowerCase() == word.toLowerCase()).toList();
+        final hit = _base
+            .where((m) => m.word.toLowerCase() == word.toLowerCase())
+            .toList();
         if (hit.isNotEmpty) openMeaningDetail(context, hit.first);
       },
     );
@@ -139,7 +142,13 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
       'Emotions',
       'Cosmos',
       'Nations & People',
-      ...cats.keys.where((k) => !const {'Elements', 'Human', 'Emotions', 'Cosmos', 'Nations & People'}.contains(k)),
+      ...cats.keys.where((k) => !const {
+            'Elements',
+            'Human',
+            'Emotions',
+            'Cosmos',
+            'Nations & People'
+          }.contains(k)),
     ];
 
     return Column(
@@ -172,7 +181,10 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
                     alignment: Alignment.bottomLeft,
                     child: Text(
                       'The Meaning Store',
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.w300, color: Colors.white),
+                      style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w300,
+                          color: Colors.white),
                     ),
                   ),
                 ),
@@ -207,7 +219,8 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
                   child: Padding(
                     padding: const EdgeInsets.only(left: 14),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
                         color: const Color(0xEE060C18),
                         borderRadius: BorderRadius.circular(40),
@@ -222,7 +235,8 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
                               width: 22,
                               height: 22,
                               fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => const SizedBox(width: 22, height: 22),
+                              errorBuilder: (_, __, ___) =>
+                                  const SizedBox(width: 22, height: 22),
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -258,10 +272,22 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
           child: ListView(
             scrollDirection: Axis.horizontal,
             children: [
-              StoreFilterChip(label: 'ALL', selected: _chip == 'ALL', onTap: () => setState(() => _chip = 'ALL')),
+              StoreFilterChip(
+                  label: 'ALL',
+                  selected: _chip == 'ALL',
+                  onTap: () => setState(() => _chip = 'ALL')),
               const SizedBox(width: 7),
-              for (final c in ['Elements', 'Human', 'Emotions', 'Cosmos', 'Nations & People']) ...[
-                StoreFilterChip(label: c.toUpperCase(), selected: _chip == c, onTap: () => setState(() => _chip = c)),
+              for (final c in [
+                'Elements',
+                'Human',
+                'Emotions',
+                'Cosmos',
+                'Nations & People'
+              ]) ...[
+                StoreFilterChip(
+                    label: c.toUpperCase(),
+                    selected: _chip == c,
+                    onTap: () => setState(() => _chip = c)),
                 const SizedBox(width: 7),
               ],
             ],
@@ -286,7 +312,9 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
           onRequestWords: () => openRequestWords(context),
           onOpenWord: (word, root, img, price) {
             // Best-effort: open first matching meaning if present.
-            final hit = _base.where((m) => m.word.toLowerCase() == word.toLowerCase()).toList();
+            final hit = _base
+                .where((m) => m.word.toLowerCase() == word.toLowerCase())
+                .toList();
             if (hit.isNotEmpty) {
               openMeaningDetail(context, hit.first);
             }
@@ -295,21 +323,27 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
         StoreRecommendedSection(
           onSeeAll: () => _openViewAll('Recommended for You'),
           onOpenWord: (word, root, img, price) {
-            final hit = _base.where((m) => m.word.toLowerCase() == word.toLowerCase()).toList();
+            final hit = _base
+                .where((m) => m.word.toLowerCase() == word.toLowerCase())
+                .toList();
             if (hit.isNotEmpty) openMeaningDetail(context, hit.first);
           },
         ),
         StoreFeaturedPlaylistSection(
           onSeeAll: () => _openViewAll('Featured Playlist'),
           onOpenWord: (word, root, img, price) {
-            final hit = _base.where((m) => m.word.toLowerCase() == word.toLowerCase()).toList();
+            final hit = _base
+                .where((m) => m.word.toLowerCase() == word.toLowerCase())
+                .toList();
             if (hit.isNotEmpty) openMeaningDetail(context, hit.first);
           },
         ),
         StoreGlassPlaylistCarousel(
           onSeeAll: () => _openViewAll('Playlists'),
           onOpenWord: (word, root, img, price) {
-            final hit = _base.where((m) => m.word.toLowerCase() == word.toLowerCase()).toList();
+            final hit = _base
+                .where((m) => m.word.toLowerCase() == word.toLowerCase())
+                .toList();
             if (hit.isNotEmpty) openMeaningDetail(context, hit.first);
           },
         ),
@@ -317,7 +351,9 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
         if (cats.isEmpty)
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 48),
-            child: Center(child: Text('No meanings match.', style: TextStyle(color: Color(0x8CFFFFFF)))),
+            child: Center(
+                child: Text('No meanings match.',
+                    style: TextStyle(color: Color(0x8CFFFFFF)))),
           ),
         const StoreDisclaimer(
           text:
@@ -333,16 +369,26 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
     Map<String, List<MsMeaning>> cats,
   ) {
     final out = <Widget>[];
+    final banners = <Widget>[];
     var rail = 0;
     for (final cat in order) {
       if (cats[cat]?.isNotEmpty != true) continue;
-      out.add(RmCatBanner(
+      banners.add(RmCatBanner(
         title: cat,
         sub: kMsCatSub[cat] ?? 'Decoded origins',
         logoUrl: kMsCatLogoUrl,
         logoAsset: kRmCatLogoAsset,
         artAsset: _artForMeaningCat(cat),
         pillLabel: cat,
+        inRail: true,
+        onViewAll: () => _openViewAll(cat),
+      ));
+    }
+    if (banners.isNotEmpty) out.add(RmBannerRail(banners: banners));
+    for (final cat in order) {
+      if (cats[cat]?.isNotEmpty != true) continue;
+      out.add(RmRowHeader(
+        title: cat,
         onViewAll: () => _openViewAll(cat),
       ));
       out.add(MsGrid(

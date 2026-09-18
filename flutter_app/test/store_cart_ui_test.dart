@@ -22,9 +22,21 @@ void main() {
       expect(cards, contains('storeBuyNow'));
       expect(cards, isNot(contains('Icons.shopping_cart_outlined')));
       expect(cards, isNot(contains('Icons.graphic_eq')));
-      expect(cards, contains('height: 124'));
+      expect(cards, contains('height: 132'));
       expect(cards, contains('_CenteredPrice'));
-      expect(cards, contains('static const double cardHeight = 176'));
+      expect(cards, contains('static const double cardHeight = 228'));
+      expect(cards, contains('kWordPriceInr'));
+      expect(cards, contains('kWordSaleInr'));
+      expect(cards, contains('RmBannerRail'));
+      expect(cards, contains('RmRowHeader'));
+      expect(cards, isNot(contains('.clamp(1, 999999)')));
+
+      final atelier =
+          File('lib/screens/store/word_atelier.dart').readAsStringSync();
+      expect(atelier, contains('RmBannerRail'));
+      expect(atelier, contains('RmRowHeader'));
+      expect(atelier, contains('kWordSaleInr'));
+      expect(atelier, contains('originalPrice'));
 
       final detail =
           File('lib/screens/store/product_detail.dart').readAsStringSync();

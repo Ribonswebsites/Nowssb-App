@@ -4,7 +4,6 @@ library;
 
 import 'package:flutter/material.dart';
 
-import '../../data/content.dart';
 import '../../data/store_catalog.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
@@ -116,19 +115,32 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
   Widget build(BuildContext context) {
     final cats = _cats;
     final sections = <Widget>[];
+    if (cats.isNotEmpty) {
+      sections.add(RmBannerRail(
+        banners: [
+          for (final cat in cats)
+            RmCatBanner(
+              title: cat.label,
+              sub: cat.sub,
+              badge: cat.badge,
+              labelColor:
+                  cat.labelColor != null ? Color(cat.labelColor!) : null,
+              logoAsset: kRmCatLogoAsset,
+              categoryId: cat.id,
+              artAsset: storeCollectionArt(cat.id),
+              pillLabel: cat.badge ?? cat.label,
+              inRail: true,
+              onViewAll: () => _openViewAll(cat.label),
+            ),
+        ],
+      ));
+    }
     // Count product rails actually emitted (search may empty some).
     var productRailIndex = 0;
     for (var i = 0; i < cats.length; i++) {
       final cat = cats[i];
-      sections.add(RmCatBanner(
+      sections.add(RmRowHeader(
         title: cat.label,
-        sub: cat.sub,
-        badge: cat.badge,
-        labelColor: cat.labelColor != null ? Color(cat.labelColor!) : null,
-        logoAsset: kRmCatLogoAsset,
-        categoryId: cat.id,
-        artAsset: storeCollectionArt(cat.id),
-        pillLabel: cat.badge ?? cat.label,
         onViewAll: () => _openViewAll(cat.label),
       ));
       sections.add(Builder(builder: (context) {
@@ -138,19 +150,15 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
           final name = w.word.isEmpty
               ? w.word
               : '${w.word[0].toUpperCase()}${w.word.substring(1)}';
-          // Live price when present; card art is always RM_WORD_IMG (part010).
-          final live = ContentStore.instance.library
-              .where((x) => x.word.toLowerCase() == w.word.toLowerCase())
-              .toList();
-          final price = live.isNotEmpty
-              ? live.first.price
-              : (cat.id == 'off50' ? 24.5 : 49);
+          final sale = cat.id == 'off50';
+          final price = sale ? kWordSaleInr : kWordPriceInr;
           const img = kRmWordImg;
           cards.add(RmWordCard(
             name: name,
             root: w.root,
             imgUrl: img,
             price: price,
+            originalPrice: sale ? kWordPriceInr : null,
             onTap: () => openAtelierWord(context,
                 word: w.word, root: w.root, img: img, price: price),
           ));

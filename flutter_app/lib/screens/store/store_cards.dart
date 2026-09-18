@@ -2,6 +2,7 @@
 /// `.rm-cat-banner`, ebook rows, and gold Signature tags.
 library;
 
+import 'dart:async';
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/foundation.dart';
@@ -23,64 +24,103 @@ String inr(num value) {
   return '₹$n';
 }
 
+/// Full word price in rupees. 50% off is [kWordSaleInr].
+const kWordPriceInr = 92;
+const kWordSaleInr = 46;
+
 String localizedMoney(BuildContext context, num inrValue) {
   if (inrValue <= 0) return 'Included';
   final locale = Localizations.localeOf(context);
-  final country = locale.countryCode ?? '';
-  final language = locale.languageCode;
+  final country = (locale.countryCode ?? '').toUpperCase();
+  final language = locale.languageCode.toLowerCase();
   var symbol = '₹';
   var rate = 1.0;
-  switch (country.isNotEmpty ? country : language) {
-    case 'US':
-    case 'en':
-      symbol = r'$';
-      rate = .012;
-      break;
-    case 'GB':
-      symbol = '£';
-      rate = .0095;
-      break;
-    case 'DE':
-    case 'FR':
-    case 'IT':
-    case 'ES':
-    case 'NL':
-    case 'EUR':
-      symbol = '€';
-      rate = .011;
-      break;
-    case 'AE':
-      symbol = 'د.إ';
-      rate = .044;
-      break;
-    case 'SG':
-      symbol = 'S\$';
-      rate = .016;
-      break;
-    case 'AU':
-      symbol = r'A$';
-      rate = .018;
-      break;
-    case 'CA':
-      symbol = r'C$';
-      rate = .0165;
-      break;
-    case 'JP':
-      symbol = '¥';
-      rate = 1.75;
-      break;
-    case 'IN':
-    case 'hi':
-      symbol = '₹';
-      rate = 1.0;
-      break;
+  var decimals = 0;
+  const euroCountries = {
+    'AT',
+    'BE',
+    'CY',
+    'DE',
+    'EE',
+    'ES',
+    'EU',
+    'FI',
+    'FR',
+    'GR',
+    'IE',
+    'IT',
+    'LT',
+    'LU',
+    'LV',
+    'MT',
+    'NL',
+    'PT',
+    'SI',
+    'SK',
+  };
+  const euroLang = {
+    'de',
+    'el',
+    'es',
+    'et',
+    'fi',
+    'fr',
+    'it',
+    'lt',
+    'lv',
+    'nl',
+    'pt',
+    'sk',
+    'sl',
+  };
+  if (country == 'IN' || language == 'hi') {
+    symbol = '₹';
+    rate = 1.0;
+    decimals = 0;
+  } else if (country == 'US' || (country.isEmpty && language == 'en')) {
+    symbol = r'$';
+    rate = 0.012;
+    decimals = 2;
+  } else if (country == 'GB') {
+    symbol = '£';
+    rate = 0.0095;
+    decimals = 2;
+  } else if (euroCountries.contains(country) || euroLang.contains(language)) {
+    symbol = '€';
+    rate = 0.011;
+    decimals = 2;
+  } else if (country == 'AE') {
+    symbol = 'د.إ';
+    rate = 0.044;
+    decimals = 2;
+  } else if (country == 'SG') {
+    symbol = r'S$';
+    rate = 0.016;
+    decimals = 2;
+  } else if (country == 'AU') {
+    symbol = r'A$';
+    rate = 0.018;
+    decimals = 2;
+  } else if (country == 'CA') {
+    symbol = r'C$';
+    rate = 0.0165;
+    decimals = 2;
+  } else if (country == 'JP') {
+    symbol = '¥';
+    rate = 1.75;
+    decimals = 0;
+  } else {
+    symbol = '₹';
+    rate = 1.0;
+    decimals = 0;
   }
-  final converted = (inrValue * rate).round().clamp(1, 999999);
-  return '$symbol$converted';
+  final converted = inrValue * rate;
+  if (decimals == 0) return '$symbol${converted.round()}';
+  return '$symbol${converted.toStringAsFixed(2)}';
 }
 
 String saleOriginalMoney(BuildContext context, num salePrice) =>
-    localizedMoney(context, salePrice * 2);
+    localizedMoney(context, kWordPriceInr);
 
 /// Clean NowssB bag + headphones product shot — NEVER fashion heels /
 /// meditation collection posters. Used in every notification pill.
@@ -186,6 +226,7 @@ class RmCatBanner extends StatelessWidget {
     this.svgBody,
     this.onViewAll,
     this.pillLabel,
+    this.inRail = false,
   });
 
   final String title;
@@ -214,6 +255,9 @@ class RmCatBanner extends StatelessWidget {
   /// Short label inside the black pill (defaults to badge or title).
   final String? pillLabel;
 
+  /// When true the banner sits in the top horizontal rail (no extra margin).
+  final bool inRail;
+
   @override
   Widget build(BuildContext context) {
     final titleColor = labelColor ?? NwsbColors.goldLight;
@@ -222,7 +266,7 @@ class RmCatBanner extends StatelessWidget {
     final leftLabel = (pillLabel ?? badge ?? title).trim();
     final r = BorderRadius.circular(kGlassRadius);
     return Padding(
-      padding: const EdgeInsets.only(top: 18, bottom: 10),
+      padding: EdgeInsets.only(top: inRail ? 0 : 18, bottom: inRail ? 0 : 10),
       child: DecoratedBox(
         decoration: BoxDecoration(
           borderRadius: r,
@@ -647,6 +691,100 @@ class StoreViewAllControl extends StatelessWidget {
   }
 }
 
+/// UFC-style row title: name on the left, View all pinned right.
+class RmRowHeader extends StatelessWidget {
+  const RmRowHeader({super.key, required this.title, this.onViewAll});
+
+  final String title;
+  final VoidCallback? onViewAll;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 18, bottom: 10),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w800,
+                color: Colors.white,
+                letterSpacing: -0.3,
+              ),
+            ),
+          ),
+          if (onViewAll != null) StoreViewAllControl(onTap: onViewAll!),
+        ],
+      ),
+    );
+  }
+}
+
+/// Auto-moving horizontal strip of category banners (one place, not per row).
+class RmBannerRail extends StatefulWidget {
+  const RmBannerRail({super.key, required this.banners});
+
+  final List<Widget> banners;
+
+  @override
+  State<RmBannerRail> createState() => _RmBannerRailState();
+}
+
+class _RmBannerRailState extends State<RmBannerRail> {
+  late final PageController _pc;
+  Timer? _timer;
+  var _page = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _pc = PageController(viewportFraction: 0.92);
+    if (widget.banners.length > 1) {
+      _timer = Timer.periodic(const Duration(milliseconds: 3800), (_) {
+        if (!mounted || !_pc.hasClients) return;
+        final next = (_page + 1) % widget.banners.length;
+        _pc.animateToPage(
+          next,
+          duration: const Duration(milliseconds: 520),
+          curve: Curves.easeOutCubic,
+        );
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _pc.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.banners.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: 10, bottom: 4),
+      child: SizedBox(
+        height: 188,
+        child: PageView.builder(
+          controller: _pc,
+          padEnds: false,
+          onPageChanged: (i) => _page = i,
+          itemCount: widget.banners.length,
+          itemBuilder: (_, i) => Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: widget.banners[i],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 /// Full-width looping row break video (part010 ROW_VIDS).
 class RmRowVid extends StatelessWidget {
   const RmRowVid({super.key, required this.url});
@@ -698,6 +836,7 @@ class RmWordCard extends StatelessWidget {
     required this.imgUrl,
     this.signature = false,
     this.price,
+    this.originalPrice,
     this.onTap,
     this.onBuyNow,
     this.onWishlist,
@@ -710,21 +849,22 @@ class RmWordCard extends StatelessWidget {
   final String imgUrl;
   final bool signature;
   final num? price;
+  final num? originalPrice;
   final VoidCallback? onTap;
   final VoidCallback? onBuyNow;
   final VoidCallback? onWishlist;
   final VoidCallback? onAddCart;
   final Color? tint;
 
-  /// Compact horizontal card: square image left, price centered.
-  static const double cardHeight = 176;
+  /// Taller horizontal card so the UFC-style price can sit large and clear.
+  static const double cardHeight = 228;
   static const double cardWidth = 338;
 
   BagItem get _item => wordBagItem(
         name: name,
         root: root,
         img: imgUrl,
-        price: price ?? 49,
+        price: price ?? kWordPriceInr,
         signature: signature,
       );
 
@@ -785,8 +925,8 @@ class RmWordCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(
-                  width: 124,
-                  height: 124,
+                  width: 132,
+                  height: 132,
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
@@ -816,19 +956,15 @@ class RmWordCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Expanded(
-                            child: Text(
-                              name,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.white,
-                                height: 1.05,
-                              ),
-                            ),
+                            child: price == null
+                                ? const SizedBox.shrink()
+                                : _CenteredPrice(
+                                    price: price!,
+                                    originalPrice: originalPrice,
+                                  ),
                           ),
                           GestureDetector(
                             onTap: () {
@@ -847,7 +983,19 @@ class RmWordCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 5),
+                      const SizedBox(height: 6),
+                      Text(
+                        name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                          height: 1.05,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
                       Text(
                         root.toUpperCase(),
                         maxLines: 1,
@@ -859,7 +1007,7 @@ class RmWordCard extends StatelessWidget {
                           color: Color(0x99C8E8F5),
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 6),
                       Text(
                         wordVibrationTag(name),
                         maxLines: 2,
@@ -870,13 +1018,7 @@ class RmWordCard extends StatelessWidget {
                           color: Color(0xB8FFFFFF),
                         ),
                       ),
-                      Expanded(
-                        child: Center(
-                          child: price == null
-                              ? const SizedBox.shrink()
-                              : _CenteredPrice(price: price!),
-                        ),
-                      ),
+                      const Spacer(),
                       const SizedBox(height: 4),
                       FittedBox(
                         fit: BoxFit.scaleDown,
@@ -987,35 +1129,41 @@ class RmWordCard extends StatelessWidget {
 }
 
 class _CenteredPrice extends StatelessWidget {
-  const _CenteredPrice({required this.price});
+  const _CenteredPrice({required this.price, this.originalPrice});
   final num price;
+  final num? originalPrice;
 
   @override
   Widget build(BuildContext context) {
     final sale = localizedMoney(context, price);
-    final original = saleOriginalMoney(context, price);
+    final original =
+        originalPrice == null ? null : localizedMoney(context, originalPrice!);
+    final showStrike = original != null && original != sale;
     return Column(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (original != sale)
+        Text(
+          sale,
+          textAlign: TextAlign.left,
+          style: const TextStyle(
+            fontSize: 34,
+            fontWeight: FontWeight.w900,
+            color: Colors.white,
+            height: 1.0,
+            letterSpacing: -0.6,
+          ),
+        ),
+        if (showStrike)
           Text(
             original,
             style: const TextStyle(
-              fontSize: 11,
-              color: Color(0x66FFFFFF),
+              fontSize: 13,
+              color: Color(0x88FFFFFF),
               decoration: TextDecoration.lineThrough,
+              decorationColor: Color(0x88FFFFFF),
             ),
           ),
-        Text(
-          sale,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.w900,
-            color: NwsbColors.goldLight,
-            height: 1.05,
-          ),
-        ),
       ],
     );
   }
