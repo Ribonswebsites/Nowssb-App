@@ -246,8 +246,9 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
     await Future<void>.delayed(const Duration(milliseconds: 720));
     if (mounted) {
       setState(
-        () => _status =
-            _matched ? _PracticeStatus.complete : _PracticeStatus.results,
+        () => _status = _matched
+            ? _PracticeStatus.complete
+            : _PracticeStatus.results,
       );
     }
   }
@@ -407,11 +408,7 @@ class _BlackTab extends StatelessWidget {
                 child: const SizedBox(
                   width: 36,
                   height: 36,
-                  child: Icon(
-                    Icons.close,
-                    color: Color(0xCCFFFFFF),
-                    size: 20,
-                  ),
+                  child: Icon(Icons.close, color: Color(0xCCFFFFFF), size: 20),
                 ),
               ),
             ],
@@ -440,10 +437,7 @@ class _BlackTab extends StatelessWidget {
                     listening: holding,
                   ),
                 ),
-                Transform.scale(
-                  scale: orbScale,
-                  child: const _OrbFilm(),
-                ),
+                Transform.scale(scale: orbScale, child: const _OrbFilm()),
               ],
             ),
           ),
@@ -511,10 +505,7 @@ class _BlackTab extends StatelessWidget {
 
 /// Concentric rings around the orb — same language as the practice card.
 class _RippleRingsPainter extends CustomPainter {
-  const _RippleRingsPainter({
-    required this.progress,
-    required this.listening,
-  });
+  const _RippleRingsPainter({required this.progress, required this.listening});
 
   final double progress;
   final bool listening;
