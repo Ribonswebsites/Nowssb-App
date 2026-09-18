@@ -520,9 +520,10 @@ class _PracticeTab extends StatelessWidget {
               border: Border.all(color: Colors.white.withOpacity(.22)),
               boxShadow: const [
                 BoxShadow(
-                    color: Color(0x44000000),
-                    blurRadius: 30,
-                    offset: Offset(0, 14)),
+                  color: Color(0x44000000),
+                  blurRadius: 30,
+                  offset: Offset(0, 14),
+                ),
               ],
             ),
             child: Column(
@@ -533,24 +534,29 @@ class _PracticeTab extends StatelessWidget {
                     children: [
                       IconButton(
                         onPressed: onClose,
-                        icon: const Icon(Icons.keyboard_arrow_down_rounded,
-                            color: Colors.white),
+                        icon: const Icon(
+                          Icons.keyboard_arrow_down_rounded,
+                          color: Colors.white,
+                        ),
                       ),
                       const Expanded(
                         child: Text(
                           'PRACTICE',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 2.8),
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 2.8,
+                          ),
                         ),
                       ),
                       IconButton(
                         onPressed: onClose,
-                        icon: const Icon(Icons.close_rounded,
-                            color: Colors.white70),
+                        icon: const Icon(
+                          Icons.close_rounded,
+                          color: Colors.white70,
+                        ),
                       ),
                     ],
                   ),
@@ -585,10 +591,11 @@ class _PracticeTab extends StatelessWidget {
                         status == 'Processing' ? 'Processing…' : 'Listening',
                         textAlign: TextAlign.center,
                         style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                            letterSpacing: .2),
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: .2,
+                        ),
                       ),
                       const SizedBox(height: 5),
                       Text(
@@ -597,9 +604,10 @@ class _PracticeTab extends StatelessWidget {
                             : 'Speak the word when you are ready.',
                         textAlign: TextAlign.center,
                         style: const TextStyle(
-                            color: Color(0xB8FFFFFF),
-                            fontSize: 11,
-                            height: 1.35),
+                          color: Color(0xB8FFFFFF),
+                          fontSize: 11,
+                          height: 1.35,
+                        ),
                       ),
                       const SizedBox(height: 18),
                       Row(
@@ -610,9 +618,11 @@ class _PracticeTab extends StatelessWidget {
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: Colors.white,
                                 side: BorderSide(
-                                    color: Colors.white.withOpacity(.38)),
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 13),
+                                  color: Colors.white.withOpacity(.38),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 13,
+                                ),
                                 shape: const StadiumBorder(),
                               ),
                               child: const Text('Replace'),
@@ -625,12 +635,14 @@ class _PracticeTab extends StatelessWidget {
                               style: FilledButton.styleFrom(
                                 backgroundColor: Colors.white,
                                 foregroundColor: const Color(0xFF08090D),
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 13),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 13,
+                                ),
                                 shape: const StadiumBorder(),
                               ),
                               child: Text(
-                                  holding ? 'Listening…' : 'Start practicing'),
+                                holding ? 'Listening…' : 'Start practicing',
+                              ),
                             ),
                           ),
                         ],
@@ -648,8 +660,11 @@ class _PracticeTab extends StatelessWidget {
 }
 
 class _ThinkingDotOrbPainter extends CustomPainter {
-  const _ThinkingDotOrbPainter(
-      {required this.progress, required this.accent, required this.intensity});
+  const _ThinkingDotOrbPainter({
+    required this.progress,
+    required this.accent,
+    required this.intensity,
+  });
   final double progress;
   final Color accent;
   final double intensity;
@@ -673,14 +688,17 @@ class _ThinkingDotOrbPainter extends CustomPainter {
         final longitude = (column / columns) * math.pi * 2;
         final drift =
             math.sin(progress * math.pi * 2 + row * .48 + column * .18) * .045;
-        final x = center.dx +
+        final x =
+            center.dx +
             math.sin(longitude + progress * math.pi * 1.4 + drift) *
                 radius *
                 ring;
-        final depth = .35 +
+        final depth =
+            .35 +
             .65 * ((math.cos(longitude + progress * math.pi * 1.4) + 1) / 2);
-        dot.color =
-            accent.withOpacity((.20 + .64 * depth) * intensity.clamp(.7, 1.0));
+        dot.color = accent.withOpacity(
+          (.20 + .64 * depth) * intensity.clamp(.7, 1.0),
+        );
         final size = .65 + 1.15 * depth;
         canvas.drawCircle(Offset(x, y), size, dot);
       }
@@ -988,7 +1006,8 @@ class _WaterRipplePainter extends CustomPainter {
     final a1 = back ? math.pi * 2 : math.pi;
     var started = false;
     for (var a = a0; a <= a1 + .04; a += .07) {
-      final wave = math.sin(a * 9 + progress * math.pi * 2) * 4.4 * fade +
+      final wave =
+          math.sin(a * 9 + progress * math.pi * 2) * 4.4 * fade +
           math.sin(a * 4 - progress * math.pi * 1.4 + age * 6) * 2.0 * fade;
       final z = math.cos(a * 5 + progress * math.pi * 1.6) * 5.2 * fade;
       final p = Offset(
