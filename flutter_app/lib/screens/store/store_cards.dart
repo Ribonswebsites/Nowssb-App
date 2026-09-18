@@ -253,41 +253,47 @@ class RmCatBanner extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Flexible(
-                        child: Text(
-                          title,
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 0.6,
-                            color: titleColor,
-                          ),
+                      Expanded(
+                        child: Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                title,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.6,
+                                  color: titleColor,
+                                ),
+                              ),
+                            ),
+                            if (badge != null) ...[
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 7,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(4),
+                                  border: Border.all(
+                                    color: titleColor.withValues(alpha: 0.45),
+                                  ),
+                                ),
+                                child: Text(
+                                  badge!,
+                                  style: TextStyle(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 1.2,
+                                    color: titleColor,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                       ),
-                      if (badge != null) ...[
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 7,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(4),
-                            border: Border.all(
-                              color: titleColor.withValues(alpha: 0.45),
-                            ),
-                          ),
-                          child: Text(
-                            badge!,
-                            style: TextStyle(
-                              fontSize: 9,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 1.2,
-                              color: titleColor,
-                            ),
-                          ),
-                        ),
-                      ],
                       if (onViewAll != null) ...[
                         const SizedBox(width: 8),
                         StoreViewAllControl(onTap: onViewAll!),
@@ -710,8 +716,8 @@ class RmWordCard extends StatelessWidget {
   final VoidCallback? onAddCart;
   final Color? tint;
 
-  /// Thicker horizontal card: image left, text + actions right.
-  static const double cardHeight = 238;
+  /// Compact horizontal card: square image left, price centered.
+  static const double cardHeight = 176;
   static const double cardWidth = 338;
 
   BagItem get _item => wordBagItem(
@@ -776,10 +782,11 @@ class RmWordCard extends StatelessWidget {
               ],
             ),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(
                   width: 124,
-                  height: double.infinity,
+                  height: 124,
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
@@ -791,11 +798,7 @@ class RmWordCard extends StatelessWidget {
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(15),
-                          child: Padding(
-                            padding: const EdgeInsets.all(7),
-                            child:
-                                StoreNetImage(url: imgUrl, fit: BoxFit.contain),
-                          ),
+                          child: StoreNetImage(url: imgUrl, fit: BoxFit.cover),
                         ),
                       ),
                       if (signature)
@@ -804,15 +807,6 @@ class RmWordCard extends StatelessWidget {
                           left: 6,
                           child: _SignatureTag(),
                         ),
-                      const Positioned(
-                        right: 7,
-                        bottom: 7,
-                        child: Icon(
-                          Icons.graphic_eq,
-                          size: 17,
-                          color: Color(0xB3E8D5A3),
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -876,57 +870,14 @@ class RmWordCard extends StatelessWidget {
                           color: Color(0xB8FFFFFF),
                         ),
                       ),
-                      const Spacer(),
-                      if (price != null)
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Wrap(
-                                    spacing: 5,
-                                    runSpacing: 1,
-                                    children: [
-                                      Text(
-                                        saleOriginalMoney(context, price!),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          color: Color(0x80FFFFFF),
-                                          decoration:
-                                              TextDecoration.lineThrough,
-                                        ),
-                                      ),
-                                      const Text(
-                                        '50% OFF',
-                                        style: TextStyle(
-                                          fontSize: 9,
-                                          fontWeight: FontWeight.w800,
-                                          color: NwsbColors.goldLight,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    localizedMoney(context, price!),
-                                    style: const TextStyle(
-                                        fontSize: 21,
-                                        fontWeight: FontWeight.w900,
-                                        color: NwsbColors.goldLight),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
+                      Expanded(
+                        child: Center(
+                          child: price == null
+                              ? const SizedBox.shrink()
+                              : _CenteredPrice(price: price!),
                         ),
-                      const SizedBox(height: 7),
+                      ),
+                      const SizedBox(height: 4),
                       FittedBox(
                         fit: BoxFit.scaleDown,
                         alignment: Alignment.centerLeft,
@@ -1031,6 +982,41 @@ class RmWordCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _CenteredPrice extends StatelessWidget {
+  const _CenteredPrice({required this.price});
+  final num price;
+
+  @override
+  Widget build(BuildContext context) {
+    final sale = localizedMoney(context, price);
+    final original = saleOriginalMoney(context, price);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (original != sale)
+          Text(
+            original,
+            style: const TextStyle(
+              fontSize: 11,
+              color: Color(0x66FFFFFF),
+              decoration: TextDecoration.lineThrough,
+            ),
+          ),
+        Text(
+          sale,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w900,
+            color: NwsbColors.goldLight,
+            height: 1.05,
+          ),
+        ),
+      ],
     );
   }
 }

@@ -13,17 +13,21 @@ void main() {
   test(
     'Word cards and product detail use cart SVG for add and bag SVG for buy',
     () {
-      final cards = File('lib/screens/store/store_cards.dart')
-          .readAsStringSync();
+      final cards =
+          File('lib/screens/store/store_cards.dart').readAsStringSync();
       expect(cards, contains("label: 'Add to Cart'"));
       expect(cards, contains('NwsbMarks.cart'));
       expect(cards, contains('NwsbMarks.bag'));
       expect(cards, contains('storeAddToCart'));
       expect(cards, contains('storeBuyNow'));
       expect(cards, isNot(contains('Icons.shopping_cart_outlined')));
+      expect(cards, isNot(contains('Icons.graphic_eq')));
+      expect(cards, contains('height: 124'));
+      expect(cards, contains('_CenteredPrice'));
+      expect(cards, contains('static const double cardHeight = 176'));
 
-      final detail = File('lib/screens/store/product_detail.dart')
-          .readAsStringSync();
+      final detail =
+          File('lib/screens/store/product_detail.dart').readAsStringSync();
       expect(detail, contains("label: 'Add to Cart'"));
       expect(detail, contains('NwsbMarks.cart'));
       expect(detail, contains("label: 'Buy Now'"));
@@ -32,8 +36,8 @@ void main() {
       expect(detail, isNot(contains('Icons.shopping_cart_outlined')));
       expect(detail, isNot(contains('Icons.flash_on_outlined')));
 
-      final flight = File('lib/widgets/cart_add_animation.dart')
-          .readAsStringSync();
+      final flight =
+          File('lib/widgets/cart_add_animation.dart').readAsStringSync();
       expect(flight, contains('NwsbMarks.cart'));
       expect(flight, isNot(contains('Icons.shopping_cart_outlined')));
     },
