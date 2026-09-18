@@ -238,8 +238,9 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
     await Future<void>.delayed(const Duration(milliseconds: 720));
     if (mounted) {
       setState(
-        () => _status =
-            _matched ? _PracticeStatus.complete : _PracticeStatus.results,
+        () => _status = _matched
+            ? _PracticeStatus.complete
+            : _PracticeStatus.results,
       );
     }
   }
@@ -362,10 +363,7 @@ class _BlackTab extends StatelessWidget {
           SizedBox(
             height: 156,
             child: Center(
-              child: Transform.scale(
-                scale: orbScale,
-                child: const _OrbFilm(),
-              ),
+              child: Transform.scale(scale: orbScale, child: const _OrbFilm()),
             ),
           ),
           const SizedBox(height: 2),
