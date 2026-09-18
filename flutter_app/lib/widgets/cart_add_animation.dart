@@ -15,10 +15,18 @@ class CartAddAnimation {
   static Future<void> addAndPlay(
     BuildContext context, {
     required BagItem item,
+    GlobalKey? fromKey,
+    BuildContext? fromContext,
     GlobalKey? targetKey,
   }) async {
     await CartBag.instance.addCart(item);
-    play(context, fromContext: context, targetKey: targetKey, item: item);
+    play(
+      context,
+      fromKey: fromKey,
+      fromContext: fromContext ?? context,
+      targetKey: targetKey,
+      item: item,
+    );
     await Future<void>.delayed(const Duration(milliseconds: 960));
   }
 
