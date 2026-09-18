@@ -264,8 +264,9 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
     await Future<void>.delayed(const Duration(milliseconds: 720));
     if (mounted) {
       setState(
-        () => _status =
-            _matched ? _PracticeStatus.complete : _PracticeStatus.results,
+        () => _status = _matched
+            ? _PracticeStatus.complete
+            : _PracticeStatus.results,
       );
     }
   }
