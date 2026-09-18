@@ -30,6 +30,9 @@ void main() {
       expect(cards, contains('RmBannerRail'));
       expect(cards, contains('RmRowHeader'));
       expect(cards, isNot(contains('.clamp(1, 999999)')));
+      expect(cards, contains('TextDecoration.lineThrough'));
+      expect(cards, contains('shape: BoxShape.circle'));
+      expect(cards, contains('NwsbMarks.wishlist'));
 
       final atelier =
           File('lib/screens/store/word_atelier.dart').readAsStringSync();
@@ -37,6 +40,9 @@ void main() {
       expect(atelier, contains('RmRowHeader'));
       expect(atelier, contains('kWordSaleInr'));
       expect(atelier, contains('originalPrice'));
+
+      final storeHome = File('lib/screens/store.dart').readAsStringSync();
+      expect(storeHome, contains('16 / 6.4'));
 
       final detail =
           File('lib/screens/store/product_detail.dart').readAsStringSync();

@@ -4,6 +4,7 @@ library;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../theme/tokens.dart';
 import '../data/settings.dart';
 import '../data/content.dart';
@@ -12,7 +13,6 @@ import '../screens/home_normal.dart';
 import '../screens/sound_library.dart';
 import '../screens/practice.dart';
 import '../screens/practice_player.dart';
-import '../screens/hearing_safety_player.dart';
 import '../screens/profile.dart';
 import '../screens/progress/progress_screen.dart';
 import '../screens/store.dart';
@@ -73,11 +73,17 @@ class _NavShellState extends State<NavShell> {
     if (mounted) setState(() {});
   }
 
-  void _openHearingSafety() {
-    if (!PlaybackSession.instance.active) return;
+  void _openMiniPlayer() {
+    final session = PlaybackSession.instance;
+    if (!session.active || session.words.isEmpty) return;
+    session.expand();
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-          builder: (_) => const HearingSafetyPlayerScreen()),
+        builder: (_) => PracticePlayerScreen(
+          words: session.words,
+          title: session.title.isEmpty ? 'NowssB' : session.title,
+        ),
+      ),
     );
   }
 
@@ -238,10 +244,22 @@ class _NavShellState extends State<NavShell> {
   }
 
   Widget _build(BuildContext context) {
-    return Scaffold(
-      // Deep (not surface light) so the chin under the floating pill is never
-      // a stray white home-indicator / divider line on Library and dark tabs.
-      backgroundColor: NwsbColors.deep,
+    final lightHome = _i == 0 && !_fashion;
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness:
+            lightHome ? Brightness.dark : Brightness.light,
+        systemNavigationBarColor:
+            lightHome ? NwsbColors.surface : NwsbColors.deep,
+        systemNavigationBarIconBrightness:
+            lightHome ? Brightness.dark : Brightness.light,
+        systemNavigationBarDividerColor: Colors.transparent,
+      ),
+      child: Scaffold(
+        // Match the visible tab so the home-indicator strip is never a black
+        // chin on Normal home, and never a white line on dark tabs.
+        backgroundColor: lightHome ? NwsbColors.surface : NwsbColors.deep,
       body: Stack(
         children: [
           // IndexedStack rather than swapping the child: it keeps each tab's
@@ -320,7 +338,7 @@ class _NavShellState extends State<NavShell> {
               bottom: 88,
               child: SafeArea(
                 top: false,
-                child: MiniPlayerPill(onOpen: _openHearingSafety),
+                child: MiniPlayerPill(onOpen: _openMiniPlayer),
               ),
             ),
 
@@ -328,14 +346,6 @@ class _NavShellState extends State<NavShell> {
           // count, live, so the ceiling is something you can watch rather
           // than something you have to take on trust.
           const Positioned(top: 4, right: 8, child: SafeArea(child: PoolHud())),
-          // Opaque chin under the pill — kills white system/home line.
-          const Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            height: 28,
-            child: ColoredBox(color: NwsbColors.deep),
-          ),
           Positioned(
             left: 0,
             right: 0,
@@ -416,6 +426,7 @@ class _NavShellState extends State<NavShell> {
           ),
         ],
       ),
+    ),
     );
   }
 }

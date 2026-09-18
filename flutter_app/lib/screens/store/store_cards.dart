@@ -921,196 +921,218 @@ class RmWordCard extends StatelessWidget {
                 ),
               ],
             ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  width: 132,
-                  height: 132,
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: const Color(0xD9060C18),
-                          borderRadius: BorderRadius.circular(15),
-                          border: Border.all(color: const Color(0x28FFFFFF)),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(15),
-                          child: StoreNetImage(url: imgUrl, fit: BoxFit.cover),
-                        ),
-                      ),
-                      if (signature)
-                        const Positioned(
-                          top: 6,
-                          left: 6,
-                          child: _SignatureTag(),
-                        ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 13),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: price == null
-                                ? const SizedBox.shrink()
-                                : _CenteredPrice(
-                                    price: price!,
-                                    originalPrice: originalPrice,
-                                  ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              if (onWishlist != null) {
-                                onWishlist!();
-                              } else {
-                                CartBag.instance.addWishlist(_item);
-                                _toast(context, 'Saved $name to wishlist');
-                              }
-                            },
-                            child: const NwsbIcon(
-                              NwsbMarks.wishlist,
-                              size: 18,
-                              color: Color(0xB3FFFFFF),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
                         name,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                          fontSize: 22,
+                          fontSize: 20,
                           fontWeight: FontWeight.w800,
                           color: Colors.white,
                           height: 1.05,
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        root.toUpperCase(),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: .8,
-                          color: Color(0x99C8E8F5),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        if (onWishlist != null) {
+                          onWishlist!();
+                        } else {
+                          CartBag.instance.addWishlist(_item);
+                          _toast(context, 'Saved $name to wishlist');
+                        }
+                      },
+                      child: Container(
+                        width: 32,
+                        height: 32,
+                        alignment: Alignment.center,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const NwsbIcon(
+                          NwsbMarks.wishlist,
+                          size: 16,
+                          color: Color(0xFF0A101C),
                         ),
                       ),
-                      const SizedBox(height: 6),
-                      Text(
-                        wordVibrationTag(name),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 11,
-                          height: 1.25,
-                          color: Color(0xB8FFFFFF),
-                        ),
-                      ),
-                      const Spacer(),
-                      const SizedBox(height: 4),
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: Alignment.centerLeft,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Expanded(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: 132,
+                        height: 132,
+                        child: Stack(
+                          fit: StackFit.expand,
                           children: [
-                            Semantics(
-                              button: true,
-                              container: true,
-                              excludeSemantics: true,
-                              label: 'Add to Cart',
-                              child: GestureDetector(
-                                onTap: () {
-                                  if (onAddCart != null) {
-                                    onAddCart!();
-                                  } else {
-                                    storeAddToCart(context, _item);
-                                    _toast(context, 'Added $name to cart');
-                                  }
-                                },
-                                child: Container(
-                                  width: 36,
-                                  height: 36,
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xE60A101C),
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: const Color(0x66E8D5A3),
-                                    ),
-                                  ),
-                                  child: const NwsbIcon(
-                                    NwsbMarks.cart,
-                                    size: 16,
-                                    color: Color(0xFFE8D5A3),
-                                  ),
+                            DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: const Color(0xD9060C18),
+                                borderRadius: BorderRadius.circular(15),
+                                border:
+                                    Border.all(color: const Color(0x28FFFFFF)),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(15),
+                                child: StoreNetImage(
+                                  url: imgUrl,
+                                  fit: BoxFit.cover,
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 8),
-                            Container(
-                              width: 1,
-                              height: 28,
-                              color: const Color(0x66FFFFFF),
+                            if (signature)
+                              const Positioned(
+                                top: 6,
+                                left: 6,
+                                child: _SignatureTag(),
+                              ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 13),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (price != null)
+                              _CenteredPrice(
+                                price: price!,
+                                originalPrice: originalPrice,
+                              ),
+                            const SizedBox(height: 4),
+                            Text(
+                              root.toUpperCase(),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: .8,
+                                color: Color(0x99C8E8F5),
+                              ),
                             ),
-                            const SizedBox(width: 8),
-                            Semantics(
-                              button: true,
-                              container: true,
-                              excludeSemantics: true,
-                              label: 'Buy Now',
-                              child: GestureDetector(
-                                onTap: () {
-                                  if (onBuyNow != null) {
-                                    onBuyNow!();
-                                  } else {
-                                    storeBuyNow(context, _item);
-                                  }
-                                },
-                                child: Container(
-                                  height: 36,
-                                  padding: const EdgeInsets.only(
-                                    left: 12,
-                                    right: 3,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(18),
-                                    gradient: const LinearGradient(
-                                      colors: [
-                                        Color(0xFFF3E4B7),
-                                        Color(0xFFC8A96E),
-                                      ],
-                                    ),
-                                  ),
-                                  child: const Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        'Buy Now',
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w800,
-                                          color: Color(0xFF060C18),
+                            const SizedBox(height: 6),
+                            Text(
+                              wordVibrationTag(name),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 11,
+                                height: 1.25,
+                                color: Color(0xB8FFFFFF),
+                              ),
+                            ),
+                            const Spacer(),
+                            const SizedBox(height: 4),
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerLeft,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Semantics(
+                                    button: true,
+                                    container: true,
+                                    excludeSemantics: true,
+                                    label: 'Add to Cart',
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        if (onAddCart != null) {
+                                          onAddCart!();
+                                        } else {
+                                          storeAddToCart(context, _item);
+                                          _toast(
+                                            context,
+                                            'Added $name to cart',
+                                          );
+                                        }
+                                      },
+                                      child: Container(
+                                        width: 36,
+                                        height: 36,
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xE60A101C),
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                            color: const Color(0x66E8D5A3),
+                                          ),
+                                        ),
+                                        child: const NwsbIcon(
+                                          NwsbMarks.cart,
+                                          size: 16,
+                                          color: Color(0xFFE8D5A3),
                                         ),
                                       ),
-                                      SizedBox(width: 7),
-                                      _BagMarkDisc(),
-                                    ],
+                                    ),
                                   ),
-                                ),
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    width: 1,
+                                    height: 28,
+                                    color: const Color(0x66FFFFFF),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Semantics(
+                                    button: true,
+                                    container: true,
+                                    excludeSemantics: true,
+                                    label: 'Buy Now',
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        if (onBuyNow != null) {
+                                          onBuyNow!();
+                                        } else {
+                                          storeBuyNow(context, _item);
+                                        }
+                                      },
+                                      child: Container(
+                                        height: 36,
+                                        padding: const EdgeInsets.only(
+                                          left: 12,
+                                          right: 3,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(18),
+                                          gradient: const LinearGradient(
+                                            colors: [
+                                              Color(0xFFF3E4B7),
+                                              Color(0xFFC8A96E),
+                                            ],
+                                          ),
+                                        ),
+                                        child: const Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              'Buy Now',
+                                              style: TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w800,
+                                                color: Color(0xFF060C18),
+                                              ),
+                                            ),
+                                            SizedBox(width: 7),
+                                            _BagMarkDisc(),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
@@ -1143,6 +1165,16 @@ class _CenteredPrice extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        if (showStrike)
+          Text(
+            original,
+            style: const TextStyle(
+              fontSize: 13,
+              color: Color(0x88FFFFFF),
+              decoration: TextDecoration.lineThrough,
+              decorationColor: Color(0x88FFFFFF),
+            ),
+          ),
         Text(
           sale,
           textAlign: TextAlign.left,
@@ -1154,16 +1186,6 @@ class _CenteredPrice extends StatelessWidget {
             letterSpacing: -0.6,
           ),
         ),
-        if (showStrike)
-          Text(
-            original,
-            style: const TextStyle(
-              fontSize: 13,
-              color: Color(0x88FFFFFF),
-              decoration: TextDecoration.lineThrough,
-              decorationColor: Color(0x88FFFFFF),
-            ),
-          ),
       ],
     );
   }

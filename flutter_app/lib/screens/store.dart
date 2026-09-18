@@ -617,7 +617,7 @@ class _StoreCompactVideoBanner extends StatelessWidget {
   Widget build(BuildContext context) => ClipRRect(
         borderRadius: BorderRadius.circular(16),
         child: AspectRatio(
-          aspectRatio: 16 / 5,
+          aspectRatio: 16 / 6.4,
           child: NwsbVideo(asset: asset, priority: ClipPriority.decoration),
         ),
       );
@@ -632,7 +632,7 @@ class _StoreVideoBanner extends StatelessWidget {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(16),
           child: AspectRatio(
-            aspectRatio: 16 / 5,
+            aspectRatio: 16 / 6.4,
             child: NwsbVideo(
                 asset: asset,
                 poster: poster,

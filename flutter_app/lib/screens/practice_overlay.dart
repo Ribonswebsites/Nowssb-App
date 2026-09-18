@@ -1,12 +1,12 @@
 /// Compact Practice tab opened from the NowssB player.
 ///
 /// Looks like the Now Playing practice card: PRACTICE header, close, status,
-/// glowing-orb film with ripple rings, and two pills. The player behind the
-/// tab is blurred; the card itself stays dark so the video orb can blend.
+/// glowing-orb film, and two pills. A separate black tab above it shows the
+/// word and syllable breakdown. The player behind the tab is blurred; the
+/// cards stay dark so the video orb can blend.
 library;
 
 import 'dart:async';
-import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
@@ -32,6 +32,7 @@ enum _PracticeStatus {
 const _sessionLength = 29;
 
 const _practiceOrbClip = 'assets/video/practice-orb.mp4';
+const _storeMark = 'assets/store/nowssb-bag-headphones.webp';
 
 /// Compact microphone used in the Now Playing dock.
 class PracticeDockOrb extends StatelessWidget {
@@ -115,7 +116,6 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
   final stt.SpeechToText _speech = stt.SpeechToText();
   late final AnimationController _entry;
   late final AnimationController _spin;
-  late final AnimationController _ripple;
   late final CurvedAnimation _open;
   late final CurvedAnimation _punch;
   late final Animation<Offset> _slide;
@@ -140,10 +140,6 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
       vsync: this,
       duration: const Duration(milliseconds: 180),
     );
-    _ripple = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 2400),
-    )..repeat();
     _open = CurvedAnimation(parent: _entry, curve: Curves.easeOutCubic);
     _punch = CurvedAnimation(parent: _spin, curve: Curves.easeOutCubic);
     _slide = Tween<Offset>(
@@ -166,7 +162,6 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
     _punch.dispose();
     _entry.dispose();
     _spin.dispose();
-    _ripple.dispose();
     _recorder.dispose();
     super.dispose();
   }
@@ -264,9 +259,8 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
     await Future<void>.delayed(const Duration(milliseconds: 720));
     if (mounted) {
       setState(
-        () => _status = _matched
-            ? _PracticeStatus.complete
-            : _PracticeStatus.results,
+        () => _status =
+            _matched ? _PracticeStatus.complete : _PracticeStatus.results,
       );
     }
   }
@@ -336,7 +330,7 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
             ),
           ),
           Align(
-            alignment: const Alignment(0, -0.06),
+            alignment: const Alignment(0, 0.28),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: FadeTransition(
@@ -345,16 +339,22 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
                   position: _slide,
                   child: ScaleTransition(
                     scale: _cardScale,
-                    child: GestureDetector(
-                      onTap: () {},
-                      child: _BlackTab(
-                        status: _statusLabel,
-                        holding: _holding,
-                        ripple: _ripple,
-                        onStart: _beginTake,
-                        onReplace: () => unawaited(_replay()),
-                        onClose: widget.onClose,
-                      ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _WordBreakTab(word: widget.word),
+                        const SizedBox(height: 10),
+                        GestureDetector(
+                          onTap: () {},
+                          child: _BlackTab(
+                            status: _statusLabel,
+                            holding: _holding,
+                            onStart: _beginTake,
+                            onReplay: () => unawaited(_replay()),
+                            onClose: widget.onClose,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -367,21 +367,103 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
   }
 }
 
+class _WordBreakTab extends StatelessWidget {
+  const _WordBreakTab({required this.word});
+
+  final Word word;
+
+  @override
+  Widget build(BuildContext context) {
+    final raw = word.word.trim();
+    final title = raw.isEmpty
+        ? ''
+        : '${raw[0].toUpperCase()}${raw.substring(1).toLowerCase()}';
+    final syllables =
+        word.syllables.map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(20, 14, 20, 16),
+      decoration: BoxDecoration(
+        color: const Color(0xF00C0C0E),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: const Color(0x14FFFFFF)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: Color(0xFFF5F5F7),
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.4,
+              height: 1.1,
+            ),
+          ),
+          if (syllables.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              alignment: WrapAlignment.center,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                for (var i = 0; i < syllables.length; i++) ...[
+                  if (i > 0)
+                    Container(
+                      width: 4,
+                      height: 4,
+                      decoration: const BoxDecoration(
+                        color: Color(0xCCF4F4F5),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF5F5F5),
+                      borderRadius: BorderRadius.circular(99),
+                    ),
+                    child: Text(
+                      syllables[i],
+                      style: const TextStyle(
+                        color: Color(0xFF0A0A0B),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 0.1,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
 class _BlackTab extends StatelessWidget {
   const _BlackTab({
     required this.status,
     required this.holding,
-    required this.ripple,
     required this.onStart,
-    required this.onReplace,
+    required this.onReplay,
     required this.onClose,
   });
 
   final String status;
   final bool holding;
-  final Animation<double> ripple;
   final VoidCallback onStart;
-  final VoidCallback onReplace;
+  final VoidCallback onReplay;
   final VoidCallback onClose;
 
   @override
@@ -398,15 +480,49 @@ class _BlackTab extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'PRACTICE',
-                style: TextStyle(
-                  color: Color(0xFFB8B8BC),
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 2.4,
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'PRACTICE',
+                    style: TextStyle(
+                      color: Color(0xFFB8B8BC),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 2.4,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: Container(
+                        width: 22,
+                        height: 22,
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          color: const Color(0x33FFFFFF),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: const Color(0x55FFFFFF)),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(5),
+                          child: Image.asset(
+                            _storeMark,
+                            width: 18,
+                            height: 18,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) =>
+                                const SizedBox.shrink(),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
               const Spacer(),
               GestureDetector(
@@ -431,26 +547,9 @@ class _BlackTab extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          SizedBox(
-            height: 196,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                AnimatedBuilder(
-                  animation: ripple,
-                  builder: (context, _) {
-                    return CustomPaint(
-                      size: const Size(196, 196),
-                      painter: _RippleRingsPainter(
-                        progress: ripple.value,
-                        listening: holding,
-                      ),
-                    );
-                  },
-                ),
-                const _OrbFilm(),
-              ],
-            ),
+          const SizedBox(
+            height: 132,
+            child: Center(child: _OrbFilm()),
           ),
           const SizedBox(height: 6),
           Row(
@@ -459,7 +558,7 @@ class _BlackTab extends StatelessWidget {
                 child: SizedBox(
                   height: 46,
                   child: OutlinedButton(
-                    onPressed: onReplace,
+                    onPressed: onReplay,
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.white,
                       side: const BorderSide(color: Colors.white, width: 1.2),
@@ -467,7 +566,7 @@ class _BlackTab extends StatelessWidget {
                       shape: const StadiumBorder(),
                     ),
                     child: const Text(
-                      'Replace',
+                      'Replay',
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
@@ -512,35 +611,6 @@ class _BlackTab extends StatelessWidget {
       ),
     );
   }
-}
-
-/// Concentric rings around the orb — same language as the practice card.
-class _RippleRingsPainter extends CustomPainter {
-  const _RippleRingsPainter({required this.progress, required this.listening});
-
-  final double progress;
-  final bool listening;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final c = Offset(size.width / 2, size.height / 2);
-    final maxR = size.shortestSide / 2;
-    final paint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.15;
-    for (var i = 0; i < 5; i++) {
-      final t = (i + 1) / 5.0;
-      final wave = math.sin((progress + i * 0.14) * math.pi * 2);
-      final pulse = listening ? 1.0 + 0.035 * wave : 1.0 + 0.012 * wave;
-      final r = maxR * (0.38 + t * 0.58) * pulse;
-      paint.color = Colors.white.withValues(alpha: 0.07 + (1 - t) * 0.11);
-      canvas.drawCircle(c, r, paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _RippleRingsPainter old) =>
-      old.progress != progress || old.listening != listening;
 }
 
 /// Glowing sphere loop. Circular clip, no chrome, black plate matches the tab.

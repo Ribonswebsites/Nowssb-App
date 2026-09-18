@@ -742,61 +742,62 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                             ),
                           ),
                           const SizedBox(height: 18),
-                          Stack(
-                            clipBehavior: Clip.none,
+                          Row(
                             children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 48,
-                                ),
-                                child: Column(
-                                  children: [
-                                    Text(
-                                      _prettyTitle(_word.word),
-                                      textAlign: TextAlign.center,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        color: Color(0xFFF4F4F5),
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w500,
-                                        height: 1.15,
-                                        letterSpacing: -0.3,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    SizedBox(
-                                      height: 20,
-                                      width: double.infinity,
-                                      child: _SubtitleMarquee(
-                                        lines: _marqueeLines,
-                                        animation: _marqueeController,
-                                      ),
-                                    ),
-                                  ],
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.asset(
+                                  'assets/store/nowssb-bag-headphones.webp',
+                                  width: 28,
+                                  height: 28,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) =>
+                                      const SizedBox.shrink(),
                                 ),
                               ),
-                              Positioned(
-                                right: 0,
-                                top: 0,
-                                child: GestureDetector(
-                                  onTap: _toggleLike,
-                                  child: SizedBox(
-                                    width: 44,
-                                    height: 44,
-                                    child: Icon(
-                                      _liked
-                                          ? Icons.favorite_rounded
-                                          : Icons.favorite_border_rounded,
-                                      color: _liked
-                                          ? const Color(0xFFF5F5F7)
-                                          : const Color(0xFF8B8B90),
-                                      size: 22,
-                                    ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  _prettyTitle(_word.word),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: Color(0xFFF4F4F5),
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.w800,
+                                    height: 1.1,
+                                    letterSpacing: -0.6,
+                                  ),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: _toggleLike,
+                                child: SizedBox(
+                                  width: 44,
+                                  height: 44,
+                                  child: Icon(
+                                    _liked
+                                        ? Icons.favorite_rounded
+                                        : Icons.favorite_border_rounded,
+                                    color: _liked
+                                        ? const Color(0xFFF5F5F7)
+                                        : const Color(0xFF8B8B90),
+                                    size: 22,
                                   ),
                                 ),
                               ),
                             ],
+                          ),
+                          const SizedBox(height: 6),
+                          ClipRect(
+                            child: SizedBox(
+                              height: 20,
+                              width: double.infinity,
+                              child: _SubtitleMarquee(
+                                lines: _marqueeLines,
+                                animation: _marqueeController,
+                              ),
+                            ),
                           ),
                           const SizedBox(height: 16),
                           _ProgressBar(
