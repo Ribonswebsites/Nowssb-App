@@ -790,7 +790,6 @@ class RmWordCard extends StatelessWidget {
     );
   }
 }
-}
 
 class _SignatureTag extends StatelessWidget {
   const _SignatureTag();
