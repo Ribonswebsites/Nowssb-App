@@ -24,6 +24,8 @@ enum _PracticeStatus {
   listening,
   recording,
   practicing,
+  processing,
+  results,
   locked,
   complete,
 }
@@ -358,7 +360,7 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
     try {
       await widget.onSpeak();
     } catch (_) {}
-    if (mounted) setState(() => _status = _PracticeStatus.ready);
+    if (mounted) setState(() => _status = _PracticeStatus.listening);
   }
 
   Future<void> _beginTake() async {
@@ -444,10 +446,11 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
     if (!mounted) return;
     setState(() {
       _holding = false;
-      _status = _elapsed >= _sessionLength - 1
-          ? _PracticeStatus.complete
-          : _PracticeStatus.locked;
+      _status = _PracticeStatus.processing;
     });
+    await Future<void>.delayed(const Duration(milliseconds: 720));
+    if (!mounted) return;
+    setState(() => _status = _PracticeStatus.results);
   }
 
   Future<void> _finishCapture() async {
@@ -492,6 +495,8 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
       _PracticeStatus.listening => 'Listening',
       _PracticeStatus.recording => 'Recording',
       _PracticeStatus.practicing => 'Practicing',
+      _PracticeStatus.processing => 'Processing',
+      _PracticeStatus.results => 'Results',
       _PracticeStatus.locked => 'Locked',
       _PracticeStatus.complete => 'Locked',
     };
@@ -616,16 +621,6 @@ class _PracticeTab extends StatelessWidget {
   final VoidCallback onHoldEnd;
   final VoidCallback onReplay;
 
-  static const _verbs = [
-    'Ready',
-    'Listening',
-    'Practicing',
-    'Recording',
-    'Thinking',
-    'Solving',
-    'Locked',
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -681,7 +676,7 @@ class _PracticeTab extends StatelessWidget {
                     children: [
                       const SizedBox(height: 4),
                       SizedBox(
-                        height: 230,
+                        height: 188,
                         child: GestureDetector(
                           onLongPressStart: (_) => onHoldStart(),
                           onLongPressEnd: (_) => onHoldEnd(),
@@ -691,13 +686,16 @@ class _PracticeTab extends StatelessWidget {
                           child: AnimatedBuilder(
                             animation: pulse,
                             builder: (context, _) => CustomPaint(
-                              painter: _WaterRipplePainter(
+                              painter: _ThinkingOrbPainter(
                                 progress: pulse.value,
                                 accent: accent,
                                 intensity: holding ? 1.55 : 1.0,
                               ),
-                              child: const Center(
-                                child: _MicDisc(size: 92, iconSize: 34),
+                              child: Center(
+                                child: _MicDisc(
+                                  size: holding ? 78 : 72,
+                                  iconSize: 28,
+                                ),
                               ),
                             ),
                           ),
@@ -823,37 +821,7 @@ class _PracticeTab extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 10),
-                      Wrap(
-                        alignment: WrapAlignment.center,
-                        spacing: 6,
-                        runSpacing: 6,
-                        children: [
-                          for (final v in _verbs)
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 5,
-                              ),
-                              decoration: BoxDecoration(
-                                color: status == v
-                                    ? Colors.white
-                                    : Colors.transparent,
-                                borderRadius: BorderRadius.circular(99),
-                              ),
-                              child: Text(
-                                v.toUpperCase(),
-                                style: TextStyle(
-                                  color: status == v
-                                      ? const Color(0xFF050506)
-                                      : Colors.white38,
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: .8,
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
+                      _PracticePhaseTabs(status: status),
                       const SizedBox(height: 16),
                       Row(
                         children: [
@@ -886,8 +854,9 @@ class _PracticeTab extends StatelessWidget {
                                 ),
                                 shape: const StadiumBorder(),
                               ),
-                              child: Text(
-                                holding ? 'Recording…' : 'Hold to speak',
+                              child: _AnimatedHoldLabel(
+                                holding: holding,
+                                processing: status == 'Processing',
                               ),
                             ),
                           ),
@@ -987,6 +956,116 @@ class _MicDisc extends StatelessWidget {
       ),
     );
   }
+}
+
+class _PracticePhaseTabs extends StatelessWidget {
+  const _PracticePhaseTabs({required this.status});
+  final String status;
+
+  @override
+  Widget build(BuildContext context) {
+    const phases = ['Listening', 'Processing', 'Results'];
+    final active = status == 'Processing' ? 1 : (status == 'Results' ? 2 : 0);
+    return SizedBox(
+      height: 30,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          for (var i = 0; i < phases.length; i++) ...[
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: i == active ? Colors.white : const Color(0x16000000),
+                borderRadius: BorderRadius.circular(99),
+                border: Border.all(
+                  color: Colors.white.withOpacity(i == active ? .9 : .16),
+                ),
+              ),
+              child: Text(
+                phases[i].toUpperCase(),
+                style: TextStyle(
+                  color: i == active ? const Color(0xFF050506) : Colors.white54,
+                  fontSize: 8,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: .8,
+                ),
+              ),
+            ),
+            if (i != phases.length - 1) const SizedBox(width: 5),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _AnimatedHoldLabel extends StatelessWidget {
+  const _AnimatedHoldLabel({required this.holding, required this.processing});
+  final bool holding;
+  final bool processing;
+
+  @override
+  Widget build(BuildContext context) {
+    final label = processing
+        ? 'Processing…'
+        : (holding ? 'Listening…' : 'Hold to speak');
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 160),
+      child: Text(label, key: ValueKey(label)),
+    );
+  }
+}
+
+class _ThinkingOrbPainter extends CustomPainter {
+  const _ThinkingOrbPainter({
+    required this.progress,
+    required this.accent,
+    required this.intensity,
+  });
+  final double progress;
+  final Color accent;
+  final double intensity;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = size.center(Offset.zero);
+    final radius = math.min(size.width, size.height) * .31;
+    final glow = Paint()
+      ..color = accent.withOpacity(.12 * intensity)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 22);
+    canvas.drawCircle(center, radius * 1.08, glow);
+    final lines = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = 1.7;
+    for (var i = -9; i <= 9; i++) {
+      final x = center.dx + i * radius / 9;
+      final width = math.sqrt(
+        math.max(0, radius * radius - (x - center.dx) * (x - center.dx)),
+      );
+      final wave = math.sin(progress * math.pi * 2 + i * .42) * 3.5 * intensity;
+      lines.color = accent.withOpacity(
+        (.22 + .62 * (1 - i.abs() / 10)) * intensity.clamp(.7, 1.0),
+      );
+      canvas.drawArc(
+        Rect.fromLTRB(
+          x - width * .12 + wave,
+          center.dy - width,
+          x + width * .12 + wave,
+          center.dy + width,
+        ),
+        -math.pi / 2,
+        math.pi,
+        false,
+        lines,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _ThinkingOrbPainter oldDelegate) =>
+      oldDelegate.progress != progress || oldDelegate.intensity != intensity;
 }
 
 class _InsetCard extends StatelessWidget {
