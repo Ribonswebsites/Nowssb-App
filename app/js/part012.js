@@ -2641,8 +2641,8 @@ function rmdAddCart() {
   var tierKey = RM_WORD_TIER[key] || 'basic_a';
   var tier = RM_TIERS[tierKey];
   var word = rmDisplayName(key);
-  if (typeof nssAddToCart === 'function')
-    nssAddToCart({ id:'rm-'+key, name:word, type:'Word', price:tier.priceVal, img:window.RM_WORD_IMG || RM_CAT_LOGO });
+  if (typeof playCartAddAnimation === 'function')
+    playCartAddAnimation(document.getElementById('rmdCartBtn'), { id:'rm-'+key, name:word, type:'Word', price:tier.priceVal, img:window.RM_WORD_IMG || RM_CAT_LOGO });
   _rmdRefreshActions();
 }
 

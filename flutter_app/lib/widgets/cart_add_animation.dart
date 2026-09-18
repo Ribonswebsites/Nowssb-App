@@ -11,24 +11,57 @@ import '../theme/tokens.dart';
 /// chip. It is an overlay so the product page does not re-layout during flight.
 class CartAddAnimation {
   CartAddAnimation._();
+  static bool _busy = false;
 
+  /// Adds once, animates in the root overlay, and completes after the flight.
+  static Future<void> playForContext(
+    BuildContext context, {
+    required BagItem item,
+    GlobalKey? pressedKey,
+    BuildContext? pressedContext,
+    GlobalKey? cartTargetKey,
+    VoidCallback? onComplete,
+    bool openCartAfter = false,
+  }) async {
+    if (_busy) return;
+    _busy = true;
+    try {
+      await CartBag.instance.addCart(item);
+      final reduceMotion =
+          MediaQuery.maybeOf(context)?.disableAnimations ?? false;
+      if (reduceMotion) {
+        onComplete?.call();
+        return;
+      }
+      play(
+        context,
+        fromKey: pressedKey,
+        fromContext: pressedContext ?? context,
+        targetKey: cartTargetKey,
+        item: item,
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 1080));
+      onComplete?.call();
+    } finally {
+      _busy = false;
+    }
+  }
+
+  @Deprecated('Use playForContext')
   static Future<void> addAndPlay(
     BuildContext context, {
     required BagItem item,
     GlobalKey? fromKey,
     BuildContext? fromContext,
     GlobalKey? targetKey,
-  }) async {
-    await CartBag.instance.addCart(item);
-    play(
-      context,
-      fromKey: fromKey,
-      fromContext: fromContext ?? context,
-      targetKey: targetKey,
-      item: item,
-    );
-    await Future<void>.delayed(const Duration(milliseconds: 1080));
-  }
+  }) =>
+      playForContext(
+        context,
+        item: item,
+        pressedKey: fromKey,
+        pressedContext: fromContext,
+        cartTargetKey: targetKey,
+      );
 
   static void play(
     BuildContext context, {
@@ -40,9 +73,8 @@ class CartAddAnimation {
     final from = fromKey == null
         ? _rectForContext(fromContext ?? context)
         : _rectFor(fromKey);
-    final target = targetKey == null
-        ? _fallbackTarget(context)
-        : _rectFor(targetKey);
+    final target =
+        targetKey == null ? _fallbackTarget(context) : _rectFor(targetKey);
     if (from == null || target == null) return;
     final overlay = Overlay.of(context, rootOverlay: true);
     late OverlayEntry entry;
@@ -129,14 +161,24 @@ class _CartFlightState extends State<_CartFlight>
           final value = _controller.value;
           final travel = Curves.easeInOutCubic.transform(value);
           final arc = math.sin(math.pi * travel) * -78;
-          final itemCenter = Offset.lerp(widget.from.center, widget.target.center, travel)! + Offset(0, arc);
+          final itemCenter =
+              Offset.lerp(widget.from.center, widget.target.center, travel)! +
+                  Offset(0, arc);
           final itemSize = math.max(26.0, math.min(widget.from.width, 72.0));
           final itemScale = value < .16
-              ? Curves.easeOutBack.transform((value / .16).clamp(0.0, 1.0).toDouble())
+              ? Curves.easeOutBack.transform(
+                  (value / .16).clamp(0.0, 1.0).toDouble(),
+                )
               : (value < .76 ? 1.0 - ((value - .16) / .60) * .58 : .42);
-          final itemOpacity = value < .74 ? 1.0 : (1 - ((value - .74) / .20)).clamp(0.0, 1.0).toDouble();
-          final cartProgress = Curves.easeOutCubic.transform(((value - .56) / .18).clamp(0.0, 1.0).toDouble());
-          final cartScale = .52 + cartProgress * .48 + (value > .74 ? math.sin((value - .74) * math.pi / .26) * .14 : 0);
+          final itemOpacity = value < .74
+              ? 1.0
+              : (1 - ((value - .74) / .20)).clamp(0.0, 1.0).toDouble();
+          final cartProgress = Curves.easeOutCubic.transform(
+            ((value - .56) / .18).clamp(0.0, 1.0).toDouble(),
+          );
+          final cartScale = .52 +
+              cartProgress * .48 +
+              (value > .74 ? math.sin((value - .74) * math.pi / .26) * .14 : 0);
           final cartOpacity = ((value - .50) / .14).clamp(0.0, 1.0).toDouble();
           return Stack(
             children: [
@@ -196,9 +238,8 @@ class _FlyingItem extends StatelessWidget {
               : CachedNetworkImage(
                   imageUrl: item.image,
                   fit: BoxFit.cover,
-                  errorWidget: (_, __, ___) => const ColoredBox(
-                    color: NwsbColors.deep,
-                  ),
+                  errorWidget: (_, __, ___) =>
+                      const ColoredBox(color: NwsbColors.deep),
                 ),
         ),
       ),
@@ -224,7 +265,11 @@ class _RollingCart extends StatelessWidget {
           BoxShadow(color: Color(0xB3000000), blurRadius: 18, spreadRadius: 2),
         ],
       ),
-      child: Icon(Icons.shopping_bag_outlined, color: NwsbColors.ink, size: 25),
+      child: Icon(
+        Icons.shopping_cart_outlined,
+        color: NwsbColors.ink,
+        size: 25,
+      ),
     );
   }
 }

@@ -5,6 +5,7 @@
 library;
 
 import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/material.dart';
 
 import '../../data/store_catalog.dart';
@@ -49,10 +50,7 @@ class StorePixelsHero extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              NwsbVideo(
-                asset: videoAsset!,
-                priority: ClipPriority.feature,
-              ),
+              NwsbVideo(asset: videoAsset!, priority: ClipPriority.feature),
               const DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -94,7 +92,8 @@ class StoreRecommendedSection extends StatelessWidget {
   });
 
   final VoidCallback onSeeAll;
-  final void Function(String word, String root, String img, num price) onOpenWord;
+  final void Function(String word, String root, String img, num price)
+      onOpenWord;
 
   static const _cards = <_RecCardData>[
     _RecCardData(
@@ -207,7 +206,8 @@ class _RecommendedCard extends StatelessWidget {
             Image.asset(
               data.art,
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF0A0F1C)),
+              errorBuilder: (_, __, ___) =>
+                  const ColoredBox(color: Color(0xFF0A0F1C)),
             ),
             const DecoratedBox(
               decoration: BoxDecoration(
@@ -281,11 +281,24 @@ class StoreFeaturedBundleSection extends StatelessWidget {
   });
 
   final VoidCallback onSeeAll;
-  final void Function(String word, String root, String img, num price) onOpenWord;
+  final void Function(String word, String root, String img, num price)
+      onOpenWord;
 
   static const _rows = <_BundleRow>[
-    _BundleRow('Earth', 'Elements · Proto-Germanic', 'earth', 'Proto-Germanic', kStoreProductArt),
-    _BundleRow('Dragon', 'Mythical · Greek', 'dragon', 'Greek', kStoreProductArt),
+    _BundleRow(
+      'Earth',
+      'Elements · Proto-Germanic',
+      'earth',
+      'Proto-Germanic',
+      kStoreProductArt,
+    ),
+    _BundleRow(
+      'Dragon',
+      'Mythical · Greek',
+      'dragon',
+      'Greek',
+      kStoreProductArt,
+    ),
     _BundleRow('Peace', 'Peace Edition', 'peace', 'Latin', kStoreProductArt),
   ];
 
@@ -303,7 +316,8 @@ class StoreFeaturedBundleSection extends StatelessWidget {
             child: Column(
               children: [
                 GestureDetector(
-                  onTap: () => onOpenWord('warrior', 'Old French', kRmWordImg, 49),
+                  onTap: () =>
+                      onOpenWord('warrior', 'Old French', kRmWordImg, 49),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -314,8 +328,11 @@ class StoreFeaturedBundleSection extends StatelessWidget {
                           width: 78,
                           height: 78,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) =>
-                              const SizedBox(width: 78, height: 78, child: ColoredBox(color: Color(0xFF0A0F1C))),
+                          errorBuilder: (_, __, ___) => const SizedBox(
+                            width: 78,
+                            height: 78,
+                            child: ColoredBox(color: Color(0xFF0A0F1C)),
+                          ),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -334,7 +351,11 @@ class StoreFeaturedBundleSection extends StatelessWidget {
                             SizedBox(height: 4),
                             Text(
                               'A curated set of strength & courage words for daily healing practice.',
-                              style: TextStyle(fontSize: 11, height: 1.4, color: Color(0x88FFFFFF)),
+                              style: TextStyle(
+                                fontSize: 11,
+                                height: 1.4,
+                                color: Color(0x88FFFFFF),
+                              ),
                             ),
                             SizedBox(height: 8),
                             _ItemCountPill(label: '12 WORDS'),
@@ -388,8 +409,11 @@ class _BundleListRow extends StatelessWidget {
               width: 42,
               height: 42,
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) =>
-                  const SizedBox(width: 42, height: 42, child: ColoredBox(color: Color(0xFF0A0F1C))),
+              errorBuilder: (_, __, ___) => const SizedBox(
+                width: 42,
+                height: 42,
+                child: ColoredBox(color: Color(0xFF0A0F1C)),
+              ),
             ),
           ),
           const SizedBox(width: 10),
@@ -407,7 +431,10 @@ class _BundleListRow extends StatelessWidget {
                 ),
                 Text(
                   row.sub,
-                  style: const TextStyle(fontSize: 11, color: Color(0x77FFFFFF)),
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: Color(0x77FFFFFF),
+                  ),
                 ),
               ],
             ),
@@ -434,7 +461,11 @@ class _ItemCountPill extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.menu_book_outlined, size: 12, color: NwsbColors.goldLight),
+          const Icon(
+            Icons.menu_book_outlined,
+            size: 12,
+            color: NwsbColors.goldLight,
+          ),
           const SizedBox(width: 5),
           Text(
             label,
@@ -475,7 +506,6 @@ class _SectionHeader extends StatelessWidget {
     );
   }
 }
-
 
 // ─── Shared glass panel ──────────────────────────────────────────────────────
 
@@ -534,9 +564,14 @@ class StoreGlassPanel extends StatelessWidget {
 // ─── #3b Limited Time Free + Browse by Goal (frequency package) ──────────────
 
 class StoreLimitedTimeFreeSection extends StatelessWidget {
-  const StoreLimitedTimeFreeSection({super.key, this.onOpenWord, this.onRequestWords});
+  const StoreLimitedTimeFreeSection({
+    super.key,
+    this.onOpenWord,
+    this.onRequestWords,
+  });
 
-  final void Function(String word, String root, String img, num price)? onOpenWord;
+  final void Function(String word, String root, String img, num price)?
+      onOpenWord;
   final VoidCallback? onRequestWords;
 
   static const _tracks = <(String, String, String)>[
@@ -578,7 +613,10 @@ class StoreLimitedTimeFreeSection extends StatelessWidget {
                 GestureDetector(
                   onTap: onRequestWords,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(color: const Color(0x55E8D5A3)),
@@ -664,7 +702,9 @@ class StoreLimitedTimeFreeSection extends StatelessWidget {
                                       _tracks[i].$3,
                                       fit: BoxFit.cover,
                                       errorBuilder: (_, __, ___) =>
-                                          const ColoredBox(color: Color(0xFF0A0F1C)),
+                                          const ColoredBox(
+                                        color: Color(0xFF0A0F1C),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -704,7 +744,11 @@ class StoreLimitedTimeFreeSection extends StatelessWidget {
 }
 
 class StoreBrowseByGoalSection extends StatelessWidget {
-  const StoreBrowseByGoalSection({super.key, required this.onSeeAll, this.onSelect});
+  const StoreBrowseByGoalSection({
+    super.key,
+    required this.onSeeAll,
+    this.onSelect,
+  });
 
   final VoidCallback onSeeAll;
   final ValueChanged<String>? onSelect;
@@ -735,7 +779,9 @@ class StoreBrowseByGoalSection extends StatelessWidget {
               itemBuilder: (context, i) {
                 final g = _goals[i];
                 return GestureDetector(
-                  onTap: onSelect == null ? null : () => onSelect!(g.$1.toLowerCase()),
+                  onTap: onSelect == null
+                      ? null
+                      : () => onSelect!(g.$1.toLowerCase()),
                   child: SizedBox(
                     width: 86,
                     child: Column(
@@ -797,7 +843,8 @@ class StoreFrequencyPackage extends StatelessWidget {
 
   final ValueChanged<String> onSelectCategory;
   final VoidCallback onSeeAll;
-  final void Function(String word, String root, String img, num price)? onOpenWord;
+  final void Function(String word, String root, String img, num price)?
+      onOpenWord;
   final VoidCallback? onRequestWords;
 
   @override
@@ -806,8 +853,14 @@ class StoreFrequencyPackage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        StoreLimitedTimeFreeSection(onOpenWord: onOpenWord, onRequestWords: onRequestWords),
-        StoreBrowseByGoalSection(onSeeAll: onSeeAll, onSelect: onSelectCategory),
+        StoreLimitedTimeFreeSection(
+          onOpenWord: onOpenWord,
+          onRequestWords: onRequestWords,
+        ),
+        StoreBrowseByGoalSection(
+          onSeeAll: onSeeAll,
+          onSelect: onSelectCategory,
+        ),
       ],
     );
   }
@@ -823,12 +876,31 @@ class StoreFeaturedPlaylistSection extends StatelessWidget {
   });
 
   final VoidCallback onSeeAll;
-  final void Function(String word, String root, String img, num price) onOpenWord;
+  final void Function(String word, String root, String img, num price)
+      onOpenWord;
 
   static const _rows = <_BundleRow>[
-    _BundleRow('Deep Healing', 'Emotional & Physical', 'peace', 'Latin', kStoreProductArt),
-    _BundleRow('Healing Frequency', 'Healing Meditation', 'spirit', 'Latin', kStoreProductArt),
-    _BundleRow('Remove Negative', 'Healing Reiki Music', 'earth', 'Proto-Germanic', kStoreProductArt),
+    _BundleRow(
+      'Deep Healing',
+      'Emotional & Physical',
+      'peace',
+      'Latin',
+      kStoreProductArt,
+    ),
+    _BundleRow(
+      'Healing Frequency',
+      'Healing Meditation',
+      'spirit',
+      'Latin',
+      kStoreProductArt,
+    ),
+    _BundleRow(
+      'Remove Negative',
+      'Healing Reiki Music',
+      'earth',
+      'Proto-Germanic',
+      kStoreProductArt,
+    ),
   ];
 
   @override
@@ -855,8 +927,11 @@ class StoreFeaturedPlaylistSection extends StatelessWidget {
                           width: 78,
                           height: 78,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) =>
-                              const SizedBox(width: 78, height: 78, child: ColoredBox(color: Color(0xFF0A0F1C))),
+                          errorBuilder: (_, __, ___) => const SizedBox(
+                            width: 78,
+                            height: 78,
+                            child: ColoredBox(color: Color(0xFF0A0F1C)),
+                          ),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -875,7 +950,11 @@ class StoreFeaturedPlaylistSection extends StatelessWidget {
                             SizedBox(height: 4),
                             Text(
                               'If you\'re looking for some chill tones to restore balance and deep focus…',
-                              style: TextStyle(fontSize: 11, height: 1.4, color: Color(0x88FFFFFF)),
+                              style: TextStyle(
+                                fontSize: 11,
+                                height: 1.4,
+                                color: Color(0x88FFFFFF),
+                              ),
                             ),
                             SizedBox(height: 8),
                             _ItemCountPill(label: '4 SESSIONS'),
@@ -912,7 +991,8 @@ class StoreGlassPlaylistCarousel extends StatelessWidget {
   });
 
   final VoidCallback onSeeAll;
-  final void Function(String word, String root, String img, num price) onOpenWord;
+  final void Function(String word, String root, String img, num price)
+      onOpenWord;
 
   static const _cards = <_GlassPlaylistCardData>[
     _GlassPlaylistCardData(
@@ -931,11 +1011,7 @@ class StoreGlassPlaylistCarousel extends StatelessWidget {
       desc: 'Divine codes and soft healing tones.',
       count: '8 SESSIONS',
       art: kStoreProductArt,
-      rows: [
-        ('Spirit', 'Latin'),
-        ('Peace', 'Latin'),
-        ('Om', 'Sanskrit'),
-      ],
+      rows: [('Spirit', 'Latin'), ('Peace', 'Latin'), ('Om', 'Sanskrit')],
     ),
     _GlassPlaylistCardData(
       title: 'Nature Resonance',
@@ -974,7 +1050,12 @@ class StoreGlassPlaylistCarousel extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       GestureDetector(
-                        onTap: () => onOpenWord(c.rows.first.$1.toLowerCase(), c.rows.first.$2, kRmWordImg, 49),
+                        onTap: () => onOpenWord(
+                          c.rows.first.$1.toLowerCase(),
+                          c.rows.first.$2,
+                          kRmWordImg,
+                          49,
+                        ),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -985,8 +1066,11 @@ class StoreGlassPlaylistCarousel extends StatelessWidget {
                                 width: 70,
                                 height: 70,
                                 fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) =>
-                                    const SizedBox(width: 70, height: 70, child: ColoredBox(color: Color(0xFF0A0F1C))),
+                                errorBuilder: (_, __, ___) => const SizedBox(
+                                  width: 70,
+                                  height: 70,
+                                  child: ColoredBox(color: Color(0xFF0A0F1C)),
+                                ),
                               ),
                             ),
                             const SizedBox(width: 10),
@@ -1041,8 +1125,11 @@ class StoreGlassPlaylistCarousel extends StatelessWidget {
                                   width: 40,
                                   height: 40,
                                   fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) =>
-                                      const SizedBox(width: 40, height: 40, child: ColoredBox(color: Color(0xFF0A0F1C))),
+                                  errorBuilder: (_, __, ___) => const SizedBox(
+                                    width: 40,
+                                    height: 40,
+                                    child: ColoredBox(color: Color(0xFF0A0F1C)),
+                                  ),
                                 ),
                               ),
                               const SizedBox(width: 10),
@@ -1060,7 +1147,10 @@ class StoreGlassPlaylistCarousel extends StatelessWidget {
                                     ),
                                     Text(
                                       c.rows[r].$2,
-                                      style: const TextStyle(fontSize: 11, color: Color(0x77FFFFFF)),
+                                      style: const TextStyle(
+                                        fontSize: 11,
+                                        color: Color(0x77FFFFFF),
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -1096,7 +1186,6 @@ class _GlassPlaylistCardData {
   final String art;
   final List<(String, String)> rows;
 }
-
 
 // ─── Mid-rail notification glass banners (6 variants, between every 2 rows) ──
 
@@ -1299,7 +1388,8 @@ Future<void> showStoreViewAllPanel(
   BuildContext context, {
   required String title,
   required List<StoreViewAllItem> items,
-  required void Function(String word, String root, String img, num price) onOpenWord,
+  required void Function(String word, String root, String img, num price)
+      onOpenWord,
 }) {
   return showGeneralDialog<void>(
     context: context,
@@ -1359,7 +1449,8 @@ class _StoreViewAllOverlay extends StatefulWidget {
 
   final String title;
   final List<StoreViewAllItem> items;
-  final void Function(String word, String root, String img, num price) onOpenWord;
+  final void Function(String word, String root, String img, num price)
+      onOpenWord;
 
   @override
   State<_StoreViewAllOverlay> createState() => _StoreViewAllOverlayState();
@@ -1402,7 +1493,11 @@ class _StoreViewAllOverlayState extends State<_StoreViewAllOverlay> {
 
   void _toast(String msg) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(msg), behavior: SnackBarBehavior.floating, duration: const Duration(seconds: 2)),
+      SnackBar(
+        content: Text(msg),
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 2),
+      ),
     );
   }
 
@@ -1452,7 +1547,11 @@ class _StoreViewAllOverlayState extends State<_StoreViewAllOverlay> {
                                 shape: BoxShape.circle,
                                 color: Color(0x22FFFFFF),
                               ),
-                              child: const Icon(Icons.close, size: 16, color: Colors.white),
+                              child: const Icon(
+                                Icons.close,
+                                size: 16,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ],
@@ -1480,15 +1579,29 @@ class _StoreViewAllOverlayState extends State<_StoreViewAllOverlay> {
                                 child: GestureDetector(
                                   onTap: () {
                                     Navigator.of(context).pop();
-                                    widget.onOpenWord(item.word, item.root, item.img, item.price);
+                                    widget.onOpenWord(
+                                      item.word,
+                                      item.root,
+                                      item.img,
+                                      item.price,
+                                    );
                                   },
                                   child: Container(
-                                    margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+                                    margin: const EdgeInsets.symmetric(
+                                      horizontal: 6,
+                                      vertical: 8,
+                                    ),
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(color: const Color(0x33FFFFFF)),
+                                      border: Border.all(
+                                        color: const Color(0x33FFFFFF),
+                                      ),
                                       boxShadow: const [
-                                        BoxShadow(color: Color(0x88000000), blurRadius: 18, offset: Offset(0, 8)),
+                                        BoxShadow(
+                                          color: Color(0x88000000),
+                                          blurRadius: 18,
+                                          offset: Offset(0, 8),
+                                        ),
                                       ],
                                     ),
                                     clipBehavior: Clip.antiAlias,
@@ -1499,14 +1612,19 @@ class _StoreViewAllOverlayState extends State<_StoreViewAllOverlay> {
                                           item.art,
                                           fit: BoxFit.cover,
                                           errorBuilder: (_, __, ___) =>
-                                              const ColoredBox(color: Color(0xFF0A0F1C)),
+                                              const ColoredBox(
+                                            color: Color(0xFF0A0F1C),
+                                          ),
                                         ),
                                         const DecoratedBox(
                                           decoration: BoxDecoration(
                                             gradient: LinearGradient(
                                               begin: Alignment.topCenter,
                                               end: Alignment.bottomCenter,
-                                              colors: [Color(0x33060C18), Color(0xF2060C18)],
+                                              colors: [
+                                                Color(0x33060C18),
+                                                Color(0xF2060C18),
+                                              ],
                                             ),
                                           ),
                                         ),
@@ -1516,7 +1634,8 @@ class _StoreViewAllOverlayState extends State<_StoreViewAllOverlay> {
                                             padding: const EdgeInsets.all(14),
                                             child: Column(
                                               mainAxisSize: MainAxisSize.min,
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
                                                 Text(
                                                   item.title,
@@ -1572,14 +1691,16 @@ class _StoreViewAllOverlayState extends State<_StoreViewAllOverlay> {
                           _WhiteCircleAction(
                             icon: Icons.favorite_border,
                             onTap: () {
-                              CartBag.instance.addWishlist(BagItem(
-                                id: 'word:${_current.word.toLowerCase()}',
-                                title: _current.title,
-                                subtitle: _current.root,
-                                image: _current.img,
-                                price: _current.price,
-                                kind: 'Word',
-                              ));
+                              CartBag.instance.addWishlist(
+                                BagItem(
+                                  id: 'word:${_current.word.toLowerCase()}',
+                                  title: _current.title,
+                                  subtitle: _current.root,
+                                  image: _current.img,
+                                  price: _current.price,
+                                  kind: 'Word',
+                                ),
+                              );
                               _toast('Saved ${_current.title} to wishlist');
                             },
                           ),
@@ -1590,9 +1711,9 @@ class _StoreViewAllOverlayState extends State<_StoreViewAllOverlay> {
                           ),
                           const SizedBox(width: 10),
                           _WhiteCircleAction(
-                            icon: Icons.shopping_bag_outlined,
+                            icon: Icons.shopping_cart_outlined,
                             onTap: () {
-                              CartAddAnimation.addAndPlay(
+                              CartAddAnimation.playForContext(
                                 context,
                                 item: BagItem(
                                   id: 'word:${_current.word.toLowerCase()}',
@@ -1647,7 +1768,11 @@ class _WhiteCircleAction extends StatelessWidget {
           shape: wide ? BoxShape.rectangle : BoxShape.circle,
           borderRadius: wide ? BorderRadius.circular(23) : null,
           boxShadow: const [
-            BoxShadow(color: Color(0x55000000), blurRadius: 10, offset: Offset(0, 4)),
+            BoxShadow(
+              color: Color(0x55000000),
+              blurRadius: 10,
+              offset: Offset(0, 4),
+            ),
           ],
         ),
         child: label != null

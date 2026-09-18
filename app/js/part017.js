@@ -134,6 +134,31 @@ function nssUpdateBadges() {
 nssUpdateBadges();
 
 // ── ADD TO CART ──
+function playCartAddAnimation(originEl, item, opts) {
+  opts = opts || {};
+  if (window.__nssCartFlightBusy) return false;
+  window.__nssCartFlightBusy = true;
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (typeof nssAddToCart === 'function') nssAddToCart(item);
+  var done = function () { window.__nssCartFlightBusy = false; if (opts.onComplete) opts.onComplete(); };
+  if (reduced || !originEl || !document.body) { done(); return true; }
+  var from = originEl.getBoundingClientRect();
+  var target = document.querySelector('.nss-cart-badge-shared, #nssCartBtn, .rm-cart-btn');
+  var to = target ? target.getBoundingClientRect() : {left: window.innerWidth - 42, top: 18, width: 30, height: 30};
+  var flight = document.createElement('div');
+  flight.className = 'nss-cart-flight';
+  flight.innerHTML = '<span class="nss-cart-flight-item">' + (item && item.name ? item.name : '•') + '</span><span class="nss-cart-flight-cart">' +
+    '<svg viewBox="0 0 22 22" aria-hidden="true"><path d="M3 3h1.5l2.5 7h9l2-5H7"/><circle cx="9" cy="18.5" r="1.5"/><circle cx="16" cy="18.5" r="1.5"/></svg></span>';
+  flight.style.setProperty('--x0', (from.left + from.width / 2) + 'px');
+  flight.style.setProperty('--y0', (from.top + from.height / 2) + 'px');
+  flight.style.setProperty('--x1', (to.left + to.width / 2) + 'px');
+  flight.style.setProperty('--y1', (to.top + to.height / 2) + 'px');
+  document.body.appendChild(flight);
+  flight.addEventListener('animationend', function () { flight.remove(); done(); }, {once:true});
+  setTimeout(function () { if (flight.isConnected) { flight.remove(); done(); } }, 1250);
+  return true;
+}
+
 function nssAddToCart(item) {
   // item = { id, name, type, price, img }
   /* Cart/Buy Now must never be gated behind an active subscription check —
@@ -684,7 +709,7 @@ function ebCartItem(b) {
 
 window.ebAddToCart = function (key) {
   var b = ebBookByKey(key); if (!b) return;
-  if (typeof nssAddToCart === 'function') nssAddToCart(ebCartItem(b));
+  if (typeof playCartAddAnimation === 'function') playCartAddAnimation(document.activeElement, ebCartItem(b));
 };
 
 window.ebToggleWishlist = function (key) {
@@ -694,7 +719,7 @@ window.ebToggleWishlist = function (key) {
 
 window.ebBuyNow = function (key) {
   var b = ebBookByKey(key); if (!b) return;
-  if (typeof nssAddToCart === 'function') nssAddToCart(ebCartItem(b));
+  if (typeof playCartAddAnimation === 'function') playCartAddAnimation(document.activeElement, ebCartItem(b));
   if (typeof openSub === 'function') openSub('checkout');
 };
 

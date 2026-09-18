@@ -97,7 +97,9 @@ void main() {
       'Store',
       'Profile'
     ]) {
-      await tester.tap(find.text(label));
+      // Some destinations (notably Store) also render the same word as a
+      // screen heading. The bottom-nav copy is the final matching widget.
+      await tester.tap(find.text(label).last);
       await tester.pump(const Duration(milliseconds: 50));
       expect(tester.takeException(), isNull, reason: '$label threw');
     }

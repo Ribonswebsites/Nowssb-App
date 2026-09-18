@@ -1111,3 +1111,14 @@ body:not(.fi-ready) #fashionHomeIntro{display:none!important;visibility:hidden!i
   #home .qa-tv-head-title,#home .qa-tv-head-sub,#home-nm .nmh-wrap-head-title,#home-nm .nmh-wrap-head-sub,
   #home .spill-pill-txt,#home-nm .spill-pill-txt,.nwsb-section-motion-banner strong,.nwsb-section-motion-banner span { animation:none; }
 }
+
+
+/* Shared Add to Cart flight: product pops, cart rolls in, catches, exits. */
+.nss-cart-flight { position:fixed; inset:0; z-index:99999; pointer-events:none; perspective:900px; }
+.nss-cart-flight-item, .nss-cart-flight-cart { position:absolute; left:var(--x0); top:var(--y0); transform:translate(-50%,-50%); }
+.nss-cart-flight-item { color:#e8d5a3; font:700 11px/1.1 'DM Sans',sans-serif; max-width:90px; text-align:center; padding:8px; border:1px solid rgba(232,213,163,.7); border-radius:50%; background:#060c18; animation:nssCartItem 1.08s cubic-bezier(.2,.8,.2,1) both; }
+.nss-cart-flight-cart { opacity:0; animation:nssCartCatch 1.08s cubic-bezier(.2,.8,.2,1) both; }
+.nss-cart-flight-cart svg { width:48px; height:48px; padding:10px; fill:none; stroke:#060c18; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; background:#fff; border:2px solid #e8d5a3; border-radius:50%; box-shadow:0 0 18px rgba(232,213,163,.45); }
+@keyframes nssCartItem { 0%{left:var(--x0);top:var(--y0);transform:translate(-50%,-50%) scale(.4) rotateX(0)} 18%{transform:translate(-50%,-50%) scale(1.12) rotateX(18deg)} 58%{left:var(--x1);top:var(--y1);transform:translate(-50%,-50%) scale(.72) rotateX(70deg)} 78%,100%{left:var(--x1);top:var(--y1);transform:translate(-50%,-50%) scale(0) rotateX(100deg);opacity:0} }
+@keyframes nssCartCatch { 0%,48%{left:var(--x1);top:var(--y1);transform:translate(-50%,-50%) scale(.45) rotate(-18deg);opacity:0} 60%{opacity:1;transform:translate(-50%,-50%) scale(1.08) rotate(8deg)} 78%{opacity:1;transform:translate(-50%,-50%) scale(.9) rotate(0)} 100%{left:var(--x1);top:var(--y1);transform:translate(-50%,-50%) scale(0) rotate(12deg);opacity:0} }
+@media (prefers-reduced-motion:reduce){.nss-cart-flight{display:none}}

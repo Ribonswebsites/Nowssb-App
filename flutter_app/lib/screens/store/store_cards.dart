@@ -91,7 +91,6 @@ Color storeCardTint(String seed) {
   return palette[h % palette.length];
 }
 
-
 class StoreNetImage extends StatelessWidget {
   const StoreNetImage({super.key, required this.url, this.fit = BoxFit.cover});
   final String url;
@@ -207,10 +206,15 @@ class RmCatBanner extends StatelessWidget {
                       if (badge != null) ...[
                         const SizedBox(width: 8),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 7,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(4),
-                            border: Border.all(color: titleColor.withValues(alpha: 0.45)),
+                            border: Border.all(
+                              color: titleColor.withValues(alpha: 0.45),
+                            ),
                           ),
                           child: Text(
                             badge!,
@@ -233,7 +237,10 @@ class RmCatBanner extends StatelessWidget {
                     const SizedBox(height: 3),
                     Text(
                       sub,
-                      style: const TextStyle(fontSize: 11, color: Color(0x88FFFFFF)),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: Color(0x88FFFFFF),
+                      ),
                     ),
                   ],
                   const SizedBox(height: 10),
@@ -390,7 +397,10 @@ class _StorePillRippleArtState extends State<StorePillRippleArt>
             height: d,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: widget.accent.withValues(alpha: 0.55), width: 1.4),
+              border: Border.all(
+                color: widget.accent.withValues(alpha: 0.55),
+                width: 1.4,
+              ),
               boxShadow: [
                 BoxShadow(
                   color: widget.accent.withValues(alpha: 0.22),
@@ -457,10 +467,16 @@ class _StorePillRippleArtState extends State<StorePillRippleArt>
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: const Color(0xEE060C18),
-                  border: Border.all(color: widget.accent.withValues(alpha: 0.55)),
+                  border: Border.all(
+                    color: widget.accent.withValues(alpha: 0.55),
+                  ),
                 ),
                 alignment: Alignment.center,
-                child: NwsbIcon(widget.svgBody!, size: d * 0.16, color: widget.accent),
+                child: NwsbIcon(
+                  widget.svgBody!,
+                  size: d * 0.16,
+                  color: widget.accent,
+                ),
               ),
             ),
         ],
@@ -496,7 +512,11 @@ class _PillRipplePainter extends CustomPainter {
 
 /// Premium 3D "View all" control — opens blur + carousel panel.
 class StoreViewAllControl extends StatelessWidget {
-  const StoreViewAllControl({super.key, required this.onTap, this.label = 'View all'});
+  const StoreViewAllControl({
+    super.key,
+    required this.onTap,
+    this.label = 'View all',
+  });
 
   final VoidCallback onTap;
   final String label;
@@ -522,8 +542,16 @@ class StoreViewAllControl extends StatelessWidget {
             ),
             border: Border.all(color: const Color(0x66FFFFFF)),
             boxShadow: const [
-              BoxShadow(color: Color(0x88000000), blurRadius: 12, offset: Offset(0, 5)),
-              BoxShadow(color: Color(0x55E8D5A3), blurRadius: 8, offset: Offset(0, 0)),
+              BoxShadow(
+                color: Color(0x88000000),
+                blurRadius: 12,
+                offset: Offset(0, 5),
+              ),
+              BoxShadow(
+                color: Color(0x55E8D5A3),
+                blurRadius: 8,
+                offset: Offset(0, 0),
+              ),
             ],
           ),
           child: Row(
@@ -539,7 +567,11 @@ class StoreViewAllControl extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 4),
-              const Icon(Icons.arrow_forward_rounded, size: 14, color: Color(0xFF060C18)),
+              const Icon(
+                Icons.arrow_forward_rounded,
+                size: 14,
+                color: Color(0xFF060C18),
+              ),
             ],
           ),
         ),
@@ -662,8 +694,16 @@ class RmWordCard extends StatelessWidget {
                 ],
               ),
               boxShadow: [
-                BoxShadow(color: bg.withOpacity(0.18), blurRadius: 24, spreadRadius: 1),
-                const BoxShadow(color: Color(0x80000000), blurRadius: 18, offset: Offset(0, 7)),
+                BoxShadow(
+                  color: bg.withOpacity(0.18),
+                  blurRadius: 24,
+                  spreadRadius: 1,
+                ),
+                const BoxShadow(
+                  color: Color(0x80000000),
+                  blurRadius: 18,
+                  offset: Offset(0, 7),
+                ),
               ],
             ),
             child: Row(
@@ -686,11 +726,19 @@ class RmWordCard extends StatelessWidget {
                         ),
                       ),
                       if (signature)
-                        const Positioned(top: 6, left: 6, child: _SignatureTag()),
+                        const Positioned(
+                          top: 6,
+                          left: 6,
+                          child: _SignatureTag(),
+                        ),
                       const Positioned(
                         right: 7,
                         bottom: 7,
-                        child: Icon(Icons.graphic_eq, size: 17, color: Color(0xB3E8D5A3)),
+                        child: Icon(
+                          Icons.graphic_eq,
+                          size: 17,
+                          color: Color(0xB3E8D5A3),
+                        ),
                       ),
                     ],
                   ),
@@ -707,7 +755,12 @@ class RmWordCard extends StatelessWidget {
                               name,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Colors.white, height: 1.05),
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
+                                height: 1.05,
+                              ),
                             ),
                           ),
                           GestureDetector(
@@ -715,30 +768,65 @@ class RmWordCard extends StatelessWidget {
                               if (onWishlist != null) {
                                 onWishlist!();
                               } else {
-                                CartBag.instance.addWishlist(BagItem(
-                                  id: 'word:${name.toLowerCase()}', title: name, subtitle: root,
-                                  image: imgUrl, price: price ?? 49, kind: signature ? 'Signature' : 'Word',
-                                ));
+                                CartBag.instance.addWishlist(
+                                  BagItem(
+                                    id: 'word:${name.toLowerCase()}',
+                                    title: name,
+                                    subtitle: root,
+                                    image: imgUrl,
+                                    price: price ?? 49,
+                                    kind: signature ? 'Signature' : 'Word',
+                                  ),
+                                );
                                 _toast(context, 'Saved $name to wishlist');
                               }
                             },
-                            child: const Icon(Icons.favorite_border, size: 19, color: Color(0xB3FFFFFF)),
+                            child: const Icon(
+                              Icons.favorite_border,
+                              size: 19,
+                              color: Color(0xB3FFFFFF),
+                            ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 5),
-                      Text(root.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: .8, color: Color(0x99C8E8F5))),
+                      Text(
+                        root.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: .8,
+                          color: Color(0x99C8E8F5),
+                        ),
+                      ),
                       const SizedBox(height: 8),
-                      Text(wordVibrationTag(name), maxLines: 2, overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 11, height: 1.25, color: Color(0xB8FFFFFF))),
+                      Text(
+                        wordVibrationTag(name),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          height: 1.25,
+                          color: Color(0xB8FFFFFF),
+                        ),
+                      ),
                       const Spacer(),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Expanded(
-                            child: Text(price == null ? '—' : inr(price!), maxLines: 1, overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: NwsbColors.goldLight)),
+                            child: Text(
+                              price == null ? '—' : inr(price!),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w800,
+                                color: NwsbColors.goldLight,
+                              ),
+                            ),
                           ),
                           GestureDetector(
                             onTap: () {
@@ -749,29 +837,59 @@ class RmWordCard extends StatelessWidget {
                               } else if (onTap != null) {
                                 onTap!();
                               } else {
-                                CartAddAnimation.addAndPlay(context, item: BagItem(
-                                  id: 'word:${name.toLowerCase()}', title: name, subtitle: root,
-                                  image: imgUrl, price: price ?? 49, kind: signature ? 'Signature' : 'Word',
-                                ));
+                                CartAddAnimation.playForContext(
+                                  context,
+                                  item: BagItem(
+                                    id: 'word:${name.toLowerCase()}',
+                                    title: name,
+                                    subtitle: root,
+                                    image: imgUrl,
+                                    price: price ?? 49,
+                                    kind: signature ? 'Signature' : 'Word',
+                                  ),
+                                );
                                 _toast(context, 'Added $name to cart');
                               }
                             },
                             child: Container(
                               height: 38,
-                              padding: const EdgeInsets.only(left: 14, right: 4),
+                              padding: const EdgeInsets.only(
+                                left: 14,
+                                right: 4,
+                              ),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(20),
-                                gradient: const LinearGradient(colors: [Color(0xFFF3E4B7), Color(0xFFC8A96E)]),
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0xFFF3E4B7),
+                                    Color(0xFFC8A96E),
+                                  ],
+                                ),
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  const Text('Buy Now', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFF060C18))),
+                                  const Text(
+                                    'Buy Now',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w800,
+                                      color: Color(0xFF060C18),
+                                    ),
+                                  ),
                                   const SizedBox(width: 8),
                                   Container(
-                                    width: 30, height: 30,
-                                    decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                                    child: const Icon(Icons.shopping_bag_outlined, size: 16, color: Color(0xFF060C18)),
+                                    width: 30,
+                                    height: 30,
+                                    decoration: const BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.shopping_cart_outlined,
+                                      size: 16,
+                                      color: Color(0xFF060C18),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -798,7 +916,9 @@ class _SignatureTag extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [Color(0xFFE8D5A3), Color(0xFFC8A96E)]),
+        gradient: const LinearGradient(
+          colors: [Color(0xFFE8D5A3), Color(0xFFC8A96E)],
+        ),
         borderRadius: BorderRadius.circular(4),
       ),
       child: const Text(
@@ -866,7 +986,8 @@ class MsCard extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
-              color: signature ? const Color(0x55E8D5A3) : const Color(0x12FFFFFF),
+              color:
+                  signature ? const Color(0x55E8D5A3) : const Color(0x12FFFFFF),
             ),
             color: const Color(0x08FFFFFF),
           ),
@@ -874,10 +995,7 @@ class MsCard extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              Opacity(
-                opacity: 0.42,
-                child: StoreNetImage(url: imgUrl),
-              ),
+              Opacity(opacity: 0.42, child: StoreNetImage(url: imgUrl)),
               const DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -899,14 +1017,16 @@ class MsCard extends StatelessWidget {
                       icon: Icons.favorite_border,
                       color: const Color(0xB3FFFFFF),
                       onTap: () {
-                        CartBag.instance.addWishlist(BagItem(
-                          id: 'meaning:${word.toLowerCase()}',
-                          title: word,
-                          subtitle: root,
-                          image: imgUrl,
-                          price: price,
-                          kind: signature ? 'Signature Meaning' : 'Meaning',
-                        ));
+                        CartBag.instance.addWishlist(
+                          BagItem(
+                            id: 'meaning:${word.toLowerCase()}',
+                            title: word,
+                            subtitle: root,
+                            image: imgUrl,
+                            price: price,
+                            kind: signature ? 'Signature Meaning' : 'Meaning',
+                          ),
+                        );
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text('Saved $word to wishlist'),
@@ -917,10 +1037,10 @@ class MsCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 5),
                     _MiniChip(
-                      icon: Icons.shopping_bag_outlined,
+                      icon: Icons.shopping_cart_outlined,
                       color: NwsbColors.goldLight,
                       onTap: () {
-                        CartAddAnimation.addAndPlay(
+                        CartAddAnimation.playForContext(
                           context,
                           item: BagItem(
                             id: 'meaning:${word.toLowerCase()}',
@@ -965,11 +1085,17 @@ class MsCard extends StatelessWidget {
                       root,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 8, color: Color(0x61C8E8F5)),
+                      style: const TextStyle(
+                        fontSize: 8,
+                        color: Color(0x61C8E8F5),
+                      ),
                     ),
                     const SizedBox(height: 5),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0x14E8D5A3),
                         borderRadius: BorderRadius.circular(4),
@@ -1077,7 +1203,11 @@ class StoreSearchBar extends StatelessWidget {
         color: const Color(0x12FFFFFF),
         border: Border.all(color: const Color(0x38FFFFFF)),
         boxShadow: const [
-          BoxShadow(color: Color(0x40000000), blurRadius: 16, offset: Offset(0, 4)),
+          BoxShadow(
+            color: Color(0x40000000),
+            blurRadius: 16,
+            offset: Offset(0, 4),
+          ),
         ],
       ),
       child: Row(
@@ -1088,12 +1218,19 @@ class StoreSearchBar extends StatelessWidget {
             child: TextField(
               controller: controller,
               onChanged: onChanged,
-              style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w300),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w300,
+              ),
               cursorColor: NwsbColors.goldLight,
               decoration: InputDecoration(
                 border: InputBorder.none,
                 hintText: hint,
-                hintStyle: const TextStyle(color: Color(0x52FFFFFF), fontSize: 14),
+                hintStyle: const TextStyle(
+                  color: Color(0x52FFFFFF),
+                  fontSize: 14,
+                ),
               ),
             ),
           ),
@@ -1144,16 +1281,31 @@ class StoreDisclaimer extends StatelessWidget {
         children: [
           const Text(
             'Disclaimer & Confidentiality',
-            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: NwsbColors.gold),
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              color: NwsbColors.gold,
+            ),
           ),
           const SizedBox(height: 8),
-          Text(text, style: const TextStyle(fontSize: 11, height: 1.55, color: Color(0x73FFFFFF))),
+          Text(
+            text,
+            style: const TextStyle(
+              fontSize: 11,
+              height: 1.55,
+              color: Color(0x73FFFFFF),
+            ),
+          ),
           const SizedBox(height: 22),
           const Center(
             child: Text(
               'NowssB\n© 2026 Adv. Sanjaykumar Gadge · Shabdapathy',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 11, height: 1.6, color: Color(0x73FFFFFF)),
+              style: TextStyle(
+                fontSize: 11,
+                height: 1.6,
+                color: Color(0x73FFFFFF),
+              ),
             ),
           ),
         ],
