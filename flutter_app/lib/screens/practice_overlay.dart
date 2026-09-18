@@ -1,12 +1,11 @@
 /// Compact black Practice tab opened from the NowssB player.
 ///
-/// No glass wrapper. The player's film stays as the page background — this
-/// sheet never claims a second decoder. A metallic ridged orb (blender-style)
-/// spins in fast on open. Status is Waiting / Listening / Analyzing.
+/// No glass wrapper. The player's film stays as the page background. The
+/// sphere is the bundled glowing-orb loop, circular-clipped and mute so it
+/// reads as a 3D object on black rather than a video player.
 library;
 
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -15,6 +14,8 @@ import 'package:record/record.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 import '../data/models.dart';
+import '../media/nwsb_video.dart';
+import '../media/video_pool.dart';
 
 enum _PracticeStatus {
   ready,
@@ -27,6 +28,8 @@ enum _PracticeStatus {
 }
 
 const _sessionLength = 29;
+
+const _practiceOrbClip = 'assets/video/practice-orb.mp4';
 
 /// Compact microphone used in the Now Playing dock.
 class PracticeDockOrb extends StatelessWidget {
@@ -107,7 +110,6 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
     with TickerProviderStateMixin {
   final AudioRecorder _recorder = AudioRecorder();
   final stt.SpeechToText _speech = stt.SpeechToText();
-  late final AnimationController _pulse;
   late final AnimationController _entry;
   late final AnimationController _spin;
 
@@ -122,10 +124,6 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
   @override
   void initState() {
     super.initState();
-    _pulse = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 2400),
-    )..repeat();
     _entry = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 280),
@@ -141,7 +139,6 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
   void dispose() {
     _clock?.cancel();
     unawaited(_finishCapture());
-    _pulse.dispose();
     _entry.dispose();
     _spin.dispose();
     _recorder.dispose();
@@ -241,9 +238,8 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
     await Future<void>.delayed(const Duration(milliseconds: 720));
     if (mounted) {
       setState(
-        () => _status = _matched
-            ? _PracticeStatus.complete
-            : _PracticeStatus.results,
+        () => _status =
+            _matched ? _PracticeStatus.complete : _PracticeStatus.results,
       );
     }
   }
@@ -305,12 +301,9 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
           child: GestureDetector(
             onTap: () {},
             child: AnimatedBuilder(
-              animation: Listenable.merge([_entry, _spin, _pulse]),
+              animation: Listenable.merge([_entry, _spin]),
               builder: (context, _) {
                 final open = Curves.easeOutCubic.transform(_entry.value);
-                final spin = _spin.isCompleted
-                    ? _pulse.value
-                    : Curves.easeOutCubic.transform(_spin.value);
                 final punch = _spin.isCompleted
                     ? 1.0
                     : Curves.easeOutBack.transform(_spin.value.clamp(0.0, 1.0));
@@ -323,9 +316,7 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
                       child: _BlackTab(
                         status: _statusLabel,
                         holding: _holding,
-                        orbProgress: spin,
                         orbScale: 0.22 + punch * 0.78,
-                        intensity: _holding ? 1.35 : 1.0,
                         onStart: _beginTake,
                         onReplace: () => unawaited(_replay()),
                       ),
@@ -345,18 +336,14 @@ class _BlackTab extends StatelessWidget {
   const _BlackTab({
     required this.status,
     required this.holding,
-    required this.orbProgress,
     required this.orbScale,
-    required this.intensity,
     required this.onStart,
     required this.onReplace,
   });
 
   final String status;
   final bool holding;
-  final double orbProgress;
   final double orbScale;
-  final double intensity;
   final VoidCallback onStart;
   final VoidCallback onReplace;
 
@@ -364,28 +351,24 @@ class _BlackTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(22, 22, 22, 20),
+      padding: const EdgeInsets.fromLTRB(22, 18, 22, 20),
       decoration: BoxDecoration(
-        color: const Color(0xFF050505),
+        color: Colors.black,
         borderRadius: BorderRadius.circular(28),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           SizedBox(
-            height: 148,
-            child: Transform.scale(
-              scale: orbScale,
-              child: CustomPaint(
-                painter: _BlenderOrbPainter(
-                  progress: orbProgress,
-                  intensity: intensity,
-                ),
-                child: const SizedBox.expand(),
+            height: 156,
+            child: Center(
+              child: Transform.scale(
+                scale: orbScale,
+                child: const _OrbFilm(),
               ),
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 2),
           Text(
             status,
             textAlign: TextAlign.center,
@@ -449,115 +432,35 @@ class _BlackTab extends StatelessWidget {
   }
 }
 
-/// Metallic ridged sphere — blender-style meridians with lighting.
-class _BlenderOrbPainter extends CustomPainter {
-  const _BlenderOrbPainter({required this.progress, required this.intensity});
-
-  final double progress;
-  final double intensity;
+/// Glowing sphere loop. Circular clip, no chrome, black plate matches the tab.
+class _OrbFilm extends StatelessWidget {
+  const _OrbFilm();
 
   @override
-  void paint(Canvas canvas, Size size) {
-    final center = size.center(Offset.zero);
-    final radius = math.min(size.width, size.height) * .38;
-    final rot = progress * math.pi * 2;
-
-    final fill = Paint()
-      ..shader = RadialGradient(
-        center: const Alignment(-0.38, -0.46),
-        radius: 1.05,
-        colors: [
-          Color.lerp(
-            const Color(0xFF9AA3AD),
-            const Color(0xFFE8EDF2),
-            0.35 * intensity,
-          )!,
-          const Color(0xFF2A2E34),
-          const Color(0xFF07080A),
-        ],
-        stops: const [0.0, 0.55, 1.0],
-      ).createShader(Rect.fromCircle(center: center, radius: radius * 1.08));
-    canvas.drawCircle(center, radius, fill);
-
-    const meridians = 26;
-    for (var i = 0; i < meridians; i++) {
-      final lon0 = (i / meridians) * math.pi * 2 + rot;
-      final path = Path();
-      var started = false;
-      for (var step = 0; step <= 40; step++) {
-        final lat = step / 40 * math.pi - math.pi / 2;
-        final x = math.sin(lon0) * math.cos(lat);
-        final y = math.sin(lat);
-        final z = math.cos(lon0) * math.cos(lat);
-        if (z < -0.08) {
-          started = false;
-          continue;
-        }
-        final px = center.dx + x * radius;
-        final py = center.dy + y * radius;
-        if (!started) {
-          path.moveTo(px, py);
-          started = true;
-        } else {
-          path.lineTo(px, py);
-        }
-      }
-      final face = (0.22 + 0.78 * math.cos(lon0).abs()).clamp(0.0, 1.0);
-      final light = (0.28 + 0.72 * math.cos(lon0 - 0.7)).clamp(0.12, 1.0);
-      canvas.drawPath(
-        path,
-        Paint()
-          ..style = PaintingStyle.stroke
-          ..strokeCap = StrokeCap.round
-          ..strokeWidth = 1.05 + face * 0.85
-          ..color = Color.lerp(
-            const Color(0xFF6E7680),
-            const Color(0xFFF4F7FA),
-            light,
-          )!.withOpacity((0.42 + face * 0.5) * intensity.clamp(0.7, 1.2)),
-      );
-    }
-
-    for (final lat in const [-0.7, 0.0, 0.7]) {
-      final path = Path();
-      var started = false;
-      for (var step = 0; step <= 48; step++) {
-        final lon = step / 48 * math.pi * 2 + rot;
-        final x = math.sin(lon) * math.cos(lat);
-        final y = math.sin(lat);
-        final z = math.cos(lon) * math.cos(lat);
-        if (z < 0.05) {
-          started = false;
-          continue;
-        }
-        final px = center.dx + x * radius;
-        final py = center.dy + y * radius;
-        if (!started) {
-          path.moveTo(px, py);
-          started = true;
-        } else {
-          path.lineTo(px, py);
-        }
-      }
-      canvas.drawPath(
-        path,
-        Paint()
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 0.7
-          ..color = Colors.white.withOpacity(0.16 * intensity),
-      );
-    }
-
-    canvas.drawCircle(
-      center + Offset(-radius * .32, -radius * .38),
-      radius * .16,
-      Paint()
-        ..color = Colors.white.withOpacity(0.18 * intensity)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10),
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: SizedBox(
+        width: 156,
+        height: 156,
+        child: ClipOval(
+          child: ColoredBox(
+            color: Colors.black,
+            child: Transform.scale(
+              // Mild crop of empty black so the sphere sits larger without
+              // cutting the iridescent rim — remaining black blends into the tab.
+              scale: 1.16,
+              child: const NwsbVideo(
+                asset: _practiceOrbClip,
+                fit: BoxFit.cover,
+                priority: ClipPriority.feature,
+                loop: true,
+                autoplay: true,
+                showPoster: true,
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
-
-  @override
-  bool shouldRepaint(covariant _BlenderOrbPainter old) =>
-      old.progress != progress || old.intensity != intensity;
 }
