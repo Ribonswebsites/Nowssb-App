@@ -309,11 +309,21 @@ class _ActBtn extends StatelessWidget {
           border: filled ? null : Border.all(color: const Color(0x24FFFFFF)),
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: filled ? MainAxisAlignment.spaceBetween : MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 16, color: filled ? NwsbColors.ink : const Color(0xB8FFFFFF)),
-            const SizedBox(width: 8),
+            if (filled) const SizedBox(width: 8),
+            if (!filled) Icon(icon, size: 16, color: const Color(0xB8FFFFFF)),
+            if (!filled) const SizedBox(width: 8),
             Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: filled ? NwsbColors.ink : const Color(0xB8FFFFFF))),
+            if (!filled) const SizedBox.shrink(),
+            if (filled)
+              Container(
+                width: 32,
+                height: 32,
+                decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                child: Icon(icon, size: 16, color: NwsbColors.ink),
+              ),
+            if (filled) const SizedBox(width: 4),
           ],
         ),
       ),

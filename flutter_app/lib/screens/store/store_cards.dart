@@ -25,6 +25,21 @@ String inr(num value) {
 /// meditation collection posters. Used in every notification pill.
 const kStoreProductArt = 'assets/store/nowssb-bag-headphones.webp';
 
+String wordVibrationTag(String name) {
+  switch (name.toLowerCase()) {
+    case 'fire':
+      return 'Ignites clarity and transformation';
+    case 'earth':
+      return 'Grounds presence and steady growth';
+    case 'water':
+      return 'Restores flow, feeling, and release';
+    case 'air':
+      return 'Opens movement, breath, and insight';
+    default:
+      return 'A sound signature for focused practice';
+  }
+}
+
 /// Pill / banner product art for a collection/word. Always the store bag
 /// product (collection posters contain fashion BS the user rejected).
 String storePillProductArt(String? id) => kStoreProductArt;
@@ -603,8 +618,8 @@ class RmWordCard extends StatelessWidget {
   final Color? tint;
 
   /// Thicker horizontal card: image left, text + actions right.
-  static const double cardHeight = 152;
-  static const double cardWidth = 310;
+  static const double cardHeight = 188;
+  static const double cardWidth = 330;
 
   void _toast(BuildContext context, String msg) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -621,202 +636,160 @@ class RmWordCard extends StatelessWidget {
     final bg = tint ?? storeCardTint(name);
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        width: cardWidth,
-        height: cardHeight,
-        decoration: BoxDecoration(
-          color: bg,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(
-            color: signature ? const Color(0x55E8D5A3) : const Color(0x2EFFFFFF),
-          ),
-          boxShadow: const [
-            BoxShadow(color: Color(0x99000000), blurRadius: 18, offset: Offset(0, 6)),
-          ],
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-          child: Row(
-            children: [
-              SizedBox(
-                width: 118,
-                height: 130,
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(14),
-                      child: StoreNetImage(url: imgUrl),
-                    ),
-                    if (signature)
-                      const Positioned(
-                        top: 6,
-                        left: 6,
-                        child: _SignatureTag(),
-                      ),
-                  ],
-                ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+          child: Container(
+            width: cardWidth,
+            height: cardHeight,
+            padding: const EdgeInsets.fromLTRB(10, 10, 12, 10),
+            decoration: BoxDecoration(
+              color: bg.withOpacity(0.13),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: signature
+                    ? const Color(0x66E8D5A3)
+                    : const Color(0x38FFFFFF),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 23,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                        height: 1.08,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  bg.withOpacity(0.22),
+                  const Color(0x1AFFFFFF),
+                  const Color(0x12000000),
+                ],
+              ),
+              boxShadow: [
+                BoxShadow(color: bg.withOpacity(0.18), blurRadius: 24, spreadRadius: 1),
+                const BoxShadow(color: Color(0x80000000), blurRadius: 18, offset: Offset(0, 7)),
+              ],
+            ),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 124,
+                  height: double.infinity,
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: const Color(0xD9060C18),
+                          borderRadius: BorderRadius.circular(15),
+                          border: Border.all(color: const Color(0x28FFFFFF)),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(15),
+                          child: StoreNetImage(url: imgUrl),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      root.toUpperCase(),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.8,
-                        height: 1.1,
-                        color: Color(0x8CC8E8F5),
+                      if (signature)
+                        const Positioned(top: 6, left: 6, child: _SignatureTag()),
+                      const Positioned(
+                        right: 7,
+                        bottom: 7,
+                        child: Icon(Icons.graphic_eq, size: 17, color: Color(0xB3E8D5A3)),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      price == null ? '—' : inr(price!),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                        height: 1.1,
-                        color: NwsbColors.goldLight,
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 13),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Colors.white, height: 1.05),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              if (onWishlist != null) {
+                                onWishlist!();
+                              } else {
+                                CartBag.instance.addWishlist(BagItem(
+                                  id: 'word:${name.toLowerCase()}', title: name, subtitle: root,
+                                  image: imgUrl, price: price ?? 49, kind: signature ? 'Signature' : 'Word',
+                                ));
+                                _toast(context, 'Saved $name to wishlist');
+                              }
+                            },
+                            child: const Icon(Icons.favorite_border, size: 19, color: Color(0xB3FFFFFF)),
+                          ),
+                        ],
                       ),
-                    ),
-                    const Spacer(),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: GestureDetector(
+                      const SizedBox(height: 5),
+                      Text(root.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: .8, color: Color(0x99C8E8F5))),
+                      const SizedBox(height: 8),
+                      Text(wordVibrationTag(name), maxLines: 2, overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 11, height: 1.25, color: Color(0xB8FFFFFF))),
+                      const Spacer(),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Expanded(
+                            child: Text(price == null ? '—' : inr(price!), maxLines: 1, overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: NwsbColors.goldLight)),
+                          ),
+                          GestureDetector(
                             onTap: () {
                               if (onBuyNow != null) {
                                 onBuyNow!();
+                              } else if (onAddCart != null) {
+                                onAddCart!();
                               } else if (onTap != null) {
                                 onTap!();
                               } else {
-                                _toast(context, 'Opening $name…');
+                                CartAddAnimation.addAndPlay(context, item: BagItem(
+                                  id: 'word:${name.toLowerCase()}', title: name, subtitle: root,
+                                  image: imgUrl, price: price ?? 49, kind: signature ? 'Signature' : 'Word',
+                                ));
+                                _toast(context, 'Added $name to cart');
                               }
                             },
                             child: Container(
-                              height: 30,
-                              alignment: Alignment.center,
+                              height: 38,
+                              padding: const EdgeInsets.only(left: 14, right: 4),
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(9),
-                                gradient: const LinearGradient(
-                                  colors: [Color(0xFFE8D5A3), Color(0xFFC8A96E)],
-                                ),
+                                borderRadius: BorderRadius.circular(20),
+                                gradient: const LinearGradient(colors: [Color(0xFFF3E4B7), Color(0xFFC8A96E)]),
                               ),
-                              child: const Text(
-                                'Buy Now',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: 0.3,
-                                  color: Color(0xFF060C18),
-                                ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Text('Buy Now', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFF060C18))),
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    width: 30, height: 30,
+                                    decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                                    child: const Icon(Icons.shopping_bag_outlined, size: 16, color: Color(0xFF060C18)),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 6),
-                        _CardAction(
-                          icon: Icons.favorite_border,
-                          onTap: () {
-                            if (onWishlist != null) {
-                              onWishlist!();
-                            } else {
-                              CartBag.instance.addWishlist(BagItem(
-                                id: 'word:${name.toLowerCase()}',
-                                title: name,
-                                subtitle: root,
-                                image: imgUrl,
-                                price: price ?? 49,
-                                kind: signature ? 'Signature' : 'Word',
-                              ));
-                              _toast(context, 'Saved $name to wishlist');
-                            }
-                          },
-                        ),
-                        const SizedBox(width: 5),
-                        _CardAction(
-                          icon: Icons.shopping_bag_outlined,
-                          accent: true,
-                          onTap: () {
-                            if (onAddCart != null) {
-                              onAddCart!();
-                            } else {
-                              CartAddAnimation.addAndPlay(
-                                context,
-                                item: BagItem(
-                                  id: 'word:${name.toLowerCase()}',
-                                  title: name,
-                                  subtitle: root,
-                                  image: imgUrl,
-                                  price: price ?? 49,
-                                  kind: signature ? 'Signature' : 'Word',
-                                ),
-                              );
-                              _toast(context, 'Added $name to cart');
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 }
-
-class _CardAction extends StatelessWidget {
-  const _CardAction({required this.icon, required this.onTap, this.accent = false});
-  final IconData icon;
-  final VoidCallback onTap;
-  final bool accent;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 28,
-        height: 28,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          color: const Color(0x22FFFFFF),
-          border: Border.all(
-            color: accent ? const Color(0x55E8D5A3) : const Color(0x33FFFFFF),
-          ),
-        ),
-        child: Icon(
-          icon,
-          size: 14,
-          color: accent ? NwsbColors.goldLight : const Color(0xCCFFFFFF),
-        ),
-      ),
-    );
-  }
 }
 
 class _SignatureTag extends StatelessWidget {

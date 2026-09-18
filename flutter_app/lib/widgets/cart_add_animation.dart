@@ -27,7 +27,7 @@ class CartAddAnimation {
       targetKey: targetKey,
       item: item,
     );
-    await Future<void>.delayed(const Duration(milliseconds: 960));
+    await Future<void>.delayed(const Duration(milliseconds: 1080));
   }
 
   static void play(
@@ -103,7 +103,7 @@ class _CartFlightState extends State<_CartFlight>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 920),
+    duration: const Duration(milliseconds: 1040),
   )..forward();
 
   @override
@@ -126,56 +126,39 @@ class _CartFlightState extends State<_CartFlight>
       child: AnimatedBuilder(
         animation: _controller,
         builder: (_, __) {
-          final t = Curves.easeInOutCubic.transform(_controller.value);
-          final itemT = Curves.easeOutBack.transform(
-            (_controller.value / .58).clamp(0.0, 1.0).toDouble(),
-          );
-          final cartT = Curves.easeInOutCubic.transform(
-            ((_controller.value - .18) / .62).clamp(0.0, 1.0).toDouble(),
-          );
-          final itemCenter = Offset.lerp(
-            widget.from.center,
-            widget.target.center,
-            t,
-          )!;
-          final cartStart = Offset(
-            widget.from.center.dx - 70,
-            widget.from.center.dy + 8,
-          );
-          final cartEnd = Offset(
-            widget.target.center.dx,
-            widget.target.center.dy,
-          );
-          final cartCenter = Offset.lerp(cartStart, cartEnd, cartT)!;
-          final itemOpacity = _controller.value < .72
-              ? 1.0
-              : (1 - ((_controller.value - .72) / .28))
-                  .clamp(0.0, 1.0)
-                  .toDouble();
-          final cartOpacity =
-              (_controller.value / .12).clamp(0.0, 1.0).toDouble();
+          final value = _controller.value;
+          final travel = Curves.easeInOutCubic.transform(value);
+          final arc = math.sin(math.pi * travel) * -78;
+          final itemCenter = Offset.lerp(widget.from.center, widget.target.center, travel)! + Offset(0, arc);
           final itemSize = math.max(26.0, math.min(widget.from.width, 72.0));
+          final itemScale = value < .16
+              ? Curves.easeOutBack.transform((value / .16).clamp(0.0, 1.0).toDouble())
+              : (value < .76 ? 1.0 - ((value - .16) / .60) * .58 : .42);
+          final itemOpacity = value < .74 ? 1.0 : (1 - ((value - .74) / .20)).clamp(0.0, 1.0).toDouble();
+          final cartProgress = Curves.easeOutCubic.transform(((value - .56) / .18).clamp(0.0, 1.0).toDouble());
+          final cartScale = .52 + cartProgress * .48 + (value > .74 ? math.sin((value - .74) * math.pi / .26) * .14 : 0);
+          final cartOpacity = ((value - .50) / .14).clamp(0.0, 1.0).toDouble();
           return Stack(
             children: [
               Positioned(
                 left: itemCenter.dx - itemSize / 2,
-                top: itemCenter.dy - itemSize / 2 - (1 - itemT) * 18,
+                top: itemCenter.dy - itemSize / 2,
                 child: Opacity(
                   opacity: itemOpacity,
                   child: Transform.scale(
-                    scale: .58 + itemT * .42,
+                    scale: itemScale,
                     child: _FlyingItem(item: widget.item, size: itemSize),
                   ),
                 ),
               ),
               Positioned(
-                left: cartCenter.dx - 27,
-                top: cartCenter.dy - 21,
-                child: Opacity(
-                  opacity: cartOpacity,
-                  child: Transform.rotate(
-                    angle: (1 - cartT) * -.12 + cartT * .16,
-                    child: _RollingCart(size: 54),
+                left: widget.target.center.dx - 28,
+                top: widget.target.center.dy - 28,
+                child: Transform.scale(
+                  scale: cartScale,
+                  child: Opacity(
+                    opacity: cartOpacity,
+                    child: _RollingCart(size: 56),
                   ),
                 ),
               ),
@@ -231,16 +214,17 @@ class _RollingCart extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: size,
-      height: 42,
+      height: size,
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
+        shape: BoxShape.circle,
+        border: Border.all(color: NwsbColors.goldLight, width: 2),
         boxShadow: const [
           BoxShadow(color: Color(0xB3000000), blurRadius: 18, spreadRadius: 2),
         ],
       ),
-      child: Icon(Icons.shopping_cart_rounded, color: NwsbColors.ink, size: 25),
+      child: Icon(Icons.shopping_bag_outlined, color: NwsbColors.ink, size: 25),
     );
   }
 }
