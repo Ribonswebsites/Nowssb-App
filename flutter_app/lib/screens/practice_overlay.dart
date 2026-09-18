@@ -23,6 +23,8 @@ enum _PracticeStatus {
   listening,
   recording,
   practicing,
+  processing,
+  results,
   locked,
   complete,
 }
@@ -292,10 +294,10 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
     if (!mounted) return;
     setState(() {
       _holding = false;
-      _status = _elapsed >= _sessionLength - 1
-          ? _PracticeStatus.complete
-          : _PracticeStatus.locked;
+      _status = _PracticeStatus.processing;
     });
+    await Future<void>.delayed(const Duration(milliseconds: 720));
+    if (mounted) setState(() => _status = _PracticeStatus.results);
   }
 
   Future<void> _finishCapture() async {
@@ -340,6 +342,8 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
       _PracticeStatus.listening => 'Listening',
       _PracticeStatus.recording => 'Recording',
       _PracticeStatus.practicing => 'Practicing',
+      _PracticeStatus.processing => 'Processing',
+      _PracticeStatus.results => 'Results',
       _PracticeStatus.locked => 'Locked',
       _PracticeStatus.complete => 'Locked',
     };
@@ -498,219 +502,194 @@ class _PracticeTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(6, 6, 6, 0),
-            child: Row(
-              children: [
-                IconButton(
-                  onPressed: onClose,
-                  icon: const Icon(
-                    Icons.keyboard_arrow_down_rounded,
-                    color: Colors.white,
-                  ),
-                ),
-                const Expanded(
-                  child: Text(
-                    'PRACTICE',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 2.6,
-                    ),
-                  ),
-                ),
-                IconButton(
-                  onPressed: onClose,
-                  icon: const Icon(Icons.close_rounded, color: Colors.white70),
-                ),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(18, 12, 18, 12),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(26),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(26),
+              gradient: const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xE40B0D12), Color(0x8CCFD4DE)],
+                stops: [0.0, 1.0],
+              ),
+              border: Border.all(color: Colors.white.withOpacity(.22)),
+              boxShadow: const [
+                BoxShadow(
+                    color: Color(0x44000000),
+                    blurRadius: 30,
+                    offset: Offset(0, 14)),
               ],
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             child: Column(
               children: [
-                SizedBox(
-                  height: 168,
-                  child: GestureDetector(
-                    onLongPressStart: (_) => onHoldStart(),
-                    onLongPressEnd: (_) => onHoldEnd(),
-                    onTapDown: (_) => onHoldStart(),
-                    onTapUp: (_) => onHoldEnd(),
-                    onTapCancel: onHoldEnd,
-                    child: AnimatedBuilder(
-                      animation: pulse,
-                      builder: (context, _) => CustomPaint(
-                        painter: _WaterRipplePainter(
-                          progress: pulse.value,
-                          accent: accent,
-                          intensity: holding ? 1.7 : 1.12,
-                        ),
-                        child: const Center(
-                          child: _MicDisc(size: 78, iconSize: 30),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 7,
-                      height: 7,
-                      margin: const EdgeInsets.only(right: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(
-                          holding || status == 'Recording' ? 1 : .45,
-                        ),
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    Text(
-                      status.toUpperCase(),
-                      style: const TextStyle(
-                        color: Colors.white54,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 2.6,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 140),
-                  child: Text(
-                    kinetic,
-                    key: ValueKey(kinetic),
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 36,
-                      height: .95,
-                      fontFamily: 'serif',
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-                if (parts.isNotEmpty) ...[
-                  const SizedBox(height: 10),
-                  Wrap(
-                    alignment: WrapAlignment.center,
-                    spacing: 7,
-                    runSpacing: 7,
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 8, 10, 0),
+                  child: Row(
                     children: [
-                      for (var i = 0; i < parts.length; i++)
-                        _SoundPill(
-                          label: parts[i].roman.isNotEmpty
-                              ? parts[i].roman
-                              : parts[i].deva,
-                          active: holding || activePart == i,
+                      IconButton(
+                        onPressed: onClose,
+                        icon: const Icon(Icons.keyboard_arrow_down_rounded,
+                            color: Colors.white),
+                      ),
+                      const Expanded(
+                        child: Text(
+                          'PRACTICE',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 2.8),
                         ),
+                      ),
+                      IconButton(
+                        onPressed: onClose,
+                        icon: const Icon(Icons.close_rounded,
+                            color: Colors.white70),
+                      ),
                     ],
                   ),
-                ],
-                const SizedBox(height: 12),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(99),
-                  child: LinearProgressIndicator(
-                    value: elapsed / _sessionLength,
-                    minHeight: 2,
-                    backgroundColor: Colors.white12,
-                    valueColor: const AlwaysStoppedAnimation<Color>(
-                      Colors.white,
-                    ),
-                  ),
                 ),
-                const SizedBox(height: 6),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '00:${elapsed.toString().padLeft(2, '0')}',
-                      style: const TextStyle(
-                        color: Colors.white38,
-                        fontSize: 11,
-                      ),
-                    ),
-                    const Text(
-                      '00:29',
-                      style: TextStyle(color: Colors.white38, fontSize: 11),
-                    ),
-                  ],
-                ),
-                _WordBreakdown(
-                  word: word,
-                  parts: parts,
-                  active: activePart,
-                  matched: matched,
-                ),
-                if (heard.isNotEmpty) ...[
-                  const SizedBox(height: 8),
-                  Text(
-                    heard,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 13,
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
-                ],
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: onReplay,
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          side: BorderSide(color: Colors.white.withOpacity(.2)),
-                          padding: const EdgeInsets.symmetric(vertical: 13),
-                          shape: const StadiumBorder(),
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.fromLTRB(22, 0, 22, 22),
+                    children: [
+                      const SizedBox(height: 2),
+                      SizedBox(
+                        height: 150,
+                        child: GestureDetector(
+                          onLongPressStart: (_) => onHoldStart(),
+                          onLongPressEnd: (_) => onHoldEnd(),
+                          onTapDown: (_) => onHoldStart(),
+                          onTapUp: (_) => onHoldEnd(),
+                          onTapCancel: onHoldEnd,
+                          child: AnimatedBuilder(
+                            animation: pulse,
+                            builder: (context, _) => CustomPaint(
+                              painter: _ThinkingDotOrbPainter(
+                                progress: pulse.value,
+                                accent: accent,
+                                intensity: holding ? 1.35 : 1.0,
+                              ),
+                            ),
+                          ),
                         ),
-                        child: const Text('Replay'),
                       ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      flex: 2,
-                      child: FilledButton(
-                        onPressed: onHoldStart,
-                        onLongPress: onHoldStart,
-                        style: FilledButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: const Color(0xFF050506),
-                          padding: const EdgeInsets.symmetric(vertical: 13),
-                          shape: const StadiumBorder(),
-                        ),
-                        child: Text(holding ? 'Recording…' : 'Hold to speak'),
+                      const SizedBox(height: 2),
+                      Text(
+                        status == 'Processing' ? 'Processing…' : 'Listening',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: .2),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  takeLocked
-                      ? 'Take saved on this device.'
-                      : 'Hold the white orb to lock a take.',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.white38, fontSize: 11),
+                      const SizedBox(height: 5),
+                      Text(
+                        status == 'Processing'
+                            ? 'Agent is processing your recording.'
+                            : 'Speak the word when you are ready.',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                            color: Color(0xB8FFFFFF),
+                            fontSize: 11,
+                            height: 1.35),
+                      ),
+                      const SizedBox(height: 18),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: onReplay,
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.white,
+                                side: BorderSide(
+                                    color: Colors.white.withOpacity(.38)),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 13),
+                                shape: const StadiumBorder(),
+                              ),
+                              child: const Text('Replace'),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: FilledButton(
+                              onPressed: onHoldStart,
+                              style: FilledButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                foregroundColor: const Color(0xFF08090D),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 13),
+                                shape: const StadiumBorder(),
+                              ),
+                              child: Text(
+                                  holding ? 'Listening…' : 'Start practicing'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
+}
+
+class _ThinkingDotOrbPainter extends CustomPainter {
+  const _ThinkingDotOrbPainter(
+      {required this.progress, required this.accent, required this.intensity});
+  final double progress;
+  final Color accent;
+  final double intensity;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = size.center(Offset.zero);
+    final radius = math.min(size.width, size.height) * .31;
+    final glow = Paint()
+      ..color = accent.withOpacity(.10 * intensity)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 22);
+    canvas.drawCircle(center, radius * 1.05, glow);
+    final dot = Paint()..style = PaintingStyle.fill;
+    const rows = 13;
+    const columns = 21;
+    for (var row = 0; row < rows; row++) {
+      final lat = (row / (rows - 1) - .5) * math.pi;
+      final ring = math.cos(lat);
+      final y = center.dy + math.sin(lat) * radius;
+      for (var column = 0; column < columns; column++) {
+        final longitude = (column / columns) * math.pi * 2;
+        final drift =
+            math.sin(progress * math.pi * 2 + row * .48 + column * .18) * .045;
+        final x = center.dx +
+            math.sin(longitude + progress * math.pi * 1.4 + drift) *
+                radius *
+                ring;
+        final depth = .35 +
+            .65 * ((math.cos(longitude + progress * math.pi * 1.4) + 1) / 2);
+        dot.color =
+            accent.withOpacity((.20 + .64 * depth) * intensity.clamp(.7, 1.0));
+        final size = .65 + 1.15 * depth;
+        canvas.drawCircle(Offset(x, y), size, dot);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _ThinkingDotOrbPainter oldDelegate) =>
+      oldDelegate.progress != progress || oldDelegate.intensity != intensity;
 }
 
 class _MicDisc extends StatelessWidget {
@@ -1009,8 +988,7 @@ class _WaterRipplePainter extends CustomPainter {
     final a1 = back ? math.pi * 2 : math.pi;
     var started = false;
     for (var a = a0; a <= a1 + .04; a += .07) {
-      final wave =
-          math.sin(a * 9 + progress * math.pi * 2) * 4.4 * fade +
+      final wave = math.sin(a * 9 + progress * math.pi * 2) * 4.4 * fade +
           math.sin(a * 4 - progress * math.pi * 1.4 + age * 6) * 2.0 * fade;
       final z = math.cos(a * 5 + progress * math.pi * 1.6) * 5.2 * fade;
       final p = Offset(
