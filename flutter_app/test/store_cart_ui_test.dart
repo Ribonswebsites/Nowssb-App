@@ -44,12 +44,17 @@ void main() {
       expect(atelier, contains('originalPrice'));
       expect(atelier, contains('cats.take(10)'));
       expect(atelier, contains('StoreViewMoreTap'));
+      expect(atelier, contains('StoreGlassFilmBanner'));
+      expect(atelier, contains('store-title-banner.mp4'));
       expect(atelier, isNot(contains('storeMidRailBannerAt')));
 
       final storeHome = File('lib/screens/store.dart').readAsStringSync();
       expect(storeHome, contains('16 / 6.4'));
       expect(storeHome, contains('_StoreQuickMosaic'));
       expect(storeHome, contains('ClipPriority.feature'));
+      expect(storeHome, contains('assets/video/store-orb-box.mp4'));
+      expect(storeHome, contains('width: 180'));
+      expect(storeHome, contains('HeavyGlassPanel'));
 
       final catalog = File('lib/data/store_catalog.dart').readAsStringSync();
       expect(catalog, contains("return 'assets/video/hero-word-store.mp4'"));

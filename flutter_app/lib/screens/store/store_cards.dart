@@ -794,11 +794,16 @@ class RmRowVid extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 8, bottom: 14),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(18),
-        child: AspectRatio(
-          aspectRatio: 16 / 6.4,
-          child: NwsbVideo(asset: url, priority: ClipPriority.feature),
+      child: GlassWrap(
+        margin: EdgeInsets.zero,
+        radius: 22,
+        padding: const EdgeInsets.all(6),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: AspectRatio(
+            aspectRatio: 16 / 6.4,
+            child: NwsbVideo(asset: url, priority: ClipPriority.feature),
+          ),
         ),
       ),
     );

@@ -197,6 +197,12 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
       }));
       productRailIndex++;
 
+      if (_chip == 'ALL' && productRailIndex == 1) {
+        sections.add(const StoreGlassFilmBanner(
+          asset: 'assets/video/store-title-banner.mp4',
+        ));
+      }
+
       // After the 4th rail → frequency package (grid + Limited Time Free + Browse by Goal).
       if (_chip == 'ALL' && productRailIndex == 4) {
         sections.add(StoreFrequencyPackage(

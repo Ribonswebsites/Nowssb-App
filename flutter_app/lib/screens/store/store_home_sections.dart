@@ -42,39 +42,43 @@ class StorePixelsHero extends StatelessWidget {
     }
     return Padding(
       padding: const EdgeInsets.only(bottom: 18),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: SizedBox(
-          height: 170,
-          width: double.infinity,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              NwsbVideo(asset: videoAsset!, priority: ClipPriority.feature),
-              const DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Color(0x22060C18), Color(0xE6060C18)],
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Align(
-                  alignment: Alignment.bottomLeft,
-                  child: Text(
-                    videoTitle,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w300,
-                      color: Colors.white,
+      child: StoreGlassPanel(
+        radius: 20,
+        padding: const EdgeInsets.all(6),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(14),
+          child: SizedBox(
+            height: 170,
+            width: double.infinity,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                NwsbVideo(asset: videoAsset!, priority: ClipPriority.feature),
+                const DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Color(0x22060C18), Color(0xE6060C18)],
                     ),
                   ),
                 ),
-              ),
-            ],
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Text(
+                      videoTitle,
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w300,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -554,6 +558,36 @@ class StoreGlassPanel extends StatelessWidget {
               border: Border.all(color: GlassWrap.line),
             ),
             child: child,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Wide looping store film in a glass frame — used between Atelier product rows.
+class StoreGlassFilmBanner extends StatelessWidget {
+  const StoreGlassFilmBanner({super.key, required this.asset});
+  final String asset;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 6, bottom: 14),
+      child: StoreGlassPanel(
+        radius: 22,
+        padding: const EdgeInsets.all(6),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: AspectRatio(
+            aspectRatio: 16 / 9,
+            child: NwsbVideo(
+              asset: asset,
+              priority: ClipPriority.decoration,
+              autoplay: true,
+              loop: true,
+              showPoster: true,
+            ),
           ),
         ),
       ),

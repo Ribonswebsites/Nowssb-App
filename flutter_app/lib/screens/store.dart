@@ -622,19 +622,27 @@ class _StoreQuickMosaic extends StatelessWidget {
       child: Column(
         children: [
           SizedBox(
-            height: 168,
+            height: 180,
             child: Row(
               children: [
-                Expanded(
-                  flex: 6,
-                  child: _MosaicTile(
-                    title: 'Words',
-                    sub: 'The Word Atelier',
-                    mark: NwsbMarks.bag,
-                    video: 'assets/video/hero-word-store.mp4',
-                    onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        builder: (_) => const WordAtelierScreen(),
+                SizedBox(
+                  width: 180,
+                  height: 180,
+                  child: HeavyGlassPanel(
+                    margin: EdgeInsets.zero,
+                    radius: 22,
+                    padding: const EdgeInsets.all(5),
+                    child: SizedBox.expand(
+                      child: _MosaicTile(
+                        title: 'Words',
+                        sub: 'The Word Atelier',
+                        mark: NwsbMarks.bag,
+                        video: 'assets/video/store-orb-box.mp4',
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (_) => const WordAtelierScreen(),
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -720,10 +728,6 @@ class _StoreQuickMosaic extends StatelessWidget {
                 ),
               ],
             ),
-          ),
-          const SizedBox(height: 12),
-          const _StoreCompactVideoBanner(
-            asset: 'assets/video/hero-word-store.mp4',
           ),
         ],
       ),
@@ -912,16 +916,21 @@ class _StoreCompactVideoBanner extends StatelessWidget {
   final String asset;
 
   @override
-  Widget build(BuildContext context) => ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: AspectRatio(
-          aspectRatio: 16 / 6.4,
-          child: NwsbVideo(
-            asset: asset,
-            priority: ClipPriority.feature,
-            autoplay: true,
-            loop: true,
-            showPoster: true,
+  Widget build(BuildContext context) => HeavyGlassPanel(
+        margin: EdgeInsets.zero,
+        radius: 20,
+        padding: const EdgeInsets.all(5),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(15),
+          child: AspectRatio(
+            aspectRatio: 16 / 6.4,
+            child: NwsbVideo(
+              asset: asset,
+              priority: ClipPriority.feature,
+              autoplay: true,
+              loop: true,
+              showPoster: true,
+            ),
           ),
         ),
       );
@@ -931,19 +940,22 @@ class _StoreVideoBanner extends StatelessWidget {
   const _StoreVideoBanner({required this.asset, required this.poster});
   final String asset, poster;
   @override
-  Widget build(BuildContext context) => Padding(
-        padding: EdgeInsets.zero,
+  Widget build(BuildContext context) => HeavyGlassPanel(
+        margin: EdgeInsets.zero,
+        radius: 20,
+        padding: const EdgeInsets.all(5),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(15),
           child: AspectRatio(
             aspectRatio: 16 / 6.4,
             child: NwsbVideo(
-                asset: asset,
-                poster: poster,
-                priority: ClipPriority.feature,
-                autoplay: true,
-                loop: true,
-                showPoster: true),
+              asset: asset,
+              poster: poster,
+              priority: ClipPriority.feature,
+              autoplay: true,
+              loop: true,
+              showPoster: true,
+            ),
           ),
         ),
       );
