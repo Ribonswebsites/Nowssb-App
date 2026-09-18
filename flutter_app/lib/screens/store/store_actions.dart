@@ -63,13 +63,16 @@ Future<void> storeAddToCart(
   BagItem item, {
   GlobalKey? origin,
   GlobalKey? cartTarget,
-}) {
-  return CartAddAnimation.playForContext(
+}) async {
+  await CartBag.instance.addCart(item);
+  if (!context.mounted) return;
+  if (MediaQuery.maybeOf(context)?.disableAnimations ?? false) return;
+  CartAddAnimation.play(
     context,
+    fromKey: origin,
+    fromContext: origin == null ? context : null,
+    targetKey: cartTarget,
     item: item,
-    pressedKey: origin,
-    pressedContext: origin == null ? context : null,
-    cartTargetKey: cartTarget,
   );
 }
 

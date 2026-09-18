@@ -4,6 +4,8 @@ library;
 
 import 'dart:ui' show ImageFilter;
 
+import 'package:flutter/foundation.dart';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
@@ -20,6 +22,65 @@ String inr(num value) {
   final n = value is int ? value : value.round();
   return '₹$n';
 }
+
+String localizedMoney(BuildContext context, num inrValue) {
+  if (inrValue <= 0) return 'Included';
+  final locale = Localizations.localeOf(context);
+  final country = locale.countryCode ?? '';
+  final language = locale.languageCode;
+  var symbol = '₹';
+  var rate = 1.0;
+  switch (country.isNotEmpty ? country : language) {
+    case 'US':
+    case 'en':
+      symbol = r'$';
+      rate = .012;
+      break;
+    case 'GB':
+      symbol = '£';
+      rate = .0095;
+      break;
+    case 'DE':
+    case 'FR':
+    case 'IT':
+    case 'ES':
+    case 'NL':
+    case 'EUR':
+      symbol = '€';
+      rate = .011;
+      break;
+    case 'AE':
+      symbol = 'د.إ';
+      rate = .044;
+      break;
+    case 'SG':
+      symbol = 'S\$';
+      rate = .016;
+      break;
+    case 'AU':
+      symbol = r'A$';
+      rate = .018;
+      break;
+    case 'CA':
+      symbol = r'C$';
+      rate = .0165;
+      break;
+    case 'JP':
+      symbol = '¥';
+      rate = 1.75;
+      break;
+    case 'IN':
+    case 'hi':
+      symbol = '₹';
+      rate = 1.0;
+      break;
+  }
+  final converted = (inrValue * rate).round();
+  return '$symbol$converted';
+}
+
+String saleOriginalMoney(BuildContext context, num salePrice) =>
+    localizedMoney(context, salePrice * 2);
 
 /// Clean NowssB bag + headphones product shot — NEVER fashion heels /
 /// meditation collection posters. Used in every notification pill.
@@ -650,7 +711,7 @@ class RmWordCard extends StatelessWidget {
   final Color? tint;
 
   /// Thicker horizontal card: image left, text + actions right.
-  static const double cardHeight = 196;
+  static const double cardHeight = 238;
   static const double cardWidth = 338;
 
   BagItem get _item => wordBagItem(
@@ -816,16 +877,50 @@ class RmWordCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Expanded(
-                            child: Text(
-                              price == null ? '—' : inr(price!),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w800,
-                                color: NwsbColors.goldLight,
-                              ),
-                            ),
+                            child: price == null
+                                ? const Text('—',
+                                    style:
+                                        TextStyle(color: NwsbColors.goldLight))
+                                : Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Wrap(
+                                        spacing: 5,
+                                        runSpacing: 1,
+                                        children: [
+                                          Text(
+                                            saleOriginalMoney(context, price!),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              fontSize: 10,
+                                              color: Color(0x80FFFFFF),
+                                              decoration:
+                                                  TextDecoration.lineThrough,
+                                            ),
+                                          ),
+                                          const Text(
+                                            '50% OFF',
+                                            style: TextStyle(
+                                              fontSize: 8,
+                                              fontWeight: FontWeight.w800,
+                                              color: NwsbColors.goldLight,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        localizedMoney(context, price!),
+                                        style: const TextStyle(
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.w900,
+                                            color: NwsbColors.goldLight),
+                                      ),
+                                    ],
+                                  ),
                           ),
                           Semantics(
                             button: true,
@@ -1220,11 +1315,19 @@ class StoreFilterChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
         decoration: BoxDecoration(
-          color: selected ? const Color(0x28C8E8F5) : const Color(0x14FFFFFF),
+          color: selected ? Colors.white : const Color(0x16FFFFFF),
           border: Border.all(
-            color: selected ? const Color(0x55C8E8F5) : const Color(0x26FFFFFF),
+            color: selected ? Colors.white : const Color(0x38FFFFFF),
           ),
           borderRadius: BorderRadius.circular(40),
+          boxShadow: selected
+              ? const [
+                  BoxShadow(
+                      color: Color(0x33000000),
+                      blurRadius: 8,
+                      offset: Offset(0, 3))
+                ]
+              : null,
         ),
         child: Text(
           label,
@@ -1232,7 +1335,7 @@ class StoreFilterChip extends StatelessWidget {
             fontSize: 9,
             letterSpacing: 1.4,
             fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-            color: selected ? Colors.white : const Color(0xCCFFFFFF),
+            color: selected ? const Color(0xFF080A10) : const Color(0xD9FFFFFF),
           ),
         ),
       ),
@@ -1260,8 +1363,9 @@ class StoreSearchBar extends StatelessWidget {
       height: 52,
       padding: const EdgeInsets.only(left: 14),
       decoration: BoxDecoration(
-        color: const Color(0x12FFFFFF),
-        border: Border.all(color: const Color(0x38FFFFFF)),
+        color: const Color(0xE6090B10),
+        border: Border.all(color: const Color(0x66FFFFFF)),
+        borderRadius: BorderRadius.circular(30),
         boxShadow: const [
           BoxShadow(
             color: Color(0x40000000),
@@ -1272,7 +1376,14 @@ class StoreSearchBar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.search, size: 17, color: Color(0x80FFFFFF)),
+          Image.asset(
+            'assets/icons/search.webp',
+            width: 18,
+            height: 18,
+            fit: BoxFit.contain,
+            color: Colors.white,
+            colorBlendMode: BlendMode.srcIn,
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: TextField(
@@ -1306,11 +1417,18 @@ class StoreSearchBar extends StatelessWidget {
             onTap: onGo,
             child: Container(
               height: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 14),
+              margin: const EdgeInsets.all(5),
+              padding: const EdgeInsets.symmetric(horizontal: 17),
               alignment: Alignment.center,
-              decoration: const BoxDecoration(
-                color: Color(0x26C8E8F5),
-                border: Border(left: BorderSide(color: Color(0x4DC8E8F5))),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: const [
+                  BoxShadow(
+                      color: Color(0x22000000),
+                      blurRadius: 8,
+                      offset: Offset(0, 2)),
+                ],
               ),
               child: const Text(
                 'GO',
@@ -1318,7 +1436,7 @@ class StoreSearchBar extends StatelessWidget {
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 2,
-                  color: Color(0xFFC8E8F5),
+                  color: Color(0xFF080A10),
                 ),
               ),
             ),

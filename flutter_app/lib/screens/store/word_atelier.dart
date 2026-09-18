@@ -26,7 +26,8 @@ class WordAtelierScreen extends StatelessWidget {
         tag: 'Shabdapathy · Word Science',
         eyebrow: '',
         title: 'The Word Atelier',
-        body: 'Every word carries a vibrational signature that predates all dictionaries. Explore the phonetic origin of any word in any language.',
+        body:
+            'Every word carries a vibrational signature that predates all dictionaries. Explore the phonetic origin of any word in any language.',
         stats: const ['Unlimited Words', 'AI-Powered', 'Every Language'],
         art: 'assets/store/intro-words.webp',
         fullBleed: true,
@@ -134,19 +135,24 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
         final cards = <Widget>[];
         for (final w in cat.words) {
           if (!_match(w.word, w.root)) continue;
-          final name = w.word.isEmpty ? w.word : '${w.word[0].toUpperCase()}${w.word.substring(1)}';
+          final name = w.word.isEmpty
+              ? w.word
+              : '${w.word[0].toUpperCase()}${w.word.substring(1)}';
           // Live price when present; card art is always RM_WORD_IMG (part010).
           final live = ContentStore.instance.library
               .where((x) => x.word.toLowerCase() == w.word.toLowerCase())
               .toList();
-          final price = live.isNotEmpty ? live.first.price : (cat.id == 'off50' ? 24.5 : 49);
+          final price = live.isNotEmpty
+              ? live.first.price
+              : (cat.id == 'off50' ? 24.5 : 49);
           const img = kRmWordImg;
           cards.add(RmWordCard(
             name: name,
             root: w.root,
             imgUrl: img,
             price: price,
-            onTap: () => openAtelierWord(context, word: w.word, root: w.root, img: img, price: price),
+            onTap: () => openAtelierWord(context,
+                word: w.word, root: w.root, img: img, price: price),
           ));
         }
         final sig = cat.signature;
@@ -246,14 +252,22 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
           videoAsset: nwsbVideo(kRmHeroVidFile),
           videoTitle: 'The Word Atelier',
         ),
-        StoreSearchBar(
-          controller: _search,
-          onChanged: (v) => setState(() => _query = v),
+        StoreGlassPanel(
+          radius: 32,
+          padding: const EdgeInsets.all(5),
+          child: StoreSearchBar(
+            controller: _search,
+            onChanged: (v) => setState(() => _query = v),
+          ),
         ),
         const SizedBox(height: 16),
         const Text(
           'YOUR WORD LIBRARY',
-          style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 2.2, color: NwsbColors.gold),
+          style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 2.2,
+              color: NwsbColors.gold),
         ),
         const SizedBox(height: 6),
         const Text(
@@ -261,22 +275,29 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
           style: TextStyle(fontSize: 13, color: Color(0x99FFFFFF)),
         ),
         const SizedBox(height: 12),
-        SizedBox(
-          height: 36,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            children: [
-              StoreFilterChip(label: 'ALL', selected: _chip == 'ALL', onTap: () => setState(() => _chip = 'ALL')),
-              const SizedBox(width: 7),
-              for (final c in kRmCategories) ...[
+        StoreGlassPanel(
+          radius: 28,
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
+          child: SizedBox(
+            height: 36,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: [
                 StoreFilterChip(
-                  label: c.label.toUpperCase(),
-                  selected: _chip == c.id,
-                  onTap: () => setState(() => _chip = c.id),
-                ),
+                    label: 'ALL',
+                    selected: _chip == 'ALL',
+                    onTap: () => setState(() => _chip = 'ALL')),
                 const SizedBox(width: 7),
+                for (final c in kRmCategories) ...[
+                  StoreFilterChip(
+                    label: c.label.toUpperCase(),
+                    selected: _chip == c.id,
+                    onTap: () => setState(() => _chip = c.id),
+                  ),
+                  const SizedBox(width: 7),
+                ],
               ],
-            ],
+            ),
           ),
         ),
         const SizedBox(height: 8),

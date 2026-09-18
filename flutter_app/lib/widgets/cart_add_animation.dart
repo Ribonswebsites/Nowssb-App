@@ -55,13 +55,14 @@ class CartAddAnimation {
     GlobalKey? fromKey,
     BuildContext? fromContext,
     GlobalKey? targetKey,
-  }) => playForContext(
-    context,
-    item: item,
-    pressedKey: fromKey,
-    pressedContext: fromContext,
-    cartTargetKey: targetKey,
-  );
+  }) =>
+      playForContext(
+        context,
+        item: item,
+        pressedKey: fromKey,
+        pressedContext: fromContext,
+        cartTargetKey: targetKey,
+      );
 
   static void play(
     BuildContext context, {
@@ -73,9 +74,8 @@ class CartAddAnimation {
     final from = fromKey == null
         ? _rectForContext(fromContext ?? context)
         : _rectFor(fromKey);
-    final target = targetKey == null
-        ? _fallbackTarget(context)
-        : _rectFor(targetKey);
+    final target =
+        targetKey == null ? _fallbackTarget(context) : _rectFor(targetKey);
     if (from == null || target == null) return;
     final overlay = Overlay.of(context, rootOverlay: true);
     late OverlayEntry entry;
@@ -160,28 +160,38 @@ class _CartFlightState extends State<_CartFlight>
         animation: _controller,
         builder: (_, __) {
           final value = _controller.value;
-          final travel = Curves.easeInOutCubic.transform(value);
-          final arc = math.sin(math.pi * travel) * -78;
-          final itemCenter =
-              Offset.lerp(widget.from.center, widget.target.center, travel)! +
-              Offset(0, arc);
-          final itemSize = math.max(26.0, math.min(widget.from.width, 72.0));
-          final itemScale = value < .16
-              ? Curves.easeOutBack.transform(
-                  (value / .16).clamp(0.0, 1.0).toDouble(),
-                )
-              : (value < .76 ? 1.0 - ((value - .16) / .60) * .58 : .42);
-          final itemOpacity = value < .74
-              ? 1.0
-              : (1 - ((value - .74) / .20)).clamp(0.0, 1.0).toDouble();
-          final cartProgress = Curves.easeOutCubic.transform(
-            ((value - .56) / .18).clamp(0.0, 1.0).toDouble(),
+          final itemSize =
+              math.max(28.0, math.min(widget.from.width * .72, 68.0));
+          final origin = widget.from.center;
+          final catchPoint = Offset(origin.dx, origin.dy - 2);
+          final itemTravel = Curves.easeInOutCubic.transform(
+            ((value - .34) / .24).clamp(0.0, 1.0).toDouble(),
           );
-          final cartScale =
-              .52 +
-              cartProgress * .48 +
-              (value > .74 ? math.sin((value - .74) * math.pi / .26) * .14 : 0);
-          final cartOpacity = ((value - .50) / .14).clamp(0.0, 1.0).toDouble();
+          final itemCenter = value < .34
+              ? origin
+              : Offset.lerp(catchPoint, widget.target.center, itemTravel)!;
+          final itemScale = value < .18
+              ? Curves.easeOutBack
+                  .transform((value / .18).clamp(0.0, 1.0).toDouble())
+              : (value < .58 ? 1.0 : .82);
+          final itemOpacity = value < .55
+              ? 1.0
+              : (1 - ((value - .55) / .18)).clamp(0.0, 1.0).toDouble();
+          final cartStart = Offset(widget.target.right + 70, catchPoint.dy);
+          final cartIn = Curves.easeOutCubic.transform(
+            ((value - .16) / .28).clamp(0.0, 1.0).toDouble(),
+          );
+          final cartOut = Curves.easeInOutCubic.transform(
+            ((value - .48) / .52).clamp(0.0, 1.0).toDouble(),
+          );
+          final cartCenter = value < .48
+              ? Offset.lerp(cartStart, catchPoint, cartIn)!
+              : Offset.lerp(catchPoint, widget.target.center, cartOut)!;
+          final cartOpacity = ((value - .08) / .12).clamp(0.0, 1.0).toDouble();
+          final cartScale = .78 + (value < .48 ? cartIn * .22 : .22);
+          final cartRotation = value < .48
+              ? -math.pi * 1.7 * cartIn
+              : -math.pi * 1.7 - math.pi * 1.4 * cartOut;
           return Stack(
             children: [
               Positioned(
@@ -196,13 +206,16 @@ class _CartFlightState extends State<_CartFlight>
                 ),
               ),
               Positioned(
-                left: widget.target.center.dx - 28,
-                top: widget.target.center.dy - 28,
-                child: Transform.scale(
-                  scale: cartScale,
-                  child: Opacity(
-                    opacity: cartOpacity,
-                    child: _RollingCart(size: 56),
+                left: cartCenter.dx - 28,
+                top: cartCenter.dy - 28,
+                child: Transform.rotate(
+                  angle: cartRotation,
+                  child: Transform.scale(
+                    scale: cartScale,
+                    child: Opacity(
+                      opacity: cartOpacity,
+                      child: _RollingCart(size: 56),
+                    ),
                   ),
                 ),
               ),
