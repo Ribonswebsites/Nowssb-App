@@ -693,8 +693,11 @@ class _ThinkingDotOrbPainter extends CustomPainter {
           ..style = PaintingStyle.stroke
           ..strokeCap = StrokeCap.round
           ..strokeWidth = 1.25 + depth * 1.1
-          ..color = Color.lerp(const Color(0x99FFFFFF), accent, .35)!
-              .withOpacity((.35 + depth * .5) * intensity.clamp(.7, 1.0)),
+          ..color = Color.lerp(
+            const Color(0x99FFFFFF),
+            accent,
+            .35,
+          )!.withOpacity((.35 + depth * .5) * intensity.clamp(.7, 1.0)),
       );
     }
     canvas.drawOval(
@@ -1007,7 +1010,8 @@ class _WaterRipplePainter extends CustomPainter {
     final a1 = back ? math.pi * 2 : math.pi;
     var started = false;
     for (var a = a0; a <= a1 + .04; a += .07) {
-      final wave = math.sin(a * 9 + progress * math.pi * 2) * 4.4 * fade +
+      final wave =
+          math.sin(a * 9 + progress * math.pi * 2) * 4.4 * fade +
           math.sin(a * 4 - progress * math.pi * 1.4 + age * 6) * 2.0 * fade;
       final z = math.cos(a * 5 + progress * math.pi * 1.6) * 5.2 * fade;
       final p = Offset(
