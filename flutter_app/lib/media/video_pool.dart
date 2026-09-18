@@ -114,6 +114,19 @@ class VideoLease extends ChangeNotifier {
   DateTime? get lastPlayingAt => _lastPlayingAt;
   int get playAttempts => _playAttempts;
 
+  String get debugState {
+    if (_disposed) return 'disposed';
+    if (_controller == null) {
+      if (!_onScreen && !_prefetch) return 'offscreen-no-lease';
+      return _prefetch ? 'prefetch-no-lease' : 'visible-no-lease';
+    }
+    final value = _controller!.value;
+    if (!value.isInitialized) return 'initializing';
+    if (value.size.isEmpty) return 'ready-no-frame-size';
+    if (value.isPlaying) return 'playing';
+    return _wantsPlay ? 'ready-paused' : 'ready-idle';
+  }
+
   /// Called by the widget after every frame it is laid out in.
   ///
   /// It has to be cheap AND it has to be quiet, and the second one is the
@@ -475,6 +488,10 @@ class VideoPool {
         'prefetchLive': _live.where((l) => l.prefetching).length,
         'maxLive': _effectiveMaxLive,
         'lastError': lastError ?? '',
+        'states': {
+          for (final l in _leases)
+            l.assetPath: l.debugState,
+        },
       };
 
   /// Empty the pool and wait until it is genuinely quiet.

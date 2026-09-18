@@ -106,15 +106,6 @@ class StoreProductPage extends StatefulWidget {
   /// Meaning detail hero clip (MS_MEANING_VID) — remote HTTPS URL.
   final String? heroVideo;
 
-  BagItem get _bagItem => BagItem(
-        id: '${kind.toLowerCase()}:${title.toLowerCase()}',
-        title: title,
-        subtitle: root,
-        image: img,
-        price: price,
-        kind: kind,
-      );
-
   @override
   State<StoreProductPage> createState() => _StoreProductPageState();
 }
@@ -222,12 +213,11 @@ class _StoreProductPageState extends State<StoreProductPage> {
                                 icon: Icons.shopping_bag_outlined,
                                 filled: false,
                                 onTap: () {
-                                  CartBag.instance.addCart(_bagItem);
-                                  CartAddAnimation.play(
+                                  CartAddAnimation.addAndPlay(
                                     context,
+                                    item: _bagItem,
                                     fromKey: _addCartKey,
                                     targetKey: _cartTargetKey,
-                                    item: _bagItem,
                                   );
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
@@ -246,12 +236,19 @@ class _StoreProductPageState extends State<StoreProductPage> {
                           icon: Icons.lock_open,
                           filled: true,
                           onTap: () {
-                            CartBag.instance.addCart(_bagItem);
-                            Navigator.of(context).push(
-                              MaterialPageRoute<void>(
-                                builder: (_) => const CheckoutPage(),
-                              ),
-                            );
+                            CartAddAnimation.addAndPlay(
+                              context,
+                              item: _bagItem,
+                              fromContext: context,
+                              targetKey: _cartTargetKey,
+                            ).whenComplete(() {
+                              if (!mounted) return;
+                              Navigator.of(context).push(
+                                MaterialPageRoute<void>(
+                                  builder: (_) => const CheckoutPage(),
+                                ),
+                              );
+                            });
                           },
                         ),
                         const SizedBox(height: 22),

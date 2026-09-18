@@ -46,6 +46,9 @@ class NavScope extends InheritedWidget {
 
 class _NavShellState extends State<NavShell> {
   int _i = Settings.instance.lastTab;
+  Timer? _tabTransitionTimer;
+  bool _tabTransitioning = false;
+  int _transitionTarget = 0;
 
   /// Which home. The website keeps both in the DOM and switches a class;
   /// here it is two different screens rather than two skins — see
@@ -64,6 +67,7 @@ class _NavShellState extends State<NavShell> {
 
   @override
   void dispose() {
+    _tabTransitionTimer?.cancel();
     Settings.instance.removeListener(_onSettings);
     PlaybackSession.instance.removeListener(_onSettings);
     super.dispose();
@@ -95,6 +99,23 @@ class _NavShellState extends State<NavShell> {
   void _goToTab(int tab) {
     _popShellOverlays();
     if (tab == _i) return;
+    _tabTransitionTimer?.cancel();
+    final reduced = MediaQuery.maybeOf(context)?.disableAnimations ?? false;
+    if (!reduced) {
+      setState(() {
+        _tabTransitioning = true;
+        _transitionTarget = tab;
+      });
+      _tabTransitionTimer = Timer(const Duration(milliseconds: 110), () {
+        if (!mounted) return;
+        setState(() => _i = tab);
+        Settings.instance.setLastTab(tab);
+        _tabTransitionTimer = Timer(const Duration(milliseconds: 360), () {
+          if (mounted) setState(() => _tabTransitioning = false);
+        });
+      });
+      return;
+    }
     Settings.instance.fadeBackgroundForNavigation();
     setState(() => _i = tab);
     Settings.instance.setLastTab(tab);
@@ -187,6 +208,61 @@ class _NavShellState extends State<NavShell> {
               _tabAlive(4, const ProfileScreen()),
             ],
           ),
+          if (_tabTransitioning)
+            Positioned.fill(
+              child: IgnorePointer(
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 320),
+                  switchInCurve: Curves.easeOutCubic,
+                  switchOutCurve: Curves.easeInCubic,
+                  child: Center(
+                    key: ValueKey(_transitionTarget),
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: const Color(0xE6060C18),
+                        borderRadius: BorderRadius.circular(26),
+                        border: Border.all(color: const Color(0x66E8D5A3)),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x66000000),
+                            blurRadius: 26,
+                            spreadRadius: 5,
+                          ),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 22,
+                          vertical: 13,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.auto_awesome,
+                              color: NwsbColors.goldLight,
+                              size: 17,
+                            ),
+                            const SizedBox(width: 9),
+                            Text(
+                              _transitionTarget == 1
+                                  ? 'Practice'
+                                  : (_navFeatures.values.elementAt(_transitionTarget)['label'] ?? 'Opening'),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: .4,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           // The switch between the two homes. On the website this lives in
           // Customize; until that screen is ported it is here, because a
           // home you cannot reach may as well not be built.

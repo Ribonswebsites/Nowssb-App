@@ -1,10 +1,10 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import '../data/cart_bag.dart';
 import '../theme/tokens.dart';
-import '../screens/store/store_cards.dart';
 
 /// Recreates the reference micro-interaction: the product pops out of the
 /// pressed button, the cart rolls in to catch it, then exits toward the cart
@@ -12,14 +12,29 @@ import '../screens/store/store_cards.dart';
 class CartAddAnimation {
   CartAddAnimation._();
 
+  static Future<void> addAndPlay(
+    BuildContext context, {
+    required BagItem item,
+    GlobalKey? targetKey,
+  }) async {
+    await CartBag.instance.addCart(item);
+    play(context, fromContext: context, targetKey: targetKey, item: item);
+    await Future<void>.delayed(const Duration(milliseconds: 960));
+  }
+
   static void play(
     BuildContext context, {
-    required GlobalKey fromKey,
-    required GlobalKey targetKey,
+    GlobalKey? fromKey,
+    BuildContext? fromContext,
+    GlobalKey? targetKey,
     required BagItem item,
   }) {
-    final from = _rectFor(fromKey);
-    final target = _rectFor(targetKey);
+    final from = fromKey == null
+        ? _rectForContext(fromContext ?? context)
+        : _rectFor(fromKey);
+    final target = targetKey == null
+        ? _fallbackTarget(context)
+        : _rectFor(targetKey);
     if (from == null || target == null) return;
     final overlay = Overlay.of(context, rootOverlay: true);
     late OverlayEntry entry;
@@ -41,6 +56,21 @@ class CartAddAnimation {
     if (render is! RenderBox || !render.hasSize) return null;
     final origin = render.localToGlobal(Offset.zero);
     return origin & render.size;
+  }
+
+  static Rect? _rectForContext(BuildContext context) {
+    final render = context.findRenderObject();
+    if (render is! RenderBox || !render.hasSize) return null;
+    return render.localToGlobal(Offset.zero) & render.size;
+  }
+
+  static Rect _fallbackTarget(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    return Rect.fromCenter(
+      center: Offset(size.width - 38, MediaQuery.paddingOf(context).top + 34),
+      width: 44,
+      height: 44,
+    );
   }
 }
 
@@ -170,7 +200,15 @@ class _FlyingItem extends StatelessWidget {
         child: SizedBox(
           width: size,
           height: size,
-          child: StoreNetImage(url: item.image),
+          child: item.image.startsWith('assets/')
+              ? Image.asset(item.image, fit: BoxFit.cover)
+              : CachedNetworkImage(
+                  imageUrl: item.image,
+                  fit: BoxFit.cover,
+                  errorWidget: (_, __, ___) => const ColoredBox(
+                    color: NwsbColors.deep,
+                  ),
+                ),
         ),
       ),
     );

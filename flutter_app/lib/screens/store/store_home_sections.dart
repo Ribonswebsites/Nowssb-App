@@ -12,6 +12,7 @@ import '../../data/cart_bag.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
+import '../../widgets/cart_add_animation.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/glass_wrap.dart';
 import 'store_cards.dart';
@@ -1591,14 +1592,17 @@ class _StoreViewAllOverlayState extends State<_StoreViewAllOverlay> {
                           _WhiteCircleAction(
                             icon: Icons.shopping_bag_outlined,
                             onTap: () {
-                              CartBag.instance.addCart(BagItem(
-                                id: 'word:${_current.word.toLowerCase()}',
-                                title: _current.title,
-                                subtitle: _current.root,
-                                image: _current.img,
-                                price: _current.price,
-                                kind: 'Word',
-                              ));
+                              CartAddAnimation.addAndPlay(
+                                context,
+                                item: BagItem(
+                                  id: 'word:${_current.word.toLowerCase()}',
+                                  title: _current.title,
+                                  subtitle: _current.root,
+                                  image: _current.img,
+                                  price: _current.price,
+                                  kind: 'Word',
+                                ),
+                              );
                               _toast('Added ${_current.title} to cart');
                             },
                           ),

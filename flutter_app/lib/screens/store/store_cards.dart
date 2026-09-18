@@ -11,6 +11,7 @@ import '../../data/cart_bag.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
+import '../../widgets/cart_add_animation.dart';
 import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_icon.dart';
 
@@ -760,14 +761,17 @@ class RmWordCard extends StatelessWidget {
                             if (onAddCart != null) {
                               onAddCart!();
                             } else {
-                              CartBag.instance.addCart(BagItem(
-                                id: 'word:${name.toLowerCase()}',
-                                title: name,
-                                subtitle: root,
-                                image: imgUrl,
-                                price: price ?? 49,
-                                kind: signature ? 'Signature' : 'Word',
-                              ));
+                              CartAddAnimation.addAndPlay(
+                                context,
+                                item: BagItem(
+                                  id: 'word:${name.toLowerCase()}',
+                                  title: name,
+                                  subtitle: root,
+                                  image: imgUrl,
+                                  price: price ?? 49,
+                                  kind: signature ? 'Signature' : 'Word',
+                                ),
+                              );
                               _toast(context, 'Added $name to cart');
                             }
                           },
@@ -944,14 +948,17 @@ class MsCard extends StatelessWidget {
                       icon: Icons.shopping_bag_outlined,
                       color: NwsbColors.goldLight,
                       onTap: () {
-                        CartBag.instance.addCart(BagItem(
-                          id: 'meaning:${word.toLowerCase()}',
-                          title: word,
-                          subtitle: root,
-                          image: imgUrl,
-                          price: price,
-                          kind: signature ? 'Signature Meaning' : 'Meaning',
-                        ));
+                        CartAddAnimation.addAndPlay(
+                          context,
+                          item: BagItem(
+                            id: 'meaning:${word.toLowerCase()}',
+                            title: word,
+                            subtitle: root,
+                            image: imgUrl,
+                            price: price,
+                            kind: signature ? 'Signature Meaning' : 'Meaning',
+                          ),
+                        );
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text('Added $word to cart'),
