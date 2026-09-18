@@ -241,8 +241,9 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
     await Future<void>.delayed(const Duration(milliseconds: 720));
     if (mounted) {
       setState(
-        () => _status =
-            _matched ? _PracticeStatus.complete : _PracticeStatus.results,
+        () => _status = _matched
+            ? _PracticeStatus.complete
+            : _PracticeStatus.results,
       );
     }
   }
@@ -312,9 +313,7 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
                     : Curves.easeOutCubic.transform(_spin.value);
                 final punch = _spin.isCompleted
                     ? 1.0
-                    : Curves.easeOutBack.transform(
-                        _spin.value.clamp(0.0, 1.0),
-                      );
+                    : Curves.easeOutBack.transform(_spin.value.clamp(0.0, 1.0));
                 return Transform.translate(
                   offset: Offset(0, 48 * (1 - open)),
                   child: Opacity(
@@ -452,10 +451,7 @@ class _BlackTab extends StatelessWidget {
 
 /// Metallic ridged sphere — blender-style meridians with lighting.
 class _BlenderOrbPainter extends CustomPainter {
-  const _BlenderOrbPainter({
-    required this.progress,
-    required this.intensity,
-  });
+  const _BlenderOrbPainter({required this.progress, required this.intensity});
 
   final double progress;
   final double intensity;
@@ -471,8 +467,11 @@ class _BlenderOrbPainter extends CustomPainter {
         center: const Alignment(-0.38, -0.46),
         radius: 1.05,
         colors: [
-          Color.lerp(const Color(0xFF9AA3AD), const Color(0xFFE8EDF2),
-              0.35 * intensity)!,
+          Color.lerp(
+            const Color(0xFF9AA3AD),
+            const Color(0xFFE8EDF2),
+            0.35 * intensity,
+          )!,
           const Color(0xFF2A2E34),
           const Color(0xFF07080A),
         ],
@@ -515,8 +514,7 @@ class _BlenderOrbPainter extends CustomPainter {
             const Color(0xFF6E7680),
             const Color(0xFFF4F7FA),
             light,
-          )!
-              .withOpacity((0.42 + face * 0.5) * intensity.clamp(0.7, 1.2)),
+          )!.withOpacity((0.42 + face * 0.5) * intensity.clamp(0.7, 1.2)),
       );
     }
 
