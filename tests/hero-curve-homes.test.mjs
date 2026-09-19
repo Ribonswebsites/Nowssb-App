@@ -14,6 +14,17 @@ assert.match(index, /Sound that finds you/, "Curve uses the Sound that finds you
 assert.match(index, /Pronunciation & sound healing, wherever you are/, "Curve uses the pronunciation headline");
 assert.doesNotMatch(index, /she stays/, "Do not put the she-stays swipe line");
 assert.match(homeFash, /HeroCurveStage\(glass: true\)/, "Flutter Fashion home puts the curve under the greeting in glass");
+assert.match(css, /width:\s*152px/, "Orbiting stills are 16:9 wide");
+assert.match(css, /height:\s*86px/, "Orbiting stills are 16:9 short");
+assert.match(css, /height:\s*72%/, "Center subject is smaller than full-bleed");
+assert.match(flutter, /width: 152/, "Flutter stills are 16:9 wide");
+assert.match(flutter, /height: 86/, "Flutter stills are 16:9 short");
+assert.match(flutter, /heightFactor: 0\.72/, "Flutter subject is smaller");
+assert.match(index, /part097-hero-curve\.js/, "Both homes must load the curve spinner");
+assert.match(css, /perspective:\s*980px/, "Curve stage must be a 3D scene");
+assert.match(js, /data-nwsb-curve/, "Spinner must bind every curve stage");
+assert.match(flutter, /rotateY/, "Flutter curve must orbit on Y");
+assert.match(homeNm, /HeroCurveStage\(compact: true\)/, "Flutter Normal home puts the curve under search");
 assert.ok(existsSync(new URL("../assets/hero-curve/subject.webp", import.meta.url)));
 assert.ok(existsSync(new URL("../assets/hero-curve/stillness.webp", import.meta.url)));
 

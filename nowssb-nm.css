@@ -16723,12 +16723,12 @@ body.fashplus :is(#home, .stw-prev-stage) .fp-card .fp-enter .tp-enter-go {
   position: absolute;
   left: 50%;
   top: 42%;
-  width: 132px;
-  height: 176px;
-  margin: -88px 0 0 -66px;
+  width: 152px;
+  height: 86px;
+  margin: -43px 0 0 -76px;
   padding: 0;
   border: 1.2px solid rgba(255,255,255,.4);
-  border-radius: 14px;
+  border-radius: 10px;
   overflow: hidden;
   background: #111;
   transform: rotateY(calc(var(--i) * 51.428deg)) translateZ(220px);
@@ -16747,10 +16747,10 @@ body.fashplus :is(#home, .stw-prev-stage) .fp-card .fp-enter .tp-enter-go {
 .nwsb-curve-subject {
   position: absolute;
   left: 50%;
-  bottom: -2%;
-  height: 96%;
+  bottom: 2%;
+  height: 72%;
   width: auto;
-  max-width: 88%;
+  max-width: 70%;
   transform: translateX(-46%) translateY(var(--para-s));
   z-index: 4;
   pointer-events: none;

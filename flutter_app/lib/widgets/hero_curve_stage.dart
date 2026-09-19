@@ -169,9 +169,9 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
                 child: Transform.translate(
                   offset: Offset(0, _scroll * -0.06),
                   child: Align(
-                    alignment: const Alignment(0.08, 1.04),
+                    alignment: const Alignment(0.04, 0.92),
                     child: FractionallySizedBox(
-                      heightFactor: 0.96,
+                      heightFactor: 0.72,
                       child: Image.asset(
                         HeroCurveAssets.subject,
                         fit: BoxFit.contain,
@@ -222,10 +222,10 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
           child: GestureDetector(
             onTap: onTap,
             child: Container(
-              width: 132,
-              height: 176,
+              width: 152,
+              height: 86,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: const Color(0x66FFFFFF), width: 1.2),
                 boxShadow: const [
                   BoxShadow(
