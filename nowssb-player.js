@@ -52,42 +52,45 @@
      Add each pair as you send it; the player cycles through them by word index. ── */
   var LGP_THEMES = [
     /* The former third visual is now the first/default look for a session. */
-    { img:'https://media.nowssb.com/migrated-images/d694cb3157c4e58f_grok_image_1782656710977_nj5r6x.jpg',
-      video:'assets/videos/79d7c93a6734ed8d_grok_video_2026-06-28-19-55-09_otgbxd.mp4',
+    { img:'assets/player/player-box-bloom.jpg',
+      video:'assets/video/player-box-liquid.mp4',
       accent:'#9bb8ff' },
-    { img:'https://media.nowssb.com/migrated-images/3670d1e477f48c31_grok_image_1782656676834_rzp2cz.jpg',
-      video:'assets/videos/a1b0a1b513ec57f6_grok_video_2026-06-28-19-54-38_wrxkgr.mp4',
+    { img:'assets/player/player-box-peak.jpg',
+      video:'assets/video/player-box-wave.mp4',
       accent:'#7fe9da' },
-    { img:'https://media.nowssb.com/migrated-images/fd380f5670852d0c_grok_image_1782656704854_cfsah3.jpg',
-      video:'assets/videos/dc68caaf51e87003_grok_video_2026-06-28-19-55-02_of5fwh.mp4',
+    { img:'assets/player/player-box-bloom.jpg',
+      video:'assets/video/player-box-liquid.mp4',
       accent:'#bd7bff' },
-    { img:'https://media.nowssb.com/migrated-images/e8bb832f2815c15a_grok_image_1782656684101_o9vc93.jpg',
-      video:'assets/videos/d8ac259577c403f3_grok_video_2026-06-28-19-54-43_it2bur.mp4',
+    { img:'assets/player/player-box-peak.jpg',
+      video:'assets/video/player-box-wave.mp4',
       accent:'#a6dcff' },
-    { img:'https://media.nowssb.com/migrated-images/48ad23ade254b2d7_grok_image_1782795582310_llvpix.jpg',
-      video:'assets/videos/3b63edc1485a45e2_grok_video_2026-06-30-10-29-43_hzxyun.mp4',
+    { img:'assets/player/player-box-bloom.jpg',
+      video:'assets/video/player-box-liquid.mp4',
       accent:'#b9a6ff' },
-    { img:'https://media.nowssb.com/migrated-images/20314fda05d34b49_grok_image_1782796537731_vzyhwn.jpg',
-      video:'assets/videos/a779a65872bf917c_grok_video_2026-06-30-10-45-45_dg2ohg.mp4',
+    { img:'assets/player/player-box-peak.jpg',
+      video:'assets/video/player-box-wave.mp4',
       accent:'#a6c8ff' },
-    { img:'https://media.nowssb.com/migrated-images/f734c819e92db433_grok_image_1782796641824_izkh09.jpg',
-      video:'assets/videos/da4159578099ee48_grok_video_2026-06-30-10-47-20_rljghs.mp4',
+    { img:'assets/player/player-box-bloom.jpg',
+      video:'assets/video/player-box-liquid.mp4',
       accent:'#b9a6ff' },
-    { img:'https://media.nowssb.com/migrated-images/e103480a2c87d55b_grok_image_1782796519587_thrrws.jpg',
-      video:'assets/videos/e55e1f1f879d8074_grok_video_2026-06-30-10-45-34_pg2y2j.mp4',
+    { img:'assets/player/player-box-peak.jpg',
+      video:'assets/video/player-box-wave.mp4',
       accent:'#e8d5a3' },
-    { img:'https://media.nowssb.com/migrated-images/122962572090895c_grok_image_1782796924745_nmksmi.jpg',
-      video:'assets/videos/7a0e0cf6903f3b16_grok_video_2026-06-30-10-52-07_gvffol.mp4',
+    { img:'assets/player/player-box-bloom.jpg',
+      video:'assets/video/player-box-liquid.mp4',
       accent:'#f0d9a8' },
-    { img:'https://media.nowssb.com/migrated-images/28b7b32c97232472_grok_image_1782796933792_qwzfgx.jpg',
-      video:'assets/videos/39905d27bd778cff_grok_video_2026-06-30-10-52-20_zk87yh.mp4',
+    { img:'assets/player/player-box-peak.jpg',
+      video:'assets/video/player-box-wave.mp4',
       accent:'#8fe6ff' },
   ];
 
   /* Full-page looping backdrop for the practice player (Flutter + WebView). */
   var PLAYER_BG_VIDEO = 'assets/video/player-bg-loop.mp4';
   var PLAYER_ACTIONS_TAB_VIDEO = 'assets/video/player-actions-tab.mp4';
-  var PRAYER_WORD_VIDEOS = [PLAYER_BG_VIDEO];
+  var PRAYER_WORD_VIDEOS = [
+    'assets/video/player-box-liquid.mp4',
+    'assets/video/player-box-wave.mp4',
+  ];
 
   /* Exposed so app/js/part051.js's background video pre-warmer (Cache
      Storage, same mechanism as every other decorative video in the app)

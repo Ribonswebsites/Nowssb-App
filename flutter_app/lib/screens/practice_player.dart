@@ -1,6 +1,7 @@
 /// The native counterpart to www/nowssb-player.js.
 ///
-/// It uses one local player-box film ([_kPlayerBoxFilm]) for every word,
+/// It uses the two local player-box films ([kPlayerBoxFilms]) — liquid glass
+/// and sine wave — cycling by word, the same clips as the WebView player.
 /// assets, word-action clip, and the same five-item control treatment as the
 /// WebView Player. Speech remains native text-to-speech and completed words
 /// are recorded locally, so the visual port does not replace a real session
@@ -745,6 +746,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                               width: stageWidth,
                               child: _VisualStage(
                                 word: _word,
+                                video: kPlayerBoxFilms[_index % kPlayerBoxFilms.length],
                                 playing: _playing,
                                 accent: theme.accent,
                                 onReplay: _prepareAndPlay,
@@ -2596,6 +2598,7 @@ class _StoreGlassVideoBox extends StatelessWidget {
 class _VisualStage extends StatelessWidget {
   const _VisualStage({
     required this.word,
+    required this.video,
     required this.playing,
     required this.accent,
     required this.onReplay,
@@ -2608,6 +2611,7 @@ class _VisualStage extends StatelessWidget {
   });
 
   final Word word;
+  final String video;
   final bool playing;
   final Color accent;
   final VoidCallback onReplay;
@@ -2642,7 +2646,7 @@ class _VisualStage extends StatelessWidget {
           children: [
             const ColoredBox(color: Colors.black),
             NwsbVideo(
-              asset: _kPlayerBoxFilm,
+              asset: video,
               fit: BoxFit.cover,
               alignment: Alignment.center,
               priority: ClipPriority.feature,
@@ -4364,53 +4368,53 @@ class _SubtitleMarquee extends StatelessWidget {
 
 const _playerThemes = <_PlayerTheme>[
   _PlayerTheme(
-    image: 'https://media.nowssb.com/migrated-images/d694cb3157c4e58f_grok_image_1782656710977_nj5r6x.jpg',
-    video: _kPlayerBoxFilm,
+    image: 'assets/player/player-box-bloom.jpg',
+    video: kPlayerBoxFilm,
     accent: Color(0xFF9BB8FF),
   ),
   _PlayerTheme(
-    image: 'https://media.nowssb.com/migrated-images/3670d1e477f48c31_grok_image_1782656676834_rzp2cz.jpg',
-    video: _kPlayerBoxFilm,
+    image: 'assets/player/player-box-peak.jpg',
+    video: kPlayerBoxWaveFilm,
     accent: Color(0xFF7FE9DA),
   ),
   _PlayerTheme(
-    image: 'https://media.nowssb.com/migrated-images/fd380f5670852d0c_grok_image_1782656704854_cfsah3.jpg',
-    video: _kPlayerBoxFilm,
+    image: 'assets/player/player-box-bloom.jpg',
+    video: kPlayerBoxFilm,
     accent: Color(0xFFBD7BFF),
   ),
   _PlayerTheme(
-    image: 'https://media.nowssb.com/migrated-images/e8bb832f2815c15a_grok_image_1782656684101_o9vc93.jpg',
-    video: _kPlayerBoxFilm,
+    image: 'assets/player/player-box-peak.jpg',
+    video: kPlayerBoxWaveFilm,
     accent: Color(0xFFA6DCFF),
   ),
   _PlayerTheme(
-    image: 'https://media.nowssb.com/migrated-images/48ad23ade254b2d7_grok_image_1782795582310_llvpix.jpg',
-    video: _kPlayerBoxFilm,
+    image: 'assets/player/player-box-bloom.jpg',
+    video: kPlayerBoxFilm,
     accent: Color(0xFFB9A6FF),
   ),
   _PlayerTheme(
-    image: 'https://media.nowssb.com/migrated-images/20314fda05d34b49_grok_image_1782796537731_vzyhwn.jpg',
-    video: _kPlayerBoxFilm,
+    image: 'assets/player/player-box-peak.jpg',
+    video: kPlayerBoxWaveFilm,
     accent: Color(0xFFA6C8FF),
   ),
   _PlayerTheme(
-    image: 'https://media.nowssb.com/migrated-images/f734c819e92db433_grok_image_1782796641824_izkh09.jpg',
-    video: _kPlayerBoxFilm,
+    image: 'assets/player/player-box-bloom.jpg',
+    video: kPlayerBoxFilm,
     accent: Color(0xFFB9A6FF),
   ),
   _PlayerTheme(
-    image: 'https://media.nowssb.com/migrated-images/e103480a2c87d55b_grok_image_1782796519587_thrrws.jpg',
-    video: _kPlayerBoxFilm,
+    image: 'assets/player/player-box-peak.jpg',
+    video: kPlayerBoxWaveFilm,
     accent: Color(0xFFE8D5A3),
   ),
   _PlayerTheme(
-    image: 'https://media.nowssb.com/migrated-images/122962572090895c_grok_image_1782796924745_nmksmi.jpg',
-    video: _kPlayerBoxFilm,
+    image: 'assets/player/player-box-bloom.jpg',
+    video: kPlayerBoxFilm,
     accent: Color(0xFFF0D9A8),
   ),
   _PlayerTheme(
-    image: 'https://media.nowssb.com/migrated-images/28b7b32c97232472_grok_image_1782796933792_qwzfgx.jpg',
-    video: _kPlayerBoxFilm,
+    image: 'assets/player/player-box-peak.jpg',
+    video: kPlayerBoxWaveFilm,
     accent: Color(0xFF8FE6FF),
   ),
 ];

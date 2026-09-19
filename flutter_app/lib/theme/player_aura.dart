@@ -1,8 +1,8 @@
 /// Shared look for the player intro, AURA clock, and Music Player Settings.
 ///
 /// Website `player-settings.html` is charcoal `#202731` with a dark swirl —
-/// not the gold Now Playing box film. That gold clip stays on the player
-/// stage only (`kPlayerBoxFilm`).
+/// not the Now Playing box films. Those clips stay on the player stage
+/// only (`kPlayerBoxFilms`).
 library;
 
 import 'package:flutter/material.dart';
@@ -11,8 +11,12 @@ import 'package:google_fonts/google_fonts.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 
-/// Gold liquid inside the Now Playing box. Do not put this on intro/setup.
-const kPlayerBoxFilm = 'assets/video/grok-video-use-this.mp4';
+/// Primary player-box film (liquid glass wave). Intro/setup must not use this.
+const kPlayerBoxFilm = 'assets/video/player-box-liquid.mp4';
+
+/// The two films the player box actually plays — liquid glass + sine wave.
+const kPlayerBoxWaveFilm = 'assets/video/player-box-wave.mp4';
+const kPlayerBoxFilms = <String>[kPlayerBoxFilm, kPlayerBoxWaveFilm];
 
 /// Charcoal AURA film — same image the website/WebView uses behind the
 /// clock and the Music Player Settings page.

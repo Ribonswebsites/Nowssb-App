@@ -10,7 +10,8 @@ void main() {
     expect(
         aura, contains("kPlayerAuraFilm = 'assets/video/player-aura-bg.mp4'"));
     expect(aura,
-        contains("kPlayerBoxFilm = 'assets/video/grok-video-use-this.mp4'"));
+        contains("kPlayerBoxFilm = 'assets/video/player-box-liquid.mp4'"));
+    expect(aura, contains("kPlayerBoxWaveFilm = 'assets/video/player-box-wave.mp4'"));
     expect(aura, contains('kPlayerSharedFilm = kPlayerAuraFilm'));
     expect(aura, contains('class PlayerAuraBackdrop'));
     expect(aura, contains('class PlayerAuraBackButton'));
@@ -59,5 +60,10 @@ void main() {
     expect(File('assets/video/player-aura-bg.mp4').existsSync(), isTrue);
     expect(
         File('assets/video/player-aura-bg-poster.webp').existsSync(), isTrue);
+    expect(File('assets/video/player-box-liquid.mp4').existsSync(), isTrue);
+    expect(File('assets/video/player-box-wave.mp4').existsSync(), isTrue);
+    expect(File('../assets/player/player-box-bloom.jpg').existsSync() ||
+            File('assets/player/player-box-bloom.jpg').existsSync(),
+        isTrue);
   });
 }
