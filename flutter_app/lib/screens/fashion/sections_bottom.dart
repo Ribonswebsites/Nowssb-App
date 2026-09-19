@@ -22,6 +22,7 @@ import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/home_parts.dart';
 import '../../widgets/home_skin.dart';
+import '../../widgets/hero_curve_stage.dart';
 import '../../widgets/tv_frame.dart';
 
 /// 19 · offer — index.html:2252. The coupon art — a clip, not a picture,
@@ -129,6 +130,11 @@ class FashPromoVideo extends StatelessWidget {
         frame: DeviceFrame.tabletLandscape,
         priority: ClipPriority.decoration,
         onTap: onTap,
+        overlay: const HeroCurveStage(
+          embedded: true,
+          subject: HeroCurveAssets.tabSubject,
+          cards: HeroCurveAssets.tabCards,
+        ),
       ),
     );
   }
@@ -361,7 +367,7 @@ class FashShabdaVideo extends StatelessWidget {
   Widget build(BuildContext context) {
     return SectionPane(
       child: TvFrame(
-        asset: 'assets/video/word-acts.mp4',
+        asset: 'assets/videos/1e9a0c8d452a809f_grok_video_2026-05-06-15-27-23_zhylbe.mp4',
         frame: DeviceFrame.tabletLandscape,
         priority: ClipPriority.decoration,
         onTap: onTap,

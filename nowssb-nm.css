@@ -16790,6 +16790,34 @@ body.fashplus :is(#home, .stw-prev-stage) .fp-card .fp-enter .tp-enter-go {
   color: #fff;
   font-family: 'DM Sans', sans-serif;
 }
+.nwsb-curve-embed {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  margin: 0;
+  overflow: hidden;
+  pointer-events: auto;
+}
+.nwsb-curve-embed .nwsb-curve-stage {
+  height: 100%;
+  background: transparent;
+}
+.nwsb-curve-embed .nwsb-curve-copy,
+.nwsb-curve-embed .nwsb-curve-mark { display: none; }
+.nwsb-curve-embed .nwsb-curve-subject {
+  height: 56%;
+  max-width: 42%;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-48%) translateY(var(--para-s));
+}
+.nwsb-curve-embed .nwsb-curve-card {
+  width: 118px;
+  height: 66px;
+  margin: -33px 0 0 -59px;
+  transform: rotateY(calc(var(--i) * 60deg)) translateZ(150px);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .nwsb-curve-ring { transition: none; }
 }

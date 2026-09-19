@@ -25,6 +25,17 @@ class HeroCurveAssets {
     'assets/hero-curve/body.webp',
     'assets/hero-curve/listen.webp',
   ];
+
+  /// Promo tablet on Fashion home — blonde cutout + campaign stills.
+  static const tabSubject = 'assets/hero-curve/tab-subject.webp';
+  static const tabCards = <String>[
+    'assets/hero-curve/tab-window.webp',
+    'assets/hero-curve/tab-desert.webp',
+    'assets/hero-curve/tab-beach.webp',
+    'assets/hero-curve/tab-stool.webp',
+    'assets/hero-curve/tab-forest.webp',
+    'assets/hero-curve/tab-rain.webp',
+  ];
 }
 
 class HeroCurveStage extends StatefulWidget {
@@ -32,6 +43,9 @@ class HeroCurveStage extends StatefulWidget {
     super.key,
     this.compact = false,
     this.glass = false,
+    this.embedded = false,
+    this.subject,
+    this.cards,
   });
 
   /// Normal home: inset rounded stage.
@@ -39,6 +53,12 @@ class HeroCurveStage extends StatefulWidget {
 
   /// Fashion home: glass pane under the greeting.
   final bool glass;
+
+  /// Inside a tablet aperture: transparent stage, no copy, smaller subject.
+  final bool embedded;
+
+  final String? subject;
+  final List<String>? cards;
 
   @override
   State<HeroCurveStage> createState() => _HeroCurveStageState();
@@ -86,6 +106,11 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.embedded) {
+      return LayoutBuilder(
+        builder: (context, c) => _stage(c.maxHeight > 0 ? c.maxHeight : 220),
+      );
+    }
     final height = widget.glass ? 580.0 : 540.0;
     final visual = ClipRRect(
       borderRadius: BorderRadius.circular(widget.glass ? 14 : 0),
@@ -123,66 +148,71 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
 
   Widget _stage(double height) {
     final rot = _auto + _drag + _scroll * 0.0016;
-    final n = HeroCurveAssets.cards.length;
+    final cards = widget.cards ?? HeroCurveAssets.cards;
+    final subject = widget.subject ?? HeroCurveAssets.subject;
+    final n = cards.length;
     final step = (math.pi * 2) / n;
-    final radius = height * 0.40;
+    final radius = height * (widget.embedded ? 0.46 : 0.40);
     final indices = List<int>.generate(n, (i) => i)
       ..sort((a, b) =>
           math.cos(rot + a * step).compareTo(math.cos(rot + b * step)));
 
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
+    final stage = GestureDetector(
+      behavior: widget.embedded
+          ? HitTestBehavior.translucent
+          : HitTestBehavior.opaque,
       onHorizontalDragUpdate: (d) {
         setState(() => _drag += d.delta.dx * 0.008);
       },
-      child: ColoredBox(
-        color: const Color(0xFF050505),
-        child: ClipRect(
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              Transform.translate(
-                offset: Offset(0, _scroll * -0.18),
-                child: Transform(
+      child: ClipRect(
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Transform.translate(
+              offset: Offset(0, _scroll * -0.18),
+              child: Transform(
+                alignment: Alignment.center,
+                transform: Matrix4.identity()..setEntry(3, 2, 0.00115),
+                child: Stack(
                   alignment: Alignment.center,
-                  transform: Matrix4.identity()..setEntry(3, 2, 0.00115),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      for (final i in indices)
-                        _card(
-                          HeroCurveAssets.cards[i],
-                          rot + i * step,
-                          radius,
-                          onTap: () => setState(() {
-                            _drag += -((rot + i * step) % (math.pi * 2));
-                            if (_drag.abs() > math.pi) {
-                              _drag -= _drag.sign * math.pi * 2;
-                            }
-                          }),
-                        ),
-                    ],
-                  ),
+                  children: [
+                    for (final i in indices)
+                      _card(
+                        cards[i],
+                        rot + i * step,
+                        radius,
+                        onTap: () => setState(() {
+                          _drag += -((rot + i * step) % (math.pi * 2));
+                          if (_drag.abs() > math.pi) {
+                            _drag -= _drag.sign * math.pi * 2;
+                          }
+                        }),
+                      ),
+                  ],
                 ),
               ),
-              IgnorePointer(
-                child: Transform.translate(
-                  offset: Offset(0, _scroll * -0.06),
-                  child: Align(
-                    alignment: const Alignment(0.04, 0.92),
-                    child: FractionallySizedBox(
-                      heightFactor: 0.72,
-                      child: Image.asset(
-                        HeroCurveAssets.subject,
-                        fit: BoxFit.contain,
-                        alignment: Alignment.bottomCenter,
-                        filterQuality: FilterQuality.high,
-                        errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-                      ),
+            ),
+            IgnorePointer(
+              child: Transform.translate(
+                offset: Offset(0, _scroll * -0.06),
+                child: Align(
+                  alignment: widget.embedded
+                      ? const Alignment(0.02, 0.95)
+                      : const Alignment(0.04, 0.92),
+                  child: FractionallySizedBox(
+                    heightFactor: widget.embedded ? 0.56 : 0.72,
+                    child: Image.asset(
+                      subject,
+                      fit: BoxFit.contain,
+                      alignment: Alignment.bottomCenter,
+                      filterQuality: FilterQuality.high,
+                      errorBuilder: (_, __, ___) => const SizedBox.shrink(),
                     ),
                   ),
                 ),
               ),
+            ),
+            if (!widget.embedded)
               const Positioned(
                 left: 18,
                 top: 16,
@@ -197,11 +227,12 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
                   ),
                 ),
               ),
-            ],
-          ),
+          ],
         ),
       ),
     );
+    if (widget.embedded) return stage;
+    return ColoredBox(color: const Color(0xFF050505), child: stage);
   }
 
   Widget _card(String asset, double angle, double radius,
@@ -222,8 +253,8 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
           child: GestureDetector(
             onTap: onTap,
             child: Container(
-              width: 152,
-              height: 86,
+              width: widget.embedded ? 118 : 152,
+              height: widget.embedded ? 66 : 86,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: const Color(0x66FFFFFF), width: 1.2),

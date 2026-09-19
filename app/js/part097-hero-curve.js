@@ -1,11 +1,12 @@
 /* Lesmana-style 3D curve on both homes: subject stays, stills orbit. */
 (function () {
   'use strict';
-  var STEP = 360 / 7;
 
   function bind(root) {
     var ring = root.querySelector('.nwsb-curve-ring');
     if (!ring) return;
+    var n = root.querySelectorAll('.nwsb-curve-card').length || 7;
+    var STEP = 360 / n;
     var rot = 0;
     var dragging = false;
     var lastX = 0;

@@ -55,6 +55,7 @@ const VIDEOS_ALLOWLIST = [
   '415dd447da33973b_grok_video_2026-07-30-14-35-05_q3tyzk.mp4',
   '7e4d709136dc254a_grok_video_2026-07-18-15-53-02_ubjx5b.mp4',
   'beaf11ea10561d43_grok_video_2026-07-30-15-35-40_xwm1ei.mp4',
+  '1e9a0c8d452a809f_grok_video_2026-05-06-15-27-23_zhylbe.mp4',
 ];
 
 const KEEP = /\.(mp4|webp|png|jpe?g|svg)$/i;

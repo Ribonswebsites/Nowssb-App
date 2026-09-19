@@ -25,6 +25,7 @@ test('Flutter local practice clips are symlinks into root assets/videos (no seco
     '415dd447da33973b_grok_video_2026-07-30-14-35-05_q3tyzk.mp4',
     '7e4d709136dc254a_grok_video_2026-07-18-15-53-02_ubjx5b.mp4',
     'beaf11ea10561d43_grok_video_2026-07-30-15-35-40_xwm1ei.mp4',
+    '1e9a0c8d452a809f_grok_video_2026-05-06-15-27-23_zhylbe.mp4',
   ];
   for (const name of needed) {
     const p = join(root, 'flutter_app/assets/videos', name);

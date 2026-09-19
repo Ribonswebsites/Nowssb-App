@@ -7,6 +7,7 @@ const js = readFileSync(new URL("../app/js/part097-hero-curve.js", import.meta.u
 const flutter = readFileSync(new URL("../flutter_app/lib/widgets/hero_curve_stage.dart", import.meta.url), "utf8");
 const homeNm = readFileSync(new URL("../flutter_app/lib/screens/home_normal.dart", import.meta.url), "utf8");
 const homeFash = readFileSync(new URL("../flutter_app/lib/screens/home_fashion.dart", import.meta.url), "utf8");
+const homeFashBottom = readFileSync(new URL("../flutter_app/lib/screens/fashion/sections_bottom.dart", import.meta.url), "utf8");
 
 assert.match(index, /nwsb-curve-nm/, "Normal home must mount the 3D curve below search");
 assert.match(index, /nwsb-curve-fash glass-wrap/, "Fashion curve sits in a glass pane");
@@ -17,16 +18,20 @@ assert.match(homeFash, /HeroCurveStage\(glass: true\)/, "Flutter Fashion home pu
 assert.match(css, /width:\s*152px/, "Orbiting stills are 16:9 wide");
 assert.match(css, /height:\s*86px/, "Orbiting stills are 16:9 short");
 assert.match(css, /height:\s*72%/, "Center subject is smaller than full-bleed");
-assert.match(flutter, /width: 152/, "Flutter stills are 16:9 wide");
-assert.match(flutter, /height: 86/, "Flutter stills are 16:9 short");
-assert.match(flutter, /heightFactor: 0\.72/, "Flutter subject is smaller");
+assert.match(flutter, /width: widget.embedded \? 118 : 152/, "Flutter stills are 16:9 wide");
+assert.match(flutter, /height: widget.embedded \? 66 : 86/, "Flutter stills are 16:9 short");
+assert.match(flutter, /heightFactor: widget.embedded \? 0\.56 : 0\.72/, "Flutter subject is smaller");
 assert.match(index, /part097-hero-curve\.js/, "Both homes must load the curve spinner");
 assert.match(css, /perspective:\s*980px/, "Curve stage must be a 3D scene");
 assert.match(js, /data-nwsb-curve/, "Spinner must bind every curve stage");
 assert.match(flutter, /rotateY/, "Flutter curve must orbit on Y");
 assert.match(homeNm, /HeroCurveStage\(compact: true\)/, "Flutter Normal home puts the curve under search");
-assert.ok(existsSync(new URL("../assets/hero-curve/subject.webp", import.meta.url)));
-assert.ok(existsSync(new URL("../assets/hero-curve/stillness.webp", import.meta.url)));
+assert.match(index, /nwsb-curve-embed/, "Promo tablet mounts the embedded 3D curve");
+assert.match(index, /tab-subject\.webp/, "Promo tablet uses the blonde cutout");
+assert.match(homeFashBottom, /embedded: true/, "Flutter promo tablet embeds the curve");
+assert.match(homeFashBottom, /zhylbe/, "Flutter Shabdapathy tablet uses the website clip");
+assert.ok(existsSync(new URL("../assets/hero-curve/tab-subject.webp", import.meta.url)));
+assert.ok(existsSync(new URL("../assets/hero-curve/tab-window.webp", import.meta.url)));
 
 const searchAt = index.indexOf('class="nmh-search"');
 const curveNmAt = index.indexOf('nwsb-curve-nm');

@@ -11,7 +11,9 @@ void main() {
     expect(File('assets/hero-curve/stillness.webp').existsSync(), isTrue);
     expect(File('assets/hero-curve/countries.webp').existsSync(), isTrue);
     expect(File('assets/hero-curve/cosmos.webp').existsSync(), isTrue);
-    expect(HeroCurveAssets.cards, hasLength(7));
+    expect(File('assets/hero-curve/tab-subject.webp').existsSync(), isTrue);
+    expect(File('assets/hero-curve/tab-window.webp').existsSync(), isTrue);
+    expect(HeroCurveAssets.tabCards, hasLength(6));
   });
 
   test('normal home parks the curve under search', () {
