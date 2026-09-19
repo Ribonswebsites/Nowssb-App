@@ -8214,18 +8214,13 @@ body.nm-mode #sub-social #ss-panel-startbg .ss-panel-sub { color: rgba(255,255,2
 .reader-sec-go svg { width: 12px; height: 12px; display: block; }
 
 /* ── Chooser ─────────────────────────────────────────────────────── */
-.rd-hub { background: #060c18; display: flex; flex-direction: column; }
-/* The clip is the page background — #sub-reader is already position:fixed
-   (the shared .sub-screen base), so these anchor to it directly. */
-.rd-hub-bgvid {
-  position: absolute; inset: 0; z-index: 0;
-  width: 100% !important; height: 100% !important;
-  object-fit: cover; display: block; pointer-events: none;
-}
-.rd-hub-bgvid-scrim {
-  position: absolute; inset: 0; z-index: 1; pointer-events: none;
-  background: linear-gradient(180deg, rgba(4,8,16,0.45) 0%, rgba(4,8,16,0.55) 55%, rgba(4,8,16,0.8) 100%);
-}
+.rd-hub { background: transparent !important; display: flex; flex-direction: column; }
+#sub-reader { background: transparent !important; }
+/* Page film is the Fashion home clip (`#fpBgVideo`), not a local Reader
+   video. The 16:9 `.rd-hub-vid` banner above the cards still plays the
+   Reader section clip. */
+.rd-hub-bgvid { display: none !important; }
+.rd-hub-bgvid-scrim { display: none !important; }
 .rd-hub-head, .rd-hub-body { position: relative; z-index: 2; }
 .rd-hub-head {
   flex-shrink: 0; display: flex; align-items: center; gap: 12px;

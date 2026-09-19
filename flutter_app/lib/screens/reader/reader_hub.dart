@@ -1,8 +1,9 @@
 /// Reader chooser — `#sub-reader` / `.rd-hub` in index.html:8382.
 ///
-/// Two cards, Meaning Reader and eBook Reader, over the Reader film. The
-/// home section used to jump to the Library tab; this is the page that
-/// actually opens.
+/// Two cards, Meaning Reader and eBook Reader, over the same Fashion-home
+/// film (`AppBackdrop` / `#fpBgVideo`). The 16:9 banner above the cards
+/// still plays the Reader clip. The home section used to jump to the
+/// Library tab; this is the page that actually opens.
 library;
 
 import 'package:flutter/material.dart';
@@ -13,6 +14,7 @@ import '../../media/nwsb_image.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
+import '../../widgets/app_backdrop.dart';
 import '../../widgets/home_parts.dart';
 import 'reader_book.dart';
 
@@ -47,26 +49,27 @@ class _ReaderHubScreenState extends State<ReaderHubScreen> {
   Widget build(BuildContext context) {
     final top = MediaQuery.paddingOf(context).top;
     return Scaffold(
-      backgroundColor: NwsbColors.deep,
+      backgroundColor: Colors.transparent,
       body: Stack(
         fit: StackFit.expand,
         children: [
-          const NwsbVideo(
-            asset: 'assets/video/reader-section.mp4',
-            poster: 'assets/video/reader-section-poster.webp',
-            fit: BoxFit.cover,
-            priority: ClipPriority.decoration,
-          ),
-          const DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0x73040810),
-                  Color(0x8C040810),
-                  Color(0xCC040810),
-                ],
+          const Positioned.fill(child: AppBackdrop()),
+          const Positioned.fill(
+            child: IgnorePointer(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: RadialGradient(
+                    center: Alignment(0, -0.1),
+                    radius: 0.88,
+                    colors: [
+                      Color(0x00000000),
+                      Color(0x24000000),
+                      Color(0x57000000),
+                      Color(0x94000000),
+                    ],
+                    stops: [0.30, 0.58, 0.80, 1.0],
+                  ),
+                ),
               ),
             ),
           ),

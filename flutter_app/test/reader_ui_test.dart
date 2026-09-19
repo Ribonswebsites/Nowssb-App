@@ -6,6 +6,7 @@
 library;
 
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
@@ -58,6 +59,20 @@ void main() {
     expect(find.text('Meaning Reader'), findsOneWidget);
     expect(find.text('eBook Reader'), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  test('reader hub page film is the Fashion home backdrop, not reader-section', () {
+    final hub = File('lib/screens/reader/reader_hub.dart').readAsStringSync();
+    expect(hub, contains('AppBackdrop'));
+    expect(hub, contains('reader-section.mp4'));
+    expect(
+      RegExp(r'Positioned\.fill\(child: AppBackdrop\(\)\)').hasMatch(hub),
+      isTrue,
+    );
+    expect(
+      hub.contains("const NwsbVideo(\n            asset: 'assets/video/reader-section.mp4'"),
+      isFalse,
+    );
   });
 
   testWidgets('Meaning Reader opens the catalogue as a book', (tester) async {
