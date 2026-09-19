@@ -132,7 +132,7 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
     final batt = _batteryPct ?? 52;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF202731),
+      backgroundColor: kPlayerAuraBg,
       body: PlayerAuraBackdrop(
         child: SafeArea(
           bottom: false,
@@ -146,30 +146,30 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
                       onTap: () => Navigator.maybePop(context),
                     ),
                     const Spacer(),
-                    const Text(
+                    Text(
                       'AURA',
-                      style: TextStyle(
-                        color: Color(0xFFF2F2EF),
-                        fontSize: 12,
+                      style: playerAuraText(
+                        size: 12,
                         letterSpacing: 4,
-                        fontWeight: FontWeight.w500,
+                        weight: FontWeight.w500,
+                        color: kPlayerAuraFg,
                       ),
                     ),
                   ],
                 ),
               ),
-              const Align(
+              Align(
                 alignment: Alignment.centerLeft,
                 child: Padding(
-                  padding: EdgeInsets.fromLTRB(24, 18, 24, 12),
+                  padding: const EdgeInsets.fromLTRB(24, 18, 24, 12),
                   child: Text(
                     'MUSIC PLAYER\nSETTINGS',
-                    style: TextStyle(
-                      color: Color(0xFFF2F2EF),
-                      fontSize: 29,
-                      fontWeight: FontWeight.w300,
+                    style: playerAuraText(
+                      size: 29,
+                      weight: FontWeight.w300,
                       letterSpacing: 4.0,
                       height: 1.28,
+                      color: kPlayerAuraFg,
                     ),
                   ),
                 ),

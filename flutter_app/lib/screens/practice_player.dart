@@ -34,6 +34,7 @@ import 'player_settings.dart';
 import 'sentence_builder.dart';
 import 'select_level.dart';
 import 'player_dial.dart';
+import 'player_intro.dart';
 import 'practice_overlay.dart';
 import '../data/playback_session.dart';
 
@@ -61,17 +62,19 @@ String _prettyTitle(String title) {
   return '${t[0].toUpperCase()}${t.substring(1).toLowerCase()}';
 }
 
-const _kPlayerBoxFilm = kPlayerSharedFilm;
+const _kPlayerBoxFilm = kPlayerBoxFilm;
 
 class PracticePlayerScreen extends StatefulWidget {
   const PracticePlayerScreen({
     super.key,
     required this.words,
     required this.title,
+    this.showIntro = true,
   });
 
   final List<Word> words;
   final String title;
+  final bool showIntro;
 
   @override
   State<PracticePlayerScreen> createState() => _PracticePlayerScreenState();
@@ -103,6 +106,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
   var _handingOff = false;
   var _practiceOpen = false;
   var _bottomPage = 0;
+  var _introDone = false;
   DateTime? _startedAt;
   String? _error;
 
@@ -122,7 +126,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     unawaited(PracticeProgress.instance.start());
     unawaited(_loadLiked());
     unawaited(_loadShuffle());
-    unawaited(_prepareAndPlay());
+    _introDone = !widget.showIntro;
+    if (_introDone) unawaited(_prepareAndPlay());
   }
 
   void _kickBottomAuto() {
@@ -421,6 +426,13 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
           onPlay: _togglePlay,
           onClose: () => Navigator.of(context).pop(),
           onSettings: _openSettings,
+          onLibrary: () {
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => const SoundLibraryScreen(),
+              ),
+            );
+          },
         ),
       ),
     );
@@ -665,6 +677,19 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
             style: TextStyle(color: Colors.white70),
           ),
         ),
+      );
+    }
+
+    if (!_introDone) {
+      return PlayerIntroScreen(
+        sessionTitle: widget.title,
+        wordCount: widget.words.length,
+        onBack: () => Navigator.of(context).maybePop(),
+        onSettings: _openSettings,
+        onBegin: () {
+          setState(() => _introDone = true);
+          unawaited(_prepareAndPlay());
+        },
       );
     }
 

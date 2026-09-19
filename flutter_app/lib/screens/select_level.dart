@@ -26,7 +26,7 @@ class _SelectLevelScreenState extends State<SelectLevelScreen> {
   Widget build(BuildContext context) {
     final levels = _expanded ? List.generate(10, (i) => i + 1) : List.generate(6, (i) => i + 1);
     return Scaffold(
-      backgroundColor: const Color(0xFF202731),
+      backgroundColor: kPlayerAuraBg,
       body: PlayerAuraBackdrop(
         child: SafeArea(
         child: Center(

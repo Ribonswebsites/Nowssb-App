@@ -82,6 +82,7 @@ class _NavShellState extends State<NavShell> {
         builder: (_) => PracticePlayerScreen(
           words: session.words,
           title: session.title.isEmpty ? 'NowssB' : session.title,
+          showIntro: false,
         ),
       ),
     );

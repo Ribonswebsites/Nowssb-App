@@ -20,12 +20,14 @@ class PlayerDial extends StatefulWidget {
     this.onPlay,
     this.onClose,
     this.onSettings,
+    this.onLibrary,
   });
   final String word;
   final bool playing;
   final VoidCallback? onPlay;
   final VoidCallback? onClose;
   final VoidCallback? onSettings;
+  final VoidCallback? onLibrary;
 
   @override
   State<PlayerDial> createState() => _PlayerDialState();
@@ -206,6 +208,12 @@ class _PlayerDialState extends State<PlayerDial> with SingleTickerProviderStateM
                         onTap: widget.onClose ?? () => Navigator.maybePop(context),
                       ),
                       const Spacer(),
+                      if (widget.onLibrary != null)
+                        IconButton(
+                          onPressed: widget.onLibrary,
+                          tooltip: 'Library',
+                          icon: const Icon(Icons.queue_music_outlined, color: Colors.white, size: 22),
+                        ),
                       IconButton(
                         onPressed: _openFullSettings,
                         tooltip: 'Player settings',
