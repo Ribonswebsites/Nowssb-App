@@ -685,9 +685,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     }
 
     if (!_guideDone) {
-      return PlayerGuideScreen(
-        onDone: () => setState(() => _guideDone = true),
-      );
+      return PlayerGuideScreen(onDone: () => setState(() => _guideDone = true));
     }
 
     if (!_introDone) {
