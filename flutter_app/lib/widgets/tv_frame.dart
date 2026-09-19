@@ -29,7 +29,9 @@ class DeviceFrame {
       required this.bottom,
       required this.left,
       this.verticalIsHeight = false,
-      this.opaqueAperture = false});
+      this.opaqueAperture = false,
+      this.screenRadius = 0,
+      this.outerRadius = 0});
 
   /// True when this frame's aperture is placed by ABSOLUTE OFFSETS rather
   /// than by padding — `top`/`bottom` percentages on a positioned box
@@ -46,6 +48,16 @@ class DeviceFrame {
   /// behind solid grey — the "dark blur" users see on Sentence/Practice/Store
   /// and on the home Customize · Features · Earn strip.
   final bool opaqueAperture;
+
+  /// Inner-screen corner radius as a fraction of the frame WIDTH. Video
+  /// textures ignore a plain [ClipRect]; a rounded clip with a save-layer
+  /// keeps the film inside the glass.
+  final double screenRadius;
+
+  /// Outer-body corner radius as a fraction of the frame WIDTH. Clips the
+  /// rectangular bounding box so the film cannot leak at the device's
+  /// rounded outer corners (kiosk, tablets).
+  final double outerRadius;
 
   final String image;
 
@@ -156,6 +168,8 @@ class DeviceFrame {
     right: 0.02454,
     bottom: 0.12270,
     left: 0.02699,
+    screenRadius: 0.012,
+    outerRadius: 0.042,
   );
 
   /// `.dev-tv-p` — padding: 3.4% 3.2% 8.4%. Render 862x1450.
@@ -284,71 +298,41 @@ class TvFrame extends StatelessWidget {
         child: LayoutBuilder(
           builder: (context, c) {
             final box = Size(c.maxWidth, c.maxHeight);
-            // Transparent bezels: ClipRect only — the hole already shapes the
-            // opening; a second radius left white gaps in tablet/TV corners.
-            // Opaque word-acts frames: video sits ON TOP of a solid aperture, so
-            // clip video only to a modest rounded-rect (not stadium) so square
-            // corners don't poke past the inner aperture edge.
             final insets = frame.insets(box);
-            final apertureR = frame.opaqueAperture
-                ? BorderRadius.circular(14) // modest rounded-rect, not pill
-                : BorderRadius.zero;
-            final Widget clippedScreen = frame.opaqueAperture
-                ? ClipRRect(
-                    borderRadius: apertureR,
-                    clipBehavior: Clip.antiAlias,
-                    child: ColoredBox(
-                      color: Colors.black,
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          if (showVideo)
-                            IgnorePointer(
-                              ignoring: overlay != null,
-                              child: NwsbVideo(
-                                asset: asset,
-                                priority: priority,
-                                autoplay: autoplay,
-                                showPoster: showPoster,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          if (overlay != null) overlay!,
-                        ],
+            // Video textures punch through ClipRect. A rounded clip with a
+            // save-layer keeps the film inside the glass, including at the
+            // kiosk's corners on Normal home.
+            final innerPx = frame.opaqueAperture
+                ? 14.0
+                : (box.width * frame.screenRadius).clamp(1.0, 28.0);
+            final clippedScreen = ClipRRect(
+              borderRadius: BorderRadius.circular(innerPx),
+              clipBehavior: Clip.antiAliasWithSaveLayer,
+              child: ColoredBox(
+                color: Colors.black,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    if (showVideo)
+                      IgnorePointer(
+                        ignoring: overlay != null,
+                        child: NwsbVideo(
+                          asset: asset,
+                          priority: priority,
+                          autoplay: autoplay,
+                          showPoster: showPoster,
+                          fit: BoxFit.cover,
+                        ),
                       ),
-                    ),
-                  )
-                : ClipRect(
-                    clipBehavior: Clip.hardEdge,
-                    child: ColoredBox(
-                      color: Colors.black,
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          if (showVideo)
-                            IgnorePointer(
-                              ignoring: overlay != null,
-                              child: NwsbVideo(
-                                asset: asset,
-                                priority: priority,
-                                autoplay: autoplay,
-                                showPoster: showPoster,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          if (overlay != null) overlay!,
-                        ],
-                      ),
-                    ),
-                  );
+                    if (overlay != null) overlay!,
+                  ],
+                ),
+              ),
+            );
             final screen = Padding(
               padding: insets,
               child: clippedScreen,
             );
-            // Opaque-aperture bezels (word-acts-tab): frame is BACKGROUND,
-            // video paints on top in the aperture — same as nowssb-player.css
-            // `.lgp-pr-glass` / `.hhr-tab`. Transparent bezels keep the
-            // classic stack: video under the hole in the glass.
             final children = frame.opaqueAperture
                 ? <Widget>[
                     IgnorePointer(child: _Bezel(frame: frame)),
@@ -358,14 +342,19 @@ class TvFrame extends StatelessWidget {
                     screen,
                     IgnorePointer(child: _Bezel(frame: frame)),
                   ];
-            final stack = Stack(fit: StackFit.expand, children: children);
-            // Opaque lit tabs (Sentence · Practice · Store / Customize ·
-            // Features · Earn): outer rounded-rectangle white device frame
-            // (~20), NOT a stadium/pill (half height).
+            Widget stack = Stack(fit: StackFit.expand, children: children);
             if (frame.opaqueAperture) {
               return ClipRRect(
                 borderRadius: BorderRadius.circular(20),
                 clipBehavior: Clip.antiAlias,
+                child: stack,
+              );
+            }
+            if (frame.outerRadius > 0) {
+              stack = ClipRRect(
+                borderRadius:
+                    BorderRadius.circular(box.width * frame.outerRadius),
+                clipBehavior: Clip.antiAliasWithSaveLayer,
                 child: stack,
               );
             }
@@ -491,40 +480,24 @@ class FramedSlot extends StatelessWidget {
         child: LayoutBuilder(
           builder: (context, c) {
             final box = Size(c.maxWidth, c.maxHeight);
-            // Same rule as [TvFrame]: transparent = ClipRect fill; opaque
-            // word-acts = modest rounded-rect ClipRRect on video only (not stadium).
             final insets = frame.insets(box);
-            final apertureR = frame.opaqueAperture
-                ? BorderRadius.circular(14)
-                : BorderRadius.zero;
-            final Widget clippedScreen = frame.opaqueAperture
-                ? ClipRRect(
-                    borderRadius: apertureR,
-                    clipBehavior: Clip.antiAlias,
-                    child: ColoredBox(
-                      color: Colors.black,
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          child,
-                          if (overlay != null) overlay!,
-                        ],
-                      ),
-                    ),
-                  )
-                : ClipRect(
-                    clipBehavior: Clip.hardEdge,
-                    child: ColoredBox(
-                      color: Colors.black,
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          child,
-                          if (overlay != null) overlay!,
-                        ],
-                      ),
-                    ),
-                  );
+            final innerPx = frame.opaqueAperture
+                ? 14.0
+                : (box.width * frame.screenRadius).clamp(1.0, 28.0);
+            final Widget clippedScreen = ClipRRect(
+              borderRadius: BorderRadius.circular(innerPx),
+              clipBehavior: Clip.antiAliasWithSaveLayer,
+              child: ColoredBox(
+                color: Colors.black,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    child,
+                    if (overlay != null) overlay!,
+                  ],
+                ),
+              ),
+            );
             final screen = Padding(
               padding: insets,
               child: clippedScreen,
@@ -538,11 +511,19 @@ class FramedSlot extends StatelessWidget {
                     screen,
                     IgnorePointer(child: _Bezel(frame: frame)),
                   ];
-            final stack = Stack(fit: StackFit.expand, children: layers);
+            Widget stack = Stack(fit: StackFit.expand, children: layers);
             if (frame.opaqueAperture) {
               return ClipRRect(
                 borderRadius: BorderRadius.circular(20),
                 clipBehavior: Clip.antiAlias,
+                child: stack,
+              );
+            }
+            if (frame.outerRadius > 0) {
+              stack = ClipRRect(
+                borderRadius:
+                    BorderRadius.circular(box.width * frame.outerRadius),
+                clipBehavior: Clip.antiAliasWithSaveLayer,
                 child: stack,
               );
             }
