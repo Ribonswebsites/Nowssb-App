@@ -3215,8 +3215,8 @@ body.nwsb-custom-fashion-bg .bgp-streak-screen .bgp-body {
   position: absolute; z-index: 3; cursor: pointer;
   display: flex; align-items: center; gap: 9px;
   padding: 4px 4px 4px 15px; min-height: 0 !important; border-radius: 999px !important;
-  background: rgba(5,7,12,0.62); border: 1px solid rgba(255,255,255,0.26);
-  backdrop-filter: none; -webkit-backdrop-filter: none;
+  background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.42);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   color: #fff; font-family: 'DM Sans', sans-serif;
   font-size: 12.5px; font-weight: 800; letter-spacing: 0.3px;
   text-shadow: 0 1px 4px rgba(0,0,0,0.5);

@@ -51,9 +51,9 @@ class FashOffer extends StatelessWidget {
                       priority: ClipPriority.decoration,
                     ),
                     Align(
-                      alignment: Alignment.topCenter,
+                      alignment: Alignment.centerRight,
                       child: Padding(
-                        padding: const EdgeInsets.only(top: 12),
+                        padding: const EdgeInsets.only(right: 12),
                         child: ScreenCta(label: 'Shop Now', onTap: onTap),
                       ),
                     ),

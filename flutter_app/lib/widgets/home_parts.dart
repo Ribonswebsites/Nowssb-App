@@ -703,11 +703,7 @@ class PhotoCard extends StatelessWidget {
   }
 }
 
-/// `.fash-banner-cta` — the dark chip that sits ON a clip.
-///
-/// The mark is the cart on every one of them: `.nmh-cta-go` carries the same
-/// trolley whether the chip says Subscribe Today or Shop Now, because both
-/// end at the same till.
+/// `.fash-banner-cta` — glass pill on a clip, cart on the right.
 class ScreenCta extends StatelessWidget {
   const ScreenCta({super.key, required this.label, this.onTap});
   final String label;
@@ -718,36 +714,51 @@ class ScreenCta extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(14, 8, 8, 8),
-        decoration: BoxDecoration(
-          color: const Color(0xB3000000),
-          border: Border.all(color: const Color(0x2EFFFFFF)),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-                color: Colors.white,
-              ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(999),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(15, 5, 4, 5),
+            decoration: BoxDecoration(
+              color: const Color(0x38FFFFFF),
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: const Color(0x73FFFFFF)),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x66000000),
+                  blurRadius: 18,
+                  offset: Offset(0, 8),
+                ),
+              ],
             ),
-            const SizedBox(width: 10),
-            Container(
-              width: 26,
-              height: 26,
-              decoration: BoxDecoration(
-                color: const Color(0x1FFFFFFF),
-                shape: BoxShape.circle,
-                border: Border.all(color: const Color(0x2EFFFFFF)),
-              ),
-              child: const Icon(Icons.shopping_cart_outlined,
-                  size: 13, color: Color(0xEBFFFFFF)),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.3,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(width: 9),
+                Container(
+                  width: 28,
+                  height: 28,
+                  decoration: BoxDecoration(
+                    color: const Color(0x1AFFFFFF),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: const Color(0x38FFFFFF)),
+                  ),
+                  child: const Icon(Icons.shopping_cart_outlined,
+                      size: 14, color: Color(0xEBFFFFFF)),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
