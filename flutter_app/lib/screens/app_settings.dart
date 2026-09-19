@@ -14,6 +14,7 @@ import '../widgets/black_glass_banner.dart';
 import 'fashion_plus.dart';
 import 'notifications_settings.dart';
 import 'player_settings.dart';
+import 'player_guide.dart';
 import 'profile.dart';
 import 'quick_access.dart';
 import 'store/request_words.dart';
@@ -377,6 +378,18 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                       _Sec(
                         label: 'INTRO & APPEARANCE',
                         children: [
+                          if (_match('Player Guide'))
+                            _NavRow(
+                              icon: Icons.menu_book_outlined,
+                              title: 'Player Guide',
+                              sub: 'Replay the player setup pages',
+                              onTap: () => _push(
+                                PlayerGuideScreen(
+                                  onDone: () =>
+                                      Navigator.of(context).maybePop(),
+                                ),
+                              ),
+                            ),
                           if (_match('Hero header'))
                             _NavRow(
                               icon: Icons.view_agenda_outlined,

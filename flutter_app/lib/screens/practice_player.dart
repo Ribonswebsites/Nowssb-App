@@ -36,6 +36,7 @@ import 'sentence_builder.dart';
 import 'select_level.dart';
 import 'player_dial.dart';
 import 'player_intro.dart';
+import 'player_guide.dart';
 import 'practice_overlay.dart';
 import '../data/playback_session.dart';
 
@@ -107,6 +108,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
   var _handingOff = false;
   var _practiceOpen = false;
   var _bottomPage = 0;
+  var _guideDone = false;
   var _introDone = false;
   DateTime? _startedAt;
   String? _error;
@@ -128,6 +130,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     unawaited(_loadLiked());
     unawaited(_loadShuffle());
     _introDone = !widget.showIntro;
+    _guideDone = !widget.showIntro;
     if (_introDone) unawaited(_prepareAndPlay());
   }
 
@@ -678,6 +681,12 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
             style: TextStyle(color: Colors.white70),
           ),
         ),
+      );
+    }
+
+    if (!_guideDone) {
+      return PlayerGuideScreen(
+        onDone: () => setState(() => _guideDone = true),
       );
     }
 

@@ -11,8 +11,10 @@ void main() {
         aura, contains("kPlayerAuraFilm = 'assets/video/player-aura-bg.mp4'"));
     expect(aura,
         contains("kPlayerBoxFilm = 'assets/video/player-box-liquid.mp4'"));
-    expect(aura, contains("kPlayerBoxWaveFilm = 'assets/video/player-box-wave.mp4'"));
-    expect(aura, contains("kPlayerPageFilm = 'assets/video/player-bg-loop.mp4'"));
+    expect(aura,
+        contains("kPlayerBoxWaveFilm = 'assets/video/player-box-wave.mp4'"));
+    expect(
+        aura, contains("kPlayerPageFilm = 'assets/video/player-bg-loop.mp4'"));
     expect(aura, contains('this.film = kPlayerAuraFilm'));
     expect(aura, contains('class PlayerAuraBackdrop'));
     expect(aura, contains('class PlayerAuraBackButton'));
@@ -25,6 +27,8 @@ void main() {
     final player = File('lib/screens/practice_player.dart').readAsStringSync();
     expect(player, contains('kPlayerBoxFilm'));
     expect(player, contains('PlayerIntroScreen'));
+    expect(player, contains('PlayerGuideScreen'));
+    expect(player, contains('_guideDone'));
     expect(player, isNot(contains('player-liquid-splash.mp4')));
 
     final intro = File('lib/screens/player_intro.dart').readAsStringSync();
@@ -67,7 +71,8 @@ void main() {
         File('assets/video/player-aura-bg-poster.webp').existsSync(), isTrue);
     expect(File('assets/video/player-box-liquid.mp4').existsSync(), isTrue);
     expect(File('assets/video/player-box-wave.mp4').existsSync(), isTrue);
-    expect(File('../assets/player/player-box-bloom.jpg').existsSync() ||
+    expect(
+        File('../assets/player/player-box-bloom.jpg').existsSync() ||
             File('assets/player/player-box-bloom.jpg').existsSync(),
         isTrue);
   });
