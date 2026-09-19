@@ -44,10 +44,9 @@ dependency_overrides:
   # which does not implement the current platform interface API on Flutter's
   # stable Linux host during Android/iOS builds.
   record_linux: 1.3.1
-  # file_picker 8.x pulls a lifecycle AAR that requires compileSdk 36, while
-  # the plugin itself still compiles against 34. Pin the last lifecycle that
-  # does not impose that floor so assembleDebug can finish.
-  flutter_plugin_android_lifecycle: 2.0.26
+  # file_picker 8.x still compiles against API 34. Newer lifecycle AARs
+  # demand 35/36 and fail checkDebugAarMetadata inside that plugin module.
+  flutter_plugin_android_lifecycle: 2.0.22
 
 dev_dependencies:
   flutter_test:
