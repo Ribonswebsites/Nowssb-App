@@ -1593,9 +1593,8 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
               ..scaleByDouble(scale, scale, scale, 1.0),
             width: _cardW,
             height: _cardH,
-            decoration: BoxDecoration(
-              border: Border.all(color: const Color(0x2EFFFFFF)),
-              boxShadow: const [
+            decoration: const BoxDecoration(
+              boxShadow: [
                 BoxShadow(
                     color: Color(0xB3000000),
                     blurRadius: 60,
@@ -1606,12 +1605,15 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
                     offset: Offset(0, 4)),
               ],
             ),
+            clipBehavior: Clip.hardEdge,
             child: Stack(
               fit: StackFit.expand,
               children: [
-                ClipRect(
+                Positioned.fill(
                   child: NwsbImage(
                     url: _shots[i],
+                    fit: BoxFit.cover,
+                    alignment: Alignment.center,
                     fallback: const ColoredBox(color: Color(0xFF0A0F1C)),
                   ),
                 ),
@@ -1635,46 +1637,12 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
 
   @override
   Widget build(BuildContext context) {
-    final fashion = HomeSkinScope.of(context) == HomeSkin.fashion;
     return Container(
       width: double.infinity,
       color: const Color(0xFF000000),
       constraints: const BoxConstraints(minHeight: 420),
       child: Stack(
         children: [
-          // Website: Fashion shows `.footer-bg-img`; Normal hides it
-          // (`#homeFooterNm .footer-bg-img { display:none }`).
-          if (fashion)
-            Positioned.fill(
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 600),
-                child: Image.network(
-                  _shots[_index],
-                  key: ValueKey(_shots[_index]),
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) =>
-                      const ColoredBox(color: Color(0xFF060C18)),
-                ),
-              ),
-            ),
-          if (fashion)
-            const Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color(0x26030814),
-                      Color(0x0D030814),
-                      Color(0x40030814),
-                      Color(0xBF030814),
-                    ],
-                    stops: [0, 0.3, 0.7, 1],
-                  ),
-                ),
-              ),
-            ),
           Padding(
             padding: const EdgeInsets.only(bottom: 24),
             child: Column(

@@ -38,7 +38,13 @@
       video.addEventListener('canplay', play, { once: true }); play();
     }
   }
-  function init() { document.querySelectorAll('.nsub-blk').forEach(render); }
+  function init() {
+    document.querySelectorAll('.nsub-blk').forEach(function (block) {
+      /* Normal home: the tablet is the film only — no pricing overlay. */
+      if (block.closest('#home-nm')) return;
+      render(block);
+    });
+  }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
   window.addEventListener('nwsb:home-ready', init);
   var slides = [

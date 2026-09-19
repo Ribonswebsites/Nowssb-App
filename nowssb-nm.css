@@ -16599,3 +16599,27 @@ body.fashplus :is(#home, .stw-prev-stage) .fp-card .fp-enter .tp-enter-go {
 [data-st-today] {
   display: none !important;
 }
+
+/* Fashion website: Personalised Healing is Normal-home only. */
+#home .fash-healing-wrap { display: none !important; }
+
+/* Normal subscription tablet: film only — no overlay, no in-screen CTA. */
+#home-nm .nsub-blk .nwsb-sub-overlay,
+#home-nm .nsub-blk .nmh-banner-cta {
+  display: none !important;
+}
+
+/* Choose Your Path laptop: fill the aperture (cover, not letterbox).
+   Beats `.dev-laptop .vbf-screen > video { object-fit: contain }`. */
+#home .vb-path-fill .vbf-screen > video,
+#home-nm .vb-path-fill .vbf-screen > video,
+#home .nwsb-genderpath .vbf-screen > video,
+#home-nm .nwsb-genderpath .vbf-screen > video {
+  object-fit: cover !important;
+}
+
+/* Fashion Choose Your Path: no Female-or-Male black tab under the laptop. */
+#home .nwsb-genderpath > .nsub-ban,
+#home .nwsb-genderpath > .ncb-carousel {
+  display: none !important;
+}

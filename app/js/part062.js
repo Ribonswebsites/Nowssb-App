@@ -95,15 +95,13 @@
            it was stranded at the TOP of the page. always, so it cannot be
            switched off from under that position. */
         { k:'healing',  sel:['.nmh-healing-wrap'],                                        t:S, label:'Personalised Healing',  sub:'Choose your health journey', always:1 },
-        /* Choose Your Path is its own section now — it used to live inside
-           the wrapper above. A direct child of the home wrap that this
-           registry does not know about gets stranded at the top of the page
-           while every registered one is re-appended around it. `after` keeps
-           it glued under Personalised Healing wherever that section sits. */
-        { k:'genderpath', sel:['[data-vbwrap="vb2"]'],                                     t:S, label:'Choose Your Path',      sub:'Female and Male path cards', vb:1, after:'healing' },
         { k:'wsearch',  sel:['.word-search-section'],                                      t:S, label:'Word Search',           sub:'Discover the origin of any word', defOff:1 },
         { k:'msearch',  sel:['[data-vbwrap="vb8"]', '.krm-section'],                                              t:S, label:'Meaning Search',        sub:'Earth · Water · God · your name', defOff:1 },
         { k:'fashsw',   sel:['#nmhFashSwitch'],                                            t:S, label:'Fashion Mode',          sub:'Switch to the Fashion home' },
+        /* Matched by class, not data-vbwrap index — PLACE used to write vb1
+           while this row looked for vb2, so the wrap was unregistered and
+           stranded at the TOP. Last movable slot = immediately above footer. */
+        { k:'genderpath', sel:['.nwsb-genderpath'],                                        t:S, label:'Choose Your Path',      sub:'Female and Male path cards', vb:1 },
         { k:'footer',   sel:['#homeFooterNm'],                                             t:S, label:'Footer',                sub:'Across Every Language', locked:1 }
       ]
     },
@@ -150,12 +148,12 @@
         { k:'shabda',   sel:['.fash-shabda-wrap'],                                         t:S, label:'Shabdapathy Foundations', sub:'Featured ancient word science', vb:1, defOff:1 },
         { k:'ebooks',   sel:['.fash-ebsec-wrap'],                                        t:S, label:'eBooks',                sub:'Deep-dive guides, yours to keep' },
         { k:'connectban', sel:['.nc-blk'],                                              t:S, label:'Connect Banner',        sub:'The clip and what Connect offers', vb:1 , kind:'blk' },
-        { k:'healing',  sel:['.fash-healing-wrap'],                                       t:S, label:'Personalised Healing',  sub:'Choose your health journey', always:1 },
-        { k:'genderpath', sel:['[data-vbwrap="vb3"]'],                                     t:S, label:'Choose Your Path',      sub:'Female and Male path cards', vb:1 , kind:'blk', after:'healing' },
+        { k:'healing',  sel:['.fash-healing-wrap'],                                       t:S, label:'Personalised Healing',  sub:'Choose your health journey', defOff:1 },
         { k:'promovid', sel:['#fashPromoVid'],                                             t:B, label:'Promo Video',           sub:'16:9 video above Word Search', vb:1 , kind:'blk' },
         { k:'wsearch',  sel:['#fashWordSearchWrap'],                                       t:S, label:'Word Search',           sub:'Banner and search section', defOff:1 },
         { k:'msearch',  sel:['[data-vbwrap="vb9"]', '#fashMeaningSearchWrap'],                                    t:S, label:'Meaning Search',        sub:'Banner and search section' , kind:'blk', defOff:1 },
         { k:'shabvid',  sel:['.hvb-glass-wrap'],                                           t:B, label:'Shabdapathy Video',     sub:'Video banner near the footer', vb:1 , kind:'blk' },
+        { k:'genderpath', sel:['.nwsb-genderpath'],                                        t:S, label:'Choose Your Path',      sub:'Female and Male path cards', vb:1 , kind:'blk' },
         { k:'footer',   sel:['#homeFooter'],                                               t:S, label:'Footer',                sub:'Across Every Language', locked:1 }
       ]
     }
@@ -189,8 +187,13 @@
      8 — Start Today deleted. Personalised Healing is on again on Normal,
          after Connect Banner (same slot as Flutter), and Choose Your Path
          is pinned under it. Saved layouts that hid healing or left the
-         carousel in the order are brought up to that once. */
-  var LAYOUT_V = 8;
+         carousel in the order are brought up to that once.
+     9 — Choose Your Path sits immediately above the footer on both homes.
+         The old data-vbwrap="vb2"/"vb3" selectors never matched PLACE
+         indices vb1/vb2, so the wrap was unregistered and stranded at the
+         TOP. Fashion Personalised Healing leaves the website; Normal keeps
+         it. Saved layouts are brought up once. */
+  var LAYOUT_V = 9;
 
   function load(which) {
     var reg = REG[which], all = reg.items.filter(function (i) { return !i.locked; }).map(function (i) { return i.k; });
@@ -264,6 +267,14 @@
           var ho2 = order.indexOf('healing');
           order.splice(ho2 < 0 ? order.length : ho2 + 1, 0, 'genderpath');
         }
+      }
+      /* v9: pin Choose Your Path as the last movable section (directly
+         above the locked footer). Fashion healing leaves the page. */
+      if ((raw.v || 0) < 9) {
+        if (which === 'fash' && off.indexOf('healing') < 0) off.push('healing');
+        var gp = order.indexOf('genderpath');
+        if (gp >= 0) order.splice(gp, 1);
+        order.push('genderpath');
       }
       try {
         localStorage.setItem(LSKEY(which), JSON.stringify({ order: order, off: off, v: LAYOUT_V }));
