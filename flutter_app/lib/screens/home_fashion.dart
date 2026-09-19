@@ -246,18 +246,7 @@ class _HomeFashionState extends State<HomeFashion> {
         // Choose Your Path is slide 2 of HealingSection — do not inject a
         // second banner/section (that caused stacked banners + blank pages).
         ('genderpath', const SizedBox.shrink()),
-        (
-          'promovid',
-          FashPromoVideo(
-            onTap: () => _go(2),
-            onPlayer: () => _go(1),
-            onSound: () => _push(const SoundLibraryScreen()),
-            onStore: () => _go(3),
-            onEbook: () => _go(2),
-            onReader: () => _push(const ReaderHubScreen()),
-            onHealing: () => _push(const HealingPathScreen()),
-          ),
-        ),
+        ('promovid', FashPromoVideo(onTap: () => _go(2))),
         ('wsearch', FashWordSearch(onOpen: (_) => _go(2))),
         ('msearch', FashMeaningSearch(onOpen: (_) => _go(2))),
         ('shabvid', FashShabdaVideo(onTap: () => _go(2))),

@@ -119,23 +119,8 @@ class FashShabdapathy extends StatelessWidget {
 /// It used to be a bare 16:9 box whose wrapper was `background: transparent`,
 /// which is why it had nothing behind it.
 class FashPromoVideo extends StatelessWidget {
-  const FashPromoVideo({
-    super.key,
-    this.onTap,
-    this.onPlayer,
-    this.onSound,
-    this.onStore,
-    this.onEbook,
-    this.onReader,
-    this.onHealing,
-  });
+  const FashPromoVideo({super.key, this.onTap});
   final VoidCallback? onTap;
-  final VoidCallback? onPlayer;
-  final VoidCallback? onSound;
-  final VoidCallback? onStore;
-  final VoidCallback? onEbook;
-  final VoidCallback? onReader;
-  final VoidCallback? onHealing;
 
   @override
   Widget build(BuildContext context) {
@@ -147,113 +132,10 @@ class FashPromoVideo extends StatelessWidget {
         autoplay: false,
         showVideo: false,
         onTap: onTap,
-        overlay: FashPromoIconMenu(
-          onPlayer: onPlayer,
-          onSound: onSound,
-          onStore: onStore,
-          onEbook: onEbook,
-          onReader: onReader,
-          onHealing: onHealing,
-        ),
-      ),
-    );
-  }
-}
-
-class FashPromoIconMenu extends StatelessWidget {
-  const FashPromoIconMenu({
-    super.key,
-    this.onPlayer,
-    this.onSound,
-    this.onStore,
-    this.onEbook,
-    this.onReader,
-    this.onHealing,
-  });
-
-  final VoidCallback? onPlayer;
-  final VoidCallback? onSound;
-  final VoidCallback? onStore;
-  final VoidCallback? onEbook;
-  final VoidCallback? onReader;
-  final VoidCallback? onHealing;
-
-  @override
-  Widget build(BuildContext context) {
-    final items = <(String, String, VoidCallback?)>[
-      ('Player', NwsbMarks.play24, onPlayer),
-      ('Sound Library', NwsbMarks.sound, onSound),
-      ('Store', NwsbMarks.bag, onStore),
-      ('eBook', NwsbMarks.ebook, onEbook),
-      ('Reader', NwsbMarks.reader, onReader),
-      ('Healing', NwsbMarks.flame, onHealing),
-    ];
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: const Color(0xA8080D18),
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: const Color(0x66FFFFFF)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
-        child: Column(
-          children: [
-            Image.asset(
-              'assets/icons/logo-disc.webp',
-              width: 42,
-              height: 42,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => const NwsbIcon(
-                NwsbMarks.signature,
-                size: 34,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Expanded(
-              child: GridView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: items.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 8,
-                  mainAxisSpacing: 8,
-                  childAspectRatio: 1.55,
-                ),
-                itemBuilder: (_, i) {
-                  final (label, mark, onTap) = items[i];
-                  return GestureDetector(
-                    onTap: onTap,
-                    behavior: HitTestBehavior.opaque,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: const Color(0x3DFFFFFF),
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: const Color(0x88FFFFFF)),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          NwsbIcon(mark, size: 24, color: Colors.white),
-                          const SizedBox(height: 4),
-                          Text(
-                            label,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 9,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
+        overlay: const HeroCurveStage(
+          embedded: true,
+          subject: HeroCurveAssets.tabSubject,
+          cards: HeroCurveAssets.tabCards,
         ),
       ),
     );
