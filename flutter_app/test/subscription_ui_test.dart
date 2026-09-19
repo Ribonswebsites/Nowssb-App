@@ -19,25 +19,21 @@ void main() {
   setUp(VideoPool.instance.debugDropAll);
   tearDown(VideoPool.instance.debugDropAll);
 
-  test('pricing flip photos and join-clip backdrop are in the repo', () {
+  test('pricing section uses the four flip photos and keeps the 16:9 banner', () {
     final src = File('lib/screens/subscription.dart').readAsStringSync();
+    expect(src, contains('aspectRatio: 16 / 9'));
+    expect(src, contains("asset: 'assets/video/subscription-banner.mp4'"));
     expect(src, contains("asset: 'assets/video/subscription-join-nowssb.mp4'"));
-    expect(src, contains('Simple plans, straight to your growth.'));
     expect(src, contains("What's Included"));
-    expect(src, contains('tier-blazer-front.png'));
-    expect(src, contains('tier-sun-back.png'));
-    expect(src, contains('tier-bag-front.png'));
-    expect(src, contains('tier-nile-back.png'));
+    expect(src, contains('Choose your frequency'));
+    expect(src, contains('Start your 30-day free trial'));
+    expect(src, contains('Subscribe to \${plan.name}'));
     expect(src, contains('rotateY'));
+    expect(src, contains('PageView.builder'));
     expect(File('assets/subscription/tier-blazer-front.png').existsSync(), isTrue);
-    expect(File('assets/subscription/tier-blazer-back.png').existsSync(), isTrue);
-    expect(File('assets/subscription/tier-sun-front.png').existsSync(), isTrue);
     expect(File('assets/subscription/tier-sun-back.png').existsSync(), isTrue);
     expect(File('assets/subscription/tier-bag-front.png').existsSync(), isTrue);
-    expect(File('assets/subscription/tier-bag-back.png').existsSync(), isTrue);
-    expect(File('assets/subscription/tier-nile-front.png').existsSync(), isTrue);
     expect(File('assets/subscription/tier-nile-back.png').existsSync(), isTrue);
-    expect(File('assets/video/subscription-join-nowssb.mp4').existsSync(), isTrue);
   });
 
   testWidgets('subscription page shows the pricing carousel', (tester) async {
@@ -49,10 +45,10 @@ void main() {
     await tester.pump(const Duration(milliseconds: 80));
     expect(tester.takeException(), isNull);
     expect(find.text('Subscription'), findsOneWidget);
-    expect(find.text('Pricing'), findsOneWidget);
-    expect(find.text('Simple plans, straight to your growth.'), findsOneWidget);
+    expect(find.text('Choose your frequency'), findsOneWidget);
     expect(find.text('Monthly'), findsOneWidget);
     expect(find.text("What's Included"), findsWidgets);
-    expect(find.text('Free'), findsWidgets);
+    expect(find.text('Start your 30-day free trial'), findsOneWidget);
+    expect(find.byType(PageView), findsOneWidget);
   });
 }

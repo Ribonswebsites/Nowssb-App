@@ -35,12 +35,12 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     _Plan(
       name: 'Free',
       detail: 'NowssB Edition',
-      monthly: 'Free',
-      yearly: 'Free',
-      cta: 'Start free trial',
+      monthly: '30 days free',
+      yearly: '30 days free',
+      accent: Color(0xFFF1F1F4),
       front: 'assets/subscription/tier-blazer-front.png',
       back: 'assets/subscription/tier-blazer-back.png',
-      features: [
+      benefits: [
         '30-day free trial',
         'Daily word discovery',
         'Essential meanings',
@@ -50,56 +50,57 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     _Plan(
       name: 'Resonance',
       detail: 'A deeper daily practice',
-      monthly: r'$4.99',
-      yearly: r'$41.90',
-      cta: 'Subscribe monthly',
+      monthly: r'$4.99 / month',
+      yearly: r'$41.90 / year',
+      accent: NwsbColors.mist,
       front: 'assets/subscription/tier-sun-front.png',
       back: 'assets/subscription/tier-sun-back.png',
-      features: [
+      benefits: [
         'Unlimited word practice',
         'Resonance sound sessions',
         'Pronunciation scoring',
         'Personal practice history',
-        'Pause or cancel anytime',
       ],
     ),
     _Plan(
       name: 'Frequency',
       detail: 'Every word and frequency',
-      monthly: r'$9.99',
-      yearly: r'$83.90',
-      cta: 'Subscribe monthly',
+      monthly: r'$9.99 / month',
+      yearly: r'$83.90 / year',
+      accent: NwsbColors.goldLight,
       front: 'assets/subscription/tier-bag-front.png',
       back: 'assets/subscription/tier-bag-back.png',
-      features: [
+      benefits: [
         'Everything in Resonance',
         'Full frequency library',
         'Custom healing routines',
         'Advanced word meanings',
-        'Priority support',
       ],
     ),
     _Plan(
       name: 'Frequency X',
       detail: 'The complete NowssB experience',
-      monthly: r'$19.99',
-      yearly: r'$167.90',
-      cta: 'Get inquiry',
+      monthly: r'$19.99 / month',
+      yearly: r'$167.90 / year',
+      accent: Color(0xFFF1F1F4),
       front: 'assets/subscription/tier-nile-front.png',
       back: 'assets/subscription/tier-nile-back.png',
-      features: [
+      benefits: [
         'Everything in Frequency',
         'Priority Personal Coach',
         'Exclusive signature words',
         'Complete NowssB access',
-        '1:1 monthly session',
       ],
     ),
   ];
 
+  void _subscribe(_Plan plan) {
+    // Same no-op hook the page already used — IAP is wired here later.
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
-        backgroundColor: const Color(0xFF05070C),
+        backgroundColor: Colors.transparent,
         body: Stack(
           fit: StackFit.expand,
           children: [
@@ -118,168 +119,143 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Color(0xE005070C),
-                      Color(0xB305070C),
-                      Color(0xF205070C),
+                      Color(0xB0060C18),
+                      Color(0x66060C18),
+                      Color(0xF0060C18),
                     ],
                   ),
                 ),
               ),
             ),
             SafeArea(
-              child: Column(
-                children: [
-                  _topBar(),
-                  Expanded(
-                    child: ListView(
-                      padding: const EdgeInsets.only(bottom: 28),
-                      children: [
-                        _headline(),
-                        _billing(),
-                        const SizedBox(height: 18),
-                        _carousel(),
-                        const SizedBox(height: 14),
-                        _dots(),
-                      ],
-                    ),
+              child: CustomScrollView(slivers: [
+                SliverAppBar(
+                  pinned: true,
+                  backgroundColor: Colors.transparent,
+                  surfaceTintColor: Colors.transparent,
+                  leading: IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.arrow_back_rounded,
+                        color: Colors.white),
                   ),
-                ],
-              ),
+                  title: const Text('Subscription',
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.w800)),
+                  centerTitle: true,
+                ),
+                SliverToBoxAdapter(child: _videoBanner()),
+                SliverToBoxAdapter(child: _billing()),
+                SliverToBoxAdapter(child: _horizontalPlans()),
+              ]),
             ),
           ],
         ),
       );
 
-  Widget _topBar() => Padding(
-        padding: const EdgeInsets.fromLTRB(6, 4, 16, 0),
-        child: Row(
-          children: [
-            IconButton(
-              onPressed: () => Navigator.pop(context),
-              icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+  Widget _videoBanner() => Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: const AspectRatio(
+            aspectRatio: 16 / 9,
+            child: NwsbVideo(
+              asset: 'assets/video/subscription-banner.mp4',
+              poster: 'assets/video/subscription-banner-poster.webp',
+              priority: ClipPriority.feature,
+              fit: BoxFit.cover,
             ),
-            const Text(
-              'Subscription',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w800,
-                fontSize: 17,
-              ),
-            ),
-          ],
-        ),
-      );
-
-  Widget _headline() => const Padding(
-        padding: EdgeInsets.fromLTRB(22, 8, 22, 16),
-        child: Column(
-          children: [
-            _PricingPill(),
-            SizedBox(height: 14),
-            Text(
-              'Simple plans, straight to your growth.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 26,
-                fontWeight: FontWeight.w800,
-                height: 1.15,
-                letterSpacing: -0.6,
-              ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'Subscription for your daily practice. Custom when you need more.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Color(0x99FFFFFF),
-                fontSize: 13.5,
-                height: 1.4,
-              ),
-            ),
-          ],
+          ),
         ),
       );
 
   Widget _billing() => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 48),
-        child: Container(
+      padding: const EdgeInsets.fromLTRB(18, 0, 18, 8),
+      child: Container(
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: const Color(0x33FFFFFF),
-            borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: const Color(0x40FFFFFF)),
-          ),
+              color: const Color(0xFF151D2B),
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: Colors.white12)),
           child: Row(children: [
             _billingButton('Monthly', false),
-            _billingButton('Yearly · Save 30%', true),
-          ]),
-        ),
-      );
+            _billingButton('Yearly · Save 30%', true)
+          ])));
 
   Widget _billingButton(String label, bool value) => Expanded(
-        child: GestureDetector(
+      child: GestureDetector(
           onTap: () => setState(() => yearly = value),
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 220),
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            decoration: BoxDecoration(
-              color: yearly == value ? Colors.white : Colors.transparent,
-              borderRadius: BorderRadius.circular(999),
-            ),
-            child: Text(
-              label,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: yearly == value ? NwsbColors.deep : Colors.white70,
-                fontWeight: FontWeight.w700,
-                fontSize: 12,
-              ),
-            ),
-          ),
-        ),
-      );
+              duration: const Duration(milliseconds: 220),
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                  color: yearly == value
+                      ? NwsbColors.goldLight
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(999)),
+              child: Text(label,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: yearly == value ? NwsbColors.deep : Colors.white70,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 11)))));
 
-  Widget _carousel() => SizedBox(
-        height: 438,
-        child: PageView.builder(
-          controller: planController,
-          itemCount: plans.length,
-          onPageChanged: (i) => setState(() => selected = i),
-          itemBuilder: (_, i) => Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6),
-            child: _TierCard(
-              plan: plans[i],
-              yearly: yearly,
-              active: selected == i,
-            ),
-          ),
-        ),
-      );
-
-  Widget _dots() => Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+  Widget _horizontalPlans() => Column(
         children: [
-          for (var i = 0; i < plans.length; i++)
-            GestureDetector(
-              onTap: () => planController.animateToPage(
-                i,
-                duration: const Duration(milliseconds: 320),
-                curve: Curves.easeOutCubic,
-              ),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 220),
-                width: i == selected ? 8 : 7,
-                height: i == selected ? 8 : 7,
-                margin: const EdgeInsets.symmetric(horizontal: 4),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: i == selected
-                      ? Colors.white
-                      : const Color(0x4DFFFFFF),
+          const Padding(
+            padding: EdgeInsets.fromLTRB(18, 20, 18, 10),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text('Choose your frequency',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900)),
+            ),
+          ),
+          SizedBox(
+            height: 438,
+            child: PageView.builder(
+              controller: planController,
+              itemCount: plans.length,
+              onPageChanged: (i) => setState(() => selected = i),
+              itemBuilder: (_, i) => Padding(
+                padding: const EdgeInsets.fromLTRB(6, 0, 10, 0),
+                child: _TierCard(
+                  plan: plans[i],
+                  yearly: yearly,
+                  active: selected == i,
+                  onSubscribe: () => _subscribe(plans[i]),
                 ),
               ),
             ),
+          ),
+          const SizedBox(height: 14),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              for (var i = 0; i < plans.length; i++)
+                GestureDetector(
+                  onTap: () => planController.animateToPage(
+                    i,
+                    duration: const Duration(milliseconds: 320),
+                    curve: Curves.easeOutCubic,
+                  ),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 220),
+                    width: i == selected ? 8 : 7,
+                    height: i == selected ? 8 : 7,
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: i == selected
+                          ? Colors.white
+                          : const Color(0x4DFFFFFF),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 28),
         ],
       );
 }
@@ -290,39 +266,15 @@ class _Plan {
     required this.detail,
     required this.monthly,
     required this.yearly,
-    required this.cta,
+    required this.accent,
     required this.front,
     required this.back,
-    required this.features,
+    required this.benefits,
   });
 
-  final String name, detail, monthly, yearly, cta, front, back;
-  final List<String> features;
-}
-
-class _PricingPill extends StatelessWidget {
-  const _PricingPill();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-      decoration: BoxDecoration(
-        color: const Color(0x22FFFFFF),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: const Color(0x55FFFFFF)),
-      ),
-      child: const Text(
-        'Pricing',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.4,
-        ),
-      ),
-    );
-  }
+  final String name, detail, monthly, yearly, front, back;
+  final Color accent;
+  final List<String> benefits;
 }
 
 class _TierCard extends StatelessWidget {
@@ -330,18 +282,16 @@ class _TierCard extends StatelessWidget {
     required this.plan,
     required this.yearly,
     required this.active,
+    required this.onSubscribe,
   });
 
   final _Plan plan;
   final bool yearly;
   final bool active;
+  final VoidCallback onSubscribe;
 
   @override
   Widget build(BuildContext context) {
-    final price = yearly ? plan.yearly : plan.monthly;
-    final unit = plan.monthly == 'Free'
-        ? ''
-        : (yearly ? ' / year' : ' / month');
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: BackdropFilter(
@@ -351,13 +301,21 @@ class _TierCard extends StatelessWidget {
             color: const Color(0x2EFFFFFF),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: active ? const Color(0x99FFFFFF) : const Color(0x40FFFFFF),
+              color: active
+                  ? plan.accent.withValues(alpha: 0.7)
+                  : const Color(0x40FFFFFF),
             ),
-            boxShadow: const [
+            boxShadow: [
               BoxShadow(
-                color: Color(0x66000000),
+                color: plan.accent.withValues(alpha: 0.18),
                 blurRadius: 22,
-                offset: Offset(0, 10),
+                offset: const Offset(0, 10),
+              ),
+              const BoxShadow(
+                color: Color(0x33FFFFFF),
+                blurRadius: 8,
+                spreadRadius: -4,
+                offset: Offset(0, 1),
               ),
             ],
           ),
@@ -371,7 +329,7 @@ class _TierCard extends StatelessWidget {
                     front: plan.front,
                     back: plan.back,
                     title: plan.name,
-                    price: '$price$unit',
+                    price: yearly ? plan.yearly : plan.monthly,
                     active: active,
                   ),
                 ),
@@ -379,9 +337,8 @@ class _TierCard extends StatelessWidget {
                 Expanded(
                   flex: 12,
                   child: _Included(
-                    features: plan.features,
-                    cta: plan.cta,
-                    inverted: plan.name == 'Frequency X',
+                    plan: plan,
+                    onSubscribe: onSubscribe,
                   ),
                 ),
               ],
@@ -394,18 +351,16 @@ class _TierCard extends StatelessWidget {
 }
 
 class _Included extends StatelessWidget {
-  const _Included({
-    required this.features,
-    required this.cta,
-    required this.inverted,
-  });
+  const _Included({required this.plan, required this.onSubscribe});
 
-  final List<String> features;
-  final String cta;
-  final bool inverted;
+  final _Plan plan;
+  final VoidCallback onSubscribe;
 
   @override
   Widget build(BuildContext context) {
+    final cta = plan.name == 'Free'
+        ? 'Start your 30-day free trial'
+        : 'Subscribe to ${plan.name}';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -427,15 +382,15 @@ class _Included extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 10),
-        for (final f in features)
+        for (final f in plan.benefits)
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Padding(
-                  padding: EdgeInsets.only(top: 1),
-                  child: Icon(Icons.check_circle, size: 14, color: Color(0xFFE23D3D)),
+                Padding(
+                  padding: const EdgeInsets.only(top: 1),
+                  child: Icon(Icons.check_circle, size: 14, color: plan.accent),
                 ),
                 const SizedBox(width: 6),
                 Expanded(
@@ -452,13 +407,17 @@ class _Included extends StatelessWidget {
             ),
           ),
         const Spacer(),
-        GestureDetector(
-          onTap: () {},
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 12),
-            decoration: BoxDecoration(
-              color: inverted ? Colors.white : const Color(0xFF111111),
-              borderRadius: BorderRadius.circular(999),
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: onSubscribe,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: plan.accent,
+              foregroundColor: NwsbColors.deep,
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(999),
+              ),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -467,19 +426,11 @@ class _Included extends StatelessWidget {
                   child: Text(
                     cta,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: inverted ? NwsbColors.deep : Colors.white,
-                      fontWeight: FontWeight.w800,
-                      fontSize: 12,
-                    ),
+                    style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 11.5),
                   ),
                 ),
-                const SizedBox(width: 6),
-                Icon(
-                  Icons.arrow_forward_rounded,
-                  size: 15,
-                  color: inverted ? NwsbColors.deep : Colors.white,
-                ),
+                const SizedBox(width: 4),
+                const Icon(Icons.arrow_forward_rounded, size: 15),
               ],
             ),
           ),
@@ -628,7 +579,7 @@ class _FlipPhotoState extends State<_FlipPhoto>
                   widget.price,
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 18,
+                    fontSize: 16,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
