@@ -1118,26 +1118,12 @@ class NmTrending extends StatelessWidget {
                       gradient: LinearGradient(
                         begin: Alignment.centerLeft,
                         end: Alignment.centerRight,
-                        colors: [Color(0xCC000000), Color(0x00000000)],
+                        colors: [Color(0x00000000), Color(0x66040A18)],
+                        stops: [0.45, 1],
                       ),
                     ),
                   ),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 18),
-                      child: Text(
-                        word,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 26,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
+                  TrendBannerLockup(word: word, onTap: onTap),
                 ],
               ),
             ),

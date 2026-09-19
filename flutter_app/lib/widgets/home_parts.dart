@@ -943,3 +943,62 @@ class SectionMotionBanner extends StatelessWidget {
   }
 }
 
+/// Today's Trending overlay: store icon on the left of the word, lockup on
+/// the right so the film stays fully visible. Matches `.nmh-trend-banner-*`.
+class TrendBannerLockup extends StatelessWidget {
+  const TrendBannerLockup({super.key, required this.word, this.onTap});
+  final String word;
+  final VoidCallback? onTap;
+
+  static const iconUrl =
+      'https://media.nowssb.com/migrated-images/86a1283688196499_ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png';
+
+  @override
+  Widget build(BuildContext context) {
+    if (word.isEmpty) return const SizedBox.shrink();
+    return Align(
+      alignment: Alignment.centerRight,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(18, 0, 22, 0),
+        child: GestureDetector(
+          onTap: onTap,
+          behavior: HitTestBehavior.opaque,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(
+                width: 28,
+                height: 28,
+                child: NwsbImage(
+                  url: TrendBannerLockup.iconUrl,
+                  fit: BoxFit.contain,
+                ),
+              ),
+              const SizedBox(width: 10),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 180),
+                child: Text(
+                  word,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.right,
+                  style: const TextStyle(
+                    fontFamily: 'DM Sans',
+                    fontSize: 19,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                    height: 1.3,
+                    shadows: [
+                      Shadow(color: Color(0x99000000), blurRadius: 10, offset: Offset(0, 2)),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
