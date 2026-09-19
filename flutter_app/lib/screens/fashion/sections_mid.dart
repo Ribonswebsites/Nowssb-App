@@ -392,13 +392,6 @@ class FashStore extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          // NOT "Enter the NowssB Store". The film says
-                          // NowssB Store in its own lettering and the
-                          // section's head says it above the card, so a
-                          // third drawn copy was the store naming itself
-                          // three times on one screen. This says what the
-                          // store is FOR instead, in the app's own headline
-                          // shape: a light line over a heavy one.
                           const Text.rich(
                             TextSpan(
                               style: TextStyle(
@@ -419,63 +412,6 @@ class FashStore extends StatelessWidget {
                             ),
                           ),
                           const Spacer(),
-                          // The mark, a hairline, then the button — one
-                          // row, set below the lettering the film carries in
-                          // its middle so the two are read in order rather
-                          // than at once.
-                          //
-                          // The paragraph that used to sit here was pushed
-                          // to the foot of the card by that Spacer, which is
-                          // exactly the band the clip keeps its own NowssB
-                          // Store lettering in: two sets of words in one
-                          // place and neither of them readable.
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const NwsbIcon(
-                                  NwsbMarks.bag,
-                                  size: 20,
-                                  color: NwsbColors.goldLight,
-                                ),
-                                const SizedBox(width: 12),
-                                Container(
-                                  width: 1,
-                                  height: 26,
-                                  color: const Color(0x59FFFFFF),
-                                ),
-                                const SizedBox(width: 12),
-                                GestureDetector(
-                                  onTap: onTap,
-                                  behavior: HitTestBehavior.opaque,
-                                  child: Container(
-                                    padding: const EdgeInsets.fromLTRB(
-                                        18, 11, 14, 11),
-                                    color: Colors.white,
-                                    child: const Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          'Shop Now',
-                                          style: TextStyle(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w700,
-                                            letterSpacing: 0.3,
-                                            color: NwsbColors.ink,
-                                          ),
-                                        ),
-                                        SizedBox(width: 9),
-                                        NwsbIcon(NwsbMarks.arrow,
-                                            size: 14, color: NwsbColors.ink),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 14),
                           Wrap(
                             spacing: 8,
                             runSpacing: 8,
@@ -499,11 +435,14 @@ class FashStore extends StatelessWidget {
                                 ),
                             ],
                           ),
-                          // The full-width Explore Store bar that used to
-                          // close the card is gone: Shop Now under the title
-                          // is the same door, and two white buttons on one
-                          // card is the card asking twice.
                         ],
+                      ),
+                    ),
+                    Align(
+                      alignment: const Alignment(1.0, 0.28),
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 16),
+                        child: ScreenCta(label: 'Shop Now', onTap: onTap),
                       ),
                     ),
                   ],
