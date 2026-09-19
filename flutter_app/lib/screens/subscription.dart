@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 
 import '../media/nwsb_video.dart';
@@ -15,33 +13,16 @@ class SubscriptionScreen extends StatefulWidget {
 class _SubscriptionScreenState extends State<SubscriptionScreen> {
   bool yearly = false;
   int selected = 0;
-  int bannerIndex = 0;
   late final PageController planController;
-  Timer? bannerTimer;
-
-  static const bannerSlides = <(String, String)>[
-    (
-      'SUBSCRIPTION · JOIN NOWSSB',
-      'Try it free for 30 days · Choose your frequency'
-    ),
-    ('EVERY WORD · EVERY FREQUENCY', 'Unlock the full NowssB practice'),
-    ('JOIN NOWSSB', 'Get your subscription today'),
-  ];
 
   @override
   void initState() {
     super.initState();
     planController = PageController(viewportFraction: .82);
-    bannerTimer = Timer.periodic(const Duration(seconds: 3), (_) {
-      if (mounted) {
-        setState(() => bannerIndex = (bannerIndex + 1) % bannerSlides.length);
-      }
-    });
   }
 
   @override
   void dispose() {
-    bannerTimer?.cancel();
     planController.dispose();
     super.dispose();
   }
@@ -161,7 +142,6 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                 SliverToBoxAdapter(child: _billing()),
                 SliverToBoxAdapter(child: _horizontalPlans()),
                 SliverToBoxAdapter(child: _benefits()),
-                SliverToBoxAdapter(child: _bottomOffer()),
               ]),
             ),
           ],
@@ -172,77 +152,16 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(24),
-          child: AspectRatio(
-            aspectRatio: 1,
-            child: Stack(fit: StackFit.expand, children: [
-              const NwsbVideo(
-                  asset: 'assets/video/subscription-join-nowssb.mp4',
-                  poster: 'assets/video/subscription-join-nowssb-poster.webp',
-                  priority: ClipPriority.feature),
-              DecoratedBox(
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                    Colors.black.withValues(alpha: .78),
-                    Colors.transparent,
-                    Colors.black.withValues(alpha: .84)
-                  ]))),
-              Padding(
-                  padding: const EdgeInsets.all(14),
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _rotatingBanner(),
-                        const Spacer(),
-                        const Align(
-                            alignment: Alignment.bottomLeft,
-                            child: Text('Choose your frequency',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 28,
-                                    height: 1.05,
-                                    fontWeight: FontWeight.w900))),
-                        const SizedBox(height: 8),
-                        _blackBanner(
-                            'JOIN NOWSSB', 'Get your subscription today'),
-                      ])),
-            ]),
+          child: const AspectRatio(
+            aspectRatio: 16 / 9,
+            child: NwsbVideo(
+              asset: 'assets/video/subscription-banner.mp4',
+              poster: 'assets/video/subscription-banner-poster.webp',
+              priority: ClipPriority.feature,
+              fit: BoxFit.cover,
+            ),
           ),
         ),
-      );
-
-  Widget _blackBanner(String title, String subtitle, {Key? key}) => Container(
-        key: key,
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
-        decoration: BoxDecoration(
-            color: const Color(0xEE030303),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white24)),
-        child: Row(children: [
-          Expanded(
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                Text(title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 1.1)),
-                const SizedBox(height: 3),
-                Text(subtitle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: Colors.white70, fontSize: 10))
-              ])),
-          const Icon(Icons.arrow_forward_rounded,
-              color: Colors.white, size: 18),
-        ]),
       );
 
   Widget _billing() => Padding(
@@ -360,7 +279,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   Widget _benefits() {
     final plan = plans[selected];
     return Padding(
-        padding: const EdgeInsets.fromLTRB(18, 22, 18, 12),
+        padding: const EdgeInsets.fromLTRB(18, 22, 18, 42),
         child: Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
@@ -403,22 +322,5 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                               : 'Subscribe to ${plan.name}',
                           style: const TextStyle(fontWeight: FontWeight.w900))))
             ])));
-  }
-
-  Widget _rotatingBanner() {
-    final slide = bannerSlides[bannerIndex];
-    return AnimatedSwitcher(
-        duration: const Duration(milliseconds: 420),
-        child: _blackBanner(slide.$1, slide.$2, key: ValueKey(bannerIndex)));
-  }
-
-  Widget _bottomOffer() {
-    final slide = bannerSlides[selected % bannerSlides.length];
-    return Padding(
-        padding: const EdgeInsets.fromLTRB(18, 8, 18, 42),
-        child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 360),
-            child: _blackBanner(slide.$1, slide.$2,
-                key: ValueKey('bottom-$selected'))));
   }
 }

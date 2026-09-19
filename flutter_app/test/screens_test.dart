@@ -16,6 +16,7 @@ import 'package:nowssb/screens/practice.dart';
 import 'package:nowssb/screens/profile.dart';
 import 'package:nowssb/screens/sound_library.dart';
 import 'package:nowssb/screens/store.dart';
+import 'package:nowssb/screens/subscription.dart';
 import 'package:nowssb/screens/widgets_page.dart';
 
 import 'fake_video_platform.dart';
@@ -49,6 +50,7 @@ void main() {
     'Practice': const PracticeScreen(),
     'Library': const LibraryScreen(),
     'Store': const StoreScreen(),
+    'Subscription': const SubscriptionScreen(),
     'Profile': const ProfileScreen(),
     'Sound Library': const SoundLibraryScreen(),
     'Fashion Plus': const FashionPlusScreen(),
