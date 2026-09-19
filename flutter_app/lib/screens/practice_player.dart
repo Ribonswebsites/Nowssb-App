@@ -746,7 +746,9 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                               width: stageWidth,
                               child: _VisualStage(
                                 word: _word,
-                                video: kPlayerBoxFilms[_index % kPlayerBoxFilms.length],
+                                video:
+                                    kPlayerBoxFilms[_index %
+                                        kPlayerBoxFilms.length],
                                 playing: _playing,
                                 accent: theme.accent,
                                 onReplay: _prepareAndPlay,
