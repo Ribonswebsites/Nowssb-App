@@ -30,6 +30,13 @@ void main() {
     expect(src, contains('Subscribe to \${plan.name}'));
     expect(src, contains('rotateY'));
     expect(src, contains('PageView.builder'));
+    expect(src, contains('GlassWrap.fill'));
+    expect(src, contains('GlassWrap.blurSigma'));
+    expect(src, contains('Disclaimer & Confidentiality'));
+    expect(src, contains('Terms & Conditions'));
+    expect(src, contains('class SubscriptionTermsScreen'));
+    expect(src, contains('top: 10'));
+    expect(src, isNot(contains('Color(0x2EFFFFFF)')));
     expect(File('assets/subscription/tier-blazer-front.png').existsSync(), isTrue);
     expect(File('assets/subscription/tier-sun-back.png').existsSync(), isTrue);
     expect(File('assets/subscription/tier-bag-front.png').existsSync(), isTrue);
@@ -49,6 +56,26 @@ void main() {
     expect(find.text('Monthly'), findsOneWidget);
     expect(find.text("What's Included"), findsWidgets);
     expect(find.text('Start your 30-day free trial'), findsOneWidget);
+    expect(find.text('Disclaimer & Confidentiality'), findsOneWidget);
+    expect(find.text('Terms & Conditions'), findsOneWidget);
+    expect(find.text('Free'), findsWidgets);
     expect(find.byType(PageView), findsOneWidget);
+  });
+
+  testWidgets('terms page lists the subscription conditions', (tester) async {
+    tester.view.physicalSize = const Size(412 * 3, 900 * 3);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(
+      const MaterialApp(home: SubscriptionTermsScreen()),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 80));
+    expect(tester.takeException(), isNull);
+    expect(find.text('Terms & Conditions'), findsOneWidget);
+    expect(find.text('Plans and access'), findsOneWidget);
+    expect(find.text('Free trial'), findsOneWidget);
+    expect(find.text('Billing and renewal'), findsOneWidget);
+    expect(find.text('Cancellation'), findsOneWidget);
   });
 }
