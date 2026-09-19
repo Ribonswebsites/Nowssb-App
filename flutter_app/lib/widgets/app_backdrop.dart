@@ -9,8 +9,6 @@ library;
 import 'package:flutter/material.dart';
 
 import '../data/settings.dart';
-import '../media/nwsb_video.dart';
-import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 
 class AppBackdrop extends StatelessWidget {
@@ -23,8 +21,7 @@ class AppBackdrop extends StatelessWidget {
       builder: (_, __) {
         final settings = Settings.instance;
         final key = ValueKey(
-          '${settings.backgroundTransition}-${settings.fashionPlus}-'
-          '${settings.fashionVideoIndex}-${settings.fashionImageIndex}',
+          '${settings.backgroundTransition}-${settings.fashionImageIndex}',
         );
         return Stack(
           fit: StackFit.expand,
@@ -44,14 +41,6 @@ class AppBackdrop extends StatelessWidget {
   }
 
   Widget _visual(Settings settings) {
-    if (settings.fashionPlus) {
-      return NwsbVideo(
-        asset: settings.fashionVideoAsset,
-        priority: ClipPriority.feature,
-        autoplay: true,
-        loop: true,
-      );
-    }
     final image = settings.fashionImageAsset;
     if (image != null) {
       return Image.asset(

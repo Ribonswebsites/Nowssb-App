@@ -62,36 +62,20 @@ class _Rail {
 
 const _rail = [
   // The subscription block's own gold clip.
-  _Rail(
-      NwsbMarks.crown,
-      'The Full Library',
-      'NowssB Subscription',
-      'assets/video/hero-subscription.mp4',
-      3),
+  _Rail(NwsbMarks.crown, 'The Full Library', 'NowssB Subscription',
+      'assets/video/hero-subscription.mp4', 3),
   // The clip a word page opens with — NWSB_WORD_BANNER_VID.
-  _Rail(
-      NwsbMarks.word,
-      'Where a word begins',
-      'NowssB Word Store',
-      'assets/video/hero-word-store.mp4',
-      3),
+  _Rail(NwsbMarks.word, 'Where a word begins', 'NowssB Word Store',
+      'assets/video/hero-word-store.mp4', 3),
   // The clip every meaning's page opens with — MS_MEANING_VID.
-  _Rail(
-      NwsbMarks.meaning,
-      'What a word truly means',
-      'NowssB Meaning Store',
-      'assets/video/hero-meaning-store.mp4',
-      3),
+  _Rail(NwsbMarks.meaning, 'What a word truly means', 'NowssB Meaning Store',
+      'assets/video/hero-meaning-store.mp4', 3),
   _Rail(NwsbMarks.signature, 'The rarest word', 'The Signature',
       'assets/video/signature-banner.mp4', 3),
   // The eBooks banner clip — and NOT the little one spinning in the spill
   // disc, which is the mistake part083.js:130 records having made.
-  _Rail(
-      NwsbMarks.book,
-      'Page by page',
-      'NowssB eBooks',
-      'assets/video/hero-ebooks.mp4',
-      2),
+  _Rail(NwsbMarks.book, 'Page by page', 'NowssB eBooks',
+      'assets/video/hero-ebooks.mp4', 2),
   _Rail(NwsbMarks.sound, 'Every word you own', 'Sound Library',
       'assets/video/sound-library-banner.mp4', 2),
 ];
@@ -272,7 +256,7 @@ class _FashionHeroState extends State<FashionHero> {
 /// left slack under the set. The top one is the shop disc and the search
 /// pill — both 44. The foot is the two bordered buttons, which come to about
 /// 37, and the Learn disc at 34.
-const double _topStripH = 50;
+const double _topStripH = 44;
 const double _footStripH = 42;
 
 /// Cell 0 — `.hs-hero-cell`. The strip, the set, the strip.

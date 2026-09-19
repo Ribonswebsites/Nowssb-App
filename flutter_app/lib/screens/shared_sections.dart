@@ -472,8 +472,9 @@ class _TierGlassPill extends StatelessWidget {
 /// the heading a white disc on the first and a neumorphic disc on the second
 /// — so the two looks come from the skin rather than from two copies of this.
 ///
-/// Rows are tall enough for a real tap (icon + label + air). A 40pt row
-/// read as a squeezed strip; 72pt is still one menu, not a page.
+/// Kept SHORT on purpose. A cell is a mark, a word and the air around them;
+/// the whole panel is about the height of one banner, because a menu that
+/// pushes the page down is a menu that gets scrolled past.
 class MainOptionsSection extends StatelessWidget {
   const MainOptionsSection({super.key, this.onGo, this.onAction});
 
@@ -484,10 +485,9 @@ class MainOptionsSection extends StatelessWidget {
   /// usable page rather than only a broad tab category.
   final void Function(String label, int tab)? onAction;
 
-  /// Icon + gap + label + air. 40pt crushed the marks into the words;
-  /// 72pt is a real tap target on both homes without turning the menu into
-  /// a page. Website `.mo-row` follows the same height.
-  static const double rowHeight = 72;
+  /// Matches website `.mo-row { height: 62px }` with a little room so icons
+  /// + labels never paint into the next row or the bottom nav.
+  static const double rowHeight = 40;
 
   /// (mark, viewBox, label, tab) — paths from index.html `.mainops-blk`.
   static const options = <(String, double, String, int)>[
@@ -583,7 +583,7 @@ class _OptRow extends StatelessWidget {
             if (i > 0)
               Align(
                 alignment: Alignment.center,
-                child: Container(width: 1, height: 48, color: rule),
+                child: Container(width: 1, height: 34, color: rule),
               ),
             Expanded(
               child: _Opt(
@@ -629,18 +629,31 @@ class _Opt extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(
-              width: 26,
-              height: 26,
+            Container(
+              width: 24,
+              height: 24,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: const Color(0x24FFFFFF),
+                shape: BoxShape.circle,
+                border: Border.all(color: const Color(0x52FFFFFF)),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x33000000),
+                    blurRadius: 8,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+              ),
               child: NwsbIcon(
                 mark,
-                size: 26,
+                size: 15,
                 viewBox: box,
                 strokeWidth: 1.6,
                 color: markColor,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 1),
             Text(
               label,
               maxLines: 1,
@@ -648,8 +661,8 @@ class _Opt extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 12,
-                height: 1.15,
+                fontSize: 9.5,
+                height: 1.1,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 0.1,
                 color: labelColor,
@@ -923,21 +936,32 @@ class EbooksSection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 14),
-          Column(
+          const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'NowssB',
                 style: TextStyle(fontSize: 14, color: Color(0x99FFFFFF)),
               ),
-              TitleWithGlassEnter(title: 'eBooks', onTap: onTap),
-              const SizedBox(height: 6),
-              const Text(
+              Text(
+                'eBooks',
+                style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                  height: 1.15,
+                ),
+              ),
+              SizedBox(height: 6),
+              Text(
                 'Word science and sound healing, read anywhere.',
                 style: TextStyle(fontSize: 13, color: Color(0xB3FFFFFF)),
               ),
             ],
           ),
+          const SizedBox(height: 14),
+          Align(
+              alignment: Alignment.centerLeft, child: EnterPill(onTap: onTap)),
           const SizedBox(height: 16),
           SecBanner(
             title: 'eBooks',
@@ -1582,8 +1606,9 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
               ..scaleByDouble(scale, scale, scale, 1.0),
             width: _cardW,
             height: _cardH,
-            decoration: const BoxDecoration(
-              boxShadow: [
+            decoration: BoxDecoration(
+              border: Border.all(color: const Color(0x2EFFFFFF)),
+              boxShadow: const [
                 BoxShadow(
                     color: Color(0xB3000000),
                     blurRadius: 60,
@@ -1594,15 +1619,12 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
                     offset: Offset(0, 4)),
               ],
             ),
-            clipBehavior: Clip.hardEdge,
             child: Stack(
               fit: StackFit.expand,
               children: [
-                Positioned.fill(
+                ClipRect(
                   child: NwsbImage(
                     url: _shots[i],
-                    fit: BoxFit.cover,
-                    alignment: Alignment.center,
                     fallback: const ColoredBox(color: Color(0xFF0A0F1C)),
                   ),
                 ),
@@ -1626,12 +1648,46 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
 
   @override
   Widget build(BuildContext context) {
+    final fashion = HomeSkinScope.of(context) == HomeSkin.fashion;
     return Container(
       width: double.infinity,
       color: const Color(0xFF000000),
       constraints: const BoxConstraints(minHeight: 420),
       child: Stack(
         children: [
+          // Website: Fashion shows `.footer-bg-img`; Normal hides it
+          // (`#homeFooterNm .footer-bg-img { display:none }`).
+          if (fashion)
+            Positioned.fill(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 600),
+                child: Image.network(
+                  _shots[_index],
+                  key: ValueKey(_shots[_index]),
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) =>
+                      const ColoredBox(color: Color(0xFF060C18)),
+                ),
+              ),
+            ),
+          if (fashion)
+            const Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Color(0x26030814),
+                      Color(0x0D030814),
+                      Color(0x40030814),
+                      Color(0xBF030814),
+                    ],
+                    stops: [0, 0.3, 0.7, 1],
+                  ),
+                ),
+              ),
+            ),
           Padding(
             padding: const EdgeInsets.only(bottom: 24),
             child: Column(

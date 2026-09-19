@@ -4,7 +4,6 @@ library;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../theme/tokens.dart';
 import '../data/settings.dart';
 import '../data/content.dart';
@@ -13,6 +12,7 @@ import '../screens/home_normal.dart';
 import '../screens/sound_library.dart';
 import '../screens/practice.dart';
 import '../screens/practice_player.dart';
+import '../screens/hearing_safety_player.dart';
 import '../screens/profile.dart';
 import '../screens/progress/progress_screen.dart';
 import '../screens/store.dart';
@@ -46,6 +46,9 @@ class NavScope extends InheritedWidget {
 
 class _NavShellState extends State<NavShell> {
   int _i = Settings.instance.lastTab;
+  Timer? _tabTransitionTimer;
+  bool _tabTransitioning = false;
+  int _transitionTarget = 0;
 
   /// Which home. The website keeps both in the DOM and switches a class;
   /// here it is two different screens rather than two skins — see
@@ -64,6 +67,7 @@ class _NavShellState extends State<NavShell> {
 
   @override
   void dispose() {
+    _tabTransitionTimer?.cancel();
     Settings.instance.removeListener(_onSettings);
     PlaybackSession.instance.removeListener(_onSettings);
     super.dispose();
@@ -73,57 +77,11 @@ class _NavShellState extends State<NavShell> {
     if (mounted) setState(() {});
   }
 
-  void _openMiniPlayer() {
-    final session = PlaybackSession.instance;
-    if (!session.active || session.words.isEmpty) return;
-    session.expand();
+  void _openHearingSafety() {
+    if (!PlaybackSession.instance.active) return;
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => PracticePlayerScreen(
-          words: session.words,
-          title: session.title.isEmpty ? 'NowssB' : session.title,
-          showIntro: false,
-        ),
-      ),
-    );
-  }
-
-  Widget _fashionHomeChip() {
-    return GestureDetector(
-      onTap: () => Settings.instance.setFashionHome(!_fashion),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-        decoration: BoxDecoration(
-          color: _fashion ? Colors.white : Colors.black,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x33000000),
-              blurRadius: 14,
-              offset: Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              _fashion ? Icons.light_mode : Icons.dark_mode,
-              size: 14,
-              color: _fashion ? Colors.black : Colors.white,
-            ),
-            const SizedBox(width: 6),
-            Text(
-              _fashion ? 'Normal home' : 'Fashion home',
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-                color: _fashion ? Colors.black : Colors.white,
-              ),
-            ),
-          ],
-        ),
-      ),
+          builder: (_) => const HearingSafetyPlayerScreen()),
     );
   }
 
@@ -142,6 +100,23 @@ class _NavShellState extends State<NavShell> {
   void _goToTab(int tab) {
     _popShellOverlays();
     if (tab == _i) return;
+    _tabTransitionTimer?.cancel();
+    final reduced = MediaQuery.maybeOf(context)?.disableAnimations ?? false;
+    if (!reduced) {
+      setState(() {
+        _tabTransitioning = true;
+        _transitionTarget = tab;
+      });
+      _tabTransitionTimer = Timer(const Duration(milliseconds: 110), () {
+        if (!mounted) return;
+        setState(() => _i = tab);
+        Settings.instance.setLastTab(tab);
+        _tabTransitionTimer = Timer(const Duration(milliseconds: 360), () {
+          if (mounted) setState(() => _tabTransitioning = false);
+        });
+      });
+      return;
+    }
     Settings.instance.fadeBackgroundForNavigation();
     setState(() => _i = tab);
     Settings.instance.setLastTab(tab);
@@ -284,22 +259,10 @@ class _NavShellState extends State<NavShell> {
   }
 
   Widget _build(BuildContext context) {
-    final lightHome = _i == 0 && !_fashion;
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness:
-            lightHome ? Brightness.dark : Brightness.light,
-        systemNavigationBarColor:
-            lightHome ? NwsbColors.surface : NwsbColors.deep,
-        systemNavigationBarIconBrightness:
-            lightHome ? Brightness.dark : Brightness.light,
-        systemNavigationBarDividerColor: Colors.transparent,
-      ),
-      child: Scaffold(
-        // Match the visible tab so the home-indicator strip is never a black
-        // chin on Normal home, and never a white line on dark tabs.
-        backgroundColor: lightHome ? NwsbColors.surface : NwsbColors.deep,
+    return Scaffold(
+      // Deep (not surface light) so the chin under the floating pill is never
+      // a stray white home-indicator / divider line on Library and dark tabs.
+      backgroundColor: NwsbColors.deep,
       body: Stack(
         children: [
           // IndexedStack rather than swapping the child: it keeps each tab's
@@ -321,32 +284,121 @@ class _NavShellState extends State<NavShell> {
               _tabAlive(4, const ProfileScreen()),
             ],
           ),
-          // Fashion-home switch + mini player share one row above the nav.
-          if (_i == 0 || PlaybackSession.instance.showPill)
+          if (_tabTransitioning)
+            Positioned.fill(
+              child: IgnorePointer(
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 320),
+                  switchInCurve: Curves.easeOutCubic,
+                  switchOutCurve: Curves.easeInCubic,
+                  child: Center(
+                    key: ValueKey(_transitionTarget),
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: const Color(0xE6060C18),
+                        borderRadius: BorderRadius.circular(26),
+                        border: Border.all(color: const Color(0x66E8D5A3)),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x66000000),
+                            blurRadius: 26,
+                            spreadRadius: 5,
+                          ),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 22,
+                          vertical: 13,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.auto_awesome,
+                              color: NwsbColors.goldLight,
+                              size: 17,
+                            ),
+                            const SizedBox(width: 9),
+                            Text(
+                              _transitionTarget == 1
+                                  ? 'Practice'
+                                  : (_navFeatures.values.elementAt(
+                                          _transitionTarget)['label'] ??
+                                      'Opening'),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: .4,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          // The switch between the two homes. On the website this lives in
+          // Customize; until that screen is ported it is here, because a
+          // home you cannot reach may as well not be built.
+          if (_i == 0)
+            Positioned(
+              left: 14,
+              bottom: PlaybackSession.instance.showPill ? 158 : 92,
+              child: SafeArea(
+                top: false,
+                child: GestureDetector(
+                  onTap: () => Settings.instance.setFashionHome(!_fashion),
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+                    decoration: BoxDecoration(
+                      color: _fashion ? Colors.white : Colors.black,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x33000000),
+                          blurRadius: 14,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          _fashion ? Icons.light_mode : Icons.dark_mode,
+                          size: 15,
+                          color: _fashion ? Colors.black : Colors.white,
+                        ),
+                        const SizedBox(width: 7),
+                        Text(
+                          _fashion ? 'Normal home' : 'Fashion home',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: _fashion ? Colors.black : Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+          // Mini player pill — above bottom nav on every tab (incl. both homes).
+          if (PlaybackSession.instance.showPill)
             Positioned(
               left: 12,
               right: 12,
               bottom: 88,
               child: SafeArea(
                 top: false,
-                child: Row(
-                  children: [
-                    if (_i == 0) _fashionHomeChip(),
-                    if (_i == 0 && PlaybackSession.instance.showPill) ...[
-                      const SizedBox(width: 8),
-                      Container(
-                        width: 1,
-                        height: 22,
-                        color: const Color(0x66FFFFFF),
-                      ),
-                      const SizedBox(width: 8),
-                    ],
-                    if (PlaybackSession.instance.showPill)
-                      Expanded(
-                        child: MiniPlayerPill(onOpen: _openMiniPlayer),
-                      ),
-                  ],
-                ),
+                child: MiniPlayerPill(onOpen: _openHearingSafety),
               ),
             ),
 
@@ -354,6 +406,14 @@ class _NavShellState extends State<NavShell> {
           // count, live, so the ceiling is something you can watch rather
           // than something you have to take on trust.
           const Positioned(top: 4, right: 8, child: SafeArea(child: PoolHud())),
+          // Opaque chin under the pill — kills white system/home line.
+          const Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: 28,
+            child: ColoredBox(color: NwsbColors.deep),
+          ),
           Positioned(
             left: 0,
             right: 0,
@@ -373,10 +433,10 @@ class _NavShellState extends State<NavShell> {
                               ? (settings.navCorner == 'rounded' ? 20.0 : 2.0)
                               : 33.0;
                       final background = settings.navColor == 'black'
-                          ? Colors.black
-                          : const Color(0xDD182033);
+                          ? const Color(0xF5000000)
+                          : const Color(0xF5182033);
                       return Container(
-                        height: 66,
+                        height: 58,
                         decoration: BoxDecoration(
                           color: background,
                           borderRadius: BorderRadius.circular(radius),
@@ -434,7 +494,6 @@ class _NavShellState extends State<NavShell> {
           ),
         ],
       ),
-    ),
     );
   }
 }

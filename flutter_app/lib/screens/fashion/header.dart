@@ -15,7 +15,6 @@ import 'package:flutter/material.dart';
 
 import '../../theme/tokens.dart';
 import '../../widgets/nwsb_icon.dart';
-import '../../widgets/looping_logo_mark.dart';
 
 class HomeHeader extends StatelessWidget {
   const HomeHeader({
@@ -59,7 +58,14 @@ class HomeHeader extends StatelessWidget {
           ),
           child: Row(
             children: [
-              const LoopingLogoMark(size: 48),
+              ClipOval(
+                child: Image.asset(
+                  'assets/icons/logo-disc.webp',
+                  width: 48,
+                  height: 48,
+                  fit: BoxFit.cover,
+                ),
+              ),
               const SizedBox(width: 12),
               // `Nowsb` heavy, `ansiu` light — one word with a break in the
               // weight, the way the mark is drawn everywhere else.
