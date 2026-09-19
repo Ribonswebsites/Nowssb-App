@@ -334,10 +334,12 @@ void main() {
     expect(find.text('LEARN'), findsOneWidget);
     expect(find.text('Follow the steps'), findsNothing);
 
-    await tester.tap(
-      find.bySemanticsLabel('How this app works — follow the steps'),
-    );
-    await tester.pumpAndSettle();
+    final disc = find.bySemanticsLabel('How this app works — follow the steps');
+    await tester.ensureVisible(disc);
+    await tester.pump();
+    await tester.tap(disc);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
 
     // The set's own screen is the first card — not step one.
     expect(find.text('Follow the steps'), findsOneWidget);
@@ -351,10 +353,12 @@ void main() {
 
   testWidgets('every step card fits the deck it runs through', (tester) async {
     await pump(tester);
-    await tester.tap(
-      find.bySemanticsLabel('How this app works — follow the steps'),
-    );
-    await tester.pumpAndSettle();
+    final disc = find.bySemanticsLabel('How this app works — follow the steps');
+    await tester.ensureVisible(disc);
+    await tester.pump();
+    await tester.tap(disc);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
 
     // Forward through all fifteen. A card taller than the cell overflows,
     // and an overflow in a test is an exception — which is the point: the
@@ -362,7 +366,8 @@ void main() {
     // live inside it.
     for (var i = 1; i <= kFstSteps.length; i++) {
       await tester.tap(find.bySemanticsLabel('Next step').first);
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 420));
       expect(find.text('Step $i of ${kFstSteps.length}'), findsOneWidget,
           reason: 'step $i did not arrive');
       expect(find.text(kFstSteps[i - 1].title), findsWidgets);
@@ -371,14 +376,17 @@ void main() {
 
   testWidgets('the guide gives the rail back', (tester) async {
     await pump(tester);
-    await tester.tap(
-      find.bySemanticsLabel('How this app works — follow the steps'),
-    );
-    await tester.pumpAndSettle();
+    final disc = find.bySemanticsLabel('How this app works — follow the steps');
+    await tester.ensureVisible(disc);
+    await tester.pump();
+    await tester.tap(disc);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
     expect(find.text('Follow the steps'), findsOneWidget);
 
     await tester.tap(find.bySemanticsLabel('Close the steps').first);
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 420));
 
     expect(find.text('Follow the steps'), findsNothing);
     expect(find.text('EXPLORE'), findsOneWidget);

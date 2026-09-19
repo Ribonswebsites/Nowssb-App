@@ -43,6 +43,7 @@ const FOLDERS = [
   'signature',    // the Signature's marks
   'certificates',
   'banners',      // the collection banners
+  'hero-curve',   // Lesmana-style 3D home gallery
 ];
 
 /* Local asset paths referenced by Flutter (assets/videos/...). Practice

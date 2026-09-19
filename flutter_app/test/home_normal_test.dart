@@ -55,15 +55,18 @@ void main() {
   }
 
   test('the registry is complete', () {
-    expect(kNormalSectionOrder, hasLength(32));
-    expect(kNormalSectionOrder.toSet(), hasLength(32),
+    expect(kNormalSectionOrder, hasLength(33));
+    expect(kNormalSectionOrder.toSet(), hasLength(33),
         reason: 'two sections share a key');
     expect(kNormalSectionOrder.indexOf('herovid'),
         kNormalSectionOrder.indexOf('streak') - 1,
         reason: 'Streak+Store video carousel must sit directly above streak text');
-    expect(kNormalSectionOrder.indexOf('promoRail'),
+    expect(kNormalSectionOrder.indexOf('heroCurve'),
         kNormalSectionOrder.indexOf('search') + 1,
-        reason: 'the promo rail must sit directly below search');
+        reason: 'the 3D curve must sit directly below search');
+    expect(kNormalSectionOrder.indexOf('promoRail'),
+        kNormalSectionOrder.indexOf('heroCurve') + 1,
+        reason: 'the promo rail must sit directly below the 3D curve');
     expect(kNormalSectionOrder.indexOf('dashboard'),
         kNormalSectionOrder.indexOf('promoRail') + 1,
         reason:
@@ -88,7 +91,7 @@ void main() {
         .where((k) => !kNormalNoMarkup.contains(k))
         .where((k) => !kNormalDefOff.contains(k))
         .length;
-    expect(shown, 28);
+    expect(shown, 29);
   });
 
   testWidgets('the Normal home builds at phone size without overflowing',

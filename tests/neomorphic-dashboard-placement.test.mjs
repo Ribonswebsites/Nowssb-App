@@ -55,7 +55,7 @@ assert.match(directSections, /placeActionBar/, "Direct renderer must force the c
 assert.match(directSections, /MutationObserver/, "Direct renderer must keep the coach bar in place after saved-layout reorders");
 assert.match(directSections, /startDashboardPractice/, "Dashboard actions must start the playable practice session");
 assert.match(index, /part094-dashboard-live\.js/, "Normal Home must load the live dashboard controller");
-assert.match(registry, /k:'dashboard'[\s\S]*sel:\['\.nmh-supplied-dashboard'\][\s\S]*after:'search'/, "Dashboard must remain anchored below search");
+assert.match(registry, /k:'dashboard'[\s\S]*sel:\['\.nmh-supplied-dashboard'\][\s\S]*after:'heroCurve'/, "Dashboard must remain anchored below the 3D curve");
 assert.match(registry, /k:'essentials'[\s\S]*sel:\['\.nmh-supplied-essentials'\][\s\S]*after:'dashboard'/, "Essentials must remain anchored below the dashboard");
 assert.match(registry, /k:'actionbar'[\s\S]*sel:\['\.nmh-supplied-actionbar'\][\s\S]*after:'mainops'/, "Action bar must remain anchored below Where to Begin");
 assert.ok(flutter.indexOf("'search'") < flutter.indexOf("'dashboard'"), "Flutter dashboard must follow search in Normal Home order");

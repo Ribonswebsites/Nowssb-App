@@ -1,0 +1,35 @@
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:nowssb/screens/home_normal.dart';
+import 'package:nowssb/widgets/hero_curve_stage.dart';
+
+void main() {
+  test('curve assets ship with the bundle', () {
+    expect(File('assets/hero-curve/subject.webp').existsSync(), isTrue);
+    expect(File('assets/hero-curve/stillness.webp').existsSync(), isTrue);
+    expect(File('assets/hero-curve/countries.webp').existsSync(), isTrue);
+    expect(File('assets/hero-curve/cosmos.webp').existsSync(), isTrue);
+    expect(HeroCurveAssets.cards, hasLength(7));
+  });
+
+  test('normal home parks the curve under search', () {
+    expect(kNormalSectionOrder.indexOf('heroCurve'),
+        kNormalSectionOrder.indexOf('search') + 1);
+  });
+
+  testWidgets('curve stage shows the NowssB wordmark', (tester) async {
+    tester.view.physicalSize = const Size(412 * 3, 900 * 3);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(
+      const MaterialApp(home: Scaffold(body: HeroCurveStage())),
+    );
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+    expect(find.text('NOWSSB'), findsOneWidget);
+    expect(find.text('Word Science'), findsOneWidget);
+    expect(find.byType(HeroCurveStage), findsOneWidget);
+  });
+}

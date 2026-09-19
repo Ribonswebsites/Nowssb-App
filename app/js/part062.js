@@ -45,7 +45,8 @@
            was landing above the greeting for exactly that reason. It sits
            after the greeting and before the hero clip and the streak. */
         { k:'search',   sel:['.nmh-search'],                                               t:S, label:'Search',                sub:'One bar for words and meanings' },
-        { k:'dashboard',sel:['.nmh-supplied-dashboard'],                                    t:S, label:'Daily dashboard',       sub:'Today’s focus, progress and up next', locked:1, after:'search' },
+        { k:'heroCurve',sel:['.nwsb-curve-nm'],                                            t:S, label:'NowssB Curve',          sub:'The 3D gallery under search', after:'search' },
+        { k:'dashboard',sel:['.nmh-supplied-dashboard'],                                    t:S, label:'Daily dashboard',       sub:'Today’s focus, progress and up next', locked:1, after:'heroCurve' },
         { k:'essentials',sel:['.nmh-supplied-essentials'],                                  t:S, label:'Your essentials',       sub:'Today’s meditation and sleep rituals', locked:1, after:'dashboard' },
         /* The streak card, on its own. The clip that used to sit directly
            above it has moved down the page to the other video banners —

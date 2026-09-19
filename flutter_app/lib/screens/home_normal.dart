@@ -66,6 +66,7 @@ import 'sound_library.dart';
 import 'notifications_sheet.dart';
 import 'widgets_page.dart';
 import '../widgets/home_menu_drawer.dart';
+import '../widgets/hero_curve_stage.dart';
 import 'practice_player.dart';
 import 'progress/progress_screen.dart';
 import 'reader/reader_hub.dart';
@@ -75,6 +76,7 @@ import 'subscription.dart';
 const kNormalSectionOrder = <String>[
   'greet',
   'search',
+  'heroCurve',
   'promoRail',
   'dashboard',
   'essentials',
@@ -201,6 +203,7 @@ class _HomeNormalState extends State<HomeNormal> {
   List<(String, Widget?)> _sections() => [
         ('greet', NmGreeting(name: widget.name)),
         ('search', NmSearch(onSearch: (_) => _go(2))),
+        ('heroCurve', const HeroCurveStage(compact: true)),
         (
           'promoRail',
           NormalPromoRail(

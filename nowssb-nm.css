@@ -16678,3 +16678,108 @@ body.fashplus :is(#home, .stw-prev-stage) .fp-card .fp-enter .tp-enter-go {
 #home .nwsb-genderpath > .ncb-carousel {
   display: none !important;
 }
+
+/* ── Lesmana-style 3D curve (Normal + Fashion) ── */
+.nwsb-curve {
+  position: relative;
+  --rot: 0deg;
+  --para: 0px;
+  --para-s: 0px;
+  color: #fff;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: pan-y;
+}
+.nwsb-curve-nm {
+  margin: 18px 16px 10px;
+  border-radius: 24px;
+  overflow: hidden;
+}
+.nwsb-curve-fash { margin: 0; }
+.nwsb-curve-stage {
+  position: relative;
+  height: 520px;
+  overflow: hidden;
+  background: #050505;
+  perspective: 980px;
+  cursor: grab;
+}
+.nwsb-curve-stage:active { cursor: grabbing; }
+.nwsb-curve-ring {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: translateY(var(--para)) rotateY(var(--rot));
+  z-index: 1;
+}
+.nwsb-curve-card {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  width: 132px;
+  height: 176px;
+  margin: -88px 0 0 -66px;
+  padding: 0;
+  border: 1.2px solid rgba(255,255,255,.4);
+  border-radius: 14px;
+  overflow: hidden;
+  background: #111;
+  transform: rotateY(calc(var(--i) * 51.428deg)) translateZ(210px);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  box-shadow: 0 14px 28px rgba(0,0,0,.45);
+  cursor: pointer;
+}
+.nwsb-curve-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+}
+.nwsb-curve-subject {
+  position: absolute;
+  left: 50%;
+  bottom: -3%;
+  height: 94%;
+  width: auto;
+  max-width: 86%;
+  transform: translateX(-46%) translateY(var(--para-s));
+  z-index: 4;
+  pointer-events: none;
+  object-fit: contain;
+  filter: drop-shadow(0 18px 28px rgba(0,0,0,.45));
+}
+.nwsb-curve-copy {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 18px;
+  z-index: 5;
+  pointer-events: none;
+  transform: translateY(calc(var(--para-s) * 0.5));
+}
+.nwsb-curve-kicker {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3.4px;
+  color: #e8d5a3;
+}
+.nwsb-curve-title {
+  margin-top: 6px;
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -.8px;
+  line-height: .95;
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+}
+.nwsb-curve-sub {
+  margin-top: 6px;
+  font-size: 13px;
+  color: rgba(255,255,255,.7);
+}
+@media (prefers-reduced-motion: reduce) {
+  .nwsb-curve-ring { transition: none; }
+}
+

@@ -4,6 +4,8 @@
 /// storeban
 library;
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../widgets/nwsb_icon.dart';
@@ -598,10 +600,21 @@ class _CustomizeExperienceBanner extends StatefulWidget {
 class _CustomizeExperienceBannerState extends State<_CustomizeExperienceBanner> with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 900));
   late final Animation<Offset> _slide = Tween(begin: Offset.zero, end: const Offset(-1.1, 0)).animate(CurvedAnimation(parent: _controller, curve: const Cubic(.7, 0, .2, 1)));
+  Timer? _intro;
   @override
-  void initState() { super.initState(); if (_flutterTest) return; Future<void>.delayed(const Duration(milliseconds: 5000), () { if (mounted) _controller.forward(); }); }
+  void initState() {
+    super.initState();
+    if (_flutterTest) return;
+    _intro = Timer(const Duration(milliseconds: 5000), () {
+      if (mounted) _controller.forward();
+    });
+  }
   @override
-  void dispose() { _controller.dispose(); super.dispose(); }
+  void dispose() {
+    _intro?.cancel();
+    _controller.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) => SlideTransition(
         position: _slide,

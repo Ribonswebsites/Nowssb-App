@@ -33,6 +33,7 @@ import '../data/settings.dart';
 import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
 import '../widgets/app_backdrop.dart';
+import '../widgets/hero_curve_stage.dart';
 import 'fashion/header.dart';
 import 'fashion/hero.dart';
 import 'fashion/sections_bottom.dart';
@@ -358,6 +359,7 @@ class _HomeFashionState extends State<HomeFashion> {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
+                          const HeroCurveStage(),
                           HeroGreeting(name: widget.name),
                           FashionHero(
                             onExplore: () => _go(2),

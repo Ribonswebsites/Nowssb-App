@@ -84,6 +84,7 @@ flutter:
     - assets/media/
     - assets/content/
     - assets/subscription/
+    - assets/hero-curve/
 
 flutter_launcher_icons:
   android: false
