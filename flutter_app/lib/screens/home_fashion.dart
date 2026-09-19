@@ -51,6 +51,7 @@ import 'normal/horizontal_routine_cards.dart';
 import 'personal_coach.dart';
 import 'healing_path.dart';
 import 'subscription.dart';
+import 'reader/reader_hub.dart';
 
 /// `REG.fash.items` — app/js/part062.js:107-148, key for key and in order.
 ///
@@ -191,7 +192,7 @@ class _HomeFashionState extends State<HomeFashion> {
             onCoach: () => _push(const PersonalCoachScreen()),
           ),
         ),
-        ('reader', FashReader(onTap: () => _go(2))),
+        ('reader', FashReader(onTap: () => _push(const ReaderHubScreen()))),
         (
           'herovid',
           FashStreakVideo(

@@ -68,6 +68,7 @@ import 'widgets_page.dart';
 import '../widgets/home_menu_drawer.dart';
 import 'practice_player.dart';
 import 'progress/progress_screen.dart';
+import 'reader/reader_hub.dart';
 import 'subscription.dart';
 
 /// `REG.norm.items` — app/js/part062.js:41-100, key for key and in order.
@@ -235,7 +236,7 @@ class _HomeNormalState extends State<HomeNormal> {
         // Four-tile grid removed from Normal home (was between Personal Coach and Store).
         ('tiles', const SizedBox.shrink()),
         ('store', NmStore(onTap: () => _go(3))),
-        ('reader', NmReader(onTap: () => _go(2))),
+        ('reader', NmReader(onTap: () => _push(const ReaderHubScreen()))),
         ('trendwd', NmTrending(onTap: () => _go(2))),
         ('custom', NmCustomize(onTap: () => _push(const WidgetsPage()))),
         ('rx', null),

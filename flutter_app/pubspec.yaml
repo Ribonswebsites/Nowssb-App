@@ -36,6 +36,8 @@ dependencies:
   google_fonts: ^6.2.1
   record: ^5.2.1
   speech_to_text: ^7.4.0
+  archive: ^3.6.1
+  file_picker: ^8.1.4
 
 dependency_overrides:
   # record 5.2.1's broad Linux constraint otherwise resolves to 0.7.2,
