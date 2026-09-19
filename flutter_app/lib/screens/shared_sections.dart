@@ -487,7 +487,7 @@ class MainOptionsSection extends StatelessWidget {
 
   /// Matches website `.mo-row { height: 62px }` with a little room so icons
   /// + labels never paint into the next row or the bottom nav.
-  static const double rowHeight = 40;
+  static const double rowHeight = 72;
 
   /// (mark, viewBox, label, tab) — paths from index.html `.mainops-blk`.
   static const options = <(String, double, String, int)>[

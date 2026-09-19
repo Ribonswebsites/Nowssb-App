@@ -329,6 +329,13 @@ class _HomeNormalState extends State<HomeNormal> {
               }),
             ),
           ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton(
+              onPressed: () => _go(1),
+              child: const Text('Play session'),
+            ),
+          ),
           Expanded(
             child: ListView.builder(
               // Modest look-ahead: enough for smooth scroll, not enough to
