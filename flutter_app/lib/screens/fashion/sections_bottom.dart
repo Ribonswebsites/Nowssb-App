@@ -22,7 +22,7 @@ import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/home_parts.dart';
 import '../../widgets/home_skin.dart';
-import '../../widgets/hero_curve_stage.dart';
+import '../../widgets/enter_curve_stage.dart';
 import '../../widgets/tv_frame.dart';
 
 /// 19 · offer — index.html:2252. The coupon art — a clip, not a picture,
@@ -119,8 +119,8 @@ class FashShabdapathy extends StatelessWidget {
 /// It used to be a bare 16:9 box whose wrapper was `background: transparent`,
 /// which is why it had nothing behind it.
 class FashPromoVideo extends StatelessWidget {
-  const FashPromoVideo({super.key, this.onTap});
-  final VoidCallback? onTap;
+  const FashPromoVideo({super.key, this.onOpen});
+  final void Function(String id)? onOpen;
 
   @override
   Widget build(BuildContext context) {
@@ -131,11 +131,9 @@ class FashPromoVideo extends StatelessWidget {
         priority: ClipPriority.decoration,
         autoplay: false,
         showVideo: false,
-        onTap: onTap,
-        overlay: const HeroCurveStage(
+        overlay: EnterCurveStage(
           embedded: true,
-          subject: HeroCurveAssets.tabSubject,
-          cards: HeroCurveAssets.tabCards,
+          onOpen: onOpen,
         ),
       ),
     );

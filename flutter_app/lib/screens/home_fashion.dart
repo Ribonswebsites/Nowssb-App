@@ -33,6 +33,7 @@ import '../data/settings.dart';
 import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
 import '../widgets/app_backdrop.dart';
+import '../widgets/enter_curve_stage.dart';
 import '../widgets/hero_curve_stage.dart';
 import 'fashion/header.dart';
 import 'fashion/hero.dart';
@@ -52,6 +53,7 @@ import 'normal/horizontal_routine_cards.dart';
 import 'personal_coach.dart';
 import 'healing_path.dart';
 import 'subscription.dart';
+import 'store/ebooks_store.dart';
 import 'reader/reader_hub.dart';
 
 /// `REG.fash.items` — app/js/part062.js:107-148, key for key and in order.
@@ -78,6 +80,7 @@ const kFashionSectionOrder = <String>[
   'trendwd',
   'custom',
   'fashplus',
+  'enterCurve',
   'rx',
   'trendvid',
   'storeban',
@@ -140,6 +143,23 @@ class _HomeFashionState extends State<HomeFashion> {
     final all = ContentStore.instance.library;
     if (i < 0 || i >= all.length) return;
     _push(WordDetail(word: all[i]));
+  }
+
+  void _openEnter(String id) {
+    switch (id) {
+      case 'player':
+        _go(1);
+      case 'library':
+        _push(const SoundLibraryScreen());
+      case 'store':
+        _go(3);
+      case 'reader':
+        _push(const ReaderHubScreen());
+      case 'ebook':
+        _push(const EbooksStoreScreen());
+      case 'healing':
+        _push(const HealingPathScreen());
+    }
   }
 
   void _openMainOption(String label, int tab) {
@@ -210,6 +230,10 @@ class _HomeFashionState extends State<HomeFashion> {
           'fashplus',
           FashPlusMini(onTap: () => _push(const FashionPlusScreen()))
         ),
+        (
+          'enterCurve',
+          EnterCurveStage(glass: true, onOpen: _openEnter),
+        ),
         ('rx', FashPrescription(onTap: () => _go(1), onWord: _openWord)),
         ('trendvid', FashShopNow(onTap: () => _go(3))),
         ('storeban', StoreBannerSection(onTap: () => _go(3))),
@@ -246,7 +270,7 @@ class _HomeFashionState extends State<HomeFashion> {
         // Choose Your Path is slide 2 of HealingSection — do not inject a
         // second banner/section (that caused stacked banners + blank pages).
         ('genderpath', const SizedBox.shrink()),
-        ('promovid', FashPromoVideo(onTap: () => _go(2))),
+        ('promovid', FashPromoVideo(onOpen: _openEnter)),
         ('wsearch', FashWordSearch(onOpen: (_) => _go(2))),
         ('msearch', FashMeaningSearch(onOpen: (_) => _go(2))),
         ('shabvid', FashShabdaVideo(onTap: () => _go(2))),

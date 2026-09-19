@@ -16822,3 +16822,103 @@ body.fashplus :is(#home, .stw-prev-stage) .fp-card .fp-enter .tp-enter-go {
   .nwsb-curve-ring { transition: none; }
 }
 
+/* Destination banners above AI Prescription + inside the promo tablet. */
+.nwsb-enter-curve .nwsb-enter-stage {
+  height: 520px;
+  background: #050505;
+}
+.nwsb-enter-curve .nwsb-enter-card {
+  width: 268px;
+  height: 150px;
+  margin: -75px 0 0 -134px;
+  transform: rotateY(calc(var(--i) * 90deg)) translateZ(240px);
+}
+.nwsb-enter-pointer {
+  position: absolute;
+  right: -4%;
+  bottom: 0;
+  height: 64%;
+  width: auto;
+  max-width: 48%;
+  z-index: 6;
+  pointer-events: none;
+  object-fit: contain;
+  filter: drop-shadow(0 16px 24px rgba(0,0,0,.5));
+}
+.nwsb-enter-rail {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 2;
+  pointer-events: auto;
+}
+.nwsb-enter-icons {
+  display: flex;
+  flex-wrap: wrap;
+  width: 52px;
+  gap: 4px;
+  justify-content: center;
+}
+.nwsb-enter-ic {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.4);
+  background: rgba(255,255,255,.16);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+}
+.nwsb-enter-ic svg {
+  width: 12px;
+  height: 12px;
+  stroke: #fff;
+  fill: none;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.nwsb-enter-rule {
+  width: 1px;
+  height: 36px;
+  background: rgba(255,255,255,.4);
+  flex-shrink: 0;
+}
+.nwsb-enter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 8px 5px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.47);
+  background: rgba(255,255,255,.16);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .3px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.nwsb-enter-pill svg { width: 10px; height: 10px; stroke: #fff; fill: none; }
+.nwsb-enter-embed .nwsb-enter-card {
+  width: 168px;
+  height: 94px;
+  margin: -47px 0 0 -84px;
+  transform: rotateY(calc(var(--i) * 90deg)) translateZ(150px);
+}
+.nwsb-enter-embed .nwsb-enter-rail { right: 6px; top: 6px; bottom: 6px; }
+.nwsb-enter-embed .nwsb-enter-icons { display: none; }
+.nwsb-enter-embed .nwsb-enter-rule { height: 22px; }
+
+

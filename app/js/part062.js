@@ -135,6 +135,7 @@
            home no matter where it was written. That is exactly what happened
            to this card. */
         { k:'fashplus', sel:['.fps-mini'],                                                 t:S, label:'Fashion Plus',          sub:'The door to the motion mode' , kind:'tab' },
+        { k:'enterCurve',sel:['.nwsb-enter-curve'],                                        t:S, label:'NowssB Enter',          sub:'Player · Library · Store · Reader', after:'fashplus' },
         { k:'rx',       sel:['#rxCardWrap'],                                               t:S, label:'AI Prescription',       sub:'Your daily recommended words' },
         { k:'connect',  sel:['.fash-connect-wrap'],                                      t:S, label:'NowssB Connect',        sub:'What the social space is' , kind:'sec', defOff:1 },
         { k:'trendvid', sel:['.fash-storevid-wrap'],                                      t:S, label:'Trending Shop',        sub:'The clip and the Shop Now banner', vb:1 },

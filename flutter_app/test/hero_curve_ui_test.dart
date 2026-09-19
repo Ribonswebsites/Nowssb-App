@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nowssb/screens/home_normal.dart';
+import 'package:nowssb/widgets/enter_curve_stage.dart';
 import 'package:nowssb/widgets/hero_curve_stage.dart';
 
 void main() {
@@ -12,6 +13,10 @@ void main() {
     expect(File('assets/hero-curve/countries.webp').existsSync(), isTrue);
     expect(File('assets/hero-curve/cosmos.webp').existsSync(), isTrue);
     expect(File('assets/hero-curve/tab-subject.webp').existsSync(), isTrue);
+    expect(File('assets/hero-curve/pointer.webp').existsSync(), isTrue);
+    expect(File('assets/hero-curve/banner-player.webp').existsSync(), isTrue);
+    expect(File('assets/hero-curve/banner-library.webp').existsSync(), isTrue);
+    expect(EnterCurveAssets.destinations, hasLength(4));
     expect(File('assets/hero-curve/tab-window.webp').existsSync(), isTrue);
     expect(HeroCurveAssets.tabCards, hasLength(6));
   });

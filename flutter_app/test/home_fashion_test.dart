@@ -59,9 +59,9 @@ void main() {
     // fresh install shows twenty-six — plus `mainops`, which is this app's
     // own: six doors on one panel, so the app can be used without knowing
     // where anything is.
-    expect(kFashionSectionOrder, hasLength(35));
+    expect(kFashionSectionOrder, hasLength(36));
     expect(kFashionDefOff, hasLength(4));
-    expect(kFashionSectionOrder.toSet(), hasLength(35),
+    expect(kFashionSectionOrder.toSet(), hasLength(36),
         reason: 'two sections share a key');
     for (final k in kFashionDefOff) {
       expect(kFashionSectionOrder, contains(k),
@@ -69,7 +69,11 @@ void main() {
     }
     expect(
       kFashionSectionOrder.where((k) => !kFashionDefOff.contains(k)).length,
-      31,
+      32,
+    );
+    expect(
+      kFashionSectionOrder.indexOf('enterCurve'),
+      kFashionSectionOrder.indexOf('rx') - 1,
     );
   });
 
