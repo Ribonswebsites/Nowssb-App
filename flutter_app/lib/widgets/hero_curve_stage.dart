@@ -108,7 +108,11 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
   Widget build(BuildContext context) {
     if (widget.embedded) {
       return LayoutBuilder(
-        builder: (context, c) => _stage(c.maxHeight > 0 ? c.maxHeight : 220),
+        builder: (context, c) {
+          final h = c.maxHeight > 0 ? c.maxHeight : 220.0;
+          final w = c.maxWidth > 0 ? c.maxWidth : 320.0;
+          return SizedBox.expand(child: _stage(h, width: w));
+        },
       );
     }
     final height = widget.glass ? 580.0 : 540.0;
@@ -146,13 +150,15 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
     return ColoredBox(color: const Color(0xFF050505), child: body);
   }
 
-  Widget _stage(double height) {
+  Widget _stage(double height, {double? width}) {
     final rot = _auto + _drag + _scroll * 0.0016;
     final cards = widget.cards ?? HeroCurveAssets.cards;
     final subject = widget.subject ?? HeroCurveAssets.subject;
     final n = cards.length;
     final step = (math.pi * 2) / n;
-    final radius = height * (widget.embedded ? 0.46 : 0.40);
+    final radius = widget.embedded
+        ? (width ?? height * 1.6) * 0.38
+        : height * 0.40;
     final indices = List<int>.generate(n, (i) => i)
       ..sort((a, b) =>
           math.cos(rot + a * step).compareTo(math.cos(rot + b * step)));
@@ -200,7 +206,7 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
                       ? const Alignment(0.02, 0.95)
                       : const Alignment(0.04, 0.92),
                   child: FractionallySizedBox(
-                    heightFactor: widget.embedded ? 0.56 : 0.72,
+                    heightFactor: widget.embedded ? 0.78 : 0.72,
                     child: Image.asset(
                       subject,
                       fit: BoxFit.contain,
@@ -253,8 +259,8 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
           child: GestureDetector(
             onTap: onTap,
             child: Container(
-              width: widget.embedded ? 118 : 152,
-              height: widget.embedded ? 66 : 86,
+              width: widget.embedded ? 150 : 152,
+              height: widget.embedded ? 84 : 86,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: const Color(0x66FFFFFF), width: 1.2),

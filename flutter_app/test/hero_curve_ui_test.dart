@@ -38,4 +38,37 @@ void main() {
     expect(find.textContaining('she stays'), findsNothing);
     expect(find.byType(HeroCurveStage), findsOneWidget);
   });
+
+  testWidgets('embedded curve paints the blonde cutout', (tester) async {
+    tester.view.physicalSize = const Size(412 * 3, 900 * 3);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: SizedBox(
+            width: 360,
+            height: 220,
+            child: HeroCurveStage(
+              embedded: true,
+              subject: HeroCurveAssets.tabSubject,
+              cards: HeroCurveAssets.tabCards,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+    expect(find.text('NowssB.'), findsNothing);
+    final images = tester.widgetList<Image>(find.byType(Image));
+    expect(
+      images.any((i) {
+        final img = i.image;
+        return img is AssetImage &&
+            img.assetName == HeroCurveAssets.tabSubject;
+      }),
+      isTrue,
+    );
+  });
 }

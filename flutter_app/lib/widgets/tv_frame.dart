@@ -307,26 +307,36 @@ class TvFrame extends StatelessWidget {
                 : (box.width * frame.screenRadius).clamp(1.0, 28.0);
             final clippedScreen = ClipRRect(
               borderRadius: BorderRadius.circular(innerPx),
-              clipBehavior: Clip.antiAliasWithSaveLayer,
-              child: ColoredBox(
-                color: Colors.black,
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    if (showVideo)
-                      IgnorePointer(
-                        ignoring: overlay != null,
-                        child: NwsbVideo(
-                          asset: asset,
-                          priority: priority,
-                          autoplay: autoplay,
-                          showPoster: showPoster,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    if (overlay != null) overlay!,
-                  ],
-                ),
+              clipBehavior: Clip.antiAlias,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  // Video textures punch through a plain ClipRect. The film
+                  // stays in its own save-layer so the bezel corners stay
+                  // black. The overlay is a SIBLING — a 3D Transform inside
+                  // that save-layer is flattened to nothing, which is why
+                  // the promo-tablet curve never drew.
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(innerPx),
+                    clipBehavior: Clip.antiAliasWithSaveLayer,
+                    child: ColoredBox(
+                      color: Colors.black,
+                      child: showVideo
+                          ? IgnorePointer(
+                              ignoring: overlay != null,
+                              child: NwsbVideo(
+                                asset: asset,
+                                priority: priority,
+                                autoplay: autoplay,
+                                showPoster: showPoster,
+                                fit: BoxFit.cover,
+                              ),
+                            )
+                          : null,
+                    ),
+                  ),
+                  if (overlay != null) Positioned.fill(child: overlay!),
+                ],
               ),
             );
             final screen = Padding(
