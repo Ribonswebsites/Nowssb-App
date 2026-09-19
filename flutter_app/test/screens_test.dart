@@ -5,6 +5,8 @@
 /// are cheap and they cover the whole surface.
 library;
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -128,16 +130,16 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('Flutter Store department intros build with foreground artwork',
-      (tester) async {
-    for (final screen in <Widget>[
-      const WordAtelierScreen(),
-      const MeaningStoreScreen(),
-      const SignatureStoreScreen(),
-      const EbooksStoreScreen(),
+  test('Flutter Store departments skip the intro gate', () {
+    for (final path in [
+      'lib/screens/store/word_atelier.dart',
+      'lib/screens/store/meaning_store.dart',
+      'lib/screens/store/signature_store.dart',
+      'lib/screens/store/ebooks_store.dart',
+      'lib/screens/store.dart',
     ]) {
-      await pump(tester, screen);
-      expect(tester.takeException(), isNull);
+      final src = File(path).readAsStringSync();
+      expect(src, isNot(contains('IntroGate')), reason: path);
     }
   });
 }

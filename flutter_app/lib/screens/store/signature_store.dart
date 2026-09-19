@@ -7,7 +7,6 @@ import '../../data/store_catalog.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
-import '../../widgets/intro_gate.dart';
 import '../../widgets/page_shell.dart';
 import 'product_detail.dart';
 import 'store_cards.dart';
@@ -19,33 +18,22 @@ class SignatureStoreScreen extends StatelessWidget {
   const SignatureStoreScreen({super.key});
 
   @override
-  Widget build(BuildContext context) => IntroGate(
-        tag: 'Shabdapathy · The Rarest',
-        eyebrow: '',
+  Widget build(BuildContext context) => PageShell(
+        eyebrow: 'NowssB Store',
         title: 'Words & Meanings',
-        body: 'One per category. Owned once, never restocked.',
-        stats: const ['15 Words', '5 Meanings', 'Never Restocked'],
-        art: 'assets/store/intro-signature.webp',
-        fullBleed: true,
-        enterLabel: 'Enter Signature Store',
+        film: 'assets/video/signature-store.mp4',
+        usePageFilm: false,
         onBack: () => Navigator.of(context).pop(),
-        child: PageShell(
-          eyebrow: 'NowssB Store',
-          title: 'Words & Meanings',
-          film: 'assets/video/signature-store.mp4',
-          usePageFilm: false,
-          onBack: () => Navigator.of(context).pop(),
-          onStorePicker: () => showStoreSelectSheet(
-            context,
-            onSelect: (id) => openStoreFromPicker(context, id, current: 'signature'),
-          ),
-          slivers: [
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 40),
-              sliver: SliverList.list(children: [_SignatureBody()]),
-            ),
-          ],
+        onStorePicker: () => showStoreSelectSheet(
+          context,
+          onSelect: (id) => openStoreFromPicker(context, id, current: 'signature'),
         ),
+        slivers: [
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 40),
+            sliver: SliverList.list(children: [_SignatureBody()]),
+          ),
+        ],
       );
 }
 

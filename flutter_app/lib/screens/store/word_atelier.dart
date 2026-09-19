@@ -8,7 +8,6 @@ import '../../data/store_catalog.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
-import '../../widgets/intro_gate.dart';
 import '../../widgets/page_shell.dart';
 import 'product_detail.dart';
 import 'store_cards.dart';
@@ -21,36 +20,24 @@ class WordAtelierScreen extends StatelessWidget {
   const WordAtelierScreen({super.key});
 
   @override
-  Widget build(BuildContext context) => IntroGate(
-        tag: 'Shabdapathy · Word Science',
-        eyebrow: '',
+  Widget build(BuildContext context) => PageShell(
+        eyebrow: 'NowssB Store',
         title: 'The Word Atelier',
-        body:
-            'Every word carries a vibrational signature that predates all dictionaries. Explore the phonetic origin of any word in any language.',
-        stats: const ['Unlimited Words', 'AI-Powered', 'Every Language'],
-        art: 'assets/store/intro-words.webp',
-        fullBleed: true,
-        enterLabel: 'Enter The Word Atelier',
+        film: nwsbVideo(kRmHeroVidFile),
+        // Fashion-home AppBackdrop film + PageShell Fashion vignette scrim
+        // so the background video is clearly visible (not a solid lid).
+        usePageFilm: false,
         onBack: () => Navigator.of(context).pop(),
-        child: PageShell(
-          eyebrow: 'NowssB Store',
-          title: 'The Word Atelier',
-          film: nwsbVideo(kRmHeroVidFile),
-          // Fashion-home AppBackdrop film + PageShell Fashion vignette scrim
-          // so the background video is clearly visible (not a solid lid).
-          usePageFilm: false,
-          onBack: () => Navigator.of(context).pop(),
-          onStorePicker: () => showStoreSelectSheet(
-            context,
-            onSelect: (id) => openStoreFromPicker(context, id, current: 'word'),
-          ),
-          slivers: [
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 40),
-              sliver: SliverList.list(children: const [_WordAtelierBody()]),
-            ),
-          ],
+        onStorePicker: () => showStoreSelectSheet(
+          context,
+          onSelect: (id) => openStoreFromPicker(context, id, current: 'word'),
         ),
+        slivers: [
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 40),
+            sliver: SliverList.list(children: const [_WordAtelierBody()]),
+          ),
+        ],
       );
 }
 

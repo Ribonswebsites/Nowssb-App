@@ -47,6 +47,19 @@ void main() {
       expect(atelier, contains('StoreGlassFilmBanner'));
       expect(atelier, contains('store-title-banner.mp4'));
       expect(atelier, isNot(contains('storeMidRailBannerAt')));
+      expect(atelier, isNot(contains('IntroGate')));
+      expect(atelier, isNot(contains('Enter The Word Atelier')));
+
+      for (final path in [
+        'lib/screens/store/word_atelier.dart',
+        'lib/screens/store/meaning_store.dart',
+        'lib/screens/store/signature_store.dart',
+        'lib/screens/store/ebooks_store.dart',
+      ]) {
+        final src = File(path).readAsStringSync();
+        expect(src, isNot(contains('IntroGate')), reason: path);
+        expect(src, contains('PageShell('), reason: path);
+      }
 
       final storeHome = File('lib/screens/store.dart').readAsStringSync();
       expect(storeHome, contains('16 / 6.4'));

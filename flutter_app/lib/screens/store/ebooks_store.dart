@@ -8,7 +8,6 @@ import '../../data/store_catalog.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
-import '../../widgets/intro_gate.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/page_shell.dart';
 import 'product_detail.dart';
@@ -23,17 +22,7 @@ class EbooksStoreScreen extends StatelessWidget {
   const EbooksStoreScreen({super.key});
 
   @override
-  Widget build(BuildContext context) => IntroGate(
-    tag: 'Shabdapathy · Library',
-    eyebrow: 'Read · Learn · Practice',
-    title: 'The NowssB\nEbooks.',
-    body: 'Deep-dive guides on word science, phonetic origin and sound healing — yours to keep, read anywhere, forever.',
-    stats: const ['3 Titles', 'Instant Access', 'Read Forever'],
-    art: 'assets/store/intro-ebooks.webp',
-    fullBleed: true,
-    enterLabel: 'Browse Ebooks',
-    onBack: () => Navigator.of(context).pop(),
-    child: PageShell(
+  Widget build(BuildContext context) => PageShell(
       eyebrow: 'NowssB Store',
       title: 'The NowssB Ebooks',
       film: 'assets/video/store-verify-banner.mp4',
@@ -49,8 +38,7 @@ class EbooksStoreScreen extends StatelessWidget {
           sliver: SliverList.list(children: const [_EbooksBody()]),
         ),
       ],
-    ),
-  );
+    );
 }
 
 class _EbooksBody extends StatelessWidget {
