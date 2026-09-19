@@ -83,6 +83,7 @@ flutter:
     - assets/banners/promo/
     - assets/media/
     - assets/content/
+    - assets/subscription/
 
 flutter_launcher_icons:
   android: false

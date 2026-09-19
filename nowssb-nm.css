@@ -2294,8 +2294,63 @@ body.nwsb-lightbg .app-bg-layer2 { background:#e4e6ed !important; opacity:0 !imp
 }
 #ss-plan-cards::-webkit-scrollbar { display: none; }
 #ss-plan-cards .plan-card {
-  flex: 0 0 100% !important; max-width: none; margin-bottom: 0 !important;
-  scroll-snap-align: center; box-sizing: border-box; align-self: flex-start;
+  flex: 0 0 88% !important; max-width: none; margin-bottom: 0 !important;
+  scroll-snap-align: center; box-sizing: border-box; align-self: stretch;
+  border-radius: 16px !important; overflow: hidden;
+}
+.ss-pricing-head { text-align: center; padding: 8px 18px 10px; }
+.ss-pricing-pill {
+  display: inline-block; padding: 5px 12px; border-radius: 999px;
+  background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.32);
+  color: #fff; font-size: 11px; font-weight: 700; letter-spacing: .4px;
+}
+.ss-pricing-head h2 {
+  margin: 12px 0 8px; color: #fff; font-family: 'DM Sans', sans-serif;
+  font-size: 26px; font-weight: 800; letter-spacing: -.6px; line-height: 1.15;
+}
+.ss-pricing-head p {
+  margin: 0; color: rgba(255,255,255,.6); font-size: 13.5px; line-height: 1.4;
+}
+.ss-flip-grid {
+  display: grid; grid-template-columns: 1fr 1.05fr; gap: 10px;
+  min-height: 360px; padding: 10px;
+}
+.ss-flip {
+  all: unset; display: block; position: relative; perspective: 1100px;
+  cursor: pointer; min-height: 340px;
+}
+.ss-flip-inner {
+  position: relative; width: 100%; height: 100%; min-height: 340px;
+  transform-style: preserve-3d; transition: transform .7s cubic-bezier(.2,.7,.2,1);
+}
+.ss-flip.is-back .ss-flip-inner { transform: rotateY(180deg); }
+.ss-flip-face {
+  position: absolute; inset: 0; border-radius: 14px; overflow: hidden;
+  background-size: cover; background-position: left center; backface-visibility: hidden;
+}
+.ss-flip-back { transform: rotateY(180deg); }
+.ss-flip-scrim {
+  position: absolute; left: 0; right: 0; bottom: 0; padding: 36px 12px 12px;
+  background: linear-gradient(180deg, transparent, rgba(0,0,0,.82));
+  color: #fff; display: flex; flex-direction: column; gap: 2px;
+}
+.ss-flip-scrim strong { font-size: 16px; font-weight: 800; }
+.ss-flip-scrim b { font-size: 18px; font-weight: 900; }
+.ss-included { display: flex; flex-direction: column; min-width: 0; }
+.ss-included-pill {
+  align-self: flex-start; padding: 3px 8px; border-radius: 999px;
+  background: rgba(255,255,255,.12); color: #fff; font-size: 9.5px; font-weight: 700;
+}
+.ss-included-row {
+  display: flex; gap: 6px; align-items: flex-start; margin-top: 8px;
+  color: rgba(255,255,255,.92); font-size: 12px; line-height: 1.25;
+}
+.ss-included-check { color: #e23d3d; font-weight: 800; }
+.ss-included-cta {
+  margin-top: auto; width: 100%; padding: 11px 12px; border: 0; cursor: pointer;
+  border-radius: 999px; background: #111; color: #fff;
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
 }
 .ss-plan-dots {
   display: flex !important; align-items: center; justify-content: center; gap: 6px;
