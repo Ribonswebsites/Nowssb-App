@@ -129,6 +129,8 @@ class FashPromoVideo extends StatelessWidget {
         asset: 'assets/video/orb-loop.mp4',
         frame: DeviceFrame.tabletLandscape,
         priority: ClipPriority.decoration,
+        autoplay: false,
+        showVideo: false,
         onTap: onTap,
         overlay: const HeroCurveStage(
           embedded: true,
@@ -367,7 +369,8 @@ class FashShabdaVideo extends StatelessWidget {
   Widget build(BuildContext context) {
     return SectionPane(
       child: TvFrame(
-        asset: 'assets/videos/1e9a0c8d452a809f_grok_video_2026-05-06-15-27-23_zhylbe.mp4',
+        asset:
+            'assets/videos/1e9a0c8d452a809f_grok_video_2026-05-06-15-27-23_zhylbe.mp4',
         frame: DeviceFrame.tabletLandscape,
         priority: ClipPriority.decoration,
         onTap: onTap,
