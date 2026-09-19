@@ -112,6 +112,7 @@
       wrap:  '#home .home-body',
       items: [
         { k:'greet',    sel:['.home-greeting', '.home-tagline'],                           t:S, label:'Greeting',              sub:'Begin Your Healing Path · hero header', locked:1 },
+        { k:'heroCurve',sel:['.nwsb-curve-fash'],                                          t:S, label:'NowssB Curve',          sub:'The 3D gallery under the greeting', after:'greet' },
         { k:'herorow',  sel:['.hhr-blk'],                                              t:S, label:'Customize · Features · Earn', sub:'The row under the greeting' , kind:'tab' },
         { k:'practice', sel:['.fash-plyr-wrap'],                                        t:S, label:"Today's Practice",      sub:'Morning word ritual', locked:1 },
         { k:'mainops',  sel:['.mainops-blk'],                                               t:S, label:'Where to Begin',        sub:'Six doors on one panel', kind:'blk' },

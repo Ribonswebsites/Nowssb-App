@@ -359,8 +359,8 @@ class _HomeFashionState extends State<HomeFashion> {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          const HeroCurveStage(),
                           HeroGreeting(name: widget.name),
+                          const HeroCurveStage(glass: true),
                           FashionHero(
                             onExplore: () => _go(2),
                             onGuide: () => _push(const WidgetsPage()),

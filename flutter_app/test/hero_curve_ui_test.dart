@@ -28,8 +28,12 @@ void main() {
     );
     await tester.pump();
     expect(tester.takeException(), isNull);
-    expect(find.text('NOWSSB'), findsOneWidget);
-    expect(find.text('Word Science'), findsOneWidget);
+    expect(find.text('NowssB.'), findsOneWidget);
+    expect(find.text('Sound that finds you'), findsOneWidget);
+    expect(find.text('Pronunciation & sound healing, wherever you are'),
+        findsOneWidget);
+    expect(find.text('Word Science'), findsNothing);
+    expect(find.textContaining('she stays'), findsNothing);
     expect(find.byType(HeroCurveStage), findsOneWidget);
   });
 }

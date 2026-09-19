@@ -2,7 +2,7 @@
 ///
 /// Drag to turn the ring. Scroll parallax on the parent list. Auto-spins
 /// when the ticker is live. Same widget on Normal (below search) and
-/// Fashion (top of the hero).
+/// Fashion (below the greeting, in glass).
 library;
 
 import 'dart:async';
@@ -10,7 +10,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../theme/tokens.dart';
+import 'glass_wrap.dart';
 
 const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
 
@@ -28,10 +28,17 @@ class HeroCurveAssets {
 }
 
 class HeroCurveStage extends StatefulWidget {
-  const HeroCurveStage({super.key, this.compact = false});
+  const HeroCurveStage({
+    super.key,
+    this.compact = false,
+    this.glass = false,
+  });
 
-  /// Normal home: inset rounded stage. Fashion: full-bleed.
+  /// Normal home: inset rounded stage.
   final bool compact;
+
+  /// Fashion home: glass pane under the greeting.
+  final bool glass;
 
   @override
   State<HeroCurveStage> createState() => _HeroCurveStageState();
@@ -79,30 +86,49 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
 
   @override
   Widget build(BuildContext context) {
-    final compact = widget.compact;
-    final height = compact ? 460.0 : 520.0;
-    final stage = SizedBox(
-      height: height,
-      width: double.infinity,
-      child: _stage(height),
-    );
-    if (!compact) return stage;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 18, 16, 8),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: stage,
+    final height = widget.glass ? 580.0 : 540.0;
+    final visual = ClipRRect(
+      borderRadius: BorderRadius.circular(widget.glass ? 14 : 0),
+      child: SizedBox(
+        height: height,
+        width: double.infinity,
+        child: _stage(height),
       ),
     );
+    final body = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        visual,
+        const _CurveCopy(),
+      ],
+    );
+
+    if (widget.glass) {
+      return GlassWrap(
+        padding: const EdgeInsets.fromLTRB(10, 10, 10, 14),
+        child: body,
+      );
+    }
+    if (widget.compact) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(16, 18, 16, 8),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: ColoredBox(color: const Color(0xFF050505), child: body),
+        ),
+      );
+    }
+    return ColoredBox(color: const Color(0xFF050505), child: body);
   }
 
   Widget _stage(double height) {
     final rot = _auto + _drag + _scroll * 0.0016;
     final n = HeroCurveAssets.cards.length;
     final step = (math.pi * 2) / n;
-    final radius = height * 0.42;
+    final radius = height * 0.40;
     final indices = List<int>.generate(n, (i) => i)
-      ..sort((a, b) => math.cos(rot + a * step).compareTo(math.cos(rot + b * step)));
+      ..sort((a, b) =>
+          math.cos(rot + a * step).compareTo(math.cos(rot + b * step)));
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -143,9 +169,9 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
                 child: Transform.translate(
                   offset: Offset(0, _scroll * -0.06),
                   child: Align(
-                    alignment: const Alignment(0.08, 1.06),
+                    alignment: const Alignment(0.08, 1.04),
                     child: FractionallySizedBox(
-                      heightFactor: 0.92,
+                      heightFactor: 0.96,
                       child: Image.asset(
                         HeroCurveAssets.subject,
                         fit: BoxFit.contain,
@@ -157,30 +183,18 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
                   ),
                 ),
               ),
-              const IgnorePointer(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Color(0x66000000),
-                        Color(0x00000000),
-                        Color(0x00000000),
-                        Color(0x99000000),
-                      ],
-                      stops: [0, 0.22, 0.62, 1],
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
+              const Positioned(
                 left: 18,
-                right: 18,
-                bottom: 18,
-                child: Transform.translate(
-                  offset: Offset(0, _scroll * -0.04),
-                  child: const _CurveCopy(),
+                top: 16,
+                child: Text(
+                  'NowssB.',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.3,
+                    height: 1,
+                  ),
                 ),
               ),
             ],
@@ -190,7 +204,8 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
     );
   }
 
-  Widget _card(String asset, double angle, double radius, {VoidCallback? onTap}) {
+  Widget _card(String asset, double angle, double radius,
+      {VoidCallback? onTap}) {
     final depth = math.cos(angle);
     if (depth < -0.22) return const SizedBox.shrink();
     final scale = 0.72 + 0.28 * ((depth + 1) / 2);
@@ -199,7 +214,7 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
       alignment: Alignment.center,
       transform: Matrix4.identity()
         ..rotateY(angle)
-        ..translateByDouble(0.0, -18.0, radius, 1.0),
+        ..translateByDouble(0.0, -8.0, radius, 1.0),
       child: Opacity(
         opacity: opacity,
         child: Transform.scale(
@@ -241,41 +256,36 @@ class _CurveCopy extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          'NOWSSB',
-          style: TextStyle(
-            color: NwsbColors.goldLight,
-            fontSize: 11,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 3.4,
+    return const Padding(
+      padding: EdgeInsets.fromLTRB(18, 18, 18, 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            'Sound that finds you',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Color(0xFFC4B5FD),
+              fontSize: 15,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.2,
+              height: 1.2,
+            ),
           ),
-        ),
-        SizedBox(height: 6),
-        Text(
-          'Word Science',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 34,
-            fontWeight: FontWeight.w800,
-            height: 0.95,
-            letterSpacing: -0.8,
+          SizedBox(height: 8),
+          Text(
+            'Pronunciation & sound healing, wherever you are',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 26,
+              fontWeight: FontWeight.w800,
+              height: 1.15,
+              letterSpacing: -0.6,
+            ),
           ),
-        ),
-        SizedBox(height: 6),
-        Text(
-          'Natural origin of sound',
-          style: TextStyle(
-            color: Color(0xB3FFFFFF),
-            fontSize: 13,
-            height: 1.3,
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
