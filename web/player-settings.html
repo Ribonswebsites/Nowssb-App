@@ -17,8 +17,10 @@
 html,body{margin:0;padding:0;height:100%;background:var(--bg);color:var(--fg);font-family:"Outfit",system-ui,sans-serif;overflow:hidden;overscroll-behavior:none;user-select:none;-webkit-font-smoothing:antialiased}
 body{display:flex;justify-content:center;touch-action:manipulation}
 .phone{width:100%;max-width:430px;height:100%;height:100dvh;position:relative;overflow:hidden;background:var(--bg)}
+.page-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;pointer-events:none}
+.page-bg-wash{position:absolute;inset:0;background:rgba(32,39,49,.45);z-index:1;pointer-events:none}
 
-.screen{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;transform:translateX(16px);transition:opacity 280ms ease,transform 280ms ease}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;transform:translateX(16px);transition:opacity 280ms ease,transform 280ms ease;z-index:2}
 .screen.active{opacity:1;pointer-events:auto;transform:translateX(0);z-index:2}
 
 .top-bar{padding:calc(14px + env(safe-area-inset-top)) 16px 4px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;overflow:visible}
@@ -30,20 +32,20 @@ body{display:flex;justify-content:center;touch-action:manipulation}
 .icon-btn.nav-back{width:44px;height:44px;background:#fff;color:#202731;box-shadow:0 6px 14px rgba(0,0,0,.18)}
 .icon-btn.nav-back svg{width:24px;height:24px}
 
-/* CLOCK — target mock: left-weighted hour+pill, C-arc ticks 15–60, date in right opening */
-.clock-stage{flex:1 1 auto;min-height:0;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:0 0 4px;margin-top:-8px}
-.clock-frame{position:relative;width:100%;max-width:380px;aspect-ratio:380/320;margin:0 auto;transform:none}
+/* CLOCK — glass circle, date pill below, no overlap */
+.clock-stage{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:4px 24px 8px;overflow:hidden}
+.clock-frame{position:relative;width:min(78vw,300px);aspect-ratio:1;margin:0 auto;border-radius:50%;overflow:hidden;background:rgba(255,255,255,.08);border:1.2px solid rgba(255,255,255,.42);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 16px 40px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.22)}
 .clock-svg{position:absolute;inset:0;width:100%;height:100%;color:var(--fg);overflow:hidden}
-.time-lockup{position:absolute;left:0;top:48%;transform:translateY(-50%);display:flex;align-items:center;gap:8px;padding-left:58px;z-index:3}
-.hour{font-size:76px;font-weight:200;letter-spacing:-0.03em;line-height:.92;background:transparent;padding:0;border-radius:0;margin-right:-2px}
+.time-lockup{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;align-items:center;gap:8px;z-index:3;padding:0}
+.hour{font-size:64px;font-weight:200;letter-spacing:-0.03em;line-height:.92;background:transparent;padding:0;border-radius:0;margin-right:-2px}
 .minute-pill{display:flex;align-items:center;gap:9px;border:1.15px solid rgba(242,242,239,0.85);border-radius:999px;padding:7px 14px 7px 12px;background:transparent}
-.minute{font-size:23px;font-weight:400;letter-spacing:0.02em}
+.minute{font-size:21px;font-weight:400;letter-spacing:0.02em}
 .pill-div{width:1px;height:14px;background:rgba(242,242,239,0.62)}
 .ampm{font-size:11px;font-weight:400;letter-spacing:0.18em;opacity:.9}
-.date-lockup{position:absolute;right:12px;top:50%;transform:translateY(-50%);text-align:right;z-index:3;background:transparent;padding:0;border-radius:0}
-.date-top{font-size:11px;letter-spacing:0.28em;font-weight:400}
-.date-rule{width:118px;height:1px;background:rgba(242,242,239,0.52);margin:9px 0 9px auto}
-.date-day{font-size:12px;letter-spacing:0.36em;font-weight:400}
+.date-lockup{position:relative;right:auto;top:auto;transform:none;text-align:center;z-index:3;display:inline-flex;align-items:center;gap:10px;padding:8px 18px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.42);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.date-top{font-size:11px;letter-spacing:0.24em;font-weight:400}
+.date-rule{width:1px;height:11px;background:rgba(242,242,239,0.45);margin:0}
+.date-day{font-size:11px;letter-spacing:0.28em;font-weight:400}
 
 /* Bottom settings — like reference, with icons */
 .home-settings{padding:0 24px 0;flex-shrink:0}
@@ -120,6 +122,8 @@ body{display:flex;justify-content:center;touch-action:manipulation}
 </head>
 <body>
 <div class="phone" id="app">
+<video class="page-bg" autoplay muted loop playsinline poster="assets/video/player-bg-loop-poster.webp" src="assets/video/player-bg-loop.mp4"></video>
+<div class="page-bg-wash"></div>
 
   <!-- CLOCK HOME -->
   <div class="screen active" id="screen-clock">
@@ -140,7 +144,7 @@ body{display:flex;justify-content:center;touch-action:manipulation}
     </header>
     <div class="clock-stage">
       <div class="clock-frame">
-        <svg class="clock-svg" viewBox="0 0 380 320" aria-hidden="true">
+        <svg class="clock-svg" viewBox="0 0 320 320" aria-hidden="true">
           <g id="ring-float"><g id="ring-outer"></g><g id="ring-inner"></g></g>
           <g id="clock-numbers"></g>
         </svg>
@@ -152,11 +156,11 @@ body{display:flex;justify-content:center;touch-action:manipulation}
             <span class="ampm" id="ampm">AM</span>
           </div>
         </div>
-        <div class="date-lockup">
-          <div class="date-top" id="date-top">21 AUG 2026</div>
-          <div class="date-rule"></div>
-          <div class="date-day" id="date-day">FRIDAY</div>
-        </div>
+      </div>
+      <div class="date-lockup">
+        <div class="date-top" id="date-top">21 AUG 2026</div>
+        <div class="date-rule"></div>
+        <div class="date-day" id="date-day">FRIDAY</div>
       </div>
     </div>
     <div class="home-settings">
@@ -338,17 +342,17 @@ function showScreen(name) {
   else batt.classList.add("hidden");
 }
 
-/* Clock — C-arc (open right), labels 15–60, no clipped full double ring */
-const CX=152, CY=160, R=118;
+/* Clock — full circle inside the glass wrapper. Date sits in a pill below. */
+const CX=160, CY=160, R=108;
 function polar(rad,deg){const a=(deg*Math.PI)/180;return{x:+(CX+rad*Math.cos(a)).toFixed(1),y:+(CY+rad*Math.sin(a)).toFixed(1)};}
-const LABEL_DEGS={15:150,20:125,25:105,30:88,35:68,40:318,45:268,50:242,55:218,60:198};
+const LABEL_DEGS={15:0,20:30,25:60,30:90,35:120,40:150,45:180,50:210,55:240,60:270};
 function buildArc(count,startDeg,spanDeg,radius,everyMajor,everyMid,lenMajor,lenMid,lenMin,opacityScale){
   const lines=[];
   const labelPts=Object.entries(LABEL_DEGS).map(([n,deg])=>{
     const p=polar(radius+16,deg); return {x:p.x,y:p.y,r:14};
   });
   for(let i=0;i<count;i++){
-    const t=count===1?0:i/(count-1);
+    const t=count===1?0:i/count;
     const deg=startDeg+t*spanDeg;
     const major=i%everyMajor===0;
     const mid=!major&&i%everyMid===0;
@@ -356,13 +360,12 @@ function buildArc(count,startDeg,spanDeg,radius,everyMajor,everyMid,lenMajor,len
     const bump=major?1.5:0;
     const p1=polar(radius+bump,deg),p2=polar(radius-len,deg);
     const mx=(p1.x+p2.x)/2,my=(p1.y+p2.y)/2;
-    // Barriers: time lockup, date opening, labels
-    if(mx>CX-8&&mx<CX+R*0.95&&my>CY-R*0.28&&my<CY+R*0.28)continue;
-    if(mx>CX+R*0.55&&my>CY-R*0.35&&my<CY+R*0.45)continue;
+    const dx=mx-CX, dy=my-CY;
+    if(dx*dx+dy*dy < (R*0.42)*(R*0.42)) continue;
     let hitNum=false;
     for(const z of labelPts){
-      const dx=mx-z.x, dy=my-z.y;
-      if(dx*dx+dy*dy < z.r*z.r){hitNum=true;break;}
+      const hx=mx-z.x, hy=my-z.y;
+      if(hx*hx+hy*hy < z.r*z.r){hitNum=true;break;}
     }
     if(hitNum)continue;
     const w=major?1.45:1.05,o=(major?0.95:mid?0.70:0.40)*opacityScale;
@@ -371,14 +374,13 @@ function buildArc(count,startDeg,spanDeg,radius,everyMajor,everyMid,lenMajor,len
   return lines.join("");
 }
 function initClock(){
-  document.getElementById("ring-outer").innerHTML=buildArc(64,48,286,R,6,3,15,9,5,1);
-  // Short inner accent only — not a second full ring clipped at edges
-  document.getElementById("ring-inner").innerHTML=buildArc(36,70,240,R*0.72,6,2,9,5.5,3.5,0.78);
+  document.getElementById("ring-outer").innerHTML=buildArc(72,0,360,R,6,3,14,8,4.5,1);
+  document.getElementById("ring-inner").innerHTML=buildArc(36,0,360,R*0.72,6,2,8,5,3,0.72);
   const nums=[15,20,25,30,35,40,45,50,55,60].map(n=>{
-    const p=polar(R+15, LABEL_DEGS[n]);
-    const x=Math.min(366, Math.max(14, p.x));
-    const y=Math.min(306, Math.max(14, p.y));
-    const s=n===60?17:13;
+    const p=polar(R+16, LABEL_DEGS[n]);
+    const x=Math.min(304, Math.max(16, p.x));
+    const y=Math.min(304, Math.max(16, p.y));
+    const s=n===60?16:12;
     return {n:String(n),x,y,s};
   });
   document.getElementById("clock-numbers").innerHTML=nums.map(n=>

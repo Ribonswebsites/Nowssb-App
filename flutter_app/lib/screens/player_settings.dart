@@ -134,6 +134,7 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
     return Scaffold(
       backgroundColor: kPlayerAuraBg,
       body: PlayerAuraBackdrop(
+        film: kPlayerPageFilm,
         child: SafeArea(
           bottom: false,
           child: Column(

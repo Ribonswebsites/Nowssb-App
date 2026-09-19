@@ -18,9 +18,11 @@ const kPlayerBoxFilm = 'assets/video/player-box-liquid.mp4';
 const kPlayerBoxWaveFilm = 'assets/video/player-box-wave.mp4';
 const kPlayerBoxFilms = <String>[kPlayerBoxFilm, kPlayerBoxWaveFilm];
 
-/// Charcoal AURA film — same image the website/WebView uses behind the
-/// clock and the Music Player Settings page.
+/// Charcoal AURA film — leftover intro rooms.
 const kPlayerAuraFilm = 'assets/video/player-aura-bg.mp4';
+
+/// Full Now Playing page film. Settings + AURA clock use this, never the box clips.
+const kPlayerPageFilm = 'assets/video/player-bg-loop.mp4';
 
 /// Intros + leftover player rooms share the AURA film.
 const kPlayerSharedFilm = kPlayerAuraFilm;
@@ -47,10 +49,16 @@ TextStyle playerAuraText({
 
 /// Full-bleed charcoal AURA film with a light wash so type stays readable.
 class PlayerAuraBackdrop extends StatelessWidget {
-  const PlayerAuraBackdrop({super.key, this.child, this.opacity = .88});
+  const PlayerAuraBackdrop({
+    super.key,
+    this.child,
+    this.opacity = .88,
+    this.film = kPlayerAuraFilm,
+  });
 
   final Widget? child;
   final double opacity;
+  final String film;
 
   @override
   Widget build(BuildContext context) {
@@ -60,8 +68,8 @@ class PlayerAuraBackdrop extends StatelessWidget {
         const ColoredBox(color: kPlayerAuraBg),
         Opacity(
           opacity: opacity,
-          child: const NwsbVideo(
-            asset: kPlayerAuraFilm,
+          child: NwsbVideo(
+            asset: film,
             fit: BoxFit.cover,
             priority: ClipPriority.decoration,
             autoplay: true,

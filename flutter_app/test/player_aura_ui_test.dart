@@ -12,7 +12,8 @@ void main() {
     expect(aura,
         contains("kPlayerBoxFilm = 'assets/video/player-box-liquid.mp4'"));
     expect(aura, contains("kPlayerBoxWaveFilm = 'assets/video/player-box-wave.mp4'"));
-    expect(aura, contains('kPlayerSharedFilm = kPlayerAuraFilm'));
+    expect(aura, contains("kPlayerPageFilm = 'assets/video/player-bg-loop.mp4'"));
+    expect(aura, contains('this.film = kPlayerAuraFilm'));
     expect(aura, contains('class PlayerAuraBackdrop'));
     expect(aura, contains('class PlayerAuraBackButton'));
     expect(aura, contains('kPlayerAuraBg'));
@@ -37,7 +38,8 @@ void main() {
         File('lib/screens/player_settings.dart').readAsStringSync();
     expect(settings, contains('PlayerAuraBackdrop'));
     expect(settings, contains('PlayerAuraBackButton'));
-    expect(settings, contains('kPlayerAuraBg'));
+    expect(settings, contains('film: kPlayerPageFilm'));
+    expect(settings, isNot(contains('kPlayerBoxFilm')));
     expect(settings, contains('MUSIC PLAYER'));
     expect(settings, isNot(contains('HeavyGlassPanel')));
     expect(settings, isNot(contains('NestedDarkWrap')));
@@ -45,6 +47,9 @@ void main() {
     final dial = File('lib/screens/player_dial.dart').readAsStringSync();
     expect(dial, contains('PlayerAuraBackdrop'));
     expect(dial, contains('PlayerAuraBackButton'));
+    expect(dial, contains('film: kPlayerPageFilm'));
+    expect(dial, contains('_GlassCircle'));
+    expect(dial, contains('_GlassDatePill'));
     expect(dial, contains('onLibrary'));
 
     final library = File('lib/screens/sound_library.dart').readAsStringSync();
