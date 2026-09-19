@@ -1,6 +1,6 @@
 /// The native counterpart to www/nowssb-player.js.
 ///
-/// It uses the same ordered image/video theme pairs, the local liquid-splash
+/// It uses one local player-box film ([_kPlayerBoxFilm]) for every word,
 /// assets, word-action clip, and the same five-item control treatment as the
 /// WebView Player. Speech remains native text-to-speech and completed words
 /// are recorded locally, so the visual port does not replace a real session
@@ -59,6 +59,8 @@ String _prettyTitle(String title) {
   if (t.isEmpty) return t;
   return '${t[0].toUpperCase()}${t.substring(1).toLowerCase()}';
 }
+
+const _kPlayerBoxFilm = 'assets/video/grok-video-use-this.mp4';
 
 class PracticePlayerScreen extends StatefulWidget {
   const PracticePlayerScreen({
@@ -717,7 +719,6 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                               width: stageWidth,
                               child: _VisualStage(
                                 word: _word,
-                                theme: theme,
                                 playing: _playing,
                                 accent: theme.accent,
                                 onReplay: _prepareAndPlay,
@@ -2569,7 +2570,6 @@ class _StoreGlassVideoBox extends StatelessWidget {
 class _VisualStage extends StatelessWidget {
   const _VisualStage({
     required this.word,
-    required this.theme,
     required this.playing,
     required this.accent,
     required this.onReplay,
@@ -2582,7 +2582,6 @@ class _VisualStage extends StatelessWidget {
   });
 
   final Word word;
-  final _PlayerTheme theme;
   final bool playing;
   final Color accent;
   final VoidCallback onReplay;
@@ -2617,10 +2616,9 @@ class _VisualStage extends StatelessWidget {
           children: [
             const ColoredBox(color: Colors.black),
             NwsbVideo(
-              asset: theme.video,
-              poster: theme.image,
+              asset: _kPlayerBoxFilm,
               fit: BoxFit.cover,
-              alignment: const Alignment(0, -0.24),
+              alignment: Alignment.center,
               priority: ClipPriority.feature,
               autoplay: true,
               loop: true,
@@ -2643,27 +2641,49 @@ class _VisualStage extends StatelessWidget {
             Positioned(
               top: 10,
               left: 10,
+              right: 10,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  AnimatedBuilder(
-                    animation: PracticeProgress.instance,
-                    builder: (context, _) => _LevelPill(
-                      level: PracticeProgress.instance.level.clamp(1, 10),
-                      onTap: onLevel,
-                    ),
+                  Row(
+                    children: [
+                      AnimatedBuilder(
+                        animation: PracticeProgress.instance,
+                        builder: (context, _) => _LevelPill(
+                          level: PracticeProgress.instance.level.clamp(1, 10),
+                          onTap: onLevel,
+                        ),
+                      ),
+                      const Spacer(),
+                      _StageGlassChip(onSettings: onSettings, onInfo: onInfo),
+                    ],
                   ),
                   const SizedBox(height: 8),
-                  // Store bag square lives INSIDE the art card (below Level badge).
-                  _StoreGlassVideoBox(onTap: onStore, size: 56),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      _StoreGlassVideoBox(onTap: onStore, size: 56),
+                      Expanded(
+                        child: Text(
+                          word.word.toUpperCase(),
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1.6,
+                            height: 1.05,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 56),
+                    ],
+                  ),
                 ],
               ),
-            ),
-            Positioned(
-              top: 10,
-              right: 10,
-              child: _StageGlassChip(onSettings: onSettings, onInfo: onInfo),
             ),
             Positioned(
               left: 0,
@@ -2671,32 +2691,16 @@ class _VisualStage extends StatelessWidget {
               bottom: 0,
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 40, 16, 14),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      word.word.toUpperCase(),
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Color(0xE6F4F4F5),
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                        letterSpacing: 6,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    _WordOverlay(
-                      word: word,
-                      accent: accent,
-                      playing: playing,
-                      liked: false,
-                      onReplay: onReplay,
-                      onNotes: onCopy,
-                      onLike: () {},
-                      onSyllable: onSyllable,
-                      embedded: true,
-                    ),
-                  ],
+                child: _WordOverlay(
+                  word: word,
+                  accent: accent,
+                  playing: playing,
+                  liked: false,
+                  onReplay: onReplay,
+                  onNotes: onCopy,
+                  onLike: () {},
+                  onSyllable: onSyllable,
+                  embedded: true,
                 ),
               ),
             ),
@@ -4335,52 +4339,52 @@ class _SubtitleMarquee extends StatelessWidget {
 const _playerThemes = <_PlayerTheme>[
   _PlayerTheme(
     image: 'https://media.nowssb.com/migrated-images/d694cb3157c4e58f_grok_image_1782656710977_nj5r6x.jpg',
-    video: 'assets/video/player-liquid-splash.mp4',
+    video: _kPlayerBoxFilm,
     accent: Color(0xFF9BB8FF),
   ),
   _PlayerTheme(
     image: 'https://media.nowssb.com/migrated-images/3670d1e477f48c31_grok_image_1782656676834_rzp2cz.jpg',
-    video: 'assets/video/grok-video-use-this.mp4',
+    video: _kPlayerBoxFilm,
     accent: Color(0xFF7FE9DA),
   ),
   _PlayerTheme(
     image: 'https://media.nowssb.com/migrated-images/fd380f5670852d0c_grok_image_1782656704854_cfsah3.jpg',
-    video: 'assets/video/grok_video_2026-09-05-15-32-08.mp4',
+    video: _kPlayerBoxFilm,
     accent: Color(0xFFBD7BFF),
   ),
   _PlayerTheme(
     image: 'https://media.nowssb.com/migrated-images/e8bb832f2815c15a_grok_image_1782656684101_o9vc93.jpg',
-    video: 'assets/video/grok_video_2026-09-05-15-32-13.mp4',
+    video: _kPlayerBoxFilm,
     accent: Color(0xFFA6DCFF),
   ),
   _PlayerTheme(
     image: 'https://media.nowssb.com/migrated-images/48ad23ade254b2d7_grok_image_1782795582310_llvpix.jpg',
-    video: 'assets/video/09a50041065bdeab_grok_video_2026-07-30-14-54-07_ddjmrr.mp4',
+    video: _kPlayerBoxFilm,
     accent: Color(0xFFB9A6FF),
   ),
   _PlayerTheme(
     image: 'https://media.nowssb.com/migrated-images/20314fda05d34b49_grok_image_1782796537731_vzyhwn.jpg',
-    video: 'assets/video/28eb0c85b5fd748e_grok_video_2026-07-24-15-42-55_lknomr.mp4',
+    video: _kPlayerBoxFilm,
     accent: Color(0xFFA6C8FF),
   ),
   _PlayerTheme(
     image: 'https://media.nowssb.com/migrated-images/f734c819e92db433_grok_image_1782796641824_izkh09.jpg',
-    video: 'assets/video/415dd447da33973b_grok_video_2026-07-30-14-35-05_q3tyzk.mp4',
+    video: _kPlayerBoxFilm,
     accent: Color(0xFFB9A6FF),
   ),
   _PlayerTheme(
     image: 'https://media.nowssb.com/migrated-images/e103480a2c87d55b_grok_image_1782796519587_thrrws.jpg',
-    video: 'assets/video/7e4d709136dc254a_grok_video_2026-07-18-15-53-02_ubjx5b.mp4',
+    video: _kPlayerBoxFilm,
     accent: Color(0xFFE8D5A3),
   ),
   _PlayerTheme(
     image: 'https://media.nowssb.com/migrated-images/122962572090895c_grok_image_1782796924745_nmksmi.jpg',
-    video: 'assets/video/beaf11ea10561d43_grok_video_2026-07-30-15-35-40_xwm1ei.mp4',
+    video: _kPlayerBoxFilm,
     accent: Color(0xFFF0D9A8),
   ),
   _PlayerTheme(
     image: 'https://media.nowssb.com/migrated-images/28b7b32c97232472_grok_image_1782796933792_qwzfgx.jpg',
-    video: 'assets/video/player-actions-tab.mp4',
+    video: _kPlayerBoxFilm,
     accent: Color(0xFF8FE6FF),
   ),
 ];

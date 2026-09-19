@@ -74,7 +74,7 @@ class _PracticeScreenState extends State<PracticeScreen> {
     return PageShell(
       eyebrow: 'Today',
       title: _slotTitle[slot] ?? 'Practice',
-      film: 'assets/video/player-liquid-splash.mp4',
+      film: 'assets/video/grok-video-use-this.mp4',
       slivers: [
         SliverPadding(
           padding: const EdgeInsets.symmetric(horizontal: 20),

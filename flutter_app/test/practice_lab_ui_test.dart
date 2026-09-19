@@ -47,6 +47,12 @@ void main() {
     expect(src, contains('assets/store/nowssb-bag-headphones.webp'));
     expect(src, contains('fontSize: 28'));
     expect(src, contains('FontWeight.w800'));
+    expect(src, contains('_kPlayerBoxFilm'));
+    expect(src, contains('assets/video/grok-video-use-this.mp4'));
+    expect(src, contains('fontSize: 22'));
+    expect(src, isNot(contains('player-liquid-splash.mp4')));
+    expect(src, isNot(contains('grok_video_2026-09-05-15-32-08.mp4')));
+    expect(src, isNot(contains('grok_video_2026-09-05-15-32-13.mp4')));
   });
 }
 
