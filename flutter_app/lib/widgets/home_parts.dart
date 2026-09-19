@@ -1002,3 +1002,41 @@ class TrendBannerLockup extends StatelessWidget {
   }
 }
 
+/// Title on the left, glass Enter pill on the same line to the right.
+class TitleWithGlassEnter extends StatelessWidget {
+  const TitleWithGlassEnter({
+    super.key,
+    required this.title,
+    this.onTap,
+    this.style = const TextStyle(
+      fontSize: 26,
+      fontWeight: FontWeight.w800,
+      color: Colors.white,
+      height: 1.15,
+    ),
+  });
+
+  final String title;
+  final VoidCallback? onTap;
+  final TextStyle style;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(
+          child: Text(
+            title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: style,
+          ),
+        ),
+        const SizedBox(width: 12),
+        GlassEnterPill(onTap: onTap),
+      ],
+    );
+  }
+}
+

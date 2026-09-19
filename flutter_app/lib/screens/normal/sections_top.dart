@@ -1056,9 +1056,10 @@ class NmReader extends StatelessWidget {
           'NowssB',
           style: TextStyle(fontSize: 14, color: NwsbColors.inkSoft),
         ),
-        const Text(
-          'Reader',
-          style: TextStyle(
+        TitleWithGlassEnter(
+          title: 'Reader',
+          onTap: onTap,
+          style: const TextStyle(
             fontSize: 26,
             fontWeight: FontWeight.w800,
             color: NwsbColors.ink,
@@ -1070,7 +1071,6 @@ class NmReader extends StatelessWidget {
           'Read every meaning, and every eBook.',
           style: TextStyle(fontSize: 13, color: NwsbColors.inkSoft),
         ),
-        Align(alignment: Alignment.centerLeft, child: EnterPill(onTap: onTap)),
         SecBanner(
           title: 'Reader',
           sub: 'Meanings and eBooks, in one place',

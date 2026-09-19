@@ -923,32 +923,21 @@ class EbooksSection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 14),
-          const Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 'NowssB',
                 style: TextStyle(fontSize: 14, color: Color(0x99FFFFFF)),
               ),
-              Text(
-                'eBooks',
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                  height: 1.15,
-                ),
-              ),
-              SizedBox(height: 6),
-              Text(
+              TitleWithGlassEnter(title: 'eBooks', onTap: onTap),
+              const SizedBox(height: 6),
+              const Text(
                 'Word science and sound healing, read anywhere.',
                 style: TextStyle(fontSize: 13, color: Color(0xB3FFFFFF)),
               ),
             ],
           ),
-          const SizedBox(height: 14),
-          Align(
-              alignment: Alignment.centerLeft, child: EnterPill(onTap: onTap)),
           const SizedBox(height: 16),
           SecBanner(
             title: 'eBooks',

@@ -443,22 +443,12 @@ class FashReader extends StatelessWidget {
                 'NowssB',
                 style: TextStyle(fontSize: 14, color: Color(0x99FFFFFF)),
               ),
-              const Text(
-                'Reader',
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                  height: 1.15,
-                ),
-              ),
+              TitleWithGlassEnter(title: 'Reader', onTap: onTap),
               const SizedBox(height: 6),
               const Text(
                 'Read every meaning, and every eBook.',
                 style: TextStyle(fontSize: 13, color: Color(0xB3FFFFFF)),
               ),
-              const SizedBox(height: 14),
-              EnterPill(onTap: onTap),
             ],
           ),
           const SizedBox(height: 16),
