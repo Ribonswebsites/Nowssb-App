@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../data/settings.dart';
+import '../theme/player_aura.dart';
 import 'player_settings.dart';
 
 class PlayerDial extends StatefulWidget {
@@ -186,8 +187,7 @@ class _PlayerDialState extends State<PlayerDial> with SingleTickerProviderStateM
     final bottomInset = MediaQuery.paddingOf(context).bottom;
     final batt = _batteryPct ?? 52;
 
-    return ColoredBox(
-      color: const Color(0xFF1B1E27),
+    return PlayerAuraBackdrop(
       child: Material(
         color: Colors.transparent,
         child: SafeArea(
@@ -202,7 +202,7 @@ class _PlayerDialState extends State<PlayerDial> with SingleTickerProviderStateM
                   padding: const EdgeInsets.fromLTRB(14, 6, 14, 0),
                   child: Row(
                     children: [
-                      _CircleBackButton(
+                      PlayerAuraBackButton(
                         onTap: widget.onClose ?? () => Navigator.maybePop(context),
                       ),
                       const Spacer(),
@@ -447,30 +447,6 @@ class _PlayerDialState extends State<PlayerDial> with SingleTickerProviderStateM
             ),
             const Icon(Icons.chevron_right, color: Color(0x73B3BDCA), size: 18),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _CircleBackButton extends StatelessWidget {
-  const _CircleBackButton({required this.onTap});
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white,
-      shape: const CircleBorder(),
-      elevation: 2,
-      shadowColor: Colors.black54,
-      child: InkWell(
-        customBorder: const CircleBorder(),
-        onTap: onTap,
-        child: const SizedBox(
-          width: 40,
-          height: 40,
-          child: Icon(Icons.chevron_left_rounded, color: Color(0xFF202731), size: 28),
         ),
       ),
     );

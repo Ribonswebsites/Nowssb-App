@@ -26,6 +26,7 @@ import '../widgets/glass_wrap.dart';
 import '../widgets/nwsb_icon.dart';
 import '../widgets/black_glass_banner.dart';
 import '../theme/tokens.dart';
+import '../theme/player_aura.dart';
 import 'sound_library.dart';
 import 'aura_sound_library.dart';
 import 'store.dart';
@@ -60,7 +61,7 @@ String _prettyTitle(String title) {
   return '${t[0].toUpperCase()}${t.substring(1).toLowerCase()}';
 }
 
-const _kPlayerBoxFilm = 'assets/video/grok-video-use-this.mp4';
+const _kPlayerBoxFilm = kPlayerSharedFilm;
 
 class PracticePlayerScreen extends StatefulWidget {
   const PracticePlayerScreen({

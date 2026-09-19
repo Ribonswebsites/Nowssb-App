@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
+import '../theme/player_aura.dart';
 
 class SelectLevelScreen extends StatefulWidget {
   const SelectLevelScreen({super.key, this.initialLevel = 3});
@@ -25,8 +26,9 @@ class _SelectLevelScreenState extends State<SelectLevelScreen> {
   Widget build(BuildContext context) {
     final levels = _expanded ? List.generate(10, (i) => i + 1) : List.generate(6, (i) => i + 1);
     return Scaffold(
-      backgroundColor: Colors.black,
-      body: SafeArea(
+      backgroundColor: const Color(0xFF202731),
+      body: PlayerAuraBackdrop(
+        child: SafeArea(
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(24),
@@ -113,6 +115,7 @@ class _SelectLevelScreenState extends State<SelectLevelScreen> {
               ]),
             ),
           ),
+        ),
         ),
       ),
     );

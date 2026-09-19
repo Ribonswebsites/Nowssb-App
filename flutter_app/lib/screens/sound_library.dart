@@ -19,6 +19,7 @@ import '../media/nwsb_image.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
+import '../theme/player_aura.dart';
 import '../widgets/app_backdrop.dart';
 import '../widgets/black_glass_banner.dart';
 import '../widgets/intro_gate.dart';
@@ -288,7 +289,7 @@ class _SoundLibraryScreenState extends State<SoundLibraryScreen> {
         '${all.length} words',
         '${meanings.length} meanings',
       ],
-      art: 'assets/store/intro-words.webp',
+      film: kPlayerSharedFilm,
       enterLabel: 'OPEN LIBRARY',
       child: feed,
     );
