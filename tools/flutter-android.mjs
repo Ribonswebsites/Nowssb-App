@@ -146,6 +146,26 @@ if (/minSdk = 23\b/.test(a)) {
   done.push('minSdk → 23');
 }
 
+// file_picker (and flutter_plugin_android_lifecycle) require compileSdk 36.
+// Flutter's default is still 34/35 on this channel; the app and every
+// plugin module have to match or assembleDebug dies in checkDebugAarMetadata.
+if (/compileSdk = 36\b/.test(a)) {
+  already.push('compileSdk 36');
+} else {
+  const before = a;
+  a = a.replace(
+    /compileSdk = flutter\.compileSdkVersion/,
+    'compileSdk = 36',
+  );
+  if (a === before && !/compileSdk = \d+/.test(a)) {
+    a = a.replace(/compileSdk = \d+/, 'compileSdk = 36');
+  }
+  if (!/compileSdk = 36\b/.test(a)) {
+    throw new Error('app/build.gradle.kts: no compileSdk line');
+  }
+  done.push('compileSdk → 36');
+}
+
 // 2. desugaring: the flag, and the library that backs it
 if (a.includes('isCoreLibraryDesugaringEnabled')) {
   already.push('desugaring enabled');
@@ -171,6 +191,31 @@ if (a.includes('coreLibraryDesugaring(')) {
 }
 
 writeFileSync(appGradle, a);
+
+// Plugins such as file_picker still pin compileSdk 34 in their own
+// build.gradle. AGP then fails checkDebugAarMetadata because
+// flutter_plugin_android_lifecycle requires 36. Force every Android
+// module up so the app's compileSdk actually applies.
+{
+  const rootGradle = join(android, 'build.gradle.kts');
+  if (existsSync(rootGradle)) {
+    let g = readFileSync(rootGradle, 'utf8');
+    if (g.includes('nwsbForceCompileSdk')) {
+      already.push('plugin compileSdk 36');
+    } else {
+      g += `
+// nwsbForceCompileSdk — file_picker ships compileSdk 34; lifecycle needs 36.
+subprojects {
+    afterEvaluate {
+        extensions.findByType<com.android.build.gradle.BaseExtension>()?.compileSdkVersion(36)
+    }
+}
+`;
+      writeFileSync(rootGradle, g);
+      done.push('plugin compileSdk → 36');
+    }
+  }
+}
 
 // ── launcher icon ──────────────────────────────────────────────────────
 // Copy the WebView's complete adaptive-icon resource set, generated from the
