@@ -111,7 +111,7 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
         builder: (context, c) {
           final h = c.maxHeight > 0 ? c.maxHeight : 220.0;
           final w = c.maxWidth > 0 ? c.maxWidth : 320.0;
-          return SizedBox.expand(child: _stage(h, width: w));
+          return SizedBox.expand(child: _embedStage(w, h));
         },
       );
     }
@@ -150,15 +150,119 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
     return ColoredBox(color: const Color(0xFF050505), child: body);
   }
 
-  Widget _stage(double height, {double? width}) {
+  /// 2D orbit inside a tablet. Matrix4 perspective is flattened by the
+  /// video texture / save-layer, so the blonde and stills never painted.
+  /// sin/cos placement composites the same way the Shabdapathy copy does.
+  Widget _embedStage(double width, double height) {
+    final rot = _auto + _drag + _scroll * 0.0016;
+    final cards = widget.cards ?? HeroCurveAssets.tabCards;
+    final subject = widget.subject ?? HeroCurveAssets.tabSubject;
+    final n = cards.length;
+    final step = (math.pi * 2) / n;
+    final radius = width * 0.34;
+    const cardW = 132.0;
+    const cardH = 74.0;
+    final indices = List<int>.generate(n, (i) => i)
+      ..sort((a, b) =>
+          math.cos(rot + a * step).compareTo(math.cos(rot + b * step)));
+
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onHorizontalDragUpdate: (d) {
+        setState(() => _drag += d.delta.dx * 0.01);
+      },
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          for (final i in indices)
+            _embedCard(
+              cards[i],
+              rot + i * step,
+              width,
+              height,
+              radius,
+              cardW,
+              cardH,
+            ),
+          IgnorePointer(
+            child: Align(
+              alignment: const Alignment(0.04, 1.0),
+              child: FractionallySizedBox(
+                heightFactor: 0.88,
+                child: Image.asset(
+                  subject,
+                  fit: BoxFit.contain,
+                  alignment: Alignment.bottomCenter,
+                  filterQuality: FilterQuality.high,
+                  errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _embedCard(
+    String asset,
+    double angle,
+    double width,
+    double height,
+    double radius,
+    double cardW,
+    double cardH,
+  ) {
+    final depth = math.cos(angle);
+    if (depth < -0.12) return const SizedBox.shrink();
+    final scale = 0.62 + 0.38 * ((depth + 1) / 2);
+    final opacity = 0.45 + 0.55 * ((depth + 0.12) / 1.12).clamp(0.0, 1.0);
+    final x = width / 2 + math.sin(angle) * radius - cardW / 2;
+    final y = height * 0.42 - cardH / 2 + (1 - depth) * 10;
+    return Positioned(
+      left: x,
+      top: y,
+      width: cardW,
+      height: cardH,
+      child: Opacity(
+        opacity: opacity,
+        child: Transform.scale(
+          scale: scale,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: const Color(0x88FFFFFF), width: 1.2),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x88000000),
+                  blurRadius: 14,
+                  offset: Offset(0, 8),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(9),
+              child: Image.asset(
+                asset,
+                fit: BoxFit.cover,
+                filterQuality: FilterQuality.medium,
+                errorBuilder: (_, __, ___) =>
+                    const ColoredBox(color: Color(0xFF111111)),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _stage(double height) {
     final rot = _auto + _drag + _scroll * 0.0016;
     final cards = widget.cards ?? HeroCurveAssets.cards;
     final subject = widget.subject ?? HeroCurveAssets.subject;
     final n = cards.length;
     final step = (math.pi * 2) / n;
-    final radius = widget.embedded
-        ? (width ?? height * 1.6) * 0.38
-        : height * 0.40;
+    final radius = height * 0.40;
     final indices = List<int>.generate(n, (i) => i)
       ..sort((a, b) =>
           math.cos(rot + a * step).compareTo(math.cos(rot + b * step)));

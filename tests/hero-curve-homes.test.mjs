@@ -19,9 +19,7 @@ assert.match(homeFash, /HeroCurveStage\(glass: true\)/, "Flutter Fashion home pu
 assert.match(css, /width:\s*152px/, "Orbiting stills are 16:9 wide");
 assert.match(css, /height:\s*86px/, "Orbiting stills are 16:9 short");
 assert.match(css, /height:\s*72%/, "Center subject is smaller than full-bleed");
-assert.match(flutter, /width: widget.embedded \? 150 : 152/, "Flutter stills are 16:9 wide");
-assert.match(flutter, /height: widget.embedded \? 84 : 86/, "Flutter stills are 16:9 short");
-assert.match(flutter, /heightFactor: widget.embedded \? 0\.78 : 0\.72/, "Flutter subject is smaller");
+assert.match(flutter, /_embedStage/, "Promo tablet curve is a 2D orbit so it paints over the video");
 assert.match(index, /part097-hero-curve\.js/, "Both homes must load the curve spinner");
 assert.match(css, /perspective:\s*980px/, "Curve stage must be a 3D scene");
 assert.match(js, /data-nwsb-curve/, "Spinner must bind every curve stage");
