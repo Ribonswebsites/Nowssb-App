@@ -1555,7 +1555,7 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
     final tz = distance == 0
         ? 200.0
         : distance == 1
-            ? -10.0
+            ? -50.0
             : distance == 2
                 ? -155.0
                 : distance == 3
@@ -1564,7 +1564,7 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
     final angle = distance == 0
         ? 0.0
         : distance == 1
-            ? direction * -28
+            ? direction * -35
             : distance == 2
                 ? direction * -50
                 : distance == 3

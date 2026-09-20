@@ -12229,11 +12229,22 @@ body.fpoff-routines :is(#home, .stw-prev-stage) .rt-vid-banner { display: none !
    That is why the frame below is sized off the card in plain pixels
    with no perspective factor anywhere in it.
    ══════════════════════════════════════════════════════════════════ */
-.footer-carousel { --fci-w: 162px; --fci-h: 260px; }
+.footer-carousel {
+  --fci-w: 162px;
+  --fci-h: 260px;
+  /* Let translateZ and rotateY read as depth instead of flattening into 2D. */
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+.footer-carousel-track {
+  transform-style: preserve-3d;
+}
 .fci {
   width: var(--fci-w); height: var(--fci-h);
   margin-left: calc(var(--fci-w) / -2);
   margin-top:  calc(var(--fci-h) / -2);
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
 }
 .fc-tab {
   position: absolute; top: 50%; left: 50%;
@@ -16913,5 +16924,4 @@ body.fashplus :is(#home, .stw-prev-stage) .fp-card .fp-enter .tp-enter-go {
 }
 .nwsb-enter-embed .nwsb-enter-rail { right: 6px; top: 6px; bottom: 6px; }
 .nwsb-enter-embed .nwsb-enter-rule { height: 22px; }
-
 
