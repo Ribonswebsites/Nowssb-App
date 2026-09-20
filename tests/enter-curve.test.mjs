@@ -25,8 +25,9 @@ assert.match(homeFash, /enterCurve/, "Flutter Fashion home has the enter curve")
 assert.match(homeFash, /EnterCurveStage\(glass: true/, "Flutter enter curve is glass");
 assert.match(promo, /showVideo: false/, "Flutter promo tablet has no film");
 assert.match(promo, /EnterCurveStage\(/, "Flutter promo tablet uses the enter ring");
-assert.match(flutter, /_fullStage/, "Flutter enter curve uses the 3D ring");
-assert.match(flutter, /setEntry\(3, 2, 0.00115\)/, "Enter curve has perspective parallax");
+assert.match(flutter, /_orbit/, "Flutter enter curve orbits the banners behind her");
+assert.match(flutter, /clamp\(-72.0, 72.0\)/, "Parallax is viewport-relative so the section stays on screen");
+assert.doesNotMatch(flutter, /_pos!\.pixels/, "Parallax is not raw list pixels");
 assert.match(flutter, /_WhiteChip/, "Icon sits in a white circle");
 assert.match(flutter, /_WhiteEnter/, "Enter sits in a white pill");
 assert.doesNotMatch(flutter, /nwsb-enter-rule|_EnterRail/, "No extra vertical rule — the still already has one");
