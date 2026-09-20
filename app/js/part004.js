@@ -316,6 +316,7 @@ let _pwPhase    = 'idle'; // 'idle'|'playing'|'post-play'|'recording'|'scoring'|
 let _pwDone      = false;
 let _pwMode      = 'listen';
 let _pwUtt       = null;
+let _pwListenedAt = 0;
 let _pwLastGatedWord = null; // weekly word-limit gate in renderPractice() — last word already checked/spent
 
 // Auto-play: controlled by the Voice Guidance / Activate Sound toggles on both intros.
@@ -843,6 +844,7 @@ function pwStop(autoEnd) {
      stays the player. autoEnd is kept in the signature because callers
      pass it and it still says WHY we stopped. */
   _pwPhase = 'idle';
+  if (autoEnd) _pwListenedAt = Date.now();
   if ('speechSynthesis' in window) window.speechSynthesis.cancel();
   document.querySelectorAll('.sp-syl-chip').forEach(el => el.classList.remove('lit'));
   const vid = document.getElementById('pwBgVideo');
@@ -979,10 +981,21 @@ function pwMainBtnAction() {
   else if (_pwPhase === 'scored') { _pwPhase = 'idle'; _pwRecordingBlob = null; renderPractice(); }
 }
 
-function pwPracticeNow() {
+function pwBeginPractice() {
   _pwPhase = 'recording';
   renderPractice();
   setTimeout(pwStartRecording, 150);
+}
+
+function pwPracticeNow() {
+  /* The survey belongs specifically to the first completed listen followed
+     immediately by Practice. Returning here keeps every other Practice path
+     unchanged, including direct entry and sentence practice. */
+  var listenedRecently = _pwListenedAt && (Date.now() - _pwListenedAt < 120000);
+  if (listenedRecently && typeof window.nwsbMaybePronunciationSurvey === 'function') {
+    if (window.nwsbMaybePronunciationSurvey(pwBeginPractice)) return;
+  }
+  pwBeginPractice();
 }
 
 function pwOpenSettings() {
