@@ -25,7 +25,7 @@ assert.match(homeFash, /enterCurve/, "Flutter Fashion home has the enter curve")
 assert.match(homeFash, /EnterCurveStage\(glass: true/, "Flutter enter curve is glass");
 assert.match(promo, /showVideo: false/, "Flutter promo tablet has no film");
 assert.match(promo, /EnterCurveStage\(/, "Flutter promo tablet uses the enter ring");
-assert.match(flutter, /pointer\.webp/, "Flutter ships the pointing figure");
+assert.match(flutter, /_coverStage/, "Flutter enter curve is a 2D coverflow so the banners paint");
 assert.ok(existsSync(new URL("../assets/hero-curve/pointer.webp", import.meta.url)));
 assert.ok(existsSync(new URL("../assets/hero-curve/banner-player.webp", import.meta.url)));
 

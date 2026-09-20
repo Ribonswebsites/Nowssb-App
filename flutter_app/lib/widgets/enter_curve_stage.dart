@@ -143,13 +143,16 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
       );
     }
 
-    const height = 520.0;
+    const height = 236.0;
     final visual = ClipRRect(
       borderRadius: BorderRadius.circular(widget.glass ? 14 : 0),
       child: SizedBox(
         height: height,
         width: double.infinity,
-        child: _fullStage(height),
+        child: LayoutBuilder(
+          builder: (context, c) =>
+              _coverStage(c.maxWidth > 0 ? c.maxWidth : 320.0, height),
+        ),
       ),
     );
 
@@ -216,12 +219,14 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
     );
   }
 
-  Widget _fullStage(double height) {
+  Widget _coverStage(double width, double height) {
     final rot = _auto + _drag + _scroll * 0.0016;
     const dests = EnterCurveAssets.destinations;
     final n = dests.length;
     final step = (math.pi * 2) / n;
-    final radius = height * 0.42;
+    final cardW = width * 0.92;
+    final cardH = math.min(height * 0.90, cardW * 9 / 16);
+    final radius = width * 0.24;
     final indices = List<int>.generate(n, (i) => i)
       ..sort((a, b) =>
           math.cos(rot + a * step).compareTo(math.cos(rot + b * step)));
@@ -229,65 +234,41 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onHorizontalDragUpdate: (d) {
-        setState(() => _drag += d.delta.dx * 0.008);
+        setState(() => _drag += d.delta.dx * 0.01);
       },
       child: ColoredBox(
         color: const Color(0xFF050505),
-        child: ClipRect(
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              Transform.translate(
-                offset: Offset(0, _scroll * -0.16),
-                child: Transform(
-                  alignment: Alignment.center,
-                  transform: Matrix4.identity()..setEntry(3, 2, 0.00105),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      for (final i in indices)
-                        _spinCard(dests[i], rot + i * step, radius),
-                    ],
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            for (final i in indices)
+              _flatCard(
+                dests[i],
+                rot + i * step,
+                width,
+                height,
+                radius,
+                cardW,
+                cardH,
+                compact: false,
+              ),
+            IgnorePointer(
+              child: Align(
+                alignment: const Alignment(1.06, 1.10),
+                child: FractionallySizedBox(
+                  heightFactor: 0.82,
+                  widthFactor: 0.40,
+                  child: Image.asset(
+                    EnterCurveAssets.pointer,
+                    fit: BoxFit.contain,
+                    alignment: Alignment.bottomRight,
+                    filterQuality: FilterQuality.high,
+                    errorBuilder: (_, __, ___) => const SizedBox.shrink(),
                   ),
                 ),
               ),
-              IgnorePointer(
-                child: Align(
-                  alignment: const Alignment(1.05, 1.12),
-                  child: FractionallySizedBox(
-                    heightFactor: 0.64,
-                    child: Image.asset(
-                      EnterCurveAssets.pointer,
-                      fit: BoxFit.contain,
-                      alignment: Alignment.bottomRight,
-                      filterQuality: FilterQuality.high,
-                      errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _spinCard(EnterCurveDest dest, double angle, double radius) {
-    final depth = math.cos(angle);
-    if (depth < -0.18) return const SizedBox.shrink();
-    final scale = 0.72 + 0.28 * ((depth + 1) / 2);
-    final opacity = 0.42 + 0.58 * ((depth + 0.18) / 1.18).clamp(0.0, 1.0);
-    return Transform(
-      alignment: Alignment.center,
-      transform: Matrix4.identity()
-        ..rotateY(angle)
-        ..translateByDouble(0.0, -6.0, radius, 1.0),
-      child: Opacity(
-        opacity: opacity,
-        child: Transform.scale(
-          scale: scale,
-          child: _banner(dest, width: 268, height: 150, compact: false),
+            ),
+          ],
         ),
       ),
     );
@@ -304,11 +285,13 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
     required bool compact,
   }) {
     final depth = math.cos(angle);
-    if (depth < -0.12) return const SizedBox.shrink();
+    if (depth < (compact ? -0.12 : 0.22)) return const SizedBox.shrink();
     final scale = 0.62 + 0.38 * ((depth + 1) / 2);
     final opacity = 0.48 + 0.52 * ((depth + 0.12) / 1.12).clamp(0.0, 1.0);
     final x = width / 2 + math.sin(angle) * radius - cardW / 2;
-    final y = height * 0.40 - cardH / 2 + (1 - depth) * 8;
+    final y = compact
+        ? height * 0.40 - cardH / 2 + (1 - depth) * 8
+        : (height - cardH) / 2;
     return Positioned(
       left: x,
       top: y,
