@@ -38,6 +38,7 @@ import 'player_dial.dart';
 import 'player_intro.dart';
 import 'player_guide.dart';
 import 'practice_overlay.dart';
+import '../widgets/pronunciation_survey.dart';
 import '../data/playback_session.dart';
 
 String _fmtClock(num sec) {
@@ -469,6 +470,15 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     });
   }
 
+  Future<void> _handlePracticeTap() async {
+    if (!mounted || _practiceOpen) return;
+    if (_completed) {
+      await showPronunciationSurveyIfNeeded(context);
+      if (!mounted) return;
+    }
+    _openPracticeLab();
+  }
+
   void _openSettings() {
     Navigator.of(context).push(
       MaterialPageRoute<void>(builder: (_) => const PlayerSettingsScreen()),
@@ -872,7 +882,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                                   accent: theme.accent,
                                   video: _actionsTabVideo,
                                   onSentence: _openSentence,
-                                  onPractice: _openPracticeLab,
+                                  onPractice: () => unawaited(_handlePracticeTap()),
                                   onStore: () => Navigator.of(context).push(
                                     MaterialPageRoute<void>(
                                       builder: (_) => const StoreScreen(),
