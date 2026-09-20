@@ -25,7 +25,12 @@ assert.match(homeFash, /enterCurve/, "Flutter Fashion home has the enter curve")
 assert.match(homeFash, /EnterCurveStage\(glass: true/, "Flutter enter curve is glass");
 assert.match(promo, /showVideo: false/, "Flutter promo tablet has no film");
 assert.match(promo, /EnterCurveStage\(/, "Flutter promo tablet uses the enter ring");
-assert.match(flutter, /_coverStage/, "Flutter enter curve is a 2D coverflow so the banners paint");
+assert.match(flutter, /_orbitStage/, "Flutter enter curve orbits the banners behind her");
+assert.match(flutter, /const height = 560/, "Enter curve is as tall as the hero");
+assert.doesNotMatch(flutter, /extras/, "Each banner keeps a single destination icon");
+assert.match(js, /ICONS.filter/, "Website rail uses the one icon for that banner");
+assert.doesNotMatch(js, /nwsb-enter-icons/, "Website no longer dumps every icon on each card");
+assert.match(css, /height: 560px/, "Website enter stage is tall");
 assert.ok(existsSync(new URL("../assets/hero-curve/pointer.webp", import.meta.url)));
 assert.ok(existsSync(new URL("../assets/hero-curve/banner-player.webp", import.meta.url)));
 

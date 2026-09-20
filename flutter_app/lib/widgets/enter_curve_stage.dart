@@ -1,9 +1,10 @@
 /// Rotating destination banners — Player, Library, Store, Reader.
 ///
-/// Each still keeps its empty right side for a glass icon rail, a rule and
-/// an Enter pill. The pointing figure sits in the bottom-right of the full
-/// stage and aims at that pill. The same ring, smaller and with the blonde
-/// in front, fills the promo tablet (no film behind her).
+/// Same language as the Lesmana hero: the stills orbit behind the figure.
+/// Each still keeps its empty right side for one destination icon, a rule
+/// and an Enter pill. The pointing figure sits in the bottom-right of the
+/// full stage and aims at that pill. The promo tablet uses the same ring
+/// with the blonde in front.
 library;
 
 import 'dart:async';
@@ -62,11 +63,6 @@ class EnterCurveAssets {
       mark: NwsbMarks.reader,
     ),
   ];
-
-  static const extras = <(String, String, String)>[
-    ('ebook', 'eBook', NwsbMarks.ebook),
-    ('healing', 'Healing', NwsbMarks.gender),
-  ];
 }
 
 class EnterCurveStage extends StatefulWidget {
@@ -102,7 +98,7 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
     if (!_flutterTest) {
       _tick = Timer.periodic(const Duration(milliseconds: 32), (_) {
         if (!mounted) return;
-        setState(() => _auto += 0.01);
+        setState(() => _auto += 0.012);
       });
     }
   }
@@ -138,20 +134,31 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
         builder: (context, c) {
           final h = c.maxHeight > 0 ? c.maxHeight : 220.0;
           final w = c.maxWidth > 0 ? c.maxWidth : 320.0;
-          return SizedBox.expand(child: _embedStage(w, h));
+          return SizedBox.expand(
+            child: _orbitStage(
+              width: w,
+              height: h,
+              compact: true,
+              pointer: false,
+            ),
+          );
         },
       );
     }
 
-    const height = 236.0;
+    const height = 560.0;
     final visual = ClipRRect(
       borderRadius: BorderRadius.circular(widget.glass ? 14 : 0),
       child: SizedBox(
         height: height,
         width: double.infinity,
         child: LayoutBuilder(
-          builder: (context, c) =>
-              _coverStage(c.maxWidth > 0 ? c.maxWidth : 320.0, height),
+          builder: (context, c) => _orbitStage(
+            width: c.maxWidth > 0 ? c.maxWidth : 320.0,
+            height: height,
+            compact: false,
+            pointer: true,
+          ),
         ),
       ),
     );
@@ -165,20 +172,32 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
     return visual;
   }
 
-  Widget _embedStage(double width, double height) {
+  /// 2D cylindrical orbit — same trick as the hero tablet. Matrix4
+  /// perspective is flattened by the glass save-layer, so sin/cos
+  /// placement is what actually paints the stills behind her.
+  Widget _orbitStage({
+    required double width,
+    required double height,
+    required bool compact,
+    required bool pointer,
+  }) {
     final rot = _auto + _drag + _scroll * 0.0016;
     const dests = EnterCurveAssets.destinations;
     final n = dests.length;
     final step = (math.pi * 2) / n;
-    final radius = width * 0.32;
-    const cardW = 168.0;
-    const cardH = 94.0;
+    final cardW = compact ? 168.0 : 220.0;
+    final cardH = compact ? 94.0 : 124.0;
+    final radius = compact ? width * 0.34 : width * 0.40;
+    final originX = compact ? width / 2 : width * 0.42;
+    final originY = compact ? height * 0.42 : height * 0.36;
     final indices = List<int>.generate(n, (i) => i)
       ..sort((a, b) =>
           math.cos(rot + a * step).compareTo(math.cos(rot + b * step)));
 
     return GestureDetector(
-      behavior: HitTestBehavior.translucent,
+      behavior: compact
+          ? HitTestBehavior.translucent
+          : HitTestBehavior.opaque,
       onHorizontalDragUpdate: (d) {
         setState(() => _drag += d.delta.dx * 0.01);
       },
@@ -188,30 +207,47 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
           fit: StackFit.expand,
           children: [
             for (final i in indices)
-              _flatCard(
+              _orbitCard(
                 dests[i],
                 rot + i * step,
-                width,
-                height,
+                originX,
+                originY,
                 radius,
                 cardW,
                 cardH,
-                compact: true,
+                compact: compact,
               ),
             IgnorePointer(
-              child: Align(
-                alignment: const Alignment(0.04, 1.0),
-                child: FractionallySizedBox(
-                  heightFactor: 0.90,
-                  child: Image.asset(
-                    EnterCurveAssets.subject,
-                    fit: BoxFit.contain,
-                    alignment: Alignment.bottomCenter,
-                    filterQuality: FilterQuality.high,
-                    errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-                  ),
-                ),
-              ),
+              child: pointer
+                  ? Align(
+                      alignment: const Alignment(1.08, 1.06),
+                      child: FractionallySizedBox(
+                        heightFactor: 0.86,
+                        widthFactor: 0.56,
+                        child: Image.asset(
+                          EnterCurveAssets.pointer,
+                          fit: BoxFit.contain,
+                          alignment: Alignment.bottomRight,
+                          filterQuality: FilterQuality.high,
+                          errorBuilder: (_, __, ___) =>
+                              const SizedBox.shrink(),
+                        ),
+                      ),
+                    )
+                  : Align(
+                      alignment: const Alignment(0.04, 1.0),
+                      child: FractionallySizedBox(
+                        heightFactor: 0.90,
+                        child: Image.asset(
+                          EnterCurveAssets.subject,
+                          fit: BoxFit.contain,
+                          alignment: Alignment.bottomCenter,
+                          filterQuality: FilterQuality.high,
+                          errorBuilder: (_, __, ___) =>
+                              const SizedBox.shrink(),
+                        ),
+                      ),
+                    ),
             ),
           ],
         ),
@@ -219,79 +255,22 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
     );
   }
 
-  Widget _coverStage(double width, double height) {
-    final rot = _auto + _drag + _scroll * 0.0016;
-    const dests = EnterCurveAssets.destinations;
-    final n = dests.length;
-    final step = (math.pi * 2) / n;
-    final cardW = width * 0.92;
-    final cardH = math.min(height * 0.90, cardW * 9 / 16);
-    final radius = width * 0.24;
-    final indices = List<int>.generate(n, (i) => i)
-      ..sort((a, b) =>
-          math.cos(rot + a * step).compareTo(math.cos(rot + b * step)));
-
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onHorizontalDragUpdate: (d) {
-        setState(() => _drag += d.delta.dx * 0.01);
-      },
-      child: ColoredBox(
-        color: const Color(0xFF050505),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            for (final i in indices)
-              _flatCard(
-                dests[i],
-                rot + i * step,
-                width,
-                height,
-                radius,
-                cardW,
-                cardH,
-                compact: false,
-              ),
-            IgnorePointer(
-              child: Align(
-                alignment: const Alignment(1.04, 1.06),
-                child: FractionallySizedBox(
-                  heightFactor: 0.96,
-                  widthFactor: 0.48,
-                  child: Image.asset(
-                    EnterCurveAssets.pointer,
-                    fit: BoxFit.contain,
-                    alignment: Alignment.bottomRight,
-                    filterQuality: FilterQuality.high,
-                    errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _flatCard(
+  Widget _orbitCard(
     EnterCurveDest dest,
     double angle,
-    double width,
-    double height,
+    double originX,
+    double originY,
     double radius,
     double cardW,
     double cardH, {
     required bool compact,
   }) {
     final depth = math.cos(angle);
-    if (depth < (compact ? -0.12 : 0.22)) return const SizedBox.shrink();
-    final scale = 0.62 + 0.38 * ((depth + 1) / 2);
-    final opacity = 0.48 + 0.52 * ((depth + 0.12) / 1.12).clamp(0.0, 1.0);
-    final x = width / 2 + math.sin(angle) * radius - cardW / 2;
-    final y = compact
-        ? height * 0.40 - cardH / 2 + (1 - depth) * 8
-        : (height - cardH) / 2;
+    if (depth < -0.18) return const SizedBox.shrink();
+    final scale = 0.58 + 0.42 * ((depth + 1) / 2);
+    final opacity = 0.40 + 0.60 * ((depth + 0.18) / 1.18).clamp(0.0, 1.0);
+    final x = originX + math.sin(angle) * radius - cardW / 2;
+    final y = originY - cardH / 2 + (1 - depth) * (compact ? 8 : 16);
     return Positioned(
       left: x,
       top: y,
@@ -299,9 +278,13 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
       height: cardH,
       child: Opacity(
         opacity: opacity,
-        child: Transform.scale(
-          scale: scale,
-          child: _banner(dest, width: cardW, height: cardH, compact: compact),
+        child: Transform(
+          alignment: Alignment.center,
+          transform: Matrix4.identity()..rotateY(math.sin(angle) * 0.62),
+          child: Transform.scale(
+            scale: scale,
+            child: _banner(dest, width: cardW, height: cardH, compact: compact),
+          ),
         ),
       ),
     );
@@ -342,9 +325,9 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
                   const ColoredBox(color: Color(0xFF111111)),
             ),
             Positioned(
-              right: compact ? 6 : 10,
-              top: compact ? 6 : 10,
-              bottom: compact ? 6 : 10,
+              right: compact ? 6 : 8,
+              top: compact ? 6 : 8,
+              bottom: compact ? 6 : 8,
               child: _EnterRail(
                 dest: dest,
                 compact: compact,
@@ -371,40 +354,18 @@ class _EnterRail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final icons = <(String, String)>[
-      for (final d in EnterCurveAssets.destinations) (d.id, d.mark),
-      for (final e in EnterCurveAssets.extras) (e.$1, e.$3),
-    ];
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        if (!compact)
-          SizedBox(
-            width: 52,
-            child: Wrap(
-              spacing: 4,
-              runSpacing: 4,
-              alignment: WrapAlignment.center,
-              children: [
-                for (final ic in icons)
-                  _GlassChip(
-                    mark: ic.$2,
-                    size: 22,
-                    onTap: () => onOpen(ic.$1),
-                  ),
-              ],
-            ),
-          )
-        else
-          _GlassChip(
-            mark: dest.mark,
-            size: 22,
-            onTap: () => onOpen(dest.id),
-          ),
+        _GlassChip(
+          mark: dest.mark,
+          size: compact ? 20 : 24,
+          onTap: () => onOpen(dest.id),
+        ),
         Container(
           width: 1,
-          height: compact ? 22 : 36,
+          height: compact ? 22 : 28,
           margin: const EdgeInsets.symmetric(horizontal: 6),
           color: const Color(0x66FFFFFF),
         ),

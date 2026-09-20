@@ -24,18 +24,9 @@
   function fillRail(rail, cardGo) {
     if (!rail || rail.getAttribute('data-ready')) return;
     rail.setAttribute('data-ready', '1');
-    var compact = rail.getAttribute('data-compact') === '1';
+    var one = ICONS.filter(function (x) { return x.id === cardGo; })[0] || ICONS[0];
     var html = '';
-    if (compact) {
-      var one = ICONS.filter(function (x) { return x.id === cardGo; })[0] || ICONS[0];
-      html += '<button type="button" class="nwsb-enter-ic" data-go="' + one.id + '"><svg viewBox="0 0 24 24">' + one.svg + '</svg></button>';
-    } else {
-      html += '<span class="nwsb-enter-icons">';
-      ICONS.forEach(function (ic) {
-        html += '<button type="button" class="nwsb-enter-ic" data-go="' + ic.id + '"><svg viewBox="0 0 24 24">' + ic.svg + '</svg></button>';
-      });
-      html += '</span>';
-    }
+    html += '<button type="button" class="nwsb-enter-ic" data-go="' + one.id + '"><svg viewBox="0 0 24 24">' + one.svg + '</svg></button>';
     html += '<span class="nwsb-enter-rule"></span>';
     html += '<span class="nwsb-enter-pill" data-go="' + cardGo + '">Enter<svg viewBox="0 0 12 12"><path d="M2 6H10M7 3L10 6L7 9" stroke-width="1.9" stroke-linecap="square"/></svg></span>';
     rail.innerHTML = html;
