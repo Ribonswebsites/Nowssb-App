@@ -1,10 +1,9 @@
 /// Rotating destination banners — Player, Library, Store, Reader.
 ///
-/// Same language as the Lesmana hero: the stills orbit behind the figure
-/// with perspective and scroll parallax. Each still keeps its own icon in
-/// a white circle (top-right) and Enter in a white pill on the empty right.
-/// The pointing figure is a cutout — no studio box — bottom-right, aiming
-/// at that pill. The promo tablet uses the same ring with the blonde in front.
+/// Two swipeable cards, each the same language as the Lesmana hero: a
+/// smaller centred figure, 16:9 stills orbiting behind, copy above and
+/// below. Card one is the pointing figure; card two is the Egyptian
+/// centre. The promo tablet keeps the blonde in front of the same ring.
 library;
 
 import 'dart:async';
@@ -34,6 +33,7 @@ class EnterCurveDest {
 
 class EnterCurveAssets {
   static const pointer = 'assets/hero-curve/pointer.webp';
+  static const cleopatra = 'assets/hero-curve/cleopatra.webp';
   static const subject = HeroCurveAssets.tabSubject;
 
   static const destinations = <EnterCurveDest>[
@@ -62,7 +62,43 @@ class EnterCurveAssets {
       mark: NwsbMarks.reader,
     ),
   ];
+
+  /// Extra stills so the ring is as full as the hero (7 slots).
+  static const extras = <String>[
+    'assets/hero-curve/stillness.webp',
+    'assets/hero-curve/cosmos.webp',
+    'assets/hero-curve/cities.webp',
+  ];
 }
+
+class _EnterPageSpec {
+  const _EnterPageSpec({
+    required this.subject,
+    required this.kicker,
+    required this.title,
+    required this.sub,
+  });
+
+  final String subject;
+  final String kicker;
+  final String title;
+  final String sub;
+}
+
+const _pages = <_EnterPageSpec>[
+  _EnterPageSpec(
+    subject: EnterCurveAssets.pointer,
+    kicker: 'Enter your path',
+    title: 'Player · Library · Store · Reader',
+    sub: 'One still, one destination — her hand shows the way.',
+  ),
+  _EnterPageSpec(
+    subject: EnterCurveAssets.cleopatra,
+    kicker: 'Sound that holds you',
+    title: 'Frequencies, words, healing',
+    sub: 'The same ring, a different centre. Swipe to step in.',
+  ),
+];
 
 class EnterCurveStage extends StatefulWidget {
   const EnterCurveStage({
@@ -88,12 +124,15 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
   double _drag = 0;
   double _para = 0;
   double _auto = 0;
+  int _page = 0;
   Timer? _tick;
   ScrollPosition? _pos;
+  late final PageController _pager;
 
   @override
   void initState() {
     super.initState();
+    _pager = PageController();
     if (!_flutterTest) {
       _tick = Timer.periodic(const Duration(milliseconds: 32), (_) {
         if (!mounted) return;
@@ -131,6 +170,7 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
   void dispose() {
     _tick?.cancel();
     _pos?.removeListener(_onScroll);
+    _pager.dispose();
     super.dispose();
   }
 
@@ -144,53 +184,156 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
           final h = c.maxHeight > 0 ? c.maxHeight : 220.0;
           final w = c.maxWidth > 0 ? c.maxWidth : 320.0;
           return SizedBox.expand(
-            child: _orbit(w, h, compact: true, pointer: false),
+            child: _orbit(
+              w,
+              h,
+              compact: true,
+              subject: EnterCurveAssets.subject,
+            ),
           );
         },
       );
     }
 
-    const height = 560.0;
-    final visual = ClipRRect(
-      borderRadius: BorderRadius.circular(widget.glass ? 14 : 0),
-      child: SizedBox(
-        height: height,
-        width: double.infinity,
-        child: LayoutBuilder(
-          builder: (context, c) => _orbit(
-            c.maxWidth > 0 ? c.maxWidth : 320.0,
-            height,
-            compact: false,
-            pointer: true,
+    final body = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SizedBox(
+          height: 560,
+          child: PageView(
+            controller: _pager,
+            onPageChanged: (i) => setState(() => _page = i),
+            children: [
+              for (final spec in _pages) _pageBody(spec),
+            ],
           ),
         ),
-      ),
+        const SizedBox(height: 8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            for (var i = 0; i < _pages.length; i++)
+              Container(
+                width: i == _page ? 16 : 6,
+                height: 6,
+                margin: const EdgeInsets.symmetric(horizontal: 3),
+                decoration: BoxDecoration(
+                  color: i == _page
+                      ? Colors.white
+                      : const Color(0x55FFFFFF),
+                  borderRadius: BorderRadius.circular(99),
+                ),
+              ),
+          ],
+        ),
+      ],
     );
 
     if (widget.glass) {
       return GlassWrap(
         padding: const EdgeInsets.fromLTRB(10, 10, 10, 12),
-        child: visual,
+        child: body,
       );
     }
-    return visual;
+    return body;
   }
 
-  /// 2D cylindrical orbit. Absolute list-pixel parallax shoved this
-  /// section (deep on Fashion home) off-screen; para is viewport-relative
-  /// and clamped. Matrix4 perspective is flattened by the glass pane, so
-  /// sin/cos placement is what actually paints the stills behind her.
-  Widget _orbit(double width, double height,
-      {required bool compact, required bool pointer}) {
+  Widget _pageBody(_EnterPageSpec spec) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+          child: Column(
+            children: [
+              const Text(
+                'NowssB.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.3,
+                  height: 1,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                spec.kicker,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Color(0xFFC4B5FD),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.2,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(14),
+            child: LayoutBuilder(
+              builder: (context, c) => _orbit(
+                c.maxWidth > 0 ? c.maxWidth : 320.0,
+                c.maxHeight > 0 ? c.maxHeight : 360.0,
+                compact: false,
+                subject: spec.subject,
+              ),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 2),
+          child: Text(
+            spec.title,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+              height: 1.2,
+              letterSpacing: -0.4,
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+          child: Text(
+            spec.sub,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Color(0xB3FFFFFF),
+              fontSize: 12,
+              height: 1.35,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// 2D cylindrical orbit matching the hero: small 16:9 tiles, centred
+  /// subject. Parallax is viewport-relative so this deep pane stays put.
+  Widget _orbit(
+    double width,
+    double height, {
+    required bool compact,
+    required String subject,
+  }) {
     final rot = _auto + _drag + _para * 0.004;
-    const dests = EnterCurveAssets.destinations;
-    final n = dests.length;
+    final items = <(String, EnterCurveDest?)>[
+      for (final d in EnterCurveAssets.destinations) (d.banner, d),
+      if (!compact) for (final a in EnterCurveAssets.extras) (a, null),
+    ];
+    final n = items.length;
     final step = (math.pi * 2) / n;
-    final cardW = compact ? 168.0 : 210.0;
-    final cardH = compact ? 94.0 : 118.0;
-    final radius = compact ? width * 0.34 : width * 0.42;
-    final originX = compact ? width / 2 : width * 0.40;
-    final originY = compact ? height * 0.42 : height * 0.40;
+    final cardW = compact ? 168.0 : 152.0;
+    final cardH = compact ? 94.0 : 86.0;
+    final radius = compact ? width * 0.34 : width * 0.38;
+    final originX = width / 2;
+    final originY = compact ? height * 0.42 : height * 0.42;
     final indices = List<int>.generate(n, (i) => i)
       ..sort((a, b) =>
           math.cos(rot + a * step).compareTo(math.cos(rot + b * step)));
@@ -198,22 +341,25 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
     return GestureDetector(
       behavior:
           compact ? HitTestBehavior.translucent : HitTestBehavior.opaque,
-      onHorizontalDragUpdate: (d) {
-        setState(() => _drag += d.delta.dx * 0.01);
-      },
+      onHorizontalDragUpdate: compact
+          ? (d) {
+              setState(() => _drag += d.delta.dx * 0.01);
+            }
+          : null,
       child: ColoredBox(
         color: const Color(0xFF050505),
         child: Stack(
           fit: StackFit.expand,
           children: [
             Transform.translate(
-              offset: Offset(0, pointer ? _para : 0),
+              offset: Offset(0, compact ? 0 : _para),
               child: Stack(
                 fit: StackFit.expand,
                 children: [
                   for (final i in indices)
                     _flatCard(
-                      dests[i],
+                      items[i].$1,
+                      items[i].$2,
                       rot + i * step,
                       originX,
                       originY,
@@ -226,36 +372,20 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
             ),
             IgnorePointer(
               child: Transform.translate(
-                offset: Offset(0, pointer ? _para * 0.35 : 0),
-                child: pointer
-                    ? Align(
-                        alignment: const Alignment(1.12, 1.02),
-                        child: FractionallySizedBox(
-                          heightFactor: 0.84,
-                          child: Image.asset(
-                            EnterCurveAssets.pointer,
-                            fit: BoxFit.contain,
-                            alignment: Alignment.bottomRight,
-                            filterQuality: FilterQuality.high,
-                            errorBuilder: (_, __, ___) =>
-                                const SizedBox.shrink(),
-                          ),
-                        ),
-                      )
-                    : Align(
-                        alignment: const Alignment(0.04, 1.0),
-                        child: FractionallySizedBox(
-                          heightFactor: 0.90,
-                          child: Image.asset(
-                            EnterCurveAssets.subject,
-                            fit: BoxFit.contain,
-                            alignment: Alignment.bottomCenter,
-                            filterQuality: FilterQuality.high,
-                            errorBuilder: (_, __, ___) =>
-                                const SizedBox.shrink(),
-                          ),
-                        ),
-                      ),
+                offset: Offset(0, compact ? 0 : _para * 0.35),
+                child: Align(
+                  alignment: const Alignment(0.04, 0.95),
+                  child: FractionallySizedBox(
+                    heightFactor: compact ? 0.88 : 0.50,
+                    child: Image.asset(
+                      subject,
+                      fit: BoxFit.contain,
+                      alignment: Alignment.bottomCenter,
+                      filterQuality: FilterQuality.high,
+                      errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                    ),
+                  ),
+                ),
               ),
             ),
           ],
@@ -265,7 +395,8 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
   }
 
   Widget _flatCard(
-    EnterCurveDest dest,
+    String asset,
+    EnterCurveDest? dest,
     double angle,
     double originX,
     double originY,
@@ -291,9 +422,37 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
           transform: Matrix4.identity()..rotateY(math.sin(angle) * 0.62),
           child: Transform.scale(
             scale: scale,
-            child: _banner(dest, width: cardW, height: cardH),
+            child: dest == null
+                ? _still(asset, cardW, cardH)
+                : _banner(dest, width: cardW, height: cardH),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _still(String asset, double width, double height) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0x66FFFFFF), width: 1.1),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x88000000),
+            blurRadius: 14,
+            offset: Offset(0, 8),
+          ),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Image.asset(
+        asset,
+        fit: BoxFit.cover,
+        filterQuality: FilterQuality.medium,
+        errorBuilder: (_, __, ___) =>
+            const ColoredBox(color: Color(0xFF111111)),
       ),
     );
   }
@@ -305,7 +464,7 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
         width: width,
         height: height,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(10),
           border: Border.all(color: const Color(0x66FFFFFF), width: 1.1),
           boxShadow: const [
             BoxShadow(
@@ -328,15 +487,15 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
                   const ColoredBox(color: Color(0xFF111111)),
             ),
             Positioned(
-              top: 8,
-              right: 8,
+              top: 6,
+              right: 6,
               child: _WhiteChip(
                 mark: dest.mark,
                 onTap: () => _open(dest.id),
               ),
             ),
             Positioned(
-              right: 10,
+              right: 8,
               top: 0,
               bottom: 0,
               child: Center(
@@ -361,8 +520,8 @@ class _WhiteChip extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 26,
-        height: 26,
+        width: 22,
+        height: 22,
         alignment: Alignment.center,
         decoration: const BoxDecoration(
           shape: BoxShape.circle,
@@ -371,7 +530,7 @@ class _WhiteChip extends StatelessWidget {
             BoxShadow(color: Color(0x33000000), blurRadius: 6, offset: Offset(0, 2)),
           ],
         ),
-        child: NwsbIcon(mark, size: 13, color: Colors.black),
+        child: NwsbIcon(mark, size: 11, color: Colors.black),
       ),
     );
   }
@@ -387,7 +546,7 @@ class _WhiteEnter extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.fromLTRB(12, 6, 10, 6),
+        padding: const EdgeInsets.fromLTRB(10, 4, 8, 4),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(999),
@@ -402,13 +561,13 @@ class _WhiteEnter extends StatelessWidget {
               'Enter',
               style: TextStyle(
                 color: Colors.black,
-                fontSize: 11,
+                fontSize: 10,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 0.3,
               ),
             ),
-            SizedBox(width: 4),
-            NwsbIcon(NwsbMarks.enterArrow, size: 10, viewBox: 12, color: Colors.black),
+            SizedBox(width: 3),
+            NwsbIcon(NwsbMarks.enterArrow, size: 9, viewBox: 12, color: Colors.black),
           ],
         ),
       ),

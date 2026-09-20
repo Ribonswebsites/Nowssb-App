@@ -222,7 +222,7 @@ class _HomeFashionState extends State<HomeFashion> {
           ),
         ),
         ('streak', FashStreak(onTap: () => _go(1))),
-        ('tiles', FashTiles(onTile: _go)),
+        ('tiles', FashTiles(onTile: _go, onOpen: _openEnter)),
         ('store', FashStore(onTap: () => _go(3))),
         ('trendwd', FashTrending(onTap: () => _go(2))),
         ('custom', FashCustomize(onTap: () => _push(const WidgetsPage()))),

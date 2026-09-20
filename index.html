@@ -150,7 +150,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=267"></script>
 <link rel="stylesheet" href="app/app.css?v=318">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=814">
+<link rel="stylesheet" href="nowssb-nm.css?v=815">
 <link rel="stylesheet" href="app/css/subscription-tiers.css?v=3">
 <link rel="stylesheet" href="app/widgets.css?v=8">
 <link rel="stylesheet" href="app/steps.css?v=9">
@@ -2103,18 +2103,20 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
     <div class="htg-end" id="fashTileEnd"><span class="htg-end-logo"><img decoding="async" loading="lazy" src="https://media.nowssb.com/migrated-images/af0736f58e0c29f3_30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" alt=""></span><span class="htg-end-rule"></span><span class="htg-end-txt">Begin your healing</span></div>
   </div>
+  <div class="fash-tile-pager">
+  <div class="fash-tile-page">
   <div class="home-grid w100">
-    <div class="home-tile" onclick="openSub('sound-library')">
+    <div class="home-tile" onclick="openConnectIntro()">
       <div class="home-tile-cover" style="background-image:url('https://media.nowssb.com/migrated-images/7fa4063875d35e04_file_000000008bf881faa9949f7b7d9824bf_niqhps.png');"></div>
       <div class="home-tile-cover-scrim"></div>
       <div class="home-tile-photo" style="background-image:url('https://media.nowssb.com/migrated-images/367cb3138df681bb_grok_image_1784119058739_g0ihh7.jpg');background-position:center;"></div>
       <div class="home-tile-photo-scrim"></div>
       <img class="home-tile-articon" loading="lazy" decoding="async" src="https://media.nowssb.com/migrated-images/028b990f41355c39_file_00000000048471f4ab69afc37df973c0_iab33r.png" alt="">
-      <div class="home-tile-icon"><img loading="lazy" decoding="async" src="https://media.nowssb.com/migrated-images/2ab8b4bbd1a045b0_file_0000000039c8720893ebc07bba4d3afd_iq64ts.png" alt=""></div>
+      <div class="home-tile-icon"><img loading="lazy" decoding="async" src="https://media.nowssb.com/migrated-images/8ed93fdc651b43c3_file_00000000b84c7209ab496862cacd6a7f_kagsie.png" alt=""></div>
       <div class="home-tile-rule"></div>
       <div class="home-tile-txt">
-        <div class="home-tile-title">Sound Library</div>
-        <div class="home-tile-sub">Root frequencies</div>
+        <div class="home-tile-title">Connect</div>
+        <div class="home-tile-sub">NowssB community</div>
       </div>
       <div class="home-tile-enter"><span class="home-tile-enter-lbl">Enter</span><span class="home-tile-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></div>
     </div>
@@ -2160,6 +2162,16 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </div>
       <div class="home-tile-enter"><span class="home-tile-enter-lbl">Enter</span><span class="home-tile-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></div>
     </div>
+  </div>
+  </div>
+  <div class="fash-tile-page">
+  <div class="home-grid w100 home-grid-banners">
+    <button type="button" class="home-tile home-tile-banner" onclick="openSub('practice')"><img src="./assets/hero-curve/banner-player.webp" alt="Player"><span class="home-tile-enter"><span class="home-tile-enter-lbl">Enter</span><span class="home-tile-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></span></button>
+    <button type="button" class="home-tile home-tile-banner" onclick="openSub('sound-library')"><img src="./assets/hero-curve/banner-library.webp" alt="Sound Library"><span class="home-tile-enter"><span class="home-tile-enter-lbl">Enter</span><span class="home-tile-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></span></button>
+    <button type="button" class="home-tile home-tile-banner" onclick="openSub('nowssb-store')"><img src="./assets/hero-curve/banner-store.webp" alt="Store"><span class="home-tile-enter"><span class="home-tile-enter-lbl">Enter</span><span class="home-tile-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></span></button>
+    <button type="button" class="home-tile home-tile-banner" onclick="openSub('reader')"><img src="./assets/hero-curve/banner-reader.webp" alt="Reader"><span class="home-tile-enter"><span class="home-tile-enter-lbl">Enter</span><span class="home-tile-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></span></button>
+  </div>
+  </div>
   </div>
   </div>
 
@@ -2232,7 +2244,9 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </span>
   </div>
 
-  <section class="nwsb-curve nwsb-enter-curve glass-wrap" data-nwsb-curve data-nwsb-enter aria-label="NowssB destinations">
+  <div class="nwsb-enter-pager glass-wrap">
+  <section class="nwsb-curve nwsb-enter-curve nwsb-enter-page" data-nwsb-curve data-nwsb-enter aria-label="NowssB destinations">
+    <div class="nwsb-enter-copy-top"><span>NowssB.</span><strong>Enter your path</strong></div>
     <div class="nwsb-curve-stage nwsb-enter-stage">
       <div class="nwsb-curve-ring">
         <button type="button" class="nwsb-curve-card nwsb-enter-card" style="--i:0" data-go="player">
@@ -2251,10 +2265,43 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
           <img src="./assets/hero-curve/banner-reader.webp" alt="NowssB Reader">
           <span class="nwsb-enter-rail"></span>
         </button>
+        <button type="button" class="nwsb-curve-card" style="--i:4"><img src="./assets/hero-curve/stillness.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:5"><img src="./assets/hero-curve/cosmos.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:6"><img src="./assets/hero-curve/cities.webp" alt=""></button>
       </div>
       <img class="nwsb-enter-pointer" src="./assets/hero-curve/pointer.webp" alt="">
     </div>
+    <div class="nwsb-enter-copy-bot"><strong>Player · Library · Store · Reader</strong><span>One still, one destination — her hand shows the way.</span></div>
   </section>
+  <section class="nwsb-curve nwsb-enter-curve nwsb-enter-page" data-nwsb-curve data-nwsb-enter aria-label="NowssB frequencies">
+    <div class="nwsb-enter-copy-top"><span>NowssB.</span><strong>Sound that holds you</strong></div>
+    <div class="nwsb-curve-stage nwsb-enter-stage">
+      <div class="nwsb-curve-ring">
+        <button type="button" class="nwsb-curve-card nwsb-enter-card" style="--i:0" data-go="player">
+          <img src="./assets/hero-curve/banner-player.webp" alt="NowssB Player">
+          <span class="nwsb-enter-rail"></span>
+        </button>
+        <button type="button" class="nwsb-curve-card nwsb-enter-card" style="--i:1" data-go="library">
+          <img src="./assets/hero-curve/banner-library.webp" alt="NowssB Sound Library">
+          <span class="nwsb-enter-rail"></span>
+        </button>
+        <button type="button" class="nwsb-curve-card nwsb-enter-card" style="--i:2" data-go="store">
+          <img src="./assets/hero-curve/banner-store.webp" alt="NowssB Store">
+          <span class="nwsb-enter-rail"></span>
+        </button>
+        <button type="button" class="nwsb-curve-card nwsb-enter-card" style="--i:3" data-go="reader">
+          <img src="./assets/hero-curve/banner-reader.webp" alt="NowssB Reader">
+          <span class="nwsb-enter-rail"></span>
+        </button>
+        <button type="button" class="nwsb-curve-card" style="--i:4"><img src="./assets/hero-curve/stillness.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:5"><img src="./assets/hero-curve/cosmos.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:6"><img src="./assets/hero-curve/cities.webp" alt=""></button>
+      </div>
+      <img class="nwsb-enter-pointer" src="./assets/hero-curve/cleopatra.webp" alt="">
+    </div>
+    <div class="nwsb-enter-copy-bot"><strong>Frequencies, words, healing</strong><span>The same ring, a different centre. Swipe to step in.</span></div>
+  </section>
+  </div>
 
   <!-- AI Prescription Card -->
   <div id="rxCardWrap" style="width:100%;"></div>

@@ -8,6 +8,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../widgets/enter_curve_stage.dart';
 import '../../widgets/nwsb_icon.dart';
 
 import '../../data/content.dart';
@@ -23,37 +24,38 @@ import '../widgets_page.dart';
 
 const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
 
-/// 7 · tiles — index.html:1939. The tip rail, then four tiles two-up.
-class FashTiles extends StatelessWidget {
-  const FashTiles({super.key, this.onTile});
+/// 7 · tiles — index.html:1939. The tip rail, then two swipeable 2×2 cards.
+class FashTiles extends StatefulWidget {
+  const FashTiles({super.key, this.onTile, this.onOpen});
 
-  /// Called with the tile's destination tab index.
+  /// Called with the tile's destination tab index (first card).
   final void Function(int)? onTile;
 
-  /// (title, sub, the round icon's artwork, destination) — the FOUR IN THE
-  /// MARKUP, in the markup's order: index.html:1958, 1970, 1982, 1994.
-  ///
-  /// This list was wrong in three ways at once. It carried "The Store",
-  /// which is not one of these four — `My Progress` is, and it was missing.
-  /// The order was wrong. And the URL on each row was the `.home-tile-cover`
-  /// artwork, which the DEFAULT look does not paint at all: nowssb-nm.css
-  /// :3968 says of these tiles, in as many words, "The 16:9 cover artwork
-  /// these used to carry is gone."
-  ///
-  /// Painting it full-bleed anyway is why each tile had a huge word lying
-  /// across it — that artwork carries its own title, which is the whole
-  /// reason the `image` look hides the DOM text when it uses it.
-  ///
-  /// The picture that IS painted is the small round one: `.home-tile-icon
-  /// img`, "the real feature artwork (from the Everything on NowssB page)
-  /// instead of a line SVG" (:3978).
+  /// Player / Library / Store / Reader on the second card.
+  final void Function(String id)? onOpen;
+
+  @override
+  State<FashTiles> createState() => _FashTilesState();
+}
+
+class _FashTilesState extends State<FashTiles> {
+  final _pager = PageController();
+  int _page = 0;
+
+  @override
+  void dispose() {
+    _pager.dispose();
+    super.dispose();
+  }
+
+  /// First card: Connect replaces Sound Library so the two cards never
+  /// share a button.
   static const _tiles = [
     (
-      'Sound Library',
-      'Root frequencies',
-      'https://res.r2.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/'
-          'v1783157829/file_0000000039c8720893ebc07bba4d3afd_iq64ts.png',
-      2,
+      'Connect',
+      'NowssB community',
+      '',
+      0,
     ),
     (
       'My Progress',
@@ -84,8 +86,6 @@ class FashTiles extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // `.htg-rail` — "Tap to restyle" at one end, "Begin your healing"
-          // at the other.
           Row(
             children: [
               const Icon(Icons.chevron_left,
@@ -93,10 +93,6 @@ class FashTiles extends StatelessWidget {
               const Icon(Icons.chevron_left,
                   size: 15, color: NwsbColors.goldLight),
               const SizedBox(width: 6),
-              // Both ends give way rather than one pushing the other off the
-              // rail: at a narrow width or a large text scale the two lines
-              // together are wider than the pane, and a Spacer between two
-              // rigid Texts simply overflows.
               const Flexible(
                 child: Text(
                   'Tap to restyle',
@@ -119,34 +115,74 @@ class FashTiles extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          // `.home-grid` — two columns, 10px gap, and EVERY TILE 118px TALL.
-          //
-          // nowssb-nm.css:7950 sets `height: 118px` on these, and :8677 sets
-          // `grid-auto-rows: 1fr` so all four match whatever their contents
-          // do. This was `childAspectRatio: 0.86`, which is not a height at
-          // all — it is a shape, so the tiles grew with the phone's width and
-          // stood far taller than they do on the site.
-          //
-          // A ratio is what GridView takes, so the ratio is computed from the
-          // width each cell actually gets rather than guessed.
           LayoutBuilder(
             builder: (context, c) {
               final cell = (c.maxWidth - 10) / 2;
-              return GridView.count(
-                crossAxisCount: 2,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                mainAxisSpacing: 10,
-                crossAxisSpacing: 10,
-                childAspectRatio: cell / _tileHeight,
+              const gridH = _tileHeight * 2 + 10;
+              return Column(
                 children: [
-                  for (final (title, sub, art, dest) in _tiles)
-                    _Tile(
-                      title: title,
-                      sub: sub,
-                      art: art,
-                      onTap: () => onTile?.call(dest),
+                  SizedBox(
+                    height: gridH,
+                    child: PageView(
+                      controller: _pager,
+                      onPageChanged: (i) => setState(() => _page = i),
+                      children: [
+                        GridView.count(
+                          crossAxisCount: 2,
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          mainAxisSpacing: 10,
+                          crossAxisSpacing: 10,
+                          childAspectRatio: cell / _tileHeight,
+                          children: [
+                            for (final (title, sub, art, dest) in _tiles)
+                              _Tile(
+                                title: title,
+                                sub: sub,
+                                art: art,
+                                mark: title == 'Connect'
+                                    ? NwsbMarks.connectPair
+                                    : null,
+                                onTap: () => widget.onTile?.call(dest),
+                              ),
+                          ],
+                        ),
+                        GridView.count(
+                          crossAxisCount: 2,
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          mainAxisSpacing: 10,
+                          crossAxisSpacing: 10,
+                          childAspectRatio: cell / _tileHeight,
+                          children: [
+                            for (final d in EnterCurveAssets.destinations)
+                              _BannerTile(
+                                dest: d,
+                                onTap: () => widget.onOpen?.call(d.id),
+                              ),
+                          ],
+                        ),
+                      ],
                     ),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      for (var i = 0; i < 2; i++)
+                        Container(
+                          width: i == _page ? 16 : 6,
+                          height: 6,
+                          margin: const EdgeInsets.symmetric(horizontal: 3),
+                          decoration: BoxDecoration(
+                            color: i == _page
+                                ? Colors.white
+                                : const Color(0x55FFFFFF),
+                            borderRadius: BorderRadius.circular(99),
+                          ),
+                        ),
+                    ],
+                  ),
                 ],
               );
             },
@@ -180,10 +216,12 @@ class _Tile extends StatelessWidget {
     required this.title,
     required this.sub,
     required this.art,
+    this.mark,
     this.onTap,
   });
 
   final String title, sub, art;
+  final String? mark;
   final VoidCallback? onTap;
 
   @override
@@ -228,11 +266,15 @@ class _Tile extends StatelessWidget {
                       shape: BoxShape.circle,
                       border: Border.all(color: const Color(0x3DE8D5A3)),
                     ),
-                    child: NwsbImage(
-                      url: art,
-                      fit: BoxFit.cover,
-                      fallback: const ColoredBox(color: Color(0x1AE8D5A3)),
-                    ),
+                    child: mark != null
+                        ? Center(
+                            child: NwsbIcon(mark!, size: 16, color: const Color(0xFFE8D5A3)),
+                          )
+                        : NwsbImage(
+                            url: art,
+                            fit: BoxFit.cover,
+                            fallback: const ColoredBox(color: Color(0x1AE8D5A3)),
+                          ),
                   ),
                   const SizedBox(width: 8),
                   // `.home-tile-rule` — 1px, `align-self: stretch`.
@@ -273,6 +315,56 @@ class _Tile extends StatelessWidget {
             ),
             // `.home-tile-enter` — absolute, bottom 8 right 8.
             const Positioned(bottom: 8, right: 8, child: _TileEnter()),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Second card: the four destination banners as tile backgrounds, Enter
+/// sitting on the empty right of the still's own vertical line.
+class _BannerTile extends StatelessWidget {
+  const _BannerTile({required this.dest, this.onTap});
+
+  final EnterCurveDest dest;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: const Color(0x14FFFFFF)),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x6B000000),
+              offset: Offset(0, 10),
+              blurRadius: 26,
+            ),
+          ],
+        ),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.asset(
+              dest.banner,
+              fit: BoxFit.cover,
+              alignment: Alignment.centerLeft,
+              filterQuality: FilterQuality.medium,
+              errorBuilder: (_, __, ___) =>
+                  const ColoredBox(color: Color(0xFF111111)),
+            ),
+            const Positioned(
+              right: 8,
+              top: 0,
+              bottom: 0,
+              child: Center(child: _TileEnter()),
+            ),
           ],
         ),
       ),

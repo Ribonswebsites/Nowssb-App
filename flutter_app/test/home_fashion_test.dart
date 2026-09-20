@@ -191,7 +191,7 @@ void main() {
             find
                 .descendant(
                   of: find.byType(GridView),
-                  matching: find.text('Sound Library'),
+                  matching: find.text('Connect'),
                 )
                 .evaluate()
                 .isEmpty;
@@ -205,7 +205,7 @@ void main() {
     // are meant to say Sound Library.
     final grid = find.byType(GridView);
     for (final t in [
-      'Sound Library',
+      'Connect',
       'My Progress',
       'Word Science',
       'My Profile',
@@ -220,7 +220,7 @@ void main() {
     // `height: 118px` — nowssb-nm.css:7950. They were sized by a ratio, so
     // they grew with the phone and stood far taller than the site's.
     final tile = tester.getRect(find.ancestor(
-      of: find.text('Sound Library'),
+      of: find.text('Connect'),
       matching: find.byType(GridView),
     ));
     expect(tile.height, closeTo(118 * 2 + 10, 1),

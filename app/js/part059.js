@@ -23,7 +23,7 @@
   'use strict';
 
   var HOME_TILES = [
-    { name: 'Sound Library', sub: 'Root frequencies', tip: 'Root frequencies to practice with',
+    { name: 'Connect', sub: 'NowssB community', tip: 'NowssB community and live rooms',
       icon: 'https://media.nowssb.com/migrated-images/2ab8b4bbd1a045b0_file_0000000039c8720893ebc07bba4d3afd_iq64ts.png',
       cover: 'https://media.nowssb.com/migrated-images/400ebe1682b0732c_file_000000008bf881faa9949f7b7d9824bf_niqhps.png',
       photo: 'https://media.nowssb.com/migrated-images/ba2d2a83c5403a04_grok_image_1784119058739_g0ihh7.jpg', photoPos: 'center',

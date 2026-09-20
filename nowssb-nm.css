@@ -16855,28 +16855,102 @@ body.fashplus :is(#home, .stw-prev-stage) .fp-card .fp-enter .tp-enter-go {
 
 /* Destination banners above AI Prescription + inside the promo tablet. */
 .nwsb-enter-curve .nwsb-enter-stage {
-  height: 560px;
+  height: 420px;
   background: #050505;
 }
-.nwsb-enter-curve .nwsb-enter-card {
-  width: 220px;
-  height: 124px;
-  margin: -62px 0 0 -110px;
-  top: 36%;
-  transform: rotateY(calc(var(--i) * 90deg)) translateZ(200px);
+.nwsb-enter-curve .nwsb-enter-card,
+.nwsb-enter-curve .nwsb-curve-card {
+  width: 152px;
+  height: 86px;
+  margin: -43px 0 0 -76px;
+  top: 42%;
+  transform: rotateY(calc(var(--i) * 51.428deg)) translateZ(200px);
 }
 .nwsb-enter-pointer {
   position: absolute;
-  right: -8%;
+  left: 50%;
+  right: auto;
   bottom: 0;
-  height: 88%;
+  height: 50%;
   width: auto;
-  max-width: none;
+  max-width: 58%;
   z-index: 6;
   pointer-events: none;
   object-fit: contain;
-  object-position: bottom right;
+  object-position: bottom center;
+  transform: translateX(-46%);
   filter: drop-shadow(0 16px 24px rgba(0,0,0,.5));
+}
+.nwsb-enter-copy-top,
+.nwsb-enter-copy-bot {
+  text-align: center;
+  padding: 10px 16px 8px;
+}
+.nwsb-enter-copy-top span {
+  display: block;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -.3px;
+}
+.nwsb-enter-copy-top strong {
+  display: block;
+  margin-top: 6px;
+  color: #c4b5fd;
+  font-size: 14px;
+  font-weight: 800;
+}
+.nwsb-enter-copy-bot strong {
+  display: block;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -.4px;
+}
+.nwsb-enter-copy-bot span {
+  display: block;
+  margin-top: 4px;
+  color: rgba(255,255,255,.7);
+  font-size: 12px;
+}
+.nwsb-enter-pager,
+.fash-tile-pager {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.nwsb-enter-pager::-webkit-scrollbar,
+.fash-tile-pager::-webkit-scrollbar { display: none; }
+.nwsb-enter-page,
+.fash-tile-page {
+  flex: 0 0 100%;
+  scroll-snap-align: start;
+  min-width: 100%;
+}
+.home-tile-banner {
+  position: relative;
+  overflow: hidden;
+  min-height: 118px;
+  padding: 0;
+  border: none;
+  background: #000;
+}
+.home-tile-banner img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: left center;
+  pointer-events: none;
+}
+.home-tile-banner .home-tile-enter {
+  right: 8px;
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
 }
 .nwsb-enter-rail {
   position: absolute;
