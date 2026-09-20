@@ -27,7 +27,6 @@
     var one = ICONS.filter(function (x) { return x.id === cardGo; })[0] || ICONS[0];
     var html = '';
     html += '<button type="button" class="nwsb-enter-ic" data-go="' + one.id + '"><svg viewBox="0 0 24 24">' + one.svg + '</svg></button>';
-    html += '<span class="nwsb-enter-rule"></span>';
     html += '<span class="nwsb-enter-pill" data-go="' + cardGo + '">Enter<svg viewBox="0 0 12 12"><path d="M2 6H10M7 3L10 6L7 9" stroke-width="1.9" stroke-linecap="square"/></svg></span>';
     rail.innerHTML = html;
     rail.addEventListener('click', function (e) {

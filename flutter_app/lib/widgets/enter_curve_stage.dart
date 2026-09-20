@@ -1,15 +1,14 @@
 /// Rotating destination banners — Player, Library, Store, Reader.
 ///
-/// Same language as the Lesmana hero: the stills orbit behind the figure.
-/// Each still keeps its empty right side for one destination icon, a rule
-/// and an Enter pill. The pointing figure sits in the bottom-right of the
-/// full stage and aims at that pill. The promo tablet uses the same ring
-/// with the blonde in front.
+/// Same language as the Lesmana hero: the stills orbit behind the figure
+/// with perspective and scroll parallax. Each still keeps its own icon in
+/// a white circle (top-right) and Enter in a white pill on the empty right.
+/// The pointing figure is a cutout — no studio box — bottom-right, aiming
+/// at that pill. The promo tablet uses the same ring with the blonde in front.
 library;
 
 import 'dart:async';
 import 'dart:math' as math;
-import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
@@ -134,14 +133,7 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
         builder: (context, c) {
           final h = c.maxHeight > 0 ? c.maxHeight : 220.0;
           final w = c.maxWidth > 0 ? c.maxWidth : 320.0;
-          return SizedBox.expand(
-            child: _orbitStage(
-              width: w,
-              height: h,
-              compact: true,
-              pointer: false,
-            ),
-          );
+          return SizedBox.expand(child: _embedStage(w, h));
         },
       );
     }
@@ -152,14 +144,7 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
       child: SizedBox(
         height: height,
         width: double.infinity,
-        child: LayoutBuilder(
-          builder: (context, c) => _orbitStage(
-            width: c.maxWidth > 0 ? c.maxWidth : 320.0,
-            height: height,
-            compact: false,
-            pointer: true,
-          ),
-        ),
+        child: _fullStage(height),
       ),
     );
 
@@ -172,105 +157,153 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
     return visual;
   }
 
-  /// 2D cylindrical orbit — same trick as the hero tablet. Matrix4
-  /// perspective is flattened by the glass save-layer, so sin/cos
-  /// placement is what actually paints the stills behind her.
-  Widget _orbitStage({
-    required double width,
-    required double height,
-    required bool compact,
-    required bool pointer,
-  }) {
+  /// 2D orbit inside the tablet — Matrix4 is flattened by the frame.
+  Widget _embedStage(double width, double height) {
     final rot = _auto + _drag + _scroll * 0.0016;
     const dests = EnterCurveAssets.destinations;
     final n = dests.length;
     final step = (math.pi * 2) / n;
-    final cardW = compact ? 168.0 : 220.0;
-    final cardH = compact ? 94.0 : 124.0;
-    final radius = compact ? width * 0.34 : width * 0.40;
-    final originX = compact ? width / 2 : width * 0.42;
-    final originY = compact ? height * 0.42 : height * 0.36;
+    final radius = width * 0.34;
+    const cardW = 168.0;
+    const cardH = 94.0;
     final indices = List<int>.generate(n, (i) => i)
       ..sort((a, b) =>
           math.cos(rot + a * step).compareTo(math.cos(rot + b * step)));
 
     return GestureDetector(
-      behavior: compact
-          ? HitTestBehavior.translucent
-          : HitTestBehavior.opaque,
+      behavior: HitTestBehavior.translucent,
       onHorizontalDragUpdate: (d) {
         setState(() => _drag += d.delta.dx * 0.01);
       },
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          for (final i in indices)
+            _flatCard(
+              dests[i],
+              rot + i * step,
+              width / 2,
+              height * 0.42,
+              radius,
+              cardW,
+              cardH,
+            ),
+          IgnorePointer(
+            child: Align(
+              alignment: const Alignment(0.04, 1.0),
+              child: FractionallySizedBox(
+                heightFactor: 0.90,
+                child: Image.asset(
+                  EnterCurveAssets.subject,
+                  fit: BoxFit.contain,
+                  alignment: Alignment.bottomCenter,
+                  filterQuality: FilterQuality.high,
+                  errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Perspective ring + scroll parallax, matching the hero curve.
+  Widget _fullStage(double height) {
+    final rot = _auto + _drag + _scroll * 0.0016;
+    const dests = EnterCurveAssets.destinations;
+    final n = dests.length;
+    final step = (math.pi * 2) / n;
+    final radius = height * 0.38;
+    final indices = List<int>.generate(n, (i) => i)
+      ..sort((a, b) =>
+          math.cos(rot + a * step).compareTo(math.cos(rot + b * step)));
+
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onHorizontalDragUpdate: (d) {
+        setState(() => _drag += d.delta.dx * 0.008);
+      },
       child: ColoredBox(
         color: const Color(0xFF050505),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            for (final i in indices)
-              _orbitCard(
-                dests[i],
-                rot + i * step,
-                originX,
-                originY,
-                radius,
-                cardW,
-                cardH,
-                compact: compact,
+        child: ClipRect(
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Transform.translate(
+                offset: Offset(0, _scroll * -0.18),
+                child: Transform(
+                  alignment: Alignment.center,
+                  transform: Matrix4.identity()..setEntry(3, 2, 0.00115),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      for (final i in indices)
+                        _spinCard(dests[i], rot + i * step, radius),
+                    ],
+                  ),
+                ),
               ),
-            IgnorePointer(
-              child: pointer
-                  ? Align(
-                      alignment: const Alignment(1.08, 1.06),
-                      child: FractionallySizedBox(
-                        heightFactor: 0.86,
-                        widthFactor: 0.56,
-                        child: Image.asset(
-                          EnterCurveAssets.pointer,
-                          fit: BoxFit.contain,
-                          alignment: Alignment.bottomRight,
-                          filterQuality: FilterQuality.high,
-                          errorBuilder: (_, __, ___) =>
-                              const SizedBox.shrink(),
-                        ),
-                      ),
-                    )
-                  : Align(
-                      alignment: const Alignment(0.04, 1.0),
-                      child: FractionallySizedBox(
-                        heightFactor: 0.90,
-                        child: Image.asset(
-                          EnterCurveAssets.subject,
-                          fit: BoxFit.contain,
-                          alignment: Alignment.bottomCenter,
-                          filterQuality: FilterQuality.high,
-                          errorBuilder: (_, __, ___) =>
-                              const SizedBox.shrink(),
-                        ),
+              IgnorePointer(
+                child: Transform.translate(
+                  offset: Offset(0, _scroll * -0.06),
+                  child: Align(
+                    alignment: const Alignment(1.12, 1.04),
+                    child: FractionallySizedBox(
+                      heightFactor: 0.88,
+                      child: Image.asset(
+                        EnterCurveAssets.pointer,
+                        fit: BoxFit.contain,
+                        alignment: Alignment.bottomRight,
+                        filterQuality: FilterQuality.high,
+                        errorBuilder: (_, __, ___) => const SizedBox.shrink(),
                       ),
                     ),
-            ),
-          ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _orbitCard(
+  Widget _spinCard(EnterCurveDest dest, double angle, double radius) {
+    final depth = math.cos(angle);
+    if (depth < -0.22) return const SizedBox.shrink();
+    final scale = 0.70 + 0.30 * ((depth + 1) / 2);
+    final opacity = 0.38 + 0.62 * ((depth + 0.22) / 1.22).clamp(0.0, 1.0);
+    return Transform(
+      alignment: Alignment.center,
+      transform: Matrix4.identity()
+        ..rotateY(angle)
+        ..translateByDouble(0.0, -8.0, radius, 1.0),
+      child: Opacity(
+        opacity: opacity,
+        child: Transform.scale(
+          scale: scale,
+          child: _banner(dest, width: 200, height: 112),
+        ),
+      ),
+    );
+  }
+
+  Widget _flatCard(
     EnterCurveDest dest,
     double angle,
     double originX,
     double originY,
     double radius,
     double cardW,
-    double cardH, {
-    required bool compact,
-  }) {
+    double cardH,
+  ) {
     final depth = math.cos(angle);
     if (depth < -0.18) return const SizedBox.shrink();
     final scale = 0.58 + 0.42 * ((depth + 1) / 2);
     final opacity = 0.40 + 0.60 * ((depth + 0.18) / 1.18).clamp(0.0, 1.0);
     final x = originX + math.sin(angle) * radius - cardW / 2;
-    final y = originY - cardH / 2 + (1 - depth) * (compact ? 8 : 16);
+    final y = originY - cardH / 2 + (1 - depth) * 8;
     return Positioned(
       left: x,
       top: y,
@@ -283,19 +316,14 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
           transform: Matrix4.identity()..rotateY(math.sin(angle) * 0.62),
           child: Transform.scale(
             scale: scale,
-            child: _banner(dest, width: cardW, height: cardH, compact: compact),
+            child: _banner(dest, width: cardW, height: cardH),
           ),
         ),
       ),
     );
   }
 
-  Widget _banner(
-    EnterCurveDest dest, {
-    required double width,
-    required double height,
-    required bool compact,
-  }) {
+  Widget _banner(EnterCurveDest dest, {required double width, required double height}) {
     return GestureDetector(
       onTap: () => _open(dest.id),
       child: Container(
@@ -325,13 +353,19 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
                   const ColoredBox(color: Color(0xFF111111)),
             ),
             Positioned(
-              right: compact ? 6 : 8,
-              top: compact ? 6 : 8,
-              bottom: compact ? 6 : 8,
-              child: _EnterRail(
-                dest: dest,
-                compact: compact,
-                onOpen: _open,
+              top: 8,
+              right: 8,
+              child: _WhiteChip(
+                mark: dest.mark,
+                onTap: () => _open(dest.id),
+              ),
+            ),
+            Positioned(
+              right: 10,
+              top: 0,
+              bottom: 0,
+              child: Center(
+                child: _WhiteEnter(onTap: () => _open(dest.id)),
               ),
             ),
           ],
@@ -341,77 +375,35 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
   }
 }
 
-class _EnterRail extends StatelessWidget {
-  const _EnterRail({
-    required this.dest,
-    required this.compact,
-    required this.onOpen,
-  });
-
-  final EnterCurveDest dest;
-  final bool compact;
-  final void Function(String id) onOpen;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        _GlassChip(
-          mark: dest.mark,
-          size: compact ? 20 : 24,
-          onTap: () => onOpen(dest.id),
-        ),
-        Container(
-          width: 1,
-          height: compact ? 22 : 28,
-          margin: const EdgeInsets.symmetric(horizontal: 6),
-          color: const Color(0x66FFFFFF),
-        ),
-        _EnterPill(onTap: () => onOpen(dest.id)),
-      ],
-    );
-  }
-}
-
-class _GlassChip extends StatelessWidget {
-  const _GlassChip({
-    required this.mark,
-    required this.size,
-    required this.onTap,
-  });
+class _WhiteChip extends StatelessWidget {
+  const _WhiteChip({required this.mark, required this.onTap});
 
   final String mark;
-  final double size;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: ClipOval(
-        child: BackdropFilter(
-          filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-          child: Container(
-            width: size,
-            height: size,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: const Color(0x28FFFFFF),
-              border: Border.all(color: const Color(0x66FFFFFF)),
-            ),
-            child: NwsbIcon(mark, size: size * 0.52),
-          ),
+      child: Container(
+        width: 26,
+        height: 26,
+        alignment: Alignment.center,
+        decoration: const BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(color: Color(0x33000000), blurRadius: 6, offset: Offset(0, 2)),
+          ],
         ),
+        child: NwsbIcon(mark, size: 13, color: Colors.black),
       ),
     );
   }
 }
 
-class _EnterPill extends StatelessWidget {
-  const _EnterPill({required this.onTap});
+class _WhiteEnter extends StatelessWidget {
+  const _WhiteEnter({required this.onTap});
 
   final VoidCallback onTap;
 
@@ -419,34 +411,30 @@ class _EnterPill extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(999),
-        child: BackdropFilter(
-          filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(10, 5, 8, 5),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(999),
-              color: const Color(0x28FFFFFF),
-              border: Border.all(color: const Color(0x77FFFFFF)),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(12, 6, 10, 6),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(999),
+          boxShadow: const [
+            BoxShadow(color: Color(0x33000000), blurRadius: 8, offset: Offset(0, 2)),
+          ],
+        ),
+        child: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Enter',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.3,
+              ),
             ),
-            child: const Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Enter',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.3,
-                  ),
-                ),
-                SizedBox(width: 4),
-                NwsbIcon(NwsbMarks.enterArrow, size: 10, viewBox: 12),
-              ],
-            ),
-          ),
+            SizedBox(width: 4),
+            NwsbIcon(NwsbMarks.enterArrow, size: 10, viewBox: 12, color: Colors.black),
+          ],
         ),
       ),
     );

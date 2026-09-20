@@ -16836,11 +16836,11 @@ body.fashplus :is(#home, .stw-prev-stage) .fp-card .fp-enter .tp-enter-go {
 }
 .nwsb-enter-pointer {
   position: absolute;
-  right: -6%;
+  right: -8%;
   bottom: 0;
-  height: 86%;
+  height: 88%;
   width: auto;
-  max-width: 56%;
+  max-width: none;
   z-index: 6;
   pointer-events: none;
   object-fit: contain;
@@ -16849,65 +16849,61 @@ body.fashplus :is(#home, .stw-prev-stage) .fp-card .fp-enter .tp-enter-go {
 }
 .nwsb-enter-rail {
   position: absolute;
-  right: 8px;
-  top: 8px;
-  bottom: 8px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  inset: 0;
   z-index: 2;
-  pointer-events: auto;
+  pointer-events: none;
 }
 .nwsb-enter-icons { display: none; }
 .nwsb-enter-ic {
-  width: 24px;
-  height: 24px;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 26px;
+  height: 26px;
   border-radius: 999px;
-  border: 1px solid rgba(255,255,255,.4);
-  background: rgba(255,255,255,.16);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  border: none;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,.2);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
   cursor: pointer;
-  flex-shrink: 0;
+  pointer-events: auto;
 }
 .nwsb-enter-ic svg {
-  width: 12px;
-  height: 12px;
-  stroke: #fff;
+  width: 13px;
+  height: 13px;
+  stroke: #111;
   fill: none;
   stroke-width: 1.7;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-.nwsb-enter-rule {
-  width: 1px;
-  height: 28px;
-  background: rgba(255,255,255,.4);
-  flex-shrink: 0;
-}
+.nwsb-enter-rule { display: none; }
 .nwsb-enter-pill {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 5px 8px 5px 10px;
+  padding: 6px 10px 6px 12px;
   border-radius: 999px;
-  border: 1px solid rgba(255,255,255,.47);
-  background: rgba(255,255,255,.16);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  color: #fff;
+  border: none;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,.2);
+  color: #111;
   font-family: 'DM Sans', sans-serif;
   font-size: 11px;
   font-weight: 800;
   letter-spacing: .3px;
   cursor: pointer;
   white-space: nowrap;
+  pointer-events: auto;
 }
-.nwsb-enter-pill svg { width: 10px; height: 10px; stroke: #fff; fill: none; }
+.nwsb-enter-pill svg { width: 10px; height: 10px; stroke: #111; fill: none; }
 .nwsb-enter-embed .nwsb-enter-card {
   width: 168px;
   height: 94px;
