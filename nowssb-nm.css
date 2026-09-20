@@ -12237,8 +12237,27 @@ body.fpoff-routines :is(#home, .stw-prev-stage) .rt-vid-banner { display: none !
   transform-style: preserve-3d;
 }
 .footer-carousel-track {
+  position: relative;
   overflow: hidden;
   transform-style: preserve-3d;
+}
+.footer-carousel-track::before,
+.footer-carousel-track::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 18%;
+  z-index: 30;
+  pointer-events: none;
+}
+.footer-carousel-track::before {
+  left: 0;
+  background: linear-gradient(to right, #000 0%, rgba(0,0,0,.82) 28%, transparent 100%);
+}
+.footer-carousel-track::after {
+  right: 0;
+  background: linear-gradient(to left, #000 0%, rgba(0,0,0,.82) 28%, transparent 100%);
 }
 .fci {
   width: var(--fci-w); height: var(--fci-h);

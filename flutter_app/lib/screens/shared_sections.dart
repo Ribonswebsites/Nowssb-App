@@ -1557,7 +1557,7 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
     final tz = distance == 0
         ? 200.0
         : distance == 1
-            ? -50.0
+            ? 100.0
             : distance == 2
                 ? -155.0
                 : distance == 3
@@ -1575,7 +1575,7 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
     final scale = distance == 0
         ? 1.0
         : distance == 1
-            ? 0.78
+            ? 1.07
             : distance == 2
                 ? 0.55
                 : distance == 3
@@ -1584,7 +1584,7 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
     final opacity = distance == 0
         ? 1.0
         : distance == 1
-            ? 0.68
+            ? 0.82
             : distance == 2
                 ? 0.36
                 : distance == 3
@@ -1758,6 +1758,26 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
                             for (var i = 0; i < _shots.length; i++)
                               _footerCard(i),
                           ],
+                        ),
+                      ),
+                      const Positioned.fill(
+                        child: IgnorePointer(
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                                colors: [
+                                  Color(0xFF000000),
+                                  Color(0xD1000000),
+                                  Color(0x00000000),
+                                  Color(0xD1000000),
+                                  Color(0xFF000000),
+                                ],
+                                stops: [0.0, 0.08, 0.18, 0.92, 1.0],
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                       IgnorePointer(

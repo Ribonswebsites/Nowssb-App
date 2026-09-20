@@ -2055,7 +2055,7 @@ function _nwsbSetupFooterCarousel(carouselId, bgImgId) {
   function cfg(s) {
     var a = Math.abs(s), d = s < 0 ? -1 : 1;
     if (a===0) return {tx:0,      tz:200,  ry:0,     sc:1.00, op:1.00, zi:20};
-    if (a===1) return {tx:d*172,  tz:-50,  ry:d*-35, sc:0.78, op:0.68, zi:15};
+    if (a===1) return {tx:d*172,  tz:100,  ry:d*-35, sc:1.07, op:0.82, zi:15};
     if (a===2) return {tx:d*292,  tz:-155, ry:d*-42, sc:0.55, op:0.36, zi:10};
     if (a===3) return {tx:d*362,  tz:-285, ry:d*-48, sc:0.34, op:0.12, zi:5};
     return           {tx:d*520,  tz:-420, ry:d*-25, sc:0.50, op:0.00, zi:0};
@@ -2092,7 +2092,7 @@ function _nwsbSetupFooterCarousel(carouselId, bgImgId) {
 
     items.forEach(function(el) {
       el.style.transition = 'none';
-      el.style.transform  = 'translateX(0px) translateZ(-600px) rotateY(0deg) scale(0.1)';
+      el.style.transform  = 'translateX(0px) translateZ(-600px) rotateY(0deg) scale(0.5)';
       el.style.opacity    = '0';
     });
 
