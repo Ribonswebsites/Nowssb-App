@@ -39,9 +39,9 @@
   }
 
   function bind(root) {
-    var ring = root.querySelector('.nwsb-curve-ring');
-    if (!ring) return;
-    var n = root.querySelectorAll('.nwsb-curve-card').length || 7;
+    var rings = root.querySelectorAll('.nwsb-curve-ring');
+    if (!rings.length) return;
+    var n = rings[0].querySelectorAll('.nwsb-curve-card').length || 7;
     var STEP = 360 / n;
     var rot = 0;
     var dragging = false;
@@ -54,7 +54,10 @@
     });
 
     function apply() {
-      ring.style.setProperty('--rot', rot + 'deg');
+      root.style.setProperty('--rot', rot + 'deg');
+      Array.prototype.forEach.call(rings, function (ring) {
+        ring.style.setProperty('--rot', rot + 'deg');
+      });
       var y = root.getBoundingClientRect().top;
       var para = Math.max(-90, Math.min(90, (180 - y) * 0.12));
       root.style.setProperty('--para', para + 'px');

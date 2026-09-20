@@ -232,7 +232,7 @@ class _HomeFashionState extends State<HomeFashion> {
         ),
         (
           'enterCurve',
-          EnterCurveStage(glass: true, onOpen: _openEnter),
+          EnterCurveStage(onOpen: _openEnter),
         ),
         ('rx', FashPrescription(onTap: () => _go(1), onWord: _openWord)),
         ('trendvid', FashShopNow(onTap: () => _go(3))),
@@ -373,7 +373,7 @@ class _HomeFashionState extends State<HomeFashion> {
                   // Modest look-ahead so off-screen video sections stay
                   // lazy-mounted instead of opening every decoder at once.
                   cacheExtent: 480,
-                  padding: const EdgeInsets.only(bottom: 108),
+                  padding: const EdgeInsets.only(bottom: 132),
                   itemCount: shown.length + 1,
                   itemBuilder: (context, i) {
                     if (i == 0) {

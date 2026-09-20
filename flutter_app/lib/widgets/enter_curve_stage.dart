@@ -124,7 +124,6 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
   double _drag = 0;
   double _para = 0;
   double _auto = 0;
-  int _page = 0;
   Timer? _tick;
   ScrollPosition? _pos;
   late final PageController _pager;
@@ -132,7 +131,7 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
   @override
   void initState() {
     super.initState();
-    _pager = PageController();
+    _pager = PageController(viewportFraction: 0.90);
     if (!_flutterTest) {
       _tick = Timer.periodic(const Duration(milliseconds: 32), (_) {
         if (!mounted) return;
@@ -195,46 +194,23 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
       );
     }
 
-    final body = Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        SizedBox(
-          height: 560,
-          child: PageView(
-            controller: _pager,
-            onPageChanged: (i) => setState(() => _page = i),
-            children: [
-              for (final spec in _pages) _pageBody(spec),
-            ],
-          ),
-        ),
-        const SizedBox(height: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            for (var i = 0; i < _pages.length; i++)
-              Container(
-                width: i == _page ? 16 : 6,
-                height: 6,
-                margin: const EdgeInsets.symmetric(horizontal: 3),
-                decoration: BoxDecoration(
-                  color: i == _page
-                      ? Colors.white
-                      : const Color(0x55FFFFFF),
-                  borderRadius: BorderRadius.circular(99),
-                ),
+    final body = SizedBox(
+      height: 520,
+      child: PageView(
+        controller: _pager,
+        padEnds: true,
+        children: [
+          for (final spec in _pages)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5),
+              child: GlassWrap(
+                padding: const EdgeInsets.fromLTRB(10, 10, 10, 16),
+                child: _pageBody(spec),
               ),
-          ],
-        ),
-      ],
+            ),
+        ],
+      ),
     );
-
-    if (widget.glass) {
-      return GlassWrap(
-        padding: const EdgeInsets.fromLTRB(10, 10, 10, 12),
-        child: body,
-      );
-    }
     return body;
   }
 
@@ -275,11 +251,9 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(14),
             child: LayoutBuilder(
-              builder: (context, c) => _orbit(
-                c.maxWidth > 0 ? c.maxWidth : 320.0,
+              builder: (context, c) => _heroStage(
                 c.maxHeight > 0 ? c.maxHeight : 360.0,
-                compact: false,
-                subject: spec.subject,
+                spec.subject,
               ),
             ),
           ),
@@ -311,6 +285,122 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
           ),
         ),
       ],
+    );
+  }
+
+  /// Two-row 3D cylinder, same language as the hero header: perspective,
+  /// rotateY, translateZ. The figure sits in front, a little larger.
+  Widget _heroStage(double height, String subject) {
+    final rot = _auto + _drag + _para * 0.004;
+    final top = <(String, EnterCurveDest?)>[
+      for (final d in EnterCurveAssets.destinations) (d.banner, d),
+      for (final a in EnterCurveAssets.extras) (a, null),
+    ];
+    final bot = <(String, EnterCurveDest?)>[
+      for (final a in HeroCurveAssets.cards) (a, null),
+    ];
+    final nTop = top.length;
+    final nBot = bot.length;
+    final stepTop = (math.pi * 2) / nTop;
+    final stepBot = (math.pi * 2) / nBot;
+    final radius = height * 0.31;
+    final topIdx = List<int>.generate(nTop, (i) => i)
+      ..sort((a, b) => math.cos(rot + a * stepTop)
+          .compareTo(math.cos(rot + b * stepTop)));
+    final botIdx = List<int>.generate(nBot, (i) => i)
+      ..sort((a, b) => math.cos(rot + a * stepBot + stepBot / 2)
+          .compareTo(math.cos(rot + b * stepBot + stepBot / 2)));
+
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onHorizontalDragUpdate: (d) {
+        setState(() => _drag += d.delta.dx * 0.008);
+      },
+      child: ColoredBox(
+        color: const Color(0xFF050505),
+        child: ClipRect(
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Transform.translate(
+                offset: Offset(0, _para),
+                child: Transform(
+                  alignment: Alignment.center,
+                  transform: Matrix4.identity()..setEntry(3, 2, 0.00115),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      for (final i in topIdx)
+                        _spinCard(
+                          top[i].$1,
+                          top[i].$2,
+                          rot + i * stepTop,
+                          radius,
+                          y: -78,
+                        ),
+                      for (final i in botIdx)
+                        _spinCard(
+                          bot[i].$1,
+                          bot[i].$2,
+                          rot + i * stepBot + stepBot / 2,
+                          radius * 0.94,
+                          y: 82,
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+              IgnorePointer(
+                child: Transform.translate(
+                  offset: Offset(0, _para * 0.35),
+                  child: Align(
+                    alignment: const Alignment(0.04, 0.96),
+                    child: FractionallySizedBox(
+                      heightFactor: 0.64,
+                      child: Image.asset(
+                        subject,
+                        fit: BoxFit.contain,
+                        alignment: Alignment.bottomCenter,
+                        filterQuality: FilterQuality.high,
+                        errorBuilder: (_, __, ___) =>
+                            const SizedBox.shrink(),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _spinCard(
+    String asset,
+    EnterCurveDest? dest,
+    double angle,
+    double radius, {
+    required double y,
+  }) {
+    final depth = math.cos(angle);
+    if (depth < -0.22) return const SizedBox.shrink();
+    final scale = 0.72 + 0.28 * ((depth + 1) / 2);
+    final opacity = 0.38 + 0.62 * ((depth + 0.22) / 1.22).clamp(0.0, 1.0);
+    return Transform(
+      alignment: Alignment.center,
+      transform: Matrix4.identity()
+        ..rotateY(angle)
+        ..translateByDouble(0.0, y, radius, 1.0),
+      child: Opacity(
+        opacity: opacity,
+        child: Transform.scale(
+          scale: scale,
+          child: dest == null
+              ? _still(asset, 152, 86)
+              : _banner(dest, width: 152, height: 86),
+        ),
+      ),
     );
   }
 

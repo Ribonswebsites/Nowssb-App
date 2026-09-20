@@ -39,8 +39,13 @@ class FashTiles extends StatefulWidget {
 }
 
 class _FashTilesState extends State<FashTiles> {
-  final _pager = PageController();
-  int _page = 0;
+  late final PageController _pager;
+
+  @override
+  void initState() {
+    super.initState();
+    _pager = PageController(viewportFraction: 0.88);
+  }
 
   @override
   void dispose() {
@@ -82,113 +87,101 @@ class _FashTilesState extends State<FashTiles> {
 
   @override
   Widget build(BuildContext context) {
-    return SectionPane(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
+    const gridH = _tileHeight * 2 + 10;
+    const cardH = 28.0 + 12 + gridH + 24;
+
+    Widget pane(Widget grid) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 5),
+        child: SectionPane(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Icon(Icons.chevron_left,
-                  size: 15, color: NwsbColors.goldLight),
-              const Icon(Icons.chevron_left,
-                  size: 15, color: NwsbColors.goldLight),
-              const SizedBox(width: 6),
-              const Flexible(
-                child: Text(
-                  'Tap to restyle',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 11.5, color: Color(0xB3FFFFFF)),
-                ),
-              ),
-              const Spacer(),
-              Container(width: 1, height: 14, color: const Color(0x24FFFFFF)),
-              const SizedBox(width: 10),
-              const Flexible(
-                child: Text(
-                  'Begin your healing',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 11.5, color: Color(0x8CFFFFFF)),
-                ),
-              ),
+              const _TilesRail(),
+              const SizedBox(height: 12),
+              SizedBox(height: gridH, child: grid),
             ],
           ),
-          const SizedBox(height: 12),
-          LayoutBuilder(
-            builder: (context, c) {
-              final cell = (c.maxWidth - 10) / 2;
-              const gridH = _tileHeight * 2 + 10;
-              return Column(
-                children: [
-                  SizedBox(
-                    height: gridH,
-                    child: PageView(
-                      controller: _pager,
-                      onPageChanged: (i) => setState(() => _page = i),
-                      children: [
-                        GridView.count(
-                          crossAxisCount: 2,
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          mainAxisSpacing: 10,
-                          crossAxisSpacing: 10,
-                          childAspectRatio: cell / _tileHeight,
-                          children: [
-                            for (final (title, sub, art, dest) in _tiles)
-                              _Tile(
-                                title: title,
-                                sub: sub,
-                                art: art,
-                                mark: title == 'Connect'
-                                    ? NwsbMarks.connectPair
-                                    : null,
-                                onTap: () => widget.onTile?.call(dest),
-                              ),
-                          ],
-                        ),
-                        GridView.count(
-                          crossAxisCount: 2,
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          mainAxisSpacing: 10,
-                          crossAxisSpacing: 10,
-                          childAspectRatio: cell / _tileHeight,
-                          children: [
-                            for (final d in EnterCurveAssets.destinations)
-                              _BannerTile(
-                                dest: d,
-                                onTap: () => widget.onOpen?.call(d.id),
-                              ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      for (var i = 0; i < 2; i++)
-                        Container(
-                          width: i == _page ? 16 : 6,
-                          height: 6,
-                          margin: const EdgeInsets.symmetric(horizontal: 3),
-                          decoration: BoxDecoration(
-                            color: i == _page
-                                ? Colors.white
-                                : const Color(0x55FFFFFF),
-                            borderRadius: BorderRadius.circular(99),
-                          ),
-                        ),
-                    ],
-                  ),
-                ],
-              );
-            },
-          ),
+        ),
+      );
+    }
+
+    Widget gridOf(List<Widget> children) {
+      return LayoutBuilder(
+        builder: (context, c) {
+          final cell = (c.maxWidth - 10) / 2;
+          return GridView.count(
+            crossAxisCount: 2,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            mainAxisSpacing: 10,
+            crossAxisSpacing: 10,
+            childAspectRatio: cell / _tileHeight,
+            children: children,
+          );
+        },
+      );
+    }
+
+    return SizedBox(
+      height: cardH + 8,
+      child: PageView(
+        controller: _pager,
+        padEnds: true,
+        children: [
+          pane(gridOf([
+            for (final (title, sub, art, dest) in _tiles)
+              _Tile(
+                title: title,
+                sub: sub,
+                art: art,
+                mark: title == 'Connect' ? NwsbMarks.connectPair : null,
+                onTap: () => widget.onTile?.call(dest),
+              ),
+          ])),
+          pane(gridOf([
+            for (final d in EnterCurveAssets.destinations)
+              _BannerTile(
+                dest: d,
+                onTap: () => widget.onOpen?.call(d.id),
+              ),
+          ])),
         ],
       ),
+    );
+  }
+}
+
+class _TilesRail extends StatelessWidget {
+  const _TilesRail();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const Icon(Icons.chevron_left, size: 15, color: NwsbColors.goldLight),
+        const Icon(Icons.chevron_left, size: 15, color: NwsbColors.goldLight),
+        const SizedBox(width: 6),
+        const Flexible(
+          child: Text(
+            'Tap to restyle',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: 11.5, color: Color(0xB3FFFFFF)),
+          ),
+        ),
+        const Spacer(),
+        Container(width: 1, height: 14, color: const Color(0x24FFFFFF)),
+        const SizedBox(width: 10),
+        const Flexible(
+          child: Text(
+            'Begin your healing',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: 11.5, color: Color(0x8CFFFFFF)),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -353,7 +346,7 @@ class _BannerTile extends StatelessWidget {
           children: [
             Image.asset(
               dest.banner,
-              fit: BoxFit.cover,
+              fit: BoxFit.contain,
               alignment: Alignment.centerLeft,
               filterQuality: FilterQuality.medium,
               errorBuilder: (_, __, ___) =>
