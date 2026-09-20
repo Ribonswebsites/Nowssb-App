@@ -254,10 +254,10 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
               ),
             IgnorePointer(
               child: Align(
-                alignment: const Alignment(1.06, 1.10),
+                alignment: const Alignment(1.04, 1.06),
                 child: FractionallySizedBox(
-                  heightFactor: 0.82,
-                  widthFactor: 0.40,
+                  heightFactor: 0.96,
+                  widthFactor: 0.48,
                   child: Image.asset(
                     EnterCurveAssets.pointer,
                     fit: BoxFit.contain,
