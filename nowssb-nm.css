@@ -12237,6 +12237,7 @@ body.fpoff-routines :is(#home, .stw-prev-stage) .rt-vid-banner { display: none !
   transform-style: preserve-3d;
 }
 .footer-carousel-track {
+  overflow: hidden;
   transform-style: preserve-3d;
 }
 .fci {
@@ -16924,4 +16925,3 @@ body.fashplus :is(#home, .stw-prev-stage) .fp-card .fp-enter .tp-enter-go {
 }
 .nwsb-enter-embed .nwsb-enter-rail { right: 6px; top: 6px; bottom: 6px; }
 .nwsb-enter-embed .nwsb-enter-rule { height: 22px; }
-

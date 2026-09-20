@@ -1551,7 +1551,9 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
             ? direction * 172
             : distance == 2
                 ? direction * 292
-                : direction * 362;
+                : distance == 3
+                    ? direction * 362
+                    : direction * 520;
     final tz = distance == 0
         ? 200.0
         : distance == 1
@@ -1566,9 +1568,9 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
         : distance == 1
             ? direction * -35
             : distance == 2
-                ? direction * -50
+                ? direction * -42
                 : distance == 3
-                    ? direction * -65
+                    ? direction * -48
                     : 0.0;
     final scale = distance == 0
         ? 1.0
@@ -1578,7 +1580,7 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
                 ? 0.55
                 : distance == 3
                     ? 0.34
-                    : 0.1;
+                    : 0.5;
     final opacity = distance == 0
         ? 1.0
         : distance == 1
@@ -1748,7 +1750,16 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
                     clipBehavior: Clip.none,
                     alignment: Alignment.center,
                     children: [
-                      for (var i = 0; i < _shots.length; i++) _footerCard(i),
+                      ClipRect(
+                        child: Stack(
+                          clipBehavior: Clip.hardEdge,
+                          fit: StackFit.expand,
+                          children: [
+                            for (var i = 0; i < _shots.length; i++)
+                              _footerCard(i),
+                          ],
+                        ),
+                      ),
                       IgnorePointer(
                         child: SizedBox(
                           width: _cardW * 908 / 800,
