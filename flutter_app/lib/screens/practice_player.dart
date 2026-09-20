@@ -882,7 +882,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                                   accent: theme.accent,
                                   video: _actionsTabVideo,
                                   onSentence: _openSentence,
-                                  onPractice: () => unawaited(_handlePracticeTap()),
+                                  onPractice: () =>
+                                      unawaited(_handlePracticeTap()),
                                   onStore: () => Navigator.of(context).push(
                                     MaterialPageRoute<void>(
                                       builder: (_) => const StoreScreen(),
