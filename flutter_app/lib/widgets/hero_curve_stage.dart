@@ -9,7 +9,6 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:sensors_plus/sensors_plus.dart';
 
 import 'glass_wrap.dart';
 
@@ -69,11 +68,7 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
   double _drag = 0;
   double _scroll = 0;
   double _auto = 0;
-  double _tiltX = 0;
-  double _tiltY = 0;
-  double _motionAge = 0;
   Timer? _tick;
-  StreamSubscription<AccelerometerEvent>? _accelerometer;
   ScrollPosition? _pos;
 
   @override
@@ -82,19 +77,8 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
     if (!_flutterTest) {
       _tick = Timer.periodic(const Duration(milliseconds: 32), (_) {
         if (!mounted) return;
-        _motionAge += 0.032;
-        final settle = (_motionAge / 1.8).clamp(0.0, 1.0);
-        final speed = 0.030 * (1 - settle) + 0.0055 * settle;
-        setState(() => _auto += speed);
-      });
-      _accelerometer = accelerometerEventStream().listen((event) {
-        if (!mounted) return;
-        setState(() {
-          _tiltX = (_tiltX * 0.88 + (event.x / 9.8).clamp(-1.0, 1.0) * 0.12)
-              .clamp(-1.0, 1.0);
-          _tiltY = (_tiltY * 0.88 + (event.y / 9.8).clamp(-1.0, 1.0) * 0.12)
-              .clamp(-1.0, 1.0);
-        });
+        // Same orbit path as before, only calmer and slower.
+        setState(() => _auto += 0.0055);
       });
     }
   }
@@ -124,7 +108,6 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
   @override
   void dispose() {
     _tick?.cancel();
-    _accelerometer?.cancel();
     _pos?.removeListener(_onScroll);
     super.dispose();
   }
@@ -295,7 +278,7 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
     final subject = widget.subject ?? HeroCurveAssets.subject;
     final n = cards.length;
     final step = (math.pi * 2) / n;
-    // Keep the cards close enough to meet instead of leaving empty padding.
+    // Keep the original orbit path, but tighten the radius to remove gaps.
     final radius = height * 0.31;
     final indices = List<int>.generate(n, (i) => i)
       ..sort((a, b) =>
@@ -316,11 +299,7 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
               offset: Offset(0, _scroll * -0.18),
               child: Transform(
                 alignment: Alignment.center,
-                transform: Matrix4.identity()
-                  ..setEntry(3, 2, 0.00115)
-                  ..rotateX(_tiltY * 0.055)
-                  ..rotateY(_tiltX * 0.075)
-                  ..translateByDouble(_tiltX * 8, _tiltY * 6, 0, 1),
+                transform: Matrix4.identity()..setEntry(3, 2, 0.00115),
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
@@ -337,25 +316,6 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
                         }),
                       ),
                   ],
-                ),
-              ),
-            ),
-            const Positioned.fill(
-              child: IgnorePointer(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                      colors: [
-                        Color(0xFF050505),
-                        Color(0x00050505),
-                        Color(0x00050505),
-                        Color(0xFF050505),
-                      ],
-                      stops: [0.0, 0.17, 0.83, 1.0],
-                    ),
-                  ),
                 ),
               ),
             ),
@@ -411,15 +371,8 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
     return Transform(
       alignment: Alignment.center,
       transform: Matrix4.identity()
-        ..setEntry(3, 2, 0.0016)
-        ..rotateX(_tiltY * 0.10 + math.sin(angle) * 0.035)
-        ..rotateY(angle * 0.68 + _tiltX * 0.14)
-        ..translateByDouble(
-          _tiltX * 14,
-          -8.0 + _tiltY * 10,
-          radius * (0.42 + 0.58 * math.cos(angle)),
-          1.0,
-        ),
+        ..rotateY(angle)
+        ..translateByDouble(0.0, -8.0, radius, 1.0),
       child: Opacity(
         opacity: opacity,
         child: Transform.scale(
@@ -427,8 +380,8 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
           child: GestureDetector(
             onTap: onTap,
             child: Container(
-              width: widget.embedded ? 150 : 158,
-              height: widget.embedded ? 84 : 88,
+              width: widget.embedded ? 150 : 152,
+              height: widget.embedded ? 84 : 86,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: const Color(0x66FFFFFF), width: 1.2),
