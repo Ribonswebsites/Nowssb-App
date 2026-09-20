@@ -131,11 +131,11 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
   @override
   void initState() {
     super.initState();
-    _pager = PageController(viewportFraction: 0.90);
+    _pager = PageController(viewportFraction: 0.94);
     if (!_flutterTest) {
       _tick = Timer.periodic(const Duration(milliseconds: 32), (_) {
         if (!mounted) return;
-        setState(() => _auto += 0.012);
+        setState(() => _auto += 0.0055);
       });
     }
   }
@@ -202,8 +202,9 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
         children: [
           for (final spec in _pages)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 5),
+              padding: const EdgeInsets.symmetric(horizontal: 6),
               child: GlassWrap(
+                margin: EdgeInsets.zero,
                 padding: const EdgeInsets.fromLTRB(10, 10, 10, 16),
                 child: _pageBody(spec),
               ),
@@ -303,7 +304,9 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
     final nBot = bot.length;
     final stepTop = (math.pi * 2) / nTop;
     final stepBot = (math.pi * 2) / nBot;
-    final radius = height * 0.31;
+    // Same translateZ the hero CSS uses (220px), so the stills are the
+    // same size and sit on the same cylinder — not a tighter inner ring.
+    const radius = 220.0;
     final topIdx = List<int>.generate(nTop, (i) => i)
       ..sort((a, b) => math.cos(rot + a * stepTop)
           .compareTo(math.cos(rot + b * stepTop)));
@@ -336,15 +339,15 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
                           top[i].$2,
                           rot + i * stepTop,
                           radius,
-                          y: -78,
+                          y: -90,
                         ),
                       for (final i in botIdx)
                         _spinCard(
                           bot[i].$1,
                           bot[i].$2,
                           rot + i * stepBot + stepBot / 2,
-                          radius * 0.94,
-                          y: 82,
+                          radius,
+                          y: 90,
                         ),
                     ],
                   ),
@@ -356,7 +359,7 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
                   child: Align(
                     alignment: const Alignment(0.04, 0.96),
                     child: FractionallySizedBox(
-                      heightFactor: 0.64,
+                      heightFactor: 0.72,
                       child: Image.asset(
                         subject,
                         fit: BoxFit.contain,

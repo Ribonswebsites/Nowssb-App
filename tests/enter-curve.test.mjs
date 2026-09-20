@@ -23,10 +23,11 @@ assert.match(js, /openSub\('sound-library'\)/, "Library Enter opens the sound li
 assert.match(reg, /k:'enterCurve'/, "Registry places the enter curve");
 assert.match(homeFash, /enterCurve/, "Flutter Fashion home has the enter curve");
 assert.match(homeFash, /EnterCurveStage\(onOpen: _openEnter\)/, "Flutter enter curve is a pager of wrapped cards");
-assert.match(flutter, /heightFactor: 0.64/, "Centre figure is a little bigger");
-assert.match(flutter, /viewportFraction: 0.90/, "Each enter card is its own wrapper");
-assert.match(flutter, /y: -78/, "Upper row of stills");
-assert.match(flutter, /y: 82/, "Lower row of stills");
+assert.match(flutter, /heightFactor: 0.72/, "Centre figure matches the hero");
+assert.match(flutter, /viewportFraction: 0.94/, "Each enter card is its own wrapper");
+assert.match(flutter, /y: -90/, "Upper row of stills");
+assert.match(flutter, /y: 90/, "Lower row of stills");
+assert.match(flutter, /const radius = 220.0/, "Orbit radius matches the hero cylinder");
 assert.match(index, /nwsb-enter-ring-bot/, "Website enter curve has two rows");
 assert.match(index, /cleopatra\.webp/, "Website ships the Egyptian centre");
 assert.match(index, /nwsb-enter-pager/, "Website enter curve is swipeable");

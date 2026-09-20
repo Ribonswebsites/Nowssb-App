@@ -9,6 +9,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../widgets/enter_curve_stage.dart';
+import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_icon.dart';
 
 import '../../data/content.dart';
@@ -44,7 +45,7 @@ class _FashTilesState extends State<FashTiles> {
   @override
   void initState() {
     super.initState();
-    _pager = PageController(viewportFraction: 0.88);
+    _pager = PageController(viewportFraction: 0.94);
   }
 
   @override
@@ -88,17 +89,26 @@ class _FashTilesState extends State<FashTiles> {
   @override
   Widget build(BuildContext context) {
     const gridH = _tileHeight * 2 + 10;
-    const cardH = 28.0 + 12 + gridH + 24;
+    const railH = 32.0;
+    const gap = 12.0;
+    const pad = 24.0;
+    const pageH = pad + railH + gap + gridH + 8;
 
     Widget pane(Widget grid) {
       return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 5),
-        child: SectionPane(
+        padding: const EdgeInsets.symmetric(horizontal: 6),
+        child: GlassWrap(
+          margin: EdgeInsets.zero,
+          padding: const EdgeInsets.all(12),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const _TilesRail(),
-              const SizedBox(height: 12),
+              const SizedBox(
+                height: railH,
+                child: _TilesRail(),
+              ),
+              const SizedBox(height: gap),
               SizedBox(height: gridH, child: grid),
             ],
           ),
@@ -124,7 +134,7 @@ class _FashTilesState extends State<FashTiles> {
     }
 
     return SizedBox(
-      height: cardH + 8,
+      height: pageH,
       child: PageView(
         controller: _pager,
         padEnds: true,

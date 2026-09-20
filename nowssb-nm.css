@@ -16864,7 +16864,7 @@ body.fashplus :is(#home, .stw-prev-stage) .fp-card .fp-enter .tp-enter-go {
   height: 86px;
   margin: -43px 0 0 -76px;
   top: 42%;
-  transform: rotateY(calc(var(--i) * 51.428deg)) translateZ(200px);
+  transform: rotateY(calc(var(--i) * 51.428deg)) translateZ(220px);
 }
 .nwsb-enter-pointer {
   position: absolute;
