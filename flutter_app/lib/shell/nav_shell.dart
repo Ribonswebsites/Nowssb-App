@@ -324,8 +324,9 @@ class _NavShellState extends State<NavShell> {
             // Fashion-home switch + mini player share one row above the nav.
             if (_i == 0 || PlaybackSession.instance.showPill)
               Positioned(
-                left: 12,
-                right: 12,
+                // Inset mode pill from screen/card edge (Normal/Fashion toggle).
+                left: 20,
+                right: 20,
                 bottom: 88,
                 child: SafeArea(
                   top: false,

@@ -43,6 +43,7 @@ import 'fashion/sections_mid.dart';
 import 'fashion/sections_top.dart';
 import 'fashion_plus.dart';
 import 'notifications_sheet.dart';
+import 'normal/header_actions_sheet.dart';
 import 'sound_library.dart';
 import 'widgets_page.dart';
 import 'quick_access.dart';
@@ -178,6 +179,19 @@ class _HomeFashionState extends State<HomeFashion> {
     }
   }
 
+
+  /// Quick action hero chip → HeaderActionsSheet destinations.
+  void _openQuickAction() {
+    showHeaderActionsSheet(
+      context,
+      glassMode: true,
+      onGlassToggle: () {},
+      onNotifications: () => showNotificationsSheet(context),
+      onFashionHome: () {},
+      onStore: () => _go(3),
+      onPlayer: () => _go(1),
+    );
+  }
 
   void _openSearchDest(String key) {
     switch (key) {
@@ -445,9 +459,8 @@ class _HomeFashionState extends State<HomeFashion> {
                               context,
                               onSelect: _openSearchDest,
                             ),
-                            // Quick action → Quick access page.
-                            onQuickAccess: () =>
-                                _push(const QuickAccessScreen()),
+                            // Quick action → HeaderActionsSheet, NOT QuickAccessScreen.
+                            onQuickAccess: _openQuickAction,
                           ),
                           FashionHero(
                             onExplore: () => _go(2),

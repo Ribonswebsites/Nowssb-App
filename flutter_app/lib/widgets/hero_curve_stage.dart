@@ -70,7 +70,7 @@ class HeroCurveStage extends StatefulWidget {
   /// Opens destination search (Hero header only).
   final VoidCallback? onSearch;
 
-  /// Opens Quick access (Hero header only — not Frequency mid glass).
+  /// Opens Quick action sheet / HeaderActionsSheet (not QuickAccessScreen).
   final VoidCallback? onQuickAccess;
 
   @override
@@ -162,13 +162,17 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
 
     if (widget.glass) {
       return GlassWrap(
-        padding: const EdgeInsets.fromLTRB(10, 10, 10, 14),
+        // Horizontal margin so Fashion black stage does not hug screen edges.
+        margin: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+        padding: const EdgeInsets.fromLTRB(14, 14, 14, 16),
         child: body,
       );
     }
     if (widget.compact) {
       return Padding(
-        padding: const EdgeInsets.fromLTRB(16, 18, 16, 8),
+        // Clear top/left/right inset so the black hero card is not flush
+        // to the screen edge (Normal home).
+        padding: const EdgeInsets.fromLTRB(20, 22, 20, 12),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(24),
           child: ColoredBox(color: const Color(0xFF050505), child: body),
@@ -553,48 +557,42 @@ class _HeroChrome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(4, 2, 4, 10),
+      // Inset chrome from the black/glass card edges (top/left/right).
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
             children: [
-              const Flexible(
-                child: Text(
-                  'NowssB.',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.3,
-                    height: 1,
-                  ),
+              const Text(
+                'NowssB.',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.3,
+                  height: 1,
                 ),
               ),
-              const SizedBox(width: 8),
+              const Spacer(),
               GestureDetector(
                 onTap: onQuickAccess,
                 behavior: HitTestBehavior.opaque,
                 child: Container(
-                  height: 42,
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  height: 36,
+                  padding: const EdgeInsets.fromLTRB(10, 0, 6, 0),
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: const Color(0x22FFFFFF),
                     borderRadius: BorderRadius.circular(99),
                     border: Border.all(color: const Color(0x44FFFFFF)),
                   ),
+                  // Order: grid icon + label, then SMALL black-circle orb on the RIGHT.
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      AppThinkingLoader(
-                        size: 28,
-                        state: OrbState.solving,
-                        circlePad: 6,
-                      ),
-                      SizedBox(width: 6),
                       Icon(Icons.apps_rounded, size: 16, color: Colors.white),
                       SizedBox(width: 6),
                       Text(
@@ -605,6 +603,12 @@ class _HeroChrome extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                           letterSpacing: 0.1,
                         ),
+                      ),
+                      SizedBox(width: 6),
+                      AppThinkingLoader(
+                        size: 16,
+                        state: OrbState.solving,
+                        circlePad: 3,
                       ),
                     ],
                   ),
