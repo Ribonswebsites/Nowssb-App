@@ -399,10 +399,7 @@ class _WordBreakTab extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const AppThinkingLoader(
-                size: 22,
-                state: OrbState.composing,
-              ),
+              const AppThinkingLoader(size: 22, state: OrbState.composing),
               const SizedBox(width: 10),
               Flexible(
                 child: Text(
