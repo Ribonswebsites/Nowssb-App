@@ -1,0 +1,58 @@
+diff --git a/flutter_app/lib/screens/home_normal.dart b/flutter_app/lib/screens/home_normal.dart
+index 909f458..e017cc5 100644
+--- a/flutter_app/lib/screens/home_normal.dart
++++ b/flutter_app/lib/screens/home_normal.dart
+@@ -62,6 +62,7 @@ import 'normal/sections_bottom.dart';
+ import 'normal/sections_top.dart';
+ import 'normal/rotating_promo_rail.dart';
+ import 'shared_sections.dart';
++import 'fashion/sections_mid.dart';
+ import 'sound_library.dart';
+ import 'notifications_sheet.dart';
+ import 'widgets_page.dart';
+@@ -71,6 +72,7 @@ import 'practice_player.dart';
+ import 'progress/progress_screen.dart';
+ import 'reader/reader_hub.dart';
+ import 'subscription.dart';
++import 'store/ebooks_store.dart';
+ 
+ /// `REG.norm.items` — app/js/part062.js:41-100, key for key and in order.
+ const kNormalSectionOrder = <String>[
+@@ -181,6 +183,23 @@ class _HomeNormalState extends State<HomeNormal> {
+     }
+   }
+ 
++  void _openEnter(String id) {
++    switch (id) {
++      case 'player':
++        _go(1);
++      case 'library':
++        _push(const SoundLibraryScreen());
++      case 'store':
++        _go(3);
++      case 'reader':
++        _push(const ReaderHubScreen());
++      case 'ebook':
++        _push(const EbooksStoreScreen());
++      case 'healing':
++        _push(const HealingPathScreen());
++    }
++  }
++
+   void _footerLink(String key) {
+     switch (key) {
+       case 'about':
+@@ -236,8 +255,11 @@ class _HomeNormalState extends State<HomeNormal> {
+               onSupport: () => _go(4),
+               onCoach: () => _push(const PersonalCoachScreen()))
+         ),
+-        // Four-tile grid removed from Normal home (was between Personal Coach and Store).
+-        ('tiles', const SizedBox.shrink()),
++        // H-scroll: Flip glass brand showcase (card 0) + existing feature cards.
++        (
++          'tiles',
++          FashTiles(onTile: _go, onOpen: _openEnter),
++        ),
+         ('store', NmStore(onTap: () => _go(3))),
+         ('reader', NmReader(onTap: () => _push(const ReaderHubScreen()))),
+         ('trendwd', NmTrending(onTap: () => _go(2))),
