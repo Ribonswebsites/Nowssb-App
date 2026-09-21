@@ -41,10 +41,10 @@ class _QuickAccessScreenState extends State<QuickAccessScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: NwsbColors.deep,
-    appBar: AppBar(backgroundColor: NwsbColors.deep, foregroundColor: Colors.white, title: const Text('Quick Access'), actions:[TextButton(onPressed:()=>setState((){shape='default';color='glass';corner='rounded';slots=['connect','practice','library','store','profile'];}),child:const Text('Reset',style:TextStyle(color:NwsbColors.goldLight)))]),
+    appBar: AppBar(backgroundColor: NwsbColors.deep, foregroundColor: Colors.white, title: const Text('Nav Settings'), actions:[TextButton(onPressed:()=>setState((){shape='default';color='glass';corner='rounded';slots=['connect','practice','library','store','profile'];}),child:const Text('Reset',style:TextStyle(color:NwsbColors.goldLight)))]),
     body: ListView(padding:const EdgeInsets.fromLTRB(20,12,20,120),children:[
       const Text('CUSTOMIZE YOUR NAVIGATION',style:TextStyle(color:NwsbColors.mist,letterSpacing:2.5,fontSize:10,fontWeight:FontWeight.w700)),
-      const SizedBox(height:8), const Text('Reshape your bottom navigation bar',style:TextStyle(color:Colors.white,fontSize:24,fontWeight:FontWeight.w700)),
+      const SizedBox(height:8), const Text('Nav Settings — reshape your bottom navigation bar',style:TextStyle(color:Colors.white,fontSize:24,fontWeight:FontWeight.w700)),
       const SizedBox(height:6), const Text('Pick its shape, colour and the exact feature icons it shows.',style:TextStyle(color:Colors.white60,fontSize:13,height:1.5)),
       const SizedBox(height:20), _section('Preview'), _preview(),
       _section('Shape'), _options({'default':'Default','pill':'Floating Pill','rect':'Floating Rectangle'},shape,(v)=>setState(()=>shape=v)),

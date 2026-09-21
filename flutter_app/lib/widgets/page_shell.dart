@@ -22,6 +22,7 @@ class PageShell extends StatefulWidget {
     required this.title,
     required this.film,
     required this.slivers,
+    this.subtitle,
     this.onBack,
     this.usePageFilm = false,
     this.onStorePicker,
@@ -29,6 +30,8 @@ class PageShell extends StatefulWidget {
 
   final String eyebrow;
   final String title;
+  /// Optional secondary line under [title] (e.g. Word Atelier under NowssB Store).
+  final String? subtitle;
 
   /// The page's own film. When [usePageFilm] is true the film loops behind
   /// the page (Store / Meaning / Ebooks). Otherwise AppBackdrop stays
@@ -175,16 +178,18 @@ class _PageShellState extends State<PageShell> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text(
-                                widget.eyebrow.toUpperCase(),
-                                style: const TextStyle(
-                                  fontSize: 10,
-                                  letterSpacing: 3,
-                                  fontWeight: FontWeight.w700,
-                                  color: NwsbColors.gold,
+                              if (widget.eyebrow.trim().isNotEmpty) ...[
+                                Text(
+                                  widget.eyebrow.toUpperCase(),
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    letterSpacing: 3,
+                                    fontWeight: FontWeight.w700,
+                                    color: NwsbColors.gold,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 4),
+                                const SizedBox(height: 4),
+                              ],
                               Text(
                                 widget.title,
                                 style: const TextStyle(
@@ -194,6 +199,19 @@ class _PageShellState extends State<PageShell> {
                                   height: 1.1,
                                 ),
                               ),
+                              if (widget.subtitle != null &&
+                                  widget.subtitle!.trim().isNotEmpty) ...[
+                                const SizedBox(height: 4),
+                                Text(
+                                  widget.subtitle!,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: Color(0xCCFFFFFF),
+                                    height: 1.2,
+                                  ),
+                                ),
+                              ],
                             ],
                           ),
                         ),

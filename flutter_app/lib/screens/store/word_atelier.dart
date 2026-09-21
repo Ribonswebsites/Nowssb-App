@@ -21,8 +21,9 @@ class WordAtelierScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => PageShell(
-        eyebrow: 'NowssB Store',
-        title: 'The Word Atelier',
+        eyebrow: '',
+        title: 'NowssB Store',
+        subtitle: 'The Word Atelier',
         film: nwsbVideo(kRmHeroVidFile),
         // Fashion-home AppBackdrop film + PageShell Fashion vignette scrim
         // so the background video is clearly visible (not a solid lid).
@@ -30,6 +31,7 @@ class WordAtelierScreen extends StatelessWidget {
         onBack: () => Navigator.of(context).pop(),
         onStorePicker: () => showStoreSelectSheet(
           context,
+          current: 'word',
           onSelect: (id) => openStoreFromPicker(context, id, current: 'word'),
         ),
         slivers: [
@@ -247,7 +249,7 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
           onBrowseAll: _browseAll,
           onViewCart: _viewCart,
           videoAsset: nwsbVideo(kRmHeroVidFile),
-          videoTitle: 'The Word Atelier',
+          videoTitle: '',
         ),
         StoreGlassPanel(
           radius: 32,
@@ -255,6 +257,17 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
           child: StoreSearchBar(
             controller: _search,
             onChanged: (v) => setState(() => _query = v),
+            onGo: () {
+              if (_query.trim().isEmpty) {
+                openRequestWords(context);
+                return;
+              }
+              // If nothing matches, offer request-word flow.
+              final any = kRmCategories.any((c) => c.words.any(
+                    (w) => _match(w.word, w.root),
+                  ));
+              if (!any) openRequestWords(context);
+            },
           ),
         ),
         const SizedBox(height: 16),
@@ -283,12 +296,14 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
                 StoreFilterChip(
                     label: 'ALL',
                     selected: _chip == 'ALL',
+                    black: true,
                     onTap: () => setState(() => _chip = 'ALL')),
                 const SizedBox(width: 7),
                 for (final c in kRmCategories) ...[
                   StoreFilterChip(
                     label: c.label.toUpperCase(),
                     selected: _chip == c.id,
+                    black: true,
                     onTap: () => setState(() => _chip = c.id),
                   ),
                   const SizedBox(width: 7),

@@ -29,9 +29,10 @@ class EbooksStoreScreen extends StatelessWidget {
       usePageFilm: false,
       onBack: () => Navigator.of(context).pop(),
       onStorePicker: () => showStoreSelectSheet(
-        context,
-        onSelect: (id) => openStoreFromPicker(context, id, current: 'ebooks'),
-      ),
+          context,
+          current: 'ebooks',
+          onSelect: (id) => openStoreFromPicker(context, id, current: 'ebooks'),
+        ),
       slivers: [
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),

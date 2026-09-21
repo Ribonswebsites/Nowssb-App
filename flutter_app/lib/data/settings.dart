@@ -89,8 +89,8 @@ class Settings extends ChangeNotifier {
   String _nowPlaying = 'On';
   int _lastTab = 0;
   bool _showSplash = true;
-  String _navShape = 'default';
-  String _navColor = 'glass';
+  String _navShape = 'pill';
+  String _navColor = 'black';
   String _navCorner = 'rounded';
   List<String> _navSlots = [
     'connect',

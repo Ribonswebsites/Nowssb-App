@@ -26,6 +26,7 @@ class SignatureStoreScreen extends StatelessWidget {
         onBack: () => Navigator.of(context).pop(),
         onStorePicker: () => showStoreSelectSheet(
           context,
+          current: 'signature',
           onSelect: (id) => openStoreFromPicker(context, id, current: 'signature'),
         ),
         slivers: [

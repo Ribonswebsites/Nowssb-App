@@ -55,6 +55,7 @@ import 'healing_path.dart';
 import '../media/video_pool.dart';
 import 'normal/glassmorphism_theme.dart';
 import 'normal/header_actions_sheet.dart';
+import 'fashion/header.dart';
 import '../widgets/nwsb_icon.dart';
 import 'normal/neomorphic_essentials.dart';
 import 'normal/horizontal_routine_cards.dart';
@@ -65,6 +66,7 @@ import 'shared_sections.dart';
 import 'fashion/sections_mid.dart';
 import 'sound_library.dart';
 import 'notifications_sheet.dart';
+import 'quick_access.dart';
 import 'widgets_page.dart';
 import '../widgets/home_menu_drawer.dart';
 import '../widgets/hero_curve_stage.dart';
@@ -222,7 +224,22 @@ class _HomeNormalState extends State<HomeNormal> {
   List<(String, Widget?)> _sections() => [
         ('greet', NmGreeting(name: widget.name)),
         ('search', NmSearch(onSearch: (_) => _go(2))),
-        ('heroCurve', const HeroCurveStage(compact: true)),
+        ('heroCurve', HeroCurveStage(
+          compact: true,
+          onSearch: () => showDestinationSearchSheet(context),
+          onQuickAccess: () => showHeaderActionsSheet(
+            context,
+            glassMode: _glassMode,
+            onGlassToggle: () => setState(() {
+              _glassMode = !_glassMode;
+              VideoPool.instance.setGlassHomeMode(_glassMode);
+            }),
+            onNotifications: () => showNotificationsSheet(context),
+            onFashionHome: () => Settings.instance.setFashionHome(true),
+            onStore: () => _go(3),
+            onPlayer: () => _go(1),
+          ),
+        )),
         (
           'promoRail',
           NormalPromoRail(
@@ -343,7 +360,7 @@ class _HomeNormalState extends State<HomeNormal> {
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
             child: _TopRow(
               onMenu: () => _openHomeMenu(context),
-              onNotifications: () => showNotificationsSheet(context),
+              onNotifications: () => _push(const QuickAccessScreen()),
               glassMode: _glassMode,
               onGlassToggle: () => setState(() {
                 _glassMode = !_glassMode;

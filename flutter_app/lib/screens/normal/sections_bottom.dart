@@ -363,20 +363,6 @@ class NmFashionSwitch extends StatelessWidget {
             ],
           ),
           ),
-          const SizedBox(height: 18),
-          SizedBox(
-            height: 98,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: 6,
-              separatorBuilder: (_, __) => const SizedBox(width: 14),
-              itemBuilder: (_, index) {
-                const labels = ['New', 'Recent', 'Grid', 'Style', 'Trending', 'Saved'];
-                const icons = [Icons.star_outline_rounded, Icons.access_time_rounded, Icons.grid_view_rounded, Icons.person_outline_rounded, Icons.trending_flat_rounded, Icons.favorite_border_rounded];
-                return GestureDetector(onTap: onTap, child: _FashionMini(label: labels[index], icon: icons[index]));
-              },
-            ),
-          ),
         ],
       ),
     );
@@ -391,10 +377,3 @@ class _FashionCircle extends StatelessWidget {
   Widget build(BuildContext context) => Container(width: size, height: size, decoration: const BoxDecoration(color: Color(0xFFECEFF4), shape: BoxShape.circle, boxShadow: [BoxShadow(color: Color(0x8CA3AABD), offset: Offset(6, 6), blurRadius: 12), BoxShadow(color: Color(0xE6FFFFFF), offset: Offset(-6, -6), blurRadius: 12)]), child: Icon(icon, size: size == 50 ? 24 : 20, color: const Color(0xFFC9A24A)));
 }
 
-class _FashionMini extends StatelessWidget {
-  const _FashionMini({required this.label, required this.icon});
-  final String label;
-  final IconData icon;
-  @override
-  Widget build(BuildContext context) => Container(width: 84, height: 84, decoration: BoxDecoration(color: const Color(0xFFECEFF4), borderRadius: BorderRadius.circular(18), boxShadow: const [BoxShadow(color: Color(0x73A3AABD), offset: Offset(5, 5), blurRadius: 10), BoxShadow(color: Color(0xB3FFFFFF), offset: Offset(-5, -5), blurRadius: 10)]), child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(icon, size: 20, color: const Color(0xFFC9A24A)), const SizedBox(height: 6), Text(label, style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600, letterSpacing: .2, color: Color(0xFF6B7080)))]));
-}

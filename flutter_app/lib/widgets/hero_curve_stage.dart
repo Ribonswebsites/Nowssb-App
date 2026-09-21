@@ -148,10 +148,11 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
     final body = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (widget.glass) _HeroChrome(
-          onSearch: widget.onSearch,
-          onQuickAccess: widget.onQuickAccess,
-        ),
+        if (widget.glass || widget.compact)
+          _HeroChrome(
+            onSearch: widget.onSearch,
+            onQuickAccess: widget.onQuickAccess,
+          ),
         visual,
         const _CurveCopy(),
       ],
@@ -214,12 +215,51 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
               alignment: const Alignment(0.04, 1.0),
               child: FractionallySizedBox(
                 heightFactor: 0.88,
-                child: Image.asset(
-                  subject,
-                  fit: BoxFit.contain,
+                child: Stack(
+                  fit: StackFit.passthrough,
                   alignment: Alignment.bottomCenter,
-                  filterQuality: FilterQuality.high,
-                  errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                  children: [
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: FractionallySizedBox(
+                        widthFactor: 0.46,
+                        heightFactor: 0.82,
+                        child: const SizedBox.expand(
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              gradient: RadialGradient(
+                                center: Alignment(0, 0.1),
+                                radius: 0.85,
+                                colors: [
+                                  Color(0xFF050505),
+                                  Color(0xF2050505),
+                                  Color(0x00050505),
+                                ],
+                                stops: [0.0, 0.62, 1.0],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    ColorFiltered(
+                      colorFilter: const ColorFilter.matrix(<double>[
+                        1, 0, 0, 0, 0,
+                        0, 1, 0, 0, 0,
+                        0, 0, 1, 0, 0,
+                        0, 0, 0, 2.2, 0,
+                      ]),
+                      child: Image.asset(
+                        subject,
+                        fit: BoxFit.contain,
+                        alignment: Alignment.bottomCenter,
+                        filterQuality: FilterQuality.high,
+                        gaplessPlayback: true,
+                        errorBuilder: (_, __, ___) =>
+                            const SizedBox.shrink(),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -339,6 +379,8 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
                 ),
               ),
             ),
+            // Subject LAST + opaque silhouette under cutout so orbit cards
+            // never show through semi-transparent clothing (yuva webp).
             IgnorePointer(
               child: Transform.translate(
                 offset: Offset(0, _scroll * -0.06),
@@ -348,33 +390,57 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
                       : const Alignment(0.04, 0.92),
                   child: FractionallySizedBox(
                     heightFactor: widget.embedded ? 0.78 : 0.72,
-                    child: Image.asset(
-                      subject,
-                      fit: BoxFit.contain,
+                    child: Stack(
+                      fit: StackFit.passthrough,
                       alignment: Alignment.bottomCenter,
-                      filterQuality: FilterQuality.high,
-                      errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                      children: [
+                        // Opaque body mask so orbit never reads through clothes.
+                        Align(
+                          alignment: Alignment.bottomCenter,
+                          child: FractionallySizedBox(
+                            widthFactor: 0.42,
+                            heightFactor: 0.78,
+                            child: const SizedBox.expand(
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  gradient: RadialGradient(
+                                    center: Alignment(0, 0.15),
+                                    radius: 0.85,
+                                    colors: [
+                                      Color(0xFF050505),
+                                      Color(0xF2050505),
+                                      Color(0x00050505),
+                                    ],
+                                    stops: [0.0, 0.62, 1.0],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        ColorFiltered(
+                          colorFilter: const ColorFilter.matrix(<double>[
+                            1, 0, 0, 0, 0,
+                            0, 1, 0, 0, 0,
+                            0, 0, 1, 0, 0,
+                            0, 0, 0, 2.2, 0,
+                          ]),
+                          child: Image.asset(
+                            subject,
+                            fit: BoxFit.contain,
+                            alignment: Alignment.bottomCenter,
+                            filterQuality: FilterQuality.high,
+                            gaplessPlayback: true,
+                            errorBuilder: (_, __, ___) =>
+                                const SizedBox.shrink(),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
               ),
             ),
-            // Brand lives in _HeroChrome when glass; keep overlay for non-glass.
-            if (!widget.embedded && !widget.glass)
-              const Positioned(
-                left: 18,
-                top: 16,
-                child: Text(
-                  'NowssB.',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.3,
-                    height: 1,
-                  ),
-                ),
-              ),
           ],
         ),
       ),
@@ -470,7 +536,7 @@ class _CurveCopy extends StatelessWidget {
 }
 
 
-/// Top of Fashion Hero: listening orb + Quick access, then NowssB. + search.
+/// Top of hero black card: NowssB. LEFT + Quick access RIGHT, search below.
 class _HeroChrome extends StatelessWidget {
   const _HeroChrome({this.onSearch, this.onQuickAccess});
   final VoidCallback? onSearch;
@@ -485,42 +551,23 @@ class _HeroChrome extends StatelessWidget {
         children: [
           Row(
             children: [
-              // Glass wrapper → black circle → listening orb
-              ClipRRect(
-                borderRadius: BorderRadius.circular(99),
-                child: BackdropFilter(
-                  filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                  child: Container(
-                    padding: const EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                      color: const Color(0x28FFFFFF),
-                      shape: BoxShape.circle,
-                      border: Border.all(color: const Color(0x44FFFFFF)),
-                    ),
-                    child: Container(
-                      width: 36,
-                      height: 36,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF000000),
-                        shape: BoxShape.circle,
-                      ),
-                      clipBehavior: Clip.antiAlias,
-                      alignment: Alignment.center,
-                      child: const AppThinkingLoader(
-                        size: 30,
-                        state: OrbState.listening,
-                      ),
-                    ),
-                  ),
+              const Text(
+                'NowssB.',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.3,
+                  height: 1,
                 ),
               ),
-              const SizedBox(width: 10),
+              const Spacer(),
               GestureDetector(
                 onTap: onQuickAccess,
                 behavior: HitTestBehavior.opaque,
                 child: Container(
                   height: 36,
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: const Color(0x22FFFFFF),
@@ -530,6 +577,11 @@ class _HeroChrome extends StatelessWidget {
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      AppThinkingLoader(
+                        size: 22,
+                        state: OrbState.solving,
+                      ),
+                      SizedBox(width: 6),
                       Icon(Icons.apps_rounded, size: 16, color: Colors.white),
                       SizedBox(width: 6),
                       Text(
@@ -545,19 +597,7 @@ class _HeroChrome extends StatelessWidget {
                   ),
                 ),
               ),
-              const Spacer(),
             ],
-          ),
-          const SizedBox(height: 10),
-          const Text(
-            'NowssB.',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 22,
-              fontWeight: FontWeight.w700,
-              letterSpacing: -0.3,
-              height: 1,
-            ),
           ),
           const SizedBox(height: 10),
           FashionGreetingSearch(

@@ -29,8 +29,8 @@ class MeaningStoreScreen extends StatelessWidget {
         onBack: () => Navigator.of(context).pop(),
         onStorePicker: () => showStoreSelectSheet(
           context,
-          onSelect: (id) =>
-              openStoreFromPicker(context, id, current: 'meaning'),
+          current: 'meaning',
+          onSelect: (id) => openStoreFromPicker(context, id, current: 'meaning'),
         ),
         slivers: [
           SliverPadding(

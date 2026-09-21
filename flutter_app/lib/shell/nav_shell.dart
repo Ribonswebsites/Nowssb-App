@@ -385,39 +385,61 @@ class _NavShellState extends State<NavShell> {
                             border: Border.all(color: const Color(0x22FFFFFF)),
                           ),
                           child: Row(children: [
-                            for (final id in settings.navSlots)
+                            for (var i = 0;
+                                i < settings.navSlots.length;
+                                i++) ...[
+                              if (i > 0)
+                                Container(
+                                  width: 1,
+                                  height: 18,
+                                  margin:
+                                      const EdgeInsets.symmetric(horizontal: 2),
+                                  color: const Color(0x33FFFFFF),
+                                ),
                               Expanded(
                                 child: GestureDetector(
                                   behavior: HitTestBehavior.opaque,
-                                  onTap: () => _goToSlot(id),
+                                  onTap: () =>
+                                      _goToSlot(settings.navSlots[i]),
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Image.network(
-                                        _navFeatures[id]?['img'] ?? '',
+                                        _navFeatures[settings.navSlots[i]]
+                                                ?['img'] ??
+                                            '',
                                         width: 28,
                                         height: 28,
                                         fit: BoxFit.contain,
                                         errorBuilder: (_, __, ___) => Icon(
                                           Icons.circle_outlined,
                                           size: 22,
-                                          color: id == 'connect' ||
-                                                  _primaryTab(id) == _i
+                                          color: settings.navSlots[i] ==
+                                                      'connect' ||
+                                                  _primaryTab(settings
+                                                          .navSlots[i]) ==
+                                                      _i
                                               ? NwsbColors.goldLight
                                               : const Color(0x99FFFFFF),
                                         ),
                                       ),
                                       const SizedBox(height: 3),
                                       Text(
-                                        _navFeatures[id]?['label'] ?? id,
+                                        _navFeatures[settings.navSlots[i]]
+                                                ?['label'] ??
+                                            settings.navSlots[i],
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                           fontSize: 9,
-                                          fontWeight: _primaryTab(id) == _i
+                                          fontWeight: _primaryTab(settings
+                                                      .navSlots[i]) ==
+                                                  _i
                                               ? FontWeight.w700
                                               : FontWeight.w400,
-                                          color: _primaryTab(id) == _i
+                                          color: _primaryTab(settings
+                                                      .navSlots[i]) ==
+                                                  _i
                                               ? NwsbColors.goldLight
                                               : const Color(0x99FFFFFF),
                                         ),
@@ -426,6 +448,7 @@ class _NavShellState extends State<NavShell> {
                                   ),
                                 ),
                               ),
+                            ],
                           ]),
                         );
                       }),

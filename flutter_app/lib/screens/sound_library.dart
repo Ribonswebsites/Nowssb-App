@@ -24,6 +24,8 @@ import '../widgets/app_backdrop.dart';
 import '../widgets/black_glass_banner.dart';
 import '../widgets/intro_gate.dart';
 import '../widgets/tv_frame.dart';
+import '../widgets/app_thinking_loader.dart';
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import 'notifications_sheet.dart';
 import 'practice.dart';
 import 'practice_player.dart';
@@ -519,10 +521,22 @@ class _SlmFeed extends StatelessWidget {
             NestedDarkWrap(
               margin: EdgeInsets.zero,
               padding: const EdgeInsets.all(14),
-              child: _CurrentlyPlayingRail(
-                words: list,
-                art: art,
-                onTap: onPlayWord,
+              child: Stack(
+                children: [
+                  _CurrentlyPlayingRail(
+                    words: list,
+                    art: art,
+                    onTap: onPlayWord,
+                  ),
+                  const Positioned(
+                    top: 0,
+                    right: 0,
+                    child: AppThinkingLoader(
+                      size: 28,
+                      state: OrbState.composing,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -1591,6 +1605,11 @@ class _SlmHead extends StatelessWidget {
                     ),
                   ),
                 ),
+                const AppThinkingLoader(
+                  size: 44,
+                  state: OrbState.composing,
+                ),
+                const SizedBox(width: 6),
                 IconButton(
                   onPressed: onNotifications,
                   padding: EdgeInsets.zero,
@@ -2815,10 +2834,22 @@ class _SoundCategoryScreenState extends State<SoundCategoryScreen> {
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: _CurrentlyPlayingRail(
-                        words: playing,
-                        art: _art,
-                        onTap: _playWord,
+                      child: Stack(
+                        children: [
+                          _CurrentlyPlayingRail(
+                            words: playing,
+                            art: _art,
+                            onTap: _playWord,
+                          ),
+                          const Positioned(
+                            top: 0,
+                            right: 0,
+                            child: AppThinkingLoader(
+                              size: 28,
+                              state: OrbState.composing,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],

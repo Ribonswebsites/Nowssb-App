@@ -1494,22 +1494,28 @@ class StoreFilterChip extends StatelessWidget {
     required this.label,
     required this.selected,
     required this.onTap,
+    this.black = false,
   });
 
   final String label;
   final bool selected;
   final VoidCallback onTap;
+  final bool black;
 
   @override
   Widget build(BuildContext context) {
+    final bg = black
+        ? (selected ? const Color(0xFF000000) : const Color(0xE6000000))
+        : Colors.white;
+    final fg = black ? Colors.white : const Color(0xFF080A10);
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: bg,
           border: Border.all(
-            color: const Color(0xCCFFFFFF),
+            color: black ? const Color(0x33FFFFFF) : const Color(0xCCFFFFFF),
           ),
           borderRadius: BorderRadius.circular(40),
           boxShadow: const [
@@ -1523,7 +1529,7 @@ class StoreFilterChip extends StatelessWidget {
             fontSize: 9,
             letterSpacing: 1.4,
             fontWeight: FontWeight.w700,
-            color: const Color(0xFF080A10),
+            color: fg,
           ),
         ),
       ),
