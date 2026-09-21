@@ -2772,7 +2772,9 @@ class _VisualStage extends StatelessWidget {
                               decoration: BoxDecoration(
                                 color: const Color(0xF00C0C0E),
                                 borderRadius: BorderRadius.circular(24),
-                                border: Border.all(color: const Color(0x22FFFFFF)),
+                                border: Border.all(
+                                  color: const Color(0x22FFFFFF),
+                                ),
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
