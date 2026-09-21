@@ -16,6 +16,8 @@ import '../data/firebase.dart';
 import '../data/models.dart';
 import '../data/practice_progress.dart';
 import '../widgets/app_backdrop.dart';
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
+import '../widgets/app_thinking_loader.dart';
 import 'practice_player.dart';
 
 const _coachApi = 'https://nowssb-api.ribonpatil2.workers.dev/api/assistant/chat';
@@ -229,7 +231,9 @@ class _PersonalCoachScreenState extends State<PersonalCoachScreen> {
         child: IconButton.filled(
           onPressed: _signingIn ? null : action,
           style: IconButton.styleFrom(backgroundColor: light ? Colors.white : const Color(0xFF17171A), foregroundColor: light ? Colors.black : Colors.white),
-          icon: _signingIn && label == 'Sign in' ? const SizedBox.square(dimension: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : Icon(icon),
+          icon: _signingIn && label == 'Sign in'
+              ? const AppThinkingLoader(size: 20, state: OrbState.solving)
+              : Icon(icon),
         ),
       );
 
@@ -302,10 +306,7 @@ class _PersonalCoachScreenState extends State<PersonalCoachScreen> {
                       backgroundColor: const Color(0xFF242429),
                     ),
                     child: _sending
-                        ? const SizedBox.square(
-                            dimension: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                          )
+                        ? const AppThinkingLoader(size: 20, state: OrbState.composing)
                         : const Icon(Icons.arrow_upward_rounded),
                   ),
                 ),

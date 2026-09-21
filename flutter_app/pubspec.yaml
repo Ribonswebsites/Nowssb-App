@@ -38,6 +38,7 @@ dependencies:
   speech_to_text: ^7.4.0
   archive: ^3.6.1
   file_picker: ^8.1.4
+  flutter_thinking_orbs: ^0.1.0
 
 dependency_overrides:
   # record 5.2.1's broad Linux constraint otherwise resolves to 0.7.2,

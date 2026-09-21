@@ -16,6 +16,8 @@ import '../data/content.dart';
 import '../data/store_catalog.dart';
 import '../widgets/black_glass_banner.dart';
 import '../widgets/nwsb_icon.dart';
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
+import '../widgets/app_thinking_loader.dart';
 import 'store.dart';
 import 'store/word_atelier.dart';
 
@@ -570,16 +572,7 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
                                                         : null,
                                                   ),
                                                   child: _building
-                                                      ? const SizedBox(
-                                                          width: 22,
-                                                          height: 22,
-                                                          child:
-                                                              CircularProgressIndicator(
-                                                            strokeWidth: 2.2,
-                                                            color: Color(
-                                                                0xFF0A0A12),
-                                                          ),
-                                                        )
+                                                      ? const AppThinkingLoader(size: 22, state: OrbState.composing)
                                                       : Row(
                                                           mainAxisAlignment:
                                                               MainAxisAlignment

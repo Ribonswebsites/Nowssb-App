@@ -75,7 +75,7 @@ class _FashTilesState extends State<FashTiles> {
 
   void _autoAdvance() {
     if (!mounted || _userPaging) return;
-    if (!TickerMode.of(context).enabled) {
+    if (!TickerMode.of(context)) {
       _armAuto();
       return;
     }

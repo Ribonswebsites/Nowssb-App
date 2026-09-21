@@ -1,9 +1,9 @@
 /// Compact Practice tab opened from the NowssB player.
 ///
 /// Looks like the Now Playing practice card: PRACTICE header, close, status,
-/// glowing-orb film, and two pills. A separate black tab above it shows the
+/// thinking orb, and two pills. A separate black tab above it shows the
 /// word and syllable breakdown. The player behind the tab is blurred; the
-/// cards stay dark so the video orb can blend.
+/// cards stay dark so the orb can blend.
 library;
 
 import 'dart:async';
@@ -14,10 +14,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../data/models.dart';
-import '../media/nwsb_video.dart';
-import '../media/video_pool.dart';
+import '../widgets/app_thinking_loader.dart';
 
 enum _PracticeStatus {
   ready,
@@ -31,7 +31,6 @@ enum _PracticeStatus {
 
 const _sessionLength = 29;
 
-const _practiceOrbClip = 'assets/video/practice-orb.mp4';
 const _storeMark = 'assets/store/nowssb-bag-headphones.webp';
 
 /// Compact microphone used in the Now Playing dock.
@@ -550,7 +549,15 @@ class _BlackTab extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          const SizedBox(height: 132, child: Center(child: _OrbFilm())),
+          const SizedBox(
+            height: 132,
+            child: Center(
+              child: AppThinkingLoader(
+                size: 72,
+                state: OrbState.listening,
+              ),
+            ),
+          ),
           const SizedBox(height: 6),
           Row(
             children: [
@@ -613,33 +620,3 @@ class _BlackTab extends StatelessWidget {
   }
 }
 
-/// Glowing sphere loop. Circular clip, no chrome, black plate matches the tab.
-class _OrbFilm extends StatelessWidget {
-  const _OrbFilm();
-
-  @override
-  Widget build(BuildContext context) {
-    return IgnorePointer(
-      child: SizedBox(
-        width: 112,
-        height: 112,
-        child: ClipOval(
-          child: ColoredBox(
-            color: Colors.black,
-            child: Transform.scale(
-              scale: 1.16,
-              child: const NwsbVideo(
-                asset: _practiceOrbClip,
-                fit: BoxFit.cover,
-                priority: ClipPriority.feature,
-                loop: true,
-                autoplay: true,
-                showPoster: true,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}

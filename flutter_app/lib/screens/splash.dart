@@ -30,7 +30,10 @@ library;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import 'package:video_player/video_player.dart';
+
+import '../widgets/app_thinking_loader.dart';
 
 class Splash extends StatefulWidget {
   const Splash({super.key, required this.onDone});
@@ -149,15 +152,19 @@ class _SplashState extends State<Splash> {
                 child: VideoPlayer(c),
               ),
             )
-          else
-            // The clip's own first frame while it opens, so the launch is
-            // never a black hole even for the half-second before playback.
+          else ...[
+            // Poster under a thinking orb while the start clip opens.
             Image.asset(
               'assets/video/start-animation-poster.webp',
               fit: BoxFit.cover,
               errorBuilder: (_, __, ___) =>
                   const ColoredBox(color: Colors.black),
             ),
+            const ColoredBox(color: Color(0x66000000)),
+            const Center(
+              child: AppThinkingLoader(label: 'Preparing…', state: OrbState.composing),
+            ),
+          ],
         ],
       ),
     );

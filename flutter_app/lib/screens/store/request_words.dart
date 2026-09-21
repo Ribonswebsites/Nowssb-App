@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import '../../data/word_requests.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/nwsb_icon.dart';
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
+import '../../widgets/app_thinking_loader.dart';
 import 'store_cards.dart';
 import 'store_home_sections.dart';
 
@@ -206,11 +208,7 @@ class _RequestWordsScreenState extends State<RequestWordsScreen> {
                         ),
                       ),
                       child: _busy
-                          ? const SizedBox(
-                              width: 22,
-                              height: 22,
-                              child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF060C18)),
-                            )
+                          ? const AppThinkingLoader(size: 22, state: OrbState.composing)
                           : const Text(
                               'Submit Request',
                               style: TextStyle(

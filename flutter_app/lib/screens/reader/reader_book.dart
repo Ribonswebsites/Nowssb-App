@@ -13,12 +13,14 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../data/reader_store.dart';
 import '../../data/store_catalog.dart';
 import '../../media/nwsb_image.dart';
 import '../../theme/tokens.dart';
+import '../../widgets/app_thinking_loader.dart';
 import 'reader_epub.dart';
 import 'reader_lookup.dart';
 
@@ -683,8 +685,7 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
   Widget _pageCard(ReaderPage? pg, int total) {
     if (pg == null) {
       return const Center(
-        child: Text('The meaning catalogue has not loaded yet.',
-            style: TextStyle(color: Color(0x73FFFFFF))),
+        child: AppThinkingLoader(label: 'Preparing…', state: OrbState.composing),
       );
     }
     final size = _store.prefs.size.toDouble();

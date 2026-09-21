@@ -10,6 +10,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../data/content.dart';
 import '../data/practice_progress.dart';
 import '../shell/nav_shell.dart';
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
+import '../widgets/app_thinking_loader.dart';
 import 'sound_library.dart';
 import 'player_settings.dart';
 import 'practice.dart';
@@ -240,7 +242,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) return const Scaffold(backgroundColor: Colors.black, body: Center(child: CircularProgressIndicator(strokeWidth: 1, color: _accent)));
+    if (_loading) {
+      return const Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(
+          child: AppThinkingLoader(label: 'Preparing…', state: OrbState.listening),
+        ),
+      );
+    }
     final int today = (DateTime.now().weekday - 1).clamp(0, 6).toInt();
     return Theme(
       data: ThemeData.dark(useMaterial3: true).copyWith(
