@@ -1,0 +1,14 @@
+{
+  "images": [
+    {"name": "img1.jpg", "md5": "5f56fd875af17d9a971bf1a8bfae8ae7", "bytes": 1436099},
+    {"name": "img2.jpg", "md5": "2e96a6a6ba4359f810981b3fc0bde5a6", "bytes": 1599138},
+    {"name": "img3.jpg", "md5": "27fa9f33f018a2b698f1fe2f6c3143b7", "bytes": 1462033},
+    {"name": "img4.jpg", "md5": "dd8b3522348955a3eb169310c99dd0c4", "bytes": 1778509},
+    {"name": "img5.jpg", "md5": "778ba5115235ad93d8b6eb17fab7d37d", "bytes": 1179597},
+    {"name": "img6.jpg", "md5": "7e7f1c062021a784306cc6f72e5db914", "bytes": 1868459},
+    {"name": "img7.jpg", "md5": "cc52e8038b2b4c1673c18874fd36faef", "bytes": 1294619},
+    {"name": "img8.jpg", "md5": "e4a766c21bd5789bbca2115bf4321e68", "bytes": 1637542},
+    {"name": "img9.jpg", "md5": "6ac16cb29b2bab6115243bf2801f8bb6", "bytes": 1568322}
+  ],
+  "note": "Exact PNG bytes stored as .jpg filenames; do not recompress. Local commit 8e4eea7 has the binaries."
+}
