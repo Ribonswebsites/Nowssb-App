@@ -104,27 +104,28 @@ class _FashTilesState extends State<FashTiles> {
       'Connect',
       'NowssB community',
       '',
+      NwsbMarks.connectPair,
       0,
     ),
     (
       'My Progress',
       'Healing journey',
-      'https://res.r2.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/'
-          'v1783157829/file_00000000ae607208aa51504989648920_ml2czc.png',
+      '',
+      NwsbMarks.bars,
       4,
     ),
     (
       'Word Science',
       'NOWSBANSIU texts',
-      'https://res.r2.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/'
-          'v1783158082/file_0000000086d872089ce376674620d5f3_mtfftb.png',
+      '',
+      NwsbMarks.wordBag,
       2,
     ),
     (
       'My Profile',
       'Your settings',
-      'https://res.r2.com/ds6duqabl/image/upload/f_auto,q_auto/'
-          'v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png',
+      '',
+      NwsbMarks.people,
       4,
     ),
   ];
@@ -206,12 +207,12 @@ class _FashTilesState extends State<FashTiles> {
             ]),
             // Card 2 — existing Connect / Progress / Word Science / Profile
             pane([
-              for (final (title, sub, art, dest) in _tiles)
+              for (final (title, sub, art, mark, dest) in _tiles)
                 _Tile(
                   title: title,
                   sub: sub,
                   art: art,
-                  mark: title == 'Connect' ? NwsbMarks.connectPair : null,
+                  mark: mark,
                   onTap: () => widget.onTile?.call(dest),
                 ),
             ]),
@@ -368,13 +369,27 @@ class _Tile extends StatelessWidget {
                     ),
                     child: mark != null
                         ? Center(
-                            child: NwsbIcon(mark!, size: 16, color: const Color(0xFFE8D5A3)),
+                            child: NwsbIcon(
+                              mark!,
+                              size: 16,
+                              color: const Color(0xFFE8D5A3),
+                            ),
                           )
-                        : NwsbImage(
-                            url: art,
-                            fit: BoxFit.cover,
-                            fallback: const ColoredBox(color: Color(0x1AE8D5A3)),
-                          ),
+                        : (art.isEmpty
+                            ? const Center(
+                                child: NwsbIcon(
+                                  NwsbMarks.discover,
+                                  size: 16,
+                                  color: Color(0xFFE8D5A3),
+                                ),
+                              )
+                            : NwsbImage(
+                                url: art,
+                                fit: BoxFit.cover,
+                                fallback: const ColoredBox(
+                                  color: Color(0x1AE8D5A3),
+                                ),
+                              )),
                   ),
                   const SizedBox(width: 8),
                   // `.home-tile-rule` — 1px, `align-self: stretch`.
@@ -464,6 +479,36 @@ class _BannerTile extends StatelessWidget {
               errorBuilder: (_, __, ___) =>
                   const ColoredBox(color: Color(0xFF111111)),
             ),
+            // Top-right destination mark (restored SVG — was missing/broken).
+            Positioned(
+              top: 8,
+              right: 8,
+              child: Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: const Color(0x22FFFFFF)),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x33000000),
+                      blurRadius: 6,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: NwsbIcon(
+                    dest.mark,
+                    size: 13,
+                    viewBox: dest.mark == NwsbMarks.enterArrow ? 12 : 24,
+                    color: const Color(0xFF1A1A2E),
+                    strokeWidth: 1.6,
+                  ),
+                ),
+              ),
+            ),
             const Positioned(
               right: 6,
               top: 0,
@@ -519,7 +564,7 @@ class _TileEnter extends StatelessWidget {
             ),
             child: Center(
               child: NwsbIcon(
-                '<path d="M2 6H10M7 3L10 6L7 9"/>',
+                NwsbMarks.enterArrow,
                 size: compact ? 8 : 10,
                 viewBox: 12,
                 strokeWidth: 1.9,

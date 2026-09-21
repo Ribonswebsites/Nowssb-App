@@ -20,6 +20,7 @@ import '../data/models.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../widgets/app_thinking_loader.dart';
+import '../widgets/glass_wrap.dart';
 
 enum _PracticeStatus {
   ready,
@@ -385,81 +386,92 @@ class _WordBreakTab extends StatelessWidget {
         .map((s) => s.trim())
         .where((s) => s.isNotEmpty)
         .toList();
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(20, 14, 20, 16),
-      decoration: BoxDecoration(
-        color: const Color(0xF00C0C0E),
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: const Color(0x14FFFFFF)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+
+    final syllableRow = syllables.isEmpty
+        ? const SizedBox.shrink()
+        : Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            alignment: WrapAlignment.start,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              const AppThinkingLoader(size: 22, state: OrbState.composing),
-              const SizedBox(width: 10),
-              Flexible(
-                child: Text(
-                  title,
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Color(0xFFF5F5F7),
-                    fontSize: 22,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.4,
-                    height: 1.1,
+              for (var i = 0; i < syllables.length; i++) ...[
+                if (i > 0)
+                  Container(
+                    width: 4,
+                    height: 4,
+                    decoration: const BoxDecoration(
+                      color: Color(0xCCF4F4F5),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF5F5F5),
+                    borderRadius: BorderRadius.circular(99),
+                  ),
+                  child: Text(
+                    syllables[i],
+                    style: const TextStyle(
+                      color: Color(0xFF0A0A0B),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 0.1,
+                    ),
                   ),
                 ),
-              ),
+              ],
             ],
-          ),
-          if (syllables.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              alignment: WrapAlignment.center,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                for (var i = 0; i < syllables.length; i++) ...[
-                  if (i > 0)
-                    Container(
-                      width: 4,
-                      height: 4,
-                      decoration: const BoxDecoration(
-                        color: Color(0xCCF4F4F5),
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF5F5F5),
-                      borderRadius: BorderRadius.circular(99),
-                    ),
-                    child: Text(
-                      syllables[i],
-                      style: const TextStyle(
-                        color: Color(0xFF0A0A0B),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        letterSpacing: 0.1,
-                      ),
+          );
+
+    // Glass wrapper around a black pill: [bigger composing] [Ananda + syllables].
+    return GlassWrap(
+      margin: EdgeInsets.zero,
+      padding: const EdgeInsets.all(6),
+      radius: 32,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(14, 12, 18, 14),
+        decoration: BoxDecoration(
+          color: const Color(0xF00C0C0E),
+          borderRadius: BorderRadius.circular(26),
+          border: Border.all(color: const Color(0x22FFFFFF)),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const AppThinkingLoader(size: 40, state: OrbState.composing),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Color(0xFFF5F5F7),
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.4,
+                      height: 1.1,
                     ),
                   ),
+                  if (syllables.isNotEmpty) ...[
+                    const SizedBox(height: 10),
+                    syllableRow,
+                  ],
                 ],
-              ],
+              ),
             ),
           ],
-        ],
+        ),
       ),
     );
   }
@@ -562,7 +574,22 @@ class _BlackTab extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           const SizedBox(height: 132, child: Center(child: _OrbFilm())),
-          const SizedBox(height: 6),
+          const SizedBox(height: 10),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              'Wait for you to say it — then tap Start',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Color(0xCCF4F4F5),
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                height: 1.35,
+                letterSpacing: 0.1,
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
           Row(
             children: [
               Expanded(

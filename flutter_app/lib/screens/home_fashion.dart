@@ -56,6 +56,10 @@ import 'healing_path.dart';
 import 'subscription.dart';
 import 'store/ebooks_store.dart';
 import 'reader/reader_hub.dart';
+import 'store/request_words.dart';
+import 'sentence_builder.dart';
+import 'app_settings.dart';
+import 'store/meaning_store.dart';
 
 /// `REG.fash.items` — app/js/part062.js:107-148, key for key and in order.
 ///
@@ -171,6 +175,55 @@ class _HomeFashionState extends State<HomeFashion> {
         _push(PracticeProgressScreen(words: ContentStore.instance.library));
       default:
         _go(tab);
+    }
+  }
+
+
+  void _openSearchDest(String key) {
+    switch (key) {
+      case 'player':
+        _go(1);
+      case 'library':
+      case 'sound-library':
+        _push(const SoundLibraryScreen());
+      case 'store':
+        _go(3);
+      case 'reader':
+        _push(const ReaderHubScreen());
+      case 'meaning-store':
+        _push(const MeaningStoreScreen());
+      case 'practice':
+        _go(1);
+      case 'profile':
+        _go(4);
+      case 'progress':
+        _push(PracticeProgressScreen(words: ContentStore.instance.library));
+      case 'healing':
+      case 'healer':
+        _push(const HealingPathScreen());
+      case 'fashion':
+        _push(const FashionPlusScreen());
+      case 'coach':
+        _push(const PersonalCoachScreen());
+      case 'settings':
+        _push(const AppSettingsScreen());
+      case 'quick-access':
+        _push(const QuickAccessScreen());
+      case 'sentence':
+        _push(const SentenceBuilderScreen());
+      case 'request-words':
+        _push(const RequestWordsScreen());
+      case 'subscribe':
+        _push(const SubscriptionScreen());
+      case 'word-science':
+      case 'about':
+        _go(2);
+      case 'widgets':
+        _push(const WidgetsPage());
+      case 'connect':
+        _go(0);
+      default:
+        _go(2);
     }
   }
 
@@ -386,7 +439,7 @@ class _HomeFashionState extends State<HomeFashion> {
                         children: [
                           HeroGreeting(name: widget.name),
                           FashionGreetingSearch(
-                            onSubmit: (_) => _go(2),
+                            onSubmit: _openSearchDest,
                           ),
                           const HeroCurveStage(glass: true),
                           FashionHero(

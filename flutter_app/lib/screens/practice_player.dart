@@ -13,6 +13,7 @@ import 'dart:math' as math;
 import 'dart:ui' show ImageFilter, lerpDouble;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -22,6 +23,7 @@ import '../data/models.dart';
 import '../data/practice_progress.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
+import '../widgets/app_thinking_loader.dart';
 import '../widgets/tv_frame.dart';
 import '../widgets/glass_wrap.dart';
 import '../widgets/nwsb_icon.dart';
@@ -2760,17 +2762,43 @@ class _VisualStage extends StatelessWidget {
                     children: [
                       _StoreGlassVideoBox(onTap: onStore, size: 56),
                       Expanded(
-                        child: Text(
-                          word.word.toUpperCase(),
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 1.6,
-                            height: 1.05,
+                        child: Center(
+                          child: GlassWrap(
+                            margin: EdgeInsets.zero,
+                            padding: const EdgeInsets.all(4),
+                            radius: 28,
+                            child: Container(
+                              padding: const EdgeInsets.fromLTRB(10, 8, 16, 8),
+                              decoration: BoxDecoration(
+                                color: const Color(0xF00C0C0E),
+                                borderRadius: BorderRadius.circular(24),
+                                border: Border.all(color: const Color(0x22FFFFFF)),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const AppThinkingLoader(
+                                    size: 28,
+                                    state: OrbState.composing,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Flexible(
+                                    child: Text(
+                                      word.word.toUpperCase(),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w800,
+                                        letterSpacing: 1.6,
+                                        height: 1.05,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                       ),

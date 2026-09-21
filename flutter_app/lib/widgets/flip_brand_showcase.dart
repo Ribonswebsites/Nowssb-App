@@ -140,26 +140,28 @@ class _FlipBrandShowcaseState extends State<FlipBrandShowcase>
   }
 
   void _ensureLoop() {
+    // After the grid has settled, never restart filmstrip→grid.
+    if (_gridEntrancePlayed) return;
     if (_looping || !widget.active || !_visible) return;
     _looping = true;
     unawaited(_runLoop());
   }
 
   Future<void> _runLoop() async {
-    while (mounted && _looping && widget.active && _visible) {
+    // One-shot: filmstrip → grid, then settled grid persists.
+    // Do NOT flip back to row or replay the grid entrance.
+    try {
       await _playFilmstrip();
-      if (!mounted || !_looping || !widget.active || !_visible) break;
+      if (!mounted || !_looping || !widget.active || !_visible) return;
       await _flipTo(_FlipMode.grid);
-      if (!mounted || !_looping || !widget.active || !_visible) break;
+      if (!mounted) return;
+      _gridEntrancePlayed = true;
       await Future<void>.delayed(const Duration(milliseconds: _holdMs));
-      if (!mounted || !_looping || !widget.active || !_visible) break;
-      await _flipTo(_FlipMode.row);
-      if (!mounted || !_looping || !widget.active || !_visible) break;
-      _clearFlipLeftovers();
+      if (!mounted) return;
       widget.onCycleComplete?.call();
-      await Future<void>.delayed(const Duration(milliseconds: 420));
+    } finally {
+      _looping = false;
     }
-    _looping = false;
   }
 
   Future<void> _playFilmstrip() async {

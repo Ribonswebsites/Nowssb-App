@@ -139,7 +139,7 @@ class _FashionHeroState extends State<FashionHero> {
       // `visible()` — :573. The rail stops when the home is not the screen
       // you are on and when the app is in the background. TickerMode is
       // both of those in Flutter.
-      if (!mounted || !TickerMode.valuesOf(context).enabled) return;
+      if (!mounted || !TickerMode.of(context)) return;
       if (!_deck.hasClients) return;
       if (DateTime.now().isBefore(_held)) return;
       _i = (_i + 1) % _cells;
@@ -788,11 +788,11 @@ class _ScreenState extends State<_Screen> {
     super.initState();
     if (_flutterTest) return;
     _wt = Timer.periodic(const Duration(seconds: 4), (_) {
-      if (!mounted || !TickerMode.valuesOf(context).enabled) return;
+      if (!mounted || !TickerMode.of(context)) return;
       setState(() => _w = (_w + 1) % _words.length);
     });
     _tt = Timer.periodic(const Duration(milliseconds: 2500), (_) {
-      if (!mounted || !TickerMode.valuesOf(context).enabled) return;
+      if (!mounted || !TickerMode.of(context)) return;
       setState(() => _t = (_t + 1) % _tags.length);
     });
   }

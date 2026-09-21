@@ -435,7 +435,7 @@ class _NcbCarouselState extends State<NcbCarousel> {
       _t = Timer.periodic(const Duration(milliseconds: 3200), (_) {
         // `if (document.hidden) return` — a bar nobody is looking at does
         // not need to be rebuilt every three seconds.
-        if (!mounted || !TickerMode.valuesOf(context).enabled) return;
+        if (!mounted || !TickerMode.of(context)) return;
         setState(() => _i = (_i + 1) % widget.slides.length);
       });
     }

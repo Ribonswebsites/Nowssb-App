@@ -416,7 +416,7 @@ class _NmPromoDiscState extends State<NmPromoDisc>
     if (_flutterTest) return;
     _spin.repeat();
     _t = Timer.periodic(const Duration(milliseconds: 1900), (_) {
-      if (!mounted || !TickerMode.valuesOf(context).enabled) return;
+      if (!mounted || !TickerMode.of(context)) return;
       setState(() {
         final lines = widget.slides[_slide].$2;
         if (_line + 1 < lines.length) {

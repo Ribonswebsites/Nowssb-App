@@ -128,6 +128,10 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
   ScrollPosition? _pos;
   late final PageController _pager;
 
+  Timer? _pageAuto;
+  var _pageIndex = 0;
+  var _userPaging = false;
+
   @override
   void initState() {
     super.initState();
@@ -136,6 +140,18 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
       _tick = Timer.periodic(const Duration(milliseconds: 32), (_) {
         if (!mounted) return;
         setState(() => _auto += 0.0055);
+      });
+      // Continuously auto-rotate the two cards (Enter your path ↔ Sound…).
+      _pageAuto = Timer.periodic(const Duration(milliseconds: 4800), (_) {
+        if (!mounted || _userPaging || widget.embedded) return;
+        if (!TickerMode.of(context)) return;
+        if (!_pager.hasClients) return;
+        final next = (_pageIndex + 1) % _pages.length;
+        _pager.animateToPage(
+          next,
+          duration: const Duration(milliseconds: 520),
+          curve: Curves.easeOutCubic,
+        );
       });
     }
   }
@@ -168,6 +184,7 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
   @override
   void dispose() {
     _tick?.cancel();
+    _pageAuto?.cancel();
     _pos?.removeListener(_onScroll);
     _pager.dispose();
     super.dispose();
@@ -196,20 +213,31 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
 
     final body = SizedBox(
       height: 520,
-      child: PageView(
-        controller: _pager,
-        padEnds: true,
-        children: [
-          for (final spec in _pages)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 6),
-              child: GlassWrap(
-                margin: EdgeInsets.zero,
-                padding: const EdgeInsets.fromLTRB(10, 10, 10, 16),
-                child: _pageBody(spec),
+      child: NotificationListener<ScrollNotification>(
+        onNotification: (n) {
+          if (n is ScrollStartNotification && n.dragDetails != null) {
+            _userPaging = true;
+          } else if (n is ScrollEndNotification) {
+            _userPaging = false;
+          }
+          return false;
+        },
+        child: PageView(
+          controller: _pager,
+          padEnds: true,
+          onPageChanged: (i) => _pageIndex = i,
+          children: [
+            for (final spec in _pages)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+                child: GlassWrap(
+                  margin: EdgeInsets.zero,
+                  padding: const EdgeInsets.fromLTRB(10, 10, 10, 16),
+                  child: _pageBody(spec),
+                ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
     return body;
