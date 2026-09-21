@@ -549,13 +549,16 @@ class MainOptionsSection extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 14),
-          SecBanner(
-            title: 'Find Your Way Around',
-            sub: 'Every screen in the app, and what each one is for',
-            mark: NwsbMarks.sliders,
-            onTap: () => onGo?.call(4),
-          ),
+                    // "Find Your Way Around" quick-access banner — Fashion only.
+          if (fashion) ...[
+            const SizedBox(height: 14),
+            SecBanner(
+              title: 'Find Your Way Around',
+              sub: 'Every screen in the app, and what each one is for',
+              mark: NwsbMarks.sliders,
+              onTap: () => onGo?.call(4),
+            ),
+          ],
         ],
       ),
     );
@@ -1484,9 +1487,7 @@ class _CarouselDots extends StatelessWidget {
 }
 
 /// 30 · footer — index.html Fashion `#homeFooter` / Normal `#homeFooterNm`.
-/// Layout, copy, links, and styling matched to current website/WebView.
-/// 30 · footer — flat band matching website/WebView link row.
-/// No background video, no 3D carousel, no neomorphism glow.
+/// Website brand panel; translucent so home background video stays visible.
 class HomeFooterSection extends StatelessWidget {
   const HomeFooterSection({super.key, this.onLink});
 
@@ -1504,93 +1505,123 @@ class HomeFooterSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fashion = HomeSkinScope.of(context) == HomeSkin.fashion;
-    final bg = fashion ? const Color(0xFF000000) : const Color(0xFFFFFFFF);
-    final fg = fashion ? const Color(0xCCFFFFFF) : const Color(0xCC000000);
+    final fg = fashion ? const Color(0xCCFFFFFF) : const Color(0xCC0A0A0B);
     final brand = fashion ? Colors.white : const Color(0xFF0A0A0B);
     final muted = fashion ? const Color(0x73FFFFFF) : const Color(0x73000000);
     final accent = fashion ? const Color(0xBFC8E8F5) : const Color(0xFF4A5568);
+    final panelFill =
+        fashion ? const Color(0x28FFFFFF) : const Color(0xB8FFFFFF);
+    final panelLine =
+        fashion ? const Color(0x33FFFFFF) : const Color(0x22FFFFFF);
 
-    return Container(
-      width: double.infinity,
-      color: bg,
-      padding: const EdgeInsets.fromLTRB(24, 36, 24, 48),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text.rich(
-            TextSpan(
-              style: TextStyle(
-                fontSize: 26,
-                color: brand,
-                letterSpacing: 1,
-              ),
-              children: const [
-                TextSpan(
-                    text: 'Nowss', style: TextStyle(fontWeight: FontWeight.w600)),
-                TextSpan(
-                    text: 'B', style: TextStyle(fontWeight: FontWeight.w200)),
-              ],
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text.rich(
-            TextSpan(
-              style: TextStyle(
-                fontSize: 9,
-                letterSpacing: 3.2,
-                fontWeight: FontWeight.w400,
-                color: muted,
-              ),
-              children: [
-                const TextSpan(text: 'THE NEW FASHION TREND OF '),
-                TextSpan(
-                  text: 'MEDITATION',
-                  style: TextStyle(color: accent),
+    // No opaque full-width slab — film / backdrop remains visible around
+    // and behind this site-like brand strip (matches WebView panel look).
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 28, 20, 36),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 400),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(22, 26, 22, 22),
+            decoration: BoxDecoration(
+              color: panelFill,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: panelLine),
+              boxShadow: [
+                BoxShadow(
+                  color: fashion
+                      ? const Color(0x66000000)
+                      : const Color(0x1A000000),
+                  blurRadius: 28,
+                  offset: const Offset(0, 10),
                 ),
               ],
             ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 22),
-          Container(
-            width: 32,
-            height: 1,
-            color: fashion ? const Color(0x33FFFFFF) : const Color(0x33000000),
-          ),
-          const SizedBox(height: 22),
-          Wrap(
-            alignment: WrapAlignment.center,
-            spacing: 18,
-            runSpacing: 10,
-            children: [
-              for (final (label, key) in _links)
-                GestureDetector(
-                  onTap: () => onLink?.call(key),
-                  behavior: HitTestBehavior.opaque,
-                  child: Text(
-                    label.toUpperCase(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text.rich(
+                  TextSpan(
                     style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: 1.8,
-                      color: fg,
+                      fontSize: 26,
+                      color: brand,
+                      letterSpacing: 1,
                     ),
+                    children: const [
+                      TextSpan(
+                          text: 'Nowss',
+                          style: TextStyle(fontWeight: FontWeight.w600)),
+                      TextSpan(
+                          text: 'B',
+                          style: TextStyle(fontWeight: FontWeight.w200)),
+                    ],
                   ),
                 ),
-            ],
-          ),
-          const SizedBox(height: 22),
-          Text(
-            '© 2026 Adv. Sanjaykumar Gadge · Shabdapathy',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 9,
-              fontWeight: FontWeight.w300,
-              letterSpacing: 1,
-              color: muted,
+                const SizedBox(height: 6),
+                Text.rich(
+                  TextSpan(
+                    style: TextStyle(
+                      fontSize: 9,
+                      letterSpacing: 3.2,
+                      fontWeight: FontWeight.w400,
+                      color: muted,
+                    ),
+                    children: [
+                      const TextSpan(text: 'THE NEW FASHION TREND OF '),
+                      TextSpan(
+                        text: 'MEDITATION',
+                        style: TextStyle(color: accent),
+                      ),
+                    ],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 18),
+                Container(
+                  width: 32,
+                  height: 1,
+                  color: fashion
+                      ? const Color(0x33FFFFFF)
+                      : const Color(0x33000000),
+                ),
+                const SizedBox(height: 18),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 16,
+                  runSpacing: 10,
+                  children: [
+                    for (final (label, key) in _links)
+                      GestureDetector(
+                        onTap: () => onLink?.call(key),
+                        behavior: HitTestBehavior.opaque,
+                        child: Text(
+                          label.toUpperCase(),
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 1.8,
+                            color: fg,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 18),
+                Text(
+                  '© 2026 Adv. Sanjaykumar Gadge · Shabdapathy',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 9,
+                    fontWeight: FontWeight.w300,
+                    letterSpacing: 1,
+                    color: muted,
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }

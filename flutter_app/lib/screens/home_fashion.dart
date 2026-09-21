@@ -438,18 +438,25 @@ class _HomeFashionState extends State<HomeFashion> {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           HeroGreeting(name: widget.name),
-                          FashionGreetingSearch(
-                            onSubmit: _openSearchDest,
+                          // Search + Quick access live ONLY inside HeroCurveStage.
+                          HeroCurveStage(
+                            glass: true,
+                            onSearch: () => showDestinationSearchSheet(
+                              context,
+                              onSelect: _openSearchDest,
+                            ),
+                            onQuickAccess: () =>
+                                _push(const QuickAccessScreen()),
                           ),
-                          const HeroCurveStage(glass: true),
                           FashionHero(
                             onExplore: () => _go(2),
                             onGuide: () => _push(const WidgetsPage()),
-                            onSearch: () => _go(2),
+                            onSearch: () => showDestinationSearchSheet(
+                              context,
+                              onSelect: _openSearchDest,
+                            ),
                             onStore: () => _go(3),
                             onRail: _go,
-                            onQuickAccess: () =>
-                                _push(const QuickAccessScreen()),
                           ),
                         ],
                       );

@@ -343,6 +343,7 @@ class _HomeNormalState extends State<HomeNormal> {
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
             child: _TopRow(
               onMenu: () => _openHomeMenu(context),
+              onNotifications: () => showNotificationsSheet(context),
               glassMode: _glassMode,
               onGlassToggle: () => setState(() {
                 _glassMode = !_glassMode;
@@ -394,11 +395,13 @@ class _HomeNormalState extends State<HomeNormal> {
 class _TopRow extends StatelessWidget {
   const _TopRow({
     required this.onMenu,
+    required this.onNotifications,
     required this.glassMode,
     required this.onGlassToggle,
   });
 
   final VoidCallback onMenu;
+  final VoidCallback onNotifications;
   final bool glassMode;
   final VoidCallback onGlassToggle;
 
@@ -499,15 +502,17 @@ class _TopRow extends StatelessWidget {
           ),
         ),
         const Spacer(),
-        // Right cluster: Settings | Quick access | Hamburger
+        // Right cluster: Settings | Notifications | Hamburger
+        // Quick access belongs in Fashion Hero — bell returns here.
         _HeaderButton(
           icon: Icons.settings_outlined,
-          onTap: () => Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const WidgetsPage()),
-          ),
+          onTap: () => _openActions(context),
         ),
         const _HeaderDivider(),
-        _HeaderActionsSvgButton(onTap: () => _openActions(context)),
+        _HeaderButton(
+          icon: Icons.notifications_none_rounded,
+          onTap: onNotifications,
+        ),
         const _HeaderDivider(),
         _HamburgerButton(onTap: onMenu),
       ],

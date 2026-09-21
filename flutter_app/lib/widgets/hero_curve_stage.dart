@@ -6,10 +6,15 @@
 library;
 
 import 'dart:async';
+import 'dart:ui' as ui;
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
+
+import '../screens/fashion/header.dart';
+import 'app_thinking_loader.dart';
 import 'glass_wrap.dart';
 
 const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
@@ -46,6 +51,8 @@ class HeroCurveStage extends StatefulWidget {
     this.embedded = false,
     this.subject,
     this.cards,
+    this.onSearch,
+    this.onQuickAccess,
   });
 
   /// Normal home: inset rounded stage.
@@ -59,6 +66,12 @@ class HeroCurveStage extends StatefulWidget {
 
   final String? subject;
   final List<String>? cards;
+
+  /// Opens destination search (Hero header only).
+  final VoidCallback? onSearch;
+
+  /// Opens Quick access (Hero header only — not Frequency mid glass).
+  final VoidCallback? onQuickAccess;
 
   @override
   State<HeroCurveStage> createState() => _HeroCurveStageState();
@@ -123,7 +136,7 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
         },
       );
     }
-    final height = widget.glass ? 640.0 : 600.0;
+    final height = widget.glass ? 560.0 : 600.0;
     final visual = ClipRRect(
       borderRadius: BorderRadius.circular(widget.glass ? 14 : 0),
       child: SizedBox(
@@ -135,6 +148,10 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
     final body = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        if (widget.glass) _HeroChrome(
+          onSearch: widget.onSearch,
+          onQuickAccess: widget.onQuickAccess,
+        ),
         visual,
         const _CurveCopy(),
       ],
@@ -342,7 +359,8 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
                 ),
               ),
             ),
-            if (!widget.embedded)
+            // Brand lives in _HeroChrome when glass; keep overlay for non-glass.
+            if (!widget.embedded && !widget.glass)
               const Positioned(
                 left: 18,
                 top: 16,
@@ -444,6 +462,107 @@ class _CurveCopy extends StatelessWidget {
               height: 1.15,
               letterSpacing: -0.6,
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
+/// Top of Fashion Hero: listening orb + Quick access, then NowssB. + search.
+class _HeroChrome extends StatelessWidget {
+  const _HeroChrome({this.onSearch, this.onQuickAccess});
+  final VoidCallback? onSearch;
+  final VoidCallback? onQuickAccess;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(4, 2, 4, 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              // Glass wrapper → black circle → listening orb
+              ClipRRect(
+                borderRadius: BorderRadius.circular(99),
+                child: BackdropFilter(
+                  filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                  child: Container(
+                    padding: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      color: const Color(0x28FFFFFF),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: const Color(0x44FFFFFF)),
+                    ),
+                    child: Container(
+                      width: 36,
+                      height: 36,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF000000),
+                        shape: BoxShape.circle,
+                      ),
+                      clipBehavior: Clip.antiAlias,
+                      alignment: Alignment.center,
+                      child: const AppThinkingLoader(
+                        size: 30,
+                        state: OrbState.listening,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              GestureDetector(
+                onTap: onQuickAccess,
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  height: 36,
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: const Color(0x22FFFFFF),
+                    borderRadius: BorderRadius.circular(99),
+                    border: Border.all(color: const Color(0x44FFFFFF)),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.apps_rounded, size: 16, color: Colors.white),
+                      SizedBox(width: 6),
+                      Text(
+                        'Quick access',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.1,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const Spacer(),
+            ],
+          ),
+          const SizedBox(height: 10),
+          const Text(
+            'NowssB.',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 22,
+              fontWeight: FontWeight.w700,
+              letterSpacing: -0.3,
+              height: 1,
+            ),
+          ),
+          const SizedBox(height: 10),
+          FashionGreetingSearch(
+            compact: true,
+            onOpen: onSearch,
           ),
         ],
       ),

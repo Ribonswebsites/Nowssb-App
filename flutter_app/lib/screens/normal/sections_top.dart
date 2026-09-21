@@ -14,6 +14,8 @@ library;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
+import '../../widgets/app_thinking_loader.dart';
 
 import '../../widgets/nwsb_icon.dart';
 
@@ -162,7 +164,21 @@ class _SearchBarState extends State<_SearchBar> {
       ),
       child: Row(
         children: [
-          const Icon(Icons.search, size: 20, color: NwsbColors.inkFaint),
+          // Listening orb in a black disc (no left search SVG).
+          Container(
+            width: 32,
+            height: 32,
+            decoration: const BoxDecoration(
+              color: Color(0xFF000000),
+              shape: BoxShape.circle,
+            ),
+            clipBehavior: Clip.antiAlias,
+            alignment: Alignment.center,
+            child: const AppThinkingLoader(
+              size: 26,
+              state: OrbState.listening,
+            ),
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: TextField(

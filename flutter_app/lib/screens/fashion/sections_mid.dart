@@ -7,6 +7,7 @@ library;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../../widgets/neumorphic.dart';
 
 import '../../widgets/enter_curve_stage.dart';
 import '../../widgets/flip_brand_showcase.dart';
@@ -141,22 +142,19 @@ class _FashTilesState extends State<FashTiles> {
     const pageH = padV + railH + gap + gridH + 2;
 
     Widget pane(List<Widget> tiles) {
+      final body = Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const SizedBox(height: railH, child: _TilesRail()),
+          const SizedBox(height: gap),
+          _TwoByTwo(children: tiles),
+        ],
+      );
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 6),
-        child: GlassWrap(
-          margin: EdgeInsets.zero,
-          padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: railH, child: _TilesRail()),
-              const SizedBox(height: gap),
-              _TwoByTwo(children: tiles),
-            ],
-          ),
-        ),
+        child: _tilesShell(context, child: body),
       );
     }
 
@@ -164,9 +162,8 @@ class _FashTilesState extends State<FashTiles> {
     // No tip-rail / demo labels — Flip fills the card body.
     final flipPage = Padding(
       padding: const EdgeInsets.symmetric(horizontal: 6),
-      child: GlassWrap(
-        margin: EdgeInsets.zero,
-        padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+      child: _tilesShell(
+        context,
         child: FlipBrandShowcase(
           active: _index == 0,
           onCycleComplete: _onFlipCycleComplete,
@@ -1363,4 +1360,20 @@ class FashShopNow extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Fashion: always glass. Normal: neo white (NeuCard flips to glass when mode on).
+Widget _tilesShell(BuildContext context, {required Widget child}) {
+  final fashion = HomeSkinScope.of(context) == HomeSkin.fashion;
+  if (fashion) {
+    return GlassWrap(
+      margin: EdgeInsets.zero,
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+      child: child,
+    );
+  }
+  return NeuCard(
+    padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+    child: child,
+  );
 }

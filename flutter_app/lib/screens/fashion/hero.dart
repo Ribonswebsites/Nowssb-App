@@ -308,7 +308,7 @@ class _HeroCard extends StatelessWidget {
           SizedBox(
             height: _topStripH,
             child: Row(
-              // Shop left; search + Quick access top-right.
+              // Shop left + search only. Quick access lives in HeroCurveStage.
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Flexible(child: _ShopChip(onTap: onStore)),
@@ -317,8 +317,6 @@ class _HeroCard extends StatelessWidget {
                   children: [
                     const _Sep(),
                     _SearchPill(onTap: onSearch),
-                    const SizedBox(width: 8),
-                    _QuickAccessChip(onTap: onQuickAccess),
                   ],
                 ),
               ],
@@ -553,14 +551,14 @@ class _ShopChip extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 44,
-            height: 44,
+            width: 40,
+            height: 40,
             decoration: const BoxDecoration(
               color: Colors.white,
               shape: BoxShape.circle,
             ),
             child: const Center(
-              child: NwsbIcon(NwsbMarks.bag, size: 20, color: NwsbColors.ink),
+              child: NwsbIcon(NwsbMarks.bag, size: 18, color: NwsbColors.ink),
             ),
           ),
           const SizedBox(width: 10),
@@ -654,7 +652,7 @@ class _SearchPill extends StatelessWidget {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
-        padding: const EdgeInsets.fromLTRB(14, 4, 4, 4),
+        padding: const EdgeInsets.fromLTRB(12, 2, 2, 2),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(28),
@@ -673,8 +671,8 @@ class _SearchPill extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Container(
-              width: 36,
-              height: 36,
+              width: 34,
+              height: 34,
               decoration: const BoxDecoration(
                 color: Color(0xFF14141C),
                 shape: BoxShape.circle,
@@ -682,7 +680,7 @@ class _SearchPill extends StatelessWidget {
               // `.hero-search-btn` carries assets/icons/search.webp, which
               // is in the repository — the one mark on this card that is a
               // picture rather than a path.
-              padding: const EdgeInsets.all(9),
+              padding: const EdgeInsets.all(8),
               child: Image.asset(
                 'assets/icons/search.webp',
                 errorBuilder: (_, __, ___) =>

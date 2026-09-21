@@ -270,20 +270,31 @@ class HeroGreeting extends StatelessWidget {
   }
 }
 
-/// Glass search under the Healer greeting.
-/// Outer glass rect → inner black pill with composing orb LEFT + centered "Search".
+/// Hero search — glass outer, "Search" label on top, black field pill inside.
+/// Listening orb LEFT, placeholder center, search SVG RIGHT. Opens A–Z sheet.
 class FashionGreetingSearch extends StatelessWidget {
-  const FashionGreetingSearch({super.key, this.onOpen, this.onSubmit, this.controller});
+  const FashionGreetingSearch({
+    super.key,
+    this.onOpen,
+    this.onSubmit,
+    this.controller,
+    this.compact = false,
+  });
 
   /// Opens the blurred destination search sheet (preferred).
   final VoidCallback? onOpen;
   final ValueChanged<String>? onSubmit;
   final TextEditingController? controller;
 
+  /// Tighter padding when embedded inside [HeroCurveStage].
+  final bool compact;
+
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 10, 20, 6),
+      padding: compact
+          ? const EdgeInsets.fromLTRB(0, 0, 0, 0)
+          : const EdgeInsets.fromLTRB(20, 10, 20, 6),
       child: GestureDetector(
         onTap: onOpen ??
             () => showDestinationSearchSheet(context, onSelect: onSubmit),
@@ -291,43 +302,83 @@ class FashionGreetingSearch extends StatelessWidget {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(18),
           child: BackdropFilter(
-            filter: ui.ImageFilter.blur(sigmaX: 9, sigmaY: 9),
+            filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
             child: Container(
-              height: 52,
-              padding: const EdgeInsets.all(5),
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 10),
               decoration: BoxDecoration(
-                color: const Color(0x14FFFFFF),
+                color: const Color(0x22FFFFFF),
                 borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: const Color(0x33FFFFFF)),
+                border: Border.all(color: const Color(0x40FFFFFF)),
               ),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xF00C0C0E),
-                  borderRadius: BorderRadius.circular(99),
-                  border: Border.all(color: const Color(0x22FFFFFF)),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: const Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: AppThinkingLoader(
-                        size: 26,
-                        state: OrbState.composing,
-                      ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Search',
+                    style: TextStyle(
+                      color: Color(0xCCFFFFFF),
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.8,
                     ),
-                    Text(
-                      'Search',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.2,
-                      ),
+                  ),
+                  const SizedBox(height: 6),
+                  Container(
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: const Color(0xF00A0A0C),
+                      borderRadius: BorderRadius.circular(99),
+                      border: Border.all(color: const Color(0x28FFFFFF)),
                     ),
-                  ],
-                ),
+                    padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 32,
+                          height: 32,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF000000),
+                            shape: BoxShape.circle,
+                          ),
+                          clipBehavior: Clip.antiAlias,
+                          alignment: Alignment.center,
+                          child: const AppThinkingLoader(
+                            size: 26,
+                            state: OrbState.listening,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        const Expanded(
+                          child: Text(
+                            'Search any word or meaning…',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: Color(0x99FFFFFF),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: Image.asset(
+                            'assets/icons/search.webp',
+                            color: Colors.white70,
+                            errorBuilder: (_, __, ___) => const Icon(
+                              Icons.search,
+                              size: 20,
+                              color: Colors.white70,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -437,131 +488,145 @@ class _DestinationSearchSheetState extends State<_DestinationSearchSheet> {
   @override
   Widget build(BuildContext context) {
     final items = _filtered;
+    final maxH = MediaQuery.sizeOf(context).height * 0.72;
     return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-        child: Column(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(18),
-              child: BackdropFilter(
-                filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-                child: Container(
-                  padding: const EdgeInsets.fromLTRB(14, 12, 8, 12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xE6101014),
+      child: Align(
+        alignment: Alignment.topCenter,
+        child: Material(
+          type: MaterialType.transparency,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxHeight: maxH),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ClipRRect(
                     borderRadius: BorderRadius.circular(18),
-                    border: Border.all(color: const Color(0x33FFFFFF)),
-                  ),
-                  child: Row(
-                    children: [
-                      const AppThinkingLoader(
-                        size: 24,
-                        state: OrbState.solving,
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: TextField(
-                          controller: _ctrl,
-                          autofocus: true,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          cursorColor: Colors.white70,
-                          onChanged: (v) => setState(() => _q = v),
-                          decoration: const InputDecoration(
-                            isDense: true,
-                            border: InputBorder.none,
-                            hintText: 'Search destinations…',
-                            hintStyle: TextStyle(
-                              color: Color(0x66FFFFFF),
-                              fontSize: 15,
-                            ),
-                          ),
+                    child: BackdropFilter(
+                      filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                      child: Container(
+                        padding: const EdgeInsets.fromLTRB(14, 12, 8, 12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xE6101014),
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(color: const Color(0x33FFFFFF)),
                         ),
-                      ),
-                      IconButton(
-                        onPressed: () => Navigator.of(context).maybePop(),
-                        icon: const Icon(Icons.close, color: Colors.white70),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(18),
-                child: BackdropFilter(
-                  filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-                  child: Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: const Color(0xCC0A0A0E),
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: const Color(0x22FFFFFF)),
-                    ),
-                    child: ListView.separated(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      itemCount: items.length,
-                      separatorBuilder: (_, __) => const Divider(
-                        height: 1,
-                        color: Color(0x14FFFFFF),
-                      ),
-                      itemBuilder: (context, i) {
-                        final (label, key) = items[i];
-                        final letter = label.isEmpty
-                            ? ''
-                            : label[0].toUpperCase();
-                        final showLetter = i == 0 ||
-                            items[i - 1].$1[0].toUpperCase() != letter;
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                        child: Row(
                           children: [
-                            if (showLetter)
-                              Padding(
-                                padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
-                                child: Text(
-                                  letter,
-                                  style: const TextStyle(
-                                    color: Color(0x99E8D5A3),
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w700,
-                                    letterSpacing: 1.4,
+                            const AppThinkingLoader(
+                              size: 24,
+                              state: OrbState.solving,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: TextField(
+                                controller: _ctrl,
+                                autofocus: true,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                cursorColor: Colors.white70,
+                                onChanged: (v) => setState(() => _q = v),
+                                decoration: const InputDecoration(
+                                  isDense: true,
+                                  border: InputBorder.none,
+                                  hintText: 'Search destinations…',
+                                  hintStyle: TextStyle(
+                                    color: Color(0x66FFFFFF),
+                                    fontSize: 15,
                                   ),
                                 ),
                               ),
-                            ListTile(
-                              dense: true,
-                              title: Text(
-                                label,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              trailing: const Icon(
-                                Icons.arrow_forward_ios_rounded,
-                                size: 14,
-                                color: Color(0x66FFFFFF),
-                              ),
-                              onTap: () => _pick(key),
+                            ),
+                            IconButton(
+                              onPressed: () => Navigator.of(context).maybePop(),
+                              icon: const Icon(Icons.close, color: Colors.white70),
                             ),
                           ],
-                        );
-                      },
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                  const SizedBox(height: 12),
+                  Flexible(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(18),
+                      child: BackdropFilter(
+                        filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                        child: Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: const Color(0xCC0A0A0E),
+                            borderRadius: BorderRadius.circular(18),
+                            border: Border.all(color: const Color(0x22FFFFFF)),
+                          ),
+                          child: ListView.separated(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            shrinkWrap: true,
+                            itemCount: items.length,
+                            separatorBuilder: (_, __) => const Divider(
+                              height: 1,
+                              color: Color(0x14FFFFFF),
+                            ),
+                            itemBuilder: (context, i) {
+                              final (label, key) = items[i];
+                              final letter = label.isEmpty
+                                  ? ''
+                                  : label[0].toUpperCase();
+                              final showLetter = i == 0 ||
+                                  items[i - 1].$1[0].toUpperCase() != letter;
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  if (showLetter)
+                                    Padding(
+                                      padding: const EdgeInsets.fromLTRB(
+                                          16, 10, 16, 4),
+                                      child: Text(
+                                        letter,
+                                        style: const TextStyle(
+                                          color: Color(0x99E8D5A3),
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w700,
+                                          letterSpacing: 1.4,
+                                        ),
+                                      ),
+                                    ),
+                                  ListTile(
+                                    dense: true,
+                                    title: Text(
+                                      label,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    trailing: const Icon(
+                                      Icons.arrow_forward_ios_rounded,
+                                      size: 14,
+                                      color: Color(0x66FFFFFF),
+                                    ),
+                                    onTap: () => _pick(key),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
+          ),
         ),
       ),
     );
+
   }
 }
