@@ -85,6 +85,7 @@ flutter:
     - assets/content/
     - assets/subscription/
     - assets/hero-curve/
+    - assets/flip_brand/
 
 flutter_launcher_icons:
   android: false
