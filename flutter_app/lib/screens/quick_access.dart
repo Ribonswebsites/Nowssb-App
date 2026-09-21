@@ -28,6 +28,11 @@ class _QuickAccessScreenState extends State<QuickAccessScreen> {
   late String shape, color, corner;
   late List<String> slots;
 
+  /// Available-features pool is hidden until the user opens +.
+  bool _picking = false;
+
+  static const int maxSlots = 5;
+
   @override
   void initState() {
     super.initState();
@@ -146,17 +151,34 @@ class _QuickAccessScreenState extends State<QuickAccessScreen> {
   Map<String, String> getById(String id) =>
       features.firstWhere((x) => x['id'] == id, orElse: () => features.first);
 
-  void toggle(String id) {
+  List<String> get _availableIds => features
+      .map((f) => f['id']!)
+      .where((id) => !slots.contains(id))
+      .toList();
+
+  void _removeSlot(String id) {
     setState(() {
-      final i = slots.indexOf(id);
-      if (i >= 0) {
-        if (slots.length > 1) slots.removeAt(i);
-      } else {
-        if (slots.length >= 5) slots.removeAt(0);
-        slots.add(id);
-      }
+      if (slots.length > 1) slots.remove(id);
     });
   }
+
+  void _addFromPool(String id) {
+    setState(() {
+      if (slots.contains(id)) return;
+      if (slots.length >= maxSlots) {
+        slots.removeAt(0); // swap oldest when full
+      }
+      slots.add(id);
+      if (slots.length >= maxSlots) _picking = false;
+    });
+  }
+
+  void _openPicker() {
+    HapticFeedback.selectionClick();
+    setState(() => _picking = true);
+  }
+
+  void _closePicker() => setState(() => _picking = false);
 
   void _reset() {
     setState(() {
@@ -164,6 +186,7 @@ class _QuickAccessScreenState extends State<QuickAccessScreen> {
       color = 'glass';
       corner = 'rounded';
       slots = ['connect', 'practice', 'library', 'store', 'profile'];
+      _picking = false;
     });
   }
 
@@ -355,10 +378,11 @@ class _QuickAccessScreenState extends State<QuickAccessScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _SecLabel('Nav Bar Icons · ${slots.length} / 5'),
+                            _SecLabel(
+                                'In your nav · ${slots.length} / $maxSlots'),
                             const SizedBox(height: 8),
                             const Text(
-                              'Pick up to 5 features. Tap any tile to add or remove it. Selected ones show in your nav in order; tapping a 6th replaces the oldest.',
+                              'Up to five destinations plus a + slot. Tap a black tile to remove it. Tap + to open the available set in a separate panel.',
                               style: TextStyle(
                                 color: Colors.white54,
                                 fontSize: 11,
@@ -366,45 +390,58 @@ class _QuickAccessScreenState extends State<QuickAccessScreen> {
                               ),
                             ),
                             const SizedBox(height: 14),
-                            Text(
-                              'IN YOUR NAV · ${slots.length} / 5',
-                              style: const TextStyle(
-                                color: NwsbColors.mist,
-                                letterSpacing: 1.5,
-                                fontSize: 10,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            _FeatureGrid(
-                              ids: slots,
+                            _InNavRow(
                               slots: slots,
                               getById: getById,
-                              onToggle: toggle,
-                            ),
-                            const SizedBox(height: 18),
-                            const Text(
-                              'AVAILABLE FEATURES',
-                              style: TextStyle(
-                                color: NwsbColors.mist,
-                                letterSpacing: 1.5,
-                                fontSize: 10,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            _FeatureGrid(
-                              ids: features
-                                  .map((f) => f['id']!)
-                                  .where((id) => !slots.contains(id))
-                                  .toList(),
-                              slots: slots,
-                              getById: getById,
-                              onToggle: toggle,
+                              onRemove: _removeSlot,
+                              onAddTap: _openPicker,
+                              picking: _picking,
                             ),
                           ],
                         ),
                       ),
+                      if (_picking) ...[
+                        const SizedBox(height: 14),
+                        _PoolCard(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Expanded(
+                                    child: _SecLabel('Available features'),
+                                  ),
+                                  TextButton(
+                                    onPressed: _closePicker,
+                                    style: TextButton.styleFrom(
+                                      foregroundColor: Colors.white70,
+                                      visualDensity: VisualDensity.compact,
+                                    ),
+                                    child: const Text('Close'),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 6),
+                              const Text(
+                                'Pick a feature to fill the + slot.',
+                                style: TextStyle(
+                                  color: Colors.white54,
+                                  fontSize: 11,
+                                  height: 1.45,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              _FeatureGrid(
+                                ids: _availableIds,
+                                slots: slots,
+                                getById: getById,
+                                onToggle: _addFromPool,
+                                blackTiles: true,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                       const SizedBox(height: 20),
                       SizedBox(
                         height: 54,
@@ -533,22 +570,34 @@ class _Options extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Custom pills — ChoiceChip M3 was painting white surfaces with white
+    // labels (invisible). Dark text on white / gold keeps every label readable.
     return Wrap(
       spacing: 8,
       runSpacing: 8,
       children: values.entries.map((e) {
         final on = e.key == selected;
-        return ChoiceChip(
-          label: Text(e.value),
-          selected: on,
-          onSelected: (_) => onTap(e.key),
-          selectedColor: NwsbColors.goldLight,
-          backgroundColor: const Color(0x14FFFFFF),
-          labelStyle: TextStyle(
-            color: on ? NwsbColors.deep : Colors.white70,
-            fontSize: 11,
+        return GestureDetector(
+          onTap: () => onTap(e.key),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 160),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+            decoration: BoxDecoration(
+              color: on ? NwsbColors.goldLight : Colors.white,
+              borderRadius: BorderRadius.circular(99),
+              border: Border.all(
+                color: on ? NwsbColors.goldLight : const Color(0x22000000),
+              ),
+            ),
+            child: Text(
+              e.value,
+              style: TextStyle(
+                color: NwsbColors.deep,
+                fontSize: 12,
+                fontWeight: on ? FontWeight.w700 : FontWeight.w600,
+              ),
+            ),
           ),
-          side: const BorderSide(color: Color(0x24FFFFFF)),
         );
       }).toList(),
     );
@@ -626,17 +675,187 @@ class _NavPreviewOverlay extends StatelessWidget {
   }
 }
 
+/// In-nav row: compact black tiles inside the glass card + trailing +.
+class _InNavRow extends StatelessWidget {
+  const _InNavRow({
+    required this.slots,
+    required this.getById,
+    required this.onRemove,
+    required this.onAddTap,
+    required this.picking,
+  });
+  final List<String> slots;
+  final Map<String, String> Function(String) getById;
+  final ValueChanged<String> onRemove;
+  final VoidCallback onAddTap;
+  final bool picking;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        for (var i = 0; i < slots.length; i++)
+          _BlackTile(
+            label: getById(slots[i])['label']!,
+            img: getById(slots[i])['img']!,
+            badge: '${i + 1}',
+            onTap: () => onRemove(slots[i]),
+          ),
+        _PlusTile(active: picking, onTap: onAddTap),
+      ],
+    );
+  }
+}
+
+class _BlackTile extends StatelessWidget {
+  const _BlackTile({
+    required this.label,
+    required this.img,
+    required this.badge,
+    required this.onTap,
+  });
+  final String label;
+  final String img;
+  final String badge;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 72,
+        height: 72,
+        decoration: BoxDecoration(
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: const Color(0x33FFFFFF)),
+        ),
+        child: Stack(
+          children: [
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _NetIcon(img, 22),
+                    const SizedBox(height: 4),
+                    Text(
+                      label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 9,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Positioned(
+              top: 4,
+              right: 6,
+              child: Text(
+                badge,
+                style: const TextStyle(
+                  color: NwsbColors.goldLight,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PlusTile extends StatelessWidget {
+  const _PlusTile({required this.onTap, required this.active});
+  final VoidCallback onTap;
+  final bool active;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 72,
+        height: 72,
+        decoration: BoxDecoration(
+          color: active ? const Color(0xFF1A1520) : Colors.black,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: active ? NwsbColors.goldLight : const Color(0x55E8D5A3),
+            width: active ? 1.4 : 1,
+          ),
+        ),
+        child: const Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.add_rounded, color: NwsbColors.goldLight, size: 26),
+            SizedBox(height: 2),
+            Text(
+              'Add',
+              style: TextStyle(
+                color: NwsbColors.goldLight,
+                fontSize: 9,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Available pool wrapper — visually distinct from the in-nav glass card.
+class _PoolCard extends StatelessWidget {
+  const _PoolCard({required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(14, 14, 14, 16),
+      decoration: BoxDecoration(
+        color: const Color(0xF00A0E18),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0x55E8D5A3)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x88000000),
+            blurRadius: 22,
+            offset: Offset(0, 10),
+          ),
+        ],
+      ),
+      child: child,
+    );
+  }
+}
+
 class _FeatureGrid extends StatelessWidget {
   const _FeatureGrid({
     required this.ids,
     required this.slots,
     required this.getById,
     required this.onToggle,
+    this.blackTiles = false,
   });
   final List<String> ids;
   final List<String> slots;
   final Map<String, String> Function(String) getById;
   final ValueChanged<String> onToggle;
+  final bool blackTiles;
 
   @override
   Widget build(BuildContext context) {
@@ -649,68 +868,78 @@ class _FeatureGrid extends StatelessWidget {
         ),
       );
     }
+    if (blackTiles) {
+      return Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        children: [
+          for (final id in ids)
+            _BlackTile(
+              label: getById(id)['label']!,
+              img: getById(id)['img']!,
+              badge: '+',
+              onTap: () => onToggle(id),
+            ),
+        ],
+      );
+    }
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 3,
-      mainAxisSpacing: 9,
-      crossAxisSpacing: 9,
-      childAspectRatio: 1.05,
+      crossAxisCount: 4,
+      mainAxisSpacing: 8,
+      crossAxisSpacing: 8,
+      childAspectRatio: 0.95,
       children: ids.map((id) {
         final f = getById(id);
         final on = slots.contains(id);
         return GestureDetector(
           onTap: () => onToggle(id),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: BackdropFilter(
-              filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: on ? const Color(0x28E8D5A3) : const Color(0x14FFFFFF),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: on
-                        ? const Color(0x88E8D5A3)
-                        : const Color(0x28FFFFFF),
-                  ),
-                ),
-                child: Stack(
-                  children: [
-                    Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _NetIcon(f['img']!, 30),
-                          const SizedBox(height: 5),
-                          Text(
-                            f['label']!,
-                            style: TextStyle(
-                              color: on ? NwsbColors.goldLight : Colors.white70,
-                              fontSize: 10,
-                              fontWeight:
-                                  on ? FontWeight.w700 : FontWeight.w400,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    if (on)
-                      Positioned(
-                        top: 6,
-                        right: 7,
-                        child: Text(
-                          '${slots.indexOf(id) + 1}',
-                          style: const TextStyle(
-                            color: NwsbColors.goldLight,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w800,
-                          ),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.black,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: on
+                    ? const Color(0x88E8D5A3)
+                    : const Color(0x33FFFFFF),
+              ),
+            ),
+            child: Stack(
+              children: [
+                Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _NetIcon(f['img']!, 22),
+                      const SizedBox(height: 4),
+                      Text(
+                        f['label']!,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: on ? NwsbColors.goldLight : Colors.white70,
+                          fontSize: 9,
+                          fontWeight: on ? FontWeight.w700 : FontWeight.w500,
                         ),
                       ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
+                if (on)
+                  Positioned(
+                    top: 4,
+                    right: 6,
+                    child: Text(
+                      '${slots.indexOf(id) + 1}',
+                      style: const TextStyle(
+                        color: NwsbColors.goldLight,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ),
         );

@@ -441,7 +441,8 @@ class _HomeFashionState extends State<HomeFashion> {
                   // Modest look-ahead so off-screen video sections stay
                   // lazy-mounted instead of opening every decoder at once.
                   cacheExtent: 480,
-                  padding: const EdgeInsets.only(bottom: 132),
+                  // Footer carries solid-black bottom clearance (no video bleed).
+                  padding: EdgeInsets.zero,
                   itemCount: shown.length + 1,
                   itemBuilder: (context, i) {
                     if (i == 0) {

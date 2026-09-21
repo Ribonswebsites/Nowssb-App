@@ -354,8 +354,6 @@ class _HomeNormalState extends State<HomeNormal> {
   @override
   Widget build(BuildContext context) {
     final built = _sections();
-    final bottomNavigationClearance =
-        MediaQuery.paddingOf(context).bottom + 112;
     assert(
       built.map((e) => e.$1).toList().toString() ==
           kNormalSectionOrder.toString(),
@@ -402,7 +400,8 @@ class _HomeNormalState extends State<HomeNormal> {
               // Modest look-ahead: enough for smooth scroll, not enough to
               // mount every video on the home at once (N+1 decoder churn).
               cacheExtent: 480,
-              padding: EdgeInsets.only(bottom: bottomNavigationClearance),
+              // Footer paints solid black through nav clearance.
+              padding: EdgeInsets.zero,
               itemCount: shown.length,
               itemBuilder: (context, i) {
                 final (k, w) = shown[i];
