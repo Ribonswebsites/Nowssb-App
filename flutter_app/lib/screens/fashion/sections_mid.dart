@@ -9,6 +9,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../widgets/enter_curve_stage.dart';
+import '../../widgets/flip_brand_showcase.dart';
 import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_icon.dart';
 
@@ -25,14 +26,17 @@ import '../widgets_page.dart';
 
 const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
 
-/// 7 · tiles — index.html:1939. The tip rail, then two swipeable 2×2 cards.
+/// 7 · tiles — tip rail + horizontal pages.
+///
+/// Page 0 = Flip glass brand showcase; pages 1+ = existing feature destination
+/// cards (Enter / nav preserved). Auto-swipes and loops while on-screen.
 class FashTiles extends StatefulWidget {
   const FashTiles({super.key, this.onTile, this.onOpen});
 
-  /// Called with the tile's destination tab index (first card).
+  /// Called with the tile's destination tab index (community card).
   final void Function(int)? onTile;
 
-  /// Player / Library / Store / Reader on the second card.
+  /// Player / Library / Store / Reader on the destination card.
   final void Function(String id)? onOpen;
 
   @override
@@ -40,22 +44,61 @@ class FashTiles extends StatefulWidget {
 }
 
 class _FashTilesState extends State<FashTiles> {
+  static const _pageCount = 3; // Flip + 2 existing feature panes
+  static const _autoMs = 5200;
+
   late final PageController _pager;
+  Timer? _auto;
+  var _index = 0;
+  var _userPaging = false;
 
   @override
   void initState() {
     super.initState();
     _pager = PageController(viewportFraction: 0.94);
+    _armAuto();
   }
 
   @override
   void dispose() {
+    _auto?.cancel();
     _pager.dispose();
     super.dispose();
   }
 
-  /// First card: Connect replaces Sound Library so the two cards never
-  /// share a button.
+  void _armAuto() {
+    _auto?.cancel();
+    // Flip page advances via onCycleComplete; other pages use a timer.
+    if (_index == 0) return;
+    _auto = Timer(const Duration(milliseconds: _autoMs), _autoAdvance);
+  }
+
+  void _autoAdvance() {
+    if (!mounted || _userPaging) return;
+    if (!TickerMode.of(context).enabled) {
+      _armAuto();
+      return;
+    }
+    final next = (_index + 1) % _pageCount;
+    _pager.animateToPage(
+      next,
+      duration: const Duration(milliseconds: 480),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  void _onFlipCycleComplete() {
+    if (!mounted || _index != 0 || _userPaging) return;
+    final next = (_index + 1) % _pageCount;
+    _pager.animateToPage(
+      next,
+      duration: const Duration(milliseconds: 520),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  /// Destination card: Connect replaces Sound Library so the two cards never
+  /// share a button. (Preserved existing card — now page index 2.)
   static const _tiles = [
     (
       'Connect',
@@ -88,11 +131,13 @@ class _FashTilesState extends State<FashTiles> {
 
   @override
   Widget build(BuildContext context) {
+    // +2 slack kills the 2.0px BOTTOM OVERFLOW on the feature panes
+    // (GlassWrap border + column math).
     const gridH = _tileHeight * 2 + 10;
     const railH = 22.0;
     const gap = 10.0;
     const padV = 22.0;
-    const pageH = padV + railH + gap + gridH;
+    const pageH = padV + railH + gap + gridH + 2;
 
     Widget pane(List<Widget> tiles) {
       return Padding(
@@ -102,7 +147,7 @@ class _FashTilesState extends State<FashTiles> {
           padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
-            mainAxisSize: MainAxisSize.max,
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: railH, child: _TilesRail()),
@@ -114,30 +159,64 @@ class _FashTilesState extends State<FashTiles> {
       );
     }
 
+    // Same outer footprint as sibling panes (GlassWrap + horizontal inset).
+    // No tip-rail / demo labels — Flip fills the card body.
+    final flipPage = Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      child: GlassWrap(
+        margin: EdgeInsets.zero,
+        padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+        child: FlipBrandShowcase(
+          active: _index == 0,
+          onCycleComplete: _onFlipCycleComplete,
+        ),
+      ),
+    );
+
     return SizedBox(
       height: pageH,
-      child: PageView(
-        controller: _pager,
-        padEnds: true,
-        children: [
-          pane([
-            for (final d in EnterCurveAssets.destinations)
-              _BannerTile(
-                dest: d,
-                onTap: () => widget.onOpen?.call(d.id),
-              ),
-          ]),
-          pane([
-            for (final (title, sub, art, dest) in _tiles)
-              _Tile(
-                title: title,
-                sub: sub,
-                art: art,
-                mark: title == 'Connect' ? NwsbMarks.connectPair : null,
-                onTap: () => widget.onTile?.call(dest),
-              ),
-          ]),
-        ],
+      child: NotificationListener<ScrollNotification>(
+        onNotification: (n) {
+          if (n is ScrollStartNotification && n.dragDetails != null) {
+            _userPaging = true;
+            _auto?.cancel();
+          } else if (n is ScrollEndNotification) {
+            _userPaging = false;
+            _armAuto();
+          }
+          return false;
+        },
+        child: PageView(
+          controller: _pager,
+          padEnds: true,
+          onPageChanged: (i) {
+            setState(() => _index = i);
+            _armAuto();
+          },
+          children: [
+            // Card 0 — Flip glass brand showcase
+            flipPage,
+            // Card 1 — existing Player / Library / Store / Reader (Enter)
+            pane([
+              for (final d in EnterCurveAssets.destinations)
+                _BannerTile(
+                  dest: d,
+                  onTap: () => widget.onOpen?.call(d.id),
+                ),
+            ]),
+            // Card 2 — existing Connect / Progress / Word Science / Profile
+            pane([
+              for (final (title, sub, art, dest) in _tiles)
+                _Tile(
+                  title: title,
+                  sub: sub,
+                  art: art,
+                  mark: title == 'Connect' ? NwsbMarks.connectPair : null,
+                  onTap: () => widget.onTile?.call(dest),
+                ),
+            ]),
+          ],
+        ),
       ),
     );
   }
