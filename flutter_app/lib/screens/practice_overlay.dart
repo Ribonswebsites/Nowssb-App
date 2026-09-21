@@ -552,10 +552,7 @@ class _BlackTab extends StatelessWidget {
           const SizedBox(
             height: 132,
             child: Center(
-              child: AppThinkingLoader(
-                size: 72,
-                state: OrbState.listening,
-              ),
+              child: AppThinkingLoader(size: 72, state: OrbState.listening),
             ),
           ),
           const SizedBox(height: 6),
@@ -619,4 +616,3 @@ class _BlackTab extends StatelessWidget {
     );
   }
 }
-
