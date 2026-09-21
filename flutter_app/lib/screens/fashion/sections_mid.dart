@@ -456,6 +456,11 @@ class _BannerTile extends StatelessWidget {
               fit: BoxFit.contain,
               alignment: Alignment.centerLeft,
               filterQuality: FilterQuality.medium,
+              gaplessPlayback: true,
+              frameBuilder: (context, child, frame, sync) {
+                if (sync || frame != null) return child;
+                return const ColoredBox(color: Color(0xFF111111));
+              },
               errorBuilder: (_, __, ___) =>
                   const ColoredBox(color: Color(0xFF111111)),
             ),

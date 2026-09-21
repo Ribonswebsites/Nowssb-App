@@ -88,12 +88,14 @@ class FashionHero extends StatefulWidget {
     this.onSearch,
     this.onStore,
     this.onRail,
+    this.onQuickAccess,
   });
 
   final VoidCallback? onExplore;
   final VoidCallback? onGuide;
   final VoidCallback? onSearch;
   final VoidCallback? onStore;
+  final VoidCallback? onQuickAccess;
 
   /// Called with the banner's destination tab.
   final void Function(int dest)? onRail;
@@ -218,6 +220,7 @@ class _FashionHeroState extends State<FashionHero> {
                   onGuide: widget.onGuide,
                   onSearch: widget.onSearch,
                   onStore: widget.onStore,
+                  onQuickAccess: widget.onQuickAccess,
                   // Only the cell on screen decodes. Off-cell clips are stills,
                   // which is what "no src at all until its turn" buys on the web.
                   live: _i == 0,
@@ -268,6 +271,7 @@ class _HeroCard extends StatelessWidget {
     this.onGuide,
     this.onSearch,
     this.onStore,
+    this.onQuickAccess,
     this.onLearn,
     this.onStep,
   });
@@ -283,6 +287,7 @@ class _HeroCard extends StatelessWidget {
   final VoidCallback? onGuide;
   final VoidCallback? onSearch;
   final VoidCallback? onStore;
+  final VoidCallback? onQuickAccess;
 
   /// The white disc, and the way back out of the guide.
   final VoidCallback? onLearn;
@@ -303,8 +308,7 @@ class _HeroCard extends StatelessWidget {
           SizedBox(
             height: _topStripH,
             child: Row(
-              // Same two groups: the shop keeps left and shrinks if it must,
-              // the search sits in the right-hand corner at its own size.
+              // Shop left; search + Quick access top-right.
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Flexible(child: _ShopChip(onTap: onStore)),
@@ -313,6 +317,8 @@ class _HeroCard extends StatelessWidget {
                   children: [
                     const _Sep(),
                     _SearchPill(onTap: onSearch),
+                    const SizedBox(width: 8),
+                    _QuickAccessChip(onTap: onQuickAccess),
                   ],
                 ),
               ],
@@ -597,6 +603,47 @@ class _ShopChip extends StatelessWidget {
 
 /// `.hs-searchpill` — the one control on this card that is a live invitation
 /// rather than a label, so it says what it is and wears a ring.
+
+/// Top-right Quick access control on the Fashion hero header.
+class _QuickAccessChip extends StatelessWidget {
+  const _QuickAccessChip({this.onTap});
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        height: 36,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: const Color(0x22FFFFFF),
+          borderRadius: BorderRadius.circular(99),
+          border: Border.all(color: const Color(0x44FFFFFF)),
+        ),
+        child: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.apps_rounded, size: 16, color: Colors.white),
+            SizedBox(width: 6),
+            Text(
+              'Quick access',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.1,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _SearchPill extends StatelessWidget {
   const _SearchPill({this.onTap});
   final VoidCallback? onTap;

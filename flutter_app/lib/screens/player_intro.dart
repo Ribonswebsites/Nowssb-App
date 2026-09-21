@@ -24,6 +24,9 @@ const kPlayerIntroArt = <String>[
 
 const _kArtIndexKey = 'nwsb_pi_art';
 
+/// Persist so PlayerIntroScreen shows once per install.
+const kPlayerIntroSeenKey = 'nwsb_player_intro_seen';
+
 class PlayerIntroScreen extends StatefulWidget {
   const PlayerIntroScreen({
     super.key,

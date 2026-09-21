@@ -88,6 +88,11 @@ class NwsbImage extends StatelessWidget {
         path,
         fit: fit,
         alignment: alignment,
+        gaplessPlayback: true,
+        frameBuilder: (context, child, frame, sync) {
+          if (sync || frame != null) return child;
+          return _fallback;
+        },
         // A picture that is in the map but missing on disk must not throw in
         // a scrolling list. Same reasoning as NwsbVideo's black rectangle.
         errorBuilder: (_, __, ___) => _fallback,

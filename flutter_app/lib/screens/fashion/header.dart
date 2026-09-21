@@ -12,8 +12,10 @@ library;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../../theme/tokens.dart';
+import '../../widgets/app_thinking_loader.dart';
 import '../../widgets/nwsb_icon.dart';
 
 class HomeHeader extends StatelessWidget {
@@ -263,6 +265,54 @@ class HeroGreeting extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Glass search under the Good morning greeting — solving orb on the right.
+class FashionGreetingSearch extends StatelessWidget {
+  const FashionGreetingSearch({super.key, this.onSubmit, this.controller});
+
+  final ValueChanged<String>? onSubmit;
+  final TextEditingController? controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 10, 20, 6),
+      child: Container(
+        height: 48,
+        padding: const EdgeInsets.fromLTRB(14, 0, 8, 0),
+        decoration: BoxDecoration(
+          color: const Color(0x22FFFFFF),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0x33FFFFFF)),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.search_rounded, color: Color(0xB3FFFFFF), size: 22),
+            const SizedBox(width: 10),
+            Expanded(
+              child: TextField(
+                controller: controller,
+                style: const TextStyle(color: Colors.white, fontSize: 15),
+                cursorColor: Colors.white70,
+                textInputAction: TextInputAction.search,
+                onSubmitted: onSubmit,
+                decoration: const InputDecoration(
+                  isDense: true,
+                  border: InputBorder.none,
+                  hintText: 'Search words, meanings…',
+                  hintStyle: TextStyle(color: Color(0x66FFFFFF), fontSize: 14),
+                ),
+              ),
+            ),
+            const SizedBox(width: 6),
+            const AppThinkingLoader(size: 22, state: OrbState.solving),
+            const SizedBox(width: 4),
+          ],
+        ),
       ),
     );
   }

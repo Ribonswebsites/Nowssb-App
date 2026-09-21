@@ -65,6 +65,8 @@ class _FlipBrandShowcaseState extends State<FlipBrandShowcase>
   bool _animating = false;
   bool _looping = false;
   bool _visible = false;
+  /// Grid entrance FLIP runs once per mount; later grid reveals snap settled.
+  bool _gridEntrancePlayed = false;
   List<Offset>? _deltas;
   List<Size>? _fromSizes;
   List<Size>? _toSizes;
@@ -79,10 +81,20 @@ class _FlipBrandShowcaseState extends State<FlipBrandShowcase>
     )..addListener(() {
         if (mounted) setState(() {});
       });
-    WidgetsBinding.instance.addPostFrameCallback((_) => _probeVisibility());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _probeVisibility();
+      _precacheBrandStills();
+    });
     _probe = Timer.periodic(const Duration(milliseconds: 400), (_) {
       _probeVisibility();
     });
+  }
+
+  void _precacheBrandStills() {
+    if (!mounted) return;
+    for (final path in kFlipBrandAssets) {
+      unawaited(precacheImage(AssetImage(path), context));
+    }
   }
 
   @override
@@ -195,6 +207,22 @@ class _FlipBrandShowcaseState extends State<FlipBrandShowcase>
 
   Future<void> _flipTo(_FlipMode next) async {
     if (_animating || _mode == next) return;
+
+    // After the first grid reveal, later returns to grid snap settled —
+    // do not replay the entrance FLIP intro.
+    if (next == _FlipMode.grid && _gridEntrancePlayed) {
+      _animating = true;
+      setState(() {
+        _mode = next;
+        _deltas = null;
+        _fromSizes = null;
+        _toSizes = null;
+      });
+      _clearFlipLeftovers();
+      _animating = false;
+      return;
+    }
+
     _animating = true;
     final first = _captureRects();
 
@@ -227,6 +255,9 @@ class _FlipBrandShowcaseState extends State<FlipBrandShowcase>
     if (!mounted) {
       _animating = false;
       return;
+    }
+    if (next == _FlipMode.grid) {
+      _gridEntrancePlayed = true;
     }
     _clearFlipLeftovers();
     if (next == _FlipMode.row && _stripCtrl.hasClients) {
@@ -291,13 +322,19 @@ class _FlipBrandShowcaseState extends State<FlipBrandShowcase>
           borderRadius: BorderRadius.circular(_tileRadius),
           child: ColoredBox(
             color: const Color(0xFF111111),
-            child: Image.asset(
-              kFlipBrandAssets[i],
+            child: Image(
+              image: AssetImage(kFlipBrandAssets[i]),
               fit: BoxFit.cover,
               width: double.infinity,
               height: double.infinity,
               gaplessPlayback: true,
               filterQuality: FilterQuality.medium,
+              frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                if (wasSynchronouslyLoaded || frame != null) {
+                  return child;
+                }
+                return const ColoredBox(color: Color(0xFF111111));
+              },
               errorBuilder: (_, __, ___) =>
                   const ColoredBox(color: Color(0xFF111111)),
             ),

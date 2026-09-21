@@ -45,6 +45,7 @@ import 'fashion_plus.dart';
 import 'notifications_sheet.dart';
 import 'sound_library.dart';
 import 'widgets_page.dart';
+import 'quick_access.dart';
 import '../widgets/home_menu_drawer.dart';
 import 'word_detail.dart';
 import 'progress/progress_screen.dart';
@@ -384,6 +385,9 @@ class _HomeFashionState extends State<HomeFashion> {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           HeroGreeting(name: widget.name),
+                          FashionGreetingSearch(
+                            onSubmit: (_) => _go(2),
+                          ),
                           const HeroCurveStage(glass: true),
                           FashionHero(
                             onExplore: () => _go(2),
@@ -391,6 +395,8 @@ class _HomeFashionState extends State<HomeFashion> {
                             onSearch: () => _go(2),
                             onStore: () => _go(3),
                             onRail: _go,
+                            onQuickAccess: () =>
+                                _push(const QuickAccessScreen()),
                           ),
                         ],
                       );

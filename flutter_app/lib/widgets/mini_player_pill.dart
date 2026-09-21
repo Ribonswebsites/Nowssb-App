@@ -5,8 +5,10 @@ library;
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../data/playback_session.dart';
+import 'app_thinking_loader.dart';
 
 const _storeMark = 'assets/store/nowssb-bag-headphones.webp';
 
@@ -106,6 +108,11 @@ class MiniPlayerPill extends StatelessWidget {
                           width: 1,
                           height: 24,
                           color: const Color(0x55FFFFFF),
+                        ),
+                        const SizedBox(width: 8),
+                        const AppThinkingLoader(
+                          size: 22,
+                          state: OrbState.composing,
                         ),
                         const SizedBox(width: 8),
                         Expanded(

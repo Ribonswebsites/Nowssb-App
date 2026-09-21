@@ -111,6 +111,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
   var _bottomPage = 0;
   var _guideDone = false;
   var _introDone = false;
+  var _flagsReady = false;
   DateTime? _startedAt;
   String? _error;
 
@@ -130,9 +131,45 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     unawaited(PracticeProgress.instance.start());
     unawaited(_loadLiked());
     unawaited(_loadShuffle());
-    _introDone = !widget.showIntro;
-    _guideDone = !widget.showIntro;
-    if (_introDone) unawaited(_prepareAndPlay());
+    if (!widget.showIntro) {
+      _introDone = true;
+      _guideDone = true;
+      _flagsReady = true;
+      unawaited(_prepareAndPlay());
+    } else {
+      unawaited(_loadIntroFlags());
+    }
+  }
+
+  Future<void> _loadIntroFlags() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final guideSeen = prefs.getBool(kPlayerGuideSeenKey) ?? false;
+      final introSeen = prefs.getBool(kPlayerIntroSeenKey) ?? false;
+      if (!mounted) return;
+      setState(() {
+        _guideDone = guideSeen;
+        _introDone = introSeen;
+        _flagsReady = true;
+      });
+      if (_introDone && _guideDone) {
+        unawaited(_prepareAndPlay());
+      } else if (_introDone && !_guideDone) {
+        // Guide still pending; do not start playback yet.
+      } else if (!_introDone && _guideDone) {
+        // Intro pending after guide already seen.
+      }
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _flagsReady = true);
+    }
+  }
+
+  Future<void> _markIntroSeen() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(kPlayerIntroSeenKey, true);
+    } catch (_) {}
   }
 
   void _kickBottomAuto() {
@@ -694,8 +731,17 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       );
     }
 
+    if (!_flagsReady) {
+      return const Scaffold(
+        backgroundColor: Color(0xFF000000),
+        body: SizedBox.expand(),
+      );
+    }
+
     if (!_guideDone) {
-      return PlayerGuideScreen(onDone: () => setState(() => _guideDone = true));
+      return PlayerGuideScreen(
+        onDone: () => setState(() => _guideDone = true),
+      );
     }
 
     if (!_introDone) {
@@ -705,6 +751,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
         onBack: () => Navigator.of(context).maybePop(),
         onSettings: _openSettings,
         onBegin: () {
+          unawaited(_markIntroSeen());
           setState(() => _introDone = true);
           unawaited(_prepareAndPlay());
         },
