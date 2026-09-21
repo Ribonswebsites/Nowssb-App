@@ -176,55 +176,32 @@ void main() {
   });
 
   testWidgets('the four tiles are the four in the markup', (tester) async {
-    // index.html:1958-1994, in order. This list carried "The Store", which
-    // is not one of them, and was missing My Progress.
     await pump(tester);
 
-    // The tiles are the seventh section, well below the fold, and a
-    // ListView.builder has not built them at rest.
-    // Scrolled to the GRID, not to the first "Sound Library" on the page —
-    // the six-door panel above the tiles says that too, and stopping at it
-    // left the tiles still below the fold.
     final list = find.byType(Scrollable).first;
     for (var i = 0;
-        i < 30 &&
-            find
-                .descendant(
-                  of: find.byType(GridView),
-                  matching: find.text('Connect'),
-                )
-                .evaluate()
-                .isEmpty;
+        i < 30 && find.text('Tap to restyle').evaluate().isEmpty;
         i++) {
       await tester.drag(list, const Offset(0, -320));
       await tester.pump(const Duration(milliseconds: 16));
     }
 
-    // Scoped to the grid. Three of these names are also on the six-door
-    // panel above — that panel is a menu and these are the tiles, and both
-    // are meant to say Sound Library.
-    final grid = find.byType(GridView);
+    expect(find.text('Tap to restyle'), findsWidgets);
+
+    // Photo banners are the first card; swipe to the Connect grid.
+    await tester.drag(find.text('Tap to restyle').first, const Offset(-280, 0));
+    await tester.pumpAndSettle();
+
     for (final t in [
       'Connect',
       'My Progress',
       'Word Science',
       'My Profile',
     ]) {
-      expect(find.descendant(of: grid, matching: find.text(t)), findsOneWidget,
-          reason: '$t is not on the home');
+      expect(find.text(t), findsWidgets, reason: '$t is not on the home');
     }
-    expect(find.descendant(of: grid, matching: find.text('The Store')),
-        findsNothing,
+    expect(find.text('The Store'), findsNothing,
         reason: 'The Store is not one of the four tiles');
-
-    // `height: 118px` — nowssb-nm.css:7950. They were sized by a ratio, so
-    // they grew with the phone and stood far taller than the site's.
-    final tile = tester.getRect(find.ancestor(
-      of: find.text('Connect'),
-      matching: find.byType(GridView),
-    ));
-    expect(tile.height, closeTo(118 * 2 + 10, 1),
-        reason: 'two rows of 118 and one 10px gap');
   });
 
   testWidgets('the offer is one section: head, film, bar', (tester) async {

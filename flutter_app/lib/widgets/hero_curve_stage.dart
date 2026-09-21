@@ -123,7 +123,7 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
         },
       );
     }
-    final height = widget.glass ? 580.0 : 540.0;
+    final height = widget.glass ? 640.0 : 600.0;
     final visual = ClipRRect(
       borderRadius: BorderRadius.circular(widget.glass ? 14 : 0),
       child: SizedBox(
@@ -283,6 +283,7 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
     final indices = List<int>.generate(n, (i) => i)
       ..sort((a, b) =>
           math.cos(rot + a * step).compareTo(math.cos(rot + b * step)));
+    const rows = [-118.0, 0.0, 118.0];
 
     final stage = GestureDetector(
       behavior: widget.embedded
@@ -303,18 +304,20 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    for (final i in indices)
-                      _card(
-                        cards[i],
-                        rot + i * step,
-                        radius,
-                        onTap: () => setState(() {
-                          _drag += -((rot + i * step) % (math.pi * 2));
-                          if (_drag.abs() > math.pi) {
-                            _drag -= _drag.sign * math.pi * 2;
-                          }
-                        }),
-                      ),
+                    for (var r = 0; r < 3; r++)
+                      for (final i in indices)
+                        _card(
+                          cards[i],
+                          rot + i * step + r * (step / 3),
+                          radius,
+                          y: rows[r],
+                          onTap: () => setState(() {
+                            _drag += -((rot + i * step) % (math.pi * 2));
+                            if (_drag.abs() > math.pi) {
+                              _drag -= _drag.sign * math.pi * 2;
+                            }
+                          }),
+                        ),
                   ],
                 ),
               ),
@@ -363,7 +366,7 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
   }
 
   Widget _card(String asset, double angle, double radius,
-      {VoidCallback? onTap}) {
+      {VoidCallback? onTap, double y = -8}) {
     final depth = math.cos(angle);
     if (depth < -0.22) return const SizedBox.shrink();
     final scale = 0.72 + 0.28 * ((depth + 1) / 2);
@@ -372,7 +375,7 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
       alignment: Alignment.center,
       transform: Matrix4.identity()
         ..rotateY(angle)
-        ..translateByDouble(0.0, -8.0, radius, 1.0),
+        ..translateByDouble(0.0, y, radius, 1.0),
       child: Opacity(
         opacity: opacity,
         child: Transform.scale(

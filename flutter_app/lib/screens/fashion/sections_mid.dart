@@ -89,47 +89,28 @@ class _FashTilesState extends State<FashTiles> {
   @override
   Widget build(BuildContext context) {
     const gridH = _tileHeight * 2 + 10;
-    const railH = 32.0;
-    const gap = 12.0;
-    const pad = 24.0;
-    const pageH = pad + railH + gap + gridH + 8;
+    const railH = 22.0;
+    const gap = 10.0;
+    const padV = 22.0;
+    const pageH = padV + railH + gap + gridH;
 
-    Widget pane(Widget grid) {
+    Widget pane(List<Widget> tiles) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 6),
         child: GlassWrap(
           margin: EdgeInsets.zero,
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(
-                height: railH,
-                child: _TilesRail(),
-              ),
+              const SizedBox(height: railH, child: _TilesRail()),
               const SizedBox(height: gap),
-              SizedBox(height: gridH, child: grid),
+              _TwoByTwo(children: tiles),
             ],
           ),
         ),
-      );
-    }
-
-    Widget gridOf(List<Widget> children) {
-      return LayoutBuilder(
-        builder: (context, c) {
-          final cell = (c.maxWidth - 10) / 2;
-          return GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 10,
-            crossAxisSpacing: 10,
-            childAspectRatio: cell / _tileHeight,
-            children: children,
-          );
-        },
       );
     }
 
@@ -139,7 +120,14 @@ class _FashTilesState extends State<FashTiles> {
         controller: _pager,
         padEnds: true,
         children: [
-          pane(gridOf([
+          pane([
+            for (final d in EnterCurveAssets.destinations)
+              _BannerTile(
+                dest: d,
+                onTap: () => widget.onOpen?.call(d.id),
+              ),
+          ]),
+          pane([
             for (final (title, sub, art, dest) in _tiles)
               _Tile(
                 title: title,
@@ -148,14 +136,7 @@ class _FashTilesState extends State<FashTiles> {
                 mark: title == 'Connect' ? NwsbMarks.connectPair : null,
                 onTap: () => widget.onTile?.call(dest),
               ),
-          ])),
-          pane(gridOf([
-            for (final d in EnterCurveAssets.destinations)
-              _BannerTile(
-                dest: d,
-                onTap: () => widget.onOpen?.call(d.id),
-              ),
-          ])),
+          ]),
         ],
       ),
     );
@@ -196,9 +177,46 @@ class _TilesRail extends StatelessWidget {
   }
 }
 
-/// `height: 118px` — nowssb-nm.css:7950, for these tiles inside the glass
-/// wrapper on the Fashion home.
-const double _tileHeight = 118;
+/// `height: 128px` — room for the Enter pill so it is not clipped.
+const double _tileHeight = 128;
+
+class _TwoByTwo extends StatelessWidget {
+  const _TwoByTwo({required this.children});
+
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    Widget cell(int i) => Expanded(child: children[i]);
+    return Column(
+      children: [
+        SizedBox(
+          height: _tileHeight,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              cell(0),
+              const SizedBox(width: 10),
+              cell(1),
+            ],
+          ),
+        ),
+        const SizedBox(height: 10),
+        SizedBox(
+          height: _tileHeight,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              cell(2),
+              const SizedBox(width: 10),
+              cell(3),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
 
 /// `.home-tile` in its DEFAULT look — `fashtile-black`, which is what
 /// `savedFashStyle()` returns when nobody has chosen otherwise
@@ -363,10 +381,10 @@ class _BannerTile extends StatelessWidget {
                   const ColoredBox(color: Color(0xFF111111)),
             ),
             const Positioned(
-              right: 8,
+              right: 6,
               top: 0,
               bottom: 0,
-              child: Center(child: _TileEnter()),
+              child: Center(child: _TileEnter(compact: true)),
             ),
           ],
         ),
@@ -378,12 +396,19 @@ class _BannerTile extends StatelessWidget {
 /// `.home-tile-enter` — a white pill: the word, then the arrow in its own
 /// circle. nowssb-nm.css:3992.
 class _TileEnter extends StatelessWidget {
-  const _TileEnter();
+  const _TileEnter({this.compact = false});
+
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
+    final pad = compact
+        ? const EdgeInsets.fromLTRB(8, 2, 2, 2)
+        : const EdgeInsets.fromLTRB(11, 4, 4, 4);
+    final font = compact ? 8.0 : 10.0;
+    final go = compact ? 16.0 : 20.0;
     return Container(
-      padding: const EdgeInsets.fromLTRB(11, 4, 4, 4),
+      padding: pad,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(30),
@@ -391,29 +416,27 @@ class _TileEnter extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text(
+          Text(
             'Enter',
             style: TextStyle(
-              fontSize: 10,
+              fontSize: font,
               fontWeight: FontWeight.w800,
               letterSpacing: 0.3,
               color: NwsbColors.ink,
             ),
           ),
-          const SizedBox(width: 6),
+          SizedBox(width: compact ? 4 : 6),
           Container(
-            width: 20,
-            height: 20,
+            width: go,
+            height: go,
             decoration: const BoxDecoration(
               color: Color(0x1A060C18),
               shape: BoxShape.circle,
             ),
-            child: const Center(
-              // The tile's own arrow — `M2 6H10M7 3L10 6L7 9` on a 12 box,
-              // square caps, not the app's usual round-capped one.
+            child: Center(
               child: NwsbIcon(
                 '<path d="M2 6H10M7 3L10 6L7 9"/>',
-                size: 10,
+                size: compact ? 8 : 10,
                 viewBox: 12,
                 strokeWidth: 1.9,
                 cap: 'square',

@@ -31,7 +31,7 @@ assert.match(flutter, /const radius = 220.0/, "Orbit radius matches the hero cyl
 assert.match(index, /nwsb-enter-ring-bot/, "Website enter curve has two rows");
 assert.match(index, /cleopatra\.webp/, "Website ships the Egyptian centre");
 assert.match(index, /nwsb-enter-pager/, "Website enter curve is swipeable");
-assert.match(index, /home-tile-banner/, "Second four-button card uses the banners");
+assert.match(index, /home-tile-banner/, "Photo banners are a four-button card");
 assert.match(index, /home-tile-title">Connect/, "Sound Library on the first four-button card is Connect");
 assert.match(homeFash, /FashTiles\(onTile: _go, onOpen: _openEnter\)/, "Second tile card opens destinations");
 assert.match(flutter, /clamp\(-72.0, 72.0\)/, "Parallax is viewport-relative so the section stays on screen");

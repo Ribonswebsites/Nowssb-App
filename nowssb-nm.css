@@ -16732,14 +16732,14 @@ body.fashplus :is(#home, .stw-prev-stage) .fp-card .fp-enter .tp-enter-go {
 }
 .nwsb-curve-stage {
   position: relative;
-  height: 560px;
+  height: 600px;
   overflow: hidden;
   background: #050505;
   perspective: 980px;
   cursor: grab;
 }
 .nwsb-curve-fash .nwsb-curve-stage {
-  height: 580px;
+  height: 640px;
   border-radius: 14px;
 }
 .nwsb-curve-stage:active { cursor: grabbing; }
@@ -16931,6 +16931,15 @@ body.fashplus :is(#home, .stw-prev-stage) .fp-card .fp-enter .tp-enter-go {
   scroll-snap-align: center;
   min-width: 88%;
 }
+.nwsb-hero-ring-a {
+  transform: translateY(calc(var(--para) - 118px)) rotateY(var(--rot));
+}
+.nwsb-hero-ring-b {
+  transform: translateY(var(--para)) rotateY(calc(var(--rot) + 17deg));
+}
+.nwsb-hero-ring-c {
+  transform: translateY(calc(var(--para) + 118px)) rotateY(calc(var(--rot) + 34deg));
+}
 .nwsb-enter-ring-top {
   transform: translateY(calc(var(--para) - 72px)) rotateY(var(--rot));
 }
@@ -16955,11 +16964,16 @@ body.fashplus :is(#home, .stw-prev-stage) .fp-card .fp-enter .tp-enter-go {
   pointer-events: none;
 }
 .home-tile-banner .home-tile-enter {
-  right: 8px;
+  right: 6px;
   top: 50%;
   bottom: auto;
   transform: translateY(-50%);
+  padding: 2px 2px 2px 8px;
+  gap: 4px;
 }
+.home-tile-banner .home-tile-enter-lbl { font-size: 8px; }
+.home-tile-banner .home-tile-enter-go { width: 16px; height: 16px; }
+.home-tile-banner .home-tile-enter-go svg { width: 8px; height: 8px; }
 .nwsb-enter-rail {
   position: absolute;
   inset: 0;

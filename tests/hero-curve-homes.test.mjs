@@ -23,7 +23,8 @@ assert.match(flutter, /_embedStage/, "Promo tablet curve is a 2D orbit so it pai
 assert.match(index, /part097-hero-curve\.js/, "Both homes must load the curve spinner");
 assert.match(css, /perspective:\s*980px/, "Curve stage must be a 3D scene");
 assert.match(js, /data-nwsb-curve/, "Spinner must bind every curve stage");
-assert.match(flutter, /rotateY/, "Flutter curve must orbit on Y");
+assert.match(flutter, /rows = \[-118.0, 0.0, 118.0\]/, "Hero curve has three rows of stills");
+assert.match(index, /nwsb-hero-ring-c/, "Website hero curve has three rings");
 assert.match(homeNm, /HeroCurveStage\(compact: true\)/, "Flutter Normal home puts the curve under search");
 assert.match(index, /nwsb-curve-embed/, "Promo tablet mounts the embedded 3D curve");
 assert.match(index, /tab-subject\.webp/, "Promo tablet uses the blonde cutout");
