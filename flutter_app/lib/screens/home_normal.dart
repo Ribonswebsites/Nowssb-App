@@ -227,18 +227,8 @@ class _HomeNormalState extends State<HomeNormal> {
         ('heroCurve', HeroCurveStage(
           compact: true,
           onSearch: () => showDestinationSearchSheet(context),
-          onQuickAccess: () => showHeaderActionsSheet(
-            context,
-            glassMode: _glassMode,
-            onGlassToggle: () => setState(() {
-              _glassMode = !_glassMode;
-              VideoPool.instance.setGlassHomeMode(_glassMode);
-            }),
-            onNotifications: () => showNotificationsSheet(context),
-            onFashionHome: () => Settings.instance.setFashionHome(true),
-            onStore: () => _go(3),
-            onPlayer: () => _go(1),
-          ),
+          // Quick action chip → Quick access page (nav customize).
+          onQuickAccess: () => _push(const QuickAccessScreen()),
         )),
         (
           'promoRail',
@@ -360,7 +350,7 @@ class _HomeNormalState extends State<HomeNormal> {
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
             child: _TopRow(
               onMenu: () => _openHomeMenu(context),
-              onNotifications: () => _push(const QuickAccessScreen()),
+              onNotifications: () => showNotificationsSheet(context),
               glassMode: _glassMode,
               onGlassToggle: () => setState(() {
                 _glassMode = !_glassMode;

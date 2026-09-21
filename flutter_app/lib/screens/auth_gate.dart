@@ -443,7 +443,7 @@ class _AuthGateState extends State<AuthGate> {
     return _whiteButton(
       onPressed: _busy ? null : _googleLogin,
       child: _busy
-          ? const Center(child: AppThinkingLoader(size: 22, state: OrbState.solving))
+          ? const Center(child: AppThinkingLoader(size: 28, state: OrbState.solving, circlePad: 6))
           : const Row(
               children: [
                 _GoogleMark(),
@@ -533,7 +533,7 @@ class _AuthGateState extends State<AuthGate> {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               ),
               child: _busy
-                  ? const AppThinkingLoader(size: 22, state: OrbState.solving)
+                  ? const AppThinkingLoader(size: 28, state: OrbState.solving, circlePad: 6)
                   : Text(_createAccount ? 'Create account' : 'Sign in with email'),
             ),
           ),
@@ -569,7 +569,7 @@ class _AuthGateState extends State<AuthGate> {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               ),
               child: _busy
-                  ? const AppThinkingLoader(size: 22, state: OrbState.listening)
+                  ? const AppThinkingLoader(size: 28, state: OrbState.listening, circlePad: 6)
                   : Text(hasCode ? 'Verify code' : 'Send code'),
             ),
           ),

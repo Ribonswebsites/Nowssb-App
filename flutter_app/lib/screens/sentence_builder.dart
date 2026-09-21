@@ -572,7 +572,7 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
                                                         : null,
                                                   ),
                                                   child: _building
-                                                      ? const AppThinkingLoader(size: 22, state: OrbState.composing)
+                                                      ? const AppThinkingLoader(size: 28, state: OrbState.composing, circlePad: 6)
                                                       : Row(
                                                           mainAxisAlignment:
                                                               MainAxisAlignment

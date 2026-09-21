@@ -165,19 +165,10 @@ class _SearchBarState extends State<_SearchBar> {
       child: Row(
         children: [
           // Listening orb in a black disc (no left search SVG).
-          Container(
-            width: 32,
-            height: 32,
-            decoration: const BoxDecoration(
-              color: Color(0xFF000000),
-              shape: BoxShape.circle,
-            ),
-            clipBehavior: Clip.antiAlias,
-            alignment: Alignment.center,
-            child: const AppThinkingLoader(
-              size: 26,
-              state: OrbState.listening,
-            ),
+          const AppThinkingLoader(
+            size: 28,
+            state: OrbState.listening,
+            circlePad: 6,
           ),
           const SizedBox(width: 12),
           Expanded(

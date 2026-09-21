@@ -111,8 +111,9 @@ class MiniPlayerPill extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                         const AppThinkingLoader(
-                          size: 22,
+                          size: 28,
                           state: OrbState.composing,
+                          circlePad: 6,
                         ),
                         const SizedBox(width: 8),
                         Expanded(

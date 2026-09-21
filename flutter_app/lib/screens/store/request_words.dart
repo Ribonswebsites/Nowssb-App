@@ -208,7 +208,7 @@ class _RequestWordsScreenState extends State<RequestWordsScreen> {
                         ),
                       ),
                       child: _busy
-                          ? const AppThinkingLoader(size: 22, state: OrbState.composing)
+                          ? const AppThinkingLoader(size: 28, state: OrbState.composing, circlePad: 6)
                           : const Text(
                               'Submit Request',
                               style: TextStyle(

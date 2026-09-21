@@ -152,6 +152,8 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
           _HeroChrome(
             onSearch: widget.onSearch,
             onQuickAccess: widget.onQuickAccess,
+            // Fashion (glass) keeps search; Normal (compact) hero loses it.
+            showSearch: widget.glass,
           ),
         visual,
         const _CurveCopy(),
@@ -536,11 +538,17 @@ class _CurveCopy extends StatelessWidget {
 }
 
 
-/// Top of hero black card: NowssB. LEFT + Quick access RIGHT, search below.
+/// Top of hero black/glass card: NowssB LEFT + Quick action RIGHT.
+/// Search below only when [showSearch] (Fashion). Normal omits search.
 class _HeroChrome extends StatelessWidget {
-  const _HeroChrome({this.onSearch, this.onQuickAccess});
+  const _HeroChrome({
+    this.onSearch,
+    this.onQuickAccess,
+    this.showSearch = true,
+  });
   final VoidCallback? onSearch;
   final VoidCallback? onQuickAccess;
+  final bool showSearch;
 
   @override
   Widget build(BuildContext context) {
@@ -551,22 +559,26 @@ class _HeroChrome extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Text(
-                'NowssB.',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.3,
-                  height: 1,
+              const Flexible(
+                child: Text(
+                  'NowssB.',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.3,
+                    height: 1,
+                  ),
                 ),
               ),
-              const Spacer(),
+              const SizedBox(width: 8),
               GestureDetector(
                 onTap: onQuickAccess,
                 behavior: HitTestBehavior.opaque,
                 child: Container(
-                  height: 36,
+                  height: 42,
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
@@ -578,14 +590,15 @@ class _HeroChrome extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       AppThinkingLoader(
-                        size: 22,
+                        size: 28,
                         state: OrbState.solving,
+                        circlePad: 6,
                       ),
                       SizedBox(width: 6),
                       Icon(Icons.apps_rounded, size: 16, color: Colors.white),
                       SizedBox(width: 6),
                       Text(
-                        'Quick access',
+                        'Quick action',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 12,
@@ -599,11 +612,13 @@ class _HeroChrome extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 10),
-          FashionGreetingSearch(
-            compact: true,
-            onOpen: onSearch,
-          ),
+          if (showSearch) ...[
+            const SizedBox(height: 10),
+            FashionGreetingSearch(
+              compact: true,
+              onOpen: onSearch,
+            ),
+          ],
         ],
       ),
     );

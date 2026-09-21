@@ -13,7 +13,10 @@ import 'product_detail.dart';
 import 'store_cards.dart';
 import 'store_home_sections.dart';
 import 'store_select_sheet.dart';
+import 'ebooks_store.dart';
+import 'meaning_store.dart';
 import 'request_words.dart';
+import 'signature_store.dart';
 import 'store_routes.dart';
 
 class WordAtelierScreen extends StatelessWidget {
@@ -187,6 +190,27 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
       productRailIndex++;
 
       if (_chip == 'ALL' && productRailIndex == 1) {
+        // Moved from Store home: Words / Request / Meanings + atelier pills
+        // sit below the first 50% OFF row.
+        sections.add(StoreQuickMosaic(
+          onWords: () {}, // already on Word Atelier
+          onMeanings: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => const MeaningStoreScreen(),
+            ),
+          ),
+          onSignature: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => const SignatureStoreScreen(),
+            ),
+          ),
+          onEbooks: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => const EbooksStoreScreen(),
+            ),
+          ),
+          onRequest: () => openRequestWords(context),
+        ));
         sections.add(const StoreGlassFilmBanner(
           asset: 'assets/video/store-title-banner.mp4',
         ));

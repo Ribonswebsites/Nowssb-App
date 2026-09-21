@@ -204,6 +204,9 @@ class _PageShellState extends State<PageShell> {
                                 const SizedBox(height: 4),
                                 Text(
                                   widget.subtitle!,
+                                  maxLines: 1,
+                                  softWrap: false,
+                                  overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,

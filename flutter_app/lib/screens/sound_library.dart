@@ -532,8 +532,9 @@ class _SlmFeed extends StatelessWidget {
                     top: 0,
                     right: 0,
                     child: AppThinkingLoader(
-                      size: 28,
+                      size: 34,
                       state: OrbState.composing,
+                      circlePad: 7,
                     ),
                   ),
                 ],
@@ -1606,8 +1607,9 @@ class _SlmHead extends StatelessWidget {
                   ),
                 ),
                 const AppThinkingLoader(
-                  size: 44,
+                  size: 52,
                   state: OrbState.composing,
+                  circlePad: 8,
                 ),
                 const SizedBox(width: 6),
                 IconButton(
@@ -2845,8 +2847,9 @@ class _SoundCategoryScreenState extends State<SoundCategoryScreen> {
                             top: 0,
                             right: 0,
                             child: AppThinkingLoader(
-                              size: 28,
+                              size: 34,
                               state: OrbState.composing,
+                              circlePad: 7,
                             ),
                           ),
                         ],

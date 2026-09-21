@@ -43,7 +43,6 @@ import 'fashion/sections_mid.dart';
 import 'fashion/sections_top.dart';
 import 'fashion_plus.dart';
 import 'notifications_sheet.dart';
-import 'normal/header_actions_sheet.dart';
 import 'sound_library.dart';
 import 'widgets_page.dart';
 import 'quick_access.dart';
@@ -415,7 +414,7 @@ class _HomeFashionState extends State<HomeFashion> {
                 builder: (context, _) {
                   return HomeHeader(
                     notifications: NotifStore.instance.unreadRaw,
-                    onNotifications: () => _push(const QuickAccessScreen()),
+                    onNotifications: () => showNotificationsSheet(context),
                     onNormalHome: () => Settings.instance.setFashionHome(false),
                     onMenu: () => showHomeMenuDrawer(context, goTab: _go),
                   );
@@ -446,16 +445,9 @@ class _HomeFashionState extends State<HomeFashion> {
                               context,
                               onSelect: _openSearchDest,
                             ),
-                            onQuickAccess: () => showHeaderActionsSheet(
-                              context,
-                              glassMode: true,
-                              onGlassToggle: () {},
-                              onNotifications: () =>
-                                  showNotificationsSheet(context),
-                              onFashionHome: () {},
-                              onStore: () => _go(3),
-                              onPlayer: () => _go(1),
-                            ),
+                            // Quick action → Quick access page.
+                            onQuickAccess: () =>
+                                _push(const QuickAccessScreen()),
                           ),
                           FashionHero(
                             onExplore: () => _go(2),

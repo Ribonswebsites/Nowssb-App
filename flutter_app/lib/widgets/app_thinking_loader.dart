@@ -2,7 +2,8 @@
 ///
 /// Picks one of [OrbState.composing], [OrbState.listening], or
 /// [OrbState.solving] once per mount so the animation does not flicker.
-/// Use size 64 for full-screen centers and 20–24 for inline/button busy.
+/// Every orb sits inside a **larger black circle** for consistent placement
+/// across hero chips, search fields, practice pills, and loaders.
 library;
 
 import 'dart:math' as math;
@@ -24,17 +25,19 @@ class AppThinkingLoader extends StatefulWidget {
   const AppThinkingLoader({
     super.key,
     this.label,
-    this.size = 64,
+    this.size = 72,
     this.state,
     this.theme = OrbTheme.auto,
     this.axis = Axis.vertical,
     this.labelStyle,
+    this.blackCircle = true,
+    this.circlePad = 7,
   });
 
   /// Optional plain text beside/below the orb (e.g. "Thinking…", "Preparing…").
   final String? label;
 
-  /// 64 for full-screen/center; 20–24 for inline buttons.
+  /// Orb diameter. Prefer 28–36 inline, 72 for full-screen centers.
   final double size;
 
   /// Force one of the three allowed states. When null, one is chosen at random
@@ -44,6 +47,12 @@ class AppThinkingLoader extends StatefulWidget {
   final OrbTheme theme;
   final Axis axis;
   final TextStyle? labelStyle;
+
+  /// When true (default), the orb sits inside a larger black circle wrapper.
+  final bool blackCircle;
+
+  /// Extra radius beyond [size] on each side of the black circle.
+  final double circlePad;
 
   @override
   State<AppThinkingLoader> createState() => _AppThinkingLoaderState();
@@ -75,8 +84,27 @@ class _AppThinkingLoaderState extends State<AppThinkingLoader> {
       size: widget.size,
       theme: widget.theme,
     );
+
+    final Widget orbWidget;
+    if (widget.blackCircle) {
+      final circle = widget.size + widget.circlePad * 2;
+      orbWidget = Container(
+        width: circle,
+        height: circle,
+        alignment: Alignment.center,
+        decoration: const BoxDecoration(
+          color: Color(0xFF000000),
+          shape: BoxShape.circle,
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: orb,
+      );
+    } else {
+      orbWidget = orb;
+    }
+
     final label = widget.label;
-    if (label == null || label.isEmpty) return orb;
+    if (label == null || label.isEmpty) return orbWidget;
 
     final brightness = Theme.of(context).brightness;
     final style = widget.labelStyle ??
@@ -102,7 +130,7 @@ class _AppThinkingLoaderState extends State<AppThinkingLoader> {
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          orb,
+          orbWidget,
           const SizedBox(width: 12),
           Flexible(child: text),
         ],
@@ -112,7 +140,7 @@ class _AppThinkingLoaderState extends State<AppThinkingLoader> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        orb,
+        orbWidget,
         const SizedBox(height: 14),
         text,
       ],

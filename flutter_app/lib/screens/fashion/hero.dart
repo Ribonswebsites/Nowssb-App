@@ -602,7 +602,7 @@ class _ShopChip extends StatelessWidget {
 /// `.hs-searchpill` — the one control on this card that is a live invitation
 /// rather than a label, so it says what it is and wears a ring.
 
-/// Top-right Quick access control on the Fashion hero header.
+/// Top-right Quick action control on the Fashion hero header.
 class _QuickAccessChip extends StatelessWidget {
   const _QuickAccessChip({this.onTap});
   final VoidCallback? onTap;
@@ -627,7 +627,7 @@ class _QuickAccessChip extends StatelessWidget {
             Icon(Icons.apps_rounded, size: 16, color: Colors.white),
             SizedBox(width: 6),
             Text(
-              'Quick access',
+              'Quick action',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 12,

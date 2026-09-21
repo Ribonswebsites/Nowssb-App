@@ -827,7 +827,7 @@ class FashCustomize extends StatelessWidget {
         _FashionCustomizeRow(title: 'Themes', sub: 'Black Edition', icon: Icons.grid_view_rounded, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const WidgetsPage()))),
         _FashionCustomizeRow(title: 'Background', sub: 'Fashion backdrop', image: 'https://media.nowssb.com/migrated-images/cfc84fc5478b4b63_file_00000000b11472098a225d3703b04a60_phr6ph.png', icon: Icons.wallpaper_rounded, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FashionPlusScreen()))),
         _FashionCustomizeRow(title: 'Start Image', sub: 'Art behind the start', image: 'https://media.nowssb.com/migrated-images/5e8a9fdb18e034ec_file_000000009f10820bb6872a5ed8007148_pvqjaa.png', icon: Icons.image_outlined, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FashionPlusScreen()))),
-        _FashionCustomizeRow(title: 'Quick Access', sub: 'Bottom nav bar', image: 'https://media.nowssb.com/migrated-images/272b820a002190fe_file_000000002cf4820b865caf6fc0554959_k7drqx.png', icon: Icons.apps_rounded, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const QuickAccessScreen()))),
+        _FashionCustomizeRow(title: 'Quick access', sub: 'Bottom nav bar', image: 'https://media.nowssb.com/migrated-images/272b820a002190fe_file_000000002cf4820b865caf6fc0554959_k7drqx.png', icon: Icons.apps_rounded, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const QuickAccessScreen()))),
         ]),
       ),
     ]);

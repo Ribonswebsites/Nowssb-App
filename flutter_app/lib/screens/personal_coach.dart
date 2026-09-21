@@ -232,7 +232,7 @@ class _PersonalCoachScreenState extends State<PersonalCoachScreen> {
           onPressed: _signingIn ? null : action,
           style: IconButton.styleFrom(backgroundColor: light ? Colors.white : const Color(0xFF17171A), foregroundColor: light ? Colors.black : Colors.white),
           icon: _signingIn && label == 'Sign in'
-              ? const AppThinkingLoader(size: 20, state: OrbState.solving)
+              ? const AppThinkingLoader(size: 26, state: OrbState.solving, circlePad: 6)
               : Icon(icon),
         ),
       );
@@ -306,7 +306,7 @@ class _PersonalCoachScreenState extends State<PersonalCoachScreen> {
                       backgroundColor: const Color(0xFF242429),
                     ),
                     child: _sending
-                        ? const AppThinkingLoader(size: 20, state: OrbState.composing)
+                        ? const AppThinkingLoader(size: 26, state: OrbState.composing, circlePad: 6)
                         : const Icon(Icons.arrow_upward_rounded),
                   ),
                 ),

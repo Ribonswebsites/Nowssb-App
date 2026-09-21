@@ -2780,8 +2780,9 @@ class _VisualStage extends StatelessWidget {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   const AppThinkingLoader(
-                                    size: 28,
+                                    size: 34,
                                     state: OrbState.composing,
+                                    circlePad: 7,
                                   ),
                                   const SizedBox(width: 10),
                                   Flexible(
