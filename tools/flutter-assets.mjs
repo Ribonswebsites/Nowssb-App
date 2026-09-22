@@ -37,6 +37,8 @@ const FOLDERS = [
   'coach',        // Personal Coach hero artwork
   'icons',        // the logo disc, the search mark
   'store',        // the intro-page artwork, and the collection covers
+  'meanings',     // Meaning Store device arts (hub/picker/product)
+  'ebooks',       // Ebooks Store product arts
   'fashion',      // the Fashion Plus intro and its icon
   'routine',      // My Routine / Get Started editorial cards
   'player',       // the player's own artwork

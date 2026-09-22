@@ -101,8 +101,9 @@ class SplitPromoSpec {
         return SplitPromoSpec(
           title: 'Signature rarities\nawait you.',
           cta: 'View Signatures',
-          leftColor: const Color(0xFF3A1848),
-          rightColor: const Color(0xFFC44DFF),
+          // Teal + amber — not purple-on-purple empty.
+          leftColor: const Color(0xFF0E2F2C),
+          rightColor: const Color(0xFFE8A838),
           art: SplitPromoArts.meaningsDevice,
           onTap: onTap,
         );

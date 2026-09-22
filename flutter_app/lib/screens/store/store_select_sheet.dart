@@ -1,15 +1,17 @@
-/// “Please select the store” bottom sheet — glassmorphism only.
-/// Active store uses a subtle glass highlight + check pill (not a thinking orb).
+/// "Please select the store" bottom sheet — strong glassmorphism.
+/// Active store: glowing ring + bottom bar (not a lone "Here" pill).
+/// Picker arts ONLY here — picker-words/meaning/signature/ebooks.
 /// Top film: assets/video/choose-store.mp4 (#1) — Choose Store page only.
 library;
 
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
-import 'store_cards.dart';
+import '../../widgets/app_thinking_loader.dart';
 
 class StoreSelectEntry {
   const StoreSelectEntry({
@@ -22,6 +24,7 @@ class StoreSelectEntry {
   final String art;
 }
 
+/// Four picker images — strictly only used in this choose-store sheet.
 const kStoreSelectEntries = <StoreSelectEntry>[
   StoreSelectEntry(
     id: 'word',
@@ -31,7 +34,7 @@ const kStoreSelectEntries = <StoreSelectEntry>[
   StoreSelectEntry(
     id: 'meaning',
     title: 'Meaning',
-    art: kMsMeaningStoreIcon,
+    art: 'assets/store/picker-meaning.png',
   ),
   StoreSelectEntry(
     id: 'signature',
@@ -41,7 +44,7 @@ const kStoreSelectEntries = <StoreSelectEntry>[
   StoreSelectEntry(
     id: 'ebooks',
     title: 'Ebooks',
-    art: kEbProductArt,
+    art: 'assets/store/picker-ebooks.png',
   ),
 ];
 
@@ -57,7 +60,7 @@ Future<void> showStoreSelectSheet(
     context: context,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
-    barrierColor: const Color(0x99000000),
+    barrierColor: const Color(0xCC000000),
     builder: (sheetCtx) => StoreSelectSheet(
       onSelect: onSelect,
       current: current,
@@ -87,18 +90,26 @@ class StoreSelectSheet extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(28),
         child: BackdropFilter(
-          filter: ui.ImageFilter.blur(sigmaX: 22, sigmaY: 22),
+          filter: ui.ImageFilter.blur(sigmaX: 48, sigmaY: 48),
           child: Container(
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(28),
-              color: const Color(0x33FFFFFF),
-              border: Border.all(color: const Color(0x44FFFFFF)),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  const Color(0x66FFFFFF),
+                  const Color(0x33FFFFFF),
+                  Colors.white.withValues(alpha: 0.12),
+                ],
+              ),
+              border: Border.all(color: const Color(0x77FFFFFF), width: 1.2),
               boxShadow: const [
                 BoxShadow(
-                  color: Color(0x66000000),
-                  blurRadius: 30,
-                  offset: Offset(0, 12),
+                  color: Color(0x99000000),
+                  blurRadius: 40,
+                  offset: Offset(0, 16),
                 ),
               ],
             ),
@@ -111,7 +122,7 @@ class StoreSelectSheet extends StatelessWidget {
                     width: 42,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: const Color(0x55FFFFFF),
+                      color: const Color(0x77FFFFFF),
                       borderRadius: BorderRadius.circular(99),
                     ),
                   ),
@@ -184,62 +195,99 @@ class _StoreSelectCard extends StatelessWidget {
     return GestureDetector(
       onTap: onExplore,
       behavior: HitTestBehavior.opaque,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(18),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            Image.asset(
-              entry.art,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => const ColoredBox(
-                color: Color(0xFF1A1A1E),
-                child: Center(
-                  child: Icon(Icons.storefront_outlined,
-                      color: Color(0x66FFFFFF)),
-                ),
-              ),
-            ),
-            // Soft glass highlight when this is the active store page.
-            if (active) ...[
-              const DecoratedBox(
-                decoration: BoxDecoration(
-                  color: Color(0x33FFFFFF),
-                  border: Border(
-                    bottom: BorderSide(color: Colors.white, width: 3),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOut,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: active ? const Color(0xFFE8D5A3) : const Color(0x33FFFFFF),
+            width: active ? 2.5 : 1,
+          ),
+          boxShadow: active
+              ? const [
+                  BoxShadow(
+                    color: Color(0x88E8D5A3),
+                    blurRadius: 18,
+                    spreadRadius: 1,
                   ),
-                ),
-              ),
-              Positioned(
-                top: 8,
-                right: 8,
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: const Color(0xCC000000),
-                    borderRadius: BorderRadius.circular(99),
-                    border: Border.all(color: const Color(0x88FFFFFF)),
-                  ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.check_rounded, size: 12, color: Colors.white),
-                      SizedBox(width: 4),
-                      Text(
-                        'Here',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                        ),
+                ]
+              : null,
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Image.asset(
+                entry.art,
+                fit: BoxFit.cover,
+                gaplessPlayback: true,
+                frameBuilder: (context, child, frame, sync) {
+                  if (sync || frame != null) return child;
+                  return const ColoredBox(
+                    color: Color(0xFF0A0A0E),
+                    child: Center(
+                      child: AppThinkingLoader(
+                        size: 36,
+                        state: OrbState.composing,
+                        circlePad: 4,
                       ),
-                    ],
+                    ),
+                  );
+                },
+                errorBuilder: (_, __, ___) => const ColoredBox(
+                  color: Color(0xFF1A1A1E),
+                  child: Center(
+                    child: Icon(Icons.storefront_outlined,
+                        color: Color(0x66FFFFFF)),
                   ),
                 ),
               ),
+              if (active) ...[
+                const DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Color(0x33E8D5A3), Color(0x00000000), Color(0x66E8D5A3)],
+                      stops: [0, 0.55, 1],
+                    ),
+                  ),
+                ),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    height: 5,
+                    color: const Color(0xFFE8D5A3),
+                  ),
+                ),
+                Positioned(
+                  top: 8,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: Container(
+                      width: 28,
+                      height: 28,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: const Color(0xEE000000),
+                        border: Border.all(color: const Color(0xFFE8D5A3), width: 1.6),
+                        boxShadow: const [
+                          BoxShadow(color: Color(0x88E8D5A3), blurRadius: 10),
+                        ],
+                      ),
+                      child: const Icon(Icons.check_rounded,
+                          size: 16, color: Color(0xFFE8D5A3)),
+                    ),
+                  ),
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );

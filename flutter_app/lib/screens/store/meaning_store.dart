@@ -1,15 +1,24 @@
 /// The Meaning Store — unique meanings experience (not a Word Atelier clone).
 /// Header: NowssB Store + one-line "The Meaning Store".
 /// One hero/video max; no word mid-rail banner stacks; meaning icons only.
+///
+/// Asset roles (meanings-only):
+/// - meanings-store-swirl.png → store hub / picker / icon ONLY
+/// - meanings-device.png → in-store product cards (coloured backs where needed)
+/// - meanings-branding.jpg → playlist / goals
+/// - meanings-clean.jpg → fallback
+/// Video banners stay unchanged.
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../../data/content.dart';
 import '../../data/store_catalog.dart';
 import '../../media/nwsb_video.dart';
 import '../../widgets/page_shell.dart';
 import '../../widgets/colored_split_promo_banner.dart';
+import '../../widgets/app_thinking_loader.dart';
 import 'product_detail.dart';
 import 'store_cards.dart';
 import 'store_home_sections.dart';
@@ -17,6 +26,31 @@ import 'store_select_sheet.dart';
 import 'request_words.dart';
 import 'store_routes.dart';
 import 'signature_store.dart';
+
+
+/// Warm Meaning + picker + ebook arts before painting (no empty black flash).
+const kMeaningWarmAssets = <String>[
+  kMsMeaningStoreIcon,
+  kMsMeaningIconAsset,
+  kMsMeaningProductArt,
+  kMsMeaningIntroArt,
+  'assets/store/picker-words.png',
+  'assets/store/picker-meaning.png',
+  'assets/store/picker-signature.png',
+  'assets/store/picker-ebooks.png',
+  kEbProductArt,
+  kEbIntroArt,
+];
+
+String _msOnlyArt(String key, String candidate) {
+  if (candidate.startsWith('assets/meanings/')) return candidate;
+  const arts = <String>[
+    kMsMeaningIntroArt,
+    kMsMeaningProductArt,
+    kMsMeaningIconAsset,
+  ];
+  return arts[key.hashCode.abs() % arts.length];
+}
 
 class MeaningStoreScreen extends StatelessWidget {
   const MeaningStoreScreen({super.key});
@@ -55,6 +89,23 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
   String _query = '';
   String _chip = 'ALL';
   var _allRows = false;
+  var _ready = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _warm());
+  }
+
+  Future<void> _warm() async {
+    if (!mounted) return;
+    for (final path in kMeaningWarmAssets) {
+      try {
+        await precacheImage(AssetImage(path), context);
+      } catch (_) {}
+    }
+    if (mounted) setState(() => _ready = true);
+  }
 
   @override
   void dispose() {
@@ -75,7 +126,7 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
           root: base.root,
           category: base.category,
           price: m.price > 0 ? m.price : base.price,
-          img: base.img,
+          img: _msOnlyArt(base.key, base.img),
         );
       } else {
         byKey[m.key] = MsMeaning(
@@ -84,7 +135,7 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
           root: m.sub.isNotEmpty ? m.sub : 'NowssB Meaning',
           category: 'Studio',
           price: m.price,
-          img: m.img.isNotEmpty ? m.img : kMsCardImg,
+          img: _msOnlyArt(m.key, m.img.isNotEmpty ? m.img : kMsCardImg),
         );
       }
     }
@@ -114,6 +165,18 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
 
   @override
   Widget build(BuildContext context) {
+    if (!_ready) {
+      return const SizedBox(
+        height: 420,
+        child: Center(
+          child: AppThinkingLoader(
+            size: 72,
+            state: OrbState.composing,
+            label: 'Loading meanings…',
+          ),
+        ),
+      );
+    }
     final all = _base;
     final cats = <String, List<MsMeaning>>{};
     for (final m in all) {
@@ -263,18 +326,23 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
         title: cat,
         onViewAll: () => _openViewAll(cat),
       ));
-      out.add(MsGrid(
-        children: [
-          for (final m in cats[cat]!)
-            MsCard(
+      // Word Atelier row template structure — meanings labels/arts only.
+      final rowChildren = <Widget>[
+        for (final m in cats[cat]!)
+          SizedBox(
+            width: 132,
+            child: MsCard(
               word: m.word,
               root: m.root,
-              imgUrl: m.img,
+              imgUrl: _msOnlyArt(m.key, m.img),
               price: m.price,
               onTap: () => openMeaningDetail(context, m),
             ),
-          if (kMsSignature.containsKey(cat) && _query.isEmpty)
-            MsCard(
+          ),
+        if (kMsSignature.containsKey(cat) && _query.isEmpty)
+          SizedBox(
+            width: 132,
+            child: MsCard(
               word: kMsSignature[cat]!.word,
               root: kMsSignature[cat]!.root,
               imgUrl: kMsSignatureImg,
@@ -293,8 +361,22 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
                 signature: true,
               ),
             ),
-        ],
-      ));
+          ),
+      ];
+      out.add(
+        Padding(
+          padding: const EdgeInsets.only(bottom: 14),
+          child: SizedBox(
+            height: 196,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: rowChildren.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 10),
+              itemBuilder: (_, i) => rowChildren[i],
+            ),
+          ),
+        ),
+      );
     }
     if (!_allRows && _chip == 'ALL') {
       final total = order.where((c) => cats[c]?.isNotEmpty == true).length;

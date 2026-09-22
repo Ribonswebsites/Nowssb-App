@@ -7,6 +7,7 @@ library;
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../../data/store_catalog.dart';
 import '../../data/cart_bag.dart';
@@ -18,6 +19,7 @@ import '../../widgets/black_glass_banner.dart';
 import '../../widgets/glass_wrap.dart';
 import 'store_actions.dart';
 import 'store_cards.dart';
+import '../../widgets/app_thinking_loader.dart';
 
 // ─── #2 Store hero video (Ribons Original copy block removed) ────────────────
 
@@ -732,6 +734,12 @@ class StoreLimitedTimeFreeSection extends StatelessWidget {
     ('639 Hz', 'Heart Open', 'assets/store/collections/nature.webp'),
   ];
 
+  static const _meaningTracks = <(String, String, String)>[
+    ('Earth', 'Grounding meaning', 'assets/meanings/meanings-device.png'),
+    ('Peace', 'Calm meaning', 'assets/meanings/meanings-branding.jpg'),
+    ('Spirit', 'Soul meaning', 'assets/meanings/meanings-clean.jpg'),
+  ];
+
   static const _tealTop = Color(0xFF2EC4B6);
   static const _tealBot = Color(0xFF0B1B3A);
 
@@ -794,7 +802,7 @@ class StoreLimitedTimeFreeSection extends StatelessWidget {
             artAsset: meanings ? kMsMeaningIconAsset : kStoreProductArt,
             accent: _tealTop,
             sub: meanings
-                ? 'Free healing tracks — request a meaning if yours is missing.'
+                ? 'Free meanings — request one if yours is missing.'
                 : 'Free healing tracks — request a word if yours is missing.',
             pillLabel: 'FREE NOW',
           ),
@@ -816,73 +824,90 @@ class StoreLimitedTimeFreeSection extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  const Text(
-                    'Listen to Healing Frequencies',
+                  Text(
+                    meanings
+                        ? 'Explore Free Meanings'
+                        : 'Listen to Healing Frequencies',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.w800,
                       color: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
-                    'Calm your mind with a free track.',
+                  Text(
+                    meanings
+                        ? 'Open a free meaning to begin.'
+                        : 'Calm your mind with a free track.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 12, color: Color(0xCCFFFFFF)),
+                    style: const TextStyle(fontSize: 12, color: Color(0xCCFFFFFF)),
                   ),
                   const SizedBox(height: 14),
                   Row(
                     children: [
-                      for (var i = 0; i < _tracks.length; i++) ...[
+                      for (var i = 0;
+                          i < (meanings ? _meaningTracks : _tracks).length;
+                          i++) ...[
                         if (i > 0) const SizedBox(width: 10),
                         Expanded(
-                          child: GestureDetector(
-                            onTap: onOpenWord == null
-                                ? null
-                                : () => onOpenWord!(
-                                    _tracks[i].$1,
-                                    _tracks[i].$2,
-                                    kRmWordImg,
-                                    0,
-                                  ),
-                            child: Column(
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: AspectRatio(
-                                    aspectRatio: 1,
-                                    child: Image.asset(
-                                      _tracks[i].$3,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (_, __, ___) =>
-                                          const ColoredBox(
-                                            color: Color(0xFF0A0F1C),
+                          child: Builder(builder: (context) {
+                            final tr = (meanings ? _meaningTracks : _tracks)[i];
+                            return GestureDetector(
+                              onTap: onOpenWord == null
+                                  ? null
+                                  : () => onOpenWord!(
+                                        tr.$1,
+                                        tr.$2,
+                                        meanings ? tr.$3 : kRmWordImg,
+                                        0,
+                                      ),
+                              child: Column(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: AspectRatio(
+                                      aspectRatio: 1,
+                                      child: Image.asset(
+                                        tr.$3,
+                                        fit: BoxFit.cover,
+                                        gaplessPlayback: true,
+                                        errorBuilder: (_, __, ___) =>
+                                            const ColoredBox(
+                                          color: Color(0xFF06060A),
+                                          child: Center(
+                                            child: AppThinkingLoader(
+                                              size: 28,
+                                              state: OrbState.composing,
+                                              circlePad: 4,
+                                            ),
                                           ),
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  _tracks[i].$1,
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w800,
-                                    color: Colors.white,
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    tr.$1,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w800,
+                                      color: Colors.white,
+                                    ),
                                   ),
-                                ),
-                                Text(
-                                  _tracks[i].$2,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontSize: 10,
-                                    color: Color(0xAAFFFFFF),
+                                  Text(
+                                    tr.$2,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 10,
+                                      color: Color(0xAAFFFFFF),
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
+                                ],
+                              ),
+                            );
+                          }),
                         ),
                       ],
                     ],
@@ -1087,8 +1112,8 @@ class StoreFeaturedPlaylistSection extends StatelessWidget {
       kMsMeaningIconAsset,
     ),
     _BundleRow(
-      'Healing Frequency',
-      'Healing Meditation',
+      'Meaning Focus',
+      'Living meditation',
       'spirit',
       'Soul meaning',
       kMsMeaningProductArt,
@@ -1240,8 +1265,8 @@ class StoreGlassPlaylistCarousel extends StatelessWidget {
       ],
     ),
     _GlassPlaylistCardData(
-      title: 'Sacred Frequency',
-      desc: 'Divine codes and soft healing tones.',
+      title: 'Sacred Meanings',
+      desc: 'Divine codes and soft meaning tones.',
       count: '8 MEANINGS',
       art: kMsMeaningProductArt,
       rows: [

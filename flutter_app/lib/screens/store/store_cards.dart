@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../../data/cart_bag.dart';
 import '../../media/nwsb_video.dart';
@@ -16,6 +17,7 @@ import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_icon.dart';
+import '../../widgets/app_thinking_loader.dart';
 import 'store_actions.dart';
 
 String inr(num value) {
@@ -216,14 +218,40 @@ class StoreNetImage extends StatelessWidget {
   final String url;
   final BoxFit fit;
 
+  static const _composing = ColoredBox(
+    color: Color(0xFF06060A),
+    child: Center(
+      child: AppThinkingLoader(
+        size: 36,
+        state: OrbState.composing,
+        circlePad: 4,
+      ),
+    ),
+  );
+
   @override
   Widget build(BuildContext context) {
-    if (url.isEmpty) return const ColoredBox(color: Color(0xFF0A0F1C));
+    if (url.isEmpty) return _composing;
+    if (url.startsWith('assets/')) {
+      return Image.asset(
+        url,
+        fit: fit,
+        gaplessPlayback: true,
+        filterQuality: FilterQuality.medium,
+        frameBuilder: (context, child, frame, sync) {
+          if (sync || frame != null) return child;
+          return _composing;
+        },
+        errorBuilder: (_, __, ___) => _composing,
+      );
+    }
     return CachedNetworkImage(
       imageUrl: url,
       fit: fit,
-      placeholder: (_, __) => const ColoredBox(color: Color(0xFF0A0F1C)),
-      errorWidget: (_, __, ___) => const ColoredBox(color: Color(0xFF0A0F1C)),
+      fadeInDuration: Duration.zero,
+      fadeOutDuration: Duration.zero,
+      placeholder: (_, __) => _composing,
+      errorWidget: (_, __, ___) => _composing,
     );
   }
 }
@@ -1357,7 +1385,7 @@ class MsCard extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              Opacity(opacity: 0.42, child: StoreNetImage(url: imgUrl)),
+              StoreNetImage(url: imgUrl),
               const DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
