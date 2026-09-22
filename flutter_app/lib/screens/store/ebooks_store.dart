@@ -1,4 +1,5 @@
-/// NowssB Ebooks store — full-width cover rows matching website `.eb-row`.
+/// NowssB Ebooks store — ebooks-only (not a Word Atelier / Meaning paste).
+/// One hero/video max; no word mid-rail banner stacks; ebook icons only.
 library;
 
 import 'package:flutter/material.dart';
@@ -9,12 +10,10 @@ import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/nwsb_icon.dart';
-import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/page_shell.dart';
 import 'product_detail.dart';
 import 'store_actions.dart';
 import 'store_cards.dart';
-import 'request_words.dart';
 import 'store_home_sections.dart';
 import 'store_select_sheet.dart';
 import 'store_routes.dart';
@@ -24,23 +23,24 @@ class EbooksStoreScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => PageShell(
-      eyebrow: 'NowssB Store',
-      title: 'The NowssB Ebooks',
-      film: 'assets/video/store-verify-banner.mp4',
-      usePageFilm: false,
-      onBack: () => Navigator.of(context).pop(),
-      onStorePicker: () => showStoreSelectSheet(
+        eyebrow: 'NowssB Store',
+        title: 'The NowssB Ebooks',
+        film: 'assets/video/hero-ebooks.mp4',
+        usePageFilm: false,
+        onBack: () => Navigator.of(context).pop(),
+        onStorePicker: () => showStoreSelectSheet(
           context,
           current: 'ebooks',
-          onSelect: (id) => openStoreFromPicker(context, id, current: 'ebooks'),
+          onSelect: (id) =>
+              openStoreFromPicker(context, id, current: 'ebooks'),
         ),
-      slivers: [
-        SliverPadding(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
-          sliver: SliverList.list(children: const [_EbooksBody()]),
-        ),
-      ],
-    );
+        slivers: [
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
+            sliver: SliverList.list(children: const [_EbooksBody()]),
+          ),
+        ],
+      );
 }
 
 class _EbooksBody extends StatelessWidget {
@@ -49,7 +49,6 @@ class _EbooksBody extends StatelessWidget {
   List<EbBook> get _books {
     final live = ContentStore.instance.books;
     if (live.isEmpty) return kEbBooks;
-    // Prefer catalogue covers/copy; overlay live titles when studio published more.
     final keys = {for (final b in kEbBooks) b.key};
     final merged = [...kEbBooks];
     for (final b in live) {
@@ -76,10 +75,7 @@ class _EbooksBody extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ColoredSplitPromoBanner.forSurface(
-          SplitPromoSurface.ebooksStore,
-        ),
-        // Restored looping hero-ebooks film (keep elevated copy overlay).
+        // Single hero/video — no back-to-back promo / word-banner stacks.
         Container(
           margin: const EdgeInsets.only(bottom: 16),
           clipBehavior: Clip.antiAlias,
@@ -106,29 +102,53 @@ class _EbooksBody extends StatelessWidget {
                     ),
                   ),
                 ),
-                const Positioned(
+                Positioned(
                   left: 18,
                   right: 18,
                   bottom: 16,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text(
-                        'READ · LEARN · PRACTICE',
-                        style: TextStyle(
-                          fontSize: 10,
-                          letterSpacing: 3,
-                          fontWeight: FontWeight.w700,
-                          color: NwsbColors.goldLight,
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'READ · LEARN · PRACTICE',
+                              style: TextStyle(
+                                fontSize: 10,
+                                letterSpacing: 3,
+                                fontWeight: FontWeight.w700,
+                                color: NwsbColors.goldLight,
+                              ),
+                            ),
+                            SizedBox(height: 6),
+                            Text(
+                              'The NowssB Ebooks',
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      SizedBox(height: 6),
-                      Text(
-                        'The NowssB Ebooks',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(14),
+                        child: Image.asset(
+                          kEbProductArt,
+                          width: 56,
+                          height: 56,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Image.asset(
+                            kEbIntroArt,
+                            width: 56,
+                            height: 56,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) =>
+                                const SizedBox(width: 56, height: 56),
+                          ),
                         ),
                       ),
                     ],
@@ -139,70 +159,111 @@ class _EbooksBody extends StatelessWidget {
           ),
         ),
         const Text(
-          'Deep-dive guides on word science, phonetic origin and sound healing — yours to keep, read anywhere, forever.',
+          'Deep-dive guides on sound, phonetic origin and healing practice — '
+          'yours to keep, read anywhere, forever. Not a word catalogue.',
           style: TextStyle(fontSize: 13, height: 1.6, color: Color(0x80FFFFFF)),
         ),
         const SizedBox(height: 18),
-        StoreFrequencyPackage(
-          onSelectCategory: (_) {},
-          onSeeAll: () => showStoreViewAllPanel(
-            context,
-            title: 'Browse by Goal',
-            items: storeDefaultViewAllItems(),
-            onOpenWord: (_, __, ___, ____) {},
-          ),
-          onRequestWords: () => openRequestWords(context),
-          onOpenWord: (_, __, ___, ____) {},
+        _EbookBrowseStrip(
+          onOpen: (b) => openEbookDetail(context, b),
+          books: books,
         ),
-        StoreRecommendedSection(
-          onSeeAll: () => showStoreViewAllPanel(
-            context,
-            title: 'Recommended for You',
-            items: storeDefaultViewAllItems(),
-            onOpenWord: (_, __, ___, ____) {},
-          ),
-          onOpenWord: (_, __, ___, ____) {},
-        ),
-        StoreFeaturedPlaylistSection(
-          onSeeAll: () => showStoreViewAllPanel(
-            context,
-            title: 'Featured Playlist',
-            items: storeDefaultViewAllItems(),
-            onOpenWord: (_, __, ___, ____) {},
-          ),
-          onOpenWord: (_, __, ___, ____) {},
-        ),
-        StoreGlassPlaylistCarousel(
-          onSeeAll: () => showStoreViewAllPanel(
-            context,
-            title: 'Playlists',
-            items: storeDefaultViewAllItems(),
-            onOpenWord: (_, __, ___, ____) {},
-          ),
-          onOpenWord: (_, __, ___, ____) {},
-        ),
-        ..._ebookRowsWithMidBanners(books),
+        const SizedBox(height: 8),
+        for (final b in books) _EbookRow(book: b),
         StoreDisclaimer(text: kEbDisclaimer),
       ],
     );
   }
+}
 
-  List<Widget> _ebookRowsWithMidBanners(List<EbBook> books) {
-    final out = <Widget>[];
-    var rail = 0;
-    for (final b in books) {
-      out.add(_EbookRow(book: b));
-      rail++;
-      if (rail % 2 == 0) {
-        final mid = storeMidRailBannerAt((rail ~/ 2) - 1);
-        if (mid != null) out.add(mid);
-      }
-    }
-    final placed = rail ~/ 2;
-    for (var i = placed; i < kStoreMidRailBanners.length; i++) {
-      out.add(StoreMidRailBanner(data: kStoreMidRailBanners[i]));
-    }
-    return out;
+/// Unique ebook goal/browse strip — ebook picker art only, no word bag.
+class _EbookBrowseStrip extends StatelessWidget {
+  const _EbookBrowseStrip({required this.books, required this.onOpen});
+
+  final List<EbBook> books;
+  final void Function(EbBook book) onOpen;
+
+  static const _goals = <(String, String, Color)>[
+    ('Guides', kEbProductArt, Color(0xFF5CE1FF)),
+    ('Origins', kEbIntroArt, Color(0xFFFFB74D)),
+    ('Atlas', kEbProductArt, Color(0xFF81C784)),
+    ('Practice', kEbIntroArt, Color(0xFFB388FF)),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Browse ebooks',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 108,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: _goals.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 12),
+              itemBuilder: (context, i) {
+                final g = _goals[i];
+                return GestureDetector(
+                  onTap: books.isEmpty ? null : () => onOpen(books[i % books.length]),
+                  child: SizedBox(
+                    width: 86,
+                    child: Column(
+                      children: [
+                        Container(
+                          width: 72,
+                          height: 72,
+                          padding: const EdgeInsets.all(3),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: g.$3, width: 2.5),
+                            boxShadow: [
+                              BoxShadow(
+                                color: g.$3.withValues(alpha: 0.35),
+                                blurRadius: 12,
+                              ),
+                            ],
+                          ),
+                          child: ClipOval(
+                            child: Image.asset(
+                              g.$2,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) =>
+                                  const ColoredBox(color: Color(0xFF0A0F1C)),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          g.$1,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xCCFFFFFF),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -353,10 +414,10 @@ class _EbookRow extends StatelessWidget {
                             colors: [Color(0xFFF3E4B7), Color(0xFFC8A96E)],
                           ),
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(
+                            const Text(
                               'Buy Now',
                               style: TextStyle(
                                 fontSize: 12,
@@ -364,11 +425,20 @@ class _EbookRow extends StatelessWidget {
                                 color: NwsbColors.ink,
                               ),
                             ),
-                            SizedBox(width: 8),
-                            NwsbIcon(
-                              NwsbMarks.bag,
-                              size: 16,
-                              color: NwsbColors.ink,
+                            const SizedBox(width: 8),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(4),
+                              child: Image.asset(
+                                kEbProductArt,
+                                width: 18,
+                                height: 18,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => const NwsbIcon(
+                                  NwsbMarks.bag,
+                                  size: 16,
+                                  color: NwsbColors.ink,
+                                ),
+                              ),
                             ),
                           ],
                         ),

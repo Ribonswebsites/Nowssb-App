@@ -1,6 +1,6 @@
-/// The Meaning Store — meanings-centric rebuild mirroring Word Atelier styling.
-/// Header: NowssB Store + one-line "The Meaning Store". No double banner title.
-/// Taller subscribe banner; Subscribe Today pill right-centre.
+/// The Meaning Store — unique meanings experience (not a Word Atelier clone).
+/// Header: NowssB Store + one-line "The Meaning Store".
+/// One hero/video max; no word mid-rail banner stacks; meaning icons only.
 library;
 
 import 'package:flutter/material.dart';
@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import '../../data/content.dart';
 import '../../data/store_catalog.dart';
 import '../../media/nwsb_video.dart';
-import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/page_shell.dart';
 import 'product_detail.dart';
 import 'store_cards.dart';
@@ -90,8 +89,6 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
     return byKey.values.toList();
   }
 
-  String _artForMeaningCat(String cat) => storePillProductArt(cat);
-
   void _openViewAll(String title) {
     showStoreViewAllPanel(
       context,
@@ -147,17 +144,13 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Video hero — no title overlay (header already has The Meaning Store).
+        // Single hero/video area — no back-to-back promo banners.
         StorePixelsHero(
           videoAsset: nwsbVideo(kStoreMeaningDoorVidFile),
           videoTitle: '',
         ),
         StoreSubscribeBanner(
           pillIconAsset: kMsMeaningProductArt,
-        ),
-        ColoredSplitPromoBanner.forSurface(
-          SplitPromoSurface.meaningStore,
-          onTap: () => _openViewAll('Meanings'),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 2),
@@ -250,21 +243,7 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
     Map<String, List<MsMeaning>> cats,
   ) {
     final out = <Widget>[];
-    final banners = <Widget>[];
-    for (final cat in order) {
-      if (cats[cat]?.isNotEmpty != true) continue;
-      banners.add(RmCatBanner(
-        title: cat,
-        sub: kMsCatSub[cat] ?? 'Decoded origins',
-        logoUrl: kMsCatLogoUrl,
-        logoAsset: kMsMeaningIconAsset,
-        artAsset: _artForMeaningCat(cat),
-        pillLabel: cat,
-        inRail: true,
-        onViewAll: () => _openViewAll(cat),
-      ));
-    }
-    if (banners.isNotEmpty) out.add(RmBannerRail(banners: banners));
+    // No word-style stacked category banner rail (CURATED/FEATURED/ATELIER…).
     var shown = 0;
     for (final cat in order) {
       if (cats[cat]?.isNotEmpty != true) continue;

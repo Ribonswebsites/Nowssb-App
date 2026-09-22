@@ -126,9 +126,15 @@ String saleOriginalMoney(BuildContext context, num salePrice) =>
 /// meditation collection posters. Used in every notification pill.
 const kStoreProductArt = 'assets/store/nowssb-bag-headphones.webp';
 
-/// Meaning Store icon set (web MS / Signature meanings).
+/// Meaning Store icon set (web MS / Signature meanings / store picker).
+/// Never the Word Atelier bag-headphones asset.
 const kMsMeaningIconAsset = 'assets/signature/sig-meanings-icon.webp';
-const kMsMeaningProductArt = 'assets/store/nowssb-bag-headphones.webp';
+const kMsMeaningProductArt = 'assets/store/picker-meaning.png';
+const kMsMeaningIntroArt = 'assets/store/intro-meanings.webp';
+
+/// Ebooks Store product art — never word bag / meaning-only defaults.
+const kEbProductArt = 'assets/store/picker-ebooks.png';
+const kEbIntroArt = 'assets/store/intro-ebooks.webp';
 
 String wordVibrationTag(String name) {
   switch (name.toLowerCase()) {
@@ -148,6 +154,12 @@ String wordVibrationTag(String name) {
 /// Pill / banner product art for a collection/word. Always the store bag
 /// product (collection posters contain fashion BS the user rejected).
 String storePillProductArt(String? id) => kStoreProductArt;
+
+/// Meaning Store pill/banner art — gold Meanings emblem / picker only.
+String storeMeaningPillArt(String? id) => kMsMeaningProductArt;
+
+/// Ebooks Store pill/banner art — ebook picker only.
+String storeEbookPillArt(String? id) => kEbProductArt;
 
 /// Legacy collection poster map — only for non-pill decorative rails that
 /// still need a keyed asset. Prefer [storePillProductArt] for pills.

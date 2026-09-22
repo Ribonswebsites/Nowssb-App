@@ -244,7 +244,7 @@ class StoreRecommendedSection extends StatelessWidget {
       root: 'Inner courage',
       img: kMsCardImg,
       price: 0,
-      art: kMsMeaningProductArt,
+      art: kMsMeaningIconAsset,
     ),
     _RecCardData(
       badge: 'Sale',
@@ -266,7 +266,7 @@ class StoreRecommendedSection extends StatelessWidget {
       root: 'Beyond form',
       img: kMsCardImg,
       price: 49,
-      art: kMsMeaningIconAsset,
+      art: kMsMeaningIntroArt,
     ),
   ];
 
@@ -816,7 +816,7 @@ class StoreLimitedTimeFreeSection extends StatelessWidget {
           StoreNotifBanner(
             heading: 'LIMITED TIME FREE',
             svgBody: NwsbMarks.hourglass,
-            artAsset: meanings ? kMsMeaningProductArt : kStoreProductArt,
+            artAsset: meanings ? kMsMeaningIconAsset : kStoreProductArt,
             accent: _tealTop,
             sub: meanings
                 ? 'Free healing tracks — request a meaning if yours is missing.'
@@ -946,7 +946,7 @@ class StoreBrowseByGoalSection extends StatelessWidget {
     ('Focus', kMsMeaningIconAsset, Color(0xFF5CE1FF)),
     ('Calm', kMsMeaningProductArt, Color(0xFF4DB6AC)),
     ('Sacred', kMsMeaningIconAsset, Color(0xFFFFB74D)),
-    ('Nature', kMsMeaningProductArt, Color(0xFF81C784)),
+    ('Nature', kMsMeaningIntroArt, Color(0xFF81C784)),
     ('Cosmos', kMsMeaningIconAsset, Color(0xFFB388FF)),
   ];
 
@@ -1104,21 +1104,21 @@ class StoreFeaturedPlaylistSection extends StatelessWidget {
       'Emotional & Physical',
       'peace',
       'Calm meaning',
-      kMsMeaningProductArt,
+      kMsMeaningIconAsset,
     ),
     _BundleRow(
       'Healing Frequency',
       'Healing Meditation',
       'spirit',
       'Soul meaning',
-      kMsMeaningIconAsset,
+      kMsMeaningProductArt,
     ),
     _BundleRow(
       'Remove Negative',
       'Healing Reiki Music',
       'earth',
       'Grounding meaning',
-      kMsMeaningProductArt,
+      kMsMeaningIntroArt,
     ),
   ];
 
@@ -1142,7 +1142,7 @@ class StoreFeaturedPlaylistSection extends StatelessWidget {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12),
                         child: Image.asset(
-                          meanings ? kMsMeaningProductArt : kStoreProductArt,
+                          meanings ? kMsMeaningIconAsset : kStoreProductArt,
                           width: 78,
                           height: 78,
                           fit: BoxFit.cover,
@@ -1252,7 +1252,7 @@ class StoreGlassPlaylistCarousel extends StatelessWidget {
       title: 'Warriors Edition',
       desc: 'Strength & courage meanings for daily practice.',
       count: '12 MEANINGS',
-      art: kMsMeaningProductArt,
+      art: kMsMeaningIconAsset,
       rows: [
         ('Warrior', 'Inner courage'),
         ('Dragon', 'Transforming power'),
@@ -1263,7 +1263,7 @@ class StoreGlassPlaylistCarousel extends StatelessWidget {
       title: 'Sacred Frequency',
       desc: 'Divine codes and soft healing tones.',
       count: '8 MEANINGS',
-      art: kMsMeaningIconAsset,
+      art: kMsMeaningProductArt,
       rows: [
         ('Spirit', 'Living essence'),
         ('Peace', 'Still centre'),
@@ -1274,7 +1274,7 @@ class StoreGlassPlaylistCarousel extends StatelessWidget {
       title: 'Nature Resonance',
       desc: 'Living element meanings for calm and clarity.',
       count: '10 MEANINGS',
-      art: kMsMeaningProductArt,
+      art: kMsMeaningIntroArt,
       rows: [
         ('Water', 'Flowing life'),
         ('Fire', 'Inner spark'),
@@ -1464,8 +1464,8 @@ class StoreMidRailBannerData {
   final String? pillLabel;
 }
 
-/// Six black notification banners between product rows. Art is always the
-/// NowssB bag-headphones product — never fashion heels / meditation stock.
+/// Word Atelier only — never inject into Meaning / Ebooks stores.
+/// Art is the NowssB bag-headphones product — never fashion heels / meditation stock.
 const kStoreMidRailBanners = <StoreMidRailBannerData>[
   StoreMidRailBannerData(
     heading: 'COLLECTIONS',
