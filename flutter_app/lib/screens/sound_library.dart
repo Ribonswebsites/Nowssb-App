@@ -33,6 +33,7 @@ import 'practice_player.dart';
 import 'profile.dart';
 import 'store.dart';
 import 'store/meaning_store.dart';
+import 'currently_playing_album.dart';
 import 'word_detail.dart';
 
 /// Collection banner file for each Atelier id — same table as part080 COLS.
@@ -88,7 +89,7 @@ Map<String, RmCategory> _wordToCol() {
 
 
 /// Filter chips that stay on Sound Library (do not open Category page).
-const _kFilterOnly = {'All', 'Sentences', 'My Words', 'Purchased', 'Trending', 'Global'};
+const _kFilterOnly = {'All', 'Currently Playing', 'Sentences', 'My Words', 'Purchased', 'Trending', 'Global'};
 
 String _playsLabel(int n) {
   if (n <= 0) return '0 plays';
@@ -162,6 +163,7 @@ class _SoundLibraryScreenState extends State<SoundLibraryScreen> {
     final sorted = cats.toList()..sort();
     return [
       'All',
+      'Currently Playing',
       'Trending',
       'Global',
       'Sentences',
@@ -173,6 +175,7 @@ class _SoundLibraryScreenState extends State<SoundLibraryScreen> {
 
   List<Word> _chosen(List<Word> all) {
     if (_chip == 'All' ||
+        _chip == 'Currently Playing' ||
         _chip == 'Sentences' ||
         _chip == 'Trending' ||
         _chip == 'Global' ||
@@ -397,7 +400,17 @@ class _SlmFeed extends StatelessWidget {
                     bottom: MediaQuery.paddingOf(context).bottom + 48,
                   ),
                   children: [
-                    if (chip == 'Sentences') ...[
+                    if (chip == 'Currently Playing') ...[
+                      CurrentlyPlayingAlbum(
+                        words: _playingRail,
+                        art: art,
+                        counts: counts,
+                        onPlay: onPlayWord,
+                        onOpen: onOpenWord,
+                      ),
+                      _currentlyPlaying(),
+                      _buyRequest(),
+                    ] else if (chip == 'Sentences') ...[
                       _sentencesSec(),
                       if (featured != null) _featuredMain(featured),
                       if (trending.isNotEmpty)

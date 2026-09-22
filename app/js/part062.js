@@ -60,6 +60,7 @@
         { k:'mainops',  sel:['.mainops-blk'],                                               t:S, label:'Where to Begin',        sub:'Six doors on one panel', kind:'blk' },
         { k:'actionbar',sel:['.nmh-supplied-actionbar'],                                    t:S, label:'Help action bar',       sub:'Support and personal coach', locked:1, after:'mainops' },
         { k:'tiles',    sel:['.nmh-tiles-wrap'],                                    t:S, label:'Home Tiles',            sub:'The four buttons and their tip rail', always:1 },
+        { k:'storiesFind', sel:['.nmh-stories-wrap'],                               t:S, label:'Sound that finds you',   sub:'Overlapping story cards' },
         { k:'store',    sel:['.nmh-store-wrap'],                                          t:S, label:'NowssB Store',          sub:'Enter the store', always:1 },
         { k:'reader',   sel:['.nmh-rdsec-wrap'],                                         t:S, label:'Reader',                sub:'Meanings and eBooks' },
         { k:'trendwd',  sel:['.nmh-trend-wrap'],                                          t:S, label:"Today's Trending",      sub:'The clip and its black banner', vb:1 },
@@ -121,10 +122,7 @@
         { k:'herovid',  sel:['.nsvb-blk'],                                                  t:S, label:'Streak Video',          sub:'The clip above the streak, on the tablet', vb:1 , kind:'blk' },
         { k:'streak',   sel:['.nmh-streak-glass-section'],                                 t:S, label:'Streak',                sub:'Your daily practice streak', always:1 },
         { k:'tiles',    sel:['.fash-tiles-wrap'],                                   t:S, label:'Home Tiles',            sub:'The four buttons and their tip rail', always:1 },
-        /* The clip, the trigger and the black banner are one panel now, so
-           there is one entry and it points at the wrapper — the registry
-           matches a DIRECT child of the home and all three are inside
-           something. */
+        { k:'storiesFind', sel:['.fash-stories-wrap'],                              t:S, label:'Sound that finds you',   sub:'Overlapping story cards' },
         { k:'store',    sel:['.fash-store-wrap'],                                          t:S, label:'NowssB Store',          sub:'The tall card and its banner', always:1 },
         { k:'trendwd',  sel:['.fash-trend-wrap'],                                          t:S, label:"Today's Trending",      sub:'The clip and its black banner', vb:1 },
         { k:'customexp',sel:['.customize-experience-banner'],                              t:S, label:'Customize prompt',        sub:'Open the customization panel' },

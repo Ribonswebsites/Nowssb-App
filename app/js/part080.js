@@ -147,7 +147,7 @@
     allWords().forEach(function (w) {
       (w.categories || []).forEach(function (c) { if (cats.indexOf(c) === -1) cats.push(c); });
     });
-    return ['All', 'Sentences', 'My Words', 'Purchased'].concat(cats);
+    return ['All', 'Currently Playing', 'Sentences', 'My Words', 'Purchased'].concat(cats);
   }
   function paintChips() {
     var box = document.getElementById('slmChips');
@@ -167,7 +167,7 @@
   /* Which words this chip is asking for. */
   function chosenWords() {
     var ws = allWords();
-    if (_chip === 'All' || _chip === 'Sentences') return ws;
+    if (_chip === 'All' || _chip === 'Sentences' || _chip === 'Currently Playing') return ws;
     if (_chip === 'Purchased') {
       var owned = purchased().map(function (p) { return (p.word || '').toUpperCase(); });
       return ws.filter(function (w) { return owned.indexOf(w.word.toUpperCase()) !== -1; });
@@ -446,6 +446,64 @@
     return '<section class="slm-sec">' + head('Meanings & origins', chevron("slmGo('real-meaning')")) + pages + '</section>';
   }
 
+  function playingRail() {
+    var counts = sessionCounts();
+    var ws = allWords();
+    var practiced = ws.filter(function (w) { return counts[w.word]; })
+      .sort(function (a, b) { return (counts[b.word] || 0) - (counts[a.word] || 0); });
+    var base = practiced.length ? practiced : ws;
+    return base.slice(0, 8);
+  }
+  function dur(w) {
+    var sec = (hash(w.word) % 90) + 45;
+    return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
+  }
+  function currentlyPlayingAlbum() {
+    var list = playingRail();
+    if (!list.length) {
+      return '<div class="slm-empty">Nothing is playing yet. Start a session and it lands here.</div>';
+    }
+    var head = list[0];
+    var cover = art(head.word);
+    var year = new Date().getFullYear();
+    var thumbs = list.slice(0, 3).map(function (w, i) {
+      return '<img class="sl-album-thumb t' + i + '" src="' + esc(art(w.word)) + '" alt="">';
+    }).join('');
+    var tracks = list.map(function (w, i) {
+      var plays = sessionCounts()[w.word] || (hash(w.word) % 9000) + 120;
+      return '<button class="sl-album-track" onclick="slmPlay(\'' + jsArg(w.word) + '\')">' +
+        '<span class="sl-album-num">' + (i + 1) + '</span>' +
+        '<span class="sl-album-tmeta"><strong>' + esc(w.word) + '</strong>' +
+        '<em>' + esc(w.origin || 'NowssB') + ' · ' + dur(w) + ' · ' + plays + ' plays</em></span>' +
+        '<span class="sl-album-more" onclick="event.stopPropagation();slmPlay(\'' + jsArg(w.word) + '\')">⋮</span>' +
+        '</button>';
+    }).join('');
+    return '<div class="sl-album">' +
+      '<div class="sl-album-artist">NOWSSB</div>' +
+      '<div class="sl-album-sub">Currently Playing · ' + year + '</div>' +
+      '<img class="sl-album-cover" src="' + esc(cover) + '" alt="">' +
+      '<div class="sl-album-title">' + esc(head.word) + '</div>' +
+      '<div class="sl-album-acts">' +
+        '<button class="sl-album-round" aria-label="Download">↓</button>' +
+        '<button class="sl-album-round" aria-label="Save">⚑</button>' +
+        '<button class="sl-album-play" onclick="slmPlay(\'' + jsArg(head.word) + '\')"><span class="sl-compose-orb"></span></button>' +
+        '<button class="sl-album-round" aria-label="Comments">💬</button>' +
+        '<button class="sl-album-round" aria-label="More">⋮</button>' +
+      '</div>' +
+      '<div class="sl-album-sample" onclick="slmPlay(\'' + jsArg(head.word) + '\')">' +
+        '<div><div class="sl-album-sample-k">Sample this</div>' +
+        '<div class="sl-album-sample-t">Tap to preview this album and find your favorites</div></div>' +
+        '<div class="sl-album-thumbs">' + thumbs + '</div>' +
+      '</div>' +
+      tracks +
+      '<div class="sl-album-mini" onclick="slmPlay(\'' + jsArg(head.word) + '\')">' +
+        '<img src="' + esc(cover) + '" alt="">' +
+        '<div><strong>' + esc(head.word) + '</strong><em>' + esc(head.origin || 'NowssB') + '</em></div>' +
+        '<span class="sl-compose-orb sm"></span>' +
+      '</div>' +
+    '</div>';
+  }
+
   /* ── The feed ─────────────────────────────────────────────────────── */
   function paintFeed() {
     var feed = document.getElementById('slContent');
@@ -454,7 +512,9 @@
     var ws = chosenWords();
     var html = '';
 
-    if (_chip === 'Sentences') {
+    if (_chip === 'Currently Playing') {
+      html = currentlyPlayingAlbum();
+    } else if (_chip === 'Sentences') {
       html = sentenceSec() + storeVideos() + promo() + meaningRows();
     } else if (!ws.length) {
       html = '<div class="slm-empty">Nothing in this filter yet.' +
