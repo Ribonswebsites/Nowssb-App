@@ -44,6 +44,20 @@
         'file_00000000fdd48246890602f65eafaab8.png'
       ]
     }
+,
+    {
+      key: 'stories',
+      eyebrow: 'NOWSSB / EDITORIAL DISCOVERY',
+      title: 'STORIES\nTHAT\nFIND YOU',
+      body: 'A living collection of words, images and rituals that meet you at exactly the right moment.',
+      note: 'READ · LISTEN · DISCOVER',
+      tint: 'paper',
+      images: [
+        'file_00000000156082109bcff739c6d80a7a.png',
+        'file_00000000b77c82119c4127cc603420a8.png',
+        'file_000000005f8881f48b6867d03c79a021.png'
+      ]
+    }
   ];
 
   function esc(s) {
@@ -63,7 +77,7 @@
     el.setAttribute('data-editorial-banner', data.key);
     el.setAttribute('aria-label', data.title.replace(/\\n/g, ' '));
     el.innerHTML =
-      '<div class="nwsb-editorial-topline"><span>' + esc(data.eyebrow) + '</span><span>0' + (index + 1) + ' / 03</span></div>' +
+      '<div class="nwsb-editorial-topline"><span>' + esc(data.eyebrow) + '</span><span>0' + (index + 1) + ' / 04</span></div>' +
       '<div class="nwsb-editorial-layout">' +
         '<div class="nwsb-editorial-copy"><div class="nwsb-editorial-title">' + title + '</div>' +
           '<div class="nwsb-editorial-body">' + esc(data.body) + '</div>' +
@@ -85,9 +99,11 @@
     /* Each surface gets the same three campaigns in a different vertical
        rhythm, so they feel discovered rather than stacked as one gallery. */
     place('#home-nm .nmh-wrap', '.nmh-supplied-essentials', banners[1], 1);
+    place('#home-nm .nmh-wrap', '.nmh-supplied-essentials', banners[3], 3);
     place('#home-nm .nmh-wrap', '.nmh-trend-wrap', banners[2], 2);
     place('#home-nm .nmh-wrap', '.nmh-store-wrap', banners[0], 0);
     place('#home .home-body', '.fash-plyr-wrap', banners[2], 2);
+    place('#home .home-body', '.fash-plyr-wrap', banners[3], 3);
     place('#home .home-body', '.fash-trend-wrap', banners[0], 0);
     place('#home .home-body', '.nwsb-enter-pager', banners[1], 1);
   }

@@ -283,7 +283,13 @@ class _HomeNormalState extends State<HomeNormal> {
               onStart: _openDashboardSession,
               onProgress: _openDashboardProgress)
         ),
-        ('editorialA', const EditorialBanner.science()),
+        ('editorialA',
+          const Column(
+            children: [
+              EditorialBanner.science(),
+              EditorialBanner.stories(),
+            ],
+          )),
         (
           'essentials',
           Column(
