@@ -379,7 +379,17 @@ window.openSub = function(id) {
 
 // ── Inject cart + wishlist buttons into rm-word-cards ──
 (function() {
+  function rmLoadGlassStyles() {
+    if (document.getElementById('nwsbWordLibraryGlassStyles')) return;
+    var link = document.createElement('link');
+    link.id = 'nwsbWordLibraryGlassStyles';
+    link.rel = 'stylesheet';
+    link.href = 'app/word-library-glass.css?v=1';
+    document.head.appendChild(link);
+  }
+
   function rmInjectCardActions() {
+    rmLoadGlassStyles();
     var cards = document.querySelectorAll('.rm-word-card');
     cards.forEach(function(card) {
       if (card.querySelector('.rm-card-actions')) return; // already injected
@@ -426,23 +436,58 @@ window.openSub = function(id) {
         }
       };
 
-      // Cart button
-      var cBtn = document.createElement('div');
-      cBtn.className = 'rm-card-action' + (inCart ? ' carted' : '');
-      cBtn.setAttribute('data-rm-cart', 'rm-' + key);
-      cBtn.innerHTML = '<svg width="11" height="11" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2h1.5l2 8h7l1.5-5.5H4.5" stroke="rgba(232,213,163,0.8)" stroke-width="1.2" stroke-linecap="square"/><circle cx="7" cy="12.5" r="1" fill="rgba(232,213,163,0.7)"/><circle cx="11" cy="12.5" r="1" fill="rgba(232,213,163,0.7)"/></svg>';
-      cBtn.onclick = function(e) {
+      wrap.appendChild(wBtn);
+      card.appendChild(wrap);
+
+      var body = card.querySelector('.rm-word-card-body');
+      if (!body) return;
+      body.classList.add('rm-word-card-glass-body');
+      var desc = document.createElement('div');
+      desc.className = 'rm-word-card-vibration';
+      desc.textContent = word.toLowerCase() === 'fire'
+        ? 'Ignites clarity and transformation'
+        : word.toLowerCase() === 'earth'
+          ? 'Grounds presence and steady growth'
+          : 'A sound signature for focused practice';
+      body.appendChild(desc);
+
+      var priceEl = document.createElement('div');
+      priceEl.className = 'rm-word-card-price';
+      priceEl.textContent = '₹' + price;
+      body.appendChild(priceEl);
+
+      var buy = document.createElement('button');
+      buy.type = 'button';
+      buy.className = 'rm-word-buy-btn' + (inCart ? ' carted' : '');
+      buy.setAttribute('data-rm-cart', 'rm-' + key);
+      buy.innerHTML = '<span>Buy Now</span><span class="rm-word-buy-icon"><svg width="16" height="16" viewBox="0 0 22 22" fill="none" stroke="#060c18" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h1.5l2.5 7h9l2-5H7"/><circle cx="9" cy="18.5" r="1.4" fill="#060c18" stroke="none"/><circle cx="16" cy="18.5" r="1.4" fill="#060c18" stroke="none"/></svg></span>';
+      buy.onclick = function(e) {
         e.stopPropagation();
         if (typeof nssAddToCart === 'function') {
           nssAddToCart({id:'rm-'+key, name:word, type:'Word', price:price, img:img});
-          cBtn.classList.add('carted');
+          buy.classList.add('carted');
+          rmPlayCartFlight(img, card);
         }
       };
-
-      wrap.appendChild(wBtn);
-      wrap.appendChild(cBtn);
-      card.appendChild(wrap);
+      body.appendChild(buy);
     });
+  }
+
+  function rmPlayCartFlight(img, card) {
+    var target = document.querySelector('#sub-real-meaning.open .rm-cart-btn, #sub-real-meaning.open [aria-label="Cart"]');
+    if (!target || !img) return;
+    var from = card.querySelector('.rm-word-card-img');
+    if (!from) return;
+    var a = from.getBoundingClientRect(), b = target.getBoundingClientRect();
+    var fly = document.createElement('img');
+    fly.className = 'rm-cart-flight';
+    fly.src = img;
+    fly.style.left = (a.left + a.width / 2 - 26) + 'px';
+    fly.style.top = (a.top + a.height / 2 - 26) + 'px';
+    fly.style.setProperty('--rm-flight-x', (b.left + b.width / 2 - a.left - a.width / 2) + 'px');
+    fly.style.setProperty('--rm-flight-y', (b.top + b.height / 2 - a.top - a.height / 2) + 'px');
+    document.body.appendChild(fly);
+    fly.addEventListener('animationend', function(){ fly.remove(); }, {once:true});
   }
 
   // Run when real-meaning opens

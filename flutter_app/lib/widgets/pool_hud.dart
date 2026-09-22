@@ -31,6 +31,14 @@ import '../media/video_pool.dart';
 class PoolHud extends StatefulWidget {
   const PoolHud({super.key});
 
+  /// Diagnostics are opt-in even in debug APKs. Pass
+  /// `--dart-define=NWSB_SHOW_POOL_HUD=true` when actively diagnosing video
+  /// playback; never cover a user's home with decoder errors by default.
+  static const showByDefault = bool.fromEnvironment(
+    'NWSB_SHOW_POOL_HUD',
+    defaultValue: false,
+  );
+
   @override
   State<PoolHud> createState() => _PoolHudState();
 }
@@ -42,7 +50,7 @@ class _PoolHudState extends State<PoolHud> {
   @override
   void initState() {
     super.initState();
-    if (kDebugMode) {
+    if (kDebugMode && PoolHud.showByDefault) {
       _t = Timer.periodic(
         const Duration(milliseconds: 500),
         (_) => mounted ? setState(() {}) : null,
@@ -58,7 +66,9 @@ class _PoolHudState extends State<PoolHud> {
 
   @override
   Widget build(BuildContext context) {
-    if (!kDebugMode || _hidden) return const SizedBox.shrink();
+    if (!kDebugMode || !PoolHud.showByDefault || _hidden) {
+      return const SizedBox.shrink();
+    }
 
     final pool = VideoPool.instance;
     final live = pool.liveCount;
