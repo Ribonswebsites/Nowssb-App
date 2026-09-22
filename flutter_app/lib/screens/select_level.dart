@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../theme/player_aura.dart';
+import '../widgets/colored_split_promo_banner.dart';
+import 'practice.dart';
 
 class SelectLevelScreen extends StatefulWidget {
   const SelectLevelScreen({super.key, this.initialLevel = 3});
@@ -75,7 +77,19 @@ class _SelectLevelScreenState extends State<SelectLevelScreen> {
                   Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: Text('SELECT LEVEL', style: TextStyle(color: Color(0x8CFFFFFF), fontSize: 12, letterSpacing: 4, fontWeight: FontWeight.w500))),
                   SizedBox(width: 44, child: Divider(color: Color(0x59FFFFFF))),
                 ]),
-                const SizedBox(height: 24),
+                const SizedBox(height: 18),
+                ColoredSplitPromoBanner.forSurface(
+                  SplitPromoSurface.selectLevel,
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => const PracticeScreen(),
+                      ),
+                    );
+                  },
+                  margin: EdgeInsets.zero,
+                ),
+                const SizedBox(height: 18),
                 GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),

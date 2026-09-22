@@ -14,6 +14,8 @@ import '../data/content.dart';
 import '../data/models.dart';
 import '../theme/tokens.dart';
 import '../widgets/page_shell.dart';
+import '../widgets/colored_split_promo_banner.dart';
+import '../shell/nav_shell.dart';
 import 'word_detail.dart';
 
 class LibraryScreen extends StatefulWidget {
@@ -98,6 +100,12 @@ class _LibraryScreenState extends State<LibraryScreen> {
                 ),
               ),
             ],
+            const SizedBox(height: 18),
+            ColoredSplitPromoBanner.forSurface(
+              SplitPromoSurface.library,
+              onTap: () => NavScope.goTo(context, 1),
+              margin: EdgeInsets.zero,
+            ),
             const SizedBox(height: 18),
             if (shown.isEmpty)
               Padding(

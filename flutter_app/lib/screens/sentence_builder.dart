@@ -15,7 +15,9 @@ import 'package:flutter/services.dart';
 import '../data/content.dart';
 import '../data/store_catalog.dart';
 import '../widgets/black_glass_banner.dart';
+import '../widgets/colored_split_promo_banner.dart';
 import '../widgets/nwsb_icon.dart';
+import 'sound_library.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import '../widgets/app_thinking_loader.dart';
 import 'store.dart';
@@ -334,6 +336,18 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
                           title: 'Buy / Shop words',
                           sub: 'Grow your library in the Store',
                         ),
+                      ),
+                      const SizedBox(height: 12),
+                      ColoredSplitPromoBanner.forSurface(
+                        SplitPromoSurface.sentenceBuilder,
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => const SoundLibraryScreen(),
+                            ),
+                          );
+                        },
+                        margin: EdgeInsets.zero,
                       ),
                       // 2) Heading BELOW the black banner
                       const Padding(

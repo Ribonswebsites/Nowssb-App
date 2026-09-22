@@ -14,7 +14,9 @@ import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 import '../widgets/app_backdrop.dart';
 import '../widgets/black_glass_banner.dart';
+import '../widgets/colored_split_promo_banner.dart';
 import '../widgets/nwsb_icon.dart';
+import 'sound_library.dart';
 import 'store/bag_ui.dart';
 
 export 'store/ebooks_store.dart';
@@ -122,6 +124,14 @@ class _StoreHomeContent extends StatelessWidget {
             icon: Icons.headphones_outlined,
           ),
         ],
+      ),
+      Padding(
+        padding: const EdgeInsets.fromLTRB(12, 6, 12, 6),
+        child: ColoredSplitPromoBanner.forSurface(
+          SplitPromoSurface.storeHome,
+          onTap: () => _push(context, const SoundLibraryScreen()),
+          margin: EdgeInsets.zero,
+        ),
       ),
       const _StoreDepartmentLabel('NOWSSB CONNECT'),
       _StoreGlassSection(

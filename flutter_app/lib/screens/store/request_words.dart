@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import '../../data/word_requests.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/nwsb_icon.dart';
+import '../../widgets/colored_split_promo_banner.dart';
+import '../../shell/nav_shell.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import '../../widgets/app_thinking_loader.dart';
 import 'store_cards.dart';
@@ -222,7 +224,12 @@ class _RequestWordsScreenState extends State<RequestWordsScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 22),
+            const SizedBox(height: 18),
+            ColoredSplitPromoBanner.forSurface(
+              SplitPromoSurface.requestWords,
+              onTap: () => NavScope.goTo(context, 1),
+            ),
+            const SizedBox(height: 8),
             const Text(
               'Your recent requests',
               style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: Colors.white),

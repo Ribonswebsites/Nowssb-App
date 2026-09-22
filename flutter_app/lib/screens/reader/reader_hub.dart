@@ -15,7 +15,9 @@ import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/app_backdrop.dart';
+import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/home_parts.dart';
+import '../store/ebooks_store.dart';
 import 'reader_book.dart';
 
 class ReaderHubScreen extends StatefulWidget {
@@ -150,6 +152,18 @@ class _ReaderHubScreenState extends State<ReaderHubScreen> {
                       sub:
                           'Every meaning in the catalogue, read as one book — grouped into chapters by category.',
                       onTap: () => _open(ReaderKind.meaning),
+                    ),
+                    const SizedBox(height: 14),
+                    ColoredSplitPromoBanner.forSurface(
+                      SplitPromoSurface.readerHub,
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (_) => const EbooksStoreScreen(),
+                          ),
+                        );
+                      },
+                      margin: EdgeInsets.zero,
                     ),
                     const SizedBox(height: 14),
                     _HubCard(

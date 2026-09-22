@@ -47,6 +47,12 @@ enum SplitPromoSurface {
   profile,
   progress,
   coach,
+  library,
+  sentenceBuilder,
+  requestWords,
+  storeHome,
+  selectLevel,
+  readerHub,
 }
 
 class SplitPromoSpec {
@@ -113,16 +119,17 @@ class SplitPromoSpec {
           cta: 'Request a word',
           leftColor: const Color(0xFF3D2914),
           rightColor: const Color(0xFFD4A017),
-          art: SplitPromoArts.robotLookback,
+          art: SplitPromoArts.whiteRobot,
           onTap: onTap,
         );
       case SplitPromoSurface.fashionHome:
+        // Black-bg lookback cutout — solid black right panel so no busy plate shows.
         return SplitPromoSpec(
           title: 'Start today\'s\npractice now.',
           cta: 'Begin Practice',
           leftColor: const Color(0xFF4A1838),
-          rightColor: const Color(0xFFE85D9A),
-          art: SplitPromoArts.whiteRobot,
+          rightColor: const Color(0xFF000000),
+          art: SplitPromoArts.robotLookback,
           onTap: onTap,
         );
       case SplitPromoSurface.ebooksStore:
@@ -169,6 +176,61 @@ class SplitPromoSpec {
           leftColor: const Color(0xFF183028),
           rightColor: const Color(0xFF27AE60),
           art: SplitPromoArts.egyptianGold,
+          onTap: onTap,
+        );
+      case SplitPromoSurface.library:
+        return SplitPromoSpec(
+          title: 'Start today\'s\npractice now.',
+          cta: 'Begin Practice',
+          leftColor: const Color(0xFF1A2838),
+          rightColor: const Color(0xFF5DADE2),
+          art: SplitPromoArts.blondeLotus,
+          onTap: onTap,
+        );
+      case SplitPromoSurface.sentenceBuilder:
+        return SplitPromoSpec(
+          title: 'Expand your\nSound Library.',
+          cta: 'Open Sound Library',
+          leftColor: const Color(0xFF2C1A3A),
+          rightColor: const Color(0xFFAF7AC5),
+          art: SplitPromoArts.robotLotus,
+          onTap: onTap,
+        );
+      case SplitPromoSurface.requestWords:
+        return SplitPromoSpec(
+          title: 'Practice your\ntones today.',
+          cta: 'Begin Practice',
+          leftColor: const Color(0xFF3A2010),
+          rightColor: const Color(0xFFE67E22),
+          art: SplitPromoArts.redHairBlazer,
+          onTap: onTap,
+        );
+      case SplitPromoSurface.storeHome:
+        // Store hub mid-scroll — never self-referential Word Store CTA.
+        return SplitPromoSpec(
+          title: 'Open today\'s\nSound Library.',
+          cta: 'Open Sound Library',
+          leftColor: const Color(0xFF0F2A2E),
+          rightColor: const Color(0xFF16A085),
+          art: SplitPromoArts.egyptianLotus,
+          onTap: onTap,
+        );
+      case SplitPromoSurface.selectLevel:
+        return SplitPromoSpec(
+          title: 'Keep your\nstreak alive.',
+          cta: 'Begin Practice',
+          leftColor: const Color(0xFF1A1830),
+          rightColor: const Color(0xFF5B2C6F),
+          art: SplitPromoArts.blondeBlazer,
+          onTap: onTap,
+        );
+      case SplitPromoSurface.readerHub:
+        return SplitPromoSpec(
+          title: 'Browse deeper\nin Ebooks.',
+          cta: 'Open Ebooks',
+          leftColor: const Color(0xFF14241C),
+          rightColor: const Color(0xFF1ABC9C),
+          art: SplitPromoArts.redLotus,
           onTap: onTap,
         );
     }
