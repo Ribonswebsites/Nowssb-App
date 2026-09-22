@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'glass_wrap.dart';
 import 'neumorphic.dart';
@@ -29,24 +30,28 @@ class StoriesFindYouBanner extends StatelessWidget {
       image: 'assets/banners/stories/prana.png',
       kicker: 'PRANA',
       title: 'SOUND\nRITUAL',
+      layout: _BookLayout.photoBottom,
     ),
     _StoryCard(
       color: Color(0xFFE8C12A),
       image: 'assets/banners/stories/pitta.png',
       kicker: 'PITTA',
       title: 'LIGHT\nBODY',
+      layout: _BookLayout.photoTop,
     ),
     _StoryCard(
       color: Color(0xFFC43A32),
       image: 'assets/banners/stories/soma.png',
       kicker: 'SOMA',
       title: 'WORD\nSCIENCE',
+      layout: _BookLayout.whiteInset,
     ),
     _StoryCard(
       color: Color(0xFF5B8FB8),
       image: 'assets/banners/stories/aura.png',
       kicker: 'AURA',
       title: 'THE\nFUTURE',
+      layout: _BookLayout.photoBottom,
     ),
   ];
 
@@ -57,43 +62,48 @@ class StoriesFindYouBanner extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       child: Container(
         color: _cream,
-        padding: const EdgeInsets.fromLTRB(18, 22, 10, 18),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(
-              flex: 9,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'SOUND\nTHAT\nFINDS YOU',
-                    style: TextStyle(
-                      color: _ink,
-                      fontSize: 28,
-                      height: 0.92,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: -1.4,
+        padding: const EdgeInsets.fromLTRB(16, 26, 8, 18),
+        child: SizedBox(
+          height: 300,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                flex: 9,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'SOUND\nTHAT\nFINDS YOU',
+                      style: GoogleFonts.anton(
+                        color: _ink,
+                        fontSize: 34,
+                        height: 0.88,
+                        letterSpacing: 0.2,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 14),
-                  const Text(
-                    'There are no limitations to the\nfrequency at NowssB.',
-                    style: TextStyle(
-                      color: Color(0xFF3A3A3A),
-                      fontSize: 10,
-                      height: 1.35,
-                      fontStyle: FontStyle.italic,
-                      fontWeight: FontWeight.w500,
+                    const SizedBox(height: 16),
+                    Text(
+                      'There are no limitations to the\nfrequency at NowssB.',
+                      style: GoogleFonts.libreBaskerville(
+                        color: const Color(0xFF3A3A3A),
+                        fontSize: 9.5,
+                        height: 1.4,
+                        fontStyle: FontStyle.italic,
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  const Icon(Icons.arrow_forward, size: 18, color: _ink),
-                ],
+                    const Spacer(),
+                    const Padding(
+                      padding: EdgeInsets.only(bottom: 6),
+                      child: Icon(Icons.arrow_forward, size: 18, color: _ink),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const Expanded(flex: 14, child: _StoryStack()),
-          ],
+              const Expanded(flex: 15, child: _StoryStack()),
+            ],
+          ),
         ),
       ),
     );
@@ -120,17 +130,21 @@ class StoriesFindYouBanner extends StatelessWidget {
   }
 }
 
+enum _BookLayout { photoBottom, photoTop, whiteInset }
+
 class _StoryCard {
   const _StoryCard({
     required this.color,
     required this.image,
     required this.kicker,
     required this.title,
+    required this.layout,
   });
   final Color color;
   final String image;
   final String kicker;
   final String title;
+  final _BookLayout layout;
 }
 
 class _StoryStack extends StatelessWidget {
@@ -139,31 +153,28 @@ class _StoryStack extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const cards = StoriesFindYouBanner._cards;
-    return SizedBox(
-      height: 268,
-      child: LayoutBuilder(
-        builder: (context, c) {
-          final w = c.maxWidth;
-          final cardW = (w * 0.42).clamp(72.0, 96.0);
-          final step = (w - cardW) / 3.2;
-          const heights = [198.0, 246.0, 232.0, 214.0];
-          return Stack(
-            clipBehavior: Clip.none,
-            children: [
-              for (var i = 0; i < cards.length; i++)
-                Positioned(
-                  left: i * step,
-                  bottom: i == 1 ? 4 : (i == 2 ? 10 : 18),
-                  child: _Book(
-                    spec: cards[i],
-                    width: cardW,
-                    height: heights[i],
-                  ),
+    return LayoutBuilder(
+      builder: (context, c) {
+        final w = c.maxWidth;
+        final cardW = (w * 0.38).clamp(70.0, 98.0);
+        final step = ((w - cardW) / 3.05).clamp(28.0, 62.0);
+        const heights = [228.0, 300.0, 276.0, 248.0];
+        return Stack(
+          clipBehavior: Clip.none,
+          children: [
+            for (var i = 0; i < cards.length; i++)
+              Positioned(
+                left: i * step,
+                bottom: 0,
+                child: _Book(
+                  spec: cards[i],
+                  width: cardW,
+                  height: heights[i],
                 ),
-            ],
-          );
-        },
-      ),
+              ),
+          ],
+        );
+      },
     );
   }
 }
@@ -180,6 +191,85 @@ class _Book extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final kicker = Text(
+      spec.kicker,
+      style: GoogleFonts.dmSans(
+        color: Colors.white,
+        fontSize: 7.5,
+        fontWeight: FontWeight.w800,
+        letterSpacing: 1.2,
+      ),
+    );
+    final title = Text(
+      spec.title,
+      style: GoogleFonts.anton(
+        color: Colors.white,
+        fontSize: 15,
+        height: 0.92,
+        letterSpacing: 0.2,
+      ),
+    );
+
+    late final Widget body;
+    switch (spec.layout) {
+      case _BookLayout.photoBottom:
+        body = Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8, 10, 8, 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [kicker, const SizedBox(height: 4), title],
+              ),
+            ),
+            Expanded(child: _photo()),
+          ],
+        );
+      case _BookLayout.photoTop:
+        body = Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(height: height * 0.34, child: _photo()),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(8, 10, 8, 12),
+                child: Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [kicker, const SizedBox(height: 4), title],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      case _BookLayout.whiteInset:
+        body = Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8, 10, 8, 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [kicker, const SizedBox(height: 4), title],
+              ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(7, 0, 7, 8),
+                child: ColoredBox(
+                  color: Colors.white,
+                  child: _photo(alignment: Alignment.topCenter),
+                ),
+              ),
+            ),
+          ],
+        );
+    }
+
     return Container(
       width: width,
       height: height,
@@ -188,52 +278,21 @@ class _Book extends StatelessWidget {
         boxShadow: const [
           BoxShadow(
             color: Color(0x33000000),
-            blurRadius: 10,
-            offset: Offset(2, 6),
+            blurRadius: 12,
+            offset: Offset(2, 8),
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(8, 10, 8, 6),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  spec.kicker,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 8,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.1,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  spec.title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 13,
-                    height: 0.95,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -0.4,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Image.asset(
-              spec.image,
-              fit: BoxFit.cover,
-              alignment: Alignment.topCenter,
-              errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-            ),
-          ),
-        ],
-      ),
+      child: body,
+    );
+  }
+
+  Widget _photo({Alignment alignment = const Alignment(0, -0.55)}) {
+    return Image.asset(
+      spec.image,
+      fit: BoxFit.cover,
+      alignment: alignment,
+      errorBuilder: (_, __, ___) => const SizedBox.shrink(),
     );
   }
 }

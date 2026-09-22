@@ -479,6 +479,8 @@
         '</button>';
     }).join('');
     return '<div class="sl-album">' +
+      '<div class="sl-album-glow" style="background-image:url(\'' + esc(cover) + '\')"></div>' +
+      '<div class="sl-album-body">' +
       '<div class="sl-album-artist">NOWSSB</div>' +
       '<div class="sl-album-sub">Currently Playing · ' + year + '</div>' +
       '<img class="sl-album-cover" src="' + esc(cover) + '" alt="">' +
@@ -500,6 +502,7 @@
         '<img src="' + esc(cover) + '" alt="">' +
         '<div><strong>' + esc(head.word) + '</strong><em>' + esc(head.origin || 'NowssB') + '</em></div>' +
         '<span class="sl-compose-orb sm"></span>' +
+      '</div>' +
       '</div>' +
     '</div>';
   }
