@@ -325,7 +325,9 @@ class _HomeFashionState extends State<HomeFashion> {
           'enterCurve',
           EnterCurveStage(onOpen: _openEnter),
         ),
-        ('editorialC', const EditorialBanner.science()),
+        // The blue “Words That Move You” editorial banner is removed from
+        // both home surfaces; keep this slot stable for registry ordering.
+        ('editorialC', const SizedBox.shrink()),
         ('rx', FashPrescription(onTap: () => _go(1), onWord: _openWord)),
         ('trendvid', FashShopNow(onTap: () => _go(3))),
         ('storeban', StoreBannerSection(onTap: () => _go(3))),

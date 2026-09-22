@@ -84,12 +84,13 @@
   function mount() {
     /* Each surface gets the same three campaigns in a different vertical
        rhythm, so they feel discovered rather than stacked as one gallery. */
-    place('#home-nm .nmh-wrap', '.nmh-supplied-essentials', banners[1], 1);
+    // The blue “Words That Move You” science banner was removed from the
+    // Normal home; do not inject it after the essentials panel.
     place('#home-nm .nmh-wrap', '.nmh-trend-wrap', banners[2], 2);
     place('#home-nm .nmh-wrap', '.nmh-store-wrap', banners[0], 0);
     place('#home .home-body', '.fash-plyr-wrap', banners[2], 2);
     place('#home .home-body', '.fash-trend-wrap', banners[0], 0);
-    place('#home .home-body', '.nwsb-enter-pager', banners[1], 1);
+    // The blue science banner is removed from Fashion home as well.
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount);

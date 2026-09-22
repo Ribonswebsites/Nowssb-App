@@ -284,7 +284,9 @@ class _HomeNormalState extends State<HomeNormal> {
               onStart: _openDashboardSession,
               onProgress: _openDashboardProgress)
         ),
-        ('editorialA', const EditorialBanner.science()),
+        // The blue “Words That Move You” editorial banner is intentionally
+        // removed from the home; keep the registry slot stable for ordering.
+        ('editorialA', const SizedBox.shrink()),
         (
           'essentials',
           Column(
