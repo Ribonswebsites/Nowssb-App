@@ -513,26 +513,14 @@ class _CurveCopy extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
-            'Sound that finds you',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Color(0xFFC4B5FD),
-              fontSize: 15,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 0.2,
-              height: 1.2,
-            ),
-          ),
-          SizedBox(height: 8),
-          Text(
-            'Pronunciation & sound healing, wherever you are',
+            '“With no weapon in his hand, the Enlightened and Brilliant Buddha ruled the world—not by the sword, but by the power of words.”',
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.white,
-              fontSize: 26,
-              fontWeight: FontWeight.w800,
-              height: 1.15,
-              letterSpacing: -0.6,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              height: 1.3,
+              letterSpacing: -0.2,
             ),
           ),
         ],

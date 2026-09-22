@@ -16850,11 +16850,11 @@ body.fashplus :is(#home, .stw-prev-stage) .fp-card .fp-enter .tp-enter-go {
   color: #c4b5fd;
 }
 .nwsb-curve-title {
-  margin-top: 8px;
-  font-size: 26px;
-  font-weight: 800;
-  letter-spacing: -.6px;
-  line-height: 1.15;
+  margin-top: 0;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -.2px;
+  line-height: 1.3;
   color: #fff;
   font-family: 'DM Sans', sans-serif;
 }
