@@ -14,6 +14,8 @@ abstract final class SplitPromoArts {
   static const egyptianGold = 'assets/banners/promo/split-egyptian-gold.png';
   static const redHairBlazer = 'assets/banners/promo/split-red-hair-blazer.png';
   static const robotLookback = 'assets/banners/promo/split-robot-lookback.png';
+  static const meaningsDevice = 'assets/meanings/meanings-device.png';
+  static const ebooksProduct = 'assets/ebooks/ebooks-headphones.jpg';
   static const robotLotus = 'assets/banners/promo/split-robot-lotus.png';
   static const blondeLotus = 'assets/banners/promo/split-blonde-lotus.png';
   static const egyptianLotus = 'assets/banners/promo/split-egyptian-lotus.png';
@@ -101,7 +103,7 @@ class SplitPromoSpec {
           cta: 'View Signatures',
           leftColor: const Color(0xFF3A1848),
           rightColor: const Color(0xFFC44DFF),
-          art: SplitPromoArts.egyptianLotus,
+          art: SplitPromoArts.meaningsDevice,
           onTap: onTap,
         );
       case SplitPromoSurface.wordAtelier:
@@ -123,12 +125,12 @@ class SplitPromoSpec {
           onTap: onTap,
         );
       case SplitPromoSurface.fashionHome:
-        // Black-bg lookback cutout — solid black right panel so no busy plate shows.
+        // Black-bg lookback cutout ON pink panel (not black) — no busy plate in PNG.
         return SplitPromoSpec(
           title: 'Start today\'s\npractice now.',
           cta: 'Begin Practice',
           leftColor: const Color(0xFF4A1838),
-          rightColor: const Color(0xFF000000),
+          rightColor: const Color(0xFFE85D9A),
           art: SplitPromoArts.robotLookback,
           onTap: onTap,
         );
@@ -138,7 +140,7 @@ class SplitPromoSpec {
           cta: 'Open Sound Library',
           leftColor: const Color(0xFF143028),
           rightColor: const Color(0xFF2D6A4F),
-          art: SplitPromoArts.egyptianGold,
+          art: SplitPromoArts.ebooksProduct,
           onTap: onTap,
         );
       case SplitPromoSurface.normalHome:

@@ -126,15 +126,18 @@ String saleOriginalMoney(BuildContext context, num salePrice) =>
 /// meditation collection posters. Used in every notification pill.
 const kStoreProductArt = 'assets/store/nowssb-bag-headphones.webp';
 
-/// Meaning Store icon set (web MS / Signature meanings / store picker).
-/// Never the Word Atelier bag-headphones asset.
-const kMsMeaningIconAsset = 'assets/signature/sig-meanings-icon.webp';
-const kMsMeaningProductArt = 'assets/store/picker-meaning.png';
-const kMsMeaningIntroArt = 'assets/store/intro-meanings.webp';
+/// Meaning Store arts — attached Meanings device only (never word bag).
+/// Swirl ([kMsMeaningStoreIcon]) is reserved for store hub / picker / icon tile.
+const kMsMeaningStoreIcon = 'assets/meanings/meanings-store-swirl.png';
+const kMsMeaningIconAsset = 'assets/meanings/meanings-clean.jpg';
+const kMsMeaningProductArt = 'assets/meanings/meanings-branding.jpg';
+/// Clean Meanings device (solid black). When shown on dark UI / as circle or
+/// split-banner centre, pair with a solid COLOURED back (not flat black).
+const kMsMeaningIntroArt = 'assets/meanings/meanings-device.png';
 
-/// Ebooks Store product art — never word bag / meaning-only defaults.
-const kEbProductArt = 'assets/store/picker-ebooks.png';
-const kEbIntroArt = 'assets/store/intro-ebooks.webp';
+/// Ebooks Store product art — attached E-books arts only (never word bag).
+const kEbProductArt = 'assets/ebooks/ebooks-headphones.jpg';
+const kEbIntroArt = 'assets/ebooks/ebooks-pair.png';
 
 String wordVibrationTag(String name) {
   switch (name.toLowerCase()) {

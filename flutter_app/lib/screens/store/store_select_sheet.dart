@@ -6,6 +6,8 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
+import 'store_cards.dart';
+
 class StoreSelectEntry {
   const StoreSelectEntry({
     required this.id,
@@ -26,7 +28,7 @@ const kStoreSelectEntries = <StoreSelectEntry>[
   StoreSelectEntry(
     id: 'meaning',
     title: 'Meaning',
-    art: 'assets/store/picker-meaning.png',
+    art: kMsMeaningStoreIcon,
   ),
   StoreSelectEntry(
     id: 'signature',
@@ -36,7 +38,7 @@ const kStoreSelectEntries = <StoreSelectEntry>[
   StoreSelectEntry(
     id: 'ebooks',
     title: 'Ebooks',
-    art: 'assets/store/picker-ebooks.png',
+    art: kEbProductArt,
   ),
 ];
 

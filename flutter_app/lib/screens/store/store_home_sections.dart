@@ -943,11 +943,12 @@ class StoreBrowseByGoalSection extends StatelessWidget {
   ];
 
   static const _meaningGoals = <(String, String, Color)>[
-    ('Focus', kMsMeaningIconAsset, Color(0xFF5CE1FF)),
-    ('Calm', kMsMeaningProductArt, Color(0xFF4DB6AC)),
-    ('Sacred', kMsMeaningIconAsset, Color(0xFFFFB74D)),
+    // Device (black-bg) sits on solid accent colour so it is not flat black-on-black.
+    ('Focus', kMsMeaningIntroArt, Color(0xFF5CE1FF)),
+    ('Calm', kMsMeaningIntroArt, Color(0xFF4DB6AC)),
+    ('Sacred', kMsMeaningIntroArt, Color(0xFFFFB74D)),
     ('Nature', kMsMeaningIntroArt, Color(0xFF81C784)),
-    ('Cosmos', kMsMeaningIconAsset, Color(0xFFB388FF)),
+    ('Cosmos', kMsMeaningIntroArt, Color(0xFFB388FF)),
   ];
 
   @override
@@ -981,6 +982,7 @@ class StoreBrowseByGoalSection extends StatelessWidget {
                           padding: const EdgeInsets.all(3),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
+                            color: meanings ? g.$3 : null,
                             border: Border.all(color: g.$3, width: 2.5),
                             boxShadow: [
                               BoxShadow(
@@ -990,11 +992,14 @@ class StoreBrowseByGoalSection extends StatelessWidget {
                             ],
                           ),
                           child: ClipOval(
-                            child: Image.asset(
-                              g.$2,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) =>
-                                  const ColoredBox(color: Color(0xFF0A0F1C)),
+                            child: ColoredBox(
+                              color: meanings ? g.$3 : const Color(0xFF0A0F1C),
+                              child: Image.asset(
+                                g.$2,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) =>
+                                    const ColoredBox(color: Color(0xFF0A0F1C)),
+                              ),
                             ),
                           ),
                         ),

@@ -71,6 +71,8 @@ flutter:
     - assets/icons/
     - assets/progress/
     - assets/store/
+    - assets/meanings/
+    - assets/ebooks/
     - assets/profile/
     - assets/profile_source/
     - assets/routine/

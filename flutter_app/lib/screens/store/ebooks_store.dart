@@ -237,6 +237,7 @@ class _EbookBrowseStrip extends StatelessWidget {
                           padding: const EdgeInsets.all(3),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
+                            color: g.$3,
                             border: Border.all(color: g.$3, width: 2.5),
                             boxShadow: [
                               BoxShadow(
@@ -246,11 +247,14 @@ class _EbookBrowseStrip extends StatelessWidget {
                             ],
                           ),
                           child: ClipOval(
-                            child: Image.asset(
-                              g.$2,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) =>
-                                  const ColoredBox(color: Color(0xFF0A0F1C)),
+                            child: ColoredBox(
+                              color: g.$3,
+                              child: Image.asset(
+                                g.$2,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) =>
+                                    const ColoredBox(color: Color(0xFF0A0F1C)),
+                              ),
                             ),
                           ),
                         ),
