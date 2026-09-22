@@ -90,6 +90,7 @@ flutter:
     - assets/subscription/
     - assets/hero-curve/
     - assets/flip_brand/
+    - assets/editorial/
 
 flutter_launcher_icons:
   android: false

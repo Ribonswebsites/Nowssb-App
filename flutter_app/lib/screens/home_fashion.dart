@@ -42,6 +42,7 @@ import 'shared_sections.dart';
 import 'fashion/sections_mid.dart';
 import 'fashion/sections_top.dart';
 import '../widgets/colored_split_promo_banner.dart';
+import '../widgets/editorial_banner.dart';
 import 'fashion_plus.dart';
 import 'notifications_sheet.dart';
 import 'normal/header_actions_sheet.dart';
@@ -73,6 +74,7 @@ const kFashionSectionOrder = <String>[
   'greet',
   'herorow',
   'practice',
+  'editorialA',
   'routineCards',
   'coachCards',
   // Not on the website's registry. Six doors on one panel so the app can
@@ -85,9 +87,11 @@ const kFashionSectionOrder = <String>[
   'tiles',
   'store',
   'trendwd',
+  'editorialB',
   'custom',
   'fashplus',
   'enterCurve',
+  'editorialC',
   'rx',
   'trendvid',
   'storeban',
@@ -179,7 +183,6 @@ class _HomeFashionState extends State<HomeFashion> {
         _go(tab);
     }
   }
-
 
   /// Quick action hero chip → HeaderActionsSheet destinations.
   void _openQuickAction() {
@@ -283,6 +286,7 @@ class _HomeFashionState extends State<HomeFashion> {
           ),
         ),
         ('practice', FashPractice(onTap: () => _go(1))),
+        ('editorialA', const EditorialBanner.healing()),
         ('routineCards', const NmHorizontalRoutineCards(fashion: true)),
         ('coachCards', const SizedBox.shrink()),
         ('mainops', MainOptionsSection(onGo: _go, onAction: _openMainOption)),
@@ -306,6 +310,7 @@ class _HomeFashionState extends State<HomeFashion> {
         ('tiles', FashTiles(onTile: _go, onOpen: _openEnter)),
         ('store', FashStore(onTap: () => _go(3))),
         ('trendwd', FashTrending(onTap: () => _go(2))),
+        ('editorialB', const EditorialBanner.connect()),
         ('custom', FashCustomize(onTap: () => _push(const WidgetsPage()))),
         (
           'fashplus',
@@ -315,6 +320,7 @@ class _HomeFashionState extends State<HomeFashion> {
           'enterCurve',
           EnterCurveStage(onOpen: _openEnter),
         ),
+        ('editorialC', const EditorialBanner.science()),
         ('rx', FashPrescription(onTap: () => _go(1), onWord: _openWord)),
         ('trendvid', FashShopNow(onTap: () => _go(3))),
         ('storeban', StoreBannerSection(onTap: () => _go(3))),

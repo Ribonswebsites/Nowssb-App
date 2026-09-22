@@ -71,6 +71,7 @@ import 'quick_access.dart';
 import 'widgets_page.dart';
 import '../widgets/home_menu_drawer.dart';
 import '../widgets/hero_curve_stage.dart';
+import '../widgets/editorial_banner.dart';
 import 'practice_player.dart';
 import 'progress/progress_screen.dart';
 import 'reader/reader_hub.dart';
@@ -84,6 +85,7 @@ const kNormalSectionOrder = <String>[
   'heroCurve',
   'promoRail',
   'dashboard',
+  'editorialA',
   'essentials',
   'routineCards',
   // Streak+Store video carousel (shared 2-card), then the streak text block.
@@ -96,8 +98,10 @@ const kNormalSectionOrder = <String>[
   'actionbar',
   'tiles',
   'store',
+  'editorialC',
   'reader',
   'trendwd',
+  'editorialB',
   'custom',
   'rx',
   'routines',
@@ -256,12 +260,15 @@ class _HomeNormalState extends State<HomeNormal> {
   List<(String, Widget?)> _sections() => [
         ('greet', NmGreeting(name: widget.name)),
         ('search', NmSearch(onSearch: (_) => _go(2))),
-        ('heroCurve', HeroCurveStage(
-          compact: true,
-          onSearch: () => showDestinationSearchSheet(context),
-          // Quick action chip → HeaderActionsSheet (destinations), NOT QuickAccessScreen.
-          onQuickAccess: _openQuickAction,
-        )),
+        (
+          'heroCurve',
+          HeroCurveStage(
+            compact: true,
+            onSearch: () => showDestinationSearchSheet(context),
+            // Quick action chip → HeaderActionsSheet (destinations), NOT QuickAccessScreen.
+            onQuickAccess: _openQuickAction,
+          )
+        ),
         (
           'promoRail',
           NormalPromoRail(
@@ -276,6 +283,7 @@ class _HomeNormalState extends State<HomeNormal> {
               onStart: _openDashboardSession,
               onProgress: _openDashboardProgress)
         ),
+        ('editorialA', const EditorialBanner.science()),
         (
           'essentials',
           Column(
@@ -315,8 +323,10 @@ class _HomeNormalState extends State<HomeNormal> {
           FashTiles(onTile: _go, onOpen: _openEnter),
         ),
         ('store', NmStore(onTap: () => _go(3))),
+        ('editorialC', const EditorialBanner.connect()),
         ('reader', NmReader(onTap: () => _push(const ReaderHubScreen()))),
         ('trendwd', NmTrending(onTap: () => _go(2))),
+        ('editorialB', const EditorialBanner.healing()),
         ('custom', NmCustomize(onTap: () => _push(const WidgetsPage()))),
         ('rx', null),
         ('routines', RoutinesSection(onTap: () => _go(1))),
