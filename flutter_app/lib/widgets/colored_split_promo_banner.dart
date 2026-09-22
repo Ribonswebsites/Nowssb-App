@@ -44,6 +44,9 @@ enum SplitPromoSurface {
   fashionHome,
   ebooksStore,
   normalHome,
+  profile,
+  progress,
+  coach,
 }
 
 class SplitPromoSpec {
@@ -132,12 +135,40 @@ class SplitPromoSpec {
           onTap: onTap,
         );
       case SplitPromoSurface.normalHome:
+        // ESSENTIALS / Normal home — never self-referential Word Store CTA.
         return SplitPromoSpec(
-          title: 'Browse the\nWord Store.',
-          cta: 'Open Word Store',
+          title: 'Open today\'s\nSound Library.',
+          cta: 'Open Sound Library',
           leftColor: const Color(0xFF1A3348),
           rightColor: const Color(0xFF2E86C1),
           art: SplitPromoArts.redHairBlazer,
+          onTap: onTap,
+        );
+      case SplitPromoSurface.profile:
+        return SplitPromoSpec(
+          title: 'Start today\'s\npractice now.',
+          cta: 'Begin Practice',
+          leftColor: const Color(0xFF1A2A3C),
+          rightColor: const Color(0xFF3D8BDB),
+          art: SplitPromoArts.blondeBlazer,
+          onTap: onTap,
+        );
+      case SplitPromoSurface.progress:
+        return SplitPromoSpec(
+          title: 'Keep your\nstreak alive.',
+          cta: 'Begin Practice',
+          leftColor: const Color(0xFF2A1838),
+          rightColor: const Color(0xFF9B59B6),
+          art: SplitPromoArts.whiteRobot,
+          onTap: onTap,
+        );
+      case SplitPromoSurface.coach:
+        return SplitPromoSpec(
+          title: 'Dig into the\nSound Library.',
+          cta: 'Open Sound Library',
+          leftColor: const Color(0xFF183028),
+          rightColor: const Color(0xFF27AE60),
+          art: SplitPromoArts.egyptianGold,
           onTap: onTap,
         );
     }

@@ -82,6 +82,7 @@ flutter:
     - assets/certificates/
     - assets/banners/
     - assets/banners/promo/
+    - assets/footer/
     - assets/media/
     - assets/content/
     - assets/subscription/

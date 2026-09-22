@@ -1486,16 +1486,29 @@ class _CarouselDots extends StatelessWidget {
   }
 }
 
-/// 30 · footer — solid black brand footer (no glass / neo / carousel / video).
-/// Used on Fashion `#homeFooter` and Normal `#homeFooterNm`.
-///
-/// The widget paints opaque black through a long bottom tail so the region
-/// under/after the footer (to the bottom of the scroll/page) cannot show
-/// Fashion backdrop video or Normal neo/surface white.
-class HomeFooterSection extends StatelessWidget {
+/// 30 · footer — index.html Fashion `#homeFooter` / Normal `#homeFooterNm`.
+/// Restored website-style brand + tagline + link grid + copyright + 3D
+/// carousel (TV-frame) with bundled tab images. Opaque black underlay + long
+/// black tail so Fashion video / Normal neo never show under/after the footer.
+class HomeFooterSection extends StatefulWidget {
   const HomeFooterSection({super.key, this.onLink});
 
   final void Function(String key)? onLink;
+
+  @override
+  State<HomeFooterSection> createState() => _HomeFooterSectionState();
+}
+
+class _HomeFooterSectionState extends State<HomeFooterSection> {
+  /// Bundled footer-tab studio shots (commit as-is; no recompress).
+  static const _shots = [
+    'assets/footer/tab-sound-of-stillness.png',
+    'assets/footer/tab-breathe-new-noise.png',
+    'assets/footer/tab-calm-new-loud.png',
+    'assets/footer/tab-find-your-frequency.png',
+    'assets/footer/tab-still-mind-still-style.png',
+    'assets/footer/tab-ancient-calm-new-sound.png',
+  ];
 
   static const _links = [
     ('About', 'about'),
@@ -1506,11 +1519,144 @@ class HomeFooterSection extends StatelessWidget {
     ('Profile', 'profile'),
   ];
 
+  /// Website `.footer-carousel { --fci-w:162; --fci-h:260 }` (nm override).
+  static const double _cardW = 162;
+  static const double _cardH = 260;
+
+  Timer? _timer;
+  int _index = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(milliseconds: 2800), (_) {
+      if (!mounted || !TickerMode.of(context)) return;
+      setState(() => _index = (_index + 1) % _shots.length);
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  Widget _footerCard(int i) {
+    var offset = i - _index;
+    if (offset > _shots.length ~/ 2) offset -= _shots.length;
+    if (offset < -(_shots.length ~/ 2)) offset += _shots.length;
+    final distance = offset.abs();
+    final direction = offset < 0 ? -1.0 : 1.0;
+    final tx = distance == 0
+        ? 0.0
+        : distance == 1
+            ? direction * 172
+            : distance == 2
+                ? direction * 292
+                : distance == 3
+                    ? direction * 362
+                    : direction * 520;
+    final tz = distance == 0
+        ? 200.0
+        : distance == 1
+            ? 100.0
+            : distance == 2
+                ? -155.0
+                : distance == 3
+                    ? -285.0
+                    : -600.0;
+    final angle = distance == 0
+        ? 0.0
+        : distance == 1
+            ? direction * -35
+            : distance == 2
+                ? direction * -42
+                : distance == 3
+                    ? direction * -48
+                    : 0.0;
+    final scale = distance == 0
+        ? 1.0
+        : distance == 1
+            ? 1.07
+            : distance == 2
+                ? 0.55
+                : distance == 3
+                    ? 0.34
+                    : 0.5;
+    final opacity = distance == 0
+        ? 1.0
+        : distance == 1
+            ? 0.82
+            : distance == 2
+                ? 0.36
+                : distance == 3
+                    ? 0.12
+                    : 0.0;
+    return IgnorePointer(
+      ignoring: opacity <= 0.05,
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 780),
+        opacity: opacity,
+        child: GestureDetector(
+          onTap: () => setState(() => _index = i),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 780),
+            curve: const Cubic(0.34, 1.08, 0.64, 1),
+            transformAlignment: Alignment.center,
+            transform: Matrix4.identity()
+              ..setEntry(3, 2, 0.001)
+              ..translateByDouble(tx, 0.0, tz, 1.0)
+              ..rotateY(angle * 3.141592653589793 / 180)
+              ..scaleByDouble(scale, scale, scale, 1.0),
+            width: _cardW,
+            height: _cardH,
+            decoration: BoxDecoration(
+              border: Border.all(color: const Color(0x2EFFFFFF)),
+              boxShadow: const [
+                BoxShadow(
+                    color: Color(0xB3000000),
+                    blurRadius: 60,
+                    offset: Offset(0, 24)),
+                BoxShadow(
+                    color: Color(0x80000000),
+                    blurRadius: 12,
+                    offset: Offset(0, 4)),
+              ],
+            ),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                ClipRect(
+                  child: Image.asset(
+                    _shots[i],
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) =>
+                        const ColoredBox(color: Color(0xFF0A0F1C)),
+                  ),
+                ),
+                const DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [Color(0x24FFFFFF), Color(0x00000000)],
+                      stops: [0, 0.55],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final mq = MediaQuery.of(context);
-    // Long opaque black tail: covers nav clearance AND the rest of the
-    // viewport once the user scrolls to the footer — no video / neo bleed.
+    // Long opaque black tail: covers nav clearance AND remaining viewport so
+    // Fashion video / Normal neo/surface cannot bleed under the footer.
     final tail = (mq.padding.bottom + 160).clamp(160.0, 400.0);
     final fill = mq.size.height * 0.55;
     final blackTail = tail > fill ? tail : fill;
@@ -1520,72 +1666,243 @@ class HomeFooterSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(28, 44, 28, 28),
-            child: Column(
+          Container(
+            width: double.infinity,
+            color: const Color(0xFF000000),
+            constraints: const BoxConstraints(minHeight: 420),
+            child: Stack(
               children: [
-                const Text.rich(
-                  TextSpan(
-                    style: TextStyle(
-                      fontSize: 28,
-                      color: Colors.white,
-                      letterSpacing: 1.2,
-                    ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      TextSpan(
-                          text: 'Nowss',
-                          style: TextStyle(fontWeight: FontWeight.w700)),
-                      TextSpan(
-                          text: 'B',
-                          style: TextStyle(fontWeight: FontWeight.w200)),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 10),
-                const Text(
-                  'THE NEW FASHION TREND OF MEDITATION',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 10,
-                    letterSpacing: 2.4,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white,
-                    height: 1.35,
-                  ),
-                ),
-                const SizedBox(height: 22),
-                Container(width: 36, height: 1, color: const Color(0x44FFFFFF)),
-                const SizedBox(height: 22),
-                Wrap(
-                  alignment: WrapAlignment.center,
-                  spacing: 18,
-                  runSpacing: 10,
-                  children: [
-                    for (final (label, key) in _links)
-                      GestureDetector(
-                        onTap: () => onLink?.call(key),
-                        behavior: HitTestBehavior.opaque,
-                        child: Text(
-                          label.toUpperCase(),
-                          style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                            letterSpacing: 1.6,
-                            color: Colors.white,
+                      const Padding(
+                        padding: EdgeInsets.fromLTRB(24, 44, 24, 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Across Every Language',
+                                style: TextStyle(
+                                    fontSize: 9,
+                                    letterSpacing: 4,
+                                    fontWeight: FontWeight.w300,
+                                    color: Color(0x6BC8E8F5))),
+                            SizedBox(height: 14),
+                            Text.rich(
+                              TextSpan(
+                                style: TextStyle(
+                                    fontSize: 40,
+                                    height: 1.1,
+                                    fontWeight: FontWeight.w200,
+                                    color: Color(0xE6FFFFFF)),
+                                children: [
+                                  TextSpan(text: 'Every civilization\n'),
+                                  TextSpan(
+                                      text: 'heard the same\n',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w800,
+                                          color: Colors.white)),
+                                  TextSpan(
+                                      text: 'original sound.',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w800,
+                                          color: Color(0xFFE8D5A3))),
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: 14),
+                            SizedBox(
+                              width: 260,
+                              child: Text(
+                                  'Different words. One root. All languages descend from the same vibrational origin.',
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w300,
+                                      letterSpacing: 0.2,
+                                      color: Color(0x61FFFFFF),
+                                      height: 1.65)),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: 300,
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          alignment: Alignment.center,
+                          children: [
+                            ClipRect(
+                              child: Stack(
+                                clipBehavior: Clip.hardEdge,
+                                fit: StackFit.expand,
+                                children: [
+                                  for (var i = 0; i < _shots.length; i++)
+                                    _footerCard(i),
+                                ],
+                              ),
+                            ),
+                            const Positioned.fill(
+                              child: IgnorePointer(
+                                child: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.centerLeft,
+                                      end: Alignment.centerRight,
+                                      colors: [
+                                        Color(0xFF000000),
+                                        Color(0xD1000000),
+                                        Color(0x00000000),
+                                        Color(0xD1000000),
+                                        Color(0xFF000000),
+                                      ],
+                                      stops: [0.0, 0.08, 0.18, 0.92, 1.0],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            IgnorePointer(
+                              child: SizedBox(
+                                width: _cardW * 908 / 800,
+                                height: _cardH * 1408 / 1286,
+                                child: Image.asset(
+                                  'assets/frames/footer-frame.webp',
+                                  fit: BoxFit.fill,
+                                  errorBuilder: (_, __, ___) =>
+                                      const SizedBox.shrink(),
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              bottom: -20,
+                              child: Row(
+                                children: [
+                                  for (var i = 0; i < _shots.length; i++)
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 3),
+                                      child: AnimatedContainer(
+                                        duration:
+                                            const Duration(milliseconds: 400),
+                                        width: i == _index ? 20 : 4,
+                                        height: 4,
+                                        color: i == _index
+                                            ? const Color(0xE6C8E8F5)
+                                            : const Color(0x4DC8E8F5),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 36),
+                      Center(
+                        child: Container(
+                          width: double.infinity,
+                          constraints: const BoxConstraints(maxWidth: 400),
+                          margin: const EdgeInsets.symmetric(horizontal: 20),
+                          padding: const EdgeInsets.fromLTRB(22, 24, 22, 20),
+                          decoration: const BoxDecoration(
+                            color: Color(0x0FFFFFFF),
+                            border: Border(
+                                top: BorderSide(color: Color(0x29FFFFFF)),
+                                left: BorderSide(color: Color(0x29FFFFFF)),
+                                right: BorderSide(color: Color(0x29FFFFFF)),
+                                bottom: BorderSide(color: Color(0x14FFFFFF))),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Color(0x80000000),
+                                  blurRadius: 40,
+                                  offset: Offset(0, -2)),
+                              BoxShadow(
+                                  color: Color(0x66000000),
+                                  blurRadius: 32,
+                                  offset: Offset(0, 8)),
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              const Text.rich(TextSpan(
+                                  style: TextStyle(
+                                      fontSize: 26,
+                                      color: Colors.white,
+                                      letterSpacing: 1),
+                                  children: [
+                                    TextSpan(
+                                        text: 'Nowss',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600)),
+                                    TextSpan(
+                                        text: 'B',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w200))
+                                  ])),
+                              const SizedBox(height: 4),
+                              const Text.rich(
+                                TextSpan(
+                                  style: TextStyle(
+                                    fontSize: 9,
+                                    letterSpacing: 4,
+                                    fontWeight: FontWeight.w400,
+                                    color: Color(0x99FFFFFF),
+                                  ),
+                                  children: [
+                                    TextSpan(
+                                        text: 'THE NEW FASHION TREND OF '),
+                                    TextSpan(
+                                      text: 'MEDITATION',
+                                      style: TextStyle(
+                                          color: Color(0xBFC8E8F5)),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 18),
+                              Container(
+                                  width: 32,
+                                  height: 1,
+                                  decoration: const BoxDecoration(
+                                      gradient: LinearGradient(colors: [
+                                    Colors.transparent,
+                                    Color(0x66C8E8F5),
+                                    Colors.transparent
+                                  ]))),
+                              const SizedBox(height: 18),
+                              Wrap(
+                                alignment: WrapAlignment.center,
+                                spacing: 16,
+                                runSpacing: 6,
+                                children: [
+                                  for (final (label, key) in _links)
+                                    GestureDetector(
+                                        onTap: () =>
+                                            widget.onLink?.call(key),
+                                        behavior: HitTestBehavior.opaque,
+                                        child: Text(label.toUpperCase(),
+                                            style: const TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w400,
+                                                letterSpacing: 2,
+                                                color: Color(0xCCFFFFFF)))),
+                                ],
+                              ),
+                              const SizedBox(height: 18),
+                              const Text(
+                                  '© 2026 Adv. Sanjaykumar Gadge · Shabdapathy',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.w300,
+                                      letterSpacing: 1,
+                                      color: Color(0x73FFFFFF))),
+                            ],
                           ),
                         ),
                       ),
-                  ],
-                ),
-                const SizedBox(height: 22),
-                const Text(
-                  '© 2026 Adv. Sanjaykumar Gadge · Shabdapathy',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w400,
-                    letterSpacing: 0.8,
-                    color: Color(0xB3FFFFFF),
+                    ],
                   ),
                 ),
               ],

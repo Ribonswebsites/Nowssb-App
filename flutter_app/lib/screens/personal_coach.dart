@@ -19,6 +19,8 @@ import '../widgets/app_backdrop.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import '../widgets/app_thinking_loader.dart';
 import 'practice_player.dart';
+import '../widgets/colored_split_promo_banner.dart';
+import 'sound_library.dart';
 
 const _coachApi = 'https://nowssb-api.ribonpatil2.workers.dev/api/assistant/chat';
 const _coachHero = 'assets/coach/personal_coach_hero.jpg';
@@ -208,6 +210,13 @@ class _PersonalCoachScreenState extends State<PersonalCoachScreen> {
         _hero(words),
         const SizedBox(height: 16),
         _metrics(data),
+        const SizedBox(height: 16),
+        ColoredSplitPromoBanner.forSurface(
+          SplitPromoSurface.coach,
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(builder: (_) => const SoundLibraryScreen()),
+          ),
+        ),
         const SizedBox(height: 16),
         const _QuoteCard(),
         const SizedBox(height: 22),

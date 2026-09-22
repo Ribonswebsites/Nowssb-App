@@ -17,6 +17,7 @@ import 'progress_insight.dart';
 import 'progress_sessions.dart';
 import 'progress_stats.dart';
 import 'progress_tokens.dart';
+import '../../widgets/colored_split_promo_banner.dart';
 
 class PracticeProgressScreen extends StatefulWidget {
   const PracticeProgressScreen({super.key, this.words = const []});
@@ -119,6 +120,10 @@ class _PracticeProgressScreenState extends State<PracticeProgressScreen> {
                     _pad(ProgressStatsRow(progress: progress)),
                     const SizedBox(height: 14),
                     _pad(const ProgressPracticeForward()),
+                    _pad(ColoredSplitPromoBanner.forSurface(
+                      SplitPromoSurface.progress,
+                      onTap: () => NavScope.goTo(context, 1),
+                    )),
                     _pad(const ProgressEyebrow('This Week')),
                     _pad(ProgressWeekGrid(progress: progress)),
                     if (progress.lastPracticed != null) ...[
