@@ -285,26 +285,23 @@
 
 })();
 
-/* The Fashion announcement is deliberately replayed on every viewport entry,
-   so returning to the customization section shows the banner again. */
+/* Horizontal customize cards auto-rotate. They stay put when you scroll
+   to the section — no slide-away. */
 (function(){
-  function replay(el){
-    el.classList.remove('is-exiting');
-    void el.offsetWidth;
-    el.classList.add('is-exiting');
-  }
   function init(){
-    var el=document.getElementById('customizeExperienceBanner');
-    if(!el) return;
-    replay(el);
-    if('IntersectionObserver' in window){
-      var seen=false;
-      new IntersectionObserver(function(entries){
-        var visible=entries[0].isIntersecting;
-        if(visible && !seen) replay(el);
-        seen=visible;
-      },{threshold:.35}).observe(el);
-    }
+    var pager=document.getElementById('fashCustPager');
+    if(!pager) return;
+    var pages=pager.querySelectorAll('.fash-cust-page');
+    if(pages.length<2) return;
+    var i=0;
+    var hold=0;
+    pager.addEventListener('pointerdown', function(){ hold=Date.now()+4000; });
+    setInterval(function(){
+      if(Date.now()<hold) return;
+      i=(i+1)%pages.length;
+      var x=pages[i].offsetLeft - pager.offsetLeft;
+      pager.scrollTo({ left:x, behavior:'smooth' });
+    }, 4000);
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
 })();

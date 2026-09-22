@@ -150,7 +150,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=267"></script>
 <link rel="stylesheet" href="app/app.css?v=318">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=818">
+<link rel="stylesheet" href="nowssb-nm.css?v=819">
 <link rel="stylesheet" href="app/css/subscription-tiers.css?v=3">
 <link rel="stylesheet" href="app/widgets.css?v=8">
 <link rel="stylesheet" href="app/steps.css?v=9">
@@ -2238,28 +2238,30 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
   </div>
 
-  <div class="customize-experience-banner" id="customizeExperienceBanner" role="button" aria-label="Customize your app experience" onclick="cuOpen()">
-    <div class="customize-experience-copy">Customized<br>you app experiance</div>
-    <div class="customize-experience-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#060c18" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-  </div>
-
-  <!-- Customize panel — Quick Access, Quick Links and Set As You Like in one
-       glass card instead of three banners scattered down the page. Tapping the
-       header opens the full Customize hub (app/js/part063.js). -->
-  <div class="cust-panel fash-cust-panel">
-    <div class="cust-panel-head" onclick="cuOpen()">
-      <div class="cust-panel-icon"><img loading="lazy" decoding="async" src="https://media.nowssb.com/migrated-images/cfc84fc5478b4b63_file_00000000b11472098a225d3703b04a60_phr6ph.png" alt=""></div>
-      <div class="cust-panel-txt">
-        <div class="cust-panel-title">Customize</div>
-        <div class="cust-panel-sub">Make this home yours</div>
+  <div class="fash-cust-pager fash-cust-panel" id="fashCustPager">
+    <div class="fash-cust-page glass-wrap" role="button" onclick="cuOpen()">
+      <div class="customize-experience-banner fash-cust-face">
+        <div class="customize-experience-copy">Themes, backdrop<br>and shortcuts.</div>
+        <div class="customize-experience-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#060c18" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       </div>
-      <div class="cust-panel-more"><svg viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="rgba(255,255,255,0.6)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     </div>
-    <!-- Rows rendered by app/js/part063.js from the same list the
-         Customize hub uses, so the two can never drift apart. -->
-    <div class="cust-scroll">
-      <div class="cust-rows"></div>
-      <div class="cust-scrollbar"><div class="cust-scrollthumb"></div></div>
+    <div class="fash-cust-page glass-wrap" role="button" onclick="cuOpen()">
+      <div class="customize-experience-banner fash-cust-face" id="customizeExperienceBanner">
+        <div class="customize-experience-copy">Customized<br>your app experience</div>
+        <div class="customize-experience-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#060c18" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+    </div>
+    <div class="fash-cust-page glass-wrap" role="button" onclick="cuGo('themes')">
+      <div class="cust-row fash-cust-face"><div class="cust-row-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" fill="#000" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/><rect x="6" y="6" width="5" height="5" rx="1.5" fill="rgba(255,255,255,0.12)"/><rect x="13" y="6" width="5" height="5" rx="1.5" fill="rgba(232,213,163,0.3)"/></svg></div><div class="cust-row-divider"></div><div class="cust-row-txt"><div class="cust-row-title">Themes</div><div class="cust-row-sub">Black Edition</div></div><div class="cust-row-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div></div>
+    </div>
+    <div class="fash-cust-page glass-wrap" role="button" onclick="cuGo('bg')">
+      <div class="cust-row fash-cust-face"><div class="cust-row-icon"><img loading="lazy" decoding="async" alt="" src="https://media.nowssb.com/migrated-images/cfc84fc5478b4b63_file_00000000b11472098a225d3703b04a60_phr6ph.png"></div><div class="cust-row-divider"></div><div class="cust-row-txt"><div class="cust-row-title">Background</div><div class="cust-row-sub">Fashion backdrop</div></div><div class="cust-row-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div></div>
+    </div>
+    <div class="fash-cust-page glass-wrap" role="button" onclick="cuGo('startbg')">
+      <div class="cust-row fash-cust-face"><div class="cust-row-icon"><img loading="lazy" decoding="async" alt="" src="https://media.nowssb.com/migrated-images/5e8a9fdb18e034ec_file_000000009f10820bb6872a5ed8007148_pvqjaa.png"></div><div class="cust-row-divider"></div><div class="cust-row-txt"><div class="cust-row-title">Start Image</div><div class="cust-row-sub">Art behind the start</div></div><div class="cust-row-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div></div>
+    </div>
+    <div class="fash-cust-page glass-wrap" role="button" onclick="cuGo('qa')">
+      <div class="cust-row fash-cust-face"><div class="cust-row-icon"><img loading="lazy" decoding="async" alt="" src="https://media.nowssb.com/migrated-images/272b820a002190fe_file_000000002cf4820b865caf6fc0554959_k7drqx.png"></div><div class="cust-row-divider"></div><div class="cust-row-txt"><div class="cust-row-title">Quick access</div><div class="cust-row-sub">Bottom nav bar</div></div><div class="cust-row-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div></div>
     </div>
   </div>
 
@@ -2386,7 +2388,21 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <!-- The store clip and its Shop Now banner, in a wrapper of its own.
        app/js/part067.js drops the clip in above the banner. -->
-  <div class="glass-wrap fash-storevid-wrap">
+  <div class="glass-wrap fash-storevid-wrap fash-today-offer">
+  <div class="nmh-trend-shop-banner fash-offer-head" onclick="nwsbTrendShopTap(this)">
+    <div class="nmh-trend-shop-logo">
+      <img decoding="async" loading="lazy" src="https://media.nowssb.com/migrated-images/86a1283688196499_ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png" alt="Store">
+    </div>
+    <div class="nmh-trend-shop-text">
+      <div class="nmh-trend-shop-label">TODAY'S OFFER</div>
+      <div class="nmh-trend-shop-word">Limited drops · healing sounds</div>
+    </div>
+    <div class="nmh-trend-shop-divider"></div>
+    <button class="nmh-trend-shop-btn" onclick="event.stopPropagation();nwsbTrendShopTap(this)">
+      <svg class="nmh-trend-shop-cart" viewBox="0 0 24 24" fill="none" stroke="#060c18" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2.5 3h2.3l1.9 12a1.4 1.4 0 0 0 1.4 1.2h9.4a1.4 1.4 0 0 0 1.4-1.1L21 8H6"/></svg>
+      Shop Now
+    </button>
+  </div>
   <div class="nmh-trend-shop-banner fash-trend-shop-banner" id="nmh-trending-shop-banner-fash" onclick="nwsbTrendShopTap(this)">
     <div class="nmh-trend-shop-logo">
       <img decoding="async" loading="lazy" src="https://media.nowssb.com/migrated-images/86a1283688196499_ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png" alt="Store">

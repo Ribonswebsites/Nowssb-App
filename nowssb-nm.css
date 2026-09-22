@@ -16190,14 +16190,51 @@ a:active,
   }
 }
 
-/* Fashion Customize experience banner: the announcement appears before the
-   customization panel, then exits left to reveal the controls. */
-.customize-experience-banner{width:100%;min-height:96px;margin:16px 0 10px;padding:18px 18px 18px 22px;display:flex!important;visibility:visible!important;align-items:flex-end;justify-content:space-between;box-sizing:border-box;background:#000!important;border:1px solid rgba(255,255,255,.16);border-radius:18px;overflow:hidden;cursor:pointer;animation:customizeExperienceSlideOut 1200ms cubic-bezier(.7,0,.2,1) 5000ms both;}
+/* Fashion Customize: horizontal glass cards, same 96px face, no slide-away. */
+.fash-cust-pager {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  gap: 10px;
+  padding: 4px 10px 12px;
+}
+.fash-cust-pager::-webkit-scrollbar { display: none; }
+.fash-cust-page {
+  flex: 0 0 88%;
+  scroll-snap-align: center;
+  min-width: 88%;
+}
+.customize-experience-banner,
+.fash-cust-face {
+  width: 100%;
+  min-height: 96px;
+  height: 96px;
+  margin: 0;
+  padding: 18px 18px 18px 22px;
+  display: flex !important;
+  visibility: visible !important;
+  align-items: flex-end;
+  justify-content: space-between;
+  box-sizing: border-box;
+  background: #000 !important;
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 18px;
+  overflow: hidden;
+  cursor: pointer;
+  animation: none !important;
+}
 .customize-experience-copy{color:#fff;font-size:25px;line-height:1.08;font-weight:700;letter-spacing:-.3px;}
 .customize-experience-arrow{width:44px;height:44px;flex:0 0 44px;display:grid;place-items:center;border-radius:50%;background:#fff;}
 .customize-experience-arrow svg{width:22px;height:22px;}
-.customize-experience-banner.is-exiting{animation:customizeExperienceSlideOut 1200ms cubic-bezier(.7,0,.2,1) 5000ms both;}
-@keyframes customizeExperienceSlideOut{0%{transform:translateX(0);opacity:1}72%{transform:translateX(-110%);opacity:1}100%{transform:translateX(-110%);opacity:0;visibility:hidden}}
+.fash-cust-page .cust-row {
+  align-items: center;
+  margin: 0;
+  height: 96px;
+}
+.fash-today-offer .nmh-trend-shop-banner { margin: 0 0 10px; }
+.fash-today-offer .nmh-trend-shop-banner:last-child { margin-bottom: 0; }
 /* My Progress FINAL Glass Orb scenes: first video belongs only to the intro; second belongs to the dashboard. */
 #sub-my-progress .mp-final-scene-one{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:.9;filter:brightness(.78) contrast(1.08);transition:opacity .35s ease;}
 #sub-my-progress .mp-scroll-bg{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:0;pointer-events:none;filter:brightness(.78) contrast(1.08);transition:opacity .35s ease;}

@@ -780,51 +780,7 @@ class FashCustomize extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        _CustomizeAutoRail(onOpenHub: onTap),
-        SectionPane(
-          child: GestureDetector(
-            onTap: onTap,
-            behavior: HitTestBehavior.opaque,
-            child: Row(children: [
-              Container(
-                width: 46,
-                height: 46,
-                decoration: BoxDecoration(
-                  color: const Color(0x14FFFFFF),
-                  shape: BoxShape.circle,
-                  border: Border.all(color: const Color(0x24FFFFFF)),
-                ),
-                child: const Icon(Icons.tune, size: 19, color: Colors.white),
-              ),
-              const SizedBox(width: 14),
-              const Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Customize',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Text(
-                      'Make this home yours',
-                      style: TextStyle(fontSize: 12, color: Color(0x8CFFFFFF)),
-                    ),
-                  ],
-                ),
-              ),
-              const Icon(Icons.chevron_right, size: 20, color: Color(0xB3FFFFFF)),
-            ]),
-          ),
-        ),
-      ],
-    );
+    return _CustomizeAutoRail(onOpenHub: onTap);
   }
 }
 
@@ -849,13 +805,13 @@ class _CustomizeAutoRailState extends State<_CustomizeAutoRail> {
   List<_CustomizeCardSpec> _specs(BuildContext context) => [
         _CustomizeCardSpec(
           kind: _CustomizeCardKind.intro,
-          title: 'Themes · Background\nStart art · Quick access',
+          title: 'Themes, backdrop\nand shortcuts.',
           sub: 'Make every surface yours',
           onTap: widget.onOpenHub,
         ),
         _CustomizeCardSpec(
           kind: _CustomizeCardKind.banner,
-          title: 'Customized\nyou app experiance',
+          title: 'Customized\nyour app experience',
           sub: '',
           onTap: widget.onOpenHub,
         ),
@@ -927,7 +883,7 @@ class _CustomizeAutoRailState extends State<_CustomizeAutoRail> {
     final specs = _specs(context);
     // Arrive with the section — no reverse-parallax / slide-away.
     return SizedBox(
-      height: kCustomizeCardHeight + 26,
+      height: kCustomizeCardHeight + 24 + 8,
       child: NotificationListener<ScrollNotification>(
         onNotification: (n) {
           if (n is ScrollStartNotification && n.dragDetails != null) {
@@ -945,8 +901,12 @@ class _CustomizeAutoRailState extends State<_CustomizeAutoRail> {
           itemBuilder: (context, i) {
             final spec = specs[i];
             return Padding(
-              padding: const EdgeInsets.fromLTRB(6, 16, 6, 10),
-              child: _CustomizeRailCard(spec: spec),
+              padding: const EdgeInsets.symmetric(horizontal: 5),
+              child: GlassWrap(
+                margin: EdgeInsets.zero,
+                padding: const EdgeInsets.all(12),
+                child: _CustomizeRailCard(spec: spec),
+              ),
             );
           },
         ),
