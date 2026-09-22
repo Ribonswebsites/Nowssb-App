@@ -617,6 +617,7 @@ class PhotoCard extends StatelessWidget {
     required this.sub,
     this.aspect = 16 / 9,
     this.onTap,
+    this.darkSurface = false,
   });
 
   final Widget background;
@@ -625,6 +626,7 @@ class PhotoCard extends StatelessWidget {
   final String sub;
   final double aspect;
   final VoidCallback? onTap;
+  final bool darkSurface;
 
   @override
   Widget build(BuildContext context) {
@@ -640,13 +642,19 @@ class PhotoCard extends StatelessWidget {
             fit: StackFit.expand,
             children: [
               // Ensure video/image paints edge-to-edge inside the rounded clip.
-              Positioned.fill(child: background),
-              const DecoratedBox(
+              Positioned.fill(
+                child: darkSurface
+                    ? const ColoredBox(color: Colors.black)
+                    : background,
+              ),
+              DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [Color(0x8C000000), Color(0xF2000000)],
+                    colors: darkSurface
+                        ? const [Color(0x00000000), Color(0x33000000)]
+                        : const [Color(0x8C000000), Color(0xF2000000)],
                   ),
                 ),
               ),
@@ -657,34 +665,39 @@ class PhotoCard extends StatelessWidget {
                   children: [
                     Text(
                       label,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
                         letterSpacing: 2,
                         fontWeight: FontWeight.w700,
-                        color: NwsbColors.goldLight,
+                        color:
+                            darkSurface ? Colors.white : NwsbColors.goldLight,
                       ),
                     ),
                     const SizedBox(height: 6),
-                    AnimatedHeading(
-                      title,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                          height: 1.15),
-                      mode: HeadingMotion.roll,
+                    Flexible(
+                      child: AnimatedHeading(
+                        title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                            height: 1.15),
+                        mode: HeadingMotion.roll,
+                      ),
                     ),
                     const Spacer(),
-                    Text(
-                      sub,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 12.5,
-                        color: Color(0xB3FFFFFF),
-                        height: 1.45,
+                    Flexible(
+                      child: Text(
+                        sub,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 12.5,
+                          color: Colors.white,
+                          height: 1.35,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -1000,7 +1013,10 @@ class TrendBannerLockup extends StatelessWidget {
                     color: Colors.white,
                     height: 1.3,
                     shadows: [
-                      Shadow(color: Color(0x99000000), blurRadius: 10, offset: Offset(0, 2)),
+                      Shadow(
+                          color: Color(0x99000000),
+                          blurRadius: 10,
+                          offset: Offset(0, 2)),
                     ],
                   ),
                 ),
@@ -1050,4 +1066,3 @@ class TitleWithGlassEnter extends StatelessWidget {
     );
   }
 }
-

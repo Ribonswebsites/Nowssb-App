@@ -98,6 +98,7 @@ class FashShabdapathy extends StatelessWidget {
             title: 'Shabdapathy Foundations',
             sub: 'Ancient word science meets modern wellness. Explore the '
                 'healing power of natural word origins.',
+            darkSurface: true,
             onTap: onTap,
           ),
           const SizedBox(height: 14),
