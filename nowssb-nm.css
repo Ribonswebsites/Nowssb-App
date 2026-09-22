@@ -17130,9 +17130,11 @@ body.fashplus :is(#home, .stw-prev-stage) .fp-card .fp-enter .tp-enter-go {
   background: #f6ede4;
   color: #111;
   padding: 26px 8px 18px 16px;
+  box-sizing: border-box;
+  aspect-ratio: 16 / 9;
   cursor: pointer;
   overflow: hidden;
-  min-height: 300px;
+  min-height: 0;
 }
 .nwsb-stories-copy { flex: 0 0 36%; min-width: 0; display: flex; flex-direction: column; }
 .nwsb-stories-copy h2 {
@@ -17156,7 +17158,8 @@ body.fashplus :is(#home, .stw-prev-stage) .fp-card .fp-enter .tp-enter-go {
 .nwsb-stories-stack {
   position: relative;
   flex: 1;
-  height: 300px;
+  height: auto;
+  min-height: 0;
 }
 .nwsb-story {
   position: absolute;
@@ -17200,10 +17203,10 @@ body.fashplus :is(#home, .stw-prev-stage) .fp-card .fp-enter .tp-enter-go {
   min-height: 0;
 }
 .nwsb-story-inset img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 12%; }
-.nwsb-story.c0 { left: 0; height: 228px; background: #e07a32; }
-.nwsb-story.c1 { left: 21%; height: 300px; background: #e8c12a; }
-.nwsb-story.c2 { left: 42%; height: 276px; background: #c43a32; }
-.nwsb-story.c3 { left: 63%; height: 248px; background: #5b8fb8; }
+.nwsb-story.c0 { left: 0; height: 76%; background: #e07a32; }
+.nwsb-story.c1 { left: 21%; height: 100%; background: #e8c12a; }
+.nwsb-story.c2 { left: 42%; height: 92%; background: #c43a32; }
+.nwsb-story.c3 { left: 63%; height: 83%; background: #5b8fb8; }
 .nmh-stories-wrap {
   margin: 10px 16px;
   border-radius: 22px;

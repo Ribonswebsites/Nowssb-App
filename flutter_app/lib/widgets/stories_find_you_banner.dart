@@ -60,11 +60,11 @@ class StoriesFindYouBanner extends StatelessWidget {
     final inner = GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: Container(
-        color: _cream,
-        padding: const EdgeInsets.fromLTRB(16, 26, 8, 18),
-        child: SizedBox(
-          height: 300,
+      child: AspectRatio(
+        aspectRatio: 16 / 9,
+        child: Container(
+          color: _cream,
+          padding: const EdgeInsets.fromLTRB(16, 20, 8, 12),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -82,7 +82,7 @@ class StoriesFindYouBanner extends StatelessWidget {
                         letterSpacing: 0.2,
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
                     Text(
                       'There are no limitations to the\nfrequency at NowssB.',
                       style: GoogleFonts.libreBaskerville(
@@ -95,7 +95,7 @@ class StoriesFindYouBanner extends StatelessWidget {
                     ),
                     const Spacer(),
                     const Padding(
-                      padding: EdgeInsets.only(bottom: 6),
+                      padding: EdgeInsets.only(bottom: 2),
                       child: Icon(Icons.arrow_forward, size: 18, color: _ink),
                     ),
                   ],
@@ -156,9 +156,10 @@ class _StoryStack extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, c) {
         final w = c.maxWidth;
+        final h = c.maxHeight.isFinite ? c.maxHeight : 300.0;
         final cardW = (w * 0.38).clamp(70.0, 98.0);
         final step = ((w - cardW) / 3.05).clamp(28.0, 62.0);
-        const heights = [228.0, 300.0, 276.0, 248.0];
+        final heights = [h * .76, h, h * .92, h * .83];
         return Stack(
           clipBehavior: Clip.none,
           children: [
