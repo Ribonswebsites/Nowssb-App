@@ -8,6 +8,7 @@ import '../../data/store_catalog.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
+import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/page_shell.dart';
 import 'product_detail.dart';
 import 'store_cards.dart';
@@ -274,6 +275,10 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
           onViewCart: _viewCart,
           videoAsset: nwsbVideo(kRmHeroVidFile),
           videoTitle: '',
+        ),
+        ColoredSplitPromoBanner.forSurface(
+          SplitPromoSurface.wordAtelier,
+          onTap: _browseAll,
         ),
         StoreGlassPanel(
           radius: 32,

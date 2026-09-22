@@ -25,6 +25,7 @@ import '../widgets/black_glass_banner.dart';
 import '../widgets/intro_gate.dart';
 import '../widgets/tv_frame.dart';
 import '../widgets/app_thinking_loader.dart';
+import '../widgets/colored_split_promo_banner.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import 'notifications_sheet.dart';
 import 'practice.dart';
@@ -1024,81 +1025,14 @@ class _SlmFeed extends StatelessWidget {
   Widget _promo() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 14, 12, 6),
-      child: HeavyGlassPanel(
-        radius: 22,
-        padding: const EdgeInsets.all(8),
-        child: NestedDarkWrap(
-          margin: EdgeInsets.zero,
-          padding: EdgeInsets.zero,
-          radius: 16,
-          onTap: onMeanings,
-          child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            gradient: const LinearGradient(
-              colors: [Color(0xFFE8F4FA), Color(0xFFC5DCE8)],
-            ),
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: IntrinsicHeight(
-            child: Row(
-              children: [
-                Expanded(
-                  flex: 58,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 16, 10, 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Every word has an origin.\nFind out what yours means.',
-                          style: TextStyle(
-                            color: Color(0xFF06121A),
-                            fontSize: 17,
-                            fontWeight: FontWeight.w600,
-                            height: 1.25,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          meanings.isEmpty
-                              ? 'The Meaning Store'
-                              : '${meanings.length} meanings in the archive',
-                          style: const TextStyle(
-                            color: Color(0xAD06121A),
-                            fontSize: 12,
-                          ),
-                        ),
-                        const Spacer(),
-                        const Icon(Icons.arrow_forward,
-                            color: Color(0xFF06121A), size: 26),
-                      ],
-                    ),
-                  ),
-                ),
-                Expanded(
-                  flex: 42,
-                  child: ColoredBox(
-                    color: const Color(0xFF06121A),
-                    child: FramedSlot(
-                      frame: DeviceFrame.tab6Landscape,
-                      child: Image.asset(
-                        'assets/store/intro-meanings.webp',
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) =>
-                            const ColoredBox(color: Color(0xFF06121A)),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+      child: ColoredSplitPromoBanner.forSurface(
+        SplitPromoSurface.soundLibrary,
+        onTap: onMeanings,
+        margin: EdgeInsets.zero,
       ),
     );
   }
+
 
   Widget _sentencesSec() {
     final pool = (words.isNotEmpty ? words : allWords).toList();

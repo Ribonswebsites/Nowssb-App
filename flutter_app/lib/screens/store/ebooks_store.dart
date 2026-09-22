@@ -9,6 +9,7 @@ import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/nwsb_icon.dart';
+import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/page_shell.dart';
 import 'product_detail.dart';
 import 'store_actions.dart';
@@ -75,6 +76,9 @@ class _EbooksBody extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        ColoredSplitPromoBanner.forSurface(
+          SplitPromoSurface.ebooksStore,
+        ),
         // Restored looping hero-ebooks film (keep elevated copy overlay).
         Container(
           margin: const EdgeInsets.only(bottom: 16),

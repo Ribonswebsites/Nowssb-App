@@ -58,6 +58,7 @@ import 'normal/header_actions_sheet.dart';
 import 'fashion/header.dart';
 import '../widgets/nwsb_icon.dart';
 import 'normal/neomorphic_essentials.dart';
+import '../widgets/colored_split_promo_banner.dart';
 import 'normal/horizontal_routine_cards.dart';
 import 'normal/sections_bottom.dart';
 import 'normal/sections_top.dart';
@@ -275,7 +276,21 @@ class _HomeNormalState extends State<HomeNormal> {
               onStart: _openDashboardSession,
               onProgress: _openDashboardProgress)
         ),
-        ('essentials', const NmSuppliedEssentials()),
+        (
+          'essentials',
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                child: ColoredSplitPromoBanner.forSurface(
+                  SplitPromoSurface.normalHome,
+                ),
+              ),
+              const NmSuppliedEssentials(),
+            ],
+          ),
+        ),
         ('routineCards', const NmHorizontalRoutineCards()),
         (
           'herovid',

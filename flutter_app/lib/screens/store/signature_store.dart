@@ -1,12 +1,13 @@
-/// Signature Store — rarest words + meanings with gold Signature tags.
+/// Signature Store — rarest Signature words & meanings.
+/// Same store family fixes: one-line subtitle, no double banner title,
+/// taller subscribe + pill right-centre, Signature-appropriate labels.
 library;
 
 import 'package:flutter/material.dart';
 
 import '../../data/store_catalog.dart';
-import '../../media/nwsb_video.dart';
-import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
+import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/page_shell.dart';
 import 'product_detail.dart';
 import 'store_cards.dart';
@@ -19,20 +20,22 @@ class SignatureStoreScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => PageShell(
-        eyebrow: 'NowssB Store',
-        title: 'Words & Meanings',
+        eyebrow: '',
+        title: 'NowssB Store',
+        subtitle: 'The Signature Store',
         film: 'assets/video/signature-store.mp4',
         usePageFilm: false,
         onBack: () => Navigator.of(context).pop(),
         onStorePicker: () => showStoreSelectSheet(
           context,
           current: 'signature',
-          onSelect: (id) => openStoreFromPicker(context, id, current: 'signature'),
+          onSelect: (id) =>
+              openStoreFromPicker(context, id, current: 'signature'),
         ),
         slivers: [
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 40),
-            sliver: SliverList.list(children: [_SignatureBody()]),
+            sliver: SliverList.list(children: const [_SignatureBody()]),
           ),
         ],
       );
@@ -43,7 +46,8 @@ class _SignatureBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final words = kRmCategories.where((c) => c.signature != null).map((c) => c.signature!).toList();
+    final words =
+        kRmCategories.where((c) => c.signature != null).map((c) => c.signature!).toList();
     final half = (words.length / 2).ceil();
     final w1 = words.take(half).toList();
     final w2 = words.skip(half).toList();
@@ -55,58 +59,48 @@ class _SignatureBody extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(14),
-          child: SizedBox(
-            height: 180,
-            width: double.infinity,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                const NwsbVideo(
-                  asset: 'assets/video/signature-store.mp4',
-                  poster: 'assets/video/signature-store-poster.webp',
-                  priority: ClipPriority.feature,
-                ),
-                const DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [Color(0x33060C18), Color(0xEE060C18)],
-                    ),
-                  ),
-                ),
-                const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Align(
-                    alignment: Alignment.bottomLeft,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('SHABDAPATHY · THE RAREST', style: TextStyle(fontSize: 10, letterSpacing: 2.2, color: NwsbColors.gold)),
-                        SizedBox(height: 6),
-                        Text('Words & Meanings', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w300, color: Colors.white)),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+        // Video hero — no stacked title overlay (header has subtitle).
+        StorePixelsHero(
+          videoAsset: 'assets/video/signature-store.mp4',
+          videoTitle: '',
+        ),
+        const StoreSubscribeBanner(
+          videoAsset: 'assets/video/signature-store.mp4',
+          pillIconAsset: kMsMeaningProductArt,
+        ),
+        ColoredSplitPromoBanner.forSurface(
+          SplitPromoSurface.signatureStore,
+          onTap: () => showStoreViewAllPanel(
+            context,
+            title: 'Signatures',
+            items: storeDefaultViewAllItems(),
+            onOpenWord: (w, r, i, p) => openAtelierWord(
+              context,
+              word: w,
+              root: r,
+              img: i,
+              price: p,
+              signature: true,
             ),
           ),
         ),
-        const SizedBox(height: 8),
         RmCatBanner(
-          title: 'Signature Words',
-          sub: 'One per collection — the rarest word each one has',
+          title: 'Signature Collection',
+          sub: 'One per collection — the rarest Signature each one has',
           pillLabel: 'SIGNATURE',
+          logoAsset: kMsMeaningIconAsset,
           onViewAll: () => showStoreViewAllPanel(
             context,
-            title: 'Signature Words',
+            title: 'Signature Collection',
             items: storeDefaultViewAllItems(),
-            onOpenWord: (w, r, i, p) =>
-                openAtelierWord(context, word: w, root: r, img: i, price: p, signature: true),
+            onOpenWord: (w, r, i, p) => openAtelierWord(
+              context,
+              word: w,
+              root: r,
+              img: i,
+              price: p,
+              signature: true,
+            ),
           ),
         ),
         RmWordRow(
@@ -118,21 +112,34 @@ class _SignatureBody extends StatelessWidget {
                 imgUrl: s.img,
                 signature: true,
                 price: kMsSignaturePrice,
-                onTap: () => openAtelierWord(context, word: s.name, root: 'Most Exclusive', img: s.img, signature: true),
+                onTap: () => openAtelierWord(
+                  context,
+                  word: s.name,
+                  root: 'Most Exclusive',
+                  img: s.img,
+                  signature: true,
+                ),
               ),
           ],
         ),
         if (w2.isNotEmpty) ...[
           RmCatBanner(
-            title: 'Signature Words · II',
-            sub: 'The rest of the collection',
+            title: 'Signature Collection · II',
+            sub: 'The rest of the rare Signature set',
             pillLabel: 'RARE II',
+            logoAsset: kMsMeaningIconAsset,
             onViewAll: () => showStoreViewAllPanel(
               context,
-              title: 'Signature Words · II',
+              title: 'Signature Collection · II',
               items: storeDefaultViewAllItems(),
-              onOpenWord: (w, r, i, p) =>
-                  openAtelierWord(context, word: w, root: r, img: i, price: p, signature: true),
+              onOpenWord: (w, r, i, p) => openAtelierWord(
+                context,
+                word: w,
+                root: r,
+                img: i,
+                price: p,
+                signature: true,
+              ),
             ),
           ),
           RmWordRow(
@@ -144,21 +151,34 @@ class _SignatureBody extends StatelessWidget {
                   imgUrl: s.img,
                   signature: true,
                   price: kMsSignaturePrice,
-                  onTap: () => openAtelierWord(context, word: s.name, root: 'Most Exclusive', img: s.img, signature: true),
+                  onTap: () => openAtelierWord(
+                    context,
+                    word: s.name,
+                    root: 'Most Exclusive',
+                    img: s.img,
+                    signature: true,
+                  ),
                 ),
             ],
           ),
         ],
         RmCatBanner(
           title: 'Signature Meanings',
-          sub: 'The full decoded origin, not the base entry',
+          sub: 'The full decoded origin — Signature grade',
           pillLabel: 'MEANINGS',
+          logoAsset: kMsMeaningIconAsset,
           onViewAll: () => showStoreViewAllPanel(
             context,
             title: 'Signature Meanings',
             items: storeDefaultViewAllItems(),
-            onOpenWord: (w, r, i, p) =>
-                openAtelierWord(context, word: w, root: r, img: i, price: p, signature: true),
+            onOpenWord: (w, r, i, p) => openAtelierWord(
+              context,
+              word: w,
+              root: r,
+              img: i,
+              price: p,
+              signature: true,
+            ),
           ),
         ),
         MsGrid(
@@ -188,14 +208,21 @@ class _SignatureBody extends StatelessWidget {
         if (m2.isNotEmpty) ...[
           RmCatBanner(
             title: 'Signature Meanings · II',
-            sub: 'The rest of the collection',
+            sub: 'The rest of the decoded Signature set',
             pillLabel: 'DECODED',
+            logoAsset: kMsMeaningIconAsset,
             onViewAll: () => showStoreViewAllPanel(
               context,
               title: 'Signature Meanings · II',
               items: storeDefaultViewAllItems(),
-              onOpenWord: (w, r, i, p) =>
-                  openAtelierWord(context, word: w, root: r, img: i, price: p, signature: true),
+              onOpenWord: (w, r, i, p) => openAtelierWord(
+                context,
+                word: w,
+                root: r,
+                img: i,
+                price: p,
+                signature: true,
+              ),
             ),
           ),
           MsGrid(
@@ -239,11 +266,23 @@ class _SignatureBody extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Signature · Words & Meanings', style: TextStyle(fontSize: 9, letterSpacing: 1.5, color: NwsbColors.gold)),
+                    Text('Signature · Request',
+                        style: TextStyle(
+                            fontSize: 9,
+                            letterSpacing: 1.5,
+                            color: NwsbColors.gold)),
                     SizedBox(height: 4),
-                    Text('Request a Signature', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white)),
+                    Text('Request a Signature',
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white)),
                     SizedBox(height: 3),
-                    Text('Personally crafted & delivered within 48 hours.', style: TextStyle(fontSize: 12, color: Color(0x8CFFFFFF))),
+                    Text(
+                      'Personally crafted & delivered within 48 hours.',
+                      style:
+                          TextStyle(fontSize: 12, color: Color(0x8CFFFFFF)),
+                    ),
                   ],
                 ),
               ),
@@ -251,7 +290,8 @@ class _SignatureBody extends StatelessWidget {
           ),
         ),
         const StoreDisclaimer(
-          text: 'Signatures are one-of-a-kind. Owned once, never restocked. For educational and wellness purposes only.',
+          text:
+              'Signatures are one-of-a-kind. Owned once, never restocked. For educational and wellness purposes only.',
         ),
       ],
     );

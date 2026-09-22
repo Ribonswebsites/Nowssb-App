@@ -505,7 +505,7 @@ const Map<String, String> kMsCatSub = {
   "Human": "The truth of body, mind and soul",
   "Emotions": "What every feeling really means",
   "Cosmos": "Origins beyond understanding",
-  "Nations & People": "The people and places behind the words",
+  "Nations & People": "The people and places behind the meanings",
 };
 
 class MsSignatureEntry {

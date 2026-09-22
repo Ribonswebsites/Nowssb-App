@@ -126,6 +126,10 @@ String saleOriginalMoney(BuildContext context, num salePrice) =>
 /// meditation collection posters. Used in every notification pill.
 const kStoreProductArt = 'assets/store/nowssb-bag-headphones.webp';
 
+/// Meaning Store icon set (web MS / Signature meanings).
+const kMsMeaningIconAsset = 'assets/signature/sig-meanings-icon.webp';
+const kMsMeaningProductArt = 'assets/store/nowssb-bag-headphones.webp';
+
 String wordVibrationTag(String name) {
   switch (name.toLowerCase()) {
     case 'fire':

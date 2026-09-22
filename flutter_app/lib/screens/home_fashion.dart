@@ -41,6 +41,7 @@ import 'fashion/sections_bottom.dart';
 import 'shared_sections.dart';
 import 'fashion/sections_mid.dart';
 import 'fashion/sections_top.dart';
+import '../widgets/colored_split_promo_banner.dart';
 import 'fashion_plus.dart';
 import 'notifications_sheet.dart';
 import 'normal/header_actions_sheet.dart';
@@ -263,10 +264,21 @@ class _HomeFashionState extends State<HomeFashion> {
         ('greet', const FashGreeting()),
         (
           'herorow',
-          FashHeroRow(
-            onCustomize: () => _push(const WidgetsPage()),
-            onFeatures: () => _push(const WidgetsPage()),
-            onEarn: () => _go(4),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              FashHeroRow(
+                onCustomize: () => _push(const WidgetsPage()),
+                onFeatures: () => _push(const WidgetsPage()),
+                onEarn: () => _go(4),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                child: ColoredSplitPromoBanner.forSurface(
+                  SplitPromoSurface.fashionHome,
+                ),
+              ),
+            ],
           ),
         ),
         ('practice', FashPractice(onTap: () => _go(1))),

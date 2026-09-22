@@ -6,7 +6,10 @@ library;
 
 import 'package:flutter/material.dart';
 
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
+
 import '../../theme/tokens.dart';
+import '../../widgets/app_thinking_loader.dart';
 import 'glassmorphism_theme.dart';
 
 class NmSuppliedEssentials extends StatefulWidget {
@@ -144,8 +147,6 @@ class _TimelineEntry extends StatelessWidget {
   final bool last;
 
   static const _base = Color(0xFFECEEF2);
-  static const _orange = Color(0xFFFF8A3D);
-  static const _orangeLight = Color(0xFFFFB44D);
 
   @override
   Widget build(BuildContext context) {
@@ -158,41 +159,27 @@ class _TimelineEntry extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           SizedBox(
-            width: 22,
+            width: 56,
             child: Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(top: 26),
-                  child: Container(
-                    width: 18,
-                    height: 18,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: active
-                          ? const LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [_orangeLight, _orange])
-                          : null,
-                      color: active ? null : _base,
-                      boxShadow: active
-                          ? const [
-                              BoxShadow(
-                                  color: Color(0x339C6B30),
-                                  blurRadius: 7,
-                                  spreadRadius: 3),
-                              BoxShadow(
-                                  color: Color(0x55000000),
-                                  offset: Offset(3, 3),
-                                  blurRadius: 6),
-                              BoxShadow(
-                                  color: Colors.white,
-                                  offset: Offset(-2, -2),
-                                  blurRadius: 6)
-                            ]
-                          : NwsbShadows.raisedXs,
-                    ),
-                  ),
+                  padding: const EdgeInsets.only(top: 10),
+                  child: active
+                      ? const AppThinkingLoader(
+                          size: 36,
+                          state: OrbState.composing,
+                          blackCircle: true,
+                          circlePad: 8,
+                        )
+                      : Container(
+                          width: 18,
+                          height: 18,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: _base,
+                            boxShadow: NwsbShadows.raisedXs,
+                          ),
+                        ),
                 ),
                 if (!last)
                   Expanded(

@@ -89,6 +89,100 @@ class StorePixelsHero extends StatelessWidget {
   }
 }
 
+
+// ─── Subscribe video banner (taller + pill right-centre) ─────────────────────
+
+class StoreSubscribeBanner extends StatelessWidget {
+  const StoreSubscribeBanner({
+    super.key,
+    this.videoAsset,
+    this.pillIconUrl,
+    this.pillIconAsset,
+  });
+
+  final String? videoAsset;
+  final String? pillIconUrl;
+  final String? pillIconAsset;
+
+  @override
+  Widget build(BuildContext context) {
+    final asset = videoAsset ?? nwsbVideo(kMsSubscribeVidFile);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: AspectRatio(
+          // Taller than 16/5 so video/content is not clipped.
+          aspectRatio: 16 / 7.2,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              NwsbVideo(
+                asset: asset,
+                priority: ClipPriority.decoration,
+              ),
+              const DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [Color(0x66060C18), Color(0x22060C18)],
+                  ),
+                ),
+              ),
+              Align(
+                alignment: const Alignment(0.55, 0.0), // right-centre
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xEE060C18),
+                    borderRadius: BorderRadius.circular(40),
+                    border: Border.all(color: const Color(0x33E8D5A3)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ClipOval(
+                        child: pillIconAsset != null
+                            ? Image.asset(
+                                pillIconAsset!,
+                                width: 22,
+                                height: 22,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) =>
+                                    const SizedBox(width: 22, height: 22),
+                              )
+                            : Image.network(
+                                pillIconUrl ?? kMsSubscribePillIcon,
+                                width: 22,
+                                height: 22,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) =>
+                                    const SizedBox(width: 22, height: 22),
+                              ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'Subscribe Today',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: NwsbColors.goldLight,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 // ─── #4 Recommended + Featured Bundle ────────────────────────────────────────
 
 class StoreRecommendedSection extends StatelessWidget {
@@ -96,13 +190,15 @@ class StoreRecommendedSection extends StatelessWidget {
     super.key,
     required this.onSeeAll,
     required this.onOpenWord,
+    this.meanings = false,
   });
 
   final VoidCallback onSeeAll;
   final void Function(String word, String root, String img, num price)
   onOpenWord;
+  final bool meanings;
 
-  static const _cards = <_RecCardData>[
+  static const _wordCards = <_RecCardData>[
     _RecCardData(
       badge: 'Free',
       badgeColor: Color(0xFF7CFF6B),
@@ -138,8 +234,45 @@ class StoreRecommendedSection extends StatelessWidget {
     ),
   ];
 
+  static const _meaningCards = <_RecCardData>[
+    _RecCardData(
+      badge: 'Free',
+      badgeColor: Color(0xFF7CFF6B),
+      title: 'Warrior',
+      sub: 'Strength · Inner courage',
+      word: 'warrior',
+      root: 'Inner courage',
+      img: kMsCardImg,
+      price: 0,
+      art: kMsMeaningProductArt,
+    ),
+    _RecCardData(
+      badge: 'Sale',
+      badgeColor: Color(0xFFFFB74D),
+      title: 'Spirit',
+      sub: 'Soul · Living essence',
+      word: 'spirit',
+      root: 'Living essence',
+      img: kMsCardImg,
+      price: 24.5,
+      art: kMsMeaningProductArt,
+    ),
+    _RecCardData(
+      badge: 'New',
+      badgeColor: Color(0xFF5CE1FF),
+      title: 'Cosmos',
+      sub: 'Infinity · Beyond form',
+      word: 'cosmos',
+      root: 'Beyond form',
+      img: kMsCardImg,
+      price: 49,
+      art: kMsMeaningIconAsset,
+    ),
+  ];
+
   @override
   Widget build(BuildContext context) {
+    final cards = meanings ? _meaningCards : _wordCards;
     return Padding(
       padding: const EdgeInsets.only(top: 8, bottom: 8),
       child: Column(
@@ -151,10 +284,10 @@ class StoreRecommendedSection extends StatelessWidget {
             height: 168,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
-              itemCount: _cards.length,
+              itemCount: cards.length,
               separatorBuilder: (_, __) => const SizedBox(width: 12),
               itemBuilder: (context, i) {
-                final c = _cards[i];
+                final c = cards[i];
                 return _RecommendedCard(
                   data: c,
                   onTap: () => onOpenWord(c.word, c.root, c.img, c.price),
@@ -285,11 +418,13 @@ class StoreFeaturedBundleSection extends StatelessWidget {
     super.key,
     required this.onSeeAll,
     required this.onOpenWord,
+    this.meanings = false,
   });
 
   final VoidCallback onSeeAll;
   final void Function(String word, String root, String img, num price)
   onOpenWord;
+  final bool meanings;
 
   static const _rows = <_BundleRow>[
     _BundleRow(
@@ -343,11 +478,11 @@ class StoreFeaturedBundleSection extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      const Expanded(
+                      Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
+                            const Text(
                               'Warriors Edition',
                               style: TextStyle(
                                 fontSize: 16,
@@ -355,17 +490,20 @@ class StoreFeaturedBundleSection extends StatelessWidget {
                                 color: Colors.white,
                               ),
                             ),
-                            SizedBox(height: 4),
+                            const SizedBox(height: 4),
                             Text(
-                              'A curated set of strength & courage words for daily healing practice.',
-                              style: TextStyle(
+                              meanings
+                                  ? 'A curated set of strength & courage meanings for daily healing practice.'
+                                  : 'A curated set of strength & courage words for daily healing practice.',
+                              style: const TextStyle(
                                 fontSize: 11,
                                 height: 1.4,
                                 color: Color(0x88FFFFFF),
                               ),
                             ),
-                            SizedBox(height: 8),
-                            _ItemCountPill(label: '12 WORDS'),
+                            const SizedBox(height: 8),
+                            _ItemCountPill(
+                                label: meanings ? '12 MEANINGS' : '12 WORDS'),
                           ],
                         ),
                       ),
@@ -605,11 +743,13 @@ class StoreLimitedTimeFreeSection extends StatelessWidget {
     super.key,
     this.onOpenWord,
     this.onRequestWords,
+    this.meanings = false,
   });
 
   final void Function(String word, String root, String img, num price)?
   onOpenWord;
   final VoidCallback? onRequestWords;
+  final bool meanings;
 
   static const _tracks = <(String, String, String)>[
     ('432 Hz', 'Relax Piano', 'assets/store/collections/peace.webp'),
@@ -659,9 +799,9 @@ class StoreLimitedTimeFreeSection extends StatelessWidget {
                       border: Border.all(color: const Color(0x55E8D5A3)),
                       color: const Color(0x22E8D5A3),
                     ),
-                    child: const Text(
-                      'Request Words',
-                      style: TextStyle(
+                    child: Text(
+                      meanings ? 'Request Meanings' : 'Request Words',
+                      style: const TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w800,
                         color: NwsbColors.goldLight,
@@ -676,9 +816,11 @@ class StoreLimitedTimeFreeSection extends StatelessWidget {
           StoreNotifBanner(
             heading: 'LIMITED TIME FREE',
             svgBody: NwsbMarks.hourglass,
-            artAsset: kStoreProductArt,
+            artAsset: meanings ? kMsMeaningProductArt : kStoreProductArt,
             accent: _tealTop,
-            sub: 'Free healing tracks — request a word if yours is missing.',
+            sub: meanings
+                ? 'Free healing tracks — request a meaning if yours is missing.'
+                : 'Free healing tracks — request a word if yours is missing.',
             pillLabel: 'FREE NOW',
           ),
           const SizedBox(height: 12),
@@ -785,17 +927,27 @@ class StoreBrowseByGoalSection extends StatelessWidget {
     super.key,
     required this.onSeeAll,
     this.onSelect,
+    this.meanings = false,
   });
 
   final VoidCallback onSeeAll;
   final ValueChanged<String>? onSelect;
+  final bool meanings;
 
-  static const _goals = <(String, String, Color)>[
+  static const _wordGoals = <(String, String, Color)>[
     ('Focus', kStoreProductArt, Color(0xFF5CE1FF)),
     ('Calm', kStoreProductArt, Color(0xFF4DB6AC)),
     ('Sacred', kStoreProductArt, Color(0xFFFFB74D)),
     ('Nature', kStoreProductArt, Color(0xFF81C784)),
     ('Cosmos', kStoreProductArt, Color(0xFFB388FF)),
+  ];
+
+  static const _meaningGoals = <(String, String, Color)>[
+    ('Focus', kMsMeaningIconAsset, Color(0xFF5CE1FF)),
+    ('Calm', kMsMeaningProductArt, Color(0xFF4DB6AC)),
+    ('Sacred', kMsMeaningIconAsset, Color(0xFFFFB74D)),
+    ('Nature', kMsMeaningProductArt, Color(0xFF81C784)),
+    ('Cosmos', kMsMeaningIconAsset, Color(0xFFB388FF)),
   ];
 
   @override
@@ -811,10 +963,10 @@ class StoreBrowseByGoalSection extends StatelessWidget {
             height: 108,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
-              itemCount: _goals.length,
+              itemCount: (meanings ? _meaningGoals : _wordGoals).length,
               separatorBuilder: (_, __) => const SizedBox(width: 12),
               itemBuilder: (context, i) {
-                final g = _goals[i];
+                final g = (meanings ? _meaningGoals : _wordGoals)[i];
                 return GestureDetector(
                   onTap: onSelect == null
                       ? null
@@ -876,6 +1028,7 @@ class StoreFrequencyPackage extends StatelessWidget {
     required this.onSeeAll,
     this.onOpenWord,
     this.onRequestWords,
+    this.meanings = false,
   });
 
   final ValueChanged<String> onSelectCategory;
@@ -883,6 +1036,7 @@ class StoreFrequencyPackage extends StatelessWidget {
   final void Function(String word, String root, String img, num price)?
   onOpenWord;
   final VoidCallback? onRequestWords;
+  final bool meanings;
 
   @override
   Widget build(BuildContext context) {
@@ -893,10 +1047,12 @@ class StoreFrequencyPackage extends StatelessWidget {
         StoreLimitedTimeFreeSection(
           onOpenWord: onOpenWord,
           onRequestWords: onRequestWords,
+          meanings: meanings,
         ),
         StoreBrowseByGoalSection(
           onSeeAll: onSeeAll,
           onSelect: onSelectCategory,
+          meanings: meanings,
         ),
       ],
     );
@@ -910,13 +1066,15 @@ class StoreFeaturedPlaylistSection extends StatelessWidget {
     super.key,
     required this.onSeeAll,
     required this.onOpenWord,
+    this.meanings = false,
   });
 
   final VoidCallback onSeeAll;
   final void Function(String word, String root, String img, num price)
   onOpenWord;
+  final bool meanings;
 
-  static const _rows = <_BundleRow>[
+  static const _wordRows = <_BundleRow>[
     _BundleRow(
       'Deep Healing',
       'Emotional & Physical',
@@ -940,6 +1098,30 @@ class StoreFeaturedPlaylistSection extends StatelessWidget {
     ),
   ];
 
+  static const _meaningRows = <_BundleRow>[
+    _BundleRow(
+      'Deep Healing',
+      'Emotional & Physical',
+      'peace',
+      'Calm meaning',
+      kMsMeaningProductArt,
+    ),
+    _BundleRow(
+      'Healing Frequency',
+      'Healing Meditation',
+      'spirit',
+      'Soul meaning',
+      kMsMeaningIconAsset,
+    ),
+    _BundleRow(
+      'Remove Negative',
+      'Healing Reiki Music',
+      'earth',
+      'Grounding meaning',
+      kMsMeaningProductArt,
+    ),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -960,7 +1142,7 @@ class StoreFeaturedPlaylistSection extends StatelessWidget {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12),
                         child: Image.asset(
-                          kStoreProductArt,
+                          meanings ? kMsMeaningProductArt : kStoreProductArt,
                           width: 78,
                           height: 78,
                           fit: BoxFit.cover,
@@ -1002,12 +1184,12 @@ class StoreFeaturedPlaylistSection extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
-                for (final r in _rows) ...[
+                for (final r in (meanings ? _meaningRows : _wordRows)) ...[
                   _BundleListRow(
                     row: r,
                     onTap: () => onOpenWord(r.word, r.root, kRmWordImg, 49),
                   ),
-                  if (r != _rows.last) const SizedBox(height: 8),
+                  if (r != (meanings ? _meaningRows : _wordRows).last) const SizedBox(height: 8),
                 ],
               ],
             ),
@@ -1025,13 +1207,15 @@ class StoreGlassPlaylistCarousel extends StatelessWidget {
     super.key,
     required this.onSeeAll,
     required this.onOpenWord,
+    this.meanings = false,
   });
 
   final VoidCallback onSeeAll;
   final void Function(String word, String root, String img, num price)
   onOpenWord;
+  final bool meanings;
 
-  static const _cards = <_GlassPlaylistCardData>[
+  static const _wordCards = <_GlassPlaylistCardData>[
     _GlassPlaylistCardData(
       title: 'Warriors Edition',
       desc: 'Strength & courage words for daily practice.',
@@ -1063,6 +1247,42 @@ class StoreGlassPlaylistCarousel extends StatelessWidget {
     ),
   ];
 
+  static const _meaningCards = <_GlassPlaylistCardData>[
+    _GlassPlaylistCardData(
+      title: 'Warriors Edition',
+      desc: 'Strength & courage meanings for daily practice.',
+      count: '12 MEANINGS',
+      art: kMsMeaningProductArt,
+      rows: [
+        ('Warrior', 'Inner courage'),
+        ('Dragon', 'Transforming power'),
+        ('Earth', 'Grounding presence'),
+      ],
+    ),
+    _GlassPlaylistCardData(
+      title: 'Sacred Frequency',
+      desc: 'Divine codes and soft healing tones.',
+      count: '8 MEANINGS',
+      art: kMsMeaningIconAsset,
+      rows: [
+        ('Spirit', 'Living essence'),
+        ('Peace', 'Still centre'),
+        ('Om', 'Sacred resonance'),
+      ],
+    ),
+    _GlassPlaylistCardData(
+      title: 'Nature Resonance',
+      desc: 'Living element meanings for calm and clarity.',
+      count: '10 MEANINGS',
+      art: kMsMeaningProductArt,
+      rows: [
+        ('Water', 'Flowing life'),
+        ('Fire', 'Inner spark'),
+        ('Wind', 'Clear breath'),
+      ],
+    ),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -1076,10 +1296,10 @@ class StoreGlassPlaylistCarousel extends StatelessWidget {
             height: 292,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
-              itemCount: _cards.length,
+              itemCount: (meanings ? _meaningCards : _wordCards).length,
               separatorBuilder: (_, __) => const SizedBox(width: 14),
               itemBuilder: (context, i) {
-                final c = _cards[i];
+                final c = (meanings ? _meaningCards : _wordCards)[i];
                 return StoreGlassPanel(
                   width: 268,
                   padding: const EdgeInsets.all(12),
