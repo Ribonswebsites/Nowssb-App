@@ -53,19 +53,6 @@ class EditorialBanner extends StatelessWidget {
         ],
         background = const Color(0xFFEAD8D1);
 
-  const EditorialBanner.stories({super.key})
-      : eyebrow = 'NOWSSB / EDITORIAL DISCOVERY',
-        title = 'STORIES\nTHAT\nFIND YOU',
-        body =
-            'A living collection of words, images and rituals that meet you at exactly the right moment.',
-        note = 'READ · LISTEN · DISCOVER',
-        images = const [
-          'assets/editorial/connect.png',
-          'assets/editorial/science.png',
-          'assets/editorial/healing.png',
-        ],
-        background = const Color(0xFFF0E5DE);
-
   final String eyebrow;
   final String title;
   final String body;

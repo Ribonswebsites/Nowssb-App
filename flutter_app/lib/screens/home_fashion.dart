@@ -286,13 +286,7 @@ class _HomeFashionState extends State<HomeFashion> {
           ),
         ),
         ('practice', FashPractice(onTap: () => _go(1))),
-        ('editorialA',
-          const Column(
-            children: [
-              EditorialBanner.healing(),
-              EditorialBanner.stories(),
-            ],
-          )),
+        ('editorialA', const EditorialBanner.healing()),
         ('routineCards', const NmHorizontalRoutineCards(fashion: true)),
         ('coachCards', const SizedBox.shrink()),
         ('mainops', MainOptionsSection(onGo: _go, onAction: _openMainOption)),
