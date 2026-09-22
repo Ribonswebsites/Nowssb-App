@@ -88,7 +88,8 @@ class EditorialBanner extends StatelessWidget {
             const SizedBox(height: 10),
             Container(height: 1, color: darkText.withValues(alpha: .3)),
             const SizedBox(height: 14),
-            IntrinsicHeight(
+            SizedBox(
+              height: 300,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
