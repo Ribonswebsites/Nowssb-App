@@ -150,7 +150,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=267"></script>
 <link rel="stylesheet" href="app/app.css?v=319">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=819">
+<link rel="stylesheet" href="nowssb-nm.css?v=820">
 <link rel="stylesheet" href="app/css/subscription-tiers.css?v=3">
 <link rel="stylesheet" href="app/widgets.css?v=8">
 <link rel="stylesheet" href="app/steps.css?v=9">
@@ -2237,30 +2237,64 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
   </div>
 
+  <div class="customize-experience-banner" id="customizeExperienceBanner" role="button" aria-label="Customize your app experience" onclick="cuOpen()">
+    <div class="customize-experience-copy">Customized<br>you app experience</div>
+    <div class="customize-experience-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#060c18" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </div>
+
   <div class="fash-cust-pager fash-cust-panel" id="fashCustPager">
     <div class="fash-cust-page glass-wrap" role="button" onclick="cuOpen()">
-      <div class="customize-experience-banner fash-cust-face">
-        <div class="customize-experience-copy">Themes, backdrop<br>and shortcuts.</div>
-        <div class="customize-experience-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#060c18" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="nwsb-enter-copy-top"><span>NowssB.</span><strong>Make this home yours</strong></div>
+      <div class="fash-cust-intro-stage">
+        <img class="fash-cust-still a" src="./assets/hero-curve/banner-player.webp" alt="">
+        <img class="fash-cust-still b" src="./assets/hero-curve/stillness.webp" alt="">
+        <img class="fash-cust-still c" src="./assets/hero-curve/cosmos.webp" alt="">
+        <img class="fash-cust-still d" src="./assets/hero-curve/banner-library.webp" alt="">
+        <img class="nwsb-enter-pointer" src="./assets/hero-curve/pointer.webp" alt="">
       </div>
+      <div class="nwsb-enter-copy-bot"><strong>Themes · Background · Start art · Access</strong><span>Four doors. One tap. The home follows you.</span></div>
     </div>
-    <div class="fash-cust-page glass-wrap" role="button" onclick="cuOpen()">
-      <div class="customize-experience-banner fash-cust-face" id="customizeExperienceBanner">
-        <div class="customize-experience-copy">Customized<br>your app experience</div>
-        <div class="customize-experience-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#060c18" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="fash-cust-page glass-wrap fash-cust-panel-card">
+      <div class="cust-panel-head" onclick="cuOpen()">
+        <div class="cust-panel-icon"><img loading="lazy" decoding="async" src="https://media.nowssb.com/migrated-images/cfc84fc5478b4b63_file_00000000b11472098a225d3703b04a60_phr6ph.png" alt=""></div>
+        <div class="cust-panel-txt">
+          <div class="cust-panel-title">Customize</div>
+          <div class="cust-panel-sub">Make this home yours</div>
+        </div>
+        <div class="cust-panel-more"><svg viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="rgba(255,255,255,0.6)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       </div>
+      <div class="cust-row" onclick="cuGo('themes')"><div class="cust-row-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" fill="#000" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/><rect x="6" y="6" width="5" height="5" rx="1.5" fill="rgba(255,255,255,0.12)"/><rect x="13" y="6" width="5" height="5" rx="1.5" fill="rgba(232,213,163,0.3)"/></svg></div><div class="cust-row-divider"></div><div class="cust-row-txt"><div class="cust-row-title">Themes</div><div class="cust-row-sub">Black Edition</div></div><div class="cust-row-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div></div>
+      <div class="cust-row" onclick="cuGo('bg')"><div class="cust-row-icon"><img loading="lazy" decoding="async" alt="" src="https://media.nowssb.com/migrated-images/cfc84fc5478b4b63_file_00000000b11472098a225d3703b04a60_phr6ph.png"></div><div class="cust-row-divider"></div><div class="cust-row-txt"><div class="cust-row-title">Background</div><div class="cust-row-sub">Fashion backdrop</div></div><div class="cust-row-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div></div>
+      <div class="cust-row" onclick="cuGo('startbg')"><div class="cust-row-icon"><img loading="lazy" decoding="async" alt="" src="https://media.nowssb.com/migrated-images/5e8a9fdb18e034ec_file_000000009f10820bb6872a5ed8007148_pvqjaa.png"></div><div class="cust-row-divider"></div><div class="cust-row-txt"><div class="cust-row-title">Start Image</div><div class="cust-row-sub">Art behind the start</div></div><div class="cust-row-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div></div>
+      <div class="cust-row" onclick="cuGo('qa')"><div class="cust-row-icon"><img loading="lazy" decoding="async" alt="" src="https://media.nowssb.com/migrated-images/272b820a002190fe_file_000000002cf4820b865caf6fc0554959_k7drqx.png"></div><div class="cust-row-divider"></div><div class="cust-row-txt"><div class="cust-row-title">Quick access</div><div class="cust-row-sub">Bottom nav bar</div></div><div class="cust-row-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div></div>
     </div>
-    <div class="fash-cust-page glass-wrap" role="button" onclick="cuGo('themes')">
-      <div class="cust-row fash-cust-face"><div class="cust-row-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" fill="#000" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/><rect x="6" y="6" width="5" height="5" rx="1.5" fill="rgba(255,255,255,0.12)"/><rect x="13" y="6" width="5" height="5" rx="1.5" fill="rgba(232,213,163,0.3)"/></svg></div><div class="cust-row-divider"></div><div class="cust-row-txt"><div class="cust-row-title">Themes</div><div class="cust-row-sub">Black Edition</div></div><div class="cust-row-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div></div>
+    <div class="fash-cust-page glass-wrap fash-cust-door" role="button" onclick="cuGo('themes')">
+      <div class="fash-cust-door-art"><svg viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" fill="#000" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/><rect x="6" y="6" width="5" height="5" rx="1.5" fill="rgba(255,255,255,0.12)"/><rect x="13" y="6" width="5" height="5" rx="1.5" fill="rgba(232,213,163,0.3)"/></svg></div>
+      <div class="fash-cust-door-title">Themes</div>
+      <div class="fash-cust-door-sub">Black Edition</div>
+      <div class="fash-cust-door-body">Swap the whole home — black, light, or the edition you keep.</div>
+      <span class="tp-enter"><span class="tp-enter-lbl">Enter</span><span class="tp-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></span>
     </div>
-    <div class="fash-cust-page glass-wrap" role="button" onclick="cuGo('bg')">
-      <div class="cust-row fash-cust-face"><div class="cust-row-icon"><img loading="lazy" decoding="async" alt="" src="https://media.nowssb.com/migrated-images/cfc84fc5478b4b63_file_00000000b11472098a225d3703b04a60_phr6ph.png"></div><div class="cust-row-divider"></div><div class="cust-row-txt"><div class="cust-row-title">Background</div><div class="cust-row-sub">Fashion backdrop</div></div><div class="cust-row-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div></div>
+    <div class="fash-cust-page glass-wrap fash-cust-door" role="button" onclick="cuGo('bg')">
+      <div class="fash-cust-door-art"><img src="https://media.nowssb.com/migrated-images/cfc84fc5478b4b63_file_00000000b11472098a225d3703b04a60_phr6ph.png" alt=""></div>
+      <div class="fash-cust-door-title">Background</div>
+      <div class="fash-cust-door-sub">Fashion backdrop</div>
+      <div class="fash-cust-door-body">The motion behind Fashion home. Pick the film you want.</div>
+      <span class="tp-enter"><span class="tp-enter-lbl">Enter</span><span class="tp-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></span>
     </div>
-    <div class="fash-cust-page glass-wrap" role="button" onclick="cuGo('startbg')">
-      <div class="cust-row fash-cust-face"><div class="cust-row-icon"><img loading="lazy" decoding="async" alt="" src="https://media.nowssb.com/migrated-images/5e8a9fdb18e034ec_file_000000009f10820bb6872a5ed8007148_pvqjaa.png"></div><div class="cust-row-divider"></div><div class="cust-row-txt"><div class="cust-row-title">Start Image</div><div class="cust-row-sub">Art behind the start</div></div><div class="cust-row-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div></div>
+    <div class="fash-cust-page glass-wrap fash-cust-door" role="button" onclick="cuGo('startbg')">
+      <div class="fash-cust-door-art"><img src="https://media.nowssb.com/migrated-images/5e8a9fdb18e034ec_file_000000009f10820bb6872a5ed8007148_pvqjaa.png" alt=""></div>
+      <div class="fash-cust-door-title">Start Image</div>
+      <div class="fash-cust-door-sub">Art behind the start</div>
+      <div class="fash-cust-door-body">The still that waits behind the start button.</div>
+      <span class="tp-enter"><span class="tp-enter-lbl">Enter</span><span class="tp-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></span>
     </div>
-    <div class="fash-cust-page glass-wrap" role="button" onclick="cuGo('qa')">
-      <div class="cust-row fash-cust-face"><div class="cust-row-icon"><img loading="lazy" decoding="async" alt="" src="https://media.nowssb.com/migrated-images/272b820a002190fe_file_000000002cf4820b865caf6fc0554959_k7drqx.png"></div><div class="cust-row-divider"></div><div class="cust-row-txt"><div class="cust-row-title">Quick access</div><div class="cust-row-sub">Bottom nav bar</div></div><div class="cust-row-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div></div>
+    <div class="fash-cust-page glass-wrap fash-cust-door" role="button" onclick="cuGo('qa')">
+      <div class="fash-cust-door-art"><img src="https://media.nowssb.com/migrated-images/272b820a002190fe_file_000000002cf4820b865caf6fc0554959_k7drqx.png" alt=""></div>
+      <div class="fash-cust-door-title">Quick access</div>
+      <div class="fash-cust-door-sub">Bottom nav bar</div>
+      <div class="fash-cust-door-body">The five doors at the foot of the home. Yours to rearrange.</div>
+      <span class="tp-enter"><span class="tp-enter-lbl">Enter</span><span class="tp-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></span>
     </div>
   </div>
 

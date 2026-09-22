@@ -771,82 +771,134 @@ class FashTrending extends StatelessWidget {
   }
 }
 
-/// 10 · custom — horizontal auto-rotating customize cards (same size as the
-/// old "Customized you app experiance" banner). No slide-away / reverse
-/// parallax: scrolling TO this section keeps the banner present.
+/// 10 · custom — black banner stays. Below it, tall glass cards.
 class FashCustomize extends StatelessWidget {
   const FashCustomize({super.key, this.onTap});
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return _CustomizeAutoRail(onOpenHub: onTap);
+    return Column(children: [
+      _CustomizeExperienceBanner(onTap: onTap),
+      _CustomizeCardPager(onOpenHub: onTap),
+    ]);
   }
 }
 
-/// Shared footprint with the legacy Customize banner (height 96).
-const double kCustomizeCardHeight = 96;
+/// Original 96px black banner. Not a pager card. Does not slide away.
+class _CustomizeExperienceBanner extends StatelessWidget {
+  const _CustomizeExperienceBanner({this.onTap});
+  final VoidCallback? onTap;
 
-class _CustomizeAutoRail extends StatefulWidget {
-  const _CustomizeAutoRail({this.onOpenHub});
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 96,
+        margin: const EdgeInsets.fromLTRB(16, 16, 16, 10),
+        padding: const EdgeInsets.fromLTRB(22, 18, 18, 18),
+        decoration: BoxDecoration(
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: const Color(0x29FFFFFF)),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            const Expanded(
+              child: Text(
+                'Customized\nyou app experience',
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 25,
+                  height: 1.08,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -.3,
+                ),
+              ),
+            ),
+            Container(
+              width: 44,
+              height: 44,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.arrow_forward,
+                  color: Color(0xFF060C18), size: 22),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Same footprint as the enter-your-path card.
+const double kCustomizeCardHeight = 520;
+
+class _CustomizeCardPager extends StatefulWidget {
+  const _CustomizeCardPager({this.onOpenHub});
   final VoidCallback? onOpenHub;
 
   @override
-  State<_CustomizeAutoRail> createState() => _CustomizeAutoRailState();
+  State<_CustomizeCardPager> createState() => _CustomizeCardPagerState();
 }
 
-class _CustomizeAutoRailState extends State<_CustomizeAutoRail> {
-  late final PageController _pager =
-      PageController(viewportFraction: 0.92);
+class _CustomizeCardPagerState extends State<_CustomizeCardPager> {
+  late final PageController _pager = PageController(viewportFraction: 0.92);
   Timer? _auto;
   var _index = 0;
   var _userPaging = false;
 
-  List<_CustomizeCardSpec> _specs(BuildContext context) => [
-        _CustomizeCardSpec(
-          kind: _CustomizeCardKind.intro,
-          title: 'Themes, backdrop\nand shortcuts.',
-          sub: 'Make every surface yours',
-          onTap: widget.onOpenHub,
-        ),
-        _CustomizeCardSpec(
-          kind: _CustomizeCardKind.banner,
-          title: 'Customized\nyour app experience',
-          sub: '',
-          onTap: widget.onOpenHub,
-        ),
-        _CustomizeCardSpec(
-          kind: _CustomizeCardKind.door,
+  List<_CustPage> _pages(BuildContext context) => [
+        _CustPage(kind: _CustKind.intro, onTap: widget.onOpenHub),
+        _CustPage(kind: _CustKind.panel, onTap: widget.onOpenHub),
+        _CustPage(
+          kind: _CustKind.door,
           title: 'Themes',
           sub: 'Black Edition',
+          body: 'Swap the whole home — black, light, or the edition you keep.',
           icon: Icons.grid_view_rounded,
           onTap: () => Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => const WidgetsPage()),
           ),
         ),
-        _CustomizeCardSpec(
-          kind: _CustomizeCardKind.door,
+        _CustPage(
+          kind: _CustKind.door,
           title: 'Background',
           sub: 'Fashion backdrop',
+          body: 'The motion behind Fashion home. Pick the film you want.',
           icon: Icons.wallpaper_rounded,
+          image:
+              'https://media.nowssb.com/migrated-images/cfc84fc5478b4b63_file_00000000b11472098a225d3703b04a60_phr6ph.png',
           onTap: () => Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => const FashionPlusScreen()),
           ),
         ),
-        _CustomizeCardSpec(
-          kind: _CustomizeCardKind.door,
+        _CustPage(
+          kind: _CustKind.door,
           title: 'Start Image',
           sub: 'Art behind the start',
+          body: 'The still that waits behind the start button.',
           icon: Icons.image_outlined,
+          image:
+              'https://media.nowssb.com/migrated-images/5e8a9fdb18e034ec_file_000000009f10820bb6872a5ed8007148_pvqjaa.png',
           onTap: () => Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => const FashionPlusScreen()),
           ),
         ),
-        _CustomizeCardSpec(
-          kind: _CustomizeCardKind.door,
+        _CustPage(
+          kind: _CustKind.door,
           title: 'Quick access',
           sub: 'Bottom nav bar',
+          body: 'The five doors at the foot of the home. Yours to rearrange.',
           icon: Icons.apps_rounded,
+          image:
+              'https://media.nowssb.com/migrated-images/272b820a002190fe_file_000000002cf4820b865caf6fc0554959_k7drqx.png',
           onTap: () => Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => const QuickAccessScreen()),
           ),
@@ -861,8 +913,7 @@ class _CustomizeAutoRailState extends State<_CustomizeAutoRail> {
       if (!mounted || _userPaging) return;
       if (!TickerMode.of(context)) return;
       if (!_pager.hasClients) return;
-      final specs = _specs(context);
-      final next = (_index + 1) % specs.length;
+      final next = (_index + 1) % _pages(context).length;
       _pager.animateToPage(
         next,
         duration: const Duration(milliseconds: 520),
@@ -880,10 +931,9 @@ class _CustomizeAutoRailState extends State<_CustomizeAutoRail> {
 
   @override
   Widget build(BuildContext context) {
-    final specs = _specs(context);
-    // Arrive with the section — no reverse-parallax / slide-away.
+    final pages = _pages(context);
     return SizedBox(
-      height: kCustomizeCardHeight + 24 + 8,
+      height: kCustomizeCardHeight,
       child: NotificationListener<ScrollNotification>(
         onNotification: (n) {
           if (n is ScrollStartNotification && n.dragDetails != null) {
@@ -896,16 +946,15 @@ class _CustomizeAutoRailState extends State<_CustomizeAutoRail> {
         child: PageView.builder(
           controller: _pager,
           padEnds: true,
-          itemCount: specs.length,
+          itemCount: pages.length,
           onPageChanged: (i) => _index = i,
           itemBuilder: (context, i) {
-            final spec = specs[i];
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 5),
               child: GlassWrap(
                 margin: EdgeInsets.zero,
-                padding: const EdgeInsets.all(12),
-                child: _CustomizeRailCard(spec: spec),
+                padding: const EdgeInsets.fromLTRB(10, 10, 10, 16),
+                child: _CustCard(page: pages[i]),
               ),
             );
           },
@@ -915,175 +964,447 @@ class _CustomizeAutoRailState extends State<_CustomizeAutoRail> {
   }
 }
 
-enum _CustomizeCardKind { intro, banner, door }
+enum _CustKind { intro, panel, door }
 
-class _CustomizeCardSpec {
-  const _CustomizeCardSpec({
+class _CustPage {
+  const _CustPage({
     required this.kind,
-    required this.title,
-    required this.sub,
+    this.title = '',
+    this.sub = '',
+    this.body = '',
     this.icon,
+    this.image,
     this.onTap,
   });
-  final _CustomizeCardKind kind;
+  final _CustKind kind;
   final String title;
   final String sub;
+  final String body;
   final IconData? icon;
+  final String? image;
   final VoidCallback? onTap;
 }
 
-class _CustomizeRailCard extends StatelessWidget {
-  const _CustomizeRailCard({required this.spec});
-  final _CustomizeCardSpec spec;
+class _CustCard extends StatelessWidget {
+  const _CustCard({required this.page});
+  final _CustPage page;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: spec.onTap,
+      onTap: page.onTap,
       behavior: HitTestBehavior.opaque,
-      child: _cardBody(),
+      child: switch (page.kind) {
+        _CustKind.intro => const _CustIntroCard(),
+        _CustKind.panel => _CustPanelCard(onTap: page.onTap),
+        _CustKind.door => _CustDoorCard(page: page),
+      },
+    );
+  }
+}
+
+class _CustIntroCard extends StatelessWidget {
+  const _CustIntroCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: EdgeInsets.fromLTRB(16, 4, 16, 8),
+          child: Column(
+            children: [
+              Text(
+                'NowssB.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.3,
+                  height: 1,
+                ),
+              ),
+              SizedBox(height: 6),
+              Text(
+                'Make this home yours',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Color(0xFFC4B5FD),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.2,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(child: _CustIntroStage()),
+        Padding(
+          padding: EdgeInsets.fromLTRB(16, 12, 16, 2),
+          child: Text(
+            'Themes · Background · Start art · Access',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+              height: 1.2,
+              letterSpacing: -0.4,
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.fromLTRB(16, 4, 16, 4),
+          child: Text(
+            'Four doors. One tap. The home follows you.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Color(0xB3FFFFFF),
+              fontSize: 12,
+              height: 1.35,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _CustIntroStage extends StatelessWidget {
+  const _CustIntroStage();
+
+  static const _stills = [
+    'assets/hero-curve/banner-player.webp',
+    'assets/hero-curve/banner-library.webp',
+    'assets/hero-curve/stillness.webp',
+    'assets/hero-curve/cosmos.webp',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(14),
+      child: ColoredBox(
+        color: const Color(0xFF050505),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Align(
+              alignment: const Alignment(-0.7, -0.35),
+              child: Transform.rotate(
+                angle: -0.18,
+                child: _still(_stills[0], 0.78),
+              ),
+            ),
+            Align(
+              alignment: const Alignment(0.72, -0.42),
+              child: Transform.rotate(
+                angle: 0.16,
+                child: _still(_stills[2], 0.82),
+              ),
+            ),
+            Align(
+              alignment: const Alignment(-0.62, 0.55),
+              child: Transform.rotate(
+                angle: 0.12,
+                child: _still(_stills[3], 0.72),
+              ),
+            ),
+            Align(
+              alignment: const Alignment(0.68, 0.48),
+              child: Transform.rotate(
+                angle: -0.1,
+                child: _still(_stills[1], 0.7),
+              ),
+            ),
+            Align(
+              alignment: const Alignment(0.04, 0.96),
+              child: FractionallySizedBox(
+                heightFactor: 0.72,
+                child: Image.asset(
+                  EnterCurveAssets.pointer,
+                  fit: BoxFit.contain,
+                  alignment: Alignment.bottomCenter,
+                  filterQuality: FilterQuality.high,
+                  errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
-  Widget _cardBody() {
-    // Glass + black — Enter-your-path language, fixed height.
-    final child = Container(
-      height: kCustomizeCardHeight,
-      padding: const EdgeInsets.fromLTRB(20, 16, 16, 16),
-      decoration: BoxDecoration(
-        color: const Color(0xF2000000),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0x33FFFFFF)),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x66000000),
-            blurRadius: 24,
-            offset: Offset(0, 10),
+  Widget _still(String asset, double scale) {
+    return Transform.scale(
+      scale: scale,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: SizedBox(
+          width: 152,
+          height: 86,
+          child: Image.asset(
+            asset,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) =>
+                const ColoredBox(color: Color(0xFF111111)),
           ),
-        ],
+        ),
       ),
-      child: switch (spec.kind) {
-        _CustomizeCardKind.intro => Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Expanded(
-                child: Text(
-                  spec.title,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    height: 1.08,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -.3,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Container(
-                width: 44,
-                height: 44,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.arrow_forward,
-                    color: Color(0xFF060C18), size: 22),
-              ),
-            ],
-          ),
-        _CustomizeCardKind.banner => Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              SizedBox(
-                width: 230,
-                child: Text(
-                  spec.title,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 25,
-                    height: 1.08,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -.3,
-                  ),
-                ),
-              ),
-              Container(
-                width: 44,
-                height: 44,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.arrow_forward,
-                    color: Color(0xFF060C18), size: 22),
-              ),
-            ],
-          ),
-        _CustomizeCardKind.door => Row(
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: const Color(0x14FFFFFF),
-                  borderRadius: BorderRadius.circular(15),
-                  border: Border.all(color: const Color(0x33FFFFFF)),
-                ),
-                child: Icon(spec.icon ?? Icons.tune,
-                    color: Colors.white, size: 24),
-              ),
-              const SizedBox(width: 14),
-              Container(width: 1, height: 34, color: const Color(0x24FFFFFF)),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      spec.title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      spec.sub,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Color(0x8CFFFFFF),
-                        fontSize: 13,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                width: 42,
-                height: 42,
-                decoration: BoxDecoration(
-                  color: const Color(0x14FFFFFF),
-                  shape: BoxShape.circle,
-                  border: Border.all(color: const Color(0x2FFFFFFF)),
-                ),
-                child: const Icon(Icons.arrow_forward,
-                    color: Colors.white70, size: 20),
-              ),
-            ],
-          ),
-      },
     );
-    return child;
+  }
+}
+
+class _CustPanelCard extends StatelessWidget {
+  const _CustPanelCard({this.onTap});
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: onTap,
+          behavior: HitTestBehavior.opaque,
+          child: const Row(children: [
+            _CustHeadIcon(),
+            SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Customize',
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Text(
+                    'Make this home yours',
+                    style: TextStyle(fontSize: 12, color: Color(0x8CFFFFFF)),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right, size: 20, color: Color(0xB3FFFFFF)),
+          ]),
+        ),
+        const SizedBox(height: 16),
+        _FashionCustomizeRow(
+          title: 'Themes',
+          sub: 'Black Edition',
+          icon: Icons.grid_view_rounded,
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const WidgetsPage()),
+          ),
+        ),
+        _FashionCustomizeRow(
+          title: 'Background',
+          sub: 'Fashion backdrop',
+          image:
+              'https://media.nowssb.com/migrated-images/cfc84fc5478b4b63_file_00000000b11472098a225d3703b04a60_phr6ph.png',
+          icon: Icons.wallpaper_rounded,
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const FashionPlusScreen()),
+          ),
+        ),
+        _FashionCustomizeRow(
+          title: 'Start Image',
+          sub: 'Art behind the start',
+          image:
+              'https://media.nowssb.com/migrated-images/5e8a9fdb18e034ec_file_000000009f10820bb6872a5ed8007148_pvqjaa.png',
+          icon: Icons.image_outlined,
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const FashionPlusScreen()),
+          ),
+        ),
+        _FashionCustomizeRow(
+          title: 'Quick access',
+          sub: 'Bottom nav bar',
+          image:
+              'https://media.nowssb.com/migrated-images/272b820a002190fe_file_000000002cf4820b865caf6fc0554959_k7drqx.png',
+          icon: Icons.apps_rounded,
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const QuickAccessScreen()),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _CustHeadIcon extends StatelessWidget {
+  const _CustHeadIcon();
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 46,
+      height: 46,
+      decoration: BoxDecoration(
+        color: const Color(0x14FFFFFF),
+        shape: BoxShape.circle,
+        border: Border.all(color: const Color(0x24FFFFFF)),
+      ),
+      child: const Icon(Icons.tune, size: 19, color: Colors.white),
+    );
+  }
+}
+
+class _CustDoorCard extends StatelessWidget {
+  const _CustDoorCard({required this.page});
+  final _CustPage page;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Expanded(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(14),
+            child: page.image == null
+                ? ColoredBox(
+                    color: const Color(0xFF0B0B12),
+                    child: Icon(page.icon,
+                        size: 72, color: const Color(0xE6FFFFFF)),
+                  )
+                : Image.network(
+                    page.image!,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => ColoredBox(
+                      color: const Color(0xFF0B0B12),
+                      child: Icon(page.icon,
+                          size: 72, color: const Color(0xE6FFFFFF)),
+                    ),
+                  ),
+          ),
+        ),
+        const SizedBox(height: 14),
+        Text(
+          page.title,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 22,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.4,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          page.sub,
+          style: const TextStyle(
+            color: Color(0xFFC4B5FD),
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          page.body,
+          maxLines: 3,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(
+            color: Color(0xB3FFFFFF),
+            fontSize: 13,
+            height: 1.4,
+          ),
+        ),
+        const SizedBox(height: 14),
+        Align(
+          alignment: Alignment.centerRight,
+          child: EnterPill(onTap: page.onTap),
+        ),
+      ],
+    );
+  }
+}
+
+class _FashionCustomizeRow extends StatelessWidget {
+  const _FashionCustomizeRow({
+    required this.title,
+    required this.sub,
+    required this.icon,
+    required this.onTap,
+    this.image,
+  });
+  final String title, sub;
+  final IconData icon;
+  final String? image;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: const Color(0x18FFFFFF)),
+        ),
+        child: Row(children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: const Color(0x0FFFFFFF),
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(color: const Color(0x33FFFFFF)),
+            ),
+            child: image == null
+                ? Icon(icon, color: Colors.white, size: 24)
+                : ClipRRect(
+                    borderRadius: BorderRadius.circular(14),
+                    child: Image.network(
+                      image!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) =>
+                          Icon(icon, color: Colors.white, size: 24),
+                    ),
+                  ),
+          ),
+          const SizedBox(width: 16),
+          Container(width: 1, height: 34, color: const Color(0x24FFFFFF)),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title,
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700)),
+                const SizedBox(height: 3),
+                Text(sub,
+                    style: const TextStyle(
+                        color: Color(0x8CFFFFFF), fontSize: 13)),
+              ],
+            ),
+          ),
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: const Color(0x14FFFFFF),
+              shape: BoxShape.circle,
+              border: Border.all(color: const Color(0x2FFFFFFF)),
+            ),
+            child: const Icon(Icons.arrow_forward,
+                color: Colors.white70, size: 20),
+          ),
+        ]),
+      ),
+    );
   }
 }
 
