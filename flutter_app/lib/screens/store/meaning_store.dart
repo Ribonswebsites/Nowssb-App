@@ -9,12 +9,14 @@ import '../../data/content.dart';
 import '../../data/store_catalog.dart';
 import '../../media/nwsb_video.dart';
 import '../../widgets/page_shell.dart';
+import '../../widgets/colored_split_promo_banner.dart';
 import 'product_detail.dart';
 import 'store_cards.dart';
 import 'store_home_sections.dart';
 import 'store_select_sheet.dart';
 import 'request_words.dart';
 import 'store_routes.dart';
+import 'signature_store.dart';
 
 class MeaningStoreScreen extends StatelessWidget {
   const MeaningStoreScreen({super.key});
@@ -210,6 +212,14 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
           meanings: true,
           onSeeAll: () => _openViewAll('Recommended for You'),
           onOpenWord: _openMeaning,
+        ),
+        ColoredSplitPromoBanner.forSurface(
+          SplitPromoSurface.meaningStore,
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => const SignatureStoreScreen(),
+            ),
+          ),
         ),
         StoreFeaturedPlaylistSection(
           meanings: true,

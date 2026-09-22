@@ -278,7 +278,11 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
         ),
         ColoredSplitPromoBanner.forSurface(
           SplitPromoSurface.wordAtelier,
-          onTap: _browseAll,
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => const MeaningStoreScreen(),
+            ),
+          ),
         ),
         StoreGlassPanel(
           radius: 32,

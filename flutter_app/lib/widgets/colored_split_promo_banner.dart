@@ -13,19 +13,31 @@ abstract final class SplitPromoArts {
   static const whiteRobot = 'assets/banners/promo/split-white-robot.png';
   static const egyptianGold = 'assets/banners/promo/split-egyptian-gold.png';
   static const redHairBlazer = 'assets/banners/promo/split-red-hair-blazer.png';
+  static const robotLookback = 'assets/banners/promo/split-robot-lookback.png';
+  static const robotLotus = 'assets/banners/promo/split-robot-lotus.png';
+  static const blondeLotus = 'assets/banners/promo/split-blonde-lotus.png';
+  static const egyptianLotus = 'assets/banners/promo/split-egyptian-lotus.png';
+  static const redLotus = 'assets/banners/promo/split-red-lotus.png';
 
   static const all = <String>[
     blondeBlazer,
     whiteRobot,
     egyptianGold,
     redHairBlazer,
+    robotLookback,
+    robotLotus,
+    blondeLotus,
+    egyptianLotus,
+    redLotus,
   ];
 }
 
-/// Per-surface presets: distinct right-panel colours, rotating the four arts.
+/// Per-surface presets: distinct right-panel colours, rotating clean studio arts.
+/// CTAs must open a useful destination for THAT surface — never "Explore Word
+/// Store" when already on Word Atelier / wrong destination for the page.
 enum SplitPromoSurface {
   soundLibrary,
-  player,
+  morningRitual,
   meaningStore,
   wordAtelier,
   signatureStore,
@@ -58,53 +70,53 @@ class SplitPromoSpec {
     switch (surface) {
       case SplitPromoSurface.soundLibrary:
         return SplitPromoSpec(
-          title: 'Reveal your healing\ntones + more.',
-          cta: 'Open Sound Library',
+          title: 'Practice your\ntones today.',
+          cta: 'Begin Practice',
           leftColor: const Color(0xFF1A3A3C),
           rightColor: const Color(0xFF2EC4B6),
-          art: SplitPromoArts.blondeBlazer,
+          art: SplitPromoArts.blondeLotus,
           onTap: onTap,
         );
-      case SplitPromoSurface.player:
+      case SplitPromoSurface.morningRitual:
         return SplitPromoSpec(
-          title: 'Start your next\nsession now.',
-          cta: 'Begin Practice',
+          title: 'Expand your\nSound Library.',
+          cta: 'Open Sound Library',
           leftColor: const Color(0xFF2A1B4D),
           rightColor: const Color(0xFF7C4DFF),
-          art: SplitPromoArts.whiteRobot,
+          art: SplitPromoArts.robotLotus,
           onTap: onTap,
         );
       case SplitPromoSurface.meaningStore:
         return SplitPromoSpec(
-          title: 'Decode every\nmeaning inside.',
-          cta: 'Browse Meanings',
+          title: 'Signature rarities\nawait you.',
+          cta: 'View Signatures',
           leftColor: const Color(0xFF3A1848),
           rightColor: const Color(0xFFC44DFF),
-          art: SplitPromoArts.egyptianGold,
+          art: SplitPromoArts.egyptianLotus,
           onTap: onTap,
         );
       case SplitPromoSurface.wordAtelier:
         return SplitPromoSpec(
-          title: 'Reveal your top\nwords + more.',
-          cta: 'Open Word Atelier',
+          title: 'Meanings unlock\neach word.',
+          cta: 'Browse meanings',
           leftColor: const Color(0xFF4A2418),
           rightColor: const Color(0xFFE07A3D),
-          art: SplitPromoArts.redHairBlazer,
+          art: SplitPromoArts.redLotus,
           onTap: onTap,
         );
       case SplitPromoSurface.signatureStore:
         return SplitPromoSpec(
-          title: 'Own the rarest\nSignature pieces.',
-          cta: 'View Signatures',
+          title: 'Request a word\nof your own.',
+          cta: 'Request a word',
           leftColor: const Color(0xFF3D2914),
           rightColor: const Color(0xFFD4A017),
-          art: SplitPromoArts.blondeBlazer,
+          art: SplitPromoArts.robotLookback,
           onTap: onTap,
         );
       case SplitPromoSurface.fashionHome:
         return SplitPromoSpec(
-          title: 'Fashion home\ncurated for you.',
-          cta: 'Explore Fashion',
+          title: 'Start today\'s\npractice now.',
+          cta: 'Begin Practice',
           leftColor: const Color(0xFF4A1838),
           rightColor: const Color(0xFFE85D9A),
           art: SplitPromoArts.whiteRobot,
@@ -112,8 +124,8 @@ class SplitPromoSpec {
         );
       case SplitPromoSurface.ebooksStore:
         return SplitPromoSpec(
-          title: 'Read · learn ·\npractice deeper.',
-          cta: 'Open E-books',
+          title: 'Dig into the\nSound Library.',
+          cta: 'Open Sound Library',
           leftColor: const Color(0xFF143028),
           rightColor: const Color(0xFF2D6A4F),
           art: SplitPromoArts.egyptianGold,
@@ -121,8 +133,8 @@ class SplitPromoSpec {
         );
       case SplitPromoSurface.normalHome:
         return SplitPromoSpec(
-          title: 'Your essentials\nready today.',
-          cta: 'See Essentials',
+          title: 'Browse the\nWord Store.',
+          cta: 'Open Word Store',
           leftColor: const Color(0xFF1A3348),
           rightColor: const Color(0xFF2E86C1),
           art: SplitPromoArts.redHairBlazer,
@@ -276,7 +288,8 @@ class ColoredSplitPromoBanner extends StatelessWidget {
                               fit: BoxFit.contain,
                               alignment: Alignment.bottomCenter,
                               filterQuality: FilterQuality.high,
-                              errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                              errorBuilder: (_, __, ___) =>
+                                  const SizedBox.shrink(),
                             ),
                           ),
                         ],

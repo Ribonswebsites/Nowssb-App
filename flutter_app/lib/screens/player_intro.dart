@@ -9,7 +9,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../media/nwsb_image.dart';
 import '../theme/player_aura.dart';
-import '../widgets/colored_split_promo_banner.dart';
 
 /// Same rotating stills as `PI_ART` in app/js/part004.js.
 const kPlayerIntroArt = <String>[
@@ -200,13 +199,6 @@ class _PlayerIntroScreenState extends State<PlayerIntroScreen> {
                         height: 1.7,
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  ColoredSplitPromoBanner.forSurface(
-                    SplitPromoSurface.player,
-                    onTap: widget.onBegin,
-                    height: 110,
-                    margin: EdgeInsets.zero,
                   ),
                   const SizedBox(height: 18),
                   Row(

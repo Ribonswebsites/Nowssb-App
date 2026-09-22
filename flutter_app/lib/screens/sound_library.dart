@@ -1027,7 +1027,7 @@ class _SlmFeed extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(12, 14, 12, 6),
       child: ColoredSplitPromoBanner.forSurface(
         SplitPromoSurface.soundLibrary,
-        onTap: onMeanings,
+        onTap: onPractice,
         margin: EdgeInsets.zero,
       ),
     );

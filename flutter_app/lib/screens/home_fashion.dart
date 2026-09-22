@@ -276,6 +276,7 @@ class _HomeFashionState extends State<HomeFashion> {
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
                 child: ColoredSplitPromoBanner.forSurface(
                   SplitPromoSurface.fashionHome,
+                  onTap: () => _go(1),
                 ),
               ),
             ],

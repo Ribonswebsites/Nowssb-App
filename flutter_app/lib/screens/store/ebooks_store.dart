@@ -11,12 +11,14 @@ import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/page_shell.dart';
+import '../../widgets/colored_split_promo_banner.dart';
 import 'product_detail.dart';
 import 'store_actions.dart';
 import 'store_cards.dart';
 import 'store_home_sections.dart';
 import 'store_select_sheet.dart';
 import 'store_routes.dart';
+import '../sound_library.dart';
 
 class EbooksStoreScreen extends StatelessWidget {
   const EbooksStoreScreen({super.key});
@@ -167,6 +169,15 @@ class _EbooksBody extends StatelessWidget {
         _EbookBrowseStrip(
           onOpen: (b) => openEbookDetail(context, b),
           books: books,
+        ),
+        const SizedBox(height: 12),
+        ColoredSplitPromoBanner.forSurface(
+          SplitPromoSurface.ebooksStore,
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => const SoundLibraryScreen(),
+            ),
+          ),
         ),
         const SizedBox(height: 8),
         for (final b in books) _EbookRow(book: b),

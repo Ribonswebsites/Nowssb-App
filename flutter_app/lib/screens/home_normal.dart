@@ -285,6 +285,7 @@ class _HomeNormalState extends State<HomeNormal> {
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
                 child: ColoredSplitPromoBanner.forSurface(
                   SplitPromoSurface.normalHome,
+                  onTap: () => _go(3),
                 ),
               ),
               const NmSuppliedEssentials(),

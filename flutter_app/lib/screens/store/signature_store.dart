@@ -14,6 +14,7 @@ import 'store_cards.dart';
 import 'store_home_sections.dart';
 import 'store_select_sheet.dart';
 import 'store_routes.dart';
+import 'request_words.dart';
 
 class SignatureStoreScreen extends StatelessWidget {
   const SignatureStoreScreen({super.key});
@@ -68,22 +69,6 @@ class _SignatureBody extends StatelessWidget {
           videoAsset: 'assets/video/signature-store.mp4',
           pillIconAsset: kMsMeaningProductArt,
         ),
-        ColoredSplitPromoBanner.forSurface(
-          SplitPromoSurface.signatureStore,
-          onTap: () => showStoreViewAllPanel(
-            context,
-            title: 'Signatures',
-            items: storeDefaultViewAllItems(),
-            onOpenWord: (w, r, i, p) => openAtelierWord(
-              context,
-              word: w,
-              root: r,
-              img: i,
-              price: p,
-              signature: true,
-            ),
-          ),
-        ),
         RmCatBanner(
           title: 'Signature Collection',
           sub: 'One per collection — the rarest Signature each one has',
@@ -121,6 +106,10 @@ class _SignatureBody extends StatelessWidget {
                 ),
               ),
           ],
+        ),
+        ColoredSplitPromoBanner.forSurface(
+          SplitPromoSurface.signatureStore,
+          onTap: () => openRequestWords(context),
         ),
         if (w2.isNotEmpty) ...[
           RmCatBanner(
