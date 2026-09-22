@@ -86,12 +86,8 @@ class _EnterPageSpec {
 }
 
 const _pages = <_EnterPageSpec>[
-  _EnterPageSpec(
-    subject: EnterCurveAssets.pointer,
-    kicker: 'Enter your path',
-    title: 'Player · Library · Store · Reader',
-    sub: 'One still, one destination — her hand shows the way.',
-  ),
+  // "Enter your path" card removed from this section only (Customize rail
+  // owns the intro-glass language now). Keep the Sound card.
   _EnterPageSpec(
     subject: EnterCurveAssets.cleopatra,
     kicker: 'Sound that holds you',
@@ -141,7 +137,7 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
         if (!mounted) return;
         setState(() => _auto += 0.0055);
       });
-      // Continuously auto-rotate the two cards (Enter your path ↔ Sound…).
+      // Auto-rotate remaining enter-curve cards when more than one.
       _pageAuto = Timer.periodic(const Duration(milliseconds: 4800), (_) {
         if (!mounted || _userPaging || widget.embedded) return;
         if (!TickerMode.of(context)) return;

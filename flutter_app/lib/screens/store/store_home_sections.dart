@@ -28,6 +28,7 @@ class StorePixelsHero extends StatelessWidget {
     this.onViewCart,
     this.videoAsset,
     this.videoTitle = 'The Word Atelier',
+    this.height,
   });
 
   /// Kept for call-site compatibility; branding CTAs were removed.
@@ -35,6 +36,8 @@ class StorePixelsHero extends StatelessWidget {
   final VoidCallback? onViewCart;
   final String? videoAsset;
   final String videoTitle;
+  /// When set, overrides the default 170px hero height (Signature uses taller).
+  final double? height;
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +52,7 @@ class StorePixelsHero extends StatelessWidget {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(14),
           child: SizedBox(
-            height: 170,
+            height: height ?? 170,
             width: double.infinity,
             child: Stack(
               fit: StackFit.expand,
@@ -90,7 +93,7 @@ class StorePixelsHero extends StatelessWidget {
 }
 
 
-// ─── Subscribe video banner (taller + pill right-centre) ─────────────────────
+// ─── Subscribe video banner (tall, no pill — video fully visible) ────────────
 
 class StoreSubscribeBanner extends StatelessWidget {
   const StoreSubscribeBanner({
@@ -98,84 +101,54 @@ class StoreSubscribeBanner extends StatelessWidget {
     this.videoAsset,
     this.pillIconUrl,
     this.pillIconAsset,
+    this.onTap,
   });
 
   final String? videoAsset;
+  /// Kept for call-site compatibility; pill UI removed.
   final String? pillIconUrl;
   final String? pillIconAsset;
+  final VoidCallback? onTap;
+
+  static const kSubscriptionOfferVideo = 'assets/video/subscription-offer.mp4';
 
   @override
   Widget build(BuildContext context) {
-    final asset = videoAsset ?? nwsbVideo(kMsSubscribeVidFile);
+    final asset = videoAsset ?? kSubscriptionOfferVideo;
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: AspectRatio(
-          // Taller than 16/5 so video/content is not clipped.
-          aspectRatio: 16 / 7.2,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              NwsbVideo(
-                asset: asset,
-                priority: ClipPriority.decoration,
-              ),
-              const DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                    colors: [Color(0x66060C18), Color(0x22060C18)],
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(18),
+          child: AspectRatio(
+            // Much taller so the film reads fully (was 16/7.2 with pill).
+            aspectRatio: 16 / 11.5,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                IgnorePointer(
+                  child: NwsbVideo(
+                    asset: asset,
+                    priority: ClipPriority.feature,
+                    autoplay: true,
+                    loop: true,
+                    showPoster: false,
                   ),
                 ),
-              ),
-              Align(
-                alignment: const Alignment(0.55, 0.0), // right-centre
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                // Light edge wash only — keep the clip visible.
+                const DecoratedBox(
                   decoration: BoxDecoration(
-                    color: const Color(0xEE060C18),
-                    borderRadius: BorderRadius.circular(40),
-                    border: Border.all(color: const Color(0x33E8D5A3)),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      ClipOval(
-                        child: pillIconAsset != null
-                            ? Image.asset(
-                                pillIconAsset!,
-                                width: 22,
-                                height: 22,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) =>
-                                    const SizedBox(width: 22, height: 22),
-                              )
-                            : Image.network(
-                                pillIconUrl ?? kMsSubscribePillIcon,
-                                width: 22,
-                                height: 22,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) =>
-                                    const SizedBox(width: 22, height: 22),
-                              ),
-                      ),
-                      const SizedBox(width: 8),
-                      const Text(
-                        'Subscribe Today',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: NwsbColors.goldLight,
-                        ),
-                      ),
-                    ],
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Color(0x14060C18), Color(0x66060C18)],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

@@ -28,6 +28,7 @@ import 'store/ebooks_store.dart';
 import 'store/meaning_store.dart';
 import 'store/request_words.dart';
 import 'store/signature_store.dart';
+import 'subscription.dart';
 import 'store/word_atelier.dart';
 
 class StoreScreen extends StatelessWidget {
@@ -168,9 +169,11 @@ class _StoreHomeContent extends StatelessWidget {
       const _StoreDepartmentLabel('SUBSCRIPTION PLANS'),
       _StoreGlassSection(
         children: [
-          const _StoreVideoBanner(
-            asset: 'assets/video/subscription-tiers-bg.mp4',
-            poster: 'assets/video/subscription-tiers-bg-poster.webp',
+          _StoreVideoBanner(
+            asset: 'assets/video/subscription-offer.mp4',
+            poster: null,
+            onTap: () => _push(context, const SubscriptionScreen()),
+            tall: true,
           ),
           const _StoreInfoBanner(
             eyebrow: 'RESONANCE · FREQUENCY · X',
@@ -558,12 +561,17 @@ class _StoreChip extends StatelessWidget {
 class _SignatureDoor extends StatelessWidget {
   const _SignatureDoor({required this.onTap});
   final VoidCallback onTap;
+
+  static const _clip = 'assets/video/signature-offer.mp4';
+
   @override
   Widget build(BuildContext context) {
+    // IgnorePointer on the platform video so the door's onTap always fires.
     return GestureDetector(
       onTap: onTap,
+      behavior: HitTestBehavior.opaque,
       child: Container(
-        height: 230,
+        height: 420,
         margin: EdgeInsets.zero,
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
@@ -571,17 +579,21 @@ class _SignatureDoor extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            const NwsbVideo(
-              asset: 'assets/video/signature-store.mp4',
-              poster: 'assets/video/signature-store-poster.webp',
-              priority: ClipPriority.feature,
+            const IgnorePointer(
+              child: NwsbVideo(
+                asset: _clip,
+                priority: ClipPriority.feature,
+                autoplay: true,
+                loop: true,
+                showPoster: false,
+              ),
             ),
             const DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Color(0x33060C18), Color(0xEE060C18)],
+                  colors: [Color(0x14060C18), Color(0x99060C18)],
                 ),
               ),
             ),
@@ -646,24 +658,38 @@ class _StoreCompactVideoBanner extends StatelessWidget {
 }
 
 class _StoreVideoBanner extends StatelessWidget {
-  const _StoreVideoBanner({required this.asset, required this.poster});
-  final String asset, poster;
+  const _StoreVideoBanner({
+    required this.asset,
+    this.poster,
+    this.onTap,
+    this.tall = false,
+  });
+  final String asset;
+  final String? poster;
+  final VoidCallback? onTap;
+  final bool tall;
   @override
-  Widget build(BuildContext context) => HeavyGlassPanel(
-        margin: EdgeInsets.zero,
-        radius: 20,
-        padding: const EdgeInsets.all(5),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: AspectRatio(
-            aspectRatio: 16 / 6.4,
-            child: NwsbVideo(
-              asset: asset,
-              poster: poster,
-              priority: ClipPriority.feature,
-              autoplay: true,
-              loop: true,
-              showPoster: true,
+  Widget build(BuildContext context) => GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: HeavyGlassPanel(
+          margin: EdgeInsets.zero,
+          radius: 20,
+          padding: const EdgeInsets.all(5),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: AspectRatio(
+              aspectRatio: tall ? 16 / 11.5 : 16 / 6.4,
+              child: IgnorePointer(
+                child: NwsbVideo(
+                  asset: asset,
+                  poster: poster,
+                  priority: ClipPriority.feature,
+                  autoplay: true,
+                  loop: true,
+                  showPoster: poster != null,
+                ),
+              ),
             ),
           ),
         ),

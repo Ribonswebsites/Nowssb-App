@@ -62,12 +62,13 @@ class _SignatureBody extends StatelessWidget {
       children: [
         // Video hero — no stacked title overlay (header has subtitle).
         StorePixelsHero(
-          videoAsset: 'assets/video/signature-store.mp4',
+          videoAsset: 'assets/video/signature-offer.mp4',
           videoTitle: '',
+          height: 320,
         ),
+        // Distinct from Signature hero clip (subscription-offer.mp4).
         const StoreSubscribeBanner(
-          videoAsset: 'assets/video/signature-store.mp4',
-          pillIconAsset: kMsMeaningProductArt,
+          videoAsset: StoreSubscribeBanner.kSubscriptionOfferVideo,
         ),
         RmCatBanner(
           title: 'Signature Collection',

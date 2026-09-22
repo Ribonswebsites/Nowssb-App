@@ -76,13 +76,6 @@ class SubscriptionSection extends StatelessWidget {
               style: TextStyle(color: Color(0x99FFFFFF), fontSize: 12)),
           const SizedBox(height: 12),
           _SubscriptionTierStack(onTap: onTap),
-          const SizedBox(height: 15),
-          SecBanner(
-            title: 'Subscribe Today',
-            sub: 'Every word and every frequency, unlocked',
-            mark: NwsbMarks.crown,
-            onTap: onTap,
-          ),
         ],
       ),
     );
@@ -117,7 +110,7 @@ class EditionSection extends StatelessWidget {
             mark: NwsbMarks.crown,
           ),
           TvFrame(
-            asset: 'assets/video/subscription-join-nowssb.mp4',
+            asset: 'assets/video/subscription-offer.mp4',
             frame: DeviceFrame.kioskPortrait,
             priority: ClipPriority.decoration,
             onTap: onTap,

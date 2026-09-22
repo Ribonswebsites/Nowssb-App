@@ -28,7 +28,7 @@ String nwsbVideo(String fileName) {
     case kMsMeaningVidFile:
       return 'assets/video/hero-meaning-store.mp4';
     case kMsSubscribeVidFile:
-      return 'assets/video/hero-subscription.mp4';
+      return 'assets/video/subscription-offer.mp4';
     default:
       final row = kRmRowVids.indexOf(fileName);
       if (row == 0) return 'assets/video/connect-banner.mp4';

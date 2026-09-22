@@ -771,140 +771,360 @@ class FashTrending extends StatelessWidget {
   }
 }
 
-/// 10 · custom — index.html:2048. `.cust-panel` — the head, and the rows the
-/// web fills from the layout registry. Reordering is out of scope, so the
-/// panel is the door to Settings rather than a list of drag handles that
-/// would not move anything.
+/// 10 · custom — horizontal auto-rotating customize cards (same size as the
+/// old "Customized you app experiance" banner). No slide-away / reverse
+/// parallax: scrolling TO this section keeps the banner present.
 class FashCustomize extends StatelessWidget {
   const FashCustomize({super.key, this.onTap});
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      _CustomizeExperienceBanner(onTap: onTap),
-      SectionPane(
-        child: Column(children: [
-        GestureDetector(
-          onTap: onTap,
-          behavior: HitTestBehavior.opaque,
-          child: Row(children: [
-            Container(
-              width: 46,
-              height: 46,
-              decoration: BoxDecoration(
-                color: const Color(0x14FFFFFF),
-                shape: BoxShape.circle,
-                border: Border.all(color: const Color(0x24FFFFFF)),
+    return Column(
+      children: [
+        _CustomizeAutoRail(onOpenHub: onTap),
+        SectionPane(
+          child: GestureDetector(
+            onTap: onTap,
+            behavior: HitTestBehavior.opaque,
+            child: Row(children: [
+              Container(
+                width: 46,
+                height: 46,
+                decoration: BoxDecoration(
+                  color: const Color(0x14FFFFFF),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: const Color(0x24FFFFFF)),
+                ),
+                child: const Icon(Icons.tune, size: 19, color: Colors.white),
               ),
-              child: const Icon(Icons.tune, size: 19, color: Colors.white),
-            ),
-            const SizedBox(width: 14),
-            const Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Customize',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
+              const SizedBox(width: 14),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Customize',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                      ),
                     ),
-                  ),
-                  Text(
-                    'Make this home yours',
-                    style: TextStyle(fontSize: 12, color: Color(0x8CFFFFFF)),
-                  ),
-                ],
+                    Text(
+                      'Make this home yours',
+                      style: TextStyle(fontSize: 12, color: Color(0x8CFFFFFF)),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const Icon(Icons.chevron_right, size: 20, color: Color(0xB3FFFFFF)),
-          ]),
+              const Icon(Icons.chevron_right, size: 20, color: Color(0xB3FFFFFF)),
+            ]),
+          ),
         ),
-        const SizedBox(height: 16),
-        _FashionCustomizeRow(title: 'Themes', sub: 'Black Edition', icon: Icons.grid_view_rounded, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const WidgetsPage()))),
-        _FashionCustomizeRow(title: 'Background', sub: 'Fashion backdrop', image: 'https://media.nowssb.com/migrated-images/cfc84fc5478b4b63_file_00000000b11472098a225d3703b04a60_phr6ph.png', icon: Icons.wallpaper_rounded, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FashionPlusScreen()))),
-        _FashionCustomizeRow(title: 'Start Image', sub: 'Art behind the start', image: 'https://media.nowssb.com/migrated-images/5e8a9fdb18e034ec_file_000000009f10820bb6872a5ed8007148_pvqjaa.png', icon: Icons.image_outlined, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FashionPlusScreen()))),
-        _FashionCustomizeRow(title: 'Quick access', sub: 'Bottom nav bar', image: 'https://media.nowssb.com/migrated-images/272b820a002190fe_file_000000002cf4820b865caf6fc0554959_k7drqx.png', icon: Icons.apps_rounded, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const QuickAccessScreen()))),
-        ]),
-      ),
-    ]);
+      ],
+    );
   }
 }
 
-class _CustomizeExperienceBanner extends StatefulWidget {
-  const _CustomizeExperienceBanner({this.onTap});
-  final VoidCallback? onTap;
+/// Shared footprint with the legacy Customize banner (height 96).
+const double kCustomizeCardHeight = 96;
+
+class _CustomizeAutoRail extends StatefulWidget {
+  const _CustomizeAutoRail({this.onOpenHub});
+  final VoidCallback? onOpenHub;
+
   @override
-  State<_CustomizeExperienceBanner> createState() => _CustomizeExperienceBannerState();
+  State<_CustomizeAutoRail> createState() => _CustomizeAutoRailState();
 }
 
-class _CustomizeExperienceBannerState extends State<_CustomizeExperienceBanner> with SingleTickerProviderStateMixin {
-  late final AnimationController _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 900));
-  late final Animation<Offset> _slide = Tween(begin: Offset.zero, end: const Offset(-1.1, 0)).animate(CurvedAnimation(parent: _controller, curve: const Cubic(.7, 0, .2, 1)));
-  Timer? _intro;
+class _CustomizeAutoRailState extends State<_CustomizeAutoRail> {
+  late final PageController _pager =
+      PageController(viewportFraction: 0.92);
+  Timer? _auto;
+  var _index = 0;
+  var _userPaging = false;
+
+  List<_CustomizeCardSpec> _specs(BuildContext context) => [
+        _CustomizeCardSpec(
+          kind: _CustomizeCardKind.intro,
+          title: 'Themes · Background\nStart art · Quick access',
+          sub: 'Make every surface yours',
+          onTap: widget.onOpenHub,
+        ),
+        _CustomizeCardSpec(
+          kind: _CustomizeCardKind.banner,
+          title: 'Customized\nyou app experiance',
+          sub: '',
+          onTap: widget.onOpenHub,
+        ),
+        _CustomizeCardSpec(
+          kind: _CustomizeCardKind.door,
+          title: 'Themes',
+          sub: 'Black Edition',
+          icon: Icons.grid_view_rounded,
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const WidgetsPage()),
+          ),
+        ),
+        _CustomizeCardSpec(
+          kind: _CustomizeCardKind.door,
+          title: 'Background',
+          sub: 'Fashion backdrop',
+          icon: Icons.wallpaper_rounded,
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const FashionPlusScreen()),
+          ),
+        ),
+        _CustomizeCardSpec(
+          kind: _CustomizeCardKind.door,
+          title: 'Start Image',
+          sub: 'Art behind the start',
+          icon: Icons.image_outlined,
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const FashionPlusScreen()),
+          ),
+        ),
+        _CustomizeCardSpec(
+          kind: _CustomizeCardKind.door,
+          title: 'Quick access',
+          sub: 'Bottom nav bar',
+          icon: Icons.apps_rounded,
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const QuickAccessScreen()),
+          ),
+        ),
+      ];
+
   @override
   void initState() {
     super.initState();
     if (_flutterTest) return;
-    _intro = Timer(const Duration(milliseconds: 5000), () {
-      if (mounted) _controller.forward();
+    _auto = Timer.periodic(const Duration(milliseconds: 4200), (_) {
+      if (!mounted || _userPaging) return;
+      if (!TickerMode.of(context)) return;
+      if (!_pager.hasClients) return;
+      final specs = _specs(context);
+      final next = (_index + 1) % specs.length;
+      _pager.animateToPage(
+        next,
+        duration: const Duration(milliseconds: 520),
+        curve: Curves.easeOutCubic,
+      );
     });
   }
+
   @override
   void dispose() {
-    _intro?.cancel();
-    _controller.dispose();
+    _auto?.cancel();
+    _pager.dispose();
     super.dispose();
   }
+
   @override
-  Widget build(BuildContext context) => SlideTransition(
-        position: _slide,
-        child: FadeTransition(
-          opacity: Tween(begin: 1.0, end: 0.0).animate(CurvedAnimation(parent: _controller, curve: const Interval(.72, 1, curve: Curves.easeOut))),
-          child: GestureDetector(
-            onTap: widget.onTap,
-            child: Container(
-              height: 96,
-              margin: const EdgeInsets.fromLTRB(16, 16, 16, 10),
-              padding: const EdgeInsets.fromLTRB(22, 18, 18, 18),
-              decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0x29FFFFFF))),
-              child: Row(crossAxisAlignment: CrossAxisAlignment.end, mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                const SizedBox(width: 230, child: Text('Customized\nyou app experiance', maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.white, fontSize: 25, height: 1.08, fontWeight: FontWeight.w700, letterSpacing: -.3))),
-                Container(width: 44, height: 44, decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle), child: const Icon(Icons.arrow_forward, color: Color(0xFF060C18), size: 22)),
-              ]),
-            ),
-          ),
+  Widget build(BuildContext context) {
+    final specs = _specs(context);
+    // Arrive with the section — no reverse-parallax / slide-away.
+    return SizedBox(
+      height: kCustomizeCardHeight + 26,
+      child: NotificationListener<ScrollNotification>(
+        onNotification: (n) {
+          if (n is ScrollStartNotification && n.dragDetails != null) {
+            _userPaging = true;
+          } else if (n is ScrollEndNotification) {
+            _userPaging = false;
+          }
+          return false;
+        },
+        child: PageView.builder(
+          controller: _pager,
+          padEnds: true,
+          itemCount: specs.length,
+          onPageChanged: (i) => _index = i,
+          itemBuilder: (context, i) {
+            final spec = specs[i];
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(6, 16, 6, 10),
+              child: _CustomizeRailCard(spec: spec),
+            );
+          },
         ),
-      );
+      ),
+    );
+  }
 }
 
-class _FashionCustomizeRow extends StatelessWidget {
-  const _FashionCustomizeRow({required this.title, required this.sub, required this.icon, required this.onTap, this.image});
-  final String title, sub;
-  final IconData icon;
-  final String? image;
-  final VoidCallback onTap;
+enum _CustomizeCardKind { intro, banner, door }
+
+class _CustomizeCardSpec {
+  const _CustomizeCardSpec({
+    required this.kind,
+    required this.title,
+    required this.sub,
+    this.icon,
+    this.onTap,
+  });
+  final _CustomizeCardKind kind;
+  final String title;
+  final String sub;
+  final IconData? icon;
+  final VoidCallback? onTap;
+}
+
+class _CustomizeRailCard extends StatelessWidget {
+  const _CustomizeRailCard({required this.spec});
+  final _CustomizeCardSpec spec;
+
   @override
-  Widget build(BuildContext context) => GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: Container(
-          margin: const EdgeInsets.only(bottom: 10),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0x18FFFFFF))),
-          child: Row(children: [
-            Container(width: 48, height: 48, decoration: BoxDecoration(color: const Color(0x0FFFFFFF), borderRadius: BorderRadius.circular(15), border: Border.all(color: const Color(0x33FFFFFF))), child: image == null ? Icon(icon, color: Colors.white, size: 24) : ClipRRect(borderRadius: BorderRadius.circular(14), child: Image.network(image!, fit: BoxFit.cover, errorBuilder: (_, __, ___) => Icon(icon, color: Colors.white, size: 24)))),
-            const SizedBox(width: 16),
-            Container(width: 1, height: 34, color: const Color(0x24FFFFFF)),
-            const SizedBox(width: 16),
-            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w700)), const SizedBox(height: 3), Text(sub, style: const TextStyle(color: Color(0x8CFFFFFF), fontSize: 13))])),
-            Container(width: 42, height: 42, decoration: BoxDecoration(color: const Color(0x14FFFFFF), shape: BoxShape.circle, border: Border.all(color: const Color(0x2FFFFFFF))), child: const Icon(Icons.arrow_forward, color: Colors.white70, size: 20)),
-          ]),
-        ),
-      );
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: spec.onTap,
+      behavior: HitTestBehavior.opaque,
+      child: _cardBody(),
+    );
+  }
+
+  Widget _cardBody() {
+    // Glass + black — Enter-your-path language, fixed height.
+    final child = Container(
+      height: kCustomizeCardHeight,
+      padding: const EdgeInsets.fromLTRB(20, 16, 16, 16),
+      decoration: BoxDecoration(
+        color: const Color(0xF2000000),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0x33FFFFFF)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x66000000),
+            blurRadius: 24,
+            offset: Offset(0, 10),
+          ),
+        ],
+      ),
+      child: switch (spec.kind) {
+        _CustomizeCardKind.intro => Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                child: Text(
+                  spec.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    height: 1.08,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -.3,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Container(
+                width: 44,
+                height: 44,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.arrow_forward,
+                    color: Color(0xFF060C18), size: 22),
+              ),
+            ],
+          ),
+        _CustomizeCardKind.banner => Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(
+                width: 230,
+                child: Text(
+                  spec.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 25,
+                    height: 1.08,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -.3,
+                  ),
+                ),
+              ),
+              Container(
+                width: 44,
+                height: 44,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.arrow_forward,
+                    color: Color(0xFF060C18), size: 22),
+              ),
+            ],
+          ),
+        _CustomizeCardKind.door => Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: const Color(0x14FFFFFF),
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(color: const Color(0x33FFFFFF)),
+                ),
+                child: Icon(spec.icon ?? Icons.tune,
+                    color: Colors.white, size: 24),
+              ),
+              const SizedBox(width: 14),
+              Container(width: 1, height: 34, color: const Color(0x24FFFFFF)),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      spec.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      spec.sub,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Color(0x8CFFFFFF),
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: const Color(0x14FFFFFF),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: const Color(0x2FFFFFFF)),
+                ),
+                child: const Icon(Icons.arrow_forward,
+                    color: Colors.white70, size: 20),
+              ),
+            ],
+          ),
+      },
+    );
+    return child;
+  }
 }
 
 /// 11 · fashplus — index.html:2069. `.fps-mini`. The third line reports the
