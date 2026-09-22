@@ -16,7 +16,11 @@ import '../data/firebase.dart';
 import '../data/models.dart';
 import '../data/practice_progress.dart';
 import '../widgets/app_backdrop.dart';
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
+import '../widgets/app_thinking_loader.dart';
 import 'practice_player.dart';
+import '../widgets/colored_split_promo_banner.dart';
+import 'sound_library.dart';
 
 const _coachApi = 'https://nowssb-api.ribonpatil2.workers.dev/api/assistant/chat';
 const _coachHero = 'assets/coach/personal_coach_hero.jpg';
@@ -207,6 +211,13 @@ class _PersonalCoachScreenState extends State<PersonalCoachScreen> {
         const SizedBox(height: 16),
         _metrics(data),
         const SizedBox(height: 16),
+        ColoredSplitPromoBanner.forSurface(
+          SplitPromoSurface.coach,
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(builder: (_) => const SoundLibraryScreen()),
+          ),
+        ),
+        const SizedBox(height: 16),
         const _QuoteCard(),
         const SizedBox(height: 22),
         const Text('Chat with your coach', style: TextStyle(color: Color(0xFFB5B5BA), fontSize: 17, fontWeight: FontWeight.w600)),
@@ -229,7 +240,9 @@ class _PersonalCoachScreenState extends State<PersonalCoachScreen> {
         child: IconButton.filled(
           onPressed: _signingIn ? null : action,
           style: IconButton.styleFrom(backgroundColor: light ? Colors.white : const Color(0xFF17171A), foregroundColor: light ? Colors.black : Colors.white),
-          icon: _signingIn && label == 'Sign in' ? const SizedBox.square(dimension: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : Icon(icon),
+          icon: _signingIn && label == 'Sign in'
+              ? const AppThinkingLoader(size: 26, state: OrbState.solving, circlePad: 6)
+              : Icon(icon),
         ),
       );
 
@@ -302,10 +315,7 @@ class _PersonalCoachScreenState extends State<PersonalCoachScreen> {
                       backgroundColor: const Color(0xFF242429),
                     ),
                     child: _sending
-                        ? const SizedBox.square(
-                            dimension: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                          )
+                        ? const AppThinkingLoader(size: 26, state: OrbState.composing, circlePad: 6)
                         : const Icon(Icons.arrow_upward_rounded),
                   ),
                 ),

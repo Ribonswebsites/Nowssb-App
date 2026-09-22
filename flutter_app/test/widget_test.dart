@@ -97,7 +97,9 @@ void main() {
       'Store',
       'Profile'
     ]) {
-      await tester.tap(find.text(label));
+      // Some destinations (notably Store) also render the same word as a
+      // screen heading. The bottom-nav copy is the final matching widget.
+      await tester.tap(find.text(label).last);
       await tester.pump(const Duration(milliseconds: 50));
       expect(tester.takeException(), isNull, reason: '$label threw');
     }
@@ -153,7 +155,8 @@ void main() {
     // would be going TO, so it reads as an action rather than a status.
     expect(find.text('Fashion home'), findsOneWidget);
     await tester.tap(find.text('Fashion home'));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 80));
 
     expect(tester.takeException(), isNull);
     expect(find.text('Normal home'), findsOneWidget);

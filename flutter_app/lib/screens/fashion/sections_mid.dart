@@ -4,8 +4,14 @@
 /// storeban
 library;
 
-import 'package:flutter/material.dart';
+import 'dart:async';
 
+import 'package:flutter/material.dart';
+import '../../widgets/neumorphic.dart';
+
+import '../../widgets/enter_curve_stage.dart';
+import '../../widgets/flip_brand_showcase.dart';
+import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_icon.dart';
 
 import '../../data/content.dart';
@@ -21,143 +27,273 @@ import '../widgets_page.dart';
 
 const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
 
-/// 7 · tiles — index.html:1939. The tip rail, then four tiles two-up.
-class FashTiles extends StatelessWidget {
-  const FashTiles({super.key, this.onTile});
+/// 7 · tiles — tip rail + horizontal pages.
+///
+/// Page 0 = Flip glass brand showcase; pages 1+ = existing feature destination
+/// cards (Enter / nav preserved). Auto-swipes and loops while on-screen.
+class FashTiles extends StatefulWidget {
+  const FashTiles({super.key, this.onTile, this.onOpen});
 
-  /// Called with the tile's destination tab index.
+  /// Called with the tile's destination tab index (community card).
   final void Function(int)? onTile;
 
-  /// (title, sub, the round icon's artwork, destination) — the FOUR IN THE
-  /// MARKUP, in the markup's order: index.html:1958, 1970, 1982, 1994.
-  ///
-  /// This list was wrong in three ways at once. It carried "The Store",
-  /// which is not one of these four — `My Progress` is, and it was missing.
-  /// The order was wrong. And the URL on each row was the `.home-tile-cover`
-  /// artwork, which the DEFAULT look does not paint at all: nowssb-nm.css
-  /// :3968 says of these tiles, in as many words, "The 16:9 cover artwork
-  /// these used to carry is gone."
-  ///
-  /// Painting it full-bleed anyway is why each tile had a huge word lying
-  /// across it — that artwork carries its own title, which is the whole
-  /// reason the `image` look hides the DOM text when it uses it.
-  ///
-  /// The picture that IS painted is the small round one: `.home-tile-icon
-  /// img`, "the real feature artwork (from the Everything on NowssB page)
-  /// instead of a line SVG" (:3978).
+  /// Player / Library / Store / Reader on the destination card.
+  final void Function(String id)? onOpen;
+
+  @override
+  State<FashTiles> createState() => _FashTilesState();
+}
+
+class _FashTilesState extends State<FashTiles> {
+  static const _pageCount = 3; // Flip + 2 existing feature panes
+  static const _autoMs = 5200;
+
+  late final PageController _pager;
+  Timer? _auto;
+  var _index = 0;
+  var _userPaging = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _pager = PageController(viewportFraction: 0.94);
+    _armAuto();
+  }
+
+  @override
+  void dispose() {
+    _auto?.cancel();
+    _pager.dispose();
+    super.dispose();
+  }
+
+  void _armAuto() {
+    _auto?.cancel();
+    // Flip page advances via onCycleComplete; other pages use a timer.
+    if (_index == 0) return;
+    _auto = Timer(const Duration(milliseconds: _autoMs), _autoAdvance);
+  }
+
+  void _autoAdvance() {
+    if (!mounted || _userPaging) return;
+    if (!TickerMode.of(context)) {
+      _armAuto();
+      return;
+    }
+    final next = (_index + 1) % _pageCount;
+    _pager.animateToPage(
+      next,
+      duration: const Duration(milliseconds: 480),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  void _onFlipCycleComplete() {
+    if (!mounted || _index != 0 || _userPaging) return;
+    final next = (_index + 1) % _pageCount;
+    _pager.animateToPage(
+      next,
+      duration: const Duration(milliseconds: 520),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  /// Destination card: Connect replaces Sound Library so the two cards never
+  /// share a button. (Preserved existing card — now page index 2.)
   static const _tiles = [
     (
-      'Sound Library',
-      'Root frequencies',
-      'https://res.r2.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/'
-          'v1783157829/file_0000000039c8720893ebc07bba4d3afd_iq64ts.png',
-      2,
+      'Connect',
+      'NowssB community',
+      '',
+      NwsbMarks.connectPair,
+      0,
     ),
     (
       'My Progress',
       'Healing journey',
-      'https://res.r2.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/'
-          'v1783157829/file_00000000ae607208aa51504989648920_ml2czc.png',
+      '',
+      NwsbMarks.bars,
       4,
     ),
     (
       'Word Science',
       'NOWSBANSIU texts',
-      'https://res.r2.com/dc4nsi3xs/image/upload/f_auto,q_auto,w_240/'
-          'v1783158082/file_0000000086d872089ce376674620d5f3_mtfftb.png',
+      '',
+      NwsbMarks.wordBag,
       2,
     ),
     (
       'My Profile',
       'Your settings',
-      'https://res.r2.com/ds6duqabl/image/upload/f_auto,q_auto/'
-          'v1779563282/62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png',
+      '',
+      NwsbMarks.people,
       4,
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
-    return SectionPane(
-      child: Column(
+    // +2 slack kills the 2.0px BOTTOM OVERFLOW on the feature panes
+    // (GlassWrap border + column math).
+    const gridH = _tileHeight * 2 + 10;
+    const railH = 22.0;
+    const gap = 10.0;
+    const padV = 22.0;
+    const pageH = padV + railH + gap + gridH + 2;
+
+    Widget pane(List<Widget> tiles) {
+      final body = Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // `.htg-rail` — "Tap to restyle" at one end, "Begin your healing"
-          // at the other.
-          Row(
-            children: [
-              const Icon(Icons.chevron_left,
-                  size: 15, color: NwsbColors.goldLight),
-              const Icon(Icons.chevron_left,
-                  size: 15, color: NwsbColors.goldLight),
-              const SizedBox(width: 6),
-              // Both ends give way rather than one pushing the other off the
-              // rail: at a narrow width or a large text scale the two lines
-              // together are wider than the pane, and a Spacer between two
-              // rigid Texts simply overflows.
-              const Flexible(
-                child: Text(
-                  'Tap to restyle',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 11.5, color: Color(0xB3FFFFFF)),
-                ),
-              ),
-              const Spacer(),
-              Container(width: 1, height: 14, color: const Color(0x24FFFFFF)),
-              const SizedBox(width: 10),
-              const Flexible(
-                child: Text(
-                  'Begin your healing',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 11.5, color: Color(0x8CFFFFFF)),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          // `.home-grid` — two columns, 10px gap, and EVERY TILE 118px TALL.
-          //
-          // nowssb-nm.css:7950 sets `height: 118px` on these, and :8677 sets
-          // `grid-auto-rows: 1fr` so all four match whatever their contents
-          // do. This was `childAspectRatio: 0.86`, which is not a height at
-          // all — it is a shape, so the tiles grew with the phone's width and
-          // stood far taller than they do on the site.
-          //
-          // A ratio is what GridView takes, so the ratio is computed from the
-          // width each cell actually gets rather than guessed.
-          LayoutBuilder(
-            builder: (context, c) {
-              final cell = (c.maxWidth - 10) / 2;
-              return GridView.count(
-                crossAxisCount: 2,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                mainAxisSpacing: 10,
-                crossAxisSpacing: 10,
-                childAspectRatio: cell / _tileHeight,
-                children: [
-                  for (final (title, sub, art, dest) in _tiles)
-                    _Tile(
-                      title: title,
-                      sub: sub,
-                      art: art,
-                      onTap: () => onTile?.call(dest),
-                    ),
-                ],
-              );
-            },
-          ),
+          const SizedBox(height: railH, child: _TilesRail()),
+          const SizedBox(height: gap),
+          _TwoByTwo(children: tiles),
         ],
+      );
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 6),
+        child: _tilesShell(context, child: body),
+      );
+    }
+
+    // Same outer footprint as sibling panes (GlassWrap + horizontal inset).
+    // No tip-rail / demo labels — Flip fills the card body.
+    final flipPage = Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      child: _tilesShell(
+        context,
+        child: FlipBrandShowcase(
+          active: _index == 0,
+          onCycleComplete: _onFlipCycleComplete,
+        ),
+      ),
+    );
+
+    return SizedBox(
+      height: pageH,
+      child: NotificationListener<ScrollNotification>(
+        onNotification: (n) {
+          if (n is ScrollStartNotification && n.dragDetails != null) {
+            _userPaging = true;
+            _auto?.cancel();
+          } else if (n is ScrollEndNotification) {
+            _userPaging = false;
+            _armAuto();
+          }
+          return false;
+        },
+        child: PageView(
+          controller: _pager,
+          padEnds: true,
+          onPageChanged: (i) {
+            setState(() => _index = i);
+            _armAuto();
+          },
+          children: [
+            // Card 0 — Flip glass brand showcase
+            flipPage,
+            // Card 1 — existing Player / Library / Store / Reader (Enter)
+            pane([
+              for (final d in EnterCurveAssets.destinations)
+                _BannerTile(
+                  dest: d,
+                  onTap: () => widget.onOpen?.call(d.id),
+                ),
+            ]),
+            // Card 2 — existing Connect / Progress / Word Science / Profile
+            pane([
+              for (final (title, sub, art, mark, dest) in _tiles)
+                _Tile(
+                  title: title,
+                  sub: sub,
+                  art: art,
+                  mark: mark,
+                  onTap: () => widget.onTile?.call(dest),
+                ),
+            ]),
+          ],
+        ),
       ),
     );
   }
 }
 
-/// `height: 118px` — nowssb-nm.css:7950, for these tiles inside the glass
-/// wrapper on the Fashion home.
-const double _tileHeight = 118;
+class _TilesRail extends StatelessWidget {
+  const _TilesRail();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const Icon(Icons.chevron_left, size: 15, color: NwsbColors.goldLight),
+        const Icon(Icons.chevron_left, size: 15, color: NwsbColors.goldLight),
+        const SizedBox(width: 6),
+        const Flexible(
+          child: Text(
+            'Tap to restyle',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: 11.5, color: Color(0xB3FFFFFF)),
+          ),
+        ),
+        const Spacer(),
+        Container(width: 1, height: 14, color: const Color(0x24FFFFFF)),
+        const SizedBox(width: 10),
+        const Flexible(
+          child: Text(
+            'Begin your healing',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: 11.5, color: Color(0x8CFFFFFF)),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// `height: 128px` — room for the Enter pill so it is not clipped.
+const double _tileHeight = 128;
+
+class _TwoByTwo extends StatelessWidget {
+  const _TwoByTwo({required this.children});
+
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    Widget cell(int i) => Expanded(child: children[i]);
+    return Column(
+      children: [
+        SizedBox(
+          height: _tileHeight,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              cell(0),
+              const SizedBox(width: 10),
+              cell(1),
+            ],
+          ),
+        ),
+        const SizedBox(height: 10),
+        SizedBox(
+          height: _tileHeight,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              cell(2),
+              const SizedBox(width: 10),
+              cell(3),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
 
 /// `.home-tile` in its DEFAULT look — `fashtile-black`, which is what
 /// `savedFashStyle()` returns when nobody has chosen otherwise
@@ -178,10 +314,12 @@ class _Tile extends StatelessWidget {
     required this.title,
     required this.sub,
     required this.art,
+    this.mark,
     this.onTap,
   });
 
   final String title, sub, art;
+  final String? mark;
   final VoidCallback? onTap;
 
   @override
@@ -226,11 +364,29 @@ class _Tile extends StatelessWidget {
                       shape: BoxShape.circle,
                       border: Border.all(color: const Color(0x3DE8D5A3)),
                     ),
-                    child: NwsbImage(
-                      url: art,
-                      fit: BoxFit.cover,
-                      fallback: const ColoredBox(color: Color(0x1AE8D5A3)),
-                    ),
+                    child: mark != null
+                        ? Center(
+                            child: NwsbIcon(
+                              mark!,
+                              size: 16,
+                              color: const Color(0xFFE8D5A3),
+                            ),
+                          )
+                        : (art.isEmpty
+                            ? const Center(
+                                child: NwsbIcon(
+                                  NwsbMarks.discover,
+                                  size: 16,
+                                  color: Color(0xFFE8D5A3),
+                                ),
+                              )
+                            : NwsbImage(
+                                url: art,
+                                fit: BoxFit.cover,
+                                fallback: const ColoredBox(
+                                  color: Color(0x1AE8D5A3),
+                                ),
+                              )),
                   ),
                   const SizedBox(width: 8),
                   // `.home-tile-rule` — 1px, `align-self: stretch`.
@@ -278,15 +434,107 @@ class _Tile extends StatelessWidget {
   }
 }
 
-/// `.home-tile-enter` — a white pill: the word, then the arrow in its own
-/// circle. nowssb-nm.css:3992.
-class _TileEnter extends StatelessWidget {
-  const _TileEnter();
+/// Second card: the four destination banners as tile backgrounds, Enter
+/// sitting on the empty right of the still's own vertical line.
+class _BannerTile extends StatelessWidget {
+  const _BannerTile({required this.dest, this.onTap});
+
+  final EnterCurveDest dest;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: const Color(0x14FFFFFF)),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x6B000000),
+              offset: Offset(0, 10),
+              blurRadius: 26,
+            ),
+          ],
+        ),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.asset(
+              dest.banner,
+              fit: BoxFit.contain,
+              alignment: Alignment.centerLeft,
+              filterQuality: FilterQuality.medium,
+              gaplessPlayback: true,
+              frameBuilder: (context, child, frame, sync) {
+                if (sync || frame != null) return child;
+                return const ColoredBox(color: Color(0xFF111111));
+              },
+              errorBuilder: (_, __, ___) =>
+                  const ColoredBox(color: Color(0xFF111111)),
+            ),
+            // Top-right destination mark (restored SVG — was missing/broken).
+            Positioned(
+              top: 8,
+              right: 8,
+              child: Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: const Color(0x22FFFFFF)),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x33000000),
+                      blurRadius: 6,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: NwsbIcon(
+                    dest.mark,
+                    size: 13,
+                    viewBox: dest.mark == NwsbMarks.enterArrow ? 12 : 24,
+                    color: const Color(0xFF1A1A2E),
+                    strokeWidth: 1.6,
+                  ),
+                ),
+              ),
+            ),
+            const Positioned(
+              right: 6,
+              top: 0,
+              bottom: 0,
+              child: Center(child: _TileEnter(compact: true)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// `.home-tile-enter` — a white pill: the word, then the arrow in its own
+/// circle. nowssb-nm.css:3992.
+class _TileEnter extends StatelessWidget {
+  const _TileEnter({this.compact = false});
+
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    final pad = compact
+        ? const EdgeInsets.fromLTRB(8, 2, 2, 2)
+        : const EdgeInsets.fromLTRB(11, 4, 4, 4);
+    final font = compact ? 8.0 : 10.0;
+    final go = compact ? 16.0 : 20.0;
     return Container(
-      padding: const EdgeInsets.fromLTRB(11, 4, 4, 4),
+      padding: pad,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(30),
@@ -294,29 +542,27 @@ class _TileEnter extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text(
+          Text(
             'Enter',
             style: TextStyle(
-              fontSize: 10,
+              fontSize: font,
               fontWeight: FontWeight.w800,
               letterSpacing: 0.3,
               color: NwsbColors.ink,
             ),
           ),
-          const SizedBox(width: 6),
+          SizedBox(width: compact ? 4 : 6),
           Container(
-            width: 20,
-            height: 20,
+            width: go,
+            height: go,
             decoration: const BoxDecoration(
               color: Color(0x1A060C18),
               shape: BoxShape.circle,
             ),
-            child: const Center(
-              // The tile's own arrow — `M2 6H10M7 3L10 6L7 9` on a 12 box,
-              // square caps, not the app's usual round-capped one.
+            child: Center(
               child: NwsbIcon(
-                '<path d="M2 6H10M7 3L10 6L7 9"/>',
-                size: 10,
+                NwsbMarks.enterArrow,
+                size: compact ? 8 : 10,
                 viewBox: 12,
                 strokeWidth: 1.9,
                 cap: 'square',
@@ -392,13 +638,6 @@ class FashStore extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          // NOT "Enter the NowssB Store". The film says
-                          // NowssB Store in its own lettering and the
-                          // section's head says it above the card, so a
-                          // third drawn copy was the store naming itself
-                          // three times on one screen. This says what the
-                          // store is FOR instead, in the app's own headline
-                          // shape: a light line over a heavy one.
                           const Text.rich(
                             TextSpan(
                               style: TextStyle(
@@ -419,63 +658,6 @@ class FashStore extends StatelessWidget {
                             ),
                           ),
                           const Spacer(),
-                          // The mark, a hairline, then the button — one
-                          // row, set below the lettering the film carries in
-                          // its middle so the two are read in order rather
-                          // than at once.
-                          //
-                          // The paragraph that used to sit here was pushed
-                          // to the foot of the card by that Spacer, which is
-                          // exactly the band the clip keeps its own NowssB
-                          // Store lettering in: two sets of words in one
-                          // place and neither of them readable.
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const NwsbIcon(
-                                  NwsbMarks.bag,
-                                  size: 20,
-                                  color: NwsbColors.goldLight,
-                                ),
-                                const SizedBox(width: 12),
-                                Container(
-                                  width: 1,
-                                  height: 26,
-                                  color: const Color(0x59FFFFFF),
-                                ),
-                                const SizedBox(width: 12),
-                                GestureDetector(
-                                  onTap: onTap,
-                                  behavior: HitTestBehavior.opaque,
-                                  child: Container(
-                                    padding: const EdgeInsets.fromLTRB(
-                                        18, 11, 14, 11),
-                                    color: Colors.white,
-                                    child: const Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          'Shop Now',
-                                          style: TextStyle(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w700,
-                                            letterSpacing: 0.3,
-                                            color: NwsbColors.ink,
-                                          ),
-                                        ),
-                                        SizedBox(width: 9),
-                                        NwsbIcon(NwsbMarks.arrow,
-                                            size: 14, color: NwsbColors.ink),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 14),
                           Wrap(
                             spacing: 8,
                             runSpacing: 8,
@@ -499,11 +681,14 @@ class FashStore extends StatelessWidget {
                                 ),
                             ],
                           ),
-                          // The full-width Explore Store bar that used to
-                          // close the card is gone: Shop Now under the title
-                          // is the same door, and two white buttons on one
-                          // card is the card asking twice.
                         ],
+                      ),
+                    ),
+                    Align(
+                      alignment: const Alignment(1.0, 0.28),
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 16),
+                        child: ScreenCta(label: 'Shop Now', onTap: onTap),
                       ),
                     ),
                   ],
@@ -561,24 +746,12 @@ class FashTrending extends StatelessWidget {
                         gradient: LinearGradient(
                           begin: Alignment.centerLeft,
                           end: Alignment.centerRight,
-                          colors: [Color(0xCC000000), Color(0x00000000)],
+                          colors: [Color(0x00000000), Color(0x66040A18)],
+                          stops: [0.45, 1],
                         ),
                       ),
                     ),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 18),
-                        child: Text(
-                          word,
-                          style: const TextStyle(
-                            fontSize: 26,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
+                    TrendBannerLockup(word: word, onTap: onTap),
                   ],
                 ),
               ),
@@ -598,10 +771,7 @@ class FashTrending extends StatelessWidget {
   }
 }
 
-/// 10 · custom — index.html:2048. `.cust-panel` — the head, and the rows the
-/// web fills from the layout registry. Reordering is out of scope, so the
-/// panel is the door to Settings rather than a list of drag handles that
-/// would not move anything.
+/// 10 · custom — black banner stays. Below it, tall glass cards.
 class FashCustomize extends StatelessWidget {
   const FashCustomize({super.key, this.onTap});
   final VoidCallback? onTap;
@@ -610,24 +780,399 @@ class FashCustomize extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(children: [
       _CustomizeExperienceBanner(onTap: onTap),
-      SectionPane(
-        child: Column(children: [
+      _CustomizeCardPager(onOpenHub: onTap),
+    ]);
+  }
+}
+
+/// Original 96px black banner. Not a pager card. Does not slide away.
+class _CustomizeExperienceBanner extends StatelessWidget {
+  const _CustomizeExperienceBanner({this.onTap});
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 96,
+        margin: const EdgeInsets.fromLTRB(16, 16, 16, 10),
+        padding: const EdgeInsets.fromLTRB(22, 18, 18, 18),
+        decoration: BoxDecoration(
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: const Color(0x29FFFFFF)),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            const Expanded(
+              child: Text(
+                'Customized\nyou app experience',
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 25,
+                  height: 1.08,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -.3,
+                ),
+              ),
+            ),
+            Container(
+              width: 44,
+              height: 44,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.arrow_forward,
+                  color: Color(0xFF060C18), size: 22),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Same footprint as the enter-your-path card.
+const double kCustomizeCardHeight = 520;
+
+class _CustomizeCardPager extends StatefulWidget {
+  const _CustomizeCardPager({this.onOpenHub});
+  final VoidCallback? onOpenHub;
+
+  @override
+  State<_CustomizeCardPager> createState() => _CustomizeCardPagerState();
+}
+
+class _CustomizeCardPagerState extends State<_CustomizeCardPager> {
+  late final PageController _pager = PageController(viewportFraction: 0.92);
+  Timer? _auto;
+  var _index = 0;
+  var _userPaging = false;
+
+  List<_CustPage> _pages(BuildContext context) => [
+        _CustPage(kind: _CustKind.intro, onTap: widget.onOpenHub),
+        _CustPage(kind: _CustKind.panel, onTap: widget.onOpenHub),
+        _CustPage(
+          kind: _CustKind.door,
+          title: 'Themes',
+          sub: 'Black Edition',
+          body: 'Swap the whole home — black, light, or the edition you keep.',
+          icon: Icons.grid_view_rounded,
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const WidgetsPage()),
+          ),
+        ),
+        _CustPage(
+          kind: _CustKind.door,
+          title: 'Background',
+          sub: 'Fashion backdrop',
+          body: 'The motion behind Fashion home. Pick the film you want.',
+          icon: Icons.wallpaper_rounded,
+          image:
+              'https://media.nowssb.com/migrated-images/cfc84fc5478b4b63_file_00000000b11472098a225d3703b04a60_phr6ph.png',
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const FashionPlusScreen()),
+          ),
+        ),
+        _CustPage(
+          kind: _CustKind.door,
+          title: 'Start Image',
+          sub: 'Art behind the start',
+          body: 'The still that waits behind the start button.',
+          icon: Icons.image_outlined,
+          image:
+              'https://media.nowssb.com/migrated-images/5e8a9fdb18e034ec_file_000000009f10820bb6872a5ed8007148_pvqjaa.png',
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const FashionPlusScreen()),
+          ),
+        ),
+        _CustPage(
+          kind: _CustKind.door,
+          title: 'Quick access',
+          sub: 'Bottom nav bar',
+          body: 'The five doors at the foot of the home. Yours to rearrange.',
+          icon: Icons.apps_rounded,
+          image:
+              'https://media.nowssb.com/migrated-images/272b820a002190fe_file_000000002cf4820b865caf6fc0554959_k7drqx.png',
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const QuickAccessScreen()),
+          ),
+        ),
+      ];
+
+  @override
+  void initState() {
+    super.initState();
+    if (_flutterTest) return;
+    _auto = Timer.periodic(const Duration(milliseconds: 4200), (_) {
+      if (!mounted || _userPaging) return;
+      if (!TickerMode.of(context)) return;
+      if (!_pager.hasClients) return;
+      final next = (_index + 1) % _pages(context).length;
+      _pager.animateToPage(
+        next,
+        duration: const Duration(milliseconds: 520),
+        curve: Curves.easeOutCubic,
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _auto?.cancel();
+    _pager.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final pages = _pages(context);
+    return SizedBox(
+      height: kCustomizeCardHeight,
+      child: NotificationListener<ScrollNotification>(
+        onNotification: (n) {
+          if (n is ScrollStartNotification && n.dragDetails != null) {
+            _userPaging = true;
+          } else if (n is ScrollEndNotification) {
+            _userPaging = false;
+          }
+          return false;
+        },
+        child: PageView.builder(
+          controller: _pager,
+          padEnds: true,
+          itemCount: pages.length,
+          onPageChanged: (i) => _index = i,
+          itemBuilder: (context, i) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5),
+              child: GlassWrap(
+                margin: EdgeInsets.zero,
+                padding: const EdgeInsets.fromLTRB(10, 10, 10, 16),
+                child: _CustCard(page: pages[i]),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+enum _CustKind { intro, panel, door }
+
+class _CustPage {
+  const _CustPage({
+    required this.kind,
+    this.title = '',
+    this.sub = '',
+    this.body = '',
+    this.icon,
+    this.image,
+    this.onTap,
+  });
+  final _CustKind kind;
+  final String title;
+  final String sub;
+  final String body;
+  final IconData? icon;
+  final String? image;
+  final VoidCallback? onTap;
+}
+
+class _CustCard extends StatelessWidget {
+  const _CustCard({required this.page});
+  final _CustPage page;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: page.onTap,
+      behavior: HitTestBehavior.opaque,
+      child: switch (page.kind) {
+        _CustKind.intro => const _CustIntroCard(),
+        _CustKind.panel => _CustPanelCard(onTap: page.onTap),
+        _CustKind.door => _CustDoorCard(page: page),
+      },
+    );
+  }
+}
+
+class _CustIntroCard extends StatelessWidget {
+  const _CustIntroCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: EdgeInsets.fromLTRB(16, 4, 16, 8),
+          child: Column(
+            children: [
+              Text(
+                'NowssB.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.3,
+                  height: 1,
+                ),
+              ),
+              SizedBox(height: 6),
+              Text(
+                'Make this home yours',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Color(0xFFC4B5FD),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.2,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(child: _CustIntroStage()),
+        Padding(
+          padding: EdgeInsets.fromLTRB(16, 12, 16, 2),
+          child: Text(
+            'Themes · Background · Start art · Access',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+              height: 1.2,
+              letterSpacing: -0.4,
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.fromLTRB(16, 4, 16, 4),
+          child: Text(
+            'Four doors. One tap. The home follows you.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Color(0xB3FFFFFF),
+              fontSize: 12,
+              height: 1.35,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _CustIntroStage extends StatelessWidget {
+  const _CustIntroStage();
+
+  static const _stills = [
+    'assets/hero-curve/banner-player.webp',
+    'assets/hero-curve/banner-library.webp',
+    'assets/hero-curve/stillness.webp',
+    'assets/hero-curve/cosmos.webp',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(14),
+      child: ColoredBox(
+        color: const Color(0xFF050505),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Align(
+              alignment: const Alignment(-0.7, -0.35),
+              child: Transform.rotate(
+                angle: -0.18,
+                child: _still(_stills[0], 0.78),
+              ),
+            ),
+            Align(
+              alignment: const Alignment(0.72, -0.42),
+              child: Transform.rotate(
+                angle: 0.16,
+                child: _still(_stills[2], 0.82),
+              ),
+            ),
+            Align(
+              alignment: const Alignment(-0.62, 0.55),
+              child: Transform.rotate(
+                angle: 0.12,
+                child: _still(_stills[3], 0.72),
+              ),
+            ),
+            Align(
+              alignment: const Alignment(0.68, 0.48),
+              child: Transform.rotate(
+                angle: -0.1,
+                child: _still(_stills[1], 0.7),
+              ),
+            ),
+            Align(
+              alignment: const Alignment(0.04, 0.96),
+              child: FractionallySizedBox(
+                heightFactor: 0.72,
+                child: Image.asset(
+                  EnterCurveAssets.pointer,
+                  fit: BoxFit.contain,
+                  alignment: Alignment.bottomCenter,
+                  filterQuality: FilterQuality.high,
+                  errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _still(String asset, double scale) {
+    return Transform.scale(
+      scale: scale,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: SizedBox(
+          width: 152,
+          height: 86,
+          child: Image.asset(
+            asset,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) =>
+                const ColoredBox(color: Color(0xFF111111)),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CustPanelCard extends StatelessWidget {
+  const _CustPanelCard({this.onTap});
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
         GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
-          child: Row(children: [
-            Container(
-              width: 46,
-              height: 46,
-              decoration: BoxDecoration(
-                color: const Color(0x14FFFFFF),
-                shape: BoxShape.circle,
-                border: Border.all(color: const Color(0x24FFFFFF)),
-              ),
-              child: const Icon(Icons.tune, size: 19, color: Colors.white),
-            ),
-            const SizedBox(width: 14),
-            const Expanded(
+          child: const Row(children: [
+            _CustHeadIcon(),
+            SizedBox(width: 14),
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
@@ -647,80 +1192,220 @@ class FashCustomize extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, size: 20, color: Color(0xB3FFFFFF)),
+            Icon(Icons.chevron_right, size: 20, color: Color(0xB3FFFFFF)),
           ]),
         ),
         const SizedBox(height: 16),
-        _FashionCustomizeRow(title: 'Themes', sub: 'Black Edition', icon: Icons.grid_view_rounded, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const WidgetsPage()))),
-        _FashionCustomizeRow(title: 'Background', sub: 'Fashion backdrop', image: 'https://media.nowssb.com/migrated-images/cfc84fc5478b4b63_file_00000000b11472098a225d3703b04a60_phr6ph.png', icon: Icons.wallpaper_rounded, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FashionPlusScreen()))),
-        _FashionCustomizeRow(title: 'Start Image', sub: 'Art behind the start', image: 'https://media.nowssb.com/migrated-images/5e8a9fdb18e034ec_file_000000009f10820bb6872a5ed8007148_pvqjaa.png', icon: Icons.image_outlined, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FashionPlusScreen()))),
-        _FashionCustomizeRow(title: 'Quick Access', sub: 'Bottom nav bar', image: 'https://media.nowssb.com/migrated-images/272b820a002190fe_file_000000002cf4820b865caf6fc0554959_k7drqx.png', icon: Icons.apps_rounded, onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const QuickAccessScreen()))),
-        ]),
-      ),
-    ]);
+        _FashionCustomizeRow(
+          title: 'Themes',
+          sub: 'Black Edition',
+          icon: Icons.grid_view_rounded,
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const WidgetsPage()),
+          ),
+        ),
+        _FashionCustomizeRow(
+          title: 'Background',
+          sub: 'Fashion backdrop',
+          image:
+              'https://media.nowssb.com/migrated-images/cfc84fc5478b4b63_file_00000000b11472098a225d3703b04a60_phr6ph.png',
+          icon: Icons.wallpaper_rounded,
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const FashionPlusScreen()),
+          ),
+        ),
+        _FashionCustomizeRow(
+          title: 'Start Image',
+          sub: 'Art behind the start',
+          image:
+              'https://media.nowssb.com/migrated-images/5e8a9fdb18e034ec_file_000000009f10820bb6872a5ed8007148_pvqjaa.png',
+          icon: Icons.image_outlined,
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const FashionPlusScreen()),
+          ),
+        ),
+        _FashionCustomizeRow(
+          title: 'Quick access',
+          sub: 'Bottom nav bar',
+          image:
+              'https://media.nowssb.com/migrated-images/272b820a002190fe_file_000000002cf4820b865caf6fc0554959_k7drqx.png',
+          icon: Icons.apps_rounded,
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const QuickAccessScreen()),
+          ),
+        ),
+      ],
+    );
   }
 }
 
-class _CustomizeExperienceBanner extends StatefulWidget {
-  const _CustomizeExperienceBanner({this.onTap});
-  final VoidCallback? onTap;
+class _CustHeadIcon extends StatelessWidget {
+  const _CustHeadIcon();
   @override
-  State<_CustomizeExperienceBanner> createState() => _CustomizeExperienceBannerState();
+  Widget build(BuildContext context) {
+    return Container(
+      width: 46,
+      height: 46,
+      decoration: BoxDecoration(
+        color: const Color(0x14FFFFFF),
+        shape: BoxShape.circle,
+        border: Border.all(color: const Color(0x24FFFFFF)),
+      ),
+      child: const Icon(Icons.tune, size: 19, color: Colors.white),
+    );
+  }
 }
 
-class _CustomizeExperienceBannerState extends State<_CustomizeExperienceBanner> with SingleTickerProviderStateMixin {
-  late final AnimationController _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 900));
-  late final Animation<Offset> _slide = Tween(begin: Offset.zero, end: const Offset(-1.1, 0)).animate(CurvedAnimation(parent: _controller, curve: const Cubic(.7, 0, .2, 1)));
+class _CustDoorCard extends StatelessWidget {
+  const _CustDoorCard({required this.page});
+  final _CustPage page;
+
   @override
-  void initState() { super.initState(); if (_flutterTest) return; Future<void>.delayed(const Duration(milliseconds: 5000), () { if (mounted) _controller.forward(); }); }
-  @override
-  void dispose() { _controller.dispose(); super.dispose(); }
-  @override
-  Widget build(BuildContext context) => SlideTransition(
-        position: _slide,
-        child: FadeTransition(
-          opacity: Tween(begin: 1.0, end: 0.0).animate(CurvedAnimation(parent: _controller, curve: const Interval(.72, 1, curve: Curves.easeOut))),
-          child: GestureDetector(
-            onTap: widget.onTap,
-            child: Container(
-              height: 96,
-              margin: const EdgeInsets.fromLTRB(16, 16, 16, 10),
-              padding: const EdgeInsets.fromLTRB(22, 18, 18, 18),
-              decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0x29FFFFFF))),
-              child: Row(crossAxisAlignment: CrossAxisAlignment.end, mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                const SizedBox(width: 230, child: Text('Customized\nyou app experiance', maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.white, fontSize: 25, height: 1.08, fontWeight: FontWeight.w700, letterSpacing: -.3))),
-                Container(width: 44, height: 44, decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle), child: const Icon(Icons.arrow_forward, color: Color(0xFF060C18), size: 22)),
-              ]),
-            ),
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Expanded(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(14),
+            child: page.image == null
+                ? ColoredBox(
+                    color: const Color(0xFF0B0B12),
+                    child: Icon(page.icon,
+                        size: 72, color: const Color(0xE6FFFFFF)),
+                  )
+                : Image.network(
+                    page.image!,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => ColoredBox(
+                      color: const Color(0xFF0B0B12),
+                      child: Icon(page.icon,
+                          size: 72, color: const Color(0xE6FFFFFF)),
+                    ),
+                  ),
           ),
         ),
-      );
+        const SizedBox(height: 14),
+        Text(
+          page.title,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 22,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.4,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          page.sub,
+          style: const TextStyle(
+            color: Color(0xFFC4B5FD),
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          page.body,
+          maxLines: 3,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(
+            color: Color(0xB3FFFFFF),
+            fontSize: 13,
+            height: 1.4,
+          ),
+        ),
+        const SizedBox(height: 14),
+        Align(
+          alignment: Alignment.centerRight,
+          child: EnterPill(onTap: page.onTap),
+        ),
+      ],
+    );
+  }
 }
 
 class _FashionCustomizeRow extends StatelessWidget {
-  const _FashionCustomizeRow({required this.title, required this.sub, required this.icon, required this.onTap, this.image});
+  const _FashionCustomizeRow({
+    required this.title,
+    required this.sub,
+    required this.icon,
+    required this.onTap,
+    this.image,
+  });
   final String title, sub;
   final IconData icon;
   final String? image;
   final VoidCallback onTap;
+
   @override
-  Widget build(BuildContext context) => GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: Container(
-          margin: const EdgeInsets.only(bottom: 10),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0x18FFFFFF))),
-          child: Row(children: [
-            Container(width: 48, height: 48, decoration: BoxDecoration(color: const Color(0x0FFFFFFF), borderRadius: BorderRadius.circular(15), border: Border.all(color: const Color(0x33FFFFFF))), child: image == null ? Icon(icon, color: Colors.white, size: 24) : ClipRRect(borderRadius: BorderRadius.circular(14), child: Image.network(image!, fit: BoxFit.cover, errorBuilder: (_, __, ___) => Icon(icon, color: Colors.white, size: 24)))),
-            const SizedBox(width: 16),
-            Container(width: 1, height: 34, color: const Color(0x24FFFFFF)),
-            const SizedBox(width: 16),
-            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w700)), const SizedBox(height: 3), Text(sub, style: const TextStyle(color: Color(0x8CFFFFFF), fontSize: 13))])),
-            Container(width: 42, height: 42, decoration: BoxDecoration(color: const Color(0x14FFFFFF), shape: BoxShape.circle, border: Border.all(color: const Color(0x2FFFFFFF))), child: const Icon(Icons.arrow_forward, color: Colors.white70, size: 20)),
-          ]),
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: const Color(0x18FFFFFF)),
         ),
-      );
+        child: Row(children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: const Color(0x0FFFFFFF),
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(color: const Color(0x33FFFFFF)),
+            ),
+            child: image == null
+                ? Icon(icon, color: Colors.white, size: 24)
+                : ClipRRect(
+                    borderRadius: BorderRadius.circular(14),
+                    child: Image.network(
+                      image!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) =>
+                          Icon(icon, color: Colors.white, size: 24),
+                    ),
+                  ),
+          ),
+          const SizedBox(width: 16),
+          Container(width: 1, height: 34, color: const Color(0x24FFFFFF)),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title,
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700)),
+                const SizedBox(height: 3),
+                Text(sub,
+                    style: const TextStyle(
+                        color: Color(0x8CFFFFFF), fontSize: 13)),
+              ],
+            ),
+          ),
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: const Color(0x14FFFFFF),
+              shape: BoxShape.circle,
+              border: Border.all(color: const Color(0x2FFFFFFF)),
+            ),
+            child: const Icon(Icons.arrow_forward,
+                color: Colors.white70, size: 20),
+          ),
+        ]),
+      ),
+    );
+  }
 }
 
 /// 11 · fashplus — index.html:2069. `.fps-mini`. The third line reports the
@@ -913,7 +1598,7 @@ class FashPrescription extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 SizedBox(
-                  height: 108,
+                  height: 114,
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
                     itemCount: picks.length,
@@ -1087,7 +1772,10 @@ class FashConnect extends StatelessWidget {
   }
 }
 
-/// 14 · trendvid — index.html:2113. The Shop Now strip.
+/// 14 · trendvid — Chandra / Heals Mind Shop Now strip.
+///
+/// One glass wrapper: "Today's offer" card (layout language of the AI
+/// Prescription word cards / 2nd card) above the existing Chandra banner.
 class FashShopNow extends StatelessWidget {
   const FashShopNow({super.key, this.onTap});
   final VoidCallback? onTap;
@@ -1097,83 +1785,157 @@ class FashShopNow extends StatelessWidget {
     final words = ContentStore.instance.library;
     final w =
         words.isEmpty ? null : words[(DateTime.now().day + 1) % words.length];
+    final organ = (w?.organ ?? 'mind').toUpperCase();
+    final word = w?.word ?? 'Chandra';
 
     return SectionPane(
-      child: GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-          decoration: const BoxDecoration(color: Colors.black),
-          child: Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF14141C),
-                  shape: BoxShape.circle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Offer header — same black-card language as Rx word cards (PITTA).
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: const Color(0xFF0B0B12),
+              border: Border.all(color: const Color(0x14FFFFFF)),
+            ),
+            child: const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Today's offer",
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w800,
+                    color: NwsbColors.goldLight,
+                  ),
                 ),
-                child: const Icon(Icons.storefront_outlined,
-                    size: 19, color: NwsbColors.goldLight),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      w == null ? 'HEALS' : 'HEALS ${w.organ.toUpperCase()}',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 10.5,
-                        letterSpacing: 1.4,
-                        color: Color(0x99FFFFFF),
-                      ),
-                    ),
-                    Text(
-                      w?.word ?? '',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 19,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
+                SizedBox(height: 4),
+                Text(
+                  'Featured healing word — limited shop drop for mind & organ.',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Color(0xB3FFFFFF),
+                    height: 1.35,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Container(width: 1, height: 34, color: const Color(0x1FFFFFFF)),
-              const SizedBox(width: 12),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                decoration: const BoxDecoration(color: NwsbColors.goldLight),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.shopping_cart_outlined,
-                        size: 15, color: NwsbColors.ink),
-                    SizedBox(width: 7),
-                    Text(
-                      'Shop Now',
-                      style: TextStyle(
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w700,
-                        color: NwsbColors.ink,
-                      ),
-                    ),
-                  ],
+                SizedBox(height: 6),
+                Text(
+                  'Tap Shop Now to claim today’s frequency.',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    color: Color(0x8CFFFFFF),
+                    height: 1.35,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
+          const SizedBox(height: 10),
+          // Existing Chandra / Heals Mind · Shop Now banner (tap → Store).
+          GestureDetector(
+            onTap: onTap,
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+              decoration: const BoxDecoration(color: Colors.black),
+              child: Row(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF14141C),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.storefront_outlined,
+                        size: 19, color: NwsbColors.goldLight),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'HEALS $organ',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 10.5,
+                            letterSpacing: 1.4,
+                            color: Color(0x99FFFFFF),
+                          ),
+                        ),
+                        Text(
+                          word,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 19,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Container(
+                      width: 1, height: 34, color: const Color(0x1FFFFFFF)),
+                  const SizedBox(width: 12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 10),
+                    decoration:
+                        const BoxDecoration(color: NwsbColors.goldLight),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.shopping_cart_outlined,
+                            size: 15, color: NwsbColors.ink),
+                        SizedBox(width: 7),
+                        Text(
+                          'Shop Now',
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w700,
+                            color: NwsbColors.ink,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
+}
+
+/// Fashion: always glass. Normal: neo white (NeuCard flips to glass when mode on).
+Widget _tilesShell(BuildContext context, {required Widget child}) {
+  final fashion = HomeSkinScope.of(context) == HomeSkin.fashion;
+  if (fashion) {
+    return GlassWrap(
+      margin: EdgeInsets.zero,
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+      child: child,
+    );
+  }
+  return NeuCard(
+    padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+    child: child,
+  );
 }

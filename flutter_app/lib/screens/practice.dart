@@ -16,7 +16,10 @@ import 'package:flutter/material.dart';
 import '../data/content.dart';
 import '../data/models.dart';
 import '../theme/tokens.dart';
+import '../theme/player_aura.dart';
 import '../widgets/page_shell.dart';
+import '../widgets/colored_split_promo_banner.dart';
+import 'sound_library.dart';
 import 'practice_player.dart';
 import 'word_detail.dart';
 
@@ -74,7 +77,7 @@ class _PracticeScreenState extends State<PracticeScreen> {
     return PageShell(
       eyebrow: 'Today',
       title: _slotTitle[slot] ?? 'Practice',
-      film: 'assets/video/player-liquid-splash.mp4',
+      film: kPlayerSharedFilm,
       slivers: [
         SliverPadding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -93,6 +96,16 @@ class _PracticeScreenState extends State<PracticeScreen> {
                     ),
                   ),
                 ),
+              ),
+              const SizedBox(height: 18),
+              ColoredSplitPromoBanner.forSurface(
+                SplitPromoSurface.morningRitual,
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const SoundLibraryScreen(),
+                  ),
+                ),
+                margin: EdgeInsets.zero,
               ),
               const SizedBox(height: 22),
               const DarkHead(

@@ -1111,3 +1111,8 @@ body:not(.fi-ready) #fashionHomeIntro{display:none!important;visibility:hidden!i
   #home .qa-tv-head-title,#home .qa-tv-head-sub,#home-nm .nmh-wrap-head-title,#home-nm .nmh-wrap-head-sub,
   #home .spill-pill-txt,#home-nm .spill-pill-txt,.nwsb-section-motion-banner strong,.nwsb-section-motion-banner span { animation:none; }
 }
+
+
+/* Shared GSAP Flip Add to Cart flight: product image flies into the cart. */
+.nss-cart-flip-proxy { z-index:99999; pointer-events:none; object-fit:cover; border-radius:12px; border:1px solid rgba(232,213,163,.75); box-shadow:0 12px 32px rgba(0,0,0,.45),0 0 20px rgba(232,213,163,.25); transform-origin:center center; will-change:transform,width,height,opacity; }
+@media (prefers-reduced-motion:reduce){.nss-cart-flip-proxy{display:none}}

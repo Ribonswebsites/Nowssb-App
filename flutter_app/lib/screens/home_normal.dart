@@ -55,27 +55,38 @@ import 'healing_path.dart';
 import '../media/video_pool.dart';
 import 'normal/glassmorphism_theme.dart';
 import 'normal/header_actions_sheet.dart';
+import 'fashion/header.dart';
 import '../widgets/nwsb_icon.dart';
 import 'normal/neomorphic_essentials.dart';
+import '../widgets/colored_split_promo_banner.dart';
 import 'normal/horizontal_routine_cards.dart';
 import 'normal/sections_bottom.dart';
 import 'normal/sections_top.dart';
 import 'normal/rotating_promo_rail.dart';
 import 'shared_sections.dart';
+import 'fashion/sections_mid.dart';
 import 'sound_library.dart';
 import 'notifications_sheet.dart';
+import 'quick_access.dart';
 import 'widgets_page.dart';
 import '../widgets/home_menu_drawer.dart';
+import '../widgets/hero_curve_stage.dart';
+import '../widgets/editorial_banner.dart';
+import '../widgets/stories_find_you_banner.dart';
 import 'practice_player.dart';
 import 'progress/progress_screen.dart';
+import 'reader/reader_hub.dart';
 import 'subscription.dart';
+import 'store/ebooks_store.dart';
 
 /// `REG.norm.items` — app/js/part062.js:41-100, key for key and in order.
 const kNormalSectionOrder = <String>[
   'greet',
   'search',
+  'heroCurve',
   'promoRail',
   'dashboard',
+  'editorialA',
   'essentials',
   'routineCards',
   // Streak+Store video carousel (shared 2-card), then the streak text block.
@@ -88,8 +99,10 @@ const kNormalSectionOrder = <String>[
   'actionbar',
   'tiles',
   'store',
+  'editorialC',
   'reader',
   'trendwd',
+  'editorialB',
   'custom',
   'rx',
   'routines',
@@ -178,6 +191,23 @@ class _HomeNormalState extends State<HomeNormal> {
     }
   }
 
+  void _openEnter(String id) {
+    switch (id) {
+      case 'player':
+        _go(1);
+      case 'library':
+        _push(const SoundLibraryScreen());
+      case 'store':
+        _go(3);
+      case 'reader':
+        _push(const ReaderHubScreen());
+      case 'ebook':
+        _push(const EbooksStoreScreen());
+      case 'healing':
+        _push(const HealingPathScreen());
+    }
+  }
+
   void _footerLink(String key) {
     switch (key) {
       case 'about':
@@ -197,9 +227,49 @@ class _HomeNormalState extends State<HomeNormal> {
   /// The twenty-nine, in `REG.norm.items` order. A null widget is a row with
   /// no markup on this home; it keeps its place in the list so the two can
   /// be diffed by eye against part062.js.
+  /// Quick action hero chip → HeaderActionsSheet destinations.
+  /// QuickAccessScreen (nav customize) stays on settings/hamburger only.
+  void _openQuickAction() {
+    showHeaderActionsSheet(
+      context,
+      glassMode: _glassMode,
+      onGlassToggle: () => setState(() {
+        _glassMode = !_glassMode;
+        VideoPool.instance.setGlassHomeMode(_glassMode);
+      }),
+      onNotifications: () => showNotificationsSheet(context),
+      onFashionHome: () => Settings.instance.setFashionHome(true),
+      onStore: () => NavScope.goTo(context, 3),
+      onPlayer: () {
+        final words = ContentStore.instance.library;
+        if (words.isEmpty) {
+          NavScope.goTo(context, 1);
+          return;
+        }
+        Navigator.of(context).push(
+          MaterialPageRoute<void>(
+            builder: (_) => PracticePlayerScreen(
+              words: words,
+              title: 'Practice',
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   List<(String, Widget?)> _sections() => [
         ('greet', NmGreeting(name: widget.name)),
         ('search', NmSearch(onSearch: (_) => _go(2))),
+        (
+          'heroCurve',
+          HeroCurveStage(
+            compact: true,
+            onSearch: () => showDestinationSearchSheet(context),
+            // Quick action chip → HeaderActionsSheet (destinations), NOT QuickAccessScreen.
+            onQuickAccess: _openQuickAction,
+          )
+        ),
         (
           'promoRail',
           NormalPromoRail(
@@ -214,7 +284,23 @@ class _HomeNormalState extends State<HomeNormal> {
               onStart: _openDashboardSession,
               onProgress: _openDashboardProgress)
         ),
-        ('essentials', const NmSuppliedEssentials()),
+        ('editorialA', const EditorialBanner.science()),
+        (
+          'essentials',
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                child: ColoredSplitPromoBanner.forSurface(
+                  SplitPromoSurface.normalHome,
+                  onTap: () => _go(2),
+                ),
+              ),
+              const NmSuppliedEssentials(),
+            ],
+          ),
+        ),
         ('routineCards', const NmHorizontalRoutineCards()),
         (
           'herovid',
@@ -232,11 +318,20 @@ class _HomeNormalState extends State<HomeNormal> {
               onSupport: () => _go(4),
               onCoach: () => _push(const PersonalCoachScreen()))
         ),
-        // Four-tile grid removed from Normal home (was between Personal Coach and Store).
-        ('tiles', const SizedBox.shrink()),
+        // H-scroll: Flip glass brand showcase (card 0) + existing feature cards.
+        (
+          'tiles',
+          FashTiles(onTile: _go, onOpen: _openEnter),
+        ),
+        (
+          'storiesFind',
+          StoriesFindYouBanner(neumorphic: true, onTap: () => _go(2)),
+        ),
         ('store', NmStore(onTap: () => _go(3))),
-        ('reader', NmReader(onTap: () => _go(2))),
+        ('editorialC', const EditorialBanner.connect()),
+        ('reader', NmReader(onTap: () => _push(const ReaderHubScreen()))),
         ('trendwd', NmTrending(onTap: () => _go(2))),
+        ('editorialB', const EditorialBanner.healing()),
         ('custom', NmCustomize(onTap: () => _push(const WidgetsPage()))),
         ('rx', null),
         ('routines', RoutinesSection(onTap: () => _go(1))),
@@ -290,8 +385,6 @@ class _HomeNormalState extends State<HomeNormal> {
   @override
   Widget build(BuildContext context) {
     final built = _sections();
-    final bottomNavigationClearance =
-        MediaQuery.paddingOf(context).bottom + 112;
     // These are useful development diagnostics, but neither a stale generated
     // build nor a content-section patch should take down the entire home.
     assert(() {
@@ -319,6 +412,7 @@ class _HomeNormalState extends State<HomeNormal> {
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
             child: _TopRow(
               onMenu: () => _openHomeMenu(context),
+              onNotifications: () => showNotificationsSheet(context),
               glassMode: _glassMode,
               onGlassToggle: () => setState(() {
                 _glassMode = !_glassMode;
@@ -327,12 +421,20 @@ class _HomeNormalState extends State<HomeNormal> {
               }),
             ),
           ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton(
+              onPressed: () => _go(1),
+              child: const Text('Play session'),
+            ),
+          ),
           Expanded(
             child: ListView.builder(
               // Modest look-ahead: enough for smooth scroll, not enough to
               // mount every video on the home at once (N+1 decoder churn).
               cacheExtent: 480,
-              padding: EdgeInsets.only(bottom: bottomNavigationClearance),
+              // Footer paints solid black through nav clearance.
+              padding: EdgeInsets.zero,
               itemCount: shown.length,
               itemBuilder: (context, i) {
                 final (k, w) = shown[i];
@@ -363,11 +465,13 @@ class _HomeNormalState extends State<HomeNormal> {
 class _TopRow extends StatelessWidget {
   const _TopRow({
     required this.onMenu,
+    required this.onNotifications,
     required this.glassMode,
     required this.onGlassToggle,
   });
 
   final VoidCallback onMenu;
+  final VoidCallback onNotifications;
   final bool glassMode;
   final VoidCallback onGlassToggle;
 
@@ -468,15 +572,17 @@ class _TopRow extends StatelessWidget {
           ),
         ),
         const Spacer(),
-        // Right cluster: Settings | Quick access | Hamburger
+        // Right cluster: Settings | Notifications | Hamburger
+        // Quick access belongs in Fashion Hero — bell returns here.
         _HeaderButton(
           icon: Icons.settings_outlined,
-          onTap: () => Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const WidgetsPage()),
-          ),
+          onTap: () => _openActions(context),
         ),
         const _HeaderDivider(),
-        _HeaderActionsSvgButton(onTap: () => _openActions(context)),
+        _HeaderButton(
+          icon: Icons.notifications_none_rounded,
+          onTap: onNotifications,
+        ),
         const _HeaderDivider(),
         _HamburgerButton(onTap: onMenu),
       ],

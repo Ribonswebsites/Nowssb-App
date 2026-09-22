@@ -29,6 +29,8 @@ var SS_PLANS = [
     id:'resonance', name:'Resonance',
     tagline:'The full frequency. The complete practice.',
     color:'#c8e8f5', badge:'',
+    photoFront: 'assets/subscription/tier-sun-front.png',
+    photoBack: 'assets/subscription/tier-sun-back.png',
     price:{ monthly:4.99, yearly:49.99 },
     wordsPerWeek: 5,
     features:[
@@ -45,6 +47,8 @@ var SS_PLANS = [
     id:'frequency', name:'Frequency',
     tagline:'Healing is your identity. This is the full edition.',
     color:'#e8d5a3', badge:'Most Popular',
+    photoFront: 'assets/subscription/tier-bag-front.png',
+    photoBack: 'assets/subscription/tier-bag-back.png',
     price:{ monthly:9.99, yearly:99.99 },
     wordsPerWeek: 10,
     features:[
@@ -62,6 +66,8 @@ var SS_PLANS = [
     id:'frequencyX', name:'Frequency X',
     tagline:'Beyond practice. This is mastery.',
     color:'#f0f0f0', badge:'Mastery',
+    photoFront: 'assets/subscription/tier-nile-front.png',
+    photoBack: 'assets/subscription/tier-nile-back.png',
     price:{ monthly:19.99, yearly:199.99 },
     wordsPerWeek: 20,
     grantsVerifyTier: 'blue',
@@ -531,6 +537,12 @@ function ssRenderPlans() {
   var container = document.getElementById('ss-plan-cards');
   var dotsEl    = document.getElementById('ss-plan-dots');
   if (!container) return;
+  if (container.parentNode && !container.parentNode.querySelector('.ss-pricing-head')) {
+    var head = document.createElement('div');
+    head.className = 'ss-pricing-head';
+    head.innerHTML = '<span class="ss-pricing-pill">Pricing</span><h2>Simple plans, straight to your growth.</h2><p>Subscription for your daily practice. Custom when you need more.</p>';
+    container.parentNode.insertBefore(head, container);
+  }
   var tier = window.GATE ? window.GATE.tier() : ((window._userDataCache && window._userDataCache.tier) || 'free');
   var html = '';
   SS_PLANS.forEach(function(p) {
@@ -540,32 +552,23 @@ function ssRenderPlans() {
     var monthlyEquiv = (_ssBilling==='yearly' && p.price.monthly>0) ? (p.price.yearly/12).toFixed(2) : p.price.monthly;
     var borderColor = isSel ? s.accent : s.restBorder;
     var textColor = (isSel && !s.flatText) ? s.accent : s.text;
-    html += '<div class="plan-card" data-plan-id="'+p.id+'" onclick="ssSelectPlan(\''+p.id+'\')" style="border:'+(isSel?'2px':'1px')+' solid '+borderColor+';background:'+s.bg+';backdrop-filter:'+(s.glass?'blur(18px)':'none')+';-webkit-backdrop-filter:'+(s.glass?'blur(18px)':'none')+';box-shadow:'+(isSel?'0 0 0 1px '+s.accent+'55, 0 8px 28px '+s.accent+'2e':'var(--glass-shadow)')+';">';
-    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">';
-    html += '<span class="plan-card-name" style="font-size:22px;font-weight:800;color:'+textColor+';font-family:\'DM Sans\',sans-serif;">'+p.name+'</span>';
-    if (p.badge) html += '<span style="font-size:9px;font-weight:700;letter-spacing:.7px;color:'+s.accent+';background:'+s.chipBg+';padding:3px 8px;border-radius:5px;">'+p.badge.toUpperCase()+'</span>';
-    if (isCur) html += '<span style="font-size:9px;color:#6ee7b7;background:rgba(110,231,183,.12);padding:3px 8px;border-radius:5px;font-weight:700;">CURRENT</span>';
-    html += '</div>';
-    html += '<div style="font-size:13px;color:'+s.sub+';line-height:1.5;margin-bottom:18px;font-family:\'DM Sans\',sans-serif;">'+p.tagline+'</div>';
-    if (p.price.monthly===0) {
-      html += '<div class="plan-card-price" style="font-size:26px;font-weight:800;color:'+s.text+';font-family:\'DM Sans\',sans-serif;">Free</div>';
-    } else {
-      html += '<div class="plan-card-price" style="font-size:26px;font-weight:800;color:'+textColor+';font-family:\'DM Sans\',sans-serif;">$'+monthlyEquiv+'<span style="font-size:13px;font-weight:400;color:'+s.sub+';">/mo</span></div>';
-      if (_ssBilling==='yearly') html += '<div style="font-size:11px;color:'+s.sub+';font-family:\'DM Sans\',sans-serif;margin-top:2px;">$'+p.price.yearly+'/year</div>';
-    }
-    // Features — up to 7, same list on every card regardless of selection
-    html += '<div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;">';
-    p.features.forEach(function(f) {
-      var text = f[1];
-      html += '<div style="display:flex;align-items:flex-start;gap:9px;">';
-      html += '<div style="width:16px;height:16px;border-radius:50%;flex-shrink:0;margin-top:1px;background:'+s.chipBg+';border:1.5px solid '+s.accent+';display:flex;align-items:center;justify-content:center;">';
-      html += checkSvg(s.accent);
-      html += '</div>';
-      html += '<span style="font-size:12px;color:'+s.text+';font-family:\'DM Sans\',sans-serif;line-height:1.4;">'+text+'</span>';
-      html += '</div>';
+    var priceLabel = p.price.monthly===0 ? 'Free' : ('$' + monthlyEquiv + ( _ssBilling==='yearly' ? ' / year' : ' / month'));
+    html += '<div class="plan-card ss-flip-card" data-plan-id="'+p.id+'" onclick="ssSelectPlan(\''+p.id+'\')" style="border:'+(isSel?'2px':'1px')+' solid '+borderColor+';background:rgba(255,255,255,.12);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:'+(isSel?'0 0 0 1px '+s.accent+'55, 0 8px 28px '+s.accent+'2e':'var(--glass-shadow)')+';">';
+    html += '<div class="ss-flip-grid">';
+    html += '<button class="ss-flip'+(isSel?' is-back':'')+'" type="button" onclick="event.stopPropagation();this.classList.toggle(\'is-back\')">';
+    html += '<span class="ss-flip-inner">';
+    html += '<span class="ss-flip-face ss-flip-front" style="background-image:url(\''+p.photoFront+'\')">';
+    html += '<span class="ss-flip-scrim"><strong>'+p.name+'</strong><b class="plan-card-price">'+priceLabel+'</b></span></span>';
+    html += '<span class="ss-flip-face ss-flip-back" style="background-image:url(\''+p.photoBack+'\')">';
+    html += '<span class="ss-flip-scrim"><strong>'+p.name+'</strong><b>'+priceLabel+'</b></span></span>';
+    html += '</span></button>';
+    html += '<div class="ss-included">';
+    html += '<div class="ss-included-pill">What\'s Included</div>';
+    p.features.slice(0,5).forEach(function(f) {
+      html += '<div class="ss-included-row"><span class="ss-included-check">✓</span><span>'+f[1]+'</span></div>';
     });
-    html += '</div>';
-    html += '</div>';
+    html += '<button class="ss-included-cta" type="button" onclick="event.stopPropagation();ssStartSubscription(\''+p.id+'\',\''+(_ssBilling||'monthly')+'\')">Subscribe monthly <span>→</span></button>';
+    html += '</div></div></div>';
   });
   container.innerHTML = html;
   if (dotsEl) {

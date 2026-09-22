@@ -74,7 +74,7 @@ class _NormalPromoRailState extends State<NormalPromoRail>
   void initState() {
     super.initState();
     _cycle = Timer.periodic(const Duration(milliseconds: 3800), (_) {
-      if (!mounted || !TickerMode.valuesOf(context).enabled) return;
+      if (!mounted || !TickerMode.of(context)) return;
       setState(() => _page = (_page + 1) % _pageCount);
     });
   }

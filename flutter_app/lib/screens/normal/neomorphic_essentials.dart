@@ -6,7 +6,10 @@ library;
 
 import 'package:flutter/material.dart';
 
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
+
 import '../../theme/tokens.dart';
+import '../../widgets/app_thinking_loader.dart';
 import 'glassmorphism_theme.dart';
 
 class NmSuppliedEssentials extends StatefulWidget {
@@ -144,8 +147,6 @@ class _TimelineEntry extends StatelessWidget {
   final bool last;
 
   static const _base = Color(0xFFECEEF2);
-  static const _orange = Color(0xFFFF8A3D);
-  static const _orangeLight = Color(0xFFFFB44D);
 
   @override
   Widget build(BuildContext context) {
@@ -158,7 +159,7 @@ class _TimelineEntry extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           SizedBox(
-            width: 22,
+            width: 28,
             child: Column(
               children: [
                 Padding(
@@ -172,13 +173,17 @@ class _TimelineEntry extends StatelessWidget {
                           ? const LinearGradient(
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
-                              colors: [_orangeLight, _orange])
+                              colors: [
+                                Color(0xFFB794F6),
+                                Color(0xFF7E57C2),
+                              ],
+                            )
                           : null,
                       color: active ? null : _base,
                       boxShadow: active
                           ? const [
                               BoxShadow(
-                                  color: Color(0x339C6B30),
+                                  color: Color(0x337E57C2),
                                   blurRadius: 7,
                                   spreadRadius: 3),
                               BoxShadow(
@@ -188,7 +193,7 @@ class _TimelineEntry extends StatelessWidget {
                               BoxShadow(
                                   color: Colors.white,
                                   offset: Offset(-2, -2),
-                                  blurRadius: 6)
+                                  blurRadius: 6),
                             ]
                           : NwsbShadows.raisedXs,
                     ),
@@ -229,6 +234,9 @@ class _HeroEssential extends StatelessWidget {
   final String subtitle;
   final String duration;
 
+  static const _ink = Color(0xFF2A1848);
+  static const _inkSoft = Color(0xFF3D2A66);
+
   @override
   Widget build(BuildContext context) => Container(
         constraints: const BoxConstraints(minHeight: 148),
@@ -238,13 +246,13 @@ class _HeroEssential extends StatelessWidget {
           gradient: const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Color(0xFFFFB44D), Color(0xFFFF8A3D)]),
+              colors: [Color(0xFFB794F6), Color(0xFF7E57C2)]),
           boxShadow: NwsbShadows.raised,
         ),
         child: Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.only(right: 42),
+              padding: const EdgeInsets.only(right: 88),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
@@ -259,37 +267,36 @@ class _HeroEssential extends StatelessWidget {
                         child: const Text('● ● ●  543',
                             style: TextStyle(
                                 fontSize: 12.5,
-                                color: Color(0xFF6B3F13),
+                                color: _ink,
                                 fontWeight: FontWeight.w700)),
                       ),
                       const Spacer(),
                       const Text('•••',
                           style: TextStyle(
-                              fontWeight: FontWeight.w800,
-                              color: Color(0xFF6B3F13))),
+                              fontWeight: FontWeight.w800, color: _ink)),
                     ]),
                     const SizedBox(height: 14),
                     Row(children: [
-                      Icon(icon, size: 17, color: const Color(0xFF4A2A09)),
+                      Icon(icon, size: 17, color: _ink),
                       const SizedBox(width: 8),
                       Expanded(
                           child: Text(title,
                               style: const TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w800,
-                                  color: Color(0xFF4A2A09))))
+                                  color: _ink)))
                     ]),
                     const SizedBox(height: 8),
                     Row(children: [
                       const Icon(Icons.volume_up_outlined,
-                          size: 15, color: Color(0xFF5C3812)),
+                          size: 15, color: _inkSoft),
                       const SizedBox(width: 6),
                       Expanded(
                           child: Text(subtitle,
                               style: const TextStyle(
                                   fontSize: 14.5,
                                   fontWeight: FontWeight.w600,
-                                  color: Color(0xFF5C3812))))
+                                  color: _inkSoft)))
                     ]),
                     Padding(
                         padding: const EdgeInsets.only(left: 22, top: 2),
@@ -297,14 +304,20 @@ class _HeroEssential extends StatelessWidget {
                             style: const TextStyle(
                                 fontSize: 14.5,
                                 fontWeight: FontWeight.w700,
-                                color: Color(0xFF5C3812)))),
+                                color: _inkSoft))),
                   ]),
             ),
+            // Big composing orb bottom-right (replaces brown head SVG).
             const Positioned(
-                right: 2,
-                bottom: 0,
-                child: Icon(Icons.face_2_outlined,
-                    size: 70, color: Color(0xA34A2A09))),
+              right: 0,
+              bottom: 0,
+              child: AppThinkingLoader(
+                size: 64,
+                state: OrbState.composing,
+                blackCircle: true,
+                circlePad: 10,
+              ),
+            ),
           ],
         ),
       );

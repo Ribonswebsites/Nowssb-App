@@ -81,6 +81,8 @@ class FashHeroRow extends StatelessWidget {
         asset: 'assets/video/word-acts.mp4',
         frame: DeviceFrame.wordActs,
         priority: ClipPriority.feature,
+        autoplay: true,
+        showVideo: true,
         overlay: Stack(
           fit: StackFit.expand,
           children: [
@@ -140,36 +142,48 @@ class _StreakBoxes extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       child: AspectRatio(
         aspectRatio: 1536 / 450,
-        child: NwsbImage(
-          url:
-              'https://media.nowssb.com/migrated-images/8bed0983f1e9348c_file_00000000c4e072079f68c8cac5eb7d0d_lshcoa.png',
-          fit: BoxFit.contain,
-          fallback: Row(
-            children: [
-              const Expanded(child: _GlassBox(child: _BoxLabel('DAY\nSTREAK'))),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _GlassBox(
-                  child: Text(
-                    '$days',
-                    style: const TextStyle(
-                      fontFamily: 'DM Sans',
-                      fontSize: 40,
-                      fontWeight: FontWeight.w800,
-                      height: 1,
-                      color: Color(0xFF1A2230),
-                    ),
-                  ),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            const Positioned.fill(
+              child: NwsbImage(
+                url:
+                    'https://media.nowssb.com/migrated-images/8bed0983f1e9348c_file_00000000c4e072079f68c8cac5eb7d0d_lshcoa.png',
+                fit: BoxFit.cover,
+                alignment: Alignment.center,
+                fallback: const Row(
+                  children: [
+                    Expanded(child: _GlassBox(child: SizedBox.expand())),
+                    SizedBox(width: 10),
+                    Expanded(child: _GlassBox(child: SizedBox.expand())),
+                    SizedBox(width: 10),
+                    Expanded(child: _GlassBox(child: SizedBox.expand())),
+                  ],
                 ),
               ),
-              const SizedBox(width: 10),
-              const Expanded(
-                child: _GlassBox(
-                  child: _BoxLabel('KEEP\nGOING', color: Color(0xFF9C7B3A)),
+            ),
+            const Align(
+              alignment: Alignment(-0.66, -0.08),
+              child: _BoxLabel('DAY\nSTREAK'),
+            ),
+            Align(
+              alignment: const Alignment(0, -0.08),
+              child: Text(
+                '$days',
+                style: const TextStyle(
+                  fontFamily: 'DM Sans',
+                  fontSize: 40,
+                  fontWeight: FontWeight.w800,
+                  height: 1,
+                  color: Color(0xFF1A2230),
                 ),
               ),
-            ],
-          ),
+            ),
+            const Align(
+              alignment: Alignment(0.66, -0.08),
+              child: _BoxLabel('KEEP\nGOING', color: Color(0xFF9C7B3A)),
+            ),
+          ],
         ),
       ),
     );
@@ -431,22 +445,12 @@ class FashReader extends StatelessWidget {
                 'NowssB',
                 style: TextStyle(fontSize: 14, color: Color(0x99FFFFFF)),
               ),
-              const Text(
-                'Reader',
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                  height: 1.15,
-                ),
-              ),
+              TitleWithGlassEnter(title: 'Reader', onTap: onTap),
               const SizedBox(height: 6),
               const Text(
                 'Read every meaning, and every eBook.',
                 style: TextStyle(fontSize: 13, color: Color(0xB3FFFFFF)),
               ),
-              const SizedBox(height: 14),
-              EnterPill(onTap: onTap),
             ],
           ),
           const SizedBox(height: 16),
@@ -463,24 +467,29 @@ class FashReader extends StatelessWidget {
   }
 }
 
-/// 5 · herovid — Streak carousel: streak VIDEO + Start Building wrappers.
-/// Store video is NOT here — see [FashStore].
+/// 5 · herovid — streak VIDEO on the landscape tablet, matching website
+/// `.nsvb-blk`. Cubes live in [FashStreak], not as a second carousel page.
 class FashStreakVideo extends StatelessWidget {
   const FashStreakVideo({super.key, this.onTap, this.onStoreTap});
   final VoidCallback? onTap;
+
   /// Kept for call-site compatibility; Store is restored on [FashStore].
   final VoidCallback? onStoreTap;
 
   @override
   Widget build(BuildContext context) {
-    return StreakStoreCarousel(
-      onStreakTap: onTap,
-      secondCard: FashStreakBody(onTap: onTap),
+    return SectionPane(
+      child: TvFrame(
+        asset: StreakStoreCarousel.streakAsset,
+        frame: DeviceFrame.tabletLandscape,
+        priority: ClipPriority.feature,
+        onTap: onTap,
+      ),
     );
   }
 }
 
-/// Start Building Your Streak Today — full wrapper used as carousel page 2.
+/// Start Building Your Streak Today — heading, cubes, Daily Streak banner.
 class FashStreakBody extends StatelessWidget {
   const FashStreakBody({super.key, this.days = 0, this.onTap});
   final int days;
@@ -523,14 +532,17 @@ class FashStreakBody extends StatelessWidget {
   }
 }
 
-/// 6 · streak — content moved into [StreakStoreCarousel] page 2 via
-/// [FashStreakBody]. Slot kept as shrink so registry order stays intact.
+/// 6 · streak — Start Building cubes, full width, matching website
+/// `.nmh-streak-glass-section`. Not stuffed into the video carousel.
 class FashStreak extends StatelessWidget {
   const FashStreak({super.key, this.days = 0, this.onTap});
   final int days;
   final VoidCallback? onTap;
 
   @override
-  Widget build(BuildContext context) => const SizedBox.shrink();
+  Widget build(BuildContext context) {
+    return SectionPane(
+      child: FashStreakBody(days: days, onTap: onTap),
+    );
+  }
 }
-

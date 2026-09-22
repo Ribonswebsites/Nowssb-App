@@ -14,6 +14,8 @@ library;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
+import '../../widgets/app_thinking_loader.dart';
 
 import '../../widgets/nwsb_icon.dart';
 
@@ -162,7 +164,12 @@ class _SearchBarState extends State<_SearchBar> {
       ),
       child: Row(
         children: [
-          const Icon(Icons.search, size: 20, color: NwsbColors.inkFaint),
+          // Listening orb in a black disc (no left search SVG).
+          const AppThinkingLoader(
+            size: 28,
+            state: OrbState.listening,
+            circlePad: 6,
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: TextField(
@@ -416,7 +423,7 @@ class _NmPromoDiscState extends State<NmPromoDisc>
     if (_flutterTest) return;
     _spin.repeat();
     _t = Timer.periodic(const Duration(milliseconds: 1900), (_) {
-      if (!mounted || !TickerMode.valuesOf(context).enabled) return;
+      if (!mounted || !TickerMode.of(context)) return;
       setState(() {
         final lines = widget.slides[_slide].$2;
         if (_line + 1 < lines.length) {
@@ -1056,9 +1063,10 @@ class NmReader extends StatelessWidget {
           'NowssB',
           style: TextStyle(fontSize: 14, color: NwsbColors.inkSoft),
         ),
-        const Text(
-          'Reader',
-          style: TextStyle(
+        TitleWithGlassEnter(
+          title: 'Reader',
+          onTap: onTap,
+          style: const TextStyle(
             fontSize: 26,
             fontWeight: FontWeight.w800,
             color: NwsbColors.ink,
@@ -1070,7 +1078,6 @@ class NmReader extends StatelessWidget {
           'Read every meaning, and every eBook.',
           style: TextStyle(fontSize: 13, color: NwsbColors.inkSoft),
         ),
-        Align(alignment: Alignment.centerLeft, child: EnterPill(onTap: onTap)),
         SecBanner(
           title: 'Reader',
           sub: 'Meanings and eBooks, in one place',
@@ -1118,26 +1125,12 @@ class NmTrending extends StatelessWidget {
                       gradient: LinearGradient(
                         begin: Alignment.centerLeft,
                         end: Alignment.centerRight,
-                        colors: [Color(0xCC000000), Color(0x00000000)],
+                        colors: [Color(0x00000000), Color(0x66040A18)],
+                        stops: [0.45, 1],
                       ),
                     ),
                   ),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 18),
-                      child: Text(
-                        word,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 26,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
+                  TrendBannerLockup(word: word, onTap: onTap),
                 ],
               ),
             ),

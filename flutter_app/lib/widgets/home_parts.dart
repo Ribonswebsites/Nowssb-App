@@ -435,7 +435,7 @@ class _NcbCarouselState extends State<NcbCarousel> {
       _t = Timer.periodic(const Duration(milliseconds: 3200), (_) {
         // `if (document.hidden) return` — a bar nobody is looking at does
         // not need to be rebuilt every three seconds.
-        if (!mounted || !TickerMode.valuesOf(context).enabled) return;
+        if (!mounted || !TickerMode.of(context)) return;
         setState(() => _i = (_i + 1) % widget.slides.length);
       });
     }
@@ -703,11 +703,7 @@ class PhotoCard extends StatelessWidget {
   }
 }
 
-/// `.fash-banner-cta` — the dark chip that sits ON a clip.
-///
-/// The mark is the cart on every one of them: `.nmh-cta-go` carries the same
-/// trolley whether the chip says Subscribe Today or Shop Now, because both
-/// end at the same till.
+/// `.fash-banner-cta` — glass pill on a clip, cart on the right.
 class ScreenCta extends StatelessWidget {
   const ScreenCta({super.key, required this.label, this.onTap});
   final String label;
@@ -718,36 +714,51 @@ class ScreenCta extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(14, 8, 8, 8),
-        decoration: BoxDecoration(
-          color: const Color(0xB3000000),
-          border: Border.all(color: const Color(0x2EFFFFFF)),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-                color: Colors.white,
-              ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(999),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(15, 5, 4, 5),
+            decoration: BoxDecoration(
+              color: const Color(0x38FFFFFF),
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: const Color(0x73FFFFFF)),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x66000000),
+                  blurRadius: 18,
+                  offset: Offset(0, 8),
+                ),
+              ],
             ),
-            const SizedBox(width: 10),
-            Container(
-              width: 26,
-              height: 26,
-              decoration: BoxDecoration(
-                color: const Color(0x1FFFFFFF),
-                shape: BoxShape.circle,
-                border: Border.all(color: const Color(0x2EFFFFFF)),
-              ),
-              child: const Icon(Icons.shopping_cart_outlined,
-                  size: 13, color: Color(0xEBFFFFFF)),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.3,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(width: 9),
+                Container(
+                  width: 28,
+                  height: 28,
+                  decoration: BoxDecoration(
+                    color: const Color(0x1AFFFFFF),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: const Color(0x38FFFFFF)),
+                  ),
+                  child: const Icon(Icons.shopping_cart_outlined,
+                      size: 14, color: Color(0xEBFFFFFF)),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -939,6 +950,103 @@ class SectionMotionBanner extends StatelessWidget {
           ],
         ],
       ),
+    );
+  }
+}
+
+/// Today's Trending overlay: store icon on the left of the word, lockup on
+/// the right so the film stays fully visible. Matches `.nmh-trend-banner-*`.
+class TrendBannerLockup extends StatelessWidget {
+  const TrendBannerLockup({super.key, required this.word, this.onTap});
+  final String word;
+  final VoidCallback? onTap;
+
+  static const iconUrl =
+      'https://media.nowssb.com/migrated-images/86a1283688196499_ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png';
+
+  @override
+  Widget build(BuildContext context) {
+    if (word.isEmpty) return const SizedBox.shrink();
+    return Align(
+      alignment: Alignment.centerRight,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(18, 0, 22, 0),
+        child: GestureDetector(
+          onTap: onTap,
+          behavior: HitTestBehavior.opaque,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(
+                width: 28,
+                height: 28,
+                child: NwsbImage(
+                  url: TrendBannerLockup.iconUrl,
+                  fit: BoxFit.contain,
+                ),
+              ),
+              const SizedBox(width: 10),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 180),
+                child: Text(
+                  word,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.right,
+                  style: const TextStyle(
+                    fontFamily: 'DM Sans',
+                    fontSize: 19,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                    height: 1.3,
+                    shadows: [
+                      Shadow(color: Color(0x99000000), blurRadius: 10, offset: Offset(0, 2)),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Title on the left, glass Enter pill on the same line to the right.
+class TitleWithGlassEnter extends StatelessWidget {
+  const TitleWithGlassEnter({
+    super.key,
+    required this.title,
+    this.onTap,
+    this.style = const TextStyle(
+      fontSize: 26,
+      fontWeight: FontWeight.w800,
+      color: Colors.white,
+      height: 1.15,
+    ),
+  });
+
+  final String title;
+  final VoidCallback? onTap;
+  final TextStyle style;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(
+          child: Text(
+            title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: style,
+          ),
+        ),
+        const SizedBox(width: 12),
+        GlassEnterPill(onTap: onTap),
+      ],
     );
   }
 }

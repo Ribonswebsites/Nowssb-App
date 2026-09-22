@@ -5,30 +5,64 @@ import 'package:cached_network_image/cached_network_image.dart';
 
 import '../data/cart_bag.dart';
 import '../theme/tokens.dart';
+import 'nwsb_icon.dart';
 
 /// Recreates the reference micro-interaction: the product pops out of the
 /// pressed button, the cart rolls in to catch it, then exits toward the cart
 /// chip. It is an overlay so the product page does not re-layout during flight.
 class CartAddAnimation {
   CartAddAnimation._();
+  static bool _busy = false;
 
+  /// Adds once, animates in the root overlay, and completes after the flight.
+  static Future<void> playForContext(
+    BuildContext context, {
+    required BagItem item,
+    GlobalKey? pressedKey,
+    BuildContext? pressedContext,
+    GlobalKey? cartTargetKey,
+    VoidCallback? onComplete,
+    bool openCartAfter = false,
+  }) async {
+    if (_busy) return;
+    _busy = true;
+    try {
+      await CartBag.instance.addCart(item);
+      final reduceMotion =
+          MediaQuery.maybeOf(context)?.disableAnimations ?? false;
+      if (reduceMotion) {
+        onComplete?.call();
+        return;
+      }
+      play(
+        context,
+        fromKey: pressedKey,
+        fromContext: pressedContext ?? context,
+        targetKey: cartTargetKey,
+        item: item,
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 1080));
+      onComplete?.call();
+    } finally {
+      _busy = false;
+    }
+  }
+
+  @Deprecated('Use playForContext')
   static Future<void> addAndPlay(
     BuildContext context, {
     required BagItem item,
     GlobalKey? fromKey,
     BuildContext? fromContext,
     GlobalKey? targetKey,
-  }) async {
-    await CartBag.instance.addCart(item);
-    play(
-      context,
-      fromKey: fromKey,
-      fromContext: fromContext ?? context,
-      targetKey: targetKey,
-      item: item,
-    );
-    await Future<void>.delayed(const Duration(milliseconds: 1080));
-  }
+  }) =>
+      playForContext(
+        context,
+        item: item,
+        pressedKey: fromKey,
+        pressedContext: fromContext,
+        cartTargetKey: targetKey,
+      );
 
   static void play(
     BuildContext context, {
@@ -40,9 +74,8 @@ class CartAddAnimation {
     final from = fromKey == null
         ? _rectForContext(fromContext ?? context)
         : _rectFor(fromKey);
-    final target = targetKey == null
-        ? _fallbackTarget(context)
-        : _rectFor(targetKey);
+    final target =
+        targetKey == null ? _fallbackTarget(context) : _rectFor(targetKey);
     if (from == null || target == null) return;
     final overlay = Overlay.of(context, rootOverlay: true);
     late OverlayEntry entry;
@@ -127,17 +160,40 @@ class _CartFlightState extends State<_CartFlight>
         animation: _controller,
         builder: (_, __) {
           final value = _controller.value;
-          final travel = Curves.easeInOutCubic.transform(value);
-          final arc = math.sin(math.pi * travel) * -78;
-          final itemCenter = Offset.lerp(widget.from.center, widget.target.center, travel)! + Offset(0, arc);
-          final itemSize = math.max(26.0, math.min(widget.from.width, 72.0));
-          final itemScale = value < .16
-              ? Curves.easeOutBack.transform((value / .16).clamp(0.0, 1.0).toDouble())
-              : (value < .76 ? 1.0 - ((value - .16) / .60) * .58 : .42);
-          final itemOpacity = value < .74 ? 1.0 : (1 - ((value - .74) / .20)).clamp(0.0, 1.0).toDouble();
-          final cartProgress = Curves.easeOutCubic.transform(((value - .56) / .18).clamp(0.0, 1.0).toDouble());
-          final cartScale = .52 + cartProgress * .48 + (value > .74 ? math.sin((value - .74) * math.pi / .26) * .14 : 0);
-          final cartOpacity = ((value - .50) / .14).clamp(0.0, 1.0).toDouble();
+          final itemSize =
+              math.max(28.0, math.min(widget.from.width * .72, 68.0));
+          final button = widget.from.center;
+          final target = widget.target.center;
+          final catchPoint = Offset(button.dx, button.dy);
+          final itemPop = Curves.easeOutBack.transform(
+            (value / .18).clamp(0.0, 1.0).toDouble(),
+          );
+          final itemCenter = value < .22
+              ? button + Offset(0, -10 * itemPop)
+              : Offset.lerp(
+                  catchPoint,
+                  target,
+                  Curves.easeInOutCubic.transform(
+                    ((value - .22) / .78).clamp(0.0, 1.0).toDouble(),
+                  ))!;
+          final itemScale = value < .18 ? itemPop : .92;
+          final itemOpacity = value < .70
+              ? 1.0
+              : (1 - ((value - .70) / .18)).clamp(0.0, 1.0).toDouble();
+          final cartIn = Curves.easeOutCubic.transform(
+            ((value - .16) / .30).clamp(0.0, 1.0).toDouble(),
+          );
+          final cartOut = Curves.easeInCubic.transform(
+            ((value - .52) / .48).clamp(0.0, 1.0).toDouble(),
+          );
+          final cartStart = Offset(button.dx + 110, button.dy);
+          final cartCenter = value < .52
+              ? Offset.lerp(cartStart, catchPoint, cartIn)!
+              : Offset.lerp(catchPoint, target, cartOut)!;
+          final cartOpacity = ((value - .08) / .12).clamp(0.0, 1.0).toDouble();
+          final cartRotation =
+              -math.pi * 2.0 * (value < .52 ? cartIn : 1 + cartOut);
+          final cartScale = .76 + (value < .52 ? cartIn * .24 : .24);
           return Stack(
             children: [
               Positioned(
@@ -152,13 +208,16 @@ class _CartFlightState extends State<_CartFlight>
                 ),
               ),
               Positioned(
-                left: widget.target.center.dx - 28,
-                top: widget.target.center.dy - 28,
-                child: Transform.scale(
-                  scale: cartScale,
-                  child: Opacity(
-                    opacity: cartOpacity,
-                    child: _RollingCart(size: 56),
+                left: cartCenter.dx - 28,
+                top: cartCenter.dy - 28,
+                child: Transform.rotate(
+                  angle: cartRotation,
+                  child: Transform.scale(
+                    scale: cartScale,
+                    child: Opacity(
+                      opacity: cartOpacity,
+                      child: _RollingCart(size: 56),
+                    ),
                   ),
                 ),
               ),
@@ -196,9 +255,8 @@ class _FlyingItem extends StatelessWidget {
               : CachedNetworkImage(
                   imageUrl: item.image,
                   fit: BoxFit.cover,
-                  errorWidget: (_, __, ___) => const ColoredBox(
-                    color: NwsbColors.deep,
-                  ),
+                  errorWidget: (_, __, ___) =>
+                      const ColoredBox(color: NwsbColors.deep),
                 ),
         ),
       ),
@@ -224,7 +282,7 @@ class _RollingCart extends StatelessWidget {
           BoxShadow(color: Color(0xB3000000), blurRadius: 18, spreadRadius: 2),
         ],
       ),
-      child: Icon(Icons.shopping_bag_outlined, color: NwsbColors.ink, size: 25),
+      child: const NwsbIcon(NwsbMarks.cart, size: 24, color: NwsbColors.ink),
     );
   }
 }

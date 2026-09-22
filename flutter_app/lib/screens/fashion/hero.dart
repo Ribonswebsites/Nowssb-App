@@ -62,36 +62,20 @@ class _Rail {
 
 const _rail = [
   // The subscription block's own gold clip.
-  _Rail(
-      NwsbMarks.crown,
-      'The Full Library',
-      'NowssB Subscription',
-      'assets/video/hero-subscription.mp4',
-      3),
+  _Rail(NwsbMarks.crown, 'The Full Library', 'NowssB Subscription',
+      'assets/video/subscription-a.mp4', 3),
   // The clip a word page opens with — NWSB_WORD_BANNER_VID.
-  _Rail(
-      NwsbMarks.word,
-      'Where a word begins',
-      'NowssB Word Store',
-      'assets/video/hero-word-store.mp4',
-      3),
+  _Rail(NwsbMarks.word, 'Where a word begins', 'NowssB Word Store',
+      'assets/video/hero-word-store.mp4', 3),
   // The clip every meaning's page opens with — MS_MEANING_VID.
-  _Rail(
-      NwsbMarks.meaning,
-      'What a word truly means',
-      'NowssB Meaning Store',
-      'assets/video/hero-meaning-store.mp4',
-      3),
+  _Rail(NwsbMarks.meaning, 'What a word truly means', 'NowssB Meaning Store',
+      'assets/video/hero-meaning-store.mp4', 3),
   _Rail(NwsbMarks.signature, 'The rarest word', 'The Signature',
       'assets/video/signature-banner.mp4', 3),
   // The eBooks banner clip — and NOT the little one spinning in the spill
   // disc, which is the mistake part083.js:130 records having made.
-  _Rail(
-      NwsbMarks.book,
-      'Page by page',
-      'NowssB eBooks',
-      'assets/video/hero-ebooks.mp4',
-      2),
+  _Rail(NwsbMarks.book, 'Page by page', 'NowssB eBooks',
+      'assets/video/hero-ebooks.mp4', 2),
   _Rail(NwsbMarks.sound, 'Every word you own', 'Sound Library',
       'assets/video/sound-library-banner.mp4', 2),
 ];
@@ -104,12 +88,14 @@ class FashionHero extends StatefulWidget {
     this.onSearch,
     this.onStore,
     this.onRail,
+    this.onQuickAccess,
   });
 
   final VoidCallback? onExplore;
   final VoidCallback? onGuide;
   final VoidCallback? onSearch;
   final VoidCallback? onStore;
+  final VoidCallback? onQuickAccess;
 
   /// Called with the banner's destination tab.
   final void Function(int dest)? onRail;
@@ -153,7 +139,7 @@ class _FashionHeroState extends State<FashionHero> {
       // `visible()` — :573. The rail stops when the home is not the screen
       // you are on and when the app is in the background. TickerMode is
       // both of those in Flutter.
-      if (!mounted || !TickerMode.valuesOf(context).enabled) return;
+      if (!mounted || !TickerMode.of(context)) return;
       if (!_deck.hasClients) return;
       if (DateTime.now().isBefore(_held)) return;
       _i = (_i + 1) % _cells;
@@ -234,6 +220,7 @@ class _FashionHeroState extends State<FashionHero> {
                   onGuide: widget.onGuide,
                   onSearch: widget.onSearch,
                   onStore: widget.onStore,
+                  onQuickAccess: widget.onQuickAccess,
                   // Only the cell on screen decodes. Off-cell clips are stills,
                   // which is what "no src at all until its turn" buys on the web.
                   live: _i == 0,
@@ -272,7 +259,7 @@ class _FashionHeroState extends State<FashionHero> {
 /// left slack under the set. The top one is the shop disc and the search
 /// pill — both 44. The foot is the two bordered buttons, which come to about
 /// 37, and the Learn disc at 34.
-const double _topStripH = 50;
+const double _topStripH = 44;
 const double _footStripH = 42;
 
 /// Cell 0 — `.hs-hero-cell`. The strip, the set, the strip.
@@ -284,6 +271,7 @@ class _HeroCard extends StatelessWidget {
     this.onGuide,
     this.onSearch,
     this.onStore,
+    this.onQuickAccess,
     this.onLearn,
     this.onStep,
   });
@@ -299,6 +287,7 @@ class _HeroCard extends StatelessWidget {
   final VoidCallback? onGuide;
   final VoidCallback? onSearch;
   final VoidCallback? onStore;
+  final VoidCallback? onQuickAccess;
 
   /// The white disc, and the way back out of the guide.
   final VoidCallback? onLearn;
@@ -319,8 +308,7 @@ class _HeroCard extends StatelessWidget {
           SizedBox(
             height: _topStripH,
             child: Row(
-              // Same two groups: the shop keeps left and shrinks if it must,
-              // the search sits in the right-hand corner at its own size.
+              // Shop left + search only. Quick access lives in HeroCurveStage.
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Flexible(child: _ShopChip(onTap: onStore)),
@@ -563,14 +551,14 @@ class _ShopChip extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 44,
-            height: 44,
+            width: 40,
+            height: 40,
             decoration: const BoxDecoration(
               color: Colors.white,
               shape: BoxShape.circle,
             ),
             child: const Center(
-              child: NwsbIcon(NwsbMarks.bag, size: 20, color: NwsbColors.ink),
+              child: NwsbIcon(NwsbMarks.bag, size: 18, color: NwsbColors.ink),
             ),
           ),
           const SizedBox(width: 10),
@@ -613,6 +601,47 @@ class _ShopChip extends StatelessWidget {
 
 /// `.hs-searchpill` — the one control on this card that is a live invitation
 /// rather than a label, so it says what it is and wears a ring.
+
+/// Top-right Quick action control on the Fashion hero header.
+class _QuickAccessChip extends StatelessWidget {
+  const _QuickAccessChip({this.onTap});
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        height: 36,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: const Color(0x22FFFFFF),
+          borderRadius: BorderRadius.circular(99),
+          border: Border.all(color: const Color(0x44FFFFFF)),
+        ),
+        child: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.apps_rounded, size: 16, color: Colors.white),
+            SizedBox(width: 6),
+            Text(
+              'Quick action',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.1,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _SearchPill extends StatelessWidget {
   const _SearchPill({this.onTap});
   final VoidCallback? onTap;
@@ -623,7 +652,7 @@ class _SearchPill extends StatelessWidget {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
-        padding: const EdgeInsets.fromLTRB(14, 4, 4, 4),
+        padding: const EdgeInsets.fromLTRB(12, 2, 2, 2),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(28),
@@ -642,8 +671,8 @@ class _SearchPill extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Container(
-              width: 36,
-              height: 36,
+              width: 34,
+              height: 34,
               decoration: const BoxDecoration(
                 color: Color(0xFF14141C),
                 shape: BoxShape.circle,
@@ -651,7 +680,7 @@ class _SearchPill extends StatelessWidget {
               // `.hero-search-btn` carries assets/icons/search.webp, which
               // is in the repository — the one mark on this card that is a
               // picture rather than a path.
-              padding: const EdgeInsets.all(9),
+              padding: const EdgeInsets.all(8),
               child: Image.asset(
                 'assets/icons/search.webp',
                 errorBuilder: (_, __, ___) =>
@@ -757,11 +786,11 @@ class _ScreenState extends State<_Screen> {
     super.initState();
     if (_flutterTest) return;
     _wt = Timer.periodic(const Duration(seconds: 4), (_) {
-      if (!mounted || !TickerMode.valuesOf(context).enabled) return;
+      if (!mounted || !TickerMode.of(context)) return;
       setState(() => _w = (_w + 1) % _words.length);
     });
     _tt = Timer.periodic(const Duration(milliseconds: 2500), (_) {
-      if (!mounted || !TickerMode.valuesOf(context).enabled) return;
+      if (!mounted || !TickerMode.of(context)) return;
       setState(() => _t = (_t + 1) % _tags.length);
     });
   }

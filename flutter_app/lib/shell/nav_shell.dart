@@ -4,6 +4,7 @@ library;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../theme/tokens.dart';
 import '../data/settings.dart';
 import '../data/content.dart';
@@ -12,7 +13,6 @@ import '../screens/home_normal.dart';
 import '../screens/sound_library.dart';
 import '../screens/practice.dart';
 import '../screens/practice_player.dart';
-import '../screens/hearing_safety_player.dart';
 import '../screens/profile.dart';
 import '../screens/progress/progress_screen.dart';
 import '../screens/store.dart';
@@ -46,9 +46,6 @@ class NavScope extends InheritedWidget {
 
 class _NavShellState extends State<NavShell> {
   int _i = Settings.instance.lastTab;
-  Timer? _tabTransitionTimer;
-  bool _tabTransitioning = false;
-  int _transitionTarget = 0;
 
   /// Which home. The website keeps both in the DOM and switches a class;
   /// here it is two different screens rather than two skins — see
@@ -67,7 +64,6 @@ class _NavShellState extends State<NavShell> {
 
   @override
   void dispose() {
-    _tabTransitionTimer?.cancel();
     Settings.instance.removeListener(_onSettings);
     PlaybackSession.instance.removeListener(_onSettings);
     super.dispose();
@@ -77,10 +73,57 @@ class _NavShellState extends State<NavShell> {
     if (mounted) setState(() {});
   }
 
-  void _openHearingSafety() {
-    if (!PlaybackSession.instance.active) return;
+  void _openMiniPlayer() {
+    final session = PlaybackSession.instance;
+    if (!session.active || session.words.isEmpty) return;
+    session.expand();
     Navigator.of(context).push(
-      MaterialPageRoute<void>(builder: (_) => const HearingSafetyPlayerScreen()),
+      MaterialPageRoute<void>(
+        builder: (_) => PracticePlayerScreen(
+          words: session.words,
+          title: session.title.isEmpty ? 'NowssB' : session.title,
+          showIntro: false,
+        ),
+      ),
+    );
+  }
+
+  Widget _fashionHomeChip() {
+    return GestureDetector(
+      onTap: () => Settings.instance.setFashionHome(!_fashion),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: _fashion ? Colors.white : Colors.black,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x33000000),
+              blurRadius: 14,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              _fashion ? Icons.light_mode : Icons.dark_mode,
+              size: 14,
+              color: _fashion ? Colors.black : Colors.white,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              _fashion ? 'Normal home' : 'Fashion home',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                color: _fashion ? Colors.black : Colors.white,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -99,48 +142,105 @@ class _NavShellState extends State<NavShell> {
   void _goToTab(int tab) {
     _popShellOverlays();
     if (tab == _i) return;
-    _tabTransitionTimer?.cancel();
-    final reduced = MediaQuery.maybeOf(context)?.disableAnimations ?? false;
-    if (!reduced) {
-      setState(() {
-        _tabTransitioning = true;
-        _transitionTarget = tab;
-      });
-      _tabTransitionTimer = Timer(const Duration(milliseconds: 110), () {
-        if (!mounted) return;
-        setState(() => _i = tab);
-        Settings.instance.setLastTab(tab);
-        _tabTransitionTimer = Timer(const Duration(milliseconds: 360), () {
-          if (mounted) setState(() => _tabTransitioning = false);
-        });
-      });
-      return;
-    }
     Settings.instance.fadeBackgroundForNavigation();
     setState(() => _i = tab);
     Settings.instance.setLastTab(tab);
   }
 
   static const _navFeatures = <String, Map<String, String>>{
-    'connect': {'label': 'Connect', 'img': 'https://media.nowssb.com/migrated-images/ea559460014dd8d9_file_00000000b84c7209ab496862cacd6a7f_kagsie.png'},
-    'practice': {'label': 'Practice', 'img': 'https://media.nowssb.com/migrated-images/44ed38a222535b9c_38538b80-56d8-11f1-8fad-095787cce754_xam2bb.png'},
-    'library': {'label': 'Library', 'img': 'https://media.nowssb.com/migrated-images/62e5d0908e54a2a6_c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png'},
-    'store': {'label': 'Store', 'img': 'https://media.nowssb.com/migrated-images/86a1283688196499_ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png'},
-    'profile': {'label': 'Profile', 'img': 'https://media.nowssb.com/migrated-images/3979b9fa35b579e6_62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png'},
-    'progress': {'label': 'Progress', 'img': 'https://media.nowssb.com/migrated-images/0480c10b8a8d79dd_file_00000000ae607208aa51504989648920_ml2czc.png'},
-    'wordscience': {'label': 'Word Sci', 'img': 'https://media.nowssb.com/migrated-images/dd44cf9fc35b783c_file_0000000086d872089ce376674620d5f3_mtfftb.png'},
-    'meaningstore': {'label': 'Meaning', 'img': 'https://media.nowssb.com/migrated-images/1a5f669e63dbae9d_file_00000000854881fa9a548a68fae59c15_w1utya.png'},
-    'search': {'label': 'Search', 'img': 'https://media.nowssb.com/migrated-images/8d85320f63c3e176_file_00000000029c7208b5e915d9af2c480c_tuccwo.png'},
-    'cart': {'label': 'Cart', 'img': 'https://media.nowssb.com/migrated-images/311c26afee2bc52c_file_00000000f02c72088cd128f3f4b08af5_vskoom.png'},
-    'wishlist': {'label': 'Wishlist', 'img': 'https://media.nowssb.com/migrated-images/a74a9935fb237eb8_file_0000000055d8720895f7ba98c4a7bf4a_s2lzab.png'},
-    'routines': {'label': 'Routines', 'img': 'https://media.nowssb.com/migrated-images/307233cd22669455_file_00000000f740820ba6aaa761133e8889_fitm0p.png'},
-    'chat': {'label': 'Chat', 'img': 'https://media.nowssb.com/migrated-images/db15f3026ea179dc_1ae1b990-5bf2-11f1-8248-b91d5cd919c2_z3xi3j.png'},
-    'ai': {'label': 'AI Rx', 'img': 'https://media.nowssb.com/migrated-images/41c9ed21b2822c90_file_0000000062a882089abd27eb90ea3945_ngqyu6.png'},
-    'streak': {'label': 'Streak', 'img': 'https://media.nowssb.com/migrated-images/f82047a0e727766b_file_0000000010fc820891f9e15a38316d2b_ffffhq.png'},
-    'settings': {'label': 'Settings', 'img': 'https://media.nowssb.com/migrated-images/523b5889d13cb14a_260480b0-56d8-11f1-8fad-095787cce754_rz6zbi.png'},
-    'everything': {'label': 'Everything', 'img': 'https://media.nowssb.com/migrated-images/47f9e2c9fad5a78f_file_00000000be547207aaa56f43cfef4f67_nxhvw0.png'},
+    'connect': {
+      'label': 'Connect',
+      'img':
+          'https://media.nowssb.com/migrated-images/ea559460014dd8d9_file_00000000b84c7209ab496862cacd6a7f_kagsie.png'
+    },
+    'practice': {
+      'label': 'Practice',
+      'img':
+          'https://media.nowssb.com/migrated-images/44ed38a222535b9c_38538b80-56d8-11f1-8fad-095787cce754_xam2bb.png'
+    },
+    'library': {
+      'label': 'Library',
+      'img':
+          'https://media.nowssb.com/migrated-images/62e5d0908e54a2a6_c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png'
+    },
+    'store': {
+      'label': 'Store',
+      'img':
+          'https://media.nowssb.com/migrated-images/86a1283688196499_ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png'
+    },
+    'profile': {
+      'label': 'Profile',
+      'img':
+          'https://media.nowssb.com/migrated-images/3979b9fa35b579e6_62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png'
+    },
+    'progress': {
+      'label': 'Progress',
+      'img':
+          'https://media.nowssb.com/migrated-images/0480c10b8a8d79dd_file_00000000ae607208aa51504989648920_ml2czc.png'
+    },
+    'wordscience': {
+      'label': 'Word Sci',
+      'img':
+          'https://media.nowssb.com/migrated-images/dd44cf9fc35b783c_file_0000000086d872089ce376674620d5f3_mtfftb.png'
+    },
+    'meaningstore': {
+      'label': 'Meaning',
+      'img':
+          'https://media.nowssb.com/migrated-images/1a5f669e63dbae9d_file_00000000854881fa9a548a68fae59c15_w1utya.png'
+    },
+    'search': {
+      'label': 'Search',
+      'img':
+          'https://media.nowssb.com/migrated-images/8d85320f63c3e176_file_00000000029c7208b5e915d9af2c480c_tuccwo.png'
+    },
+    'cart': {
+      'label': 'Cart',
+      'img':
+          'https://media.nowssb.com/migrated-images/311c26afee2bc52c_file_00000000f02c72088cd128f3f4b08af5_vskoom.png'
+    },
+    'wishlist': {
+      'label': 'Wishlist',
+      'img':
+          'https://media.nowssb.com/migrated-images/a74a9935fb237eb8_file_0000000055d8720895f7ba98c4a7bf4a_s2lzab.png'
+    },
+    'routines': {
+      'label': 'Routines',
+      'img':
+          'https://media.nowssb.com/migrated-images/307233cd22669455_file_00000000f740820ba6aaa761133e8889_fitm0p.png'
+    },
+    'chat': {
+      'label': 'Chat',
+      'img':
+          'https://media.nowssb.com/migrated-images/db15f3026ea179dc_1ae1b990-5bf2-11f1-8248-b91d5cd919c2_z3xi3j.png'
+    },
+    'ai': {
+      'label': 'AI Rx',
+      'img':
+          'https://media.nowssb.com/migrated-images/41c9ed21b2822c90_file_0000000062a882089abd27eb90ea3945_ngqyu6.png'
+    },
+    'streak': {
+      'label': 'Streak',
+      'img':
+          'https://media.nowssb.com/migrated-images/f82047a0e727766b_file_0000000010fc820891f9e15a38316d2b_ffffhq.png'
+    },
+    'settings': {
+      'label': 'Settings',
+      'img':
+          'https://media.nowssb.com/migrated-images/523b5889d13cb14a_260480b0-56d8-11f1-8fad-095787cce754_rz6zbi.png'
+    },
+    'everything': {
+      'label': 'Everything',
+      'img':
+          'https://media.nowssb.com/migrated-images/47f9e2c9fad5a78f_file_00000000be547207aaa56f43cfef4f67_nxhvw0.png'
+    },
   };
-  int? _primaryTab(String id) => const {'connect': 0, 'practice': 1, 'library': 2, 'store': 3, 'profile': 4}[id];
+  int? _primaryTab(String id) => const {
+        'connect': 0,
+        'practice': 1,
+        'library': 2,
+        'store': 3,
+        'profile': 4
+      }[id];
   void _goToSlot(String id) {
     final tab = _primaryTab(id);
     if (tab != null) {
@@ -152,14 +252,15 @@ class _NavShellState extends State<NavShell> {
       // Progress is NOT a tab root — push the dedicated screen only.
       _popShellOverlays();
       Navigator.of(context).push(MaterialPageRoute(
-        builder: (_) => PracticeProgressScreen(words: ContentStore.instance.library),
+        builder: (_) =>
+            PracticeProgressScreen(words: ContentStore.instance.library),
       ));
       return;
     }
     _popShellOverlays();
-    Navigator.of(context).push(MaterialPageRoute(builder: (_) => const QuickAccessScreen()));
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (_) => const QuickAccessScreen()));
   }
-
 
   /// Keep inactive tabs mounted (IndexedStack) but off-stage so their videos
   /// do not claim VideoPool decoders. NwsbVideo already respects Offstage.
@@ -183,234 +284,182 @@ class _NavShellState extends State<NavShell> {
   }
 
   Widget _build(BuildContext context) {
-    return Scaffold(
-      // Deep (not surface light) so the chin under the floating pill is never
-      // a stray white home-indicator / divider line on Library and dark tabs.
-      backgroundColor: NwsbColors.deep,
-      body: Stack(
-        children: [
-          // IndexedStack rather than swapping the child: it keeps each tab's
-          // scroll position and state alive, which is what the website does
-          // (its screens are all in the DOM at once, one of them .active).
-          IndexedStack(
-            index: _i,
-            children: [
-              // Offstage + TickerMode: inactive IndexedStack tabs still layout,
-              // so without this their NwsbVideos keep claiming VideoPool seats
-              // and the visible tab (and player overlays) starve — "playing 1".
-              _tabAlive(0, _fashion ? const HomeFashion() : const HomeNormal()),
-              _tabAlive(1, const PracticeScreen()),
-              // Bottom-nav Library must be the media-rich Sound Library (website
-              // SLM), NOT the old plain letter list in library.dart.
-              _tabAlive(2, const SoundLibraryScreen(embedded: true)),
-              _tabAlive(3, const StoreScreen()),
-              // Tab 4 is always account Profile — never PracticeProgressScreen.
-              _tabAlive(4, const ProfileScreen()),
-            ],
-          ),
-          if (_tabTransitioning)
-            Positioned.fill(
-              child: IgnorePointer(
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 320),
-                  switchInCurve: Curves.easeOutCubic,
-                  switchOutCurve: Curves.easeInCubic,
-                  child: Center(
-                    key: ValueKey(_transitionTarget),
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: const Color(0xE6060C18),
-                        borderRadius: BorderRadius.circular(26),
-                        border: Border.all(color: const Color(0x66E8D5A3)),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Color(0x66000000),
-                            blurRadius: 26,
-                            spreadRadius: 5,
-                          ),
-                        ],
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 22,
-                          vertical: 13,
+    final lightHome = _i == 0 && !_fashion;
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: lightHome ? Brightness.dark : Brightness.light,
+        systemNavigationBarColor:
+            lightHome ? NwsbColors.surface : NwsbColors.deep,
+        systemNavigationBarIconBrightness:
+            lightHome ? Brightness.dark : Brightness.light,
+        systemNavigationBarDividerColor: Colors.transparent,
+      ),
+      child: Scaffold(
+        // Match the visible tab so the home-indicator strip is never a black
+        // chin on Normal home, and never a white line on dark tabs.
+        backgroundColor: lightHome ? NwsbColors.surface : NwsbColors.deep,
+        body: Stack(
+          children: [
+            // IndexedStack rather than swapping the child: it keeps each tab's
+            // scroll position and state alive, which is what the website does
+            // (its screens are all in the DOM at once, one of them .active).
+            IndexedStack(
+              index: _i,
+              children: [
+                // Offstage + TickerMode: inactive IndexedStack tabs still layout,
+                // so without this their NwsbVideos keep claiming VideoPool seats
+                // and the visible tab (and player overlays) starve — "playing 1".
+                _tabAlive(
+                    0, _fashion ? const HomeFashion() : const HomeNormal()),
+                _tabAlive(1, const PracticeScreen()),
+                // Bottom-nav Library must be the media-rich Sound Library (website
+                // SLM), NOT the old plain letter list in library.dart.
+                _tabAlive(2, const SoundLibraryScreen(embedded: true)),
+                _tabAlive(3, const StoreScreen()),
+                // Tab 4 is always account Profile — never PracticeProgressScreen.
+                _tabAlive(4, const ProfileScreen()),
+              ],
+            ),
+            // Fashion-home switch + mini player share one row above the nav.
+            if (_i == 0 || PlaybackSession.instance.showPill)
+              Positioned(
+                // Inset mode pill from screen/card edge (Normal/Fashion toggle).
+                left: 20,
+                right: 20,
+                bottom: 88,
+                child: SafeArea(
+                  top: false,
+                  child: Row(
+                    children: [
+                      if (_i == 0) _fashionHomeChip(),
+                      if (_i == 0 && PlaybackSession.instance.showPill) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          width: 1,
+                          height: 22,
+                          color: const Color(0x66FFFFFF),
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.auto_awesome,
-                              color: NwsbColors.goldLight,
-                              size: 17,
-                            ),
-                            const SizedBox(width: 9),
-                            Text(
-                              _transitionTarget == 1
-                                  ? 'Practice'
-                                  : (_navFeatures.values.elementAt(_transitionTarget)['label'] ?? 'Opening'),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: .4,
-                              ),
-                            ),
-                          ],
+                        const SizedBox(width: 8),
+                      ],
+                      if (PlaybackSession.instance.showPill)
+                        Expanded(
+                          child: MiniPlayerPill(onOpen: _openMiniPlayer),
                         ),
-                      ),
-                    ),
+                    ],
                   ),
                 ),
               ),
-            ),
-          // The switch between the two homes. On the website this lives in
-          // Customize; until that screen is ported it is here, because a
-          // home you cannot reach may as well not be built.
-          if (_i == 0)
+
+            // Debug only, and compiled out of a release build: the decoder
+            // count, live, so the ceiling is something you can watch rather
+            // than something you have to take on trust.
+            const Positioned(
+                top: 4, right: 8, child: SafeArea(child: PoolHud())),
             Positioned(
-              left: 14,
-              bottom: PlaybackSession.instance.showPill ? 158 : 92,
+              left: 0,
+              right: 0,
+              bottom: 14,
               child: SafeArea(
                 top: false,
-                child: GestureDetector(
-                  onTap: () => Settings.instance.setFashionHome(!_fashion),
-                  child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-                    decoration: BoxDecoration(
-                      color: _fashion ? Colors.white : Colors.black,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Color(0x33000000),
-                          blurRadius: 14,
-                          offset: Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          _fashion ? Icons.light_mode : Icons.dark_mode,
-                          size: 15,
-                          color: _fashion ? Colors.black : Colors.white,
-                        ),
-                        const SizedBox(width: 7),
-                        Text(
-                          _fashion ? 'Normal home' : 'Fashion home',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            color: _fashion ? Colors.black : Colors.white,
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints:
+                        const BoxConstraints(maxWidth: double.infinity),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      child: Builder(builder: (context) {
+                        final settings = Settings.instance;
+                        final radius = settings.navShape == 'pill'
+                            ? 40.0
+                            : settings.navShape == 'rect'
+                                ? (settings.navCorner == 'rounded' ? 20.0 : 2.0)
+                                : 33.0;
+                        final background = settings.navColor == 'black'
+                            ? const Color(0xF5000000)
+                            : const Color(0xF5182033);
+                        return Container(
+                          height: 58,
+                          decoration: BoxDecoration(
+                            color: background,
+                            borderRadius: BorderRadius.circular(radius),
+                            border: Border.all(color: const Color(0x22FFFFFF)),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-
-          // Mini player pill — above bottom nav on every tab (incl. both homes).
-          if (PlaybackSession.instance.showPill)
-            Positioned(
-              left: 12,
-              right: 12,
-              bottom: 88,
-              child: SafeArea(
-                top: false,
-                child: MiniPlayerPill(onOpen: _openHearingSafety),
-              ),
-            ),
-
-          // Debug only, and compiled out of a release build: the decoder
-          // count, live, so the ceiling is something you can watch rather
-          // than something you have to take on trust.
-          const Positioned(top: 4, right: 8, child: SafeArea(child: PoolHud())),
-          // Opaque chin under the pill — kills white system/home line.
-          const Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            height: 28,
-            child: ColoredBox(color: NwsbColors.deep),
-          ),
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 14,
-            child: SafeArea(
-              top: false,
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: double.infinity),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 14),
-                    child: Builder(builder: (context) {
-                      final settings = Settings.instance;
-                      final radius = settings.navShape == 'pill'
-                          ? 40.0
-                          : settings.navShape == 'rect'
-                              ? (settings.navCorner == 'rounded' ? 20.0 : 2.0)
-                              : 33.0;
-                      final background = settings.navColor == 'black'
-                          ? Colors.black
-                          : const Color(0xDD182033);
-                      return Container(
-                        height: 66,
-                        decoration: BoxDecoration(
-                          color: background,
-                          borderRadius: BorderRadius.circular(radius),
-                          border: Border.all(color: const Color(0x22FFFFFF)),
-                        ),
-                        child: Row(children: [
-                          for (final id in settings.navSlots)
-                            Expanded(
-                              child: GestureDetector(
-                                behavior: HitTestBehavior.opaque,
-                                onTap: () => _goToSlot(id),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Image.network(
-                                      _navFeatures[id]?['img'] ?? '',
-                                      width: 28,
-                                      height: 28,
-                                      fit: BoxFit.contain,
-                                      errorBuilder: (_, __, ___) => Icon(
-                                        Icons.circle_outlined,
-                                        size: 22,
-                                        color: id == 'connect' || _primaryTab(id) == _i
-                                            ? NwsbColors.goldLight
-                                            : const Color(0x99FFFFFF),
+                          child: Row(children: [
+                            for (var i = 0;
+                                i < settings.navSlots.length;
+                                i++) ...[
+                              if (i > 0)
+                                Container(
+                                  width: 1,
+                                  height: 18,
+                                  margin:
+                                      const EdgeInsets.symmetric(horizontal: 2),
+                                  color: const Color(0x33FFFFFF),
+                                ),
+                              Expanded(
+                                child: GestureDetector(
+                                  behavior: HitTestBehavior.opaque,
+                                  onTap: () =>
+                                      _goToSlot(settings.navSlots[i]),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Image.network(
+                                        _navFeatures[settings.navSlots[i]]
+                                                ?['img'] ??
+                                            '',
+                                        width: 28,
+                                        height: 28,
+                                        fit: BoxFit.contain,
+                                        errorBuilder: (_, __, ___) => Icon(
+                                          Icons.circle_outlined,
+                                          size: 22,
+                                          color: settings.navSlots[i] ==
+                                                      'connect' ||
+                                                  _primaryTab(settings
+                                                          .navSlots[i]) ==
+                                                      _i
+                                              ? NwsbColors.goldLight
+                                              : const Color(0x99FFFFFF),
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(height: 3),
-                                    Text(
-                                      _navFeatures[id]?['label'] ?? id,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        fontSize: 9,
-                                        fontWeight: _primaryTab(id) == _i ? FontWeight.w700 : FontWeight.w400,
-                                        color: _primaryTab(id) == _i ? NwsbColors.goldLight : const Color(0x99FFFFFF),
+                                      const SizedBox(height: 3),
+                                      Text(
+                                        _navFeatures[settings.navSlots[i]]
+                                                ?['label'] ??
+                                            settings.navSlots[i],
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 9,
+                                          fontWeight: _primaryTab(settings
+                                                      .navSlots[i]) ==
+                                                  _i
+                                              ? FontWeight.w700
+                                              : FontWeight.w400,
+                                          color: _primaryTab(settings
+                                                      .navSlots[i]) ==
+                                                  _i
+                                              ? NwsbColors.goldLight
+                                              : const Color(0x99FFFFFF),
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                        ]),
-                      );
-                    }),
+                            ],
+                          ]),
+                        );
+                      }),
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

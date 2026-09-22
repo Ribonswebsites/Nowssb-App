@@ -4,53 +4,46 @@ library;
 
 import 'package:flutter/material.dart';
 
-import '../../data/content.dart';
 import '../../data/store_catalog.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
-import '../../widgets/intro_gate.dart';
+import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/page_shell.dart';
 import 'product_detail.dart';
 import 'store_cards.dart';
 import 'store_home_sections.dart';
 import 'store_select_sheet.dart';
+import 'ebooks_store.dart';
+import 'meaning_store.dart';
 import 'request_words.dart';
+import 'signature_store.dart';
 import 'store_routes.dart';
 
 class WordAtelierScreen extends StatelessWidget {
   const WordAtelierScreen({super.key});
 
   @override
-  Widget build(BuildContext context) => IntroGate(
-        tag: 'Shabdapathy · Word Science',
+  Widget build(BuildContext context) => PageShell(
         eyebrow: '',
-        title: 'The Word Atelier',
-        body: 'Every word carries a vibrational signature that predates all dictionaries. Explore the phonetic origin of any word in any language.',
-        stats: const ['Unlimited Words', 'AI-Powered', 'Every Language'],
-        art: 'assets/store/intro-words.webp',
-        fullBleed: true,
-        enterLabel: 'Enter The Word Atelier',
+        title: 'NowssB Store',
+        subtitle: 'The Word Atelier',
+        film: nwsbVideo(kRmHeroVidFile),
+        // Fashion-home AppBackdrop film + PageShell Fashion vignette scrim
+        // so the background video is clearly visible (not a solid lid).
+        usePageFilm: false,
         onBack: () => Navigator.of(context).pop(),
-        child: PageShell(
-          eyebrow: 'NowssB Store',
-          title: 'The Word Atelier',
-          film: nwsbVideo(kRmHeroVidFile),
-          // Fashion-home AppBackdrop film + PageShell Fashion vignette scrim
-          // so the background video is clearly visible (not a solid lid).
-          usePageFilm: false,
-          onBack: () => Navigator.of(context).pop(),
-          onStorePicker: () => showStoreSelectSheet(
-            context,
-            onSelect: (id) => openStoreFromPicker(context, id, current: 'word'),
-          ),
-          slivers: [
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 40),
-              sliver: SliverList.list(children: const [_WordAtelierBody()]),
-            ),
-          ],
+        onStorePicker: () => showStoreSelectSheet(
+          context,
+          current: 'word',
+          onSelect: (id) => openStoreFromPicker(context, id, current: 'word'),
         ),
+        slivers: [
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 40),
+            sliver: SliverList.list(children: const [_WordAtelierBody()]),
+          ),
+        ],
       );
 }
 
@@ -64,6 +57,7 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
   final _search = TextEditingController();
   String _query = '';
   String _chip = 'ALL';
+  var _allRows = false;
 
   @override
   void dispose() {
@@ -114,39 +108,56 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
   @override
   Widget build(BuildContext context) {
     final cats = _cats;
+    final rowCats = (_chip == 'ALL' && !_allRows && cats.length > 10)
+        ? cats.take(10).toList()
+        : cats;
     final sections = <Widget>[];
+    if (cats.isNotEmpty) {
+      sections.add(RmBannerRail(
+        banners: [
+          for (final cat in cats)
+            RmCatBanner(
+              title: cat.label,
+              sub: cat.sub,
+              badge: cat.badge,
+              labelColor:
+                  cat.labelColor != null ? Color(cat.labelColor!) : null,
+              logoAsset: kRmCatLogoAsset,
+              categoryId: cat.id,
+              artAsset: storeCollectionArt(cat.id),
+              pillLabel: cat.badge ?? cat.label,
+              inRail: true,
+              onViewAll: () => _openViewAll(cat.label),
+            ),
+        ],
+      ));
+    }
     // Count product rails actually emitted (search may empty some).
     var productRailIndex = 0;
-    for (var i = 0; i < cats.length; i++) {
-      final cat = cats[i];
-      sections.add(RmCatBanner(
+    for (var i = 0; i < rowCats.length; i++) {
+      final cat = rowCats[i];
+      sections.add(RmRowHeader(
         title: cat.label,
-        sub: cat.sub,
-        badge: cat.badge,
-        labelColor: cat.labelColor != null ? Color(cat.labelColor!) : null,
-        logoAsset: kRmCatLogoAsset,
-        categoryId: cat.id,
-        artAsset: storeCollectionArt(cat.id),
-        pillLabel: cat.badge ?? cat.label,
         onViewAll: () => _openViewAll(cat.label),
       ));
       sections.add(Builder(builder: (context) {
         final cards = <Widget>[];
         for (final w in cat.words) {
           if (!_match(w.word, w.root)) continue;
-          final name = w.word.isEmpty ? w.word : '${w.word[0].toUpperCase()}${w.word.substring(1)}';
-          // Live price when present; card art is always RM_WORD_IMG (part010).
-          final live = ContentStore.instance.library
-              .where((x) => x.word.toLowerCase() == w.word.toLowerCase())
-              .toList();
-          final price = live.isNotEmpty ? live.first.price : (cat.id == 'off50' ? 24.5 : 49);
+          final name = w.word.isEmpty
+              ? w.word
+              : '${w.word[0].toUpperCase()}${w.word.substring(1)}';
+          final sale = cat.id == 'off50';
+          final price = sale ? kWordSaleInr : kWordPriceInr;
           const img = kRmWordImg;
           cards.add(RmWordCard(
             name: name,
             root: w.root,
             imgUrl: img,
             price: price,
-            onTap: () => openAtelierWord(context, word: w.word, root: w.root, img: img, price: price),
+            originalPrice: sale ? kWordPriceInr : null,
+            onTap: () => openAtelierWord(context,
+                word: w.word, root: w.root, img: img, price: price),
           ));
         }
         final sig = cat.signature;
@@ -179,11 +190,31 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
       }));
       productRailIndex++;
 
-      // Compact mid-rail glass banners between every 2 product rows (exactly 7).
-      if (_chip == 'ALL' && productRailIndex % 2 == 0) {
-        final midIdx = (productRailIndex ~/ 2) - 1;
-        final mid = storeMidRailBannerAt(midIdx);
-        if (mid != null) sections.add(mid);
+      if (_chip == 'ALL' && productRailIndex == 1) {
+        // Moved from Store home: Words / Request / Meanings + atelier pills
+        // sit below the first 50% OFF row.
+        sections.add(StoreQuickMosaic(
+          onWords: () {}, // already on Word Atelier
+          onMeanings: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => const MeaningStoreScreen(),
+            ),
+          ),
+          onSignature: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => const SignatureStoreScreen(),
+            ),
+          ),
+          onEbooks: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => const EbooksStoreScreen(),
+            ),
+          ),
+          onRequest: () => openRequestWords(context),
+        ));
+        sections.add(const StoreGlassFilmBanner(
+          asset: 'assets/video/store-title-banner.mp4',
+        ));
       }
 
       // After the 4th rail → frequency package (grid + Limited Time Free + Browse by Goal).
@@ -229,12 +260,11 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
       }
     }
 
-    // Ensure exactly 6 mid-rail banners when ALL chip (pad if <12 rails).
-    if (_chip == 'ALL') {
-      final placed = productRailIndex ~/ 2;
-      for (var i = placed; i < kStoreMidRailBanners.length; i++) {
-        sections.add(StoreMidRailBanner(data: kStoreMidRailBanners[i]));
-      }
+    if (_chip == 'ALL' && !_allRows && cats.length > 10) {
+      sections.add(StoreViewMoreTap(
+        leftover: cats.length - 10,
+        onTap: () => setState(() => _allRows = true),
+      ));
     }
 
     return Column(
@@ -244,16 +274,43 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
           onBrowseAll: _browseAll,
           onViewCart: _viewCart,
           videoAsset: nwsbVideo(kRmHeroVidFile),
-          videoTitle: 'The Word Atelier',
+          videoTitle: '',
         ),
-        StoreSearchBar(
-          controller: _search,
-          onChanged: (v) => setState(() => _query = v),
+        ColoredSplitPromoBanner.forSurface(
+          SplitPromoSurface.wordAtelier,
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => const MeaningStoreScreen(),
+            ),
+          ),
+        ),
+        StoreGlassPanel(
+          radius: 32,
+          padding: const EdgeInsets.all(5),
+          child: StoreSearchBar(
+            controller: _search,
+            onChanged: (v) => setState(() => _query = v),
+            onGo: () {
+              if (_query.trim().isEmpty) {
+                openRequestWords(context);
+                return;
+              }
+              // If nothing matches, offer request-word flow.
+              final any = kRmCategories.any((c) => c.words.any(
+                    (w) => _match(w.word, w.root),
+                  ));
+              if (!any) openRequestWords(context);
+            },
+          ),
         ),
         const SizedBox(height: 16),
         const Text(
           'YOUR WORD LIBRARY',
-          style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 2.2, color: NwsbColors.gold),
+          style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 2.2,
+              color: NwsbColors.gold),
         ),
         const SizedBox(height: 6),
         const Text(
@@ -261,22 +318,31 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
           style: TextStyle(fontSize: 13, color: Color(0x99FFFFFF)),
         ),
         const SizedBox(height: 12),
-        SizedBox(
-          height: 36,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            children: [
-              StoreFilterChip(label: 'ALL', selected: _chip == 'ALL', onTap: () => setState(() => _chip = 'ALL')),
-              const SizedBox(width: 7),
-              for (final c in kRmCategories) ...[
+        StoreGlassPanel(
+          radius: 28,
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
+          child: SizedBox(
+            height: 36,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: [
                 StoreFilterChip(
-                  label: c.label.toUpperCase(),
-                  selected: _chip == c.id,
-                  onTap: () => setState(() => _chip = c.id),
-                ),
+                    label: 'ALL',
+                    selected: _chip == 'ALL',
+                    black: true,
+                    onTap: () => setState(() => _chip = 'ALL')),
                 const SizedBox(width: 7),
+                for (final c in kRmCategories) ...[
+                  StoreFilterChip(
+                    label: c.label.toUpperCase(),
+                    selected: _chip == c.id,
+                    black: true,
+                    onTap: () => setState(() => _chip = c.id),
+                  ),
+                  const SizedBox(width: 7),
+                ],
               ],
-            ],
+            ),
           ),
         ),
         const SizedBox(height: 8),

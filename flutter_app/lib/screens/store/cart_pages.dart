@@ -7,8 +7,14 @@ import 'package:flutter/services.dart';
 import '../../data/cart_bag.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/app_backdrop.dart';
+import '../../widgets/cart_add_animation.dart';
 import 'bag_ui.dart';
-import 'store_cards.dart';
+
+String _inr(num value) {
+  if (value <= 0) return 'Included';
+  final n = value is int ? value : value.round();
+  return '₹$n';
+}
 
 class CartPage extends StatelessWidget {
   const CartPage({super.key});
@@ -35,7 +41,7 @@ class CartPage extends StatelessWidget {
             children: [
               for (final it in bag.cart) _CartTile(item: it),
               const SizedBox(height: 12),
-              _TotalRow(label: 'Subtotal', value: inr(bag.cartTotal)),
+              _TotalRow(label: 'Subtotal', value: _inr(bag.cartTotal)),
               const SizedBox(height: 16),
               _GoldBtn(
                 label: 'Checkout',
@@ -87,9 +93,7 @@ class WishlistPage extends StatelessWidget {
           }
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
-            children: [
-              for (final it in bag.wishlist) _WishTile(item: it),
-            ],
+            children: [for (final it in bag.wishlist) _WishTile(item: it)],
           );
         },
       ),
@@ -175,7 +179,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
             ),
             const SizedBox(height: 6),
             Text(
-              '${o.items.length} item${o.items.length == 1 ? '' : 's'} · ${inr(o.total)} · ${o.payMethod}',
+              '${o.items.length} item${o.items.length == 1 ? '' : 's'} · ${_inr(o.total)} · ${o.payMethod}',
               style: const TextStyle(fontSize: 13, color: Color(0x99FFFFFF)),
             ),
             const SizedBox(height: 16),
@@ -183,8 +187,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Text(
-                  '${it.title}  ×${it.qty}  ${inr(it.lineTotal)}',
-                  style: const TextStyle(color: Color(0xCCFFFFFF), fontSize: 13),
+                  '${it.title}  ×${it.qty}  ${_inr(it.lineTotal)}',
+                  style: const TextStyle(
+                    color: Color(0xCCFFFFFF),
+                    fontSize: 13,
+                  ),
                 ),
               ),
             const SizedBox(height: 8),
@@ -242,13 +249,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           ),
                         ),
                         Text(
-                          inr(it.lineTotal),
+                          _inr(it.lineTotal),
                           style: const TextStyle(color: NwsbColors.goldLight),
                         ),
                       ],
                     ),
                   ),
-                _TotalRow(label: 'To pay', value: inr(bag.cartTotal)),
+                _TotalRow(label: 'To pay', value: _inr(bag.cartTotal)),
               ],
               const SizedBox(height: 22),
               const Text(
@@ -262,7 +269,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
               ),
               const SizedBox(height: 10),
               _Field(controller: _name, hint: 'Full name'),
-              _Field(controller: _phone, hint: 'Phone', keyboard: TextInputType.phone),
+              _Field(
+                controller: _phone,
+                hint: 'Phone',
+                keyboard: TextInputType.phone,
+              ),
               _Field(controller: _address, hint: 'Address', maxLines: 3),
               const SizedBox(height: 18),
               const Text(
@@ -353,8 +364,11 @@ class _BagScaffold extends StatelessWidget {
                             color: Colors.white,
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.arrow_back,
-                              size: 19, color: NwsbColors.ink),
+                          child: const Icon(
+                            Icons.arrow_back,
+                            size: 19,
+                            color: NwsbColors.ink,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 14),
@@ -419,14 +433,22 @@ class _CartTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(item.title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.w700)),
-                Text('${item.kind} · ${inr(item.price)}',
-                    style: const TextStyle(
-                        fontSize: 11, color: Color(0x80FFFFFF))),
+                Text(
+                  item.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                Text(
+                  '${item.kind} · ${_inr(item.price)}',
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: Color(0x80FFFFFF),
+                  ),
+                ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
@@ -436,8 +458,10 @@ class _CartTile extends StatelessWidget {
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Text('${item.qty}',
-                          style: const TextStyle(color: Colors.white)),
+                      child: Text(
+                        '${item.qty}',
+                        style: const TextStyle(color: Colors.white),
+                      ),
                     ),
                     _QtyBtn(
                       icon: Icons.add,
@@ -446,9 +470,13 @@ class _CartTile extends StatelessWidget {
                     const Spacer(),
                     GestureDetector(
                       onTap: () => bag.removeCart(item.id),
-                      child: const Text('Remove',
-                          style: TextStyle(
-                              fontSize: 11, color: Color(0x99FFFFFF))),
+                      child: const Text(
+                        'Remove',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Color(0x99FFFFFF),
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -484,31 +512,54 @@ class _WishTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(item.title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.w700)),
-                Text('${item.kind} · ${inr(item.price)}',
-                    style: const TextStyle(
-                        fontSize: 11, color: Color(0x80FFFFFF))),
+                Text(
+                  item.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                Text(
+                  '${item.kind} · ${_inr(item.price)}',
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: Color(0x80FFFFFF),
+                  ),
+                ),
                 const SizedBox(height: 8),
                 Row(
                   children: [
                     GestureDetector(
-                      onTap: () => bag.moveWishToCart(item.id),
-                      child: const Text('Add to cart',
-                          style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: NwsbColors.goldLight)),
+                      onTap: () async {
+                        await bag.moveWishToCart(item.id);
+                        if (!context.mounted) return;
+                        CartAddAnimation.play(
+                          context,
+                          fromContext: context,
+                          item: item,
+                        );
+                      },
+                      child: const Text(
+                        'Add to cart',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: NwsbColors.goldLight,
+                        ),
+                      ),
                     ),
                     const Spacer(),
                     GestureDetector(
                       onTap: () => bag.removeWishlist(item.id),
-                      child: const Text('Remove',
-                          style: TextStyle(
-                              fontSize: 11, color: Color(0x99FFFFFF))),
+                      child: const Text(
+                        'Remove',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Color(0x99FFFFFF),
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -530,7 +581,7 @@ class _OrderTile extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Text(
-        '${order.id} · ${inr(order.total)} · ${order.payMethod}',
+        '${order.id} · ${_inr(order.total)} · ${order.payMethod}',
         style: const TextStyle(fontSize: 12, color: Color(0x80FFFFFF)),
       ),
     );
@@ -571,11 +622,14 @@ class _TotalRow extends StatelessWidget {
       children: [
         Text(label, style: const TextStyle(color: Color(0x99FFFFFF))),
         const Spacer(),
-        Text(value,
-            style: const TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.w800)),
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
       ],
     );
   }
@@ -675,15 +729,20 @@ class _PageEmpty extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(title,
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800)),
+            Text(
+              title,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
             const SizedBox(height: 8),
-            Text(body,
-                textAlign: TextAlign.center,
-                style: const TextStyle(color: Color(0x99FFFFFF), height: 1.5)),
+            Text(
+              body,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Color(0x99FFFFFF), height: 1.5),
+            ),
             const SizedBox(height: 20),
             _GoldBtn(label: action, onTap: onAction),
           ],

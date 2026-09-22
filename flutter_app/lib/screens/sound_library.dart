@@ -19,16 +19,21 @@ import '../media/nwsb_image.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
+import '../theme/player_aura.dart';
 import '../widgets/app_backdrop.dart';
 import '../widgets/black_glass_banner.dart';
 import '../widgets/intro_gate.dart';
 import '../widgets/tv_frame.dart';
+import '../widgets/app_thinking_loader.dart';
+import '../widgets/colored_split_promo_banner.dart';
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import 'notifications_sheet.dart';
 import 'practice.dart';
 import 'practice_player.dart';
 import 'profile.dart';
 import 'store.dart';
 import 'store/meaning_store.dart';
+import 'currently_playing_album.dart';
 import 'word_detail.dart';
 
 /// Collection banner file for each Atelier id — same table as part080 COLS.
@@ -84,7 +89,7 @@ Map<String, RmCategory> _wordToCol() {
 
 
 /// Filter chips that stay on Sound Library (do not open Category page).
-const _kFilterOnly = {'All', 'Sentences', 'My Words', 'Purchased', 'Trending', 'Global'};
+const _kFilterOnly = {'All', 'Currently Playing', 'Sentences', 'My Words', 'Purchased', 'Trending', 'Global'};
 
 String _playsLabel(int n) {
   if (n <= 0) return '0 plays';
@@ -158,6 +163,7 @@ class _SoundLibraryScreenState extends State<SoundLibraryScreen> {
     final sorted = cats.toList()..sort();
     return [
       'All',
+      'Currently Playing',
       'Trending',
       'Global',
       'Sentences',
@@ -169,6 +175,7 @@ class _SoundLibraryScreenState extends State<SoundLibraryScreen> {
 
   List<Word> _chosen(List<Word> all) {
     if (_chip == 'All' ||
+        _chip == 'Currently Playing' ||
         _chip == 'Sentences' ||
         _chip == 'Trending' ||
         _chip == 'Global' ||
@@ -288,7 +295,7 @@ class _SoundLibraryScreenState extends State<SoundLibraryScreen> {
         '${all.length} words',
         '${meanings.length} meanings',
       ],
-      art: 'assets/store/intro-words.webp',
+      film: kPlayerSharedFilm,
       enterLabel: 'OPEN LIBRARY',
       child: feed,
     );
@@ -393,7 +400,17 @@ class _SlmFeed extends StatelessWidget {
                     bottom: MediaQuery.paddingOf(context).bottom + 48,
                   ),
                   children: [
-                    if (chip == 'Sentences') ...[
+                    if (chip == 'Currently Playing') ...[
+                      CurrentlyPlayingAlbum(
+                        words: _playingRail,
+                        art: art,
+                        counts: counts,
+                        onPlay: onPlayWord,
+                        onOpen: onOpenWord,
+                      ),
+                      _currentlyPlaying(),
+                      _buyRequest(),
+                    ] else if (chip == 'Sentences') ...[
                       _sentencesSec(),
                       if (featured != null) _featuredMain(featured),
                       if (trending.isNotEmpty)
@@ -518,10 +535,23 @@ class _SlmFeed extends StatelessWidget {
             NestedDarkWrap(
               margin: EdgeInsets.zero,
               padding: const EdgeInsets.all(14),
-              child: _CurrentlyPlayingRail(
-                words: list,
-                art: art,
-                onTap: onPlayWord,
+              child: Stack(
+                children: [
+                  _CurrentlyPlayingRail(
+                    words: list,
+                    art: art,
+                    onTap: onPlayWord,
+                  ),
+                  const Positioned(
+                    top: 0,
+                    right: 0,
+                    child: AppThinkingLoader(
+                      size: 34,
+                      state: OrbState.composing,
+                      circlePad: 7,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -1008,81 +1038,14 @@ class _SlmFeed extends StatelessWidget {
   Widget _promo() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 14, 12, 6),
-      child: HeavyGlassPanel(
-        radius: 22,
-        padding: const EdgeInsets.all(8),
-        child: NestedDarkWrap(
-          margin: EdgeInsets.zero,
-          padding: EdgeInsets.zero,
-          radius: 16,
-          onTap: onMeanings,
-          child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            gradient: const LinearGradient(
-              colors: [Color(0xFFE8F4FA), Color(0xFFC5DCE8)],
-            ),
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: IntrinsicHeight(
-            child: Row(
-              children: [
-                Expanded(
-                  flex: 58,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 16, 10, 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Every word has an origin.\nFind out what yours means.',
-                          style: TextStyle(
-                            color: Color(0xFF06121A),
-                            fontSize: 17,
-                            fontWeight: FontWeight.w600,
-                            height: 1.25,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          meanings.isEmpty
-                              ? 'The Meaning Store'
-                              : '${meanings.length} meanings in the archive',
-                          style: const TextStyle(
-                            color: Color(0xAD06121A),
-                            fontSize: 12,
-                          ),
-                        ),
-                        const Spacer(),
-                        const Icon(Icons.arrow_forward,
-                            color: Color(0xFF06121A), size: 26),
-                      ],
-                    ),
-                  ),
-                ),
-                Expanded(
-                  flex: 42,
-                  child: ColoredBox(
-                    color: const Color(0xFF06121A),
-                    child: FramedSlot(
-                      frame: DeviceFrame.tab6Landscape,
-                      child: Image.asset(
-                        'assets/store/intro-meanings.webp',
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) =>
-                            const ColoredBox(color: Color(0xFF06121A)),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+      child: ColoredSplitPromoBanner.forSurface(
+        SplitPromoSurface.soundLibrary,
+        onTap: onPractice,
+        margin: EdgeInsets.zero,
       ),
     );
   }
+
 
   Widget _sentencesSec() {
     final pool = (words.isNotEmpty ? words : allWords).toList();
@@ -1590,6 +1553,12 @@ class _SlmHead extends StatelessWidget {
                     ),
                   ),
                 ),
+                const AppThinkingLoader(
+                  size: 52,
+                  state: OrbState.composing,
+                  circlePad: 8,
+                ),
+                const SizedBox(width: 6),
                 IconButton(
                   onPressed: onNotifications,
                   padding: EdgeInsets.zero,
@@ -2814,10 +2783,23 @@ class _SoundCategoryScreenState extends State<SoundCategoryScreen> {
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: _CurrentlyPlayingRail(
-                        words: playing,
-                        art: _art,
-                        onTap: _playWord,
+                      child: Stack(
+                        children: [
+                          _CurrentlyPlayingRail(
+                            words: playing,
+                            art: _art,
+                            onTap: _playWord,
+                          ),
+                          const Positioned(
+                            top: 0,
+                            right: 0,
+                            child: AppThinkingLoader(
+                              size: 34,
+                              state: OrbState.composing,
+                              circlePad: 7,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],

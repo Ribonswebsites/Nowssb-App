@@ -33,16 +33,23 @@ import '../data/settings.dart';
 import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
 import '../widgets/app_backdrop.dart';
+import '../widgets/enter_curve_stage.dart';
+import '../widgets/hero_curve_stage.dart';
+import '../widgets/stories_find_you_banner.dart';
 import 'fashion/header.dart';
 import 'fashion/hero.dart';
 import 'fashion/sections_bottom.dart';
 import 'shared_sections.dart';
 import 'fashion/sections_mid.dart';
 import 'fashion/sections_top.dart';
+import '../widgets/colored_split_promo_banner.dart';
+import '../widgets/editorial_banner.dart';
 import 'fashion_plus.dart';
 import 'notifications_sheet.dart';
+import 'normal/header_actions_sheet.dart';
 import 'sound_library.dart';
 import 'widgets_page.dart';
+import 'quick_access.dart';
 import '../widgets/home_menu_drawer.dart';
 import 'word_detail.dart';
 import 'progress/progress_screen.dart';
@@ -51,6 +58,12 @@ import 'normal/horizontal_routine_cards.dart';
 import 'personal_coach.dart';
 import 'healing_path.dart';
 import 'subscription.dart';
+import 'store/ebooks_store.dart';
+import 'reader/reader_hub.dart';
+import 'store/request_words.dart';
+import 'sentence_builder.dart';
+import 'app_settings.dart';
+import 'store/meaning_store.dart';
 
 /// `REG.fash.items` — app/js/part062.js:107-148, key for key and in order.
 ///
@@ -62,6 +75,7 @@ const kFashionSectionOrder = <String>[
   'greet',
   'herorow',
   'practice',
+  'editorialA',
   'routineCards',
   'coachCards',
   // Not on the website's registry. Six doors on one panel so the app can
@@ -74,8 +88,11 @@ const kFashionSectionOrder = <String>[
   'tiles',
   'store',
   'trendwd',
+  'editorialB',
   'custom',
   'fashplus',
+  'enterCurve',
+  'editorialC',
   'rx',
   'trendvid',
   'storeban',
@@ -140,6 +157,23 @@ class _HomeFashionState extends State<HomeFashion> {
     _push(WordDetail(word: all[i]));
   }
 
+  void _openEnter(String id) {
+    switch (id) {
+      case 'player':
+        _go(1);
+      case 'library':
+        _push(const SoundLibraryScreen());
+      case 'store':
+        _go(3);
+      case 'reader':
+        _push(const ReaderHubScreen());
+      case 'ebook':
+        _push(const EbooksStoreScreen());
+      case 'healing':
+        _push(const HealingPathScreen());
+    }
+  }
+
   void _openMainOption(String label, int tab) {
     switch (label) {
       case 'Sound Library':
@@ -148,6 +182,67 @@ class _HomeFashionState extends State<HomeFashion> {
         _push(PracticeProgressScreen(words: ContentStore.instance.library));
       default:
         _go(tab);
+    }
+  }
+
+  /// Quick action hero chip → HeaderActionsSheet destinations.
+  void _openQuickAction() {
+    showHeaderActionsSheet(
+      context,
+      glassMode: true,
+      onGlassToggle: () {},
+      onNotifications: () => showNotificationsSheet(context),
+      onFashionHome: () {},
+      onStore: () => _go(3),
+      onPlayer: () => _go(1),
+    );
+  }
+
+  void _openSearchDest(String key) {
+    switch (key) {
+      case 'player':
+        _go(1);
+      case 'library':
+      case 'sound-library':
+        _push(const SoundLibraryScreen());
+      case 'store':
+        _go(3);
+      case 'reader':
+        _push(const ReaderHubScreen());
+      case 'meaning-store':
+        _push(const MeaningStoreScreen());
+      case 'practice':
+        _go(1);
+      case 'profile':
+        _go(4);
+      case 'progress':
+        _push(PracticeProgressScreen(words: ContentStore.instance.library));
+      case 'healing':
+      case 'healer':
+        _push(const HealingPathScreen());
+      case 'fashion':
+        _push(const FashionPlusScreen());
+      case 'coach':
+        _push(const PersonalCoachScreen());
+      case 'settings':
+        _push(const AppSettingsScreen());
+      case 'quick-access':
+        _push(const QuickAccessScreen());
+      case 'sentence':
+        _push(const SentenceBuilderScreen());
+      case 'request-words':
+        _push(const RequestWordsScreen());
+      case 'subscribe':
+        _push(const SubscriptionScreen());
+      case 'word-science':
+      case 'about':
+        _go(2);
+      case 'widgets':
+        _push(const WidgetsPage());
+      case 'connect':
+        _go(0);
+      default:
+        _go(2);
     }
   }
 
@@ -173,13 +268,26 @@ class _HomeFashionState extends State<HomeFashion> {
         ('greet', const FashGreeting()),
         (
           'herorow',
-          FashHeroRow(
-            onCustomize: () => _push(const WidgetsPage()),
-            onFeatures: () => _push(const WidgetsPage()),
-            onEarn: () => _go(4),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              FashHeroRow(
+                onCustomize: () => _push(const WidgetsPage()),
+                onFeatures: () => _push(const WidgetsPage()),
+                onEarn: () => _go(4),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                child: ColoredSplitPromoBanner.forSurface(
+                  SplitPromoSurface.fashionHome,
+                  onTap: () => _go(1),
+                ),
+              ),
+            ],
           ),
         ),
         ('practice', FashPractice(onTap: () => _go(1))),
+        ('editorialA', const EditorialBanner.healing()),
         ('routineCards', const NmHorizontalRoutineCards(fashion: true)),
         ('coachCards', const SizedBox.shrink()),
         ('mainops', MainOptionsSection(onGo: _go, onAction: _openMainOption)),
@@ -191,7 +299,7 @@ class _HomeFashionState extends State<HomeFashion> {
             onCoach: () => _push(const PersonalCoachScreen()),
           ),
         ),
-        ('reader', FashReader(onTap: () => _go(2))),
+        ('reader', FashReader(onTap: () => _push(const ReaderHubScreen()))),
         (
           'herovid',
           FashStreakVideo(
@@ -200,14 +308,24 @@ class _HomeFashionState extends State<HomeFashion> {
           ),
         ),
         ('streak', FashStreak(onTap: () => _go(1))),
-        ('tiles', FashTiles(onTile: _go)),
+        ('tiles', FashTiles(onTile: _go, onOpen: _openEnter)),
+        (
+          'storiesFind',
+          StoriesFindYouBanner(onTap: () => _go(2)),
+        ),
         ('store', FashStore(onTap: () => _go(3))),
         ('trendwd', FashTrending(onTap: () => _go(2))),
+        ('editorialB', const EditorialBanner.connect()),
         ('custom', FashCustomize(onTap: () => _push(const WidgetsPage()))),
         (
           'fashplus',
           FashPlusMini(onTap: () => _push(const FashionPlusScreen()))
         ),
+        (
+          'enterCurve',
+          EnterCurveStage(onOpen: _openEnter),
+        ),
+        ('editorialC', const EditorialBanner.science()),
         ('rx', FashPrescription(onTap: () => _go(1), onWord: _openWord)),
         ('trendvid', FashShopNow(onTap: () => _go(3))),
         ('storeban', StoreBannerSection(onTap: () => _go(3))),
@@ -244,7 +362,7 @@ class _HomeFashionState extends State<HomeFashion> {
         // Choose Your Path is slide 2 of HealingSection — do not inject a
         // second banner/section (that caused stacked banners + blank pages).
         ('genderpath', const SizedBox.shrink()),
-        ('promovid', FashPromoVideo(onTap: () => _go(2))),
+        ('promovid', FashPromoVideo(onOpen: _openEnter)),
         ('wsearch', FashWordSearch(onOpen: (_) => _go(2))),
         ('msearch', FashMeaningSearch(onOpen: (_) => _go(2))),
         ('shabvid', FashShabdaVideo(onTap: () => _go(2))),
@@ -353,7 +471,8 @@ class _HomeFashionState extends State<HomeFashion> {
                   // Modest look-ahead so off-screen video sections stay
                   // lazy-mounted instead of opening every decoder at once.
                   cacheExtent: 480,
-                  padding: const EdgeInsets.only(bottom: 108),
+                  // Footer carries solid-black bottom clearance (no video bleed).
+                  padding: EdgeInsets.zero,
                   itemCount: shown.length + 1,
                   itemBuilder: (context, i) {
                     if (i == 0) {
@@ -364,10 +483,23 @@ class _HomeFashionState extends State<HomeFashion> {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           HeroGreeting(name: widget.name),
+                          // Search + Quick access live ONLY inside HeroCurveStage.
+                          HeroCurveStage(
+                            glass: true,
+                            onSearch: () => showDestinationSearchSheet(
+                              context,
+                              onSelect: _openSearchDest,
+                            ),
+                            // Quick action → HeaderActionsSheet, NOT QuickAccessScreen.
+                            onQuickAccess: _openQuickAction,
+                          ),
                           FashionHero(
                             onExplore: () => _go(2),
                             onGuide: () => _push(const WidgetsPage()),
-                            onSearch: () => _go(2),
+                            onSearch: () => showDestinationSearchSheet(
+                              context,
+                              onSelect: _openSearchDest,
+                            ),
                             onStore: () => _go(3),
                             onRail: _go,
                           ),

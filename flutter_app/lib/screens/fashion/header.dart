@@ -12,10 +12,11 @@ library;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../../theme/tokens.dart';
+import '../../widgets/app_thinking_loader.dart';
 import '../../widgets/nwsb_icon.dart';
-import '../../widgets/looping_logo_mark.dart';
 
 class HomeHeader extends StatelessWidget {
   const HomeHeader({
@@ -59,7 +60,14 @@ class HomeHeader extends StatelessWidget {
           ),
           child: Row(
             children: [
-              const LoopingLogoMark(size: 48),
+              ClipOval(
+                child: Image.asset(
+                  'assets/icons/logo-disc.webp',
+                  width: 48,
+                  height: 48,
+                  fit: BoxFit.cover,
+                ),
+              ),
               const SizedBox(width: 12),
               // `Nowsb` heavy, `ansiu` light — one word with a break in the
               // weight, the way the mark is drawn everywhere else.
@@ -259,5 +267,358 @@ class HeroGreeting extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+/// Hero search — glass outer, "Search" label on top, black field pill inside.
+/// Listening orb LEFT, placeholder center, search SVG RIGHT. Opens A–Z sheet.
+class FashionGreetingSearch extends StatelessWidget {
+  const FashionGreetingSearch({
+    super.key,
+    this.onOpen,
+    this.onSubmit,
+    this.controller,
+    this.compact = false,
+  });
+
+  /// Opens the blurred destination search sheet (preferred).
+  final VoidCallback? onOpen;
+  final ValueChanged<String>? onSubmit;
+  final TextEditingController? controller;
+
+  /// Tighter padding when embedded inside [HeroCurveStage].
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: compact
+          ? const EdgeInsets.fromLTRB(0, 0, 0, 0)
+          : const EdgeInsets.fromLTRB(20, 10, 20, 6),
+      child: GestureDetector(
+        onTap: onOpen ??
+            () => showDestinationSearchSheet(context, onSelect: onSubmit),
+        behavior: HitTestBehavior.opaque,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(18),
+          child: BackdropFilter(
+            filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 10),
+              decoration: BoxDecoration(
+                color: const Color(0x22FFFFFF),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: const Color(0x40FFFFFF)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Search',
+                    style: TextStyle(
+                      color: Color(0xCCFFFFFF),
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.8,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Container(
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: const Color(0xF00A0A0C),
+                      borderRadius: BorderRadius.circular(99),
+                      border: Border.all(color: const Color(0x28FFFFFF)),
+                    ),
+                    padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
+                    child: Row(
+                      children: [
+                        const AppThinkingLoader(
+                          size: 28,
+                          state: OrbState.listening,
+                          circlePad: 6,
+                        ),
+                        const SizedBox(width: 10),
+                        const Expanded(
+                          child: Text(
+                            'Search any word or meaning…',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: Color(0x99FFFFFF),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: Image.asset(
+                            'assets/icons/search.webp',
+                            color: Colors.white70,
+                            errorBuilder: (_, __, ___) => const Icon(
+                              Icons.search,
+                              size: 20,
+                              color: Colors.white70,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Major app destinations for A–Z search suggestions.
+const kNwsbSearchDestinations = <(String, String)>[
+  ('About', 'about'),
+  ('App Settings', 'settings'),
+  ('Connect', 'connect'),
+  ('Fashion Plus', 'fashion'),
+  ('Healer', 'healer'),
+  ('Healing Path', 'healing'),
+  ('Library', 'library'),
+  ('Meaning Store', 'meaning-store'),
+  ('Personal Coach', 'coach'),
+  ('Player', 'player'),
+  ('Practice', 'practice'),
+  ('Profile', 'profile'),
+  ('Progress', 'progress'),
+  ('Quick Access', 'quick-access'),
+  ('Reader', 'reader'),
+  ('Request Words', 'request-words'),
+  ('Sentence Builder', 'sentence'),
+  ('Settings', 'settings'),
+  ('Sound Library', 'sound-library'),
+  ('Store', 'store'),
+  ('Subscribe', 'subscribe'),
+  ('Word Science', 'word-science'),
+  ('Widgets', 'widgets'),
+];
+
+Future<void> showDestinationSearchSheet(
+  BuildContext context, {
+  ValueChanged<String>? onSelect,
+}) {
+  return showGeneralDialog<void>(
+    context: context,
+    barrierDismissible: true,
+    barrierLabel: 'Search',
+    barrierColor: const Color(0xB7040812),
+    transitionDuration: const Duration(milliseconds: 280),
+    pageBuilder: (context, anim, secondary) {
+      return _DestinationSearchSheet(onSelect: onSelect);
+    },
+    transitionBuilder: (context, anim, secondary, child) {
+      final curved = CurvedAnimation(
+        parent: anim,
+        curve: const Cubic(0.4, 0, 0.2, 1),
+      );
+      return FadeTransition(
+        opacity: curved,
+        child: BackdropFilter(
+          filter: ui.ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0, -0.04),
+              end: Offset.zero,
+            ).animate(curved),
+            child: child,
+          ),
+        ),
+      );
+    },
+  );
+}
+
+class _DestinationSearchSheet extends StatefulWidget {
+  const _DestinationSearchSheet({this.onSelect});
+  final ValueChanged<String>? onSelect;
+
+  @override
+  State<_DestinationSearchSheet> createState() =>
+      _DestinationSearchSheetState();
+}
+
+class _DestinationSearchSheetState extends State<_DestinationSearchSheet> {
+  final _ctrl = TextEditingController();
+  String _q = '';
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  List<(String, String)> get _filtered {
+    final q = _q.trim().toLowerCase();
+    final all = [...kNwsbSearchDestinations]
+      ..sort((a, b) => a.$1.toLowerCase().compareTo(b.$1.toLowerCase()));
+    if (q.isEmpty) return all;
+    return all
+        .where((d) =>
+            d.$1.toLowerCase().contains(q) || d.$2.toLowerCase().contains(q))
+        .toList();
+  }
+
+  void _pick(String key) {
+    Navigator.of(context).maybePop();
+    widget.onSelect?.call(key);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final items = _filtered;
+    final maxH = MediaQuery.sizeOf(context).height * 0.72;
+    return SafeArea(
+      child: Align(
+        alignment: Alignment.topCenter,
+        child: Material(
+          type: MaterialType.transparency,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxHeight: maxH),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(18),
+                    child: BackdropFilter(
+                      filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                      child: Container(
+                        padding: const EdgeInsets.fromLTRB(14, 12, 8, 12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xE6101014),
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(color: const Color(0x33FFFFFF)),
+                        ),
+                        child: Row(
+                          children: [
+                            const AppThinkingLoader(
+                              size: 30,
+                              state: OrbState.solving,
+                              circlePad: 6,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: TextField(
+                                controller: _ctrl,
+                                autofocus: true,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                cursorColor: Colors.white70,
+                                onChanged: (v) => setState(() => _q = v),
+                                decoration: const InputDecoration(
+                                  isDense: true,
+                                  border: InputBorder.none,
+                                  hintText: 'Search destinations…',
+                                  hintStyle: TextStyle(
+                                    color: Color(0x66FFFFFF),
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () => Navigator.of(context).maybePop(),
+                              icon: const Icon(Icons.close, color: Colors.white70),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Flexible(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(18),
+                      child: BackdropFilter(
+                        filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                        child: Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: const Color(0xCC0A0A0E),
+                            borderRadius: BorderRadius.circular(18),
+                            border: Border.all(color: const Color(0x22FFFFFF)),
+                          ),
+                          child: ListView.separated(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            shrinkWrap: true,
+                            itemCount: items.length,
+                            separatorBuilder: (_, __) => const Divider(
+                              height: 1,
+                              color: Color(0x14FFFFFF),
+                            ),
+                            itemBuilder: (context, i) {
+                              final (label, key) = items[i];
+                              final letter = label.isEmpty
+                                  ? ''
+                                  : label[0].toUpperCase();
+                              final showLetter = i == 0 ||
+                                  items[i - 1].$1[0].toUpperCase() != letter;
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  if (showLetter)
+                                    Padding(
+                                      padding: const EdgeInsets.fromLTRB(
+                                          16, 10, 16, 4),
+                                      child: Text(
+                                        letter,
+                                        style: const TextStyle(
+                                          color: Color(0x99E8D5A3),
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w700,
+                                          letterSpacing: 1.4,
+                                        ),
+                                      ),
+                                    ),
+                                  ListTile(
+                                    dense: true,
+                                    title: Text(
+                                      label,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    trailing: const Icon(
+                                      Icons.arrow_forward_ios_rounded,
+                                      size: 14,
+                                      color: Color(0x66FFFFFF),
+                                    ),
+                                    onTap: () => _pick(key),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
   }
 }

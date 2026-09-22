@@ -22,6 +22,7 @@ import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/home_parts.dart';
 import '../../widgets/home_skin.dart';
+import '../../widgets/enter_curve_stage.dart';
 import '../../widgets/tv_frame.dart';
 
 /// 19 · offer — index.html:2252. The coupon art — a clip, not a picture,
@@ -51,9 +52,9 @@ class FashOffer extends StatelessWidget {
                       priority: ClipPriority.decoration,
                     ),
                     Align(
-                      alignment: Alignment.topCenter,
+                      alignment: Alignment.centerRight,
                       child: Padding(
-                        padding: const EdgeInsets.only(top: 12),
+                        padding: const EdgeInsets.only(right: 12),
                         child: ScreenCta(label: 'Shop Now', onTap: onTap),
                       ),
                     ),
@@ -118,8 +119,8 @@ class FashShabdapathy extends StatelessWidget {
 /// It used to be a bare 16:9 box whose wrapper was `background: transparent`,
 /// which is why it had nothing behind it.
 class FashPromoVideo extends StatelessWidget {
-  const FashPromoVideo({super.key, this.onTap});
-  final VoidCallback? onTap;
+  const FashPromoVideo({super.key, this.onOpen});
+  final void Function(String id)? onOpen;
 
   @override
   Widget build(BuildContext context) {
@@ -128,7 +129,12 @@ class FashPromoVideo extends StatelessWidget {
         asset: 'assets/video/orb-loop.mp4',
         frame: DeviceFrame.tabletLandscape,
         priority: ClipPriority.decoration,
-        onTap: onTap,
+        autoplay: false,
+        showVideo: false,
+        overlay: EnterCurveStage(
+          embedded: true,
+          onOpen: onOpen,
+        ),
       ),
     );
   }
@@ -361,7 +367,8 @@ class FashShabdaVideo extends StatelessWidget {
   Widget build(BuildContext context) {
     return SectionPane(
       child: TvFrame(
-        asset: 'assets/video/word-acts.mp4',
+        asset:
+            'assets/videos/1e9a0c8d452a809f_grok_video_2026-05-06-15-27-23_zhylbe.mp4',
         frame: DeviceFrame.tabletLandscape,
         priority: ClipPriority.decoration,
         onTap: onTap,

@@ -76,13 +76,6 @@ class SubscriptionSection extends StatelessWidget {
               style: TextStyle(color: Color(0x99FFFFFF), fontSize: 12)),
           const SizedBox(height: 12),
           _SubscriptionTierStack(onTap: onTap),
-          const SizedBox(height: 15),
-          SecBanner(
-            title: 'Subscribe Today',
-            sub: 'Every word and every frequency, unlocked',
-            mark: NwsbMarks.crown,
-            onTap: onTap,
-          ),
         ],
       ),
     );
@@ -117,7 +110,7 @@ class EditionSection extends StatelessWidget {
             mark: NwsbMarks.crown,
           ),
           TvFrame(
-            asset: 'assets/video/subscription-join-nowssb.mp4',
+            asset: 'assets/video/subscription-b.mp4',
             frame: DeviceFrame.kioskPortrait,
             priority: ClipPriority.decoration,
             onTap: onTap,
@@ -140,8 +133,8 @@ class EditionSection extends StatelessWidget {
                       const SizedBox(height: 3),
                       const _SubMarqueeText(
                         'Get your subscription today',
-                        style: TextStyle(
-                            color: Color(0xBBFFFFFF), fontSize: 11),
+                        style:
+                            TextStyle(color: Color(0xBBFFFFFF), fontSize: 11),
                         duration: Duration(milliseconds: 4200),
                       ),
                       const SizedBox(height: 9),
@@ -487,7 +480,7 @@ class MainOptionsSection extends StatelessWidget {
 
   /// Matches website `.mo-row { height: 62px }` with a little room so icons
   /// + labels never paint into the next row or the bottom nav.
-  static const double rowHeight = 40;
+  static const double rowHeight = 72;
 
   /// (mark, viewBox, label, tab) — paths from index.html `.mainops-blk`.
   static const options = <(String, double, String, int)>[
@@ -504,10 +497,8 @@ class MainOptionsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final fashion = HomeSkinScope.of(context) == HomeSkin.fashion;
     final rule = fashion ? const Color(0x1FFFFFFF) : const Color(0x141A1A2E);
-    final fill =
-        fashion ? const Color(0x0FFFFFFF) : const Color(0x081A1A2E);
-    final stroke =
-        fashion ? const Color(0x1FFFFFFF) : const Color(0x141A1A2E);
+    final fill = fashion ? const Color(0x0FFFFFFF) : const Color(0x081A1A2E);
+    final stroke = fashion ? const Color(0x1FFFFFFF) : const Color(0x141A1A2E);
 
     return SectionPane(
       child: Column(
@@ -551,13 +542,16 @@ class MainOptionsSection extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 14),
-          SecBanner(
-            title: 'Find Your Way Around',
-            sub: 'Every screen in the app, and what each one is for',
-            mark: NwsbMarks.sliders,
-            onTap: () => onGo?.call(4),
-          ),
+                    // "Find Your Way Around" quick-access banner — Fashion only.
+          if (fashion) ...[
+            const SizedBox(height: 14),
+            SecBanner(
+              title: 'Find Your Way Around',
+              sub: 'Every screen in the app, and what each one is for',
+              mark: NwsbMarks.sliders,
+              onTap: () => onGo?.call(4),
+            ),
+          ],
         ],
       ),
     );
@@ -631,18 +625,31 @@ class _Opt extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(
-              width: 21,
-              height: 21,
+            Container(
+              width: 24,
+              height: 24,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: const Color(0x24FFFFFF),
+                shape: BoxShape.circle,
+                border: Border.all(color: const Color(0x52FFFFFF)),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x33000000),
+                    blurRadius: 8,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+              ),
               child: NwsbIcon(
                 mark,
-                size: 21,
+                size: 15,
                 viewBox: box,
                 strokeWidth: 1.6,
                 color: markColor,
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 1),
             Text(
               label,
               maxLines: 1,
@@ -650,7 +657,7 @@ class _Opt extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 10.5,
+                fontSize: 9.5,
                 height: 1.1,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 0.1,
@@ -1060,7 +1067,7 @@ class _HealingSectionState extends State<HealingSection> {
     super.initState();
     _page = PageController(viewportFraction: 0.92);
     _timer = Timer.periodic(const Duration(milliseconds: _autoMs), (_) {
-      if (!mounted || !TickerMode.valuesOf(context).enabled) return;
+      if (!mounted || !TickerMode.of(context)) return;
       if (_paused) return;
       if (_resumeAfter != null && DateTime.now().isBefore(_resumeAfter!)) {
         return;
@@ -1473,7 +1480,9 @@ class _CarouselDots extends StatelessWidget {
 }
 
 /// 30 · footer — index.html Fashion `#homeFooter` / Normal `#homeFooterNm`.
-/// Layout, copy, links, and styling matched to current website/WebView.
+/// Restored website-style brand + tagline + link grid + copyright + 3D
+/// carousel (TV-frame) with bundled tab images. Opaque black underlay + long
+/// black tail so Fashion video / Normal neo never show under/after the footer.
 class HomeFooterSection extends StatefulWidget {
   const HomeFooterSection({super.key, this.onLink});
 
@@ -1484,17 +1493,14 @@ class HomeFooterSection extends StatefulWidget {
 }
 
 class _HomeFooterSectionState extends State<HomeFooterSection> {
+  /// Bundled footer-tab studio shots (commit as-is; no recompress).
   static const _shots = [
-    'https://media.nowssb.com/migrated-images/de6f1331af862c18_grok_image_1776931241446_2_oqn7z0.jpg',
-    'https://media.nowssb.com/migrated-images/c63fd60894cef334_grok_image_1776931251298_2_nuhjin.jpg',
-    'https://media.nowssb.com/migrated-images/7b69c8d374502725_grok_image_1776931991083_2_eyvogv.jpg',
-    'https://media.nowssb.com/migrated-images/ef785a342307f508_grok_image_1776932343988_3_bofj1s.jpg',
-    'https://media.nowssb.com/migrated-images/f67dedbd317ef3c3_grok_image_1776931659181_2_l3dxyi.jpg',
-    'https://media.nowssb.com/migrated-images/43cdce970c2897dd_grok_image_1776931253654_2_hrtsra.jpg',
-    'https://media.nowssb.com/migrated-images/e4a21614b9e3d1c0_grok_image_1776932830246_2_x0yyb6.jpg',
-    'https://media.nowssb.com/migrated-images/378e89b2f157b2a9_grok_image_1776933033268_2_m3fmo9.jpg',
-    'https://media.nowssb.com/migrated-images/4ef4e116dedc8ef6_grok_image_1776932933365_2_jb1lch.jpg',
-    'https://media.nowssb.com/migrated-images/c37c1f7e2c2a1fa0_grok_image_1776932486772_2_spplq4.jpg',
+    'assets/footer/tab-sound-of-stillness.png',
+    'assets/footer/tab-breathe-new-noise.png',
+    'assets/footer/tab-calm-new-loud.png',
+    'assets/footer/tab-find-your-frequency.png',
+    'assets/footer/tab-still-mind-still-style.png',
+    'assets/footer/tab-ancient-calm-new-sound.png',
   ];
 
   static const _links = [
@@ -1517,7 +1523,7 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
   void initState() {
     super.initState();
     _timer = Timer.periodic(const Duration(milliseconds: 2800), (_) {
-      if (!mounted || !TickerMode.valuesOf(context).enabled) return;
+      if (!mounted || !TickerMode.of(context)) return;
       setState(() => _index = (_index + 1) % _shots.length);
     });
   }
@@ -1540,11 +1546,13 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
             ? direction * 172
             : distance == 2
                 ? direction * 292
-                : direction * 362;
+                : distance == 3
+                    ? direction * 362
+                    : direction * 520;
     final tz = distance == 0
         ? 200.0
         : distance == 1
-            ? -10.0
+            ? 100.0
             : distance == 2
                 ? -155.0
                 : distance == 3
@@ -1553,25 +1561,25 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
     final angle = distance == 0
         ? 0.0
         : distance == 1
-            ? direction * -28
+            ? direction * -35
             : distance == 2
-                ? direction * -50
+                ? direction * -42
                 : distance == 3
-                    ? direction * -65
+                    ? direction * -48
                     : 0.0;
     final scale = distance == 0
         ? 1.0
         : distance == 1
-            ? 0.78
+            ? 1.07
             : distance == 2
                 ? 0.55
                 : distance == 3
                     ? 0.34
-                    : 0.1;
+                    : 0.5;
     final opacity = distance == 0
         ? 1.0
         : distance == 1
-            ? 0.68
+            ? 0.82
             : distance == 2
                 ? 0.36
                 : distance == 3
@@ -1612,9 +1620,11 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
               fit: StackFit.expand,
               children: [
                 ClipRect(
-                  child: NwsbImage(
-                    url: _shots[i],
-                    fallback: const ColoredBox(color: Color(0xFF0A0F1C)),
+                  child: Image.asset(
+                    _shots[i],
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) =>
+                        const ColoredBox(color: Color(0xFF0A0F1C)),
                   ),
                 ),
                 const DecoratedBox(
@@ -1637,244 +1647,262 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
 
   @override
   Widget build(BuildContext context) {
-    final fashion = HomeSkinScope.of(context) == HomeSkin.fashion;
-    return Container(
-      width: double.infinity,
+    final mq = MediaQuery.of(context);
+    // Long opaque black tail: covers nav clearance AND remaining viewport so
+    // Fashion video / Normal neo/surface cannot bleed under the footer.
+    final tail = (mq.padding.bottom + 160).clamp(160.0, 400.0);
+    final fill = mq.size.height * 0.55;
+    final blackTail = tail > fill ? tail : fill;
+
+    return ColoredBox(
       color: const Color(0xFF000000),
-      constraints: const BoxConstraints(minHeight: 420),
-      child: Stack(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Website: Fashion shows `.footer-bg-img`; Normal hides it
-          // (`#homeFooterNm .footer-bg-img { display:none }`).
-          if (fashion)
-            Positioned.fill(
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 600),
-                child: Image.network(
-                  _shots[_index],
-                  key: ValueKey(_shots[_index]),
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) =>
-                      const ColoredBox(color: Color(0xFF060C18)),
-                ),
-              ),
-            ),
-          if (fashion)
-            const Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color(0x26030814),
-                      Color(0x0D030814),
-                      Color(0x40030814),
-                      Color(0xBF030814),
-                    ],
-                    stops: [0, 0.3, 0.7, 1],
-                  ),
-                ),
-              ),
-            ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+          Container(
+            width: double.infinity,
+            color: const Color(0xFF000000),
+            constraints: const BoxConstraints(minHeight: 420),
+            child: Stack(
               children: [
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(24, 44, 24, 16),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 24),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text('Across Every Language',
-                          style: TextStyle(
-                              fontSize: 9,
-                              letterSpacing: 4,
-                              fontWeight: FontWeight.w300,
-                              color: Color(0x6BC8E8F5))),
-                      SizedBox(height: 14),
-                      Text.rich(
-                        TextSpan(
-                          style: TextStyle(
-                              fontSize: 40,
-                              height: 1.1,
-                              fontWeight: FontWeight.w200,
-                              color: Color(0xE6FFFFFF)),
+                      const Padding(
+                        padding: EdgeInsets.fromLTRB(24, 44, 24, 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            TextSpan(text: 'Every civilization\n'),
-                            TextSpan(
-                                text: 'heard the same\n',
+                            Text('Across Every Language',
                                 style: TextStyle(
-                                    fontWeight: FontWeight.w800,
-                                    color: Colors.white)),
-                            TextSpan(
-                                text: 'original sound.',
+                                    fontSize: 9,
+                                    letterSpacing: 4,
+                                    fontWeight: FontWeight.w300,
+                                    color: Color(0x6BC8E8F5))),
+                            SizedBox(height: 14),
+                            Text.rich(
+                              TextSpan(
                                 style: TextStyle(
-                                    fontWeight: FontWeight.w800,
-                                    color: Color(0xFFE8D5A3))),
+                                    fontSize: 40,
+                                    height: 1.1,
+                                    fontWeight: FontWeight.w200,
+                                    color: Color(0xE6FFFFFF)),
+                                children: [
+                                  TextSpan(text: 'Every civilization\n'),
+                                  TextSpan(
+                                      text: 'heard the same\n',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w800,
+                                          color: Colors.white)),
+                                  TextSpan(
+                                      text: 'original sound.',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w800,
+                                          color: Color(0xFFE8D5A3))),
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: 14),
+                            SizedBox(
+                              width: 260,
+                              child: Text(
+                                  'Different words. One root. All languages descend from the same vibrational origin.',
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w300,
+                                      letterSpacing: 0.2,
+                                      color: Color(0x61FFFFFF),
+                                      height: 1.65)),
+                            ),
                           ],
                         ),
                       ),
-                      SizedBox(height: 14),
                       SizedBox(
-                        width: 260,
-                        child: Text(
-                            'Different words. One root. All languages descend from the same vibrational origin.',
-                            style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w300,
-                                letterSpacing: 0.2,
-                                color: Color(0x61FFFFFF),
-                                height: 1.65)),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  height: 300,
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    alignment: Alignment.center,
-                    children: [
-                      for (var i = 0; i < _shots.length; i++) _footerCard(i),
-                      IgnorePointer(
-                        child: SizedBox(
-                          width: _cardW * 908 / 800,
-                          height: _cardH * 1408 / 1286,
-                          child: Image.asset(
-                            'assets/frames/footer-frame.webp',
-                            fit: BoxFit.fill,
-                            errorBuilder: (_, __, ___) =>
-                                const SizedBox.shrink(),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        bottom: -20,
-                        child: Row(
+                        height: 300,
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          alignment: Alignment.center,
                           children: [
-                            for (var i = 0; i < _shots.length; i++)
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 3),
-                                child: AnimatedContainer(
-                                  duration: const Duration(milliseconds: 400),
-                                  width: i == _index ? 20 : 4,
-                                  height: 4,
-                                  color: i == _index
-                                      ? const Color(0xE6C8E8F5)
-                                      : const Color(0x4DC8E8F5),
+                            ClipRect(
+                              child: Stack(
+                                clipBehavior: Clip.hardEdge,
+                                fit: StackFit.expand,
+                                children: [
+                                  for (var i = 0; i < _shots.length; i++)
+                                    _footerCard(i),
+                                ],
+                              ),
+                            ),
+                            const Positioned.fill(
+                              child: IgnorePointer(
+                                child: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.centerLeft,
+                                      end: Alignment.centerRight,
+                                      colors: [
+                                        Color(0xFF000000),
+                                        Color(0xD1000000),
+                                        Color(0x00000000),
+                                        Color(0xD1000000),
+                                        Color(0xFF000000),
+                                      ],
+                                      stops: [0.0, 0.08, 0.18, 0.92, 1.0],
+                                    ),
+                                  ),
                                 ),
                               ),
+                            ),
+                            IgnorePointer(
+                              child: SizedBox(
+                                width: _cardW * 908 / 800,
+                                height: _cardH * 1408 / 1286,
+                                child: Image.asset(
+                                  'assets/frames/footer-frame.webp',
+                                  fit: BoxFit.fill,
+                                  errorBuilder: (_, __, ___) =>
+                                      const SizedBox.shrink(),
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              bottom: -20,
+                              child: Row(
+                                children: [
+                                  for (var i = 0; i < _shots.length; i++)
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 3),
+                                      child: AnimatedContainer(
+                                        duration:
+                                            const Duration(milliseconds: 400),
+                                        width: i == _index ? 20 : 4,
+                                        height: 4,
+                                        color: i == _index
+                                            ? const Color(0xE6C8E8F5)
+                                            : const Color(0x4DC8E8F5),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
                       ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 36),
-                Center(
-                  child: Container(
-                    width: double.infinity,
-                    constraints: const BoxConstraints(maxWidth: 400),
-                    margin: const EdgeInsets.symmetric(horizontal: 20),
-                    padding: const EdgeInsets.fromLTRB(22, 24, 22, 20),
-                    decoration: const BoxDecoration(
-                      color: Color(0x0FFFFFFF),
-                      border: Border(
-                          top: BorderSide(color: Color(0x29FFFFFF)),
-                          left: BorderSide(color: Color(0x29FFFFFF)),
-                          right: BorderSide(color: Color(0x29FFFFFF)),
-                          bottom: BorderSide(color: Color(0x14FFFFFF))),
-                      boxShadow: [
-                        BoxShadow(
-                            color: Color(0x80000000),
-                            blurRadius: 40,
-                            offset: Offset(0, -2)),
-                        BoxShadow(
-                            color: Color(0x66000000),
-                            blurRadius: 32,
-                            offset: Offset(0, 8)),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        const Text.rich(TextSpan(
-                            style: TextStyle(
-                                fontSize: 26,
-                                color: Colors.white,
-                                letterSpacing: 1),
+                      const SizedBox(height: 36),
+                      Center(
+                        child: Container(
+                          width: double.infinity,
+                          constraints: const BoxConstraints(maxWidth: 400),
+                          margin: const EdgeInsets.symmetric(horizontal: 20),
+                          padding: const EdgeInsets.fromLTRB(22, 24, 22, 20),
+                          decoration: const BoxDecoration(
+                            color: Color(0x0FFFFFFF),
+                            border: Border(
+                                top: BorderSide(color: Color(0x29FFFFFF)),
+                                left: BorderSide(color: Color(0x29FFFFFF)),
+                                right: BorderSide(color: Color(0x29FFFFFF)),
+                                bottom: BorderSide(color: Color(0x14FFFFFF))),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Color(0x80000000),
+                                  blurRadius: 40,
+                                  offset: Offset(0, -2)),
+                              BoxShadow(
+                                  color: Color(0x66000000),
+                                  blurRadius: 32,
+                                  offset: Offset(0, 8)),
+                            ],
+                          ),
+                          child: Column(
                             children: [
-                              TextSpan(
-                                  text: 'Nowss',
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.w600)),
-                              TextSpan(
-                                  text: 'B',
-                                  style: TextStyle(fontWeight: FontWeight.w200))
-                            ])),
-                        const SizedBox(height: 4),
-                        const Text.rich(
-                          TextSpan(
-                            style: TextStyle(
-                              fontSize: 9,
-                              letterSpacing: 4,
-                              fontWeight: FontWeight.w400,
-                              color: Color(0x99FFFFFF),
-                            ),
-                            children: [
-                              TextSpan(text: 'THE NEW FASHION TREND OF '),
-                              TextSpan(
-                                text: 'MEDITATION',
-                                style: TextStyle(color: Color(0xBFC8E8F5)),
+                              const Text.rich(TextSpan(
+                                  style: TextStyle(
+                                      fontSize: 26,
+                                      color: Colors.white,
+                                      letterSpacing: 1),
+                                  children: [
+                                    TextSpan(
+                                        text: 'Nowss',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600)),
+                                    TextSpan(
+                                        text: 'B',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w200))
+                                  ])),
+                              const SizedBox(height: 4),
+                              const Text.rich(
+                                TextSpan(
+                                  style: TextStyle(
+                                    fontSize: 9,
+                                    letterSpacing: 4,
+                                    fontWeight: FontWeight.w400,
+                                    color: Color(0x99FFFFFF),
+                                  ),
+                                  children: [
+                                    TextSpan(
+                                        text: 'THE NEW FASHION TREND OF '),
+                                    TextSpan(
+                                      text: 'MEDITATION',
+                                      style: TextStyle(
+                                          color: Color(0xBFC8E8F5)),
+                                    ),
+                                  ],
+                                ),
                               ),
+                              const SizedBox(height: 18),
+                              Container(
+                                  width: 32,
+                                  height: 1,
+                                  decoration: const BoxDecoration(
+                                      gradient: LinearGradient(colors: [
+                                    Colors.transparent,
+                                    Color(0x66C8E8F5),
+                                    Colors.transparent
+                                  ]))),
+                              const SizedBox(height: 18),
+                              Wrap(
+                                alignment: WrapAlignment.center,
+                                spacing: 16,
+                                runSpacing: 6,
+                                children: [
+                                  for (final (label, key) in _links)
+                                    GestureDetector(
+                                        onTap: () =>
+                                            widget.onLink?.call(key),
+                                        behavior: HitTestBehavior.opaque,
+                                        child: Text(label.toUpperCase(),
+                                            style: const TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w400,
+                                                letterSpacing: 2,
+                                                color: Color(0xCCFFFFFF)))),
+                                ],
+                              ),
+                              const SizedBox(height: 18),
+                              const Text(
+                                  '© 2026 Adv. Sanjaykumar Gadge · Shabdapathy',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.w300,
+                                      letterSpacing: 1,
+                                      color: Color(0x73FFFFFF))),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 18),
-                        Container(
-                            width: 32,
-                            height: 1,
-                            decoration: const BoxDecoration(
-                                gradient: LinearGradient(colors: [
-                              Colors.transparent,
-                              Color(0x66C8E8F5),
-                              Colors.transparent
-                            ]))),
-                        const SizedBox(height: 18),
-                        Wrap(
-                          alignment: WrapAlignment.center,
-                          spacing: 16,
-                          runSpacing: 6,
-                          children: [
-                            for (final (label, key) in _links)
-                              GestureDetector(
-                                  onTap: () => widget.onLink?.call(key),
-                                  behavior: HitTestBehavior.opaque,
-                                  child: Text(label.toUpperCase(),
-                                      style: const TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w400,
-                                          letterSpacing: 2,
-                                          color: Color(0xCCFFFFFF)))),
-                          ],
-                        ),
-                        const SizedBox(height: 18),
-                        const Text('© 2026 Adv. Sanjaykumar Gadge · Shabdapathy',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontSize: 9,
-                                fontWeight: FontWeight.w300,
-                                letterSpacing: 1,
-                                color: Color(0x73FFFFFF))),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
+          // CRITICAL: opaque black under/after footer to page bottom.
+          SizedBox(height: blackTail),
         ],
       ),
     );

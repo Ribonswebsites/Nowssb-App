@@ -152,8 +152,8 @@
     var wordSafe = String(w.word).replace(/'/g, '');
     targets.forEach(function (t) {
       t.box.innerHTML = '<div class="nmh-trend-banner-item" onclick="event.stopPropagation();nwsbOpenStoreWord(\'' + wordSafe + '\')">' +
-        '<div class="nmh-trend-banner-word">' + (w.word || '') + '</div>' +
         '<img class="nmh-trend-banner-icon" decoding="async" loading="lazy" src="' + STORE_ICON_URL + '" alt="">' +
+        '<div class="nmh-trend-banner-word">' + (w.word || '') + '</div>' +
       '</div>';
       var item = t.box.querySelector('.nmh-trend-banner-item');
       if (item) {

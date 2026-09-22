@@ -13,6 +13,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 import '../data/firebase.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
+import '../widgets/app_thinking_loader.dart';
 
 class AuthGate extends StatefulWidget {
   const AuthGate({super.key, required this.child});
@@ -440,19 +442,21 @@ class _AuthGateState extends State<AuthGate> {
   Widget _googleButton() {
     return _whiteButton(
       onPressed: _busy ? null : _googleLogin,
-      child: Row(
-        children: [
-          const _GoogleMark(),
-          const SizedBox(width: 12),
-          const Expanded(
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              alignment: Alignment.centerLeft,
-              child: Text('Continue with Google'),
+      child: _busy
+          ? const Center(child: AppThinkingLoader(size: 28, state: OrbState.solving, circlePad: 6))
+          : const Row(
+              children: [
+                _GoogleMark(),
+                SizedBox(width: 12),
+                Expanded(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text('Continue with Google'),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -529,7 +533,7 @@ class _AuthGateState extends State<AuthGate> {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               ),
               child: _busy
-                  ? const SizedBox.square(dimension: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
+                  ? const AppThinkingLoader(size: 28, state: OrbState.solving, circlePad: 6)
                   : Text(_createAccount ? 'Create account' : 'Sign in with email'),
             ),
           ),
@@ -565,7 +569,7 @@ class _AuthGateState extends State<AuthGate> {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               ),
               child: _busy
-                  ? const SizedBox.square(dimension: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
+                  ? const AppThinkingLoader(size: 28, state: OrbState.listening, circlePad: 6)
                   : Text(hasCode ? 'Verify code' : 'Send code'),
             ),
           ),
@@ -616,6 +620,14 @@ class _AuthGateState extends State<AuthGate> {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            backgroundColor: Colors.black,
+            body: Center(
+              child: AppThinkingLoader(label: 'Preparing…', state: OrbState.composing),
+            ),
+          );
+        }
         if (snapshot.hasData) return widget.child;
         return _buildAuthScreen();
       },

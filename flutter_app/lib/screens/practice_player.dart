@@ -1,6 +1,7 @@
 /// The native counterpart to www/nowssb-player.js.
 ///
-/// It uses the same ordered image/video theme pairs, the local liquid-splash
+/// It uses the two local player-box films ([kPlayerBoxFilms]) — liquid glass
+/// and sine wave — cycling by word, the same clips as the WebView player.
 /// assets, word-action clip, and the same five-item control treatment as the
 /// WebView Player. Speech remains native text-to-speech and completed words
 /// are recorded locally, so the visual port does not replace a real session
@@ -12,6 +13,7 @@ import 'dart:math' as math;
 import 'dart:ui' show ImageFilter, lerpDouble;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -21,11 +23,13 @@ import '../data/models.dart';
 import '../data/practice_progress.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
+import '../widgets/app_thinking_loader.dart';
 import '../widgets/tv_frame.dart';
 import '../widgets/glass_wrap.dart';
 import '../widgets/nwsb_icon.dart';
 import '../widgets/black_glass_banner.dart';
 import '../theme/tokens.dart';
+import '../theme/player_aura.dart';
 import 'sound_library.dart';
 import 'aura_sound_library.dart';
 import 'store.dart';
@@ -33,7 +37,10 @@ import 'player_settings.dart';
 import 'sentence_builder.dart';
 import 'select_level.dart';
 import 'player_dial.dart';
+import 'player_intro.dart';
+import 'player_guide.dart';
 import 'practice_overlay.dart';
+import '../widgets/pronunciation_survey.dart';
 import '../data/playback_session.dart';
 
 String _fmtClock(num sec) {
@@ -60,15 +67,19 @@ String _prettyTitle(String title) {
   return '${t[0].toUpperCase()}${t.substring(1).toLowerCase()}';
 }
 
+const _kPlayerBoxFilm = kPlayerBoxFilm;
+
 class PracticePlayerScreen extends StatefulWidget {
   const PracticePlayerScreen({
     super.key,
     required this.words,
     required this.title,
+    this.showIntro = true,
   });
 
   final List<Word> words;
   final String title;
+  final bool showIntro;
 
   @override
   State<PracticePlayerScreen> createState() => _PracticePlayerScreenState();
@@ -98,7 +109,11 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
   var _shuffle = false;
   var _volume = 1.0;
   var _handingOff = false;
+  var _practiceOpen = false;
   var _bottomPage = 0;
+  var _guideDone = false;
+  var _introDone = false;
+  var _flagsReady = false;
   DateTime? _startedAt;
   String? _error;
 
@@ -118,7 +133,45 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     unawaited(PracticeProgress.instance.start());
     unawaited(_loadLiked());
     unawaited(_loadShuffle());
-    unawaited(_prepareAndPlay());
+    if (!widget.showIntro) {
+      _introDone = true;
+      _guideDone = true;
+      _flagsReady = true;
+      unawaited(_prepareAndPlay());
+    } else {
+      unawaited(_loadIntroFlags());
+    }
+  }
+
+  Future<void> _loadIntroFlags() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final guideSeen = prefs.getBool(kPlayerGuideSeenKey) ?? false;
+      final introSeen = prefs.getBool(kPlayerIntroSeenKey) ?? false;
+      if (!mounted) return;
+      setState(() {
+        _guideDone = guideSeen;
+        _introDone = introSeen;
+        _flagsReady = true;
+      });
+      if (_introDone && _guideDone) {
+        unawaited(_prepareAndPlay());
+      } else if (_introDone && !_guideDone) {
+        // Guide still pending; do not start playback yet.
+      } else if (!_introDone && _guideDone) {
+        // Intro pending after guide already seen.
+      }
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _flagsReady = true);
+    }
+  }
+
+  Future<void> _markIntroSeen() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(kPlayerIntroSeenKey, true);
+    } catch (_) {}
   }
 
   void _kickBottomAuto() {
@@ -417,25 +470,52 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
           onPlay: _togglePlay,
           onClose: () => Navigator.of(context).pop(),
           onSettings: _openSettings,
+          onLibrary: () {
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => const SoundLibraryScreen(),
+              ),
+            );
+          },
         ),
       ),
     );
   }
 
   void _openPracticeLab() {
-    showModalBottomSheet<void>(
+    if (!mounted || _practiceOpen) return;
+    _practiceOpen = true;
+    showGeneralDialog<void>(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      barrierDismissible: true,
+      barrierLabel: 'Practice',
       barrierColor: Colors.transparent,
-      builder: (_) => PracticeLabSheet(
+      transitionDuration: const Duration(milliseconds: 80),
+      pageBuilder: (ctx, _, __) => PracticeLabSheet(
         word: _word,
         accent: _theme.accent,
         video: _theme.video,
         onSpeak: _prepareAndPlay,
-        onClose: () => Navigator.of(context).pop(),
+        onClose: () => Navigator.of(ctx).pop(),
       ),
-    );
+      transitionBuilder: (context, anim, _, child) {
+        return FadeTransition(
+          opacity: CurvedAnimation(parent: anim, curve: Curves.easeOutCubic),
+          child: child,
+        );
+      },
+    ).whenComplete(() {
+      _practiceOpen = false;
+    });
+  }
+
+  Future<void> _handlePracticeTap() async {
+    if (!mounted || _practiceOpen) return;
+    if (_completed) {
+      await showPronunciationSurveyIfNeeded(context);
+      if (!mounted) return;
+    }
+    _openPracticeLab();
   }
 
   void _openSettings() {
@@ -653,6 +733,31 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       );
     }
 
+    if (!_flagsReady) {
+      return const Scaffold(
+        backgroundColor: Color(0xFF000000),
+        body: SizedBox.expand(),
+      );
+    }
+
+    if (!_guideDone) {
+      return PlayerGuideScreen(onDone: () => setState(() => _guideDone = true));
+    }
+
+    if (!_introDone) {
+      return PlayerIntroScreen(
+        sessionTitle: widget.title,
+        wordCount: widget.words.length,
+        onBack: () => Navigator.of(context).maybePop(),
+        onSettings: _openSettings,
+        onBegin: () {
+          unawaited(_markIntroSeen());
+          setState(() => _introDone = true);
+          unawaited(_prepareAndPlay());
+        },
+      );
+    }
+
     final theme = _theme;
     final pageBackgroundVideo = 'assets/video/player-bg-loop.mp4';
     return PopScope(
@@ -705,7 +810,9 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                               width: stageWidth,
                               child: _VisualStage(
                                 word: _word,
-                                theme: theme,
+                                video:
+                                    kPlayerBoxFilms[_index %
+                                        kPlayerBoxFilms.length],
                                 playing: _playing,
                                 accent: theme.accent,
                                 onReplay: _prepareAndPlay,
@@ -730,61 +837,50 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                             ),
                           ),
                           const SizedBox(height: 18),
-                          Stack(
-                            clipBehavior: Clip.none,
+                          Row(
                             children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 48,
-                                ),
-                                child: Column(
-                                  children: [
-                                    Text(
-                                      _prettyTitle(_word.word),
-                                      textAlign: TextAlign.center,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        color: Color(0xFFF4F4F5),
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w500,
-                                        height: 1.15,
-                                        letterSpacing: -0.3,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    SizedBox(
-                                      height: 20,
-                                      width: double.infinity,
-                                      child: _SubtitleMarquee(
-                                        lines: _marqueeLines,
-                                        animation: _marqueeController,
-                                      ),
-                                    ),
-                                  ],
+                              Expanded(
+                                child: Text(
+                                  _prettyTitle(_word.word),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: Color(0xFFF4F4F5),
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.w800,
+                                    height: 1.1,
+                                    letterSpacing: -0.6,
+                                  ),
                                 ),
                               ),
-                              Positioned(
-                                right: 0,
-                                top: 0,
-                                child: GestureDetector(
-                                  onTap: _toggleLike,
-                                  child: SizedBox(
-                                    width: 44,
-                                    height: 44,
-                                    child: Icon(
-                                      _liked
-                                          ? Icons.favorite_rounded
-                                          : Icons.favorite_border_rounded,
-                                      color: _liked
-                                          ? const Color(0xFFF5F5F7)
-                                          : const Color(0xFF8B8B90),
-                                      size: 22,
-                                    ),
+                              GestureDetector(
+                                onTap: _toggleLike,
+                                child: SizedBox(
+                                  width: 44,
+                                  height: 44,
+                                  child: Icon(
+                                    _liked
+                                        ? Icons.favorite_rounded
+                                        : Icons.favorite_border_rounded,
+                                    color: _liked
+                                        ? const Color(0xFFF5F5F7)
+                                        : const Color(0xFF8B8B90),
+                                    size: 22,
                                   ),
                                 ),
                               ),
                             ],
+                          ),
+                          const SizedBox(height: 6),
+                          ClipRect(
+                            child: SizedBox(
+                              height: 20,
+                              width: double.infinity,
+                              child: _SubtitleMarquee(
+                                lines: _marqueeLines,
+                                animation: _marqueeController,
+                              ),
+                            ),
                           ),
                           const SizedBox(height: 16),
                           _ProgressBar(
@@ -833,7 +929,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                                   accent: theme.accent,
                                   video: _actionsTabVideo,
                                   onSentence: _openSentence,
-                                  onPractice: _openPracticeLab,
+                                  onPractice: () =>
+                                      unawaited(_handlePracticeTap()),
                                   onStore: () => Navigator.of(context).push(
                                     MaterialPageRoute<void>(
                                       builder: (_) => const StoreScreen(),
@@ -2568,7 +2665,7 @@ class _StoreGlassVideoBox extends StatelessWidget {
 class _VisualStage extends StatelessWidget {
   const _VisualStage({
     required this.word,
-    required this.theme,
+    required this.video,
     required this.playing,
     required this.accent,
     required this.onReplay,
@@ -2581,7 +2678,7 @@ class _VisualStage extends StatelessWidget {
   });
 
   final Word word;
-  final _PlayerTheme theme;
+  final String video;
   final bool playing;
   final Color accent;
   final VoidCallback onReplay;
@@ -2616,10 +2713,9 @@ class _VisualStage extends StatelessWidget {
           children: [
             const ColoredBox(color: Colors.black),
             NwsbVideo(
-              asset: theme.video,
-              poster: theme.image,
+              asset: video,
               fit: BoxFit.cover,
-              alignment: const Alignment(0, -0.24),
+              alignment: Alignment.center,
               priority: ClipPriority.feature,
               autoplay: true,
               loop: true,
@@ -2642,27 +2738,78 @@ class _VisualStage extends StatelessWidget {
             Positioned(
               top: 10,
               left: 10,
+              right: 10,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  AnimatedBuilder(
-                    animation: PracticeProgress.instance,
-                    builder: (context, _) => _LevelPill(
-                      level: PracticeProgress.instance.level.clamp(1, 10),
-                      onTap: onLevel,
-                    ),
+                  Row(
+                    children: [
+                      AnimatedBuilder(
+                        animation: PracticeProgress.instance,
+                        builder: (context, _) => _LevelPill(
+                          level: PracticeProgress.instance.level.clamp(1, 10),
+                          onTap: onLevel,
+                        ),
+                      ),
+                      const Spacer(),
+                      _StageGlassChip(onSettings: onSettings, onInfo: onInfo),
+                    ],
                   ),
                   const SizedBox(height: 8),
-                  // Store bag square lives INSIDE the art card (below Level badge).
-                  _StoreGlassVideoBox(onTap: onStore, size: 56),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      _StoreGlassVideoBox(onTap: onStore, size: 56),
+                      Expanded(
+                        child: Center(
+                          child: GlassWrap(
+                            margin: EdgeInsets.zero,
+                            padding: const EdgeInsets.all(4),
+                            radius: 28,
+                            child: Container(
+                              padding: const EdgeInsets.fromLTRB(10, 8, 16, 8),
+                              decoration: BoxDecoration(
+                                color: const Color(0xF00C0C0E),
+                                borderRadius: BorderRadius.circular(24),
+                                border: Border.all(
+                                  color: const Color(0x22FFFFFF),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const AppThinkingLoader(
+                                    size: 34,
+                                    state: OrbState.composing,
+                                    circlePad: 7,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Flexible(
+                                    child: Text(
+                                      word.word.toUpperCase(),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w800,
+                                        letterSpacing: 1.6,
+                                        height: 1.05,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 56),
+                    ],
+                  ),
                 ],
               ),
-            ),
-            Positioned(
-              top: 10,
-              right: 10,
-              child: _StageGlassChip(onSettings: onSettings, onInfo: onInfo),
             ),
             Positioned(
               left: 0,
@@ -2670,32 +2817,16 @@ class _VisualStage extends StatelessWidget {
               bottom: 0,
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 40, 16, 14),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      word.word.toUpperCase(),
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Color(0xE6F4F4F5),
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                        letterSpacing: 6,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    _WordOverlay(
-                      word: word,
-                      accent: accent,
-                      playing: playing,
-                      liked: false,
-                      onReplay: onReplay,
-                      onNotes: onCopy,
-                      onLike: () {},
-                      onSyllable: onSyllable,
-                      embedded: true,
-                    ),
-                  ],
+                child: _WordOverlay(
+                  word: word,
+                  accent: accent,
+                  playing: playing,
+                  liked: false,
+                  onReplay: onReplay,
+                  onNotes: onCopy,
+                  onLike: () {},
+                  onSyllable: onSyllable,
+                  embedded: true,
                 ),
               ),
             ),
@@ -3759,28 +3890,31 @@ class _WordActionStrip extends StatelessWidget {
       frame: DeviceFrame.wordActs,
       priority: ClipPriority.feature,
       autoplay: true,
-      overlay: Row(
-        children: [
-          Expanded(
-            child: _WordAction(
-              svg: '<path d="M4 5.5h16v10.5H9.5L5.5 19.5V16H4z"/><path d="M7.5 9.5h9M7.5 12.6h6"/>',
-              label: 'Sentence',
-              onTap: onSentence,
+      overlay: ColoredBox(
+        color: Colors.transparent,
+        child: Row(
+          children: [
+            Expanded(
+              child: _WordAction(
+                svg: '<path d="M4 5.5h16v10.5H9.5L5.5 19.5V16H4z"/><path d="M7.5 9.5h9M7.5 12.6h6"/>',
+                label: 'Sentence',
+                onTap: onSentence,
+              ),
             ),
-          ),
-          _sep(),
-          Expanded(
-            child: PracticeDockOrb(onTap: onPractice, accent: accent),
-          ),
-          _sep(),
-          Expanded(
-            child: _WordAction(
-              svg: NwsbMarks.bag,
-              label: 'Store',
-              onTap: onStore,
+            _sep(),
+            Expanded(
+              child: PracticeDockOrb(onTap: onPractice, accent: accent),
             ),
-          ),
-        ],
+            _sep(),
+            Expanded(
+              child: _WordAction(
+                svg: NwsbMarks.bag,
+                label: 'Store',
+                onTap: onStore,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -3803,6 +3937,7 @@ class _WordAction extends StatelessWidget {
     button: true,
     label: label,
     child: GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -4329,53 +4464,53 @@ class _SubtitleMarquee extends StatelessWidget {
 
 const _playerThemes = <_PlayerTheme>[
   _PlayerTheme(
-    image: 'https://media.nowssb.com/migrated-images/d694cb3157c4e58f_grok_image_1782656710977_nj5r6x.jpg',
-    video: 'https://nowssb.com/assets/video/79d7c93a6734ed8d_grok_video_2026-06-28-19-55-09_otgbxd.mp4',
+    image: 'assets/player/player-box-bloom.jpg',
+    video: kPlayerBoxFilm,
     accent: Color(0xFF9BB8FF),
   ),
   _PlayerTheme(
-    image: 'https://media.nowssb.com/migrated-images/3670d1e477f48c31_grok_image_1782656676834_rzp2cz.jpg',
-    video: 'https://nowssb.com/assets/video/a1b0a1b513ec57f6_grok_video_2026-06-28-19-54-38_wrxkgr.mp4',
+    image: 'assets/player/player-box-peak.jpg',
+    video: kPlayerBoxWaveFilm,
     accent: Color(0xFF7FE9DA),
   ),
   _PlayerTheme(
-    image: 'https://media.nowssb.com/migrated-images/fd380f5670852d0c_grok_image_1782656704854_cfsah3.jpg',
-    video: 'https://nowssb.com/assets/video/dc68caaf51e87003_grok_video_2026-06-28-19-55-02_of5fwh.mp4',
+    image: 'assets/player/player-box-bloom.jpg',
+    video: kPlayerBoxFilm,
     accent: Color(0xFFBD7BFF),
   ),
   _PlayerTheme(
-    image: 'https://media.nowssb.com/migrated-images/e8bb832f2815c15a_grok_image_1782656684101_o9vc93.jpg',
-    video: 'https://nowssb.com/assets/video/d8ac259577c403f3_grok_video_2026-06-28-19-54-43_it2bur.mp4',
+    image: 'assets/player/player-box-peak.jpg',
+    video: kPlayerBoxWaveFilm,
     accent: Color(0xFFA6DCFF),
   ),
   _PlayerTheme(
-    image: 'https://media.nowssb.com/migrated-images/48ad23ade254b2d7_grok_image_1782795582310_llvpix.jpg',
-    video: 'https://nowssb.com/assets/video/3b63edc1485a45e2_grok_video_2026-06-30-10-29-43_hzxyun.mp4',
+    image: 'assets/player/player-box-bloom.jpg',
+    video: kPlayerBoxFilm,
     accent: Color(0xFFB9A6FF),
   ),
   _PlayerTheme(
-    image: 'https://media.nowssb.com/migrated-images/20314fda05d34b49_grok_image_1782796537731_vzyhwn.jpg',
-    video: 'https://nowssb.com/assets/video/a779a65872bf917c_grok_video_2026-06-30-10-45-45_dg2ohg.mp4',
+    image: 'assets/player/player-box-peak.jpg',
+    video: kPlayerBoxWaveFilm,
     accent: Color(0xFFA6C8FF),
   ),
   _PlayerTheme(
-    image: 'https://media.nowssb.com/migrated-images/f734c819e92db433_grok_image_1782796641824_izkh09.jpg',
-    video: 'https://nowssb.com/assets/video/da4159578099ee48_grok_video_2026-06-30-10-47-20_rljghs.mp4',
+    image: 'assets/player/player-box-bloom.jpg',
+    video: kPlayerBoxFilm,
     accent: Color(0xFFB9A6FF),
   ),
   _PlayerTheme(
-    image: 'https://media.nowssb.com/migrated-images/e103480a2c87d55b_grok_image_1782796519587_thrrws.jpg',
-    video: 'https://nowssb.com/assets/video/e55e1f1f879d8074_grok_video_2026-06-30-10-45-34_pg2y2j.mp4',
+    image: 'assets/player/player-box-peak.jpg',
+    video: kPlayerBoxWaveFilm,
     accent: Color(0xFFE8D5A3),
   ),
   _PlayerTheme(
-    image: 'https://media.nowssb.com/migrated-images/122962572090895c_grok_image_1782796924745_nmksmi.jpg',
-    video: 'https://nowssb.com/assets/video/7a0e0cf6903f3b16_grok_video_2026-06-30-10-52-07_gvffol.mp4',
+    image: 'assets/player/player-box-bloom.jpg',
+    video: kPlayerBoxFilm,
     accent: Color(0xFFF0D9A8),
   ),
   _PlayerTheme(
-    image: 'https://media.nowssb.com/migrated-images/28b7b32c97232472_grok_image_1782796933792_qwzfgx.jpg',
-    video: 'https://nowssb.com/assets/video/39905d27bd778cff_grok_video_2026-06-30-10-52-20_zk87yh.mp4',
+    image: 'assets/player/player-box-peak.jpg',
+    video: kPlayerBoxWaveFilm,
     accent: Color(0xFF8FE6FF),
   ),
 ];

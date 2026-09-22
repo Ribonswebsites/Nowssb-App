@@ -1,54 +1,80 @@
-/// The Meaning Store — `.ms-grid` of `.ms-card` tiles + plain black banners.
-/// Media matches index.html / app/js/part026.js (no collection photo banners).
+/// The Meaning Store — unique meanings experience (not a Word Atelier clone).
+/// Header: NowssB Store + one-line "The Meaning Store".
+/// One hero/video max; no word mid-rail banner stacks; meaning icons only.
+///
+/// Asset roles (meanings-only):
+/// - meanings-store-swirl.png → store hub / picker / icon ONLY
+/// - meanings-device.png → in-store product cards (coloured backs where needed)
+/// - meanings-branding.jpg → playlist / goals
+/// - meanings-clean.jpg → fallback
+/// Video banners stay unchanged.
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../../data/content.dart';
 import '../../data/store_catalog.dart';
 import '../../media/nwsb_video.dart';
-import '../../media/video_pool.dart';
-import '../../theme/tokens.dart';
-import '../../widgets/intro_gate.dart';
 import '../../widgets/page_shell.dart';
+import '../../widgets/colored_split_promo_banner.dart';
+import '../../widgets/app_thinking_loader.dart';
 import 'product_detail.dart';
 import 'store_cards.dart';
 import 'store_home_sections.dart';
 import 'store_select_sheet.dart';
 import 'request_words.dart';
 import 'store_routes.dart';
+import 'signature_store.dart';
+
+
+/// Warm Meaning + picker + ebook arts before painting (no empty black flash).
+const kMeaningWarmAssets = <String>[
+  kMsMeaningStoreIcon,
+  kMsMeaningIconAsset,
+  kMsMeaningProductArt,
+  kMsMeaningIntroArt,
+  'assets/store/picker-words.png',
+  'assets/store/picker-meaning.png',
+  'assets/store/picker-signature.png',
+  'assets/store/picker-ebooks.png',
+  kEbProductArt,
+  kEbIntroArt,
+];
+
+String _msOnlyArt(String key, String candidate) {
+  if (candidate.startsWith('assets/meanings/')) return candidate;
+  const arts = <String>[
+    kMsMeaningIntroArt,
+    kMsMeaningProductArt,
+    kMsMeaningIconAsset,
+  ];
+  return arts[key.hashCode.abs() % arts.length];
+}
 
 class MeaningStoreScreen extends StatelessWidget {
   const MeaningStoreScreen({super.key});
 
   @override
-  Widget build(BuildContext context) => IntroGate(
-        tag: 'Shabdapathy · Origins',
+  Widget build(BuildContext context) => PageShell(
         eyebrow: '',
-        title: 'The Meaning Store',
-        body: 'Base meanings, purchased words and AI-decoded origins — the truth behind the sound.',
-        stats: const ['Base Meanings', 'AI-Decoded', 'Owned Forever'],
-        art: 'assets/store/intro-meanings.webp',
-        fullBleed: true,
-        enterLabel: 'Enter The Meaning Store',
+        title: 'NowssB Store',
+        subtitle: 'The Meaning Store',
+        film: nwsbVideo(kStoreMeaningDoorVidFile),
+        usePageFilm: false,
         onBack: () => Navigator.of(context).pop(),
-        child: PageShell(
-          eyebrow: 'NowssB Store',
-          title: 'The Meaning Store',
-          film: nwsbVideo(kStoreMeaningDoorVidFile),
-          usePageFilm: false,
-          onBack: () => Navigator.of(context).pop(),
-          onStorePicker: () => showStoreSelectSheet(
-            context,
-            onSelect: (id) => openStoreFromPicker(context, id, current: 'meaning'),
-          ),
-          slivers: [
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
-              sliver: SliverList.list(children: const [_MeaningStoreBody()]),
-            ),
-          ],
+        onStorePicker: () => showStoreSelectSheet(
+          context,
+          current: 'meaning',
+          onSelect: (id) =>
+              openStoreFromPicker(context, id, current: 'meaning'),
         ),
+        slivers: [
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
+            sliver: SliverList.list(children: const [_MeaningStoreBody()]),
+          ),
+        ],
       );
 }
 
@@ -62,6 +88,24 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
   final _search = TextEditingController();
   String _query = '';
   String _chip = 'ALL';
+  var _allRows = false;
+  var _ready = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _warm());
+  }
+
+  Future<void> _warm() async {
+    if (!mounted) return;
+    for (final path in kMeaningWarmAssets) {
+      try {
+        await precacheImage(AssetImage(path), context);
+      } catch (_) {}
+    }
+    if (mounted) setState(() => _ready = true);
+  }
 
   @override
   void dispose() {
@@ -69,8 +113,7 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
     super.dispose();
   }
 
-  /// Prefer MS_BASE_MEANINGS card art from the catalogue. Live ContentStore
-  /// may append unknown keys, but must not overwrite catalogue `img` URLs.
+  /// Prefer MS_BASE_MEANINGS card art from the catalogue.
   List<MsMeaning> get _base {
     final live = ContentStore.instance.meanings;
     final byKey = {for (final m in kMsBaseMeanings) m.key: m};
@@ -83,7 +126,7 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
           root: base.root,
           category: base.category,
           price: m.price > 0 ? m.price : base.price,
-          img: base.img, // keep part026 per-meaning art
+          img: _msOnlyArt(base.key, base.img),
         );
       } else {
         byKey[m.key] = MsMeaning(
@@ -92,17 +135,11 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
           root: m.sub.isNotEmpty ? m.sub : 'NowssB Meaning',
           category: 'Studio',
           price: m.price,
-          img: m.img.isNotEmpty ? m.img : kMsCardImg,
+          img: _msOnlyArt(m.key, m.img.isNotEmpty ? m.img : kMsCardImg),
         );
       }
     }
     return byKey.values.toList();
-  }
-
-
-  String _artForMeaningCat(String cat) {
-    // Notification pills use the store bag product — never fashion posters.
-    return storePillProductArt(cat);
   }
 
   void _openViewAll(String title) {
@@ -111,14 +148,35 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
       title: title,
       items: storeDefaultViewAllItems(),
       onOpenWord: (word, root, img, price) {
-        final hit = _base.where((m) => m.word.toLowerCase() == word.toLowerCase()).toList();
+        final hit = _base
+            .where((m) => m.word.toLowerCase() == word.toLowerCase())
+            .toList();
         if (hit.isNotEmpty) openMeaningDetail(context, hit.first);
       },
     );
   }
 
+  void _openMeaning(String word, String root, String img, num price) {
+    final hit = _base
+        .where((m) => m.word.toLowerCase() == word.toLowerCase())
+        .toList();
+    if (hit.isNotEmpty) openMeaningDetail(context, hit.first);
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (!_ready) {
+      return const SizedBox(
+        height: 420,
+        child: Center(
+          child: AppThinkingLoader(
+            size: 72,
+            state: OrbState.composing,
+            label: 'Loading meanings…',
+          ),
+        ),
+      );
+    }
     final all = _base;
     final cats = <String, List<MsMeaning>>{};
     for (final m in all) {
@@ -139,111 +197,26 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
       'Emotions',
       'Cosmos',
       'Nations & People',
-      ...cats.keys.where((k) => !const {'Elements', 'Human', 'Emotions', 'Cosmos', 'Nations & People'}.contains(k)),
+      ...cats.keys.where((k) => !const {
+            'Elements',
+            'Human',
+            'Emotions',
+            'Cosmos',
+            'Nations & People'
+          }.contains(k)),
     ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(14),
-          child: SizedBox(
-            height: 160,
-            width: double.infinity,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                NwsbVideo(
-                  asset: nwsbVideo(kStoreMeaningDoorVidFile),
-                  priority: ClipPriority.feature,
-                ),
-                const DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [Color(0x22060C18), Color(0xE6060C18)],
-                    ),
-                  ),
-                ),
-                const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Align(
-                    alignment: Alignment.bottomLeft,
-                    child: Text(
-                      'The Meaning Store',
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.w300, color: Colors.white),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+        // Single hero/video area — no back-to-back promo banners.
+        StorePixelsHero(
+          videoAsset: nwsbVideo(kStoreMeaningDoorVidFile),
+          videoTitle: '',
         ),
-        const SizedBox(height: 14),
-        // Subscribe video banner — same clip as index / part026.
-        ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: AspectRatio(
-            aspectRatio: 16 / 5,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                NwsbVideo(
-                  asset: nwsbVideo(kMsSubscribeVidFile),
-                  priority: ClipPriority.decoration,
-                ),
-                const DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                      colors: [Color(0xAA060C18), Color(0x22060C18)],
-                    ),
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 14),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: const Color(0xEE060C18),
-                        borderRadius: BorderRadius.circular(40),
-                        border: Border.all(color: const Color(0x33E8D5A3)),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          ClipOval(
-                            child: Image.network(
-                              kMsSubscribePillIcon,
-                              width: 22,
-                              height: 22,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => const SizedBox(width: 22, height: 22),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          const Text(
-                            'Subscribe Today',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: NwsbColors.goldLight,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+        StoreSubscribeBanner(
+          pillIconAsset: kMsMeaningProductArt,
         ),
-        const SizedBox(height: 14),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 2),
           child: StoreSearchBar(
@@ -258,10 +231,22 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
           child: ListView(
             scrollDirection: Axis.horizontal,
             children: [
-              StoreFilterChip(label: 'ALL', selected: _chip == 'ALL', onTap: () => setState(() => _chip = 'ALL')),
+              StoreFilterChip(
+                  label: 'ALL',
+                  selected: _chip == 'ALL',
+                  onTap: () => setState(() => _chip = 'ALL')),
               const SizedBox(width: 7),
-              for (final c in ['Elements', 'Human', 'Emotions', 'Cosmos', 'Nations & People']) ...[
-                StoreFilterChip(label: c.toUpperCase(), selected: _chip == c, onTap: () => setState(() => _chip = c)),
+              for (final c in [
+                'Elements',
+                'Human',
+                'Emotions',
+                'Cosmos',
+                'Nations & People'
+              ]) ...[
+                StoreFilterChip(
+                    label: c.toUpperCase(),
+                    selected: _chip == c,
+                    onTap: () => setState(() => _chip = c)),
                 const SizedBox(width: 7),
               ],
             ],
@@ -269,8 +254,8 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
         ),
         const SizedBox(height: 8),
         StoreFrequencyPackage(
+          meanings: true,
           onSelectCategory: (id) {
-            // Map heal-grid ids → meaning category chips when possible.
             const map = {
               'elements': 'Elements',
               'sacred': 'Emotions',
@@ -284,40 +269,38 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
           },
           onSeeAll: () => _openViewAll('Browse by Goal'),
           onRequestWords: () => openRequestWords(context),
-          onOpenWord: (word, root, img, price) {
-            // Best-effort: open first matching meaning if present.
-            final hit = _base.where((m) => m.word.toLowerCase() == word.toLowerCase()).toList();
-            if (hit.isNotEmpty) {
-              openMeaningDetail(context, hit.first);
-            }
-          },
+          onOpenWord: _openMeaning,
         ),
         StoreRecommendedSection(
+          meanings: true,
           onSeeAll: () => _openViewAll('Recommended for You'),
-          onOpenWord: (word, root, img, price) {
-            final hit = _base.where((m) => m.word.toLowerCase() == word.toLowerCase()).toList();
-            if (hit.isNotEmpty) openMeaningDetail(context, hit.first);
-          },
+          onOpenWord: _openMeaning,
+        ),
+        ColoredSplitPromoBanner.forSurface(
+          SplitPromoSurface.meaningStore,
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => const SignatureStoreScreen(),
+            ),
+          ),
         ),
         StoreFeaturedPlaylistSection(
+          meanings: true,
           onSeeAll: () => _openViewAll('Featured Playlist'),
-          onOpenWord: (word, root, img, price) {
-            final hit = _base.where((m) => m.word.toLowerCase() == word.toLowerCase()).toList();
-            if (hit.isNotEmpty) openMeaningDetail(context, hit.first);
-          },
+          onOpenWord: _openMeaning,
         ),
         StoreGlassPlaylistCarousel(
-          onSeeAll: () => _openViewAll('Playlists'),
-          onOpenWord: (word, root, img, price) {
-            final hit = _base.where((m) => m.word.toLowerCase() == word.toLowerCase()).toList();
-            if (hit.isNotEmpty) openMeaningDetail(context, hit.first);
-          },
+          meanings: true,
+          onSeeAll: () => _openViewAll('Featured Collections'),
+          onOpenWord: _openMeaning,
         ),
         ..._meaningCollectionSections(context, order, cats),
         if (cats.isEmpty)
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 48),
-            child: Center(child: Text('No meanings match.', style: TextStyle(color: Color(0x8CFFFFFF)))),
+            child: Center(
+                child: Text('No meanings match.',
+                    style: TextStyle(color: Color(0x8CFFFFFF)))),
           ),
         const StoreDisclaimer(
           text:
@@ -333,30 +316,33 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
     Map<String, List<MsMeaning>> cats,
   ) {
     final out = <Widget>[];
-    var rail = 0;
+    // No word-style stacked category banner rail (CURATED/FEATURED/ATELIER…).
+    var shown = 0;
     for (final cat in order) {
       if (cats[cat]?.isNotEmpty != true) continue;
-      out.add(RmCatBanner(
+      if (!_allRows && _chip == 'ALL' && shown >= 10) continue;
+      shown++;
+      out.add(RmRowHeader(
         title: cat,
-        sub: kMsCatSub[cat] ?? 'Decoded origins',
-        logoUrl: kMsCatLogoUrl,
-        logoAsset: kRmCatLogoAsset,
-        artAsset: _artForMeaningCat(cat),
-        pillLabel: cat,
         onViewAll: () => _openViewAll(cat),
       ));
-      out.add(MsGrid(
-        children: [
-          for (final m in cats[cat]!)
-            MsCard(
+      // Word Atelier row template structure — meanings labels/arts only.
+      final rowChildren = <Widget>[
+        for (final m in cats[cat]!)
+          SizedBox(
+            width: 132,
+            child: MsCard(
               word: m.word,
               root: m.root,
-              imgUrl: m.img,
+              imgUrl: _msOnlyArt(m.key, m.img),
               price: m.price,
               onTap: () => openMeaningDetail(context, m),
             ),
-          if (kMsSignature.containsKey(cat) && _query.isEmpty)
-            MsCard(
+          ),
+        if (kMsSignature.containsKey(cat) && _query.isEmpty)
+          SizedBox(
+            width: 132,
+            child: MsCard(
               word: kMsSignature[cat]!.word,
               root: kMsSignature[cat]!.root,
               imgUrl: kMsSignatureImg,
@@ -375,18 +361,31 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
                 signature: true,
               ),
             ),
-        ],
-      ));
-      rail++;
-      if (rail % 2 == 0) {
-        final mid = storeMidRailBannerAt((rail ~/ 2) - 1);
-        if (mid != null) out.add(mid);
-      }
+          ),
+      ];
+      out.add(
+        Padding(
+          padding: const EdgeInsets.only(bottom: 14),
+          child: SizedBox(
+            height: 196,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: rowChildren.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 10),
+              itemBuilder: (_, i) => rowChildren[i],
+            ),
+          ),
+        ),
+      );
     }
-    // Ensure all 6 mid-rail banners appear even when few categories.
-    final placed = rail ~/ 2;
-    for (var i = placed; i < kStoreMidRailBanners.length; i++) {
-      out.add(StoreMidRailBanner(data: kStoreMidRailBanners[i]));
+    if (!_allRows && _chip == 'ALL') {
+      final total = order.where((c) => cats[c]?.isNotEmpty == true).length;
+      if (total > 10) {
+        out.add(StoreViewMoreTap(
+          leftover: total - 10,
+          onTap: () => setState(() => _allRows = true),
+        ));
+      }
     }
     return out;
   }

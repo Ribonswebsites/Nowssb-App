@@ -29,7 +29,7 @@
 <script>
 (function () {
   try {
-    var KEY = 'nwsb_sw_reset_v6';
+    var KEY = 'nwsb_sw_reset_v8';
     if (localStorage.getItem(KEY)) return;
     localStorage.setItem(KEY, '1');
     if (!('serviceWorker' in navigator)) return;
@@ -141,6 +141,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <link rel="icon" type="image/png" sizes="512x512" href="./assets/icons/app-icon-512.png?v=2">
 <link rel="shortcut icon" type="image/webp" href="./assets/icons/logo-disc.webp?v=2">
 
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Libre+Baskerville:ital@1&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?DM+Sans:wght@200;300;400;500;600&display=swap" rel="stylesheet">
 
 <!-- Firebase -->
@@ -148,13 +149,15 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
      dead while the Firebase SDK is still on its way. -->
 <script src="app/js/part079.js?v=4"></script><!-- ══ AUTH BUTTON GUARD ══ -->
 <script type="module" src="app/js/firebase.module.js?v=267"></script>
-<link rel="stylesheet" href="app/app.css?v=318">
+<link rel="stylesheet" href="app/app.css?v=319">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=803">
+<link rel="stylesheet" href="nowssb-nm.css?v=822">
 <link rel="stylesheet" href="app/css/subscription-tiers.css?v=3">
 <link rel="stylesheet" href="app/widgets.css?v=8">
 <link rel="stylesheet" href="app/steps.css?v=9">
 <link rel="stylesheet" href="nowssb-player.css?v=237">
+<link rel="stylesheet" href="app/css/pronunciation-survey.css?v=1">
+  <link rel="stylesheet" href="app/css/editorial-banners.css?v=1">
 </head>
 <body>
 <script src="app/js/part002.js?v=163"></script>
@@ -995,6 +998,43 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </button>
     </div>
 
+    <section class="nwsb-curve nwsb-curve-nm" data-nwsb-curve aria-label="NowssB">
+      <div class="nwsb-curve-stage">
+        <div class="nwsb-curve-ring nwsb-hero-ring-a">
+          <button type="button" class="nwsb-curve-card" style="--i:0"><img src="./assets/hero-curve/stillness.webp" alt=""></button>
+          <button type="button" class="nwsb-curve-card" style="--i:1"><img src="./assets/hero-curve/countries.webp" alt=""></button>
+          <button type="button" class="nwsb-curve-card" style="--i:2"><img src="./assets/hero-curve/cosmos.webp" alt=""></button>
+          <button type="button" class="nwsb-curve-card" style="--i:3"><img src="./assets/hero-curve/cities.webp" alt=""></button>
+          <button type="button" class="nwsb-curve-card" style="--i:4"><img src="./assets/hero-curve/currencies.webp" alt=""></button>
+          <button type="button" class="nwsb-curve-card" style="--i:5"><img src="./assets/hero-curve/body.webp" alt=""></button>
+          <button type="button" class="nwsb-curve-card" style="--i:6"><img src="./assets/hero-curve/listen.webp" alt=""></button>
+        </div>
+        <div class="nwsb-curve-ring nwsb-hero-ring-b">
+          <button type="button" class="nwsb-curve-card" style="--i:0"><img src="./assets/hero-curve/stillness.webp" alt=""></button>
+          <button type="button" class="nwsb-curve-card" style="--i:1"><img src="./assets/hero-curve/countries.webp" alt=""></button>
+          <button type="button" class="nwsb-curve-card" style="--i:2"><img src="./assets/hero-curve/cosmos.webp" alt=""></button>
+          <button type="button" class="nwsb-curve-card" style="--i:3"><img src="./assets/hero-curve/cities.webp" alt=""></button>
+          <button type="button" class="nwsb-curve-card" style="--i:4"><img src="./assets/hero-curve/currencies.webp" alt=""></button>
+          <button type="button" class="nwsb-curve-card" style="--i:5"><img src="./assets/hero-curve/body.webp" alt=""></button>
+          <button type="button" class="nwsb-curve-card" style="--i:6"><img src="./assets/hero-curve/listen.webp" alt=""></button>
+        </div>
+        <div class="nwsb-curve-ring nwsb-hero-ring-c">
+          <button type="button" class="nwsb-curve-card" style="--i:0"><img src="./assets/hero-curve/stillness.webp" alt=""></button>
+          <button type="button" class="nwsb-curve-card" style="--i:1"><img src="./assets/hero-curve/countries.webp" alt=""></button>
+          <button type="button" class="nwsb-curve-card" style="--i:2"><img src="./assets/hero-curve/cosmos.webp" alt=""></button>
+          <button type="button" class="nwsb-curve-card" style="--i:3"><img src="./assets/hero-curve/cities.webp" alt=""></button>
+          <button type="button" class="nwsb-curve-card" style="--i:4"><img src="./assets/hero-curve/currencies.webp" alt=""></button>
+          <button type="button" class="nwsb-curve-card" style="--i:5"><img src="./assets/hero-curve/body.webp" alt=""></button>
+          <button type="button" class="nwsb-curve-card" style="--i:6"><img src="./assets/hero-curve/listen.webp" alt=""></button>
+        </div>
+        <img class="nwsb-curve-subject" src="./assets/hero-curve/subject.webp" alt="">
+        <div class="nwsb-curve-mark">NowssB.</div>
+      </div>
+      <div class="nwsb-curve-copy">
+        <div class="nwsb-curve-title">“With no weapon in his hand, the Enlightened and Brilliant Buddha ruled the world—not by the sword, but by the power of words.”</div>
+      </div>
+    </section>
+
     <!-- Supplied dashboard — used directly below Normal Home search. The
          hosts add only placement; their supplied documents are rendered
          directly into this page rather than inside an external iframe. -->
@@ -1367,6 +1407,22 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
       </div>
     </div>
 </div><!-- /nmh-tiles-wrap -->
+
+    <div class="nmh-stories-wrap">
+      <div class="nwsb-stories" onclick="openSub('sound-library')">
+        <div class="nwsb-stories-copy">
+          <h2>SOUND<br>THAT<br>FINDS YOU</h2>
+          <p>There are no limitations to the<br>frequency at NowssB.</p>
+          <span class="nwsb-stories-go">→</span>
+        </div>
+        <div class="nwsb-stories-stack">
+          <article class="nwsb-story c0"><span>PRANA</span><strong>SOUND<br>RITUAL</strong><img src="./assets/banners/stories/prana.png" alt=""></article>
+          <article class="nwsb-story c1"><img src="./assets/banners/stories/pitta.png" alt=""><div class="nwsb-story-copy"><span>PITTA</span><strong>LIGHT<br>BODY</strong></div></article>
+          <article class="nwsb-story c2"><span>SOMA</span><strong>WORD<br>SCIENCE</strong><div class="nwsb-story-inset"><img src="./assets/banners/stories/soma.png" alt=""></div></article>
+          <article class="nwsb-story c3"><span>AURA</span><strong>THE<br>FUTURE</strong><img src="./assets/banners/stories/aura.png" alt=""></article>
+        </div>
+      </div>
+    </div>
 
     <!-- Reader, then Customize, directly under the four home buttons.
          app/js/part062.js REG order is what actually decides this at
@@ -1809,6 +1865,43 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <div class="home-greeting w100">Begin Your<br>Healing Path</div>
   <div class="home-tagline w100"><span class="brand-tag" style="font-size:12px;">Natural Origin of <strong>Word Science</strong></span></div>
 
+  <section class="nwsb-curve nwsb-curve-fash glass-wrap" data-nwsb-curve aria-label="NowssB">
+    <div class="nwsb-curve-stage">
+      <div class="nwsb-curve-ring nwsb-hero-ring-a">
+        <button type="button" class="nwsb-curve-card" style="--i:0"><img src="./assets/hero-curve/stillness.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:1"><img src="./assets/hero-curve/countries.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:2"><img src="./assets/hero-curve/cosmos.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:3"><img src="./assets/hero-curve/cities.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:4"><img src="./assets/hero-curve/currencies.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:5"><img src="./assets/hero-curve/body.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:6"><img src="./assets/hero-curve/listen.webp" alt=""></button>
+      </div>
+      <div class="nwsb-curve-ring nwsb-hero-ring-b">
+        <button type="button" class="nwsb-curve-card" style="--i:0"><img src="./assets/hero-curve/stillness.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:1"><img src="./assets/hero-curve/countries.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:2"><img src="./assets/hero-curve/cosmos.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:3"><img src="./assets/hero-curve/cities.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:4"><img src="./assets/hero-curve/currencies.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:5"><img src="./assets/hero-curve/body.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:6"><img src="./assets/hero-curve/listen.webp" alt=""></button>
+      </div>
+      <div class="nwsb-curve-ring nwsb-hero-ring-c">
+        <button type="button" class="nwsb-curve-card" style="--i:0"><img src="./assets/hero-curve/stillness.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:1"><img src="./assets/hero-curve/countries.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:2"><img src="./assets/hero-curve/cosmos.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:3"><img src="./assets/hero-curve/cities.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:4"><img src="./assets/hero-curve/currencies.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:5"><img src="./assets/hero-curve/body.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:6"><img src="./assets/hero-curve/listen.webp" alt=""></button>
+      </div>
+      <img class="nwsb-curve-subject" src="./assets/hero-curve/subject.webp" alt="">
+      <div class="nwsb-curve-mark">NowssB.</div>
+    </div>
+    <div class="nwsb-curve-copy">
+      <div class="nwsb-curve-title">“With no weapon in his hand, the Enlightened and Brilliant Buddha ruled the world—not by the sword, but by the power of words.”</div>
+    </div>
+  </section>
+
   <!-- Customize · Features · Earn, under the greeting rather than
        under the hero. In a wrapper like every other block on this
        home — and registered in app/js/part062.js as 'herorow',
@@ -2062,18 +2155,28 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
     <div class="htg-end" id="fashTileEnd"><span class="htg-end-logo"><img decoding="async" loading="lazy" src="https://media.nowssb.com/migrated-images/af0736f58e0c29f3_30ebb160-5840-11f1-bb0c-71720609fd8f_g5nmcn.png" alt=""></span><span class="htg-end-rule"></span><span class="htg-end-txt">Begin your healing</span></div>
   </div>
+  <div class="fash-tile-pager">
+  <div class="fash-tile-page">
+  <div class="home-grid w100 home-grid-banners">
+    <button type="button" class="home-tile home-tile-banner" onclick="openSub('practice')"><img src="./assets/hero-curve/banner-player.webp" alt="Player"><span class="home-tile-enter"><span class="home-tile-enter-lbl">Enter</span><span class="home-tile-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></span></button>
+    <button type="button" class="home-tile home-tile-banner" onclick="openSub('sound-library')"><img src="./assets/hero-curve/banner-library.webp" alt="Sound Library"><span class="home-tile-enter"><span class="home-tile-enter-lbl">Enter</span><span class="home-tile-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></span></button>
+    <button type="button" class="home-tile home-tile-banner" onclick="openSub('nowssb-store')"><img src="./assets/hero-curve/banner-store.webp" alt="Store"><span class="home-tile-enter"><span class="home-tile-enter-lbl">Enter</span><span class="home-tile-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></span></button>
+    <button type="button" class="home-tile home-tile-banner" onclick="openSub('reader')"><img src="./assets/hero-curve/banner-reader.webp" alt="Reader"><span class="home-tile-enter"><span class="home-tile-enter-lbl">Enter</span><span class="home-tile-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></span></button>
+  </div>
+  </div>
+  <div class="fash-tile-page">
   <div class="home-grid w100">
-    <div class="home-tile" onclick="openSub('sound-library')">
+    <div class="home-tile" onclick="openConnectIntro()">
       <div class="home-tile-cover" style="background-image:url('https://media.nowssb.com/migrated-images/7fa4063875d35e04_file_000000008bf881faa9949f7b7d9824bf_niqhps.png');"></div>
       <div class="home-tile-cover-scrim"></div>
       <div class="home-tile-photo" style="background-image:url('https://media.nowssb.com/migrated-images/367cb3138df681bb_grok_image_1784119058739_g0ihh7.jpg');background-position:center;"></div>
       <div class="home-tile-photo-scrim"></div>
       <img class="home-tile-articon" loading="lazy" decoding="async" src="https://media.nowssb.com/migrated-images/028b990f41355c39_file_00000000048471f4ab69afc37df973c0_iab33r.png" alt="">
-      <div class="home-tile-icon"><img loading="lazy" decoding="async" src="https://media.nowssb.com/migrated-images/2ab8b4bbd1a045b0_file_0000000039c8720893ebc07bba4d3afd_iq64ts.png" alt=""></div>
+      <div class="home-tile-icon"><img loading="lazy" decoding="async" src="https://media.nowssb.com/migrated-images/8ed93fdc651b43c3_file_00000000b84c7209ab496862cacd6a7f_kagsie.png" alt=""></div>
       <div class="home-tile-rule"></div>
       <div class="home-tile-txt">
-        <div class="home-tile-title">Sound Library</div>
-        <div class="home-tile-sub">Root frequencies</div>
+        <div class="home-tile-title">Connect</div>
+        <div class="home-tile-sub">NowssB community</div>
       </div>
       <div class="home-tile-enter"><span class="home-tile-enter-lbl">Enter</span><span class="home-tile-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></div>
     </div>
@@ -2121,6 +2224,25 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
   </div>
   </div>
+  </div>
+  </div>
+
+
+  <div class="glass-wrap fash-stories-wrap">
+    <div class="nwsb-stories" onclick="openSub('sound-library')">
+      <div class="nwsb-stories-copy">
+        <h2>SOUND<br>THAT<br>FINDS YOU</h2>
+        <p>There are no limitations to the<br>frequency at NowssB.</p>
+        <span class="nwsb-stories-go">→</span>
+      </div>
+      <div class="nwsb-stories-stack">
+        <article class="nwsb-story c0"><span>PRANA</span><strong>SOUND<br>RITUAL</strong><img src="./assets/banners/stories/prana.png" alt=""></article>
+        <article class="nwsb-story c1"><img src="./assets/banners/stories/pitta.png" alt=""><div class="nwsb-story-copy"><span>PITTA</span><strong>LIGHT<br>BODY</strong></div></article>
+        <article class="nwsb-story c2"><span>SOMA</span><strong>WORD<br>SCIENCE</strong><div class="nwsb-story-inset"><img src="./assets/banners/stories/soma.png" alt=""></div></article>
+        <article class="nwsb-story c3"><span>AURA</span><strong>THE<br>FUTURE</strong><img src="./assets/banners/stories/aura.png" alt=""></article>
+      </div>
+    </div>
+  </div>
 
 
     <!-- Today's Trending sits directly above Customize; part062.js REG order
@@ -2150,27 +2272,63 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
 
   <div class="customize-experience-banner" id="customizeExperienceBanner" role="button" aria-label="Customize your app experience" onclick="cuOpen()">
-    <div class="customize-experience-copy">Customized<br>you app experiance</div>
+    <div class="customize-experience-copy">Customized<br>you app experience</div>
     <div class="customize-experience-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#060c18" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
   </div>
 
-  <!-- Customize panel — Quick Access, Quick Links and Set As You Like in one
-       glass card instead of three banners scattered down the page. Tapping the
-       header opens the full Customize hub (app/js/part063.js). -->
-  <div class="cust-panel fash-cust-panel">
-    <div class="cust-panel-head" onclick="cuOpen()">
-      <div class="cust-panel-icon"><img loading="lazy" decoding="async" src="https://media.nowssb.com/migrated-images/cfc84fc5478b4b63_file_00000000b11472098a225d3703b04a60_phr6ph.png" alt=""></div>
-      <div class="cust-panel-txt">
-        <div class="cust-panel-title">Customize</div>
-        <div class="cust-panel-sub">Make this home yours</div>
+  <div class="fash-cust-pager fash-cust-panel" id="fashCustPager">
+    <div class="fash-cust-page glass-wrap" role="button" onclick="cuOpen()">
+      <div class="nwsb-enter-copy-top"><span>NowssB.</span><strong>Make this home yours</strong></div>
+      <div class="fash-cust-intro-stage">
+        <img class="fash-cust-still a" src="./assets/hero-curve/banner-player.webp" alt="">
+        <img class="fash-cust-still b" src="./assets/hero-curve/stillness.webp" alt="">
+        <img class="fash-cust-still c" src="./assets/hero-curve/cosmos.webp" alt="">
+        <img class="fash-cust-still d" src="./assets/hero-curve/banner-library.webp" alt="">
+        <img class="nwsb-enter-pointer" src="./assets/hero-curve/pointer.webp" alt="">
       </div>
-      <div class="cust-panel-more"><svg viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="rgba(255,255,255,0.6)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="nwsb-enter-copy-bot"><strong>Themes · Background · Start art · Access</strong><span>Four doors. One tap. The home follows you.</span></div>
     </div>
-    <!-- Rows rendered by app/js/part063.js from the same list the
-         Customize hub uses, so the two can never drift apart. -->
-    <div class="cust-scroll">
-      <div class="cust-rows"></div>
-      <div class="cust-scrollbar"><div class="cust-scrollthumb"></div></div>
+    <div class="fash-cust-page glass-wrap fash-cust-panel-card">
+      <div class="cust-panel-head" onclick="cuOpen()">
+        <div class="cust-panel-icon"><img loading="lazy" decoding="async" src="https://media.nowssb.com/migrated-images/cfc84fc5478b4b63_file_00000000b11472098a225d3703b04a60_phr6ph.png" alt=""></div>
+        <div class="cust-panel-txt">
+          <div class="cust-panel-title">Customize</div>
+          <div class="cust-panel-sub">Make this home yours</div>
+        </div>
+        <div class="cust-panel-more"><svg viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="rgba(255,255,255,0.6)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="cust-row" onclick="cuGo('themes')"><div class="cust-row-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" fill="#000" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/><rect x="6" y="6" width="5" height="5" rx="1.5" fill="rgba(255,255,255,0.12)"/><rect x="13" y="6" width="5" height="5" rx="1.5" fill="rgba(232,213,163,0.3)"/></svg></div><div class="cust-row-divider"></div><div class="cust-row-txt"><div class="cust-row-title">Themes</div><div class="cust-row-sub">Black Edition</div></div><div class="cust-row-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div></div>
+      <div class="cust-row" onclick="cuGo('bg')"><div class="cust-row-icon"><img loading="lazy" decoding="async" alt="" src="https://media.nowssb.com/migrated-images/cfc84fc5478b4b63_file_00000000b11472098a225d3703b04a60_phr6ph.png"></div><div class="cust-row-divider"></div><div class="cust-row-txt"><div class="cust-row-title">Background</div><div class="cust-row-sub">Fashion backdrop</div></div><div class="cust-row-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div></div>
+      <div class="cust-row" onclick="cuGo('startbg')"><div class="cust-row-icon"><img loading="lazy" decoding="async" alt="" src="https://media.nowssb.com/migrated-images/5e8a9fdb18e034ec_file_000000009f10820bb6872a5ed8007148_pvqjaa.png"></div><div class="cust-row-divider"></div><div class="cust-row-txt"><div class="cust-row-title">Start Image</div><div class="cust-row-sub">Art behind the start</div></div><div class="cust-row-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div></div>
+      <div class="cust-row" onclick="cuGo('qa')"><div class="cust-row-icon"><img loading="lazy" decoding="async" alt="" src="https://media.nowssb.com/migrated-images/272b820a002190fe_file_000000002cf4820b865caf6fc0554959_k7drqx.png"></div><div class="cust-row-divider"></div><div class="cust-row-txt"><div class="cust-row-title">Quick access</div><div class="cust-row-sub">Bottom nav bar</div></div><div class="cust-row-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div></div>
+    </div>
+    <div class="fash-cust-page glass-wrap fash-cust-door" role="button" onclick="cuGo('themes')">
+      <div class="fash-cust-door-art"><svg viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" fill="#000" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/><rect x="6" y="6" width="5" height="5" rx="1.5" fill="rgba(255,255,255,0.12)"/><rect x="13" y="6" width="5" height="5" rx="1.5" fill="rgba(232,213,163,0.3)"/></svg></div>
+      <div class="fash-cust-door-title">Themes</div>
+      <div class="fash-cust-door-sub">Black Edition</div>
+      <div class="fash-cust-door-body">Swap the whole home — black, light, or the edition you keep.</div>
+      <span class="tp-enter"><span class="tp-enter-lbl">Enter</span><span class="tp-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></span>
+    </div>
+    <div class="fash-cust-page glass-wrap fash-cust-door" role="button" onclick="cuGo('bg')">
+      <div class="fash-cust-door-art"><img src="https://media.nowssb.com/migrated-images/cfc84fc5478b4b63_file_00000000b11472098a225d3703b04a60_phr6ph.png" alt=""></div>
+      <div class="fash-cust-door-title">Background</div>
+      <div class="fash-cust-door-sub">Fashion backdrop</div>
+      <div class="fash-cust-door-body">The motion behind Fashion home. Pick the film you want.</div>
+      <span class="tp-enter"><span class="tp-enter-lbl">Enter</span><span class="tp-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></span>
+    </div>
+    <div class="fash-cust-page glass-wrap fash-cust-door" role="button" onclick="cuGo('startbg')">
+      <div class="fash-cust-door-art"><img src="https://media.nowssb.com/migrated-images/5e8a9fdb18e034ec_file_000000009f10820bb6872a5ed8007148_pvqjaa.png" alt=""></div>
+      <div class="fash-cust-door-title">Start Image</div>
+      <div class="fash-cust-door-sub">Art behind the start</div>
+      <div class="fash-cust-door-body">The still that waits behind the start button.</div>
+      <span class="tp-enter"><span class="tp-enter-lbl">Enter</span><span class="tp-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></span>
+    </div>
+    <div class="fash-cust-page glass-wrap fash-cust-door" role="button" onclick="cuGo('qa')">
+      <div class="fash-cust-door-art"><img src="https://media.nowssb.com/migrated-images/272b820a002190fe_file_000000002cf4820b865caf6fc0554959_k7drqx.png" alt=""></div>
+      <div class="fash-cust-door-title">Quick access</div>
+      <div class="fash-cust-door-sub">Bottom nav bar</div>
+      <div class="fash-cust-door-body">The five doors at the foot of the home. Yours to rearrange.</div>
+      <span class="tp-enter"><span class="tp-enter-lbl">Enter</span><span class="tp-enter-go"><svg viewBox="0 0 12 12" fill="none"><path d="M2 6H10M7 3L10 6L7 9" stroke="#060c18" stroke-width="1.9" stroke-linecap="square"/></svg></span></span>
     </div>
   </div>
 
@@ -2191,7 +2349,82 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </span>
   </div>
 
-  <!-- The Shop Now video banner that sat here is gone. -->
+  <div class="nwsb-enter-pager">
+  <section class="nwsb-curve nwsb-enter-curve nwsb-enter-page glass-wrap" data-nwsb-curve data-nwsb-enter aria-label="NowssB destinations">
+    <div class="nwsb-enter-copy-top"><span>NowssB.</span><strong>Enter your path</strong></div>
+    <div class="nwsb-curve-stage nwsb-enter-stage">
+      <div class="nwsb-curve-ring nwsb-enter-ring-top">
+        <button type="button" class="nwsb-curve-card nwsb-enter-card" style="--i:0" data-go="player">
+          <img src="./assets/hero-curve/banner-player.webp" alt="NowssB Player">
+          <span class="nwsb-enter-rail"></span>
+        </button>
+        <button type="button" class="nwsb-curve-card nwsb-enter-card" style="--i:1" data-go="library">
+          <img src="./assets/hero-curve/banner-library.webp" alt="NowssB Sound Library">
+          <span class="nwsb-enter-rail"></span>
+        </button>
+        <button type="button" class="nwsb-curve-card nwsb-enter-card" style="--i:2" data-go="store">
+          <img src="./assets/hero-curve/banner-store.webp" alt="NowssB Store">
+          <span class="nwsb-enter-rail"></span>
+        </button>
+        <button type="button" class="nwsb-curve-card nwsb-enter-card" style="--i:3" data-go="reader">
+          <img src="./assets/hero-curve/banner-reader.webp" alt="NowssB Reader">
+          <span class="nwsb-enter-rail"></span>
+        </button>
+        <button type="button" class="nwsb-curve-card" style="--i:4"><img src="./assets/hero-curve/stillness.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:5"><img src="./assets/hero-curve/cosmos.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:6"><img src="./assets/hero-curve/cities.webp" alt=""></button>
+      </div>
+      <div class="nwsb-curve-ring nwsb-enter-ring-bot">
+        <button type="button" class="nwsb-curve-card" style="--i:0"><img src="./assets/hero-curve/stillness.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:1"><img src="./assets/hero-curve/countries.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:2"><img src="./assets/hero-curve/cosmos.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:3"><img src="./assets/hero-curve/cities.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:4"><img src="./assets/hero-curve/currencies.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:5"><img src="./assets/hero-curve/body.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:6"><img src="./assets/hero-curve/listen.webp" alt=""></button>
+      </div>
+      <img class="nwsb-enter-pointer" src="./assets/hero-curve/pointer.webp" alt="">
+    </div>
+    <div class="nwsb-enter-copy-bot"><strong>Player · Library · Store · Reader</strong><span>One still, one destination — her hand shows the way.</span></div>
+  </section>
+  <section class="nwsb-curve nwsb-enter-curve nwsb-enter-page glass-wrap" data-nwsb-curve data-nwsb-enter aria-label="NowssB frequencies">
+    <div class="nwsb-enter-copy-top"><span>NowssB.</span><strong>Sound that holds you</strong></div>
+    <div class="nwsb-curve-stage nwsb-enter-stage">
+      <div class="nwsb-curve-ring nwsb-enter-ring-top">
+        <button type="button" class="nwsb-curve-card nwsb-enter-card" style="--i:0" data-go="player">
+          <img src="./assets/hero-curve/banner-player.webp" alt="NowssB Player">
+          <span class="nwsb-enter-rail"></span>
+        </button>
+        <button type="button" class="nwsb-curve-card nwsb-enter-card" style="--i:1" data-go="library">
+          <img src="./assets/hero-curve/banner-library.webp" alt="NowssB Sound Library">
+          <span class="nwsb-enter-rail"></span>
+        </button>
+        <button type="button" class="nwsb-curve-card nwsb-enter-card" style="--i:2" data-go="store">
+          <img src="./assets/hero-curve/banner-store.webp" alt="NowssB Store">
+          <span class="nwsb-enter-rail"></span>
+        </button>
+        <button type="button" class="nwsb-curve-card nwsb-enter-card" style="--i:3" data-go="reader">
+          <img src="./assets/hero-curve/banner-reader.webp" alt="NowssB Reader">
+          <span class="nwsb-enter-rail"></span>
+        </button>
+        <button type="button" class="nwsb-curve-card" style="--i:4"><img src="./assets/hero-curve/stillness.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:5"><img src="./assets/hero-curve/cosmos.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:6"><img src="./assets/hero-curve/cities.webp" alt=""></button>
+      </div>
+      <div class="nwsb-curve-ring nwsb-enter-ring-bot">
+        <button type="button" class="nwsb-curve-card" style="--i:0"><img src="./assets/hero-curve/stillness.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:1"><img src="./assets/hero-curve/countries.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:2"><img src="./assets/hero-curve/cosmos.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:3"><img src="./assets/hero-curve/cities.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:4"><img src="./assets/hero-curve/currencies.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:5"><img src="./assets/hero-curve/body.webp" alt=""></button>
+        <button type="button" class="nwsb-curve-card" style="--i:6"><img src="./assets/hero-curve/listen.webp" alt=""></button>
+      </div>
+      <img class="nwsb-enter-pointer" src="./assets/hero-curve/cleopatra.webp" alt="">
+    </div>
+    <div class="nwsb-enter-copy-bot"><strong>Frequencies, words, healing</strong><span>The same ring, a different centre. Swipe to step in.</span></div>
+  </section>
+  </div>
 
   <!-- AI Prescription Card -->
   <div id="rxCardWrap" style="width:100%;"></div>
@@ -2222,7 +2455,21 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 
   <!-- The store clip and its Shop Now banner, in a wrapper of its own.
        app/js/part067.js drops the clip in above the banner. -->
-  <div class="glass-wrap fash-storevid-wrap">
+  <div class="glass-wrap fash-storevid-wrap fash-today-offer">
+  <div class="nmh-trend-shop-banner fash-offer-head" onclick="nwsbTrendShopTap(this)">
+    <div class="nmh-trend-shop-logo">
+      <img decoding="async" loading="lazy" src="https://media.nowssb.com/migrated-images/86a1283688196499_ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png" alt="Store">
+    </div>
+    <div class="nmh-trend-shop-text">
+      <div class="nmh-trend-shop-label">TODAY'S OFFER</div>
+      <div class="nmh-trend-shop-word">Limited drops · healing sounds</div>
+    </div>
+    <div class="nmh-trend-shop-divider"></div>
+    <button class="nmh-trend-shop-btn" onclick="event.stopPropagation();nwsbTrendShopTap(this)">
+      <svg class="nmh-trend-shop-cart" viewBox="0 0 24 24" fill="none" stroke="#060c18" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2.5 3h2.3l1.9 12a1.4 1.4 0 0 0 1.4 1.2h9.4a1.4 1.4 0 0 0 1.4-1.1L21 8H6"/></svg>
+      Shop Now
+    </button>
+  </div>
   <div class="nmh-trend-shop-banner fash-trend-shop-banner" id="nmh-trending-shop-banner-fash" onclick="nwsbTrendShopTap(this)">
     <div class="nmh-trend-shop-logo">
       <img decoding="async" loading="lazy" src="https://media.nowssb.com/migrated-images/86a1283688196499_ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png" alt="Store">
@@ -2502,9 +2749,17 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   <div id="fashPromoVid" class="glass-wrap fash-promovid-wrap">
     <div class="fpv-tab nwsb-inframe dev-tab-l">
       <div class="fpv-screen">
-        <video class="fpv-video" data-nwsb-auto muted loop playsinline preload="none"
-               aria-hidden="true" tabindex="-1"
-               poster="https://media.nowssb.com/migrated-images/2da873072fb16210_grok_image_1778665450_c1npax.jpg" src="assets/videos/2da873072fb16210_grok_video_2026-05-13-15-13-43_c1npax.mp4"></video>
+        <div class="nwsb-curve nwsb-curve-embed nwsb-enter-embed" data-nwsb-curve data-nwsb-enter aria-label="NowssB">
+          <div class="nwsb-curve-stage">
+            <div class="nwsb-curve-ring">
+              <button type="button" class="nwsb-curve-card nwsb-enter-card" style="--i:0" data-go="player"><img src="./assets/hero-curve/banner-player.webp" alt="Player"><span class="nwsb-enter-rail" data-compact="1"></span></button>
+              <button type="button" class="nwsb-curve-card nwsb-enter-card" style="--i:1" data-go="library"><img src="./assets/hero-curve/banner-library.webp" alt="Sound Library"><span class="nwsb-enter-rail" data-compact="1"></span></button>
+              <button type="button" class="nwsb-curve-card nwsb-enter-card" style="--i:2" data-go="store"><img src="./assets/hero-curve/banner-store.webp" alt="Store"><span class="nwsb-enter-rail" data-compact="1"></span></button>
+              <button type="button" class="nwsb-curve-card nwsb-enter-card" style="--i:3" data-go="reader"><img src="./assets/hero-curve/banner-reader.webp" alt="Reader"><span class="nwsb-enter-rail" data-compact="1"></span></button>
+            </div>
+            <img class="nwsb-curve-subject" src="./assets/hero-curve/tab-subject.webp" alt="">
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -2868,6 +3123,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 </div>
 
 <script src="app/js/part004.js?v=290"></script>
+<script src="app/js/pronunciation-survey.js?v=1"></script>
 
 <!-- ══ SUB-SCREEN: SOUND LIBRARY ══ -->
 <!-- ══ SOUND LIBRARY — STYLES ══ -->
@@ -5000,7 +5256,7 @@ document.querySelectorAll('.option').forEach(b=>b.addEventListener('click',()=>b
         </div>
 
         <!-- BUY NOW — final CTA, after all the detail content -->
-        <button class="rmd-act-buy" id="rmdBuyBtn" onclick="rmdBuyNow()" style="margin-top:24px;">Buy Now</button>
+        <button class="rmd-act-buy" id="rmdBuyBtn" onclick="rmdBuyNow()" style="margin-top:24px;display:flex;align-items:center;justify-content:center;gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>Buy Now</button>
 
       </div>
 
@@ -6526,13 +6782,15 @@ document.querySelectorAll('.option').forEach(b=>b.addEventListener('click',()=>b
 
 </div><!-- /sub-signature-store -->
 
-<script src="app/js/part017.js?v=208"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/Flip.min.js"></script>
+<script>if (window.gsap && window.Flip) window.gsap.registerPlugin(window.Flip);</script>
+<script src="app/js/part017.js?v=209"></script>
 
 <!-- intro rendered inline -->
 
 <script src="app/js/part018.js?v=80"></script>
 <!-- Must load after part018.js — it takes over window.slRender/slSetTab. -->
-<script src="app/js/part080.js?v=8"></script><!-- ══ SOUND LIBRARY FEED ══ -->
+<script src="app/js/part080.js?v=9"></script><!-- ══ SOUND LIBRARY FEED ══ -->
 <script src="app/js/part081.js?v=3"></script>
 <script src="app/js/part082.js?v=25"></script>
 <script src="app/js/part083.js?v=17"></script>
@@ -11347,12 +11605,12 @@ document.querySelectorAll('.option').forEach(b=>b.addEventListener('click',()=>b
 <script src="app/js/part059.js?v=8"></script>
 <script src="app/js/part060.js?v=15"></script>
 <script src="app/js/part061.js?v=8"></script>
-<script src="app/js/part062.js?v=49"></script>
+<script src="app/js/part062.js?v=51"></script>
 <script src="app/js/part063.js?v=9"></script>
 <script src="app/js/part064.js?v=7"></script>
 <script src="app/js/part065.js?v=13"></script>
 <script src="app/js/part066.js?v=42"></script>
-<script src="app/js/part067.js?v=40"></script>
+<script src="app/js/part067.js?v=41"></script>
 <script src="app/js/part068.js?v=6"></script><!-- ══ PHONE NOTIFICATIONS ══ -->
 <script src="app/js/part069.js?v=1"></script><!-- ══ CONTENT (Firestore + fallback) ══ -->
 <script src="app/js/part070.js?v=1"></script><!-- ══ STUDIO DOOR ══ -->
@@ -11366,13 +11624,15 @@ document.querySelectorAll('.option').forEach(b=>b.addEventListener('click',()=>b
 <script src="nowssb-social.js?v=185" defer></script>
 <script src="nowssb-nm.js?v=180" defer></script>
 <script src="app/js/part085-sentence-builder.js?v=3"></script>
-<script src="app/js/subscription-tiers.js?v=3"></script>
+<script src="app/js/subscription-tiers.js?v=4"></script>
 <script src="nowssb-player.js?v=330" defer></script>
 <script src="app/js/part092-motion.js?v=1" defer></script><!-- APP-WIDE AURA MOTION -->
 <script src="app/js/part094-dashboard-live.js?v=1" defer></script>
 <script src="app/js/personal-coach-live.js?v=1" defer></script>
 <script src="app/js/part095-direct-neomorphic-sections.js?v=3" defer></script>
-<script src="app/js/part096-start-today-carousel.js?v=2" defer></script>
+<script src="app/js/part096-start-today-carousel.js?v=3" defer></script>
+<script src="app/js/part097-hero-curve.js?v=3" defer></script>
+<script src="app/js/editorial-banners.js?v=1"></script>
 
 <script>
 /* ── How tall the fixed home header is, as a CSS variable ──

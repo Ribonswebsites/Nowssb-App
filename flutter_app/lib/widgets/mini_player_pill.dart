@@ -1,10 +1,16 @@
-/// Floating mini-player pill shown above the bottom nav while a practice
-/// session is minimized. Tap opens the hearing-safety expanded player.
+/// Floating mini-player shown above the bottom nav while a session is
+/// minimized. Black rounded rectangle inside a glass wrapper — not a pill.
 library;
 
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/material.dart';
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../data/playback_session.dart';
+import 'app_thinking_loader.dart';
+
+const _storeMark = 'assets/store/nowssb-bag-headphones.webp';
 
 class MiniPlayerPill extends StatelessWidget {
   const MiniPlayerPill({
@@ -29,92 +35,176 @@ class MiniPlayerPill extends StatelessWidget {
         final title = session.word?.word ?? session.title;
         return Material(
           color: Colors.transparent,
-          child: InkWell(
+          child: GestureDetector(
             onTap: onOpen,
-            borderRadius: BorderRadius.circular(16),
-            child: Ink(
-              height: 58,
-              decoration: BoxDecoration(
-                color: const Color(0xF2141418),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0x28FFFFFF)),
-                boxShadow: const [
-                  BoxShadow(color: Color(0x66000000), blurRadius: 18, offset: Offset(0, 6)),
-                ],
-              ),
-              child: Row(
-                children: [
-                  const SizedBox(width: 8),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: SizedBox(
-                      width: 42,
-                      height: 42,
-                      child: art.isEmpty
-                          ? const ColoredBox(color: Color(0xFF222228))
-                          : art.startsWith('http')
-                              ? Image.network(
-                                  art,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) =>
-                                      const ColoredBox(color: Color(0xFF222228)),
-                                )
-                              : Image.asset(
-                                  art,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) =>
-                                      const ColoredBox(color: Color(0xFF222228)),
-                                ),
-                    ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(18),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                child: Container(
+                  padding: const EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                    color: const Color(0x33101014),
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(color: const Color(0x33FFFFFF)),
                   ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Container(
+                    height: 56,
+                    padding: const EdgeInsets.fromLTRB(6, 5, 6, 5),
+                    decoration: BoxDecoration(
+                      color: const Color(0xF00C0C0E),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Row(
                       children: [
-                        Text(
-                          title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Color(0xFFF5F5F7),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: -0.2,
+                        SizedBox(
+                          width: 46,
+                          height: 46,
+                          child: Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: art.isEmpty
+                                    ? const ColoredBox(color: Color(0xFF222228))
+                                    : art.startsWith('http')
+                                        ? Image.network(
+                                            art,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (_, __, ___) =>
+                                                const ColoredBox(
+                                              color: Color(0xFF222228),
+                                            ),
+                                          )
+                                        : Image.asset(
+                                            art,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (_, __, ___) =>
+                                                const ColoredBox(
+                                              color: Color(0xFF222228),
+                                            ),
+                                          ),
+                              ),
+                              Positioned(
+                                right: 2,
+                                bottom: 2,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(5),
+                                  child: Image.asset(
+                                    _storeMark,
+                                    width: 14,
+                                    height: 14,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) =>
+                                        const SizedBox.shrink(),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 2),
-                        Text(
-                          session.playing ? 'Playing · NowssB' : 'Paused · NowssB',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 11),
+                        const SizedBox(width: 8),
+                        Container(
+                          width: 1,
+                          height: 24,
+                          color: const Color(0x55FFFFFF),
+                        ),
+                        const SizedBox(width: 8),
+                        const AppThinkingLoader(
+                          size: 28,
+                          state: OrbState.composing,
+                          circlePad: 6,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                title,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  color: Color(0xFFF5F5F7),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: -0.2,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                session.playing
+                                    ? 'Playing · NowssB'
+                                    : 'Paused · NowssB',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  color: Color(0xFF8E8E93),
+                                  fontSize: 10,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        _WhiteCircleBtn(
+                          icon: session.playing
+                              ? Icons.pause_rounded
+                              : Icons.play_arrow_rounded,
+                          onTap: onPlayPause ??
+                              () => PlaybackSession.instance.togglePlay(),
+                        ),
+                        const SizedBox(width: 6),
+                        Container(
+                          width: 1,
+                          height: 18,
+                          color: const Color(0x55FFFFFF),
+                        ),
+                        const SizedBox(width: 6),
+                        _WhiteCircleBtn(
+                          icon: Icons.close_rounded,
+                          size: 16,
+                          onTap: onDismiss ??
+                              () => PlaybackSession.instance.dismiss(),
                         ),
                       ],
                     ),
                   ),
-                  IconButton(
-                    visualDensity: VisualDensity.compact,
-                    onPressed: onPlayPause ?? () => PlaybackSession.instance.togglePlay(),
-                    icon: Icon(
-                      session.playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
-                      color: const Color(0xFFF5F5F7),
-                      size: 28,
-                    ),
-                  ),
-                  IconButton(
-                    visualDensity: VisualDensity.compact,
-                    onPressed: onDismiss ?? () => PlaybackSession.instance.dismiss(),
-                    icon: const Icon(Icons.close_rounded, color: Color(0xFFB0B0B5), size: 20),
-                  ),
-                  const SizedBox(width: 2),
-                ],
+                ),
               ),
             ),
           ),
         );
       },
+    );
+  }
+}
+
+class _WhiteCircleBtn extends StatelessWidget {
+  const _WhiteCircleBtn({
+    required this.icon,
+    required this.onTap,
+    this.size = 20,
+  });
+
+  final IconData icon;
+  final VoidCallback onTap;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 30,
+        height: 30,
+        alignment: Alignment.center,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
+        ),
+        child: Icon(icon, color: const Color(0xFF0A0A0C), size: size),
+      ),
     );
   }
 }

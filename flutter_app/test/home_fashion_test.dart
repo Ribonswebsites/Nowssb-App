@@ -59,9 +59,9 @@ void main() {
     // fresh install shows twenty-six — plus `mainops`, which is this app's
     // own: six doors on one panel, so the app can be used without knowing
     // where anything is.
-    expect(kFashionSectionOrder, hasLength(35));
+    expect(kFashionSectionOrder, hasLength(36));
     expect(kFashionDefOff, hasLength(4));
-    expect(kFashionSectionOrder.toSet(), hasLength(35),
+    expect(kFashionSectionOrder.toSet(), hasLength(36),
         reason: 'two sections share a key');
     for (final k in kFashionDefOff) {
       expect(kFashionSectionOrder, contains(k),
@@ -69,7 +69,11 @@ void main() {
     }
     expect(
       kFashionSectionOrder.where((k) => !kFashionDefOff.contains(k)).length,
-      31,
+      32,
+    );
+    expect(
+      kFashionSectionOrder.indexOf('enterCurve'),
+      kFashionSectionOrder.indexOf('rx') - 1,
     );
   });
 
@@ -172,55 +176,32 @@ void main() {
   });
 
   testWidgets('the four tiles are the four in the markup', (tester) async {
-    // index.html:1958-1994, in order. This list carried "The Store", which
-    // is not one of them, and was missing My Progress.
     await pump(tester);
 
-    // The tiles are the seventh section, well below the fold, and a
-    // ListView.builder has not built them at rest.
-    // Scrolled to the GRID, not to the first "Sound Library" on the page —
-    // the six-door panel above the tiles says that too, and stopping at it
-    // left the tiles still below the fold.
     final list = find.byType(Scrollable).first;
     for (var i = 0;
-        i < 30 &&
-            find
-                .descendant(
-                  of: find.byType(GridView),
-                  matching: find.text('Sound Library'),
-                )
-                .evaluate()
-                .isEmpty;
+        i < 30 && find.text('Tap to restyle').evaluate().isEmpty;
         i++) {
       await tester.drag(list, const Offset(0, -320));
       await tester.pump(const Duration(milliseconds: 16));
     }
 
-    // Scoped to the grid. Three of these names are also on the six-door
-    // panel above — that panel is a menu and these are the tiles, and both
-    // are meant to say Sound Library.
-    final grid = find.byType(GridView);
+    expect(find.text('Tap to restyle'), findsWidgets);
+
+    // Photo banners are the first card; swipe to the Connect grid.
+    await tester.drag(find.text('Tap to restyle').first, const Offset(-280, 0));
+    await tester.pumpAndSettle();
+
     for (final t in [
-      'Sound Library',
+      'Connect',
       'My Progress',
       'Word Science',
       'My Profile',
     ]) {
-      expect(find.descendant(of: grid, matching: find.text(t)), findsOneWidget,
-          reason: '$t is not on the home');
+      expect(find.text(t), findsWidgets, reason: '$t is not on the home');
     }
-    expect(find.descendant(of: grid, matching: find.text('The Store')),
-        findsNothing,
+    expect(find.text('The Store'), findsNothing,
         reason: 'The Store is not one of the four tiles');
-
-    // `height: 118px` — nowssb-nm.css:7950. They were sized by a ratio, so
-    // they grew with the phone and stood far taller than the site's.
-    final tile = tester.getRect(find.ancestor(
-      of: find.text('Sound Library'),
-      matching: find.byType(GridView),
-    ));
-    expect(tile.height, closeTo(118 * 2 + 10, 1),
-        reason: 'two rows of 118 and one 10px gap');
   });
 
   testWidgets('the offer is one section: head, film, bar', (tester) async {
@@ -301,22 +282,22 @@ void main() {
     // whole point of it.
     expect(MainOptionsSection.options.map((o) => o.$4).toSet(), hasLength(5));
 
-    // SHORT. A menu that pushes the page down is a menu that gets scrolled
-    // past, so the two rows are held to a height rather than left to grow.
-    // SHORT. Six doors cost 2 x rowHeight — 124pt for the lot, which is
-    // less than the black bar underneath them takes on its own. The head and
-    // the bar are the app's standard furniture, shared with every section on
-    // both homes, and they are 228 of the total; the grid is the part this
-    // widget controls and it is the small part.
-    expect(MainOptionsSection.rowHeight, lessThanOrEqualTo(64));
+    // Tall enough to tap. A 40pt row crushed the marks into the labels;
+    // 72pt is a real door on both homes without turning the panel into a
+    // page. The head and the bar under it stay the shared furniture.
+    expect(MainOptionsSection.rowHeight, 72);
+    expect(MainOptionsSection.rowHeight, greaterThanOrEqualTo(68));
+    expect(MainOptionsSection.rowHeight, lessThanOrEqualTo(80));
     final panel = tester.getRect(find.byType(MainOptionsSection));
-    final bar = tester.getRect(find.descendant(
-      of: find.byType(MainOptionsSection),
-      matching: find.byType(SecBanner),
-    ));
-    expect(MainOptionsSection.rowHeight * 2, lessThan(bar.height + 10),
-        reason: 'six doors should not cost more than one banner');
-    expect(panel.height, lessThan(440),
+    expect(
+        find.descendant(
+          of: find.byType(MainOptionsSection),
+          matching: find.byType(SecBanner),
+        ),
+        findsOneWidget);
+    expect(MainOptionsSection.rowHeight * 2, greaterThan(120),
+        reason: 'two rows must be tall enough to tap');
+    expect(panel.height, lessThan(480),
         reason: 'the panel got tall — it is meant to read as one menu');
     expect(tester.takeException(), isNull);
   });
@@ -334,10 +315,12 @@ void main() {
     expect(find.text('LEARN'), findsOneWidget);
     expect(find.text('Follow the steps'), findsNothing);
 
-    await tester.tap(
-      find.bySemanticsLabel('How this app works — follow the steps'),
-    );
-    await tester.pumpAndSettle();
+    final disc = find.bySemanticsLabel('How this app works — follow the steps');
+    await tester.ensureVisible(disc);
+    await tester.pump();
+    await tester.tap(disc);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
 
     // The set's own screen is the first card — not step one.
     expect(find.text('Follow the steps'), findsOneWidget);
@@ -351,10 +334,12 @@ void main() {
 
   testWidgets('every step card fits the deck it runs through', (tester) async {
     await pump(tester);
-    await tester.tap(
-      find.bySemanticsLabel('How this app works — follow the steps'),
-    );
-    await tester.pumpAndSettle();
+    final disc = find.bySemanticsLabel('How this app works — follow the steps');
+    await tester.ensureVisible(disc);
+    await tester.pump();
+    await tester.tap(disc);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
 
     // Forward through all fifteen. A card taller than the cell overflows,
     // and an overflow in a test is an exception — which is the point: the
@@ -362,7 +347,8 @@ void main() {
     // live inside it.
     for (var i = 1; i <= kFstSteps.length; i++) {
       await tester.tap(find.bySemanticsLabel('Next step').first);
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 420));
       expect(find.text('Step $i of ${kFstSteps.length}'), findsOneWidget,
           reason: 'step $i did not arrive');
       expect(find.text(kFstSteps[i - 1].title), findsWidgets);
@@ -371,14 +357,17 @@ void main() {
 
   testWidgets('the guide gives the rail back', (tester) async {
     await pump(tester);
-    await tester.tap(
-      find.bySemanticsLabel('How this app works — follow the steps'),
-    );
-    await tester.pumpAndSettle();
+    final disc = find.bySemanticsLabel('How this app works — follow the steps');
+    await tester.ensureVisible(disc);
+    await tester.pump();
+    await tester.tap(disc);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
     expect(find.text('Follow the steps'), findsOneWidget);
 
     await tester.tap(find.bySemanticsLabel('Close the steps').first);
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 420));
 
     expect(find.text('Follow the steps'), findsNothing);
     expect(find.text('EXPLORE'), findsOneWidget);

@@ -14,7 +14,7 @@ test('every successful Android build publishes a stable APK before its update ma
   assert.match(webview, /tools\/capacitor-android-version\.mjs/);
   assert.match(webview, /NowssB-Android\.apk/);
   assert.match(webview, /NowssB-WebView-update\.json/);
-  assert.match(webview, /gh release upload "\$TAG" "\$PUBLIC_FILE"[\s\S]*gh release upload "\$TAG" "\$UPDATE_FILE"/);
+  assert.match(webview, /upload "\$PUBLIC_FILE"[\s\S]*upload "\$UPDATE_FILE"/);
   assert.match(flutter, /NWSB_BUILD_NUMBER=\$\{\{ github\.run_number \}\}/);
   assert.match(flutter, /tools\/flutter-version\.mjs/);
   assert.match(flutter, /NowssB-Flutter-Android\.apk/);

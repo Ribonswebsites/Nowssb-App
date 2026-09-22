@@ -60,8 +60,12 @@ class Settings extends ChangeNotifier {
     'assets/fashion/fp-intro.webp',
     'assets/store/intro-store.webp',
     'assets/store/intro-words.webp',
-    'assets/store/intro-meanings.webp',
-    'assets/store/intro-ebooks.webp',
+    'assets/meanings/meanings-clean.jpg',
+    'assets/meanings/meanings-branding.jpg',
+    'assets/meanings/meanings-store-swirl.png',
+    'assets/meanings/meanings-device.png',
+    'assets/ebooks/ebooks-headphones.jpg',
+    'assets/ebooks/ebooks-pair.png',
   ];
   static const fashionImageNames = <String>[
     'Fashion',
@@ -89,8 +93,8 @@ class Settings extends ChangeNotifier {
   String _nowPlaying = 'On';
   int _lastTab = 0;
   bool _showSplash = true;
-  String _navShape = 'default';
-  String _navColor = 'glass';
+  String _navShape = 'pill';
+  String _navColor = 'black';
   String _navCorner = 'rounded';
   List<String> _navSlots = [
     'connect',

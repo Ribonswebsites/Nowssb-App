@@ -45,7 +45,8 @@
            was landing above the greeting for exactly that reason. It sits
            after the greeting and before the hero clip and the streak. */
         { k:'search',   sel:['.nmh-search'],                                               t:S, label:'Search',                sub:'One bar for words and meanings' },
-        { k:'dashboard',sel:['.nmh-supplied-dashboard'],                                    t:S, label:'Daily dashboard',       sub:'Today’s focus, progress and up next', locked:1, after:'search' },
+        { k:'heroCurve',sel:['.nwsb-curve-nm'],                                            t:S, label:'NowssB Curve',          sub:'The 3D gallery under search', after:'search' },
+        { k:'dashboard',sel:['.nmh-supplied-dashboard'],                                    t:S, label:'Daily dashboard',       sub:'Today’s focus, progress and up next', locked:1, after:'heroCurve' },
         { k:'essentials',sel:['.nmh-supplied-essentials'],                                  t:S, label:'Your essentials',       sub:'Today’s meditation and sleep rituals', locked:1, after:'dashboard' },
         /* The streak card, on its own. The clip that used to sit directly
            above it has moved down the page to the other video banners —
@@ -56,10 +57,10 @@
         { k:'streak',   sel:['.nmh-streak-wrap'],                                          t:S, label:'Streak',                sub:'Your streak and its banner' },
         { k:'storedisc',sel:['.npc-card.npc-purple'],                                      t:B, label:'Store Disc',            sub:'Rotating store promo disc', vb:1, defOff:1 },
         { k:'practice', sel:['.nmh-plyr-wrap'],                                             t:S, label:"Today's Practice",      sub:'Your personalised word ritual', locked:1, after:'streak' },
-        { k:'coachCards', sel:['#home-nm .st-today-sec'],                                t:S, label:'Start Today',           sub:'Practice · Player · Healing cards', after:'practice' },
         { k:'mainops',  sel:['.mainops-blk'],                                               t:S, label:'Where to Begin',        sub:'Six doors on one panel', kind:'blk' },
         { k:'actionbar',sel:['.nmh-supplied-actionbar'],                                    t:S, label:'Help action bar',       sub:'Support and personal coach', locked:1, after:'mainops' },
         { k:'tiles',    sel:['.nmh-tiles-wrap'],                                    t:S, label:'Home Tiles',            sub:'The four buttons and their tip rail', always:1 },
+        { k:'storiesFind', sel:['.nmh-stories-wrap'],                               t:S, label:'Sound that finds you',   sub:'Overlapping story cards' },
         { k:'store',    sel:['.nmh-store-wrap'],                                          t:S, label:'NowssB Store',          sub:'Enter the store', always:1 },
         { k:'reader',   sel:['.nmh-rdsec-wrap'],                                         t:S, label:'Reader',                sub:'Meanings and eBooks' },
         { k:'trendwd',  sel:['.nmh-trend-wrap'],                                          t:S, label:"Today's Trending",      sub:'The clip and its black banner', vb:1 },
@@ -90,19 +91,19 @@
         { k:'subvid',   sel:['.nsub-blk'],                                                  t:S, label:'Subscription',          sub:'The clip, the heading and its banner', vb:1 },
         { k:'ebooks',   sel:['.nmh-ebsec-wrap'],                                         t:S, label:'eBooks',                sub:'Deep-dive guides, yours to keep' },
         { k:'connectban', sel:['.nc-blk'],                                              t:S, label:'Connect Banner',        sub:'The clip and what Connect offers', vb:1 },
-        /* Off on the shipped Normal home, and opt-in from this editor —
-           `always` is gone precisely so it CAN be switched off, and defOff
-           keeps it off until someone turns it on. The Fashion home's own
-           healing entry is untouched. */
-        { k:'healing',  sel:['.nmh-healing-wrap'],                                        t:S, label:'Personalised Healing',  sub:'Choose your health journey', defOff:1 },
-        /* Choose Your Path is its own section now — it used to live inside
-           the wrapper above. A direct child of the home wrap that this
-           registry does not know about gets stranded at the top of the page
-           while every registered one is re-appended around it. */
-        { k:'genderpath', sel:['[data-vbwrap="vb2"]'],                                     t:S, label:'Choose Your Path',      sub:'Female and Male path cards', vb:1 },
+        /* On the Flutter Normal home this sits after Connect Banner, just
+           above Choose Your Path and the footer. It used to be defOff — so
+           the real section was hidden and the Start Today card that quoted
+           it was stranded at the TOP of the page. always, so it cannot be
+           switched off from under that position. */
+        { k:'healing',  sel:['.nmh-healing-wrap'],                                        t:S, label:'Personalised Healing',  sub:'Choose your health journey', always:1 },
         { k:'wsearch',  sel:['.word-search-section'],                                      t:S, label:'Word Search',           sub:'Discover the origin of any word', defOff:1 },
         { k:'msearch',  sel:['[data-vbwrap="vb8"]', '.krm-section'],                                              t:S, label:'Meaning Search',        sub:'Earth · Water · God · your name', defOff:1 },
         { k:'fashsw',   sel:['#nmhFashSwitch'],                                            t:S, label:'Fashion Mode',          sub:'Switch to the Fashion home' },
+        /* Matched by class, not data-vbwrap index — PLACE used to write vb1
+           while this row looked for vb2, so the wrap was unregistered and
+           stranded at the TOP. Last movable slot = immediately above footer. */
+        { k:'genderpath', sel:['.nwsb-genderpath'],                                        t:S, label:'Choose Your Path',      sub:'Female and Male path cards', vb:1 },
         { k:'footer',   sel:['#homeFooterNm'],                                             t:S, label:'Footer',                sub:'Across Every Language', locked:1 }
       ]
     },
@@ -112,19 +113,16 @@
       wrap:  '#home .home-body',
       items: [
         { k:'greet',    sel:['.home-greeting', '.home-tagline'],                           t:S, label:'Greeting',              sub:'Begin Your Healing Path · hero header', locked:1 },
+        { k:'heroCurve',sel:['.nwsb-curve-fash'],                                          t:S, label:'NowssB Curve',          sub:'The 3D gallery under the greeting', after:'greet' },
         { k:'herorow',  sel:['.hhr-blk'],                                              t:S, label:'Customize · Features · Earn', sub:'The row under the greeting' , kind:'tab' },
         { k:'practice', sel:['.fash-plyr-wrap'],                                        t:S, label:"Today's Practice",      sub:'Morning word ritual', locked:1 },
-        { k:'coachCards', sel:['#home .st-today-sec'],                                   t:S, label:'Start Today',           sub:'Practice · Player · Healing cards', after:'practice' },
         { k:'mainops',  sel:['.mainops-blk'],                                               t:S, label:'Where to Begin',        sub:'Six doors on one panel', kind:'blk' },
         { k:'actionbar',sel:['.nmh-supplied-actionbar'],                                    t:S, label:'Help action bar',       sub:'Support and personal coach', locked:1, after:'mainops' },
         { k:'reader',   sel:['.fash-rdsec-wrap'],                                        t:S, label:'Reader',                sub:'Meanings and eBooks' },
         { k:'herovid',  sel:['.nsvb-blk'],                                                  t:S, label:'Streak Video',          sub:'The clip above the streak, on the tablet', vb:1 , kind:'blk' },
         { k:'streak',   sel:['.nmh-streak-glass-section'],                                 t:S, label:'Streak',                sub:'Your daily practice streak', always:1 },
         { k:'tiles',    sel:['.fash-tiles-wrap'],                                   t:S, label:'Home Tiles',            sub:'The four buttons and their tip rail', always:1 },
-        /* The clip, the trigger and the black banner are one panel now, so
-           there is one entry and it points at the wrapper — the registry
-           matches a DIRECT child of the home and all three are inside
-           something. */
+        { k:'storiesFind', sel:['.fash-stories-wrap'],                              t:S, label:'Sound that finds you',   sub:'Overlapping story cards' },
         { k:'store',    sel:['.fash-store-wrap'],                                          t:S, label:'NowssB Store',          sub:'The tall card and its banner', always:1 },
         { k:'trendwd',  sel:['.fash-trend-wrap'],                                          t:S, label:"Today's Trending",      sub:'The clip and its black banner', vb:1 },
         { k:'customexp',sel:['.customize-experience-banner'],                              t:S, label:'Customize prompt',        sub:'Open the customization panel' },
@@ -135,6 +133,7 @@
            home no matter where it was written. That is exactly what happened
            to this card. */
         { k:'fashplus', sel:['.fps-mini'],                                                 t:S, label:'Fashion Plus',          sub:'The door to the motion mode' , kind:'tab' },
+        { k:'enterCurve',sel:['.nwsb-enter-curve'],                                        t:S, label:'NowssB Enter',          sub:'Player · Library · Store · Reader', after:'fashplus' },
         { k:'rx',       sel:['#rxCardWrap'],                                               t:S, label:'AI Prescription',       sub:'Your daily recommended words' },
         { k:'connect',  sel:['.fash-connect-wrap'],                                      t:S, label:'NowssB Connect',        sub:'What the social space is' , kind:'sec', defOff:1 },
         { k:'trendvid', sel:['.fash-storevid-wrap'],                                      t:S, label:'Trending Shop',        sub:'The clip and the Shop Now banner', vb:1 },
@@ -150,12 +149,12 @@
         { k:'shabda',   sel:['.fash-shabda-wrap'],                                         t:S, label:'Shabdapathy Foundations', sub:'Featured ancient word science', vb:1, defOff:1 },
         { k:'ebooks',   sel:['.fash-ebsec-wrap'],                                        t:S, label:'eBooks',                sub:'Deep-dive guides, yours to keep' },
         { k:'connectban', sel:['.nc-blk'],                                              t:S, label:'Connect Banner',        sub:'The clip and what Connect offers', vb:1 , kind:'blk' },
-        { k:'healing',  sel:['.fash-healing-wrap'],                                       t:S, label:'Personalised Healing',  sub:'Choose your health journey', always:1 },
-        { k:'genderpath', sel:['[data-vbwrap="vb3"]'],                                     t:S, label:'Choose Your Path',      sub:'Female and Male path cards', vb:1 , kind:'blk' },
+        { k:'healing',  sel:['.fash-healing-wrap'],                                       t:S, label:'Personalised Healing',  sub:'Choose your health journey', defOff:1 },
         { k:'promovid', sel:['#fashPromoVid'],                                             t:B, label:'Promo Video',           sub:'16:9 video above Word Search', vb:1 , kind:'blk' },
         { k:'wsearch',  sel:['#fashWordSearchWrap'],                                       t:S, label:'Word Search',           sub:'Banner and search section', defOff:1 },
         { k:'msearch',  sel:['[data-vbwrap="vb9"]', '#fashMeaningSearchWrap'],                                    t:S, label:'Meaning Search',        sub:'Banner and search section' , kind:'blk', defOff:1 },
         { k:'shabvid',  sel:['.hvb-glass-wrap'],                                           t:B, label:'Shabdapathy Video',     sub:'Video banner near the footer', vb:1 , kind:'blk' },
+        { k:'genderpath', sel:['.nwsb-genderpath'],                                        t:S, label:'Choose Your Path',      sub:'Female and Male path cards', vb:1 , kind:'blk' },
         { k:'footer',   sel:['#homeFooter'],                                               t:S, label:'Footer',                sub:'Across Every Language', locked:1 }
       ]
     }
@@ -185,8 +184,17 @@
            taken away by the old behaviour gets it back here, once. */
   /* 5 — Home cleanup: Normal storedisc + actionbar off; Fashion Connect
          marketing card off; store bag banner above Store removed (part067).
-     6 — Restore Normal Start Today carousel / actionbar (locked again; not defOff). */
-  var LAYOUT_V = 7;
+     6 — Restore Normal Start Today carousel / actionbar (locked again; not defOff).
+     8 — Start Today deleted. Personalised Healing is on again on Normal,
+         after Connect Banner (same slot as Flutter), and Choose Your Path
+         is pinned under it. Saved layouts that hid healing or left the
+         carousel in the order are brought up to that once.
+     9 — Choose Your Path sits immediately above the footer on both homes.
+         The old data-vbwrap="vb2"/"vb3" selectors never matched PLACE
+         indices vb1/vb2, so the wrap was unregistered and stranded at the
+         TOP. Fashion Personalised Healing leaves the website; Normal keeps
+         it. Saved layouts are brought up once. */
+  var LAYOUT_V = 9;
 
   function load(which) {
     var reg = REG[which], all = reg.items.filter(function (i) { return !i.locked; }).map(function (i) { return i.k; });
@@ -241,6 +249,33 @@
           ti = order.indexOf('tiles');
           order.splice(ti + 1, 0, 'store');
         }
+      }
+      /* v8: drop the Start Today slot and put Personalised Healing where
+         Flutter has it — after Connect Banner, with Choose Your Path
+         directly under it. v1 had hidden healing on Normal forever. */
+      if ((raw.v || 0) < 8) {
+        var ci = order.indexOf('coachCards');
+        if (ci >= 0) order.splice(ci, 1);
+        var hv = off.indexOf('healing');
+        if (hv >= 0) off.splice(hv, 1);
+        var ho = order.indexOf('healing');
+        if (ho >= 0) order.splice(ho, 1);
+        var cb = order.indexOf('connectban');
+        order.splice(cb < 0 ? order.length : cb + 1, 0, 'healing');
+        var go = order.indexOf('genderpath');
+        if (go >= 0) {
+          order.splice(go, 1);
+          var ho2 = order.indexOf('healing');
+          order.splice(ho2 < 0 ? order.length : ho2 + 1, 0, 'genderpath');
+        }
+      }
+      /* v9: pin Choose Your Path as the last movable section (directly
+         above the locked footer). Fashion healing leaves the page. */
+      if ((raw.v || 0) < 9) {
+        if (which === 'fash' && off.indexOf('healing') < 0) off.push('healing');
+        var gp = order.indexOf('genderpath');
+        if (gp >= 0) order.splice(gp, 1);
+        order.push('genderpath');
       }
       try {
         localStorage.setItem(LSKEY(which), JSON.stringify({ order: order, off: off, v: LAYOUT_V }));

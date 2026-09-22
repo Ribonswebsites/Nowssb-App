@@ -134,6 +134,102 @@ function nssUpdateBadges() {
 nssUpdateBadges();
 
 // ── ADD TO CART ──
+function playCartAddAnimation(originEl, item, opts) {
+  opts = opts || {};
+  if (window.__nssCartFlightBusy) return false;
+  window.__nssCartFlightBusy = true;
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var alreadyInCart = (window.nssCart || []).some(function (entry) { return entry.id === item.id; });
+  var scope = originEl && originEl.closest
+    ? (originEl.closest('.sub-screen.open') || document)
+    : document;
+  var target = scope.querySelector('#nssCartBtn, .rm-cart-btn, .ms-cart-btn');
+  if (!target) {
+    var targets = document.querySelectorAll('#nssCartBtn, .rm-cart-btn, .ms-cart-btn, .nss-cart-badge-shared');
+    for (var ti = 0; ti < targets.length; ti++) {
+      var tr = targets[ti].getBoundingClientRect();
+      if (tr.width > 0 && tr.height > 0) { target = targets[ti]; break; }
+    }
+  }
+  var gsapApi = window.gsap;
+  var flipApi = window.Flip;
+  var committed = false;
+  var land = function () {
+    if (committed) return;
+    committed = true;
+    if (typeof nssAddToCart === 'function') nssAddToCart(item);
+    window.__nssCartFlightBusy = false;
+    var badge = document.getElementById('nssCartBadge') || target;
+    if (gsapApi && badge) {
+      gsapApi.fromTo(badge, {scale: 1}, {
+        scale: 1.18,
+        duration: .14,
+        yoyo: true,
+        repeat: 1,
+        ease: 'back.out(2)',
+        clearProps: 'transform'
+      });
+    }
+    if (opts.onComplete) opts.onComplete();
+  };
+  if (reduced || alreadyInCart || !document.body || !target || !gsapApi || !flipApi) {
+    land();
+    return true;
+  }
+
+  var card = originEl && originEl.closest
+    ? originEl.closest('.rm-word-card, .ms-card, .nss-card, .eb-card, .sig-card')
+    : null;
+  var source = originEl && originEl.tagName === 'IMG'
+    ? originEl
+    : (card && card.querySelector('img'));
+  var sourceNode = source || originEl;
+  if (!sourceNode || !sourceNode.getBoundingClientRect) {
+    land();
+    return true;
+  }
+  var sourceRect = sourceNode.getBoundingClientRect();
+  var proxy = source && source.cloneNode ? source.cloneNode(true) : document.createElement('div');
+  proxy.className = 'nss-cart-flip-proxy';
+  proxy.setAttribute('aria-hidden', 'true');
+  proxy.style.position = 'fixed';
+  proxy.style.left = sourceRect.left + 'px';
+  proxy.style.top = sourceRect.top + 'px';
+  proxy.style.width = Math.max(24, sourceRect.width) + 'px';
+  proxy.style.height = Math.max(24, sourceRect.height) + 'px';
+  document.body.appendChild(proxy);
+
+  /* Canonical FLIP: First (getState), Last (append into cart), Play (from). */
+  var state = flipApi.getState(proxy);
+  target.appendChild(proxy);
+  proxy.style.position = 'absolute';
+  proxy.style.left = '50%';
+  proxy.style.top = '50%';
+  proxy.style.width = '24px';
+  proxy.style.height = '24px';
+  proxy.style.transform = 'translate(-50%, -50%)';
+  flipApi.from(state, {
+    duration: .62,
+    ease: 'back.in(0.8)',
+    absolute: true,
+    onComplete: function () {
+      proxy.remove();
+      land();
+    },
+    onInterrupt: function () {
+      proxy.remove();
+      land();
+    }
+  });
+  setTimeout(function () {
+    if (proxy.isConnected) {
+      proxy.remove();
+      land();
+    }
+  }, 1000);
+  return true;
+}
+
 function nssAddToCart(item) {
   // item = { id, name, type, price, img }
   /* Cart/Buy Now must never be gated behind an active subscription check —
@@ -684,7 +780,7 @@ function ebCartItem(b) {
 
 window.ebAddToCart = function (key) {
   var b = ebBookByKey(key); if (!b) return;
-  if (typeof nssAddToCart === 'function') nssAddToCart(ebCartItem(b));
+  if (typeof playCartAddAnimation === 'function') playCartAddAnimation(document.activeElement, ebCartItem(b));
 };
 
 window.ebToggleWishlist = function (key) {
@@ -694,7 +790,7 @@ window.ebToggleWishlist = function (key) {
 
 window.ebBuyNow = function (key) {
   var b = ebBookByKey(key); if (!b) return;
-  if (typeof nssAddToCart === 'function') nssAddToCart(ebCartItem(b));
+  if (typeof playCartAddAnimation === 'function') playCartAddAnimation(document.activeElement, ebCartItem(b));
   if (typeof openSub === 'function') openSub('checkout');
 };
 

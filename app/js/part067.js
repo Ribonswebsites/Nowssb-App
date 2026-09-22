@@ -30,19 +30,17 @@
     { before: '#home .fash-storeban-slot',        vid: './assets/video/store-banner-fash.mp4?v=1' },
 
     /* Choose Your Path, on the laptop, in a section of its own.
-       It used to be appended INSIDE the Personalised Healing wrapper, which
-       made it part of that section — `after` puts it beside it instead, and
-       `wrap` gives it a wrapper of its own. Both are registered in
-       app/js/part062.js as 'genderpath'; a direct child of the home wrap
-       that the registry does not know about gets stranded at the top of the
-       page while everything registered is re-appended around it. */
-    { after: '#home-nm .nmh-healing-wrap',         vid: './assets/video/healing-path-bg.mp4', gender: 1, frame: 'dev-laptop', wrap: 'nwsb-vbwrap vb-path-fill',
+       Injected immediately before the footer so an unregistered wrap cannot
+       strand at the TOP of the home while part062 re-appends everything it
+       knows. `.nwsb-genderpath` is what the layout registry matches —
+       data-vbwrap="vb2"/"vb3" never matched these PLACE indices (vb1/vb2). */
+    { before: '#homeFooterNm', vid: './assets/video/healing-path-bg.mp4?v=2', gender: 1, frame: 'dev-laptop', wrap: 'nwsb-vbwrap vb-path-fill nwsb-genderpath', wrapKey: 'genderpath',
       head: { hello:'Body, organ and mind', name:'Choose Your Path',
               icon:"<svg viewBox=\"0 0 24 24\" fill=\"none\"><path d=\"M12 3.2v17.6\" stroke=\"#fff\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><circle cx=\"7\" cy=\"8.4\" r=\"2.6\" stroke=\"#fff\" stroke-width=\"1.5\"/><circle cx=\"17\" cy=\"8.4\" r=\"2.6\" stroke=\"#fff\" stroke-width=\"1.5\"/><path d=\"M3 17.4v-.8a4 4 0 018 0v.8M13 17.4v-.8a4 4 0 018 0v.8\" stroke=\"#fff\" stroke-width=\"1.5\" stroke-linecap=\"round\"/></svg>",
               banName:'Female or Male', banSub:'Your wellness, decoded for your body',
               banGo: function () { if (typeof openHealingIntro === 'function') openHealingIntro();
                                    else if (typeof openSub === 'function') openSub('health-category'); } } },
-    { after: '#home .fash-healing-wrap',           vid: './assets/video/healing-path-bg.mp4', gender: 1, frame: 'dev-laptop', wrap: 'glass-wrap nwsb-vbwrap vb-path-fill',
+    { before: '#homeFooter', vid: './assets/video/healing-path-bg.mp4?v=2', gender: 1, frame: 'dev-laptop', wrap: 'glass-wrap nwsb-vbwrap vb-path-fill nwsb-genderpath', wrapKey: 'genderpath', noBan: 1,
       head: { hello:'Body, organ and mind', name:'Choose Your Path',
               icon:"<svg viewBox=\"0 0 24 24\" fill=\"none\"><path d=\"M12 3.2v17.6\" stroke=\"#fff\" stroke-width=\"1.5\" stroke-linecap=\"round\"/><circle cx=\"7\" cy=\"8.4\" r=\"2.6\" stroke=\"#fff\" stroke-width=\"1.5\"/><circle cx=\"17\" cy=\"8.4\" r=\"2.6\" stroke=\"#fff\" stroke-width=\"1.5\"/><path d=\"M3 17.4v-.8a4 4 0 018 0v.8M13 17.4v-.8a4 4 0 018 0v.8\" stroke=\"#fff\" stroke-width=\"1.5\" stroke-linecap=\"round\"/></svg>",
               banName:'Female or Male', banSub:'Your wellness, decoded for your body',
@@ -472,8 +470,14 @@
 
   function place() {
     var added = false;
+    /* Leftover path wraps from before the registry knew `.nwsb-genderpath`
+       sit unregistered at the TOP of the home. Strip them so this pass can
+       put one wrap, with a class the layout editor matches, above the footer. */
+    document.querySelectorAll('.vb-path-fill:not(.nwsb-genderpath)').forEach(function (n) {
+      if (n.parentNode) n.parentNode.removeChild(n);
+    });
     PLACE.forEach(function (spec, i) {
-      var key = 'vb' + i;
+      var key = spec.wrapKey || ('vb' + i);
       var sel = spec.before || spec.top || spec.bottom || spec.after;
       var host = document.querySelector(sel);
       if (!host) return;
@@ -482,6 +486,8 @@
       if (!scope) return;
       if (scope.querySelector(':scope > .vb-banner[data-vb="' + key + '"]')) return;
       if (scope.querySelector(':scope > [data-vbwrap="' + key + '"]')) return;
+      if (spec.wrap && spec.wrap.indexOf('nwsb-genderpath') >= 0 &&
+          scope.querySelector(':scope > .nwsb-genderpath')) return;
       var el = makeBanner(spec);
       el.setAttribute('data-vb', key);
       /* A wrapper of its own, when asked for. The banner keeps its data-vb
@@ -493,7 +499,7 @@
         w.setAttribute('data-vbwrap', key);
         if (spec.head) w.appendChild(vbHead(spec.head));
         w.appendChild(el);
-        if (spec.head) w.appendChild(vbBanner(spec.head));
+        if (spec.head && !spec.noBan) w.appendChild(vbBanner(spec.head));
         el = w;
       }
       if (spec.before) host.parentNode.insertBefore(el, host);

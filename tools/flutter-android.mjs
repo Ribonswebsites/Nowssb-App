@@ -146,6 +146,26 @@ if (/minSdk = 23\b/.test(a)) {
   done.push('minSdk → 23');
 }
 
+// file_picker (and flutter_plugin_android_lifecycle) require compileSdk 36.
+// Flutter's default is still 34/35 on this channel; the app and every
+// plugin module have to match or assembleDebug dies in checkDebugAarMetadata.
+if (/compileSdk = 36\b/.test(a)) {
+  already.push('compileSdk 36');
+} else {
+  const before = a;
+  a = a.replace(
+    /compileSdk = flutter\.compileSdkVersion/,
+    'compileSdk = 36',
+  );
+  if (a === before && !/compileSdk = \d+/.test(a)) {
+    a = a.replace(/compileSdk = \d+/, 'compileSdk = 36');
+  }
+  if (!/compileSdk = 36\b/.test(a)) {
+    throw new Error('app/build.gradle.kts: no compileSdk line');
+  }
+  done.push('compileSdk → 36');
+}
+
 // 2. desugaring: the flag, and the library that backs it
 if (a.includes('isCoreLibraryDesugaringEnabled')) {
   already.push('desugaring enabled');

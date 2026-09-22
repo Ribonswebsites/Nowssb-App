@@ -14,7 +14,7 @@ test('website and WebView downloads use the supplied listing and the correct lat
   const middleware = read('functions/_middleware.js');
 
   assert.match(page, /nowssb-listing-2\.html/);
-  assert.match(install, /window\.location\.href = '\.\/nowssb-listing-2\.html'/);
+  assert.match(install, /releases\/download\/nowssb-android\/NowssB-Android\.apk/);
   assert.match(listing, /nowssb-android\/NowssB-Android\.apk/);
   assert.match(listing, /nowssb\.com\/download\/flutter\.apk/);
   assert.match(listing, /inCapacitorWebView/);
@@ -63,7 +63,7 @@ test('Fashion Plus keeps one live film behind every page and menu', () => {
   const fashion = read('app/js/part076.js');
   const css = read('nowssb-nm.css');
 
-  assert.match(page, /part051\.js\?v=25/);
+  assert.match(page, /part051\.js\?v=27/);
   assert.match(page, /part076\.js\?v=119/);
   assert.match(page, /nowssb-nm\.css\?v=797/);
   assert.match(playback, /v\.id === 'fpBgVideo' \|\| v\.id === 'fpPageVid'/);
@@ -125,7 +125,7 @@ test('login has no transition video and Fashion Plus restores intro artwork abov
   assert.match(backgrounds, /NWSB_DEFAULT_FASHION_BG = NWSB_FASHION_BGS\[0\]/);
   assert.match(backgrounds, /Default background restored/);
   assert.match(backgrounds, /No prior choice: apply the curated image immediately/);
-  assert.match(page, /part017\.js\?v=207/);
+  assert.match(page, /part017\.js\?v=208/);
   assert.match(page, /part047\.js\?v=187/);
   const pkg = JSON.parse(read('package.json'));
   assert.match(pkg.scripts.dev, /http\.server 5173/);

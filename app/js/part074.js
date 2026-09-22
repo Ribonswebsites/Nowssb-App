@@ -116,7 +116,7 @@
         '</svg>' +
       '</div>' +
       '<div class="nss-card-action' + (inC ? ' carted' : '') + '" data-nss-cart="' + esc(it.id) + '" ' +
-        'onclick="event.stopPropagation();nssAddToCart(' + args + ');sigRenderStore()">' +
+        'onclick="event.stopPropagation();playCartAddAnimation(this,' + args + ');sigRenderStore()">' +
         '<svg width="11" height="11" viewBox="0 0 16 16" fill="none">' +
           '<path d="M2 2h1.5l2 8h7l1.5-5.5H4.5" stroke="rgba(232,213,163,0.8)" stroke-width="1.2" stroke-linecap="square"/>' +
           '<circle cx="7" cy="12.5" r="1" fill="rgba(232,213,163,0.7)"/>' +

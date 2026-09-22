@@ -9,16 +9,34 @@ const kRmWordImg =
 const kRmSignatureImg =
     "https://media.nowssb.com/migrated-images/26780a9d82ed389f_file_00000000d39081faa073bf17312d89fc_q9ehat.png";
 const kMsCardImg =
-    "https://media.nowssb.com/migrated-images/ee0598260fbb63ea_7562ed60-5b68-11f1-af5d-9196714121d3_y4f80z.png";
+    "assets/meanings/meanings-device.png";
 const kMsSignatureImg =
-    "https://media.nowssb.com/migrated-images/a7c5f95b3e9029e5_file_000000008eb081fba87f16fe9146e413_mk9wbe.png";
+    "assets/meanings/meanings-branding.jpg";
 const kMsSignaturePrice = 299;
 
-/// Live site plays these from the website origin (index / part010 / part026).
-/// Flutter opens them as remote NwsbVideo URLs — same files the browser uses.
+/// Live site plays these from the website origin. Flutter maps them onto
+/// bundled `assets/video/` clips so banners actually move on device —
+/// remote nowssb.com URLs were dying with PlatformException VideoError.
 const kNowssbVideoOrigin = 'https://nowssb.com/assets/video/';
 
-String nwsbVideo(String fileName) => '$kNowssbVideoOrigin$fileName';
+String nwsbVideo(String fileName) {
+  switch (fileName) {
+    case kRmHeroVidFile:
+    case kStoreWordDoorVidFile:
+      return 'assets/video/hero-word-store.mp4';
+    case kStoreMeaningDoorVidFile:
+    case kMsMeaningVidFile:
+      return 'assets/video/hero-meaning-store.mp4';
+    case kMsSubscribeVidFile:
+      return 'assets/video/subscription-a.mp4';
+    default:
+      final row = kRmRowVids.indexOf(fileName);
+      if (row == 0) return 'assets/video/connect-banner.mp4';
+      if (row == 1) return 'assets/video/signature-banner.mp4';
+      if (row == 2) return 'assets/video/hero-ebooks.mp4';
+      return 'assets/video/hero-word-store.mp4';
+  }
+}
 
 /// Word Atelier category logo — `./assets/icons/collection-icon.webp` on web.
 const kRmCatLogoAsset = 'assets/icons/collection-icon.webp';
@@ -456,30 +474,30 @@ class MsMeaning {
 }
 
 const List<MsMeaning> kMsBaseMeanings = [
-  MsMeaning(word: "Earth", key: "earth", root: "Proto-Germanic · erþō", category: "Elements", price: 49, img: "https://media.nowssb.com/migrated-images/41f5e532b0c0e661_grok_image_1777030001969_2_mpmpu2.jpg"),
-  MsMeaning(word: "Water", key: "water", root: "Proto-Indo-European · wódr̥", category: "Elements", price: 49, img: "https://media.nowssb.com/migrated-images/0d9f29f0abec0ed5_grok_image_1777029845867_2_abtxad.jpg"),
-  MsMeaning(word: "Fire", key: "fire", root: "Proto-Indo-European · péh₂wr̥", category: "Elements", price: 49, img: "https://media.nowssb.com/migrated-images/fe881b289d00730d_1000033063-ezremove_r22cph.png"),
-  MsMeaning(word: "Sun", key: "sun", root: "Proto-Indo-European · séh₂wl̥", category: "Elements", price: 49, img: "https://media.nowssb.com/migrated-images/fe881b289d00730d_1000033063-ezremove_r22cph.png"),
-  MsMeaning(word: "Moon", key: "moon", root: "Proto-Germanic · mēnô", category: "Elements", price: 49, img: "https://media.nowssb.com/migrated-images/63bdfda9170e8c19_1000033096-ezremove_eb2gnu.png"),
-  MsMeaning(word: "Light", key: "light", root: "Proto-Indo-European · leuk-", category: "Elements", price: 49, img: "https://media.nowssb.com/migrated-images/fe881b289d00730d_1000033063-ezremove_r22cph.png"),
-  MsMeaning(word: "Dark", key: "dark", root: "Proto-Germanic · derkaz", category: "Elements", price: 49, img: "https://media.nowssb.com/migrated-images/63bdfda9170e8c19_1000033096-ezremove_eb2gnu.png"),
-  MsMeaning(word: "Body", key: "body", root: "Old English · bodig", category: "Human", price: 49, img: "https://media.nowssb.com/migrated-images/5c4551501630cd00_1000033084-ezremove_ybzuzs.png"),
-  MsMeaning(word: "Mind", key: "mind", root: "Proto-Indo-European · men-", category: "Human", price: 49, img: "https://media.nowssb.com/migrated-images/5c4551501630cd00_1000033084-ezremove_ybzuzs.png"),
-  MsMeaning(word: "Soul", key: "soul", root: "Proto-Germanic · saiwalō", category: "Human", price: 49, img: "https://media.nowssb.com/migrated-images/d614abe902eccd10_1000033052-ezremove_vx4rib.png"),
-  MsMeaning(word: "Blood", key: "blood", root: "Proto-Indo-European · bhel-", category: "Human", price: 49, img: "https://media.nowssb.com/migrated-images/fe881b289d00730d_1000033063-ezremove_r22cph.png"),
-  MsMeaning(word: "Breath", key: "breath", root: "Proto-Germanic · brǣþ", category: "Human", price: 49, img: "https://media.nowssb.com/migrated-images/d614abe902eccd10_1000033052-ezremove_vx4rib.png"),
-  MsMeaning(word: "Love", key: "love", root: "Proto-Indo-European · leubh-", category: "Emotions", price: 49, img: "https://media.nowssb.com/migrated-images/dd23331ed4a9b751_grok_image_1776753853585_luk2yh.jpg"),
-  MsMeaning(word: "Fear", key: "fear", root: "Proto-Germanic · feraz", category: "Emotions", price: 49, img: "https://media.nowssb.com/migrated-images/63bdfda9170e8c19_1000033096-ezremove_eb2gnu.png"),
-  MsMeaning(word: "Joy", key: "joy", root: "Old French · joie", category: "Emotions", price: 49, img: "https://media.nowssb.com/migrated-images/dd23331ed4a9b751_grok_image_1776753853585_luk2yh.jpg"),
-  MsMeaning(word: "God", key: "god", root: "Proto-Germanic · ǵʰew-", category: "Cosmos", price: 49, img: "https://media.nowssb.com/migrated-images/63bdfda9170e8c19_1000033096-ezremove_eb2gnu.png"),
-  MsMeaning(word: "Time", key: "time", root: "Proto-Indo-European · dī-", category: "Cosmos", price: 49, img: "https://media.nowssb.com/migrated-images/d59e474dabdaa2a5_grok_image_1777030062742_2_f7k7eo.jpg"),
-  MsMeaning(word: "Space", key: "space", root: "Latin · spatium", category: "Cosmos", price: 49, img: "https://media.nowssb.com/migrated-images/63bdfda9170e8c19_1000033096-ezremove_eb2gnu.png"),
-  MsMeaning(word: "Truth", key: "truth", root: "Proto-Germanic · trewwþō", category: "Cosmos", price: 49, img: "https://media.nowssb.com/migrated-images/41f5e532b0c0e661_grok_image_1777030001969_2_mpmpu2.jpg"),
-  MsMeaning(word: "Country", key: "country", root: "Latin · contra", category: "Nations & People", price: 49, img: "https://media.nowssb.com/migrated-images/99dfe1e72e000cd5_grok_image_1777029510370_2_lilo5x.jpg"),
-  MsMeaning(word: "India", key: "india", root: "Natural Origin · Sindhu", category: "Nations & People", price: 49, img: "https://media.nowssb.com/migrated-images/22792c141d392143_1000033069-ezremove_hz5p0s.png"),
-  MsMeaning(word: "Mother", key: "mother", root: "Proto-Indo-European · méh₂tēr", category: "Nations & People", price: 49, img: "https://media.nowssb.com/migrated-images/99dfe1e72e000cd5_grok_image_1777029510370_2_lilo5x.jpg"),
-  MsMeaning(word: "Father", key: "father", root: "Proto-Indo-European · ph₂tḗr", category: "Nations & People", price: 49, img: "https://media.nowssb.com/migrated-images/d59e474dabdaa2a5_grok_image_1777030062742_2_f7k7eo.jpg"),
-  MsMeaning(word: "Name", key: "name", root: "Proto-Indo-European · h₁nómn̥", category: "Nations & People", price: 49, img: "https://media.nowssb.com/migrated-images/99dfe1e72e000cd5_grok_image_1777029510370_2_lilo5x.jpg"),
+  MsMeaning(word: "Earth", key: "earth", root: "Proto-Germanic · erþō", category: "Elements", price: 49, img: "assets/meanings/meanings-device.png"),
+  MsMeaning(word: "Water", key: "water", root: "Proto-Indo-European · wódr̥", category: "Elements", price: 49, img: "assets/meanings/meanings-branding.jpg"),
+  MsMeaning(word: "Fire", key: "fire", root: "Proto-Indo-European · péh₂wr̥", category: "Elements", price: 49, img: "assets/meanings/meanings-clean.jpg"),
+  MsMeaning(word: "Sun", key: "sun", root: "Proto-Indo-European · séh₂wl̥", category: "Elements", price: 49, img: "assets/meanings/meanings-device.png"),
+  MsMeaning(word: "Moon", key: "moon", root: "Proto-Germanic · mēnô", category: "Elements", price: 49, img: "assets/meanings/meanings-branding.jpg"),
+  MsMeaning(word: "Light", key: "light", root: "Proto-Indo-European · leuk-", category: "Elements", price: 49, img: "assets/meanings/meanings-clean.jpg"),
+  MsMeaning(word: "Dark", key: "dark", root: "Proto-Germanic · derkaz", category: "Elements", price: 49, img: "assets/meanings/meanings-device.png"),
+  MsMeaning(word: "Body", key: "body", root: "Old English · bodig", category: "Human", price: 49, img: "assets/meanings/meanings-branding.jpg"),
+  MsMeaning(word: "Mind", key: "mind", root: "Proto-Indo-European · men-", category: "Human", price: 49, img: "assets/meanings/meanings-clean.jpg"),
+  MsMeaning(word: "Soul", key: "soul", root: "Proto-Germanic · saiwalō", category: "Human", price: 49, img: "assets/meanings/meanings-device.png"),
+  MsMeaning(word: "Blood", key: "blood", root: "Proto-Indo-European · bhel-", category: "Human", price: 49, img: "assets/meanings/meanings-branding.jpg"),
+  MsMeaning(word: "Breath", key: "breath", root: "Proto-Germanic · brǣþ", category: "Human", price: 49, img: "assets/meanings/meanings-clean.jpg"),
+  MsMeaning(word: "Love", key: "love", root: "Proto-Indo-European · leubh-", category: "Emotions", price: 49, img: "assets/meanings/meanings-device.png"),
+  MsMeaning(word: "Fear", key: "fear", root: "Proto-Germanic · feraz", category: "Emotions", price: 49, img: "assets/meanings/meanings-branding.jpg"),
+  MsMeaning(word: "Joy", key: "joy", root: "Old French · joie", category: "Emotions", price: 49, img: "assets/meanings/meanings-clean.jpg"),
+  MsMeaning(word: "God", key: "god", root: "Proto-Germanic · ǵʰew-", category: "Cosmos", price: 49, img: "assets/meanings/meanings-device.png"),
+  MsMeaning(word: "Time", key: "time", root: "Proto-Indo-European · dī-", category: "Cosmos", price: 49, img: "assets/meanings/meanings-branding.jpg"),
+  MsMeaning(word: "Space", key: "space", root: "Latin · spatium", category: "Cosmos", price: 49, img: "assets/meanings/meanings-clean.jpg"),
+  MsMeaning(word: "Truth", key: "truth", root: "Proto-Germanic · trewwþō", category: "Cosmos", price: 49, img: "assets/meanings/meanings-device.png"),
+  MsMeaning(word: "Country", key: "country", root: "Latin · contra", category: "Nations & People", price: 49, img: "assets/meanings/meanings-branding.jpg"),
+  MsMeaning(word: "India", key: "india", root: "Natural Origin · Sindhu", category: "Nations & People", price: 49, img: "assets/meanings/meanings-clean.jpg"),
+  MsMeaning(word: "Mother", key: "mother", root: "Proto-Indo-European · méh₂tēr", category: "Nations & People", price: 49, img: "assets/meanings/meanings-device.png"),
+  MsMeaning(word: "Father", key: "father", root: "Proto-Indo-European · ph₂tḗr", category: "Nations & People", price: 49, img: "assets/meanings/meanings-branding.jpg"),
+  MsMeaning(word: "Name", key: "name", root: "Proto-Indo-European · h₁nómn̥", category: "Nations & People", price: 49, img: "assets/meanings/meanings-clean.jpg"),
 ];
 
 const Map<String, String> kMsCatSub = {
@@ -487,7 +505,7 @@ const Map<String, String> kMsCatSub = {
   "Human": "The truth of body, mind and soul",
   "Emotions": "What every feeling really means",
   "Cosmos": "Origins beyond understanding",
-  "Nations & People": "The people and places behind the words",
+  "Nations & People": "The people and places behind the meanings",
 };
 
 class MsSignatureEntry {

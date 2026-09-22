@@ -15,7 +15,11 @@ import 'package:flutter/services.dart';
 import '../data/content.dart';
 import '../data/store_catalog.dart';
 import '../widgets/black_glass_banner.dart';
+import '../widgets/colored_split_promo_banner.dart';
 import '../widgets/nwsb_icon.dart';
+import 'sound_library.dart';
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
+import '../widgets/app_thinking_loader.dart';
 import 'store.dart';
 import 'store/word_atelier.dart';
 
@@ -333,6 +337,18 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
                           sub: 'Grow your library in the Store',
                         ),
                       ),
+                      const SizedBox(height: 12),
+                      ColoredSplitPromoBanner.forSurface(
+                        SplitPromoSurface.sentenceBuilder,
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => const SoundLibraryScreen(),
+                            ),
+                          );
+                        },
+                        margin: EdgeInsets.zero,
+                      ),
                       // 2) Heading BELOW the black banner
                       const Padding(
                         padding: EdgeInsets.fromLTRB(4, 10, 4, 12),
@@ -570,16 +586,7 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
                                                         : null,
                                                   ),
                                                   child: _building
-                                                      ? const SizedBox(
-                                                          width: 22,
-                                                          height: 22,
-                                                          child:
-                                                              CircularProgressIndicator(
-                                                            strokeWidth: 2.2,
-                                                            color: Color(
-                                                                0xFF0A0A12),
-                                                          ),
-                                                        )
+                                                      ? const AppThinkingLoader(size: 28, state: OrbState.composing, circlePad: 6)
                                                       : Row(
                                                           mainAxisAlignment:
                                                               MainAxisAlignment

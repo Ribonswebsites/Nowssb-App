@@ -60,7 +60,7 @@ class _PracticeCarouselState extends State<PracticeCarousel> {
     super.initState();
     _page = PageController();
     _timer = Timer.periodic(const Duration(milliseconds: 4200), (_) {
-      if (!mounted || !TickerMode.valuesOf(context).enabled) return;
+      if (!mounted || !TickerMode.of(context)) return;
       final next = (_index + 1) % _cardCount;
       _page.animateToPage(
         next,

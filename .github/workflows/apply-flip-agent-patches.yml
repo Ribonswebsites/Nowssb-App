@@ -1,0 +1,22 @@
+name: Apply Flip agent patches
+on:
+  workflow_dispatch:
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply home + mid patches
+        run: |
+          set -euo pipefail
+          git apply --verbose flutter_app/.agent_patches/home_normal.patch
+          base64 -d flutter_app/.agent_patches/sections_mid.patch.b64 > /tmp/mid.patch
+          git apply --verbose /tmp/mid.patch
+          git config user.name "Ribon Patil"
+          git config user.email "ethcryptodesk@gmail.com"
+          git add flutter_app/lib/screens/home_normal.dart flutter_app/lib/screens/fashion/sections_mid.dart
+          git status
+          git commit -m "feat(home): Flip glass as first H-scroll card + Normal wiring + overflow fix"
+          git push origin HEAD:main

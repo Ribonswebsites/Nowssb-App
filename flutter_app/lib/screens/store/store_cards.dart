@@ -2,18 +2,23 @@
 /// `.rm-cat-banner`, ebook rows, and gold Signature tags.
 library;
 
+import 'dart:async';
 import 'dart:ui' show ImageFilter;
+
+import 'package:flutter/foundation.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../../data/cart_bag.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
-import '../../widgets/cart_add_animation.dart';
 import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_icon.dart';
+import '../../widgets/app_thinking_loader.dart';
+import 'store_actions.dart';
 
 String inr(num value) {
   if (value <= 0) return 'Included';
@@ -21,9 +26,120 @@ String inr(num value) {
   return '₹$n';
 }
 
+/// Full word price in rupees. 50% off is [kWordSaleInr].
+const kWordPriceInr = 92;
+const kWordSaleInr = 46;
+
+String localizedMoney(BuildContext context, num inrValue) {
+  if (inrValue <= 0) return 'Included';
+  final locale = Localizations.localeOf(context);
+  final country = (locale.countryCode ?? '').toUpperCase();
+  final language = locale.languageCode.toLowerCase();
+  var symbol = '₹';
+  var rate = 1.0;
+  var decimals = 0;
+  const euroCountries = {
+    'AT',
+    'BE',
+    'CY',
+    'DE',
+    'EE',
+    'ES',
+    'EU',
+    'FI',
+    'FR',
+    'GR',
+    'IE',
+    'IT',
+    'LT',
+    'LU',
+    'LV',
+    'MT',
+    'NL',
+    'PT',
+    'SI',
+    'SK',
+  };
+  const euroLang = {
+    'de',
+    'el',
+    'es',
+    'et',
+    'fi',
+    'fr',
+    'it',
+    'lt',
+    'lv',
+    'nl',
+    'pt',
+    'sk',
+    'sl',
+  };
+  if (country == 'IN' || language == 'hi') {
+    symbol = '₹';
+    rate = 1.0;
+    decimals = 0;
+  } else if (country == 'US' || (country.isEmpty && language == 'en')) {
+    symbol = r'$';
+    rate = 0.012;
+    decimals = 2;
+  } else if (country == 'GB') {
+    symbol = '£';
+    rate = 0.0095;
+    decimals = 2;
+  } else if (euroCountries.contains(country) || euroLang.contains(language)) {
+    symbol = '€';
+    rate = 0.011;
+    decimals = 2;
+  } else if (country == 'AE') {
+    symbol = 'د.إ';
+    rate = 0.044;
+    decimals = 2;
+  } else if (country == 'SG') {
+    symbol = r'S$';
+    rate = 0.016;
+    decimals = 2;
+  } else if (country == 'AU') {
+    symbol = r'A$';
+    rate = 0.018;
+    decimals = 2;
+  } else if (country == 'CA') {
+    symbol = r'C$';
+    rate = 0.0165;
+    decimals = 2;
+  } else if (country == 'JP') {
+    symbol = '¥';
+    rate = 1.75;
+    decimals = 0;
+  } else {
+    symbol = '₹';
+    rate = 1.0;
+    decimals = 0;
+  }
+  final converted = inrValue * rate;
+  if (decimals == 0) return '$symbol${converted.round()}';
+  return '$symbol${converted.toStringAsFixed(2)}';
+}
+
+String saleOriginalMoney(BuildContext context, num salePrice) =>
+    localizedMoney(context, kWordPriceInr);
+
 /// Clean NowssB bag + headphones product shot — NEVER fashion heels /
 /// meditation collection posters. Used in every notification pill.
 const kStoreProductArt = 'assets/store/nowssb-bag-headphones.webp';
+
+/// Meaning Store arts — attached Meanings device only (never word bag).
+/// Swirl ([kMsMeaningStoreIcon]) is reserved for store hub / picker / icon tile.
+const kMsMeaningStoreIcon = 'assets/meanings/meanings-store-swirl.png';
+const kMsMeaningIconAsset = 'assets/meanings/meanings-clean.jpg';
+const kMsMeaningProductArt = 'assets/meanings/meanings-branding.jpg';
+/// Clean Meanings device (solid black). When shown on dark UI / as circle or
+/// split-banner centre, pair with a solid COLOURED back (not flat black).
+const kMsMeaningIntroArt = 'assets/meanings/meanings-device.png';
+
+/// Ebooks Store product art — attached E-books arts only (never word bag).
+const kEbProductArt = 'assets/ebooks/ebooks-headphones.jpg';
+const kEbIntroArt = 'assets/ebooks/ebooks-pair.png';
 
 String wordVibrationTag(String name) {
   switch (name.toLowerCase()) {
@@ -43,6 +159,12 @@ String wordVibrationTag(String name) {
 /// Pill / banner product art for a collection/word. Always the store bag
 /// product (collection posters contain fashion BS the user rejected).
 String storePillProductArt(String? id) => kStoreProductArt;
+
+/// Meaning Store pill/banner art — gold Meanings emblem / picker only.
+String storeMeaningPillArt(String? id) => kMsMeaningProductArt;
+
+/// Ebooks Store pill/banner art — ebook picker only.
+String storeEbookPillArt(String? id) => kEbProductArt;
 
 /// Legacy collection poster map — only for non-pill decorative rails that
 /// still need a keyed asset. Prefer [storePillProductArt] for pills.
@@ -91,20 +213,45 @@ Color storeCardTint(String seed) {
   return palette[h % palette.length];
 }
 
-
 class StoreNetImage extends StatelessWidget {
   const StoreNetImage({super.key, required this.url, this.fit = BoxFit.cover});
   final String url;
   final BoxFit fit;
 
+  static const _composing = ColoredBox(
+    color: Color(0xFF06060A),
+    child: Center(
+      child: AppThinkingLoader(
+        size: 36,
+        state: OrbState.composing,
+        circlePad: 4,
+      ),
+    ),
+  );
+
   @override
   Widget build(BuildContext context) {
-    if (url.isEmpty) return const ColoredBox(color: Color(0xFF0A0F1C));
+    if (url.isEmpty) return _composing;
+    if (url.startsWith('assets/')) {
+      return Image.asset(
+        url,
+        fit: fit,
+        gaplessPlayback: true,
+        filterQuality: FilterQuality.medium,
+        frameBuilder: (context, child, frame, sync) {
+          if (sync || frame != null) return child;
+          return _composing;
+        },
+        errorBuilder: (_, __, ___) => _composing,
+      );
+    }
     return CachedNetworkImage(
       imageUrl: url,
       fit: fit,
-      placeholder: (_, __) => const ColoredBox(color: Color(0xFF0A0F1C)),
-      errorWidget: (_, __, ___) => const ColoredBox(color: Color(0xFF0A0F1C)),
+      fadeInDuration: Duration.zero,
+      fadeOutDuration: Duration.zero,
+      placeholder: (_, __) => _composing,
+      errorWidget: (_, __, ___) => _composing,
     );
   }
 }
@@ -126,6 +273,7 @@ class RmCatBanner extends StatelessWidget {
     this.svgBody,
     this.onViewAll,
     this.pillLabel,
+    this.inRail = false,
   });
 
   final String title;
@@ -154,6 +302,9 @@ class RmCatBanner extends StatelessWidget {
   /// Short label inside the black pill (defaults to badge or title).
   final String? pillLabel;
 
+  /// When true the banner sits in the top horizontal rail (no extra margin).
+  final bool inRail;
+
   @override
   Widget build(BuildContext context) {
     final titleColor = labelColor ?? NwsbColors.goldLight;
@@ -162,7 +313,7 @@ class RmCatBanner extends StatelessWidget {
     final leftLabel = (pillLabel ?? badge ?? title).trim();
     final r = BorderRadius.circular(kGlassRadius);
     return Padding(
-      padding: const EdgeInsets.only(top: 18, bottom: 10),
+      padding: EdgeInsets.only(top: inRail ? 0 : 18, bottom: inRail ? 0 : 10),
       child: DecoratedBox(
         decoration: BoxDecoration(
           borderRadius: r,
@@ -193,36 +344,47 @@ class RmCatBanner extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Flexible(
-                        child: Text(
-                          title,
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 0.6,
-                            color: titleColor,
-                          ),
+                      Expanded(
+                        child: Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                title,
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.6,
+                                  color: titleColor,
+                                ),
+                              ),
+                            ),
+                            if (badge != null) ...[
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 7,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(4),
+                                  border: Border.all(
+                                    color: titleColor.withValues(alpha: 0.45),
+                                  ),
+                                ),
+                                child: Text(
+                                  badge!,
+                                  style: TextStyle(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 1.2,
+                                    color: titleColor,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                       ),
-                      if (badge != null) ...[
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(4),
-                            border: Border.all(color: titleColor.withValues(alpha: 0.45)),
-                          ),
-                          child: Text(
-                            badge!,
-                            style: TextStyle(
-                              fontSize: 9,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 1.2,
-                              color: titleColor,
-                            ),
-                          ),
-                        ),
-                      ],
                       if (onViewAll != null) ...[
                         const SizedBox(width: 8),
                         StoreViewAllControl(onTap: onViewAll!),
@@ -233,7 +395,10 @@ class RmCatBanner extends StatelessWidget {
                     const SizedBox(height: 3),
                     Text(
                       sub,
-                      style: const TextStyle(fontSize: 11, color: Color(0x88FFFFFF)),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: Color(0x88FFFFFF),
+                      ),
                     ),
                   ],
                   const SizedBox(height: 10),
@@ -390,7 +555,10 @@ class _StorePillRippleArtState extends State<StorePillRippleArt>
             height: d,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: widget.accent.withValues(alpha: 0.55), width: 1.4),
+              border: Border.all(
+                color: widget.accent.withValues(alpha: 0.55),
+                width: 1.4,
+              ),
               boxShadow: [
                 BoxShadow(
                   color: widget.accent.withValues(alpha: 0.22),
@@ -457,10 +625,16 @@ class _StorePillRippleArtState extends State<StorePillRippleArt>
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: const Color(0xEE060C18),
-                  border: Border.all(color: widget.accent.withValues(alpha: 0.55)),
+                  border: Border.all(
+                    color: widget.accent.withValues(alpha: 0.55),
+                  ),
                 ),
                 alignment: Alignment.center,
-                child: NwsbIcon(widget.svgBody!, size: d * 0.16, color: widget.accent),
+                child: NwsbIcon(
+                  widget.svgBody!,
+                  size: d * 0.16,
+                  color: widget.accent,
+                ),
               ),
             ),
         ],
@@ -496,7 +670,11 @@ class _PillRipplePainter extends CustomPainter {
 
 /// Premium 3D "View all" control — opens blur + carousel panel.
 class StoreViewAllControl extends StatelessWidget {
-  const StoreViewAllControl({super.key, required this.onTap, this.label = 'View all'});
+  const StoreViewAllControl({
+    super.key,
+    required this.onTap,
+    this.label = 'View all',
+  });
 
   final VoidCallback onTap;
   final String label;
@@ -522,8 +700,16 @@ class StoreViewAllControl extends StatelessWidget {
             ),
             border: Border.all(color: const Color(0x66FFFFFF)),
             boxShadow: const [
-              BoxShadow(color: Color(0x88000000), blurRadius: 12, offset: Offset(0, 5)),
-              BoxShadow(color: Color(0x55E8D5A3), blurRadius: 8, offset: Offset(0, 0)),
+              BoxShadow(
+                color: Color(0x88000000),
+                blurRadius: 12,
+                offset: Offset(0, 5),
+              ),
+              BoxShadow(
+                color: Color(0x55E8D5A3),
+                blurRadius: 8,
+                offset: Offset(0, 0),
+              ),
             ],
           ),
           child: Row(
@@ -539,8 +725,106 @@ class StoreViewAllControl extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 4),
-              const Icon(Icons.arrow_forward_rounded, size: 14, color: Color(0xFF060C18)),
+              const Icon(
+                Icons.arrow_forward_rounded,
+                size: 14,
+                color: Color(0xFF060C18),
+              ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// UFC-style row title: name on the left, View all pinned right.
+class RmRowHeader extends StatelessWidget {
+  const RmRowHeader({super.key, required this.title, this.onViewAll});
+
+  final String title;
+  final VoidCallback? onViewAll;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 18, bottom: 10),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w800,
+                color: Colors.white,
+                letterSpacing: -0.3,
+              ),
+            ),
+          ),
+          if (onViewAll != null) StoreViewAllControl(onTap: onViewAll!),
+        ],
+      ),
+    );
+  }
+}
+
+/// Auto-moving horizontal strip of category banners (one place, not per row).
+class RmBannerRail extends StatefulWidget {
+  const RmBannerRail({super.key, required this.banners});
+
+  final List<Widget> banners;
+
+  @override
+  State<RmBannerRail> createState() => _RmBannerRailState();
+}
+
+class _RmBannerRailState extends State<RmBannerRail> {
+  late final PageController _pc;
+  Timer? _timer;
+  var _page = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _pc = PageController(viewportFraction: 0.92);
+    if (widget.banners.length > 1) {
+      _timer = Timer.periodic(const Duration(milliseconds: 3800), (_) {
+        if (!mounted || !_pc.hasClients) return;
+        final next = (_page + 1) % widget.banners.length;
+        _pc.animateToPage(
+          next,
+          duration: const Duration(milliseconds: 520),
+          curve: Curves.easeOutCubic,
+        );
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _pc.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.banners.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: 10, bottom: 4),
+      child: SizedBox(
+        height: 188,
+        child: PageView.builder(
+          controller: _pc,
+          padEnds: false,
+          onPageChanged: (i) => _page = i,
+          itemCount: widget.banners.length,
+          itemBuilder: (_, i) => Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: widget.banners[i],
           ),
         ),
       ),
@@ -557,11 +841,16 @@ class RmRowVid extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 8, bottom: 14),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(18),
-        child: AspectRatio(
-          aspectRatio: 16 / 9,
-          child: NwsbVideo(asset: url, priority: ClipPriority.decoration),
+      child: GlassWrap(
+        margin: EdgeInsets.zero,
+        radius: 22,
+        padding: const EdgeInsets.all(6),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: AspectRatio(
+            aspectRatio: 16 / 6.4,
+            child: NwsbVideo(asset: url, priority: ClipPriority.feature),
+          ),
         ),
       ),
     );
@@ -599,6 +888,7 @@ class RmWordCard extends StatelessWidget {
     required this.imgUrl,
     this.signature = false,
     this.price,
+    this.originalPrice,
     this.onTap,
     this.onBuyNow,
     this.onWishlist,
@@ -611,15 +901,24 @@ class RmWordCard extends StatelessWidget {
   final String imgUrl;
   final bool signature;
   final num? price;
+  final num? originalPrice;
   final VoidCallback? onTap;
   final VoidCallback? onBuyNow;
   final VoidCallback? onWishlist;
   final VoidCallback? onAddCart;
   final Color? tint;
 
-  /// Thicker horizontal card: image left, text + actions right.
-  static const double cardHeight = 188;
-  static const double cardWidth = 330;
+  /// Taller horizontal card so the UFC-style price can sit large and clear.
+  static const double cardHeight = 228;
+  static const double cardWidth = 338;
+
+  BagItem get _item => wordBagItem(
+        name: name,
+        root: root,
+        img: imgUrl,
+        price: price ?? kWordPriceInr,
+        signature: signature,
+      );
 
   void _toast(BuildContext context, String msg) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -662,122 +961,246 @@ class RmWordCard extends StatelessWidget {
                 ],
               ),
               boxShadow: [
-                BoxShadow(color: bg.withOpacity(0.18), blurRadius: 24, spreadRadius: 1),
-                const BoxShadow(color: Color(0x80000000), blurRadius: 18, offset: Offset(0, 7)),
+                BoxShadow(
+                  color: bg.withOpacity(0.18),
+                  blurRadius: 24,
+                  spreadRadius: 1,
+                ),
+                const BoxShadow(
+                  color: Color(0x80000000),
+                  blurRadius: 18,
+                  offset: Offset(0, 7),
+                ),
               ],
             ),
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  width: 124,
-                  height: double.infinity,
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: const Color(0xD9060C18),
-                          borderRadius: BorderRadius.circular(15),
-                          border: Border.all(color: const Color(0x28FFFFFF)),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(15),
-                          child: StoreNetImage(url: imgUrl),
+                Row(
+                  children: [
+                    const NwsbIcon(
+                      NwsbMarks.bag,
+                      size: 18,
+                      color: Color(0xFFE8D5A3),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      width: 1,
+                      height: 16,
+                      color: const Color(0x66FFFFFF),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                          height: 1.05,
                         ),
                       ),
-                      if (signature)
-                        const Positioned(top: 6, left: 6, child: _SignatureTag()),
-                      const Positioned(
-                        right: 7,
-                        bottom: 7,
-                        child: Icon(Icons.graphic_eq, size: 17, color: Color(0xB3E8D5A3)),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        if (onWishlist != null) {
+                          onWishlist!();
+                        } else {
+                          CartBag.instance.addWishlist(_item);
+                          _toast(context, 'Saved $name to wishlist');
+                        }
+                      },
+                      child: Container(
+                        width: 32,
+                        height: 32,
+                        alignment: Alignment.center,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const NwsbIcon(
+                          NwsbMarks.wishlist,
+                          size: 16,
+                          color: Color(0xFF0A101C),
+                        ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 13),
+                const SizedBox(height: 8),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              name,
+                      SizedBox(
+                        width: 132,
+                        height: 132,
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: const Color(0xD9060C18),
+                                borderRadius: BorderRadius.circular(15),
+                                border:
+                                    Border.all(color: const Color(0x28FFFFFF)),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(15),
+                                child: StoreNetImage(
+                                  url: imgUrl,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                            if (signature)
+                              const Positioned(
+                                top: 6,
+                                left: 6,
+                                child: _SignatureTag(),
+                              ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 13),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              root.toUpperCase(),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Colors.white, height: 1.05),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              if (onWishlist != null) {
-                                onWishlist!();
-                              } else {
-                                CartBag.instance.addWishlist(BagItem(
-                                  id: 'word:${name.toLowerCase()}', title: name, subtitle: root,
-                                  image: imgUrl, price: price ?? 49, kind: signature ? 'Signature' : 'Word',
-                                ));
-                                _toast(context, 'Saved $name to wishlist');
-                              }
-                            },
-                            child: const Icon(Icons.favorite_border, size: 19, color: Color(0xB3FFFFFF)),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 5),
-                      Text(root.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: .8, color: Color(0x99C8E8F5))),
-                      const SizedBox(height: 8),
-                      Text(wordVibrationTag(name), maxLines: 2, overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 11, height: 1.25, color: Color(0xB8FFFFFF))),
-                      const Spacer(),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Expanded(
-                            child: Text(price == null ? '—' : inr(price!), maxLines: 1, overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: NwsbColors.goldLight)),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              if (onBuyNow != null) {
-                                onBuyNow!();
-                              } else if (onAddCart != null) {
-                                onAddCart!();
-                              } else if (onTap != null) {
-                                onTap!();
-                              } else {
-                                CartAddAnimation.addAndPlay(context, item: BagItem(
-                                  id: 'word:${name.toLowerCase()}', title: name, subtitle: root,
-                                  image: imgUrl, price: price ?? 49, kind: signature ? 'Signature' : 'Word',
-                                ));
-                                _toast(context, 'Added $name to cart');
-                              }
-                            },
-                            child: Container(
-                              height: 38,
-                              padding: const EdgeInsets.only(left: 14, right: 4),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                gradient: const LinearGradient(colors: [Color(0xFFF3E4B7), Color(0xFFC8A96E)]),
+                              style: const TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: .8,
+                                color: Color(0x99C8E8F5),
                               ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              wordVibrationTag(name),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 11,
+                                height: 1.25,
+                                color: Color(0xB8FFFFFF),
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            if (price != null)
+                              _CenteredPrice(
+                                price: price!,
+                                originalPrice: originalPrice,
+                              ),
+                            const Spacer(),
+                            const SizedBox(height: 4),
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerLeft,
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  const Text('Buy Now', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFF060C18))),
+                                  Semantics(
+                                    button: true,
+                                    container: true,
+                                    excludeSemantics: true,
+                                    label: 'Add to Cart',
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        if (onAddCart != null) {
+                                          onAddCart!();
+                                        } else {
+                                          storeAddToCart(context, _item);
+                                          _toast(
+                                            context,
+                                            'Added $name to cart',
+                                          );
+                                        }
+                                      },
+                                      child: Container(
+                                        width: 36,
+                                        height: 36,
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xE60A101C),
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                            color: const Color(0x66E8D5A3),
+                                          ),
+                                        ),
+                                        child: const NwsbIcon(
+                                          NwsbMarks.cart,
+                                          size: 16,
+                                          color: Color(0xFFE8D5A3),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                   const SizedBox(width: 8),
                                   Container(
-                                    width: 30, height: 30,
-                                    decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                                    child: const Icon(Icons.shopping_bag_outlined, size: 16, color: Color(0xFF060C18)),
+                                    width: 1,
+                                    height: 28,
+                                    color: const Color(0x66FFFFFF),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Semantics(
+                                    button: true,
+                                    container: true,
+                                    excludeSemantics: true,
+                                    label: 'Buy Now',
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        if (onBuyNow != null) {
+                                          onBuyNow!();
+                                        } else {
+                                          storeBuyNow(context, _item);
+                                        }
+                                      },
+                                      child: Container(
+                                        height: 36,
+                                        padding: const EdgeInsets.only(
+                                          left: 12,
+                                          right: 3,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(18),
+                                          gradient: const LinearGradient(
+                                            colors: [
+                                              Color(0xFFF3E4B7),
+                                              Color(0xFFC8A96E),
+                                            ],
+                                          ),
+                                        ),
+                                        child: const Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              'Buy Now',
+                                              style: TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w800,
+                                                color: Color(0xFF060C18),
+                                              ),
+                                            ),
+                                            SizedBox(width: 7),
+                                            _BagMarkDisc(),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -791,6 +1214,47 @@ class RmWordCard extends StatelessWidget {
   }
 }
 
+class _CenteredPrice extends StatelessWidget {
+  const _CenteredPrice({required this.price, this.originalPrice});
+  final num price;
+  final num? originalPrice;
+
+  @override
+  Widget build(BuildContext context) {
+    final sale = localizedMoney(context, price);
+    final original =
+        originalPrice == null ? null : localizedMoney(context, originalPrice!);
+    final showStrike = original != null && original != sale;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (showStrike)
+          Text(
+            original,
+            style: const TextStyle(
+              fontSize: 13,
+              color: Color(0x88FFFFFF),
+              decoration: TextDecoration.lineThrough,
+              decorationColor: Color(0x88FFFFFF),
+            ),
+          ),
+        Text(
+          sale,
+          textAlign: TextAlign.left,
+          style: const TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w900,
+            color: Colors.white,
+            height: 1.0,
+            letterSpacing: -0.6,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _SignatureTag extends StatelessWidget {
   const _SignatureTag();
   @override
@@ -798,7 +1262,9 @@ class _SignatureTag extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [Color(0xFFE8D5A3), Color(0xFFC8A96E)]),
+        gradient: const LinearGradient(
+          colors: [Color(0xFFE8D5A3), Color(0xFFC8A96E)],
+        ),
         borderRadius: BorderRadius.circular(4),
       ),
       child: const Text(
@@ -814,24 +1280,54 @@ class _SignatureTag extends StatelessWidget {
   }
 }
 
-class _MiniChip extends StatelessWidget {
-  const _MiniChip({required this.icon, required this.color, this.onTap});
-  final IconData icon;
-  final Color color;
-  final VoidCallback? onTap;
+class _BagMarkDisc extends StatelessWidget {
+  const _BagMarkDisc();
+
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 28,
-        height: 28,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: const Color(0xD1060C18),
-          border: Border.all(color: const Color(0x1FFFFFFF)),
+    return Container(
+      width: 30,
+      height: 30,
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        shape: BoxShape.circle,
+      ),
+      child: const NwsbIcon(NwsbMarks.bag, size: 15, color: Color(0xFF060C18)),
+    );
+  }
+}
+
+class _SvgChip extends StatelessWidget {
+  const _SvgChip({
+    required this.mark,
+    required this.color,
+    this.onTap,
+    this.label,
+  });
+  final String mark;
+  final Color color;
+  final VoidCallback? onTap;
+  final String? label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: label,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: 28,
+          height: 28,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: const Color(0xD1060C18),
+            border: Border.all(color: const Color(0x1FFFFFFF)),
+          ),
+          child: NwsbIcon(mark, size: 13, color: color),
         ),
-        child: Icon(icon, size: 13, color: color),
       ),
     );
   }
@@ -847,6 +1343,9 @@ class MsCard extends StatelessWidget {
     required this.price,
     this.signature = false,
     this.onTap,
+    this.onAddCart,
+    this.onBuyNow,
+    this.onWishlist,
   });
 
   final String word;
@@ -855,6 +1354,17 @@ class MsCard extends StatelessWidget {
   final num price;
   final bool signature;
   final VoidCallback? onTap;
+  final VoidCallback? onAddCart;
+  final VoidCallback? onBuyNow;
+  final VoidCallback? onWishlist;
+
+  BagItem get _item => meaningBagItem(
+        word: word,
+        root: root,
+        img: imgUrl,
+        price: price,
+        signature: signature,
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -866,7 +1376,8 @@ class MsCard extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
-              color: signature ? const Color(0x55E8D5A3) : const Color(0x12FFFFFF),
+              color:
+                  signature ? const Color(0x55E8D5A3) : const Color(0x12FFFFFF),
             ),
             color: const Color(0x08FFFFFF),
           ),
@@ -874,10 +1385,7 @@ class MsCard extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              Opacity(
-                opacity: 0.42,
-                child: StoreNetImage(url: imgUrl),
-              ),
+              StoreNetImage(url: imgUrl),
               const DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -895,18 +1403,16 @@ class MsCard extends StatelessWidget {
                 right: 6,
                 child: Column(
                   children: [
-                    _MiniChip(
-                      icon: Icons.favorite_border,
+                    _SvgChip(
+                      mark: NwsbMarks.wishlist,
                       color: const Color(0xB3FFFFFF),
+                      label: 'Wishlist',
                       onTap: () {
-                        CartBag.instance.addWishlist(BagItem(
-                          id: 'meaning:${word.toLowerCase()}',
-                          title: word,
-                          subtitle: root,
-                          image: imgUrl,
-                          price: price,
-                          kind: signature ? 'Signature Meaning' : 'Meaning',
-                        ));
+                        if (onWishlist != null) {
+                          onWishlist!();
+                          return;
+                        }
+                        CartBag.instance.addWishlist(_item);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text('Saved $word to wishlist'),
@@ -916,27 +1422,35 @@ class MsCard extends StatelessWidget {
                       },
                     ),
                     const SizedBox(height: 5),
-                    _MiniChip(
-                      icon: Icons.shopping_bag_outlined,
+                    _SvgChip(
+                      mark: NwsbMarks.cart,
                       color: NwsbColors.goldLight,
+                      label: 'Add to Cart',
                       onTap: () {
-                        CartAddAnimation.addAndPlay(
-                          context,
-                          item: BagItem(
-                            id: 'meaning:${word.toLowerCase()}',
-                            title: word,
-                            subtitle: root,
-                            image: imgUrl,
-                            price: price,
-                            kind: signature ? 'Signature Meaning' : 'Meaning',
-                          ),
-                        );
+                        if (onAddCart != null) {
+                          onAddCart!();
+                          return;
+                        }
+                        storeAddToCart(context, _item);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text('Added $word to cart'),
                             behavior: SnackBarBehavior.floating,
                           ),
                         );
+                      },
+                    ),
+                    const SizedBox(height: 5),
+                    _SvgChip(
+                      mark: NwsbMarks.bag,
+                      color: NwsbColors.goldLight,
+                      label: 'Buy Now',
+                      onTap: () {
+                        if (onBuyNow != null) {
+                          onBuyNow!();
+                          return;
+                        }
+                        storeBuyNow(context, _item);
                       },
                     ),
                   ],
@@ -965,11 +1479,17 @@ class MsCard extends StatelessWidget {
                       root,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 8, color: Color(0x61C8E8F5)),
+                      style: const TextStyle(
+                        fontSize: 8,
+                        color: Color(0x61C8E8F5),
+                      ),
                     ),
                     const SizedBox(height: 5),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0x14E8D5A3),
                         borderRadius: BorderRadius.circular(4),
@@ -1021,32 +1541,42 @@ class StoreFilterChip extends StatelessWidget {
     required this.label,
     required this.selected,
     required this.onTap,
+    this.black = false,
   });
 
   final String label;
   final bool selected;
   final VoidCallback onTap;
+  final bool black;
 
   @override
   Widget build(BuildContext context) {
+    final bg = black
+        ? (selected ? const Color(0xFF000000) : const Color(0xE6000000))
+        : Colors.white;
+    final fg = black ? Colors.white : const Color(0xFF080A10);
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
         decoration: BoxDecoration(
-          color: selected ? const Color(0x28C8E8F5) : const Color(0x14FFFFFF),
+          color: bg,
           border: Border.all(
-            color: selected ? const Color(0x55C8E8F5) : const Color(0x26FFFFFF),
+            color: black ? const Color(0x33FFFFFF) : const Color(0xCCFFFFFF),
           ),
           borderRadius: BorderRadius.circular(40),
+          boxShadow: const [
+            BoxShadow(
+                color: Color(0x33000000), blurRadius: 8, offset: Offset(0, 3)),
+          ],
         ),
         child: Text(
           label,
           style: TextStyle(
             fontSize: 9,
             letterSpacing: 1.4,
-            fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-            color: selected ? Colors.white : const Color(0xCCFFFFFF),
+            fontWeight: FontWeight.w700,
+            color: fg,
           ),
         ),
       ),
@@ -1074,26 +1604,45 @@ class StoreSearchBar extends StatelessWidget {
       height: 52,
       padding: const EdgeInsets.only(left: 14),
       decoration: BoxDecoration(
-        color: const Color(0x12FFFFFF),
-        border: Border.all(color: const Color(0x38FFFFFF)),
+        color: const Color(0xE6090B10),
+        border: Border.all(color: const Color(0x66FFFFFF)),
+        borderRadius: BorderRadius.circular(30),
         boxShadow: const [
-          BoxShadow(color: Color(0x40000000), blurRadius: 16, offset: Offset(0, 4)),
+          BoxShadow(
+            color: Color(0x40000000),
+            blurRadius: 16,
+            offset: Offset(0, 4),
+          ),
         ],
       ),
       child: Row(
         children: [
-          const Icon(Icons.search, size: 17, color: Color(0x80FFFFFF)),
+          Image.asset(
+            'assets/icons/search.webp',
+            width: 18,
+            height: 18,
+            fit: BoxFit.contain,
+            color: Colors.white,
+            colorBlendMode: BlendMode.srcIn,
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: TextField(
               controller: controller,
               onChanged: onChanged,
-              style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w300),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w300,
+              ),
               cursorColor: NwsbColors.goldLight,
               decoration: InputDecoration(
                 border: InputBorder.none,
                 hintText: hint,
-                hintStyle: const TextStyle(color: Color(0x52FFFFFF), fontSize: 14),
+                hintStyle: const TextStyle(
+                  color: Color(0x52FFFFFF),
+                  fontSize: 14,
+                ),
               ),
             ),
           ),
@@ -1109,11 +1658,18 @@ class StoreSearchBar extends StatelessWidget {
             onTap: onGo,
             child: Container(
               height: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 14),
+              margin: const EdgeInsets.all(5),
+              padding: const EdgeInsets.symmetric(horizontal: 17),
               alignment: Alignment.center,
-              decoration: const BoxDecoration(
-                color: Color(0x26C8E8F5),
-                border: Border(left: BorderSide(color: Color(0x4DC8E8F5))),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: const [
+                  BoxShadow(
+                      color: Color(0x22000000),
+                      blurRadius: 8,
+                      offset: Offset(0, 2)),
+                ],
               ),
               child: const Text(
                 'GO',
@@ -1121,7 +1677,7 @@ class StoreSearchBar extends StatelessWidget {
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 2,
-                  color: Color(0xFFC8E8F5),
+                  color: Color(0xFF080A10),
                 ),
               ),
             ),
@@ -1144,19 +1700,90 @@ class StoreDisclaimer extends StatelessWidget {
         children: [
           const Text(
             'Disclaimer & Confidentiality',
-            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: NwsbColors.gold),
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              color: NwsbColors.gold,
+            ),
           ),
           const SizedBox(height: 8),
-          Text(text, style: const TextStyle(fontSize: 11, height: 1.55, color: Color(0x73FFFFFF))),
+          Text(
+            text,
+            style: const TextStyle(
+              fontSize: 11,
+              height: 1.55,
+              color: Color(0x73FFFFFF),
+            ),
+          ),
           const SizedBox(height: 22),
           const Center(
             child: Text(
               'NowssB\n© 2026 Adv. Sanjaykumar Gadge · Shabdapathy',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 11, height: 1.6, color: Color(0x73FFFFFF)),
+              style: TextStyle(
+                fontSize: 11,
+                height: 1.6,
+                color: Color(0x73FFFFFF),
+              ),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class StoreViewMoreTap extends StatelessWidget {
+  const StoreViewMoreTap({
+    super.key,
+    required this.leftover,
+    required this.onTap,
+  });
+
+  final int leftover;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 8, 0, 16),
+      child: GestureDetector(
+        onTap: onTap,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(22),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              decoration: BoxDecoration(
+                color: const Color(0x330C0C0E),
+                borderRadius: BorderRadius.circular(22),
+                border: Border.all(color: const Color(0x22FFFFFF)),
+              ),
+              child: Row(
+                children: [
+                  const NwsbIcon(
+                    NwsbMarks.bag,
+                    size: 18,
+                    color: Color(0xFFE8D5A3),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'View more · $leftover collections',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  const Icon(Icons.expand_more_rounded, color: Colors.white),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

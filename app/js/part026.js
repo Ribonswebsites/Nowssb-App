@@ -179,7 +179,7 @@ window.msBuy = function(key, wordDisplay, price, img) {
           '<div class="ms-locked-wish-btn' + (inWish ? ' wishlisted' : '') + '" data-nss-wish="' + itemId + '" onclick="nssToggleWishlist(' + itemArgs + ')" aria-label="Wishlist">' +
             '<svg width="18" height="18" viewBox="0 0 16 16" fill="' + (inWish ? 'rgba(220,80,80,0.9)' : 'none') + '"><path d="M8 13.5S2 9.5 2 5.5A3 3 0 0 1 8 4.1 3 3 0 0 1 14 5.5C14 9.5 8 13.5 8 13.5Z" stroke="rgba(255,255,255,0.7)" stroke-width="1.2" stroke-linejoin="round"/></svg>' +
           '</div>' +
-          '<button class="ms-locked-cart-btn' + (inCart ? ' carted' : '') + '" data-nss-cart="' + itemId + '" onclick="nssAddToCart(' + itemArgs + ')">' +
+          '<button class="ms-locked-cart-btn' + (inCart ? ' carted' : '') + '" data-nss-cart="' + itemId + '" onclick="playCartAddAnimation(this,' + itemArgs + ')">' +
             '<span class="ms-locked-cart-btn-add"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#060c18" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1.3"/><circle cx="18" cy="21" r="1.3"/><path d="M2.5 3.5h2.3l1.9 10.5a1.2 1.2 0 0 0 1.2 1h8.2a1.2 1.2 0 0 0 1.2-.95L19 7.5H6"/></svg>Add to Cart · ' + msMoneyLabel(price) + '</span>' +
             '<span class="ms-locked-cart-btn-in"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>In Cart</span>' +
           '</button>' +
@@ -372,7 +372,7 @@ window.msRenderStore = function() {
         '</svg>' +
       '</div>' +
       '<div class="nss-card-action' + (inCart ? ' carted' : '') + '" data-nss-cart="ms-' + id + '" ' +
-        'onclick="event.stopPropagation();nssAddToCart({id:\'ms-' + id + '\',name:\'' + safeName + '\',type:\'Meaning\',price:' + price + ',img:\'' + safeImg + '\'})">' +
+        'onclick="event.stopPropagation();playCartAddAnimation(this,{id:\'ms-' + id + '\',name:\'' + safeName + '\',type:\'Meaning\',price:' + price + ',img:\'' + safeImg + '\'})">' +
         '<svg width="11" height="11" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">' +
           '<path d="M2 2h1.5l2 8h7l1.5-5.5H4.5" stroke="rgba(232,213,163,0.8)" stroke-width="1.2" stroke-linecap="square"/>' +
           '<circle cx="7" cy="12.5" r="1" fill="rgba(232,213,163,0.7)"/>' +
