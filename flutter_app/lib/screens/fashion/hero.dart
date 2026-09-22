@@ -63,7 +63,7 @@ class _Rail {
 const _rail = [
   // The subscription block's own gold clip.
   _Rail(NwsbMarks.crown, 'The Full Library', 'NowssB Subscription',
-      'assets/video/hero-subscription.mp4', 3),
+      'assets/video/subscription-a.mp4', 3),
   // The clip a word page opens with — NWSB_WORD_BANNER_VID.
   _Rail(NwsbMarks.word, 'Where a word begins', 'NowssB Word Store',
       'assets/video/hero-word-store.mp4', 3),

@@ -107,10 +107,10 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
           children: [
             const Positioned.fill(
               child: NwsbVideo(
-                asset: 'assets/video/subscription-join-nowssb.mp4',
-                poster: 'assets/video/subscription-join-nowssb-poster.webp',
+                asset: 'assets/video/subscription-a.mp4',
                 priority: ClipPriority.feature,
                 fit: BoxFit.cover,
+                showPoster: false,
               ),
             ),
             const Positioned.fill(
@@ -160,10 +160,10 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
           child: const AspectRatio(
             aspectRatio: 16 / 9,
             child: NwsbVideo(
-              asset: 'assets/video/subscription-banner.mp4',
-              poster: 'assets/video/subscription-banner-poster.webp',
+              asset: 'assets/video/subscription-b.mp4',
               priority: ClipPriority.feature,
               fit: BoxFit.cover,
+              showPoster: false,
             ),
           ),
         ),
@@ -784,10 +784,10 @@ class SubscriptionTermsScreen extends StatelessWidget {
         children: [
           const Positioned.fill(
             child: NwsbVideo(
-              asset: 'assets/video/subscription-join-nowssb.mp4',
-              poster: 'assets/video/subscription-join-nowssb-poster.webp',
+              asset: 'assets/video/subscription-a.mp4',
               priority: ClipPriority.feature,
               fit: BoxFit.cover,
+              showPoster: false,
             ),
           ),
           const Positioned.fill(

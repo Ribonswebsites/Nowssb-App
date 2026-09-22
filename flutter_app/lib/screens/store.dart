@@ -170,7 +170,7 @@ class _StoreHomeContent extends StatelessWidget {
       _StoreGlassSection(
         children: [
           _StoreVideoBanner(
-            asset: 'assets/video/subscription-offer.mp4',
+            asset: 'assets/video/subscription-a.mp4',
             poster: null,
             onTap: () => _push(context, const SubscriptionScreen()),
             tall: true,
@@ -562,7 +562,7 @@ class _SignatureDoor extends StatelessWidget {
   const _SignatureDoor({required this.onTap});
   final VoidCallback onTap;
 
-  static const _clip = 'assets/video/signature-offer.mp4';
+  static const _clip = 'assets/video/signature-store-hero.mp4';
 
   @override
   Widget build(BuildContext context) {

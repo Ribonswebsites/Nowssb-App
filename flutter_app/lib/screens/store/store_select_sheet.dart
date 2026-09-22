@@ -1,11 +1,14 @@
 /// “Please select the store” bottom sheet — glassmorphism only.
 /// Active store uses a subtle glass highlight + check pill (not a thinking orb).
+/// Top film: assets/video/choose-store.mp4 (#1) — Choose Store page only.
 library;
 
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
+import '../../media/nwsb_video.dart';
+import '../../media/video_pool.dart';
 import 'store_cards.dart';
 
 class StoreSelectEntry {
@@ -41,6 +44,9 @@ const kStoreSelectEntries = <StoreSelectEntry>[
     art: kEbProductArt,
   ),
 ];
+
+/// Choose Store sheet film — attachment #1 only. Never used for Signature/Subscribe.
+const kChooseStoreVideo = 'assets/video/choose-store.mp4';
 
 Future<void> showStoreSelectSheet(
   BuildContext context, {
@@ -107,6 +113,20 @@ class StoreSelectSheet extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: const Color(0x55FFFFFF),
                       borderRadius: BorderRadius.circular(99),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: const AspectRatio(
+                    aspectRatio: 16 / 9,
+                    child: NwsbVideo(
+                      asset: kChooseStoreVideo,
+                      priority: ClipPriority.feature,
+                      autoplay: true,
+                      loop: true,
+                      showPoster: false,
                     ),
                   ),
                 ),

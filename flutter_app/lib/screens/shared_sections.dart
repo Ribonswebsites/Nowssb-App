@@ -110,7 +110,7 @@ class EditionSection extends StatelessWidget {
             mark: NwsbMarks.crown,
           ),
           TvFrame(
-            asset: 'assets/video/subscription-offer.mp4',
+            asset: 'assets/video/subscription-b.mp4',
             frame: DeviceFrame.kioskPortrait,
             priority: ClipPriority.decoration,
             onTap: onTap,

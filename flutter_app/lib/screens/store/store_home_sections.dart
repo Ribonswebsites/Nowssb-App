@@ -110,7 +110,9 @@ class StoreSubscribeBanner extends StatelessWidget {
   final String? pillIconAsset;
   final VoidCallback? onTap;
 
-  static const kSubscriptionOfferVideo = 'assets/video/subscription-offer.mp4';
+  /// Primary subscribe film (#3). Alternate surfaces use subscription-b.mp4 (#4).
+  static const kSubscriptionOfferVideo = 'assets/video/subscription-a.mp4';
+  static const kSubscriptionAlternateVideo = 'assets/video/subscription-b.mp4';
 
   @override
   Widget build(BuildContext context) {
