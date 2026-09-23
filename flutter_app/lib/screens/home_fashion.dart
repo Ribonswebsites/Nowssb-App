@@ -37,6 +37,7 @@ import '../widgets/enter_curve_stage.dart';
 import '../widgets/hero_curve_stage.dart';
 import '../widgets/buddha_gyro_stage.dart';
 import '../widgets/stories_find_you_banner.dart';
+import '../widgets/subscription_today_offer.dart';
 import 'fashion/header.dart';
 import 'fashion/hero.dart';
 import 'fashion/sections_bottom.dart';
@@ -348,7 +349,9 @@ class _HomeFashionState extends State<HomeFashion> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              FashStore(onTap: () => _go(3)),
+              SubscriptionTodayOffer(
+                onClaim: () => _push(const SubscriptionScreen()),
+              ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
                 child: ColoredSplitPromoBanner(

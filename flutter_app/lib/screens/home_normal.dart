@@ -73,6 +73,7 @@ import '../widgets/home_menu_drawer.dart';
 import '../widgets/hero_curve_stage.dart';
 import '../widgets/buddha_gyro_stage.dart';
 import '../widgets/stories_find_you_banner.dart';
+import '../widgets/subscription_today_offer.dart';
 import 'practice_player.dart';
 import 'progress/progress_screen.dart';
 import 'reader/reader_hub.dart';
@@ -347,11 +348,14 @@ class _HomeNormalState extends State<HomeNormal> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              NmStore(onTap: () => _go(3)),
+              SubscriptionTodayOffer(
+                onClaim: () => _push(const SubscriptionScreen()),
+              ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
                 child: ColoredSplitPromoBanner(
-                  spec: SplitPromoExtras.at(3, onTap: () => _push(const ReaderHubScreen())),
+                  spec: SplitPromoExtras.at(3,
+                      onTap: () => _push(const ReaderHubScreen())),
                   margin: EdgeInsets.zero,
                 ),
               ),
@@ -450,7 +454,8 @@ class _HomeNormalState extends State<HomeNormal> {
       if (keys.toString() != kNormalSectionOrder.toString()) {
         debugPrint('NowssB: Normal section registry drift: $keys');
       }
-      final noMarkup = built.where((e) => e.$2 == null).map((e) => e.$1).toSet();
+      final noMarkup =
+          built.where((e) => e.$2 == null).map((e) => e.$1).toSet();
       if (noMarkup.toString() != kNormalNoMarkup.toString()) {
         debugPrint('NowssB: Normal no-markup drift: $noMarkup');
       }

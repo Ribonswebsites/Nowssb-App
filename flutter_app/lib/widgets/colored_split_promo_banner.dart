@@ -1,7 +1,7 @@
 /// YouTube Music–style split promotional banner.
 ///
 /// Left: dark panel with title + outlined CTA pill.
-/// Right: solid COLOURED panel with a studio graphic (black-bg PNG).
+/// Right: solid COLOURED panel with a cut-out studio graphic (no black plate).
 /// Sharp vertical split, rounded card. Not the Sound Library Meaning card.
 library;
 

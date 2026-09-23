@@ -10,10 +10,13 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
+import 'app_thinking_loader.dart';
 import 'glass_wrap.dart';
 import 'hero_curve_stage.dart';
 import 'nwsb_icon.dart';
+import 'scroll_progress_rail.dart';
 import '../data/content.dart';
 
 const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
@@ -133,6 +136,7 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
   Timer? _tick;
   ScrollPosition? _pos;
   late final PageController _pager;
+  late final ScrollController _wordsScroll;
 
   Timer? _pageAuto;
   var _pageIndex = 0;
@@ -142,6 +146,7 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
   void initState() {
     super.initState();
     _pager = PageController(viewportFraction: 0.94);
+    _wordsScroll = ScrollController();
     if (!_flutterTest) {
       _tick = Timer.periodic(const Duration(milliseconds: 32), (_) {
         if (!mounted) return;
@@ -193,6 +198,7 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
     _pageAuto?.cancel();
     _pos?.removeListener(_onScroll);
     _pager.dispose();
+    _wordsScroll.dispose();
     super.dispose();
   }
 
@@ -251,9 +257,8 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
 
   Widget _wordsBody() {
     final words = ContentStore.instance.library;
-    final featured = words.isEmpty
-        ? null
-        : words[(DateTime.now().day + 1) % words.length];
+    final featured =
+        words.isEmpty ? null : words[(DateTime.now().day + 1) % words.length];
     final organ = (featured?.organ ?? 'immune system').toUpperCase();
     final word = featured?.word ?? 'AAROGYA';
     return Column(
@@ -261,44 +266,63 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
       children: [
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.fromLTRB(8, 10, 12, 10),
           decoration: BoxDecoration(
             color: const Color(0xFF0B0B12),
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(color: const Color(0x14FFFFFF)),
           ),
-          child: const Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: const Row(
             children: [
-              Text(
-                "Today's offer",
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w800,
-                  color: Color(0xFFE8D5A3),
-                ),
+              AppThinkingLoader(
+                size: 40,
+                state: OrbState.composing,
+                blackCircle: false,
               ),
-              SizedBox(height: 4),
-              Text(
-                'Featured healing word — limited shop drop for mind & organ.',
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Color(0xB3FFFFFF),
-                  height: 1.35,
-                ),
+              SizedBox(width: 8),
+              SizedBox(
+                width: 1,
+                height: 42,
+                child: ColoredBox(color: Color(0x33FFFFFF)),
               ),
-              SizedBox(height: 6),
-              Text(
-                'Tap Shop Now to claim today’s frequency.',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 11.5,
-                  color: Color(0x8CFFFFFF),
-                  height: 1.35,
+              SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Today's offer",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFFE8D5A3),
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      'Featured healing word — limited shop drop for mind & organ.',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Color(0xB3FFFFFF),
+                        height: 1.35,
+                      ),
+                    ),
+                    SizedBox(height: 6),
+                    Text(
+                      'Tap Shop Now to claim today’s frequency.',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        color: Color(0x8CFFFFFF),
+                        height: 1.35,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -314,51 +338,61 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
                     style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 13),
                   ),
                 )
-              : ListView.separated(
-                  primary: false,
-                  padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
-                  itemCount: words.length,
-                  separatorBuilder: (_, __) => const Divider(
-                    height: 1,
-                    color: Color(0x22FFFFFF),
-                  ),
-                  itemBuilder: (_, i) {
-                    final w = words[i];
-                    final meaning = w.meaning.isNotEmpty
-                        ? w.meaning
-                        : (w.benefit.isNotEmpty ? w.benefit : w.organ);
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            w.word,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w800,
+              : Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    ScrollProgressRail(controller: _wordsScroll),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: ListView.separated(
+                        controller: _wordsScroll,
+                        primary: false,
+                        padding: const EdgeInsets.fromLTRB(4, 4, 8, 8),
+                        itemCount: words.length,
+                        separatorBuilder: (_, __) => const Divider(
+                          height: 1,
+                          color: Color(0x22FFFFFF),
+                        ),
+                        itemBuilder: (_, i) {
+                          final w = words[i];
+                          final meaning = w.meaning.isNotEmpty
+                              ? w.meaning
+                              : (w.benefit.isNotEmpty ? w.benefit : w.organ);
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  w.word,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                                if (meaning.isNotEmpty) ...[
+                                  const SizedBox(height: 3),
+                                  Text(
+                                    meaning,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      color: Color(0xB3FFFFFF),
+                                      fontSize: 12,
+                                      height: 1.3,
+                                    ),
+                                  ),
+                                ],
+                              ],
                             ),
-                          ),
-                          if (meaning.isNotEmpty) ...[
-                            const SizedBox(height: 3),
-                            Text(
-                              meaning,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                color: Color(0xB3FFFFFF),
-                                fontSize: 12,
-                                height: 1.3,
-                              ),
-                            ),
-                          ],
-                        ],
+                          );
+                        },
                       ),
-                    );
-                  },
+                    ),
+                  ],
                 ),
         ),
         const SizedBox(height: 8),
@@ -367,7 +401,10 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
           behavior: HitTestBehavior.opaque,
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-            color: Colors.black,
+            decoration: BoxDecoration(
+              color: Colors.black,
+              borderRadius: BorderRadius.circular(16),
+            ),
             child: Row(
               children: [
                 Container(
@@ -413,7 +450,10 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  color: const Color(0xFFE8D5A3),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE8D5A3),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -532,10 +572,11 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
     // same size and sit on the same cylinder — not a tighter inner ring.
     const radius = 220.0;
     final topIdx = List<int>.generate(nTop, (i) => i)
-      ..sort((a, b) => math.cos(rot + a * stepTop)
-          .compareTo(math.cos(rot + b * stepTop)));
+      ..sort((a, b) =>
+          math.cos(rot + a * stepTop).compareTo(math.cos(rot + b * stepTop)));
     final botIdx = List<int>.generate(nBot, (i) => i)
-      ..sort((a, b) => math.cos(rot + a * stepBot + stepBot / 2)
+      ..sort((a, b) => math
+          .cos(rot + a * stepBot + stepBot / 2)
           .compareTo(math.cos(rot + b * stepBot + stepBot / 2)));
 
     return GestureDetector(
@@ -589,8 +630,7 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
                         fit: BoxFit.contain,
                         alignment: Alignment.bottomCenter,
                         filterQuality: FilterQuality.high,
-                        errorBuilder: (_, __, ___) =>
-                            const SizedBox.shrink(),
+                        errorBuilder: (_, __, ___) => const SizedBox.shrink(),
                       ),
                     ),
                   ),
@@ -642,7 +682,8 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
     final rot = _auto + _drag + _para * 0.004;
     final items = <(String, EnterCurveDest?)>[
       for (final d in EnterCurveAssets.destinations) (d.banner, d),
-      if (!compact) for (final a in EnterCurveAssets.extras) (a, null),
+      if (!compact)
+        for (final a in EnterCurveAssets.extras) (a, null),
     ];
     final n = items.length;
     final step = (math.pi * 2) / n;
@@ -656,8 +697,7 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
           math.cos(rot + a * step).compareTo(math.cos(rot + b * step)));
 
     return GestureDetector(
-      behavior:
-          compact ? HitTestBehavior.translucent : HitTestBehavior.opaque,
+      behavior: compact ? HitTestBehavior.translucent : HitTestBehavior.opaque,
       onHorizontalDragUpdate: compact
           ? (d) {
               setState(() => _drag += d.delta.dx * 0.01);
@@ -774,7 +814,8 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
     );
   }
 
-  Widget _banner(EnterCurveDest dest, {required double width, required double height}) {
+  Widget _banner(EnterCurveDest dest,
+      {required double width, required double height}) {
     return GestureDetector(
       onTap: () => _open(dest.id),
       child: Container(
@@ -844,7 +885,8 @@ class _WhiteChip extends StatelessWidget {
           shape: BoxShape.circle,
           color: Colors.white,
           boxShadow: [
-            BoxShadow(color: Color(0x33000000), blurRadius: 6, offset: Offset(0, 2)),
+            BoxShadow(
+                color: Color(0x33000000), blurRadius: 6, offset: Offset(0, 2)),
           ],
         ),
         child: NwsbIcon(mark, size: 11, color: Colors.black),
@@ -868,7 +910,8 @@ class _WhiteEnter extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(999),
           boxShadow: const [
-            BoxShadow(color: Color(0x33000000), blurRadius: 8, offset: Offset(0, 2)),
+            BoxShadow(
+                color: Color(0x33000000), blurRadius: 8, offset: Offset(0, 2)),
           ],
         ),
         child: const Row(
@@ -884,7 +927,8 @@ class _WhiteEnter extends StatelessWidget {
               ),
             ),
             SizedBox(width: 3),
-            NwsbIcon(NwsbMarks.enterArrow, size: 9, viewBox: 12, color: Colors.black),
+            NwsbIcon(NwsbMarks.enterArrow,
+                size: 9, viewBox: 12, color: Colors.black),
           ],
         ),
       ),
