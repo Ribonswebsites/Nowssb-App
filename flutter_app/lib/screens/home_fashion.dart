@@ -35,6 +35,7 @@ import '../theme/tokens.dart';
 import '../widgets/app_backdrop.dart';
 import '../widgets/enter_curve_stage.dart';
 import '../widgets/hero_curve_stage.dart';
+import '../widgets/stories_find_you_banner.dart';
 import 'fashion/header.dart';
 import 'fashion/hero.dart';
 import 'fashion/sections_bottom.dart';
@@ -83,6 +84,7 @@ const kFashionSectionOrder = <String>[
   'herovid',
   'streak',
   'tiles',
+  'storiesFind',
   'store',
   'trendwd',
   'custom',
@@ -303,6 +305,10 @@ class _HomeFashionState extends State<HomeFashion> {
         ),
         ('streak', FashStreak(onTap: () => _go(1))),
         ('tiles', FashTiles(onTile: _go, onOpen: _openEnter)),
+        (
+          'storiesFind',
+          StoriesFindYouBanner(onTap: () => _go(2)),
+        ),
         ('store', FashStore(onTap: () => _go(3))),
         ('trendwd', FashTrending(onTap: () => _go(2))),
         ('custom', FashCustomize(onTap: () => _push(const WidgetsPage()))),

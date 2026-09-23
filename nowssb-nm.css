@@ -17127,8 +17127,8 @@ body.fashplus :is(#home, .stw-prev-stage) .fp-card .fp-enter .tp-enter-go {
   display: flex;
   align-items: stretch;
   gap: 8px;
-  background: #f6ede4;
-  color: #111;
+  background: #050505;
+  color: #fff;
   padding: 26px 8px 18px 16px;
   box-sizing: border-box;
   aspect-ratio: 16 / 9;
@@ -17152,7 +17152,7 @@ body.fashplus :is(#home, .stw-prev-stage) .fp-card .fp-enter .tp-enter-go {
   font-size: 9.5px;
   line-height: 1.4;
   font-style: italic;
-  color: #3a3a3a;
+  color: #fff;
 }
 .nwsb-stories-go { font-size: 18px; margin-top: auto; padding-bottom: 6px; }
 .nwsb-stories-stack {
@@ -17211,8 +17211,8 @@ body.fashplus :is(#home, .stw-prev-stage) .fp-card .fp-enter .tp-enter-go {
   margin: 10px 16px;
   border-radius: 22px;
   overflow: hidden;
-  background: #f0f2f7;
-  box-shadow: 6px 6px 14px rgba(163,177,198,.55), -6px -6px 14px #fff;
+  background: #050505;
+  box-shadow: 6px 6px 14px rgba(0,0,0,.5), -6px -6px 14px rgba(255,255,255,.08);
 }
 .fash-stories-wrap .nwsb-stories { border-radius: 12px; }
 .sl-album { position: relative; padding: 10px 0 24px; color: #fff; text-align: center; background: #000; overflow: hidden; }

@@ -71,6 +71,7 @@ import 'quick_access.dart';
 import 'widgets_page.dart';
 import '../widgets/home_menu_drawer.dart';
 import '../widgets/hero_curve_stage.dart';
+import '../widgets/stories_find_you_banner.dart';
 import 'practice_player.dart';
 import 'progress/progress_screen.dart';
 import 'reader/reader_hub.dart';
@@ -95,6 +96,7 @@ const kNormalSectionOrder = <String>[
   'mainops',
   'actionbar',
   'tiles',
+  'storiesFind',
   'store',
   'reader',
   'trendwd',
@@ -316,6 +318,10 @@ class _HomeNormalState extends State<HomeNormal> {
         (
           'tiles',
           FashTiles(onTile: _go, onOpen: _openEnter),
+        ),
+        (
+          'storiesFind',
+          StoriesFindYouBanner(neumorphic: true, onTap: () => _go(2)),
         ),
         ('store', NmStore(onTap: () => _go(3))),
         ('reader', NmReader(onTap: () => _push(const ReaderHubScreen()))),

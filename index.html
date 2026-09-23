@@ -151,7 +151,7 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
 <script type="module" src="app/js/firebase.module.js?v=267"></script>
 <link rel="stylesheet" href="app/app.css?v=319">
 <link rel="stylesheet" href="nowssb-social.css?v=210">
-<link rel="stylesheet" href="nowssb-nm.css?v=822">
+<link rel="stylesheet" href="nowssb-nm.css?v=823">
 <link rel="stylesheet" href="app/css/subscription-tiers.css?v=3">
 <link rel="stylesheet" href="app/widgets.css?v=8">
 <link rel="stylesheet" href="app/steps.css?v=9">
@@ -1407,6 +1407,21 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
     </div>
 </div><!-- /nmh-tiles-wrap -->
 
+    <div class="nmh-stories-wrap">
+      <div class="nwsb-stories" onclick="openSub('sound-library')">
+        <div class="nwsb-stories-copy">
+          <h2>SOUND<br>THAT<br>FINDS YOU</h2>
+          <p>There are no limitations to the<br>frequency at NowssB.</p>
+          <span class="nwsb-stories-go">→</span>
+        </div>
+        <div class="nwsb-stories-stack">
+          <article class="nwsb-story c0"><span>PRANA</span><strong>SOUND<br>RITUAL</strong><img src="./assets/banners/stories/prana.png" alt=""></article>
+          <article class="nwsb-story c1"><img src="./assets/banners/stories/pitta.png" alt=""><div class="nwsb-story-copy"><span>PITTA</span><strong>LIGHT<br>BODY</strong></div></article>
+          <article class="nwsb-story c2"><span>SOMA</span><strong>WORD<br>SCIENCE</strong><div class="nwsb-story-inset"><img src="./assets/banners/stories/soma.png" alt=""></div></article>
+          <article class="nwsb-story c3"><span>AURA</span><strong>THE<br>FUTURE</strong><img src="./assets/banners/stories/aura.png" alt=""></article>
+        </div>
+      </div>
+    </div>
 
     <!-- Reader, then Customize, directly under the four home buttons.
          app/js/part062.js REG order is what actually decides this at
@@ -2211,6 +2226,26 @@ window.addEventListener('appinstalled', function () { window._bipEvent = null; }
   </div>
   </div>
 
+
+  <div class="glass-wrap fash-stories-wrap">
+    <div class="nwsb-stories" onclick="openSub('sound-library')">
+      <div class="nwsb-stories-copy">
+        <h2>SOUND<br>THAT<br>FINDS YOU</h2>
+        <p>There are no limitations to the<br>frequency at NowssB.</p>
+        <span class="nwsb-stories-go">→</span>
+      </div>
+      <div class="nwsb-stories-stack">
+        <article class="nwsb-story c0"><span>PRANA</span><strong>SOUND<br>RITUAL</strong><img src="./assets/banners/stories/prana.png" alt=""></article>
+        <article class="nwsb-story c1"><img src="./assets/banners/stories/pitta.png" alt=""><div class="nwsb-story-copy"><span>PITTA</span><strong>LIGHT<br>BODY</strong></div></article>
+        <article class="nwsb-story c2"><span>SOMA</span><strong>WORD<br>SCIENCE</strong><div class="nwsb-story-inset"><img src="./assets/banners/stories/soma.png" alt=""></div></article>
+        <article class="nwsb-story c3"><span>AURA</span><strong>THE<br>FUTURE</strong><img src="./assets/banners/stories/aura.png" alt=""></article>
+      </div>
+    </div>
+  </div>
+
+
+    <!-- Today's Trending sits directly above Customize; part062.js REG order
+       is what decides this at runtime, so the two must stay in step. -->
   <!-- Today's Trending and the word banner under it, in one glass wrapper. -->
   <div class="glass-wrap trend-wrap fash-trend-wrap">
   <!-- Today Trending — video banner (fashion) -->
