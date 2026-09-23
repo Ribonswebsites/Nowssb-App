@@ -28,6 +28,7 @@ import '../widgets/tv_frame.dart';
 import '../widgets/glass_wrap.dart';
 import '../widgets/nwsb_icon.dart';
 import '../widgets/black_glass_banner.dart';
+import '../widgets/colored_split_promo_banner.dart';
 import '../theme/tokens.dart';
 import '../theme/player_aura.dart';
 import 'sound_library.dart';
@@ -4321,6 +4322,11 @@ class _PlayerInfoSheet extends StatelessWidget {
                     value: word.mouthPos,
                     accent: accent,
                   ),
+                const SizedBox(height: 8),
+                ColoredSplitPromoBanner(
+                  spec: SplitPromoExtras.at(11),
+                  margin: EdgeInsets.zero,
+                ),
               ],
             ),
           ),

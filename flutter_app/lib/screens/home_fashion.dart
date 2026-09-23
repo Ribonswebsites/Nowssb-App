@@ -38,6 +38,9 @@ import '../widgets/hero_curve_stage.dart';
 import '../widgets/buddha_gyro_stage.dart';
 import '../widgets/stories_find_you_banner.dart';
 import '../widgets/subscription_today_offer.dart';
+import '../widgets/promo_color_grid.dart';
+import 'quotes_live.dart';
+import 'player_settings.dart';
 import 'fashion/header.dart';
 import 'fashion/hero.dart';
 import 'fashion/sections_bottom.dart';
@@ -155,6 +158,29 @@ class _HomeFashionState extends State<HomeFashion> {
     final all = ContentStore.instance.library;
     if (i < 0 || i >= all.length) return;
     _push(WordDetail(word: all[i]));
+  }
+
+  void _openGrid(String id) {
+    switch (id) {
+      case 'practice':
+        _go(1);
+      case 'library':
+        _go(2);
+      case 'store':
+        _go(3);
+      case 'reader':
+        _push(const ReaderHubScreen());
+      case 'healing':
+        _push(const HealingPathScreen());
+      case 'subscription':
+        _push(const SubscriptionScreen());
+      case 'player':
+        _push(const PlayerSettingsScreen());
+      case 'progress':
+        _push(PracticeProgressScreen(words: ContentStore.instance.library));
+      case 'quotes':
+        _push(const QuotesWeekScreen());
+    }
   }
 
   void _openEnter(String id) {
@@ -303,7 +329,13 @@ class _HomeFashionState extends State<HomeFashion> {
             ],
           ),
         ),
-        ('routineCards', const NmHorizontalRoutineCards(fashion: true)),
+        ('routineCards', Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const NmHorizontalRoutineCards(fashion: true),
+            PromoColorGrid(onOpen: _openGrid),
+          ],
+        )),
         ('coachCards', const SizedBox.shrink()),
         ('mainops', MainOptionsSection(onGo: _go, onAction: _openMainOption)),
         (
@@ -343,7 +375,9 @@ class _HomeFashionState extends State<HomeFashion> {
           'storiesFind',
           StoriesFindYouBanner(onTap: () => _go(2)),
         ),
-        ('buddhaGyro', const BuddhaGyroStage()),
+        ('buddhaGyro', BuddhaGyroStage(
+          onOpenQuotes: () => _push(const QuotesWeekScreen()),
+        )),
         (
           'store',
           Column(
@@ -543,6 +577,7 @@ class _HomeFashionState extends State<HomeFashion> {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
+                          const LiveQuoteTab(),
                           HeroGreeting(name: widget.name),
                           // Search + Quick access live ONLY inside HeroCurveStage.
                           HeroCurveStage(

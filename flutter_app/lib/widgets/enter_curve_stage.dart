@@ -277,7 +277,7 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
               AppThinkingLoader(
                 size: 40,
                 state: OrbState.composing,
-                blackCircle: false,
+                blackCircle: true,
               ),
               SizedBox(width: 8),
               SizedBox(

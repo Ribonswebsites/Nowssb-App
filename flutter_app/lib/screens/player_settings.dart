@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 
 import '../data/settings.dart';
 import '../theme/player_aura.dart';
+import '../widgets/colored_split_promo_banner.dart';
 
 class PlayerSettingsScreen extends StatefulWidget {
   const PlayerSettingsScreen({super.key});
@@ -190,6 +191,12 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
                         () => _choose('Crossfade', _crossfadeOptions, s.crossfade, s.setCrossfade)),
                     _nav(Icons.timer_outlined, 'Sleep Timer', s.sleepTimer,
                         () => _choose('Sleep Timer', _sleepOptions, s.sleepTimer, s.setSleepTimer)),
+                    const SizedBox(height: 14),
+                    ColoredSplitPromoBanner(
+                      spec: SplitPromoExtras.at(7),
+                      margin: EdgeInsets.zero,
+                    ),
+                    const SizedBox(height: 8),
                     _toggle(Icons.download_outlined, 'Download Only', s.downloadOnly, s.toggleDownloadOnly),
                     _nav(Icons.queue_music, 'Now Playing View', s.playlist,
                         () => _choose('Now Playing View', _viewOptions, s.playlist, s.setPlaylist)),
@@ -204,6 +211,11 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
                     _nav(Icons.notifications_none, 'Now Playing', s.nowPlaying,
                         () => _choose('Now Playing', _nowPlayingOptions, s.nowPlaying, s.setNowPlaying),
                         last: true),
+                    const SizedBox(height: 16),
+                    ColoredSplitPromoBanner(
+                      spec: SplitPromoExtras.at(10),
+                      margin: EdgeInsets.zero,
+                    ),
                     const SizedBox(height: 24),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,

@@ -1,9 +1,9 @@
 /// Today's Quotes — two auto-rotating cards.
 ///
-/// The type plate is the background and can be dragged left and right.
-/// The Buddha has no plate of its own, so the words stay visible around it.
-/// Tilting the phone up and down swings the figure against that plate.
-/// Card two is the raised hand, with the composing orb on the fingertips.
+/// The type plate fills the card in black. Dragging it left and right
+/// reveals the other side of the poster; anything past the plate stays
+/// black, never the home's glass or neu colour. The Buddha is smaller and
+/// sits on the bottom edge so the words stay readable around it.
 library;
 
 import 'dart:async';
@@ -20,9 +20,15 @@ import 'neumorphic.dart';
 const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
 
 class BuddhaGyroStage extends StatefulWidget {
-  const BuddhaGyroStage({super.key, this.neumorphic = false});
+  const BuddhaGyroStage({
+    super.key,
+    this.neumorphic = false,
+    this.onOpenQuotes,
+  });
 
+  /// Normal home. Fashion never gets a neu wrapper.
   final bool neumorphic;
+  final VoidCallback? onOpenQuotes;
 
   @override
   State<BuddhaGyroStage> createState() => _BuddhaGyroStageState();
@@ -37,7 +43,7 @@ class _BuddhaGyroStageState extends State<BuddhaGyroStage> {
   var _page = 0;
   var _userPaging = false;
 
-  static const _stageH = 580.0;
+  static const _stageH = 680.0;
 
   @override
   void initState() {
@@ -77,7 +83,11 @@ class _BuddhaGyroStageState extends State<BuddhaGyroStage> {
   }
 
   void _drag(double dx) {
-    setState(() => _pan = (_pan + dx).clamp(-170.0, 170.0));
+    final box = context.findRenderObject();
+    final w = box is RenderBox && box.hasSize ? box.size.width : 340.0;
+    // Travel far enough to reveal the other side of the poster, then black.
+    final limit = (w * 0.92).clamp(160.0, 520.0);
+    setState(() => _pan = (_pan + dx).clamp(-limit, limit));
   }
 
   @override
@@ -99,57 +109,46 @@ class _BuddhaGyroStageState extends State<BuddhaGyroStage> {
         ),
         SizedBox(
           height: _stageH,
-          child: NotificationListener<ScrollNotification>(
-            onNotification: (n) {
-              if (n is ScrollStartNotification && n.dragDetails != null) {
-                _userPaging = true;
-              } else if (n is ScrollEndNotification) {
-                _userPaging = false;
-              }
-              return false;
-            },
-            child: PageView(
-              controller: _pager,
-              physics: const NeverScrollableScrollPhysics(),
-              onPageChanged: (i) => _page = i,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: _shell(
-                    0,
-                    _stage('assets/banners/gyro/buddha.png'),
-                  ),
+          child: PageView(
+            controller: _pager,
+            physics: const NeverScrollableScrollPhysics(),
+            onPageChanged: (i) => _page = i,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: _shell(0, _stage('assets/banners/gyro/buddha.png')),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: _shell(
+                  1,
+                  _stage('assets/banners/gyro/buddha-hand.png', orb: true),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: _shell(
-                    1,
-                    _stage('assets/banners/gyro/buddha-hand.png', orb: true),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
+          child: _enterBar(),
         ),
       ],
     );
   }
 
-  /// Card 0 wears this home's pane. Card 1 wears the other, so the two
-  /// wrappers are not the same.
   Widget _shell(int index, Widget child) {
-    final glass = widget.neumorphic ? index == 1 : index == 0;
-    if (glass) {
-      return GlassWrap(
-        margin: EdgeInsets.zero,
+    if (widget.neumorphic) {
+      return NeuCard(
         padding: const EdgeInsets.all(8),
+        radius: index == 0 ? 18 : 26,
+        elevation: index == 0 ? NwsbElevation.md : NwsbElevation.sm,
         child: child,
       );
     }
-    return NeuCard(
+    return GlassWrap(
+      margin: EdgeInsets.zero,
+      radius: index == 0 ? 18 : 26,
       padding: const EdgeInsets.all(8),
-      radius: 18,
-      color: widget.neumorphic ? null : const Color(0xFFF3F0EA),
       child: child,
     );
   }
@@ -159,78 +158,161 @@ class _BuddhaGyroStageState extends State<BuddhaGyroStage> {
       onHorizontalDragUpdate: (d) => _drag(d.delta.dx),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(14),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            Transform.translate(
-              offset: Offset(_pan, _pitch * -20),
-              child: Transform.scale(
-                scale: 1.48,
-                child: Image.asset(
-                  'assets/banners/gyro/words-bg.png',
-                  fit: BoxFit.cover,
-                  alignment: Alignment(_pan / 220, _pitch * 0.12),
-                ),
-              ),
-            ),
-            LayoutBuilder(
-              builder: (context, c) {
-                final w = c.maxWidth;
-                final h = c.maxHeight;
-                const aspect = 844 / 1500;
-                var imgH = h;
-                var imgW = imgH * aspect;
-                if (imgW > w) {
-                  imgW = w;
-                  imgH = imgW / aspect;
-                }
-                final left = (w - imgW) / 2;
-                final top = h - imgH;
-                final tilt = Matrix4.identity()
-                  ..setEntry(3, 2, 0.0012)
-                  ..rotateX(_pitch * 0.38)
-                  ..translateByDouble(0, _pitch * 14, 0, 1);
-                return Stack(
-                  children: [
-                    Positioned(
-                      left: left,
-                      top: top,
-                      width: imgW,
-                      height: imgH,
-                      child: Transform(
-                        alignment: Alignment.bottomCenter,
-                        transform: tilt,
-                        child: Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            Positioned.fill(
-                              child: Image.asset(
-                                figure,
-                                fit: BoxFit.fill,
-                                filterQuality: FilterQuality.high,
-                              ),
-                            ),
-                            if (orb)
-                              Positioned(
-                                left: imgW * 0.86 - 28,
-                                top: imgH * 0.46 - 8,
-                                child: const AppThinkingLoader(
-                                  size: 56,
-                                  state: OrbState.composing,
-                                  blackCircle: false,
-                                ),
-                              ),
-                          ],
-                        ),
+        child: ColoredBox(
+          color: Colors.black,
+          child: LayoutBuilder(
+            builder: (context, c) {
+              final w = c.maxWidth;
+              final h = c.maxHeight;
+              // Wider than the card so a sideways drag reveals the other
+              // half of the type plate. Past that edge the fill is black.
+              final plateW = w * 2.35;
+              final plateH = h * 1.28;
+              final plateTilt = Matrix4.identity()
+                ..setEntry(3, 2, 0.0011)
+                ..rotateX(_pitch * 0.22)
+                ..rotateY((_pan / w).clamp(-1.0, 1.0) * 0.08);
+              final tilt = Matrix4.identity()
+                ..setEntry(3, 2, 0.0012)
+                ..rotateX(_pitch * 0.28)
+                ..translateByDouble(0, _pitch * 8, 0, 1);
+              const aspect = 844 / 1500;
+              final imgH = h * 0.58;
+              final imgW = imgH * aspect;
+              final left = (w - imgW) / 2;
+              final top = h - imgH;
+              const orbSize = 46.0;
+              return Stack(
+                fit: StackFit.expand,
+                clipBehavior: Clip.hardEdge,
+                children: [
+                  Positioned(
+                    left: (w - plateW) / 2 + _pan,
+                    top: (h - plateH) / 2 + _pitch * -18,
+                    width: plateW,
+                    height: plateH,
+                    child: Transform(
+                      alignment: Alignment.center,
+                      transform: plateTilt,
+                      child: Image.asset(
+                        'assets/banners/gyro/words-bg.png',
+                        fit: BoxFit.cover,
+                        filterQuality: FilterQuality.high,
                       ),
                     ),
-                  ],
-                );
-              },
+                  ),
+                  Positioned(
+                    left: left,
+                    top: top,
+                    width: imgW,
+                    height: imgH,
+                    child: Transform(
+                      alignment: Alignment.bottomCenter,
+                      transform: tilt,
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Positioned.fill(
+                            child: Image.asset(
+                              figure,
+                              fit: BoxFit.fill,
+                              filterQuality: FilterQuality.high,
+                            ),
+                          ),
+                          if (orb)
+                            Positioned(
+                              // Fingertips of the raised hand, not the type.
+                              left: imgW * 0.90 - orbSize * 0.5,
+                              top: imgH * 0.47 - orbSize * 0.45,
+                              child: const AppThinkingLoader(
+                                size: orbSize,
+                                state: OrbState.composing,
+                                blackCircle: true,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _enterBar() {
+    final bar = GestureDetector(
+      onTap: widget.onOpenQuotes,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(10, 10, 12, 10),
+        decoration: BoxDecoration(
+          color: const Color(0xFF0B0B12),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: [
+            const AppThinkingLoader(
+              size: 34,
+              state: OrbState.composing,
+              blackCircle: true,
+            ),
+            const SizedBox(width: 8),
+            Container(width: 1, height: 28, color: const Color(0x33FFFFFF)),
+            const SizedBox(width: 10),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "This week's quotes",
+                    style: TextStyle(
+                      color: Color(0xFFE8D5A3),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  Text(
+                    'Today, last day, and the rest of the week.',
+                    style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 11.5),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFE8D5A3),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Text(
+                'Enter',
+                style: TextStyle(
+                  color: Color(0xFF1A1A2E),
+                  fontWeight: FontWeight.w800,
+                  fontSize: 12,
+                ),
+              ),
             ),
           ],
         ),
       ),
+    );
+    if (widget.neumorphic) {
+      return NeuCard(
+        padding: const EdgeInsets.all(8),
+        radius: 18,
+        elevation: NwsbElevation.sm,
+        child: bar,
+      );
+    }
+    return GlassWrap(
+      margin: EdgeInsets.zero,
+      padding: const EdgeInsets.all(8),
+      child: bar,
     );
   }
 }

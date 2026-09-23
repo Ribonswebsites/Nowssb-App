@@ -125,6 +125,18 @@ class _PracticeScreenState extends State<PracticeScreen> {
                 const SizedBox(height: 14),
                 for (final w in rest) _row(context, w),
               ],
+              const SizedBox(height: 22),
+              ColoredSplitPromoBanner(
+                spec: SplitPromoExtras.at(
+                  12,
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => const SoundLibraryScreen(),
+                    ),
+                  ),
+                ),
+                margin: EdgeInsets.zero,
+              ),
             ],
           ]),
         ),

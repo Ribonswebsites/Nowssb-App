@@ -74,6 +74,9 @@ import '../widgets/hero_curve_stage.dart';
 import '../widgets/buddha_gyro_stage.dart';
 import '../widgets/stories_find_you_banner.dart';
 import '../widgets/subscription_today_offer.dart';
+import '../widgets/promo_color_grid.dart';
+import 'quotes_live.dart';
+import 'player_settings.dart';
 import 'practice_player.dart';
 import 'progress/progress_screen.dart';
 import 'reader/reader_hub.dart';
@@ -191,6 +194,29 @@ class _HomeNormalState extends State<HomeNormal> {
     }
   }
 
+  void _openGrid(String id) {
+    switch (id) {
+      case 'practice':
+        _go(1);
+      case 'library':
+        _go(2);
+      case 'store':
+        _go(3);
+      case 'reader':
+        _push(const ReaderHubScreen());
+      case 'healing':
+        _push(const HealingPathScreen());
+      case 'subscription':
+        _push(const SubscriptionScreen());
+      case 'player':
+        _push(const PlayerSettingsScreen());
+      case 'progress':
+        _push(PracticeProgressScreen(words: ContentStore.instance.library));
+      case 'quotes':
+        _push(const QuotesWeekScreen());
+    }
+  }
+
   void _openEnter(String id) {
     switch (id) {
       case 'player':
@@ -259,7 +285,13 @@ class _HomeNormalState extends State<HomeNormal> {
   }
 
   List<(String, Widget?)> _sections() => [
-        ('greet', NmGreeting(name: widget.name)),
+        ('greet', Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const LiveQuoteTab(),
+            NmGreeting(name: widget.name),
+          ],
+        )),
         ('search', NmSearch(onSearch: (_) => _go(2))),
         (
           'heroCurve',
@@ -301,7 +333,13 @@ class _HomeNormalState extends State<HomeNormal> {
             ],
           ),
         ),
-        ('routineCards', const NmHorizontalRoutineCards()),
+        ('routineCards', Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const NmHorizontalRoutineCards(),
+            PromoColorGrid(onOpen: _openGrid),
+          ],
+        )),
         (
           'herovid',
           NmStreakVideo(
@@ -342,13 +380,17 @@ class _HomeNormalState extends State<HomeNormal> {
           'storiesFind',
           StoriesFindYouBanner(neumorphic: true, onTap: () => _go(2)),
         ),
-        ('buddhaGyro', const BuddhaGyroStage(neumorphic: true)),
+        ('buddhaGyro', BuddhaGyroStage(
+          neumorphic: true,
+          onOpenQuotes: () => _push(const QuotesWeekScreen()),
+        )),
         (
           'store',
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               SubscriptionTodayOffer(
+                neumorphic: true,
                 onClaim: () => _push(const SubscriptionScreen()),
               ),
               Padding(

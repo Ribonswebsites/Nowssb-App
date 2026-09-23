@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 
 import '../data/settings.dart';
 import '../theme/player_aura.dart';
+import '../widgets/colored_split_promo_banner.dart';
 import 'player_settings.dart';
 
 class PlayerDial extends StatefulWidget {
@@ -373,6 +374,12 @@ class _PlayerDialState extends State<PlayerDial> with SingleTickerProviderStateM
                         s.sleepTimer.toUpperCase(),
                         () => _choose('Sleep Timer', _sleepOptions, s.sleepTimer, s.setSleepTimer),
                       ),
+                      const SizedBox(height: 12),
+                      ColoredSplitPromoBanner(
+                        spec: SplitPromoExtras.at(9),
+                        margin: EdgeInsets.zero,
+                      ),
+                      const SizedBox(height: 8),
                       _row(
                         Icons.queue_music,
                         'NOW PLAYING VIEW',

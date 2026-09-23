@@ -97,19 +97,9 @@ class _ScrollProgressRailState extends State<ScrollProgressRail> {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Color(0x337E57C2),
-                        blurRadius: 7,
-                        spreadRadius: 3,
-                      ),
-                      BoxShadow(
-                        color: Color(0x55000000),
-                        offset: Offset(3, 3),
-                        blurRadius: 6,
-                      ),
-                      BoxShadow(
-                        color: Colors.white,
-                        offset: Offset(-2, -2),
-                        blurRadius: 6,
+                        color: Color(0x667E57C2),
+                        blurRadius: 8,
+                        spreadRadius: 1,
                       ),
                     ],
                   ),

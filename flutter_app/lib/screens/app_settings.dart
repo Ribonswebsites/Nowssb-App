@@ -11,12 +11,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../data/settings.dart';
 import '../theme/tokens.dart';
 import '../widgets/black_glass_banner.dart';
+import '../widgets/colored_split_promo_banner.dart';
 import 'fashion_plus.dart';
 import 'notifications_settings.dart';
 import 'player_settings.dart';
 import 'player_guide.dart';
 import 'profile.dart';
 import 'quick_access.dart';
+import 'quotes_live.dart';
 import 'store/request_words.dart';
 import 'widgets_page.dart';
 
@@ -317,6 +319,11 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                       ),
                     ),
                     const SizedBox(height: 8),
+                    ColoredSplitPromoBanner(
+                      spec: SplitPromoExtras.at(13),
+                      margin: EdgeInsets.zero,
+                    ),
+                    const SizedBox(height: 18),
                     Container(
                       height: 48,
                       margin: const EdgeInsets.only(bottom: 22),
@@ -374,6 +381,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                         _match('Hero header') ||
                         _match('Fashion Plus') ||
                         _match('Quick Access') ||
+                        _match('Today\'s quote') ||
                         _match('Player Settings'))
                       _Sec(
                         label: 'INTRO & APPEARANCE',
@@ -412,6 +420,13 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                               title: 'Quick Access',
                               sub: 'Customize bottom navigation',
                               onTap: () => _push(const QuickAccessScreen()),
+                            ),
+                          if (_match('Today\'s quote', 'live'))
+                            _NavRow(
+                              icon: Icons.format_quote_rounded,
+                              title: "Today's quote",
+                              sub: 'Type the line that lives on the home',
+                              onTap: () => _push(const QuoteAdminScreen()),
                             ),
                           if (_match('Player Settings'))
                             _NavRow(

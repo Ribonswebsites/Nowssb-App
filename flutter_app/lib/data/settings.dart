@@ -42,6 +42,8 @@ class Settings extends ChangeNotifier {
   static const _kNavSlots = 'nwsb_nav_slots';
   static const _kHero = 'nwsb_hero_style';
   static const _kQuickActions = 'nwsb_quick_actions';
+  static const _kLiveQuote = 'nwsb_live_quote';
+  static const _kWeekQuotes = 'nwsb_week_quotes';
 
   /// One selected Fashion Plus film plays behind every primary page while
   /// motion mode is enabled.
@@ -123,6 +125,8 @@ class Settings extends ChangeNotifier {
     'fashion',
   ];
   List<String> _quickActions = List<String>.from(defaultQuickActions);
+  String _liveQuote = '';
+  List<String> _weekQuotes = List<String>.filled(7, '');
 
   /// Motion mode: do page backgrounds play, or hold their first frame?
   bool get fashionPlus => _fashionPlus;
@@ -157,6 +161,35 @@ class Settings extends ChangeNotifier {
 
   /// Shortcut ids shown in the Normal home Quick actions carousel.
   List<String> get quickActions => List.unmodifiable(_quickActions);
+
+  /// Admin override for the top "quotes to live by" tab. Empty uses today's
+  /// weekday line.
+  String get liveQuote => _liveQuote;
+
+  /// Seven lines, Monday first. Empty slots fall back to the built-in line.
+  List<String> get weekQuotes => List.unmodifiable(_weekQuotes);
+
+  String quoteFor(DateTime day) {
+    const fallback = <String>[
+      'A quiet word is enough to begin the day.',
+      'Without a weapon in hand, words guided the world.',
+      'Sit with the sound until the body answers.',
+      'The frequency you keep is the hour you heal.',
+      'What you repeat becomes the path you walk.',
+      'Last light is for the word you still need.',
+      'Rest is a practice. Let the tone finish.',
+    ];
+    final i = (day.weekday - 1).clamp(0, 6);
+    final custom = i < _weekQuotes.length ? _weekQuotes[i].trim() : '';
+    if (custom.isNotEmpty) return custom;
+    return fallback[i];
+  }
+
+  String get todayQuote {
+    final live = _liveQuote.trim();
+    if (live.isNotEmpty) return live;
+    return quoteFor(DateTime.now());
+  }
 
   Future<void> load() async {
     try {
@@ -194,6 +227,11 @@ class Settings extends ChangeNotifier {
       final qa = p.getStringList(_kQuickActions);
       if (qa != null && qa.isNotEmpty) {
         _quickActions = sanitizeQuickActions(qa);
+      }
+      _liveQuote = p.getString(_kLiveQuote) ?? '';
+      final week = p.getStringList(_kWeekQuotes);
+      if (week != null && week.isNotEmpty) {
+        _weekQuotes = List<String>.generate(7, (i) => i < week.length ? week[i] : '');
       }
       _showSplash = !(p.getBool(_kLaunched) ?? false);
       await p.setBool(_kLaunched, true);
@@ -241,6 +279,22 @@ class Settings extends ChangeNotifier {
 
   static int _validImageIndex(int index) =>
       index >= 0 && index < fashionImages.length ? index : -1;
+
+  Future<void> setLiveQuote(String value) async {
+    _liveQuote = value.trim();
+    await _saveString(_kLiveQuote, _liveQuote);
+    notifyListeners();
+  }
+
+  Future<void> setWeekQuote(int index, String value) async {
+    if (index < 0 || index > 6) return;
+    _weekQuotes[index] = value.trim();
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.setStringList(_kWeekQuotes, _weekQuotes);
+    } catch (_) {}
+    notifyListeners();
+  }
 
   Future<void> setQuickActions(List<String> ids) async {
     final next = sanitizeQuickActions(ids);
