@@ -71,8 +71,6 @@ import 'quick_access.dart';
 import 'widgets_page.dart';
 import '../widgets/home_menu_drawer.dart';
 import '../widgets/hero_curve_stage.dart';
-import '../widgets/editorial_banner.dart';
-import '../widgets/stories_find_you_banner.dart';
 import 'practice_player.dart';
 import 'progress/progress_screen.dart';
 import 'reader/reader_hub.dart';
@@ -86,7 +84,6 @@ const kNormalSectionOrder = <String>[
   'heroCurve',
   'promoRail',
   'dashboard',
-  'editorialA',
   'essentials',
   'routineCards',
   // Streak+Store video carousel (shared 2-card), then the streak text block.
@@ -99,10 +96,8 @@ const kNormalSectionOrder = <String>[
   'actionbar',
   'tiles',
   'store',
-  'editorialC',
   'reader',
   'trendwd',
-  'editorialB',
   'custom',
   'rx',
   'routines',
@@ -284,9 +279,6 @@ class _HomeNormalState extends State<HomeNormal> {
               onStart: _openDashboardSession,
               onProgress: _openDashboardProgress)
         ),
-        // The blue “Words That Move You” editorial banner is intentionally
-        // removed from the home; keep the registry slot stable for ordering.
-        ('editorialA', const SizedBox.shrink()),
         (
           'essentials',
           Column(
@@ -325,15 +317,9 @@ class _HomeNormalState extends State<HomeNormal> {
           'tiles',
           FashTiles(onTile: _go, onOpen: _openEnter),
         ),
-        (
-          'storiesFind',
-          StoriesFindYouBanner(neumorphic: true, onTap: () => _go(2)),
-        ),
         ('store', NmStore(onTap: () => _go(3))),
-        ('editorialC', const EditorialBanner.connect()),
         ('reader', NmReader(onTap: () => _push(const ReaderHubScreen()))),
         ('trendwd', NmTrending(onTap: () => _go(2))),
-        ('editorialB', const EditorialBanner.healing()),
         ('custom', NmCustomize(onTap: () => _push(const WidgetsPage()))),
         ('rx', null),
         ('routines', RoutinesSection(onTap: () => _go(1))),

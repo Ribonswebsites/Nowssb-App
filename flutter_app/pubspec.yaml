@@ -84,14 +84,12 @@ flutter:
     - assets/certificates/
     - assets/banners/
     - assets/banners/promo/
-    - assets/banners/stories/
     - assets/footer/
     - assets/media/
     - assets/content/
     - assets/subscription/
     - assets/hero-curve/
     - assets/flip_brand/
-    - assets/editorial/
 
 flutter_launcher_icons:
   android: false

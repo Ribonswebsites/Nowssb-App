@@ -35,7 +35,6 @@ import '../theme/tokens.dart';
 import '../widgets/app_backdrop.dart';
 import '../widgets/enter_curve_stage.dart';
 import '../widgets/hero_curve_stage.dart';
-import '../widgets/stories_find_you_banner.dart';
 import 'fashion/header.dart';
 import 'fashion/hero.dart';
 import 'fashion/sections_bottom.dart';
@@ -43,7 +42,6 @@ import 'shared_sections.dart';
 import 'fashion/sections_mid.dart';
 import 'fashion/sections_top.dart';
 import '../widgets/colored_split_promo_banner.dart';
-import '../widgets/editorial_banner.dart';
 import 'fashion_plus.dart';
 import 'notifications_sheet.dart';
 import 'normal/header_actions_sheet.dart';
@@ -75,7 +73,6 @@ const kFashionSectionOrder = <String>[
   'greet',
   'herorow',
   'practice',
-  'editorialA',
   'routineCards',
   'coachCards',
   // Not on the website's registry. Six doors on one panel so the app can
@@ -88,11 +85,9 @@ const kFashionSectionOrder = <String>[
   'tiles',
   'store',
   'trendwd',
-  'editorialB',
   'custom',
   'fashplus',
   'enterCurve',
-  'editorialC',
   'rx',
   'trendvid',
   'storeban',
@@ -287,7 +282,6 @@ class _HomeFashionState extends State<HomeFashion> {
           ),
         ),
         ('practice', FashPractice(onTap: () => _go(1))),
-        ('editorialA', const EditorialBanner.healing()),
         ('routineCards', const NmHorizontalRoutineCards(fashion: true)),
         ('coachCards', const SizedBox.shrink()),
         ('mainops', MainOptionsSection(onGo: _go, onAction: _openMainOption)),
@@ -309,13 +303,8 @@ class _HomeFashionState extends State<HomeFashion> {
         ),
         ('streak', FashStreak(onTap: () => _go(1))),
         ('tiles', FashTiles(onTile: _go, onOpen: _openEnter)),
-        (
-          'storiesFind',
-          StoriesFindYouBanner(onTap: () => _go(2)),
-        ),
         ('store', FashStore(onTap: () => _go(3))),
         ('trendwd', FashTrending(onTap: () => _go(2))),
-        ('editorialB', const EditorialBanner.connect()),
         ('custom', FashCustomize(onTap: () => _push(const WidgetsPage()))),
         (
           'fashplus',
@@ -325,9 +314,6 @@ class _HomeFashionState extends State<HomeFashion> {
           'enterCurve',
           EnterCurveStage(onOpen: _openEnter),
         ),
-        // The blue “Words That Move You” editorial banner is removed from
-        // both home surfaces; keep this slot stable for registry ordering.
-        ('editorialC', const SizedBox.shrink()),
         ('rx', FashPrescription(onTap: () => _go(1), onWord: _openWord)),
         ('trendvid', FashShopNow(onTap: () => _go(3))),
         ('storeban', StoreBannerSection(onTap: () => _go(3))),
