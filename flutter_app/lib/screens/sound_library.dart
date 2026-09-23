@@ -426,15 +426,16 @@ class _SlmFeed extends StatelessWidget {
                           ),
                         ),
                       _storeVideos(wide),
-                      _promo(),
+                      _promoAt(0),
                       _buyRequest(),
                       _meaningRows(),
                     ] else if (words.isEmpty) ...[
                       _empty(),
-                      _promo(),
+                      _promoAt(1),
                       _buyRequest(),
                     ] else ...[
                       _currentlyPlaying(),
+                      _promoAt(0),
                       if (featured != null) _featuredMain(featured),
                       _speedDial(),
                       if (hits.isNotEmpty)
@@ -455,6 +456,7 @@ class _SlmFeed extends StatelessWidget {
                             : _pill('Play all', () => onPlayWord(words.first)),
                         child: _rowPages(words.take(12).toList()),
                       ),
+                      _promoAt(1),
                       if (trending.isNotEmpty)
                         _ytmPlainSection(
                           'Trending songs for you',
@@ -468,7 +470,6 @@ class _SlmFeed extends StatelessWidget {
                           ),
                         ),
                       _storeVideos(wide),
-                      _promo(),
                       _sentencesSec(),
                       _collections(context, wide),
                       _bigCards(wide),
@@ -484,6 +485,7 @@ class _SlmFeed extends StatelessWidget {
                           ),
                         ),
                       _buyRequest(),
+                      _promoAt(2),
                       _meaningRows(),
                     ],
                   ],
@@ -1035,26 +1037,25 @@ class _SlmFeed extends StatelessWidget {
     );
   }
 
-  Widget _promo() {
+  Widget _promoAt(int which) {
+    final banner = switch (which) {
+      0 => ColoredSplitPromoBanner.forSurface(
+          SplitPromoSurface.soundLibrary,
+          onTap: onPractice,
+          margin: EdgeInsets.zero,
+        ),
+      1 => ColoredSplitPromoBanner(
+          spec: SplitPromoExtras.at(4, onTap: onPractice),
+          margin: EdgeInsets.zero,
+        ),
+      _ => ColoredSplitPromoBanner(
+          spec: SplitPromoExtras.at(5, onTap: onStore),
+          margin: EdgeInsets.zero,
+        ),
+    };
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 14, 12, 6),
-      child: Column(
-        children: [
-          ColoredSplitPromoBanner.forSurface(
-            SplitPromoSurface.soundLibrary,
-            onTap: onPractice,
-            margin: const EdgeInsets.only(bottom: 12),
-          ),
-          ColoredSplitPromoBanner(
-            spec: SplitPromoExtras.at(4, onTap: onPractice),
-            margin: const EdgeInsets.only(bottom: 12),
-          ),
-          ColoredSplitPromoBanner(
-            spec: SplitPromoExtras.at(5, onTap: onStore),
-            margin: EdgeInsets.zero,
-          ),
-        ],
-      ),
+      child: banner,
     );
   }
 

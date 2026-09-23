@@ -294,16 +294,6 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
             ),
           ),
         ),
-        ColoredSplitPromoBanner(
-          spec: SplitPromoExtras.at(
-            7,
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => const SignatureStoreScreen(),
-              ),
-            ),
-          ),
-        ),
         StoreGlassPanel(
           radius: 32,
           padding: const EdgeInsets.all(5),
@@ -367,6 +357,16 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
         ),
         const SizedBox(height: 8),
         ...sections,
+        ColoredSplitPromoBanner(
+          spec: SplitPromoExtras.at(
+            7,
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => const SignatureStoreScreen(),
+              ),
+            ),
+          ),
+        ),
         const StoreDisclaimer(
           text:
               'Words shared or sold here are for educational and wellness purposes only — nothing here is medical advice. Purchases are final once unlocked. Any information you share with us is kept strictly confidential and never sold or shared with third parties.',

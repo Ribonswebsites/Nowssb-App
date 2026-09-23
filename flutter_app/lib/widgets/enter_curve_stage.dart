@@ -239,7 +239,7 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
                 child: GlassWrap(
                   margin: EdgeInsets.zero,
                   padding: const EdgeInsets.fromLTRB(10, 10, 10, 16),
-                  child: spec.words ? _wordsBody(spec) : _pageBody(spec),
+                  child: spec.words ? _wordsBody() : _pageBody(spec),
                 ),
               ),
           ],
@@ -249,40 +249,62 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
     return body;
   }
 
-  Widget _wordsBody(_EnterPageSpec spec) {
+  Widget _wordsBody() {
     final words = ContentStore.instance.library;
+    final featured = words.isEmpty
+        ? null
+        : words[(DateTime.now().day + 1) % words.length];
+    final organ = (featured?.organ ?? 'immune system').toUpperCase();
+    final word = featured?.word ?? 'AAROGYA';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
-          child: Column(
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: const Color(0xFF0B0B12),
+            border: Border.all(color: const Color(0x14FFFFFF)),
+          ),
+          child: const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'NowssB.',
-                textAlign: TextAlign.center,
+              Text(
+                "Today's offer",
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.3,
-                  height: 1,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFFE8D5A3),
                 ),
               ),
-              const SizedBox(height: 6),
+              SizedBox(height: 4),
               Text(
-                spec.kicker,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Color(0xFFC4B5FD),
-                  fontSize: 14,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 0.2,
+                'Featured healing word — limited shop drop for mind & organ.',
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Color(0xB3FFFFFF),
+                  height: 1.35,
+                ),
+              ),
+              SizedBox(height: 6),
+              Text(
+                'Tap Shop Now to claim today’s frequency.',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 11.5,
+                  color: Color(0x8CFFFFFF),
+                  height: 1.35,
                 ),
               ),
             ],
           ),
         ),
+        const SizedBox(height: 8),
         Expanded(
           child: words.isEmpty
               ? const Center(
@@ -338,6 +360,80 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
                     );
                   },
                 ),
+        ),
+        const SizedBox(height: 8),
+        GestureDetector(
+          onTap: () => widget.onOpen?.call('store'),
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            color: Colors.black,
+            child: Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF14141C),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.storefront_outlined,
+                      size: 18, color: Color(0xFFE8D5A3)),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'HEALS $organ',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 10,
+                          letterSpacing: 1.2,
+                          color: Color(0x99FFFFFF),
+                        ),
+                      ),
+                      Text(
+                        word,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(width: 1, height: 32, color: const Color(0x1FFFFFFF)),
+                const SizedBox(width: 10),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  color: const Color(0xFFE8D5A3),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.shopping_cart_outlined,
+                          size: 14, color: Color(0xFF1A1A2E)),
+                      SizedBox(width: 6),
+                      Text(
+                        'Shop Now',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF1A1A2E),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ],
     );

@@ -294,12 +294,6 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
             ),
           ),
         ),
-        ColoredSplitPromoBanner(
-          spec: SplitPromoExtras.at(
-            9,
-            onTap: () => openRequestWords(context),
-          ),
-        ),
         StoreFeaturedPlaylistSection(
           meanings: true,
           onSeeAll: () => _openViewAll('Featured Playlist'),
@@ -318,6 +312,9 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
                 child: Text('No meanings match.',
                     style: TextStyle(color: Color(0x8CFFFFFF)))),
           ),
+        ColoredSplitPromoBanner(
+          spec: SplitPromoExtras.at(9, onTap: () => openRequestWords(context)),
+        ),
         const StoreDisclaimer(
           text:
               'Meanings shared or sold here are for educational and wellness purposes only — nothing here is medical advice. Purchases are final once unlocked.',

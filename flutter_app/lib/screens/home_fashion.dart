@@ -35,6 +35,7 @@ import '../theme/tokens.dart';
 import '../widgets/app_backdrop.dart';
 import '../widgets/enter_curve_stage.dart';
 import '../widgets/hero_curve_stage.dart';
+import '../widgets/buddha_gyro_stage.dart';
 import '../widgets/stories_find_you_banner.dart';
 import 'fashion/header.dart';
 import 'fashion/hero.dart';
@@ -85,6 +86,7 @@ const kFashionSectionOrder = <String>[
   'streak',
   'tiles',
   'storiesFind',
+  'buddhaGyro',
   'store',
   'trendwd',
   'custom',
@@ -275,28 +277,31 @@ class _HomeFashionState extends State<HomeFashion> {
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                child: Column(
-                  children: [
-                    ColoredSplitPromoBanner.forSurface(
-                      SplitPromoSurface.fashionHome,
-                      onTap: () => _go(1),
-                      margin: const EdgeInsets.only(bottom: 12),
-                    ),
-                    ColoredSplitPromoBanner(
-                      spec: SplitPromoExtras.at(0, onTap: () => _go(2)),
-                      margin: const EdgeInsets.only(bottom: 12),
-                    ),
-                    ColoredSplitPromoBanner(
-                      spec: SplitPromoExtras.at(1, onTap: () => _go(1)),
-                      margin: EdgeInsets.zero,
-                    ),
-                  ],
+                child: ColoredSplitPromoBanner.forSurface(
+                  SplitPromoSurface.fashionHome,
+                  onTap: () => _go(1),
+                  margin: EdgeInsets.zero,
                 ),
               ),
             ],
           ),
         ),
-        ('practice', FashPractice(onTap: () => _go(1))),
+        (
+          'practice',
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              FashPractice(onTap: () => _go(1)),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                child: ColoredSplitPromoBanner(
+                  spec: SplitPromoExtras.at(0, onTap: () => _go(2)),
+                  margin: EdgeInsets.zero,
+                ),
+              ),
+            ],
+          ),
+        ),
         ('routineCards', const NmHorizontalRoutineCards(fashion: true)),
         ('coachCards', const SizedBox.shrink()),
         ('mainops', MainOptionsSection(onGo: _go, onAction: _openMainOption)),
@@ -308,7 +313,22 @@ class _HomeFashionState extends State<HomeFashion> {
             onCoach: () => _push(const PersonalCoachScreen()),
           ),
         ),
-        ('reader', FashReader(onTap: () => _push(const ReaderHubScreen()))),
+        (
+          'reader',
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              FashReader(onTap: () => _push(const ReaderHubScreen())),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                child: ColoredSplitPromoBanner(
+                  spec: SplitPromoExtras.at(1, onTap: () => _go(1)),
+                  margin: EdgeInsets.zero,
+                ),
+              ),
+            ],
+          ),
+        ),
         (
           'herovid',
           FashStreakVideo(
@@ -322,9 +342,40 @@ class _HomeFashionState extends State<HomeFashion> {
           'storiesFind',
           StoriesFindYouBanner(onTap: () => _go(2)),
         ),
-        ('store', FashStore(onTap: () => _go(3))),
+        ('buddhaGyro', const BuddhaGyroStage()),
+        (
+          'store',
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              FashStore(onTap: () => _go(3)),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                child: ColoredSplitPromoBanner(
+                  spec: SplitPromoExtras.at(14, onTap: () => _go(1)),
+                  margin: EdgeInsets.zero,
+                ),
+              ),
+            ],
+          ),
+        ),
         ('trendwd', FashTrending(onTap: () => _go(2))),
-        ('custom', FashCustomize(onTap: () => _push(const WidgetsPage()))),
+        (
+          'custom',
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              FashCustomize(onTap: () => _push(const WidgetsPage())),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                child: ColoredSplitPromoBanner(
+                  spec: SplitPromoExtras.at(15, onTap: () => _go(2)),
+                  margin: EdgeInsets.zero,
+                ),
+              ),
+            ],
+          ),
+        ),
         (
           'fashplus',
           FashPlusMini(onTap: () => _push(const FashionPlusScreen()))

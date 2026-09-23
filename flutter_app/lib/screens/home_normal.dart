@@ -71,6 +71,7 @@ import 'quick_access.dart';
 import 'widgets_page.dart';
 import '../widgets/home_menu_drawer.dart';
 import '../widgets/hero_curve_stage.dart';
+import '../widgets/buddha_gyro_stage.dart';
 import '../widgets/stories_find_you_banner.dart';
 import 'practice_player.dart';
 import 'progress/progress_screen.dart';
@@ -97,6 +98,7 @@ const kNormalSectionOrder = <String>[
   'actionbar',
   'tiles',
   'storiesFind',
+  'buddhaGyro',
   'store',
   'reader',
   'trendwd',
@@ -288,22 +290,10 @@ class _HomeNormalState extends State<HomeNormal> {
             children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                child: Column(
-                  children: [
-                    ColoredSplitPromoBanner.forSurface(
-                      SplitPromoSurface.normalHome,
-                      onTap: () => _go(2),
-                      margin: const EdgeInsets.only(bottom: 12),
-                    ),
-                    ColoredSplitPromoBanner(
-                      spec: SplitPromoExtras.at(2, onTap: () => _go(1)),
-                      margin: const EdgeInsets.only(bottom: 12),
-                    ),
-                    ColoredSplitPromoBanner(
-                      spec: SplitPromoExtras.at(3, onTap: () => _push(const ReaderHubScreen())),
-                      margin: EdgeInsets.zero,
-                    ),
-                  ],
+                child: ColoredSplitPromoBanner.forSurface(
+                  SplitPromoSurface.normalHome,
+                  onTap: () => _go(2),
+                  margin: EdgeInsets.zero,
                 ),
               ),
               const NmSuppliedEssentials(),
@@ -318,7 +308,22 @@ class _HomeNormalState extends State<HomeNormal> {
             onStoreTap: () => _go(3),
           ),
         ),
-        ('streak', NmStreak(onTap: () => _go(1))),
+        (
+          'streak',
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              NmStreak(onTap: () => _go(1)),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+                child: ColoredSplitPromoBanner(
+                  spec: SplitPromoExtras.at(2, onTap: () => _go(1)),
+                  margin: EdgeInsets.zero,
+                ),
+              ),
+            ],
+          ),
+        ),
         ('practice', NmPractice(onTap: () => _go(1))),
         ('mainops', MainOptionsSection(onGo: _go, onAction: _openMainOption)),
         (
@@ -336,9 +341,55 @@ class _HomeNormalState extends State<HomeNormal> {
           'storiesFind',
           StoriesFindYouBanner(neumorphic: true, onTap: () => _go(2)),
         ),
-        ('store', NmStore(onTap: () => _go(3))),
-        ('reader', NmReader(onTap: () => _push(const ReaderHubScreen()))),
-        ('trendwd', NmTrending(onTap: () => _go(2))),
+        ('buddhaGyro', const BuddhaGyroStage(neumorphic: true)),
+        (
+          'store',
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              NmStore(onTap: () => _go(3)),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+                child: ColoredSplitPromoBanner(
+                  spec: SplitPromoExtras.at(3, onTap: () => _push(const ReaderHubScreen())),
+                  margin: EdgeInsets.zero,
+                ),
+              ),
+            ],
+          ),
+        ),
+        (
+          'reader',
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              NmReader(onTap: () => _push(const ReaderHubScreen())),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+                child: ColoredSplitPromoBanner(
+                  spec: SplitPromoExtras.at(14, onTap: () => _go(1)),
+                  margin: EdgeInsets.zero,
+                ),
+              ),
+            ],
+          ),
+        ),
+        (
+          'trendwd',
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              NmTrending(onTap: () => _go(2)),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+                child: ColoredSplitPromoBanner(
+                  spec: SplitPromoExtras.at(15, onTap: () => _go(2)),
+                  margin: EdgeInsets.zero,
+                ),
+              ),
+            ],
+          ),
+        ),
         ('custom', NmCustomize(onTap: () => _push(const WidgetsPage()))),
         ('rx', null),
         ('routines', RoutinesSection(onTap: () => _go(1))),

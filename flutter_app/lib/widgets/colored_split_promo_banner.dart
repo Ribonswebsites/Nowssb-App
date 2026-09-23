@@ -20,6 +20,16 @@ abstract final class SplitPromoArts {
   static const blondeLotus = 'assets/banners/promo/split-blonde-lotus.png';
   static const egyptianLotus = 'assets/banners/promo/split-egyptian-lotus.png';
   static const redLotus = 'assets/banners/promo/split-red-lotus.png';
+  static const pose01 = 'assets/banners/promo/pose-01.png';
+  static const pose02 = 'assets/banners/promo/pose-02.png';
+  static const pose03 = 'assets/banners/promo/pose-03.png';
+  static const pose04 = 'assets/banners/promo/pose-04.png';
+  static const pose05 = 'assets/banners/promo/pose-05.png';
+  static const pose06 = 'assets/banners/promo/pose-06.png';
+  static const pose07 = 'assets/banners/promo/pose-07.png';
+  static const pose08 = 'assets/banners/promo/pose-08.png';
+  static const pose09 = 'assets/banners/promo/pose-09.png';
+  static const pose10 = 'assets/banners/promo/pose-10.png';
 
   static const all = <String>[
     blondeBlazer,
@@ -411,98 +421,112 @@ abstract final class SplitPromoExtras {
       'Open Library',
       0xFF10243A,
       0xFF1ABC9C,
-      SplitPromoArts.egyptianGold,
+      SplitPromoArts.pose01,
     ),
     (
       'A word for\nthe body now.',
       'Begin Practice',
       0xFF3B1528,
       0xFFE07A32,
-      SplitPromoArts.blondeBlazer,
+      SplitPromoArts.pose02,
     ),
     (
       'Sleep into\nthe next tone.',
       'Begin Practice',
       0xFF143028,
       0xFFD4A017,
-      SplitPromoArts.blondeLotus,
+      SplitPromoArts.pose03,
     ),
     (
       'Meanings that\nstay with you.',
       'Open Reader',
       0xFF2A1840,
       0xFFE07A5F,
-      SplitPromoArts.robotLotus,
+      SplitPromoArts.pose04,
     ),
     (
       'Today\'s tones,\nready to play.',
       'Begin Practice',
       0xFF1A2744,
       0xFF5B8FB8,
-      SplitPromoArts.whiteRobot,
+      SplitPromoArts.pose05,
     ),
     (
       'Shop the word\nthat heals.',
       'Open Store',
       0xFF3A2410,
       0xFFC47B2B,
-      SplitPromoArts.egyptianLotus,
+      SplitPromoArts.pose06,
     ),
     (
       'Build a library\nof your own.',
       'Browse words',
       0xFF1A2038,
       0xFF6C5CE7,
-      SplitPromoArts.redLotus,
+      SplitPromoArts.pose07,
     ),
     (
       'Unlock what\nthe word means.',
       'Open meanings',
       0xFF0E2F2C,
       0xFF2EC4B6,
-      SplitPromoArts.redHairBlazer,
+      SplitPromoArts.pose08,
     ),
     (
       'A rare drop,\nonce only.',
       'View signatures',
       0xFF2C1810,
       0xFFC9A227,
-      SplitPromoArts.robotLookback,
+      SplitPromoArts.pose09,
     ),
     (
       'Read the science\nbehind the sound.',
       'Open Ebooks',
       0xFF102820,
       0xFF27AE60,
-      SplitPromoArts.ebooksProduct,
+      SplitPromoArts.pose10,
     ),
     (
       'Request a word\nmade for you.',
       'Request a word',
       0xFF2A1420,
       0xFFE85D9A,
-      SplitPromoArts.meaningsDevice,
+      SplitPromoArts.pose01,
     ),
     (
       'Practice the\norgan it heals.',
       'Begin Practice',
       0xFF142033,
       0xFF3498DB,
-      SplitPromoArts.egyptianGold,
+      SplitPromoArts.pose02,
     ),
     (
       'Hold the tone\nuntil it lands.',
       'Begin Practice',
       0xFF241430,
       0xFF9B59B6,
-      SplitPromoArts.blondeBlazer,
+      SplitPromoArts.pose03,
     ),
     (
       'A meaning for\nevery frequency.',
       'Open meanings',
       0xFF1A2830,
       0xFF16A085,
-      SplitPromoArts.whiteRobot,
+      SplitPromoArts.pose04,
+    ),
+    (
+      'Sit with the\nsound awhile.',
+      'Begin Practice',
+      0xFF1A1428,
+      0xFF8E44AD,
+      SplitPromoArts.pose05,
+    ),
+    (
+      'The word is\nthe practice.',
+      'Open Library',
+      0xFF10241C,
+      0xFF1ABC9C,
+      SplitPromoArts.pose06,
     ),
   ];
 

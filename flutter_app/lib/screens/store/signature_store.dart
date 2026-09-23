@@ -115,9 +115,6 @@ class _SignatureBody extends StatelessWidget {
         ColoredSplitPromoBanner(
           spec: SplitPromoExtras.at(10, onTap: () => openRequestWords(context)),
         ),
-        ColoredSplitPromoBanner(
-          spec: SplitPromoExtras.at(11, onTap: () => openRequestWords(context)),
-        ),
         if (w2.isNotEmpty) ...[
           RmCatBanner(
             title: 'Signature Collection · II',
@@ -284,6 +281,9 @@ class _SignatureBody extends StatelessWidget {
               ),
             ],
           ),
+        ),
+        ColoredSplitPromoBanner(
+          spec: SplitPromoExtras.at(11, onTap: () => openRequestWords(context)),
         ),
         const StoreDisclaimer(
           text:

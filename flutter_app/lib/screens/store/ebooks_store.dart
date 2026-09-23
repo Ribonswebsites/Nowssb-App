@@ -189,6 +189,8 @@ class _EbooksBody extends StatelessWidget {
             ),
           ),
         ),
+        const SizedBox(height: 8),
+        for (final b in books) _EbookRow(book: b),
         ColoredSplitPromoBanner(
           spec: SplitPromoExtras.at(
             13,
@@ -199,8 +201,6 @@ class _EbooksBody extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 8),
-        for (final b in books) _EbookRow(book: b),
         StoreDisclaimer(text: kEbDisclaimer),
       ],
     );
