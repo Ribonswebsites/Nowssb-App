@@ -284,6 +284,26 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
             ),
           ),
         ),
+        ColoredSplitPromoBanner(
+          spec: SplitPromoExtras.at(
+            6,
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => const MeaningStoreScreen(),
+              ),
+            ),
+          ),
+        ),
+        ColoredSplitPromoBanner(
+          spec: SplitPromoExtras.at(
+            7,
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => const SignatureStoreScreen(),
+              ),
+            ),
+          ),
+        ),
         StoreGlassPanel(
           radius: 32,
           padding: const EdgeInsets.all(5),

@@ -112,6 +112,12 @@ class _SignatureBody extends StatelessWidget {
           SplitPromoSurface.signatureStore,
           onTap: () => openRequestWords(context),
         ),
+        ColoredSplitPromoBanner(
+          spec: SplitPromoExtras.at(10, onTap: () => openRequestWords(context)),
+        ),
+        ColoredSplitPromoBanner(
+          spec: SplitPromoExtras.at(11, onTap: () => openRequestWords(context)),
+        ),
         if (w2.isNotEmpty) ...[
           RmCatBanner(
             title: 'Signature Collection · II',

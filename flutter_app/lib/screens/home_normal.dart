@@ -288,9 +288,22 @@ class _HomeNormalState extends State<HomeNormal> {
             children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                child: ColoredSplitPromoBanner.forSurface(
-                  SplitPromoSurface.normalHome,
-                  onTap: () => _go(2),
+                child: Column(
+                  children: [
+                    ColoredSplitPromoBanner.forSurface(
+                      SplitPromoSurface.normalHome,
+                      onTap: () => _go(2),
+                      margin: const EdgeInsets.only(bottom: 12),
+                    ),
+                    ColoredSplitPromoBanner(
+                      spec: SplitPromoExtras.at(2, onTap: () => _go(1)),
+                      margin: const EdgeInsets.only(bottom: 12),
+                    ),
+                    ColoredSplitPromoBanner(
+                      spec: SplitPromoExtras.at(3, onTap: () => _push(const ReaderHubScreen())),
+                      margin: EdgeInsets.zero,
+                    ),
+                  ],
                 ),
               ),
               const NmSuppliedEssentials(),

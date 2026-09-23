@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'glass_wrap.dart';
 import 'hero_curve_stage.dart';
 import 'nwsb_icon.dart';
+import '../data/content.dart';
 
 const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
 
@@ -77,22 +78,31 @@ class _EnterPageSpec {
     required this.kicker,
     required this.title,
     required this.sub,
+    this.words = false,
   });
 
   final String subject;
   final String kicker;
   final String title;
   final String sub;
+  final bool words;
 }
 
 const _pages = <_EnterPageSpec>[
-  // "Enter your path" card removed from this section only (Customize rail
-  // owns the intro-glass language now). Keep the Sound card.
+  // Card 1 — same 520 stage, copy is Today's offers.
   _EnterPageSpec(
     subject: EnterCurveAssets.cleopatra,
-    kicker: 'Sound that holds you',
-    title: 'Frequencies, words, healing',
-    sub: 'The same ring, a different centre. Swipe to step in.',
+    kicker: "Today's offers",
+    title: 'A featured drop for this hour',
+    sub: 'Swipe for the words and what they mean.',
+  ),
+  // Card 2 — words and meanings, same height, own glass wrapper.
+  _EnterPageSpec(
+    subject: '',
+    kicker: 'Words & meanings',
+    title: '',
+    sub: '',
+    words: true,
   ),
 ];
 
@@ -229,7 +239,7 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
                 child: GlassWrap(
                   margin: EdgeInsets.zero,
                   padding: const EdgeInsets.fromLTRB(10, 10, 10, 16),
-                  child: _pageBody(spec),
+                  child: spec.words ? _wordsBody(spec) : _pageBody(spec),
                 ),
               ),
           ],
@@ -237,6 +247,100 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
       ),
     );
     return body;
+  }
+
+  Widget _wordsBody(_EnterPageSpec spec) {
+    final words = ContentStore.instance.library;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+          child: Column(
+            children: [
+              const Text(
+                'NowssB.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.3,
+                  height: 1,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                spec.kicker,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Color(0xFFC4B5FD),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.2,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: words.isEmpty
+              ? const Center(
+                  child: Text(
+                    'Words land here as the library loads.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 13),
+                  ),
+                )
+              : ListView.separated(
+                  primary: false,
+                  padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
+                  itemCount: words.length,
+                  separatorBuilder: (_, __) => const Divider(
+                    height: 1,
+                    color: Color(0x22FFFFFF),
+                  ),
+                  itemBuilder: (_, i) {
+                    final w = words[i];
+                    final meaning = w.meaning.isNotEmpty
+                        ? w.meaning
+                        : (w.benefit.isNotEmpty ? w.benefit : w.organ);
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            w.word,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          if (meaning.isNotEmpty) ...[
+                            const SizedBox(height: 3),
+                            Text(
+                              meaning,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Color(0xB3FFFFFF),
+                                fontSize: 12,
+                                height: 1.3,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    );
+                  },
+                ),
+        ),
+      ],
+    );
   }
 
   Widget _pageBody(_EnterPageSpec spec) {

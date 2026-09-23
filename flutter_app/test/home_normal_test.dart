@@ -55,8 +55,8 @@ void main() {
   }
 
   test('the registry is complete', () {
-    expect(kNormalSectionOrder, hasLength(33));
-    expect(kNormalSectionOrder.toSet(), hasLength(33),
+    expect(kNormalSectionOrder, hasLength(34));
+    expect(kNormalSectionOrder.toSet(), hasLength(34),
         reason: 'two sections share a key');
     expect(kNormalSectionOrder.indexOf('herovid'),
         kNormalSectionOrder.indexOf('streak') - 1,
@@ -91,7 +91,7 @@ void main() {
         .where((k) => !kNormalNoMarkup.contains(k))
         .where((k) => !kNormalDefOff.contains(k))
         .length;
-    expect(shown, 29);
+    expect(shown, 30);
   });
 
   testWidgets('the Normal home builds at phone size without overflowing',

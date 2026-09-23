@@ -1038,10 +1038,22 @@ class _SlmFeed extends StatelessWidget {
   Widget _promo() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 14, 12, 6),
-      child: ColoredSplitPromoBanner.forSurface(
-        SplitPromoSurface.soundLibrary,
-        onTap: onPractice,
-        margin: EdgeInsets.zero,
+      child: Column(
+        children: [
+          ColoredSplitPromoBanner.forSurface(
+            SplitPromoSurface.soundLibrary,
+            onTap: onPractice,
+            margin: const EdgeInsets.only(bottom: 12),
+          ),
+          ColoredSplitPromoBanner(
+            spec: SplitPromoExtras.at(4, onTap: onPractice),
+            margin: const EdgeInsets.only(bottom: 12),
+          ),
+          ColoredSplitPromoBanner(
+            spec: SplitPromoExtras.at(5, onTap: onStore),
+            margin: EdgeInsets.zero,
+          ),
+        ],
       ),
     );
   }

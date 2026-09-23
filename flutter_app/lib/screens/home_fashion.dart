@@ -275,9 +275,22 @@ class _HomeFashionState extends State<HomeFashion> {
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                child: ColoredSplitPromoBanner.forSurface(
-                  SplitPromoSurface.fashionHome,
-                  onTap: () => _go(1),
+                child: Column(
+                  children: [
+                    ColoredSplitPromoBanner.forSurface(
+                      SplitPromoSurface.fashionHome,
+                      onTap: () => _go(1),
+                      margin: const EdgeInsets.only(bottom: 12),
+                    ),
+                    ColoredSplitPromoBanner(
+                      spec: SplitPromoExtras.at(0, onTap: () => _go(2)),
+                      margin: const EdgeInsets.only(bottom: 12),
+                    ),
+                    ColoredSplitPromoBanner(
+                      spec: SplitPromoExtras.at(1, onTap: () => _go(1)),
+                      margin: EdgeInsets.zero,
+                    ),
+                  ],
                 ),
               ),
             ],

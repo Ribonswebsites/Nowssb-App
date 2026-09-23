@@ -284,6 +284,22 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
             ),
           ),
         ),
+        ColoredSplitPromoBanner(
+          spec: SplitPromoExtras.at(
+            8,
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => const SignatureStoreScreen(),
+              ),
+            ),
+          ),
+        ),
+        ColoredSplitPromoBanner(
+          spec: SplitPromoExtras.at(
+            9,
+            onTap: () => openRequestWords(context),
+          ),
+        ),
         StoreFeaturedPlaylistSection(
           meanings: true,
           onSeeAll: () => _openViewAll('Featured Playlist'),

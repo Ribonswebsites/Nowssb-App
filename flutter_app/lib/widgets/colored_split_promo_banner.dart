@@ -401,3 +401,120 @@ class ColoredSplitPromoBanner extends StatelessWidget {
     );
   }
 }
+
+/// Extra split banners. Same 132px chrome as the original practice banner.
+/// Homes take 0–3, Sound Library 4–5, store sub-pages 6–13.
+abstract final class SplitPromoExtras {
+  static const _rows = <(String, String, int, int, String)>[
+    (
+      'Keep this hour\'s\nfrequency.',
+      'Open Library',
+      0xFF10243A,
+      0xFF1ABC9C,
+      SplitPromoArts.egyptianGold,
+    ),
+    (
+      'A word for\nthe body now.',
+      'Begin Practice',
+      0xFF3B1528,
+      0xFFE07A32,
+      SplitPromoArts.blondeBlazer,
+    ),
+    (
+      'Sleep into\nthe next tone.',
+      'Begin Practice',
+      0xFF143028,
+      0xFFD4A017,
+      SplitPromoArts.blondeLotus,
+    ),
+    (
+      'Meanings that\nstay with you.',
+      'Open Reader',
+      0xFF2A1840,
+      0xFFE07A5F,
+      SplitPromoArts.robotLotus,
+    ),
+    (
+      'Today\'s tones,\nready to play.',
+      'Begin Practice',
+      0xFF1A2744,
+      0xFF5B8FB8,
+      SplitPromoArts.whiteRobot,
+    ),
+    (
+      'Shop the word\nthat heals.',
+      'Open Store',
+      0xFF3A2410,
+      0xFFC47B2B,
+      SplitPromoArts.egyptianLotus,
+    ),
+    (
+      'Build a library\nof your own.',
+      'Browse words',
+      0xFF1A2038,
+      0xFF6C5CE7,
+      SplitPromoArts.redLotus,
+    ),
+    (
+      'Unlock what\nthe word means.',
+      'Open meanings',
+      0xFF0E2F2C,
+      0xFF2EC4B6,
+      SplitPromoArts.redHairBlazer,
+    ),
+    (
+      'A rare drop,\nonce only.',
+      'View signatures',
+      0xFF2C1810,
+      0xFFC9A227,
+      SplitPromoArts.robotLookback,
+    ),
+    (
+      'Read the science\nbehind the sound.',
+      'Open Ebooks',
+      0xFF102820,
+      0xFF27AE60,
+      SplitPromoArts.ebooksProduct,
+    ),
+    (
+      'Request a word\nmade for you.',
+      'Request a word',
+      0xFF2A1420,
+      0xFFE85D9A,
+      SplitPromoArts.meaningsDevice,
+    ),
+    (
+      'Practice the\norgan it heals.',
+      'Begin Practice',
+      0xFF142033,
+      0xFF3498DB,
+      SplitPromoArts.egyptianGold,
+    ),
+    (
+      'Hold the tone\nuntil it lands.',
+      'Begin Practice',
+      0xFF241430,
+      0xFF9B59B6,
+      SplitPromoArts.blondeBlazer,
+    ),
+    (
+      'A meaning for\nevery frequency.',
+      'Open meanings',
+      0xFF1A2830,
+      0xFF16A085,
+      SplitPromoArts.whiteRobot,
+    ),
+  ];
+
+  static SplitPromoSpec at(int index, {VoidCallback? onTap}) {
+    final row = _rows[index % _rows.length];
+    return SplitPromoSpec(
+      title: row.$1,
+      cta: row.$2,
+      leftColor: Color(row.$3),
+      rightColor: Color(row.$4),
+      art: row.$5,
+      onTap: onTap,
+    );
+  }
+}

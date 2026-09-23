@@ -179,6 +179,26 @@ class _EbooksBody extends StatelessWidget {
             ),
           ),
         ),
+        ColoredSplitPromoBanner(
+          spec: SplitPromoExtras.at(
+            12,
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => const SoundLibraryScreen(),
+              ),
+            ),
+          ),
+        ),
+        ColoredSplitPromoBanner(
+          spec: SplitPromoExtras.at(
+            13,
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => const SoundLibraryScreen(),
+              ),
+            ),
+          ),
+        ),
         const SizedBox(height: 8),
         for (final b in books) _EbookRow(book: b),
         StoreDisclaimer(text: kEbDisclaimer),
