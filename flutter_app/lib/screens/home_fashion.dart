@@ -38,6 +38,7 @@ import '../widgets/hero_curve_stage.dart';
 import '../widgets/buddha_gyro_stage.dart';
 import '../widgets/stories_find_you_banner.dart';
 import '../widgets/subscription_today_offer.dart';
+import '../widgets/earth_day_film.dart';
 import '../widgets/promo_color_grid.dart';
 import 'quotes_live.dart';
 import 'player_settings.dart';
@@ -333,6 +334,7 @@ class _HomeFashionState extends State<HomeFashion> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const NmHorizontalRoutineCards(fashion: true),
+            const EarthDayFilm(),
             PromoColorGrid(onOpen: _openGrid),
           ],
         )),
@@ -578,6 +580,7 @@ class _HomeFashionState extends State<HomeFashion> {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           const LiveQuoteTab(),
+                          const EarthDayFilm(height: 210),
                           HeroGreeting(name: widget.name),
                           // Search + Quick access live ONLY inside HeroCurveStage.
                           HeroCurveStage(

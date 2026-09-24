@@ -6,6 +6,7 @@
 library;
 
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
@@ -26,6 +27,8 @@ class _Tier {
     required this.was,
     required this.cta,
     required this.benefits,
+    required this.front,
+    required this.back,
   });
 
   final String name;
@@ -35,6 +38,8 @@ class _Tier {
   final String was;
   final String cta;
   final List<String> benefits;
+  final String front;
+  final String back;
 }
 
 const _tiers = <_Tier>[
@@ -45,6 +50,8 @@ const _tiers = <_Tier>[
     now: '30 days free',
     was: '',
     cta: 'Start free',
+    front: 'assets/subscription/tier-blazer-front.png',
+    back: 'assets/subscription/tier-blazer-back.png',
     benefits: [
       '30-day free trial',
       'Daily word discovery',
@@ -59,6 +66,8 @@ const _tiers = <_Tier>[
     now: r'$2.49 / month',
     was: r'$4.99',
     cta: 'Claim 50% off',
+    front: 'assets/subscription/tier-sun-front.png',
+    back: 'assets/subscription/tier-sun-back.png',
     benefits: [
       'Unlimited word practice',
       'Resonance sound sessions',
@@ -73,6 +82,8 @@ const _tiers = <_Tier>[
     now: r'$4.99 / month',
     was: r'$9.99',
     cta: 'Claim 50% off',
+    front: 'assets/subscription/tier-bag-front.png',
+    back: 'assets/subscription/tier-bag-back.png',
     benefits: [
       'Everything in Resonance',
       'Full frequency library',
@@ -87,6 +98,8 @@ const _tiers = <_Tier>[
     now: r'$9.99 / month',
     was: r'$19.99',
     cta: 'Claim 50% off',
+    front: 'assets/subscription/tier-nile-front.png',
+    back: 'assets/subscription/tier-nile-back.png',
     benefits: [
       'Everything in Frequency',
       'Priority Personal Coach',
@@ -161,7 +174,10 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
         },
         child: PageView(
           controller: _pager,
-          onPageChanged: (i) => _page = i,
+          onPageChanged: (i) {
+            if (_page == i) return;
+            setState(() => _page = i);
+          },
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
@@ -170,7 +186,7 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
             for (var i = 0; i < _tiers.length; i++)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
-                child: _shell(i + 1, _tierCard(_tiers[i])),
+                child: _shell(i + 1, _tierCard(_tiers[i], i + 1)),
               ),
           ],
         ),
@@ -205,44 +221,63 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
       ),
       child: Padding(
         padding: const EdgeInsets.all(6),
-        child: Column(
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _head(
-              title: "Today's offer",
-              sub: 'First tier free. Every other tier is 50% off.',
-            ),
-            const SizedBox(height: 8),
             Expanded(
-              child: Row(
+              flex: 11,
+              child: _OfferFlip(
+                front: _tiers.first.front,
+                back: _tiers.first.back,
+                title: _tiers.first.name,
+                price: _tiers.first.now,
+                active: _page == 0,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              flex: 13,
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  ScrollProgressRail(controller: _rail),
-                  const SizedBox(width: 8),
+                  _head(
+                    title: "Today's offer",
+                    sub: 'First tier free. Every other tier is 50% off.',
+                  ),
+                  const SizedBox(height: 8),
                   Expanded(
-                    child: ListView(
-                      controller: _rail,
-                      primary: false,
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      padding: const EdgeInsets.only(bottom: 12),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        for (final tier in _tiers) _tierLine(tier),
-                        const SizedBox(height: 48),
+                        ScrollProgressRail(controller: _rail),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: ListView(
+                            controller: _rail,
+                            primary: false,
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            padding: const EdgeInsets.only(bottom: 12),
+                            children: [
+                              for (final tier in _tiers) _tierLine(tier),
+                              const SizedBox(height: 48),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),
+                  const SizedBox(height: 8),
+                  _foot("try 30 day's Free trials today"),
                 ],
               ),
             ),
-            const SizedBox(height: 8),
-            _foot("try 30 day's Free trials today"),
           ],
         ),
       ),
     );
   }
 
-  Widget _tierCard(_Tier tier) {
+  Widget _tierCard(_Tier tier, int page) {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: const Color(0xFF14121A),
@@ -250,58 +285,83 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
       ),
       child: Padding(
         padding: const EdgeInsets.all(6),
-        child: Column(
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _head(title: "Today's offer", sub: tier.detail, name: tier.name),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                _badge(tier),
-                const SizedBox(width: 8),
-                if (tier.was.isNotEmpty)
-                  Text(
-                    tier.was,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: Color(0x88FFFFFF),
-                      decoration: TextDecoration.lineThrough,
-                      decorationColor: Color(0x88FFFFFF),
-                    ),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 6),
-            Text(
-              tier.now,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w800,
-                color: Colors.white,
+            Expanded(
+              flex: 11,
+              child: _OfferFlip(
+                front: tier.front,
+                back: tier.back,
+                title: tier.name,
+                price: tier.now,
+                active: _page == page,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(width: 8),
             Expanded(
-              child: ListView(
-                primary: false,
-                physics: const ClampingScrollPhysics(),
+              flex: 13,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  for (final line in tier.benefits)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 7),
-                      child: Text(
-                        line,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xE6FFFFFF),
+                  _head(title: "Today's offer", sub: tier.detail, name: tier.name),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      _badge(tier),
+                      const SizedBox(width: 8),
+                      if (tier.was.isNotEmpty)
+                        Flexible(
+                          child: Text(
+                            tier.was,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: Color(0x88FFFFFF),
+                              decoration: TextDecoration.lineThrough,
+                              decorationColor: Color(0x88FFFFFF),
+                            ),
+                          ),
                         ),
-                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    tier.now,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
                     ),
+                  ),
+                  const SizedBox(height: 8),
+                  Expanded(
+                    child: ListView(
+                      primary: false,
+                      physics: const ClampingScrollPhysics(),
+                      children: [
+                        for (final line in tier.benefits)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 6),
+                            child: Text(
+                              line,
+                              style: const TextStyle(
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xE6FFFFFF),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  _foot(tier.cta),
                 ],
               ),
             ),
-            _foot(tier.cta),
           ],
         ),
       ),
@@ -457,6 +517,162 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Same left-side flip the subscription plan cards use. Offer price is the
+/// discounted line, not the full plan price.
+class _OfferFlip extends StatefulWidget {
+  const _OfferFlip({
+    required this.front,
+    required this.back,
+    required this.title,
+    required this.price,
+    required this.active,
+  });
+
+  final String front;
+  final String back;
+  final String title;
+  final String price;
+  final bool active;
+
+  @override
+  State<_OfferFlip> createState() => _OfferFlipState();
+}
+
+class _OfferFlipState extends State<_OfferFlip> with SingleTickerProviderStateMixin {
+  late final AnimationController _c;
+  Timer? _auto;
+  var _back = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 720));
+    if (widget.active) _schedule();
+  }
+
+  @override
+  void didUpdateWidget(covariant _OfferFlip old) {
+    super.didUpdateWidget(old);
+    if (widget.active && !old.active) _schedule();
+    if (!widget.active && old.active && _back) _flip();
+  }
+
+  void _schedule() {
+    if (_flutterTest) return;
+    _auto?.cancel();
+    _auto = Timer(const Duration(milliseconds: 700), () {
+      if (mounted && widget.active && !_back) _flip();
+    });
+  }
+
+  void _flip() {
+    if (_back) {
+      _c.reverse();
+    } else {
+      _c.forward();
+    }
+    _back = !_back;
+  }
+
+  @override
+  void dispose() {
+    _auto?.cancel();
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: _flip,
+      child: AnimatedBuilder(
+        animation: _c,
+        builder: (_, child) {
+          final t = Curves.easeInOutCubic.transform(_c.value);
+          final ang = t * math.pi;
+          final showBack = t > 0.5;
+          return Transform(
+            alignment: Alignment.center,
+            transform: Matrix4.identity()
+              ..setEntry(3, 2, 0.0014)
+              ..rotateY(ang),
+            child: showBack
+                ? Transform(
+                    alignment: Alignment.center,
+                    transform: Matrix4.rotationY(math.pi),
+                    child: _face(widget.back),
+                  )
+                : _face(widget.front),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _face(String asset) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(14),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(
+            asset,
+            fit: BoxFit.cover,
+            alignment: Alignment.centerLeft,
+            errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black),
+          ),
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xB3000000),
+                  Color(0x00000000),
+                  Color(0x00000000),
+                  Color(0xCC000000),
+                ],
+                stops: [0, 0.28, 0.55, 1],
+              ),
+            ),
+          ),
+          Positioned(
+            left: 8,
+            right: 8,
+            top: 8,
+            child: Text(
+              widget.title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w800,
+                height: 1.1,
+              ),
+            ),
+          ),
+          Positioned(
+            left: 8,
+            right: 8,
+            bottom: 10,
+            child: Text(
+              widget.price,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 13,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

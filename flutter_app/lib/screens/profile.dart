@@ -19,6 +19,7 @@ import 'progress/progress_screen.dart';
 import 'quick_access.dart';
 import 'store.dart';
 import '../widgets/colored_split_promo_banner.dart';
+import '../widgets/earth_day_film.dart';
 
 const _accent = Color(0xFFE3BD7D);
 const _text = Color(0xFFF5F5F3);
@@ -274,6 +275,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
                   children: [
                     _banner(),
+                    const EarthDayFilm(height: 200),
                     _profileCard(),
                     _progress(),
                     _about(),

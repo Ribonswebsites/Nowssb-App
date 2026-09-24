@@ -107,6 +107,10 @@ class _BuddhaGyroStageState extends State<BuddhaGyroStage> {
             ),
           ),
         ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+          child: _enterBar(),
+        ),
         SizedBox(
           height: _stageH,
           child: PageView(
@@ -127,10 +131,6 @@ class _BuddhaGyroStageState extends State<BuddhaGyroStage> {
               ),
             ],
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
-          child: _enterBar(),
         ),
       ],
     );
@@ -164,10 +164,11 @@ class _BuddhaGyroStageState extends State<BuddhaGyroStage> {
             builder: (context, c) {
               final w = c.maxWidth;
               final h = c.maxHeight;
-              // Wider than the card so a sideways drag reveals the other
-              // half of the type plate. Past that edge the fill is black.
-              final plateW = w * 2.35;
-              final plateH = h * 1.28;
+              // The plate is the poster’s own shape, contained in the card,
+              // so the whole line reads. Dragging it still lands on black.
+              const posterAspect = 844 / 1500;
+              final plateH = h * 0.92;
+              final plateW = plateH * posterAspect;
               final plateTilt = Matrix4.identity()
                 ..setEntry(3, 2, 0.0011)
                 ..rotateX(_pitch * 0.22)
@@ -177,7 +178,7 @@ class _BuddhaGyroStageState extends State<BuddhaGyroStage> {
                 ..rotateX(_pitch * 0.28)
                 ..translateByDouble(0, _pitch * 8, 0, 1);
               const aspect = 844 / 1500;
-              final imgH = h * 0.58;
+              final imgH = h * 0.42;
               final imgW = imgH * aspect;
               final left = (w - imgW) / 2;
               final top = h - imgH;
@@ -196,7 +197,7 @@ class _BuddhaGyroStageState extends State<BuddhaGyroStage> {
                       transform: plateTilt,
                       child: Image.asset(
                         'assets/banners/gyro/words-bg.png',
-                        fit: BoxFit.cover,
+                        fit: BoxFit.contain,
                         filterQuality: FilterQuality.high,
                       ),
                     ),

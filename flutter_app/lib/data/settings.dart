@@ -44,6 +44,7 @@ class Settings extends ChangeNotifier {
   static const _kQuickActions = 'nwsb_quick_actions';
   static const _kLiveQuote = 'nwsb_live_quote';
   static const _kWeekQuotes = 'nwsb_week_quotes';
+  static const _kThoughts = 'nwsb_shared_thoughts';
 
   /// One selected Fashion Plus film plays behind every primary page while
   /// motion mode is enabled.
@@ -127,6 +128,7 @@ class Settings extends ChangeNotifier {
   List<String> _quickActions = List<String>.from(defaultQuickActions);
   String _liveQuote = '';
   List<String> _weekQuotes = List<String>.filled(7, '');
+  List<String> _sharedThoughts = const [];
 
   /// Motion mode: do page backgrounds play, or hold their first frame?
   bool get fashionPlus => _fashionPlus;
@@ -168,6 +170,9 @@ class Settings extends ChangeNotifier {
 
   /// Seven lines, Monday first. Empty slots fall back to the built-in line.
   List<String> get weekQuotes => List.unmodifiable(_weekQuotes);
+
+  /// Lines a person typed to share. Kept on this phone even when unsigned.
+  List<String> get sharedThoughts => List.unmodifiable(_sharedThoughts);
 
   String quoteFor(DateTime day) {
     const fallback = <String>[
@@ -233,6 +238,7 @@ class Settings extends ChangeNotifier {
       if (week != null && week.isNotEmpty) {
         _weekQuotes = List<String>.generate(7, (i) => i < week.length ? week[i] : '');
       }
+      _sharedThoughts = p.getStringList(_kThoughts) ?? const [];
       _showSplash = !(p.getBool(_kLaunched) ?? false);
       await p.setBool(_kLaunched, true);
       notifyListeners();
@@ -292,6 +298,17 @@ class Settings extends ChangeNotifier {
     try {
       final p = await SharedPreferences.getInstance();
       await p.setStringList(_kWeekQuotes, _weekQuotes);
+    } catch (_) {}
+    notifyListeners();
+  }
+
+  Future<void> addSharedThought(String value) async {
+    final text = value.trim();
+    if (text.isEmpty) return;
+    _sharedThoughts = [text, ..._sharedThoughts].take(40).toList();
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.setStringList(_kThoughts, _sharedThoughts);
     } catch (_) {}
     notifyListeners();
   }

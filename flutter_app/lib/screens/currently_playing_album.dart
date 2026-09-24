@@ -1,13 +1,12 @@
 /// YouTube Music album page used by the Sound Library "Currently Playing" chip.
 library;
 
-import 'dart:ui' as ui;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../data/models.dart';
 import '../widgets/app_thinking_loader.dart';
+import '../widgets/glass_wrap.dart';
 
 class CurrentlyPlayingAlbum extends StatelessWidget {
   const CurrentlyPlayingAlbum({
@@ -55,52 +54,9 @@ class CurrentlyPlayingAlbum extends StatelessWidget {
     final cover = art(head.word);
     final year = DateTime.now().year.toString();
 
-    return ColoredBox(
-      color: const Color(0xFF000000),
-      child: Stack(
-        children: [
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 340,
-            child: IgnorePointer(
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  ImageFiltered(
-                    imageFilter: ui.ImageFilter.blur(sigmaX: 42, sigmaY: 42),
-                    child: Transform.scale(
-                      scale: 1.35,
-                      child: Image.asset(
-                        cover,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) =>
-                            const ColoredBox(color: Color(0xFF2A1038)),
-                      ),
-                    ),
-                  ),
-                  const DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Color(0x66140A22),
-                          Color(0xCC000000),
-                          Color(0xFF000000),
-                        ],
-                        stops: [0, 0.55, 1],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Column(
-            children: [
-              const SizedBox(height: 10),
+    return Column(
+      children: [
+        const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -135,16 +91,21 @@ class CurrentlyPlayingAlbum extends StatelessWidget {
               ),
               const SizedBox(height: 18),
               Center(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: SizedBox(
-                    width: 228,
-                    height: 228,
-                    child: Image.asset(
-                      cover,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) =>
-                          const ColoredBox(color: Color(0xFF1A1A1A)),
+                child: GlassWrap(
+                  margin: EdgeInsets.zero,
+                  padding: const EdgeInsets.all(8),
+                  radius: 18,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: SizedBox(
+                      width: 228,
+                      height: 228,
+                      child: Image.asset(
+                        cover,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) =>
+                            const ColoredBox(color: Color(0xFF1A1A1A)),
+                      ),
                     ),
                   ),
                 ),
@@ -341,9 +302,6 @@ class CurrentlyPlayingAlbum extends StatelessWidget {
                 ),
               ),
             ],
-          ),
-        ],
-      ),
     );
   }
 

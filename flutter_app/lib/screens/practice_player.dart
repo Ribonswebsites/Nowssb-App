@@ -4607,7 +4607,12 @@ class _PracticeNotesSheet extends StatelessWidget {
                         fontSize: 13,
                       ),
                     ),
-                    const SizedBox(height: 18),
+                    const SizedBox(height: 14),
+                    ColoredSplitPromoBanner(
+                      spec: SplitPromoExtras.at(15),
+                      margin: EdgeInsets.zero,
+                    ),
+                    const SizedBox(height: 14),
                     _noteBlock(
                       'PRONUNCIATION',
                       word.tip.isEmpty
