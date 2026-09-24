@@ -26,7 +26,6 @@ import '../widgets/intro_gate.dart';
 import '../widgets/tv_frame.dart';
 import '../widgets/app_thinking_loader.dart';
 import '../widgets/colored_split_promo_banner.dart';
-import '../widgets/studio_panels.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import 'notifications_sheet.dart';
 import 'practice.dart';
@@ -401,10 +400,6 @@ class _SlmFeed extends StatelessWidget {
                     bottom: MediaQuery.paddingOf(context).bottom + 48,
                   ),
                   children: [
-                    const Padding(
-                      padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
-                      child: SoundAgePanel(),
-                    ),
                     if (chip == 'Currently Playing') ...[
                       CurrentlyPlayingAlbum(
                         words: _playingRail,

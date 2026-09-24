@@ -14,9 +14,11 @@ import '../data/settings.dart';
 import '../widgets/app_thinking_loader.dart';
 import '../widgets/colored_split_promo_banner.dart';
 import '../widgets/glass_wrap.dart';
+import '../widgets/home_skin.dart';
 import '../widgets/neumorphic.dart';
 import '../widgets/scroll_progress_rail.dart';
 import 'healing_path.dart';
+import 'notifications_sheet.dart';
 import 'player_settings.dart';
 import 'practice.dart';
 import 'reader/reader_hub.dart';
@@ -104,23 +106,21 @@ class _LiveQuoteTabState extends State<LiveQuoteTab> {
       builder: (context, _) {
         final live = Settings.instance.liveQuote.trim();
         final quote = live.isNotEmpty ? live : _kBuddhaQuote;
-        final banner = Dismissible(
-          key: const ValueKey('home-today-quote'),
-          direction: DismissDirection.horizontal,
-          onDismissed: (_) => _hide(),
-          child: GlassWrap(
-            margin: const EdgeInsets.fromLTRB(16, 6, 16, 0),
-            padding: const EdgeInsets.all(8),
-            child: Stack(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(4, 4, 28, 4),
-                  child: GestureDetector(
-                    onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute<void>(builder: (_) => const QuotesWeekScreen()),
-                    ),
-                    behavior: HitTestBehavior.opaque,
-                    child: Row(
+        final inner = Container(
+          decoration: BoxDecoration(
+            color: const Color(0xFF0B0B12),
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8, 8, 28, 8),
+                child: GestureDetector(
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(builder: (_) => const QuotesWeekScreen()),
+                  ),
+                  behavior: HitTestBehavior.opaque,
+                  child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const AppThinkingLoader(
@@ -161,24 +161,43 @@ class _LiveQuoteTabState extends State<LiveQuoteTab> {
                         ),
                       ),
                     ],
-                    ),
                   ),
                 ),
-                Positioned(
-                  top: 0,
-                  right: 0,
-                  child: GestureDetector(
-                    onTap: _hide,
-                    behavior: HitTestBehavior.opaque,
-                    child: const Padding(
-                      padding: EdgeInsets.all(4),
-                      child: Icon(Icons.close_rounded, color: Colors.white, size: 18),
-                    ),
+              ),
+              Positioned(
+                top: 4,
+                right: 4,
+                child: GestureDetector(
+                  onTap: _hide,
+                  behavior: HitTestBehavior.opaque,
+                  child: const Padding(
+                    padding: EdgeInsets.all(4),
+                    child: Icon(Icons.close_rounded, color: Colors.white, size: 18),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
+        );
+        final normal = HomeSkinScope.of(context) == HomeSkin.normal;
+        final banner = Dismissible(
+          key: const ValueKey('home-today-quote'),
+          direction: DismissDirection.horizontal,
+          onDismissed: (_) => _hide(),
+          child: normal
+              ? Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 6, 16, 0),
+                  child: NeuCard(
+                    padding: const EdgeInsets.all(8),
+                    radius: 24,
+                    child: inner,
+                  ),
+                )
+              : GlassWrap(
+                  margin: const EdgeInsets.fromLTRB(16, 6, 16, 0),
+                  padding: const EdgeInsets.all(8),
+                  child: inner,
+                ),
         );
         return banner;
       },
@@ -1062,9 +1081,17 @@ class _QuoteMonthSheetState extends State<_QuoteMonthSheet> {
           filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
           child: DecoratedBox(
             decoration: BoxDecoration(
-              color: const Color(0xF0101018),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-              border: Border.all(color: const Color(0x33FFFFFF)),
+              gradient: const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xD0C43B32),
+                  Color(0xC8E06A22),
+                  Color(0xC8F0A03A),
+                ],
+              ),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+              border: Border.all(color: const Color(0x66FFFFFF)),
             ),
             child: ListView(
               padding: const EdgeInsets.fromLTRB(16, 10, 16, 28),
@@ -1079,11 +1106,34 @@ class _QuoteMonthSheetState extends State<_QuoteMonthSheet> {
                     ),
                   ),
                 ),
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(8, 8, 8, 0),
-                  child: Text(
-                    'Calendar',
-                    style: TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.w800),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 10, 4, 0),
+                  child: Row(
+                    children: [
+                      const Expanded(
+                        child: Text(
+                          'Calendar',
+                          style: TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.w800),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () => showNotificationsSheet(context),
+                        child: Container(
+                          width: 42,
+                          height: 42,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white.withValues(alpha: 0.18),
+                            border: Border.all(color: Colors.white38),
+                          ),
+                          child: const Icon(Icons.notifications_none_rounded, color: Colors.white),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(Icons.close_rounded, color: Colors.white),
+                      ),
+                    ],
                   ),
                 ),
                 Row(
@@ -1110,10 +1160,6 @@ class _QuoteMonthSheetState extends State<_QuoteMonthSheet> {
                         _month = DateTime(_month.year, _month.month + 1);
                       }),
                       icon: const Icon(Icons.chevron_right, color: Colors.white),
-                    ),
-                    IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.close_rounded, color: Colors.white),
                     ),
                   ],
                 ),
@@ -1143,30 +1189,32 @@ class _QuoteMonthSheetState extends State<_QuoteMonthSheet> {
                   ),
                 const SizedBox(height: 12),
                 Container(
-                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF0B0B12),
-                    borderRadius: BorderRadius.circular(16),
+                    color: const Color(0x66FFFFFF),
+                    borderRadius: BorderRadius.circular(22),
+                    border: Border.all(color: const Color(0x55FFFFFF)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
+                          Expanded(
+                            child: Text(
+                              '${_days[_selected.weekday - 1]} quote',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                                height: 1.05,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ),
                           const AppThinkingLoader(
                             size: 32,
                             state: OrbState.composing,
                             blackCircle: true,
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              '${_days[_selected.weekday - 1]} · ${_selected.day} ${_months[_selected.month - 1]}',
-                              style: const TextStyle(
-                                color: Color(0xFFE8D5A3),
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
                           ),
                         ],
                       ),
@@ -1175,55 +1223,68 @@ class _QuoteMonthSheetState extends State<_QuoteMonthSheet> {
                         quote,
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 18,
+                          fontSize: 15,
                           height: 1.3,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                       const SizedBox(height: 12),
                       Row(
                         children: [
-                          _pill('Like', _likes.contains(id), () => _toggle('like')),
-                          const SizedBox(width: 8),
-                          _pill('Save', _saves.contains(id), () => _toggle('save')),
+                          _meta('Like', _likes.contains(id) ? 'Saved' : 'Tap', () => _toggle('like')),
+                          const SizedBox(width: 18),
+                          _meta('Keep', _saves.contains(id) ? 'Yes' : 'Tap', () => _toggle('save')),
                         ],
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 14),
-                const Text(
-                  'This week',
-                  style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w800),
-                ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 for (var i = 0; i < 7; i++)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8),
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-                      decoration: BoxDecoration(
-                        color: const Color(0x14FFFFFF),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: const Color(0x33FFFFFF)),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            _days[i],
-                            style: const TextStyle(color: Color(0xFFE8D5A3), fontWeight: FontWeight.w800, fontSize: 13),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            Settings.instance.quoteFor(now.add(Duration(days: i - (now.weekday - 1)))),
-                            style: const TextStyle(color: Colors.white, fontSize: 15, height: 1.3, fontWeight: FontWeight.w700),
-                          ),
-                        ],
+                    child: GestureDetector(
+                      onTap: () {
+                        final monday = now.subtract(Duration(days: now.weekday - 1));
+                        final day = DateTime(monday.year, monday.month, monday.day + i);
+                        setState(() {
+                          _selected = day;
+                          _month = DateTime(day.year, day.month);
+                        });
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+                        decoration: BoxDecoration(
+                          color: const Color(0x40FFFFFF),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: const Color(0x44FFFFFF)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _days[i],
+                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 18),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              Settings.instance.quoteFor(now.add(Duration(days: i - (now.weekday - 1)))),
+                              style: const TextStyle(color: Colors.white, fontSize: 14, height: 1.3, fontWeight: FontWeight.w600),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
+                const SizedBox(height: 8),
+                ColoredSplitPromoBanner.forSurface(
+                  SplitPromoSurface.normalHome,
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(builder: (_) => const QuotesWeekScreen()),
+                  ),
+                  margin: EdgeInsets.zero,
+                ),
               ],
             ),
           ),
@@ -1277,21 +1338,24 @@ class _QuoteMonthSheetState extends State<_QuoteMonthSheet> {
     );
   }
 
-  Widget _pill(String label, bool on, VoidCallback tap) {
-    return GestureDetector(
-      onTap: tap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(
-          color: on ? const Color(0xFFE8D5A3) : const Color(0xFF14121A),
-          borderRadius: BorderRadius.circular(99),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: on ? const Color(0xFF1A1A2E) : Colors.white,
-            fontWeight: FontWeight.w800,
-          ),
+  Widget _meta(String label, String value, VoidCallback tap) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: tap,
+        behavior: HitTestBehavior.opaque,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: const TextStyle(color: Color(0xE6FFFFFF), fontSize: 12, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              value,
+              style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800),
+            ),
+          ],
         ),
       ),
     );

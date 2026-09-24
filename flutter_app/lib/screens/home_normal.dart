@@ -76,7 +76,6 @@ import '../widgets/stories_find_you_banner.dart';
 import '../widgets/subscription_today_offer.dart';
 import '../widgets/earth_day_film.dart';
 import '../widgets/promo_color_grid.dart';
-import '../widgets/studio_panels.dart';
 import 'quotes_live.dart';
 import 'player_settings.dart';
 import 'practice_player.dart';
@@ -320,10 +319,6 @@ class _HomeNormalState extends State<HomeNormal> {
               NmSuppliedDashboard(
                 onStart: _openDashboardSession,
                 onProgress: _openDashboardProgress,
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
-                child: SoundAgePanel(onSnapshot: _openDashboardProgress),
               ),
             ],
           ),

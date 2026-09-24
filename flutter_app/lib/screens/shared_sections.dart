@@ -1492,7 +1492,8 @@ class HomeFooterSection extends StatefulWidget {
   State<HomeFooterSection> createState() => _HomeFooterSectionState();
 }
 
-class _HomeFooterSectionState extends State<HomeFooterSection> {
+class _HomeFooterSectionState extends State<HomeFooterSection>
+    with SingleTickerProviderStateMixin {
   /// Bundled footer-tab studio shots (commit as-is; no recompress).
   static const _shots = [
     'assets/footer/tab-sound-of-stillness.png',
@@ -1512,55 +1513,66 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
     ('Profile', 'profile'),
   ];
 
-  /// Website `.footer-carousel` card rhythm.
-  Timer? _timer;
+  late final AnimationController _travel;
   int _index = 0;
 
   @override
   void initState() {
     super.initState();
-    _timer = Timer.periodic(const Duration(milliseconds: 2800), (_) {
-      if (!mounted || !TickerMode.of(context)) return;
-      setState(() => _index = (_index + 1) % _shots.length);
-    });
+    _travel = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 4600),
+    )..addStatusListener((status) {
+        if (status != AnimationStatus.completed || !mounted) return;
+        setState(() => _index = (_index + 1) % _shots.length);
+        _travel.forward(from: 0);
+      });
+    _travel.forward();
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
+    _travel.dispose();
     super.dispose();
   }
 
-  Widget _sideShot(int index) {
-    return AspectRatio(
-      aspectRatio: 0.72,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(14),
-        child: Image.asset(
-          _shots[index],
-          fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF0A0F1C)),
+  Widget _movingShot({
+    required int slot,
+    required double t,
+    required double width,
+    required double sideW,
+    required double tabW,
+    required double tabH,
+  }) {
+    final s = slot - t;
+    final travel = tabW / 2 + 10 + sideW / 2;
+    final center = width / 2 + s * travel;
+    final abs = s.abs().clamp(0.0, 1.6);
+    final blend = abs.clamp(0.0, 1.0);
+    final cardW = _lerp(tabW - 28, sideW, blend);
+    final cardH = _lerp(tabH - 34, sideW / 0.72, blend);
+    final opacity = abs > 1.35 ? ((1.85 - abs) / 0.5).clamp(0.0, 1.0) : 1.0;
+    final idx = (_index + slot + _shots.length * 8) % _shots.length;
+    return Positioned(
+      left: center - cardW / 2,
+      top: (300 - cardH) / 2,
+      width: cardW,
+      height: cardH,
+      child: Opacity(
+        opacity: opacity,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(blend < 0.35 ? 10 : 14),
+          child: Image.asset(
+            _shots[idx],
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF0A0F1C)),
+          ),
         ),
       ),
     );
   }
 
-  Widget _rotatingTab() {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(10),
-      child: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 700),
-        child: Image.asset(
-          _shots[_index],
-          key: ValueKey(_index),
-          fit: BoxFit.cover,
-          width: double.infinity,
-          height: double.infinity,
-          errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF0A0F1C)),
-        ),
-      ),
-    );
-  }
+  double _lerp(double a, double b, double t) => a + (b - a) * t;
 
 
   @override
@@ -1631,56 +1643,72 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
                       ),
                       SizedBox(
                         height: 300,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Expanded(child: _sideShot((_index + _shots.length - 1) % _shots.length)),
-                              const SizedBox(width: 8),
-                              SizedBox(
-                                width: 168,
-                                height: 280,
-                                child: Stack(
-                                  alignment: Alignment.center,
+                        child: AnimatedBuilder(
+                          animation: _travel,
+                          builder: (context, _) {
+                            final t = Curves.easeInOutCubic.transform(_travel.value);
+                            return LayoutBuilder(
+                              builder: (context, box) {
+                                final w = box.maxWidth;
+                                const tabW = 168.0;
+                                const tabH = 280.0;
+                                final sideW = ((w - tabW - 20) / 2).clamp(64.0, 150.0);
+                                final order = [-1, 2, 1, 0]..sort((a, b) => (b - t).abs().compareTo((a - t).abs()));
+                                return Stack(
+                                  clipBehavior: Clip.hardEdge,
                                   children: [
-                                    Padding(
-                                      padding: const EdgeInsets.fromLTRB(12, 12, 12, 18),
-                                      child: _rotatingTab(),
-                                    ),
-                                    IgnorePointer(
-                                      child: Image.asset(
-                                        'assets/frames/footer-frame.webp',
-                                        fit: BoxFit.fill,
-                                        errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                                    for (final slot in order)
+                                      _movingShot(
+                                        slot: slot,
+                                        t: t,
+                                        width: w,
+                                        sideW: sideW,
+                                        tabW: tabW,
+                                        tabH: tabH,
+                                      ),
+                                    Positioned(
+                                      left: (w - tabW) / 2,
+                                      top: (300 - tabH) / 2,
+                                      width: tabW,
+                                      height: tabH,
+                                      child: IgnorePointer(
+                                        child: Image.asset(
+                                          'assets/frames/footer-frame.webp',
+                                          fit: BoxFit.fill,
+                                          errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                                        ),
                                       ),
                                     ),
                                   ],
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(child: _sideShot((_index + 1) % _shots.length)),
-                            ],
-                          ),
+                                );
+                              },
+                            );
+                          },
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          for (var i = 0; i < _shots.length; i++)
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 3),
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 400),
-                                width: i == _index ? 20 : 4,
-                                height: 4,
-                                color: i == _index
-                                    ? const Color(0xE6C8E8F5)
-                                    : const Color(0x4DC8E8F5),
-                              ),
-                            ),
-                        ],
+                      AnimatedBuilder(
+                        animation: _travel,
+                        builder: (context, _) {
+                          final shown = (_index + (_travel.value > 0.55 ? 1 : 0)) % _shots.length;
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              for (var i = 0; i < _shots.length; i++)
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 3),
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 240),
+                                    width: i == shown ? 20 : 4,
+                                    height: 4,
+                                    color: i == shown
+                                        ? const Color(0xE6C8E8F5)
+                                        : const Color(0x4DC8E8F5),
+                                  ),
+                                ),
+                            ],
+                          );
+                        },
                       ),
                       const SizedBox(height: 16),
                       Center(

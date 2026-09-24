@@ -10,6 +10,7 @@ import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/page_shell.dart';
+import '../../widgets/studio_panels.dart';
 import 'product_detail.dart';
 import 'store_cards.dart';
 import 'store_home_sections.dart';
@@ -274,6 +275,8 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
           videoAsset: nwsbVideo(kRmHeroVidFile),
           videoTitle: '',
         ),
+        const SizedBox(height: 14),
+        const PracticeStudioSection(),
         const SizedBox(height: 8),
         ColoredSplitPromoBanner.forSurface(
           SplitPromoSurface.wordAtelier,

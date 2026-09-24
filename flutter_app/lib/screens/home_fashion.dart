@@ -329,10 +329,6 @@ class _HomeFashionState extends State<HomeFashion> {
                   margin: EdgeInsets.zero,
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.fromLTRB(16, 8, 16, 0),
-                child: SoundAgePanel(),
-              ),
             ],
           ),
         ),
@@ -453,12 +449,19 @@ class _HomeFashionState extends State<HomeFashion> {
         ('connectban', ConnectBannerSection(onTap: () => _go(0))),
         (
           'healing',
-          HealingSection(
-            onTap: () => _push(const HealingPathScreen()),
-            onFemale: () => _push(
-                const HealingPathScreen(initialGender: HealingGender.female)),
-            onMale: () => _push(
-                const HealingPathScreen(initialGender: HealingGender.male)),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              HealingSection(
+                onTap: () => _push(const HealingPathScreen()),
+                onFemale: () => _push(
+                    const HealingPathScreen(initialGender: HealingGender.female)),
+                onMale: () => _push(
+                    const HealingPathScreen(initialGender: HealingGender.male)),
+              ),
+              const SizedBox(height: 8),
+              const PracticeStudioSection(),
+            ],
           ),
         ),
         ('journey', const SizedBox.shrink()),

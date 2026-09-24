@@ -2374,94 +2374,80 @@ class StoreHalfOffRail extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               child: SizedBox(
                 height: 188,
-                child: Stack(
-                  fit: StackFit.expand,
+                child: Row(
                   children: [
-                    const ColoredBox(color: Color(0xFF14081F)),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: Image.asset(
-                        'assets/store/signature-portrait.jpg',
-                        height: 188,
-                        fit: BoxFit.contain,
-                        alignment: Alignment.centerRight,
-                        errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-                      ),
-                    ),
-                    const DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [Color(0xF214081F), Color(0x8814081F), Color(0x0014081F)],
-                          stops: [0, 0.42, 0.72],
+                    const Expanded(
+                      flex: 6,
+                      child: ColoredBox(
+                        color: Color(0xFF1A0B2E),
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(16, 16, 10, 14),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Deal of the Day',
+                                style: TextStyle(
+                                  color: Color(0xFFE8D5A3),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              SizedBox(height: 6),
+                              Text(
+                                'Up To\n50% Off',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 32,
+                                  height: 0.95,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              Spacer(),
+                              Text(
+                                'Words at half price. Limited.',
+                                style: TextStyle(color: Color(0xD9FFFFFF), fontSize: 12),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                    const Positioned(
-                      right: 8,
-                      top: 10,
-                      child: Text(
-                        'SALE',
-                        style: TextStyle(
-                          color: Color(0x55FFFFFF),
-                          fontSize: 22,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 2,
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    Expanded(
+                      flex: 5,
+                      child: Stack(
+                        fit: StackFit.expand,
                         children: [
-                          const Text(
-                            'Deal of the Day',
-                            style: TextStyle(
-                              color: Color(0xFFE8D5A3),
-                              fontSize: 12,
-                              fontWeight: FontWeight.w800,
-                            ),
+                          const ColoredBox(color: Color(0xFF120814)),
+                          Image.asset(
+                            'assets/store/signature-portrait.jpg',
+                            fit: BoxFit.contain,
+                            alignment: Alignment.center,
+                            errorBuilder: (_, __, ___) => const SizedBox.shrink(),
                           ),
-                          const SizedBox(height: 6),
-                          const Text(
-                            'Up To\n50% Off',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 32,
-                              height: 0.95,
-                              fontWeight: FontWeight.w800,
+                          Positioned(
+                            right: 8,
+                            bottom: 8,
+                            child: GestureDetector(
+                              onTap: onViewAll,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(99),
+                                ),
+                                child: const Text(
+                                  'View all',
+                                  style: TextStyle(
+                                    color: Color(0xFF111111),
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
-                          const Spacer(),
-                          const Text(
-                            'Words at half price. Limited.',
-                            style: TextStyle(color: Color(0xD9FFFFFF), fontSize: 12),
                           ),
                         ],
-                      ),
-                    ),
-                    Positioned(
-                      right: 12,
-                      bottom: 12,
-                      child: GestureDetector(
-                        onTap: onViewAll,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(99),
-                          ),
-                          child: const Text(
-                            'View all',
-                            style: TextStyle(
-                              color: Color(0xFF111111),
-                              fontWeight: FontWeight.w800,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
                       ),
                     ),
                   ],

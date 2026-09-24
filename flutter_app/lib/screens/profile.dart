@@ -19,7 +19,6 @@ import 'progress/progress_screen.dart';
 import 'quick_access.dart';
 import 'store.dart';
 import '../widgets/colored_split_promo_banner.dart';
-import '../widgets/studio_panels.dart';
 
 const _accent = Color(0xFFE3BD7D);
 const _text = Color(0xFFF5F5F3);
@@ -276,7 +275,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     _banner(),
                     _profileCard(),
-                    const SoundAgePanel(),
                     _progress(),
                     _about(),
                     ColoredSplitPromoBanner.forSurface(

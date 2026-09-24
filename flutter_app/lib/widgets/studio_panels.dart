@@ -1,295 +1,60 @@
-/// Progress courses board and the sound-age ring.
-/// The ring is the same block on home, the sound library, and profile.
+/// Fashion-home practice board, matched to the courses reference.
+/// Profile photo and banner, campaign stills, working controls.
 library;
-
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
 import '../data/practice_progress.dart';
+import '../screens/notifications_sheet.dart';
+import '../screens/practice.dart';
+import '../screens/progress/progress_screen.dart';
+import '../screens/sound_library.dart';
 import '../shell/nav_shell.dart';
 
-/// Courses board from the reference, filled with NowssB practice paths.
-class PracticeCoursesPanel extends StatelessWidget {
-  const PracticeCoursesPanel({super.key});
+void openPracticeTab(BuildContext context, int tab) {
+  final scope = context.getInheritedWidgetOfExactType<NavScope>();
+  if (scope != null) {
+    scope.go(tab);
+    return;
+  }
+  final page = switch (tab) {
+    1 => const PracticeScreen(),
+    2 => const SoundLibraryScreen(),
+    _ => const PracticeScreen(),
+  };
+  Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => page));
+}
+
+class PracticeStudioSection extends StatelessWidget {
+  const PracticeStudioSection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final progress = PracticeProgress.instance;
-    final done = progress.uniqueWords;
-    return Container(
-      margin: const EdgeInsets.fromLTRB(16, 8, 16, 6),
-      padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(32),
-        gradient: const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFF6B4C9A), Color(0xFF3A2458), Color(0xFF1A1028)],
-        ),
-        boxShadow: const [
-          BoxShadow(color: Color(0x66000000), blurRadius: 24, offset: Offset(0, 12)),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            children: [
-              ClipOval(
-                child: Image.asset(
-                  'assets/icons/logo-disc.webp',
-                  width: 42,
-                  height: 42,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => const CircleAvatar(
-                    radius: 21,
-                    backgroundColor: Color(0xFF2A1840),
-                    child: Icon(Icons.person, color: Colors.white),
-                  ),
-                ),
-              ),
-              const Spacer(),
-              _seg('My Practice', true),
-              const SizedBox(width: 6),
-              _seg('Progress', false),
-              const Spacer(),
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white.withValues(alpha: 0.16),
-                  border: Border.all(color: Colors.white24),
-                ),
-                child: const Icon(Icons.notifications_none_rounded, color: Colors.white, size: 20),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(22),
-            child: SizedBox(
-              height: 214,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  const DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [Color(0xFFFF8AD8), Color(0xFFB14CFF), Color(0xFF6A35C8)],
-                      ),
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: Image.asset(
-                      'assets/banners/promo/pose-02.png',
-                      height: 200,
-                      fit: BoxFit.contain,
-                      errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            _faces('+12'),
-                            const Spacer(),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(99),
-                              ),
-                              child: const Text('Active', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12)),
-                            ),
-                          ],
-                        ),
-                        const Spacer(),
-                        const Text(
-                          'Origin Words',
-                          style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w700, height: 1.05),
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            const Icon(Icons.schedule_rounded, color: Colors.white, size: 15),
-                            const SizedBox(width: 4),
-                            Text(progress.timeLabel, style: const TextStyle(color: Colors.white, fontSize: 13)),
-                            const SizedBox(width: 10),
-                            const Icon(Icons.star_rounded, color: Color(0xFFFFD15C), size: 16),
-                            const Text(' 4.7', style: TextStyle(color: Colors.white, fontSize: 13)),
-                            const SizedBox(width: 10),
-                            const Icon(Icons.play_circle_outline, color: Colors.white, size: 15),
-                            Text(' $done', style: const TextStyle(color: Colors.white, fontSize: 13)),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        Row(
-                          children: [
-                            Text(
-                              done == 0 ? '0 of 5' : '1 of 5',
-                              style: const TextStyle(color: Colors.white70, fontSize: 13),
-                            ),
-                            const Spacer(),
-                            GestureDetector(
-                              onTap: () => NavScope.goTo(context, 1),
-                              child: const Text(
-                                'Continue  ›',
-                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 15),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              _chip('All Paths', '12', true),
-              _chip('Completed', '$done', false),
-              _chip('In practice', '${progress.todaySessions}', false),
-              _chip('Saved', '${progress.streak}', false),
-            ],
-          ),
-          const SizedBox(height: 12),
-          GestureDetector(
-            onTap: () => NavScope.goTo(context, 1),
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: const Color(0xFF16121F),
-                borderRadius: BorderRadius.circular(22),
-              ),
-              child: Row(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Image.asset(
-                      'assets/footer/tab-still-mind-still-style.png',
-                      width: 96,
-                      height: 96,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(width: 96, height: 96, color: const Color(0xFF3A2458)),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'From\nSound to\nStillness',
-                          style: TextStyle(color: Colors.white, fontSize: 18, height: 1.05, fontWeight: FontWeight.w700),
-                        ),
-                        SizedBox(height: 8),
-                        Text('12h 24m   ★ 4.8', style: TextStyle(color: Colors.white70, fontSize: 12)),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white24),
-                    ),
-                    child: const Icon(Icons.chevron_right, color: Colors.white),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _seg(String label, bool on) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: on ? Colors.white.withValues(alpha: 0.18) : Colors.transparent,
-        borderRadius: BorderRadius.circular(99),
-        border: Border.all(color: on ? Colors.white30 : Colors.transparent),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(color: on ? Colors.white : Colors.white60, fontWeight: FontWeight.w700, fontSize: 12),
-      ),
-    );
-  }
-
-  Widget _chip(String label, String count, bool on) {
-    return Expanded(
-      child: Column(
-        children: [
-          Text.rich(
-            TextSpan(
-              text: label,
-              style: TextStyle(color: on ? Colors.white : Colors.white54, fontWeight: FontWeight.w700, fontSize: 10),
-              children: [
-                TextSpan(text: ' $count', style: const TextStyle(fontSize: 9, color: Color(0xFFB9A0FF))),
-              ],
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 4),
-          Container(height: 2, color: on ? Colors.white : Colors.transparent),
-        ],
-      ),
-    );
-  }
-
-  Widget _faces(String extra) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(4, 3, 8, 3),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(99)),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ClipOval(
-            child: Image.asset(
-              'assets/icons/logo-disc.webp',
-              width: 22,
-              height: 22,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => const SizedBox(width: 22, height: 22),
-            ),
-          ),
-          const SizedBox(width: 4),
-          Text(extra, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 11)),
-        ],
-      ),
+    return const Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        PracticeCoursesPanel(),
+        SizedBox(height: 14),
+        PracticeCourseRail(),
+      ],
     );
   }
 }
 
-/// Biological-age board. Numbers come from recorded practice.
-class SoundAgePanel extends StatefulWidget {
-  const SoundAgePanel({super.key, this.onSnapshot});
-
-  /// Opens the full progress page. Falls back to the practice tab.
-  final VoidCallback? onSnapshot;
+class PracticeCoursesPanel extends StatefulWidget {
+  const PracticeCoursesPanel({super.key});
 
   @override
-  State<SoundAgePanel> createState() => _SoundAgePanelState();
+  State<PracticeCoursesPanel> createState() => _PracticeCoursesPanelState();
 }
 
-class _SoundAgePanelState extends State<SoundAgePanel> {
+class _PracticeCoursesPanelState extends State<PracticeCoursesPanel> {
+  var _progress = false;
+  var _chip = 0;
+
+  static const _profile = 'assets/profile_source/img-about.jpeg';
+  static const _banner = 'assets/profile_source/img-banner.png';
+
   @override
   void initState() {
     super.initState();
@@ -307,236 +72,390 @@ class _SoundAgePanelState extends State<SoundAgePanel> {
     if (mounted) setState(() {});
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final p = PracticeProgress.instance;
-    final streak = p.streak;
-    final age = p.totalSessions == 0 ? p.level : (36 - streak.clamp(0, 14));
-    final younger = p.totalSessions == 0 ? 'Start today' : '$streak days sharper';
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
-      decoration: BoxDecoration(
-        color: const Color(0xFF07080D),
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: const Color(0x22FFFFFF)),
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              ClipOval(
-                child: Image.asset(
-                  'assets/icons/logo-disc.webp',
-                  width: 40,
-                  height: 40,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => const SizedBox(width: 40, height: 40),
-                ),
-              ),
-              const Expanded(
-                child: Text(
-                  'Estimated\nSound Age',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white, fontSize: 16, height: 1.15, fontWeight: FontWeight.w600),
-                ),
-              ),
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: const Color(0xFF16181F),
-                  border: Border.all(color: Colors.white12),
-                ),
-                child: const Icon(Icons.notifications_none_rounded, color: Colors.white, size: 18),
-              ),
-            ],
-          ),
-          SizedBox(
-            height: 210,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                const CustomPaint(size: Size(210, 210), painter: _AgeRingPainter()),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      '$age',
-                      style: const TextStyle(color: Colors.white, fontSize: 72, fontWeight: FontWeight.w600, height: 1),
-                    ),
-                    const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF1A120E),
-                        borderRadius: BorderRadius.circular(99),
-                        border: Border.all(color: const Color(0x66FF6A2A)),
-                      ),
-                      child: Text(
-                        younger,
-                        style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          SizedBox(
-            height: 18,
-            child: Row(
-              children: [
-                for (var i = 0; i < 36; i++)
-                  Expanded(
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 1),
-                      height: i == (streak % 36) ? 16 : 8,
-                      color: i == (streak % 36) ? const Color(0xFFFF4D2E) : const Color(0x33FFFFFF),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 14),
-          GestureDetector(
-            onTap: widget.onSnapshot ?? () => NavScope.goTo(context, 1),
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(22),
-                gradient: const LinearGradient(colors: [Color(0xFF1A1C24), Color(0xFF101218)]),
-                border: Border.all(color: Colors.white10),
-              ),
-              child: Row(
-                children: [
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Your Practice\nSnapshot',
-                          style: TextStyle(color: Colors.white, fontSize: 20, height: 1.1, fontWeight: FontWeight.w700),
-                        ),
-                        SizedBox(height: 6),
-                        Text('Recommendations  ›', style: TextStyle(color: Colors.white54, fontSize: 13)),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    width: 42,
-                    height: 42,
-                    decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Colors.white24)),
-                    child: const Icon(Icons.graphic_eq_rounded, color: Colors.white),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Expanded(
-                child: _mini(
-                  const Color(0xFF3A0D12),
-                  const Color(0xFF7A1D24),
-                  Icons.lightbulb_outline,
-                  'Your\nInsights',
-                  '${p.todaySessions} today',
-                  () => NavScope.goTo(context, 2),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _mini(
-                  const Color(0xFF3A220C),
-                  const Color(0xFFC65A12),
-                  Icons.calendar_today_outlined,
-                  'Action\nPlan',
-                  'Details',
-                  () => NavScope.goTo(context, 1),
-                ),
-              ),
-            ],
-          ),
-        ],
+  void _openTab(int tab) => openPracticeTab(context, tab);
+
+  void _openPractice() => _openTab(1);
+
+  void _openProgress() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => const PracticeProgressScreen(),
       ),
     );
   }
 
-  Widget _mini(Color a, Color b, IconData icon, String title, String cta, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: 158,
-        padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(22),
-          gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [a, b]),
+  @override
+  Widget build(BuildContext context) {
+    final p = PracticeProgress.instance;
+    final done = p.uniqueWords;
+    final title = _progress ? 'Your Progress' : 'Origin Words';
+    final art = _progress
+        ? 'assets/banners/course-bubble.jpg'
+        : 'assets/banners/course-cleo-a.jpg';
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(36),
+        gradient: const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFF8D6BB8), Color(0xFF5A3D86), Color(0xFF2A1844)],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        boxShadow: const [
+          BoxShadow(color: Color(0x66000000), blurRadius: 28, offset: Offset(0, 16)),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(36),
+        child: Stack(
           children: [
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.black26,
-                border: Border.all(color: Colors.white24),
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 120,
+              child: Opacity(
+                opacity: 0.28,
+                child: Image.asset(_banner, fit: BoxFit.cover),
               ),
-              child: Icon(icon, color: Colors.white, size: 16),
             ),
-            const Spacer(),
-            Text(title, style: const TextStyle(color: Colors.white, fontSize: 18, height: 1.05, fontWeight: FontWeight.w700)),
-            const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(99)),
-              child: Text('$cta  →', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12)),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      ClipOval(
+                        child: Image.asset(
+                          _profile,
+                          width: 46,
+                          height: 46,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      Expanded(
+                        child: Center(
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.14),
+                              borderRadius: BorderRadius.circular(99),
+                              border: Border.all(color: Colors.white24),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                _tab('My Practice', !_progress, () => setState(() => _progress = false)),
+                                _tab('Progress', _progress, () => setState(() => _progress = true)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () => showNotificationsSheet(context),
+                        child: Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white.withValues(alpha: 0.16),
+                            border: Border.all(color: Colors.white30),
+                          ),
+                          child: const Icon(Icons.notifications_none_rounded, color: Colors.white),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(26),
+                    child: SizedBox(
+                      height: 248,
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          const DecoratedBox(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [Color(0xFFFFB7E8), Color(0xFFE56BFF), Color(0xFF7A4CFF)],
+                              ),
+                            ),
+                          ),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: Image.asset(art, fit: BoxFit.contain, height: 248),
+                          ),
+                          const DecoratedBox(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                                colors: [Color(0xAA3A1458), Color(0x223A1458), Color(0x003A1458)],
+                                stops: [0, 0.46, 0.72],
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    _faces('+12'),
+                                    const Spacer(),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(99),
+                                      ),
+                                      child: const Text('Active', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
+                                    ),
+                                  ],
+                                ),
+                                const Spacer(),
+                                Text(
+                                  title,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.w700,
+                                    height: 1.02,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    const Icon(Icons.schedule_rounded, color: Colors.white, size: 16),
+                                    const SizedBox(width: 4),
+                                    Text(p.timeLabel, style: const TextStyle(color: Colors.white, fontSize: 13)),
+                                    const SizedBox(width: 10),
+                                    const Icon(Icons.star_rounded, color: Color(0xFFFFD15C), size: 16),
+                                    const Text(' 4.7', style: TextStyle(color: Colors.white, fontSize: 13)),
+                                    const SizedBox(width: 10),
+                                    const Icon(Icons.play_circle_outline, color: Colors.white, size: 16),
+                                    Text(' $done', style: const TextStyle(color: Colors.white, fontSize: 13)),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                Row(
+                                  children: [
+                                    Text(
+                                      '${_chip == 0 ? 1 : done.clamp(0, 5)} of 5',
+                                      style: const TextStyle(color: Colors.white, fontSize: 14),
+                                    ),
+                                    const Spacer(),
+                                    GestureDetector(
+                                      onTap: _progress ? _openProgress : _openPractice,
+                                      child: const Text(
+                                        'Continue  ›',
+                                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      _chipBtn('All Paths', '12', 0),
+                      _chipBtn('Completed', '$done', 1),
+                      _chipBtn('In practice', '${p.todaySessions}', 2),
+                      _chipBtn('Saved', '${p.streak}', 3),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  GestureDetector(
+                    onTap: _openPractice,
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: const Color(0xF014101C),
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      child: Row(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(18),
+                            child: Image.asset(
+                              _lower[_chip].$1,
+                              width: 112,
+                              height: 112,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Align(alignment: Alignment.centerRight, child: _faces('+2k')),
+                                Text(
+                                  _lower[_chip].$2,
+                                  style: const TextStyle(color: Colors.white, fontSize: 22, height: 1.02, fontWeight: FontWeight.w700),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(_lower[_chip].$3, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            width: 38,
+                            height: 38,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.white.withValues(alpha: 0.08),
+                              border: Border.all(color: Colors.white24),
+                            ),
+                            child: const Icon(Icons.chevron_right, color: Colors.white),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
       ),
     );
   }
-}
 
-class _AgeRingPainter extends CustomPainter {
-  const _AgeRingPainter();
+  static const _lower = [
+    ('assets/banners/course-bubble.jpg', 'From\nSound to\nStillness', '12h 24m    ★ 4.8    12'),
+    ('assets/banners/course-cleo-a.jpg', 'Hear\nyourself', 'Completed path'),
+    ('assets/banners/course-cleo-b.jpg', 'Let go', 'Still in practice'),
+    ('assets/banners/course-cleo-a.jpg', 'Saved\nwords', 'Kept for later'),
+  ];
 
-  @override
-  void paint(Canvas canvas, Size size) {
-    final c = Offset(size.width / 2, size.height / 2);
-    final r = size.width * 0.38;
-    canvas.drawCircle(
-      c,
-      r,
-      Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 10
-        ..color = const Color(0x55FF3B1F)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10),
+  Widget _tab(String label, bool on, VoidCallback tap) {
+    return GestureDetector(
+      onTap: tap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: on ? Colors.white.withValues(alpha: 0.22) : Colors.white.withValues(alpha: 0.06),
+          borderRadius: BorderRadius.circular(99),
+          border: Border.all(color: on ? Colors.white38 : Colors.white12),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(color: on ? Colors.white : Colors.white70, fontWeight: FontWeight.w700, fontSize: 13),
+        ),
+      ),
     );
-    final ticks = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.4
-      ..strokeCap = StrokeCap.round
-      ..color = const Color(0xFFFF5A32);
-    for (var i = 0; i < 90; i++) {
-      final a = (i / 90) * math.pi * 2 - 1.2;
-      final inner = r - 6 - (i % 5) * 1.2;
-      final outer = r + 8 + (i % 7);
-      canvas.drawLine(
-        c + Offset(inner * math.cos(a), inner * math.sin(a)),
-        c + Offset(outer * math.cos(a), outer * math.sin(a)),
-        ticks,
-      );
-    }
   }
 
+  Widget _chipBtn(String label, String count, int i) {
+    final on = _chip == i;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => setState(() => _chip = i),
+        child: Column(
+          children: [
+            Text.rich(
+              TextSpan(
+                text: label,
+                style: TextStyle(color: on ? Colors.white : Colors.white60, fontWeight: FontWeight.w700, fontSize: 11),
+                children: [
+                  TextSpan(text: ' $count', style: const TextStyle(fontSize: 9, color: Color(0xFFD2C4FF))),
+                ],
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 5),
+            Container(height: 2, margin: const EdgeInsets.symmetric(horizontal: 8), color: on ? Colors.white : Colors.transparent),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _faces(String extra) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(4, 3, 8, 3),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(99)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ClipOval(child: Image.asset(_profile, width: 22, height: 22, fit: BoxFit.cover)),
+          const SizedBox(width: 4),
+          Text(extra, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 11)),
+        ],
+      ),
+    );
+  }
+}
+
+class PracticeCourseRail extends StatelessWidget {
+  const PracticeCourseRail({super.key});
+
+  static const _items = [
+    ('assets/banners/course-cleo-a.jpg', 'Hear yourself', 1),
+    ('assets/banners/course-cleo-b.jpg', 'Let go', 2),
+    ('assets/banners/course-bubble.jpg', 'Find your sound', 1),
+  ];
+
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 168,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        itemCount: _items.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 12),
+        itemBuilder: (context, i) {
+          final item = _items[i];
+          return GestureDetector(
+            onTap: () => openPracticeTab(context, item.$3),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(22),
+              child: SizedBox(
+                width: 240,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Image.asset(item.$1, fit: BoxFit.cover),
+                    const DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
+                          colors: [Color(0xCC140818), Color(0x00140818)],
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      left: 12,
+                      bottom: 12,
+                      right: 12,
+                      child: Text(
+                        item.$2,
+                        style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
 }

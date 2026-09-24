@@ -61,9 +61,9 @@ class EarthDayFilm extends StatelessWidget {
               ),
               Positioned(
                 top: 12,
-                right: 12,
+                left: 12,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
                       'NowssB',
@@ -90,7 +90,7 @@ class EarthDayFilm extends StatelessWidget {
                       width: 168,
                       child: Text(
                         _sub[part] ?? '',
-                        textAlign: TextAlign.right,
+                        textAlign: TextAlign.left,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 11,

@@ -1,9 +1,6 @@
-/// Kling-style login stage: the twenty campaign stills drift on four walls
-/// around a phone frame. The frame is the supplied handset; sign-in sits
-/// inside its screen.
+/// Login stage. The handset stays small in the middle. Twenty campaign
+/// stills travel the four walls of a tunnel, looping toward the camera.
 library;
-
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
@@ -48,7 +45,7 @@ class _LoginGalleryState extends State<LoginGallery>
     super.initState();
     _drift = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 26),
+      duration: const Duration(seconds: 18),
     )..repeat();
   }
 
@@ -64,10 +61,10 @@ class _LoginGalleryState extends State<LoginGallery>
       builder: (context, constraints) {
         final w = constraints.maxWidth;
         final h = constraints.maxHeight;
-        var phoneH = h * 0.9;
+        var phoneH = h * 0.5;
         var phoneW = phoneH * (606 / 1296);
-        if (phoneW > w * 0.86) {
-          phoneW = w * 0.86;
+        if (phoneW > w * 0.46) {
+          phoneW = w * 0.46;
           phoneH = phoneW * (1296 / 606);
         }
         return AnimatedBuilder(
@@ -78,13 +75,13 @@ class _LoginGalleryState extends State<LoginGallery>
               fit: StackFit.expand,
               clipBehavior: Clip.hardEdge,
               children: [
-                const ColoredBox(color: Color(0xFF02030A)),
+                const ColoredBox(color: Color(0xFF010208)),
                 const DecoratedBox(
                   decoration: BoxDecoration(
                     gradient: RadialGradient(
-                      center: Alignment(0, 0.05),
-                      radius: 0.85,
-                      colors: [Color(0x332A4CFF), Color(0x0002030A)],
+                      center: Alignment(0, 0.08),
+                      radius: 0.72,
+                      colors: [Color(0x553A2CFF), Color(0x22101840), Color(0xFF010208)],
                     ),
                   ),
                 ),
@@ -97,7 +94,7 @@ class _LoginGalleryState extends State<LoginGallery>
                     child: Transform(
                       alignment: Alignment.center,
                       transform: Matrix4.identity()
-                        ..setEntry(3, 2, 0.0016)
+                        ..setEntry(3, 2, 0.0014)
                         ..rotateY(tile.ry)
                         ..rotateX(tile.rx),
                       child: Opacity(
@@ -114,20 +111,26 @@ class _LoginGalleryState extends State<LoginGallery>
                       fit: StackFit.expand,
                       children: [
                         Positioned(
-                          left: phoneW * 0.09,
-                          top: phoneH * 0.115,
-                          width: phoneW * 0.82,
-                          height: phoneH * 0.78,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(phoneW * 0.07),
-                            child: const ColoredBox(color: Color(0xFF070B16)),
+                          left: phoneW * 0.07,
+                          right: phoneW * 0.07,
+                          top: phoneH * 0.1,
+                          bottom: phoneH * 0.06,
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(phoneW * 0.08),
+                              gradient: const LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [Color(0xFF0A1024), Color(0xFF12082A), Color(0xFF06182C)],
+                              ),
+                            ),
                           ),
                         ),
                         Positioned(
-                          left: phoneW * 0.11,
-                          top: phoneH * 0.145,
-                          width: phoneW * 0.78,
-                          height: phoneH * 0.72,
+                          left: phoneW * 0.1,
+                          top: phoneH * 0.13,
+                          width: phoneW * 0.8,
+                          height: phoneH * 0.76,
                           child: widget.child,
                         ),
                         IgnorePointer(
@@ -137,6 +140,23 @@ class _LoginGalleryState extends State<LoginGallery>
                           ),
                         ),
                       ],
+                    ),
+                  ),
+                ),
+                Positioned(
+                  left: w * 0.28,
+                  right: w * 0.28,
+                  top: h * 0.5 + phoneH * 0.42,
+                  child: IgnorePointer(
+                    child: Container(
+                      height: 28,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(40),
+                        boxShadow: const [
+                          BoxShadow(color: Color(0xAA3D6BFF), blurRadius: 28, spreadRadius: 4),
+                          BoxShadow(color: Color(0x667A3CFF), blurRadius: 40, spreadRadius: 8),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -150,54 +170,66 @@ class _LoginGalleryState extends State<LoginGallery>
 
   List<_Tile> _layout(double t, double w, double h) {
     final tiles = <_Tile>[];
-    const perWall = 5;
+    final cx = w / 2;
+    final cy = h * 0.46;
+    final focal = w * 0.82;
+    const depthCount = 4;
+    const lanes = 3;
+    var n = 0;
     for (var wall = 0; wall < 4; wall++) {
-      for (var i = 0; i < perWall; i++) {
-        final index = wall * perWall + i;
-        final phase = (t + i / perWall) % 1.0;
-        final near = phase;
-        final fadeIn = (near / 0.08).clamp(0.0, 1.0);
-        final fadeOut = ((1 - near) / 0.07).clamp(0.0, 1.0);
-        final opacity = math.min(fadeIn, fadeOut);
-        final cw = w * (0.16 + near * 0.2);
-        final ch = cw * 1.15;
-        final spread = 0.16 + near * 0.7;
-        final stagger = (i - 2) * (10 + near * 34);
-        late double x;
-        late double y;
-        var rx = 0.0;
-        var ry = 0.0;
-        if (wall == 0) {
-          x = w * 0.5 - w * spread * 0.58 - cw * 0.85;
-          y = h * 0.42 - ch * 0.5 + stagger;
-          ry = 0.62;
-        } else if (wall == 1) {
-          x = w * 0.5 + w * spread * 0.42 - cw * 0.1;
-          y = h * 0.46 - ch * 0.5 + stagger * 0.85;
-          ry = -0.62;
-        } else if (wall == 2) {
-          x = w * 0.5 - cw * 0.5 + stagger * 1.15;
-          y = h * 0.46 - h * spread * 0.5 - ch * 0.35;
-          rx = 0.78;
-        } else {
-          x = w * 0.5 - cw * 0.5 + stagger;
-          y = h * 0.5 + h * spread * 0.38 - ch * 0.15;
-          rx = -0.72;
+      for (var lane = 0; lane < lanes; lane++) {
+        for (var d = 0; d < depthCount; d++) {
+          final asset = _cards[n % _cards.length];
+          n++;
+          var zNorm = (d + lane * 0.16 + wall * 0.04 - t * depthCount) % depthCount;
+          if (zNorm < 0) zNorm += depthCount;
+          final z = 1.28 + (zNorm / depthCount) * 5.15;
+          final laneT = (lane - 1).toDouble();
+          var wx = 0.0;
+          var wy = 0.0;
+          var rx = 0.0;
+          var ry = 0.0;
+          const wallDist = 1.08;
+          const spread = 0.78;
+          const cardWorld = 1.18;
+          if (wall == 0) {
+            wx = -wallDist;
+            wy = laneT * spread;
+            ry = 0.58;
+          } else if (wall == 1) {
+            wx = wallDist;
+            wy = laneT * spread;
+            ry = -0.58;
+          } else if (wall == 2) {
+            wy = -wallDist * 0.96;
+            wx = laneT * spread;
+            rx = 0.64;
+          } else {
+            wy = wallDist;
+            wx = laneT * spread;
+            rx = -0.56;
+          }
+          final sx = cx + (wx / z) * focal;
+          final sy = cy + (wy / z) * focal;
+          final cw = (cardWorld / z) * focal;
+          final ch = cw * 0.66;
+          final nearFade = ((z - 1.22) / 0.28).clamp(0.0, 1.0);
+          final farFade = ((6.7 - z) / 0.7).clamp(0.0, 1.0);
+          tiles.add(_Tile(
+            asset: asset,
+            x: sx - cw / 2,
+            y: sy - ch / 2,
+            w: cw,
+            h: ch,
+            rx: rx,
+            ry: ry,
+            opacity: nearFade * farFade,
+            depth: z,
+          ));
         }
-        tiles.add(_Tile(
-          asset: _cards[index],
-          x: x,
-          y: y,
-          w: cw,
-          h: ch,
-          rx: rx,
-          ry: ry,
-          opacity: opacity,
-          depth: near,
-        ));
       }
     }
-    tiles.sort((a, b) => a.depth.compareTo(b.depth));
+    tiles.sort((a, b) => b.depth.compareTo(a.depth));
     return tiles;
   }
 }
@@ -234,14 +266,14 @@ class _Still extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0x66D6E4FF), width: 1),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0x88E7F0FF), width: 1.2),
         boxShadow: const [
-          BoxShadow(color: Color(0x99000000), blurRadius: 16, offset: Offset(0, 8)),
+          BoxShadow(color: Color(0xCC000000), blurRadius: 18, offset: Offset(0, 10)),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(11),
+        borderRadius: BorderRadius.circular(12),
         child: Image.asset(asset, fit: BoxFit.cover),
       ),
     );
