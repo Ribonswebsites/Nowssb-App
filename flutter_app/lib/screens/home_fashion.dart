@@ -344,7 +344,6 @@ class _HomeFashionState extends State<HomeFashion> {
             PromoColorGrid(onOpen: _openGrid),
           ],
         )),
-<<<<<<< /tmp/nonexistent
 
         ('coachCards', const SizedBox.shrink()),
         ('mainops', MainOptionsSection(onGo: _go, onAction: _openMainOption)),
