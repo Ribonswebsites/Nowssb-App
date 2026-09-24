@@ -45,7 +45,6 @@ import 'quotes_live.dart';
 import 'player_settings.dart';
 import 'fashion/header.dart';
 import 'fashion/hero.dart';
-import 'fashion/origin_practice_panel.dart';
 import 'fashion/sections_bottom.dart';
 import 'shared_sections.dart';
 import 'fashion/sections_mid.dart';
@@ -321,7 +320,7 @@ class _HomeFashionState extends State<HomeFashion> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              OriginPracticePanel(onTap: () => _go(1)),
+              FashPractice(onTap: () => _go(1)),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
                 child: ColoredSplitPromoBanner(
