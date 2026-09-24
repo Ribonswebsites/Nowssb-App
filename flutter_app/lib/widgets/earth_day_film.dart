@@ -33,6 +33,13 @@ class EarthDayFilm extends StatelessWidget {
     'night': 'Night',
   };
 
+  static const _sub = {
+    'morning': 'The first light. Begin here.',
+    'afternoon': 'A quieter hour to sit with the sound.',
+    'evening': 'Let the day finish in one word.',
+    'night': 'Rest is a practice. Stay with the tone.',
+  };
+
   void _start(BuildContext context) => NavScope.goTo(context, 1);
 
   @override
@@ -53,26 +60,62 @@ class EarthDayFilm extends StatelessWidget {
                 fit: BoxFit.cover,
               ),
               Positioned(
-                left: 12,
-                right: 10,
-                bottom: 10,
-                child: Row(
+                top: 12,
+                right: 12,
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Expanded(
+                    const Text(
+                      'NowssB',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 16,
+                        letterSpacing: 0.4,
+                        shadows: [Shadow(color: Colors.black87, blurRadius: 8)],
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      _label[part] ?? part,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 18,
+                        shadows: [Shadow(color: Colors.black87, blurRadius: 8)],
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    SizedBox(
+                      width: 168,
                       child: Text(
-                        _label[part] ?? part,
+                        _sub[part] ?? '',
+                        textAlign: TextAlign.right,
                         style: const TextStyle(
                           color: Colors.white,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 16,
-                          shadows: [
-                            Shadow(color: Colors.black87, blurRadius: 8),
-                          ],
+                          fontSize: 11,
+                          height: 1.25,
+                          fontWeight: FontWeight.w600,
+                          shadows: [Shadow(color: Colors.black87, blurRadius: 8)],
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
+                  ],
+                ),
+              ),
+              Positioned(
+                left: 12,
+                right: 12,
+                bottom: 28,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const AppThinkingLoader(
+                      size: 40,
+                      state: OrbState.composing,
+                      blackCircle: true,
+                    ),
+                    const Spacer(),
                     GestureDetector(
                       onTap: () => _start(context),
                       child: Container(
@@ -110,12 +153,6 @@ class EarthDayFilm extends StatelessWidget {
                           size: 18,
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    const AppThinkingLoader(
-                      size: 36,
-                      state: OrbState.composing,
-                      blackCircle: true,
                     ),
                   ],
                 ),

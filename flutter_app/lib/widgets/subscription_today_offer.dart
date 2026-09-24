@@ -270,7 +270,7 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
           children: [
             Positioned.fill(
               child: Padding(
-                padding: const EdgeInsets.only(top: 92),
+                padding: const EdgeInsets.only(top: 74),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -279,7 +279,7 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
                       child: _OfferFlip(
                         front: tier.front,
                         back: tier.back,
-                        title: '',
+                        title: tier.name,
                         price: tier.now,
                         active: _page == page,
                       ),
@@ -358,19 +358,6 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   _head(title: "Today's offer", sub: tier.detail),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(10, 6, 10, 0),
-                    child: Text(
-                      tier.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -654,18 +641,19 @@ class _OfferFlipState extends State<_OfferFlip> with SingleTickerProviderStateMi
             ),
           ),
           Positioned(
-            left: 8,
+            left: 10,
             right: 8,
-            top: 8,
+            top: 28,
             child: Text(
               widget.title,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 14,
+                fontSize: 20,
                 fontWeight: FontWeight.w800,
-                height: 1.1,
+                height: 1.05,
+                shadows: [Shadow(color: Colors.black87, blurRadius: 8)],
               ),
             ),
           ),

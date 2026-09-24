@@ -1534,126 +1534,26 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
     super.dispose();
   }
 
-  Widget _footerCard(int i) {
-    var offset = i - _index;
-    if (offset > _shots.length ~/ 2) offset -= _shots.length;
-    if (offset < -(_shots.length ~/ 2)) offset += _shots.length;
-    final distance = offset.abs();
-    final direction = offset < 0 ? -1.0 : 1.0;
-    final tx = distance == 0
-        ? 0.0
-        : distance == 1
-            ? direction * 172
-            : distance == 2
-                ? direction * 292
-                : distance == 3
-                    ? direction * 362
-                    : direction * 520;
-    final tz = distance == 0
-        ? 200.0
-        : distance == 1
-            ? 100.0
-            : distance == 2
-                ? -155.0
-                : distance == 3
-                    ? -285.0
-                    : -600.0;
-    final angle = distance == 0
-        ? 0.0
-        : distance == 1
-            ? direction * -35
-            : distance == 2
-                ? direction * -42
-                : distance == 3
-                    ? direction * -48
-                    : 0.0;
-    final scale = distance == 0
-        ? 1.0
-        : distance == 1
-            ? 1.07
-            : distance == 2
-                ? 0.55
-                : distance == 3
-                    ? 0.34
-                    : 0.5;
-    final opacity = distance == 0
-        ? 1.0
-        : distance == 1
-            ? 0.82
-            : distance == 2
-                ? 0.36
-                : distance == 3
-                    ? 0.12
-                    : 0.0;
-    return IgnorePointer(
-      ignoring: opacity <= 0.05,
-      child: AnimatedOpacity(
-        duration: const Duration(milliseconds: 780),
-        opacity: opacity,
-        child: GestureDetector(
-          onTap: () => setState(() => _index = i),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 780),
-            curve: const Cubic(0.34, 1.08, 0.64, 1),
-            transformAlignment: Alignment.center,
-            transform: Matrix4.identity()
-              ..setEntry(3, 2, 0.001)
-              ..translateByDouble(tx, 0.0, tz, 1.0)
-              ..rotateY(angle * 3.141592653589793 / 180)
-              ..scaleByDouble(scale, scale, scale, 1.0),
-            width: _cardW,
-            height: _cardH,
-            decoration: BoxDecoration(
-              border: Border.all(color: const Color(0x2EFFFFFF)),
-              boxShadow: const [
-                BoxShadow(
-                    color: Color(0xB3000000),
-                    blurRadius: 60,
-                    offset: Offset(0, 24)),
-                BoxShadow(
-                    color: Color(0x80000000),
-                    blurRadius: 12,
-                    offset: Offset(0, 4)),
-              ],
-            ),
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                ClipRect(
-                  child: Image.asset(
-                    _shots[i],
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) =>
-                        const ColoredBox(color: Color(0xFF0A0F1C)),
-                  ),
-                ),
-                const DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [Color(0x24FFFFFF), Color(0x00000000)],
-                      stops: [0, 0.55],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+  Widget _rotatingTab() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(10),
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 700),
+        child: Image.asset(
+          _shots[_index],
+          key: ValueKey(_index),
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: double.infinity,
+          errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF0A0F1C)),
         ),
       ),
     );
   }
 
+
   @override
   Widget build(BuildContext context) {
-    final mq = MediaQuery.of(context);
-    // Long opaque black tail: covers nav clearance AND remaining viewport so
-    // Fashion video / Normal neo/surface cannot bleed under the footer.
-    final tail = (mq.padding.bottom + 160).clamp(160.0, 400.0);
-    final fill = mq.size.height * 0.55;
-    final blackTail = tail > fill ? tail : fill;
-
     return ColoredBox(
       color: const Color(0xFF000000),
       child: Column(
@@ -1662,11 +1562,10 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
           Container(
             width: double.infinity,
             color: const Color(0xFF000000),
-            constraints: const BoxConstraints(minHeight: 420),
             child: Stack(
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 24),
+                  padding: const EdgeInsets.only(bottom: 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -1720,78 +1619,50 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
                         ),
                       ),
                       SizedBox(
-                        height: 300,
-                        child: Stack(
-                          clipBehavior: Clip.none,
-                          alignment: Alignment.center,
-                          children: [
-                            ClipRect(
-                              child: Stack(
-                                clipBehavior: Clip.hardEdge,
-                                fit: StackFit.expand,
-                                children: [
-                                  for (var i = 0; i < _shots.length; i++)
-                                    _footerCard(i),
-                                ],
-                              ),
-                            ),
-                            const Positioned.fill(
-                              child: IgnorePointer(
-                                child: DecoratedBox(
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      begin: Alignment.centerLeft,
-                                      end: Alignment.centerRight,
-                                      colors: [
-                                        Color(0xFF000000),
-                                        Color(0xD1000000),
-                                        Color(0x00000000),
-                                        Color(0xD1000000),
-                                        Color(0xFF000000),
-                                      ],
-                                      stops: [0.0, 0.08, 0.18, 0.92, 1.0],
-                                    ),
+                        height: 310,
+                        child: Center(
+                          child: SizedBox(
+                            width: _cardW * 908 / 800,
+                            height: _cardH * 1408 / 1286,
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 22),
+                                  child: _rotatingTab(),
+                                ),
+                                IgnorePointer(
+                                  child: Image.asset(
+                                    'assets/frames/footer-frame.webp',
+                                    fit: BoxFit.fill,
+                                    errorBuilder: (_, __, ___) =>
+                                        const SizedBox.shrink(),
                                   ),
                                 ),
-                              ),
+                              ],
                             ),
-                            IgnorePointer(
-                              child: SizedBox(
-                                width: _cardW * 908 / 800,
-                                height: _cardH * 1408 / 1286,
-                                child: Image.asset(
-                                  'assets/frames/footer-frame.webp',
-                                  fit: BoxFit.fill,
-                                  errorBuilder: (_, __, ___) =>
-                                      const SizedBox.shrink(),
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              bottom: -20,
-                              child: Row(
-                                children: [
-                                  for (var i = 0; i < _shots.length; i++)
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 3),
-                                      child: AnimatedContainer(
-                                        duration:
-                                            const Duration(milliseconds: 400),
-                                        width: i == _index ? 20 : 4,
-                                        height: 4,
-                                        color: i == _index
-                                            ? const Color(0xE6C8E8F5)
-                                            : const Color(0x4DC8E8F5),
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 36),
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          for (var i = 0; i < _shots.length; i++)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 3),
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 400),
+                                width: i == _index ? 20 : 4,
+                                height: 4,
+                                color: i == _index
+                                    ? const Color(0xE6C8E8F5)
+                                    : const Color(0x4DC8E8F5),
+                              ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
                       Center(
                         child: Container(
                           width: double.infinity,
@@ -1901,8 +1772,7 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
               ],
             ),
           ),
-          // CRITICAL: opaque black under/after footer to page bottom.
-          SizedBox(height: blackTail),
+          const SizedBox(height: 12),
         ],
       ),
     );

@@ -28,10 +28,8 @@ class WordAtelierScreen extends StatelessWidget {
         eyebrow: '',
         title: 'NowssB Store',
         subtitle: 'The Word Atelier',
-        film: nwsbVideo(kRmHeroVidFile),
-        // Fashion-home AppBackdrop film + PageShell Fashion vignette scrim
-        // so the background video is clearly visible (not a solid lid).
-        usePageFilm: false,
+        film: 'assets/video/player-bg-loop.mp4',
+        usePageFilm: true,
         onBack: () => Navigator.of(context).pop(),
         onStorePicker: () => showStoreSelectSheet(
           context,
@@ -276,6 +274,11 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
           videoAsset: nwsbVideo(kRmHeroVidFile),
           videoTitle: '',
         ),
+        StoreHalfOffRail(
+          onViewAll: () => setState(() => _chip = 'off50'),
+          onOpenWord: (word, root) => _openWord(word, root, '', 0),
+        ),
+        const SizedBox(height: 8),
         ColoredSplitPromoBanner.forSurface(
           SplitPromoSurface.wordAtelier,
           onTap: () => Navigator.of(context).push(
@@ -283,7 +286,9 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
               builder: (_) => const MeaningStoreScreen(),
             ),
           ),
+          margin: EdgeInsets.zero,
         ),
+        const SizedBox(height: 28),
         ColoredSplitPromoBanner(
           spec: SplitPromoExtras.at(
             6,
@@ -293,6 +298,7 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
               ),
             ),
           ),
+          margin: const EdgeInsets.only(top: 8, bottom: 20),
         ),
         StoreGlassPanel(
           radius: 32,

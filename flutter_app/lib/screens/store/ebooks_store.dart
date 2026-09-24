@@ -27,8 +27,8 @@ class EbooksStoreScreen extends StatelessWidget {
   Widget build(BuildContext context) => PageShell(
         eyebrow: 'NowssB Store',
         title: 'The NowssB Ebooks',
-        film: 'assets/video/hero-ebooks.mp4',
-        usePageFilm: false,
+        film: 'assets/video/player-bg-loop.mp4',
+        usePageFilm: true,
         onBack: () => Navigator.of(context).pop(),
         onStorePicker: () => showStoreSelectSheet(
           context,

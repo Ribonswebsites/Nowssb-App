@@ -73,11 +73,6 @@ class _SelectLevelScreenState extends State<SelectLevelScreen> {
                                 showPoster: false,
                               ),
                             ),
-                            const AppThinkingLoader(
-                              size: 52,
-                              state: OrbState.composing,
-                              blackCircle: true,
-                            ),
                           ],
                         ),
                       ),
@@ -127,14 +122,25 @@ class _SelectLevelScreenState extends State<SelectLevelScreen> {
                             Text(level.toString().padLeft(2, '0'), style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w300, height: 1)),
                             Text('STAGE ${_words[level - 1]}', style: const TextStyle(color: Color(0x73FFFFFF), fontSize: 9, letterSpacing: 1.5)),
                           ]),
-                          NwsbIcon(NwsbMarks.stages, size: 18, color: selected ? Colors.white : const Color(0x66FFFFFF)),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: const [
+                              NwsbIcon(NwsbMarks.stages, size: 16, color: Colors.white),
+                              SizedBox(width: 6),
+                              AppThinkingLoader(
+                                size: 26,
+                                state: OrbState.composing,
+                                blackCircle: true,
+                              ),
+                            ],
+                          ),
                         ]),
                       ),
                     );
                   },
                 ),
                 const SizedBox(height: 14),
-                _ActionRow(icon: Icons.layers_rounded, label: _expanded ? 'COLLAPSE OPTIONS' : 'EXPAND OPTIONS', trailing: _expanded ? Icons.expand_less_rounded : Icons.expand_more_rounded, compact: true, onTap: () => setState(() => _expanded = !_expanded)),
+                _ActionRow(icon: Icons.grid_view_rounded, label: _expanded ? 'VIEW LESS' : 'VIEW ALL', trailing: _expanded ? Icons.expand_less_rounded : Icons.expand_more_rounded, onTap: () => setState(() => _expanded = !_expanded)),
                 if (_expanded) ...[
                   const SizedBox(height: 8),
                   _ActionRow(icon: Icons.keyboard_arrow_up_rounded, label: 'PREVIOUS STAGES', trailing: null, compact: true, onTap: () => setState(() => _expanded = false)),

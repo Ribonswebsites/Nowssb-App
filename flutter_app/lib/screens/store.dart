@@ -12,12 +12,12 @@ import 'package:flutter/material.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
-import '../widgets/app_backdrop.dart';
 import '../widgets/black_glass_banner.dart';
 import '../widgets/colored_split_promo_banner.dart';
 import '../widgets/nwsb_icon.dart';
 import 'sound_library.dart';
 import 'store/bag_ui.dart';
+import 'store/store_home_sections.dart';
 
 export 'store/ebooks_store.dart';
 export 'store/meaning_store.dart';
@@ -77,6 +77,10 @@ class _StoreHomeContent extends StatelessWidget {
         children: [
           _StoreImageRotator(),
         ],
+      ),
+      const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 12),
+        child: StoreHalfOffRail(),
       ),
       // Kept visually empty for existing deep-link smoke tests; the old hero
       // itself is intentionally gone from the rendered Store page.
@@ -203,7 +207,15 @@ class _StoreHomeContent extends StatelessWidget {
       backgroundColor: NwsbColors.deep,
       body: Stack(
         children: [
-          const Positioned.fill(child: AppBackdrop()),
+          const Positioned.fill(
+            child: NwsbVideo(
+              asset: 'assets/video/player-bg-loop.mp4',
+              priority: ClipPriority.decoration,
+              autoplay: true,
+              loop: true,
+              fit: BoxFit.cover,
+            ),
+          ),
           const Positioned.fill(
             child: IgnorePointer(
               child: DecoratedBox(

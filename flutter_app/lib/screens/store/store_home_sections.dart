@@ -2341,3 +2341,200 @@ class _MosaicPill extends StatelessWidget {
     );
   }
 }
+
+/// Myntra-style half-off hero, then glass product boxes. Uses our banner art.
+class StoreHalfOffRail extends StatelessWidget {
+  const StoreHalfOffRail({super.key, this.onViewAll, this.onOpenWord});
+
+  final VoidCallback? onViewAll;
+  final void Function(String word, String root)? onOpenWord;
+
+  static const _poses = [
+    'assets/banners/promo/pose-07.png',
+    'assets/banners/promo/pose-02.png',
+    'assets/banners/promo/pose-08.png',
+    'assets/banners/promo/pose-03.png',
+    'assets/banners/promo/pose-01.png',
+    'assets/banners/promo/pose-10.png',
+  ];
+
+  static const _backs = [
+    Color(0xFF7C4DFF),
+    Color(0xFFE07A32),
+    Color(0xFF2EC4B6),
+    Color(0xFFE85D9A),
+    Color(0xFF3D8BDB),
+    Color(0xFFD4A017),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final words = kRmCategories.first.words.take(6).toList();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const SizedBox(height: 18),
+        GlassWrap(
+          margin: EdgeInsets.zero,
+          padding: const EdgeInsets.all(6),
+          radius: 20,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: SizedBox(
+              height: 176,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.asset(
+                    'assets/banners/sale-purple.webp',
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF2A1848)),
+                  ),
+                  const DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [Color(0xE6100818), Color(0x66100818), Color(0x22000000)],
+                      ),
+                    ),
+                  ),
+                  const Positioned.fill(
+                    child: Padding(
+                    padding: EdgeInsets.fromLTRB(16, 16, 16, 14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Deal of the Day',
+                          style: TextStyle(
+                            color: Color(0xFFE8D5A3),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.4,
+                          ),
+                        ),
+                        SizedBox(height: 6),
+                        Text(
+                          'Up To\n50% Off',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 32,
+                            height: 0.95,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        Spacer(),
+                        Text(
+                          'Words at half price. Limited.',
+                          style: TextStyle(color: Color(0xD9FFFFFF), fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ),
+                  ),
+                  Positioned(
+                    right: 12,
+                    bottom: 12,
+                    child: GestureDetector(
+                      onTap: onViewAll,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(99),
+                        ),
+                        child: const Text(
+                          'View all',
+                          style: TextStyle(
+                            color: Color(0xFF111111),
+                            fontWeight: FontWeight.w800,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 14),
+        SizedBox(
+          height: 196,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: words.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 10),
+            itemBuilder: (context, i) {
+              final word = words[i];
+              return GestureDetector(
+                onTap: () => onOpenWord?.call(word.word, word.root),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                    child: Container(
+                      width: 132,
+                      decoration: BoxDecoration(
+                        color: const Color(0x1AFFFFFF),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: const Color(0x33FFFFFF)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            child: ColoredBox(
+                              color: _backs[i % _backs.length],
+                              child: Padding(
+                                padding: const EdgeInsets.all(6),
+                                child: Image.asset(
+                                  _poses[i % _poses.length],
+                                  fit: BoxFit.contain,
+                                  alignment: Alignment.bottomCenter,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  word.word,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                                const Text(
+                                  '50% OFF',
+                                  style: TextStyle(
+                                    color: Color(0xFFE8D5A3),
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 22),
+      ],
+    );
+  }
+}

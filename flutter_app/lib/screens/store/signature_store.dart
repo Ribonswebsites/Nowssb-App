@@ -24,8 +24,8 @@ class SignatureStoreScreen extends StatelessWidget {
         eyebrow: '',
         title: 'NowssB Store',
         subtitle: 'The Signature Store',
-        film: 'assets/video/signature-store.mp4',
-        usePageFilm: false,
+        film: 'assets/video/player-bg-loop.mp4',
+        usePageFilm: true,
         onBack: () => Navigator.of(context).pop(),
         onStorePicker: () => showStoreSelectSheet(
           context,

@@ -179,7 +179,7 @@ class Settings extends ChangeNotifier {
       'A quiet word is enough to begin the day.',
       'Without a weapon in hand, words guided the world.',
       'Sit with the sound until the body answers.',
-      'The frequency you keep is the hour you heal.',
+      'Without a weapon in hand, the enlightened Mahaveer Buddha guided the world, not by the sword, but by the power of Natural Origin Words',
       'What you repeat becomes the path you walk.',
       'Last light is for the word you still need.',
       'Rest is a practice. Let the tone finish.',
