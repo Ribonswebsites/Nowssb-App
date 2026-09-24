@@ -85,13 +85,12 @@ void main() {
           reason: '$k is listed as absent but is not in the order');
     }
 
-    // Three rows with no markup, one hidden by default (routines) — so a
-    // fresh install shows twenty-eight registered sections.
+    // Four rows with no markup, one hidden by default (routines).
     final shown = kNormalSectionOrder
         .where((k) => !kNormalNoMarkup.contains(k))
         .where((k) => !kNormalDefOff.contains(k))
         .length;
-    expect(shown, 31);
+    expect(shown, 30);
   });
 
   testWidgets('the Normal home builds at phone size without overflowing',

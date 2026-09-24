@@ -178,6 +178,14 @@ class _QuotesWeekScreenState extends State<QuotesWeekScreen> {
                           ),
                         ),
                       ),
+                      IconButton(
+                        onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (_) => const QuoteAdminScreen(),
+                          ),
+                        ),
+                        icon: Icon(Icons.edit_outlined, color: ink),
+                      ),
                     ],
                   ),
                 ),
@@ -197,8 +205,10 @@ class _QuotesWeekScreenState extends State<QuotesWeekScreen> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        ScrollProgressRail(controller: _rail),
-                        const SizedBox(width: 8),
+                        if (_neu) ...[
+                          ScrollProgressRail(controller: _rail),
+                          const SizedBox(width: 8),
+                        ],
                         Expanded(
                           child: ListView(
                             controller: _rail,
@@ -206,8 +216,6 @@ class _QuotesWeekScreenState extends State<QuotesWeekScreen> {
                               _dayCard(today, today: today, last: last, big: true),
                               const SizedBox(height: 6),
                               _calendarStrip(),
-                              const SizedBox(height: 8),
-                              _otherDays(today),
                               const SizedBox(height: 8),
                               _shareBox(),
                               const SizedBox(height: 12),

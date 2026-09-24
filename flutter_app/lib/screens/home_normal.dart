@@ -129,7 +129,7 @@ const kNormalSectionOrder = <String>[
 /// Registered, and with nothing behind them on this home. See the note at
 /// the head of this file — each one was taken out of `#home-nm` deliberately
 /// and its registry row was left standing.
-const kNormalNoMarkup = <String>{'rx', 'wsearch', 'msearch'};
+const kNormalNoMarkup = <String>{'custom', 'rx', 'wsearch', 'msearch'};
 
 /// The two `defOff` entries that DO have markup. Built, not placed.
 const kNormalDefOff = <String>{'routines'};
@@ -290,7 +290,6 @@ class _HomeNormalState extends State<HomeNormal> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const LiveQuoteTab(),
-            const EarthDayFilm(height: 210),
             NmGreeting(name: widget.name),
           ],
         )),
@@ -439,7 +438,7 @@ class _HomeNormalState extends State<HomeNormal> {
             ],
           ),
         ),
-        ('custom', NmCustomize(onTap: () => _push(const WidgetsPage()))),
+        ('custom', null),
         ('rx', null),
         ('routines', RoutinesSection(onTap: () => _go(1))),
         (

@@ -221,56 +221,37 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
       ),
       child: Padding(
         padding: const EdgeInsets.all(6),
-        child: Row(
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Expanded(
-              flex: 11,
-              child: _OfferFlip(
-                front: _tiers.first.front,
-                back: _tiers.first.back,
-                title: _tiers.first.name,
-                price: _tiers.first.now,
-                active: _page == 0,
-              ),
+            _head(
+              title: "Today's offer",
+              sub: 'First tier free. Every other tier is 50% off.',
             ),
-            const SizedBox(width: 8),
+            const SizedBox(height: 8),
             Expanded(
-              flex: 13,
-              child: Column(
+              child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _head(
-                    title: "Today's offer",
-                    sub: 'First tier free. Every other tier is 50% off.',
-                  ),
-                  const SizedBox(height: 8),
+                  ScrollProgressRail(controller: _rail),
+                  const SizedBox(width: 8),
                   Expanded(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                    child: ListView(
+                      controller: _rail,
+                      primary: false,
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.only(bottom: 12),
                       children: [
-                        ScrollProgressRail(controller: _rail),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: ListView(
-                            controller: _rail,
-                            primary: false,
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            padding: const EdgeInsets.only(bottom: 12),
-                            children: [
-                              for (final tier in _tiers) _tierLine(tier),
-                              const SizedBox(height: 48),
-                            ],
-                          ),
-                        ),
+                        for (final tier in _tiers) _tierLine(tier),
+                        const SizedBox(height: 48),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  _foot("try 30 day's Free trials today"),
                 ],
               ),
             ),
+            const SizedBox(height: 8),
+            _foot("try 30 day's Free trials today"),
           ],
         ),
       ),
@@ -285,80 +266,111 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
       ),
       child: Padding(
         padding: const EdgeInsets.all(6),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        child: Stack(
           children: [
-            Expanded(
-              flex: 11,
-              child: _OfferFlip(
-                front: tier.front,
-                back: tier.back,
-                title: tier.name,
-                price: tier.now,
-                active: _page == page,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              flex: 13,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _head(title: "Today's offer", sub: tier.detail, name: tier.name),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      _badge(tier),
-                      const SizedBox(width: 8),
-                      if (tier.was.isNotEmpty)
-                        Flexible(
-                          child: Text(
-                            tier.was,
+            Positioned.fill(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 92),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(
+                      flex: 11,
+                      child: _OfferFlip(
+                        front: tier.front,
+                        back: tier.back,
+                        title: '',
+                        price: tier.now,
+                        active: _page == page,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      flex: 13,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Row(
+                            children: [
+                              _badge(tier),
+                              const SizedBox(width: 8),
+                              if (tier.was.isNotEmpty)
+                                Flexible(
+                                  child: Text(
+                                    tier.was,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      color: Color(0x88FFFFFF),
+                                      decoration: TextDecoration.lineThrough,
+                                      decorationColor: Color(0x88FFFFFF),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            tier.now,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
-                              fontSize: 13,
-                              color: Color(0x88FFFFFF),
-                              decoration: TextDecoration.lineThrough,
-                              decorationColor: Color(0x88FFFFFF),
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
                             ),
                           ),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    tier.now,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Expanded(
-                    child: ListView(
-                      primary: false,
-                      physics: const ClampingScrollPhysics(),
-                      children: [
-                        for (final line in tier.benefits)
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 6),
-                            child: Text(
-                              line,
-                              style: const TextStyle(
-                                fontSize: 13.5,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xE6FFFFFF),
-                              ),
+                          const SizedBox(height: 8),
+                          Expanded(
+                            child: ListView(
+                              primary: false,
+                              physics: const ClampingScrollPhysics(),
+                              children: [
+                                for (final line in tier.benefits)
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 6),
+                                    child: Text(
+                                      line,
+                                      style: const TextStyle(
+                                        fontSize: 13.5,
+                                        fontWeight: FontWeight.w600,
+                                        color: Color(0xE6FFFFFF),
+                                      ),
+                                    ),
+                                  ),
+                              ],
                             ),
                           ),
-                      ],
+                          _foot(tier.cta),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _head(title: "Today's offer", sub: tier.detail),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(10, 6, 10, 0),
+                    child: Text(
+                      tier.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
                   ),
-                  _foot(tier.cta),
                 ],
               ),
             ),

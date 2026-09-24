@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../theme/player_aura.dart';
+import '../widgets/app_thinking_loader.dart';
 import '../widgets/colored_split_promo_banner.dart';
+import '../widgets/nwsb_icon.dart';
 import 'practice.dart';
 
 class SelectLevelScreen extends StatefulWidget {
@@ -26,7 +29,7 @@ class _SelectLevelScreenState extends State<SelectLevelScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final levels = _expanded ? List.generate(10, (i) => i + 1) : List.generate(6, (i) => i + 1);
+    final levels = _expanded ? List.generate(10, (i) => i + 1) : List.generate(4, (i) => i + 1);
     return Scaffold(
       backgroundColor: kPlayerAuraBg,
       body: PlayerAuraBackdrop(
@@ -57,15 +60,25 @@ class _SelectLevelScreenState extends State<SelectLevelScreen> {
                       child: SizedBox(
                         width: orbSize,
                         height: orbSize,
-                        child: ClipOval(
-                          child: NwsbVideo(
-                            asset: 'assets/video/orb-loop.mp4',
-                            fit: BoxFit.cover,
-                            priority: ClipPriority.feature,
-                            autoplay: true,
-                            loop: true,
-                            showPoster: false,
-                          ),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            ClipOval(
+                              child: NwsbVideo(
+                                asset: 'assets/video/orb-loop.mp4',
+                                fit: BoxFit.cover,
+                                priority: ClipPriority.feature,
+                                autoplay: true,
+                                loop: true,
+                                showPoster: false,
+                              ),
+                            ),
+                            const AppThinkingLoader(
+                              size: 52,
+                              state: OrbState.composing,
+                              blackCircle: true,
+                            ),
+                          ],
                         ),
                       ),
                     );
@@ -74,7 +87,7 @@ class _SelectLevelScreenState extends State<SelectLevelScreen> {
                 const SizedBox(height: 18),
                 Row(mainAxisAlignment: MainAxisAlignment.center, children: const [
                   SizedBox(width: 44, child: Divider(color: Color(0x59FFFFFF))),
-                  Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: Text('SELECT LEVEL', style: TextStyle(color: Color(0x8CFFFFFF), fontSize: 12, letterSpacing: 4, fontWeight: FontWeight.w500))),
+                  Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: Text('SELECT STAGE', style: TextStyle(color: Color(0x8CFFFFFF), fontSize: 12, letterSpacing: 4, fontWeight: FontWeight.w500))),
                   SizedBox(width: 44, child: Divider(color: Color(0x59FFFFFF))),
                 ]),
                 const SizedBox(height: 18),
@@ -111,20 +124,20 @@ class _SelectLevelScreenState extends State<SelectLevelScreen> {
                         ),
                         child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                           Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
-                            Text(level.toString().padLeft(2, '0'), style: const TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.w300, height: 1)),
-                            Text('LEVEL ${_words[level - 1]}', style: const TextStyle(color: Color(0x73FFFFFF), fontSize: 9, letterSpacing: 1.5)),
+                            Text(level.toString().padLeft(2, '0'), style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w300, height: 1)),
+                            Text('STAGE ${_words[level - 1]}', style: const TextStyle(color: Color(0x73FFFFFF), fontSize: 9, letterSpacing: 1.5)),
                           ]),
-                          Container(width: 28, height: 28, decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: selected ? const Color(0xB3FFFFFF) : const Color(0x38FFFFFF))), child: selected ? const Center(child: DecoratedBox(decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white), child: SizedBox(width: 7, height: 7))) : null),
+                          NwsbIcon(NwsbMarks.stages, size: 18, color: selected ? Colors.white : const Color(0x66FFFFFF)),
                         ]),
                       ),
                     );
                   },
                 ),
                 const SizedBox(height: 14),
-                _ActionRow(icon: Icons.layers_rounded, label: _expanded ? 'COLLAPSE OPTIONS' : 'EXPAND OPTIONS', trailing: _expanded ? Icons.expand_less_rounded : Icons.expand_more_rounded, onTap: () => setState(() => _expanded = !_expanded)),
+                _ActionRow(icon: Icons.layers_rounded, label: _expanded ? 'COLLAPSE OPTIONS' : 'EXPAND OPTIONS', trailing: _expanded ? Icons.expand_less_rounded : Icons.expand_more_rounded, compact: true, onTap: () => setState(() => _expanded = !_expanded)),
                 if (_expanded) ...[
-                  const SizedBox(height: 12),
-                  _ActionRow(icon: Icons.keyboard_arrow_up_rounded, label: 'PREVIOUS LEVELS', trailing: null, onTap: () => setState(() => _expanded = false)),
+                  const SizedBox(height: 8),
+                  _ActionRow(icon: Icons.keyboard_arrow_up_rounded, label: 'PREVIOUS STAGES', trailing: null, compact: true, onTap: () => setState(() => _expanded = false)),
                 ],
               ]),
             ),
@@ -147,11 +160,12 @@ class _CircleButton extends StatelessWidget {
 }
 
 class _ActionRow extends StatelessWidget {
-  const _ActionRow({required this.icon, required this.label, required this.trailing, required this.onTap});
+  const _ActionRow({required this.icon, required this.label, required this.trailing, required this.onTap, this.compact = false});
   final IconData icon;
   final String label;
   final IconData? trailing;
   final VoidCallback onTap;
+  final bool compact;
   @override
-  Widget build(BuildContext context) => GestureDetector(onTap: onTap, child: Container(padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16), decoration: BoxDecoration(borderRadius: BorderRadius.circular(99), color: const Color(0x0AFFFFFF), border: Border.all(color: const Color(0x24FFFFFF))), child: Row(children: [Icon(icon, color: Colors.white70, size: 18), const SizedBox(width: 14), Expanded(child: Text(label, style: const TextStyle(color: Colors.white, fontSize: 12, letterSpacing: 2.2))), if (trailing != null) Icon(trailing, color: Colors.white70, size: 18)])));
+  Widget build(BuildContext context) => GestureDetector(onTap: onTap, child: Container(padding: EdgeInsets.symmetric(horizontal: compact ? 14 : 20, vertical: compact ? 8 : 16), decoration: BoxDecoration(borderRadius: BorderRadius.circular(99), color: const Color(0x0AFFFFFF), border: Border.all(color: const Color(0x24FFFFFF))), child: Row(children: [Icon(icon, color: Colors.white70, size: compact ? 14 : 18), const SizedBox(width: 10), Expanded(child: Text(label, style: TextStyle(color: Colors.white, fontSize: compact ? 10 : 12, letterSpacing: compact ? 1.4 : 2.2))), if (trailing != null) Icon(trailing, color: Colors.white70, size: compact ? 16 : 18)])));
 }

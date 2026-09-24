@@ -322,6 +322,13 @@ class _PlayerDialState extends State<PlayerDial> with SingleTickerProviderStateM
                   ),
                 ),
                 Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 6),
+                  child: ColoredSplitPromoBanner(
+                    spec: SplitPromoExtras.at(9),
+                    margin: EdgeInsets.zero,
+                  ),
+                ),
+                Padding(
                   padding: const EdgeInsets.fromLTRB(24, 0, 24, 4),
                   child: Align(
                     alignment: Alignment.centerLeft,
@@ -374,11 +381,6 @@ class _PlayerDialState extends State<PlayerDial> with SingleTickerProviderStateM
                         s.sleepTimer.toUpperCase(),
                         () => _choose('Sleep Timer', _sleepOptions, s.sleepTimer, s.setSleepTimer),
                       ),
-                      const SizedBox(height: 12),
-                      ColoredSplitPromoBanner(
-                        spec: SplitPromoExtras.at(9),
-                        margin: EdgeInsets.zero,
-                      ),
                       const SizedBox(height: 8),
                       _row(
                         Icons.queue_music,
@@ -387,10 +389,19 @@ class _PlayerDialState extends State<PlayerDial> with SingleTickerProviderStateM
                         () => _choose('Now Playing View', _viewOptions, s.playlist, s.setPlaylist),
                       ),
                       const SizedBox(height: 10),
-                      const Text(
-                        'SWIPE UP FOR MORE',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Color(0x47FFFFFF), fontSize: 10, letterSpacing: 2.2),
+                      GestureDetector(
+                        onTap: _openFullSettings,
+                        onVerticalDragEnd: (d) {
+                          if ((d.primaryVelocity ?? 0) < -200) _openFullSettings();
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 8),
+                          child: Text(
+                            'SWIPE UP FOR MORE',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Color(0x47FFFFFF), fontSize: 10, letterSpacing: 2.2),
+                          ),
+                        ),
                       ),
                       SizedBox(height: 18 + bottomInset * 0.25),
                       Row(

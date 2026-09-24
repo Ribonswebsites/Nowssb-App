@@ -38,11 +38,14 @@ import 'player_settings.dart';
 import 'sentence_builder.dart';
 import 'select_level.dart';
 import 'player_dial.dart';
+import 'saved_words.dart';
 import 'player_intro.dart';
 import 'player_guide.dart';
 import 'practice_overlay.dart';
 import '../widgets/pronunciation_survey.dart';
+import '../data/settings.dart';
 import '../data/playback_session.dart';
+import 'store/request_words.dart';
 
 String _fmtClock(num sec) {
   final s = sec.round().clamp(0, 24 * 3600);
@@ -115,6 +118,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
   var _guideDone = false;
   var _introDone = false;
   var _flagsReady = false;
+  Timer? _sleepTimer;
   DateTime? _startedAt;
   String? _error;
 
@@ -131,6 +135,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     )..repeat();
     _kickBottomAuto();
     PracticeProgress.instance.addListener(_onProgress);
+    Settings.instance.addListener(_onSettings);
+    _armSleep();
     unawaited(PracticeProgress.instance.start());
     unawaited(_loadLiked());
     unawaited(_loadShuffle());
@@ -203,9 +209,11 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
   @override
   void dispose() {
     _bottomAutoTimer?.cancel();
+    _sleepTimer?.cancel();
     _bottomPageController.dispose();
     _marqueeController.dispose();
     PracticeProgress.instance.removeListener(_onProgress);
+    Settings.instance.removeListener(_onSettings);
     // When minimizing to the floating pill, PlaybackSession owns audio.
     if (!_handingOff) {
       unawaited(_tts.stop());
@@ -215,6 +223,27 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
 
   void _onProgress() {
     if (mounted) setState(() {});
+  }
+
+  void _onSettings() {
+    _armSleep();
+    if (mounted) setState(() {});
+  }
+
+  void _armSleep() {
+    _sleepTimer?.cancel();
+    final mins = switch (Settings.instance.sleepTimer) {
+      '15 Min' => 15,
+      '30 Min' => 30,
+      '45 Min' => 45,
+      '1 Hour' => 60,
+      _ => 0,
+    };
+    if (mins <= 0) return;
+    _sleepTimer = Timer(Duration(minutes: mins), () {
+      unawaited(_tts.stop());
+      if (mounted) setState(() => _playing = false);
+    });
   }
 
   Future<void> _loadShuffle() async {
@@ -257,11 +286,46 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       _startedAt = DateTime.now();
     });
     try {
+      final prefs = Settings.instance;
+      var rate = (0.34 * prefs.speed).clamp(0.2, 0.85);
+      var pitch = 1.0;
+      if (prefs.bassBoost) pitch = 0.82;
+      switch (prefs.eq) {
+        case 'deep':
+          pitch = 0.76;
+          break;
+        case 'bright':
+          pitch = 1.24;
+          break;
+        case 'focus':
+          pitch = 1.05;
+          rate = (rate * 0.9).clamp(0.2, 0.85);
+          break;
+        case 'custom':
+          pitch = 1.14;
+          rate = (rate * 1.08).clamp(0.2, 0.85);
+          break;
+        default:
+          break;
+      }
+      var volume = _volume;
+      if (prefs.quality == 'Low') volume *= 0.7;
+      if (prefs.quality == 'Lossless') volume = 1;
+      if (prefs.downloadOnly) {
+        final store = await SharedPreferences.getInstance();
+        final saved = store.getStringList(_likedWordsKey) ?? const <String>[];
+        if (saved.isNotEmpty && !saved.contains(_word.word)) {
+          final next = widget.words.indexWhere((w) => saved.contains(w.word));
+          if (next >= 0 && next != _index && mounted) {
+            setState(() => _index = next);
+          }
+        }
+      }
       await _tts.awaitSpeakCompletion(true);
       await _tts.setLanguage('en-US');
-      await _tts.setSpeechRate(0.34);
-      await _tts.setPitch(1.0);
-      await _tts.setVolume(_volume);
+      await _tts.setSpeechRate(rate);
+      await _tts.setPitch(pitch.clamp(0.5, 2.0));
+      await _tts.setVolume(volume.clamp(0.0, 1.0));
       await _tts.stop();
       final started = DateTime.now();
       await _tts.speak(_word.word);
@@ -348,12 +412,127 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
   }
 
   Future<void> _copyWord() async {
-    final syllables = _word.syllables.join(' · ');
-    final organ = _word.organ.trim().isEmpty
-        ? ''
-        : ' — ${_word.organ.toUpperCase()}';
-    await Clipboard.setData(
-      ClipboardData(text: '${_word.word}$organ\n$syllables\n${_word.meaning}'),
+    _openQuickDrawer();
+  }
+
+  void _openQuickDrawer() {
+    var volume = _volume;
+    showGeneralDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'Player tools',
+      barrierColor: const Color(0x66040812),
+      transitionDuration: const Duration(milliseconds: 220),
+      pageBuilder: (ctx, _, __) {
+        return StatefulBuilder(
+          builder: (ctx, setLocal) {
+            return SafeArea(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 18),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
+                      child: Material(
+                        color: const Color(0xE6141418),
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              const Text(
+                                'Quick tools',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              _quickBtn('Know the meaning', Icons.menu_book_outlined, () {
+                                Navigator.of(ctx).pop();
+                                _openNotes();
+                              }),
+                              _quickBtn('Volume', Icons.volume_up_outlined, () {}),
+                              Slider(
+                                value: volume,
+                                onChanged: (v) {
+                                  setLocal(() => volume = v);
+                                  setState(() => _volume = v);
+                                },
+                              ),
+                              _quickBtn('Request a word', Icons.edit_outlined, () {
+                                Navigator.of(ctx).pop();
+                                openRequestWords(context);
+                              }),
+                              _quickBtn('Hear it again', Icons.replay_rounded, () {
+                                Navigator.of(ctx).pop();
+                                unawaited(_prepareAndPlay());
+                              }),
+                              _quickBtn(
+                                _liked ? 'Saved word' : 'Save this word',
+                                Icons.bookmark_border,
+                                () {
+                                  Navigator.of(ctx).pop();
+                                  unawaited(_toggleLike());
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+      transitionBuilder: (context, anim, _, child) {
+        return FadeTransition(
+          opacity: anim,
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 8 * anim.value, sigmaY: 8 * anim.value),
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _quickBtn(String label, IconData icon, VoidCallback onTap) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Material(
+        color: const Color(0xFF0B0B12),
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            child: Row(
+              children: [
+                Icon(icon, color: const Color(0xFFE8D5A3), size: 18),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    label,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -415,6 +594,15 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       if (next < 0) next += widget.words.length;
     }
     await _tts.stop();
+    final fade = switch (Settings.instance.crossfade) {
+      '3 Sec' => 3,
+      '5 Sec' => 5,
+      '8 Sec' => 8,
+      '12 Sec' => 12,
+      _ => 0,
+    };
+    if (fade > 0) await Future<void>.delayed(Duration(seconds: fade));
+    if (!mounted) return;
     setState(() {
       _index = next;
       _liked = false;
@@ -474,7 +662,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
           onLibrary: () {
             Navigator.of(context).push(
               MaterialPageRoute<void>(
-                builder: (_) => const SoundLibraryScreen(),
+                builder: (_) => const SavedWordsScreen(),
               ),
             );
           },
@@ -1240,14 +1428,14 @@ class _ProfileHeader extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(
-                        Icons.star_rounded,
+                      const NwsbIcon(
+                        NwsbMarks.stages,
+                        size: 14,
                         color: Color(0xFFE8D5A3),
-                        size: 12,
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        'Level ${progress.level}  ›',
+                        'Stage ${progress.level}  ›',
                         style: const TextStyle(
                           color: Color(0xFFE8D5A3),
                           fontSize: 12,
@@ -1310,16 +1498,16 @@ class _LevelList extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                        Icon(
-                          Icons.star_rounded,
+                        NwsbIcon(
+                          NwsbMarks.stages,
+                          size: 16,
                           color: on
                               ? const Color(0xFFE8D5A3)
                               : const Color(0xFFF4F4F5),
-                          size: 18,
                         ),
                         const SizedBox(width: 12),
                         Text(
-                          'Level $n',
+                          'Stage $n',
                           style: TextStyle(
                             color: on ? const Color(0xFFE8D5A3) : Colors.white,
                             fontSize: 14,
@@ -1601,7 +1789,11 @@ class _QueueSheetState extends State<_QueueSheet> {
 
   void _onScroll() {
     if (!_scrollCtrl.hasClients) return;
-    // Backdrop dim only — hero geometry uses FlexibleSpaceBarSettings every frame.
+    if (_scrollCtrl.offset < -48) {
+      _scrollCtrl.jumpTo(0);
+      Navigator.of(context).maybePop();
+      return;
+    }
     final range = (_expandExtent - _collapseExtent).clamp(1.0, 9999.0);
     final next = (_scrollCtrl.offset / range).clamp(0.0, 1.0);
     if ((next - _collapse).abs() > 0.04) {
@@ -1705,27 +1897,36 @@ class _QueueSheetState extends State<_QueueSheet> {
     final word = _currentWord;
     final theme = _currentTheme;
     final art = (word?.img.isNotEmpty == true) ? word!.img : theme.image;
-    // Always have a looping hero video — remote theme clip, else local bg loop.
-    final video = theme.video.trim().isNotEmpty
-        ? theme.video
-        : 'assets/video/player-bg-loop.mp4';
     final t = _collapse;
     // Continuous collapse — no stage jump-cuts. Hero owns geometry via localT.
     final controlsOpacity = (1.0 - t / 0.55).clamp(0.0, 1.0);
     final miniOpacity = ((t - 0.4) / 0.6).clamp(0.0, 1.0);
 
+    final heroVideo = kPlayerBoxFilms[widget.index % kPlayerBoxFilms.length];
+
     return PopScope(
       canPop: true,
       child: Material(
-        color: const Color(0xFF000000),
+        color: Colors.transparent,
         child: Stack(
           children: [
+            const Positioned.fill(
+              child: IgnorePointer(
+                child: NwsbVideo(
+                  asset: kPlayerPageFilm,
+                  fit: BoxFit.cover,
+                  priority: ClipPriority.decoration,
+                  autoplay: true,
+                  loop: true,
+                ),
+              ),
+            ),
             // Dimmed player backdrop — continuous with sheet rise
             Positioned.fill(
               child: GestureDetector(
                 onTap: () => Navigator.of(context).maybePop(),
                 child: ColoredBox(
-                  color: Color.fromRGBO(0, 0, 0, 0.35 + 0.35 * t),
+                  color: Color.fromRGBO(0, 0, 0, 0.18),
                 ),
               ),
             ),
@@ -1752,6 +1953,7 @@ class _QueueSheetState extends State<_QueueSheet> {
                         scrolledUnderElevation: 0,
                         // Collapsed height = sticky mini row (thumb + title + play).
                         toolbarHeight: _collapseExtent,
+                        collapsedHeight: media.padding.top + _expandExtent,
                         expandedHeight: media.padding.top + _expandExtent,
                         flexibleSpace: ClipRect(
                           child: LayoutBuilder(
@@ -1789,7 +1991,7 @@ class _QueueSheetState extends State<_QueueSheet> {
                                 collapse: localT,
                                 maxHeight: constraints.maxHeight,
                                 art: art,
-                                video: video,
+                                video: heroVideo,
                                 title: word?.word ?? 'NowssB',
                                 subtitle: 'NowssB',
                                 playing: widget.playing,
@@ -2123,8 +2325,7 @@ class _YtmCollapsingHero extends StatelessWidget {
     final fullOpacity = (1.0 - (t / 0.72)).clamp(0.0, 1.0);
     final miniOpacity = ((t - 0.38) / 0.62).clamp(0.0, 1.0);
 
-    return ColoredBox(
-      color: const Color(0xFF000000),
+    return SizedBox.expand(
       child: Stack(
         fit: StackFit.expand,
         clipBehavior: Clip.hardEdge,
@@ -2242,57 +2443,6 @@ class _YtmCollapsingHero extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          // Full-bleed looping video/art behind controls (YTM-style hero).
-          if (video.isNotEmpty)
-            Positioned.fill(
-              child: Opacity(
-                opacity: (1.0 - et * 0.85).clamp(0.15, 1.0),
-                child: NwsbVideo(
-                  asset: video,
-                  poster: art,
-                  fit: BoxFit.cover,
-                  alignment: const Alignment(0, -0.15),
-                  priority: ClipPriority.feature,
-                  autoplay: true,
-                  loop: true,
-                  showPoster: true,
-                ),
-              ),
-            )
-          else
-            Positioned.fill(
-              child: Opacity(
-                opacity: (1.0 - et * 0.85).clamp(0.15, 1.0),
-                child: art.startsWith('http')
-                    ? Image.network(
-                        art,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) =>
-                            const ColoredBox(color: Color(0xFF111111)),
-                      )
-                    : Image.asset(
-                        art,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) =>
-                            const ColoredBox(color: Color(0xFF111111)),
-                      ),
-              ),
-            ),
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color.fromRGBO(0, 0, 0, 0.25 + 0.35 * et),
-                    Color.fromRGBO(0, 0, 0, 0.15 + 0.2 * et),
-                    Color.fromRGBO(0, 0, 0, 0.72 + 0.2 * et),
-                  ],
-                ),
-              ),
-            ),
-          ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -2313,14 +2463,12 @@ class _YtmCollapsingHero extends StatelessWidget {
                           ),
                         ),
                         const Spacer(),
-                        IconButton(
-                          onPressed: () {},
-                          icon: const Icon(
-                            Icons.more_vert_rounded,
-                            color: Color(0xFFCFCFD2),
-                            size: 22,
-                          ),
+                        const AppThinkingLoader(
+                          size: 36,
+                          state: OrbState.composing,
+                          blackCircle: true,
                         ),
+                        const SizedBox(width: 8),
                       ],
                     ),
                   ),
@@ -2328,15 +2476,32 @@ class _YtmCollapsingHero extends StatelessWidget {
               if (gapAfterChrome > 0.5) SizedBox(height: gapAfterChrome),
               SizedBox(
                 height: artBudget,
-                // When looping video fills the hero, skip the duplicate square so the
-                // motion stays visible (user: video must be there).
-                child: video.isEmpty
-                    ? Center(
-                        child: artSize > 1
-                            ? _artBox(artSize, radius: radius)
-                            : const SizedBox.shrink(),
-                      )
-                    : const SizedBox.shrink(),
+                child: Center(
+                  child: artSize > 1
+                      ? GlassWrap(
+                          margin: EdgeInsets.zero,
+                          padding: const EdgeInsets.all(8),
+                          radius: 22,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(14),
+                            child: SizedBox(
+                              width: artSize,
+                              height: artSize,
+                              child: video.isNotEmpty
+                                  ? NwsbVideo(
+                                      asset: video,
+                                      poster: art,
+                                      fit: BoxFit.cover,
+                                      priority: ClipPriority.feature,
+                                      autoplay: true,
+                                      loop: true,
+                                    )
+                                  : const ColoredBox(color: Color(0xFF111111)),
+                            ),
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+                ),
               ),
               if (gapAfterArt > 0.5) SizedBox(height: gapAfterArt),
               if (titleBlockH > 0.5)
@@ -2868,10 +3033,14 @@ class _LevelPill extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.star_rounded, color: Color(0xFFE8D5A3), size: 14),
+            const NwsbIcon(
+              NwsbMarks.stages,
+              size: 14,
+              color: Color(0xFFE8D5A3),
+            ),
             const SizedBox(width: 6),
             Text(
-              'Level $level',
+              'Stage $level',
               style: const TextStyle(
                 color: Color(0xFFF4F4F5),
                 fontSize: 12,
@@ -3590,7 +3759,7 @@ class _WordOverlay extends StatelessWidget {
             children: [
               _ActBtn(icon: Icons.replay_rounded, onTap: onReplay),
               Container(width: 1, height: 16, color: const Color(0x2EFFFFFF)),
-              _ActBtn(icon: Icons.copy_rounded, onTap: onNotes),
+              _ActBtn(icon: Icons.dashboard_customize_outlined, onTap: onNotes),
             ],
           ),
         ),

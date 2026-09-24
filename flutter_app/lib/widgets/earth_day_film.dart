@@ -1,16 +1,20 @@
-/// Earth film that follows the day.
+/// Earth film that follows the day. Sits above Open a door only.
 ///
-/// Morning, afternoon, evening, night — the same windows as practice.
-/// Decorative only, so it does not take a feature decoder from the home film.
+/// Morning, afternoon, evening, night. The clip stays clear — no dark plate
+/// over it. Start practice, the enter arrow, and the composing orb sit at
+/// the bottom right.
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
+import '../shell/nav_shell.dart';
+import 'app_thinking_loader.dart';
 
 class EarthDayFilm extends StatelessWidget {
-  const EarthDayFilm({super.key, this.height = 196});
+  const EarthDayFilm({super.key, this.height = 228});
 
   final double height;
 
@@ -29,13 +33,15 @@ class EarthDayFilm extends StatelessWidget {
     'night': 'Night',
   };
 
+  void _start(BuildContext context) => NavScope.goTo(context, 1);
+
   @override
   Widget build(BuildContext context) {
     final part = slot();
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(22),
         child: SizedBox(
           height: height,
           child: Stack(
@@ -46,26 +52,72 @@ class EarthDayFilm extends StatelessWidget {
                 priority: ClipPriority.decoration,
                 fit: BoxFit.cover,
               ),
-              const DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Color(0x00000000), Color(0x99000000)],
-                  ),
-                ),
-              ),
               Positioned(
-                left: 14,
-                bottom: 12,
-                child: Text(
-                  _label[part] ?? part,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 14,
-                    shadows: [Shadow(color: Colors.black54, blurRadius: 8)],
-                  ),
+                left: 12,
+                right: 10,
+                bottom: 10,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        _label[part] ?? part,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 16,
+                          shadows: [
+                            Shadow(color: Colors.black87, blurRadius: 8),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    GestureDetector(
+                      onTap: () => _start(context),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 9,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(99),
+                        ),
+                        child: const Text(
+                          'Start your practice',
+                          style: TextStyle(
+                            color: Color(0xFF111111),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    GestureDetector(
+                      onTap: () => _start(context),
+                      child: Container(
+                        width: 36,
+                        height: 36,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.arrow_forward_rounded,
+                          color: Color(0xFF111111),
+                          size: 18,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    const AppThinkingLoader(
+                      size: 36,
+                      state: OrbState.composing,
+                      blackCircle: true,
+                    ),
+                  ],
                 ),
               ),
             ],

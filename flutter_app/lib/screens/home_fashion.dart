@@ -580,7 +580,6 @@ class _HomeFashionState extends State<HomeFashion> {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           const LiveQuoteTab(),
-                          const EarthDayFilm(height: 210),
                           HeroGreeting(name: widget.name),
                           // Search + Quick access live ONLY inside HeroCurveStage.
                           HeroCurveStage(
