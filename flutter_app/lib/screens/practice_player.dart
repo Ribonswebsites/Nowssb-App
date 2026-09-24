@@ -452,11 +452,19 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                                 ),
                               ),
                               const SizedBox(height: 10),
-                              _quickBtn('Know the meaning', Icons.menu_book_outlined, () {
-                                Navigator.of(ctx).pop();
-                                _openNotes();
-                              }),
-                              _quickBtn('Volume', Icons.volume_up_outlined, () {}),
+                              _quickBtn(
+                                'Know the meaning',
+                                Icons.menu_book_outlined,
+                                () {
+                                  Navigator.of(ctx).pop();
+                                  _openNotes();
+                                },
+                              ),
+                              _quickBtn(
+                                'Volume',
+                                Icons.volume_up_outlined,
+                                () {},
+                              ),
                               Slider(
                                 value: volume,
                                 onChanged: (v) {
@@ -464,14 +472,22 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                                   setState(() => _volume = v);
                                 },
                               ),
-                              _quickBtn('Request a word', Icons.edit_outlined, () {
-                                Navigator.of(ctx).pop();
-                                openRequestWords(context);
-                              }),
-                              _quickBtn('Hear it again', Icons.replay_rounded, () {
-                                Navigator.of(ctx).pop();
-                                unawaited(_prepareAndPlay());
-                              }),
+                              _quickBtn(
+                                'Request a word',
+                                Icons.edit_outlined,
+                                () {
+                                  Navigator.of(ctx).pop();
+                                  openRequestWords(context);
+                                },
+                              ),
+                              _quickBtn(
+                                'Hear it again',
+                                Icons.replay_rounded,
+                                () {
+                                  Navigator.of(ctx).pop();
+                                  unawaited(_prepareAndPlay());
+                                },
+                              ),
                               _quickBtn(
                                 _liked ? 'Saved word' : 'Save this word',
                                 Icons.bookmark_border,
@@ -496,7 +512,10 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
         return FadeTransition(
           opacity: anim,
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 8 * anim.value, sigmaY: 8 * anim.value),
+            filter: ImageFilter.blur(
+              sigmaX: 8 * anim.value,
+              sigmaY: 8 * anim.value,
+            ),
             child: child,
           ),
         );
@@ -661,9 +680,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
           onSettings: _openSettings,
           onLibrary: () {
             Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => const SavedWordsScreen(),
-              ),
+              MaterialPageRoute<void>(builder: (_) => const SavedWordsScreen()),
             );
           },
         ),
@@ -1925,9 +1942,7 @@ class _QueueSheetState extends State<_QueueSheet> {
             Positioned.fill(
               child: GestureDetector(
                 onTap: () => Navigator.of(context).maybePop(),
-                child: ColoredBox(
-                  color: Color.fromRGBO(0, 0, 0, 0.18),
-                ),
+                child: ColoredBox(color: Color.fromRGBO(0, 0, 0, 0.18)),
               ),
             ),
             // Continuous NestedScrollView / CustomScrollView (YTM)
