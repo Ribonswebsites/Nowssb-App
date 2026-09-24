@@ -384,26 +384,3 @@ class ProgressOrbHero extends StatelessWidget {
     );
   }
 }
-
-/// Tagline overlay only — NO empty video card. Page scroll bg shows through.
-class ProgressPracticeForward extends StatelessWidget {
-  const ProgressPracticeForward({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.fromLTRB(8, 8, 8, 4),
-      child: Text(
-        'Your practice, moving forward.',
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          color: Color(0xFFEDEDEB),
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-          height: 1.35,
-          shadows: [Shadow(blurRadius: 14, color: Colors.black)],
-        ),
-      ),
-    );
-  }
-}
