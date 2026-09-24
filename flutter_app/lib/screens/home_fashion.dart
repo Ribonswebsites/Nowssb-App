@@ -40,6 +40,7 @@ import '../widgets/stories_find_you_banner.dart';
 import '../widgets/subscription_today_offer.dart';
 import '../widgets/earth_day_film.dart';
 import '../widgets/promo_color_grid.dart';
+import '../widgets/studio_panels.dart';
 import 'quotes_live.dart';
 import 'player_settings.dart';
 import 'fashion/header.dart';
@@ -326,6 +327,10 @@ class _HomeFashionState extends State<HomeFashion> {
                   spec: SplitPromoExtras.at(0, onTap: () => _go(2)),
                   margin: EdgeInsets.zero,
                 ),
+              ),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(16, 8, 16, 0),
+                child: SoundAgePanel(),
               ),
             ],
           ),

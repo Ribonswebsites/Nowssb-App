@@ -274,10 +274,6 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
           videoAsset: nwsbVideo(kRmHeroVidFile),
           videoTitle: '',
         ),
-        StoreHalfOffRail(
-          onViewAll: () => setState(() => _chip = 'off50'),
-          onOpenWord: (word, root) => _openWord(word, root, '', 0),
-        ),
         const SizedBox(height: 8),
         ColoredSplitPromoBanner.forSurface(
           SplitPromoSurface.wordAtelier,

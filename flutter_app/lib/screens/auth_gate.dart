@@ -11,8 +11,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../data/firebase.dart';
-import '../media/nwsb_video.dart';
-import '../media/video_pool.dart';
+import '../widgets/login_gallery.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import '../widgets/app_thinking_loader.dart';
 
@@ -25,9 +24,6 @@ class AuthGate extends StatefulWidget {
 }
 
 class _AuthGateState extends State<AuthGate> {
-  static const _phoneAsset = 'assets/video/login-phone.mp4';
-  static const _posterAsset = 'assets/video/login-phone-poster.webp';
-
   final _email = TextEditingController();
   final _password = TextEditingController();
   final _phone = TextEditingController();
@@ -223,72 +219,11 @@ class _AuthGateState extends State<AuthGate> {
   }
 
   Widget _buildAuthScreen({String? unavailable}) {
-    // Full-bleed film behind the glass: cover the whole viewport with no
-    // letterboxing. The phone-aperture percentages keep buttons on the
-    // screen of the login-phone clip the same way the website does.
     return Scaffold(
       backgroundColor: Colors.black,
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final maxWidth = constraints.maxWidth;
-          final maxHeight = constraints.maxHeight;
-          // Cover the viewport with the clip's 720×1264 aspect (same trick
-          // as .lg-phone on the site): at least as wide and as tall as the
-          // screen, crop the overflow, never stretch.
-          final width = math.max(maxWidth, maxHeight * 720 / 1264);
-          final height = width * 1264 / 720;
-          return Stack(
-            fit: StackFit.expand,
-            children: [
-              Center(
-                child: SizedBox(
-                  width: width,
-                  height: height,
-                  child: _phoneFilm(),
-                ),
-              ),
-              Center(
-                child: SizedBox(
-                  width: width,
-                  height: height,
-                  child: LayoutBuilder(
-                    builder: (context, phoneConstraints) {
-                      final w = phoneConstraints.maxWidth;
-                      final h = phoneConstraints.maxHeight;
-                      return Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          Positioned.fromRect(
-                            rect: Rect.fromLTWH(
-                              w * .18889,
-                              h * .1503,
-                              w * .628,
-                              h * .7722,
-                            ),
-                            child: _glassContent(unavailable: unavailable),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-              ),
-            ],
-          );
-        },
+      body: LoginGallery(
+        child: _glassContent(unavailable: unavailable),
       ),
-    );
-  }
-
-  Widget _phoneFilm() {
-    // Central NwsbVideo path: muted loop, pool lease, resume on visibility.
-    return const NwsbVideo(
-      asset: _phoneAsset,
-      poster: _posterAsset,
-      fit: BoxFit.cover,
-      priority: ClipPriority.feature,
-      loop: true,
-      autoplay: true,
     );
   }
 
@@ -306,24 +241,17 @@ class _AuthGateState extends State<AuthGate> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   _brandHeader(),
-                  SizedBox(height: math.max(28, constraints.maxHeight * .095)),
+                  const SizedBox(height: 18),
                   const Text(
-                    'Welcome',
-                    textAlign: TextAlign.left,
+                    'Welcome back',
+                    textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 27,
-                      fontWeight: FontWeight.w800,
-                      height: 1.05,
+                      color: Colors.white70,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                  const SizedBox(height: 7),
-                  const Text(
-                    'Sign in or create your account',
-                    textAlign: TextAlign.left,
-                    style: TextStyle(color: Colors.white60, fontSize: 13),
-                  ),
-                  const SizedBox(height: 22),
+                  const SizedBox(height: 18),
                   _googleButton(),
                   _orDivider(),
                   _methodButton(
@@ -387,52 +315,36 @@ class _AuthGateState extends State<AuthGate> {
   }
 
   Widget _brandHeader() {
-    // Match the site / target: logo + NowssB + plain grey BY NOWSSBANSIU
-    // subtitle. No bordered pill / stadium chrome around the byline.
-    return Row(
+    return Column(
       children: [
         ClipOval(
           child: Image.asset(
             'assets/icons/logo-disc.webp',
-            width: 46,
-            height: 46,
+            width: 54,
+            height: 54,
             fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => const SizedBox(width: 46, height: 46),
+            errorBuilder: (_, __, ___) => const SizedBox(width: 54, height: 54),
           ),
         ),
-        Container(
-          width: 1,
-          height: 34,
-          margin: const EdgeInsets.symmetric(horizontal: 13),
-          color: Colors.white24,
+        const SizedBox(height: 12),
+        const Text(
+          'NOWSSB',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 26,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1.4,
+          ),
         ),
-        const Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text.rich(
-                TextSpan(
-                  children: [
-                    TextSpan(text: 'Nowss', style: TextStyle(fontWeight: FontWeight.w800)),
-                    TextSpan(text: 'B', style: TextStyle(fontWeight: FontWeight.w300, color: Colors.white70)),
-                  ],
-                ),
-                style: TextStyle(color: Colors.white, fontSize: 21, height: 1.05),
-              ),
-              SizedBox(height: 5),
-              Text(
-                'BY NOWSSBANSIU',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: Color(0x6BFFFFFF),
-                  fontSize: 9.5,
-                  fontWeight: FontWeight.w300,
-                  letterSpacing: 2.2,
-                  height: 1.1,
-                ),
-              ),
-            ],
+        const SizedBox(height: 6),
+        const Text(
+          'TURN SOUND INTO STILLNESS',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Color(0x99FFFFFF),
+            fontSize: 10,
+            letterSpacing: 1.6,
+            fontWeight: FontWeight.w500,
           ),
         ),
       ],
@@ -485,12 +397,15 @@ class _AuthGateState extends State<AuthGate> {
       child: FilledButton(
         onPressed: onPressed,
         style: FilledButton.styleFrom(
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
-          disabledBackgroundColor: Colors.white54,
-          disabledForegroundColor: Colors.black54,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-          padding: const EdgeInsets.symmetric(horizontal: 18),
+          backgroundColor: const Color(0xFF121826),
+          foregroundColor: Colors.white,
+          disabledBackgroundColor: const Color(0xFF121826),
+          disabledForegroundColor: Colors.white54,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(28),
+            side: const BorderSide(color: Color(0x55FFFFFF)),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           textStyle: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600),
         ),
         child: child,

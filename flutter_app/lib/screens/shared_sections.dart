@@ -1512,10 +1512,7 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
     ('Profile', 'profile'),
   ];
 
-  /// Website `.footer-carousel { --fci-w:162; --fci-h:260 }` (nm override).
-  static const double _cardW = 162;
-  static const double _cardH = 260;
-
+  /// Website `.footer-carousel` card rhythm.
   Timer? _timer;
   int _index = 0;
 
@@ -1532,6 +1529,20 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
   void dispose() {
     _timer?.cancel();
     super.dispose();
+  }
+
+  Widget _sideShot(int index) {
+    return AspectRatio(
+      aspectRatio: 0.72,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(14),
+        child: Image.asset(
+          _shots[index],
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF0A0F1C)),
+        ),
+      ),
+    );
   }
 
   Widget _rotatingTab() {
@@ -1619,28 +1630,37 @@ class _HomeFooterSectionState extends State<HomeFooterSection> {
                         ),
                       ),
                       SizedBox(
-                        height: 310,
-                        child: Center(
-                          child: SizedBox(
-                            width: _cardW * 908 / 800,
-                            height: _cardH * 1408 / 1286,
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 22),
-                                  child: _rotatingTab(),
+                        height: 300,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Expanded(child: _sideShot((_index + _shots.length - 1) % _shots.length)),
+                              const SizedBox(width: 8),
+                              SizedBox(
+                                width: 168,
+                                height: 280,
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.fromLTRB(12, 12, 12, 18),
+                                      child: _rotatingTab(),
+                                    ),
+                                    IgnorePointer(
+                                      child: Image.asset(
+                                        'assets/frames/footer-frame.webp',
+                                        fit: BoxFit.fill,
+                                        errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                IgnorePointer(
-                                  child: Image.asset(
-                                    'assets/frames/footer-frame.webp',
-                                    fit: BoxFit.fill,
-                                    errorBuilder: (_, __, ___) =>
-                                        const SizedBox.shrink(),
-                                  ),
-                                ),
-                              ],
-                            ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(child: _sideShot((_index + 1) % _shots.length)),
+                            ],
                           ),
                         ),
                       ),

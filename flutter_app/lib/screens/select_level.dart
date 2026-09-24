@@ -102,7 +102,12 @@ class _SelectLevelScreenState extends State<SelectLevelScreen> {
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: levels.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, crossAxisSpacing: 12, mainAxisSpacing: 12, childAspectRatio: 1.85),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                    childAspectRatio: 2.15,
+                  ),
                   itemBuilder: (_, i) {
                     final level = levels[i];
                     final selected = _selected == level;
@@ -110,29 +115,40 @@ class _SelectLevelScreenState extends State<SelectLevelScreen> {
                       onTap: () => setState(() => _selected = level),
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 250),
-                        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(99),
                           gradient: const LinearGradient(colors: [Color(0x0FFFFFFF), Color(0x05000000)]),
                           border: Border.all(color: selected ? const Color(0x8CFFFFFF) : const Color(0x24FFFFFF)),
                           boxShadow: selected ? const [BoxShadow(color: Color(0x38FFFFFF), blurRadius: 26)] : const [],
                         ),
-                        child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                          Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
-                            Text(level.toString().padLeft(2, '0'), style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w300, height: 1)),
-                            Text('STAGE ${_words[level - 1]}', style: const TextStyle(color: Color(0x73FFFFFF), fontSize: 9, letterSpacing: 1.5)),
-                          ]),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: const [
-                              NwsbIcon(NwsbMarks.stages, size: 16, color: Colors.white),
-                              SizedBox(width: 6),
-                              AppThinkingLoader(
-                                size: 26,
-                                state: OrbState.composing,
-                                blackCircle: true,
-                              ),
-                            ],
+                        child: Row(children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  level.toString().padLeft(2, '0'),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w300, height: 1),
+                                ),
+                                Text(
+                                  'STAGE ${_words[level - 1]}',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(color: Color(0x73FFFFFF), fontSize: 8, letterSpacing: 1.1),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const NwsbIcon(NwsbMarks.stages, size: 14, color: Colors.white),
+                          const SizedBox(width: 4),
+                          const AppThinkingLoader(
+                            size: 22,
+                            state: OrbState.composing,
+                            blackCircle: true,
                           ),
                         ]),
                       ),

@@ -18,6 +18,7 @@ import 'progress_sessions.dart';
 import 'progress_stats.dart';
 import 'progress_tokens.dart';
 import '../../widgets/colored_split_promo_banner.dart';
+import '../../widgets/studio_panels.dart';
 
 class PracticeProgressScreen extends StatefulWidget {
   const PracticeProgressScreen({super.key, this.words = const []});
@@ -110,6 +111,7 @@ class _PracticeProgressScreenState extends State<PracticeProgressScreen> {
                   controller: _scroll,
                   padding: const EdgeInsets.only(bottom: 90),
                   children: [
+                    const PracticeCoursesPanel(),
                     // Full-bleed orb overlay (page video shows through).
                     ProgressOrbHero(
                       sessions: progress.totalSessions,

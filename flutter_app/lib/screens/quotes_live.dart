@@ -281,9 +281,24 @@ class _QuotesWeekScreenState extends State<QuotesWeekScreen> {
                           child: ListView(
                             controller: _rail,
                             children: [
+                              ColoredSplitPromoBanner(
+                                spec: SplitPromoExtras.at(
+                                  4,
+                                  onTap: () => _push(const PracticeScreen()),
+                                ),
+                                margin: const EdgeInsets.only(bottom: 10),
+                              ),
                               _calendarStrip(),
                               const SizedBox(height: 8),
                               const _WeekQuotesBox(),
+                              const SizedBox(height: 8),
+                              ColoredSplitPromoBanner(
+                                spec: SplitPromoExtras.at(
+                                  8,
+                                  onTap: () => _push(const PracticeScreen()),
+                                ),
+                                margin: EdgeInsets.zero,
+                              ),
                               const SizedBox(height: 8),
                               _shareBox(),
                               const SizedBox(height: 12),
@@ -337,14 +352,6 @@ class _QuotesWeekScreenState extends State<QuotesWeekScreen> {
                                     builder: (_) => const SubscriptionScreen(),
                                   ),
                                 ),
-                              ),
-                              const SizedBox(height: 8),
-                              ColoredSplitPromoBanner(
-                                spec: SplitPromoExtras.at(
-                                  8,
-                                  onTap: () => _push(const PracticeScreen()),
-                                ),
-                                margin: EdgeInsets.zero,
                               ),
                               const SizedBox(height: 24),
                             ],
@@ -952,35 +959,6 @@ class _WeekQuotesBoxState extends State<_WeekQuotesBox> {
                 _mark('Save', Icons.bookmark_border, _saves.contains(id), () => _toggle('save')),
               ],
             ),
-            const SizedBox(height: 14),
-            for (var i = 0; i < 7; i++)
-              if (i != today)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _days[i],
-                        style: const TextStyle(
-                          color: Color(0xFFE8D5A3),
-                          fontWeight: FontWeight.w800,
-                          fontSize: 13,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        Settings.instance.quoteFor(now.add(Duration(days: i - today))),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          height: 1.3,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
           ],
         ),
       ),
@@ -1066,7 +1044,7 @@ class _QuoteMonthSheetState extends State<_QuoteMonthSheet> {
   @override
   Widget build(BuildContext context) {
     final days = DateTime(_month.year, _month.month + 1, 0).day;
-    final lead = DateTime(_month.year, _month.month, 1).weekday - 1;
+    final lead = DateTime(_month.year, _month.month, 1).weekday % 7;
     final cells = lead + days;
     final rows = (cells / 7).ceil();
     final now = DateTime.now();
@@ -1101,6 +1079,13 @@ class _QuoteMonthSheetState extends State<_QuoteMonthSheet> {
                     ),
                   ),
                 ),
+                const Padding(
+                  padding: EdgeInsets.fromLTRB(8, 8, 8, 0),
+                  child: Text(
+                    'Calendar',
+                    style: TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.w800),
+                  ),
+                ),
                 Row(
                   children: [
                     IconButton(
@@ -1111,12 +1096,12 @@ class _QuoteMonthSheetState extends State<_QuoteMonthSheet> {
                     ),
                     Expanded(
                       child: Text(
-                        '${_months[_month.month - 1]} ${_month.year}',
+                        _months[_month.month - 1],
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),
@@ -1135,12 +1120,12 @@ class _QuoteMonthSheetState extends State<_QuoteMonthSheet> {
                 const SizedBox(height: 6),
                 Row(
                   children: [
-                    for (final d in const ['M', 'T', 'W', 'T', 'F', 'S', 'S'])
+                    for (final d in const ['S', 'M', 'T', 'W', 'T', 'F', 'S'])
                       Expanded(
                         child: Text(
                           d,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(color: Color(0x88FFFFFF), fontSize: 11),
+                          style: const TextStyle(color: Color(0x99FFFFFF), fontSize: 12, fontWeight: FontWeight.w600),
                         ),
                       ),
                   ],
@@ -1206,6 +1191,39 @@ class _QuoteMonthSheetState extends State<_QuoteMonthSheet> {
                     ],
                   ),
                 ),
+                const SizedBox(height: 14),
+                const Text(
+                  'This week',
+                  style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w800),
+                ),
+                const SizedBox(height: 8),
+                for (var i = 0; i < 7; i++)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+                      decoration: BoxDecoration(
+                        color: const Color(0x14FFFFFF),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: const Color(0x33FFFFFF)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _days[i],
+                            style: const TextStyle(color: Color(0xFFE8D5A3), fontWeight: FontWeight.w800, fontSize: 13),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            Settings.instance.quoteFor(now.add(Duration(days: i - (now.weekday - 1)))),
+                            style: const TextStyle(color: Colors.white, fontSize: 15, height: 1.3, fontWeight: FontWeight.w700),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -1226,32 +1244,34 @@ class _QuoteMonthSheetState extends State<_QuoteMonthSheet> {
     final saved = _saves.contains(id);
     return GestureDetector(
       onTap: () => setState(() => _selected = date),
-      child: Container(
-        height: 44,
-        margin: const EdgeInsets.all(2),
-        decoration: BoxDecoration(
-          color: on ? const Color(0x33FFFFFF) : Colors.transparent,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: on ? Colors.white : Colors.transparent),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              '$day',
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 13),
-            ),
-            if (liked || saved)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (liked)
-                    const Icon(Icons.favorite, size: 8, color: Color(0xFFE8D5A3)),
-                  if (saved)
-                    const Icon(Icons.bookmark, size: 8, color: Colors.white),
-                ],
+      child: SizedBox(
+        height: 46,
+        child: Center(
+          child: Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: on ? const Color(0xFF111111) : Colors.transparent,
+              border: Border.all(
+                color: on
+                    ? const Color(0xFFFFB020)
+                    : (liked || saved)
+                        ? const Color(0xFFE8D5A3)
+                        : const Color(0x66FFFFFF),
+                width: on ? 2 : 1,
               ),
-          ],
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              '$day',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: on ? FontWeight.w800 : FontWeight.w600,
+                fontSize: 13,
+              ),
+            ),
+          ),
         ),
       ),
     );
