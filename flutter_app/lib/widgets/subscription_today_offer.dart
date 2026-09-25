@@ -14,7 +14,6 @@ import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import 'app_thinking_loader.dart';
 import 'glass_wrap.dart';
 import 'neumorphic.dart';
-import 'scroll_progress_rail.dart';
 
 const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
 
@@ -127,7 +126,6 @@ class SubscriptionTodayOffer extends StatefulWidget {
 
 class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
   late final PageController _pager;
-  late final ScrollController _rail;
   Timer? _auto;
   var _page = 0;
   var _userPaging = false;
@@ -136,7 +134,6 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
   void initState() {
     super.initState();
     _pager = PageController(viewportFraction: 0.92);
-    _rail = ScrollController();
     if (_flutterTest) return;
     _auto = Timer.periodic(const Duration(milliseconds: 4800), (_) {
       if (!mounted || _userPaging) return;
@@ -155,7 +152,6 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
   void dispose() {
     _auto?.cancel();
     _pager.dispose();
-    _rail.dispose();
     super.dispose();
   }
 
@@ -248,12 +244,13 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
               ),
             ),
             Expanded(
-              child: Align(
-                alignment: Alignment.bottomRight,
+              child: ClipRect(
                 child: Image.asset(
                   'assets/banners/point-subscribe.jpg',
-                  fit: BoxFit.contain,
+                  fit: BoxFit.fitHeight,
                   alignment: Alignment.bottomRight,
+                  width: double.infinity,
+                  height: double.infinity,
                 ),
               ),
             ),
@@ -296,46 +293,84 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
   }
 
   Widget _overview() {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: const Color(0xFF14121A),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(6),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _head(
-              title: "Today's offer",
-              sub: 'First tier free. Every other tier is 50% off.',
-            ),
-            const SizedBox(height: 8),
-            Expanded(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  ScrollProgressRail(controller: _rail),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: ListView(
-                      controller: _rail,
-                      primary: false,
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      padding: const EdgeInsets.only(bottom: 12),
-                      children: [
-                        for (final tier in _tiers) _tierLine(tier),
-                        const SizedBox(height: 48),
-                      ],
-                    ),
-                  ),
-                ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Container(
+          padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+          decoration: BoxDecoration(
+            color: const Color(0xFF000000),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'NowssB',
+                style: TextStyle(
+                  color: Color(0xFFE8D5A3),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.4,
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            _foot("try 30 day's Free trials today"),
-          ],
+              SizedBox(height: 4),
+              Text(
+                'Subscription',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
         ),
+        const SizedBox(height: 10),
+        for (var i = 0; i < _tiers.length; i++) ...[
+          if (i > 0) const SizedBox(height: 8),
+          Expanded(child: _tierBox(_tiers[i])),
+        ],
+      ],
+    );
+  }
+
+  Widget _tierBox(_Tier tier) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 8, 10, 8),
+      decoration: BoxDecoration(
+        color: const Color(0xFF000000),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  tier.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  tier.was.isEmpty ? tier.now : '${tier.now}  ·  was ${tier.was}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+          _badge(tier),
+        ],
       ),
     );
   }

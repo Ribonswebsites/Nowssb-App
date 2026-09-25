@@ -178,6 +178,7 @@ class _EbooksBody extends StatelessWidget {
               builder: (_) => const SoundLibraryScreen(),
             ),
           ),
+          margin: const EdgeInsets.only(bottom: 36),
         ),
         ColoredSplitPromoBanner(
           spec: SplitPromoExtras.at(

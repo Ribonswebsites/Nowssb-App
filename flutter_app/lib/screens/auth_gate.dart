@@ -332,7 +332,7 @@ class _AuthGateState extends State<AuthGate> {
         ),
         const SizedBox(height: 6),
         const Text(
-          'TURN SOUND INTO STILLNESS',
+          'Natural Origin Word Science',
           textAlign: TextAlign.center,
           style: TextStyle(
             color: Color(0x99FFFFFF),
@@ -391,9 +391,9 @@ class _AuthGateState extends State<AuthGate> {
       child: FilledButton(
         onPressed: onPressed,
         style: FilledButton.styleFrom(
-          backgroundColor: const Color(0x24FFFFFF),
+          backgroundColor: const Color(0xFF000000),
           foregroundColor: Colors.white,
-          disabledBackgroundColor: const Color(0x18FFFFFF),
+          disabledBackgroundColor: const Color(0xFF000000),
           disabledForegroundColor: Colors.white54,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(28),

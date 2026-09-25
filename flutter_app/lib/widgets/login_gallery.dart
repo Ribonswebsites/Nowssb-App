@@ -82,17 +82,29 @@ class _LoginGalleryState extends State<LoginGallery>
               clipBehavior: Clip.hardEdge,
               children: [
                 const ColoredBox(color: Color(0xFF000000)),
-                IgnorePointer(
-                  child: Transform.translate(
-                    offset: Offset(0, -stride + dy),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: gap),
-                      child: Column(
-                        children: [
-                          _grid(tile, gap),
-                          const SizedBox(height: gap),
-                          _grid(tile, gap),
-                        ],
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: ClipRect(
+                      child: OverflowBox(
+                        alignment: Alignment.topLeft,
+                        minWidth: w,
+                        maxWidth: w,
+                        minHeight: 0,
+                        maxHeight: double.infinity,
+                        child: Transform.translate(
+                          offset: Offset(0, -stride + dy),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: gap),
+                            child: Column(
+                              children: [
+                                for (var i = 0; i < (h / stride).ceil() + 1; i++) ...[
+                                  if (i > 0) const SizedBox(height: gap),
+                                  _grid(tile, gap),
+                                ],
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ),

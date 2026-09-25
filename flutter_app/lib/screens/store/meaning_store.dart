@@ -283,6 +283,7 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
               builder: (_) => const SignatureStoreScreen(),
             ),
           ),
+          margin: const EdgeInsets.only(bottom: 36),
         ),
         ColoredSplitPromoBanner(
           spec: SplitPromoExtras.at(

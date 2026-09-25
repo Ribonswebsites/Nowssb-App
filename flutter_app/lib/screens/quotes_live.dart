@@ -305,7 +305,7 @@ class _QuotesWeekScreenState extends State<QuotesWeekScreen> {
                                   4,
                                   onTap: () => _push(const PracticeScreen()),
                                 ),
-                                margin: const EdgeInsets.only(bottom: 10),
+                                margin: const EdgeInsets.only(bottom: 36),
                               ),
                               _calendarStrip(),
                               const SizedBox(height: 8),

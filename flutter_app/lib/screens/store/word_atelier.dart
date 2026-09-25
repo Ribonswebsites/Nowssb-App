@@ -10,7 +10,6 @@ import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/page_shell.dart';
-import '../../widgets/studio_panels.dart';
 import 'product_detail.dart';
 import 'store_cards.dart';
 import 'store_home_sections.dart';
@@ -275,9 +274,7 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
           videoAsset: nwsbVideo(kRmHeroVidFile),
           videoTitle: '',
         ),
-        const SizedBox(height: 14),
-        const PracticeStudioSection(),
-        const SizedBox(height: 8),
+        const SizedBox(height: 18),
         ColoredSplitPromoBanner.forSurface(
           SplitPromoSurface.wordAtelier,
           onTap: () => Navigator.of(context).push(
@@ -285,9 +282,8 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
               builder: (_) => const MeaningStoreScreen(),
             ),
           ),
-          margin: EdgeInsets.zero,
+          margin: const EdgeInsets.only(bottom: 36),
         ),
-        const SizedBox(height: 28),
         ColoredSplitPromoBanner(
           spec: SplitPromoExtras.at(
             6,
@@ -297,7 +293,7 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
               ),
             ),
           ),
-          margin: const EdgeInsets.only(top: 8, bottom: 20),
+          margin: const EdgeInsets.only(top: 0, bottom: 28),
         ),
         StoreGlassPanel(
           radius: 32,
