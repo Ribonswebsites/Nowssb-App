@@ -228,49 +228,33 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            const Text(
+              'Subscription',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 28,
+                height: 1.02,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 6),
+            const Text(
+              'First tier free. Every other tier is half off today.',
+              style: TextStyle(
+                color: Color(0xCCFFFFFF),
+                fontSize: 13,
+                height: 1.3,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
             Expanded(
-              child: Stack(
-                children: [
-                  Positioned(
-                    left: 0,
-                    top: 0,
-                    bottom: 0,
-                    width: 210,
-                    child: Image.asset(
-                      'assets/banners/point-subscribe.jpg',
-                      fit: BoxFit.contain,
-                      alignment: Alignment.topLeft,
-                    ),
-                  ),
-                  const Positioned(
-                    left: 132,
-                    top: 36,
-                    right: 4,
-                    child: Text(
-                      'Subscription',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 28,
-                        height: 1.02,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ),
-                  const Positioned(
-                    left: 148,
-                    right: 4,
-                    top: 84,
-                    child: Text(
-                      'First tier free. Every other tier is half off today.',
-                      style: TextStyle(
-                        color: Color(0xCCFFFFFF),
-                        fontSize: 13,
-                        height: 1.3,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
+              child: Align(
+                alignment: Alignment.bottomRight,
+                child: Image.asset(
+                  'assets/banners/point-subscribe.jpg',
+                  fit: BoxFit.contain,
+                  alignment: Alignment.bottomRight,
+                ),
               ),
             ),
             const SizedBox(height: 8),
@@ -503,18 +487,21 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
 
   Widget _badge(_Tier tier) {
     final free = tier.badge == 'Free';
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: free ? const Color(0xFF7E57C2) : const Color(0xFFE8D5A3),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        tier.badge,
-        style: TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w800,
-          color: free ? Colors.white : const Color(0xFF1A1A2E),
+    return Padding(
+      padding: const EdgeInsets.only(right: 12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+        decoration: BoxDecoration(
+          color: free ? const Color(0xFF7E57C2) : const Color(0xFFE8D5A3),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(
+          tier.badge,
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w800,
+            color: free ? Colors.white : const Color(0xFF1A1A2E),
+          ),
         ),
       ),
     );

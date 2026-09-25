@@ -391,13 +391,13 @@ class _AuthGateState extends State<AuthGate> {
       child: FilledButton(
         onPressed: onPressed,
         style: FilledButton.styleFrom(
-          backgroundColor: const Color(0xFF121826),
+          backgroundColor: const Color(0x24FFFFFF),
           foregroundColor: Colors.white,
-          disabledBackgroundColor: const Color(0xFF121826),
+          disabledBackgroundColor: const Color(0x18FFFFFF),
           disabledForegroundColor: Colors.white54,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(28),
-            side: const BorderSide(color: Color(0x55FFFFFF)),
+            side: const BorderSide(color: Color(0x66FFFFFF)),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 16),
           textStyle: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600),

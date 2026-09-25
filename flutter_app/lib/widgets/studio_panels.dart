@@ -10,6 +10,7 @@ import '../screens/practice.dart';
 import '../screens/progress/progress_screen.dart';
 import '../screens/sound_library.dart';
 import '../shell/nav_shell.dart';
+import 'glass_wrap.dart';
 
 void openPracticeTab(BuildContext context, int tab) {
   final scope = context.getInheritedWidgetOfExactType<NavScope>();
@@ -30,14 +31,7 @@ class PracticeStudioSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        PracticeCoursesPanel(),
-        SizedBox(height: 14),
-        PracticeCourseRail(),
-      ],
-    );
+    return const PracticeCoursesPanel();
   }
 }
 
@@ -53,7 +47,6 @@ class _PracticeCoursesPanelState extends State<PracticeCoursesPanel> {
   var _chip = 0;
 
   static const _profile = 'assets/profile_source/img-about.jpeg';
-  static const _banner = 'assets/profile_source/img-banner.png';
 
   @override
   void initState() {
@@ -92,67 +85,35 @@ class _PracticeCoursesPanelState extends State<PracticeCoursesPanel> {
     final art = _progress
         ? 'assets/banners/course-bubble.jpg'
         : 'assets/banners/course-cleo-a.jpg';
-    return Container(
+    return GlassWrap(
       margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(36),
-        gradient: const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFF8D6BB8), Color(0xFF5A3D86), Color(0xFF2A1844)],
-        ),
-        boxShadow: const [
-          BoxShadow(color: Color(0x66000000), blurRadius: 28, offset: Offset(0, 16)),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(36),
-        child: Stack(
-          children: [
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              height: 120,
-              child: Opacity(
-                opacity: 0.28,
-                child: Image.asset(_banner, fit: BoxFit.cover),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+      radius: 28,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              const SizedBox(width: 44),
+              Expanded(
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.14),
+                      borderRadius: BorderRadius.circular(99),
+                      border: Border.all(color: Colors.white24),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _tab('My Practice', !_progress, () => setState(() => _progress = false)),
+                        _tab('Progress', _progress, () => setState(() => _progress = true)),
+                      ],
+                    ),
+                  ),
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Row(
-                    children: [
-                      ClipOval(
-                        child: Image.asset(
-                          _profile,
-                          width: 46,
-                          height: 46,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      Expanded(
-                        child: Center(
-                          child: Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.14),
-                              borderRadius: BorderRadius.circular(99),
-                              border: Border.all(color: Colors.white24),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                _tab('My Practice', !_progress, () => setState(() => _progress = false)),
-                                _tab('Progress', _progress, () => setState(() => _progress = true)),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
                       GestureDetector(
                         onTap: () => showNotificationsSheet(context),
                         child: Container(
@@ -326,10 +287,6 @@ class _PracticeCoursesPanelState extends State<PracticeCoursesPanel> {
                   ),
                 ],
               ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 

@@ -1546,25 +1546,30 @@ class _HomeFooterSectionState extends State<HomeFooterSection>
   }) {
     final s = slot - t;
     final travel = tabW / 2 + 10 + sideW / 2;
-    final center = width / 2 + s * travel;
+    final centerX = width / 2 + s * travel;
     final abs = s.abs().clamp(0.0, 1.6);
     final blend = abs.clamp(0.0, 1.0);
-    final cardW = _lerp(tabW - 28, sideW, blend);
-    final cardH = _lerp(tabH - 34, sideW / 0.72, blend);
+    // Inner screen of footer-frame.webp, measured on the asset.
+    final holeW = tabW * (802 / 908);
+    final holeH = tabH * (1288 / 1408);
+    final sideH = sideW / 0.72;
+    final cardW = _lerp(holeW, sideW, blend);
+    final cardH = _lerp(holeH, sideH, blend);
     final opacity = abs > 1.35 ? ((1.85 - abs) / 0.5).clamp(0.0, 1.0) : 1.0;
     final idx = (_index + slot + _shots.length * 8) % _shots.length;
     return Positioned(
-      left: center - cardW / 2,
+      left: centerX - cardW / 2,
       top: (300 - cardH) / 2,
       width: cardW,
       height: cardH,
       child: Opacity(
         opacity: opacity,
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(blend < 0.35 ? 10 : 14),
+          borderRadius: BorderRadius.circular(blend < 0.35 ? 8 : 14),
           child: Image.asset(
             _shots[idx],
             fit: BoxFit.cover,
+            alignment: Alignment.center,
             errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF0A0F1C)),
           ),
         ),
