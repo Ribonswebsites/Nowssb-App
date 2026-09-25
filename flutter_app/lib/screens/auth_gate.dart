@@ -3,7 +3,6 @@
 library;
 
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -228,89 +227,80 @@ class _AuthGateState extends State<AuthGate> {
   }
 
   Widget _glassContent({String? unavailable}) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final minHeight = math.max(0.0, constraints.maxHeight - 24.0).toDouble();
-        return SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: minHeight),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(18, 10, 18, 14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _brandHeader(),
-                  const SizedBox(height: 18),
-                  const Text(
-                    'Welcome back',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                  _googleButton(),
-                  _orDivider(),
-                  _methodButton(
-                    icon: Icons.email_outlined,
-                    label: 'Continue with Email',
-                    open: _showEmail,
-                    onTap: () => setState(() {
-                      _showEmail = !_showEmail;
-                      if (_showEmail) _showPhone = false;
-                      _error = null;
-                    }),
-                  ),
-                  if (_showEmail) _emailForm(),
-                  const SizedBox(height: 10),
-                  _methodButton(
-                    icon: Icons.phone_iphone_outlined,
-                    label: 'Continue with Phone',
-                    open: _showPhone,
-                    onTap: () => setState(() {
-                      _showPhone = !_showPhone;
-                      if (_showPhone) _showEmail = false;
-                      _error = null;
-                    }),
-                  ),
-                  if (_showPhone) _phoneForm(),
-                  if (unavailable != null) ...[
-                    const SizedBox(height: 12),
-                    Text(
-                      unavailable,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(color: Color(0xFFFFB4AB), fontSize: 11, height: 1.35),
-                    ),
-                  ],
-                  if (_error != null) ...[
-                    const SizedBox(height: 12),
-                    Text(
-                      _error!,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(color: Color(0xFFFFB4AB), fontSize: 11, height: 1.35),
-                    ),
-                  ],
-                  const SizedBox(height: 18),
-                  TextButton(
-                    onPressed: _busy ? null : () => setState(() => _guest = true),
-                    style: TextButton.styleFrom(
-                      foregroundColor: const Color(0xFFD4AF37),
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                    ),
-                    child: const Text(
-                      'Explore without account →',
-                      style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500, letterSpacing: 0.3),
-                    ),
-                  ),
-                ],
-              ),
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.fromLTRB(18, 18, 18, 14),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _brandHeader(),
+          const SizedBox(height: 14),
+          const Text(
+            'Welcome back',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
             ),
           ),
-        );
-      },
+          const SizedBox(height: 14),
+          _googleButton(),
+          _orDivider(),
+          _methodButton(
+            icon: Icons.email_outlined,
+            label: 'Continue with Email',
+            open: _showEmail,
+            onTap: () => setState(() {
+              _showEmail = !_showEmail;
+              if (_showEmail) _showPhone = false;
+              _error = null;
+            }),
+          ),
+          if (_showEmail) _emailForm(),
+          const SizedBox(height: 10),
+          _methodButton(
+            icon: Icons.phone_iphone_outlined,
+            label: 'Continue with Phone',
+            open: _showPhone,
+            onTap: () => setState(() {
+              _showPhone = !_showPhone;
+              if (_showPhone) _showEmail = false;
+              _error = null;
+            }),
+          ),
+          if (_showPhone) _phoneForm(),
+          if (unavailable != null) ...[
+            const SizedBox(height: 12),
+            Text(
+              unavailable,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Color(0xFFFFB4AB), fontSize: 11, height: 1.35),
+            ),
+          ],
+          if (_error != null) ...[
+            const SizedBox(height: 12),
+            Text(
+              _error!,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Color(0xFFFFB4AB), fontSize: 11, height: 1.35),
+            ),
+          ],
+          const SizedBox(height: 8),
+          TextButton(
+            onPressed: _busy ? null : () => setState(() => _guest = true),
+            style: TextButton.styleFrom(
+              foregroundColor: const Color(0xFFD4AF37),
+              padding: const EdgeInsets.symmetric(vertical: 10),
+            ),
+            child: const Text(
+              'Explore without account →',
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, letterSpacing: 0.2),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -326,14 +316,18 @@ class _AuthGateState extends State<AuthGate> {
             errorBuilder: (_, __, ___) => const SizedBox(width: 54, height: 54),
           ),
         ),
-        const SizedBox(height: 12),
-        const Text(
-          'NOWSSB',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 26,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 1.4,
+        const SizedBox(height: 10),
+        const FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            'NOWSSB',
+            maxLines: 1,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 28,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 2,
+            ),
           ),
         ),
         const SizedBox(height: 6),

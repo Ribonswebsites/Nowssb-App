@@ -1,6 +1,9 @@
-/// Login stage. The handset stays small in the middle. Twenty campaign
-/// stills travel the four walls of a tunnel, looping toward the camera.
+/// Login stage. No phone. A glass panel stays in the middle.
+/// Ten stills fall from the top like shooting stars. Ten rise from the
+/// bottom. Left and right walls travel the opposite way. Black, looping.
 library;
+
+import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 
@@ -45,7 +48,7 @@ class _LoginGalleryState extends State<LoginGallery>
     super.initState();
     _drift = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 18),
+      duration: const Duration(milliseconds: 7000),
     )..repeat();
   }
 
@@ -57,16 +60,11 @@ class _LoginGalleryState extends State<LoginGallery>
 
   @override
   Widget build(BuildContext context) {
+    final pad = MediaQuery.paddingOf(context);
     return LayoutBuilder(
       builder: (context, constraints) {
         final w = constraints.maxWidth;
         final h = constraints.maxHeight;
-        var phoneH = h * 0.5;
-        var phoneW = phoneH * (606 / 1296);
-        if (phoneW > w * 0.46) {
-          phoneW = w * 0.46;
-          phoneH = phoneW * (1296 / 606);
-        }
         return AnimatedBuilder(
           animation: _drift,
           builder: (context, _) {
@@ -75,87 +73,102 @@ class _LoginGalleryState extends State<LoginGallery>
               fit: StackFit.expand,
               clipBehavior: Clip.hardEdge,
               children: [
-                const ColoredBox(color: Color(0xFF010208)),
-                const DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: RadialGradient(
-                      center: Alignment(0, 0.08),
-                      radius: 0.72,
-                      colors: [Color(0x553A2CFF), Color(0x22101840), Color(0xFF010208)],
-                    ),
-                  ),
-                ),
-                for (final tile in tiles)
-                  Positioned(
-                    left: tile.x,
-                    top: tile.y,
-                    width: tile.w,
-                    height: tile.h,
-                    child: Transform(
-                      alignment: Alignment.center,
-                      transform: Matrix4.identity()
-                        ..setEntry(3, 2, 0.0014)
-                        ..rotateY(tile.ry)
-                        ..rotateX(tile.rx),
-                      child: Opacity(
-                        opacity: tile.opacity,
-                        child: _Still(asset: tile.asset),
-                      ),
-                    ),
-                  ),
-                Center(
-                  child: SizedBox(
-                    width: phoneW,
-                    height: phoneH,
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        Positioned(
-                          left: phoneW * 0.07,
-                          right: phoneW * 0.07,
-                          top: phoneH * 0.1,
-                          bottom: phoneH * 0.06,
-                          child: DecoratedBox(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(phoneW * 0.08),
-                              gradient: const LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [Color(0xFF0A1024), Color(0xFF12082A), Color(0xFF06182C)],
+                const ColoredBox(color: Color(0xFF000000)),
+                IgnorePointer(
+                  child: Stack(
+                    fit: StackFit.expand,
+                    clipBehavior: Clip.hardEdge,
+                    children: [
+                      for (final tile in tiles)
+                        if (tile.opacity > 0.04)
+                          Positioned(
+                            left: tile.x,
+                            top: tile.y,
+                            width: tile.w,
+                            height: tile.h,
+                            child: Transform(
+                              alignment: Alignment.center,
+                              transform: Matrix4.identity()
+                                ..setEntry(3, 2, 0.0011)
+                                ..rotateX(tile.rx)
+                                ..rotateY(tile.ry),
+                              child: Opacity(
+                                opacity: tile.opacity,
+                                child: _Still(asset: tile.asset),
                               ),
                             ),
                           ),
-                        ),
-                        Positioned(
-                          left: phoneW * 0.1,
-                          top: phoneH * 0.13,
-                          width: phoneW * 0.8,
-                          height: phoneH * 0.76,
-                          child: widget.child,
-                        ),
-                        IgnorePointer(
-                          child: Image.asset(
-                            'assets/login/phone-frame.png',
-                            fit: BoxFit.fill,
-                          ),
-                        ),
+                    ],
+                  ),
+                ),
+                const DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: RadialGradient(
+                      center: Alignment(0, 0.02),
+                      radius: 0.95,
+                      colors: [
+                        Color(0x00000000),
+                        Color(0x33000000),
+                        Color(0x99000000),
                       ],
+                      stops: [0.5, 0.78, 1],
                     ),
                   ),
                 ),
                 Positioned(
-                  left: w * 0.28,
-                  right: w * 0.28,
-                  top: h * 0.5 + phoneH * 0.42,
-                  child: IgnorePointer(
-                    child: Container(
-                      height: 28,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(40),
-                        boxShadow: const [
-                          BoxShadow(color: Color(0xAA3D6BFF), blurRadius: 28, spreadRadius: 4),
-                          BoxShadow(color: Color(0x667A3CFF), blurRadius: 40, spreadRadius: 8),
-                        ],
+                  left: w * 0.22,
+                  right: w * 0.22,
+                  top: h * 0.58,
+                  child: const IgnorePointer(
+                    child: SizedBox(
+                      height: 36,
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0xCC3D6BFF),
+                              blurRadius: 36,
+                              spreadRadius: 6,
+                            ),
+                            BoxShadow(
+                              color: Color(0x887A3CFF),
+                              blurRadius: 48,
+                              spreadRadius: 10,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(18, pad.top + 12, 18, pad.bottom + 12),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: 420,
+                        maxHeight: h - pad.top - pad.bottom - 24,
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(28),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: const Color(0xC4101422),
+                              borderRadius: BorderRadius.circular(28),
+                              border: Border.all(color: const Color(0x66FFFFFF)),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Color(0x99000000),
+                                  blurRadius: 32,
+                                  offset: Offset(0, 18),
+                                ),
+                              ],
+                            ),
+                            child: widget.child,
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -171,64 +184,105 @@ class _LoginGalleryState extends State<LoginGallery>
   List<_Tile> _layout(double t, double w, double h) {
     final tiles = <_Tile>[];
     final cx = w / 2;
-    final cy = h * 0.46;
-    final focal = w * 0.82;
-    const depthCount = 4;
-    const lanes = 3;
-    var n = 0;
-    for (var wall = 0; wall < 4; wall++) {
-      for (var lane = 0; lane < lanes; lane++) {
-        for (var d = 0; d < depthCount; d++) {
-          final asset = _cards[n % _cards.length];
-          n++;
-          var zNorm = (d + lane * 0.16 + wall * 0.04 - t * depthCount) % depthCount;
-          if (zNorm < 0) zNorm += depthCount;
-          final z = 1.28 + (zNorm / depthCount) * 5.15;
-          final laneT = (lane - 1).toDouble();
-          var wx = 0.0;
-          var wy = 0.0;
-          var rx = 0.0;
-          var ry = 0.0;
-          const wallDist = 1.08;
-          const spread = 0.78;
-          const cardWorld = 1.18;
-          if (wall == 0) {
-            wx = -wallDist;
-            wy = laneT * spread;
-            ry = 0.58;
-          } else if (wall == 1) {
-            wx = wallDist;
-            wy = laneT * spread;
-            ry = -0.58;
-          } else if (wall == 2) {
-            wy = -wallDist * 0.96;
-            wx = laneT * spread;
-            rx = 0.64;
-          } else {
-            wy = wallDist;
-            wx = laneT * spread;
-            rx = -0.56;
-          }
-          final sx = cx + (wx / z) * focal;
-          final sy = cy + (wy / z) * focal;
-          final cw = (cardWorld / z) * focal;
-          final ch = cw * 0.66;
-          final nearFade = ((z - 1.22) / 0.28).clamp(0.0, 1.0);
-          final farFade = ((6.7 - z) / 0.7).clamp(0.0, 1.0);
-          tiles.add(_Tile(
-            asset: asset,
-            x: sx - cw / 2,
-            y: sy - ch / 2,
-            w: cw,
-            h: ch,
-            rx: rx,
-            ry: ry,
-            opacity: nearFade * farFade,
-            depth: z,
-          ));
-        }
+    final cy = h * 0.48;
+    final focal = w * 1.05;
+
+    void add({
+      required String asset,
+      required double worldX,
+      required double worldY,
+      required double z,
+      required double rx,
+      required double ry,
+      required double phase,
+      double cardWorld = 1.12,
+    }) {
+      final fadeIn = (phase / 0.07).clamp(0.0, 1.0);
+      final fadeOut = ((1 - phase) / 0.1).clamp(0.0, 1.0);
+      final sx = cx + (worldX / z) * focal;
+      final sy = cy + (worldY / z) * focal;
+      final cw = (cardWorld / z) * focal;
+      final ch = cw * 0.72;
+      tiles.add(_Tile(
+        asset: asset,
+        x: sx - cw / 2,
+        y: sy - ch / 2,
+        w: cw,
+        h: ch,
+        rx: rx,
+        ry: ry,
+        opacity: fadeIn * fadeOut,
+        depth: z,
+      ));
+    }
+
+    // Top puzzle: images 1–10. Rows fall from the top toward the glass.
+    for (var c = 0; c < 5; c++) {
+      for (var k = 0; k < 3; k++) {
+        final phase = ((k / 3) + t) % 1.0;
+        final lane = (c - 2).toDouble();
+        final z = 4.2 - phase * 2.5;
+        final worldY = -3.36 + phase * 2.95;
+        add(
+          asset: _cards[c + (k % 2) * 5],
+          worldX: lane * 0.9,
+          worldY: worldY,
+          z: z,
+          rx: 0.78,
+          ry: lane * -0.05,
+          phase: phase,
+        );
       }
     }
+
+    // Bottom puzzle: images 11–20. Same grid, shooting up from below.
+    for (var c = 0; c < 5; c++) {
+      for (var k = 0; k < 3; k++) {
+        final phase = ((k / 3) + t) % 1.0;
+        final lane = (c - 2).toDouble();
+        final z = 1.7 + phase * 2.5;
+        final worldY = 1.49 - phase * 0.48;
+        add(
+          asset: _cards[10 + c + (k % 2) * 5],
+          worldX: lane * 0.9,
+          worldY: worldY,
+          z: z,
+          rx: -0.74,
+          ry: lane * 0.05,
+          phase: phase,
+          cardWorld: 1.22,
+        );
+      }
+    }
+
+    // Left wall falls. Right wall rises.
+    for (var i = 0; i < 5; i++) {
+      final phase = ((i / 5) + t) % 1.0;
+      add(
+        asset: _cards[i * 2],
+        worldX: -1.15 - phase * 0.12,
+        worldY: -1.6 + phase * 3.2,
+        z: 3.2 - phase * 1.35,
+        rx: 0,
+        ry: 0.82,
+        phase: phase,
+        cardWorld: 1.3,
+      );
+    }
+    for (var i = 0; i < 5; i++) {
+      final phase = ((i / 5) + t) % 1.0;
+      add(
+        asset: _cards[10 + i * 2],
+        worldX: 1.15 + phase * 0.12,
+        worldY: 1.6 - phase * 3.2,
+        z: 1.85 + phase * 1.35,
+        rx: 0,
+        ry: -0.82,
+        phase: phase,
+        cardWorld: 1.3,
+      );
+    }
+
     tiles.sort((a, b) => b.depth.compareTo(a.depth));
     return tiles;
   }
@@ -266,14 +320,14 @@ class _Still extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0x88E7F0FF), width: 1.2),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xAAE7F4FF), width: 1.1),
         boxShadow: const [
-          BoxShadow(color: Color(0xCC000000), blurRadius: 18, offset: Offset(0, 10)),
+          BoxShadow(color: Color(0xE6000000), blurRadius: 16, offset: Offset(0, 8)),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10),
         child: Image.asset(asset, fit: BoxFit.cover),
       ),
     );
