@@ -111,9 +111,7 @@ class _SignatureBody extends StatelessWidget {
         ColoredSplitPromoBanner.forSurface(
           SplitPromoSurface.signatureStore,
           onTap: () => openRequestWords(context),
-        ),
-        ColoredSplitPromoBanner(
-          spec: SplitPromoExtras.at(10, onTap: () => openRequestWords(context)),
+          margin: const EdgeInsets.only(bottom: 8),
         ),
         if (w2.isNotEmpty) ...[
           RmCatBanner(
@@ -281,6 +279,11 @@ class _SignatureBody extends StatelessWidget {
               ),
             ],
           ),
+        ),
+        const SizedBox(height: 36),
+        ColoredSplitPromoBanner(
+          spec: SplitPromoExtras.at(10, onTap: () => openRequestWords(context)),
+          margin: const EdgeInsets.only(bottom: 40),
         ),
         ColoredSplitPromoBanner(
           spec: SplitPromoExtras.at(11, onTap: () => openRequestWords(context)),

@@ -48,9 +48,9 @@ class _SplashState extends State<Splash> {
 
   static const _asset = 'assets/video/start-animation.mp4';
 
-  /// A quarter faster than recorded. Enough to take the wait off a ten-second
-  /// clip without the motion reading as sped-up.
-  static const _speed = 1.25;
+  /// Twice recorded speed. The clip still plays all the way through — it
+  /// just does not sit on the launch.
+  static const _speed = 2.0;
 
   @override
   void initState() {

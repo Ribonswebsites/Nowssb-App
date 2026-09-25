@@ -32,28 +32,21 @@ class PlayerGuideSlide {
   final bool isFinal;
 }
 
-/// Same URLs as `PWG_ICONS` / `PWG_*_IMG` in part054.js.
-const _kBrand =
-    'https://media.nowssb.com/migrated-images/2ab8b4bbd1a045b0_file_0000000039c8720893ebc07bba4d3afd_iq64ts.png';
-const _kListenIcon =
-    'https://media.nowssb.com/migrated-images/74d38b3c7b69b30b_e06d2880-7389-11f1-8c74-0593c060acc9_jy24tl.png';
-const _kPracticeIcon =
-    'https://media.nowssb.com/migrated-images/a8a2eb1bb04d59d1_27cbc180-7387-11f1-ac66-23a66b2b6053_mf6jdr.png';
-const _kLibraryIcon =
-    'https://media.nowssb.com/migrated-images/643dd804e986b5f6_3259c840-7387-11f1-ac66-23a66b2b6053_ikqafa.png';
-const _kSettingsIcon =
-    'https://media.nowssb.com/migrated-images/909b614a4f984b77_f90f56e0-7386-11f1-ac66-23a66b2b6053_n5ahnk.png';
-const _kStoreIcon =
-    'https://media.nowssb.com/migrated-images/1a5f669e63dbae9d_file_00000000854881fa9a548a68fae59c15_w1utya.png';
-const _kReadyIcon =
-    'https://media.nowssb.com/migrated-images/dc638b945c082954_file_000000003254720aab81c7118e7cc24a_ohsba3.png';
+/// Local copies of the walkthrough stills. Remote URLs made every slide
+/// wait on the network — these are in the bundle so the guide is instant.
+const _kBrand = 'assets/player/guide/brand.png';
+const _kListenIcon = 'assets/player/guide/listen.png';
+const _kPracticeIcon = 'assets/player/guide/practice.png';
+const _kLibraryIcon = 'assets/player/guide/library.png';
+const _kSettingsIcon = 'assets/player/guide/settings.png';
+const _kStoreIcon = 'assets/player/guide/store.png';
+const _kReadyIcon = 'assets/player/guide/ready.png';
 
 const kPlayerGuideSlides = <PlayerGuideSlide>[
   PlayerGuideSlide(
     title: 'NowssB Player Guide',
     icon: _kBrand,
-    img:
-        'https://media.nowssb.com/migrated-images/2ec9ad4747c6b76d_file_00000000d7e88209a05b0cd46d3c9204_yylblf.png',
+    img: 'assets/player/guide/01.png',
     heading: 'Welcome to Your Practice Player',
     desc:
         'This is where you listen to, pronounce and master every word in your daily routine. Let’s walk through exactly how it works — button by button.',
@@ -61,8 +54,7 @@ const kPlayerGuideSlides = <PlayerGuideSlide>[
   PlayerGuideSlide(
     title: 'Player Listen',
     icon: _kListenIcon,
-    img:
-        'https://media.nowssb.com/migrated-images/8f6e22d3e27e8f82_file_00000000e0948207852ee99ed468fbb0_gon5be.png',
+    img: 'assets/player/guide/02.png',
     heading: 'Listen & Navigate',
     desc:
         'Tap the centre Play button to hear the word pronounced aloud. Use the arrows on either side to move to the Previous or Next word, and tap Replay anytime to hear it again.',
@@ -70,8 +62,7 @@ const kPlayerGuideSlides = <PlayerGuideSlide>[
   PlayerGuideSlide(
     title: 'Player Record',
     icon: _kPracticeIcon,
-    img:
-        'https://media.nowssb.com/migrated-images/2c3aae23bdda443d_file_000000007b8081fa9f8bfa346747e79f_pbkbqy.png',
+    img: 'assets/player/guide/03.png',
     heading: 'Practice & Get Scored',
     desc:
         'Tap Practice to record your own voice saying the word. Each syllable lights up as you speak it, and you get an instant pronunciation score — the more you repeat, the more it builds your streak.',
@@ -79,8 +70,7 @@ const kPlayerGuideSlides = <PlayerGuideSlide>[
   PlayerGuideSlide(
     title: 'Player Library',
     icon: _kLibraryIcon,
-    img:
-        'https://media.nowssb.com/migrated-images/d21b96de1967b542_file_00000000bc3481fba068b600e71ed418_xt5arr.png',
+    img: 'assets/player/guide/04.png',
     heading: 'Build Your Library & Sentences',
     desc:
         'Tap the Library icon to open every word you’ve unlocked. Every word you purchase is added here automatically — combine them to build your own healing sentences, saved for practice anytime.',
@@ -88,8 +78,7 @@ const kPlayerGuideSlides = <PlayerGuideSlide>[
   PlayerGuideSlide(
     title: 'Player Settings',
     icon: _kSettingsIcon,
-    img:
-        'https://media.nowssb.com/migrated-images/db763251a11604b4_file_00000000cf00820b83f17dc392a0071d_hhm18g.png',
+    img: 'assets/player/guide/05.png',
     heading: 'Word Info & Player Settings',
     desc:
         'Tap the info icon to see the word’s meaning, the organ it benefits, and healing detail. Tap the settings gear to switch the voice (male or female), turn Loop on, or change your rep target.',
@@ -97,8 +86,7 @@ const kPlayerGuideSlides = <PlayerGuideSlide>[
   PlayerGuideSlide(
     title: 'Player Store',
     icon: _kStoreIcon,
-    img:
-        'https://media.nowssb.com/migrated-images/5808c91d1975b9fa_file_00000000c70081faab87b58c23b3edcb_yzyrbf.png',
+    img: 'assets/player/guide/06.png',
     heading: 'Grow Your Collection',
     desc:
         'Tap the Store icon anytime to buy new words and meanings — every purchase instantly joins your Library, so you can keep expanding your personal word ritual.',
@@ -106,8 +94,7 @@ const kPlayerGuideSlides = <PlayerGuideSlide>[
   PlayerGuideSlide(
     title: 'Signature Word',
     icon: _kStoreIcon,
-    img:
-        'https://media.nowssb.com/migrated-images/f3c17b36e07098ec_file_0000000035ac81fa8d163588e627b067_xjpm5r.png',
+    img: 'assets/player/guide/07.png',
     heading: 'Unlock a Signature Word',
     desc:
         'Signature words are the rarest word in each category — one per set, own only in a special gold edition. Look for the Signature tag in the Store to add one to your collection.',
@@ -115,8 +102,7 @@ const kPlayerGuideSlides = <PlayerGuideSlide>[
   PlayerGuideSlide(
     title: 'Player Ready',
     icon: _kReadyIcon,
-    img:
-        'https://media.nowssb.com/migrated-images/9f4113b898ea8bfe_file_00000000b6c481fab8074cb5a1d16756_thikfl.png',
+    img: 'assets/player/guide/08.png',
     heading: 'You’re All Set',
     desc:
         'That’s everything you need to know. Tap Begin to start your first practice session.',
@@ -142,6 +128,13 @@ class _PlayerGuideScreenState extends State<PlayerGuideScreen> {
   void initState() {
     super.initState();
     _pages = PageController();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      for (final s in kPlayerGuideSlides) {
+        precacheImage(AssetImage(s.img), context);
+        precacheImage(AssetImage(s.icon), context);
+      }
+    });
   }
 
   @override

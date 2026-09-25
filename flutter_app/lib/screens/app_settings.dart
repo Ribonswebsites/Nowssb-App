@@ -4,11 +4,15 @@
 /// Settings row. Persists toggles via SharedPreferences. No emoji.
 library;
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import '../data/practice_progress.dart';
 import '../data/settings.dart';
+import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 import '../widgets/black_glass_banner.dart';
 import '../widgets/colored_split_promo_banner.dart';
@@ -732,7 +736,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                               icon: Icons.lock_outline,
                               title: 'Privacy Settings',
                               sub: 'Who can see your stats',
-                              onTap: () => _toast('Privacy options saved locally.'),
+                              onTap: () => _openPrivacy(),
                             ),
                           if (_match('Chat'))
                             _NavRow(
@@ -740,12 +744,11 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                               title: 'Chat Settings',
                               sub: 'Manage who can message you',
                               last: true,
-                              onTap: () => _toast('Chat preferences saved.'),
+                              onTap: () => _openChat(),
                             ),
                         ],
                       ),
-                    if (_match('Download') ||
-                        _match('Cached') ||
+                    if (_match('Cached') ||
                         _match('Clear Practice') ||
                         _match('About') ||
                         _match('Terms') ||
@@ -753,20 +756,12 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                       _Sec(
                         label: 'APP & ABOUT',
                         children: [
-                          if (_match('Download'))
-                            _NavRow(
-                              icon: Icons.download_rounded,
-                              title: 'Download App',
-                              sub: 'You are already in the NowssB app',
-                              onTap: () => _toast(
-                                  'You are already in the NowssB app.'),
-                            ),
                           if (_match('Cached'))
                             _NavRow(
                               icon: Icons.cleaning_services_outlined,
                               title: 'Cached Data',
                               sub: 'Clear temporary media cache',
-                              onTap: () => _toast('Cache cleared.'),
+                              onTap: _clearCache,
                             ),
                           if (_match('Clear Practice'))
                             _NavRow(
@@ -795,14 +790,14 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                               icon: Icons.info_outline,
                               title: 'About NowssB',
                               sub: 'v2.6.0 · nowssb.com',
-                              onTap: () => _toast('NowssB · Shabdapathy'),
+                              onTap: _openAbout,
                             ),
                           if (_match('Terms'))
                             _NavRow(
                               icon: Icons.description_outlined,
                               title: 'Terms & Privacy Policy',
                               sub: 'Legal',
-                              onTap: () => _toast('Opens nowssb.com/legal'),
+                              onTap: _openTerms,
                             ),
                           if (_match('Sign Out'))
                             _NavRow(
@@ -811,7 +806,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                               sub: 'End this session',
                               last: true,
                               danger: true,
-                              onTap: () => _toast('Signed out on this device.'),
+                              onTap: _signOut,
                             ),
                         ],
                       ),
@@ -823,6 +818,137 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _clearCache() async {
+    PaintingBinding.instance.imageCache.clear();
+    PaintingBinding.instance.imageCache.clearLiveImages();
+    await VideoPool.instance.releaseAll();
+    _toast('Temporary media cache cleared.');
+  }
+
+  Future<void> _openAbout() async {
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF14171E),
+        title: const Text('About NowssB',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+        content: const Text(
+          'NowssB · Shabdapathy\nNatural Origin Word Science\nVersion 9.5.0\n\nnowssb.com',
+          style: TextStyle(color: Color(0xE6FFFFFF), height: 1.45),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Close'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              _openTerms();
+            },
+            child: const Text('Website'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _openTerms() async {
+    final uri = Uri.parse('https://nowssb.com');
+    final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!opened && mounted) _toast('Could not open nowssb.com');
+  }
+
+  Future<void> _openPrivacy() async {
+    final prefs = await SharedPreferences.getInstance();
+    var stats = prefs.getBool('ss_privacy_stats') ?? true;
+    var profile = prefs.getBool('ss_privacy_profile') ?? true;
+    if (!mounted) return;
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setLocal) => AlertDialog(
+          backgroundColor: const Color(0xFF14171E),
+          title: const Text('Privacy',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Show practice stats',
+                    style: TextStyle(color: Colors.white)),
+                value: stats,
+                onChanged: (v) async {
+                  setLocal(() => stats = v);
+                  await prefs.setBool('ss_privacy_stats', v);
+                },
+              ),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Public profile',
+                    style: TextStyle(color: Colors.white)),
+                value: profile,
+                onChanged: (v) async {
+                  setLocal(() => profile = v);
+                  await prefs.setBool('ss_privacy_profile', v);
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Done'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openChat() async {
+    final prefs = await SharedPreferences.getInstance();
+    var messages = prefs.getBool('ss_chat_messages') ?? true;
+    if (!mounted) return;
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setLocal) => AlertDialog(
+          backgroundColor: const Color(0xFF14171E),
+          title: const Text('Messages',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+          content: SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: const Text('Allow messages',
+                style: TextStyle(color: Colors.white)),
+            subtitle: const Text('Turn off to stop new messages on this phone',
+                style: TextStyle(color: Color(0x99FFFFFF))),
+            value: messages,
+            onChanged: (v) async {
+              setLocal(() => messages = v);
+              await prefs.setBool('ss_chat_messages', v);
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Done'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _signOut() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+    } catch (_) {}
+    if (!mounted) return;
+    _toast('Signed out.');
   }
 
   void _toast(String msg) {
@@ -854,7 +980,10 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
         ],
       ),
     );
-    if (ok == true && mounted) _toast('Practice history cleared.');
+    if (ok == true && mounted) {
+      await PracticeProgress.instance.clearAll();
+      if (mounted) _toast('Practice history cleared.');
+    }
   }
 }
 

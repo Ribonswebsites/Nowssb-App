@@ -565,7 +565,7 @@ class _HomeFashionState extends State<HomeFashion> {
                   return HomeHeader(
                     notifications: NotifStore.instance.unreadRaw,
                     onNotifications: () => showNotificationsSheet(context),
-                    onNormalHome: () => Settings.instance.setFashionHome(false),
+                    onSettings: () => _push(const AppSettingsScreen()),
                     onMenu: () => showHomeMenuDrawer(context, goTab: _go),
                   );
                 },

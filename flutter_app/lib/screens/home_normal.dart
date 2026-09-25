@@ -77,6 +77,7 @@ import '../widgets/subscription_today_offer.dart';
 import '../widgets/earth_day_film.dart';
 import '../widgets/promo_color_grid.dart';
 import 'quotes_live.dart';
+import 'app_settings.dart';
 import 'player_settings.dart';
 import 'practice_player.dart';
 import 'progress/progress_screen.dart';
@@ -689,7 +690,11 @@ class _TopRow extends StatelessWidget {
         // Quick access belongs in Fashion Hero — bell returns here.
         _HeaderButton(
           icon: Icons.settings_outlined,
-          onTap: () => _openActions(context),
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => const AppSettingsScreen(),
+            ),
+          ),
         ),
         const _HeaderDivider(),
         _HeaderButton(

@@ -178,8 +178,11 @@ class _EbooksBody extends StatelessWidget {
               builder: (_) => const SoundLibraryScreen(),
             ),
           ),
-          margin: const EdgeInsets.only(bottom: 36),
+          margin: const EdgeInsets.only(bottom: 8),
         ),
+        const SizedBox(height: 8),
+        for (final b in books) _EbookRow(book: b),
+        const SizedBox(height: 40),
         ColoredSplitPromoBanner(
           spec: SplitPromoExtras.at(
             12,
@@ -189,9 +192,8 @@ class _EbooksBody extends StatelessWidget {
               ),
             ),
           ),
+          margin: const EdgeInsets.only(bottom: 48),
         ),
-        const SizedBox(height: 8),
-        for (final b in books) _EbookRow(book: b),
         ColoredSplitPromoBanner(
           spec: SplitPromoExtras.at(
             13,

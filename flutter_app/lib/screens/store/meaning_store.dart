@@ -283,17 +283,7 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
               builder: (_) => const SignatureStoreScreen(),
             ),
           ),
-          margin: const EdgeInsets.only(bottom: 36),
-        ),
-        ColoredSplitPromoBanner(
-          spec: SplitPromoExtras.at(
-            8,
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => const SignatureStoreScreen(),
-              ),
-            ),
-          ),
+          margin: const EdgeInsets.only(bottom: 8),
         ),
         StoreFeaturedPlaylistSection(
           meanings: true,
@@ -304,6 +294,18 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
           meanings: true,
           onSeeAll: () => _openViewAll('Featured Collections'),
           onOpenWord: _openMeaning,
+        ),
+        const SizedBox(height: 36),
+        ColoredSplitPromoBanner(
+          spec: SplitPromoExtras.at(
+            8,
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => const SignatureStoreScreen(),
+              ),
+            ),
+          ),
+          margin: const EdgeInsets.only(bottom: 36),
         ),
         ..._meaningCollectionSections(context, order, cats),
         if (cats.isEmpty)

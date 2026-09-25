@@ -174,19 +174,46 @@ class _SoundLibraryScreenState extends State<SoundLibraryScreen> {
   }
 
   List<Word> _chosen(List<Word> all) {
-    if (_chip == 'All' ||
-        _chip == 'Currently Playing' ||
-        _chip == 'Sentences' ||
-        _chip == 'Trending' ||
-        _chip == 'Global' ||
-        _chip == 'Purchased' ||
-        _chip == 'My Words') {
-      // Never leave Sentences / Purchased / My Words as an empty cage —
-      // wire filters to real library content.
-      return all;
+    final counts = _sessionCounts();
+    List<Word> practiced() {
+      final list = all.where((w) => (counts[w.word] ?? 0) > 0).toList()
+        ..sort((a, b) =>
+            (counts[b.word] ?? 0).compareTo(counts[a.word] ?? 0));
+      return list;
     }
-    final hit = all.where((w) => w.categories.contains(_chip)).toList();
-    return hit.isNotEmpty ? hit : all;
+
+    switch (_chip) {
+      case 'All':
+        return all;
+      case 'Currently Playing':
+        final live = practiced();
+        return live.isNotEmpty ? live.take(8).toList() : all.take(1).toList();
+      case 'Trending':
+        final hot = practiced();
+        if (hot.length >= 3) return hot;
+        return all.reversed.toList();
+      case 'Global':
+        final global = all.where((w) {
+          final blob =
+              '${w.word} ${w.origin} ${w.categories.join(' ')}'.toLowerCase();
+          return blob.contains('global') ||
+              blob.contains('world') ||
+              w.categories.length > 1;
+        }).toList();
+        if (global.isNotEmpty && global.length < all.length) return global;
+        return [
+          for (var i = 0; i < all.length; i++)
+            if (i.isOdd) all[i],
+        ];
+      case 'Sentences':
+        return all;
+      case 'My Words':
+        return practiced();
+      case 'Purchased':
+        return all.where((w) => w.price == 0).toList();
+      default:
+        return all.where((w) => w.categories.contains(_chip)).toList();
+    }
   }
 
   void _onChip(String c) {
@@ -425,10 +452,65 @@ class _SlmFeed extends StatelessWidget {
                             onMore: onOpenWord,
                           ),
                         ),
-                      _storeVideos(wide),
                       _promoAt(0),
                       _buyRequest(),
-                      _meaningRows(),
+                    ] else if (chip == 'Global') ...[
+                      _ytmPlainSection(
+                        "Today's Global Hits",
+                        eyebrow: 'NOT THE SAME LIST AS ALL',
+                        child: _HitsRail(
+                          words: words.take(12).toList(),
+                          art: art,
+                          counts: counts,
+                          onTap: onPlayWord,
+                        ),
+                      ),
+                      _storeVideos(wide),
+                    ] else if (chip == 'Trending') ...[
+                      if (words.isEmpty)
+                        _empty()
+                      else
+                        _ytmPlainSection(
+                          'Trending songs for you',
+                          trailing: _pill('Play all', () => onPlayWord(words.first)),
+                          child: _YtmTrackList(
+                            words: words,
+                            art: art,
+                            counts: counts,
+                            onTap: onPlayWord,
+                            onMore: onOpenWord,
+                          ),
+                        ),
+                    ] else if (chip == 'My Words') ...[
+                      if (words.isEmpty)
+                        _empty()
+                      else
+                        _ytmPlainSection(
+                          'Words you have practiced',
+                          trailing: _pill('Play all', () => onPlayWord(words.first)),
+                          child: _YtmTrackList(
+                            words: words,
+                            art: art,
+                            counts: counts,
+                            onTap: onPlayWord,
+                            onMore: onOpenWord,
+                          ),
+                        ),
+                    ] else if (chip == 'Purchased') ...[
+                      if (words.isEmpty)
+                        _empty()
+                      else
+                        _ytmPlainSection(
+                          'Included with your library',
+                          trailing: _pill('Play all', () => onPlayWord(words.first)),
+                          child: _YtmTrackList(
+                            words: words,
+                            art: art,
+                            counts: counts,
+                            onTap: onPlayWord,
+                            onMore: onOpenWord,
+                          ),
+                        ),
                     ] else if (words.isEmpty) ...[
                       _empty(),
                       _promoAt(1),
@@ -984,7 +1066,7 @@ class _SlmFeed extends StatelessWidget {
       'From the Store',
       trailing: _chev(onStore),
       child: SizedBox(
-        height: 220,
+        height: cardW * 9 / 16 + 52,
         child: ListView.separated(
           scrollDirection: Axis.horizontal,
           padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -999,12 +1081,15 @@ class _SlmFeed extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    FramedSlot(
-                      frame: DeviceFrame.tab4Landscape,
-                      child: NwsbVideo(
-                        asset: x.asset,
-                        priority: ClipPriority.decoration,
-                        fit: BoxFit.contain,
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(14),
+                      child: AspectRatio(
+                        aspectRatio: 16 / 9,
+                        child: NwsbVideo(
+                          asset: x.asset,
+                          priority: ClipPriority.decoration,
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 6),
@@ -1598,6 +1683,29 @@ class _SlmHead extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
               ],
+            ),
+          ),
+          const SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            child: GestureDetector(
+              onVerticalDragEnd: (d) {
+                if ((d.primaryVelocity ?? 0) > 180) onPlayHeader?.call();
+              },
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: const AspectRatio(
+                  aspectRatio: 16 / 9,
+                  child: NwsbVideo(
+                    asset: 'assets/video/sound-library-banner.mp4',
+                    fit: BoxFit.cover,
+                    priority: ClipPriority.feature,
+                    autoplay: true,
+                    loop: true,
+                    showPoster: true,
+                  ),
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 10),
@@ -2590,10 +2698,17 @@ class _SoundCategoryScreenState extends State<SoundCategoryScreen> {
   }
 
   List<Word> _wordsFor(List<Word> all) {
-    final hit =
-        all.where((w) => w.categories.contains(widget.category)).toList();
-    // Never leave Category pages empty — fall back to full library lists.
-    return hit.isNotEmpty ? hit : all;
+    return all.where((w) => w.categories.contains(widget.category)).toList();
+  }
+
+  String _bannerFor(String category) {
+    const vids = [
+      'assets/video/sound-library-banner.mp4',
+      'assets/video/signature-banner.mp4',
+      'assets/video/subscription-a.mp4',
+      'assets/video/coupon-a.mp4',
+    ];
+    return vids[category.hashCode.abs() % vids.length];
   }
 
   void _playWord(Word w) {
@@ -2646,131 +2761,108 @@ class _SoundCategoryScreenState extends State<SoundCategoryScreen> {
       backgroundColor: Colors.black,
       body: CustomScrollView(
         slivers: [
-          // Artist-style hero — tall film, name, audience, Subscribe + Play.
           SliverToBoxAdapter(
-            child: SizedBox(
-              height: top + 340,
-              child: Stack(
-                fit: StackFit.expand,
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(12, top + 8, 12, 4),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Positioned.fill(
-                    child: NwsbVideo(
-                      asset: 'assets/video/sound-library-banner.mp4',
-                      fit: BoxFit.cover,
-                      priority: ClipPriority.feature,
-                      autoplay: true,
-                      loop: true,
-                      showPoster: true,
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: () => Navigator.of(context).maybePop(),
+                        icon: const Icon(Icons.arrow_back_rounded,
+                            color: Colors.white, size: 24),
+                      ),
+                      const Spacer(),
+                      IconButton(
+                        onPressed: _goStore,
+                        icon: const Icon(Icons.share_outlined,
+                            color: Colors.white, size: 22),
+                      ),
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Text(
+                      widget.category.toUpperCase(),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 32,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.6,
+                        height: 1.05,
+                      ),
                     ),
                   ),
-                  Positioned.fill(
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          stops: const [0.0, 0.45, 0.78, 1.0],
-                          colors: [
-                            Colors.black.withValues(alpha: 0.18),
-                            Colors.transparent,
-                            Colors.black.withValues(alpha: 0.35),
-                            Colors.black.withValues(alpha: 0.92),
-                          ],
+                  const SizedBox(height: 10),
+                  GestureDetector(
+                    onVerticalDragEnd: (d) {
+                      if ((d.primaryVelocity ?? 0) > 180) _playAll(words);
+                    },
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: AspectRatio(
+                        aspectRatio: 16 / 9,
+                        child: NwsbVideo(
+                          asset: _bannerFor(widget.category),
+                          fit: BoxFit.cover,
+                          priority: ClipPriority.feature,
+                          autoplay: true,
+                          loop: true,
+                          showPoster: true,
                         ),
                       ),
                     ),
                   ),
-                  Positioned(
-                    left: 8,
-                    right: 12,
-                    top: top + 4,
-                    child: Row(
-                      children: [
-                        IconButton(
-                          onPressed: () => Navigator.of(context).maybePop(),
-                          icon: const Icon(Icons.arrow_back_rounded,
-                              color: Colors.white, size: 24),
-                        ),
-                        const Spacer(),
-                        IconButton(
-                          onPressed: _goStore,
-                          icon: const Icon(Icons.share_outlined,
-                              color: Colors.white, size: 22),
-                        ),
-                      ],
+                  const SizedBox(height: 10),
+                  Text(
+                    '${words.length} word${words.length == 1 ? '' : 's'} · NowssB audience',
+                    style: const TextStyle(
+                      color: Color(0xFFE0E0E0),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                  Positioned(
-                    left: 16,
-                    right: 16,
-                    bottom: 18,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.category.toUpperCase(),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      GestureDetector(
+                        onTap: _goStore,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 18, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE8E8E8),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: const Text(
+                            'Subscribe',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      GestureDetector(
+                        onTap: () => _playAll(words),
+                        child: Container(
+                          width: 48,
+                          height: 48,
+                          decoration: const BoxDecoration(
                             color: Colors.white,
-                            fontSize: 34,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: -0.8,
-                            height: 1.05,
-                            shadows: [
-                              Shadow(color: Colors.black54, blurRadius: 8),
-                            ],
+                            shape: BoxShape.circle,
                           ),
+                          child: const Icon(Icons.play_arrow_rounded,
+                              color: Colors.black, size: 30),
                         ),
-                        const SizedBox(height: 6),
-                        Text(
-                          '${words.length} word${words.length == 1 ? '' : 's'} · NowssB audience',
-                          style: const TextStyle(
-                            color: Color(0xFFE0E0E0),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-                        Row(
-                          children: [
-                            GestureDetector(
-                              onTap: _goStore,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 18, vertical: 10),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFE8E8E8),
-                                  borderRadius: BorderRadius.circular(999),
-                                ),
-                                child: const Text(
-                                  'Subscribe',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            GestureDetector(
-                              onTap: () => _playAll(words),
-                              child: Container(
-                                width: 48,
-                                height: 48,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(Icons.play_arrow_rounded,
-                                    color: Colors.black, size: 30),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ],
               ),

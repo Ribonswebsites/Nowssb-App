@@ -11,14 +11,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../data/content.dart';
-import '../data/settings.dart';
-import '../media/nwsb_image.dart';
 import '../screens/app_settings.dart';
 import '../screens/notifications_settings.dart';
 import '../screens/progress/progress_screen.dart';
+import '../screens/reader/reader_hub.dart';
+import '../screens/saved_words.dart';
+import '../screens/shared_sections.dart';
 import '../screens/sound_library.dart';
 import '../screens/store/meaning_store.dart';
+import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
+import '../widgets/nwsb_icon.dart';
 import 'black_glass_banner.dart';
 
 /// Opens the website hamburger (`#menuDrawer`) over the current route.
@@ -27,7 +30,7 @@ Future<void> showHomeMenuDrawer(
   required void Function(int tab) goTab,
 }) {
   HapticFeedback.lightImpact();
-  final light = !Settings.instance.fashionHome;
+  // Both homes open the same dark menu. The pale drawer was a different page.
   return showGeneralDialog<void>(
     context: context,
     barrierDismissible: true,
@@ -36,7 +39,7 @@ Future<void> showHomeMenuDrawer(
     transitionDuration: const Duration(milliseconds: 350),
     pageBuilder: (ctx, anim, secondary) {
       return HomeMenuDrawer(
-        light: light,
+        light: false,
         goTab: goTab,
       );
     },
@@ -79,47 +82,34 @@ class HomeMenuDrawer extends StatelessWidget {
   final bool light;
   final void Function(int tab) goTab;
 
-  // Icon URLs — index.html `#menuDrawer` rows, verbatim.
-  static const _ico = {
-    'home':
-        'https://media.nowssb.com/migrated-images/4815ce65fb831cbf_569b91f0-578c-11f1-b67f-cfd32a085e10_pm6xc7.png',
-    'practice':
-        'https://media.nowssb.com/migrated-images/44ed38a222535b9c_38538b80-56d8-11f1-8fad-095787cce754_xam2bb.png',
-    'routines':
-        'https://media.nowssb.com/migrated-images/307233cd22669455_file_00000000f740820ba6aaa761133e8889_fitm0p.png',
-    'library':
-        'https://media.nowssb.com/migrated-images/62e5d0908e54a2a6_c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png',
-    'science':
-        'https://media.nowssb.com/migrated-images/18d60349303620d7_f89da3a0-578a-11f1-9331-1302872077be_xfgkbq.png',
-    'shabda':
-        'https://media.nowssb.com/migrated-images/8d5ed439e0e80c36_49a3a200-578a-11f1-9331-1302872077be_jgmnss.png',
-    'progress':
-        'https://media.nowssb.com/migrated-images/8cf0327e534eb7d4_a7b04840-5789-11f1-9331-1302872077be_bqobig.png',
-    'store':
-        'https://media.nowssb.com/migrated-images/86a1283688196499_ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png',
-    'meaning':
-        'https://media.nowssb.com/migrated-images/fb6b31dcda617790_cb456de0-56cf-11f1-8fad-095787cce754_zplzrc.png',
-    'profile':
-        'https://media.nowssb.com/migrated-images/3979b9fa35b579e6_62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png',
-    'settings':
-        'https://media.nowssb.com/migrated-images/523b5889d13cb14a_260480b0-56d8-11f1-8fad-095787cce754_rz6zbi.png',
-    'connect':
-        'https://media.nowssb.com/migrated-images/ea559460014dd8d9_file_00000000b84c7209ab496862cacd6a7f_kagsie.png',
+  // Drawn marks only — no remote icon photos.
+  static const _mark = {
+    'home': NwsbMarks.house,
+    'practice': NwsbMarks.play,
+    'routines': NwsbMarks.flame,
+    'library': NwsbMarks.sound,
+    'science': NwsbMarks.book,
+    'shabda': NwsbMarks.signature,
+    'progress': NwsbMarks.trending,
+    'store': NwsbMarks.bag,
+    'meaning': NwsbMarks.meaning,
+    'profile': NwsbMarks.user,
+    'settings': NwsbMarks.gear,
+    'connect': NwsbMarks.reader,
   };
 
   void _close(BuildContext context) => Navigator.of(context).maybePop();
 
   void _goTab(BuildContext context, int tab) {
     Navigator.of(context).pop();
-    Future<void>.delayed(const Duration(milliseconds: 280), () => goTab(tab));
+    goTab(tab);
   }
 
+  /// Replaces the drawer route so the home never flashes underneath.
   void _push(BuildContext context, Widget page) {
-    final root = Navigator.of(context, rootNavigator: true);
-    Navigator.of(context).pop();
-    Future<void>.delayed(const Duration(milliseconds: 280), () {
-      root.push(MaterialPageRoute<void>(builder: (_) => page));
-    });
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute<void>(builder: (_) => page),
+    );
   }
 
   @override
@@ -227,25 +217,25 @@ class HomeMenuDrawer extends StatelessWidget {
                         children: [
                           _Row(
                             light: light,
-                            iconUrl: _ico['home']!,
+                            mark: _mark['home']!,
                             label: 'Home',
                             sub: 'Dashboard',
                             onTap: () => _goTab(context, 0),
                           ),
                           _Row(
                             light: light,
-                            iconUrl: _ico['practice']!,
+                            mark: _mark['practice']!,
+                            viewBox: 22,
                             label: 'Daily Practice',
                             sub: 'Morning ritual',
                             onTap: () => _goTab(context, 1),
                           ),
                           _Row(
                             light: light,
-                            iconUrl: _ico['routines']!,
-                            iconSize: 26,
+                            mark: _mark['routines']!,
                             label: 'My Routines',
                             sub: '5 routine slots',
-                            onTap: () => _goTab(context, 1),
+                            onTap: () => _push(context, const _RoutinesPage()),
                           ),
                         ],
                       ),
@@ -255,7 +245,7 @@ class HomeMenuDrawer extends StatelessWidget {
                         children: [
                           _Row(
                             light: light,
-                            iconUrl: _ico['library']!,
+                            mark: _mark['library']!,
                             label: 'Sound Library',
                             sub: 'Root frequencies',
                             onTap: () =>
@@ -263,17 +253,18 @@ class HomeMenuDrawer extends StatelessWidget {
                           ),
                           _Row(
                             light: light,
-                            iconUrl: _ico['science']!,
+                            mark: _mark['science']!,
                             label: 'Word Science',
                             sub: 'NOWSBANSIU system',
                             onTap: () => _goTab(context, 2),
                           ),
                           _Row(
                             light: light,
-                            iconUrl: _ico['shabda']!,
+                            mark: _mark['shabda']!,
                             label: 'Shabdapathy',
                             sub: 'Foundations',
-                            onTap: () => _goTab(context, 2),
+                            onTap: () =>
+                                _push(context, const ReaderHubScreen()),
                           ),
                         ],
                       ),
@@ -283,7 +274,8 @@ class HomeMenuDrawer extends StatelessWidget {
                         children: [
                           _Row(
                             light: light,
-                            iconUrl: _ico['progress']!,
+                            mark: _mark['progress']!,
+                            viewBox: 22,
                             label: 'My Progress',
                             sub: 'Healing journey',
                             onTap: () => _push(
@@ -295,14 +287,14 @@ class HomeMenuDrawer extends StatelessWidget {
                           ),
                           _Row(
                             light: light,
-                            iconUrl: _ico['store']!,
+                            mark: _mark['store']!,
                             label: 'NowssB Store',
                             sub: 'Word & Meaning Libraries',
                             onTap: () => _goTab(context, 3),
                           ),
                           _Row(
                             light: light,
-                            iconUrl: _ico['meaning']!,
+                            mark: _mark['meaning']!,
                             label: 'Meaning Store',
                             sub: 'True hidden meanings',
                             onTap: () =>
@@ -316,14 +308,14 @@ class HomeMenuDrawer extends StatelessWidget {
                         children: [
                           _Row(
                             light: light,
-                            iconUrl: _ico['profile']!,
+                            mark: _mark['profile']!,
                             label: 'Profile',
                             sub: 'Settings & account',
                             onTap: () => _goTab(context, 4),
                           ),
                           _Row(
                             light: light,
-                            iconUrl: _ico['settings']!,
+                            mark: _mark['settings']!,
                             label: 'Settings',
                             sub: 'Preferences',
                             onTap: () =>
@@ -331,11 +323,7 @@ class HomeMenuDrawer extends StatelessWidget {
                           ),
                           _Row(
                             light: light,
-                            icon: const Icon(
-                              Icons.notifications_none_rounded,
-                              size: 21,
-                              color: NwsbColors.gold,
-                            ),
+                            mark: NwsbMarks.bell,
                             label: 'Notifications',
                             sub: 'Turn them on for this phone',
                             onTap: () => _push(
@@ -345,33 +333,12 @@ class HomeMenuDrawer extends StatelessWidget {
                           ),
                           _Row(
                             light: light,
-                            iconUrl: _ico['connect']!,
-                            roundIcon: true,
+                            mark: _mark['connect']!,
                             label: 'NowssB Connect',
-                            sub: 'Saved, liked, settings & theme',
-                            onTap: () => _goTab(context, 0),
-                          ),
-                          _Row(
-                            light: light,
-                            icon: const Icon(
-                              Icons.download_rounded,
-                              size: 20,
-                              color: NwsbColors.gold,
-                            ),
-                            label: 'Download App',
-                            sub: 'Install NowssB on your device',
+                            sub: 'Saved and liked words',
                             last: true,
-                            onTap: () {
-                              final messenger = ScaffoldMessenger.maybeOf(context);
-                              _close(context);
-                              messenger?.showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'You are already in the NowssB app.',
-                                  ),
-                                ),
-                              );
-                            },
+                            onTap: () =>
+                                _push(context, const SavedWordsScreen()),
                           ),
                         ],
                       ),
@@ -508,10 +475,9 @@ class _Row extends StatelessWidget {
     required this.label,
     required this.sub,
     required this.onTap,
-    this.iconUrl,
+    this.mark,
+    this.viewBox = 24,
     this.icon,
-    this.iconSize = 22,
-    this.roundIcon = false,
     this.last = false,
   });
 
@@ -519,25 +485,26 @@ class _Row extends StatelessWidget {
   final String label;
   final String sub;
   final VoidCallback onTap;
-  final String? iconUrl;
+  final String? mark;
+  final double viewBox;
   final Widget? icon;
-  final double iconSize;
-  final bool roundIcon;
   final bool last;
+
+  Widget _glyph(Color color) {
+    if (icon != null) return icon!;
+    return NwsbIcon(
+      mark ?? NwsbMarks.arrow,
+      size: 22,
+      color: color,
+      viewBox: viewBox,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     if (!light) {
       // Match AppSettingsScreen _NavRow → NestedDarkWrap.
-      final leading = icon ??
-          ClipRRect(
-            borderRadius: BorderRadius.circular(roundIcon ? 18 : 8),
-            child: SizedBox(
-              width: iconSize,
-              height: iconSize,
-              child: NwsbImage(url: iconUrl!, fit: BoxFit.contain),
-            ),
-          );
+      final leading = _glyph(NwsbColors.gold);
       return NestedDarkWrap(
         margin: EdgeInsets.only(bottom: last ? 0 : 8),
         onTap: onTap,
@@ -605,7 +572,7 @@ class _Row extends StatelessWidget {
                 height: 36,
                 decoration: BoxDecoration(
                   color: const Color(0xFFEEF1F7),
-                  borderRadius: BorderRadius.circular(roundIcon ? 18 : 8),
+                  borderRadius: BorderRadius.circular(8),
                   boxShadow: const [
                     BoxShadow(
                       color: Color(0x21000000),
@@ -616,19 +583,7 @@ class _Row extends StatelessWidget {
                   ],
                 ),
                 alignment: Alignment.center,
-                child: icon ??
-                    ClipRRect(
-                      borderRadius:
-                          BorderRadius.circular(roundIcon ? 18 : 0),
-                      child: SizedBox(
-                        width: iconSize,
-                        height: iconSize,
-                        child: NwsbImage(
-                          url: iconUrl!,
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                    ),
+                child: _glyph(NwsbColors.gold),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -655,6 +610,35 @@ class _Row extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// The five routine slots, opened from the menu — not the practice tab.
+class _RoutinesPage extends StatelessWidget {
+  const _RoutinesPage();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF060C18),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF060C18),
+        foregroundColor: Colors.white,
+        title: const Text('My Routines'),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
+        children: [
+          RoutinesSection(
+            fashion: true,
+            onTap: () {
+              Navigator.of(context).pop();
+              NavScope.goTo(context, 1);
+            },
+          ),
+        ],
       ),
     );
   }

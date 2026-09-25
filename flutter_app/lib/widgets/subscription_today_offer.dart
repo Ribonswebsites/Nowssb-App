@@ -297,30 +297,56 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Container(
-          padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+          height: 136,
+          clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
             color: const Color(0xFF000000),
             borderRadius: BorderRadius.circular(16),
           ),
-          child: const Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
             children: [
-              Text(
-                'NowssB',
-                style: TextStyle(
-                  color: Color(0xFFE8D5A3),
-                  fontSize: 13,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 0.4,
+              const Expanded(
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(16, 12, 8, 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'NowssB',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 30,
+                          fontWeight: FontWeight.w900,
+                          height: 1,
+                          letterSpacing: -0.4,
+                        ),
+                      ),
+                      SizedBox(height: 6),
+                      Text(
+                        'Subscription',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w800,
+                          height: 1.05,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              SizedBox(height: 4),
-              Text(
-                'Subscription',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w800,
+              SizedBox(
+                width: 124,
+                height: 136,
+                child: Image.asset(
+                  'assets/subscription/sub-hero.png',
+                  fit: BoxFit.cover,
+                  alignment: Alignment.topCenter,
                 ),
               ),
             ],

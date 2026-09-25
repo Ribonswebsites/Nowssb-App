@@ -282,19 +282,9 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
               builder: (_) => const MeaningStoreScreen(),
             ),
           ),
-          margin: const EdgeInsets.only(bottom: 36),
+          margin: const EdgeInsets.only(bottom: 8),
         ),
-        ColoredSplitPromoBanner(
-          spec: SplitPromoExtras.at(
-            6,
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => const MeaningStoreScreen(),
-              ),
-            ),
-          ),
-          margin: const EdgeInsets.only(top: 0, bottom: 28),
-        ),
+        const SizedBox(height: 8),
         StoreGlassPanel(
           radius: 32,
           padding: const EdgeInsets.all(5),
@@ -357,6 +347,17 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
           ),
         ),
         const SizedBox(height: 8),
+        ColoredSplitPromoBanner(
+          spec: SplitPromoExtras.at(
+            6,
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => const MeaningStoreScreen(),
+              ),
+            ),
+          ),
+          margin: const EdgeInsets.only(top: 28, bottom: 36),
+        ),
         ...sections,
         ColoredSplitPromoBanner(
           spec: SplitPromoExtras.at(

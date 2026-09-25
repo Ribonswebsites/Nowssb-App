@@ -211,6 +211,16 @@ class PracticeProgress extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Wipes every recorded session on this device. Used by Settings.
+  Future<void> clearAll() async {
+    _sessions.clear();
+    try {
+      final preferences = await SharedPreferences.getInstance();
+      await preferences.remove(_storageKey);
+    } catch (_) {}
+    notifyListeners();
+  }
+
   static String _day(DateTime date) {
     final month = date.month.toString().padLeft(2, '0');
     final day = date.day.toString().padLeft(2, '0');

@@ -23,13 +23,13 @@ class HomeHeader extends StatelessWidget {
     super.key,
     this.notifications = 0,
     this.onNotifications,
-    this.onNormalHome,
+    this.onSettings,
     this.onMenu,
   });
 
   final int notifications;
   final VoidCallback? onNotifications;
-  final VoidCallback? onNormalHome;
+  final VoidCallback? onSettings;
   final VoidCallback? onMenu;
 
   @override
@@ -106,7 +106,7 @@ class HomeHeader extends StatelessWidget {
                 onTap: onNotifications,
               ),
               const _HdrRule(),
-              _HdrIcon(mark: NwsbMarks.house, onTap: onNormalHome),
+              _HdrIcon(mark: NwsbMarks.gear, onTap: onSettings),
               const _HdrRule(),
               _HdrIcon(mark: NwsbMarks.menu, stroke: 1.9, onTap: onMenu),
             ],

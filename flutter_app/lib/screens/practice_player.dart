@@ -556,12 +556,13 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
   }
 
   void _openQueueSheet(BuildContext context) {
-    showModalBottomSheet<void>(
+    showGeneralDialog<void>(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      barrierDismissible: true,
+      barrierLabel: 'Player',
       barrierColor: Colors.black54,
-      builder: (_) => _QueueSheet(
+      transitionDuration: const Duration(milliseconds: 280),
+      pageBuilder: (ctx, _, __) => _QueueSheet(
         words: widget.words,
         index: _index,
         themes: _playerThemes,
@@ -587,10 +588,19 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
           await _prepareAndPlay();
         },
         onReorderQueue: (ordered) {
-          // Persist order via SharedPreferences; player keeps current list.
           unawaited(_persistQueueOrder(ordered));
         },
       ),
+      transitionBuilder: (ctx, anim, _, child) {
+        final curved = CurvedAnimation(parent: anim, curve: Curves.easeOutCubic);
+        return SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0, -1),
+            end: Offset.zero,
+          ).animate(curved),
+          child: child,
+        );
+      },
     );
   }
 
@@ -1005,10 +1015,17 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          _PlayerHeader(
-                            onBack: _minimizeToPill,
-                            onSettings: _openSettings,
-                            onMore: _openAuraClock,
+                          GestureDetector(
+                            onVerticalDragEnd: (d) {
+                              if ((d.primaryVelocity ?? 0) > 220) {
+                                _openQueueSheet(context);
+                              }
+                            },
+                            child: _PlayerHeader(
+                              onBack: _minimizeToPill,
+                              onSettings: _openSettings,
+                              onMore: _openAuraClock,
+                            ),
                           ),
                           const SizedBox(height: 12),
                           Center(
@@ -1968,7 +1985,7 @@ class _QueueSheetState extends State<_QueueSheet> {
                         scrolledUnderElevation: 0,
                         // Collapsed height = sticky mini row (thumb + title + play).
                         toolbarHeight: _collapseExtent,
-                        collapsedHeight: media.padding.top + _expandExtent,
+                        collapsedHeight: media.padding.top + _collapseExtent,
                         expandedHeight: media.padding.top + _expandExtent,
                         flexibleSpace: ClipRect(
                           child: LayoutBuilder(
