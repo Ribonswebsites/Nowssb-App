@@ -12,6 +12,8 @@ class VaultScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return EconomyPage(
       title: 'NowssB Vault',
+      requireAuth: true,
+      banner: const _VaultBanner(),
       child: ListenableBuilder(
         listenable: EconomyMirror.instance,
         builder: (context, _) {
@@ -19,7 +21,7 @@ class VaultScreen extends StatelessWidget {
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
             children: [
-              Text('${w.coins}', style: const TextStyle(fontSize: 42, color: NwsbColors.goldLight, fontWeight: FontWeight.w700)),
+              CoinCount(value: w.coins),
               Text('${w.plan} · streak ${w.streak} · ${w.freezesLeft} freezes left', style: const TextStyle(color: NwsbColors.mist)),
               const SizedBox(height: 12),
               const EconomyNote(
@@ -54,14 +56,14 @@ class VaultScreen extends StatelessWidget {
               const SizedBox(height: 18),
               const Text('PLAY PURCHASES', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.4, fontSize: 12)),
               const SizedBox(height: 8),
-              _buy(context, 'Word', 'nwsb_word', 49, 'word', 'Word'),
-              _buy(context, 'Meaning', 'nwsb_meaning', 49, 'meaning', 'Meaning'),
-              _buy(context, '10-word bundle', 'nwsb_bundle_10', 490, 'bundle', '10-word bundle'),
-              _buy(context, 'Meaning package', 'nwsb_package', 199, 'package', 'Meaning package'),
-              _buy(context, 'Resonance', 'nwsb_sub_resonance', 249, 'subscription', 'Resonance'),
-              _buy(context, 'Frequency', 'nwsb_sub_frequency', 499, 'subscription', 'Frequency'),
-              _buy(context, 'Frequency X', 'nwsb_sub_frequency_x', 999, 'subscription', 'Frequency X'),
-              _buy(context, 'Restore streak', 'nwsb_streak_restore', 99, 'streak', 'Streak restore'),
+              _buy(context, 'Word', 'nwsb_word', 99, 'word', 'Word'),
+              _buy(context, 'Meaning', 'nwsb_meaning', 99, 'meaning', 'Meaning'),
+              _buy(context, '10-word bundle', 'nwsb_bundle_10', 999, 'bundle', '10-word bundle'),
+              _buy(context, 'Meaning package', 'nwsb_package', 399, 'package', 'Meaning package'),
+              _buy(context, 'Resonance', 'nwsb_sub_resonance', 499, 'subscription', 'Resonance'),
+              _buy(context, 'Frequency', 'nwsb_sub_frequency', 999, 'subscription', 'Frequency'),
+              _buy(context, 'Frequency X', 'nwsb_sub_frequency_x', 1999, 'subscription', 'Frequency X'),
+              _buy(context, 'Restore streak', 'nwsb_streak_restore', 199, 'streak', 'Streak restore'),
               const SizedBox(height: 18),
               const Text('MILESTONE CHEST', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.4, fontSize: 12)),
               const SizedBox(height: 8),
@@ -77,13 +79,26 @@ class VaultScreen extends StatelessWidget {
 
   Widget _quest(BuildContext context, String id, String title, int value, int goal, int reward) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: GoldButton(
-        label: '$title · $value/$goal · $reward coins',
-        filled: false,
-        onTap: value >= goal
-            ? () => runEconomy(context, () => EconomyApi.call('claimQuest', {'questId': id}))
-            : null,
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('$title · $value/$goal · $reward coins', style: const TextStyle(color: Colors.white)),
+          const SizedBox(height: 6),
+          LinearProgressIndicator(
+            value: goal == 0 ? 0 : (value / goal).clamp(0, 1),
+            color: NwsbColors.gold,
+            backgroundColor: const Color(0x22FFFFFF),
+          ),
+          const SizedBox(height: 6),
+          GoldButton(
+            label: value >= goal ? 'Open chest' : 'In progress',
+            filled: false,
+            onTap: value >= goal
+                ? () => runEconomy(context, () => EconomyApi.call('claimQuest', {'questId': id}))
+                : null,
+          ),
+        ],
       ),
     );
   }
@@ -102,10 +117,13 @@ class VaultScreen extends StatelessWidget {
   Widget _buy(BuildContext context, String label, String catalogId, int price, String kind, String title) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
-      child: GoldButton(
-        label: '$label · ₹$price',
-        filled: false,
-        onTap: () => runEconomy(context, () async {
+      child: FutureBuilder<String>(
+        future: PlayCheckout.priceLabel(catalogId),
+        builder: (context, snap) {
+          return GoldButton(
+            label: '${label} · ${snap.data ?? 'Play price'}',
+            filled: false,
+            onTap: () => runEconomy(context, () async {
           final quote = CashQuote.forPrice(
             price: price,
             balance: EconomyMirror.instance.coins,
@@ -124,6 +142,8 @@ class VaultScreen extends StatelessWidget {
             },
           );
         }),
+          );
+        },
       ),
     );
   }
@@ -183,6 +203,18 @@ class _MilestoneFormState extends State<_MilestoneForm> {
               })),
         ),
       ],
+    );
+  }
+}
+
+class _VaultBanner extends StatelessWidget {
+  const _VaultBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
+      child: EconomyNote('Daily login, streak chests, and quests. Coins never cover more than 30% of a Play purchase.'),
     );
   }
 }

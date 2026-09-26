@@ -2,10 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../screens/subscription.dart';
 import '../../data/firebase.dart';
 import '../../theme/tokens.dart';
 import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
+import '../economy/money.dart';
 
 class CircleScreen extends StatefulWidget {
   const CircleScreen({super.key});
@@ -27,10 +29,21 @@ class _CircleScreenState extends State<CircleScreen> {
   Widget build(BuildContext context) {
     return EconomyPage(
       title: 'NowssB Circle',
+      requireAuth: true,
       child: ListenableBuilder(
         listenable: EconomyMirror.instance,
         builder: (context, _) {
           final w = EconomyMirror.instance;
+          if (!w.subscribed) {
+            return EconomyMessage(
+              title: 'Circle opens with a paid plan',
+              body: 'A free or lapsed plan cannot share a code or earn from one. Your tier is kept when you renew.',
+              action: 'See plans',
+              onAction: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(builder: (_) => const SubscriptionScreen()),
+              ),
+            );
+          }
           final next = w.paidReferrals >= 100
               ? 100
               : w.paidReferrals >= 50
@@ -55,7 +68,7 @@ class _CircleScreenState extends State<CircleScreen> {
               Text('Squad volume ${w.paidReferrals} / $next toward the next Circle tier', style: const TextStyle(color: NwsbColors.mist, fontSize: 12)),
               const SizedBox(height: 12),
               const EconomyNote(
-                'A paid subscription through your code gives you one free cycle if you do not already have that plan, otherwise coins. After 5 paid referrals you become a partner: 20% cash, then 25, 30, and 35 at Platinum. Level 2 is 5% and only while you and your direct referral both have an active plan. Nothing pays on an invite alone.',
+                'Your code works only while your paid plan is active. After 5 paid referrals you earn cash: 20%, then 25, 30, and 35 at Platinum. Level 2 is 5% and only while you and your direct referral both have an active plan. Nothing pays on an invite alone.',
               ),
               const SizedBox(height: 14),
               GoldButton(
@@ -105,7 +118,7 @@ class _CircleScreenState extends State<CircleScreen> {
                           Padding(
                             padding: const EdgeInsets.only(bottom: 8),
                             child: Text(
-                              'L${doc.data()['level']} · ${doc.data()['status']} · ₹${doc.data()['commissionAmount'] ?? 0}',
+                              'L${doc.data()['level']} · ${doc.data()['status']} · ${FxBook.instance.formatCents((doc.data()['commissionAmount'] as num?)?.toInt() ?? 0)}',
                               style: const TextStyle(color: Colors.white),
                             ),
                           ),

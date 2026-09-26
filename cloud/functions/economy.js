@@ -1,16 +1,17 @@
 /** Pure economy rules. Cloud Functions call these; the phone does not. */
 
-const CASH_TIERS = [49, 99, 149, 199, 249, 299, 399, 499, 699, 999];
+/** Canonical prices are USD cents. The phone formats them for the local currency. */
+const CASH_TIERS = [99, 199, 299, 399, 499, 699, 999, 1499, 1999];
 
 const CATALOG = {
-  nwsb_sub_resonance: { kind: 'subscription', price: 249, plan: 'Resonance' },
-  nwsb_sub_frequency: { kind: 'subscription', price: 499, plan: 'Frequency' },
-  nwsb_sub_frequency_x: { kind: 'subscription', price: 999, plan: 'Frequency X' },
-  nwsb_word: { kind: 'word', price: 49 },
-  nwsb_meaning: { kind: 'meaning', price: 49 },
-  nwsb_bundle_10: { kind: 'bundle', price: 490, bonus: 50 },
-  nwsb_package: { kind: 'package', price: 199, bonus: 40 },
-  nwsb_streak_restore: { kind: 'streak', price: 99 },
+  nwsb_sub_resonance: { kind: 'subscription', price: 499, plan: 'Resonance' },
+  nwsb_sub_frequency: { kind: 'subscription', price: 999, plan: 'Frequency' },
+  nwsb_sub_frequency_x: { kind: 'subscription', price: 1999, plan: 'Frequency X' },
+  nwsb_word: { kind: 'word', price: 99 },
+  nwsb_meaning: { kind: 'meaning', price: 99 },
+  nwsb_bundle_10: { kind: 'bundle', price: 999, bonus: 50 },
+  nwsb_package: { kind: 'package', price: 399, bonus: 40 },
+  nwsb_streak_restore: { kind: 'streak', price: 199 },
 };
 
 const QUESTS = [
@@ -107,7 +108,7 @@ function priceBand(original, asked) {
   const low = Math.ceil(base * 0.5);
   const high = Math.floor(base * 1.5);
   if (price < low || price > high) {
-    return { ok: false, error: `Price must stay between ₹${low} and ₹${high}.` };
+    return { ok: false, error: 'Price must stay inside the resale band.' };
   }
   return { ok: true, price, low, high };
 }

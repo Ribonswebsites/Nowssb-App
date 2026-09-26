@@ -9,6 +9,20 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'economy_api.dart';
 
 class PlayCheckout {
+  static final _prices = <String, String>{};
+
+  static Future<String> priceLabel(String productId) async {
+    final cached = _prices[productId];
+    if (cached != null) return cached;
+    final iap = InAppPurchase.instance;
+    if (!await iap.isAvailable()) return 'Play price';
+    final response = await iap.queryProductDetails({productId});
+    if (response.productDetails.isEmpty) return 'Play price';
+    final label = response.productDetails.first.price;
+    _prices[productId] = label;
+    return label;
+  }
+
   static Future<void> buy({
     required String callable,
     required String productId,

@@ -15,6 +15,8 @@ import '../screens/app_settings.dart';
 import '../features/bazaar/bazaar_screen.dart';
 import '../features/circle/circle_screen.dart';
 import '../features/earn/earn_hub_screen.dart';
+import '../features/earn/earnings_screen.dart';
+import '../features/notifications/inbox_screen.dart';
 import '../features/social/echo_wall_screen.dart';
 import '../features/vault/vault_screen.dart';
 import '../features/wordprint/word_print_screen.dart';
@@ -378,6 +380,20 @@ class HomeMenuDrawer extends StatelessWidget {
                             label: 'Echo Wall',
                             sub: 'Reflections',
                             onTap: () => _push(context, const EchoWallScreen()),
+                          ),
+                          _Row(
+                            light: light,
+                            mark: NwsbMarks.earn,
+                            label: 'Earnings',
+                            sub: 'Payouts and commissions',
+                            onTap: () => _push(context, const EarningsScreen()),
+                          ),
+                          _Row(
+                            light: light,
+                            mark: NwsbMarks.bell,
+                            label: 'Activity',
+                            sub: 'Rewards and payout updates',
+                            onTap: () => _push(context, const InboxScreen()),
                           ),
                           _Row(
                             light: light,

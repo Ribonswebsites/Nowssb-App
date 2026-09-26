@@ -17,6 +17,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'cart_bag.dart';
 import 'firebase.dart';
+import '../features/economy/money.dart';
 import 'practice_progress.dart';
 
 class EarnActivity {
@@ -441,8 +442,8 @@ class EarnWallet extends ChangeNotifier {
     _log(
       title,
       spend == 0
-          ? 'Cash ₹${price.round()} recorded'
-          : '₹$spend coins · ₹${cash < 0 ? 0 : cash} cash recorded',
+          ? 'Cash ${FxBook.instance.formatRupees(price)} recorded'
+          : '${FxBook.instance.formatRupees(spend)} coins · ${FxBook.instance.formatRupees(cash < 0 ? 0 : cash)} cash recorded',
       -spend,
     );
     final bonus = _purchaseBonus(kind, id, title);
@@ -485,7 +486,7 @@ class EarnWallet extends ChangeNotifier {
     final ok = await _spend(
       q.coins,
       'Coins on checkout',
-      '30% of ₹${q.price} · cash still ₹${q.cash}',
+      '30% covered · cash still ${FxBook.instance.formatRupees(q.cash)}',
     );
     return ok ? q.coins : 0;
   }
@@ -537,7 +538,7 @@ class EarnWallet extends ChangeNotifier {
       image: piece.image,
       at: DateTime.now().millisecondsSinceEpoch,
     ));
-    _log('Listed ${piece.title}', 'Resell shop · ₹${price.round()}', 0);
+    _log('Listed ${piece.title}', 'Resell shop · ${FxBook.instance.formatRupees(price)}', 0);
     await _persist();
     return null;
   }

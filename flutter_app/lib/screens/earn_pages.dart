@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 
 import '../data/content.dart';
 import '../data/earn_wallet.dart';
+import '../features/economy/money.dart';
 import '../data/firebase.dart';
 import '../data/models.dart';
 import '../data/practice_progress.dart';
@@ -65,7 +66,7 @@ class EarnScreen extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               _GoldBtn(
-                label: '10-word bundle · ₹490',
+                label: '10-word bundle',
                 onTap: () => _buyBundle(context),
                 filled: false,
               ),
@@ -83,7 +84,7 @@ class EarnScreen extends StatelessWidget {
               const SizedBox(height: 8),
               _GoldBtn(
                 label: streak < 1
-                    ? 'Restore streak · ₹${EarnWallet.restorePrice}'
+                    ? 'Restore streak'
                     : 'Streak is $streak · restore if it breaks',
                 onTap: () => _restore(context),
                 filled: false,
@@ -167,7 +168,7 @@ class EarnScreen extends StatelessWidget {
                   style: const TextStyle(color: Color(0x99FFFFFF), fontSize: 12),
                 ),
                 trailing: Text(
-                  '₹${_ask(w.price)}',
+                  FxBook.instance.formatRupees(_ask(w.price)),
                   style: const TextStyle(color: NwsbColors.goldLight),
                 ),
                 onTap: () => Navigator.pop(ctx, w),
@@ -236,7 +237,7 @@ class EarnScreen extends StatelessWidget {
                   style: const TextStyle(color: Color(0x99FFFFFF), fontSize: 12),
                 ),
                 trailing: Text(
-                  '₹${_ask(m.price)}',
+                  FxBook.instance.formatRupees(_ask(m.price)),
                   style: const TextStyle(color: NwsbColors.goldLight),
                 ),
                 onTap: () => Navigator.pop(ctx, m),
@@ -381,7 +382,7 @@ class _SellShopScreenState extends State<SellShopScreen> {
           keyboardType: TextInputType.number,
           style: const TextStyle(color: Colors.white),
           decoration: const InputDecoration(
-            labelText: 'Price in ₹',
+            labelText: 'Price',
             labelStyle: TextStyle(color: NwsbColors.gold),
           ),
         ),
@@ -396,7 +397,7 @@ class _SellShopScreenState extends State<SellShopScreen> {
     if (ok != true || !mounted) return;
     final err = await EarnWallet.instance.listForSale(piece, raw);
     if (!mounted) return;
-    _toast(context, err ?? '${piece.title} is listed at ₹${raw.round()}.');
+    _toast(context, err ?? '${piece.title} is listed at ${FxBook.instance.formatRupees(raw)}.');
   }
 
   Future<void> _sell(ResaleListing listing) async {
@@ -408,7 +409,7 @@ class _SellShopScreenState extends State<SellShopScreen> {
         title: const Text('Confirm sale', style: TextStyle(color: Colors.white)),
         content: Text(
           'This removes ${listing.title} from your library and pays $cut coins '
-          '(${EarnWallet.instance.commissionPercent}% of ₹${listing.price.round()}). '
+          '(${EarnWallet.instance.commissionPercent}% of ${FxBook.instance.formatRupees(listing.price)}). '
           'The buyer’s cash is not collected here.',
           style: const TextStyle(color: Color(0xCCFFFFFF), height: 1.4),
         ),
@@ -482,7 +483,7 @@ class _SellShopScreenState extends State<SellShopScreen> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                '${listing.kind} · ₹${listing.price.round()}',
+                                '${listing.kind} · ${FxBook.instance.formatRupees(listing.price)}',
                                 style: const TextStyle(color: Color(0x99FFFFFF), fontSize: 12),
                               ),
                             ],
@@ -844,7 +845,7 @@ class _PlanRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final current = EarnWallet.instance.holdsPlan(plan.name);
     return _GoldBtn(
-      label: current ? '${plan.name} · current' : '${plan.name} · ₹${plan.rupees}',
+      label: current ? '${plan.name} · current' : '${plan.name} · ${FxBook.instance.formatRupees(plan.rupees)}',
       filled: !current,
       onTap: current
           ? null
@@ -1013,7 +1014,7 @@ class _PaySheetState extends State<_PaySheet> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Price ₹${widget.price.round()} · coins up to ${q.maxCoins} (30%)',
+            'Price ${FxBook.instance.formatRupees(widget.price)} · coins up to ${q.maxCoins} (30%)',
             style: const TextStyle(color: Color(0xCCFFFFFF)),
           ),
           const SizedBox(height: 8),
@@ -1026,7 +1027,7 @@ class _PaySheetState extends State<_PaySheet> {
               style: const TextStyle(color: Colors.white),
             ),
             subtitle: Text(
-              'Cash recorded ₹${cash < 0 ? 0 : cash}',
+              'Cash recorded ${FxBook.instance.formatRupees(cash < 0 ? 0 : cash)}',
               style: const TextStyle(color: NwsbColors.goldLight),
             ),
           ),

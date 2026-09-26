@@ -9,12 +9,12 @@ import '../../data/earn_wallet.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/app_backdrop.dart';
 import '../../widgets/cart_add_animation.dart';
+import '../../features/economy/money.dart';
 import 'bag_ui.dart';
 
 String _inr(num value) {
   if (value <= 0) return 'Included';
-  final n = value is int ? value : value.round();
-  return '₹$n';
+  return FxBook.instance.formatRupees(value);
 }
 
 class CartPage extends StatelessWidget {

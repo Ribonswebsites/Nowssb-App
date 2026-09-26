@@ -19,6 +19,12 @@ class AuthGate extends StatefulWidget {
   const AuthGate({super.key, required this.child});
   final Widget child;
 
+  static final reopen = ValueNotifier<int>(0);
+
+  static void askForAccount() {
+    reopen.value++;
+  }
+
   @override
   State<AuthGate> createState() => _AuthGateState();
 }
@@ -45,7 +51,18 @@ class _AuthGateState extends State<AuthGate> {
   int? _resendToken;
 
   @override
+  void initState() {
+    super.initState();
+    AuthGate.reopen.addListener(_leaveGuest);
+  }
+
+  void _leaveGuest() {
+    if (mounted) setState(() => _guest = false);
+  }
+
+  @override
   void dispose() {
+    AuthGate.reopen.removeListener(_leaveGuest);
     _email.dispose();
     _password.dispose();
     _phone.dispose();

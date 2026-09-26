@@ -69,6 +69,7 @@ import 'reader/reader_hub.dart';
 import 'store/request_words.dart';
 import 'sentence_builder.dart';
 import 'app_settings.dart';
+import '../features/earn/earn_discovery_card.dart';
 import '../features/earn/earn_hub_screen.dart';
 import 'store/meaning_store.dart';
 
@@ -428,7 +429,13 @@ class _HomeFashionState extends State<HomeFashion> {
         ),
         ('rx', FashPrescription(onTap: () => _go(1), onWord: _openWord)),
         ('trendvid', FashShopNow(onTap: () => _go(3))),
-        ('storeban', StoreBannerSection(onTap: () => _go(3))),
+        ('storeban', Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            StoreBannerSection(onTap: () => _go(3)),
+            const EarnDiscoveryCard(),
+          ],
+        )),
         ('subvid', const SizedBox.shrink()),
         (
           'edition',

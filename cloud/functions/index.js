@@ -1,9 +1,11 @@
 const crypto = require('crypto');
 const admin = require('firebase-admin');
-const { onCall, HttpsError } = require('firebase-functions/v2/https');
+const { onCall, onRequest, HttpsError } = require('firebase-functions/v2/https');
+const { onSchedule } = require('firebase-functions/v2/scheduler');
 const { setGlobalOptions } = require('firebase-functions/v2');
 const rules = require('./economy');
 const { verifyPlayProduct } = require('./play');
+const { refreshFx } = require('./fx');
 
 if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
@@ -54,13 +56,15 @@ async function ensureUser(tx, uid, installId) {
     tx.set(referralRef, {
       code, referredBy: '', paidReferralCount: 0, tier: 'Member',
       installId: String(installId || '').slice(0, 80),
+      subscriptionActive: false,
+      subscriptionLapsedAt: null,
     });
-    tx.set(db.doc(`referralCodes/${code}`), { uid });
+    tx.set(db.doc(`referralCodes/${code}`), { uid, active: false });
   }
   if (!seller.exists) {
     tx.set(sellerRef, { wordsSoldTotal: 0, tier: 'Seller', nextTierTarget: 100 });
   }
-  if (!payout.exists) tx.set(payoutRef, { cashBalance: 0 });
+  if (!payout.exists) tx.set(payoutRef, { cashBalance: 0, lifetimeCents: 0 });
   if (!profile.exists) {
     tx.set(profileRef, {
       handle: `nowssb_${uid.slice(0, 6)}`,
@@ -77,6 +81,19 @@ async function ensureUser(tx, uid, installId) {
       followerCount: 0,
       followingCount: 0,
     });
+  }
+  if (referral.exists) {
+    const open = activeSub(wallet.exists ? wallet.data() : null);
+    const flag = referral.data().subscriptionActive === true;
+    const code = referral.data().code;
+    if (open && !flag) {
+      tx.set(referralRef, { subscriptionActive: true, subscriptionLapsedAt: null }, { merge: true });
+      if (code) tx.set(db.doc(`referralCodes/${code}`), { uid, active: true }, { merge: true });
+    }
+    if (!open && flag) {
+      tx.set(referralRef, { subscriptionActive: false, subscriptionLapsedAt: Date.now() }, { merge: true });
+      if (code) tx.set(db.doc(`referralCodes/${code}`), { uid, active: false }, { merge: true });
+    }
   }
   return { walletRef, referralRef, sellerRef, payoutRef, profileRef, wallet, referral };
 }
@@ -112,9 +129,19 @@ function writeCash(tx, uid, delta, reason, refId) {
   tx.set(db.collection('cashLedger').doc(), {
     uid, delta, balanceAfter: next, reason, refId: refId || '', at: stamp(),
   });
-  tx.set(db.doc(`users/${uid}/payout/main`), { cashBalance: next, updatedAt: stamp() }, { merge: true });
+  tx.set(db.doc(`users/${uid}/payout/main`), {
+    cashBalance: next,
+    lifetimeCents: admin.firestore.FieldValue.increment(delta > 0 ? delta : 0),
+    updatedAt: stamp(),
+  }, { merge: true });
   tx._mem[key] = next;
   return next;
+}
+
+function queueNotify(tx, uid, title, body, kind, refId) {
+  tx.set(db.collection(`users/${uid}/notifications`).doc(), {
+    title, body, kind: kind || 'earn', refId: refId || '', read: false, at: stamp(),
+  });
 }
 
 function bumpPublic(tx, uid, profileSnap, patch) {
@@ -169,6 +196,20 @@ function applyCircle(tx, loaded, { buyerUid, price, paymentId, plan }) {
   const count = alreadyCounted ? prevCount : prevCount + 1;
   const tier = rules.circleTier(count);
   const l1Active = activeSub(l1.wallet.data());
+  const code = String(l1Data.code || '');
+  if (!l1Active) {
+    tx.set(db.doc(`users/${l1.uid}/referral/main`), {
+      subscriptionActive: false,
+      subscriptionLapsedAt: Date.now(),
+    }, { merge: true });
+    if (code) tx.set(db.doc(`referralCodes/${code}`), { uid: l1.uid, active: false }, { merge: true });
+    return;
+  }
+  tx.set(db.doc(`users/${l1.uid}/referral/main`), {
+    subscriptionActive: true,
+    subscriptionLapsedAt: null,
+  }, { merge: true });
+  if (code) tx.set(db.doc(`referralCodes/${code}`), { uid: l1.uid, active: true }, { merge: true });
   remember(
     tx,
     l1.uid,
@@ -179,51 +220,45 @@ function applyCircle(tx, loaded, { buyerUid, price, paymentId, plan }) {
     tx.set(db.doc(`users/${l1.uid}/referral/main`), {
       paidReferralCount: count,
       tier: tier.name,
+      subscriptionActive: true,
     }, { merge: true });
     tx.set(db.doc(`users/${buyerUid}/referral/main`), { paidCounted: true }, { merge: true });
     bumpPublic(tx, l1.uid, null, { circleTier: tier.name });
+    queueNotify(tx, l1.uid, 'Circle', 'A paid referral landed on your code.', 'circle', paymentId);
   }
   tx.set(db.collection('referralLedger').doc(), {
     referrerUid: l1.uid, referredUid: buyerUid, level: 1, paymentId,
-    commissionAmount: 0, at: stamp(), status: 'recorded',
+    commissionAmount: 0, amountBase: 0, currency: 'USD', at: stamp(), status: 'recorded',
   });
-  if (!alreadyCounted && count < 5) {
-    if (!l1Active && plan) {
-      tx.set(db.doc(`users/${l1.uid}/wallet/main`), {
-        plan, subUntil: Date.now() + 30 * 86400000,
-      }, { merge: true });
-      tx.set(db.collection('referralLedger').doc(), {
-        referrerUid: l1.uid, referredUid: buyerUid, level: 1, paymentId,
-        commissionAmount: 0, at: stamp(), status: 'free-cycle',
-      });
-    } else {
-      const coins = Math.max(10, Math.round(price * 0.1));
-      writeCoins(tx, l1.uid, coins, 'Referral coins', paymentId);
-    }
+  if (count < 5) {
+    const coins = Math.max(10, Math.round(price * 0.1));
+    writeCoins(tx, l1.uid, coins, 'Referral coins', paymentId);
+    queueNotify(tx, l1.uid, 'Referral coins', 'Coins were added for a paid referral.', 'circle', paymentId);
     return;
   }
-  if (count < 5 || !l1Active) return;
   const cash = Math.round(price * tier.rate);
   if (cash > 0) {
     writeCash(tx, l1.uid, cash, 'Circle commission', paymentId);
     tx.set(db.collection('referralLedger').doc(), {
       referrerUid: l1.uid, referredUid: buyerUid, level: 1, paymentId,
-      commissionAmount: cash, at: stamp(), status: 'paid',
+      commissionAmount: cash, amountBase: cash, currency: 'USD', at: stamp(), status: 'paid',
     });
+    queueNotify(tx, l1.uid, 'Circle commission', 'A commission was added to your earnings.', 'payout', paymentId);
   }
   const l2 = loaded.l2;
   if (!l2 || !plan) return;
   const l2Count = Number(l2.referral.data()?.paidReferralCount || 0);
   if (l2Count < 5) return;
-  if (!activeSub(l2.wallet.data()) || !l1Active) return;
+  if (!activeSub(l2.wallet.data()) || l2.referral.data()?.subscriptionActive === false) return;
   const leg = Math.round(price * 0.05);
   if (leg <= 0) return;
   remember(tx, l2.uid, null, Number(l2.payout.data()?.cashBalance || 0));
   writeCash(tx, l2.uid, leg, 'Circle level 2', paymentId);
   tx.set(db.collection('referralLedger').doc(), {
     referrerUid: l2.uid, referredUid: buyerUid, level: 2, paymentId,
-    commissionAmount: leg, at: stamp(), status: 'paid',
+    commissionAmount: leg, amountBase: leg, currency: 'USD', at: stamp(), status: 'paid',
   });
+  queueNotify(tx, l2.uid, 'Level 2 commission', 'A second-level commission was added.', 'payout', paymentId);
 }
 
 exports.ensureEconomyProfile = onCall(async (request) => {
@@ -268,6 +303,7 @@ exports.claimDailyLogin = onCall(async (request) => {
     tx.set(capRef, { login: true, uid }, { merge: true });
     tx.set(walletRef, { streak, longestStreak: longest, lastLoginYmd: day }, { merge: true });
     writeCoins(tx, uid, granted, 'Daily login', day);
+    queueNotify(tx, uid, 'Daily coins', 'Today’s login coins are in your Vault.', 'coins', day);
     bumpPublic(tx, uid, profile, { publicStats: { streak, longestStreak: longest } });
   });
   return { ok: true, coins: granted };
@@ -296,12 +332,13 @@ exports.verifyPlayPurchase = onCall(async (request) => {
     if (existing.exists) return;
     const walletRef = db.doc(`users/${uid}/wallet/main`);
     const capRef = db.doc(`users/${uid}/earnCaps/${rules.ymd()}`);
-    const [wallet, cap, profile, config, circle] = await Promise.all([
+    const [wallet, cap, profile, config, circle, referral] = await Promise.all([
       tx.get(walletRef),
       tx.get(capRef),
       tx.get(db.doc(`profiles/${uid}`)),
       tx.get(db.doc('config/economy')),
       loadCircle(tx, uid),
+      tx.get(db.doc(`users/${uid}/referral/main`)),
     ]);
     const data = wallet.exists ? wallet.data() : {};
     const balance = Number(data.coins || 0);
@@ -325,6 +362,14 @@ exports.verifyPlayPurchase = onCall(async (request) => {
         subUntil: Date.now() + 30 * 86400000,
         purchases,
       }, { merge: true });
+      const refData = referral.exists ? referral.data() : {};
+      tx.set(db.doc(`users/${uid}/referral/main`), {
+        subscriptionActive: true,
+        subscriptionLapsedAt: null,
+      }, { merge: true });
+      if (refData.code) {
+        tx.set(db.doc(`referralCodes/${refData.code}`), { uid, active: true }, { merge: true });
+      }
     } else if (kind === 'streak') {
       const longest = Math.max(Number(data.longestStreak || 0), Number(data.streak || 0), 1);
       tx.set(walletRef, {
@@ -375,9 +420,16 @@ exports.applyReferralCode = onCall(async (request) => {
       throw new HttpsError('already-exists', 'A referral code is already on this profile.');
     }
     const found = await tx.get(db.doc(`referralCodes/${code}`));
-    if (!found.exists) throw new HttpsError('not-found', 'That code is not active.');
+    if (!found.exists || found.data().active === false) {
+      throw new HttpsError('not-found', 'That code is not active.');
+    }
     if (found.data().uid === uid) throw new HttpsError('failed-precondition', 'You cannot use your own code.');
-    const theirs = await tx.get(db.doc(`users/${found.data().uid}/referral/main`));
+    const owner = found.data().uid;
+    const theirs = await tx.get(db.doc(`users/${owner}/referral/main`));
+    const ownerWallet = await tx.get(db.doc(`users/${owner}/wallet/main`));
+    if (!activeSub(ownerWallet.data()) || (theirs.exists && theirs.data().subscriptionActive === false)) {
+      throw new HttpsError('failed-precondition', 'That code is paused until their plan is active again.');
+    }
     if (theirs.exists && mine.exists && theirs.data().installId && theirs.data().installId === mine.data().installId) {
       throw new HttpsError('failed-precondition', 'That code is on this device already.');
     }
@@ -853,16 +905,167 @@ exports.setFollow = onCall(async (request) => {
 
 exports.requestPayout = onCall(async (request) => {
   const uid = uidOf(request);
+  const requestRef = db.collection('payoutRequests').doc();
+  let amount = 0;
+  let vpa = '';
   await db.runTransaction(async (tx) => {
     const payout = await tx.get(db.doc(`users/${uid}/payout/main`));
-    const balance = Number(payout.data()?.cashBalance || 0);
-    if (balance < 100) throw new HttpsError('failed-precondition', 'Payout starts at ₹100.');
-    remember(tx, uid, null, balance);
-    writeCash(tx, uid, -balance, 'Payout request', 'payout');
-    tx.set(db.collection('payoutRequests').doc(), {
-      uid, amount: balance, status: 'pending', at: stamp(),
+    amount = Number(payout.data()?.cashBalance || 0);
+    vpa = String(payout.data()?.upi || '').trim().toLowerCase();
+    if (amount < 500) {
+      throw new HttpsError('failed-precondition', 'Payout opens once your earnings reach the minimum.');
+    }
+    if (!/^[\w.\-]{2,}@[\w.\-]{2,}$/.test(vpa)) {
+      throw new HttpsError('failed-precondition', 'Add a UPI id before requesting a payout.');
+    }
+    remember(tx, uid, null, amount);
+    writeCash(tx, uid, -amount, 'Payout request', requestRef.id);
+    tx.set(requestRef, {
+      uid,
+      amountBase: amount,
+      currency: 'USD',
+      settlementCurrency: 'INR',
+      status: 'pending',
+      at: stamp(),
     });
   });
+  const key = process.env.RAZORPAYX_KEY_ID;
+  const secret = process.env.RAZORPAYX_KEY_SECRET;
+  const account = process.env.RAZORPAYX_ACCOUNT_NUMBER;
+  if (!key || !secret || !account) {
+    await requestRef.set({ status: 'queued' }, { merge: true });
+    queueNotifyOutside(uid, 'Payout queued', 'Your payout is waiting for the settlement rail.');
+    return { ok: true, status: 'queued' };
+  }
+  try {
+    const fx = await db.doc('config/fx').get();
+    const inr = Number(fx.data()?.rates?.INR || 83.5);
+    const paise = Math.max(100, Math.round((amount / 100) * inr * 100));
+    const razorpayId = await sendRazorpayPayout({ key, secret, account, vpa, paise, reference: requestRef.id, uid });
+    await requestRef.set({
+      status: 'processing',
+      razorpayPayoutId: razorpayId,
+      settlementAmount: paise,
+    }, { merge: true });
+    return { ok: true, status: 'processing' };
+  } catch (err) {
+    await db.runTransaction(async (tx) => {
+      const payout = await tx.get(db.doc(`users/${uid}/payout/main`));
+      remember(tx, uid, null, Number(payout.data()?.cashBalance || 0));
+      writeCash(tx, uid, amount, 'Payout returned', requestRef.id);
+    });
+    await requestRef.set({ status: 'failed' }, { merge: true });
+    throw new HttpsError('failed-precondition', 'The payout could not be sent. Your balance was returned.');
+  }
+});
+
+function queueNotifyOutside(uid, title, body) {
+  return db.collection(`users/${uid}/notifications`).add({
+    title, body, kind: 'payout', refId: '', read: false, at: stamp(),
+  });
+}
+
+async function sendRazorpayPayout({ key, secret, account, vpa, paise, reference, uid }) {
+  const auth = Buffer.from(`${key}:${secret}`).toString('base64');
+  const headers = { Authorization: `Basic ${auth}`, 'Content-Type': 'application/json' };
+  const contactRes = await fetch('https://api.razorpay.com/v1/contacts', {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ name: 'NowssB member', type: 'customer', reference_id: uid.slice(0, 20) }),
+  });
+  const contact = await contactRes.json();
+  if (!contactRes.ok) throw new Error(contact.error?.description || 'contact');
+  const fundRes = await fetch('https://api.razorpay.com/v1/fund_accounts', {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      contact_id: contact.id,
+      account_type: 'vpa',
+      vpa: { address: vpa },
+    }),
+  });
+  const fund = await fundRes.json();
+  if (!fundRes.ok) throw new Error(fund.error?.description || 'fund');
+  const payRes = await fetch('https://api.razorpay.com/v1/payouts', {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      account_number: account,
+      fund_account_id: fund.id,
+      amount: paise,
+      currency: 'INR',
+      mode: 'UPI',
+      purpose: 'payout',
+      queue_if_low_balance: true,
+      reference_id: reference.slice(0, 40),
+    }),
+  });
+  const payout = await payRes.json();
+  if (!payRes.ok) throw new Error(payout.error?.description || 'payout');
+  return payout.id || '';
+}
+
+exports.razorpayPayoutWebhook = onRequest(async (req, res) => {
+  const secret = process.env.RAZORPAYX_WEBHOOK_SECRET;
+  if (!secret) {
+    res.status(503).send('unconfigured');
+    return;
+  }
+  const expected = crypto.createHmac('sha256', secret).update(req.rawBody || '').digest('hex');
+  const got = String(req.get('x-razorpay-signature') || '');
+  if (expected !== got) {
+    res.status(401).send('bad signature');
+    return;
+  }
+  const event = String(req.body?.event || '');
+  const entity = req.body?.payload?.payout?.entity || {};
+  const id = entity.id;
+  if (!id) {
+    res.status(200).send('ok');
+    return;
+  }
+  const found = await db.collection('payoutRequests').where('razorpayPayoutId', '==', id).limit(1).get();
+  if (!found.empty) {
+    const status = event.includes('processed') ? 'paid' : event.includes('failed') || event.includes('reversed') ? 'failed' : 'processing';
+    const row = found.docs[0].data();
+    const prev = String(row.status || '');
+    await found.docs[0].ref.set({ status }, { merge: true });
+    if (status === 'paid' && prev !== 'paid') {
+      await db.collection(`users/${row.uid}/notifications`).add({
+        title: 'Payout sent', body: 'Your earnings payout was processed.', kind: 'payout', refId: id, read: false, at: stamp(),
+      });
+    }
+    if (status === 'failed' && prev !== 'failed' && prev !== 'paid') {
+      await db.runTransaction(async (tx) => {
+        const payout = await tx.get(db.doc(`users/${row.uid}/payout/main`));
+        remember(tx, row.uid, null, Number(payout.data()?.cashBalance || 0));
+        writeCash(tx, row.uid, Number(row.amountBase || 0), 'Payout failed', id);
+      });
+    }
+  }
+  res.status(200).send('ok');
+});
+
+exports.refreshFxRates = onSchedule('every 24 hours', async () => {
+  await refreshFx(db, stamp);
+});
+
+exports.savePayoutAccount = onCall(async (request) => {
+  const uid = uidOf(request);
+  const upi = String(request.data?.upi || '').trim().toLowerCase();
+  if (!/^[\w.\-]{2,}@[\w.\-]{2,}$/.test(upi)) {
+    throw new HttpsError('invalid-argument', 'Enter a UPI id like name@bank.');
+  }
+  await db.doc(`users/${uid}/payout/main`).set({ upi }, { merge: true });
+  return { ok: true };
+});
+
+exports.dismissEarnCard = onCall(async (request) => {
+  const uid = uidOf(request);
+  await db.doc(`users/${uid}/prefs/earn`).set({
+    hasSeenEarnCard: true,
+    earnCardLastShownAt: Date.now(),
+  }, { merge: true });
   return { ok: true };
 });
 

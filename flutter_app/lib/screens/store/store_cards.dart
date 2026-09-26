@@ -18,12 +18,12 @@ import '../../theme/tokens.dart';
 import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/app_thinking_loader.dart';
+import '../../features/economy/money.dart';
 import 'store_actions.dart';
 
 String inr(num value) {
   if (value <= 0) return 'Included';
-  final n = value is int ? value : value.round();
-  return '₹$n';
+  return FxBook.instance.formatRupees(value);
 }
 
 /// Full word price in rupees. 50% off is [kWordSaleInr].
@@ -32,93 +32,7 @@ const kWordSaleInr = 46;
 
 String localizedMoney(BuildContext context, num inrValue) {
   if (inrValue <= 0) return 'Included';
-  final locale = Localizations.localeOf(context);
-  final country = (locale.countryCode ?? '').toUpperCase();
-  final language = locale.languageCode.toLowerCase();
-  var symbol = '₹';
-  var rate = 1.0;
-  var decimals = 0;
-  const euroCountries = {
-    'AT',
-    'BE',
-    'CY',
-    'DE',
-    'EE',
-    'ES',
-    'EU',
-    'FI',
-    'FR',
-    'GR',
-    'IE',
-    'IT',
-    'LT',
-    'LU',
-    'LV',
-    'MT',
-    'NL',
-    'PT',
-    'SI',
-    'SK',
-  };
-  const euroLang = {
-    'de',
-    'el',
-    'es',
-    'et',
-    'fi',
-    'fr',
-    'it',
-    'lt',
-    'lv',
-    'nl',
-    'pt',
-    'sk',
-    'sl',
-  };
-  if (country == 'IN' || language == 'hi') {
-    symbol = '₹';
-    rate = 1.0;
-    decimals = 0;
-  } else if (country == 'US' || (country.isEmpty && language == 'en')) {
-    symbol = r'$';
-    rate = 0.012;
-    decimals = 2;
-  } else if (country == 'GB') {
-    symbol = '£';
-    rate = 0.0095;
-    decimals = 2;
-  } else if (euroCountries.contains(country) || euroLang.contains(language)) {
-    symbol = '€';
-    rate = 0.011;
-    decimals = 2;
-  } else if (country == 'AE') {
-    symbol = 'د.إ';
-    rate = 0.044;
-    decimals = 2;
-  } else if (country == 'SG') {
-    symbol = r'S$';
-    rate = 0.016;
-    decimals = 2;
-  } else if (country == 'AU') {
-    symbol = r'A$';
-    rate = 0.018;
-    decimals = 2;
-  } else if (country == 'CA') {
-    symbol = r'C$';
-    rate = 0.0165;
-    decimals = 2;
-  } else if (country == 'JP') {
-    symbol = '¥';
-    rate = 1.75;
-    decimals = 0;
-  } else {
-    symbol = '₹';
-    rate = 1.0;
-    decimals = 0;
-  }
-  final converted = inrValue * rate;
-  if (decimals == 0) return '$symbol${converted.round()}';
-  return '$symbol${converted.toStringAsFixed(2)}';
+  return FxBook.instance.formatRupees(inrValue);
 }
 
 String saleOriginalMoney(BuildContext context, num salePrice) =>

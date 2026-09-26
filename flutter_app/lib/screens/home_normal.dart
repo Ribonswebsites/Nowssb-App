@@ -77,6 +77,7 @@ import '../widgets/subscription_today_offer.dart';
 import '../widgets/earth_day_film.dart';
 import '../widgets/promo_color_grid.dart';
 import 'quotes_live.dart';
+import '../features/earn/earn_discovery_card.dart';
 import '../features/earn/earn_hub_screen.dart';
 import 'app_settings.dart';
 import 'player_settings.dart';
@@ -403,6 +404,7 @@ class _HomeNormalState extends State<HomeNormal> {
                 neumorphic: true,
                 onClaim: () => _push(const SubscriptionScreen()),
               ),
+              const EarnDiscoveryCard(neumorphic: true),
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
                 child: ColoredSplitPromoBanner(

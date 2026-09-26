@@ -7,6 +7,8 @@ import '../bazaar/bazaar_screen.dart';
 import '../circle/circle_screen.dart';
 import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
+import '../economy/money.dart';
+import 'earnings_screen.dart';
 import '../social/echo_wall_screen.dart';
 import '../vault/vault_screen.dart';
 import '../wordprint/word_print_screen.dart';
@@ -18,6 +20,7 @@ class EarnHubScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return EconomyPage(
       title: 'NowssB Earn',
+      requireAuth: true,
       child: ListenableBuilder(
         listenable: EconomyMirror.instance,
         builder: (context, _) {
@@ -25,8 +28,9 @@ class EarnHubScreen extends StatelessWidget {
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
             children: [
-              Text('${w.coins} coins', style: const TextStyle(fontSize: 28, color: NwsbColors.goldLight, fontWeight: FontWeight.w700)),
-              Text('₹${w.cash} payout · ${w.plan}', style: const TextStyle(color: NwsbColors.mist)),
+              CoinCount(value: w.coins, style: const TextStyle(fontSize: 28, color: NwsbColors.goldLight, fontWeight: FontWeight.w700)),
+              MoneyCount(cents: w.cash, style: const TextStyle(color: NwsbColors.mist)),
+              Text(w.plan, style: const TextStyle(color: NwsbColors.mist)),
               const SizedBox(height: 6),
               Text('${w.sellerTier} · ${w.wordsSold}/${w.nextSellerTarget} sold', style: const TextStyle(color: NwsbColors.mist)),
               Text('${w.circleTier} · ${w.code}', style: const TextStyle(color: NwsbColors.mist)),
@@ -43,14 +47,7 @@ class EarnHubScreen extends StatelessWidget {
               const SizedBox(height: 8),
               GoldButton(label: 'Echo Wall', filled: false, onTap: () => _open(context, const EchoWallScreen())),
               const SizedBox(height: 14),
-              GoldButton(
-                label: w.cash >= 100 ? 'Request payout · ₹${w.cash}' : 'Payout opens at ₹100',
-                onTap: w.cash >= 100
-                    ? () => runEconomy(context, () => EconomyApi.call('requestPayout'))
-                    : null,
-              ),
-              const SizedBox(height: 8),
-              const EconomyNote('A payout is queued for NowssB to pay. Play Billing does not pay marketplace sellers, and this app does not send the money itself.'),
+              GoldButton(label: 'Earnings', filled: false, onTap: () => _open(context, const EarningsScreen())),
               const SizedBox(height: 18),
               const Text('COIN LEDGER', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12)),
               const SizedBox(height: 8),

@@ -5,17 +5,20 @@ import '../../data/firebase.dart';
 import '../../theme/tokens.dart';
 import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
+import '../economy/money.dart';
 import '../economy/play_billing.dart';
 
 class BazaarScreen extends StatelessWidget {
-  const BazaarScreen({super.key});
+  const BazaarScreen({super.key, this.embedded = false});
+
+  final bool embedded;
 
   @override
   Widget build(BuildContext context) {
-    return EconomyPage(
-      title: 'Word Bazaar',
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
+    final body = ListView(
+      shrinkWrap: embedded,
+      physics: embedded ? const NeverScrollableScrollPhysics() : null,
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
         children: [
           const EconomyNote(
             'Resale price stays between 50% and 150% of the original. The platform cut starts at 20% and falls toward 10% as you sell more. 3% goes to the content owner. No refunds on resold items. NowssB can delist a listing. You must own the word before you list it.',
@@ -29,8 +32,9 @@ class BazaarScreen extends StatelessWidget {
           const SizedBox(height: 8),
           const _LiveListings(),
         ],
-      ),
     );
+    if (embedded) return body;
+    return EconomyPage(title: 'Word Bazaar', requireAuth: true, child: body);
   }
 }
 
@@ -155,7 +159,7 @@ class _ListingTile extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('$title · ₹$price', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+          Text('$title · ${FxBook.instance.formatCents(price)}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
           Text('${data['kind'] ?? 'word'} · seller ${data['sellerUid']}', style: const TextStyle(color: NwsbColors.mist, fontSize: 12)),
           const SizedBox(height: 6),
           if (!mine)

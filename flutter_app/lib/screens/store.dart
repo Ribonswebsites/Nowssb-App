@@ -15,6 +15,7 @@ import '../theme/tokens.dart';
 import '../widgets/black_glass_banner.dart';
 import '../widgets/colored_split_promo_banner.dart';
 import '../widgets/nwsb_icon.dart';
+import '../features/bazaar/bazaar_screen.dart';
 import 'sound_library.dart';
 import 'store/bag_ui.dart';
 import 'store/store_home_sections.dart';
@@ -38,8 +39,15 @@ class StoreScreen extends StatelessWidget {
   Widget build(BuildContext context) => const _StoreHomeContent();
 }
 
-class _StoreHomeContent extends StatelessWidget {
+class _StoreHomeContent extends StatefulWidget {
   const _StoreHomeContent();
+
+  @override
+  State<_StoreHomeContent> createState() => _StoreHomeContentState();
+}
+
+class _StoreHomeContentState extends State<_StoreHomeContent> {
+  bool _resell = false;
 
   @override
   Widget build(BuildContext context) {
@@ -69,6 +77,24 @@ class _StoreHomeContent extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             const StoreBagBar(),
+          ],
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+        child: Row(
+          children: [
+            _StoreTab(
+              label: 'Shop',
+              selected: !_resell,
+              onTap: () => setState(() => _resell = false),
+            ),
+            const SizedBox(width: 8),
+            _StoreTab(
+              label: 'Resell',
+              selected: _resell,
+              onTap: () => setState(() => _resell = true),
+            ),
           ],
         ),
       ),
@@ -203,6 +229,9 @@ class _StoreHomeContent extends StatelessWidget {
         ),
       ),
     ];
+    final shown = _resell
+        ? <Widget>[items[0], items[1], const BazaarScreen(embedded: true)]
+        : items;
     return Scaffold(
       backgroundColor: NwsbColors.deep,
       body: Stack(
@@ -254,7 +283,7 @@ class _StoreHomeContent extends StatelessWidget {
               ),
             ),
           ),
-          SafeArea(child: ListView(children: items)),
+          SafeArea(child: ListView(children: shown)),
         ],
       ),
     );
@@ -262,6 +291,38 @@ class _StoreHomeContent extends StatelessWidget {
 
   static void _push(BuildContext context, Widget page) {
     Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => page));
+  }
+}
+
+class _StoreTab extends StatelessWidget {
+  const _StoreTab({required this.label, required this.selected, required this.onTap});
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: selected ? NwsbColors.gold : const Color(0x14000000),
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(color: const Color(0x55C8A96E)),
+          ),
+          child: Text(
+            label,
+            style: TextStyle(
+              color: selected ? NwsbColors.ink : Colors.white,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 

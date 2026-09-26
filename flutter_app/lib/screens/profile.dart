@@ -12,7 +12,10 @@ import '../data/earn_wallet.dart';
 import '../features/bazaar/bazaar_screen.dart';
 import '../features/circle/circle_screen.dart';
 import '../features/earn/earn_hub_screen.dart';
+import '../features/earn/earnings_screen.dart';
 import '../features/economy/economy_api.dart';
+import '../features/economy/money.dart';
+import '../features/vault/vault_screen.dart';
 import '../data/practice_progress.dart';
 import '../shell/nav_shell.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
@@ -453,40 +456,71 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _earnHub() {
     final live = EconomyMirror.instance.live;
     final coins = live ? EconomyMirror.instance.coins : EarnWallet.instance.coins;
-    final plan = _planName;
-    final code = live ? EconomyMirror.instance.code : EarnWallet.instance.code;
-    final sold = live ? EconomyMirror.instance.wordsSold : EarnWallet.instance.wordsSold;
+    final streak = live ? EconomyMirror.instance.streak : PracticeProgress.instance.streak;
+    final code = live && EconomyMirror.instance.subscribed ? EconomyMirror.instance.code : 'Locked';
     final refs = live ? EconomyMirror.instance.paidReferrals : EarnWallet.instance.referralSubs;
-    return SectionBlock(
-      marginBottom: 34,
-      title: 'NowssB Earn',
-      child: GlassCard(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '$coins',
-              style: const TextStyle(fontFamily: _mono, fontSize: 32, fontWeight: FontWeight.w600, color: _accent, height: 1),
+    final tier = live ? EconomyMirror.instance.circleTier : 'Member';
+    final earned = live ? EconomyMirror.instance.lifetimeCents : 0;
+    return Column(
+      children: [
+        SectionBlock(
+          marginBottom: 18,
+          title: 'Rewards',
+          child: GlassCard(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+            child: InkWell(
+              onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const VaultScreen())),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('$coins', style: const TextStyle(fontFamily: _mono, fontSize: 32, fontWeight: FontWeight.w600, color: _accent, height: 1)),
+                  const SizedBox(height: 6),
+                  Text('Streak $streak · open Vault', style: const TextStyle(fontSize: 12.5, color: _dim)),
+                ],
+              ),
             ),
-            const SizedBox(height: 6),
-            Text(
-              '$plan · $code · $sold sold · $refs referrals',
-              style: const TextStyle(fontSize: 12.5, color: _dim),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(child: _earnLink('Earn', const EarnHubScreen())),
-                const SizedBox(width: 8),
-                Expanded(child: _earnLink('Bazaar', const BazaarScreen())),
-                const SizedBox(width: 8),
-                Expanded(child: _earnLink('Circle', const CircleScreen())),
-              ],
-            ),
-          ],
+          ),
         ),
-      ),
+        SectionBlock(
+          marginBottom: 18,
+          title: 'Networking',
+          child: GlassCard(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+            child: InkWell(
+              onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CircleScreen())),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(tier, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: _accent)),
+                  const SizedBox(height: 6),
+                  Text('$code · $refs paid referrals', style: const TextStyle(fontSize: 12.5, color: _dim)),
+                ],
+              ),
+            ),
+          ),
+        ),
+        SectionBlock(
+          marginBottom: 34,
+          title: 'Earnings',
+          child: GlassCard(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+            child: InkWell(
+              onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarningsScreen())),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    live ? FxBook.instance.formatCents(earned) : 'Sign in',
+                    style: const TextStyle(fontFamily: _mono, fontSize: 22, fontWeight: FontWeight.w600, color: _accent),
+                  ),
+                  const SizedBox(height: 6),
+                  const Text('Sales and Circle · payout history', style: TextStyle(fontSize: 12.5, color: _dim)),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

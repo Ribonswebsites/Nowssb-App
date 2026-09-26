@@ -32,17 +32,17 @@ class CashQuote {
   final int coins;
   final String? catalogId;
 
-  static const tiers = [49, 99, 149, 199, 249, 299, 399, 499, 699, 999];
+  static const tiers = [99, 199, 299, 399, 499, 699, 999, 1499, 1999];
 
   static const catalogPrices = <String, int>{
-    'nwsb_sub_resonance': 249,
-    'nwsb_sub_frequency': 499,
-    'nwsb_sub_frequency_x': 999,
-    'nwsb_word': 49,
-    'nwsb_meaning': 49,
-    'nwsb_bundle_10': 490,
-    'nwsb_package': 199,
-    'nwsb_streak_restore': 99,
+    'nwsb_sub_resonance': 499,
+    'nwsb_sub_frequency': 999,
+    'nwsb_sub_frequency_x': 1999,
+    'nwsb_word': 99,
+    'nwsb_meaning': 99,
+    'nwsb_bundle_10': 999,
+    'nwsb_package': 399,
+    'nwsb_streak_restore': 199,
   };
 
   /// Smallest Play cash tier that leaves at most 30% for coins.
@@ -112,7 +112,33 @@ class EconomyApi {
       }
       return {'ok': true};
     } on FirebaseFunctionsException catch (e) {
-      throw EconomyException(e.message ?? e.code);
+      throw EconomyException(_friendly(e));
+    } catch (_) {
+      throw EconomyException('That did not go through. Try again.');
+    }
+  }
+
+  static String _friendly(FirebaseFunctionsException e) {
+    final raw = e.message ?? '';
+    if (raw.contains('Play Billing verification') || raw.contains('PLAY_SERVICE_ACCOUNT')) {
+      return 'Play purchases are not switched on yet. Nothing was credited.';
+    }
+    if (raw.contains('Exception') || raw.contains('firebase') || raw.contains('INTERNAL')) {
+      return 'That did not go through. Try again.';
+    }
+    switch (e.code) {
+      case 'unauthenticated':
+        return 'Sign in to continue.';
+      case 'permission-denied':
+        return 'That account cannot do this.';
+      case 'not-found':
+      case 'already-exists':
+      case 'failed-precondition':
+      case 'resource-exhausted':
+      case 'invalid-argument':
+        return raw.isEmpty ? 'That did not go through. Try again.' : raw;
+      default:
+        return 'That did not go through. Try again.';
     }
   }
 }
@@ -137,11 +163,17 @@ class EconomyMirror extends ChangeNotifier {
   String sellerTier = 'Seller';
   int wordsSold = 0;
   int nextSellerTarget = 100;
+  int subUntil = 0;
+  int lifetimeCents = 0;
+  bool subscriptionActive = false;
+  bool hasSeenEarn = false;
+  int unread = 0;
+  String upi = '';
   bool live = false;
   String? uid;
 
   StreamSubscription<User?>? _auth;
-  final List<StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>> _docs = [];
+  final List<StreamSubscription<dynamic>> _docs = [];
 
   Future<void> start() async {
     if (!NwsbFirebase.ready || _auth != null) return;
@@ -180,27 +212,48 @@ class EconomyMirror extends ChangeNotifier {
       playerOpens = (data['playerOpens'] as num?)?.toInt() ?? 0;
       purchases = (data['purchases'] as num?)?.toInt() ?? 0;
       practiceCredits = (data['practiceCredits'] as num?)?.toInt() ?? 0;
+      subUntil = (data['subUntil'] as num?)?.toInt() ?? 0;
     });
     _watch('users/$id/payout/main', (data) {
       cash = (data['cashBalance'] as num?)?.toInt() ?? 0;
+      lifetimeCents = (data['lifetimeCents'] as num?)?.toInt() ?? 0;
+      upi = (data['upi'] as String?) ?? '';
     });
     _watch('users/$id/referral/main', (data) {
       code = (data['code'] as String?) ?? '';
       referredBy = (data['referredBy'] as String?) ?? '';
       circleTier = (data['tier'] as String?) ?? 'Member';
       paidReferrals = (data['paidReferralCount'] as num?)?.toInt() ?? 0;
+      subscriptionActive = data['subscriptionActive'] == true;
     });
     _watch('users/$id/sellerStats/main', (data) {
       sellerTier = (data['tier'] as String?) ?? 'Seller';
       wordsSold = (data['wordsSoldTotal'] as num?)?.toInt() ?? 0;
       nextSellerTarget = (data['nextTierTarget'] as num?)?.toInt() ?? 100;
     });
+    _watch('users/$id/prefs/earn', (data) {
+      hasSeenEarn = data['hasSeenEarnCard'] == true;
+    });
+    _docs.add(
+      FirebaseFirestore.instance
+          .collection('users/$id/notifications')
+          .where('read', isEqualTo: false)
+          .limit(20)
+          .snapshots()
+          .listen((snap) {
+        unread = snap.size;
+        notifyListeners();
+      }),
+    );
   }
+
+  bool get subscribed =>
+      plan != 'Free' && subUntil > DateTime.now().millisecondsSinceEpoch && subscriptionActive;
 
   void _watch(String path, void Function(Map<String, dynamic> data) apply) {
     _docs.add(FirebaseFirestore.instance.doc(path).snapshots().listen((snap) {
       apply(snap.data() ?? {});
       notifyListeners();
-    }));
+    }, onError: (_) {}));
   }
 }
