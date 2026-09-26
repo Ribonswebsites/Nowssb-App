@@ -155,7 +155,11 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
 
   void _rewardPlayerOpen() {
     unawaited(EarnWallet.instance.onPlayerOpened());
-    unawaited(EconomyApi.call('reportPractice', {'openedPlayer': true}).catchError((_) => <String, dynamic>{}));
+    unawaited(
+      EconomyApi.call('reportPractice', {
+        'openedPlayer': true,
+      }).catchError((_) => <String, dynamic>{}),
+    );
   }
 
   Future<void> _loadIntroFlags() async {
