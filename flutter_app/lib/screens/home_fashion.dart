@@ -69,7 +69,7 @@ import 'reader/reader_hub.dart';
 import 'store/request_words.dart';
 import 'sentence_builder.dart';
 import 'app_settings.dart';
-import 'earn_pages.dart';
+import '../features/earn/earn_hub_screen.dart';
 import 'store/meaning_store.dart';
 
 /// `REG.fash.items` — app/js/part062.js:107-148, key for key and in order.
@@ -303,7 +303,7 @@ class _HomeFashionState extends State<HomeFashion> {
               FashHeroRow(
                 onCustomize: () => _push(const WidgetsPage()),
                 onFeatures: () => _push(const WidgetsPage()),
-                onEarn: () => _push(const EarnScreen()),
+                onEarn: () => _push(const EarnHubScreen()),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),

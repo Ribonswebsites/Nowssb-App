@@ -20,6 +20,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/earn_wallet.dart';
+import '../features/economy/economy_api.dart';
 import '../data/models.dart';
 import '../data/practice_progress.dart';
 import '../media/nwsb_video.dart';
@@ -154,6 +155,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
 
   void _rewardPlayerOpen() {
     unawaited(EarnWallet.instance.onPlayerOpened());
+    unawaited(EconomyApi.call('reportPractice', {'openedPlayer': true}).catchError((_) => <String, dynamic>{}));
   }
 
   Future<void> _loadIntroFlags() async {

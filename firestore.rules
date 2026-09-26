@@ -64,6 +64,115 @@ service cloud.firestore {
     match /blocks/{uid}/blocked/{blockedUid} { allow read: if isSelf(uid); allow create, delete: if isSelf(uid) && blockedUid != request.auth.uid; allow update: if false; }
     match /reports/{reportId} { allow create: if signedIn() && request.resource.data.reporterUid == request.auth.uid; allow get: if isAdmin() || (signedIn() && resource.data.reporterUid == request.auth.uid); allow list: if isAdmin() || (signedIn() && resource.data.reporterUid == request.auth.uid);
       allow update, delete: if isAdmin(); }
+
+    // Economy. Balances, ledgers, listings, and payouts are written only by
+    // Cloud Functions (Admin SDK). Clients may read what they own.
+    function ownsLedger() {
+      return signedIn() && resource.data.uid == request.auth.uid;
+    }
+    match /users/{uid}/wallet/{docId} {
+      allow read: if isSelf(uid);
+      allow write: if false;
+    }
+    match /users/{uid}/referral/{docId} {
+      allow read: if isSelf(uid);
+      allow write: if false;
+    }
+    match /users/{uid}/sellerStats/{docId} {
+      allow read: if isSelf(uid);
+      allow write: if false;
+    }
+    match /users/{uid}/payout/{docId} {
+      allow read: if isSelf(uid);
+      allow write: if false;
+    }
+    match /users/{uid}/owned/{itemId} {
+      allow read: if isSelf(uid);
+      allow write: if false;
+    }
+    match /users/{uid}/earnCaps/{day} {
+      allow read: if isSelf(uid);
+      allow write: if false;
+    }
+    match /users/{uid}/quests/{questId} {
+      allow read: if isSelf(uid);
+      allow write: if false;
+    }
+    match /users/{uid}/milestones/{wordId} {
+      allow read: if isSelf(uid);
+      allow write: if false;
+    }
+    match /users/{uid}/wishlist/{itemId} {
+      allow read: if isSelf(uid);
+      allow write: if false;
+    }
+    match /coinLedger/{entryId} {
+      allow get: if ownsLedger();
+      allow list: if signedIn() && resource.data.uid == request.auth.uid;
+      allow write: if false;
+    }
+    match /referralLedger/{entryId} {
+      allow get: if signedIn() && (resource.data.referrerUid == request.auth.uid || resource.data.referredUid == request.auth.uid);
+      allow list: if signedIn() && (resource.data.referrerUid == request.auth.uid || resource.data.referredUid == request.auth.uid);
+      allow write: if false;
+    }
+    match /cashLedger/{entryId} {
+      allow get: if ownsLedger();
+      allow list: if signedIn() && resource.data.uid == request.auth.uid;
+      allow write: if false;
+    }
+    match /playReceipts/{receiptId} {
+      allow read: if signedIn() && resource.data.uid == request.auth.uid;
+      allow write: if false;
+    }
+    match /listings/{listingId} {
+      allow get, list: if resource.data.status == 'live' || (signedIn() && (resource.data.sellerUid == request.auth.uid || isAdmin()));
+      allow write: if false;
+    }
+    match /sellerProfiles/{uid} {
+      allow get: if true;
+      allow list: if true;
+      allow write: if false;
+    }
+    match /resaleReviews/{reviewId} {
+      allow get, list: if resource.data.status == 'live';
+      allow write: if false;
+    }
+    match /referralCodes/{code} {
+      allow get: if true;
+      allow list: if false;
+      allow write: if false;
+    }
+    match /payoutRequests/{id} {
+      allow get: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin());
+      allow list: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+      allow write: if false;
+    }
+    // Word Print. Public document holds only public fields. Money stays under
+    // /users/{uid}/wallet and /users/{uid}/payout, which other accounts cannot read.
+    match /profiles/{uid} {
+      allow get: if true;
+      allow list: if true;
+      allow create, update, delete: if false;
+    }
+    match /echoPosts/{postId} {
+      allow get, list: if resource.data.status == 'live' || (signedIn() && (resource.data.authorUid == request.auth.uid || isAdmin()));
+      allow write: if false;
+    }
+    match /echoComments/{commentId} {
+      allow get, list: if resource.data.status == 'live' || (signedIn() && (resource.data.authorUid == request.auth.uid || isAdmin()));
+      allow write: if false;
+    }
+    match /echoReports/{reportId} {
+      allow create: if false;
+      allow get, list: if isAdmin() || (signedIn() && resource.data.reporterUid == request.auth.uid);
+      allow update, delete: if false;
+    }
+    match /config/{docId} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
     match /ratings/{uid}/entries/{raterUid} { allow read: if signedIn(); allow create, update: if isSelf(raterUid) && uid != request.auth.uid; allow delete: if isSelf(raterUid) || isAdmin(); }
     match /reels/{id} { allow read: if true; allow create: if signedIn() && request.resource.data.uid == request.auth.uid; allow update, delete: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin()); }
     match /{document=**} { allow read, write: if false; }

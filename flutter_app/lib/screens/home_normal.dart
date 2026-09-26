@@ -77,7 +77,7 @@ import '../widgets/subscription_today_offer.dart';
 import '../widgets/earth_day_film.dart';
 import '../widgets/promo_color_grid.dart';
 import 'quotes_live.dart';
-import 'earn_pages.dart';
+import '../features/earn/earn_hub_screen.dart';
 import 'app_settings.dart';
 import 'player_settings.dart';
 import 'practice_player.dart';
@@ -310,7 +310,7 @@ class _HomeNormalState extends State<HomeNormal> {
           NormalPromoRail(
             onStore: () => _go(3),
             onPlayer: () => _go(1),
-            onEarn: () => _push(const EarnScreen()),
+            onEarn: () => _push(const EarnHubScreen()),
           ),
         ),
         (

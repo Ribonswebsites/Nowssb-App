@@ -1,0 +1,15 @@
+{
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "storage": {
+    "rules": "storage.rules"
+  },
+  "functions": [
+    {
+      "source": "cloud/functions",
+      "codebase": "economy",
+      "ignore": ["node_modules", ".git"]
+    }
+  ]
+}

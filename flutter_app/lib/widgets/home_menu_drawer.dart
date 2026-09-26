@@ -12,7 +12,12 @@ import 'package:flutter/services.dart';
 
 import '../data/content.dart';
 import '../screens/app_settings.dart';
-import '../screens/earn_pages.dart';
+import '../features/bazaar/bazaar_screen.dart';
+import '../features/circle/circle_screen.dart';
+import '../features/earn/earn_hub_screen.dart';
+import '../features/social/echo_wall_screen.dart';
+import '../features/vault/vault_screen.dart';
+import '../features/wordprint/word_print_screen.dart';
 import '../screens/notifications_settings.dart';
 import '../screens/progress/progress_screen.dart';
 import '../screens/reader/reader_hub.dart';
@@ -336,22 +341,43 @@ class HomeMenuDrawer extends StatelessWidget {
                             light: light,
                             mark: NwsbMarks.earn,
                             label: 'NowssB Earn',
-                            sub: 'Coins, plans, streak',
-                            onTap: () => _push(context, const EarnScreen()),
+                            sub: 'Coins, payout, plans',
+                            onTap: () => _push(context, const EarnHubScreen()),
+                          ),
+                          _Row(
+                            light: light,
+                            mark: NwsbMarks.earn,
+                            label: 'Vault',
+                            sub: 'Daily coins and quests',
+                            onTap: () => _push(context, const VaultScreen()),
                           ),
                           _Row(
                             light: light,
                             mark: NwsbMarks.bag,
-                            label: 'Resell Shop',
-                            sub: 'Sell words you own',
-                            onTap: () => _push(context, const SellShopScreen()),
+                            label: 'Word Bazaar',
+                            sub: 'Resell words you own',
+                            onTap: () => _push(context, const BazaarScreen()),
                           ),
                           _Row(
                             light: light,
                             mark: NwsbMarks.verified,
-                            label: 'Networking',
-                            sub: 'Commission and referrals',
-                            onTap: () => _push(context, const NetworkScreen()),
+                            label: 'NowssB Circle',
+                            sub: 'Referral commission',
+                            onTap: () => _push(context, const CircleScreen()),
+                          ),
+                          _Row(
+                            light: light,
+                            mark: NwsbMarks.user,
+                            label: 'Word Print',
+                            sub: 'Public profile',
+                            onTap: () => _push(context, const WordPrintScreen()),
+                          ),
+                          _Row(
+                            light: light,
+                            mark: NwsbMarks.feed,
+                            label: 'Echo Wall',
+                            sub: 'Reflections',
+                            onTap: () => _push(context, const EchoWallScreen()),
                           ),
                           _Row(
                             light: light,

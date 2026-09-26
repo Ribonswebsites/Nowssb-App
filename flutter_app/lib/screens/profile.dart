@@ -9,6 +9,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 
 import '../data/content.dart';
 import '../data/earn_wallet.dart';
+import '../features/bazaar/bazaar_screen.dart';
+import '../features/circle/circle_screen.dart';
+import '../features/earn/earn_hub_screen.dart';
+import '../features/economy/economy_api.dart';
 import '../data/practice_progress.dart';
 import '../shell/nav_shell.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
@@ -18,7 +22,6 @@ import 'player_settings.dart';
 import 'practice.dart';
 import 'progress/progress_screen.dart';
 import 'quick_access.dart';
-import 'earn_pages.dart';
 import 'store.dart';
 import '../widgets/colored_split_promo_banner.dart';
 
@@ -81,6 +84,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
     PracticeProgress.instance.addListener(_onLiveProgress);
     EarnWallet.instance.addListener(_onEarn);
+    EconomyMirror.instance.addListener(_onEarn);
     PracticeProgress.instance.start();
     _load();
   }
@@ -152,6 +156,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void dispose() {
     PracticeProgress.instance.removeListener(_onLiveProgress);
     EarnWallet.instance.removeListener(_onEarn);
+    EconomyMirror.instance.removeListener(_onEarn);
     _nameController.dispose();
     _toastEntry?.remove();
     super.dispose();
@@ -434,7 +439,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(height: 6),
                     const Flexible(child: Text('Practicing daily, growing steadily.', maxLines: 2, style: TextStyle(fontSize: 12.5, height: 1.45, color: _dim))),
                     const SizedBox(height: 9),
-                    Container(padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 5), decoration: BoxDecoration(color: const Color(0x08FFFFFF), border: const Border.fromBorderSide(BorderSide(color: _border)), borderRadius: BorderRadius.circular(999)), child: Row(mainAxisSize: MainAxisSize.min, children: [Container(width: 6, height: 6, decoration: const BoxDecoration(color: _accent, shape: BoxShape.circle, boxShadow: [BoxShadow(color: _accent, blurRadius: 6)])), const SizedBox(width: 6), Text(EarnWallet.instance.plan == 'Free' ? 'Free Plan' : EarnWallet.instance.plan, style: const TextStyle(fontSize: 11.5, letterSpacing: .45))])),
+                    Container(padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 5), decoration: BoxDecoration(color: const Color(0x08FFFFFF), border: const Border.fromBorderSide(BorderSide(color: _border)), borderRadius: BorderRadius.circular(999)), child: Row(mainAxisSize: MainAxisSize.min, children: [Container(width: 6, height: 6, decoration: const BoxDecoration(color: _accent, shape: BoxShape.circle, boxShadow: [BoxShadow(color: _accent, blurRadius: 6)])), const SizedBox(width: 6), Text(_planName == 'Free' ? 'Free Plan' : _planName, style: const TextStyle(fontSize: 11.5, letterSpacing: .45))])),
                   ]),
                 ),
               ),
@@ -443,8 +448,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       );
 
+  String get _planName => EconomyMirror.instance.live ? EconomyMirror.instance.plan : EarnWallet.instance.plan;
+
   Widget _earnHub() {
-    final w = EarnWallet.instance;
+    final live = EconomyMirror.instance.live;
+    final coins = live ? EconomyMirror.instance.coins : EarnWallet.instance.coins;
+    final plan = _planName;
+    final code = live ? EconomyMirror.instance.code : EarnWallet.instance.code;
+    final sold = live ? EconomyMirror.instance.wordsSold : EarnWallet.instance.wordsSold;
+    final refs = live ? EconomyMirror.instance.paidReferrals : EarnWallet.instance.referralSubs;
     return SectionBlock(
       marginBottom: 34,
       title: 'NowssB Earn',
@@ -454,22 +466,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '${w.coins}',
+              '$coins',
               style: const TextStyle(fontFamily: _mono, fontSize: 32, fontWeight: FontWeight.w600, color: _accent, height: 1),
             ),
             const SizedBox(height: 6),
             Text(
-              '${w.plan} · ${w.code} · ${w.wordsSold} sold · ${w.referralSubs} referrals',
+              '$plan · $code · $sold sold · $refs referrals',
               style: const TextStyle(fontSize: 12.5, color: _dim),
             ),
             const SizedBox(height: 12),
             Row(
               children: [
-                Expanded(child: _earnLink('Earn', const EarnScreen())),
+                Expanded(child: _earnLink('Earn', const EarnHubScreen())),
                 const SizedBox(width: 8),
-                Expanded(child: _earnLink('Sell', const SellShopScreen())),
+                Expanded(child: _earnLink('Bazaar', const BazaarScreen())),
                 const SizedBox(width: 8),
-                Expanded(child: _earnLink('Network', const NetworkScreen())),
+                Expanded(child: _earnLink('Circle', const CircleScreen())),
               ],
             ),
           ],
@@ -589,7 +601,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return SectionBlock(
       marginBottom: 40,
       title: 'Recent Activity',
-      trailing: _viewAll(icon: 'assets/icons/icon_11.svg', onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarnScreen())), pill: true),
+      trailing: _viewAll(icon: 'assets/icons/icon_11.svg', onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarnHubScreen())), pill: true),
       child: GlassCard(
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
         child: items.isEmpty
@@ -631,7 +643,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 16),
           const FractionallySizedBox(widthFactor: .66, child: Text.rich(TextSpan(children: [TextSpan(text: 'My Focus.\nBreathe.\nLet go.\n'), TextSpan(text: 'Grow.', style: TextStyle(color: _accent))]), style: TextStyle(fontSize: 25, height: 1.22, fontWeight: FontWeight.w300))),
           const SizedBox(height: 14),
-          Row(children: [Expanded(child: _compactQuick('Practice', '$_duration min', 15)), const SizedBox(width: 5), Expanded(child: _compactQuick('Reminder', _reminderText, 17)), const SizedBox(width: 5), Expanded(child: _compactQuick('Voice', _voice == 'female' ? 'Female' : 'Male', 19)), const SizedBox(width: 5), Expanded(child: _compactQuick('Plan', EarnWallet.instance.plan, 21))]),
+          Row(children: [Expanded(child: _compactQuick('Practice', '$_duration min', 15)), const SizedBox(width: 5), Expanded(child: _compactQuick('Reminder', _reminderText, 17)), const SizedBox(width: 5), Expanded(child: _compactQuick('Voice', _voice == 'female' ? 'Female' : 'Male', 19)), const SizedBox(width: 5), Expanded(child: _compactQuick('Plan', _planName, 21))]),
         ]),
       );
 
@@ -679,7 +691,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _account() => _sectionList('Account', [
         _listRow('Member Since', trailing: const Text('Jan 2025', style: TextStyle(fontSize: 13, color: _dim))),
-        _listRow('Current Plan', trailing: Row(mainAxisSize: MainAxisSize.min, children: [Text(EarnWallet.instance.plan, style: const TextStyle(fontSize: 13, color: _dim)), const SizedBox(width: 10), InkWell(onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarnScreen())), child: const Text('Upgrade', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, decoration: TextDecoration.underline)))])),
+        _listRow('Current Plan', trailing: Row(mainAxisSize: MainAxisSize.min, children: [Text(_planName, style: const TextStyle(fontSize: 13, color: _dim)), const SizedBox(width: 10), InkWell(onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarnHubScreen())), child: const Text('Upgrade', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, decoration: TextDecoration.underline)))])),
       ]);
 
   Widget _quote() => GlassCard(

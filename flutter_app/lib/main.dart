@@ -24,6 +24,7 @@ import 'app_update.dart';
 import 'data/content.dart';
 import 'data/earn_wallet.dart';
 import 'data/firebase.dart';
+import 'features/economy/economy_api.dart';
 import 'data/notifications.dart';
 import 'data/cart_bag.dart';
 import 'data/settings.dart';
@@ -57,6 +58,7 @@ Future<void> main() async {
   await NotifStore.instance.load();
   await CartBag.instance.load();
   await EarnWallet.instance.start();
+  await EconomyMirror.instance.start();
   await ContentStore.instance.start();
 
   // Nothing decodes underneath the start animation. Released by the splash
