@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import '../data/content.dart';
+import '../data/earn_wallet.dart';
 import '../data/practice_progress.dart';
 import '../shell/nav_shell.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
@@ -17,6 +18,7 @@ import 'player_settings.dart';
 import 'practice.dart';
 import 'progress/progress_screen.dart';
 import 'quick_access.dart';
+import 'earn_pages.dart';
 import 'store.dart';
 import '../widgets/colored_split_promo_banner.dart';
 
@@ -78,6 +80,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     PracticeProgress.instance.addListener(_onLiveProgress);
+    EarnWallet.instance.addListener(_onEarn);
     PracticeProgress.instance.start();
     _load();
   }
@@ -141,9 +144,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (mounted) setState(() => _loading = false);
   }
 
+  void _onEarn() {
+    if (mounted) setState(() {});
+  }
+
   @override
   void dispose() {
     PracticeProgress.instance.removeListener(_onLiveProgress);
+    EarnWallet.instance.removeListener(_onEarn);
     _nameController.dispose();
     _toastEntry?.remove();
     super.dispose();
@@ -275,6 +283,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     _banner(),
                     _profileCard(),
+                    _earnHub(),
                     _progress(),
                     _about(),
                     ColoredSplitPromoBanner.forSurface(
@@ -425,12 +434,61 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(height: 6),
                     const Flexible(child: Text('Practicing daily, growing steadily.', maxLines: 2, style: TextStyle(fontSize: 12.5, height: 1.45, color: _dim))),
                     const SizedBox(height: 9),
-                    Container(padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 5), decoration: BoxDecoration(color: const Color(0x08FFFFFF), border: const Border.fromBorderSide(BorderSide(color: _border)), borderRadius: BorderRadius.circular(999)), child: Row(mainAxisSize: MainAxisSize.min, children: [Container(width: 6, height: 6, decoration: const BoxDecoration(color: _accent, shape: BoxShape.circle, boxShadow: [BoxShadow(color: _accent, blurRadius: 6)])), const SizedBox(width: 6), const Text('Free Plan', style: TextStyle(fontSize: 11.5, letterSpacing: .45))])),
+                    Container(padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 5), decoration: BoxDecoration(color: const Color(0x08FFFFFF), border: const Border.fromBorderSide(BorderSide(color: _border)), borderRadius: BorderRadius.circular(999)), child: Row(mainAxisSize: MainAxisSize.min, children: [Container(width: 6, height: 6, decoration: const BoxDecoration(color: _accent, shape: BoxShape.circle, boxShadow: [BoxShadow(color: _accent, blurRadius: 6)])), const SizedBox(width: 6), Text(EarnWallet.instance.plan == 'Free' ? 'Free Plan' : EarnWallet.instance.plan, style: const TextStyle(fontSize: 11.5, letterSpacing: .45))])),
                   ]),
                 ),
               ),
             ],
           ),
+        ),
+      );
+
+  Widget _earnHub() {
+    final w = EarnWallet.instance;
+    return SectionBlock(
+      marginBottom: 34,
+      title: 'NowssB Earn',
+      child: GlassCard(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '${w.coins}',
+              style: const TextStyle(fontFamily: _mono, fontSize: 32, fontWeight: FontWeight.w600, color: _accent, height: 1),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              '${w.plan} · ${w.code} · ${w.wordsSold} sold · ${w.referralSubs} referrals',
+              style: const TextStyle(fontSize: 12.5, color: _dim),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(child: _earnLink('Earn', const EarnScreen())),
+                const SizedBox(width: 8),
+                Expanded(child: _earnLink('Sell', const SellShopScreen())),
+                const SizedBox(width: 8),
+                Expanded(child: _earnLink('Network', const NetworkScreen())),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _earnLink(String label, Widget page) => InkWell(
+        onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => page)),
+        borderRadius: BorderRadius.circular(14),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            border: const Border.fromBorderSide(BorderSide(color: _border)),
+          ),
+          child: Text(label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: _text)),
         ),
       );
 
@@ -527,26 +585,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
 
   Widget _recentActivity() {
-    final data = [('Morning Calm', 'Guided Meditation', '2h ago', 'assets/profile_source/img-act1.jpeg'), ('Deep Breathing', 'Breathwork Session', '1d ago', 'assets/profile_source/img-act2.jpeg'), ('Body Scan', 'Sleep Wind-Down', '3d ago', 'assets/profile_source/img-act3.jpeg')];
+    final items = EarnWallet.instance.activity;
     return SectionBlock(
       marginBottom: 40,
       title: 'Recent Activity',
-      trailing: _viewAll(icon: 'assets/icons/icon_11.svg', onTap: () => setState(() => _recentOpen = true), pill: true),
+      trailing: _viewAll(icon: 'assets/icons/icon_11.svg', onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarnScreen())), pill: true),
       child: GlassCard(
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-        child: Column(children: data.asMap().entries.map((entry) {
-          final i = entry.key; final x = entry.value;
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
-            decoration: BoxDecoration(border: Border(bottom: i == data.length - 1 ? BorderSide.none : const BorderSide(color: _borderSoft))),
-            child: Row(children: [
-              ClipRRect(borderRadius: BorderRadius.circular(13), child: Container(width: 48, height: 48, decoration: BoxDecoration(image: DecorationImage(image: AssetImage(x.$4), fit: BoxFit.cover), border: const Border.fromBorderSide(BorderSide(color: _borderSoft))))),
-              const SizedBox(width: 13),
-              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(x.$1, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600)), const SizedBox(height: 2), Text(x.$2, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12.5, color: _dim))])),
-              const SizedBox(width: 10), Text(x.$3, style: const TextStyle(fontSize: 12, color: _faint)), const SizedBox(width: 10), _circleButton(asset: 'assets/icons/icon_${(12 + i).toString().padLeft(2, '0')}.svg', size: 30, onTap: () => _showToast(x.$1)),
-            ]),
-          );
-        }).toList()),
+        child: items.isEmpty
+            ? const Padding(
+                padding: EdgeInsets.all(16),
+                child: Text('Coins, sales, and referrals show up here.', style: TextStyle(fontSize: 13, color: _dim)),
+              )
+            : Column(children: [
+                for (var i = 0; i < items.length && i < 6; i++)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
+                    decoration: BoxDecoration(border: Border(bottom: i == items.length - 1 || i == 5 ? BorderSide.none : const BorderSide(color: _borderSoft))),
+                    child: Row(children: [
+                      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text(items[i].title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600)),
+                        const SizedBox(height: 2),
+                        Text(items[i].detail, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12.5, color: _dim)),
+                      ])),
+                      const SizedBox(width: 10),
+                      Text(
+                        items[i].coins == 0 ? '—' : (items[i].coins > 0 ? '+${items[i].coins}' : '${items[i].coins}'),
+                        style: const TextStyle(fontFamily: _mono, fontSize: 12, color: _accent),
+                      ),
+                    ]),
+                  ),
+              ]),
       ),
     );
   }
@@ -562,7 +631,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 16),
           const FractionallySizedBox(widthFactor: .66, child: Text.rich(TextSpan(children: [TextSpan(text: 'My Focus.\nBreathe.\nLet go.\n'), TextSpan(text: 'Grow.', style: TextStyle(color: _accent))]), style: TextStyle(fontSize: 25, height: 1.22, fontWeight: FontWeight.w300))),
           const SizedBox(height: 14),
-          Row(children: [Expanded(child: _compactQuick('Practice', '$_duration min', 15)), const SizedBox(width: 5), Expanded(child: _compactQuick('Reminder', _reminderText, 17)), const SizedBox(width: 5), Expanded(child: _compactQuick('Voice', _voice == 'female' ? 'Female' : 'Male', 19)), const SizedBox(width: 5), Expanded(child: _compactQuick('Plan', 'Free', 21))]),
+          Row(children: [Expanded(child: _compactQuick('Practice', '$_duration min', 15)), const SizedBox(width: 5), Expanded(child: _compactQuick('Reminder', _reminderText, 17)), const SizedBox(width: 5), Expanded(child: _compactQuick('Voice', _voice == 'female' ? 'Female' : 'Male', 19)), const SizedBox(width: 5), Expanded(child: _compactQuick('Plan', EarnWallet.instance.plan, 21))]),
         ]),
       );
 
@@ -610,7 +679,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _account() => _sectionList('Account', [
         _listRow('Member Since', trailing: const Text('Jan 2025', style: TextStyle(fontSize: 13, color: _dim))),
-        _listRow('Current Plan', trailing: Row(mainAxisSize: MainAxisSize.min, children: [const Text('Free', style: TextStyle(fontSize: 13, color: _dim)), const SizedBox(width: 10), InkWell(onTap: () => _showToast('Upgrade flow not wired up yet'), child: const Text('Upgrade', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, decoration: TextDecoration.underline)))])),
+        _listRow('Current Plan', trailing: Row(mainAxisSize: MainAxisSize.min, children: [Text(EarnWallet.instance.plan, style: const TextStyle(fontSize: 13, color: _dim)), const SizedBox(width: 10), InkWell(onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarnScreen())), child: const Text('Upgrade', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, decoration: TextDecoration.underline)))])),
       ]);
 
   Widget _quote() => GlassCard(

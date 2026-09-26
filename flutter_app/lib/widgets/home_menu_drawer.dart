@@ -12,6 +12,7 @@ import 'package:flutter/services.dart';
 
 import '../data/content.dart';
 import '../screens/app_settings.dart';
+import '../screens/earn_pages.dart';
 import '../screens/notifications_settings.dart';
 import '../screens/progress/progress_screen.dart';
 import '../screens/reader/reader_hub.dart';
@@ -330,6 +331,27 @@ class HomeMenuDrawer extends StatelessWidget {
                               context,
                               const NotificationsSettingsPage(),
                             ),
+                          ),
+                          _Row(
+                            light: light,
+                            mark: NwsbMarks.earn,
+                            label: 'NowssB Earn',
+                            sub: 'Coins, plans, streak',
+                            onTap: () => _push(context, const EarnScreen()),
+                          ),
+                          _Row(
+                            light: light,
+                            mark: NwsbMarks.bag,
+                            label: 'Resell Shop',
+                            sub: 'Sell words you own',
+                            onTap: () => _push(context, const SellShopScreen()),
+                          ),
+                          _Row(
+                            light: light,
+                            mark: NwsbMarks.verified,
+                            label: 'Networking',
+                            sub: 'Commission and referrals',
+                            onTap: () => _push(context, const NetworkScreen()),
                           ),
                           _Row(
                             light: light,

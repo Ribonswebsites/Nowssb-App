@@ -59,6 +59,7 @@ class BagOrder {
     required this.payMethod,
     required this.items,
     required this.total,
+    this.coinsUsed = 0,
   });
 
   final String id;
@@ -66,6 +67,7 @@ class BagOrder {
   final String name, phone, address, payMethod;
   final List<BagItem> items;
   final num total;
+  final int coinsUsed;
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -76,6 +78,7 @@ class BagOrder {
         'payMethod': payMethod,
         'items': items.map((e) => e.toJson()).toList(),
         'total': total,
+        'coinsUsed': coinsUsed,
       };
 
   static BagOrder fromJson(Map<String, dynamic> m) => BagOrder(
@@ -90,6 +93,7 @@ class BagOrder {
             if (e is Map) BagItem.fromJson(Map<String, dynamic>.from(e)),
         ],
         total: m['total'] is num ? m['total'] as num : 0,
+        coinsUsed: (m['coinsUsed'] as num?)?.toInt() ?? 0,
       );
 }
 
@@ -244,17 +248,20 @@ class CartBag extends ChangeNotifier {
     required String phone,
     required String address,
     required String payMethod,
+    int coinsUsed = 0,
   }) async {
     if (_cart.isEmpty) return null;
     await saveShip(name: name, phone: phone, address: address);
     final now = DateTime.now();
+    final cash = cartTotal - coinsUsed;
+    final method = coinsUsed > 0 ? '$payMethod + $coinsUsed coins' : payMethod;
     final order = BagOrder(
       id: 'NSB${now.millisecondsSinceEpoch}',
       at: now.millisecondsSinceEpoch,
       name: name.trim(),
       phone: phone.trim(),
       address: address.trim(),
-      payMethod: payMethod,
+      payMethod: method,
       items: [
         for (final e in _cart)
           BagItem(
@@ -267,7 +274,8 @@ class CartBag extends ChangeNotifier {
             qty: e.qty,
           ),
       ],
-      total: cartTotal,
+      total: cash < 0 ? 0 : cash,
+      coinsUsed: coinsUsed,
     );
     _orders.insert(0, order);
     _cart.clear();

@@ -16,11 +16,13 @@
 library;
 
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'app_update.dart';
 import 'data/content.dart';
+import 'data/earn_wallet.dart';
 import 'data/firebase.dart';
 import 'data/notifications.dart';
 import 'data/cart_bag.dart';
@@ -54,6 +56,7 @@ Future<void> main() async {
   await Settings.instance.load();
   await NotifStore.instance.load();
   await CartBag.instance.load();
+  await EarnWallet.instance.start();
   await ContentStore.instance.start();
 
   // Nothing decodes underneath the start animation. Released by the splash
@@ -102,6 +105,9 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) {
       VideoPool.instance.resume();
       _checkForUpdate();
+      if (NwsbFirebase.ready && FirebaseAuth.instance.currentUser != null) {
+        unawaited(EarnWallet.instance.onSignedIn());
+      }
     } else if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.hidden ||
         state == AppLifecycleState.detached) {

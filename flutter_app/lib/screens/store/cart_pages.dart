@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../data/cart_bag.dart';
+import '../../data/earn_wallet.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/app_backdrop.dart';
 import '../../widgets/cart_add_animation.dart';
@@ -113,6 +114,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   late final TextEditingController _phone;
   late final TextEditingController _address;
   String _pay = 'UPI';
+  bool _useCoins = true;
   BagOrder? _placed;
   String? _error;
 
@@ -146,12 +148,20 @@ class _CheckoutPageState extends State<CheckoutPage> {
       return;
     }
     HapticFeedback.mediumImpact();
+    final coinsUsed = await EarnWallet.instance.reserveCheckoutCoins(
+      bag.cartTotal,
+      use: _useCoins,
+    );
     final order = await bag.checkout(
       name: _name.text,
       phone: _phone.text,
       address: _address.text,
       payMethod: _pay,
+      coinsUsed: coinsUsed,
     );
+    if (order != null) {
+      await EarnWallet.instance.onStoreOrder(order);
+    }
     if (!mounted) return;
     setState(() {
       _placed = order;
@@ -217,9 +227,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
       title: 'Checkout',
       eyebrow: 'NowssB Store',
       child: ListenableBuilder(
-        listenable: CartBag.instance,
+        listenable: Listenable.merge([CartBag.instance, EarnWallet.instance]),
         builder: (context, _) {
           final bag = CartBag.instance;
+          final quote = EarnWallet.instance.quote(bag.cartTotal);
+          final coins = _useCoins ? quote.coins : 0;
+          final cash = bag.cartTotal - coins;
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
             children: [
@@ -255,7 +268,15 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       ],
                     ),
                   ),
-                _TotalRow(label: 'To pay', value: _inr(bag.cartTotal)),
+                _TotalRow(label: 'To pay', value: _inr(cash < 0 ? 0 : cash)),
+                if (coins > 0)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Text(
+                      '$coins coins cover up to 30%. Cash ${_inr(cash < 0 ? 0 : cash)} is recorded, not charged to a card.',
+                      style: const TextStyle(color: Color(0x99FFFFFF), fontSize: 12),
+                    ),
+                  ),
               ],
               const SizedBox(height: 22),
               const Text(
@@ -305,6 +326,22 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     ),
                 ],
               ),
+              if (quote.maxCoins > 0) ...[
+                const SizedBox(height: 14),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  value: _useCoins,
+                  onChanged: (v) => setState(() => _useCoins = v),
+                  title: Text(
+                    'Use ${quote.coins} NowssB Coins',
+                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                  ),
+                  subtitle: const Text(
+                    'At most 30% of this order',
+                    style: TextStyle(color: Color(0x99FFFFFF), fontSize: 12),
+                  ),
+                ),
+              ],
               if (_error != null) ...[
                 const SizedBox(height: 14),
                 Text(_error!, style: const TextStyle(color: Color(0xFFFF8A80))),

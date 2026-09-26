@@ -19,6 +19,7 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../data/earn_wallet.dart';
 import '../data/models.dart';
 import '../data/practice_progress.dart';
 import '../media/nwsb_video.dart';
@@ -145,9 +146,14 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       _guideDone = true;
       _flagsReady = true;
       unawaited(_prepareAndPlay());
+      _rewardPlayerOpen();
     } else {
       unawaited(_loadIntroFlags());
     }
+  }
+
+  void _rewardPlayerOpen() {
+    unawaited(EarnWallet.instance.onPlayerOpened());
   }
 
   Future<void> _loadIntroFlags() async {
@@ -163,6 +169,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       });
       if (_introDone && _guideDone) {
         unawaited(_prepareAndPlay());
+        _rewardPlayerOpen();
       } else if (_introDone && !_guideDone) {
         // Guide still pending; do not start playback yet.
       } else if (!_introDone && _guideDone) {
@@ -973,6 +980,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
           unawaited(_markIntroSeen());
           setState(() => _introDone = true);
           unawaited(_prepareAndPlay());
+          _rewardPlayerOpen();
         },
       );
     }

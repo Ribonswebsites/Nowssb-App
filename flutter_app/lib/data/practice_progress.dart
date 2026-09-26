@@ -221,6 +221,30 @@ class PracticeProgress extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Fills yesterday so a broken streak reconnects. Returns false when
+  /// yesterday is already practiced.
+  Future<bool> restoreBrokenStreak() async {
+    final now = DateTime.now();
+    final yesterday = DateTime(now.year, now.month, now.day)
+        .subtract(const Duration(days: 1));
+    final day = _day(yesterday);
+    final already = _sessions.values.any((s) => s['date'] == day);
+    if (already) return false;
+    _sessions['${day}_Streak restore'] = {
+      'date': day,
+      'word': 'Streak restore',
+      'completedAt': DateTime.now().toIso8601String(),
+      'source': 'coin-restore',
+      'durationSec': 60,
+    };
+    try {
+      final preferences = await SharedPreferences.getInstance();
+      await preferences.setString(_storageKey, jsonEncode(_sessions));
+    } catch (_) {}
+    notifyListeners();
+    return true;
+  }
+
   static String _day(DateTime date) {
     final month = date.month.toString().padLeft(2, '0');
     final day = date.day.toString().padLeft(2, '0');

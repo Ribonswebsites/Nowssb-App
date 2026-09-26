@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+import '../data/earn_wallet.dart';
 import '../data/firebase.dart';
 import '../widgets/login_gallery.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
@@ -38,6 +39,7 @@ class _AuthGateState extends State<AuthGate> {
   bool _showEmail = false;
   bool _showPhone = false;
   bool _guest = false;
+  String? _rewardedUid;
   String? _error;
   String? _verificationId;
   int? _resendToken;
@@ -537,7 +539,17 @@ class _AuthGateState extends State<AuthGate> {
             ),
           );
         }
-        if (snapshot.hasData) return widget.child;
+        if (snapshot.hasData) {
+          final uid = snapshot.data?.uid;
+          if (uid != null && _rewardedUid != uid) {
+            _rewardedUid = uid;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!mounted) return;
+              EarnWallet.instance.onSignedIn();
+            });
+          }
+          return widget.child;
+        }
         return _buildAuthScreen();
       },
     );
