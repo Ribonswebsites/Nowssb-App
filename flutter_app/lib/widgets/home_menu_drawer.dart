@@ -349,22 +349,22 @@ class HomeMenuDrawer extends StatelessWidget {
                           _Row(
                             light: light,
                             mark: NwsbMarks.earn,
-                            label: 'Vault',
+                            label: 'NowssB Earn — Rewards',
                             sub: 'Daily coins and quests',
                             onTap: () => _push(context, const VaultScreen()),
                           ),
                           _Row(
                             light: light,
                             mark: NwsbMarks.bag,
-                            label: 'Word Bazaar',
-                            sub: 'Resell words you own',
+                            label: 'NowssB Earn — Resell',
+                            sub: 'Listings inside the Store',
                             onTap: () => _push(context, const BazaarScreen()),
                           ),
                           _Row(
                             light: light,
                             mark: NwsbMarks.verified,
-                            label: 'NowssB Circle',
-                            sub: 'Referral commission',
+                            label: 'NowssB Earn — Referrals',
+                            sub: 'Codes and commission',
                             onTap: () => _push(context, const CircleScreen()),
                           ),
                           _Row(

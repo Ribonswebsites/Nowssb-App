@@ -1,4 +1,4 @@
-/// NowssB Earn, Resell Shop, and Networking.
+/// NowssB Earn, Resell, and Referrals.
 ///
 /// Coins, listings, and referral codes live in [EarnWallet] on this phone.
 /// The cash share of a price is recorded, not charged — a card or UPI
@@ -94,7 +94,7 @@ class EarnScreen extends StatelessWidget {
                 children: [
                   Expanded(
                     child: _GoldBtn(
-                      label: 'Resell Shop',
+                      label: 'Resell',
                       onTap: () => Navigator.of(context).push(
                         MaterialPageRoute<void>(
                           builder: (_) => const SellShopScreen(),
@@ -106,7 +106,7 @@ class EarnScreen extends StatelessWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: _GoldBtn(
-                      label: 'Network',
+                      label: 'Referrals',
                       onTap: () => Navigator.of(context).push(
                         MaterialPageRoute<void>(
                           builder: (_) => const NetworkScreen(),
@@ -428,7 +428,7 @@ class _SellShopScreenState extends State<SellShopScreen> {
   @override
   Widget build(BuildContext context) {
     return _EarnScaffold(
-      eyebrow: 'Resell Shop',
+      eyebrow: 'NowssB Earn — Resell',
       title: 'Sell',
       child: ListenableBuilder(
         listenable: EarnWallet.instance,
@@ -596,7 +596,7 @@ class _NetworkScreenState extends State<NetworkScreen> {
   @override
   Widget build(BuildContext context) {
     return _EarnScaffold(
-      eyebrow: 'Networking',
+      eyebrow: 'NowssB Earn — Referrals',
       title: 'Promote',
       child: ListenableBuilder(
         listenable: EarnWallet.instance,

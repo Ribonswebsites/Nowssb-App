@@ -14,6 +14,7 @@ import '../features/circle/circle_screen.dart';
 import '../features/earn/earn_hub_screen.dart';
 import '../features/earn/earnings_screen.dart';
 import '../features/economy/economy_api.dart';
+import '../features/economy/economy_theme.dart';
 import '../features/economy/money.dart';
 import '../features/vault/vault_screen.dart';
 import '../data/practice_progress.dart';
@@ -473,7 +474,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('$coins', style: const TextStyle(fontFamily: _mono, fontSize: 32, fontWeight: FontWeight.w600, color: _accent, height: 1)),
+                  CoinCount(
+                    value: coins,
+                    style: const TextStyle(fontFamily: _mono, fontSize: 32, fontWeight: FontWeight.w600, color: _accent, height: 1),
+                  ),
                   const SizedBox(height: 6),
                   Text('Streak $streak · open Vault', style: const TextStyle(fontSize: 12.5, color: _dim)),
                 ],
@@ -483,7 +487,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         SectionBlock(
           marginBottom: 18,
-          title: 'Networking',
+          title: 'Referrals',
           child: GlassCard(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
             child: InkWell(
@@ -514,7 +518,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     style: const TextStyle(fontFamily: _mono, fontSize: 22, fontWeight: FontWeight.w600, color: _accent),
                   ),
                   const SizedBox(height: 6),
-                  const Text('Sales and Circle · payout history', style: TextStyle(fontSize: 12.5, color: _dim)),
+                  const Text('Sales and referrals · payout history', style: TextStyle(fontSize: 12.5, color: _dim)),
                 ],
               ),
             ),
@@ -559,15 +563,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
           padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
           child: Row(
             children: [
+              GestureDetector(
+                onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const VaultScreen())),
+                child: _TeaserStat(
+                  '${EconomyMirror.instance.live ? EconomyMirror.instance.coins : EarnWallet.instance.coins}',
+                  'Coins',
+                  expanded: false,
+                  figure: CoinCount(
+                    value: EconomyMirror.instance.live ? EconomyMirror.instance.coins : EarnWallet.instance.coins,
+                    style: const TextStyle(fontFamily: _mono, fontSize: 22, fontWeight: FontWeight.w600, height: 1, color: _text),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
               Expanded(
-                child: Row(
-                  children: [
-                    _TeaserStat('${p.streak}', 'Streak'),
-                    const SizedBox(width: 10),
-                    _TeaserStat('${p.totalSessions}', 'Sessions'),
-                    const SizedBox(width: 10),
-                    _TeaserStat('${p.uniqueWords}', 'Words'),
-                  ],
+                child: InkWell(
+                  onTap: openProgress,
+                  child: Row(
+                    children: [
+                      _TeaserStat('${p.streak}', 'Streak'),
+                      const SizedBox(width: 10),
+                      _TeaserStat('${p.totalSessions}', 'Sessions'),
+                      const SizedBox(width: 10),
+                      _TeaserStat('${p.uniqueWords}', 'Words'),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(width: 8),
@@ -831,10 +851,12 @@ class SectionBlock extends StatelessWidget {
 
 class _TeaserStat extends StatelessWidget {
   final String value, label;
-  const _TeaserStat(this.value, this.label);
+  final bool expanded;
+  final Widget? figure;
+  const _TeaserStat(this.value, this.label, {this.expanded = true, this.figure});
   @override
-  Widget build(BuildContext context) => Expanded(
-        child: Container(
+  Widget build(BuildContext context) {
+    final chip = Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
           decoration: BoxDecoration(
             color: const Color(0x570C0C0E),
@@ -844,13 +866,14 @@ class _TeaserStat extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(value, style: const TextStyle(fontFamily: _mono, fontSize: 22, fontWeight: FontWeight.w600, height: 1, color: _text)),
+              figure ?? Text(value, style: const TextStyle(fontFamily: _mono, fontSize: 22, fontWeight: FontWeight.w600, height: 1, color: _text)),
               const SizedBox(height: 6),
               Text(label.toUpperCase(), style: const TextStyle(fontSize: 9, letterSpacing: 1.1, color: _dim)),
             ],
           ),
-        ),
-      );
+        );
+    return expanded ? Expanded(child: chip) : chip;
+  }
 }
 
 class ToggleSwitch extends StatelessWidget {

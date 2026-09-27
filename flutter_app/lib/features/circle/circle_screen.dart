@@ -2,7 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../screens/nwsb_sign_in_sheet.dart';
 import '../../screens/subscription.dart';
+import '../../widgets/colored_split_promo_banner.dart';
+import '../../widgets/nwsb_icon.dart';
 import '../../data/firebase.dart';
 import '../../theme/tokens.dart';
 import '../economy/economy_api.dart';
@@ -28,22 +31,22 @@ class _CircleScreenState extends State<CircleScreen> {
   @override
   Widget build(BuildContext context) {
     return EconomyPage(
-      title: 'NowssB Circle',
-      requireAuth: true,
+      title: 'NowssB Earn — Referrals',
+      banner: ColoredSplitPromoBanner(
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+        spec: SplitPromoSpec(
+          title: 'NowssB Earn\nReferrals',
+          cta: 'See the ladder',
+          leftColor: const Color(0xFF1A3A3C),
+          rightColor: const Color(0xFF2EC4B6),
+          art: SplitPromoArts.blondeLotus,
+        ),
+      ),
       child: ListenableBuilder(
         listenable: EconomyMirror.instance,
         builder: (context, _) {
           final w = EconomyMirror.instance;
-          if (!w.subscribed) {
-            return EconomyMessage(
-              title: 'Circle opens with a paid plan',
-              body: 'A free or lapsed plan cannot share a code or earn from one. Your tier is kept when you renew.',
-              action: 'See plans',
-              onAction: () => Navigator.of(context).push(
-                MaterialPageRoute<void>(builder: (_) => const SubscriptionScreen()),
-              ),
-            );
-          }
+          final signedIn = NwsbFirebase.ready && w.uid != null;
           final next = w.paidReferrals >= 100
               ? 100
               : w.paidReferrals >= 50
@@ -56,33 +59,84 @@ class _CircleScreenState extends State<CircleScreen> {
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
             children: [
-              Text(w.code.isEmpty ? '—' : w.code, style: const TextStyle(fontSize: 32, color: NwsbColors.goldLight, fontWeight: FontWeight.w700, letterSpacing: 2)),
-              Text('${w.circleTier} · ${w.paidReferrals} paid referrals', style: const TextStyle(color: NwsbColors.mist)),
+              const Text('TIER LADDER', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12)),
               const SizedBox(height: 8),
-              LinearProgressIndicator(
-                value: next == 0 ? 0 : (w.paidReferrals / next).clamp(0, 1),
-                color: NwsbColors.gold,
-                backgroundColor: const Color(0x22FFFFFF),
-              ),
-              const SizedBox(height: 6),
-              Text('Squad volume ${w.paidReferrals} / $next toward the next Circle tier', style: const TextStyle(color: NwsbColors.mist, fontSize: 12)),
+              for (final step in const [
+                ('Member', 'Before 5 paid referrals'),
+                ('Bronze', '5 paid referrals · 20%'),
+                ('Silver', '20 paid referrals · 25%'),
+                ('Gold', '50 paid referrals · 30%'),
+                ('Platinum', '100 paid referrals · 35%'),
+              ])
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    children: [
+                      NwsbIcon(
+                        NwsbMarks.verified,
+                        size: 18,
+                        color: signedIn && w.circleTier == step.$1 ? NwsbColors.goldLight : NwsbColors.mist,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          '${step.$1} · ${step.$2}',
+                          style: TextStyle(
+                            color: signedIn && w.circleTier == step.$1 ? Colors.white : NwsbColors.mist,
+                            fontWeight: signedIn && w.circleTier == step.$1 ? FontWeight.w700 : FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              const SizedBox(height: 8),
+              if (signedIn) ...[
+                LinearProgressIndicator(
+                  value: (w.paidReferrals / next).clamp(0, 1),
+                  color: NwsbColors.gold,
+                  backgroundColor: const Color(0x22FFFFFF),
+                ),
+                const SizedBox(height: 6),
+                Text('${w.paidReferrals} / $next toward the next tier', style: const TextStyle(color: NwsbColors.mist, fontSize: 12)),
+              ],
               const SizedBox(height: 12),
               const EconomyNote(
-                'Your code works only while your paid plan is active. After 5 paid referrals you earn cash: 20%, then 25, 30, and 35 at Platinum. Level 2 is 5% and only while you and your direct referral both have an active plan. Nothing pays on an invite alone.',
+                'A code pays only while that member’s plan is active. After 5 paid referrals the rate is 20%, then 25, 30, and 35. The second level is 5%, and only while both plans are active. An invite alone pays nothing.',
               ),
               const SizedBox(height: 14),
-              GoldButton(
-                label: 'Copy code',
-                filled: false,
-                onTap: w.code.isEmpty
-                    ? null
-                    : () async {
-                        await Clipboard.setData(ClipboardData(text: w.code));
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Code copied.')));
-                        }
-                      },
-              ),
+              if (!signedIn)
+                GoldButton(
+                  label: 'Sign in to see your code',
+                  onTap: () => NwsbSignInPage.open(context),
+                )
+              else if (!w.subscribed) ...[
+                const EconomyNote('Your code stays paused until a paid plan is active. The count you already have is kept.'),
+                const SizedBox(height: 8),
+                GoldButton(
+                  label: 'See plans',
+                  filled: false,
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(builder: (_) => const SubscriptionScreen()),
+                  ),
+                ),
+              ] else ...[
+                Text(w.code.isEmpty ? '—' : w.code, style: const TextStyle(fontSize: 32, color: NwsbColors.goldLight, fontWeight: FontWeight.w700, letterSpacing: 2)),
+                Text('${w.circleTier} · ${w.paidReferrals} paid referrals', style: const TextStyle(color: NwsbColors.mist)),
+                const SizedBox(height: 8),
+                GoldButton(
+                  label: 'Copy code',
+                  filled: false,
+                  onTap: w.code.isEmpty
+                      ? null
+                      : () async {
+                          await Clipboard.setData(ClipboardData(text: w.code));
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Code copied.')));
+                          }
+                        },
+                ),
+              ],
               const SizedBox(height: 16),
               TextField(
                 controller: _code,
@@ -93,9 +147,11 @@ class _CircleScreenState extends State<CircleScreen> {
               const SizedBox(height: 8),
               GoldButton(
                 label: w.referredBy.isEmpty ? 'Apply code' : 'Code already applied',
-                onTap: w.referredBy.isEmpty
-                    ? () => runEconomy(context, () => EconomyApi.call('applyReferralCode', {'code': _code.text.trim()}))
-                    : null,
+                onTap: signedIn && w.referredBy.isEmpty
+                    ? () => runPrivate(context, () => EconomyApi.call('applyReferralCode', {'code': _code.text.trim()}))
+                    : signedIn
+                        ? null
+                        : () => NwsbSignInPage.open(context),
               ),
               const SizedBox(height: 18),
               const Text('LEDGER', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12)),

@@ -1,8 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import '../../data/firebase.dart';
-import '../../screens/auth_gate.dart';
+import '../../screens/nwsb_sign_in_sheet.dart';
+import '../../widgets/nwsb_icon.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/app_backdrop.dart';
 import 'economy_api.dart';
@@ -15,18 +14,15 @@ class EconomyPage extends StatelessWidget {
     required this.child,
     this.action,
     this.banner,
-    this.requireAuth = false,
   });
 
   final String title;
   final Widget child;
   final Widget? action;
   final Widget? banner;
-  final bool requireAuth;
 
   @override
   Widget build(BuildContext context) {
-    final body = requireAuth ? EconomyGate(child: child) : child;
     return Scaffold(
       backgroundColor: NwsbColors.deep,
       body: Stack(
@@ -67,44 +63,12 @@ class EconomyPage extends StatelessWidget {
                   ),
                 ),
                 if (banner != null) banner!,
-                Expanded(child: body),
+                Expanded(child: child),
               ],
             ),
           ),
         ],
       ),
-    );
-  }
-}
-
-class EconomyGate extends StatelessWidget {
-  const EconomyGate({super.key, required this.child});
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    if (!NwsbFirebase.ready) {
-      return const EconomyMessage(
-        title: 'Earn is not on this build yet',
-        body: 'This phone has no Firebase connection, so coins and payouts stay closed.',
-      );
-    }
-    return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snap) {
-        if (snap.connectionState == ConnectionState.waiting) {
-          return const EconomySkeleton();
-        }
-        if (snap.data == null) {
-          return EconomyMessage(
-            title: 'Sign in to open this',
-            body: 'Rewards, resale, and payouts stay on your account.',
-            action: 'Sign in',
-            onAction: () => AuthGate.askForAccount(),
-          );
-        }
-        return child;
-      },
     );
   }
 }
@@ -123,7 +87,7 @@ class EconomyMessage extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.auto_awesome, color: NwsbColors.gold, size: 36),
+            const NwsbIcon(NwsbMarks.earn, color: NwsbColors.gold, size: 36),
             const SizedBox(height: 14),
             Text(title, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700)),
             const SizedBox(height: 8),
@@ -238,6 +202,12 @@ class EconomyNote extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(text, style: const TextStyle(color: NwsbColors.mist, fontSize: 13, height: 1.4));
   }
+}
+
+Future<void> runPrivate(BuildContext context, Future<void> Function() action) async {
+  final ok = await NwsbSignInPage.open(context);
+  if (!ok || !context.mounted) return;
+  await runEconomy(context, action);
 }
 
 Future<void> runEconomy(BuildContext context, Future<void> Function() action) async {

@@ -7,6 +7,7 @@ import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
 import '../economy/money.dart';
 import '../economy/play_billing.dart';
+import '../../widgets/colored_split_promo_banner.dart';
 
 class BazaarScreen extends StatelessWidget {
   const BazaarScreen({super.key, this.embedded = false});
@@ -15,10 +16,12 @@ class BazaarScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final body = ListView(
-      shrinkWrap: embedded,
-      physics: embedded ? const NeverScrollableScrollPhysics() : null,
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
+    final listening = ListenableBuilder(
+      listenable: EconomyMirror.instance,
+      builder: (context, _) => ListView(
+        shrinkWrap: embedded,
+        physics: embedded ? const NeverScrollableScrollPhysics() : null,
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
         children: [
           const EconomyNote(
             'Resale price stays between 50% and 150% of the original. The platform cut starts at 20% and falls toward 10% as you sell more. 3% goes to the content owner. No refunds on resold items. NowssB can delist a listing. You must own the word before you list it.',
@@ -32,9 +35,23 @@ class BazaarScreen extends StatelessWidget {
           const SizedBox(height: 8),
           const _LiveListings(),
         ],
+      ),
     );
-    if (embedded) return body;
-    return EconomyPage(title: 'Word Bazaar', requireAuth: true, child: body);
+    if (embedded) return listening;
+    return EconomyPage(
+      title: 'NowssB Earn — Resell',
+      banner: ColoredSplitPromoBanner(
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+        spec: SplitPromoSpec(
+          title: 'NowssB Earn\nResell',
+          cta: 'Browse listings',
+          leftColor: const Color(0xFF3D2914),
+          rightColor: const Color(0xFFE07A3D),
+          art: SplitPromoArts.redLotus,
+        ),
+      ),
+      child: listening,
+    );
   }
 }
 
@@ -107,7 +124,7 @@ class _ListCardState extends State<_ListCard> {
           GoldButton(
             label: 'List $title',
             filled: false,
-            onTap: () => runEconomy(context, () => EconomyApi.call('createListing', {
+            onTap: () => runPrivate(context, () => EconomyApi.call('createListing', {
                   'itemId': widget.doc.id,
                   'price': int.tryParse(_price.text.trim()) ?? 0,
                 })),
@@ -131,9 +148,21 @@ class _LiveListings extends StatelessWidget {
           .limit(40)
           .snapshots(),
       builder: (context, snap) {
-        if (snap.hasError) return EconomyNote('${snap.error}');
+        if (snap.hasError) {
+          return const EconomyNote('Live listings did not load. Pull back in a moment.');
+        }
         final docs = snap.data?.docs ?? [];
-        if (docs.isEmpty) return const EconomyNote('No live listings yet.');
+        if (docs.isEmpty) {
+          return const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              EconomyNote('No live listings yet. A listing shows the word, the seller’s price, and a Play buy button.'),
+              SizedBox(height: 8),
+              Text('Sample · a word you already own', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+              Text('Price stays between 50% and 150% of the original.', style: TextStyle(color: NwsbColors.mist, fontSize: 12)),
+            ],
+          );
+        }
         return Column(
           children: [
             for (final doc in docs) _ListingTile(doc: doc),
@@ -165,7 +194,7 @@ class _ListingTile extends StatelessWidget {
           if (!mine)
             GoldButton(
               label: 'Buy with Play',
-              onTap: () => runEconomy(context, () async {
+              onTap: () => runPrivate(context, () async {
                 final quote = CashQuote.forPrice(price: price, balance: EconomyMirror.instance.coins);
                 await PlayCheckout.buy(
                   callable: 'purchaseListing',
@@ -178,7 +207,7 @@ class _ListingTile extends StatelessWidget {
             GoldButton(
               label: 'Boost 3 days · 60 coins',
               filled: false,
-              onTap: () => runEconomy(context, () => EconomyApi.call('spendCoins', {
+              onTap: () => runPrivate(context, () => EconomyApi.call('spendCoins', {
                     'purpose': 'boost',
                     'listingId': doc.id,
                   })),
@@ -187,7 +216,7 @@ class _ListingTile extends StatelessWidget {
             GoldButton(
               label: 'Flash sale −10%',
               filled: false,
-              onTap: () => runEconomy(context, () => EconomyApi.call('setFlashSale', {
+              onTap: () => runPrivate(context, () => EconomyApi.call('setFlashSale', {
                     'listingId': doc.id,
                     'price': (price * 0.9).round(),
                     'hours': 24,
@@ -198,7 +227,7 @@ class _ListingTile extends StatelessWidget {
             GoldButton(
               label: 'Review up',
               filled: false,
-              onTap: () => runEconomy(context, () => EconomyApi.call('reviewResale', {
+              onTap: () => runPrivate(context, () => EconomyApi.call('reviewResale', {
                     'listingId': doc.id,
                     'up': true,
                     'comment': 'Helpful resale',

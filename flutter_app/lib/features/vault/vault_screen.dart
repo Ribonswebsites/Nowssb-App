@@ -4,6 +4,7 @@ import '../../theme/tokens.dart';
 import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
 import '../economy/play_billing.dart';
+import '../../widgets/colored_split_promo_banner.dart';
 
 class VaultScreen extends StatelessWidget {
   const VaultScreen({super.key});
@@ -11,9 +12,17 @@ class VaultScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return EconomyPage(
-      title: 'NowssB Vault',
-      requireAuth: true,
-      banner: const _VaultBanner(),
+      title: 'NowssB Earn — Rewards',
+      banner: ColoredSplitPromoBanner(
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+        spec: SplitPromoSpec(
+          title: 'NowssB Earn\nRewards',
+          cta: 'Claim today’s coins',
+          leftColor: const Color(0xFF2A1B4D),
+          rightColor: const Color(0xFFC8A96E),
+          art: SplitPromoArts.egyptianGold,
+        ),
+      ),
       child: ListenableBuilder(
         listenable: EconomyMirror.instance,
         builder: (context, _) {
@@ -30,13 +39,13 @@ class VaultScreen extends StatelessWidget {
               const SizedBox(height: 18),
               GoldButton(
                 label: 'Claim daily login',
-                onTap: () => runEconomy(context, () => EconomyApi.call('claimDailyLogin')),
+                onTap: () => runPrivate(context, () => EconomyApi.call('claimDailyLogin')),
               ),
               const SizedBox(height: 8),
               GoldButton(
                 label: 'Log a practice',
                 filled: false,
-                onTap: () => runEconomy(context, () => EconomyApi.call('reportPractice')),
+                onTap: () => runPrivate(context, () => EconomyApi.call('reportPractice')),
               ),
               const SizedBox(height: 22),
               const Text('QUESTS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.4, fontSize: 12)),
@@ -95,7 +104,7 @@ class VaultScreen extends StatelessWidget {
             label: value >= goal ? 'Open chest' : 'In progress',
             filled: false,
             onTap: value >= goal
-                ? () => runEconomy(context, () => EconomyApi.call('claimQuest', {'questId': id}))
+                ? () => runPrivate(context, () => EconomyApi.call('claimQuest', {'questId': id}))
                 : null,
           ),
         ],
@@ -109,7 +118,7 @@ class VaultScreen extends StatelessWidget {
       child: GoldButton(
         label: label,
         filled: false,
-        onTap: () => runEconomy(context, () => EconomyApi.call('spendCoins', {'purpose': purpose, ...?extra})),
+        onTap: () => runPrivate(context, () => EconomyApi.call('spendCoins', {'purpose': purpose, ...?extra})),
       ),
     );
   }
@@ -123,7 +132,7 @@ class VaultScreen extends StatelessWidget {
           return GoldButton(
             label: '${label} · ${snap.data ?? 'Play price'}',
             filled: false,
-            onTap: () => runEconomy(context, () async {
+            onTap: () => runPrivate(context, () async {
           final quote = CashQuote.forPrice(
             price: price,
             balance: EconomyMirror.instance.coins,
@@ -197,24 +206,12 @@ class _MilestoneFormState extends State<_MilestoneForm> {
         GoldButton(
           label: 'Open chest · ${_level * 5} coins',
           filled: false,
-          onTap: () => runEconomy(context, () => EconomyApi.call('claimMilestone', {
+          onTap: () => runPrivate(context, () => EconomyApi.call('claimMilestone', {
                 'wordId': _word.text.trim(),
                 'level': _level,
               })),
         ),
       ],
-    );
-  }
-}
-
-class _VaultBanner extends StatelessWidget {
-  const _VaultBanner();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
-      child: EconomyNote('Daily login, streak chests, and quests. Coins never cover more than 30% of a Play purchase.'),
     );
   }
 }

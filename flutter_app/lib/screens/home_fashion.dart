@@ -69,7 +69,7 @@ import 'reader/reader_hub.dart';
 import 'store/request_words.dart';
 import 'sentence_builder.dart';
 import 'app_settings.dart';
-import '../features/earn/earn_discovery_card.dart';
+import '../features/earn/earn_home_sections.dart';
 import '../features/earn/earn_hub_screen.dart';
 import 'store/meaning_store.dart';
 
@@ -433,7 +433,10 @@ class _HomeFashionState extends State<HomeFashion> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             StoreBannerSection(onTap: () => _go(3)),
-            const EarnDiscoveryCard(),
+            const SizedBox(height: 16),
+            const EarnUmbrellaSection(),
+            const SizedBox(height: 16),
+            const YourRewardsSection(),
           ],
         )),
         ('subvid', const SizedBox.shrink()),

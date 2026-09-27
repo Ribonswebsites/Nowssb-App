@@ -80,7 +80,7 @@ class _WordPrintScreenState extends State<WordPrintScreen> {
                     if (!mine)
                       GoldButton(
                         label: 'Follow',
-                        onTap: () => runEconomy(context, () => EconomyApi.call('setFollow', {'targetUid': uid, 'follow': true})),
+                        onTap: () => runPrivate(context, () => EconomyApi.call('setFollow', {'targetUid': uid, 'follow': true})),
                       ),
                     if (mine) ...[
                       TextField(
@@ -97,7 +97,7 @@ class _WordPrintScreenState extends State<WordPrintScreen> {
                       GoldButton(
                         label: 'Save Word Print',
                         filled: false,
-                        onTap: () => runEconomy(context, () => EconomyApi.call('updateWordPrint', {
+                        onTap: () => runPrivate(context, () => EconomyApi.call('updateWordPrint', {
                               if (_handle.text.trim().isNotEmpty) 'handle': _handle.text.trim(),
                               'bio': _bio.text.trim(),
                               'featuredBadges': badges.take(6).toList(),

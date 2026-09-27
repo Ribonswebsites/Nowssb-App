@@ -12,6 +12,8 @@ import 'earnings_screen.dart';
 import '../social/echo_wall_screen.dart';
 import '../vault/vault_screen.dart';
 import '../wordprint/word_print_screen.dart';
+import '../../screens/nwsb_sign_in_sheet.dart';
+import '../../widgets/colored_split_promo_banner.dart';
 
 class EarnHubScreen extends StatelessWidget {
   const EarnHubScreen({super.key});
@@ -20,7 +22,16 @@ class EarnHubScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return EconomyPage(
       title: 'NowssB Earn',
-      requireAuth: true,
+      banner: const ColoredSplitPromoBanner(
+        margin: EdgeInsets.fromLTRB(16, 0, 16, 8),
+        spec: SplitPromoSpec(
+          title: 'NowssB Earn',
+          cta: 'Rewards, referrals, resell',
+          leftColor: Color(0xFF2A1B4D),
+          rightColor: Color(0xFFC8A96E),
+          art: SplitPromoArts.egyptianGold,
+        ),
+      ),
       child: ListenableBuilder(
         listenable: EconomyMirror.instance,
         builder: (context, _) {
@@ -28,20 +39,27 @@ class EarnHubScreen extends StatelessWidget {
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
             children: [
-              CoinCount(value: w.coins, style: const TextStyle(fontSize: 28, color: NwsbColors.goldLight, fontWeight: FontWeight.w700)),
-              MoneyCount(cents: w.cash, style: const TextStyle(color: NwsbColors.mist)),
-              Text(w.plan, style: const TextStyle(color: NwsbColors.mist)),
-              const SizedBox(height: 6),
-              Text('${w.sellerTier} · ${w.wordsSold}/${w.nextSellerTarget} sold', style: const TextStyle(color: NwsbColors.mist)),
-              Text('${w.circleTier} · ${w.code}', style: const TextStyle(color: NwsbColors.mist)),
+              if (w.uid == null)
+                GoldButton(
+                  label: 'Sign in to see your balance',
+                  onTap: () => NwsbSignInPage.open(context),
+                )
+              else ...[
+                CoinCount(value: w.coins, style: const TextStyle(fontSize: 28, color: NwsbColors.goldLight, fontWeight: FontWeight.w700)),
+                MoneyCount(cents: w.cash, style: const TextStyle(color: NwsbColors.mist)),
+                Text(w.plan, style: const TextStyle(color: NwsbColors.mist)),
+                const SizedBox(height: 6),
+                Text('${w.sellerTier} · ${w.wordsSold}/${w.nextSellerTarget} sold', style: const TextStyle(color: NwsbColors.mist)),
+                Text('${w.circleTier} · ${w.code.isEmpty ? 'code paused' : w.code}', style: const TextStyle(color: NwsbColors.mist)),
+              ],
               const SizedBox(height: 8),
               const EconomyNote('This page is only yours. Coin and cash balances are not on the public Word Print.'),
               const SizedBox(height: 14),
-              GoldButton(label: 'Vault', onTap: () => _open(context, const VaultScreen())),
+              GoldButton(label: 'Rewards', onTap: () => _open(context, const VaultScreen())),
               const SizedBox(height: 8),
-              GoldButton(label: 'Word Bazaar', filled: false, onTap: () => _open(context, const BazaarScreen())),
+              GoldButton(label: 'Resell', filled: false, onTap: () => _open(context, const BazaarScreen())),
               const SizedBox(height: 8),
-              GoldButton(label: 'Circle', filled: false, onTap: () => _open(context, const CircleScreen())),
+              GoldButton(label: 'Referrals', filled: false, onTap: () => _open(context, const CircleScreen())),
               const SizedBox(height: 8),
               GoldButton(label: 'Word Print', filled: false, onTap: () => _open(context, WordPrintScreen(uid: w.uid))),
               const SizedBox(height: 8),

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../data/firebase.dart';
+import '../../screens/nwsb_sign_in_sheet.dart';
 import '../../theme/tokens.dart';
 import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
@@ -156,6 +157,10 @@ class _EchoWallScreenState extends State<EchoWallScreen> {
   }
 
   Future<void> _pick() async {
+    if (EconomyMirror.instance.uid == null) {
+      final ok = await NwsbSignInPage.open(context);
+      if (!ok || !mounted) return;
+    }
     final uid = EconomyMirror.instance.uid;
     if (uid == null) return;
     final picked = await ImagePicker().pickImage(source: ImageSource.gallery, maxWidth: 1600, imageQuality: 80);
@@ -171,27 +176,28 @@ class _EchoWallScreenState extends State<EchoWallScreen> {
       if (mounted) setState(() => _imageRef = path);
     } on EconomyException catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
-    } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
+    } catch (_) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('That image did not upload. Try again.')));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
   }
 
   Future<void> _post() async {
-    setState(() => _busy = true);
-    try {
-      await EconomyApi.call('createEchoPost', {
-        'text': _text.text.trim(),
-        'imageRef': _imageRef ?? '',
-      });
-      _text.clear();
-      setState(() => _imageRef = null);
-    } on EconomyException catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
-    } finally {
-      if (mounted) setState(() => _busy = false);
-    }
+    await runPrivate(context, () async {
+      if (!mounted) return;
+      setState(() => _busy = true);
+      try {
+        await EconomyApi.call('createEchoPost', {
+          'text': _text.text.trim(),
+          'imageRef': _imageRef ?? '',
+        });
+        _text.clear();
+        if (mounted) setState(() => _imageRef = null);
+      } finally {
+        if (mounted) setState(() => _busy = false);
+      }
+    });
   }
 }
 
@@ -223,7 +229,7 @@ class _PostCard extends StatelessWidget {
           Row(
             children: [
               TextButton(
-                onPressed: () => runEconomy(context, () => EconomyApi.call('toggleEchoLike', {'postId': doc.id})),
+                onPressed: () => runPrivate(context, () => EconomyApi.call('toggleEchoLike', {'postId': doc.id})),
                 child: Text('Like ${data['likeCount'] ?? 0}', style: const TextStyle(color: NwsbColors.goldLight)),
               ),
               TextButton(
@@ -231,7 +237,7 @@ class _PostCard extends StatelessWidget {
                 child: Text('Comment ${data['commentCount'] ?? 0}', style: const TextStyle(color: NwsbColors.mist)),
               ),
               TextButton(
-                onPressed: () => runEconomy(context, () => EconomyApi.call('reportEcho', {
+                onPressed: () => runPrivate(context, () => EconomyApi.call('reportEcho', {
                       'targetType': 'post',
                       'targetId': doc.id,
                       'reason': 'report',
@@ -241,7 +247,7 @@ class _PostCard extends StatelessWidget {
             ],
           ),
           TextButton(
-            onPressed: () => runEconomy(context, () => EconomyApi.call('blockEchoUser', {'targetUid': data['authorUid']})),
+            onPressed: () => runPrivate(context, () => EconomyApi.call('blockEchoUser', {'targetUid': data['authorUid']})),
             child: const Text('Block author', style: TextStyle(color: NwsbColors.mist, fontSize: 12)),
           ),
         ],
@@ -265,7 +271,7 @@ class _PostCard extends StatelessWidget {
     );
     controller.dispose();
     if (text == null || text.isEmpty || !context.mounted) return;
-    await runEconomy(context, () => EconomyApi.call('commentOnPost', {'postId': doc.id, 'text': text}));
+    await runPrivate(context, () => EconomyApi.call('commentOnPost', {'postId': doc.id, 'text': text}));
   }
 }
 

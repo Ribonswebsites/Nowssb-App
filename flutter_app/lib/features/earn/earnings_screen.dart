@@ -6,6 +6,7 @@ import '../../theme/tokens.dart';
 import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
 import '../economy/money.dart';
+import '../../widgets/colored_split_promo_banner.dart';
 
 class EarningsScreen extends StatefulWidget {
   const EarningsScreen({super.key});
@@ -27,11 +28,16 @@ class _EarningsScreenState extends State<EarningsScreen> {
   @override
   Widget build(BuildContext context) {
     return EconomyPage(
-      title: 'Earnings',
-      requireAuth: true,
-      banner: const Padding(
-        padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
-        child: EconomyNote('Shown in your currency. Settlement to an Indian account is in INR until another payout rail is added.'),
+      title: 'NowssB Earn — Earnings',
+      banner: const ColoredSplitPromoBanner(
+        margin: EdgeInsets.fromLTRB(16, 0, 16, 8),
+        spec: SplitPromoSpec(
+          title: 'NowssB Earn\nEarnings',
+          cta: 'Sales and referrals',
+          leftColor: Color(0xFF143028),
+          rightColor: Color(0xFF2D6A4F),
+          art: SplitPromoArts.blondeLotus,
+        ),
       ),
       child: ListenableBuilder(
         listenable: EconomyMirror.instance,
@@ -40,6 +46,8 @@ class _EarningsScreenState extends State<EarningsScreen> {
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
             children: [
+              const EconomyNote('Shown in your currency. Settlement to an Indian account is in INR until another payout rail is added.'),
+              const SizedBox(height: 12),
               const Text('Lifetime', style: TextStyle(color: NwsbColors.mist, fontSize: 12)),
               MoneyCount(cents: w.lifetimeCents),
               const SizedBox(height: 4),
@@ -58,13 +66,13 @@ class _EarningsScreenState extends State<EarningsScreen> {
               GoldButton(
                 label: 'Save payout account',
                 filled: false,
-                onTap: () => runEconomy(context, () => EconomyApi.call('savePayoutAccount', {'upi': _upi.text.trim()})),
+                onTap: () => runPrivate(context, () => EconomyApi.call('savePayoutAccount', {'upi': _upi.text.trim()})),
               ),
               const SizedBox(height: 8),
               GoldButton(
                 label: 'Request payout',
                 onTap: w.cash >= 500 && w.upi.isNotEmpty
-                    ? () => runEconomy(context, () => EconomyApi.call('requestPayout'))
+                    ? () => runPrivate(context, () => EconomyApi.call('requestPayout'))
                     : null,
               ),
               const SizedBox(height: 8),
@@ -72,7 +80,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
               const SizedBox(height: 16),
               Row(
                 children: [
-                  for (final item in const [('all', 'All'), ('sale', 'Sales'), ('circle', 'Circle'), ('payout', 'Payouts')])
+                  for (final item in const [('all', 'All'), ('sale', 'Sales'), ('circle', 'Referrals'), ('payout', 'Payouts')])
                     Padding(
                       padding: const EdgeInsets.only(right: 8),
                       child: ChoiceChip(
@@ -130,7 +138,7 @@ class _History extends StatelessWidget {
                 }
                 final shown = rows.where((row) => filter == 'all' || row.kind == filter).toList();
                 if (shown.isEmpty) {
-                  return const EconomyMessage(title: 'No earnings yet', body: 'Sales and Circle commissions will show up here.');
+                  return const EconomyMessage(title: 'No earnings yet', body: 'Sales and referral commissions will show up here.');
                 }
                 return Column(
                   children: [
