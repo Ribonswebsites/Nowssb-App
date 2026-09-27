@@ -4713,7 +4713,9 @@ class _SoundBoxState extends State<_SoundBox> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Voice preview needs text-to-speech on this phone.')),
+          const SnackBar(
+            content: Text('Voice preview needs text-to-speech on this phone.'),
+          ),
         );
       }
     } finally {
@@ -4746,7 +4748,11 @@ class _SoundBoxState extends State<_SoundBox> {
                 const SizedBox(height: 4),
                 const Text(
                   'Equalizer, boost, presets, and a wide spatial voice. Preview plays on this phone.',
-                  style: TextStyle(color: Color(0xFF9A9AA2), fontSize: 12, height: 1.35),
+                  style: TextStyle(
+                    color: Color(0xFF9A9AA2),
+                    fontSize: 12,
+                    height: 1.35,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 Wrap(
@@ -4777,7 +4783,9 @@ class _SoundBoxState extends State<_SoundBox> {
                                   child: RotatedBox(
                                     quarterTurns: 3,
                                     child: Slider(
-                                      value: (i < bands.length ? bands[i] : 0.0).clamp(-1.0, 1.0).toDouble(),
+                                      value: (i < bands.length ? bands[i] : 0.0)
+                                          .clamp(-1.0, 1.0)
+                                          .toDouble(),
                                       min: -1,
                                       max: 1,
                                       onChanged: (v) {
@@ -4793,7 +4801,10 @@ class _SoundBoxState extends State<_SoundBox> {
                                 ),
                                 Text(
                                   ['Low', 'Low-mid', 'Mid', 'High', 'Air'][i],
-                                  style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 10),
+                                  style: const TextStyle(
+                                    color: Color(0xFF8E8E93),
+                                    fontSize: 10,
+                                  ),
                                 ),
                               ],
                             ),
@@ -4804,14 +4815,23 @@ class _SoundBoxState extends State<_SoundBox> {
                 ),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('Boost sound', style: TextStyle(color: Colors.white)),
-                  subtitle: const Text('Louder, deeper voice', style: TextStyle(color: Color(0xFF8E8E93), fontSize: 12)),
+                  title: const Text(
+                    'Boost sound',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  subtitle: const Text(
+                    'Louder, deeper voice',
+                    style: TextStyle(color: Color(0xFF8E8E93), fontSize: 12),
+                  ),
                   value: s.bassBoost,
                   onChanged: (_) => s.toggleBass(),
                 ),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('Spatial audio', style: TextStyle(color: Colors.white)),
+                  title: const Text(
+                    'Spatial audio',
+                    style: TextStyle(color: Colors.white),
+                  ),
                   subtitle: const Text(
                     'Wide voice: the word, then a softer reflection. Phone TTS has no hardware HRTF, so this is the on-device layer.',
                     style: TextStyle(color: Color(0xFF8E8E93), fontSize: 12),
@@ -4829,7 +4849,9 @@ class _SoundBoxState extends State<_SoundBox> {
                     final nav = Navigator.of(context);
                     nav.pop();
                     nav.push(
-                      MaterialPageRoute<void>(builder: (_) => const PlayerSettingsScreen()),
+                      MaterialPageRoute<void>(
+                        builder: (_) => const PlayerSettingsScreen(),
+                      ),
                     );
                   },
                   child: const Text('More playback settings'),
