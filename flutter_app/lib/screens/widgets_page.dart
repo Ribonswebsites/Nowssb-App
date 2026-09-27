@@ -20,6 +20,7 @@ import '../media/nwsb_video.dart';
 import '../theme/tokens.dart';
 import '../widgets/app_backdrop.dart';
 import 'fashion_plus.dart';
+import 'healing_path.dart';
 import 'notifications_settings.dart';
 import 'player_settings.dart';
 import 'practice.dart';
@@ -211,6 +212,9 @@ class _WidgetsPageState extends State<WidgetsPage> {
                         onPlayer: () => _push(const PlayerSettingsScreen()),
                         onTogglePlus: s.setFashionPlus,
                         onToggleHome: s.setFashionHome,
+                        showHealing: s.showHealing,
+                        onToggleHealing: s.setShowHealing,
+                        onHealing: () => _push(const HealingPathScreen()),
                         onProfile: () => _push(const ProfileScreen()),
                       ),
                     ),
@@ -576,6 +580,9 @@ class _MakeRail extends StatelessWidget {
     required this.onPlayer,
     required this.onTogglePlus,
     required this.onToggleHome,
+    required this.showHealing,
+    required this.onToggleHealing,
+    required this.onHealing,
     required this.onProfile,
   });
 
@@ -586,6 +593,9 @@ class _MakeRail extends StatelessWidget {
   final VoidCallback onPlayer;
   final ValueChanged<bool> onTogglePlus;
   final ValueChanged<bool> onToggleHome;
+  final bool showHealing;
+  final ValueChanged<bool> onToggleHealing;
+  final VoidCallback onHealing;
   final VoidCallback onProfile;
 
   @override
@@ -634,6 +644,19 @@ class _MakeRail extends StatelessWidget {
             title: 'Home buttons',
             sub: 'Quick Access bar',
             onTap: onQuickAccess,
+          ),
+          const SizedBox(width: 12),
+          _GoCard(
+            icon: Icons.spa_outlined,
+            title: 'Personalised Healing',
+            sub: showHealing ? 'On your home' : 'Add it to home',
+            onTap: onHealing,
+            trailing: Switch(
+              value: showHealing,
+              onChanged: onToggleHealing,
+              activeThumbColor: NwsbColors.goldLight,
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
           ),
           const SizedBox(width: 12),
           _GoCard(

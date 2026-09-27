@@ -58,6 +58,7 @@ import 'normal/header_actions_sheet.dart';
 import 'fashion/header.dart';
 import '../widgets/nwsb_icon.dart';
 import 'normal/neomorphic_essentials.dart';
+import '../widgets/brand_top_banner.dart';
 import '../widgets/colored_split_promo_banner.dart';
 import 'normal/horizontal_routine_cards.dart';
 import 'normal/sections_bottom.dart';
@@ -154,6 +155,7 @@ class _HomeNormalState extends State<HomeNormal> {
     super.initState();
     ContentStore.instance.addListener(_onContent);
     PracticeProgress.instance.addListener(_onContent);
+    Settings.instance.addListener(_onContent);
     unawaited(PracticeProgress.instance.start());
   }
 
@@ -161,6 +163,7 @@ class _HomeNormalState extends State<HomeNormal> {
   void dispose() {
     ContentStore.instance.removeListener(_onContent);
     PracticeProgress.instance.removeListener(_onContent);
+    Settings.instance.removeListener(_onContent);
     VideoPool.instance.setGlassHomeMode(false);
     super.dispose();
   }
@@ -292,6 +295,7 @@ class _HomeNormalState extends State<HomeNormal> {
         ('greet', Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            const BrandTopBanner(),
             const LiveQuoteTab(),
             NmGreeting(name: widget.name),
           ],
@@ -360,19 +364,7 @@ class _HomeNormalState extends State<HomeNormal> {
         ),
         (
           'streak',
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              NmStreak(onTap: () => _go(1)),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-                child: ColoredSplitPromoBanner(
-                  spec: SplitPromoExtras.at(2, onTap: () => _go(1)),
-                  margin: EdgeInsets.zero,
-                ),
-              ),
-            ],
-          ),
+          NmStreak(onTap: () => _go(1)),
         ),
         ('practice', NmPractice(onTap: () => _go(1))),
         ('mainops', MainOptionsSection(onGo: _go, onAction: _openMainOption)),
@@ -408,48 +400,16 @@ class _HomeNormalState extends State<HomeNormal> {
               const EarnUmbrellaSection(),
               const SizedBox(height: 16),
               const YourRewardsSection(),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-                child: ColoredSplitPromoBanner(
-                  spec: SplitPromoExtras.at(3,
-                      onTap: () => _push(const ReaderHubScreen())),
-                  margin: EdgeInsets.zero,
-                ),
-              ),
             ],
           ),
         ),
         (
           'reader',
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              NmReader(onTap: () => _push(const ReaderHubScreen())),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-                child: ColoredSplitPromoBanner(
-                  spec: SplitPromoExtras.at(14, onTap: () => _go(1)),
-                  margin: EdgeInsets.zero,
-                ),
-              ),
-            ],
-          ),
+          NmReader(onTap: () => _push(const ReaderHubScreen())),
         ),
         (
           'trendwd',
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              NmTrending(onTap: () => _go(2)),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-                child: ColoredSplitPromoBanner(
-                  spec: SplitPromoExtras.at(15, onTap: () => _go(2)),
-                  margin: EdgeInsets.zero,
-                ),
-              ),
-            ],
-          ),
+          NmTrending(onTap: () => _go(2)),
         ),
         ('custom', null),
         ('rx', null),
@@ -521,7 +481,10 @@ class _HomeNormalState extends State<HomeNormal> {
 
     final shown = [
       for (final (k, w) in built)
-        if (w != null && !kNormalDefOff.contains(k)) (k, w),
+        if (w != null &&
+            !kNormalDefOff.contains(k) &&
+            (k != 'healing' || Settings.instance.showHealing))
+          (k, w),
     ];
 
     final page = SafeArea(
@@ -558,7 +521,20 @@ class _HomeNormalState extends State<HomeNormal> {
               itemCount: shown.length,
               itemBuilder: (context, i) {
                 final (k, w) = shown[i];
-                return KeyedSubtree(key: ValueKey('nm-$k'), child: w);
+                const air = {
+                  'promoRail',
+                  'storiesFind',
+                  'herovid',
+                  'store',
+                  'trendwd',
+                  'connectban',
+                  'edition',
+                  'condisc',
+                };
+                return Padding(
+                  padding: EdgeInsets.only(bottom: air.contains(k) ? 26 : 8),
+                  child: KeyedSubtree(key: ValueKey('nm-$k'), child: w),
+                );
               },
             ),
           ),

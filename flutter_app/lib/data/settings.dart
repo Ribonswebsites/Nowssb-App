@@ -26,6 +26,9 @@ class Settings extends ChangeNotifier {
   static const _kVideo = 'nwsb_fashplus_video';
   static const _kImage = 'nwsb_fashplus_image';
   static const _kEq = 'nwsb_player_eq';
+  static const _kEqBands = 'nwsb_player_eq_bands';
+  static const _kSpatial = 'nwsb_player_spatial';
+  static const _kHealing = 'nwsb_home_healing';
   static const _kQuality = 'nwsb_player_quality';
   static const _kBass = 'nwsb_player_bass';
   static const _kSpeed = 'nwsb_player_speed';
@@ -86,6 +89,9 @@ class Settings extends ChangeNotifier {
   int _fashionImage = -1;
   int _backgroundTransition = 0;
   String _eq = 'flat';
+  List<double> _eqBands = const [0, 0, 0, 0, 0];
+  bool _spatial = false;
+  bool _showHealing = false;
   String _quality = 'Normal';
   bool _bassBoost = false;
   double _speed = 1.0;
@@ -143,6 +149,10 @@ class Settings extends ChangeNotifier {
       _fashionImage < 0 ? null : fashionImages[_fashionImage];
   int get backgroundTransition => _backgroundTransition;
   String get eq => _eq;
+  List<double> get eqBands => List<double>.unmodifiable(_eqBands);
+  bool get spatialAudio => _spatial;
+  /// Optional home block. Off until someone adds it from Widgets.
+  bool get showHealing => _showHealing;
   String get quality => _quality;
   bool get bassBoost => _bassBoost;
   double get speed => _speed;
@@ -208,6 +218,9 @@ class Settings extends ChangeNotifier {
       );
       _fashionImage = _validImageIndex(p.getInt(_kImage) ?? _fashionImage);
       _eq = p.getString(_kEq) ?? _eq;
+      _eqBands = _parseBands(p.getString(_kEqBands));
+      _spatial = p.getBool(_kSpatial) ?? _spatial;
+      _showHealing = p.getBool(_kHealing) ?? _showHealing;
       _quality = p.getString(_kQuality) ?? _quality;
       _bassBoost = p.getBool(_kBass) ?? _bassBoost;
       _speed = p.getDouble(_kSpeed) ?? _speed;
@@ -345,8 +358,55 @@ class Settings extends ChangeNotifier {
 
   Future<void> setEq(String value) async {
     _eq = value;
+    _eqBands = _bandsForPreset(value);
     await _saveString(_kEq, value);
+    await _saveString(_kEqBands, _eqBands.join(','));
     notifyListeners();
+  }
+
+  Future<void> setEqBands(List<double> bands) async {
+    _eqBands = [
+      for (final v in bands.take(5)) v.clamp(-1.0, 1.0),
+    ];
+    while (_eqBands.length < 5) {
+      _eqBands.add(0);
+    }
+    _eq = 'custom';
+    await _saveString(_kEq, _eq);
+    await _saveString(_kEqBands, _eqBands.join(','));
+    notifyListeners();
+  }
+
+  Future<void> setSpatial(bool value) async {
+    _spatial = value;
+    await _save(_kSpatial, value);
+    notifyListeners();
+  }
+
+  Future<void> setShowHealing(bool value) async {
+    _showHealing = value;
+    await _save(_kHealing, value);
+    notifyListeners();
+  }
+
+  static List<double> _bandsForPreset(String value) {
+    return switch (value) {
+      'deep' => [0.85, 0.45, 0.0, -0.25, -0.4],
+      'bright' => [-0.35, -0.1, 0.2, 0.6, 0.85],
+      'focus' => [-0.2, 0.15, 0.75, 0.35, -0.05],
+      'custom' => [0.25, 0.55, 0.1, 0.4, 0.65],
+      _ => [0, 0, 0, 0, 0],
+    };
+  }
+
+  static List<double> _parseBands(String? raw) {
+    if (raw == null || raw.isEmpty) return const [0, 0, 0, 0, 0];
+    final parts = raw.split(',');
+    if (parts.length < 5) return const [0, 0, 0, 0, 0];
+    return [
+      for (final p in parts.take(5))
+        double.tryParse(p.trim())?.clamp(-1.0, 1.0) ?? 0,
+    ];
   }
 
   Future<void> setQuality(String value) async {

@@ -427,6 +427,30 @@ class _SlmFeed extends StatelessWidget {
                     bottom: MediaQuery.paddingOf(context).bottom + 48,
                   ),
                   children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(14, 4, 14, 8),
+                      child: GestureDetector(
+                        onVerticalDragEnd: (d) {
+                          if ((d.primaryVelocity ?? 0) > 180 && pool.isNotEmpty) {
+                            onPlayWord(pool.first);
+                          }
+                        },
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: const AspectRatio(
+                            aspectRatio: 16 / 9,
+                            child: NwsbVideo(
+                              asset: 'assets/video/sound-library-banner.mp4',
+                              fit: BoxFit.cover,
+                              priority: ClipPriority.feature,
+                              autoplay: true,
+                              loop: true,
+                              showPoster: true,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                     if (chip == 'Currently Playing') ...[
                       CurrentlyPlayingAlbum(
                         words: _playingRail,
@@ -1683,29 +1707,6 @@ class _SlmHead extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
               ],
-            ),
-          ),
-          const SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            child: GestureDetector(
-              onVerticalDragEnd: (d) {
-                if ((d.primaryVelocity ?? 0) > 180) onPlayHeader?.call();
-              },
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: const AspectRatio(
-                  aspectRatio: 16 / 9,
-                  child: NwsbVideo(
-                    asset: 'assets/video/sound-library-banner.mp4',
-                    fit: BoxFit.cover,
-                    priority: ClipPriority.feature,
-                    autoplay: true,
-                    loop: true,
-                    showPoster: true,
-                  ),
-                ),
-              ),
             ),
           ),
           const SizedBox(height: 10),

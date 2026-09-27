@@ -40,7 +40,7 @@ import '../widgets/stories_find_you_banner.dart';
 import '../widgets/subscription_today_offer.dart';
 import '../widgets/earth_day_film.dart';
 import '../widgets/promo_color_grid.dart';
-import '../widgets/studio_panels.dart';
+import '../widgets/brand_top_banner.dart';
 import 'quotes_live.dart';
 import 'player_settings.dart';
 import 'fashion/header.dart';
@@ -139,11 +139,13 @@ class _HomeFashionState extends State<HomeFashion> {
   void initState() {
     super.initState();
     ContentStore.instance.addListener(_onContent);
+    Settings.instance.addListener(_onContent);
   }
 
   @override
   void dispose() {
     ContentStore.instance.removeListener(_onContent);
+    Settings.instance.removeListener(_onContent);
     super.dispose();
   }
 
@@ -319,19 +321,7 @@ class _HomeFashionState extends State<HomeFashion> {
         ),
         (
           'practice',
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              FashPractice(onTap: () => _go(1)),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                child: ColoredSplitPromoBanner(
-                  spec: SplitPromoExtras.at(0, onTap: () => _go(2)),
-                  margin: EdgeInsets.zero,
-                ),
-              ),
-            ],
-          ),
+          FashPractice(onTap: () => _go(1)),
         ),
         ('routineCards', Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -386,38 +376,14 @@ class _HomeFashionState extends State<HomeFashion> {
         )),
         (
           'store',
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SubscriptionTodayOffer(
-                onClaim: () => _push(const SubscriptionScreen()),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                child: ColoredSplitPromoBanner(
-                  spec: SplitPromoExtras.at(14, onTap: () => _go(1)),
-                  margin: EdgeInsets.zero,
-                ),
-              ),
-            ],
+          SubscriptionTodayOffer(
+            onClaim: () => _push(const SubscriptionScreen()),
           ),
         ),
         ('trendwd', FashTrending(onTap: () => _go(2))),
         (
           'custom',
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              FashCustomize(onTap: () => _push(const WidgetsPage())),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                child: ColoredSplitPromoBanner(
-                  spec: SplitPromoExtras.at(15, onTap: () => _go(2)),
-                  margin: EdgeInsets.zero,
-                ),
-              ),
-            ],
-          ),
+          FashCustomize(onTap: () => _push(const WidgetsPage())),
         ),
         (
           'fashplus',
@@ -459,19 +425,12 @@ class _HomeFashionState extends State<HomeFashion> {
         ('connectban', ConnectBannerSection(onTap: () => _go(0))),
         (
           'healing',
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              HealingSection(
-                onTap: () => _push(const HealingPathScreen()),
-                onFemale: () => _push(
-                    const HealingPathScreen(initialGender: HealingGender.female)),
-                onMale: () => _push(
-                    const HealingPathScreen(initialGender: HealingGender.male)),
-              ),
-              const SizedBox(height: 8),
-              const PracticeStudioSection(),
-            ],
+          HealingSection(
+            onTap: () => _push(const HealingPathScreen()),
+            onFemale: () => _push(
+                const HealingPathScreen(initialGender: HealingGender.female)),
+            onMale: () => _push(
+                const HealingPathScreen(initialGender: HealingGender.male)),
           ),
         ),
         ('journey', const SizedBox.shrink()),
@@ -479,7 +438,7 @@ class _HomeFashionState extends State<HomeFashion> {
         // Choose Your Path is slide 2 of HealingSection — do not inject a
         // second banner/section (that caused stacked banners + blank pages).
         ('genderpath', const SizedBox.shrink()),
-        ('promovid', FashPromoVideo(onOpen: _openEnter)),
+        ('promovid', const SizedBox.shrink()),
         ('wsearch', FashWordSearch(onOpen: (_) => _go(2))),
         ('msearch', FashMeaningSearch(onOpen: (_) => _go(2))),
         ('shabvid', FashShabdaVideo(onTap: () => _go(2))),
@@ -503,7 +462,9 @@ class _HomeFashionState extends State<HomeFashion> {
 
     final shown = [
       for (final (k, w) in built)
-        if (!kFashionDefOff.contains(k)) (k, w),
+        if (!kFashionDefOff.contains(k) &&
+            (k != 'healing' || Settings.instance.showHealing))
+          (k, w),
     ];
 
     return Scaffold(
@@ -599,6 +560,7 @@ class _HomeFashionState extends State<HomeFashion> {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
+                          const BrandTopBanner(),
                           const LiveQuoteTab(),
                           HeroGreeting(name: widget.name),
                           // Search + Quick access live ONLY inside HeroCurveStage.
@@ -625,7 +587,20 @@ class _HomeFashionState extends State<HomeFashion> {
                       );
                     }
                     final (k, w) = shown[i - 1];
-                    return KeyedSubtree(key: ValueKey('fash-$k'), child: w);
+                    const air = {
+                      'herorow',
+                      'reader',
+                      'storiesFind',
+                      'store',
+                      'storeban',
+                      'connectban',
+                      'edition',
+                      'trendwd',
+                    };
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: air.contains(k) ? 26 : 8),
+                      child: KeyedSubtree(key: ValueKey('fash-$k'), child: w),
+                    );
                   },
                 ),
               ),

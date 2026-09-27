@@ -10,6 +10,8 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'brand_top_banner.dart';
+
 import '../data/content.dart';
 import '../screens/app_settings.dart';
 import '../features/bazaar/bazaar_screen.dart';
@@ -219,6 +221,7 @@ class HomeMenuDrawer extends StatelessWidget {
                       bottom + 40,
                     ),
                     children: [
+                      const BrandTopBanner(compact: true),
                       _SectionLabel('Practice', light: light),
                       _Group(
                         light: light,

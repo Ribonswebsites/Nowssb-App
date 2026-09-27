@@ -107,7 +107,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
           children: [
             const Positioned.fill(
               child: NwsbVideo(
-                asset: 'assets/video/subscription-a.mp4',
+                asset: 'assets/video/subscription-bg.mp4',
                 priority: ClipPriority.feature,
                 fit: BoxFit.cover,
                 showPoster: false,
@@ -784,7 +784,7 @@ class SubscriptionTermsScreen extends StatelessWidget {
         children: [
           const Positioned.fill(
             child: NwsbVideo(
-              asset: 'assets/video/subscription-a.mp4',
+              asset: 'assets/video/subscription-bg.mp4',
               priority: ClipPriority.feature,
               fit: BoxFit.cover,
               showPoster: false,

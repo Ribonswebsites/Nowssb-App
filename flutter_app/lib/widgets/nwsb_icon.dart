@@ -198,11 +198,12 @@ class NwsbMarks {
   static const bars = '<path d="M4 20h16"/>'
       '<path d="M6.8 20V13M11.4 20V7.2M16 20v-4.6"/>';
 
-  /// Practice stages — stacked layers, white stroke. Not the stair mark.
+  /// Practice stages — white sound circle, not stacked layers.
   static const stages =
-      '<path d="M12 3.4 4.2 7.6 12 11.8 19.8 7.6 12 3.4z"/>'
-      '<path d="M4.2 12.2 12 16.4 19.8 12.2"/>'
-      '<path d="M4.2 16.2 12 20.4 19.8 16.2"/>';
+      '<circle cx="12" cy="12" r="2.15"/>'
+      '<circle cx="12" cy="12" r="5.15"/>'
+      '<circle cx="12" cy="12" r="8.35"/>'
+      '<path d="M12 1.6v1.7M12 20.7v1.7M1.6 12h1.7M20.7 12h1.7"/>';
 
   /// Where to Begin · Practice play — index.html:1161. 24 box triangle.
   static const play24 = '<path d="M8 5.2 19 12 8 18.8z"/>';

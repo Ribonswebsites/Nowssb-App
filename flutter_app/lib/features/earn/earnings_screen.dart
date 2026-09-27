@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../data/firebase.dart';
 import '../../theme/tokens.dart';
@@ -18,11 +19,51 @@ class EarningsScreen extends StatefulWidget {
 class _EarningsScreenState extends State<EarningsScreen> {
   final _upi = TextEditingController();
   String _filter = 'all';
+  String _country = 'IN';
+
+  static const _countries = <(String, String)>[
+    ('IN', 'India — bank / UPI, INR'),
+    ('US', 'United States'),
+    ('GB', 'United Kingdom'),
+    ('CA', 'Canada'),
+    ('AU', 'Australia'),
+    ('AE', 'United Arab Emirates'),
+    ('SG', 'Singapore'),
+    ('DE', 'Germany'),
+    ('FR', 'France'),
+    ('JP', 'Japan'),
+    ('BR', 'Brazil'),
+    ('MX', 'Mexico'),
+    ('NZ', 'New Zealand'),
+    ('XX', 'Another country'),
+  ];
 
   @override
   void dispose() {
     _upi.dispose();
     super.dispose();
+  }
+
+  Future<void> _saveAccount() async {
+    final result = await EconomyApi.call('savePayoutAccount', {
+      'country': _country,
+      'upi': _upi.text.trim(),
+    });
+    final url = '${result['onboardUrl'] ?? ''}';
+    if (url.startsWith('http')) {
+      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    }
+    final message = '${result['message'] ?? ''}';
+    final rail = '${result['rail'] ?? ''}';
+    if (!mounted) return;
+    final text = message.isNotEmpty
+        ? message
+        : rail == 'unsupported'
+            ? 'This country is not supported yet. Your balance stays here.'
+            : rail == 'razorpayx'
+                ? 'India payouts will settle in INR to your UPI.'
+                : 'Payout account saved.';
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
   }
 
   @override
@@ -43,10 +84,19 @@ class _EarningsScreenState extends State<EarningsScreen> {
         listenable: EconomyMirror.instance,
         builder: (context, _) {
           final w = EconomyMirror.instance;
+          final india = _country == 'IN';
+          final unsupported = _country == 'XX';
+          final canPay = w.cash >= 500 && !unsupported && (india ? w.upi.isNotEmpty || _upi.text.trim().contains('@') : w.payoutRail == 'stripe_connect');
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
             children: [
-              const EconomyNote('Shown in your currency. Settlement to an Indian account is in INR until another payout rail is added.'),
+              EconomyNote(
+                unsupported
+                    ? 'This country is not on a payout rail yet. Earnings stay in your balance and are not sent in the wrong currency.'
+                    : india
+                        ? 'India settles in INR through RazorpayX to your UPI.'
+                        : 'Everywhere else uses Stripe Connect. You finish identity checks in Stripe, then payouts go to your local bank.',
+              ),
               const SizedBox(height: 12),
               const Text('Lifetime', style: TextStyle(color: NwsbColors.mist, fontSize: 12)),
               MoneyCount(cents: w.lifetimeCents),
@@ -54,29 +104,49 @@ class _EarningsScreenState extends State<EarningsScreen> {
               const Text('Available', style: TextStyle(color: NwsbColors.mist, fontSize: 12)),
               MoneyCount(cents: w.cash),
               const SizedBox(height: 12),
-              TextField(
-                controller: _upi,
+              DropdownButtonFormField<String>(
+                initialValue: _country,
+                dropdownColor: const Color(0xFF141820),
                 style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  hintText: w.upi.isEmpty ? 'UPI id for settlement' : w.upi,
-                  hintStyle: const TextStyle(color: NwsbColors.mist),
-                ),
+                decoration: const InputDecoration(labelText: 'Payout country', labelStyle: TextStyle(color: NwsbColors.mist)),
+                items: [
+                  for (final item in _countries)
+                    DropdownMenuItem(value: item.$1, child: Text(item.$2)),
+                ],
+                onChanged: (value) {
+                  if (value == null) return;
+                  setState(() => _country = value);
+                },
               ),
+              if (india) ...[
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _upi,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    hintText: w.upi.isEmpty ? 'UPI id, name@bank' : w.upi,
+                    hintStyle: const TextStyle(color: NwsbColors.mist),
+                  ),
+                ),
+              ],
               const SizedBox(height: 8),
               GoldButton(
-                label: 'Save payout account',
+                label: india ? 'Save India payout account' : unsupported ? 'Save country' : 'Set up Stripe payouts',
                 filled: false,
-                onTap: () => runPrivate(context, () => EconomyApi.call('savePayoutAccount', {'upi': _upi.text.trim()})),
+                onTap: () => runPrivate(context, _saveAccount),
               ),
               const SizedBox(height: 8),
               GoldButton(
                 label: 'Request payout',
-                onTap: w.cash >= 500 && w.upi.isNotEmpty
+                onTap: canPay
                     ? () => runPrivate(context, () => EconomyApi.call('requestPayout'))
                     : null,
               ),
               const SizedBox(height: 8),
-              const EconomyNote('Minimum applies in the base balance. If the payout rail is not connected, the request stays queued and is not marked paid.'),
+              Text(
+                w.payoutRail.isEmpty ? 'No payout rail saved yet.' : 'Saved rail: ${w.payoutRail}',
+                style: const TextStyle(color: NwsbColors.mist, fontSize: 12),
+              ),
               const SizedBox(height: 16),
               Row(
                 children: [

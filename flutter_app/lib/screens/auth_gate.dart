@@ -367,7 +367,6 @@ class _AuthGateState extends State<AuthGate> {
             ),
           ),
         ),
-<<<<<<< HEAD
         const SizedBox(height: 6),
         const Text(
           'Natural Origin Word Science',
@@ -377,42 +376,6 @@ class _AuthGateState extends State<AuthGate> {
             fontSize: 10,
             letterSpacing: 1.6,
             fontWeight: FontWeight.w500,
-=======
-        const Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text.rich(
-                TextSpan(
-                  children: [
-                    TextSpan(
-                        text: 'Nowss',
-                        style: TextStyle(fontWeight: FontWeight.w800)),
-                    TextSpan(
-                        text: 'B',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w300,
-                            color: Colors.white70)),
-                  ],
-                ),
-                style:
-                    TextStyle(color: Colors.white, fontSize: 21, height: 1.05),
-              ),
-              SizedBox(height: 5),
-              Text(
-                'BY NOWSSBANSIU',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: Color(0x6BFFFFFF),
-                  fontSize: 9.5,
-                  fontWeight: FontWeight.w300,
-                  letterSpacing: 2.2,
-                  height: 1.1,
-                ),
-              ),
-            ],
->>>>>>> 721c9799 (fix: report Android OAuth auth failures clearly)
           ),
         ),
       ],
@@ -469,7 +432,6 @@ class _AuthGateState extends State<AuthGate> {
       child: FilledButton(
         onPressed: onPressed,
         style: FilledButton.styleFrom(
-<<<<<<< HEAD
           backgroundColor: const Color(0xFF000000),
           foregroundColor: Colors.white,
           disabledBackgroundColor: const Color(0xFF000000),
@@ -480,17 +442,6 @@ class _AuthGateState extends State<AuthGate> {
           ),
           padding: const EdgeInsets.symmetric(horizontal: 16),
           textStyle: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600),
-=======
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
-          disabledBackgroundColor: Colors.white54,
-          disabledForegroundColor: Colors.black54,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-          padding: const EdgeInsets.symmetric(horizontal: 18),
-          textStyle:
-              const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600),
->>>>>>> 721c9799 (fix: report Android OAuth auth failures clearly)
         ),
         child: child,
       ),

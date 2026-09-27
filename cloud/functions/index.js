@@ -903,20 +903,58 @@ exports.setFollow = onCall(async (request) => {
   return { ok: true };
 });
 
+const STRIPE_PAYOUT_COUNTRIES = new Set([
+  'US', 'GB', 'CA', 'AU', 'NZ', 'SG', 'HK', 'JP', 'AE', 'DE', 'FR', 'IT', 'ES', 'NL', 'IE',
+  'SE', 'NO', 'DK', 'FI', 'AT', 'BE', 'CH', 'PT', 'LU', 'MY', 'MX', 'BR', 'EE', 'LT', 'LV',
+  'SK', 'SI', 'CZ', 'PL', 'RO', 'BG', 'HR', 'GR', 'CY', 'MT', 'HU', 'TH', 'ID',
+]);
+
+function payoutRailFor(country) {
+  const code = String(country || '').trim().toUpperCase();
+  if (code === 'IN') return 'razorpayx';
+  if (STRIPE_PAYOUT_COUNTRIES.has(code)) return 'stripe_connect';
+  return 'unsupported';
+}
+
 exports.requestPayout = onCall(async (request) => {
   const uid = uidOf(request);
   const requestRef = db.collection('payoutRequests').doc();
   let amount = 0;
+  let rail = 'unsupported';
+  let country = '';
   let vpa = '';
+  let stripeAccountId = '';
   await db.runTransaction(async (tx) => {
     const payout = await tx.get(db.doc(`users/${uid}/payout/main`));
-    amount = Number(payout.data()?.cashBalance || 0);
-    vpa = String(payout.data()?.upi || '').trim().toLowerCase();
+    const data = payout.data() || {};
+    amount = Number(data.cashBalance || 0);
+    country = String(data.country || '').toUpperCase();
+    rail = String(data.payoutRail || payoutRailFor(country));
+    vpa = String(data.upi || '').trim().toLowerCase();
+    stripeAccountId = String(data.stripeAccountId || '');
     if (amount < 500) {
       throw new HttpsError('failed-precondition', 'Payout opens once your earnings reach the minimum.');
     }
-    if (!/^[\w.\-]{2,}@[\w.\-]{2,}$/.test(vpa)) {
+    if (!country) {
+      throw new HttpsError('failed-precondition', 'Choose the country on your payout account first.');
+    }
+    if (rail === 'unsupported') {
+      tx.set(requestRef, {
+        uid,
+        amountBase: amount,
+        currency: 'USD',
+        country,
+        rail: 'unsupported',
+        status: 'unsupported_region',
+        at: stamp(),
+      });
+      return;
+    }
+    if (rail === 'razorpayx' && !/^[\w.\-]{2,}@[\w.\-]{2,}$/.test(vpa)) {
       throw new HttpsError('failed-precondition', 'Add a UPI id before requesting a payout.');
+    }
+    if (rail === 'stripe_connect' && !stripeAccountId) {
+      throw new HttpsError('failed-precondition', 'Finish Stripe payout setup before requesting a payout.');
     }
     remember(tx, uid, null, amount);
     writeCash(tx, uid, -amount, 'Payout request', requestRef.id);
@@ -924,18 +962,27 @@ exports.requestPayout = onCall(async (request) => {
       uid,
       amountBase: amount,
       currency: 'USD',
-      settlementCurrency: 'INR',
+      country,
+      rail,
+      settlementCurrency: rail === 'razorpayx' ? 'INR' : country,
       status: 'pending',
       at: stamp(),
     });
   });
+  if (rail === 'unsupported') {
+    await queueNotifyOutside(uid, 'Payout not available here', 'This country is not on a payout rail yet. Your balance was not taken.');
+    return { ok: true, status: 'unsupported_region', rail };
+  }
+  if (rail === 'stripe_connect') {
+    return sendStripePayout({ uid, amount, requestRef, stripeAccountId, country });
+  }
   const key = process.env.RAZORPAYX_KEY_ID;
   const secret = process.env.RAZORPAYX_KEY_SECRET;
   const account = process.env.RAZORPAYX_ACCOUNT_NUMBER;
   if (!key || !secret || !account) {
-    await requestRef.set({ status: 'queued' }, { merge: true });
-    queueNotifyOutside(uid, 'Payout queued', 'Your payout is waiting for the settlement rail.');
-    return { ok: true, status: 'queued' };
+    await requestRef.set({ status: 'queued', rail: 'razorpayx' }, { merge: true });
+    queueNotifyOutside(uid, 'Payout queued', 'Your payout is waiting for the India settlement rail.');
+    return { ok: true, status: 'queued', rail: 'razorpayx' };
   }
   try {
     const fx = await db.doc('config/fx').get();
@@ -944,20 +991,65 @@ exports.requestPayout = onCall(async (request) => {
     const razorpayId = await sendRazorpayPayout({ key, secret, account, vpa, paise, reference: requestRef.id, uid });
     await requestRef.set({
       status: 'processing',
+      rail: 'razorpayx',
       razorpayPayoutId: razorpayId,
       settlementAmount: paise,
     }, { merge: true });
-    return { ok: true, status: 'processing' };
+    return { ok: true, status: 'processing', rail: 'razorpayx' };
   } catch (err) {
-    await db.runTransaction(async (tx) => {
-      const payout = await tx.get(db.doc(`users/${uid}/payout/main`));
-      remember(tx, uid, null, Number(payout.data()?.cashBalance || 0));
-      writeCash(tx, uid, amount, 'Payout returned', requestRef.id);
-    });
-    await requestRef.set({ status: 'failed' }, { merge: true });
+    await restorePayout(uid, amount, requestRef.id);
+    await requestRef.set({ status: 'failed', rail: 'razorpayx' }, { merge: true });
     throw new HttpsError('failed-precondition', 'The payout could not be sent. Your balance was returned.');
   }
 });
+
+async function restorePayout(uid, amount, ref) {
+  await db.runTransaction(async (tx) => {
+    const payout = await tx.get(db.doc(`users/${uid}/payout/main`));
+    remember(tx, uid, null, Number(payout.data()?.cashBalance || 0));
+    writeCash(tx, uid, amount, 'Payout returned', ref);
+  });
+}
+
+async function sendStripePayout({ uid, amount, requestRef, stripeAccountId, country }) {
+  const key = process.env.STRIPE_SECRET_KEY;
+  const client = process.env.STRIPE_CONNECT_CLIENT_ID;
+  if (!key || !client) {
+    await requestRef.set({ status: 'queued', rail: 'stripe_connect' }, { merge: true });
+    await queueNotifyOutside(uid, 'Payout queued', 'Your payout is waiting for the global settlement rail.');
+    return { ok: true, status: 'queued', rail: 'stripe_connect' };
+  }
+  try {
+    const body = new URLSearchParams({
+      amount: String(amount),
+      currency: 'usd',
+      destination: stripeAccountId,
+      'metadata[payoutRequest]': requestRef.id,
+      'metadata[uid]': uid,
+      'metadata[country]': country,
+    });
+    const res = await fetch('https://api.stripe.com/v1/transfers', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${key}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body,
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error?.message || 'transfer');
+    await requestRef.set({
+      status: 'processing',
+      rail: 'stripe_connect',
+      stripeTransferId: json.id || '',
+    }, { merge: true });
+    return { ok: true, status: 'processing', rail: 'stripe_connect' };
+  } catch (err) {
+    await restorePayout(uid, amount, requestRef.id);
+    await requestRef.set({ status: 'failed', rail: 'stripe_connect' }, { merge: true });
+    throw new HttpsError('failed-precondition', 'The payout could not be sent. Your balance was returned.');
+  }
+}
 
 function queueNotifyOutside(uid, title, body) {
   return db.collection(`users/${uid}/notifications`).add({
@@ -1052,12 +1144,124 @@ exports.refreshFxRates = onSchedule('every 24 hours', async () => {
 
 exports.savePayoutAccount = onCall(async (request) => {
   const uid = uidOf(request);
+  const country = String(request.data?.country || '').trim().toUpperCase();
   const upi = String(request.data?.upi || '').trim().toLowerCase();
-  if (!/^[\w.\-]{2,}@[\w.\-]{2,}$/.test(upi)) {
-    throw new HttpsError('invalid-argument', 'Enter a UPI id like name@bank.');
+  const email = String(request.data?.email || '').trim();
+  if (!/^[A-Z]{2}$/.test(country)) {
+    throw new HttpsError('invalid-argument', 'Choose your country first.');
   }
-  await db.doc(`users/${uid}/payout/main`).set({ upi }, { merge: true });
-  return { ok: true };
+  const rail = payoutRailFor(country);
+  const ref = db.doc(`users/${uid}/payout/main`);
+  if (rail === 'unsupported') {
+    await ref.set({ country, payoutRail: 'unsupported', upi: '' }, { merge: true });
+    return {
+      ok: true,
+      rail: 'unsupported',
+      message: 'Payouts are not available in this country yet. Your earnings stay in your balance.',
+    };
+  }
+  if (rail === 'razorpayx') {
+    if (!/^[\w.\-]{2,}@[\w.\-]{2,}$/.test(upi)) {
+      throw new HttpsError('invalid-argument', 'Enter a UPI id like name@bank.');
+    }
+    await ref.set({ country, upi, payoutRail: 'razorpayx', email }, { merge: true });
+    return { ok: true, rail: 'razorpayx' };
+  }
+  const key = process.env.STRIPE_SECRET_KEY;
+  const client = process.env.STRIPE_CONNECT_CLIENT_ID;
+  if (!key || !client) {
+    await ref.set({ country, email, payoutRail: 'stripe_connect' }, { merge: true });
+    return {
+      ok: true,
+      rail: 'stripe_connect',
+      message: 'Your country is saved. Global payouts start once Stripe Connect is connected.',
+    };
+  }
+  const existing = await ref.get();
+  let acct = existing.data()?.stripeAccountId || '';
+  if (!acct) {
+    const body = new URLSearchParams({
+      type: 'express',
+      country,
+      'capabilities[transfers][requested]': 'true',
+      'metadata[uid]': uid,
+    });
+    if (email) body.set('email', email);
+    const res = await fetch('https://api.stripe.com/v1/accounts', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/x-www-form-urlencoded' },
+      body,
+    });
+    const json = await res.json();
+    if (!res.ok) {
+      throw new HttpsError('failed-precondition', json.error?.message || 'Stripe could not open a payout account.');
+    }
+    acct = json.id;
+  }
+  const linkBody = new URLSearchParams({
+    account: acct,
+    type: 'account_onboarding',
+    refresh_url: 'https://nowssb.com/earn',
+    return_url: 'https://nowssb.com/earn',
+  });
+  const linkRes = await fetch('https://api.stripe.com/v1/account_links', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: linkBody,
+  });
+  const link = await linkRes.json();
+  if (!linkRes.ok) {
+    throw new HttpsError('failed-precondition', link.error?.message || 'Stripe could not open onboarding.');
+  }
+  await ref.set({
+    country,
+    email,
+    payoutRail: 'stripe_connect',
+    stripeAccountId: acct,
+    stripeClientId: client,
+  }, { merge: true });
+  return { ok: true, rail: 'stripe_connect', onboardUrl: link.url || '' };
+});
+
+exports.stripePayoutWebhook = onRequest(async (req, res) => {
+  const secret = process.env.STRIPE_WEBHOOK_SECRET || '';
+  if (!process.env.STRIPE_SECRET_KEY) {
+    res.status(503).send('unconfigured');
+    return;
+  }
+  if (secret) {
+    const sig = String(req.get('stripe-signature') || '');
+    const parts = Object.fromEntries(sig.split(',').map((p) => p.split('=')));
+    const payload = `${parts.t}.${req.rawBody ? req.rawBody.toString('utf8') : JSON.stringify(req.body || {})}`;
+    const expected = crypto.createHmac('sha256', secret).update(payload).digest('hex');
+    if (expected !== parts.v1) {
+      res.status(401).send('bad signature');
+      return;
+    }
+  }
+  const event = req.body || {};
+  const type = String(event.type || '');
+  const obj = event.data?.object || {};
+  const transferId = type.startsWith('transfer') ? obj.id : obj.transfer || '';
+  if (!transferId) {
+    res.status(200).send('ok');
+    return;
+  }
+  const found = await db.collection('payoutRequests').where('stripeTransferId', '==', transferId).limit(1).get();
+  if (!found.empty) {
+    const status = type === 'payout.paid' || type === 'transfer.paid'
+      ? 'paid'
+      : type.includes('failed') || type.includes('reversed')
+          ? 'failed'
+          : 'processing';
+    const row = found.docs[0].data();
+    const prev = String(row.status || '');
+    await found.docs[0].ref.set({ status, rail: 'stripe_connect' }, { merge: true });
+    if (status === 'failed' && prev !== 'failed' && prev !== 'paid') {
+      await restorePayout(row.uid, Number(row.amountBase || 0), transferId);
+    }
+  }
+  res.status(200).send('ok');
 });
 
 exports.dismissEarnCard = onCall(async (request) => {
