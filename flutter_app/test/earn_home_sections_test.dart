@@ -27,8 +27,8 @@ void main() {
     await tester.pump();
 
     expect(find.text('NowssB Earn'), findsWidgets);
-    expect(find.text('Agents, codes, commission'), findsOneWidget);
-    expect(find.text('Become an agent'), findsOneWidget);
+    expect(find.text('Open Earn'), findsWidgets);
+    expect(find.text('Commission on net. Two levels. Never a third.'), findsOneWidget);
     expect(find.text('NowssB Rewards'), findsWidgets);
     expect(find.text('NowssB Gifts'), findsWidgets);
     expect(find.text('Sign in to see your rewards'), findsOneWidget);

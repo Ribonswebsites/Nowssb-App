@@ -14,8 +14,10 @@ import '../../data/firebase.dart';
 import '../../screens/nwsb_sign_in_sheet.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/colored_split_promo_banner.dart';
+import '../../widgets/glass_wrap.dart';
 import '../../widgets/home_parts.dart';
 import '../../widgets/home_skin.dart';
+import '../../widgets/neumorphic.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../bazaar/bazaar_screen.dart';
 import '../circle/circle_screen.dart';
@@ -24,66 +26,416 @@ import '../economy/economy_theme.dart';
 import '../gifts/gifts_screen.dart';
 import '../vault/vault_screen.dart';
 
-class EarnUmbrellaSection extends StatelessWidget {
+const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
+
+class _EarnTier {
+  const _EarnTier(this.name, this.detail, this.badge, this.lines);
+  final String name;
+  final String detail;
+  final String badge;
+  final List<String> lines;
+}
+
+const _earnTiers = <_EarnTier>[
+  _EarnTier('Starter', '0–99 units · 10% of net', '10%', [
+    'Your code on any purchase',
+    '10% of net after the store fee',
+    'Paid plan required',
+  ]),
+  _EarnTier('Rising', '100 units · 15% of net', '15%', [
+    'Same code, higher rate',
+    '15% of net after the store fee',
+    'Units you already have stay',
+  ]),
+  _EarnTier('Pro', '300 units · 20% of net', '20%', [
+    '20% of net after the store fee',
+    'Direct recruits pay 5% of their commission',
+    'Only while both plans are active',
+  ]),
+  _EarnTier('Elite', '500 units · 25% of net', '25%', [
+    '25% of net after the store fee',
+    'Two levels. There is no third',
+    'An invite by itself pays nothing',
+  ]),
+  _EarnTier('Master', '1000 units · 30% of net', '30%', [
+    '30% of net. The cap',
+    'Never a percent of the sticker price',
+    'Payouts wait for review',
+  ]),
+];
+
+class EarnUmbrellaSection extends StatefulWidget {
   const EarnUmbrellaSection({super.key});
+
+  static void _open(BuildContext context, Widget page) {
+    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => page));
+  }
+
+  @override
+  State<EarnUmbrellaSection> createState() => _EarnUmbrellaSectionState();
+}
+
+class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
+  late final PageController _pager;
+  Timer? _auto;
+  var _page = 0;
+  var _userPaging = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _pager = PageController(viewportFraction: 0.92);
+    if (_flutterTest) return;
+    _auto = Timer.periodic(const Duration(milliseconds: 4800), (_) {
+      if (!mounted || _userPaging) return;
+      if (!TickerMode.of(context)) return;
+      if (!_pager.hasClients) return;
+      final next = (_page + 1) % 3;
+      _pager.animateToPage(
+        next,
+        duration: const Duration(milliseconds: 520),
+        curve: Curves.easeOutCubic,
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _auto?.cancel();
+    _pager.dispose();
+    super.dispose();
+  }
+
+  void _openEarn() => EarnUmbrellaSection._open(context, const CircleScreen());
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const _OutsidePromo(
-          slides: [
-            _Slide(
-              title: 'NowssB Earn\nAgents',
-              cta: 'Open Earn',
-              left: Color(0xFF1A3A3C),
-              right: Color(0xFF2EC4B6),
-              art: SplitPromoArts.blondeLotus,
-              dest: _Dest.earn,
+    final neu = HomeSkinScope.of(context) == HomeSkin.normal;
+    return SizedBox(
+      height: 540,
+      child: NotificationListener<ScrollNotification>(
+        onNotification: (n) {
+          if (n is ScrollStartNotification && n.dragDetails != null) {
+            _userPaging = true;
+          } else if (n is ScrollEndNotification) {
+            _userPaging = false;
+          }
+          return false;
+        },
+        child: PageView(
+          controller: _pager,
+          onPageChanged: (i) {
+            if (_page == i) return;
+            setState(() => _page = i);
+          },
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+              child: _shell(neu, 0, _intro()),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+              child: _shell(neu, 1, _overview()),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+              child: _shell(neu, 2, _how()),
             ),
           ],
         ),
-        const SizedBox(height: 12),
-        SectionPane(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const PaneHead(
-                eyebrow: 'NowssB Earn',
-                title: 'Agents, codes, commission',
-                mark: NwsbMarks.earn,
+      ),
+    );
+  }
+
+  Widget _shell(bool neu, int i, Widget child) {
+    if (neu) {
+      return NeuCard(
+        padding: const EdgeInsets.all(8),
+        radius: 16 + (i % 3) * 4,
+        elevation: i.isEven ? NwsbElevation.md : NwsbElevation.sm,
+        child: child,
+      );
+    }
+    return GlassWrap(
+      margin: EdgeInsets.zero,
+      radius: i.isEven ? 18 : 26,
+      padding: const EdgeInsets.fromLTRB(10, 10, 10, 12),
+      child: child,
+    );
+  }
+
+  Widget _intro() {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: const Color(0xFF000000),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(14, 14, 12, 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text(
+              'NowssB Earn',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 28,
+                height: 1.02,
+                fontWeight: FontWeight.w800,
               ),
-              const SizedBox(height: 12),
-              SecBanner(
-                title: 'Become an agent',
-                sub: 'Paid plan required. Commission is on net, after the store fee.',
-                mark: NwsbMarks.verified,
-                onTap: () => _open(context, const CircleScreen()),
+            ),
+            const SizedBox(height: 6),
+            const Text(
+              'Commission on net. Two levels. Never a third.',
+              style: TextStyle(
+                color: Color(0xCCFFFFFF),
+                fontSize: 13,
+                height: 1.3,
+                fontWeight: FontWeight.w600,
               ),
-              const SizedBox(height: 8),
-              SecBanner(
-                title: 'Your code',
-                sub: 'Any purchase with your code counts. Two levels, never a third.',
-                mark: NwsbMarks.earn,
-                onTap: () => _open(context, const CircleScreen()),
+            ),
+            Expanded(
+              child: ClipRect(
+                child: Image.asset(
+                  'assets/banners/brand-cleo.png',
+                  fit: BoxFit.fitHeight,
+                  alignment: Alignment.bottomRight,
+                  errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                ),
               ),
-              const SizedBox(height: 8),
-              SecBanner(
-                title: 'Downline',
-                sub: 'Your legs, their volume, and a 5% override while both plans are active.',
-                mark: NwsbMarks.user,
-                onTap: () => _open(context, const CircleScreen()),
-              ),
-            ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                const Expanded(
+                  child: Text(
+                    'Join today',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: _openEarn,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(99),
+                    ),
+                    child: const Text(
+                      'Open Earn',
+                      style: TextStyle(
+                        color: Color(0xFF111111),
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _overview() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        GestureDetector(
+          onTap: _openEarn,
+          child: Container(
+            height: 112,
+            clipBehavior: Clip.antiAlias,
+            decoration: BoxDecoration(
+              color: const Color(0xFF000000),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Row(
+              children: [
+                const Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(16, 12, 8, 12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'NowssB',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 28,
+                            fontWeight: FontWeight.w900,
+                            height: 1,
+                            letterSpacing: -0.4,
+                          ),
+                        ),
+                        SizedBox(height: 6),
+                        Text(
+                          'Earn',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w800,
+                            height: 1.05,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 108,
+                  height: 112,
+                  child: Image.asset(
+                    'assets/banners/course-cleo-a.jpg',
+                    fit: BoxFit.cover,
+                    alignment: Alignment.topCenter,
+                    errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111)),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
+        const SizedBox(height: 8),
+        for (var i = 0; i < _earnTiers.length; i++) ...[
+          if (i > 0) const SizedBox(height: 6),
+          Expanded(child: _tierBox(_earnTiers[i])),
+        ],
       ],
     );
   }
 
-  static void _open(BuildContext context, Widget page) {
-    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => page));
+  Widget _tierBox(_EarnTier tier) {
+    return GestureDetector(
+      onTap: _openEarn,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(14, 6, 10, 6),
+        decoration: BoxDecoration(
+          color: const Color(0xFF000000),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    tier.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    tier.detail,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            _badge(tier.badge),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _how() {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: const Color(0xFF000000),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text(
+              'How you get paid',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 26,
+                height: 1.05,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 6),
+            const Text(
+              'Net after the store fee. Not the sticker price.',
+              style: TextStyle(color: Color(0xCCFFFFFF), fontSize: 13, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 12),
+            for (final tier in _earnTiers) ...[
+              Text(
+                tier.name,
+                style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w800),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                tier.lines.first,
+                style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12),
+              ),
+              const SizedBox(height: 8),
+            ],
+            const Spacer(),
+            Align(
+              alignment: Alignment.centerRight,
+              child: GestureDetector(
+                onTap: _openEarn,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(99),
+                  ),
+                  child: const Text(
+                    'Open Earn',
+                    style: TextStyle(color: Color(0xFF111111), fontWeight: FontWeight.w800),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _badge(String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: const Color(0xFFE8D5A3),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w800,
+          color: Color(0xFF1A1A2E),
+        ),
+      ),
+    );
   }
 }
 

@@ -20,6 +20,7 @@ import '../features/earn/earnings_screen.dart';
 import '../features/notifications/inbox_screen.dart';
 import '../features/social/echo_wall_screen.dart';
 import '../features/gifts/gifts_screen.dart';
+import '../features/vault/vault_screen.dart';
 import '../features/wordprint/word_print_screen.dart';
 import '../screens/notifications_settings.dart';
 import '../screens/progress/progress_screen.dart';
