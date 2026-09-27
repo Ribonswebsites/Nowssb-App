@@ -6,6 +6,7 @@ import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -34,7 +35,8 @@ class _AuthGateState extends State<AuthGate> {
   final _password = TextEditingController();
   final _phone = TextEditingController();
   final _smsCode = TextEditingController();
-  static const _googleWebClientId = '1024709686012-h1h9glk84uti9cbqpht5d09igdqb8pgu.apps.googleusercontent.com';
+  static const _googleWebClientId =
+      '1024709686012-h1h9glk84uti9cbqpht5d09igdqb8pgu.apps.googleusercontent.com';
   final _google = GoogleSignIn(
     scopes: const ['email'],
     serverClientId: _googleWebClientId,
@@ -201,6 +203,22 @@ class _AuthGateState extends State<AuthGate> {
 
   String _friendlyAuthError(Object error) {
     final code = error is FirebaseAuthException ? error.code : '';
+    if (error is PlatformException) {
+      // GoogleSignIn reports Android OAuth misconfiguration as the opaque
+      // platform error `sign_in_failed` (usually status 10/12500). It is not
+      // a connectivity failure and the old generic copy sent users in the
+      // wrong direction on every device.
+      final details = '${error.code} ${error.message ?? ''}'.toLowerCase();
+      if (details.contains('10') ||
+          details.contains('12500') ||
+          details.contains('developer_error') ||
+          details.contains('sign_in_failed')) {
+        return 'Google sign-in is not authorised for this Android build. '
+            'Add package com.nowssb.app and this build’s SHA-1/SHA-256 '
+            'certificates to the NowssB Firebase Android app.';
+      }
+      return error.message ?? 'Google sign-in could not be completed.';
+    }
     switch (code) {
       case 'network-request-failed':
         return 'No network connection is available. Reconnect and try again.';
@@ -349,6 +367,7 @@ class _AuthGateState extends State<AuthGate> {
             ),
           ),
         ),
+<<<<<<< HEAD
         const SizedBox(height: 6),
         const Text(
           'Natural Origin Word Science',
@@ -358,6 +377,42 @@ class _AuthGateState extends State<AuthGate> {
             fontSize: 10,
             letterSpacing: 1.6,
             fontWeight: FontWeight.w500,
+=======
+        const Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                        text: 'Nowss',
+                        style: TextStyle(fontWeight: FontWeight.w800)),
+                    TextSpan(
+                        text: 'B',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w300,
+                            color: Colors.white70)),
+                  ],
+                ),
+                style:
+                    TextStyle(color: Colors.white, fontSize: 21, height: 1.05),
+              ),
+              SizedBox(height: 5),
+              Text(
+                'BY NOWSSBANSIU',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: Color(0x6BFFFFFF),
+                  fontSize: 9.5,
+                  fontWeight: FontWeight.w300,
+                  letterSpacing: 2.2,
+                  height: 1.1,
+                ),
+              ),
+            ],
+>>>>>>> 721c9799 (fix: report Android OAuth auth failures clearly)
           ),
         ),
       ],
@@ -368,7 +423,9 @@ class _AuthGateState extends State<AuthGate> {
     return _whiteButton(
       onPressed: _busy ? null : _googleLogin,
       child: _busy
-          ? const Center(child: AppThinkingLoader(size: 28, state: OrbState.solving, circlePad: 6))
+          ? const Center(
+              child: AppThinkingLoader(
+                  size: 28, state: OrbState.solving, circlePad: 6))
           : const Row(
               children: [
                 _GoogleMark(),
@@ -398,18 +455,21 @@ class _AuthGateState extends State<AuthGate> {
           Icon(icon, size: 20),
           const SizedBox(width: 12),
           Expanded(child: Text(label)),
-          Icon(open ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down, size: 20),
+          Icon(open ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+              size: 20),
         ],
       ),
     );
   }
 
-  Widget _whiteButton({required VoidCallback? onPressed, required Widget child}) {
+  Widget _whiteButton(
+      {required VoidCallback? onPressed, required Widget child}) {
     return SizedBox(
       height: 52,
       child: FilledButton(
         onPressed: onPressed,
         style: FilledButton.styleFrom(
+<<<<<<< HEAD
           backgroundColor: const Color(0xFF000000),
           foregroundColor: Colors.white,
           disabledBackgroundColor: const Color(0xFF000000),
@@ -420,6 +480,17 @@ class _AuthGateState extends State<AuthGate> {
           ),
           padding: const EdgeInsets.symmetric(horizontal: 16),
           textStyle: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600),
+=======
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black,
+          disabledBackgroundColor: Colors.white54,
+          disabledForegroundColor: Colors.black54,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          padding: const EdgeInsets.symmetric(horizontal: 18),
+          textStyle:
+              const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600),
+>>>>>>> 721c9799 (fix: report Android OAuth auth failures clearly)
         ),
         child: child,
       ),
@@ -434,7 +505,9 @@ class _AuthGateState extends State<AuthGate> {
           Expanded(child: Divider(color: Colors.white24, height: 1)),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 14),
-            child: Text('OR', style: TextStyle(color: Colors.white38, fontSize: 10, letterSpacing: 2.4)),
+            child: Text('OR',
+                style: TextStyle(
+                    color: Colors.white38, fontSize: 10, letterSpacing: 2.4)),
           ),
           Expanded(child: Divider(color: Colors.white24, height: 1)),
         ],
@@ -458,17 +531,24 @@ class _AuthGateState extends State<AuthGate> {
               style: FilledButton.styleFrom(
                 backgroundColor: const Color(0xFFE8D5A3),
                 foregroundColor: Colors.black,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14)),
               ),
               child: _busy
-                  ? const AppThinkingLoader(size: 28, state: OrbState.solving, circlePad: 6)
-                  : Text(_createAccount ? 'Create account' : 'Sign in with email'),
+                  ? const AppThinkingLoader(
+                      size: 28, state: OrbState.solving, circlePad: 6)
+                  : Text(
+                      _createAccount ? 'Create account' : 'Sign in with email'),
             ),
           ),
           TextButton(
-            onPressed: _busy ? null : () => setState(() => _createAccount = !_createAccount),
+            onPressed: _busy
+                ? null
+                : () => setState(() => _createAccount = !_createAccount),
             style: TextButton.styleFrom(foregroundColor: Colors.white70),
-            child: Text(_createAccount ? 'I already have an account' : 'Create a new account'),
+            child: Text(_createAccount
+                ? 'I already have an account'
+                : 'Create a new account'),
           ),
         ],
       ),
@@ -481,23 +561,28 @@ class _AuthGateState extends State<AuthGate> {
       padding: const EdgeInsets.only(top: 10),
       child: Column(
         children: [
-          _field(_phone, 'Phone number with country code', keyboard: TextInputType.phone),
+          _field(_phone, 'Phone number with country code',
+              keyboard: TextInputType.phone),
           if (hasCode) ...[
             const SizedBox(height: 10),
-            _field(_smsCode, 'SMS verification code', keyboard: TextInputType.number),
+            _field(_smsCode, 'SMS verification code',
+                keyboard: TextInputType.number),
           ],
           const SizedBox(height: 10),
           SizedBox(
             height: 48,
             child: FilledButton(
-              onPressed: _busy ? null : (hasCode ? _verifyPhoneCode : _sendPhoneCode),
+              onPressed:
+                  _busy ? null : (hasCode ? _verifyPhoneCode : _sendPhoneCode),
               style: FilledButton.styleFrom(
                 backgroundColor: const Color(0xFFE8D5A3),
                 foregroundColor: Colors.black,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14)),
               ),
               child: _busy
-                  ? const AppThinkingLoader(size: 28, state: OrbState.listening, circlePad: 6)
+                  ? const AppThinkingLoader(
+                      size: 28, state: OrbState.listening, circlePad: 6)
                   : Text(hasCode ? 'Verify code' : 'Send code'),
             ),
           ),
@@ -542,7 +627,8 @@ class _AuthGateState extends State<AuthGate> {
     if (_guest) return widget.child;
     if (!NwsbFirebase.ready) {
       return _buildAuthScreen(
-        unavailable: 'Firebase is not ready in this build. You can still explore without an account.',
+        unavailable:
+            'Firebase is not ready in this build. You can still explore without an account.',
       );
     }
     return StreamBuilder<User?>(
@@ -552,7 +638,8 @@ class _AuthGateState extends State<AuthGate> {
           return const Scaffold(
             backgroundColor: Colors.black,
             body: Center(
-              child: AppThinkingLoader(label: 'Preparing…', state: OrbState.composing),
+              child: AppThinkingLoader(
+                  label: 'Preparing…', state: OrbState.composing),
             ),
           );
         }
