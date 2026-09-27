@@ -194,7 +194,8 @@ function applyCircle(tx, loaded, { buyerUid, price, paymentId, plan }) {
   const alreadyCounted = buyerData.paidCounted === true;
   const prevCount = Number(l1Data.paidReferralCount || 0);
   const count = alreadyCounted ? prevCount : prevCount + 1;
-  const tier = rules.circleTier(count);
+  const units = Number(l1Data.unitsSold || 0) + 1;
+  const tier = rules.agentTier(units);
   const l1Active = activeSub(l1.wallet.data());
   const code = String(l1Data.code || '');
   if (!l1Active) {
@@ -216,47 +217,79 @@ function applyCircle(tx, loaded, { buyerUid, price, paymentId, plan }) {
     Number(l1.wallet.data()?.coins || 0),
     Number(l1.payout.data()?.cashBalance || 0),
   );
+  const gross = Math.round(Number(price) || 0);
+  const net = rules.netOfStoreFee(gross);
+  const commission = Math.round(net * tier.rate);
+  tx.set(db.doc(`users/${l1.uid}/referral/main`), {
+    unitsSold: units,
+    paidReferralCount: count,
+    tier: tier.name,
+    subscriptionActive: true,
+  }, { merge: true });
   if (!alreadyCounted) {
-    tx.set(db.doc(`users/${l1.uid}/referral/main`), {
-      paidReferralCount: count,
-      tier: tier.name,
-      subscriptionActive: true,
-    }, { merge: true });
     tx.set(db.doc(`users/${buyerUid}/referral/main`), { paidCounted: true }, { merge: true });
-    bumpPublic(tx, l1.uid, null, { circleTier: tier.name });
-    queueNotify(tx, l1.uid, 'Circle', 'A paid referral landed on your code.', 'circle', paymentId);
   }
+  bumpPublic(tx, l1.uid, null, { circleTier: tier.name });
   tx.set(db.collection('referralLedger').doc(), {
-    referrerUid: l1.uid, referredUid: buyerUid, level: 1, paymentId,
-    commissionAmount: 0, amountBase: 0, currency: 'USD', at: stamp(), status: 'recorded',
+    referrerUid: l1.uid,
+    referredUid: buyerUid,
+    level: 1,
+    paymentId,
+    grossAmount: gross,
+    netAmount: net,
+    commissionAmount: commission,
+    amountBase: commission,
+    currency: 'USD',
+    at: stamp(),
+    status: 'accrued',
+    kind: 'sale',
   });
-  if (count < 5) {
-    const coins = Math.max(10, Math.round(price * 0.1));
-    writeCoins(tx, l1.uid, coins, 'Referral coins', paymentId);
-    queueNotify(tx, l1.uid, 'Referral coins', 'Coins were added for a paid referral.', 'circle', paymentId);
-    return;
-  }
-  const cash = Math.round(price * tier.rate);
-  if (cash > 0) {
-    writeCash(tx, l1.uid, cash, 'Circle commission', paymentId);
-    tx.set(db.collection('referralLedger').doc(), {
-      referrerUid: l1.uid, referredUid: buyerUid, level: 1, paymentId,
-      commissionAmount: cash, amountBase: cash, currency: 'USD', at: stamp(), status: 'paid',
-    });
-    queueNotify(tx, l1.uid, 'Circle commission', 'A commission was added to your earnings.', 'payout', paymentId);
+  tx.set(db.collection('commissionLedger').doc(), {
+    agentUid: l1.uid,
+    saleId: paymentId,
+    level: 1,
+    grossAmount: gross,
+    netAmount: net,
+    commissionAmount: commission,
+    status: 'accrued',
+    kind: 'sale',
+    at: stamp(),
+  });
+  if (commission > 0) {
+    writeCash(tx, l1.uid, commission, 'Agent commission', paymentId);
+    queueNotify(tx, l1.uid, 'Agent commission', 'A commission was added to your earnings.', 'payout', paymentId);
   }
   const l2 = loaded.l2;
-  if (!l2 || !plan) return;
-  const l2Count = Number(l2.referral.data()?.paidReferralCount || 0);
-  if (l2Count < 5) return;
+  if (!l2) return;
   if (!activeSub(l2.wallet.data()) || l2.referral.data()?.subscriptionActive === false) return;
-  const leg = Math.round(price * 0.05);
+  const leg = Math.round(commission * 0.05);
   if (leg <= 0) return;
   remember(tx, l2.uid, null, Number(l2.payout.data()?.cashBalance || 0));
-  writeCash(tx, l2.uid, leg, 'Circle level 2', paymentId);
+  writeCash(tx, l2.uid, leg, 'Agent level 2', paymentId);
   tx.set(db.collection('referralLedger').doc(), {
-    referrerUid: l2.uid, referredUid: buyerUid, level: 2, paymentId,
-    commissionAmount: leg, amountBase: leg, currency: 'USD', at: stamp(), status: 'paid',
+    referrerUid: l2.uid,
+    referredUid: buyerUid,
+    level: 2,
+    paymentId,
+    grossAmount: gross,
+    netAmount: net,
+    commissionAmount: leg,
+    amountBase: leg,
+    currency: 'USD',
+    at: stamp(),
+    status: 'accrued',
+    kind: 'override',
+  });
+  tx.set(db.collection('commissionLedger').doc(), {
+    agentUid: l2.uid,
+    saleId: paymentId,
+    level: 2,
+    grossAmount: gross,
+    netAmount: net,
+    commissionAmount: leg,
+    status: 'accrued',
+    kind: 'override',
+    at: stamp(),
   });
   queueNotify(tx, l2.uid, 'Level 2 commission', 'A second-level commission was added.', 'payout', paymentId);
 }
@@ -965,13 +998,18 @@ exports.requestPayout = onCall(async (request) => {
       country,
       rail,
       settlementCurrency: rail === 'razorpayx' ? 'INR' : country,
-      status: 'pending',
+      status: 'pending_review',
       at: stamp(),
     });
   });
   if (rail === 'unsupported') {
     await queueNotifyOutside(uid, 'Payout not available here', 'This country is not on a payout rail yet. Your balance was not taken.');
     return { ok: true, status: 'unsupported_region', rail };
+  }
+  const cfg = await db.doc('config/economy').get();
+  if (!(cfg.exists && cfg.data().autoPayouts === true)) {
+    await queueNotifyOutside(uid, 'Payout in review', 'Your payout is waiting for review. Nothing is sent until it is approved.');
+    return { ok: true, status: 'pending_review', rail };
   }
   if (rail === 'stripe_connect') {
     return sendStripePayout({ uid, amount, requestRef, stripeAccountId, country });

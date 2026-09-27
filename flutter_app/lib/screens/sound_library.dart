@@ -9,6 +9,8 @@
 /// Artwork is Word Atelier collection renders in `assets/store/collections/`.
 library;
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../data/content.dart';
@@ -25,6 +27,7 @@ import '../widgets/black_glass_banner.dart';
 import '../widgets/intro_gate.dart';
 import '../widgets/tv_frame.dart';
 import '../widgets/app_thinking_loader.dart';
+import '../widgets/nwsb_icon.dart';
 import '../widgets/colored_split_promo_banner.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import 'notifications_sheet.dart';
@@ -427,30 +430,6 @@ class _SlmFeed extends StatelessWidget {
                     bottom: MediaQuery.paddingOf(context).bottom + 48,
                   ),
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(14, 4, 14, 8),
-                      child: GestureDetector(
-                        onVerticalDragEnd: (d) {
-                          if ((d.primaryVelocity ?? 0) > 180 && pool.isNotEmpty) {
-                            onPlayWord(pool.first);
-                          }
-                        },
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: const AspectRatio(
-                            aspectRatio: 16 / 9,
-                            child: NwsbVideo(
-                              asset: 'assets/video/sound-library-banner.mp4',
-                              fit: BoxFit.cover,
-                              priority: ClipPriority.feature,
-                              autoplay: true,
-                              loop: true,
-                              showPoster: true,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
                     if (chip == 'Currently Playing') ...[
                       CurrentlyPlayingAlbum(
                         words: _playingRail,
@@ -1086,63 +1065,9 @@ class _SlmFeed extends StatelessWidget {
         onTap: onStore,
       ),
     ];
-    return _section(
-      'From the Store',
-      trailing: _chev(onStore),
-      child: SizedBox(
-        height: cardW * 9 / 16 + 52,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          itemCount: items.length,
-          separatorBuilder: (_, __) => const SizedBox(width: 12),
-          itemBuilder: (_, i) {
-            final x = items[i];
-            return SizedBox(
-              width: cardW,
-              child: GestureDetector(
-                onTap: x.onTap,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(14),
-                      child: AspectRatio(
-                        aspectRatio: 16 / 9,
-                        child: NwsbVideo(
-                          asset: x.asset,
-                          priority: ClipPriority.decoration,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      x.title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Text(
-                      x.sub,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Color(0x94FFFFFF),
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
-      ),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 14, 12, 6),
+      child: _StoreFilmReel(items: items, cardW: cardW),
     );
   }
 
@@ -1578,6 +1503,120 @@ class _SlmFeed extends StatelessWidget {
   }
 }
 
+class _StoreFilmReel extends StatefulWidget {
+  const _StoreFilmReel({required this.items, required this.cardW});
+  final List<_StoreVid> items;
+  final double cardW;
+
+  @override
+  State<_StoreFilmReel> createState() => _StoreFilmReelState();
+}
+
+class _StoreFilmReelState extends State<_StoreFilmReel> {
+  late final PageController _pages = PageController();
+  Timer? _timer;
+  var _index = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(milliseconds: 3400), (_) {
+      if (!mounted || widget.items.isEmpty || !_pages.hasClients) return;
+      _index = (_index + 1) % widget.items.length;
+      _pages.animateToPage(
+        _index,
+        duration: const Duration(milliseconds: 460),
+        curve: Curves.easeOutCubic,
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _pages.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        HeavyGlassPanel(
+          radius: 18,
+          padding: const EdgeInsets.fromLTRB(14, 12, 8, 12),
+          child: Row(
+            children: [
+              const Expanded(
+                child: Text(
+                  'From the Store',
+                  style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700),
+                ),
+              ),
+              IconButton(
+                onPressed: widget.items.isEmpty ? null : widget.items.first.onTap,
+                icon: const Icon(Icons.chevron_right_rounded, color: Colors.white70),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 10),
+        SizedBox(
+          height: widget.cardW * 9 / 16 + 78,
+          child: PageView.builder(
+            controller: _pages,
+            itemCount: widget.items.length,
+            onPageChanged: (i) => _index = i,
+            itemBuilder: (_, i) {
+              final x = widget.items[i];
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 2),
+                child: GestureDetector(
+                  onTap: x.onTap,
+                  child: HeavyGlassPanel(
+                    radius: 20,
+                    padding: const EdgeInsets.fromLTRB(10, 10, 10, 12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(14),
+                          child: AspectRatio(
+                            aspectRatio: 16 / 9,
+                            child: NwsbVideo(
+                              asset: x.asset,
+                              priority: ClipPriority.decoration,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          x.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700),
+                        ),
+                        Text(
+                          x.sub,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(color: Color(0x94FFFFFF), fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _StoreVid {
   const _StoreVid({
     required this.title,
@@ -1649,38 +1688,43 @@ class _SlmHead extends StatelessWidget {
                   onTap: onPlayHeader,
                   behavior: HitTestBehavior.opaque,
                   child: Container(
-                    width: 26,
-                    height: 26,
-                    decoration: const BoxDecoration(
-                      color: NwsbColors.goldLight,
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
                       shape: BoxShape.circle,
+                      border: Border.all(color: const Color(0x33FFFFFF)),
                     ),
-                    child: const Icon(Icons.play_arrow_rounded,
-                        color: Color(0xFF060C18), size: 18),
+                    child: const Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        AppThinkingLoader(
+                          size: 42,
+                          state: OrbState.composing,
+                          circlePad: 2,
+                        ),
+                        NwsbIcon(NwsbMarks.play, size: 16, color: Colors.white),
+                      ],
+                    ),
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 10),
                 const Expanded(
                   child: Text(
-                    'Sound Library',
+                    'NowssB',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.2,
                       shadows: [
                         Shadow(color: Colors.black87, blurRadius: 4),
                       ],
                     ),
                   ),
                 ),
-                const AppThinkingLoader(
-                  size: 52,
-                  state: OrbState.composing,
-                  circlePad: 8,
-                ),
-                const SizedBox(width: 6),
                 IconButton(
                   onPressed: onNotifications,
                   padding: EdgeInsets.zero,

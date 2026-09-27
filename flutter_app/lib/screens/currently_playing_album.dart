@@ -7,6 +7,7 @@ import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import '../data/models.dart';
 import '../widgets/app_thinking_loader.dart';
 import '../widgets/glass_wrap.dart';
+import '../widgets/nwsb_icon.dart';
 
 class CurrentlyPlayingAlbum extends StatelessWidget {
   const CurrentlyPlayingAlbum({
@@ -60,16 +61,23 @@ class CurrentlyPlayingAlbum extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircleAvatar(
-                    radius: 10,
-                    backgroundColor: const Color(0x33FFFFFF),
-                    child: Text(
-                      'N',
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.9),
-                        fontSize: 10,
-                        fontWeight: FontWeight.w800,
-                      ),
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: const BoxDecoration(
+                      color: Colors.black,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        AppThinkingLoader(
+                          size: 36,
+                          state: OrbState.composing,
+                          circlePad: 1,
+                        ),
+                        NwsbIcon(NwsbMarks.play, size: 14, color: Colors.white),
+                      ],
                     ),
                   ),
                   const SizedBox(width: 8),

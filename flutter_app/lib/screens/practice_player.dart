@@ -36,7 +36,7 @@ import '../theme/player_aura.dart';
 import 'sound_library.dart';
 import 'aura_sound_library.dart';
 import 'store.dart';
-import 'player_settings.dart';
+import 'sound_settings_sheet.dart';
 import 'sentence_builder.dart';
 import 'select_level.dart';
 import 'player_dial.dart';
@@ -95,7 +95,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     with TickerProviderStateMixin {
   static const _likedWordsKey = 'nwsb_liked_words';
   static const _shuffleKey = 'nwsb_player_shuffle';
-  static const _actionsTabVideo = 'assets/video/player-bg-loop.mp4';
+  static const _actionsTabVideo = 'assets/video/player-actions-tab.mp4';
   static const _marqueeLines = <String>[
     'NowssB · Words Without Dictionary',
     'NowssB · The future of Meditation',
@@ -763,22 +763,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
   }
 
   void _openSettings() {
-    showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: const Color(0xFF0C0C10),
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
-      ),
-      builder: (sheetContext) {
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.viewInsetsOf(sheetContext).bottom,
-          ),
-          child: const _SoundBox(),
-        );
-      },
-    );
+    showSoundSettingsSheet(context);
   }
 
   void _openSettingsLegacy() {
@@ -1059,8 +1044,11 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                         children: [
                           GestureDetector(
                             onVerticalDragEnd: (d) {
-                              if ((d.primaryVelocity ?? 0) > 220) {
+                              final v = d.primaryVelocity ?? 0;
+                              if (v > 220) {
                                 _openQueueSheet(context);
+                              } else if (v < -280) {
+                                _openAuraClock();
                               }
                             },
                             child: _PlayerHeader(
@@ -1075,7 +1063,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                               width: stageWidth,
                               child: _VisualStage(
                                 word: _word,
-                                video: 'assets/video/player-bg-loop.mp4',
+                                video: _theme.video,
                                 playing: _playing,
                                 accent: theme.accent,
                                 onReplay: _prepareAndPlay,
@@ -4655,214 +4643,6 @@ class _BottomDot extends StatelessWidget {
           : null,
     ),
   );
-}
-
-class _SoundBox extends StatefulWidget {
-  const _SoundBox();
-
-  @override
-  State<_SoundBox> createState() => _SoundBoxState();
-}
-
-class _SoundBoxState extends State<_SoundBox> {
-  final FlutterTts _preview = FlutterTts();
-  var _busy = false;
-
-  static const _presets = [
-    ('Flat', 'flat'),
-    ('Bass', 'deep'),
-    ('Vocal', 'focus'),
-    ('Bright', 'bright'),
-    ('Wide', 'custom'),
-  ];
-
-  @override
-  void dispose() {
-    _preview.stop();
-    super.dispose();
-  }
-
-  Future<void> _hear() async {
-    if (_busy) return;
-    setState(() => _busy = true);
-    final prefs = Settings.instance;
-    final bands = prefs.eqBands;
-    var pitch = 1.0;
-    var rate = 0.42;
-    if (bands.length >= 5) {
-      pitch *= 1 + bands[4] * 0.22 - bands[0] * 0.2;
-      rate = (rate * (1 + bands[2] * 0.12)).clamp(0.2, 0.85);
-    }
-    if (prefs.bassBoost) {
-      pitch *= 0.86;
-    }
-    var volume = prefs.bassBoost ? 1.0 : 0.85;
-    try {
-      await _preview.awaitSpeakCompletion(true);
-      await _preview.setLanguage('en-US');
-      await _preview.setSpeechRate(rate);
-      await _preview.setPitch(pitch.clamp(0.5, 2.0));
-      await _preview.setVolume(volume);
-      await _preview.stop();
-      await _preview.speak('NowssB');
-      if (prefs.spatialAudio) {
-        await _preview.setPitch((pitch * 1.16).clamp(0.5, 2.0));
-        await _preview.setVolume(0.4);
-        await _preview.speak('NowssB');
-      }
-    } catch (_) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Voice preview needs text-to-speech on this phone.'),
-          ),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _busy = false);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final s = Settings.instance;
-    return ListenableBuilder(
-      listenable: s,
-      builder: (context, _) {
-        final bands = s.eqBands;
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(18, 12, 18, 16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const Text(
-                  'Sound',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  'Equalizer, boost, presets, and a wide spatial voice. Preview plays on this phone.',
-                  style: TextStyle(
-                    color: Color(0xFF9A9AA2),
-                    fontSize: 12,
-                    height: 1.35,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    for (final preset in _presets)
-                      ChoiceChip(
-                        label: Text(preset.$1),
-                        selected: s.eq == preset.$2,
-                        onSelected: (_) => s.setEq(preset.$2),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 14),
-                SizedBox(
-                  height: 120,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      for (var i = 0; i < 5; i++)
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 6),
-                            child: Column(
-                              children: [
-                                Expanded(
-                                  child: RotatedBox(
-                                    quarterTurns: 3,
-                                    child: Slider(
-                                      value: (i < bands.length ? bands[i] : 0.0)
-                                          .clamp(-1.0, 1.0)
-                                          .toDouble(),
-                                      min: -1,
-                                      max: 1,
-                                      onChanged: (v) {
-                                        final next = [...s.eqBands];
-                                        while (next.length < 5) {
-                                          next.add(0);
-                                        }
-                                        next[i] = v;
-                                        s.setEqBands(next);
-                                      },
-                                    ),
-                                  ),
-                                ),
-                                Text(
-                                  ['Low', 'Low-mid', 'Mid', 'High', 'Air'][i],
-                                  style: const TextStyle(
-                                    color: Color(0xFF8E8E93),
-                                    fontSize: 10,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                SwitchListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: const Text(
-                    'Boost sound',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  subtitle: const Text(
-                    'Louder, deeper voice',
-                    style: TextStyle(color: Color(0xFF8E8E93), fontSize: 12),
-                  ),
-                  value: s.bassBoost,
-                  onChanged: (_) => s.toggleBass(),
-                ),
-                SwitchListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: const Text(
-                    'Spatial audio',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  subtitle: const Text(
-                    'Wide voice: the word, then a softer reflection. Phone TTS has no hardware HRTF, so this is the on-device layer.',
-                    style: TextStyle(color: Color(0xFF8E8E93), fontSize: 12),
-                  ),
-                  value: s.spatialAudio,
-                  onChanged: s.setSpatial,
-                ),
-                const SizedBox(height: 8),
-                FilledButton(
-                  onPressed: _busy ? null : _hear,
-                  child: Text(_busy ? 'Playing…' : 'Preview this sound'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    final nav = Navigator.of(context);
-                    nav.pop();
-                    nav.push(
-                      MaterialPageRoute<void>(
-                        builder: (_) => const PlayerSettingsScreen(),
-                      ),
-                    );
-                  },
-                  child: const Text('More playback settings'),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
 }
 
 class _SubtitleMarquee extends StatelessWidget {

@@ -160,6 +160,7 @@ class EconomyMirror extends ChangeNotifier {
   String referredBy = '';
   String circleTier = 'Member';
   int paidReferrals = 0;
+  int unitsSold = 0;
   String sellerTier = 'Seller';
   int wordsSold = 0;
   int nextSellerTarget = 100;
@@ -228,6 +229,7 @@ class EconomyMirror extends ChangeNotifier {
       referredBy = (data['referredBy'] as String?) ?? '';
       circleTier = (data['tier'] as String?) ?? 'Member';
       paidReferrals = (data['paidReferralCount'] as num?)?.toInt() ?? 0;
+      unitsSold = (data['unitsSold'] as num?)?.toInt() ?? paidReferrals;
       subscriptionActive = data['subscriptionActive'] == true;
     });
     _watch('users/$id/sellerStats/main', (data) {

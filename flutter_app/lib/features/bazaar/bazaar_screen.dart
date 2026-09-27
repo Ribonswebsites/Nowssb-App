@@ -8,6 +8,7 @@ import '../economy/economy_theme.dart';
 import '../economy/money.dart';
 import '../economy/play_billing.dart';
 import '../../widgets/colored_split_promo_banner.dart';
+import '../../screens/subscription.dart';
 
 class BazaarScreen extends StatelessWidget {
   const BazaarScreen({super.key, this.embedded = false});
@@ -23,10 +24,33 @@ class BazaarScreen extends StatelessWidget {
         physics: embedded ? const NeverScrollableScrollPhysics() : null,
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
         children: [
+          const ColoredSplitPromoBanner(
+            margin: EdgeInsets.zero,
+            spec: SplitPromoSpec(
+              title: 'Resell',
+              cta: 'List a word',
+              leftColor: Color(0xFF3D2914),
+              rightColor: Color(0xFFE07A3D),
+              art: SplitPromoArts.redLotus,
+            ),
+          ),
+          const SizedBox(height: 12),
           const EconomyNote(
             'Resale price stays between 50% and 150% of the original. The platform cut starts at 20% and falls toward 10% as you sell more. 3% goes to the content owner. No refunds on resold items. NowssB can delist a listing. You must own the word before you list it.',
           ),
+          const SizedBox(height: 8),
+          GoldButton(
+            label: 'Terms and conditions',
+            filled: false,
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => const SubscriptionTermsScreen()),
+            ),
+          ),
           const SizedBox(height: 16),
+          const Text('WORDS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12)),
+          const SizedBox(height: 8),
+          const _SampleWords(),
+          const SizedBox(height: 18),
           const Text('YOUR OWNED WORDS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12)),
           const SizedBox(height: 8),
           const _OwnedList(),
@@ -39,11 +63,11 @@ class BazaarScreen extends StatelessWidget {
     );
     if (embedded) return listening;
     return EconomyPage(
-      title: 'NowssB Earn — Resell',
+      title: 'Resell',
       banner: ColoredSplitPromoBanner(
         margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
         spec: SplitPromoSpec(
-          title: 'NowssB Earn\nResell',
+          title: 'Resell',
           cta: 'Browse listings',
           leftColor: const Color(0xFF3D2914),
           rightColor: const Color(0xFFE07A3D),
@@ -135,6 +159,61 @@ class _ListCardState extends State<_ListCard> {
   }
 }
 
+class _SampleWords extends StatelessWidget {
+  const _SampleWords();
+
+  static const _words = <(String, int)>[
+    ('Ananda', 99),
+    ('Prana', 99),
+    ('Tejas', 149),
+    ('Soma', 99),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        for (final word in _words)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+              decoration: BoxDecoration(
+                color: Colors.black,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: const Color(0x29FFFFFF)),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(word.$1, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+                        Text(
+                          'Original ${FxBook.instance.formatCents(word.$2)} · list ${FxBook.instance.formatCents((word.$2 * 0.5).round())}–${FxBook.instance.formatCents((word.$2 * 1.5).round())}',
+                          style: const TextStyle(color: NwsbColors.mist, fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () => runPrivate(context, () async {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Own ${word.$1} before you list it.')),
+                      );
+                    }),
+                    child: const Text('List'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
 class _LiveListings extends StatelessWidget {
   const _LiveListings();
 
@@ -148,19 +227,12 @@ class _LiveListings extends StatelessWidget {
           .limit(40)
           .snapshots(),
       builder: (context, snap) {
-        if (snap.hasError) {
-          return const EconomyNote('Live listings did not load. Pull back in a moment.');
-        }
         final docs = snap.data?.docs ?? [];
-        if (docs.isEmpty) {
-          return const Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              EconomyNote('No live listings yet. A listing shows the word, the seller’s price, and a Play buy button.'),
-              SizedBox(height: 8),
-              Text('Sample · a word you already own', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
-              Text('Price stays between 50% and 150% of the original.', style: TextStyle(color: NwsbColors.mist, fontSize: 12)),
-            ],
+        if (snap.hasError || docs.isEmpty) {
+          return EconomyNote(
+            snap.hasError
+                ? 'Listings are quiet right now. The words above are still here to list once you own them.'
+                : 'No live listings yet. Own a word, then list it between half and one and a half times the original price.',
           );
         }
         return Column(

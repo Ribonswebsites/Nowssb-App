@@ -16,6 +16,7 @@ import '../features/earn/earnings_screen.dart';
 import '../features/economy/economy_api.dart';
 import '../features/economy/economy_theme.dart';
 import '../features/economy/money.dart';
+import '../features/gifts/gifts_screen.dart';
 import '../features/vault/vault_screen.dart';
 import '../data/practice_progress.dart';
 import '../shell/nav_shell.dart';
@@ -487,7 +488,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         SectionBlock(
           marginBottom: 18,
-          title: 'Referrals',
+          title: 'NowssB Earn',
           child: GlassCard(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
             child: InkWell(
@@ -498,6 +499,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Text(tier, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: _accent)),
                   const SizedBox(height: 6),
                   Text('$code · $refs paid referrals', style: const TextStyle(fontSize: 12.5, color: _dim)),
+                ],
+              ),
+            ),
+          ),
+        ),
+        SectionBlock(
+          marginBottom: 18,
+          title: 'Gifts',
+          child: GlassCard(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+            child: InkWell(
+              onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const GiftsScreen())),
+              child: const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Send or redeem', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: _accent)),
+                  SizedBox(height: 6),
+                  Text('A real purchase, shared as a code', style: TextStyle(fontSize: 12.5, color: _dim)),
                 ],
               ),
             ),

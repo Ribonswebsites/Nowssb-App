@@ -18,8 +18,11 @@ assert.strictEqual(split.platform, 10);
 assert.strictEqual(split.royalty, 3);
 assert.strictEqual(split.seller, 87);
 
-assert.strictEqual(e.circleTier(5).rate, 0.2);
-assert.strictEqual(e.circleTier(100).rate, 0.35);
+assert.strictEqual(e.agentTier(0).rate, 0.1);
+assert.strictEqual(e.agentTier(100).name, 'Rising Agent');
+assert.strictEqual(e.agentTier(1000).rate, 0.3);
+assert.strictEqual(e.netOfStoreFee(1000), 850);
+assert.strictEqual(Math.round(e.netOfStoreFee(1000) * e.agentTier(1000).rate), 255);
 assert.strictEqual(e.sellerTier(1000).platformCut, 0.1);
 assert.ok(e.loginMultiplier(30) <= 2);
 assert.strictEqual(e.streakBonus(20), 40);

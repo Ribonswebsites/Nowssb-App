@@ -18,6 +18,7 @@ void main() {
             children: const [
               EarnUmbrellaSection(),
               YourRewardsSection(),
+              GiftsHomeSection(),
             ],
           ),
         ),
@@ -25,12 +26,11 @@ void main() {
     );
     await tester.pump();
 
-    expect(find.text('NowssB Earn'), findsOneWidget);
-    expect(find.text('Rewards, referrals, resell'), findsOneWidget);
-    expect(find.text('Rewards'), findsWidgets);
-    expect(find.text('Referrals'), findsWidgets);
-    expect(find.text('Resell'), findsWidgets);
-    expect(find.text('Your Rewards'), findsOneWidget);
+    expect(find.text('NowssB Earn'), findsWidgets);
+    expect(find.text('Agents, codes, commission'), findsOneWidget);
+    expect(find.text('Become an agent'), findsOneWidget);
+    expect(find.text('NowssB Rewards'), findsWidgets);
+    expect(find.text('NowssB Gifts'), findsWidgets);
     expect(find.text('Sign in to see your rewards'), findsOneWidget);
     expect(find.text('Networking'), findsNothing);
     expect(find.text('Circle'), findsNothing);

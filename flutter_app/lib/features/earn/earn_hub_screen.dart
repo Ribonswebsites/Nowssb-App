@@ -10,6 +10,7 @@ import '../economy/economy_theme.dart';
 import '../economy/money.dart';
 import 'earnings_screen.dart';
 import '../social/echo_wall_screen.dart';
+import '../gifts/gifts_screen.dart';
 import '../vault/vault_screen.dart';
 import '../wordprint/word_print_screen.dart';
 import '../../screens/nwsb_sign_in_sheet.dart';
@@ -26,7 +27,7 @@ class EarnHubScreen extends StatelessWidget {
         margin: EdgeInsets.fromLTRB(16, 0, 16, 8),
         spec: SplitPromoSpec(
           title: 'NowssB Earn',
-          cta: 'Rewards, referrals, resell',
+          cta: 'Agents, rewards, gifts',
           leftColor: Color(0xFF2A1B4D),
           rightColor: Color(0xFFC8A96E),
           art: SplitPromoArts.egyptianGold,
@@ -55,11 +56,13 @@ class EarnHubScreen extends StatelessWidget {
               const SizedBox(height: 8),
               const EconomyNote('This page is only yours. Coin and cash balances are not on the public Word Print.'),
               const SizedBox(height: 14),
-              GoldButton(label: 'Rewards', onTap: () => _open(context, const VaultScreen())),
+              GoldButton(label: 'NowssB Earn', onTap: () => _open(context, const CircleScreen())),
+              const SizedBox(height: 8),
+              GoldButton(label: 'Rewards', filled: false, onTap: () => _open(context, const VaultScreen())),
+              const SizedBox(height: 8),
+              GoldButton(label: 'Gifts', filled: false, onTap: () => _open(context, const GiftsScreen())),
               const SizedBox(height: 8),
               GoldButton(label: 'Resell', filled: false, onTap: () => _open(context, const BazaarScreen())),
-              const SizedBox(height: 8),
-              GoldButton(label: 'Referrals', filled: false, onTap: () => _open(context, const CircleScreen())),
               const SizedBox(height: 8),
               GoldButton(label: 'Word Print', filled: false, onTap: () => _open(context, WordPrintScreen(uid: w.uid))),
               const SizedBox(height: 8),

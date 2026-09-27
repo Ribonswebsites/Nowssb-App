@@ -16,11 +16,10 @@ import '../data/content.dart';
 import '../screens/app_settings.dart';
 import '../features/bazaar/bazaar_screen.dart';
 import '../features/circle/circle_screen.dart';
-import '../features/earn/earn_hub_screen.dart';
 import '../features/earn/earnings_screen.dart';
 import '../features/notifications/inbox_screen.dart';
 import '../features/social/echo_wall_screen.dart';
-import '../features/vault/vault_screen.dart';
+import '../features/gifts/gifts_screen.dart';
 import '../features/wordprint/word_print_screen.dart';
 import '../screens/notifications_settings.dart';
 import '../screens/progress/progress_screen.dart';
@@ -346,29 +345,29 @@ class HomeMenuDrawer extends StatelessWidget {
                             light: light,
                             mark: NwsbMarks.earn,
                             label: 'NowssB Earn',
-                            sub: 'Coins, payout, plans',
-                            onTap: () => _push(context, const EarnHubScreen()),
+                            sub: 'Agents, codes, commission',
+                            onTap: () => _push(context, const CircleScreen()),
                           ),
                           _Row(
                             light: light,
                             mark: NwsbMarks.earn,
-                            label: 'NowssB Earn — Rewards',
-                            sub: 'Daily coins and quests',
+                            label: 'NowssB Rewards',
+                            sub: 'Daily coins, quests, one invite',
                             onTap: () => _push(context, const VaultScreen()),
                           ),
                           _Row(
                             light: light,
                             mark: NwsbMarks.bag,
-                            label: 'NowssB Earn — Resell',
-                            sub: 'Listings inside the Store',
-                            onTap: () => _push(context, const BazaarScreen()),
+                            label: 'NowssB Gifts',
+                            sub: 'Send or redeem a real purchase',
+                            onTap: () => _push(context, const GiftsScreen()),
                           ),
                           _Row(
                             light: light,
-                            mark: NwsbMarks.verified,
-                            label: 'NowssB Earn — Referrals',
-                            sub: 'Codes and commission',
-                            onTap: () => _push(context, const CircleScreen()),
+                            mark: NwsbMarks.bag,
+                            label: 'Resell',
+                            sub: 'Listings inside the Store',
+                            onTap: () => _push(context, const BazaarScreen()),
                           ),
                           _Row(
                             light: light,

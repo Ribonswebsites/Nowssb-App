@@ -12,6 +12,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 import '../data/earn_wallet.dart';
 import '../data/firebase.dart';
+import '../widgets/brand_top_banner.dart';
 import '../widgets/login_gallery.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import '../widgets/app_thinking_loader.dart';
@@ -271,7 +272,18 @@ class _AuthGateState extends State<AuthGate> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _brandHeader(),
+          const BrandTopBanner(bare: true, compact: true),
+          const SizedBox(height: 10),
+          const Text(
+            'Natural Origin Word Science',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Color(0x99FFFFFF),
+              fontSize: 10,
+              letterSpacing: 1.6,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
           const SizedBox(height: 14),
           const Text(
             'Welcome back',
@@ -338,47 +350,6 @@ class _AuthGateState extends State<AuthGate> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _brandHeader() {
-    return Column(
-      children: [
-        ClipOval(
-          child: Image.asset(
-            'assets/icons/logo-disc.webp',
-            width: 54,
-            height: 54,
-            fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => const SizedBox(width: 54, height: 54),
-          ),
-        ),
-        const SizedBox(height: 10),
-        const FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Text(
-            'NOWSSB',
-            maxLines: 1,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 28,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 2,
-            ),
-          ),
-        ),
-        const SizedBox(height: 6),
-        const Text(
-          'Natural Origin Word Science',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: Color(0x99FFFFFF),
-            fontSize: 10,
-            letterSpacing: 1.6,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
     );
   }
 

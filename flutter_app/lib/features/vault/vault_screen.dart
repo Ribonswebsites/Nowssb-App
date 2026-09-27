@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../theme/tokens.dart';
 import '../economy/economy_api.dart';
@@ -12,11 +13,11 @@ class VaultScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return EconomyPage(
-      title: 'NowssB Earn — Rewards',
+      title: 'NowssB Rewards',
       banner: ColoredSplitPromoBanner(
         margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
         spec: SplitPromoSpec(
-          title: 'NowssB Earn\nRewards',
+          title: 'NowssB Rewards',
           cta: 'Claim today’s coins',
           leftColor: const Color(0xFF2A1B4D),
           rightColor: const Color(0xFFC8A96E),
@@ -35,6 +36,27 @@ class VaultScreen extends StatelessWidget {
               const SizedBox(height: 12),
               const EconomyNote(
                 'Coins are earned. They cover at most 30% of a Play purchase. They cannot be bought, gifted, or cashed out.',
+              ),
+              const SizedBox(height: 12),
+              const EconomyNote(
+                'Invite a friend once. If they subscribe, you get one free month when you have no plan, or coins when you already do. No tiers and no ongoing percent — that lives in NowssB Earn.',
+              ),
+              const SizedBox(height: 8),
+              GoldButton(
+                label: 'Copy friend invite',
+                filled: false,
+                onTap: () async {
+                  final code = w.code;
+                  final text = code.isEmpty
+                      ? 'Practice with me on NowssB.'
+                      : 'Practice with me on NowssB. Friend invite $code';
+                  await Clipboard.setData(ClipboardData(text: text));
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Friend invite copied.')),
+                    );
+                  }
+                },
               ),
               const SizedBox(height: 18),
               GoldButton(

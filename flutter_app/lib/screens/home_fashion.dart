@@ -403,6 +403,8 @@ class _HomeFashionState extends State<HomeFashion> {
             const EarnUmbrellaSection(),
             const SizedBox(height: 16),
             const YourRewardsSection(),
+            const SizedBox(height: 16),
+            const GiftsHomeSection(),
           ],
         )),
         ('subvid', const SizedBox.shrink()),

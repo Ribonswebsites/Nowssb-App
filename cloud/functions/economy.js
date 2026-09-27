@@ -92,13 +92,23 @@ function sellerTier(sold) {
   return { name: 'Seller', platformCut: 0.2, next: 100 };
 }
 
-function circleTier(paid) {
-  const n = Math.round(paid || 0);
-  if (n >= 100) return { name: 'Platinum', rate: 0.35, next: 100 };
-  if (n >= 50) return { name: 'Gold', rate: 0.3, next: 100 };
-  if (n >= 20) return { name: 'Silver', rate: 0.25, next: 50 };
-  if (n >= 5) return { name: 'Bronze', rate: 0.2, next: 20 };
-  return { name: 'Member', rate: 0, next: 5 };
+function agentTier(units) {
+  const n = Math.round(units || 0);
+  if (n >= 1000) return { name: 'Master Agent', rate: 0.3, next: 1000 };
+  if (n >= 500) return { name: 'Elite Agent', rate: 0.25, next: 1000 };
+  if (n >= 300) return { name: 'Pro Agent', rate: 0.2, next: 500 };
+  if (n >= 100) return { name: 'Rising Agent', rate: 0.15, next: 300 };
+  return { name: 'Starter Agent', rate: 0.1, next: 100 };
+}
+
+function circleTier(units) {
+  return agentTier(units);
+}
+
+const PLAY_FEE = 0.15;
+
+function netOfStoreFee(gross) {
+  return Math.max(0, Math.round(Math.round(gross) * (1 - PLAY_FEE)));
 }
 
 function priceBand(original, asked) {
@@ -174,6 +184,8 @@ module.exports = {
   streakBonus,
   sellerTier,
   circleTier,
+  agentTier,
+  netOfStoreFee,
   priceBand,
   splitSale,
   purchaseCoinBack,

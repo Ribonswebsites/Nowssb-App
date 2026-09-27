@@ -1,17 +1,36 @@
 import 'package:flutter/material.dart';
 
+import 'nwsb_icon.dart';
+
 /// Black home / menu banner: logo and NowssB on the left, portrait on the right.
 class BrandTopBanner extends StatelessWidget {
-  const BrandTopBanner({super.key, this.onTap, this.compact = false});
+  const BrandTopBanner({
+    super.key,
+    this.onTap,
+    this.compact = false,
+    this.bare = false,
+    this.title = 'NowssB',
+    this.mark,
+  });
 
   final VoidCallback? onTap;
   final bool compact;
 
+  /// No outer page inset — for use inside a glass card or a sheet.
+  final bool bare;
+  final String title;
+
+  /// When set, a white circle with this SVG replaces the disc logo.
+  final String? mark;
+
   @override
   Widget build(BuildContext context) {
     final h = compact ? 78.0 : 96.0;
+    final disc = compact ? 40.0 : 48.0;
     return Padding(
-      padding: EdgeInsets.fromLTRB(16, compact ? 8 : 12, 16, 8),
+      padding: bare
+          ? EdgeInsets.zero
+          : EdgeInsets.fromLTRB(16, compact ? 8 : 12, 16, 8),
       child: Material(
         color: const Color(0xFF000000),
         borderRadius: BorderRadius.circular(18),
@@ -23,29 +42,38 @@ class BrandTopBanner extends StatelessWidget {
             child: Row(
               children: [
                 const SizedBox(width: 14),
-                ClipOval(
-                  child: Image.asset(
-                    'assets/icons/logo-disc.webp',
-                    width: compact ? 40 : 48,
-                    height: compact ? 40 : 48,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => SizedBox(
-                      width: compact ? 40 : 48,
-                      height: compact ? 40 : 48,
+                if (mark != null)
+                  Container(
+                    width: disc,
+                    height: disc,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    alignment: Alignment.center,
+                    child: NwsbIcon(mark!, size: disc * 0.46, color: Colors.black),
+                  )
+                else
+                  ClipOval(
+                    child: Image.asset(
+                      'assets/icons/logo-disc.webp',
+                      width: disc,
+                      height: disc,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => SizedBox(width: disc, height: disc),
                     ),
                   ),
-                ),
                 const SizedBox(width: 12),
-                const Expanded(
+                Expanded(
                   child: Text(
-                    'NowssB',
+                    title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 26,
+                      fontSize: 22,
                       fontWeight: FontWeight.w800,
-                      letterSpacing: 0.6,
+                      letterSpacing: 0.2,
                       height: 1,
                     ),
                   ),

@@ -12,6 +12,7 @@ import '../data/settings.dart';
 import '../theme/player_aura.dart';
 import '../widgets/colored_split_promo_banner.dart';
 import 'player_settings.dart';
+import 'sound_settings_sheet.dart';
 
 class PlayerDial extends StatefulWidget {
   const PlayerDial({
@@ -355,7 +356,7 @@ class _PlayerDialState extends State<PlayerDial> with SingleTickerProviderStateM
                         Icons.tune,
                         'EQUALIZER',
                         _eqLabel.toUpperCase(),
-                        () => _choose('Equalizer', _eqOptions, _eqLabel, _setEq),
+                        () => showSoundSettingsSheet(context),
                       ),
                       _row(
                         Icons.graphic_eq,

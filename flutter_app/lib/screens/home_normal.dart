@@ -400,6 +400,8 @@ class _HomeNormalState extends State<HomeNormal> {
               const EarnUmbrellaSection(),
               const SizedBox(height: 16),
               const YourRewardsSection(),
+              const SizedBox(height: 16),
+              const GiftsHomeSection(),
             ],
           ),
         ),

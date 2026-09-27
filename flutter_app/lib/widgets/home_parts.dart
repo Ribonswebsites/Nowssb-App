@@ -386,14 +386,15 @@ class SecBanner extends StatelessWidget {
                         color: Colors.white),
                   ),
                   const SizedBox(height: 2),
-                  GentleMarqueeText(
+                  Text(
                     sub,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 12,
                       color: Color(0x8CFFFFFF),
                       height: 1.35,
                     ),
-                    duration: const Duration(milliseconds: 4200),
                   ),
                 ],
               ),

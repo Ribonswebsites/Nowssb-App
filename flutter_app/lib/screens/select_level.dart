@@ -33,6 +33,7 @@ class _SelectLevelScreenState extends State<SelectLevelScreen> {
     return Scaffold(
       backgroundColor: kPlayerAuraBg,
       body: PlayerAuraBackdrop(
+        film: kPlayerPageFilm,
         child: SafeArea(
         child: Center(
           child: SingleChildScrollView(
