@@ -24,6 +24,7 @@ import '../features/economy/economy_api.dart';
 import '../data/models.dart';
 import '../data/practice_progress.dart';
 import '../media/nwsb_video.dart';
+import '../media/onboarding_warmup.dart';
 import '../media/video_pool.dart';
 import '../widgets/app_thinking_loader.dart';
 import '../widgets/tv_frame.dart';
@@ -171,6 +172,10 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       final guideSeen = prefs.getBool(kPlayerGuideSeenKey) ?? false;
       final introSeen = prefs.getBool(kPlayerIntroSeenKey) ?? false;
       if (!mounted) return;
+      // Decode the setup pages' pictures before they are shown. Normally the
+      // splash already did; this covers an evicted cache.
+      if (!guideSeen) unawaited(OnboardingWarmup.playerGuide(context));
+      if (!introSeen) unawaited(OnboardingWarmup.playerIntro(context));
       setState(() {
         _guideDone = guideSeen;
         _introDone = introSeen;

@@ -116,8 +116,11 @@ jobs:
         continue-on-error: true
         run: flutter test
 
+      # Phones only: arm64 + 32-bit arm. The x86/x86_64 debug engines were
+      # emulator-only weight in every download. Still one universal
+      # app-debug.apk, which the publish step below relies on.
       - name: Build
-        run: flutter build apk --debug --dart-define=NWSB_BUILD_NUMBER=${{ github.run_number }}
+        run: flutter build apk --debug --target-platform android-arm,android-arm64 --dart-define=NWSB_BUILD_NUMBER=${{ github.run_number }}
 
       - name: Commit verified Practice Lab UI
         working-directory: .

@@ -12,20 +12,30 @@ import '../theme/player_aura.dart';
 
 /// Same rotating stills as `PI_ART` in app/js/part004.js.
 const kPlayerIntroArt = <String>[
-  'https://media.nowssb.com/migrated-images/177c353c491b0de9_file_00000000210881fabda4b62a827e2b7d_shsdnw.png',
-  'https://media.nowssb.com/migrated-images/1208f305864e171f_file_000000005c28820693e31425ac03a99a_myqo9z.png',
-  'https://media.nowssb.com/migrated-images/d45a2ad961881f1a_file_00000000fbb481fa897d6c4b800c7abc_x0fmja.png',
-  'https://media.nowssb.com/migrated-images/0a886e63010f07db_file_0000000013088209a33ed2b6c15a7dfe_l6j2wf.png',
-  'https://media.nowssb.com/migrated-images/0bcdf699fbd0626d_file_00000000868081fa8048698268ae60bb_rw97tp.png',
-  'https://media.nowssb.com/migrated-images/d9d911700ddae27c_file_00000000112882069935a3c4bce3b4ca_r6awjq.png',
-  'https://media.nowssb.com/migrated-images/1e84950d507185ec_file_00000000fdb08207a6e3e5e768f47448_apuryf.png',
-  'https://media.nowssb.com/migrated-images/583f4d21147adb19_file_00000000280082069ad442c609cdd790_ci1kbd.png',
+  // The same eight R2 paintings as PI_ART, bundled so
+  // the intro opens with its picture instead of waiting on a 2MB download.
+  'assets/player/intro/01.webp',
+  'assets/player/intro/02.webp',
+  'assets/player/intro/03.webp',
+  'assets/player/intro/04.webp',
+  'assets/player/intro/05.webp',
+  'assets/player/intro/06.webp',
+  'assets/player/intro/07.webp',
+  'assets/player/intro/08.webp',
 ];
 
 const _kArtIndexKey = 'nwsb_pi_art';
 
 /// Persist so PlayerIntroScreen shows once per install.
 const kPlayerIntroSeenKey = 'nwsb_player_intro_seen';
+
+/// The painting the next Player Intro will show — the same rotation
+/// [PlayerIntroScreen] advances — so it can be decoded ahead of time.
+String playerIntroNextArt(SharedPreferences prefs) {
+  final next =
+      ((prefs.getInt(_kArtIndexKey) ?? -1) + 1) % kPlayerIntroArt.length;
+  return kPlayerIntroArt[next];
+}
 
 class PlayerIntroScreen extends StatefulWidget {
   const PlayerIntroScreen({
@@ -48,7 +58,9 @@ class PlayerIntroScreen extends StatefulWidget {
 }
 
 class _PlayerIntroScreenState extends State<PlayerIntroScreen> {
-  String _art = kPlayerIntroArt.first;
+  /// Null for the instant before the rotation is read, so the intro never
+  /// flashes painting #1 before swapping to the one it actually picked.
+  String? _art;
 
   static const _descs = {
     'Morning':
@@ -72,11 +84,14 @@ class _PlayerIntroScreenState extends State<PlayerIntroScreen> {
   Future<void> _pickArt() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final next =
-          ((prefs.getInt(_kArtIndexKey) ?? -1) + 1) % kPlayerIntroArt.length;
-      await prefs.setInt(_kArtIndexKey, next);
-      if (mounted) setState(() => _art = kPlayerIntroArt[next]);
-    } catch (_) {}
+      final art = playerIntroNextArt(prefs);
+      if (mounted) setState(() => _art = art);
+      await prefs.setInt(_kArtIndexKey, kPlayerIntroArt.indexOf(art));
+    } catch (_) {
+      if (mounted && _art == null) {
+        setState(() => _art = kPlayerIntroArt.first);
+      }
+    }
   }
 
   String get _slot {
@@ -106,7 +121,12 @@ class _PlayerIntroScreenState extends State<PlayerIntroScreen> {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          NwsbImage(url: _art, fit: BoxFit.cover),
+          if (_art != null)
+            NwsbImage(
+              url: _art!,
+              fit: BoxFit.cover,
+              fallback: const ColoredBox(color: Color(0xFF060C18)),
+            ),
           const DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(

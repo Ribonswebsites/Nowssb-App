@@ -52,15 +52,18 @@ const FOLDERS = [
    player themes use https://nowssb.com/… and are NOT bundled. Posters that
    only live under flutter_app/assets/videos/ are left alone. */
 const VIDEOS_ALLOWLIST = [
-  '09a50041065bdeab_grok_video_2026-07-30-14-54-07_ddjmrr.mp4',
-  '28eb0c85b5fd748e_grok_video_2026-07-24-15-42-55_lknomr.mp4',
-  '415dd447da33973b_grok_video_2026-07-30-14-35-05_q3tyzk.mp4',
-  '7e4d709136dc254a_grok_video_2026-07-18-15-53-02_ubjx5b.mp4',
-  'beaf11ea10561d43_grok_video_2026-07-30-15-35-40_xwm1ei.mp4',
+  // Only clips the Flutter code names under assets/videos/. The other
+  // grok clips it plays are referenced from assets/video/ — listing them
+  // here too shipped every one of them twice.
   '1e9a0c8d452a809f_grok_video_2026-05-06-15-27-23_zhylbe.mp4',
 ];
 
 const KEEP = /\.(mp4|webp|png|jpe?g|svg)$/i;
+
+// Website favicons, launcher-icon sources and notification icons. Tools
+// read them from the root assets/icons/ directly; no Flutter screen names
+// them, so copying them only added dead weight to the APK.
+const ICON_SKIP = /^(admin-|app-icon-|notif-)/;
 
 let copied = 0, skipped = 0, bytes = 0;
 
@@ -82,6 +85,7 @@ function copyDir(rel) {
     const s = statSync(src);
     if (s.isDirectory()) { copyDir(join(rel, name)); continue; }
     if (!KEEP.test(name)) continue;
+    if (rel === 'icons' && ICON_SKIP.test(name)) continue;
 
     const dst = join(to, name);
     if (existsSync(dst) && lstatSync(dst).isSymbolicLink()) {

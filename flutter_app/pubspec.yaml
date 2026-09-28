@@ -68,7 +68,6 @@ flutter:
     # Every clip and its poster, on the phone after the download.
     - assets/video/
     - assets/videos/
-    - assets/healing/
 
     # The app's own artwork and Store intro-page paintings.
     - assets/frames/
@@ -78,13 +77,14 @@ flutter:
     - assets/store/
     - assets/meanings/
     - assets/ebooks/
-    - assets/profile/
     - assets/profile_source/
     - assets/routine/
     - assets/store/collections/
     - assets/store/store-rotator/
     - assets/fashion/
     - assets/player/
+    - assets/player/guide/
+    - assets/player/intro/
     - assets/signature/
     - assets/certificates/
     - assets/banners/

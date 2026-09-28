@@ -12,6 +12,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../data/practice_progress.dart';
 import '../data/settings.dart';
+import '../media/onboarding_warmup.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 import '../widgets/black_glass_banner.dart';
@@ -395,12 +396,18 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                               icon: Icons.menu_book_outlined,
                               title: 'Player Guide',
                               sub: 'Replay the player setup pages',
-                              onTap: () => _push(
-                                PlayerGuideScreen(
-                                  onDone: () =>
-                                      Navigator.of(context).maybePop(),
-                                ),
-                              ),
+                              onTap: () {
+                                // Decode the opening slide and orb badges
+                                // during the route transition.
+                                OnboardingWarmup.playerGuide(context,
+                                    firstOnly: true);
+                                _push(
+                                  PlayerGuideScreen(
+                                    onDone: () =>
+                                        Navigator.of(context).maybePop(),
+                                  ),
+                                );
+                              },
                             ),
                           if (_match('Hero header'))
                             _NavRow(

@@ -80,6 +80,20 @@ class _IntroGateState extends State<IntroGate> {
     Settings.instance.addListener(_onSettings);
   }
 
+  String? _warmedArt;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // The gate is built inside the tab shell before it is looked at, so
+    // decoding its painting here means it is already there when shown.
+    final art = widget.art;
+    if (art != null && art != _warmedArt) {
+      _warmedArt = art;
+      precacheImage(AssetImage(art), context, onError: (_, __) {});
+    }
+  }
+
   @override
   void dispose() {
     Settings.instance.removeListener(_onSettings);
@@ -155,7 +169,9 @@ class _Intro extends StatelessWidget {
         children: [
           const AppBackdrop(),
           if (art != null && fullBleed)
-            Positioned.fill(child: Image.asset(art!, fit: BoxFit.cover))
+            Positioned.fill(
+              child: Image.asset(art!, fit: BoxFit.cover, gaplessPlayback: true),
+            )
           else if (art != null)
             Positioned(
               top: 78,
@@ -167,6 +183,7 @@ class _Intro extends StatelessWidget {
                 child: Image.asset(
                   art!,
                   fit: BoxFit.cover,
+                  gaplessPlayback: true,
                   errorBuilder: (_, __, ___) => const SizedBox.shrink(),
                 ),
               ),

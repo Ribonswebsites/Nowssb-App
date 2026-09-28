@@ -56,6 +56,11 @@ Future<void> showStoreSelectSheet(
   required ValueChanged<String> onSelect,
   String? current,
 }) {
+  // Decode the four picker paintings while the sheet slides up, so the
+  // tiles land painted rather than on their loader.
+  for (final e in kStoreSelectEntries) {
+    precacheImage(AssetImage(e.art), context, onError: (_, __) {});
+  }
   return showModalBottomSheet<void>(
     context: context,
     backgroundColor: Colors.transparent,

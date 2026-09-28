@@ -6,11 +6,14 @@
 /// Begin pill as the website walkthrough.
 library;
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../media/nwsb_image.dart';
+import '../media/onboarding_warmup.dart';
 
 const kPlayerGuideSeenKey = 'nwsb_player_guide_seen';
 
@@ -46,7 +49,7 @@ const kPlayerGuideSlides = <PlayerGuideSlide>[
   PlayerGuideSlide(
     title: 'NowssB Player Guide',
     icon: _kBrand,
-    img: 'assets/player/guide/01.png',
+    img: 'assets/player/guide/01.webp',
     heading: 'Welcome to Your Practice Player',
     desc:
         'This is where you listen to, pronounce and master every word in your daily routine. Let’s walk through exactly how it works — button by button.',
@@ -54,7 +57,7 @@ const kPlayerGuideSlides = <PlayerGuideSlide>[
   PlayerGuideSlide(
     title: 'Player Listen',
     icon: _kListenIcon,
-    img: 'assets/player/guide/02.png',
+    img: 'assets/player/guide/02.webp',
     heading: 'Listen & Navigate',
     desc:
         'Tap the centre Play button to hear the word pronounced aloud. Use the arrows on either side to move to the Previous or Next word, and tap Replay anytime to hear it again.',
@@ -62,7 +65,7 @@ const kPlayerGuideSlides = <PlayerGuideSlide>[
   PlayerGuideSlide(
     title: 'Player Record',
     icon: _kPracticeIcon,
-    img: 'assets/player/guide/03.png',
+    img: 'assets/player/guide/03.webp',
     heading: 'Practice & Get Scored',
     desc:
         'Tap Practice to record your own voice saying the word. Each syllable lights up as you speak it, and you get an instant pronunciation score — the more you repeat, the more it builds your streak.',
@@ -70,7 +73,7 @@ const kPlayerGuideSlides = <PlayerGuideSlide>[
   PlayerGuideSlide(
     title: 'Player Library',
     icon: _kLibraryIcon,
-    img: 'assets/player/guide/04.png',
+    img: 'assets/player/guide/04.webp',
     heading: 'Build Your Library & Sentences',
     desc:
         'Tap the Library icon to open every word you’ve unlocked. Every word you purchase is added here automatically — combine them to build your own healing sentences, saved for practice anytime.',
@@ -78,7 +81,7 @@ const kPlayerGuideSlides = <PlayerGuideSlide>[
   PlayerGuideSlide(
     title: 'Player Settings',
     icon: _kSettingsIcon,
-    img: 'assets/player/guide/05.png',
+    img: 'assets/player/guide/05.webp',
     heading: 'Word Info & Player Settings',
     desc:
         'Tap the info icon to see the word’s meaning, the organ it benefits, and healing detail. Tap the settings gear to switch the voice (male or female), turn Loop on, or change your rep target.',
@@ -86,7 +89,7 @@ const kPlayerGuideSlides = <PlayerGuideSlide>[
   PlayerGuideSlide(
     title: 'Player Store',
     icon: _kStoreIcon,
-    img: 'assets/player/guide/06.png',
+    img: 'assets/player/guide/06.webp',
     heading: 'Grow Your Collection',
     desc:
         'Tap the Store icon anytime to buy new words and meanings — every purchase instantly joins your Library, so you can keep expanding your personal word ritual.',
@@ -94,7 +97,7 @@ const kPlayerGuideSlides = <PlayerGuideSlide>[
   PlayerGuideSlide(
     title: 'Signature Word',
     icon: _kStoreIcon,
-    img: 'assets/player/guide/07.png',
+    img: 'assets/player/guide/07.webp',
     heading: 'Unlock a Signature Word',
     desc:
         'Signature words are the rarest word in each category — one per set, own only in a special gold edition. Look for the Signature tag in the Store to add one to your collection.',
@@ -102,7 +105,7 @@ const kPlayerGuideSlides = <PlayerGuideSlide>[
   PlayerGuideSlide(
     title: 'Player Ready',
     icon: _kReadyIcon,
-    img: 'assets/player/guide/08.png',
+    img: 'assets/player/guide/08.webp',
     heading: 'You’re All Set',
     desc:
         'That’s everything you need to know. Tap Begin to start your first practice session.',
@@ -128,13 +131,19 @@ class _PlayerGuideScreenState extends State<PlayerGuideScreen> {
   void initState() {
     super.initState();
     _pages = PageController();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      for (final s in kPlayerGuideSlides) {
-        precacheImage(AssetImage(s.img), context);
-        precacheImage(AssetImage(s.icon), context);
-      }
-    });
+  }
+
+  var _warmed = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Usually a no-op: the splash (first run) or the row that opened this
+    // screen has already decoded these. If not, the first slide and the orb
+    // badges go first so the opening frame is complete, then the rest.
+    if (_warmed) return;
+    _warmed = true;
+    unawaited(OnboardingWarmup.playerGuide(context));
   }
 
   @override
@@ -211,6 +220,7 @@ class _PlayerGuideScreenState extends State<PlayerGuideScreen> {
                             url: s.img,
                             fit: BoxFit.cover,
                             alignment: Alignment.topCenter,
+                            fallback: const ColoredBox(color: _navy),
                           ),
                           const DecoratedBox(
                             decoration: BoxDecoration(

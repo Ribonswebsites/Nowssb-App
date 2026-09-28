@@ -32,6 +32,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
+import '../media/onboarding_warmup.dart';
+
 class Splash extends StatefulWidget {
   const Splash({super.key, required this.onDone});
 
@@ -58,6 +60,15 @@ class _SplashState extends State<Splash> {
     _start();
     // Only until the real duration is known — see _start.
     _ceiling = Timer(const Duration(seconds: 20), _leave);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // The splash runs for several seconds with nothing else decoding — the
+    // moment to get the Player Guide / Intro pictures into the image cache
+    // so a first-run user never sees those pages blank. Runs once.
+    unawaited(OnboardingWarmup.atLaunch(context));
   }
 
   Future<void> _start() async {
