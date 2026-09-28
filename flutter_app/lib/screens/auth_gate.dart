@@ -7,16 +7,14 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/earn_wallet.dart';
 import '../data/firebase.dart';
-import '../widgets/brand_top_banner.dart';
-import '../widgets/login_gallery.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import '../widgets/app_thinking_loader.dart';
-import '../admin/template/editable.dart';
+import '../widgets/login_stage.dart';
 
 class AuthGate extends StatefulWidget {
   const AuthGate({super.key, required this.child});
@@ -36,7 +34,6 @@ class _AuthGateState extends State<AuthGate> {
   final _email = TextEditingController();
   final _password = TextEditingController();
   final _phone = TextEditingController();
-  final _smsCode = TextEditingController();
   static const _googleWebClientId =
       '1024709686012-h1h9glk84uti9cbqpht5d09igdqb8pgu.apps.googleusercontent.com';
   final _google = GoogleSignIn(
@@ -46,11 +43,12 @@ class _AuthGateState extends State<AuthGate> {
 
   bool _busy = false;
   bool _createAccount = false;
-  bool _showEmail = false;
-  bool _showPhone = false;
   bool _guest = false;
+  bool _remember = true;
+  bool _obscure = true;
   String? _rewardedUid;
   String? _error;
+  String? _notice;
   String? _verificationId;
   int? _resendToken;
 
@@ -58,6 +56,21 @@ class _AuthGateState extends State<AuthGate> {
   void initState() {
     super.initState();
     AuthGate.reopen.addListener(_leaveGuest);
+    _loadRemember();
+  }
+
+  Future<void> _loadRemember() async {
+    final prefs = await SharedPreferences.getInstance();
+    final remember = prefs.getBool('nwsb.rememberMe') ?? true;
+    if (mounted) setState(() => _remember = remember);
+    if (!remember && NwsbFirebase.ready) {
+      await FirebaseAuth.instance.signOut();
+    }
+  }
+
+  Future<void> _saveRemember() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('nwsb.rememberMe', _remember);
   }
 
   void _leaveGuest() {
@@ -70,15 +83,16 @@ class _AuthGateState extends State<AuthGate> {
     _email.dispose();
     _password.dispose();
     _phone.dispose();
-    _smsCode.dispose();
     super.dispose();
   }
 
   Future<void> _run(Future<void> Function() action) async {
     if (_busy) return;
+    await _saveRemember();
     setState(() {
       _busy = true;
       _error = null;
+      _notice = null;
     });
     try {
       await action().timeout(
@@ -179,6 +193,8 @@ class _AuthGateState extends State<AuthGate> {
               _verificationId = verificationId;
               _resendToken = resendToken;
               _error = null;
+              _password.clear();
+              _notice = 'Code sent. Enter it and tap Verify.';
             });
           },
           codeAutoRetrievalTimeout: (verificationId) {
@@ -189,7 +205,7 @@ class _AuthGateState extends State<AuthGate> {
 
   Future<void> _verifyPhoneCode() => _run(() async {
         final verificationId = _verificationId;
-        final code = _smsCode.text.trim();
+        final code = _password.text.trim();
         if (verificationId == null) {
           throw const _AuthMessage('Request a verification code first.');
         }
@@ -256,291 +272,74 @@ class _AuthGateState extends State<AuthGate> {
     }
   }
 
+  Future<void> _submit() async {
+    final raw = _email.text.trim();
+    if (!raw.contains('@') && _verificationId != null) {
+      await _verifyPhoneCode();
+      return;
+    }
+    if (raw.contains('@')) {
+      await _emailLogin();
+      return;
+    }
+    _phone.text = raw;
+    await _sendPhoneCode();
+  }
+
+  Future<void> _appleLogin() => _run(() async {
+        if (!NwsbFirebase.ready) {
+          throw const _AuthMessage(
+            'Apple sign-in is not configured in this build.',
+          );
+        }
+        final provider = AppleAuthProvider()
+          ..addScope('email')
+          ..addScope('name');
+        await FirebaseAuth.instance.signInWithProvider(provider);
+      });
+
+  Future<void> _forgot() => _run(() async {
+        if (!NwsbFirebase.ready) {
+          throw const _AuthMessage(
+            'Password reset is unavailable until Firebase is configured in this build.',
+          );
+        }
+        final email = _email.text.trim();
+        if (!email.contains('@')) {
+          throw const _AuthMessage('Enter the email on your account.');
+        }
+        await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+        if (mounted) {
+          setState(() => _notice = 'Reset link sent. Check your email.');
+        }
+      });
+
   Widget _buildAuthScreen({String? unavailable}) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: LoginGallery(
-        child: _glassContent(unavailable: unavailable),
-      ),
-    );
-  }
-
-  Widget _glassContent({String? unavailable}) {
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(18, 18, 18, 14),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const BrandTopBanner(bare: true, compact: true),
-          const SizedBox(height: 10),
-          const EditableLabel('auth_gate.AuthGate',
-            'Natural Origin Word Science',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Color(0x99FFFFFF),
-              fontSize: 10,
-              letterSpacing: 1.6,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 14),
-          const EditableLabel('auth_gate.AuthGate',
-            'Welcome back',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white70,
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 14),
-          _googleButton(),
-          _orDivider(),
-          _methodButton(
-            icon: Icons.email_outlined,
-            label: 'Continue with Email',
-            open: _showEmail,
-            onTap: () => setState(() {
-              _showEmail = !_showEmail;
-              if (_showEmail) _showPhone = false;
-              _error = null;
-            }),
-          ),
-          if (_showEmail) _emailForm(),
-          const SizedBox(height: 10),
-          _methodButton(
-            icon: Icons.phone_iphone_outlined,
-            label: 'Continue with Phone',
-            open: _showPhone,
-            onTap: () => setState(() {
-              _showPhone = !_showPhone;
-              if (_showPhone) _showEmail = false;
-              _error = null;
-            }),
-          ),
-          if (_showPhone) _phoneForm(),
-          if (unavailable != null) ...[
-            const SizedBox(height: 12),
-            Text(
-              unavailable,
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: Color(0xFFFFB4AB), fontSize: 11, height: 1.35),
-            ),
-          ],
-          if (_error != null) ...[
-            const SizedBox(height: 12),
-            Text(
-              _error!,
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: Color(0xFFFFB4AB), fontSize: 11, height: 1.35),
-            ),
-          ],
-          const SizedBox(height: 8),
-          TextButton(
-            onPressed: _busy ? null : () => setState(() => _guest = true),
-            style: TextButton.styleFrom(
-              foregroundColor: const Color(0xFFD4AF37),
-              padding: const EdgeInsets.symmetric(vertical: 10),
-            ),
-            child: const EditableLabel('auth_gate.AuthGate',
-              'Explore without account →',
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, letterSpacing: 0.2),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _googleButton() {
-    return _whiteButton(
-      onPressed: _busy ? null : _googleLogin,
-      child: _busy
-          ? const Center(
-              child: AppThinkingLoader(
-                  size: 28, state: OrbState.solving, circlePad: 6))
-          : const Row(
-              children: [
-                _GoogleMark(),
-                SizedBox(width: 12),
-                Expanded(
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: Alignment.centerLeft,
-                    child: EditableLabel('auth_gate.AuthGate', 'Continue with Google'),
-                  ),
-                ),
-              ],
-            ),
-    );
-  }
-
-  Widget _methodButton({
-    required IconData icon,
-    required String label,
-    required bool open,
-    required VoidCallback onTap,
-  }) {
-    return _whiteButton(
-      onPressed: _busy ? null : onTap,
-      child: Row(
-        children: [
-          Icon(icon, size: 20),
-          const SizedBox(width: 12),
-          Expanded(child: EditableLabel('auth_gate.AuthGate', label)),
-          Icon(open ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-              size: 20),
-        ],
-      ),
-    );
-  }
-
-  Widget _whiteButton(
-      {required VoidCallback? onPressed, required Widget child}) {
-    return SizedBox(
-      height: 52,
-      child: FilledButton(
-        onPressed: onPressed,
-        style: FilledButton.styleFrom(
-          backgroundColor: const Color(0xFF000000),
-          foregroundColor: Colors.white,
-          disabledBackgroundColor: const Color(0xFF000000),
-          disabledForegroundColor: Colors.white54,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(28),
-            side: const BorderSide(color: Color(0x66FFFFFF)),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          textStyle: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600),
-        ),
-        child: child,
-      ),
-    );
-  }
-
-  Widget _orDivider() {
-    return const Padding(
-      padding: EdgeInsets.symmetric(vertical: 14),
-      child: Row(
-        children: [
-          Expanded(child: Divider(color: Colors.white24, height: 1)),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 14),
-            child: EditableLabel('auth_gate.AuthGate', 'OR',
-                style: TextStyle(
-                    color: Colors.white38, fontSize: 10, letterSpacing: 2.4)),
-          ),
-          Expanded(child: Divider(color: Colors.white24, height: 1)),
-        ],
-      ),
-    );
-  }
-
-  Widget _emailForm() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 10),
-      child: Column(
-        children: [
-          _field(_email, 'Email address', keyboard: TextInputType.emailAddress),
-          const SizedBox(height: 10),
-          _field(_password, 'Password', obscure: true),
-          const SizedBox(height: 10),
-          SizedBox(
-            height: 48,
-            child: FilledButton(
-              onPressed: _busy ? null : _emailLogin,
-              style: FilledButton.styleFrom(
-                backgroundColor: const Color(0xFFE8D5A3),
-                foregroundColor: Colors.black,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14)),
-              ),
-              child: _busy
-                  ? const AppThinkingLoader(
-                      size: 28, state: OrbState.solving, circlePad: 6)
-                  : Text(
-                      _createAccount ? 'Create account' : 'Sign in with email'),
-            ),
-          ),
-          TextButton(
-            onPressed: _busy
-                ? null
-                : () => setState(() => _createAccount = !_createAccount),
-            style: TextButton.styleFrom(foregroundColor: Colors.white70),
-            child: Text(_createAccount
-                ? 'I already have an account'
-                : 'Create a new account'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _phoneForm() {
-    final hasCode = _verificationId != null;
-    return Padding(
-      padding: const EdgeInsets.only(top: 10),
-      child: Column(
-        children: [
-          _field(_phone, 'Phone number with country code',
-              keyboard: TextInputType.phone),
-          if (hasCode) ...[
-            const SizedBox(height: 10),
-            _field(_smsCode, 'SMS verification code',
-                keyboard: TextInputType.number),
-          ],
-          const SizedBox(height: 10),
-          SizedBox(
-            height: 48,
-            child: FilledButton(
-              onPressed:
-                  _busy ? null : (hasCode ? _verifyPhoneCode : _sendPhoneCode),
-              style: FilledButton.styleFrom(
-                backgroundColor: const Color(0xFFE8D5A3),
-                foregroundColor: Colors.black,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14)),
-              ),
-              child: _busy
-                  ? const AppThinkingLoader(
-                      size: 28, state: OrbState.listening, circlePad: 6)
-                  : Text(hasCode ? 'Verify code' : 'Send code'),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _field(
-    TextEditingController controller,
-    String label, {
-    bool obscure = false,
-    TextInputType? keyboard,
-  }) {
-    return TextField(
-      controller: controller,
-      keyboardType: keyboard,
-      obscureText: obscure,
-      autocorrect: false,
-      enableSuggestions: !obscure,
-      style: const TextStyle(color: Colors.white, fontSize: 14),
-      decoration: InputDecoration(
-        hintText: label,
-        hintStyle: const TextStyle(color: Colors.white38),
-        filled: true,
-        fillColor: Colors.white10,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 15),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Colors.white24),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFFE8D5A3)),
-        ),
+      resizeToAvoidBottomInset: true,
+      body: LoginStage(
+        id: _email,
+        secret: _password,
+        busy: _busy,
+        obscure: _obscure,
+        remember: _remember,
+        createAccount: _createAccount,
+        codeSent: _verificationId != null && !_email.text.contains('@'),
+        error: _error ?? unavailable,
+        notice: _notice,
+        onSubmit: _submit,
+        onGoogle: _googleLogin,
+        onApple: _appleLogin,
+        onForgot: _forgot,
+        onToggleCreate: () => setState(() {
+          _createAccount = !_createAccount;
+          _error = null;
+          _notice = null;
+        }),
+        onToggleObscure: () => setState(() => _obscure = !_obscure),
+        onToggleRemember: () => setState(() => _remember = !_remember),
+        onExplore: _busy ? null : () => setState(() => _guest = true),
       ),
     );
   }
@@ -583,22 +382,6 @@ class _AuthGateState extends State<AuthGate> {
   }
 }
 
-class _GoogleMark extends StatelessWidget {
-  const _GoogleMark();
-
-  static const _svg =
-      '<svg width="20" height="20" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">'
-      '<path d="M17.1 9.2c0-.6-.1-1.2-.2-1.8H9v3.3h4.6c-.2 1-.8 1.9-1.7 2.4v2h2.7c1.6-1.4 2.5-3.6 2.5-5.9z" fill="#4285F4"/>'
-      '<path d="M9 18c2.3 0 4.2-.8 5.6-2.1l-2.7-2c-.8.5-1.8.8-2.9.8-2.2 0-4.1-1.5-4.8-3.5H1.4v2.1C2.8 16.1 5.7 18 9 18z" fill="#34A853"/>'
-      '<path d="M4.2 11.2c-.2-.5-.3-1-.3-1.6s.1-1.1.3-1.6V5.9H1.4C.5 7.4 0 9.1 0 10.9s.5 3.5 1.4 5l2.8-4.7z" fill="#FBBC05"/>'
-      '<path d="M9 3.6c1.2 0 2.3.4 3.2 1.2L14.8 2C13.3.7 11.3 0 9 0 5.7 0 2.8 1.9 1.4 4.6l2.8 2.1C4.9 5.1 6.8 3.6 9 3.6z" fill="#EA4335"/>'
-      '</svg>';
-
-  @override
-  Widget build(BuildContext context) {
-    return SvgPicture.string(_svg, width: 20, height: 20);
-  }
-}
 
 class _AuthMessage implements Exception {
   const _AuthMessage(this.message);

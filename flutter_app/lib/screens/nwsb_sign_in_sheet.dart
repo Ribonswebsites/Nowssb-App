@@ -5,11 +5,10 @@ library;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/firebase.dart';
-import '../widgets/login_gallery.dart';
-import '../widgets/nwsb_icon.dart';
-import '../admin/template/editable.dart';
+import '../widgets/login_stage.dart';
 
 class NwsbSignInPage extends StatefulWidget {
   const NwsbSignInPage({super.key});
@@ -37,29 +36,42 @@ class _NwsbSignInPageState extends State<NwsbSignInPage> {
   final _google = GoogleSignIn(scopes: const ['email'], serverClientId: _googleWebClientId);
   final _email = TextEditingController();
   final _password = TextEditingController();
-  final _phone = TextEditingController();
-  final _sms = TextEditingController();
   bool _busy = false;
   bool _create = false;
-  bool _showEmail = false;
-  bool _showPhone = false;
+  bool _obscure = true;
+  bool _remember = true;
   String? _error;
+  String? _notice;
   String? _verificationId;
 
   @override
   void dispose() {
     _email.dispose();
     _password.dispose();
-    _phone.dispose();
-    _sms.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    SharedPreferences.getInstance().then((prefs) {
+      if (!mounted) return;
+      setState(() => _remember = prefs.getBool('nwsb.rememberMe') ?? true);
+    });
+  }
+
+  Future<void> _saveRemember() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('nwsb.rememberMe', _remember);
   }
 
   Future<void> _run(Future<void> Function() action) async {
     if (_busy) return;
+    await _saveRemember();
     setState(() {
       _busy = true;
       _error = null;
+      _notice = null;
     });
     try {
       if (!NwsbFirebase.ready) throw 'Firebase is not ready in this build.';
@@ -105,172 +117,112 @@ class _NwsbSignInPageState extends State<NwsbSignInPage> {
     }
   }
 
+
+  Future<void> _submit() => _run(() async {
+        final raw = _email.text.trim();
+        if (!raw.contains('@') && _verificationId != null) {
+          final code = _password.text.trim();
+          if (code.length < 4) throw 'Enter the verification code from SMS.';
+          await FirebaseAuth.instance.signInWithCredential(
+            PhoneAuthProvider.credential(verificationId: _verificationId!, smsCode: code),
+          );
+          return;
+        }
+        if (raw.contains('@')) {
+          final password = _password.text;
+          if (raw.isEmpty || password.length < 6) {
+            throw 'Enter a valid email and a password of at least 6 characters.';
+          }
+          if (_create) {
+            await FirebaseAuth.instance.createUserWithEmailAndPassword(email: raw, password: password);
+          } else {
+            await FirebaseAuth.instance.signInWithEmailAndPassword(email: raw, password: password);
+          }
+          return;
+        }
+        if (!RegExp(r'^\+\d{8,15}$').hasMatch(raw)) {
+          throw 'Enter an email, or a phone number with its country code.';
+        }
+        await FirebaseAuth.instance.verifyPhoneNumber(
+          phoneNumber: raw,
+          verificationCompleted: (credential) async {
+            await FirebaseAuth.instance.signInWithCredential(credential);
+            if (!mounted) return;
+            Navigator.of(context).pop(true);
+          },
+          verificationFailed: (error) {
+            if (mounted) setState(() => _error = _message(error));
+          },
+          codeSent: (verificationId, _) {
+            if (!mounted) return;
+            setState(() {
+              _verificationId = verificationId;
+              _password.clear();
+              _notice = 'Code sent. Enter it and tap Verify.';
+            });
+          },
+          codeAutoRetrievalTimeout: (verificationId) {
+            _verificationId = verificationId;
+          },
+        );
+      });
+
+  Future<void> _apple() => _run(() async {
+        final provider = AppleAuthProvider()
+          ..addScope('email')
+          ..addScope('name');
+        await FirebaseAuth.instance.signInWithProvider(provider);
+      });
+
+  Future<void> _forgot() => _run(() async {
+        final email = _email.text.trim();
+        if (!email.contains('@')) throw 'Enter the email on your account.';
+        await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+        if (mounted) setState(() => _notice = 'Reset link sent. Check your email.');
+      });
+
+  Future<void> _googleLogin() => _run(() async {
+        final account = await _google.signIn();
+        if (account == null) return;
+        final credentials = await account.authentication;
+        if (credentials.idToken == null && credentials.accessToken == null) {
+          throw 'Google did not return a credential.';
+        }
+        await FirebaseAuth.instance.signInWithCredential(
+          GoogleAuthProvider.credential(
+            accessToken: credentials.accessToken,
+            idToken: credentials.idToken,
+          ),
+        );
+      });
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: LoginGallery(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(18, 8, 18, 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: IconButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  icon: const NwsbIcon(NwsbMarks.house, color: Colors.white),
-                ),
-              ),
-              const EditableLabel('nwsb_sign_in_sheet.NwsbSignInPage',
-                'Sign in to NowssB',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700),
-              ),
-              const SizedBox(height: 8),
-              const EditableLabel('nwsb_sign_in_sheet.NwsbSignInPage',
-                'You come straight back to this page.',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white70),
-              ),
-              const SizedBox(height: 16),
-              FilledButton(
-                onPressed: _busy
-                    ? null
-                    : () => _run(() async {
-                          final account = await _google.signIn();
-                          if (account == null) return;
-                          final credentials = await account.authentication;
-                          if (credentials.idToken == null && credentials.accessToken == null) {
-                            throw 'Google did not return a credential.';
-                          }
-                          await FirebaseAuth.instance.signInWithCredential(
-                            GoogleAuthProvider.credential(
-                              accessToken: credentials.accessToken,
-                              idToken: credentials.idToken,
-                            ),
-                          );
-                        }),
-                style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFFE8D5A3),
-                  foregroundColor: Colors.black,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                ),
-                child: Text(_busy ? 'Please wait' : 'Continue with Google'),
-              ),
-              const SizedBox(height: 10),
-              OutlinedButton(
-                onPressed: () => setState(() {
-                  _showEmail = !_showEmail;
-                  _showPhone = false;
-                  _error = null;
-                }),
-                child: const EditableLabel('nwsb_sign_in_sheet.NwsbSignInPage', 'Continue with Email'),
-              ),
-              if (_showEmail) ...[
-                const SizedBox(height: 8),
-                _field(_email, 'Email'),
-                const SizedBox(height: 8),
-                _field(_password, 'Password', obscure: true),
-                Row(
-                  children: [
-                    Checkbox(value: _create, onChanged: (v) => setState(() => _create = v == true)),
-                    const EditableLabel('nwsb_sign_in_sheet.NwsbSignInPage', 'Create account', style: TextStyle(color: Colors.white70)),
-                  ],
-                ),
-                FilledButton(
-                  onPressed: _busy
-                      ? null
-                      : () => _run(() async {
-                            final email = _email.text.trim();
-                            final password = _password.text;
-                            if (email.isEmpty || password.length < 6) {
-                              throw 'Enter a valid email and a password of at least 6 characters.';
-                            }
-                            if (_create) {
-                              await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
-                            } else {
-                              await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
-                            }
-                          }),
-                  child: Text(_create ? 'Create account' : 'Sign in'),
-                ),
-              ],
-              const SizedBox(height: 10),
-              OutlinedButton(
-                onPressed: () => setState(() {
-                  _showPhone = !_showPhone;
-                  _showEmail = false;
-                  _error = null;
-                }),
-                child: const EditableLabel('nwsb_sign_in_sheet.NwsbSignInPage', 'Continue with Phone'),
-              ),
-              if (_showPhone) ...[
-                const SizedBox(height: 8),
-                _field(_phone, 'Phone with country code'),
-                if (_verificationId != null) ...[
-                  const SizedBox(height: 8),
-                  _field(_sms, 'SMS code'),
-                ],
-                const SizedBox(height: 8),
-                FilledButton(
-                  onPressed: _busy
-                      ? null
-                      : () => _run(() async {
-                            if (_verificationId == null) {
-                              final phone = _phone.text.trim();
-                              if (!RegExp(r'^\+\d{8,15}$').hasMatch(phone)) {
-                                throw 'Use the full phone number with country code, for example +919876543210.';
-                              }
-                              await FirebaseAuth.instance.verifyPhoneNumber(
-                                phoneNumber: phone,
-                                verificationCompleted: (credential) async {
-                                  await FirebaseAuth.instance.signInWithCredential(credential);
-                                  if (!context.mounted) return;
-                                  Navigator.of(context).pop(true);
-                                },
-                                verificationFailed: (error) {
-                                  if (mounted) setState(() => _error = _message(error));
-                                },
-                                codeSent: (verificationId, _) {
-                                  if (mounted) setState(() => _verificationId = verificationId);
-                                },
-                                codeAutoRetrievalTimeout: (verificationId) {
-                                  _verificationId = verificationId;
-                                },
-                              );
-                              return;
-                            }
-                            final code = _sms.text.trim();
-                            if (code.length < 4) throw 'Enter the verification code from SMS.';
-                            await FirebaseAuth.instance.signInWithCredential(
-                              PhoneAuthProvider.credential(verificationId: _verificationId!, smsCode: code),
-                            );
-                          }),
-                  child: Text(_verificationId == null ? 'Send code' : 'Verify code'),
-                ),
-              ],
-              if (_error != null) ...[
-                const SizedBox(height: 12),
-                Text(_error!, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFFFFB4AB), height: 1.35)),
-              ],
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _field(TextEditingController controller, String hint, {bool obscure = false}) {
-    return TextField(
-      controller: controller,
-      obscureText: obscure,
-      style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        hintText: hint,
-        hintStyle: const TextStyle(color: Colors.white38),
-        filled: true,
-        fillColor: Colors.white10,
+      resizeToAvoidBottomInset: true,
+      body: LoginStage(
+        id: _email,
+        secret: _password,
+        busy: _busy,
+        obscure: _obscure,
+        remember: _remember,
+        createAccount: _create,
+        codeSent: _verificationId != null && !_email.text.contains('@'),
+        error: _error,
+        notice: _notice,
+        onClose: () => Navigator.of(context).pop(false),
+        onSubmit: _submit,
+        onGoogle: _googleLogin,
+        onApple: _apple,
+        onForgot: _forgot,
+        onToggleCreate: () => setState(() {
+          _create = !_create;
+          _error = null;
+          _notice = null;
+        }),
+        onToggleObscure: () => setState(() => _obscure = !_obscure),
+        onToggleRemember: () => setState(() => _remember = !_remember),
       ),
     );
   }

@@ -40,6 +40,11 @@ void main() {
     await tester.pumpWidget(const MaterialApp(home: NwsbSignInPage()));
     await tester.pump();
 
+    await tester.scrollUntilVisible(
+      find.text('Continue with Google'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
     await tester.tap(find.text('Continue with Google'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 50));
