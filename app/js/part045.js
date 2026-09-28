@@ -240,81 +240,118 @@ window._updateTrialBanner = function() {
   banner.style.display = 'flex';
 };
 
-/* ── Subscribe with Razorpay ── */
+/* ── Subscribe with Razorpay ──
+   The server does the money part (functions/api/pay/*):
+     1. POST /api/pay/order  — the server picks the price for the plan and
+        creates a Razorpay order tagged with this account's uid.
+     2. Razorpay Checkout takes the payment.
+     3. POST /api/pay/verify — the server checks the signature, confirms the
+        payment with Razorpay and writes isPro/tier/subscriptionEndDate to
+        users/{uid}. The page never writes those fields itself (the Firestore
+        rules forbid it), and nothing is granted unless a real payment went
+        through. A Razorpay webhook grants it too, if this page is closed early. */
+var _PAY_BASE = (function () {
+  var h = location.hostname;
+  // Same-origin on nowssb.com / Pages previews / local dev; anywhere else
+  // (GitHub Pages mirror, app webview) calls the live site's API.
+  return (/(^|\.)nowssb\.com$/.test(h) || /\.pages\.dev$/.test(h) || h === 'localhost' || h === '127.0.0.1') && location.protocol.indexOf('http') === 0
+    ? '' : 'https://nowssb.com';
+})();
+
+function _payNotice(msg) {
+  var el = document.getElementById('ss-pay-notice');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'ss-pay-notice';
+    el.setAttribute('role', 'status');
+    el.style.cssText = 'position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:100000;max-width:90vw;' +
+      'background:#1b1b1f;color:#f3ecd9;border:1px solid rgba(232,213,163,.35);border-radius:12px;padding:12px 18px;' +
+      'font:500 14px/1.4 system-ui,sans-serif;box-shadow:0 8px 30px rgba(0,0,0,.4);text-align:center';
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.style.display = 'block';
+  clearTimeout(el._t);
+  el._t = setTimeout(function () { el.style.display = 'none'; }, 6000);
+}
+
+function _payPost(path, body) {
+  var user = window._currentUser;
+  return user.getIdToken().then(function (tok) {
+    return fetch(_PAY_BASE + path, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tok },
+      body: JSON.stringify(body)
+    });
+  }).then(function (r) {
+    return r.json().catch(function () { return {}; }).then(function (d) {
+      if (!r.ok) { var e = new Error(d.error || ('HTTP ' + r.status)); e.status = r.status; throw e; }
+      return d;
+    });
+  });
+}
+
+var _payBusy = false;
 window.ssStartSubscription = function(planId, billing) {
   var plan = SS_PLANS.find(function(p){ return p.id === planId; });
   if (!plan) return;
-  var amount = billing === 'yearly' ? plan.price.yearly : plan.price.monthly;
-  var amountMinor = Math.round(amount * 100); // USD dollars → cents (the minor unit)
+  billing = billing === 'yearly' ? 'yearly' : 'monthly';
   var user = window._currentUser;
-  var email = (user && user.email) || '';
-  var RAZORPAY_KEY_ID = 'rzp_live_REPLACE_WITH_YOUR_KEY';
-  var apiBase = (typeof NOWSSB_API !== 'undefined') ? NOWSSB_API : '';
+  if (!user || typeof user.getIdToken !== 'function') { _payNotice('Sign in first, then choose your plan.'); return; }
+  if (typeof Razorpay === 'undefined') { _payNotice('The payment window could not load. Check your connection and try again.'); return; }
+  if (_payBusy) return;
+  _payBusy = true;
 
-  function _openPayment(orderId) {
-    var options = {
-      key: RAZORPAY_KEY_ID,
-      amount: amountMinor,
-      currency: 'USD',
+  _payPost('/api/pay/order', { plan: planId, billing: billing }).then(function (ord) {
+    var rzp = new Razorpay({
+      key: ord.keyId,
+      amount: ord.amount,
+      currency: ord.currency,
+      order_id: ord.orderId,
       name: 'NowssB',
       description: plan.name + ' — ' + (billing === 'yearly' ? 'Yearly' : 'Monthly'),
-      order_id: orderId || undefined,
-      prefill: { email: email },
+      prefill: { email: user.email || '', name: user.displayName || '' },
       theme: { color: '#e8d5a3' },
       notes: { tier: planId, billing: billing },
-      handler: function(response) {
-        _onSubscriptionSuccess(response, planId, billing, amount);
+      modal: { ondismiss: function () { _payBusy = false; } },
+      handler: function (response) {
+        _payNotice('Confirming your payment…');
+        _payPost('/api/pay/verify', {
+          razorpay_order_id: response.razorpay_order_id,
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_signature: response.razorpay_signature
+        }).then(function (res) {
+          _payBusy = false;
+          var n = document.getElementById('ss-pay-notice'); if (n) n.style.display = 'none';
+          _onSubscriptionSuccess(res, planId, billing);
+        }).catch(function (e) {
+          _payBusy = false;
+          _payNotice('Payment received, but we could not confirm it yet (' + e.message + '). It will be applied automatically — reload in a minute.');
+        });
       }
-    };
-    if (typeof Razorpay !== 'undefined') {
-      try { new Razorpay(options).open(); }
-      catch(e) { _onSubscriptionSuccess({ razorpay_payment_id: 'sim_' + Date.now() }, planId, billing, amount); }
-    } else {
-      _onSubscriptionSuccess({ razorpay_payment_id: 'sim_' + Date.now() }, planId, billing, amount);
-    }
-  }
-
-  if (apiBase) {
-    fetch(apiBase + '/api/razorpay/order', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount: amountMinor, currency: 'USD', notes: { tier: planId, billing: billing, email: email } })
-    })
-    .then(function(r){ return r.json(); })
-    .then(function(ord){ _openPayment(ord.id); })
-    .catch(function(){ _openPayment(''); });
-  } else {
-    _openPayment('');
-  }
+    });
+    rzp.on && rzp.on('payment.failed', function (r) {
+      _payNotice('Payment failed: ' + ((r && r.error && r.error.description) || 'please try again.'));
+    });
+    rzp.open();
+  }).catch(function (e) {
+    _payBusy = false;
+    _payNotice(e.status === 501 ? 'Payments are not available right now. Please try again later.' : ('Could not start the payment: ' + e.message));
+  });
 };
 
-function _onSubscriptionSuccess(response, planId, billing, amount) {
+/* Runs only after /api/pay/verify said the plan is on the account (the
+   server already wrote it) — this just refreshes the page's copy and UI. */
+function _onSubscriptionSuccess(res, planId, billing) {
   var user = window._currentUser;
   if (!user) return;
-  var now = new Date();
-  var endDate = new Date(now);
-  if (billing === 'yearly') endDate.setFullYear(endDate.getFullYear() + 1);
-  else endDate.setMonth(endDate.getMonth() + 1);
-
-  // Write to Firestore
-  if (window._fbSetDoc) {
-    window._fbSetDoc(user.uid, {
-      isPro: true,
-      tier: planId,
-      subscriptionBilling: billing,
-      subscriptionStartDate: now.toISOString(),
-      subscriptionEndDate: endDate.toISOString(),
-      subscriptionPaymentId: response.razorpay_payment_id || '',
-    }).catch(function(){});
-  }
-
-  // Update local cache
   if (window._userDataCache) {
     window._userDataCache.isPro = true;
-    window._userDataCache.tier = planId;
-    window._userDataCache.subscriptionBilling = billing;
-    window._userDataCache.subscriptionStartDate = now.toISOString();
-    window._userDataCache.subscriptionEndDate = endDate.toISOString();
+    window._userDataCache.tier = res.tier || planId;
+    window._userDataCache.subscriptionBilling = res.billing || billing;
+    window._userDataCache.subscriptionEndDate = res.subscriptionEndDate;
+    window._userDataCache.subscriptionPaymentId = res.paymentId;
+    window._userDataCache.subscriptionSource = 'razorpay';
   }
 
   // Some plans include a free verification badge (Frequency X → Blue) — grant

@@ -14,6 +14,8 @@ await env.withSecurityRulesDisabled(async (c) => {
   await setDoc(doc(db, 'users/pro'), { uid: 'pro', isPro: true, tier: 'gold' });
   await setDoc(doc(db, 'requests/r1'), { uid: 'alice', word: 'om', status: 'new', at: 1 });
   await setDoc(doc(db, 'requests/r2'), { uid: 'bob', word: 'ra', status: 'new', at: 2 });
+  await setDoc(doc(db, 'payments/pay_A'), { uid: 'alice', tier: 'frequency', amount: 999 });
+  await setDoc(doc(db, 'payments/pay_B'), { uid: 'bob', tier: 'resonance', amount: 499 });
 });
 const alice = env.authenticatedContext('alice').firestore();
 const boss = env.authenticatedContext('boss').firestore();
@@ -88,6 +90,16 @@ await t('user update request denied', assertFails(updateDoc(doc(alice, 'requests
 await t('admin creates notification', assertSucceeds(addDoc(collection(boss, 'users/alice/notifications'), { title: 't', read: false })));
 await t('user creates own notification denied', assertFails(addDoc(collection(alice, 'users/alice/notifications'), { title: 't' })));
 await t('admin creates inbox', assertSucceeds(addDoc(collection(boss, 'users/alice/inbox'), { title: 't', read: false })));
+// payments (server-written receipts) + server-only subscription fields
+await t('self set subscriptionSource denied', assertFails(setDoc(doc(alice, 'users/alice'), { subscriptionSource: 'razorpay' }, { merge: true })));
+await t('self set subscriptionOrderId denied', assertFails(setDoc(doc(alice, 'users/alice'), { subscriptionOrderId: 'order_x' }, { merge: true })));
+await t('user reads own payment', assertSucceeds(getDoc(doc(alice, 'payments/pay_A'))));
+await t('user lists own payments', assertSucceeds(getDocs(query(collection(alice, 'payments'), where('uid', '==', 'alice')))));
+await t('user reads other payment denied', assertFails(getDoc(doc(alice, 'payments/pay_B'))));
+await t('user lists all payments denied', assertFails(getDocs(collection(alice, 'payments'))));
+await t('user writes payment denied', assertFails(setDoc(doc(alice, 'payments/pay_C'), { uid: 'alice', tier: 'frequencyX' })));
+await t('admin reads payments', assertSucceeds(getDocs(collection(boss, 'payments'))));
+await t('admin writes payment denied', assertFails(setDoc(doc(boss, 'payments/pay_D'), { uid: 'boss' })));
 // untouched areas still behave
 await t('publicProfiles unaffected (self create)', assertSucceeds(setDoc(doc(alice, 'publicProfiles/alice'), { uid: 'alice', displayName: 'A' })));
 await t('coach goals self', assertSucceeds(setDoc(doc(alice, 'users/alice/goals/g1'), { a: 1 })));

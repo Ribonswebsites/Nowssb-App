@@ -1,0 +1,20 @@
+# Cloudflare Pages → nowssb (this site) → Settings → Variables and Secrets → Production
+# Needed by functions/api/pay/{order,verify,webhook}.js (Razorpay subscriptions).
+# Names only — never commit real values; add them as encrypted "Secret" variables.
+#
+# Razorpay Dashboard → Account & Settings → API Keys (live mode):
+RAZORPAY_KEY_ID=
+RAZORPAY_KEY_SECRET=
+# Razorpay Dashboard → Webhooks → Add: URL https://nowssb.com/api/pay/webhook,
+# events payment.captured + order.paid, and the secret you type there:
+RAZORPAY_WEBHOOK_SECRET=
+# Firebase console → Project settings → Service accounts → Generate new private
+# key; paste the whole JSON. (FCM_SERVICE_ACCOUNT is used instead if this one is
+# absent and it holds the same Firebase Admin service-account JSON.)
+FIREBASE_SERVICE_ACCOUNT=
+# Already set:
+# FIREBASE_PROJECT_ID=nowssb-34f1b
+#
+# Until all of these exist, /api/pay/* answers 501 naming what is missing and
+# the website shows "Payments are not available right now" — nothing is granted.
+# Offline test: node tools/pay/pay-functions.test.mjs
