@@ -6,14 +6,11 @@
   <link rel="dns-prefetch" href="//firestore.googleapis.com">
   <link rel="dns-prefetch" href="//identitytoolkit.googleapis.com">
   <link rel="dns-prefetch" href="//api.groq.com">
-  <link rel="dns-prefetch" href="//checkout.razorpay.com">
   <link rel="dns-prefetch" href="//api.elevenlabs.io">
   <link rel="dns-prefetch" href="//fonts.gstatic.com">
   <!-- Preconnect to most-used origins -->
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <!-- Razorpay deferred — only load when user opens checkout -->
-  <script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
   <!-- Critical image preloads — load before JS runs -->
   <link rel="preload" as="image" href="https://media.nowssb.com/migrated-images/d2b178512c109407_grok_image_1777570509389_ch0bif.jpg" fetchpriority="high">
   <link rel="preload" as="image" href="https://media.nowssb.com/migrated-images/63bdfda9170e8c19_1000033096-ezremove_eb2gnu.png" fetchpriority="high">
@@ -7967,7 +7964,7 @@ document.querySelectorAll('.option').forEach(b=>b.addEventListener('click',()=>b
 
 
 <!-- ══════════════════════════════════════════════════════════
-     CHECKOUT SUB-SCREEN — Razorpay-ready · world-class
+     CHECKOUT SUB-SCREEN — purchases happen in the Android app (Google Play)
 ══════════════════════════════════════════════════════════ -->
 
 
@@ -8103,7 +8100,7 @@ document.querySelectorAll('.option').forEach(b=>b.addEventListener('click',()=>b
         <path d="M8 1L2 4v5c0 4 2.5 6.5 6 8 3.5-1.5 6-4 6-8V4L8 1Z" stroke="rgba(120,220,120,0.5)" stroke-width="1.3" fill="none"/>
         <path d="M5 9l2 2 4-4" stroke="rgba(120,220,120,0.7)" stroke-width="1.4" stroke-linecap="square"/>
       </svg>
-      <div class="chk-secure-text">Secure checkout · 256-bit SSL encryption · Your payment data never touches our servers</div>
+      <div class="chk-secure-text">Purchases are made in the NowssB Android app through Google Play — nothing is charged on this website</div>
     </div>
 
     </div>
@@ -8115,12 +8112,12 @@ document.querySelectorAll('.option').forEach(b=>b.addEventListener('click',()=>b
       <span class="chk-paybar-label">Total Due</span>
       <span class="chk-paybar-total" id="chkBarTotal">$0.00</span>
     </div>
-    <button class="chk-pay-btn" id="chkPayBtn" onclick="chkProceedToRazorpay()">
+    <button class="chk-pay-btn" id="chkPayBtn" onclick="chkProceedToCheckout()">
       <span class="chk-btn-spinner" id="chkSpinner"></span>
       <svg id="chkPayArrow" width="14" height="14" viewBox="0 0 14 14" fill="none">
         <path d="M1 7h12M8 3l4 4-4 4" stroke="var(--accent-gold)" stroke-width="1.6" stroke-linecap="square"/>
       </svg>
-      Pay Now
+      Buy in the Android app
     </button>
   </div>
 
@@ -8933,7 +8930,7 @@ document.querySelectorAll('.option').forEach(b=>b.addEventListener('click',()=>b
 <script src="app/js/part053.js?v=16"></script>
 
 <!-- ══ CHECKOUT PAGE JS ══ -->
-<script src="app/js/part029.js?v=279"></script>
+<script src="app/js/part029.js?v=280"></script>
 
 <!-- ══ COUPON / BUNDLE SHOP PAGES JS ══ -->
 <script src="app/js/part055.js?v=1"></script>
@@ -9273,7 +9270,7 @@ document.querySelectorAll('.option').forEach(b=>b.addEventListener('click',()=>b
   </div><!-- /ws-page-body -->
 </div><!-- /sub-word-search -->
 
-<script src="app/js/part030.js?v=253"></script>
+<script src="app/js/part030.js?v=254"></script>
 
 
 <!-- ══════════════════════════════════════════════════════════
@@ -10206,7 +10203,7 @@ document.querySelectorAll('.option').forEach(b=>b.addEventListener('click',()=>b
 </div><!-- /ss-wrap -->
 </div><!-- /sub-social -->
 
-<script src="app/js/part032.js?v=227"></script>
+<script src="app/js/part032.js?v=228"></script>
 
 <!-- ═══════════════════════════════════════════════════════════
      NOWSSB SOCIAL — People / Explore / Search / Profile / Social Home
@@ -11481,7 +11478,7 @@ document.querySelectorAll('.option').forEach(b=>b.addEventListener('click',()=>b
 
 <!-- ── Global subscription promo bars for free users ── -->
 
-<script src="app/js/part045.js?v=218"></script>
+<script src="app/js/part045.js?v=219"></script>
 
 <!-- ── TRIAL BANNER ── -->
 <div id="trial-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(232,213,163,0.08);border-bottom:1px solid rgba(232,213,163,0.18);padding:9px 18px;align-items:center;justify-content:space-between;backdrop-filter:none;-webkit-backdrop-filter:none;">

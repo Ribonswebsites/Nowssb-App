@@ -549,10 +549,11 @@ function ssRenderPlans() {
     var isSel = _ssSelectedPlan === p.id;
     var isCur = tier === p.id;
     var s = SS_CARD_STYLE[p.id] || SS_CARD_STYLE.frequency;
-    var monthlyEquiv = (_ssBilling==='yearly' && p.price.monthly>0) ? (p.price.yearly/12).toFixed(2) : p.price.monthly;
     var borderColor = isSel ? s.accent : s.restBorder;
     var textColor = (isSel && !s.flatText) ? s.accent : s.text;
-    var priceLabel = p.price.monthly===0 ? 'Free' : ('$' + monthlyEquiv + ( _ssBilling==='yearly' ? ' / year' : ' / month'));
+    // Paid plans are sold only in the Android app through Google Play, which
+    // sets the price in the buyer's currency — so no dollar figure here.
+    var priceLabel = p.price.monthly===0 ? 'Free' : 'On Google Play';
     html += '<div class="plan-card ss-flip-card" data-plan-id="'+p.id+'" onclick="ssSelectPlan(\''+p.id+'\')" style="border:'+(isSel?'2px':'1px')+' solid '+borderColor+';background:rgba(255,255,255,.12);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:'+(isSel?'0 0 0 1px '+s.accent+'55, 0 8px 28px '+s.accent+'2e':'var(--glass-shadow)')+';">';
     html += '<div class="ss-flip-grid">';
     html += '<button class="ss-flip'+(isSel?' is-back':'')+'" type="button" onclick="event.stopPropagation();this.classList.toggle(\'is-back\')">';
@@ -567,7 +568,7 @@ function ssRenderPlans() {
     p.features.slice(0,5).forEach(function(f) {
       html += '<div class="ss-included-row"><span class="ss-included-check">✓</span><span>'+f[1]+'</span></div>';
     });
-    html += '<button class="ss-included-cta" type="button" onclick="event.stopPropagation();ssStartSubscription(\''+p.id+'\',\''+(_ssBilling||'monthly')+'\')">Subscribe monthly <span>→</span></button>';
+    html += '<button class="ss-included-cta" type="button" onclick="event.stopPropagation();ssStartSubscription(\''+p.id+'\',\''+(_ssBilling||'monthly')+'\')">Get the Android app <span>→</span></button>';
     html += '</div></div></div>';
   });
   container.innerHTML = html;
@@ -595,13 +596,11 @@ function ssRenderCTA() {
   var isCurrentPlan = curTier === plan.id;
   var bgMap = { resonance:'linear-gradient(135deg,#a8d4e8,#7ab8d4)', frequency:'linear-gradient(135deg,#e8d5a3,#c8a96e)', frequencyX:'linear-gradient(135deg,#f5e6b8,#c9a227)' };
   var planBg = bgMap[plan.id] || 'linear-gradient(135deg,#e8d5a3,#c8a96e)';
-  var trialLabel = (curTier === 'trial' || curTier === 'expired')
-    ? 'Start 15-Day Free Trial — then $' + ((_ssBilling==='yearly') ? plan.price.yearly + '/year' : plan.price.monthly + '/mo')
-    : ((_ssBilling==='yearly') ? 'Subscribe — $' + plan.price.yearly + '/year' : 'Subscribe — $' + plan.price.monthly + '/mo');
+  var trialLabel = 'Subscribe to ' + plan.name + ' in the Android app';
   if (!isCurrentPlan || curTier === 'trial' || curTier === 'expired') {
     ctaHtml = '<button onclick="ssStartSubscription(\''+plan.id+'\',\''+(_ssBilling||'monthly')+'\')" style="width:100%;padding:17px 0;border-radius:16px;border:none;background:'+planBg+';color:#060c18;font-size:15px;font-weight:700;font-family:\'DM Sans\',sans-serif;cursor:pointer;margin-bottom:12px;letter-spacing:.2px;">'+trialLabel+'</button>';
     if (curTier === 'trial') {
-      ctaHtml += '<div style="text-align:center;font-size:11px;color:rgba(255,255,255,.38);font-family:\'DM Sans\',sans-serif;margin-bottom:8px;">Card saved now · charged after 15-day trial · cancel anytime before</div>';
+      ctaHtml += '<div style="text-align:center;font-size:11px;color:rgba(255,255,255,.38);font-family:\'DM Sans\',sans-serif;margin-bottom:8px;">Subscriptions are bought through Google Play in the NowssB Android app</div>';
     }
   } else {
     ctaHtml = '<div style="text-align:center;padding:14px 0;font-size:13px;color:rgba(255,255,255,.38);font-family:\'DM Sans\',sans-serif;">This is your current plan</div>';
@@ -680,7 +679,7 @@ function ssPlanBannerSync() {
   var bannerText = document.getElementById('ssPlanBannerText');
   if (!bannerText) return;
   var activePlan = SS_PLANS.find(function (p) { return p.id === _ssSelectedPlan; }) || SS_PLANS[0];
-  var priceStr = (_ssBilling === 'yearly') ? '$' + activePlan.price.yearly + '/year' : '$' + activePlan.price.monthly + '/mo';
+  var priceStr = activePlan.price.monthly === 0 ? 'Free' : 'Google Play · Android app';
   bannerText.innerHTML = '<div class="ss-plan-banner-name">' + activePlan.name + '</div><div class="ss-plan-banner-price">' + priceStr + '</div>';
 }
 

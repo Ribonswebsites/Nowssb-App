@@ -10,6 +10,8 @@ import '../theme/tokens.dart';
 import '../widgets/glass_wrap.dart';
 import '../admin/template/editable.dart';
 import '../admin/layout/layout_sections.dart';
+import '../data/billing_config.dart';
+import '../data/play_subscriptions.dart';
 
 class SubscriptionScreen extends StatefulWidget {
   const SubscriptionScreen({super.key});
@@ -26,12 +28,19 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   void initState() {
     super.initState();
     planController = PageController(viewportFraction: 0.88);
+    PlaySubscriptions.instance.addListener(_billingChanged);
+    PlaySubscriptions.instance.start();
   }
 
   @override
   void dispose() {
+    PlaySubscriptions.instance.removeListener(_billingChanged);
     planController.dispose();
     super.dispose();
+  }
+
+  void _billingChanged() {
+    if (mounted) setState(() {});
   }
 
   static const plans = <_Plan>[
@@ -53,8 +62,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     _Plan(
       name: 'Resonance',
       detail: 'A deeper daily practice',
-      monthly: r'$4.99 / month',
-      yearly: r'$41.90 / year',
+      monthly: 'Price on Google Play',
+      yearly: 'Price on Google Play',
       accent: NwsbColors.mist,
       front: 'assets/subscription/tier-sun-front.png',
       back: 'assets/subscription/tier-sun-back.png',
@@ -68,8 +77,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     _Plan(
       name: 'Frequency',
       detail: 'Every word and frequency',
-      monthly: r'$9.99 / month',
-      yearly: r'$83.90 / year',
+      monthly: 'Price on Google Play',
+      yearly: 'Price on Google Play',
       accent: NwsbColors.goldLight,
       front: 'assets/subscription/tier-bag-front.png',
       back: 'assets/subscription/tier-bag-back.png',
@@ -83,8 +92,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     _Plan(
       name: 'Frequency X',
       detail: 'The complete NowssB experience',
-      monthly: r'$19.99 / month',
-      yearly: r'$167.90 / year',
+      monthly: 'Price on Google Play',
+      yearly: 'Price on Google Play',
       accent: Color(0xFFF1F1F4),
       front: 'assets/subscription/tier-nile-front.png',
       back: 'assets/subscription/tier-nile-back.png',
@@ -97,8 +106,76 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     ),
   ];
 
-  void _subscribe(_Plan plan) {
-    // Same no-op hook the page already used — IAP is wired here later.
+  /// Google Play Billing only. The plan unlocks after /api/play/verify
+  /// confirms the purchase with Google (lib/data/play_subscriptions.dart).
+  Future<void> _subscribe(_Plan plan) async {
+    final tier = tierForPlanName(plan.name);
+    if (tier == null) {
+      _say('The free plan needs no purchase. Pick a paid plan to subscribe through Google Play.');
+      return;
+    }
+    if (PlaySubscriptions.instance.activeTier == tier) {
+      _say('${plan.name} is already your plan. Manage it in Google Play → Subscriptions.');
+      return;
+    }
+    final r = await PlaySubscriptions.instance.buy(tier, yearly: yearly);
+    _say(r.message);
+  }
+
+  Future<void> _restore() async {
+    final r = await PlaySubscriptions.instance.restore();
+    _say(r.message);
+  }
+
+  void _say(String text) {
+    if (!mounted || text.isEmpty) return;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(text)));
+  }
+
+  /// Play's price for this card, in the buyer's currency, when Play gave one.
+  String? _playPrice(_Plan plan) {
+    final tier = tierForPlanName(plan.name);
+    final p = tier == null ? null : playPlanFor(tier, yearly: yearly);
+    if (p == null) return null;
+    final price = PlaySubscriptions.instance.priceFor(p.productId);
+    return price == null ? null : '$price / ${yearly ? 'year' : 'month'}';
+  }
+
+  Widget _playFooter() {
+    final billing = PlaySubscriptions.instance;
+    final note = billing.available == false || billing.unavailableReason != null
+        ? billing.unavailableReason
+        : null;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(18, 14, 18, 0),
+      child: Column(
+        children: [
+          if (note != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Text(
+                note,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 11.5, height: 1.4),
+              ),
+            ),
+          TextButton(
+            onPressed: billing.busy ? null : _restore,
+            child: Text(
+              billing.busy ? 'Working…' : 'Restore purchases',
+              style: const TextStyle(color: NwsbColors.goldLight, fontWeight: FontWeight.w700),
+            ),
+          ),
+          const Text(
+            'Payments are handled by Google Play. Manage or cancel in Google Play → Subscriptions.',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Color(0x73FFFFFF), fontSize: 10.5, height: 1.4),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -233,6 +310,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                   plan: plans[i],
                   yearly: yearly,
                   active: selected == i,
+                  playPrice: _playPrice(plans[i]),
+                  current: tierForPlanName(plans[i].name) != null &&
+                      PlaySubscriptions.instance.activeTier == tierForPlanName(plans[i].name),
                   onSubscribe: () => _subscribe(plans[i]),
                 ),
               ),
@@ -264,6 +344,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                 ),
             ],
           ),
+          _playFooter(),
           _legalBlock(context),
         ],
       );
@@ -374,16 +455,20 @@ class _TierCard extends StatelessWidget {
     required this.yearly,
     required this.active,
     required this.onSubscribe,
+    this.playPrice,
+    this.current = false,
   });
 
   final _Plan plan;
   final bool yearly;
   final bool active;
   final VoidCallback onSubscribe;
+  final String? playPrice;
+  final bool current;
 
   @override
   Widget build(BuildContext context) {
-    final price = yearly ? plan.yearly : plan.monthly;
+    final price = playPrice ?? (yearly ? plan.yearly : plan.monthly);
     final radius = BorderRadius.circular(kGlassRadius);
     return ClipRRect(
       borderRadius: radius,
@@ -462,6 +547,7 @@ class _TierCard extends StatelessWidget {
                         child: _Included(
                           plan: plan,
                           price: price,
+                          current: current,
                           onSubscribe: onSubscribe,
                         ),
                       ),
@@ -482,17 +568,21 @@ class _Included extends StatelessWidget {
     required this.plan,
     required this.price,
     required this.onSubscribe,
+    this.current = false,
   });
 
   final _Plan plan;
   final String price;
   final VoidCallback onSubscribe;
+  final bool current;
 
   @override
   Widget build(BuildContext context) {
-    final cta = plan.name == 'Free'
-        ? 'Start your 30-day free trial'
-        : 'Subscribe to ${plan.name}';
+    final cta = current
+        ? 'Your current plan'
+        : plan.name == 'Free'
+            ? 'Start your 30-day free trial'
+            : 'Subscribe to ${plan.name}';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -555,7 +645,7 @@ class _Included extends StatelessWidget {
         Text(
           plan.name == 'Free'
               ? 'No card required to start · $price'
-              : 'Billed $price · cancel anytime',
+              : '$price · cancel anytime in Google Play',
           style: const TextStyle(
             color: Color(0x8CFFFFFF),
             fontSize: 10,
@@ -764,11 +854,11 @@ class SubscriptionTermsScreen extends StatelessWidget {
     ),
     (
       'Billing and renewal',
-      'Paid plans renew automatically at the end of each month or year until you cancel. Yearly billing is offered at a 30% saving versus paying month by month. Prices are shown in US dollars. Taxes may apply where required.',
+      'Paid plans renew automatically at the end of each month or year until you cancel. Subscriptions are bought and billed through Google Play; the price is the one Google Play shows, in your local currency. Taxes may apply where required.',
     ),
     (
       'Cancellation',
-      'Cancel anytime from Subscription or your store account. Cancellation stops the next renewal. You keep access until the period you already paid for ends. Purchases are final once a period has started, except where local law says otherwise.',
+      'Cancel anytime in Google Play → Subscriptions. Cancellation stops the next renewal. You keep access until the period you already paid for ends. Purchases are final once a period has started, except where local law says otherwise.',
     ),
     (
       'Wellness, not medical advice',

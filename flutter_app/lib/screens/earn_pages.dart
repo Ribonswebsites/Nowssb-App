@@ -17,6 +17,9 @@ import '../data/practice_progress.dart';
 import '../theme/tokens.dart';
 import '../widgets/app_backdrop.dart';
 import '../admin/template/editable.dart';
+import '../data/billing_config.dart';
+import '../data/play_subscriptions.dart';
+import 'subscription.dart';
 
 class EarnScreen extends StatelessWidget {
   const EarnScreen({super.key});
@@ -842,30 +845,30 @@ class _PlanRow extends StatelessWidget {
   const _PlanRow({required this.plan});
   final EarnPlan plan;
 
+  // Plans are Google Play subscriptions only (no coins, no "cash
+  // recorded"): the row opens the Subscription screen, which buys through
+  // Play and unlocks after the server confirms.
   @override
   Widget build(BuildContext context) {
-    final current = EarnWallet.instance.holdsPlan(plan.name);
-    return _GoldBtn(
-      label: current ? '${plan.name} · current' : '${plan.name} · ${FxBook.instance.formatRupees(plan.rupees)}',
-      filled: !current,
-      onTap: current
-          ? null
-          : () async {
-              final err = await showCoinPaySheet(
-                context,
-                title: plan.name,
-                price: plan.rupees,
-                onPay: (use) => EarnWallet.instance.pay(
-                  title: plan.name,
-                  price: plan.rupees,
-                  useCoins: use,
-                  kind: 'Subscription',
-                  id: 'plan:${plan.name}',
-                ),
-              );
-              if (!context.mounted) return;
-              _paid(context, err, '${plan.name} is your plan.');
-            },
+    return ListenableBuilder(
+      listenable: PlaySubscriptions.instance,
+      builder: (context, _) {
+        final tier = tierForPlanName(plan.name);
+        final current = tier != null && PlaySubscriptions.instance.activeTier == tier;
+        final p = tier == null ? null : playPlanFor(tier, yearly: false);
+        final price = p == null ? null : PlaySubscriptions.instance.priceFor(p.productId);
+        return _GoldBtn(
+          label: current
+              ? '${plan.name} · current'
+              : '${plan.name} · ${price == null ? 'Google Play' : '$price / month'}',
+          filled: !current,
+          onTap: current
+              ? null
+              : () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(builder: (_) => const SubscriptionScreen()),
+                  ),
+        );
+      },
     );
   }
 }
@@ -1033,7 +1036,7 @@ class _PaySheetState extends State<_PaySheet> {
             ),
           ),
           const EditableLabel('earn_pages.PaySheet',
-            'The cash share is saved as an order. A real card or UPI charge needs Razorpay or Play Billing.',
+            'The cash share is saved as an order on this phone. No card or UPI charge is taken here.',
             style: TextStyle(color: Color(0x99FFFFFF), fontSize: 12, height: 1.35),
           ),
           const SizedBox(height: 14),

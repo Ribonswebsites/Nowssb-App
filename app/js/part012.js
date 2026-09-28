@@ -2707,8 +2707,8 @@ function rmConfirmWordRequest() {
   word = word.charAt(0).toUpperCase() + word.slice(1);
   var sheet = document.getElementById('rmReqSheet');
   if (sheet) sheet.remove();
-  // TODO: integrate payment $2.99 here — same placeholder pattern as
-  // wsConfirmRequest() in part030.js until Razorpay is wired up.
+  // No payment is taken on the website (purchases are Google Play only, in
+  // the Android app); the request is recorded for the studio.
   /* The request has to actually go somewhere. This sat behind a 1.8s
      timer and a success sheet and wrote nothing, so every word anybody
      asked for died in their tab and the studio's list stayed empty. It

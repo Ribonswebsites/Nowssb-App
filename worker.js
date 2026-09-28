@@ -6,27 +6,18 @@
  *
  * Required Secrets (set via wrangler secret put OR CF Dashboard):
  *   GROQ_API_KEY         — from console.groq.com
- *   RAZORPAY_KEY_ID      — from Razorpay Dashboard
- *   RAZORPAY_KEY_SECRET  — from Razorpay Dashboard (NEVER in frontend)
  *   ELEVENLABS_API_KEY   — from elevenlabs.io
  *   ANTHROPIC_API_KEY    — from console.anthropic.com (NEVER in frontend)
  *
  * Endpoints:
  *   POST /api/groq/transcribe   — Groq Whisper (pronunciation scoring)
  *   POST /api/groq/complete     — Groq LLM (sentence gen, daily prescription, AI feedback)
- *   POST /api/razorpay/order        — Create Razorpay order (server-side, returns order_id)
- *   POST /api/razorpay/subscription — Create Razorpay subscription (auto-pay, returns subscription_id)
  *   POST /api/elevenlabs/speak      — ElevenLabs TTS (generate word audio)
  *   POST /api/claude/complete       — Claude AI (persona feedback, onboarding, conversation mode)
  *   GET  /api/health                — health check
  *
- * Razorpay subscription plan IDs (set as env vars):
- *   RAZORPAY_PLAN_RESONANCE_MONTHLY   — plan_id for Resonance monthly $4.99
- *   RAZORPAY_PLAN_RESONANCE_YEARLY    — plan_id for Resonance yearly $49.99
- *   RAZORPAY_PLAN_FREQUENCY_MONTHLY   — plan_id for Frequency monthly $9.99
- *   RAZORPAY_PLAN_FREQUENCY_YEARLY    — plan_id for Frequency yearly $99.99
- *   RAZORPAY_PLAN_FREQUENCYX_MONTHLY  — plan_id for Frequency X monthly $19.99
- *   RAZORPAY_PLAN_FREQUENCYX_YEARLY   — plan_id for Frequency X yearly $199.99
+ * Payments are not handled here. Subscriptions are Google Play Billing only,
+ * verified by the Pages Function functions/api/play/verify.js on nowssb.com.
  */
 
 const ALLOWED_ORIGINS = [
@@ -169,98 +160,6 @@ export default {
 
       const data = await groqRes.json();
       return json(data, 200, origin);
-    }
-
-    // ── Razorpay: create order (server-side only) ─────────────────────────────
-    if (path === '/api/razorpay/order') {
-      /*
-       * Expects { amount, currency?, notes? }
-       * amount in the currency's minor unit ($1 = 100 cents). App is universal → USD.
-       * Returns { id, amount, currency } — pass id to Razorpay checkout in frontend
-       */
-      const { amount, currency = 'USD', notes = {} } = body;
-      if (!amount || isNaN(amount) || amount < 50) {
-        return err('amount (in minor units) required, min 50', 400, origin);
-      }
-
-      const credentials = btoa(`${env.RAZORPAY_KEY_ID}:${env.RAZORPAY_KEY_SECRET}`);
-      const rzpRes = await fetch('https://api.razorpay.com/v1/orders', {
-        method: 'POST',
-        headers: {
-          Authorization: `Basic ${credentials}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          amount: Math.round(amount),
-          currency,
-          receipt: `nwsb_${Date.now()}`,
-          notes,
-        }),
-      });
-
-      if (!rzpRes.ok) {
-        const errText = await rzpRes.text();
-        return err(`Razorpay order creation failed: ${errText}`, 502, origin);
-      }
-
-      const order = await rzpRes.json();
-      // Only return what the frontend needs — never expose Key Secret
-      return json({ id: order.id, amount: order.amount, currency: order.currency }, 200, origin);
-    }
-
-    // ── Razorpay: create subscription (auto-pay) ─────────────────────────────
-    if (path === '/api/razorpay/subscription') {
-      /*
-       * Expects { tier, billing, email, total_count? }
-       * tier: 'resonance' | 'frequency' | 'frequencyX'
-       * billing: 'monthly' | 'yearly'
-       * Returns { subscription_id } — pass to Razorpay checkout in frontend
-       *
-       * The subscription starts after the 15-day trial period.
-       * Razorpay collects the mandate/card during checkout but first charge
-       * happens at start_at (15 days from now).
-       */
-      const { tier, billing = 'monthly', email = '', total_count = 12 } = body;
-      if (!tier) return err('tier required', 400, origin);
-
-      const planMap = {
-        resonance_monthly:   env.RAZORPAY_PLAN_RESONANCE_MONTHLY,
-        resonance_yearly:    env.RAZORPAY_PLAN_RESONANCE_YEARLY,
-        frequency_monthly:   env.RAZORPAY_PLAN_FREQUENCY_MONTHLY,
-        frequency_yearly:    env.RAZORPAY_PLAN_FREQUENCY_YEARLY,
-        frequencyX_monthly:  env.RAZORPAY_PLAN_FREQUENCYX_MONTHLY,
-        frequencyX_yearly:   env.RAZORPAY_PLAN_FREQUENCYX_YEARLY,
-      };
-      const planId = planMap[`${tier}_${billing}`];
-      if (!planId) return err(`No plan configured for ${tier}/${billing}`, 400, origin);
-
-      // Trial ends in 15 days — auto-charge starts then
-      const trialEndUnix = Math.floor(Date.now() / 1000) + 15 * 24 * 60 * 60;
-
-      const credentials = btoa(`${env.RAZORPAY_KEY_ID}:${env.RAZORPAY_KEY_SECRET}`);
-      const rzpRes = await fetch('https://api.razorpay.com/v1/subscriptions', {
-        method: 'POST',
-        headers: {
-          Authorization: `Basic ${credentials}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          plan_id: planId,
-          total_count: billing === 'yearly' ? 5 : total_count,
-          quantity: 1,
-          start_at: trialEndUnix,
-          customer_notify: 1,
-          notes: { email, tier, billing },
-        }),
-      });
-
-      if (!rzpRes.ok) {
-        const errText = await rzpRes.text();
-        return err(`Razorpay subscription creation failed: ${errText}`, 502, origin);
-      }
-
-      const sub = await rzpRes.json();
-      return json({ subscription_id: sub.id, start_at: trialEndUnix }, 200, origin);
     }
 
     // ── ElevenLabs: text-to-speech ────────────────────────────────────────────

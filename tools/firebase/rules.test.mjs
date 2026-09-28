@@ -109,7 +109,12 @@ await t('admin creates notification', assertSucceeds(addDoc(collection(boss, 'us
 await t('user creates own notification denied', assertFails(addDoc(collection(alice, 'users/alice/notifications'), { title: 't' })));
 await t('admin creates inbox', assertSucceeds(addDoc(collection(boss, 'users/alice/inbox'), { title: 't', read: false })));
 // payments (server-written receipts) + server-only subscription fields
-await t('self set subscriptionSource denied', assertFails(setDoc(doc(alice, 'users/alice'), { subscriptionSource: 'razorpay' }, { merge: true })));
+await t('self set subscriptionSource denied', assertFails(setDoc(doc(alice, 'users/alice'), { subscriptionSource: 'play' }, { merge: true })));
+await t('self set subscriptionProductId denied', assertFails(setDoc(doc(alice, 'users/alice'), { subscriptionProductId: 'nowssb_frequency_monthly' }, { merge: true })));
+await t('self set subscriptionTokenHash denied', assertFails(setDoc(doc(alice, 'users/alice'), { subscriptionTokenHash: 'x' }, { merge: true })));
+await t('self set verifyTier denied', assertFails(setDoc(doc(alice, 'users/alice'), { verifyTier: 'gold' }, { merge: true })));
+await t('create with verifyTier denied', assertFails(setDoc(doc(env.authenticatedContext('n3').firestore(), 'users/n3'), { uid: 'n3', verifyTier: 'blue' })));
+await t('admin sets verifyTier ok', assertSucceeds(setDoc(doc(boss, 'users/alice'), { verifyTier: 'blue' }, { merge: true })));
 await t('self set subscriptionOrderId denied', assertFails(setDoc(doc(alice, 'users/alice'), { subscriptionOrderId: 'order_x' }, { merge: true })));
 await t('user reads own payment', assertSucceeds(getDoc(doc(alice, 'payments/pay_A'))));
 await t('user lists own payments', assertSucceeds(getDocs(query(collection(alice, 'payments'), where('uid', '==', 'alice')))));

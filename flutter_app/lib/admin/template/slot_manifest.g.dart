@@ -74,7 +74,7 @@ const kSlotManifest = <List<String>>[
   ['earn_pages.EarnScreen.buy-a-meaning', 'text', 'Buy a meaning', 'screens/earn_pages.dart'],
   ['earn_pages.EarnScreen.buy-a-word', 'text', 'Buy a word', 'screens/earn_pages.dart'],
   ['earn_pages.NetworkScreen.your-code', 'text', 'YOUR CODE', 'screens/earn_pages.dart'],
-  ['earn_pages.PaySheet.the-cash-share-is-saved-as-an-order-a-re-1d3760ef', 'text', 'The cash share is saved as an order. A real card or UPI charge needs Razorpay or Play Billing.', 'screens/earn_pages.dart'],
+  ['earn_pages.PaySheet.the-cash-share-is-saved-as-an-order-on-t-74c945e6', 'text', 'The cash share is saved as an order on this phone. No card or UPI charge is taken here.', 'screens/earn_pages.dart'],
   ['earn_pages.SellShopScreen.cancel', 'text', 'Cancel', 'screens/earn_pages.dart'],
   ['earn_pages.SellShopScreen.confirm-sale', 'text', 'Confirm sale', 'screens/earn_pages.dart'],
   ['earn_pages.SellShopScreen.list', 'text', 'List', 'screens/earn_pages.dart'],

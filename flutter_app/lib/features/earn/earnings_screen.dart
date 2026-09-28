@@ -63,7 +63,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
         ? message
         : rail == 'unsupported'
             ? 'This country is not supported yet. Your balance stays here.'
-            : rail == 'razorpayx'
+            : rail == 'upi_manual'
                 ? 'India payouts will settle in INR to your UPI.'
                 : 'Payout account saved.';
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: EditableLabel('earnings_screen.EarningsScreen', text)));
@@ -104,7 +104,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
                 unsupported
                     ? 'This country is not on a payout rail yet. Earnings stay in your balance and are not sent in the wrong currency.'
                     : india
-                        ? 'India settles in INR through RazorpayX to your UPI.'
+                        ? 'India settles in INR to your UPI id.'
                         : 'Everywhere else uses Stripe Connect. You finish identity checks in Stripe, then payouts go to your local bank.',
               ),
               const SizedBox(height: 12),

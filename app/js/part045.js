@@ -240,150 +240,44 @@ window._updateTrialBanner = function() {
   banner.style.display = 'flex';
 };
 
-/* ── Subscribe with Razorpay ──
-   The server does the money part (functions/api/pay/*):
-     1. POST /api/pay/order  — the server picks the price for the plan and
-        creates a Razorpay order tagged with this account's uid.
-     2. Razorpay Checkout takes the payment.
-     3. POST /api/pay/verify — the server checks the signature, confirms the
-        payment with Razorpay and writes isPro/tier/subscriptionEndDate to
-        users/{uid}. The page never writes those fields itself (the Firestore
-        rules forbid it), and nothing is granted unless a real payment went
-        through. A Razorpay webhook grants it too, if this page is closed early. */
-var _PAY_BASE = (function () {
-  var h = location.hostname;
-  // Same-origin on nowssb.com / Pages previews / local dev; anywhere else
-  // (GitHub Pages mirror, app webview) calls the live site's API.
-  return (/(^|\.)nowssb\.com$/.test(h) || /\.pages\.dev$/.test(h) || h === 'localhost' || h === '127.0.0.1') && location.protocol.indexOf('http') === 0
-    ? '' : 'https://nowssb.com';
-})();
+/* ── Subscriptions: Google Play only ──
+   NowssB plans are sold ONLY inside the Android app through Google Play
+   Billing, and the server (functions/api/play/verify.js) writes the plan to
+   users/{uid} after Google confirms the purchase. The website never takes a
+   payment and never grants a plan or an item itself — every Subscribe /
+   Checkout button here opens this "get the app" prompt instead. */
+var NWSB_PLAY_URL = 'https://play.google.com/store/apps/details?id=com.nowssb.app';
+var NWSB_APK_URL = 'https://nowssb.com/download/flutter.apk';
 
-function _payNotice(msg) {
-  var el = document.getElementById('ss-pay-notice');
-  if (!el) {
-    el = document.createElement('div');
-    el.id = 'ss-pay-notice';
-    el.setAttribute('role', 'status');
-    el.style.cssText = 'position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:100000;max-width:90vw;' +
-      'background:#1b1b1f;color:#f3ecd9;border:1px solid rgba(232,213,163,.35);border-radius:12px;padding:12px 18px;' +
-      'font:500 14px/1.4 system-ui,sans-serif;box-shadow:0 8px 30px rgba(0,0,0,.4);text-align:center';
-    document.body.appendChild(el);
-  }
-  el.textContent = msg;
-  el.style.display = 'block';
-  clearTimeout(el._t);
-  el._t = setTimeout(function () { el.style.display = 'none'; }, 6000);
-}
-
-function _payPost(path, body) {
-  var user = window._currentUser;
-  return user.getIdToken().then(function (tok) {
-    return fetch(_PAY_BASE + path, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tok },
-      body: JSON.stringify(body)
-    });
-  }).then(function (r) {
-    return r.json().catch(function () { return {}; }).then(function (d) {
-      if (!r.ok) { var e = new Error(d.error || ('HTTP ' + r.status)); e.status = r.status; throw e; }
-      return d;
-    });
-  });
-}
-
-var _payBusy = false;
-window.ssStartSubscription = function(planId, billing) {
-  var plan = SS_PLANS.find(function(p){ return p.id === planId; });
-  if (!plan) return;
-  billing = billing === 'yearly' ? 'yearly' : 'monthly';
-  var user = window._currentUser;
-  if (!user || typeof user.getIdToken !== 'function') { _payNotice('Sign in first, then choose your plan.'); return; }
-  if (typeof Razorpay === 'undefined') { _payNotice('The payment window could not load. Check your connection and try again.'); return; }
-  if (_payBusy) return;
-  _payBusy = true;
-
-  _payPost('/api/pay/order', { plan: planId, billing: billing }).then(function (ord) {
-    var rzp = new Razorpay({
-      key: ord.keyId,
-      amount: ord.amount,
-      currency: ord.currency,
-      order_id: ord.orderId,
-      name: 'NowssB',
-      description: plan.name + ' — ' + (billing === 'yearly' ? 'Yearly' : 'Monthly'),
-      prefill: { email: user.email || '', name: user.displayName || '' },
-      theme: { color: '#e8d5a3' },
-      notes: { tier: planId, billing: billing },
-      modal: { ondismiss: function () { _payBusy = false; } },
-      handler: function (response) {
-        _payNotice('Confirming your payment…');
-        _payPost('/api/pay/verify', {
-          razorpay_order_id: response.razorpay_order_id,
-          razorpay_payment_id: response.razorpay_payment_id,
-          razorpay_signature: response.razorpay_signature
-        }).then(function (res) {
-          _payBusy = false;
-          var n = document.getElementById('ss-pay-notice'); if (n) n.style.display = 'none';
-          _onSubscriptionSuccess(res, planId, billing);
-        }).catch(function (e) {
-          _payBusy = false;
-          _payNotice('Payment received, but we could not confirm it yet (' + e.message + '). It will be applied automatically — reload in a minute.');
-        });
-      }
-    });
-    rzp.on && rzp.on('payment.failed', function (r) {
-      _payNotice('Payment failed: ' + ((r && r.error && r.error.description) || 'please try again.'));
-    });
-    rzp.open();
-  }).catch(function (e) {
-    _payBusy = false;
-    _payNotice(e.status === 501 ? 'Payments are not available right now. Please try again later.' : ('Could not start the payment: ' + e.message));
-  });
+window.nwsbGetAppPrompt = function (what) {
+  var old = document.getElementById('nwsb-get-app');
+  if (old) old.remove();
+  var ov = document.createElement('div');
+  ov.id = 'nwsb-get-app';
+  ov.setAttribute('role', 'dialog');
+  ov.setAttribute('aria-modal', 'true');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:100000;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.72);';
+  var title = what || 'Subscriptions and purchases';
+  ov.innerHTML =
+    '<div style="width:100%;max-width:480px;background:#0e1624;border-radius:20px 20px 0 0;border-top:1px solid rgba(232,213,163,.18);padding:26px 24px 36px;font-family:\'DM Sans\',system-ui,sans-serif;">' +
+      '<div style="width:40px;height:4px;background:rgba(255,255,255,.15);border-radius:2px;margin:0 auto 22px;"></div>' +
+      '<div style="font-size:11px;font-weight:600;letter-spacing:1.2px;color:rgba(232,213,163,.6);text-transform:uppercase;margin-bottom:8px;">Get the NowssB app</div>' +
+      '<div data-title="1" style="font-size:19px;font-weight:700;color:#fff;margin-bottom:10px;line-height:1.3;"></div>' +
+      '<div style="font-size:13px;color:rgba(255,255,255,.62);line-height:1.6;margin-bottom:22px;">Payments are handled only by Google Play inside the NowssB Android app. Nothing is charged or unlocked on this website. Sign in to the app with the same account and your plan applies everywhere.</div>' +
+      '<a href="' + NWSB_PLAY_URL + '" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none;width:100%;box-sizing:border-box;padding:15px;background:linear-gradient(135deg,rgba(232,213,163,.95),rgba(200,170,100,.9));color:#0a0e1a;font-size:14px;font-weight:700;border-radius:12px;margin-bottom:10px;">Get it on Google Play</a>' +
+      '<a href="' + NWSB_APK_URL + '" style="display:block;text-align:center;text-decoration:none;width:100%;box-sizing:border-box;padding:13px;background:rgba(255,255,255,.06);color:rgba(255,255,255,.7);font-size:13px;border:1px solid rgba(255,255,255,.1);border-radius:12px;margin-bottom:10px;">Download the Android app (APK)</a>' +
+      '<button type="button" data-close="1" style="width:100%;padding:13px;background:none;color:rgba(255,255,255,.45);font-size:13px;border:none;cursor:pointer;">Not now</button>' +
+    '</div>';
+  ov.querySelector('[data-title]').textContent = title + ' are in the Android app';
+  function close() { ov.remove(); }
+  ov.addEventListener('click', function (e) { if (e.target === ov || (e.target.getAttribute && e.target.getAttribute('data-close'))) close(); });
+  document.body.appendChild(ov);
 };
 
-/* Runs only after /api/pay/verify said the plan is on the account (the
-   server already wrote it) — this just refreshes the page's copy and UI. */
-function _onSubscriptionSuccess(res, planId, billing) {
-  var user = window._currentUser;
-  if (!user) return;
-  if (window._userDataCache) {
-    window._userDataCache.isPro = true;
-    window._userDataCache.tier = res.tier || planId;
-    window._userDataCache.subscriptionBilling = res.billing || billing;
-    window._userDataCache.subscriptionEndDate = res.subscriptionEndDate;
-    window._userDataCache.subscriptionPaymentId = res.paymentId;
-    window._userDataCache.subscriptionSource = 'razorpay';
-  }
-
-  // Some plans include a free verification badge (Frequency X → Blue) — grant
-  // it, but never downgrade a tier the user already has (e.g. already Gold).
-  var subscribedPlan = SS_PLANS.find(function(p){ return p.id === planId; });
-  if (subscribedPlan && subscribedPlan.grantsVerifyTier) {
-    var vtierRank = { blue:1, silver:2, gold:3, diamond:4 };
-    var curVtier = '';
-    try { curVtier = localStorage.getItem('nwsb_verify_tier') || ''; } catch(e) {}
-    if (!curVtier) curVtier = (window._userDataCache && window._userDataCache.verifyTier) || '';
-    if (!curVtier || (vtierRank[subscribedPlan.grantsVerifyTier] || 0) > (vtierRank[curVtier] || 0)) {
-      try { localStorage.setItem('nwsb_verify_tier', subscribedPlan.grantsVerifyTier); } catch(e) {}
-      if (window._userDataCache) window._userDataCache.verifyTier = subscribedPlan.grantsVerifyTier;
-      if (window._fbSetDoc) window._fbSetDoc(user.uid, { verifyTier: subscribedPlan.grantsVerifyTier }).catch(function(){});
-    }
-  }
-
-  // Hide trial banner and promo bars
-  var banner = document.getElementById('trial-banner');
-  if (banner) banner.style.display = 'none';
-  if (window._spRefreshPromo) window._spRefreshPromo();
-
-  // Hide expired overlay if shown
-  var expOv = document.getElementById('trial-expired-overlay');
-  if (expOv) expOv.style.display = 'none';
-
-  // Close subscription panel
-  if (window.ssClosePanel) window.ssClosePanel('subscription');
-
-  // Show success screen
-  _showSubscriptionSuccess(planId);
-}
+window.ssStartSubscription = function (planId) {
+  var plan = (window.SS_PLANS || []).find(function (p) { return p.id === planId; });
+  window.nwsbGetAppPrompt(plan ? plan.name + ' subscriptions' : 'Subscriptions');
+};
 
 /* Render plan cards inside the trial-expired overlay */
 function _renderExpiredPlanCards() {
@@ -394,7 +288,7 @@ function _renderExpiredPlanCards() {
     return '<div style="padding:20px;border-radius:16px;border:1.5px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);">'+
       '<div style="font-size:17px;font-weight:700;color:'+p.color+';font-family:\'DM Sans\',sans-serif;margin-bottom:4px;">'+p.name+'</div>'+
       '<div style="font-size:11px;color:rgba(255,255,255,.45);font-family:\'DM Sans\',sans-serif;margin-bottom:14px;">'+p.tagline+'</div>'+
-      '<div style="font-size:22px;font-weight:800;color:#fff;font-family:\'DM Sans\',sans-serif;margin-bottom:16px;">$'+p.price.monthly+'<span style="font-size:12px;font-weight:400;color:rgba(255,255,255,.45);">/mo</span></div>'+
+      '<div style="font-size:13px;font-weight:600;color:rgba(255,255,255,.7);font-family:\'DM Sans\',sans-serif;margin-bottom:16px;">Subscribe in the Android app (Google Play)</div>'+
       '<button onclick="ssStartSubscription(\''+p.id+'\',\'monthly\');document.getElementById(\'trial-expired-overlay\').style.display=\'none\'" style="width:100%;padding:13px 0;border-radius:12px;border:none;background:'+(bg[p.id]||bg.frequency)+';color:#060c18;font-size:14px;font-weight:700;font-family:\'DM Sans\',sans-serif;cursor:pointer;">Continue with '+p.name+'</button>'+
       '</div>';
   }).join('');

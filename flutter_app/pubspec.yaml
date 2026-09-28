@@ -21,6 +21,10 @@ dependencies:
   firebase_storage: ^12.3.4
   intl: ^0.19.0
   in_app_purchase: ^3.2.1
+  # Google Play subscriptions (lib/data/play_subscriptions.dart): offer
+  # tokens, upgrades, and sha256(uid) as the obfuscated account id.
+  in_app_purchase_android: ^0.5.0
+  crypto: ^3.0.3
   google_sign_in: ^6.2.1
 
   # Notifications. The sending side needs nothing new: functions/api/push.js

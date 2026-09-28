@@ -1,20 +1,37 @@
 # Cloudflare Pages → nowssb (this site) → Settings → Variables and Secrets → Production
-# Needed by functions/api/pay/{order,verify,webhook}.js (Razorpay subscriptions).
-# Names only — never commit real values; add them as encrypted "Secret" variables.
+# Names only — never commit real values. Add each as an encrypted "Secret".
 #
-# Razorpay Dashboard → Account & Settings → API Keys (live mode):
-RAZORPAY_KEY_ID=
-RAZORPAY_KEY_SECRET=
-# Razorpay Dashboard → Webhooks → Add: URL https://nowssb.com/api/pay/webhook,
-# events payment.captured + order.paid, and the secret you type there:
-RAZORPAY_WEBHOOK_SECRET=
+# ── Google Play Billing (functions/api/play/verify.js, functions/api/play/rtdn.js) ──
+# Google Cloud service account JSON (whole file). Invite its email in
+# Play Console → Users and permissions with app access to NowssB and the
+# permissions "View financial data, orders, and cancellation survey responses"
+# and "Manage orders and subscriptions". The Google Play Android Developer API
+# must be enabled in that service account's Google Cloud project.
+PLAY_SERVICE_ACCOUNT_JSON=
 # Firebase console → Project settings → Service accounts → Generate new private
-# key; paste the whole JSON. (FCM_SERVICE_ACCOUNT is used instead if this one is
-# absent and it holds the same Firebase Admin service-account JSON.)
+# key (project nowssb-34f1b); paste the whole JSON. Used for Firestore REST.
 FIREBASE_SERVICE_ACCOUNT=
-# Already set:
-# FIREBASE_PROJECT_ID=nowssb-34f1b
+# Same kind of JSON, used by /api/push and /api/users (FCM). The Play functions
+# fall back to it when FIREBASE_SERVICE_ACCOUNT is absent.
+FCM_SERVICE_ACCOUNT=
+FIREBASE_PROJECT_ID=nowssb-34f1b
 #
-# Until all of these exist, /api/pay/* answers 501 naming what is missing and
-# the website shows "Payments are not available right now" — nothing is granted.
-# Offline test: node tools/pay/pay-functions.test.mjs
+# ── Cloudflare R2 media uploads (functions/api/admin/upload-url.js) ──
+R2_ACCOUNT_ID=
+R2_BUCKET=
+R2_ACCESS_KEY_ID=
+R2_SECRET_ACCESS_KEY=
+R2_PUBLIC_BASE_URL=https://media.nowssb.com
+#
+# Until the Play variables exist, /api/play/* answers 501 naming what is
+# missing and the app says purchases are not available — nothing is granted.
+# Offline test: node tools/play/play-functions.test.mjs
+#
+# Real-time Developer Notifications (optional, recommended — renewals,
+# cancellations, expiry): Google Cloud → Pub/Sub → create topic (e.g.
+# play-rtdn); give google-play-developer-notifications@system.gserviceaccount.com
+# the "Pub/Sub Publisher" role on it; Play Console → Monetization setup →
+# Real-time developer notifications → that topic. Then add a PUSH subscription
+# on the topic: endpoint https://nowssb.com/api/play/rtdn, "Enable
+# authentication" with the PLAY_SERVICE_ACCOUNT_JSON service account, audience
+# left empty (defaults to the endpoint URL).

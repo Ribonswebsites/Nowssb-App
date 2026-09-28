@@ -944,7 +944,7 @@ const STRIPE_PAYOUT_COUNTRIES = new Set([
 
 function payoutRailFor(country) {
   const code = String(country || '').trim().toUpperCase();
-  if (code === 'IN') return 'razorpayx';
+  if (code === 'IN') return 'upi_manual';
   if (STRIPE_PAYOUT_COUNTRIES.has(code)) return 'stripe_connect';
   return 'unsupported';
 }
@@ -983,7 +983,7 @@ exports.requestPayout = onCall(async (request) => {
       });
       return;
     }
-    if (rail === 'razorpayx' && !/^[\w.\-]{2,}@[\w.\-]{2,}$/.test(vpa)) {
+    if (rail === 'upi_manual' && !/^[\w.\-]{2,}@[\w.\-]{2,}$/.test(vpa)) {
       throw new HttpsError('failed-precondition', 'Add a UPI id before requesting a payout.');
     }
     if (rail === 'stripe_connect' && !stripeAccountId) {
@@ -997,7 +997,7 @@ exports.requestPayout = onCall(async (request) => {
       currency: 'USD',
       country,
       rail,
-      settlementCurrency: rail === 'razorpayx' ? 'INR' : country,
+      settlementCurrency: rail === 'upi_manual' ? 'INR' : country,
       status: 'pending_review',
       at: stamp(),
     });
@@ -1014,31 +1014,11 @@ exports.requestPayout = onCall(async (request) => {
   if (rail === 'stripe_connect') {
     return sendStripePayout({ uid, amount, requestRef, stripeAccountId, country });
   }
-  const key = process.env.RAZORPAYX_KEY_ID;
-  const secret = process.env.RAZORPAYX_KEY_SECRET;
-  const account = process.env.RAZORPAYX_ACCOUNT_NUMBER;
-  if (!key || !secret || !account) {
-    await requestRef.set({ status: 'queued', rail: 'razorpayx' }, { merge: true });
-    queueNotifyOutside(uid, 'Payout queued', 'Your payout is waiting for the India settlement rail.');
-    return { ok: true, status: 'queued', rail: 'razorpayx' };
-  }
-  try {
-    const fx = await db.doc('config/fx').get();
-    const inr = Number(fx.data()?.rates?.INR || 83.5);
-    const paise = Math.max(100, Math.round((amount / 100) * inr * 100));
-    const razorpayId = await sendRazorpayPayout({ key, secret, account, vpa, paise, reference: requestRef.id, uid });
-    await requestRef.set({
-      status: 'processing',
-      rail: 'razorpayx',
-      razorpayPayoutId: razorpayId,
-      settlementAmount: paise,
-    }, { merge: true });
-    return { ok: true, status: 'processing', rail: 'razorpayx' };
-  } catch (err) {
-    await restorePayout(uid, amount, requestRef.id);
-    await requestRef.set({ status: 'failed', rail: 'razorpayx' }, { merge: true });
-    throw new HttpsError('failed-precondition', 'The payout could not be sent. Your balance was returned.');
-  }
+  // India: UPI payouts are settled by hand from the studio (no automated
+  // payout provider is connected). The request stays queued until then.
+  await requestRef.set({ status: 'queued', rail: 'upi_manual' }, { merge: true });
+  await queueNotifyOutside(uid, 'Payout queued', 'Your payout is queued and will be sent to your UPI id.');
+  return { ok: true, status: 'queued', rail: 'upi_manual' };
 });
 
 async function restorePayout(uid, amount, ref) {
@@ -1095,87 +1075,6 @@ function queueNotifyOutside(uid, title, body) {
   });
 }
 
-async function sendRazorpayPayout({ key, secret, account, vpa, paise, reference, uid }) {
-  const auth = Buffer.from(`${key}:${secret}`).toString('base64');
-  const headers = { Authorization: `Basic ${auth}`, 'Content-Type': 'application/json' };
-  const contactRes = await fetch('https://api.razorpay.com/v1/contacts', {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({ name: 'NowssB member', type: 'customer', reference_id: uid.slice(0, 20) }),
-  });
-  const contact = await contactRes.json();
-  if (!contactRes.ok) throw new Error(contact.error?.description || 'contact');
-  const fundRes = await fetch('https://api.razorpay.com/v1/fund_accounts', {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({
-      contact_id: contact.id,
-      account_type: 'vpa',
-      vpa: { address: vpa },
-    }),
-  });
-  const fund = await fundRes.json();
-  if (!fundRes.ok) throw new Error(fund.error?.description || 'fund');
-  const payRes = await fetch('https://api.razorpay.com/v1/payouts', {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({
-      account_number: account,
-      fund_account_id: fund.id,
-      amount: paise,
-      currency: 'INR',
-      mode: 'UPI',
-      purpose: 'payout',
-      queue_if_low_balance: true,
-      reference_id: reference.slice(0, 40),
-    }),
-  });
-  const payout = await payRes.json();
-  if (!payRes.ok) throw new Error(payout.error?.description || 'payout');
-  return payout.id || '';
-}
-
-exports.razorpayPayoutWebhook = onRequest(async (req, res) => {
-  const secret = process.env.RAZORPAYX_WEBHOOK_SECRET;
-  if (!secret) {
-    res.status(503).send('unconfigured');
-    return;
-  }
-  const expected = crypto.createHmac('sha256', secret).update(req.rawBody || '').digest('hex');
-  const got = String(req.get('x-razorpay-signature') || '');
-  if (expected !== got) {
-    res.status(401).send('bad signature');
-    return;
-  }
-  const event = String(req.body?.event || '');
-  const entity = req.body?.payload?.payout?.entity || {};
-  const id = entity.id;
-  if (!id) {
-    res.status(200).send('ok');
-    return;
-  }
-  const found = await db.collection('payoutRequests').where('razorpayPayoutId', '==', id).limit(1).get();
-  if (!found.empty) {
-    const status = event.includes('processed') ? 'paid' : event.includes('failed') || event.includes('reversed') ? 'failed' : 'processing';
-    const row = found.docs[0].data();
-    const prev = String(row.status || '');
-    await found.docs[0].ref.set({ status }, { merge: true });
-    if (status === 'paid' && prev !== 'paid') {
-      await db.collection(`users/${row.uid}/notifications`).add({
-        title: 'Payout sent', body: 'Your earnings payout was processed.', kind: 'payout', refId: id, read: false, at: stamp(),
-      });
-    }
-    if (status === 'failed' && prev !== 'failed' && prev !== 'paid') {
-      await db.runTransaction(async (tx) => {
-        const payout = await tx.get(db.doc(`users/${row.uid}/payout/main`));
-        remember(tx, row.uid, null, Number(payout.data()?.cashBalance || 0));
-        writeCash(tx, row.uid, Number(row.amountBase || 0), 'Payout failed', id);
-      });
-    }
-  }
-  res.status(200).send('ok');
-});
-
 exports.refreshFxRates = onSchedule('every 24 hours', async () => {
   await refreshFx(db, stamp);
 });
@@ -1198,12 +1097,12 @@ exports.savePayoutAccount = onCall(async (request) => {
       message: 'Payouts are not available in this country yet. Your earnings stay in your balance.',
     };
   }
-  if (rail === 'razorpayx') {
+  if (rail === 'upi_manual') {
     if (!/^[\w.\-]{2,}@[\w.\-]{2,}$/.test(upi)) {
       throw new HttpsError('invalid-argument', 'Enter a UPI id like name@bank.');
     }
-    await ref.set({ country, upi, payoutRail: 'razorpayx', email }, { merge: true });
-    return { ok: true, rail: 'razorpayx' };
+    await ref.set({ country, upi, payoutRail: 'upi_manual', email }, { merge: true });
+    return { ok: true, rail: 'upi_manual' };
   }
   const key = process.env.STRIPE_SECRET_KEY;
   const client = process.env.STRIPE_CONNECT_CLIENT_ID;

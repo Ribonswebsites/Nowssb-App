@@ -35,6 +35,7 @@ import 'data/presence.dart';
 import 'data/quotes_remote.dart';
 import 'data/word_requests.dart';
 import 'data/cart_bag.dart';
+import 'data/play_subscriptions.dart';
 import 'data/settings.dart';
 import 'media/video_pool.dart';
 import 'screens/auth_gate.dart';
@@ -69,6 +70,8 @@ Future<void> main() async {
   await EarnWallet.instance.start();
   await EconomyMirror.instance.start();
   await FxBook.instance.start();
+  // Google Play subscriptions: listen for purchases Play delivers at launch.
+  unawaited(PlaySubscriptions.instance.start());
   await ContentStore.instance.start();
 
   // Admin mode and the live template layer (lib/admin). Overrides load from

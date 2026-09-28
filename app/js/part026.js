@@ -595,8 +595,8 @@ window.msConfirmMeaningRequest = function() {
   word = word.charAt(0).toUpperCase() + word.slice(1);
   var sheet = document.getElementById('msReqSheet');
   if (sheet) sheet.remove();
-  // TODO: integrate payment ₹199 here — same placeholder pattern as
-  // rmConfirmWordRequest() in part012.js until Razorpay is wired up.
+  // No payment is taken on the website (purchases are Google Play only, in
+  // the Android app); the request is recorded for the studio.
   var waiting = window.nwsbProcessingOverlay('msReqWaiting', 'Decoding request…');
   document.body.appendChild(waiting);
   /* The request has to reach somebody. It goes to Firestore, where the

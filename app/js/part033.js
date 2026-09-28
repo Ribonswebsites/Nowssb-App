@@ -850,8 +850,8 @@
       window._nwsbVrLoopTimer = setInterval(function () { paintLoops(true); }, 2600);
     },
     /* ── Verification KYC wizard — real name → DOB → residence → documents →
-       review, then hands off to the real payment gateway (buyVerify → cart →
-       Razorpay checkout). Pre-fills from the user's profile where available. ── */
+       review, then hands off to checkout (buyVerify → cart → checkout, which
+       points to the Android app: purchases are Google Play only). Pre-fills from the user's profile where available. ── */
     verifyKyc:function(tier, billing){
       var t=null; for(var i=0;i<VERIFY_TIERS.length;i++){ if(VERIFY_TIERS[i].key===tier){ t=VERIFY_TIERS[i]; break; } }
       if(!t) return;
@@ -1211,12 +1211,12 @@
         window._fbSetDoc(window._currentUid, {kycName:st.name,kycDob:st.dob,kycCountry:st.country,kycCity:st.city,kycSubmitted:true}).catch(function(){});
       }
       var p=document.getElementById('nwsb-vkyc'); if(p) p.remove();
-      // Hand off to the REAL payment gateway (adds badge to bag → checkout → Razorpay)
+      // Hand off to checkout (adds badge to bag → checkout → Android app prompt)
       this.buyVerify(st.tier, st.billing);
     },
     buyVerify:function(tier, billing){
       // Put the badge in the shopping bag and send the user through the real
-      // checkout — the badge is granted by chkHandleSuccess after payment.
+      // checkout. The website never grants the badge; it is bought in the app.
       var t=null; for(var i=0;i<VERIFY_TIERS.length;i++){ if(VERIFY_TIERS[i].key===tier){ t=VERIFY_TIERS[i]; break; } }
       if(!t) return;
       var isYear = (billing==='yearly' && t.yearly);

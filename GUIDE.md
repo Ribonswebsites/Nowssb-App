@@ -97,7 +97,7 @@ NowssB is a personalized daily word & sentence practice app built on **Shabdapat
 ├── index.html          ← THE entire main app (~22,500 lines, single-file SPA)
 ├── admin.html          ← CEO admin panel (password protected)
 ├── admin-dev.html      ← Developer admin variant
-├── worker.js           ← Cloudflare Worker (Razorpay order_id server)
+├── worker.js           ← Cloudflare Worker (AI/TTS proxy; no payments)
 ├── GUIDE.md            ← This file
 ├── assets/             ← Static assets
 └── components/         ← Component files
@@ -150,7 +150,7 @@ gender               'male' | 'female' | 'other'
 onboardingDone       boolean
 isPro                boolean  legacy — tier field is source of truth
 tier                 'resonance' | 'frequency' | 'frequencyX' | null
-subscriptionType     'razorpay' | 'admin_grant'
+subscriptionSource   'play' | 'admin_grant'
 subscriptionBilling  'monthly' | 'yearly'
 subscriptionStart    ISO string
 subscriptionEnd      ISO string
@@ -356,10 +356,9 @@ No permanent free tier. After trial expires, app is locked until a plan is chose
 | Free Blue verification badge | ✗ | ✗ | ✓ |
 
 ### Payment
-- **Gateway:** Razorpay
-- **Key location:** `index.html` — search `rzp_live_REPLACE_WITH_YOUR_KEY`
-- **Server:** `worker.js` (Cloudflare Worker) — generates `order_id` for Razorpay
-- **Post-payment:** `chkHandleSuccess()` — writes tier + subscription fields to Firestore
+- **Gateway:** Google Play Billing only, in the Flutter Android app (`flutter_app/lib/data/play_subscriptions.dart`, product ids in `flutter_app/lib/data/billing_config.dart`)
+- **Server:** Cloudflare Pages Function `functions/api/play/verify.js` — checks the purchase with the Google Play Developer API and writes tier + subscription fields to Firestore. `functions/api/play/rtdn.js` handles renewals/cancellations (Real-time Developer Notifications). Setup: `PAY_ENV.example`.
+- **Website:** never takes a payment or grants anything; Subscribe/Checkout show a "get the Android app" prompt.
 
 ---
 
@@ -471,7 +470,6 @@ In Android Studio: Build → Generate Signed APK/AAB → upload to Play Store.
 - Firebase works as-is (uses HTTP, not native SDK)
 - Replace `signInWithPopup` with `@codetrix-studio/capacitor-google-auth` for native Google Auth (bottom sheet, instant — see Section 13)
 - Microphone permission: add to `AndroidManifest.xml`
-- Razorpay JS checkout is unreliable inside WebViews — needs Razorpay Android SDK (see Section 13)
 
 ---
 
@@ -564,10 +562,8 @@ Both read and write to the same Firestore.
 **Status:** Firebase Dynamic Links is deprecated and shutting down. If email link authentication is used for mobile sign-in, it will stop working.
 **Fix:** Remove email link auth flow, or migrate to Firebase Hosting-based redirect links. For the APK, native deep links via Capacitor (`@capacitor/app`) can replace this.
 
-### 2. Razorpay JS Checkout Unreliable in WebViews
-**Impact:** Payments may silently fail inside the Capacitor APK.
-**Status:** Razorpay's JavaScript checkout (`https://checkout.razorpay.com/v1/checkout.js`) is not designed for Android WebViews — it opens a popup that gets blocked or silently fails.
-**Fix before APK build:** Integrate the **Razorpay Android SDK** via a Capacitor plugin or use Razorpay's Cordova/Capacitor plugin. The web version (browser) is fine.
+### 2. Payments are Google Play only
+**Status:** Subscriptions are sold only in the Flutter Android app through Google Play Billing and verified server-side by `functions/api/play/verify.js`. The website shows a "get the app" prompt instead of a checkout.
 
 ### 3. Admin Password in Plain Text
 **Impact:** Anyone who views `admin.html` source can see the password.
@@ -588,15 +584,8 @@ Replace the `signInWithPopup` call with the Capacitor Google Auth plugin. The we
 **Status:** `index.html` — search `PASTE_YOUR_GROQ_KEY_HERE` — placeholder, not wired.
 **Fix:** Replace with real Groq API key. Free tier: 2,000 requests/day. Rotate across multiple Groq accounts (6,000–8,000 free checks/day) for early stage.
 
-### 6. Razorpay Live Key is Placeholder
-**Impact:** All payments fail.
-**Status:** `index.html` — search `rzp_live_REPLACE_WITH_YOUR_KEY` — placeholder.
-**Fix:** Replace with real Razorpay live key. Also requires `worker.js` Cloudflare Worker to generate `order_id` server-side.
-
-### 7. `chkHandleSuccess()` Not Defined
-**Impact:** After successful Razorpay payment, nothing happens — no tier granted, no Firestore write.
-**Status:** The function is called in the payment flow but not implemented.
-**Fix:** Implement `chkHandleSuccess()` to: write tier + subscription fields to Firestore, update `window._userDataCache`, hide promo bars, show success screen.
+### 6. Play Billing needs Play Console setup
+**Impact:** Until the subscription products and the Play service account exist, the app shows "not available" and `/api/play/verify` answers 501 naming the missing Cloudflare variables. See `PAY_ENV.example`.
 
 ---
 
@@ -619,7 +608,7 @@ Replace the `signInWithPopup` call with the Capacitor Google Auth plugin. The we
 
 | Feature | What's There | What's Missing |
 |---|---|---|
-| Razorpay payments | Checkout UI | Real key + Worker `order_id` + `chkHandleSuccess()` |
+| Play subscriptions | App purchase flow + server verification | Play Console products + service account (see `PAY_ENV.example`) |
 | Groq AI | All function hooks | Real API key |
 | Word Store | Product listings, cart | Actual payment processing |
 | Chat | UI panel, message input | Firestore real-time listener |
@@ -646,7 +635,7 @@ Replace the `signInWithPopup` call with the Capacitor Google Auth plugin. The we
 ## 15. Development Roadmap
 
 ### Phase 1 — Make It Sellable (Immediate)
-1. Wire Razorpay real key + Worker `order_id` + implement `chkHandleSuccess()`
+1. Create the Play subscription products and link the Play service account (see `PAY_ENV.example`)
 2. Add `GATE.check()` subscription enforcement on key features (Speak mode, AI feedback, Sound Bath)
 3. Add `trialStartDate` / `trialEndDate` to `saveUser()` Firestore write
 4. Fix Chat — wire Firestore real-time listener for messages
@@ -675,7 +664,7 @@ Replace the `signInWithPopup` call with the Capacitor Google Auth plugin. The we
 21. Vite build pipeline setup
 22. Capacitor project setup for main app
 23. Replace `signInWithPopup` with `@codetrix-studio/capacitor-google-auth`
-24. Add Razorpay Android SDK (replaces JS checkout in WebView)
+24. Google Play Billing in the Flutter app (done — needs Play Console products)
 25. Android build → Play Store submission
 26. Admin Capacitor project setup + FCM integration
 27. Sideload admin APK on Sanjay's phone
@@ -699,7 +688,6 @@ Replace the `signInWithPopup` call with the Capacitor Google Auth plugin. The we
 | Admin panel password | `sanjay_nowssb_2026` | `admin.html` line 334 |
 | Firebase project | `nowssb-34f1b` | Already wired in both `index.html` and `admin.html` |
 | Groq API key | **NEEDS TO BE ADDED** | `index.html` — search `PASTE_YOUR_GROQ_KEY_HERE` |
-| Razorpay live key | **NEEDS TO BE ADDED** | `index.html` — search `rzp_live_REPLACE_WITH_YOUR_KEY` |
 | ElevenLabs API key | **NEEDS TO BE ADDED** | `index.html` — search for ElevenLabs config |
 
 **Before APK release:** Admin password must be replaced with Firebase Admin Auth. The password must never be in source code in a distributed APK.

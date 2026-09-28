@@ -1,6 +1,7 @@
 /* Shared helpers for Pages Functions (not a route: no onRequest exports).
-   Firebase ID-token check, a Google access token from a service account,
-   Firestore REST, HMAC, JSON + CORS. WebCrypto only — no dependencies. */
+   Firebase ID-token check, Google OIDC check, a Google access token from a
+   service account, Firestore REST, SHA-256/HMAC, JSON + CORS. WebCrypto only —
+   no dependencies. */
 
 export const enc = new TextEncoder();
 
@@ -79,6 +80,35 @@ export async function verifyIdToken(token, projectId) {
   const ok = await crypto.subtle.verify('RSASSA-PKCS1-v1_5', key, b64urlToBytes(parts[2]), enc.encode(parts[0] + '.' + parts[1]));
   return ok ? claims : null;
 }
+/* ── Google-signed OIDC token (e.g. a Pub/Sub push) ── */
+let _gcerts = { at: 0, keys: null };
+async function googleOidcJwks() {
+  if (_gcerts.keys && Date.now() - _gcerts.at < 3600e3) return _gcerts.keys;
+  const r = await fetch('https://www.googleapis.com/oauth2/v3/certs');
+  if (!r.ok) throw new Error('certs ' + r.status);
+  _gcerts = { at: Date.now(), keys: (await r.json()).keys || [] };
+  return _gcerts.keys;
+}
+/** Verifies an RS256 Google OIDC token; returns claims when aud matches. */
+export async function verifyGoogleOidc(token, audience) {
+  const parts = String(token || '').split('.');
+  if (parts.length !== 3) return null;
+  let header, claims;
+  try {
+    header = JSON.parse(new TextDecoder().decode(b64urlToBytes(parts[0])));
+    claims = JSON.parse(new TextDecoder().decode(b64urlToBytes(parts[1])));
+  } catch (e) { return null; }
+  const now = Math.floor(Date.now() / 1000);
+  if (header.alg !== 'RS256' || claims.aud !== audience) return null;
+  if (claims.iss !== 'https://accounts.google.com' && claims.iss !== 'accounts.google.com') return null;
+  if (!claims.exp || claims.exp <= now) return null;
+  const jwk = (await googleOidcJwks()).find((k) => k.kid === header.kid);
+  if (!jwk) return null;
+  const key = await crypto.subtle.importKey('jwk', jwk, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['verify']);
+  const ok = await crypto.subtle.verify('RSASSA-PKCS1-v1_5', key, b64urlToBytes(parts[2]), enc.encode(parts[0] + '.' + parts[1]));
+  return ok ? claims : null;
+}
+
 /** Returns claims, or a Response to send back. */
 export async function requireUser(request, env, headers = {}) {
   const auth = request.headers.get('Authorization') || '';
@@ -92,13 +122,17 @@ export async function requireUser(request, env, headers = {}) {
 }
 
 /* ── Service account → Google access token ── */
-export function serviceAccount(env) {
-  const raw = env.FIREBASE_SERVICE_ACCOUNT || env.FCM_SERVICE_ACCOUNT;
+export function parseServiceAccount(raw) {
   if (!raw) return null;
   try {
-    const sa = JSON.parse(raw);
-    return sa.private_key && sa.client_email ? sa : null;
+    const sa = typeof raw === 'string' ? JSON.parse(raw) : raw;
+    return sa && sa.private_key && sa.client_email ? sa : null;
   } catch (e) { return null; }
+}
+/** Firebase Admin service account (Firestore REST). FCM_SERVICE_ACCOUNT is
+    accepted when it holds the same kind of JSON. */
+export function serviceAccount(env) {
+  return parseServiceAccount(env.FIREBASE_SERVICE_ACCOUNT) || parseServiceAccount(env.FCM_SERVICE_ACCOUNT);
 }
 function pemToPkcs8(pem) {
   const bin = atob(pem.replace(/-----[^-]+-----/g, '').replace(/\s+/g, ''));
@@ -106,14 +140,19 @@ function pemToPkcs8(pem) {
   for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
   return out;
 }
-let _tok = { at: 0, value: null, who: '' };
-export async function googleToken(sa) {
-  if (_tok.value && _tok.who === sa.client_email && Date.now() - _tok.at < 3540e3) return _tok.value;
+export const SCOPE_FIRESTORE = 'https://www.googleapis.com/auth/datastore https://www.googleapis.com/auth/cloud-platform';
+export const SCOPE_ANDROIDPUBLISHER = 'https://www.googleapis.com/auth/androidpublisher';
+const _toks = new Map();
+/** OAuth access token for a service account (JWT bearer flow), cached per
+    account + scope for just under an hour. Never logs key material. */
+export async function googleToken(sa, scope = SCOPE_FIRESTORE) {
+  const cacheKey = sa.client_email + ' ' + scope;
+  const hit = _toks.get(cacheKey);
+  if (hit && Date.now() - hit.at < 3540e3) return hit.value;
   const now = Math.floor(Date.now() / 1000);
   const head = bytesToB64url(enc.encode(JSON.stringify({ alg: 'RS256', typ: 'JWT', kid: sa.private_key_id })));
   const body = bytesToB64url(enc.encode(JSON.stringify({
-    iss: sa.client_email, sub: sa.client_email, aud: 'https://oauth2.googleapis.com/token', iat: now, exp: now + 3600,
-    scope: 'https://www.googleapis.com/auth/datastore https://www.googleapis.com/auth/cloud-platform',
+    iss: sa.client_email, sub: sa.client_email, aud: 'https://oauth2.googleapis.com/token', iat: now, exp: now + 3600, scope,
   })));
   const key = await crypto.subtle.importKey('pkcs8', pemToPkcs8(sa.private_key), { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['sign']);
   const sig = await crypto.subtle.sign('RSASSA-PKCS1-v1_5', key, enc.encode(head + '.' + body));
@@ -123,9 +162,13 @@ export async function googleToken(sa) {
     body: 'grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=' + head + '.' + body + '.' + bytesToB64url(sig),
   });
   const d = await r.json().catch(() => ({}));
-  if (!r.ok || !d.access_token) throw new Error('google auth: ' + (d.error_description || r.status));
-  _tok = { at: Date.now(), value: d.access_token, who: sa.client_email };
+  if (!r.ok || !d.access_token) throw new Error('google auth failed (' + r.status + ')');
+  _toks.set(cacheKey, { at: Date.now(), value: d.access_token });
   return d.access_token;
+}
+
+export async function sha256Hex(text) {
+  return hex(await crypto.subtle.digest('SHA-256', enc.encode(String(text))));
 }
 
 /* ── Firestore REST ── */
@@ -176,4 +219,18 @@ export async function fsCommit(token, project, writes) {
   });
   const d = await r.json().catch(() => ({}));
   return { ok: r.ok, status: r.status, error: d.error };
+}
+/** Structured query on one collection; returns [{ name, data }]. */
+export async function fsQuery(token, project, collectionId, where, limit = 5) {
+  const r = await fetch(`https://firestore.googleapis.com/v1/${fsBase(project)}:runQuery`, {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ structuredQuery: { from: [{ collectionId }], where, limit } }),
+  });
+  if (!r.ok) throw new Error('firestore query ' + r.status);
+  const rows = await r.json();
+  return (rows || []).filter((x) => x.document).map((x) => ({
+    name: x.document.name,
+    data: fsPlain({ mapValue: { fields: x.document.fields || {} } }),
+  }));
 }

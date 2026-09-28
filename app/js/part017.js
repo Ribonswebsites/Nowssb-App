@@ -413,7 +413,7 @@ function nssWishOverlayClick(e) {
   if (e.target === document.getElementById('nssWishlistOverlay')) nssCloseWishlist();
 }
 
-// ── CHECKOUT (Razorpay placeholder) ──
+// ── CHECKOUT (opens the checkout screen; buying happens in the Android app) ──
 function nssCheckout() {
   if (!nssCart || nssCart.length === 0) return;
   // Open checkout ON TOP of the still-open cart (checkout sits later in the

@@ -360,6 +360,7 @@ function _wsShowSuccessSheet(word) {
 function wsBuyThisWord() {
   if (!_wsCurrentWord) return;
   var word = _wsCurrentWord.charAt(0).toUpperCase() + _wsCurrentWord.slice(1);
-  // TODO: Razorpay purchase flow
-  alert('Purchase flow coming soon for: ' + word);
+  // Buying happens only in the Android app (Google Play Billing).
+  if (typeof window.nwsbGetAppPrompt === 'function') window.nwsbGetAppPrompt('Purchases of ' + word);
+  else alert(word + ' can be bought in the NowssB Android app.');
 }

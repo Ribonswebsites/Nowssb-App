@@ -16,7 +16,8 @@ service cloud.firestore {
               'entitlements', 'blocked', 'blockedAt', 'blockedBy', 'blockedReason', 'removedAt', 'disabled',
               'role', 'roles', 'admin', 'isAdmin', 'coins', 'balance', 'wallet', 'adminGifts',
               'subscriptionOrderId', 'subscriptionSource', 'subscriptionAmount', 'subscriptionCurrency',
-              'subscriptionUpdatedAt'];
+              'subscriptionUpdatedAt', 'subscriptionProductId', 'subscriptionTokenHash', 'subscriptionState',
+              'subscriptionAutoRenew', 'verifyTier'];
     }
     // isPro:false and tier:null are harmless (a downgrade), so the website's
     // sign-up writes keep working.
@@ -78,8 +79,8 @@ service cloud.firestore {
       allow create: if isAdmin() && request.resource.data.uid == request.auth.uid;
       allow update, delete: if false;
     }
-    // Written only by the server (functions/api/pay/*, service account) after
-    // Razorpay confirms a payment. A buyer can read their own receipts.
+    // Written only by the server (functions/api/play/*, service account) after
+    // Google Play confirms a purchase. A buyer can read their own receipts.
     match /payments/{paymentId} {
       allow get, list: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
       allow write: if false;

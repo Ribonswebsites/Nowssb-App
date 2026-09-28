@@ -9,6 +9,7 @@ import '../../widgets/brand_top_banner.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../admin/template/editable.dart';
+import '../../screens/subscription.dart';
 
 class VaultScreen extends StatelessWidget {
   const VaultScreen({super.key});
@@ -101,9 +102,18 @@ class VaultScreen extends StatelessWidget {
               _buy(context, 'Meaning', 'nwsb_meaning', 99, 'meaning', 'Meaning'),
               _buy(context, '10-word bundle', 'nwsb_bundle_10', 999, 'bundle', '10-word bundle'),
               _buy(context, 'Meaning package', 'nwsb_package', 399, 'package', 'Meaning package'),
-              _buy(context, 'Resonance', 'nwsb_sub_resonance', 499, 'subscription', 'Resonance'),
-              _buy(context, 'Frequency', 'nwsb_sub_frequency', 999, 'subscription', 'Frequency'),
-              _buy(context, 'Frequency X', 'nwsb_sub_frequency_x', 1999, 'subscription', 'Frequency X'),
+              // Plans are Google Play subscriptions, bought and verified on
+              // the Subscription screen (lib/data/play_subscriptions.dart).
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: GoldButton(
+                  label: 'Plans · Resonance, Frequency, Frequency X',
+                  filled: false,
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(builder: (_) => const SubscriptionScreen()),
+                  ),
+                ),
+              ),
               _buy(context, 'Restore streak', 'nwsb_streak_restore', 199, 'streak', 'Streak restore'),
               const SizedBox(height: 18),
               const EditableLabel('vault_screen.VaultScreen', 'MILESTONE CHEST', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.4, fontSize: 12)),
