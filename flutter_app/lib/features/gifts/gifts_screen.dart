@@ -6,7 +6,9 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../theme/tokens.dart';
+import '../../widgets/brand_top_banner.dart';
 import '../../widgets/colored_split_promo_banner.dart';
+import '../../widgets/nwsb_icon.dart';
 import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
 import '../economy/money.dart';
@@ -210,23 +212,31 @@ class _GiftsScreenState extends State<GiftsScreen> {
   Widget build(BuildContext context) {
     return EconomyPage(
       title: 'NowssB Gifts',
-      banner: ColoredSplitPromoBanner(
-        margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-        spec: SplitPromoSpec(
-          title: 'NowssB Gifts',
-          cta: 'Send a gift',
-          leftColor: const Color(0xFF3D2914),
-          rightColor: const Color(0xFFE07A3D),
-          art: SplitPromoArts.redLotus,
-          onTap: () => setState(() => _tab = 0),
-        ),
-      ),
       child: ListenableBuilder(
         listenable: GiftBook.instance,
         builder: (context, _) {
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
             children: [
+              BrandTopBanner(
+                bare: true,
+                title: 'NowssB Gifts',
+                mark: NwsbMarks.gift,
+                onTap: () => setState(() => _tab = 0),
+              ),
+              const SizedBox(height: 12),
+              ColoredSplitPromoBanner(
+                margin: EdgeInsets.zero,
+                spec: SplitPromoSpec(
+                  title: 'NowssB Gifts',
+                  cta: 'Send a gift',
+                  leftColor: const Color(0xFF3D2914),
+                  rightColor: const Color(0xFFE07A3D),
+                  art: SplitPromoArts.redLotus,
+                  onTap: () => setState(() => _tab = 0),
+                ),
+              ),
+              const SizedBox(height: 12),
               Row(
                 children: [
                   _chip('Send', 0),

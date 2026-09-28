@@ -1,14 +1,19 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../screens/nwsb_sign_in_sheet.dart';
 import '../../screens/subscription.dart';
+import '../../widgets/brand_top_banner.dart';
 import '../../widgets/colored_split_promo_banner.dart';
+import '../../widgets/flip_portrait.dart';
 import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../data/firebase.dart';
 import '../../theme/tokens.dart';
+import '../earn/earn_topic_page.dart';
 import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
 import '../economy/money.dart';
@@ -67,50 +72,6 @@ class _CircleScreenState extends State<CircleScreen> {
   Widget build(BuildContext context) {
     return EconomyPage(
       title: 'NowssB Earn',
-      banner: Column(
-        children: [
-          ColoredSplitPromoBanner(
-            margin: const EdgeInsets.fromLTRB(16, 0, 16, 10),
-            spec: SplitPromoSpec(
-              title: 'NowssB Earn\nPartner',
-              cta: 'Welcome',
-              leftColor: const Color(0xFF3D2914),
-              rightColor: const Color(0xFFE6B325),
-              art: SplitPromoArts.egyptianGold,
-              onTap: _welcome,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-            child: SizedBox(
-              height: 148,
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: _toneCard(
-                      'Partner',
-                      const Color(0xFFE07A32),
-                      'assets/banners/promo/pose-01.png',
-                      _welcome,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    flex: 2,
-                    child: _toneCard(
-                      'Your status',
-                      const Color(0xFF7C4DFF),
-                      'assets/banners/promo/pose-02.png',
-                      _welcome,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
       child: ListenableBuilder(
         listenable: EconomyMirror.instance,
         builder: (context, _) {
@@ -129,6 +90,15 @@ class _CircleScreenState extends State<CircleScreen> {
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
             children: [
+              BrandTopBanner(
+                bare: true,
+                title: 'NowssB Earn',
+                mark: NwsbMarks.piggy,
+                onTap: _welcome,
+              ),
+              const SizedBox(height: 12),
+              const _EarnCardRail(),
+              const SizedBox(height: 14),
               GlassWrap(
                 margin: EdgeInsets.zero,
                 padding: const EdgeInsets.all(10),
@@ -193,6 +163,18 @@ class _CircleScreenState extends State<CircleScreen> {
                       ),
                     ],
                   ),
+                ),
+              ),
+              const SizedBox(height: 14),
+              ColoredSplitPromoBanner(
+                margin: EdgeInsets.zero,
+                spec: SplitPromoSpec(
+                  title: 'NowssB Earn\nPartner',
+                  cta: 'Welcome',
+                  leftColor: const Color(0xFF3D2914),
+                  rightColor: const Color(0xFFE6B325),
+                  art: SplitPromoArts.egyptianGold,
+                  onTap: _welcome,
                 ),
               ),
               const SizedBox(height: 14),
@@ -349,6 +331,10 @@ class _CircleScreenState extends State<CircleScreen> {
                     );
                   },
                 ),
+              const SizedBox(height: 18),
+              const Text('AGENT TIERS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12)),
+              const SizedBox(height: 8),
+              const _TierRail(),
             ],
           );
         },
@@ -357,30 +343,167 @@ class _CircleScreenState extends State<CircleScreen> {
   }
 }
 
-Widget _toneCard(String label, Color color, String art, VoidCallback onTap) {
-  return GestureDetector(
-    onTap: onTap,
-    child: ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          ColoredBox(color: color),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(8, 8, 8, 28),
-            child: Image.asset(art, fit: BoxFit.contain, alignment: Alignment.bottomCenter),
-          ),
-          Positioned(
-            left: 10,
-            right: 8,
-            bottom: 8,
-            child: Text(
-              label,
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13),
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
+class _EarnCardRail extends StatefulWidget {
+  const _EarnCardRail();
+
+  @override
+  State<_EarnCardRail> createState() => _EarnCardRailState();
 }
+
+class _EarnCardRailState extends State<_EarnCardRail> {
+  late final PageController _pages = PageController();
+  Timer? _timer;
+  var _index = 0;
+
+  static const _cards = <(String, String, void Function(BuildContext))>[
+    ('NowssB Gifts', NwsbMarks.gift, openGifts),
+    ('NowssB Rewards', NwsbMarks.earn, openRewards),
+    ('Your Earning', NwsbMarks.piggy, openEarnings),
+    ('NowssB coins earned', NwsbMarks.earn, openCoins),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    if (bool.fromEnvironment('FLUTTER_TEST')) return;
+    _timer = Timer.periodic(const Duration(milliseconds: 2600), (_) {
+      if (!mounted || !_pages.hasClients) return;
+      _index = (_index + 1) % _cards.length;
+      _pages.animateToPage(_index, duration: const Duration(milliseconds: 420), curve: Curves.easeOutCubic);
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _pages.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassWrap(
+      margin: EdgeInsets.zero,
+      padding: const EdgeInsets.all(8),
+      child: SizedBox(
+        height: 132,
+        child: Row(
+          children: [
+            Expanded(
+              flex: 3,
+              child: _blackCard(
+                label: 'NowssB Earn',
+                onTap: () {},
+                child: const FlipPortrait(
+                  front: 'assets/banners/earn/hands-light.png',
+                  back: 'assets/banners/earn/hands-dark.png',
+                  mark: NwsbMarks.piggy,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              flex: 2,
+              child: PageView.builder(
+                controller: _pages,
+                itemCount: _cards.length,
+                onPageChanged: (i) => _index = i,
+                itemBuilder: (_, i) {
+                  final card = _cards[i];
+                  return _blackCard(
+                    label: card.$1,
+                    onTap: () => card.$3(context),
+                    child: Center(child: NwsbIcon(card.$2, size: 36, color: Colors.white)),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _blackCard({required String label, required VoidCallback onTap, required Widget child}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(14),
+        child: ColoredBox(
+          color: Colors.black,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              child,
+              Positioned(
+                left: 8,
+                right: 8,
+                bottom: 6,
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 12),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TierRail extends StatelessWidget {
+  const _TierRail();
+
+  static const _tiers = <(String, String, String)>[
+    ('Starter Agent', '0–99 units · 10% of net', 'The first agent tier. Your code works on any purchase. Commission is 10% of NowssB’s net after the store fee, not the sticker price.'),
+    ('Rising Agent', '100 units · 15% of net', 'At 100 units the rate rises to 15% of net. The units you already have stay.'),
+    ('Pro Agent', '300 units · 20% of net', 'At 300 units the rate is 20% of net. A direct recruit pays you 5% of their commission, and only while both paid plans are active.'),
+    ('Elite Agent', '500 units · 25% of net', 'At 500 units the rate is 25% of net. Two levels only. There is no third.'),
+    ('Master Agent', '1000 units · 30% of net', 'Master is the cap: 30% of net. An invite by itself pays nothing. Payouts wait for review before money moves.'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 168,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: _tiers.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 10),
+        itemBuilder: (_, i) {
+          final tier = _tiers[i];
+          return GestureDetector(
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => AgentTierPage(name: tier.$1, detail: tier.$2, note: tier.$3),
+              ),
+            ),
+            child: Container(
+              width: 220,
+              padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+              decoration: BoxDecoration(
+                color: Colors.black,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: const Color(0x33FFFFFF)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(tier.$1, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)),
+                  const SizedBox(height: 6),
+                  Text(tier.$2, style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12)),
+                  const Spacer(),
+                  const Text('Open this tier', style: TextStyle(color: Color(0xFFE8D5A3), fontWeight: FontWeight.w700, fontSize: 12)),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+

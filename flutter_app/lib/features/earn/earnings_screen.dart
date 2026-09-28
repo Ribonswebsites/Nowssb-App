@@ -7,7 +7,9 @@ import '../../theme/tokens.dart';
 import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
 import '../economy/money.dart';
+import '../../widgets/brand_top_banner.dart';
 import '../../widgets/colored_split_promo_banner.dart';
+import '../../widgets/nwsb_icon.dart';
 
 class EarningsScreen extends StatefulWidget {
   const EarningsScreen({super.key});
@@ -69,17 +71,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
   @override
   Widget build(BuildContext context) {
     return EconomyPage(
-      title: 'NowssB Earn — Earnings',
-      banner: const ColoredSplitPromoBanner(
-        margin: EdgeInsets.fromLTRB(16, 0, 16, 8),
-        spec: SplitPromoSpec(
-          title: 'NowssB Earn\nEarnings',
-          cta: 'Sales and referrals',
-          leftColor: Color(0xFF143028),
-          rightColor: Color(0xFF2D6A4F),
-          art: SplitPromoArts.blondeLotus,
-        ),
-      ),
+      title: 'Your Earning',
       child: ListenableBuilder(
         listenable: EconomyMirror.instance,
         builder: (context, _) {
@@ -90,6 +82,23 @@ class _EarningsScreenState extends State<EarningsScreen> {
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
             children: [
+              const BrandTopBanner(
+                bare: true,
+                title: 'Your Earning',
+                mark: NwsbMarks.piggy,
+              ),
+              const SizedBox(height: 12),
+              const ColoredSplitPromoBanner(
+                margin: EdgeInsets.zero,
+                spec: SplitPromoSpec(
+                  title: 'Your Earning',
+                  cta: 'Sales and referrals',
+                  leftColor: Color(0xFF143028),
+                  rightColor: Color(0xFF2D6A4F),
+                  art: SplitPromoArts.blondeLotus,
+                ),
+              ),
+              const SizedBox(height: 12),
               EconomyNote(
                 unsupported
                     ? 'This country is not on a payout rail yet. Earnings stay in your balance and are not sent in the wrong currency.'

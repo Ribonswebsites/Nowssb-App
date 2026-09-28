@@ -358,7 +358,7 @@ class HomeMenuDrawer extends StatelessWidget {
                           ),
                           _Row(
                             light: light,
-                            mark: NwsbMarks.bag,
+                            mark: NwsbMarks.gift,
                             label: 'NowssB Gifts',
                             sub: 'Send or redeem a real purchase',
                             onTap: () => _push(context, const GiftsScreen()),

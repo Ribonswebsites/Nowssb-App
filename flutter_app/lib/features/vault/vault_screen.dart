@@ -5,7 +5,9 @@ import '../../theme/tokens.dart';
 import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
 import '../economy/play_billing.dart';
+import '../../widgets/brand_top_banner.dart';
 import '../../widgets/colored_split_promo_banner.dart';
+import '../../widgets/nwsb_icon.dart';
 
 class VaultScreen extends StatelessWidget {
   const VaultScreen({super.key});
@@ -14,16 +16,6 @@ class VaultScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return EconomyPage(
       title: 'NowssB Rewards',
-      banner: ColoredSplitPromoBanner(
-        margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-        spec: SplitPromoSpec(
-          title: 'NowssB Rewards',
-          cta: 'Claim today’s coins',
-          leftColor: const Color(0xFF2A1B4D),
-          rightColor: const Color(0xFFC8A96E),
-          art: SplitPromoArts.egyptianGold,
-        ),
-      ),
       child: ListenableBuilder(
         listenable: EconomyMirror.instance,
         builder: (context, _) {
@@ -31,6 +23,23 @@ class VaultScreen extends StatelessWidget {
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
             children: [
+              const BrandTopBanner(
+                bare: true,
+                title: 'NowssB Rewards',
+                mark: NwsbMarks.earn,
+              ),
+              const SizedBox(height: 12),
+              const ColoredSplitPromoBanner(
+                margin: EdgeInsets.zero,
+                spec: SplitPromoSpec(
+                  title: 'NowssB Rewards',
+                  cta: 'Claim today’s coins',
+                  leftColor: Color(0xFF2A1B4D),
+                  rightColor: Color(0xFFC8A96E),
+                  art: SplitPromoArts.egyptianGold,
+                ),
+              ),
+              const SizedBox(height: 12),
               CoinCount(value: w.coins),
               Text('${w.plan} · streak ${w.streak} · ${w.freezesLeft} freezes left', style: const TextStyle(color: NwsbColors.mist)),
               const SizedBox(height: 12),

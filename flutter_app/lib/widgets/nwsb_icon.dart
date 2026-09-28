@@ -282,4 +282,18 @@ class NwsbMarks {
       '<path d="M14.6 9.3c-.5-.9-1.5-1.4-2.6-1.4-1.6 0-2.7.8-2.7 2 0 2.7 5.4 1.3 5.4 4.1'
       ' 0 1.2-1.1 2.1-2.7 2.1-1.2 0-2.2-.5-2.7-1.5"/>'
       '<path d="M12 5.6v1.9M12 16.5v1.9"/>';
+
+  /// Piggy bank — NowssB Earn.
+  static const piggy = '<ellipse cx="11.2" cy="13.2" rx="6.6" ry="4.8"/>'
+      '<path d="M9.2 8.6c.6-1.8 2-2.6 3.4-2.2"/>'
+      '<path d="M12.2 6.4v1.8"/>'
+      '<circle cx="8.4" cy="12.4" r="0.7"/>'
+      '<path d="M16.6 12.6h1.6"/>'
+      '<circle cx="18.8" cy="12.6" r="1.35"/>'
+      '<path d="M7.4 17.4v1.5M10.4 17.8v1.4M13.6 17.6v1.4"/>';
+
+  /// Gift box — NowssB Gifts. Not the shop bag.
+  static const gift = '<rect x="3.5" y="10.5" width="17" height="9" rx="1.4"/>'
+      '<path d="M3.5 14.2h17M12 10.5v9"/>'
+      '<path d="M12 10.5c-1-2.2-3.8-3-4.8-1.5S8.6 11.2 12 10.5c3.4.7 4-1.2 5-2.5S13 8.3 12 10.5z"/>';
 }

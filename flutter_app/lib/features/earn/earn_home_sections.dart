@@ -13,7 +13,9 @@ import 'package:flutter/services.dart';
 import '../../data/firebase.dart';
 import '../../screens/nwsb_sign_in_sheet.dart';
 import '../../theme/tokens.dart';
+import '../../widgets/brand_top_banner.dart';
 import '../../widgets/colored_split_promo_banner.dart';
+import '../../widgets/flip_portrait.dart';
 import '../../widgets/glass_wrap.dart';
 import '../../widgets/home_parts.dart';
 import '../../widgets/home_skin.dart';
@@ -295,11 +297,13 @@ class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
                 SizedBox(
                   width: 108,
                   height: 112,
-                  child: Image.asset(
-                    'assets/banners/course-cleo-a.jpg',
-                    fit: BoxFit.cover,
-                    alignment: Alignment.topCenter,
-                    errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111)),
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.horizontal(right: Radius.circular(16)),
+                    child: const FlipPortrait(
+                      front: 'assets/banners/earn/hands-light.png',
+                      back: 'assets/banners/earn/hands-dark.png',
+                      mark: NwsbMarks.piggy,
+                    ),
                   ),
                 ),
               ],
@@ -383,7 +387,18 @@ class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
               'Net after the store fee. Not the sticker price.',
               style: TextStyle(color: Color(0xCCFFFFFF), fontSize: 13, fontWeight: FontWeight.w600),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
+            const SizedBox(
+              height: 120,
+              child: ClipRRect(
+                borderRadius: BorderRadius.all(Radius.circular(12)),
+                child: FlipPortrait(
+                  front: 'assets/banners/earn/sit-light.png',
+                  back: 'assets/banners/earn/sit-dark.png',
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
             for (final tier in _earnTiers) ...[
               Text(
                 tier.name,
@@ -475,6 +490,13 @@ class YourRewardsSection extends StatelessWidget {
                     title: 'Coins and streak',
                     mark: NwsbMarks.earn,
                   ),
+                  const SizedBox(height: 10),
+                  const BrandTopBanner(
+                    bare: true,
+                    compact: true,
+                    title: 'NowssB Rewards',
+                    mark: NwsbMarks.earn,
+                  ),
                   const SizedBox(height: 12),
                   if (!signedIn)
                     SecBanner(
@@ -556,13 +578,20 @@ class GiftsHomeSection extends StatelessWidget {
               const PaneHead(
                 eyebrow: 'NowssB Gifts',
                 title: 'Send a real purchase',
-                mark: NwsbMarks.bag,
+                mark: NwsbMarks.gift,
+              ),
+              const SizedBox(height: 10),
+              const BrandTopBanner(
+                bare: true,
+                compact: true,
+                title: 'NowssB Gifts',
+                mark: NwsbMarks.gift,
               ),
               const SizedBox(height: 12),
               SecBanner(
                 title: 'Send a gift',
                 sub: 'A word, meaning, bundle, or plan. Paid with Play, not coins.',
-                mark: NwsbMarks.bag,
+                mark: NwsbMarks.gift,
                 onTap: () => EarnUmbrellaSection._open(context, const GiftsScreen()),
               ),
               const SizedBox(height: 8),

@@ -58,7 +58,6 @@ import 'normal/header_actions_sheet.dart';
 import 'fashion/header.dart';
 import '../widgets/nwsb_icon.dart';
 import 'normal/neomorphic_essentials.dart';
-import '../widgets/brand_top_banner.dart';
 import '../widgets/colored_split_promo_banner.dart';
 import 'normal/horizontal_routine_cards.dart';
 import 'normal/sections_bottom.dart';
@@ -295,7 +294,6 @@ class _HomeNormalState extends State<HomeNormal> {
         ('greet', Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const BrandTopBanner(),
             const LiveQuoteTab(),
             NmGreeting(name: widget.name),
           ],

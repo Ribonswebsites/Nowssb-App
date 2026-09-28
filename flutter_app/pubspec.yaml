@@ -91,6 +91,7 @@ flutter:
     - assets/banners/promo/
     - assets/banners/stories/
     - assets/banners/gyro/
+    - assets/banners/earn/
     - assets/footer/
     - assets/login/
     - assets/media/
