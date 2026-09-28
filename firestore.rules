@@ -65,6 +65,14 @@ service cloud.firestore {
     match /words/{key} { allow read: if true; allow write: if isAdmin(); }
     match /word_drafts/{key} { allow read, write: if isAdmin(); }
     match /ui_overrides/{id} { allow read: if true; allow write: if isAdmin(); }
+    // UI Editor (Admin → UI Editor): page layouts are read by every app;
+    // only admins write them. History is admin-only and append-only so a
+    // restore can never be rewritten after the fact.
+    match /ui_layouts/{id} { allow read: if true; allow write: if isAdmin(); }
+    match /ui_history/{id} {
+      allow read, create: if isAdmin();
+      allow update, delete: if false;
+    }
     match /adminLog/{id} {
       allow read: if isAdmin();
       allow create: if isAdmin() && request.resource.data.uid == request.auth.uid;

@@ -22,6 +22,7 @@ import 'practice_player.dart';
 import '../widgets/colored_split_promo_banner.dart';
 import 'sound_library.dart';
 import '../admin/template/editable.dart';
+import '../admin/layout/layout_sections.dart';
 
 const _coachApi = 'https://nowssb-api.ribonpatil2.workers.dev/api/assistant/chat';
 const _coachHero = 'assets/coach/personal_coach_hero.jpg';
@@ -199,29 +200,30 @@ class _PersonalCoachScreenState extends State<PersonalCoachScreen> {
     final words = ContentStore.instance.library.take(6).toList(growable: false);
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 10, 20, 30),
-      children: [
-        Row(children: [
+      // Server-driven order (Admin → UI Editor); bundled order by default.
+      children: layoutChildren(context, 'coach', [
+        LSection('top', 'Top buttons', Row(children: [
           _topButton(Icons.arrow_back_rounded, 'Back', () => Navigator.of(context).pop(), light: true),
           const Spacer(),
           const _OrbitMark(),
           const SizedBox(width: 12),
           _topButton(signedIn ? Icons.logout_rounded : Icons.person_outline_rounded, signedIn ? 'Sign out' : 'Sign in', signedIn ? () => FirebaseAuth.instance.signOut() : _signIn),
-        ]),
+        ])),
         const SizedBox(height: 16),
-        _hero(words),
+        LSection('hero', 'Hero', _hero(words)),
         const SizedBox(height: 16),
-        _metrics(data),
+        LSection('metrics', 'Metrics', _metrics(data)),
         const SizedBox(height: 16),
-        ColoredSplitPromoBanner.forSurface(
+        LSection('promo', 'Split promo banner', ColoredSplitPromoBanner.forSurface(
           SplitPromoSurface.coach,
           onTap: () => Navigator.of(context).push(
             MaterialPageRoute<void>(builder: (_) => const SoundLibraryScreen()),
           ),
-        ),
+        )),
         const SizedBox(height: 16),
-        const _QuoteCard(),
+        const LSection('quote', 'Quote card', _QuoteCard()),
         const SizedBox(height: 22),
-        const EditableLabel('personal_coach.PersonalCoachScreen', 'Chat with your coach', style: TextStyle(color: Color(0xFFB5B5BA), fontSize: 17, fontWeight: FontWeight.w600)),
+        const LSection('chat', 'Chat with your coach', EditableLabel('personal_coach.PersonalCoachScreen', 'Chat with your coach', style: TextStyle(color: Color(0xFFB5B5BA), fontSize: 17, fontWeight: FontWeight.w600))),
         const SizedBox(height: 10),
         _composer(data, signedIn),
         if (_notice != null) Padding(padding: const EdgeInsets.only(top: 10), child: Text(_notice!, style: const TextStyle(color: Color(0xFFE2B8BA), height: 1.4))),
@@ -230,8 +232,8 @@ class _PersonalCoachScreenState extends State<PersonalCoachScreen> {
           ...data.messages.lastItems(6).map(_bubble),
         ],
         const SizedBox(height: 12),
-        Text(data.streak > 0 ? 'Your ${data.streak}-day streak informs your coach context.' : 'Complete a practice to begin your coach progress history.', style: const TextStyle(color: Color(0xFF7F7F85), fontSize: 13)),
-      ],
+        LSection('note', 'Streak note', Text(data.streak > 0 ? 'Your ${data.streak}-day streak informs your coach context.' : 'Complete a practice to begin your coach progress history.', style: const TextStyle(color: Color(0xFF7F7F85), fontSize: 13))),
+      ]),
     );
   }
 
@@ -253,7 +255,7 @@ class _PersonalCoachScreenState extends State<PersonalCoachScreen> {
           height: 260,
           decoration: BoxDecoration(color: const Color(0xFF09090B), border: Border.all(color: Colors.white.withOpacity(.08))),
           child: Stack(fit: StackFit.expand, children: [
-            EditableImage.asset(_coachHero, fit: BoxFit.cover, alignment: Alignment.topCenter, slot: 'personal_coach.PersonalCoachScreen'),
+            const EditableImage.asset(_coachHero, fit: BoxFit.cover, alignment: Alignment.topCenter, slot: 'personal_coach.PersonalCoachScreen'),
             DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.black.withOpacity(.05), Colors.black.withOpacity(.80)], stops: const [.25, 1]))),
             Padding(
               padding: const EdgeInsets.all(24),

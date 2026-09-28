@@ -1,8 +1,11 @@
 /// The remote override layer behind the live template editor.
 ///
 /// `ui_overrides/{docId}` holds one replacement per slot:
-///   { slot, type: image|video|text, url?, text?, storagePath?,
+///   { slot, type: image|video|text|orb, url?, text?, storagePath?,
+///     style?: {...}, start?, end? (ms, optional schedule),
 ///     updatedAt, updatedBy }
+/// `text: null` (or absent) with a `style` means "keep the words, change the
+/// look" — see lib/admin/editor/style_props.dart for the style keys.
 ///
 /// Same three-stage contract as lib/data/content.dart:
 ///   1. nothing at all — every slot shows what ships in the app;
@@ -20,8 +23,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -29,6 +30,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/firebase.dart';
 import '../admin_state.dart';
 import 'slot_keys.dart';
+import '../layout/ui_layouts.dart';
 
 class UiOverride {
   const UiOverride({
@@ -39,6 +41,10 @@ class UiOverride {
     this.storagePath = '',
     this.updatedAt = 0,
     this.updatedBy = '',
+    this.textSet = true,
+    this.style = const {},
+    this.start = 0,
+    this.end = 0,
   });
 
   final String slot;
@@ -49,13 +55,62 @@ class UiOverride {
   final int updatedAt;
   final String updatedBy;
 
-  bool get isMedia => type != SlotType.text && url.isNotEmpty;
+  /// False when only the look changed and the default words stay.
+  final bool textSet;
+
+  /// Look overrides (text style, button wrapper, orb choice). Empty = none.
+  final Map<String, dynamic> style;
+
+  /// Optional schedule, epoch ms; 0 = open-ended.
+  final int start;
+  final int end;
+
+  bool get isMedia =>
+      (type == SlotType.image || type == SlotType.video) && url.isNotEmpty;
+
+  /// Inside its schedule (always true without one).
+  bool get activeNow {
+    if (start == 0 && end == 0) return true;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    return (start == 0 || now >= start) && (end == 0 || now < end);
+  }
+
+  UiOverride copyWith({
+    String? text,
+    bool? textSet,
+    String? url,
+    String? storagePath,
+    Map<String, dynamic>? style,
+    int? start,
+    int? end,
+  }) =>
+      UiOverride(
+        slot: slot,
+        type: type,
+        url: url ?? this.url,
+        text: text ?? this.text,
+        storagePath: storagePath ?? this.storagePath,
+        updatedAt: updatedAt,
+        updatedBy: updatedBy,
+        textSet: textSet ?? this.textSet,
+        style: style ?? this.style,
+        start: start ?? this.start,
+        end: end ?? this.end,
+      );
+
+  /// Nothing left to override (the editor deletes the doc instead).
+  bool get isEmpty =>
+      url.isEmpty && (!textSet || type != SlotType.text) && style.isEmpty;
 
   static UiOverride? from(Map<String, dynamic> m) {
     final slot = '${m['slot'] ?? ''}';
     final type = slotTypeFrom('${m['type'] ?? ''}');
     if (slot.isEmpty || type == null) return null;
     final at = m['updatedAt'];
+    int ms(dynamic v) => v is Timestamp
+        ? v.millisecondsSinceEpoch
+        : (v is num ? v.toInt() : 0);
+    final st = m['style'];
     return UiOverride(
       slot: slot,
       type: type,
@@ -66,6 +121,10 @@ class UiOverride {
           ? at.millisecondsSinceEpoch
           : (at is num ? at.toInt() : 0),
       updatedBy: '${m['updatedBy'] ?? ''}',
+      textSet: m.containsKey('text') ? m['text'] != null : type == SlotType.text,
+      style: st is Map ? Map<String, dynamic>.from(st) : const {},
+      start: ms(m['start']),
+      end: ms(m['end']),
     );
   }
 
@@ -73,10 +132,13 @@ class UiOverride {
         'slot': slot,
         'type': type.name,
         'url': url,
-        'text': text,
+        'text': textSet ? text : null,
         'storagePath': storagePath,
         'updatedAt': updatedAt,
         'updatedBy': updatedBy,
+        if (style.isNotEmpty) 'style': style,
+        if (start != 0) 'start': start,
+        if (end != 0) 'end': end,
       };
 }
 
@@ -98,7 +160,9 @@ class UiOverrides extends ChangeNotifier {
   /// The replacement text for [key], or null to show the default.
   String? textFor(String key) {
     final o = _byKey[key];
-    if (o == null || o.type != SlotType.text) return null;
+    if (o == null || o.type != SlotType.text || !o.textSet || !o.activeNow) {
+      return null;
+    }
     return o.text;
   }
 
@@ -106,7 +170,9 @@ class UiOverrides extends ChangeNotifier {
   /// file when it has been downloaded, else its URL.
   UiOverride? mediaFor(String key, SlotType type) {
     final o = _byKey[key];
-    if (o == null || o.type != type || o.url.isEmpty) return null;
+    if (o == null || o.type != type || o.url.isEmpty || !o.activeNow) {
+      return null;
+    }
     return o;
   }
 
@@ -263,12 +329,17 @@ class SlotRegistry {
   static const _kSeen = 'nwsb_admin_seen_slots_v1';
 
   final Map<String, SlotInfo> _seen = {};
+  final Map<String, Set<String>> _bySection = {};
   bool _dirty = false;
   Timer? _flush;
 
   Map<String, SlotInfo> get seen => Map.unmodifiable(_seen);
 
-  void see(String key, SlotType type, String defaultValue) {
+  /// Slots drawn inside section `<pageId>/<sectionId>` (this session).
+  Set<String> slotsIn(String sectionKey) => _bySection[sectionKey] ?? const {};
+
+  void see(String key, SlotType type, String defaultValue, [String? section]) {
+    if (section != null) (_bySection[section] ??= <String>{}).add(key);
     if (_seen.containsKey(key)) return;
     _seen[key] = SlotInfo(key, type, defaultValue);
     if (!AdminState.instance.isAdmin) return;
@@ -313,8 +384,12 @@ class SlotRegistry {
 class UiScope extends InheritedNotifier<Listenable> {
   UiScope({super.key, required super.child}) : super(notifier: _merged);
 
-  static final Listenable _merged = Listenable.merge(
-      [UiOverrides.instance, EditMode.instance, AdminState.instance]);
+  static final Listenable _merged = Listenable.merge([
+    UiOverrides.instance,
+    EditMode.instance,
+    AdminState.instance,
+    UiLayouts.instance,
+  ]);
 
   /// Subscribe [context] to changes. Harmless where there is no scope
   /// (widget tests): the widget simply reads the current values.

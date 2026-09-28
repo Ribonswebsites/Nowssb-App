@@ -22,6 +22,7 @@ import 'package:flutter/services.dart';
 
 import 'admin/admin_state.dart';
 import 'admin/edit_fab.dart';
+import 'admin/layout/ui_layouts.dart';
 import 'admin/template/ui_overrides.dart';
 import 'app_update.dart';
 import 'data/content.dart';
@@ -74,6 +75,7 @@ Future<void> main() async {
   // the phone before the first frame, so a replaced picture or line shows
   // at once instead of flashing the default; the Firestore watch follows.
   await UiOverrides.instance.start();
+  await UiLayouts.instance.start();
   await EditMode.instance.load();
   await SlotRegistry.instance.load();
   AdminState.instance.start();

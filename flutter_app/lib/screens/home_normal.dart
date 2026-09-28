@@ -86,6 +86,7 @@ import 'progress/progress_screen.dart';
 import 'reader/reader_hub.dart';
 import 'subscription.dart';
 import 'store/ebooks_store.dart';
+import '../admin/layout/layout_sections.dart';
 import '../admin/template/editable.dart';
 
 /// `REG.norm.items` — app/js/part062.js:41-100, key for key and in order.
@@ -137,6 +138,43 @@ const kNormalNoMarkup = <String>{'custom', 'rx', 'wsearch', 'msearch'};
 
 /// The two `defOff` entries that DO have markup. Built, not placed.
 const kNormalDefOff = <String>{'routines'};
+
+/// Plain-words names for the UI Editor.
+const kNormalSectionTitles = <String, String>{
+  'greet': 'Quote & greeting',
+  'search': 'Search bar',
+  'heroCurve': 'Hero curve',
+  'promoRail': 'Promo rail',
+  'dashboard': 'Practice dashboard',
+  'essentials': 'Split banner & essentials',
+  'routineCards': 'Routine cards, Earth Day film & colour grid',
+  'herovid': 'Streak & store videos',
+  'streak': 'Streak',
+  'practice': 'Practice card',
+  'mainops': 'Main options',
+  'actionbar': 'Support & coach bar',
+  'tiles': 'Feature tiles',
+  'storiesFind': 'Stories find you',
+  'buddhaGyro': 'Buddha quotes stage',
+  'store': 'Offer, earn, rewards & gifts',
+  'reader': 'Reader',
+  'trendwd': 'Trending words',
+  'routines': 'Routines (off by default)',
+  'condisc': 'Connect disc',
+  'feed': 'Feed',
+  'quickrow': 'Quick access row',
+  'trendshop': 'Trending in the shop',
+  'edition': 'Edition',
+  'ebooks': 'eBooks',
+  'connectban': 'Connect banner',
+  'healing': 'Healing path',
+  'fashsw': 'Switch to Fashion home',
+  'footer': 'Footer',
+};
+
+/// Sideways carousels wired to the Animation tab's transitions and
+/// auto-rotate (carouselFxItem / CarouselAutoRotate inside them).
+const kNormalCarousels = <String>{'herovid', 'tiles', 'healing'};
 
 class HomeNormal extends StatefulWidget {
   const HomeNormal({super.key, this.name = 'Healer'});
@@ -480,13 +518,43 @@ class _HomeNormalState extends State<HomeNormal> {
       return true;
     }());
 
-    final shown = [
-      for (final (k, w) in built)
-        if (w != null &&
-            !kNormalDefOff.contains(k) &&
-            (k != 'healing' || Settings.instance.showHealing))
-          (k, w),
-    ];
+    const air = {
+      'promoRail',
+      'storiesFind',
+      'herovid',
+      'store',
+      'trendwd',
+      'connectban',
+      'edition',
+      'condisc',
+    };
+    // Server-driven order (Admin → UI Editor). Each row is a section with a
+    // stable id; the two empty rows stay as glue so the spacing is exactly
+    // what it was. With no saved layout this is the bundled order, as is.
+    final shown = layoutChildren(
+      context,
+      'home.normal',
+      [
+        for (final (k, w) in built)
+          if (w != null && (k != 'healing' || Settings.instance.showHealing))
+            if (w is SizedBox && w.width == 0 && w.height == 0)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: KeyedSubtree(key: ValueKey('nm-$k'), child: w),
+              )
+            else
+              LSection(
+                k,
+                kNormalSectionTitles[k] ?? k,
+                Padding(
+                  padding: EdgeInsets.only(bottom: air.contains(k) ? 26 : 8),
+                  child: KeyedSubtree(key: ValueKey('nm-$k'), child: w),
+                ),
+                carousel: kNormalCarousels.contains(k),
+              ),
+      ],
+      hiddenByDefault: kNormalDefOff,
+    );
 
     final page = SafeArea(
       child: Column(
@@ -520,23 +588,7 @@ class _HomeNormalState extends State<HomeNormal> {
               // Footer paints solid black through nav clearance.
               padding: EdgeInsets.zero,
               itemCount: shown.length,
-              itemBuilder: (context, i) {
-                final (k, w) = shown[i];
-                const air = {
-                  'promoRail',
-                  'storiesFind',
-                  'herovid',
-                  'store',
-                  'trendwd',
-                  'connectban',
-                  'edition',
-                  'condisc',
-                };
-                return Padding(
-                  padding: EdgeInsets.only(bottom: air.contains(k) ? 26 : 8),
-                  child: KeyedSubtree(key: ValueKey('nm-$k'), child: w),
-                );
-              },
+              itemBuilder: (context, i) => shown[i],
             ),
           ),
         ],

@@ -27,6 +27,7 @@ library;
 
 import 'package:flutter/material.dart';
 
+import '../admin/layout/layout_sections.dart';
 import '../data/content.dart';
 import '../data/notifications.dart';
 import '../data/settings.dart';
@@ -123,6 +124,46 @@ const kFashionSectionOrder = <String>[
 
 /// The four `defOff` entries. Built, not placed.
 const kFashionDefOff = <String>{'routines', 'shabda', 'wsearch', 'msearch'};
+
+/// Plain-words names for the UI Editor.
+const kFashionSectionTitles = <String, String>{
+  'greet': 'Greeting line',
+  'herorow': 'Hero row & split banner',
+  'practice': 'Practice card',
+  'routineCards': 'Routine cards, Earth Day film & colour grid',
+  'mainops': 'Main options',
+  'actionbar': 'Support & coach bar',
+  'reader': 'Reader & promo banner',
+  'herovid': 'Streak & store videos',
+  'streak': 'Streak',
+  'tiles': 'Feature tiles',
+  'storiesFind': 'Stories find you',
+  'buddhaGyro': 'Buddha quotes stage',
+  'store': "Today's offer",
+  'trendwd': 'Trending words',
+  'custom': 'Customize',
+  'fashplus': 'Fashion Plus',
+  'enterCurve': 'Enter curve',
+  'rx': 'Word prescription',
+  'trendvid': 'Shop now video',
+  'storeban': 'Store banner, earn, rewards & gifts',
+  'edition': 'Edition',
+  'routines': 'Routines (off by default)',
+  'offer': 'Offer',
+  'cube': 'Quick access cube',
+  'shabda': 'Shabdapathy foundations (off by default)',
+  'ebooks': 'eBooks',
+  'connectban': 'Connect banner',
+  'healing': 'Healing path',
+  'wsearch': 'Word search (off by default)',
+  'msearch': 'Meaning search (off by default)',
+  'shabvid': 'Shabdapathy video',
+  'footer': 'Footer',
+};
+
+/// Sideways carousels wired to the Animation tab's transitions and
+/// auto-rotate (carouselFxItem / CarouselAutoRotate inside them).
+const kFashionCarousels = <String>{'tiles', 'healing'};
 
 class HomeFashion extends StatefulWidget {
   const HomeFashion({super.key, this.name = 'Healer'});
@@ -461,12 +502,78 @@ class _HomeFashionState extends State<HomeFashion> {
       return true;
     }());
 
-    final shown = [
-      for (final (k, w) in built)
-        if (!kFashionDefOff.contains(k) &&
-            (k != 'healing' || Settings.instance.showHealing))
-          (k, w),
-    ];
+    const air = {
+      'herorow',
+      'reader',
+      'storiesFind',
+      'store',
+      'storeban',
+      'connectban',
+      'edition',
+      'trendwd',
+    };
+    // Server-driven order (Admin → UI Editor). The hero block is a section
+    // of its own; empty rows stay as glue so the spacing is unchanged. With
+    // no saved layout this is the bundled order, as is.
+    final shown = layoutChildren(
+      context,
+      'home.fashion',
+      [
+        LSection(
+          'hero',
+          'Hero: quote, greeting, curve & rail',
+          // The greeting sits ABOVE the deck, not inside it —
+          // app/js/part083.js:505 inserts it before the deck
+          // in the home; it does not travel with the rail.
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const LiveQuoteTab(),
+              HeroGreeting(name: widget.name),
+              // Search + Quick access live ONLY inside HeroCurveStage.
+              HeroCurveStage(
+                glass: true,
+                onSearch: () => showDestinationSearchSheet(
+                  context,
+                  onSelect: _openSearchDest,
+                ),
+                // Quick action → HeaderActionsSheet, NOT QuickAccessScreen.
+                onQuickAccess: _openQuickAction,
+              ),
+              FashionHero(
+                onExplore: () => _go(2),
+                onGuide: () => _push(const WidgetsPage()),
+                onSearch: () => showDestinationSearchSheet(
+                  context,
+                  onSelect: _openSearchDest,
+                ),
+                onStore: () => _go(3),
+                onRail: _go,
+              ),
+            ],
+          ),
+          carousel: true,
+        ),
+        for (final (k, w) in built)
+          if (k != 'healing' || Settings.instance.showHealing)
+            if (w is SizedBox && w.width == 0 && w.height == 0)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: KeyedSubtree(key: ValueKey('fash-$k'), child: w),
+              )
+            else
+              LSection(
+                k,
+                kFashionSectionTitles[k] ?? k,
+                Padding(
+                  padding: EdgeInsets.only(bottom: air.contains(k) ? 26 : 8),
+                  child: KeyedSubtree(key: ValueKey('fash-$k'), child: w),
+                ),
+                carousel: kFashionCarousels.contains(k),
+              ),
+      ],
+      hiddenByDefault: kFashionDefOff,
+    );
 
     return Scaffold(
       backgroundColor: NwsbColors.deep,
@@ -552,56 +659,8 @@ class _HomeFashionState extends State<HomeFashion> {
                   cacheExtent: 480,
                   // Footer carries solid-black bottom clearance (no video bleed).
                   padding: EdgeInsets.zero,
-                  itemCount: shown.length + 1,
-                  itemBuilder: (context, i) {
-                    if (i == 0) {
-                      // The greeting sits ABOVE the deck, not inside it —
-                      // app/js/part083.js:505 inserts it before the deck
-                      // in the home; it does not travel with the rail.
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          const LiveQuoteTab(),
-                          HeroGreeting(name: widget.name),
-                          // Search + Quick access live ONLY inside HeroCurveStage.
-                          HeroCurveStage(
-                            glass: true,
-                            onSearch: () => showDestinationSearchSheet(
-                              context,
-                              onSelect: _openSearchDest,
-                            ),
-                            // Quick action → HeaderActionsSheet, NOT QuickAccessScreen.
-                            onQuickAccess: _openQuickAction,
-                          ),
-                          FashionHero(
-                            onExplore: () => _go(2),
-                            onGuide: () => _push(const WidgetsPage()),
-                            onSearch: () => showDestinationSearchSheet(
-                              context,
-                              onSelect: _openSearchDest,
-                            ),
-                            onStore: () => _go(3),
-                            onRail: _go,
-                          ),
-                        ],
-                      );
-                    }
-                    final (k, w) = shown[i - 1];
-                    const air = {
-                      'herorow',
-                      'reader',
-                      'storiesFind',
-                      'store',
-                      'storeban',
-                      'connectban',
-                      'edition',
-                      'trendwd',
-                    };
-                    return Padding(
-                      padding: EdgeInsets.only(bottom: air.contains(k) ? 26 : 8),
-                      child: KeyedSubtree(key: ValueKey('fash-$k'), child: w),
-                    );
-                  },
+                  itemCount: shown.length,
+                  itemBuilder: (context, i) => shown[i],
                 ),
               ),
             ],

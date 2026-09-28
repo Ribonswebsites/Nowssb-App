@@ -80,7 +80,8 @@ String slotGroup(String key) {
   return i < 0 ? key : key.substring(0, i);
 }
 
-enum SlotType { image, video, text }
+/// `orb` is a thinking-orb loader (which animation, size, black circle).
+enum SlotType { image, video, text, orb }
 
 SlotType? slotTypeFrom(String? s) {
   switch (s) {
@@ -90,6 +91,8 @@ SlotType? slotTypeFrom(String? s) {
       return SlotType.video;
     case 'text':
       return SlotType.text;
+    case 'orb':
+      return SlotType.orb;
   }
   return null;
 }

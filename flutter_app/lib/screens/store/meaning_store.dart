@@ -27,6 +27,7 @@ import 'request_words.dart';
 import 'store_routes.dart';
 import 'signature_store.dart';
 import '../../admin/template/editable.dart';
+import '../../admin/layout/layout_sections.dart';
 
 
 /// Warm Meaning + picker + ebook arts before painting (no empty black flash).
@@ -209,7 +210,22 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+      // Server-driven order (Admin → UI Editor); bundled order by default.
+      children: layoutIndexed(context, 'store.meaning', const {
+        0: ('hero', 'Hero film'),
+        1: ('subscribe', 'Subscribe banner'),
+        2: ('search', 'Search'),
+        4: ('chips', 'Category chips'),
+        6: ('goals', 'Browse by goal'),
+        7: ('recommended', 'Recommended for you'),
+        8: ('promo', 'Signature Store banner'),
+        9: ('playlist', 'Featured playlist'),
+        10: ('collections', 'Featured collections'),
+        12: ('promo2', 'Signature promo'),
+        13: ('rows', 'Meaning collections'),
+        -2: ('promo3', 'Request words banner'),
+        -1: ('disclaimer', 'Disclaimer'),
+      }, [
         // Single hero/video area — no back-to-back promo banners.
         StorePixelsHero(
           videoAsset: nwsbVideo(kStoreMeaningDoorVidFile),
@@ -323,7 +339,7 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
           text:
               'Meanings shared or sold here are for educational and wellness purposes only — nothing here is medical advice. Purchases are final once unlocked.',
         ),
-      ],
+      ]),
     );
   }
 

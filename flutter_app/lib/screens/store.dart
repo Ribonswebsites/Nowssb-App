@@ -32,6 +32,7 @@ import 'store/signature_store.dart';
 import 'subscription.dart';
 import 'store/word_atelier.dart';
 import '../admin/template/editable.dart';
+import '../admin/layout/layout_sections.dart';
 
 class StoreScreen extends StatelessWidget {
   const StoreScreen({super.key});
@@ -232,7 +233,23 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
     ];
     final shown = _resell
         ? <Widget>[items[0], items[1], const BazaarScreen(embedded: true)]
-        : items;
+        // Server-driven order (Admin → UI Editor); bundled order by default.
+        : layoutChildren(context, 'store.home', [
+            LSection('header', 'Title & bag', items[0]),
+            LSection('tabs', 'Shop / Resell tabs', items[1]),
+            LSection('rotator', 'Picture rotator', items[2]),
+            LSection('halfoff', 'Half-off rail', items[3]),
+            items[4],
+            LSection.group('atelier', 'Word Atelier', [items[5], items[6]]),
+            LSection.group('meaning', 'Meaning Store', [items[7], items[8]]),
+            LSection.group('signature', 'Signature Store', [items[9], items[10]]),
+            LSection('promo', 'Split promo banner', items[11]),
+            LSection.group('connect', 'NowssB Connect', [items[12], items[13]]),
+            LSection.group('ebooks', 'eBooks', [items[14], items[15]]),
+            LSection.group('plans', 'Subscription plans', [items[16], items[17]]),
+            LSection('disclaimer', 'Disclaimer', items[18]),
+            LSection('credits', 'Credits', items[19]),
+          ]);
     return Scaffold(
       backgroundColor: NwsbColors.deep,
       body: Stack(

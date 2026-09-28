@@ -18,6 +18,7 @@ import '../widgets/colored_split_promo_banner.dart';
 import '../shell/nav_shell.dart';
 import 'word_detail.dart';
 import '../admin/template/editable.dart';
+import '../admin/layout/layout_sections.dart';
 
 class LibraryScreen extends StatefulWidget {
   const LibraryScreen({super.key});
@@ -76,9 +77,11 @@ class _LibraryScreenState extends State<LibraryScreen> {
       slivers: [
         SliverPadding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
-          sliver: SliverList.list(children: [
-            _SearchField(controller: _search),
-            if (categories.isNotEmpty) ...[
+          sliver: SliverList.list(
+      // Server-driven order (Admin → UI Editor); bundled order by default.
+      children: layoutChildren(context, 'library', [
+            LSection('search', 'Search', _SearchField(controller: _search)),
+            if (categories.isNotEmpty) LSection.group('chips', 'Category chips', align: CrossAxisAlignment.stretch, [
               const SizedBox(height: 14),
               SizedBox(
                 height: 34,
@@ -100,14 +103,15 @@ class _LibraryScreenState extends State<LibraryScreen> {
                   ],
                 ),
               ),
-            ],
+            ]),
             const SizedBox(height: 18),
-            ColoredSplitPromoBanner.forSurface(
+            LSection('promo', 'Split promo banner', ColoredSplitPromoBanner.forSurface(
               SplitPromoSurface.library,
               onTap: () => NavScope.goTo(context, 1),
               margin: EdgeInsets.zero,
-            ),
+            )),
             const SizedBox(height: 18),
+            LSection.group('words', 'Word list', [
             if (shown.isEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 50),
@@ -123,7 +127,8 @@ class _LibraryScreenState extends State<LibraryScreen> {
               )
             else
               for (final w in shown) _row(context, w),
-          ]),
+            ]),
+          ])),
         ),
       ],
     );

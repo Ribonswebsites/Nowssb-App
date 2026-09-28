@@ -9,6 +9,7 @@ import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 import '../widgets/glass_wrap.dart';
 import '../admin/template/editable.dart';
+import '../admin/layout/layout_sections.dart';
 
 class SubscriptionScreen extends StatefulWidget {
   const SubscriptionScreen({super.key});
@@ -146,9 +147,13 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                           color: Colors.white, fontWeight: FontWeight.w800)),
                   centerTitle: true,
                 ),
-                SliverToBoxAdapter(child: _videoBanner()),
-                SliverToBoxAdapter(child: _billing()),
-                SliverToBoxAdapter(child: _horizontalPlans()),
+                // Server-driven order (Admin → UI Editor); bundled order by default.
+                for (final w in layoutChildren(context, 'subscription', [
+                  LSection('video', 'Video banner', _videoBanner()),
+                  LSection('billing', 'Monthly / yearly switch', _billing()),
+                  LSection('plans', 'Plans', _horizontalPlans()),
+                ]))
+                  SliverToBoxAdapter(child: w),
               ]),
             ),
           ],

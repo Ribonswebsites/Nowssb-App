@@ -13,6 +13,8 @@ import '../media/video_pool.dart';
 import '../widgets/home_parts.dart';
 import '../widgets/home_skin.dart';
 import '../widgets/nwsb_icon.dart';
+import '../admin/layout/carousel_fx.dart';
+import '../admin/layout/layout_sections.dart' show CarouselAutoRotate;
 
 /// One section: wrap head + PageView of two equal-height cards.
 /// Card 1 = streak video + Keep Your Streak banner.
@@ -80,10 +82,10 @@ class _StreakStoreCarouselState extends State<StreakStoreCarousel> {
           children: [
             SizedBox(
               height: pageH,
-              child: PageView(
+              child: CarouselAutoRotate(controller: _page, count: _cardCount, child: PageView(
                 controller: _page,
                 onPageChanged: (i) => setState(() => _index = i),
-                children: [
+                children: carouselFxChildren(context, _page, [
                   _VideoBannerCard(
                     asset: StreakStoreCarousel.streakAsset,
                     priority: ClipPriority.feature,
@@ -100,8 +102,8 @@ class _StreakStoreCarouselState extends State<StreakStoreCarousel> {
                       child: widget.secondCard,
                     ),
                   ),
-                ],
-              ),
+                ]),
+              )),
             ),
             const SizedBox(height: 10),
             Row(

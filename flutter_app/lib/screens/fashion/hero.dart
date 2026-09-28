@@ -39,6 +39,8 @@ import '../../widgets/nwsb_icon.dart';
 import '../../widgets/tv_frame.dart';
 import 'follow_steps.dart';
 import '../../admin/template/editable.dart';
+import '../../admin/layout/carousel_fx.dart';
+import '../../admin/layout/layout_sections.dart' show CarouselAutoRotate;
 
 const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
 
@@ -205,7 +207,7 @@ class _FashionHeroState extends State<FashionHero> {
             12 + _topStripH + 10 + tv + 10 + _footStripH + 12 + (8 * 2) + 2;
         return SizedBox(
           height: h,
-          child: PageView.builder(
+          child: CarouselAutoRotate(controller: _deck, count: _cells, child: PageView.builder(
             controller: _deck,
             itemCount: _cells,
             onPageChanged: (i) {
@@ -214,7 +216,14 @@ class _FashionHeroState extends State<FashionHero> {
               _held = DateTime.now().add(_hold);
               setState(() => _i = i);
             },
-            itemBuilder: (context, i) {
+            itemBuilder: (context, i) => carouselFxItem(context, _deck, i, _cell(i)),
+          )),
+        );
+      },
+    );
+  }
+
+  Widget _cell(int i) {
               if (i == 0) {
                 return _HeroCard(
                   onExplore: widget.onExplore,
@@ -248,11 +257,6 @@ class _FashionHeroState extends State<FashionHero> {
                 live: _i == i,
                 onTap: () => widget.onRail?.call(r.dest),
               );
-            },
-          ),
-        );
-      },
-    );
   }
 }
 

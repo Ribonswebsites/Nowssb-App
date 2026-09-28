@@ -31,6 +31,8 @@ import '../widgets/neu_wrap.dart';
 import '../widgets/home_skin.dart';
 import '../widgets/tv_frame.dart';
 import '../admin/template/editable.dart';
+import '../admin/layout/carousel_fx.dart';
+import '../admin/layout/layout_sections.dart' show CarouselAutoRotate;
 
 /// 16 · subvid — the shared subscription tier page used by both homes.
 class SubscriptionSection extends StatelessWidget {
@@ -1122,11 +1124,11 @@ class _HealingSectionState extends State<HealingSection> {
                 _onUserScroll(n);
                 return false;
               },
-              child: PageView(
+              child: CarouselAutoRotate(controller: _page, count: _slideCount, child: PageView(
                 controller: _page,
                 padEnds: true,
                 onPageChanged: (i) => setState(() => _index = i),
-                children: [
+                children: carouselFxChildren(context, _page, [
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     child: _HealJourneyCard(
@@ -1148,8 +1150,8 @@ class _HealingSectionState extends State<HealingSection> {
                       onTap: widget.onTap,
                     ),
                   ),
-                ],
-              ),
+                ]),
+              )),
             ),
           ),
           const SizedBox(height: 10),

@@ -25,9 +25,40 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../admin_state.dart';
+import '../layout/scopes.dart';
 import 'slot_keys.dart';
 import 'slot_sheet.dart';
+import 'style_apply.dart';
 import 'ui_overrides.dart';
+
+/// Records that [key] was drawn (and in which section).
+void slotSeen(BuildContext context, String key, SlotType type, String def) {
+  SlotRegistry.instance.see(key, type, def, SectionScope.keyOf(context));
+}
+
+/// A replacement picture/clip to draw now (pending edit in the preview,
+/// else the live one), or null for the default.
+UiOverride? mediaOverride(BuildContext context, String key, SlotType type) {
+  final o = effectiveOverride(context, key);
+  if (o == null || o.type != type || o.url.isEmpty) return null;
+  return o;
+}
+
+/// What goes around an editable element: nothing for everyone else; the
+/// pencil in edit mode; a tappable marker in the UI Editor's preview.
+Widget slotChrome(
+  BuildContext context,
+  String key,
+  SlotType type,
+  String def,
+  Widget child,
+) {
+  if (EditorPreviewScope.peek(context) != null) {
+    return PreviewSlotMarker(slotKey: key, type: type, defaultValue: def, child: child);
+  }
+  if (!EditMode.instance.on) return child;
+  return SlotBadge(slotKey: key, type: type, defaultValue: def, child: child);
+}
 
 /// Fixed copy. Named Label because Flutter already has an `EditableText`.
 class EditableLabel extends StatelessWidget {
@@ -78,11 +109,13 @@ class EditableLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     UiScope.watch(context);
     final key = slotKey;
-    SlotRegistry.instance.see(key, SlotType.text, data);
-    final text = UiOverrides.instance.textFor(key) ?? data;
-    final child = Text(
+    slotSeen(context, key, SlotType.text, data);
+    final o = effectiveOverride(context, key);
+    final text = (o != null && o.type == SlotType.text && o.textSet) ? o.text : data;
+    final look = o?.style ?? const <String, dynamic>{};
+    Widget child = Text(
       text,
-      style: style,
+      style: look.isEmpty ? style : applyTextLook(style, look),
       strutStyle: strutStyle,
       textAlign: textAlign,
       textDirection: textDirection,
@@ -96,8 +129,8 @@ class EditableLabel extends StatelessWidget {
       textHeightBehavior: textHeightBehavior,
       selectionColor: selectionColor,
     );
-    if (!EditMode.instance.on) return child;
-    return SlotBadge(slotKey: key, type: SlotType.text, defaultValue: data, child: child);
+    if (look.isNotEmpty) child = applyTextDecor(child, look);
+    return slotChrome(context, key, SlotType.text, data, child);
   }
 }
 
@@ -255,8 +288,8 @@ class EditableImage extends StatelessWidget {
   Widget build(BuildContext context) {
     UiScope.watch(context);
     final key = slotKey;
-    SlotRegistry.instance.see(key, SlotType.image, source);
-    final o = UiOverrides.instance.mediaFor(key, SlotType.image);
+    slotSeen(context, key, SlotType.image, source);
+    final o = mediaOverride(context, key, SlotType.image);
     final Widget child = o == null
         ? _default()
         : Image(
@@ -276,8 +309,7 @@ class EditableImage extends StatelessWidget {
                 (frame == null && !sync) ? _default() : img,
             errorBuilder: (_, __, ___) => _default(),
           );
-    if (!EditMode.instance.on) return child;
-    return SlotBadge(slotKey: key, type: SlotType.image, defaultValue: source, child: child);
+    return slotChrome(context, key, SlotType.image, source, child);
   }
 }
 
@@ -302,8 +334,8 @@ ImageProvider slotImageProvider(
 ) {
   UiScope.watch(context);
   final key = '$slot.${slotMediaId(asset)}';
-  SlotRegistry.instance.see(key, SlotType.image, asset);
-  final o = UiOverrides.instance.mediaFor(key, SlotType.image);
+  slotSeen(context, key, SlotType.image, asset);
+  final o = mediaOverride(context, key, SlotType.image);
   if (o == null) return fallback;
   return overrideImageProvider(o.url);
 }
@@ -371,8 +403,8 @@ class EditableSvg extends StatelessWidget {
   Widget build(BuildContext context) {
     UiScope.watch(context);
     final key = slotKey;
-    SlotRegistry.instance.see(key, SlotType.image, source);
-    final o = UiOverrides.instance.mediaFor(key, SlotType.image);
+    slotSeen(context, key, SlotType.image, source);
+    final o = mediaOverride(context, key, SlotType.image);
     final Widget child = o == null
         ? _default()
         : Image(
@@ -386,8 +418,7 @@ class EditableSvg extends StatelessWidget {
                 (frame == null && !sync) ? _default() : img,
             errorBuilder: (_, __, ___) => _default(),
           );
-    if (!EditMode.instance.on) return child;
-    return SlotBadge(slotKey: key, type: SlotType.image, defaultValue: source, child: child);
+    return slotChrome(context, key, SlotType.image, source, child);
   }
 }
 
@@ -447,9 +478,7 @@ class SlotBadge extends StatelessWidget {
                 boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 4)],
               ),
               child: Icon(
-                type == SlotType.text
-                    ? Icons.edit_rounded
-                    : (type == SlotType.video ? Icons.movie_edit : Icons.image_rounded),
+                slotIcon(type),
                 size: 13,
                 color: const Color(0xFF060C18),
               ),
@@ -459,4 +488,67 @@ class SlotBadge extends StatelessWidget {
       ],
     );
   }
+}
+
+IconData slotIcon(SlotType type) => switch (type) {
+      SlotType.text => Icons.edit_rounded,
+      SlotType.video => Icons.movie_edit,
+      SlotType.image => Icons.image_rounded,
+      SlotType.orb => Icons.blur_circular_rounded,
+    };
+
+/// In the UI Editor's preview: registers where the element is so the
+/// editor can draw a tappable hotspot over it (the page itself does not
+/// take taps there, so buttons in the preview never navigate away).
+class PreviewSlotMarker extends StatefulWidget {
+  const PreviewSlotMarker({
+    super.key,
+    required this.slotKey,
+    required this.type,
+    required this.defaultValue,
+    required this.child,
+  });
+
+  final String slotKey;
+  final SlotType type;
+  final String defaultValue;
+  final Widget child;
+
+  @override
+  State<PreviewSlotMarker> createState() => _PreviewSlotMarkerState();
+}
+
+class _PreviewSlotMarkerState extends State<PreviewSlotMarker> {
+  final GlobalKey _box = GlobalKey();
+  EditorPreviewController? _ctl;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final c = EditorPreviewScope.peek(context);
+    if (c != _ctl) {
+      _ctl?.unmountSlot(_box);
+      _ctl = c;
+    }
+    _ctl?.mountSlot(PreviewSlot(
+        widget.slotKey, widget.type, widget.defaultValue, _box, SectionScope.keyOf(context)));
+  }
+
+  @override
+  void didUpdateWidget(PreviewSlotMarker old) {
+    super.didUpdateWidget(old);
+    if (old.slotKey != widget.slotKey) {
+      _ctl?.mountSlot(PreviewSlot(
+          widget.slotKey, widget.type, widget.defaultValue, _box, SectionScope.keyOf(context)));
+    }
+  }
+
+  @override
+  void dispose() {
+    _ctl?.unmountSlot(_box);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => KeyedSubtree(key: _box, child: widget.child);
 }

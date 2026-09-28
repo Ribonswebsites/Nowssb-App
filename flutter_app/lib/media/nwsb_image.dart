@@ -37,7 +37,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../admin/admin_state.dart';
-import '../admin/template/editable.dart' show SlotBadge, overrideImageProvider;
+import '../admin/template/editable.dart' show mediaOverride, overrideImageProvider, slotChrome, slotSeen;
 import '../admin/template/slot_keys.dart';
 import '../admin/template/ui_overrides.dart';
 import 'media_map.dart';
@@ -98,8 +98,8 @@ class NwsbImage extends StatelessWidget {
   Widget build(BuildContext context) {
     UiScope.watch(context);
     final key = slotKey;
-    SlotRegistry.instance.see(key, SlotType.image, url);
-    final o = UiOverrides.instance.mediaFor(key, SlotType.image);
+    slotSeen(context, key, SlotType.image, url);
+    final o = mediaOverride(context, key, SlotType.image);
     final Widget child = o == null
         ? _picture()
         : Image(
@@ -111,8 +111,7 @@ class NwsbImage extends StatelessWidget {
                 (frame == null && !sync) ? _picture() : img,
             errorBuilder: (_, __, ___) => _picture(),
           );
-    if (!EditMode.instance.on) return child;
-    return SlotBadge(slotKey: key, type: SlotType.image, defaultValue: url, child: child);
+    return slotChrome(context, key, SlotType.image, url, child);
   }
 
   Widget _picture() {

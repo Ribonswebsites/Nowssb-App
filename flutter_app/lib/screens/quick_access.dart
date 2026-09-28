@@ -18,6 +18,7 @@ import '../widgets/app_backdrop.dart';
 import '../widgets/app_thinking_loader.dart';
 import '../widgets/tv_frame.dart';
 import '../admin/template/editable.dart';
+import '../admin/layout/layout_sections.dart';
 
 class QuickAccessScreen extends StatefulWidget {
   const QuickAccessScreen({super.key});
@@ -233,11 +234,11 @@ class _QuickAccessScreenState extends State<QuickAccessScreen> {
             ),
           ),
           // Soft looping film under glass cards (notification-tab language).
-          Positioned.fill(
-            child: IgnorePointer(
-              child: Opacity(
+          const Positioned.fill(
+            child: const IgnorePointer(
+              child: const Opacity(
                 opacity: 0.35,
-                child: NwsbVideo(
+                child: const NwsbVideo(
                   asset: 'assets/video/hero-bg.mp4',
                   priority: ClipPriority.decoration,
                   autoplay: true,
@@ -255,8 +256,9 @@ class _QuickAccessScreenState extends State<QuickAccessScreen> {
                 Expanded(
                   child: ListView(
                     padding: EdgeInsets.fromLTRB(16, 8, 16, 28 + bottom),
-                    children: [
-                      const _GlassCard(
+                    // Server-driven order (Admin → UI Editor); bundled order by default.
+      children: layoutChildren(context, 'quickaccess', [
+                      const LSection('intro', 'Intro', _GlassCard(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -311,9 +313,9 @@ class _QuickAccessScreenState extends State<QuickAccessScreen> {
                             ),
                           ],
                         ),
-                      ),
+                      )),
                       const SizedBox(height: 14),
-                      _GlassCard(
+                      LSection('nav', 'Nav preview', _GlassCard(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
@@ -333,9 +335,9 @@ class _QuickAccessScreenState extends State<QuickAccessScreen> {
                             ),
                           ],
                         ),
-                      ),
+                      )),
                       const SizedBox(height: 14),
-                      _GlassCard(
+                      LSection('shape', 'Shape', _GlassCard(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -374,9 +376,9 @@ class _QuickAccessScreenState extends State<QuickAccessScreen> {
                             ),
                           ],
                         ),
-                      ),
+                      )),
                       const SizedBox(height: 14),
-                      _GlassCard(
+                      LSection('innav', 'In your nav', _GlassCard(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -401,8 +403,8 @@ class _QuickAccessScreenState extends State<QuickAccessScreen> {
                             ),
                           ],
                         ),
-                      ),
-                      if (_picking) ...[
+                      )),
+                      if (_picking) LSection.group('pool', 'Pick from pool', align: CrossAxisAlignment.stretch, [
                         const SizedBox(height: 14),
                         _PoolCard(
                           child: Column(
@@ -443,9 +445,9 @@ class _QuickAccessScreenState extends State<QuickAccessScreen> {
                             ],
                           ),
                         ),
-                      ],
+                      ]),
                       const SizedBox(height: 20),
-                      SizedBox(
+                      LSection('apply', 'Apply button', SizedBox(
                         height: 54,
                         child: ElevatedButton.icon(
                           onPressed: _apply,
@@ -459,8 +461,8 @@ class _QuickAccessScreenState extends State<QuickAccessScreen> {
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      )),
+                    ]),
                   ),
                 ),
               ],

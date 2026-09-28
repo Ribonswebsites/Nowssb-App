@@ -31,6 +31,7 @@ import 'quick_access.dart';
 import 'sound_library.dart';
 import 'store/meaning_store.dart';
 import '../admin/template/editable.dart';
+import '../admin/layout/layout_sections.dart';
 
 class WidgetsPage extends StatefulWidget {
   const WidgetsPage({super.key});
@@ -150,8 +151,9 @@ class _WidgetsPageState extends State<WidgetsPage> {
               Expanded(
                 child: ListView(
                   padding: EdgeInsets.fromLTRB(0, 0, 0, bottom + 40),
-                  children: [
-                    const Padding(
+                  // Server-driven order (Admin → UI Editor); bundled order by default.
+      children: layoutChildren(context, 'widgets', [
+                    const LSection('intro', 'Intro', Padding(
                       padding: EdgeInsets.fromLTRB(20, 4, 20, 20),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -177,13 +179,13 @@ class _WidgetsPageState extends State<WidgetsPage> {
                           ),
                         ],
                       ),
-                    ),
-                    _Rail(
+                    )),
+                    LSection('hero', 'Hero header styles', _Rail(
                       title: 'Hero header',
                       child: _HeroRail(current: s.heroStyle),
-                    ),
+                    )),
                     const SizedBox(height: 8),
-                    _Rail(
+                    LSection('jump', 'Jump to', _Rail(
                       title: 'Jump to',
                       sub: 'Screens that already exist',
                       child: _JumpRail(
@@ -203,8 +205,8 @@ class _WidgetsPageState extends State<WidgetsPage> {
                             _push(const NotificationsSettingsPage()),
                         onProfile: () => _push(const ProfileScreen()),
                       ),
-                    ),
-                    _Rail(
+                    )),
+                    LSection('make', 'Make it yours', _Rail(
                       title: 'Make it yours',
                       sub: 'How the app looks and plays',
                       child: _MakeRail(
@@ -221,8 +223,8 @@ class _WidgetsPageState extends State<WidgetsPage> {
                         onHealing: () => _push(const HealingPathScreen()),
                         onProfile: () => _push(const ProfileScreen()),
                       ),
-                    ),
-                  ],
+                    )),
+                  ]),
                 ),
               ),
             ],

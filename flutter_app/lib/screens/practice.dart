@@ -23,6 +23,7 @@ import 'sound_library.dart';
 import 'practice_player.dart';
 import 'word_detail.dart';
 import '../admin/template/editable.dart';
+import '../admin/layout/layout_sections.dart';
 
 String nwsbSlot([DateTime? at]) {
   final h = (at ?? DateTime.now()).hour;
@@ -85,8 +86,9 @@ class _PracticeScreenState extends State<PracticeScreen> {
           sliver: SliverList.list(children: [
             if (all.isEmpty)
               const _Empty()
-            else ...[
-              _SessionCard(
+            // Server-driven order (Admin → UI Editor); bundled order by default.
+            else ...layoutChildren(context, 'practice', [
+              LSection('session', 'Session card', _SessionCard(
                 count: sessionWords.length,
                 slot: slot,
                 onStart: () => Navigator.of(context).push(
@@ -97,9 +99,9 @@ class _PracticeScreenState extends State<PracticeScreen> {
                     ),
                   ),
                 ),
-              ),
+              )),
               const SizedBox(height: 18),
-              ColoredSplitPromoBanner.forSurface(
+              LSection('promo', 'Morning Ritual banner', ColoredSplitPromoBanner.forSurface(
                 SplitPromoSurface.morningRitual,
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute<void>(
@@ -107,16 +109,16 @@ class _PracticeScreenState extends State<PracticeScreen> {
                   ),
                 ),
                 margin: EdgeInsets.zero,
-              ),
+              )),
               const SizedBox(height: 22),
-              const DarkHead(
+              const LSection('now', 'This session words', DarkHead(
                 eyebrow: 'Tap a word to open it',
                 title: 'This session',
                 icon: Icons.play_circle_outline,
-              ),
+              )),
               const SizedBox(height: 14),
               for (final w in now) _row(context, w),
-              if (rest.isNotEmpty) ...[
+              if (rest.isNotEmpty) LSection.group('also', 'Also today words', align: CrossAxisAlignment.stretch, [
                 const SizedBox(height: 22),
                 const DarkHead(
                   eyebrow: 'Every other word you have',
@@ -125,9 +127,9 @@ class _PracticeScreenState extends State<PracticeScreen> {
                 ),
                 const SizedBox(height: 14),
                 for (final w in rest) _row(context, w),
-              ],
+              ]),
               const SizedBox(height: 22),
-              ColoredSplitPromoBanner(
+              LSection('promo2', 'Sound Library banner', ColoredSplitPromoBanner(
                 spec: SplitPromoExtras.at(
                   12,
                   onTap: () => Navigator.of(context).push(
@@ -137,8 +139,8 @@ class _PracticeScreenState extends State<PracticeScreen> {
                   ),
                 ),
                 margin: EdgeInsets.zero,
-              ),
-            ],
+              )),
+            ]),
           ]),
         ),
       ],

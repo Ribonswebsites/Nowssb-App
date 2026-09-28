@@ -20,6 +20,7 @@ import 'store_select_sheet.dart';
 import 'store_routes.dart';
 import '../sound_library.dart';
 import '../../admin/template/editable.dart';
+import '../../admin/layout/layout_sections.dart';
 
 class EbooksStoreScreen extends StatelessWidget {
   const EbooksStoreScreen({super.key});
@@ -77,9 +78,10 @@ class _EbooksBody extends StatelessWidget {
     final books = _books;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+      // Server-driven order (Admin → UI Editor); bundled order by default.
+      children: layoutChildren(context, 'store.ebooks', [
         // Single hero/video — no back-to-back promo / word-banner stacks.
-        Container(
+        LSection('hero', 'Hero film', Container(
           margin: const EdgeInsets.only(bottom: 16),
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
@@ -163,19 +165,19 @@ class _EbooksBody extends StatelessWidget {
               ],
             ),
           ),
-        ),
-        const Text(
+        )),
+        const LSection('intro', 'Intro line', Text(
           'Deep-dive guides on sound, phonetic origin and healing practice — '
           'yours to keep, read anywhere, forever. Not a word catalogue.',
           style: TextStyle(fontSize: 13, height: 1.6, color: Color(0x80FFFFFF)),
-        ),
+        )),
         const SizedBox(height: 18),
-        _EbookBrowseStrip(
+        LSection('browse', 'Browse strip', _EbookBrowseStrip(
           onOpen: (b) => openEbookDetail(context, b),
           books: books,
-        ),
+        )),
         const SizedBox(height: 12),
-        ColoredSplitPromoBanner.forSurface(
+        LSection('promo', 'Split promo banner', ColoredSplitPromoBanner.forSurface(
           SplitPromoSurface.ebooksStore,
           onTap: () => Navigator.of(context).push(
             MaterialPageRoute<void>(
@@ -183,11 +185,11 @@ class _EbooksBody extends StatelessWidget {
             ),
           ),
           margin: const EdgeInsets.only(bottom: 8),
-        ),
+        )),
         const SizedBox(height: 8),
-        for (final b in books) _EbookRow(book: b),
+        LSection.group('books', 'All books', align: CrossAxisAlignment.start, [for (final b in books) _EbookRow(book: b)]),
         const SizedBox(height: 40),
-        ColoredSplitPromoBanner(
+        LSection('promo2', 'Promo banner', ColoredSplitPromoBanner(
           spec: SplitPromoExtras.at(
             12,
             onTap: () => Navigator.of(context).push(
@@ -197,8 +199,8 @@ class _EbooksBody extends StatelessWidget {
             ),
           ),
           margin: const EdgeInsets.only(bottom: 48),
-        ),
-        ColoredSplitPromoBanner(
+        )),
+        LSection('promo3', 'Promo banner 2', ColoredSplitPromoBanner(
           spec: SplitPromoExtras.at(
             13,
             onTap: () => Navigator.of(context).push(
@@ -207,9 +209,9 @@ class _EbooksBody extends StatelessWidget {
               ),
             ),
           ),
-        ),
-        StoreDisclaimer(text: kEbDisclaimer),
-      ],
+        )),
+        const LSection('disclaimer', 'Disclaimer', StoreDisclaimer(text: kEbDisclaimer)),
+      ]),
     );
   }
 }

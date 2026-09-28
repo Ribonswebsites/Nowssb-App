@@ -18,6 +18,7 @@ import 'progress_sessions.dart';
 import 'progress_stats.dart';
 import 'progress_tokens.dart';
 import '../../widgets/colored_split_promo_banner.dart';
+import '../../admin/layout/layout_sections.dart';
 
 class PracticeProgressScreen extends StatefulWidget {
   const PracticeProgressScreen({super.key, this.words = const []});
@@ -109,40 +110,41 @@ class _PracticeProgressScreenState extends State<PracticeProgressScreen> {
                 child: ListView(
                   controller: _scroll,
                   padding: const EdgeInsets.only(bottom: 90),
-                  children: [
+                  // Server-driven order (Admin → UI Editor); bundled order by default.
+      children: layoutChildren(context, 'progress', [
                     // Full-bleed orb overlay (page video shows through).
-                    ProgressOrbHero(
+                    LSection('hero', 'Orb hero', ProgressOrbHero(
                       sessions: progress.totalSessions,
                       timeLabel: progress.timeLabel,
                       onViewInsights: _scrollToInsight,
-                    ),
-                    _pad(const ProgressEyebrow('Your Numbers', tightTop: true)),
+                    )),
+                    LSection('numbers', 'Your numbers', _pad(const ProgressEyebrow('Your Numbers', tightTop: true))),
                     _pad(ProgressStatsRow(progress: progress)),
                     const SizedBox(height: 14),
-                    _pad(ColoredSplitPromoBanner.forSurface(
+                    LSection('promo', 'Split promo banner', _pad(ColoredSplitPromoBanner.forSurface(
                       SplitPromoSurface.progress,
                       onTap: () => NavScope.goTo(context, 1),
-                    )),
-                    _pad(const ProgressEyebrow('This Week')),
+                    ))),
+                    LSection('week', 'This week', _pad(const ProgressEyebrow('This Week'))),
                     _pad(ProgressWeekGrid(progress: progress)),
-                    if (progress.lastPracticed != null) ...[
+                    if (progress.lastPracticed != null) LSection.group('last', 'Last practiced', align: CrossAxisAlignment.stretch, [
                       const SizedBox(height: 10),
                       _pad(ProgressLastPracticed(date: progress.lastPracticed!)),
-                    ],
-                    _pad(const ProgressEyebrow('Recent Sessions')),
+                    ]),
+                    LSection('recent', 'Recent sessions', _pad(const ProgressEyebrow('Recent Sessions'))),
                     _pad(ProgressSessionsCard(
                       sessions: progress.sessionsSnapshot.take(8).toList(),
                       organFor: organFor,
                     )),
-                    _pad(const ProgressEyebrow('Body & Mind')),
+                    LSection('body', 'Body & mind', _pad(const ProgressEyebrow('Body & Mind'))),
                     _pad(ProgressBodyMap(progress: progress, words: widget.words)),
-                    _pad(const ProgressEyebrow('Milestones')),
+                    LSection('milestones', 'Milestones', _pad(const ProgressEyebrow('Milestones'))),
                     _pad(ProgressMilestones(progress: progress)),
-                    _pad(ProgressEyebrow('Weekly Insight', key: _insightKey)),
+                    LSection('insight', 'Weekly insight', _pad(ProgressEyebrow('Weekly Insight', key: _insightKey)), copyable: false),
                     _pad(ProgressInsight(progress: progress)),
-                    _pad(const ProgressEyebrow('Your Feedback')),
+                    LSection('feedback', 'Your feedback', _pad(const ProgressEyebrow('Your Feedback'))),
                     _pad(const ProgressFeedbackSection()),
-                  ],
+                  ]),
                 ),
               ),
             ],

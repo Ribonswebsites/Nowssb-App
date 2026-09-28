@@ -25,6 +25,8 @@ import '../quick_access.dart';
 import '../fashion_plus.dart';
 import '../widgets_page.dart';
 import '../../admin/template/editable.dart';
+import '../../admin/layout/carousel_fx.dart';
+import '../../admin/layout/layout_sections.dart' show CarouselAutoRotate;
 
 const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
 
@@ -185,14 +187,14 @@ class _FashTilesState extends State<FashTiles> {
           }
           return false;
         },
-        child: PageView(
+        child: CarouselAutoRotate(controller: _pager, count: 3, child: PageView(
           controller: _pager,
           padEnds: true,
           onPageChanged: (i) {
             setState(() => _index = i);
             _armAuto();
           },
-          children: [
+          children: carouselFxChildren(context, _pager, [
             // Card 0 — Flip glass brand showcase
             flipPage,
             // Card 1 — existing Player / Library / Store / Reader (Enter)
@@ -214,8 +216,8 @@ class _FashTilesState extends State<FashTiles> {
                   onTap: () => widget.onTile?.call(dest),
                 ),
             ]),
-          ],
-        ),
+          ]),
+        )),
       ),
     );
   }

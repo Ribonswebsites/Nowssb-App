@@ -17,6 +17,7 @@ import '../theme/tokens.dart';
 import '../widgets/intro_gate.dart';
 import '../widgets/page_shell.dart';
 import '../admin/template/editable.dart';
+import '../admin/layout/layout_sections.dart';
 
 class FashionPlusScreen extends StatefulWidget {
   const FashionPlusScreen({super.key});
@@ -80,25 +81,27 @@ class _FashionPlusScreenState extends State<FashionPlusScreen> {
         slivers: [
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            sliver: SliverList.list(children: [
-              _Switch(
+            sliver: SliverList.list(
+      // Server-driven order (Admin → UI Editor); bundled order by default.
+      children: layoutChildren(context, 'fashionplus', [
+              LSection('switch', 'Fashion Plus switch', _Switch(
                 on: on,
                 onChanged: (v) => Settings.instance.setFashionPlus(v),
-              ),
+              )),
               const SizedBox(height: 14),
-              const _BackgroundChooser(),
+              const LSection('backgrounds', 'Background chooser', _BackgroundChooser()),
               const SizedBox(height: 24),
-              const DarkHead(
+              const LSection('changes', 'What the switch touches', DarkHead(
                 eyebrow: 'What the switch touches',
                 title: 'Seven things',
                 icon: Icons.auto_awesome_motion_outlined,
-              ),
+              )),
               const SizedBox(height: 14),
               for (final (title, sub) in _changes)
                 _ChangeRow(title: title, sub: sub, on: on),
               const SizedBox(height: 18),
-              const _Cost(),
-            ]),
+              const LSection('cost', 'Cost', _Cost()),
+            ])),
           ),
         ],
       ),

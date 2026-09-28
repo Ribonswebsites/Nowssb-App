@@ -17,7 +17,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import '../admin/admin_state.dart';
-import '../admin/template/editable.dart' show SlotBadge;
+import '../admin/template/editable.dart' show slotChrome, slotSeen;
 import '../admin/template/slot_keys.dart';
 import '../admin/template/ui_overrides.dart';
 import 'video_pool.dart';
@@ -328,15 +328,8 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    SlotRegistry.instance.see(widget.slotKey, SlotType.video, widget.asset);
-    final clip = _clip();
-    if (!EditMode.instance.on) return clip;
-    return SlotBadge(
-      slotKey: widget.slotKey,
-      type: SlotType.video,
-      defaultValue: widget.asset,
-      child: clip,
-    );
+    slotSeen(context, widget.slotKey, SlotType.video, widget.asset);
+    return slotChrome(context, widget.slotKey, SlotType.video, widget.asset, _clip());
   }
 
   Widget _clip() {

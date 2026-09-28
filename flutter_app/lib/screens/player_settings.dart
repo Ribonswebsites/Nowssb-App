@@ -8,6 +8,7 @@ import '../data/settings.dart';
 import '../theme/player_aura.dart';
 import '../widgets/colored_split_promo_banner.dart';
 import '../admin/template/editable.dart';
+import '../admin/layout/layout_sections.dart';
 
 class PlayerSettingsScreen extends StatefulWidget {
   const PlayerSettingsScreen({super.key});
@@ -180,40 +181,41 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
               Expanded(
                 child: ListView(
                   padding: EdgeInsets.fromLTRB(22, 0, 16, 28 + bottomInset),
-                  children: [
+                  // Server-driven order (Admin → UI Editor); bundled order by default.
+      children: layoutChildren(context, 'player.settings', [
                     const SizedBox(height: 4),
-                    ColoredSplitPromoBanner(
+                    LSection('promo', 'Promo banner', ColoredSplitPromoBanner(
                       spec: SplitPromoExtras.at(7),
                       margin: EdgeInsets.zero,
-                    ),
+                    )),
                     const SizedBox(height: 8),
-                    _nav(Icons.tune, 'Equalizer', _eqLabel,
-                        () => _choose('Equalizer', _eqOptions, _eqLabel, _setEq)),
-                    _nav(Icons.graphic_eq, 'Audio Quality', s.quality,
-                        () => _choose('Audio Quality', _qualityOptions, s.quality, s.setQuality)),
-                    _toggle(Icons.multitrack_audio, 'Bass Boost', s.bassBoost, s.toggleBass),
-                    _nav(Icons.speed, 'Playback Speed', _speedLabel,
-                        () => _choose('Playback Speed', _speedOptions, _speedLabel, _setSpeed)),
-                    _nav(Icons.compare_arrows, 'Crossfade', s.crossfade,
-                        () => _choose('Crossfade', _crossfadeOptions, s.crossfade, s.setCrossfade)),
-                    _nav(Icons.timer_outlined, 'Sleep Timer', s.sleepTimer,
-                        () => _choose('Sleep Timer', _sleepOptions, s.sleepTimer, s.setSleepTimer)),
-                    _toggle(Icons.download_outlined, 'Download Only', s.downloadOnly, s.toggleDownloadOnly),
-                    _nav(Icons.queue_music, 'Now Playing View', s.playlist,
-                        () => _choose('Now Playing View', _viewOptions, s.playlist, s.setPlaylist)),
-                    _nav(
+                    LSection('eq', 'Equalizer', _nav(Icons.tune, 'Equalizer', _eqLabel,
+                        () => _choose('Equalizer', _eqOptions, _eqLabel, _setEq))),
+                    LSection('quality', 'Audio quality', _nav(Icons.graphic_eq, 'Audio Quality', s.quality,
+                        () => _choose('Audio Quality', _qualityOptions, s.quality, s.setQuality))),
+                    LSection('bass', 'Bass boost', _toggle(Icons.multitrack_audio, 'Bass Boost', s.bassBoost, s.toggleBass)),
+                    LSection('speed', 'Playback speed', _nav(Icons.speed, 'Playback Speed', _speedLabel,
+                        () => _choose('Playback Speed', _speedOptions, _speedLabel, _setSpeed))),
+                    LSection('crossfade', 'Crossfade', _nav(Icons.compare_arrows, 'Crossfade', s.crossfade,
+                        () => _choose('Crossfade', _crossfadeOptions, s.crossfade, s.setCrossfade))),
+                    LSection('sleep', 'Sleep timer', _nav(Icons.timer_outlined, 'Sleep Timer', s.sleepTimer,
+                        () => _choose('Sleep Timer', _sleepOptions, s.sleepTimer, s.setSleepTimer))),
+                    LSection('download', 'Download only', _toggle(Icons.download_outlined, 'Download Only', s.downloadOnly, s.toggleDownloadOnly)),
+                    LSection('nowview', 'Now playing view', _nav(Icons.queue_music, 'Now Playing View', s.playlist,
+                        () => _choose('Now Playing View', _viewOptions, s.playlist, s.setPlaylist))),
+                    LSection('playlist', 'Playlist view', _nav(
                       Icons.view_list_outlined,
                       'Playlist View',
                       s.playlist == 'Classic' || s.playlist == 'Grid' || s.playlist == 'Compact'
                           ? s.playlist
                           : 'Classic',
                       () => _choose('Playlist View', _playlistOptions, s.playlist, s.setPlaylist),
-                    ),
-                    _nav(Icons.notifications_none, 'Now Playing', s.nowPlaying,
+                    )),
+                    LSection('nowplaying', 'Now playing', _nav(Icons.notifications_none, 'Now Playing', s.nowPlaying,
                         () => _choose('Now Playing', _nowPlayingOptions, s.nowPlaying, s.setNowPlaying),
-                        last: true),
+                        last: true)),
                     const SizedBox(height: 24),
-                    Row(
+                    LSection('battery', 'Battery note', Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(Icons.battery_full, size: 14, color: Colors.white.withOpacity(0.55)),
@@ -227,9 +229,9 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
                           ),
                         ),
                       ],
-                    ),
+                    )),
                     SizedBox(height: 12 + bottomInset),
-                  ],
+                  ]),
                 ),
               ),
             ],

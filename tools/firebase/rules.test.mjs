@@ -60,6 +60,24 @@ await t('anon list ui_overrides', assertSucceeds(getDocs(collection(anon, 'ui_ov
 await t('user write ui_overrides denied', assertFails(setDoc(doc(alice, 'ui_overrides/x'), { slot: 'x' })));
 await t('admin write ui_overrides', assertSucceeds(setDoc(doc(boss, 'ui_overrides/x'), { slot: 'x', type: 'text', text: 'hi' })));
 await t('admin delete ui_overrides', assertSucceeds(deleteDoc(doc(boss, 'ui_overrides/x'))));
+// ui_layouts (UI Editor page layouts)
+await t('anon read ui_layouts', assertSucceeds(getDoc(doc(anon, 'ui_layouts/home.normal'))));
+await t('anon list ui_layouts', assertSucceeds(getDocs(collection(anon, 'ui_layouts'))));
+await t('user write ui_layouts denied', assertFails(setDoc(doc(alice, 'ui_layouts/home.normal'), { page: 'home.normal', sections: [] })));
+await t('anon write ui_layouts denied', assertFails(setDoc(doc(anon, 'ui_layouts/home.normal'), { page: 'home.normal', sections: [] })));
+await t('admin write ui_layouts', assertSucceeds(setDoc(doc(boss, 'ui_layouts/home.normal'), { page: 'home.normal', version: 1, sections: [{ id: 'greet', kind: 'builtin', visible: true }] })));
+await t('claim admin write ui_layouts', assertSucceeds(setDoc(doc(claim, 'ui_layouts/home.fashion'), { page: 'home.fashion', version: 1, sections: [] })));
+await t('user delete ui_layouts denied', assertFails(deleteDoc(doc(alice, 'ui_layouts/home.normal'))));
+await t('admin delete ui_layouts', assertSucceeds(deleteDoc(doc(boss, 'ui_layouts/home.fashion'))));
+// ui_history (UI Editor version history)
+await t('admin create ui_history', assertSucceeds(addDoc(collection(boss, 'ui_history'), { page: 'home.normal', kind: 'layout', target: 'home.normal', before: null, after: { sections: [] }, at: serverTimestamp(), by: 'boss' })));
+await t('user create ui_history denied', assertFails(addDoc(collection(alice, 'ui_history'), { page: 'home.normal', kind: 'slot', target: 'x' })));
+await t('admin read ui_history', assertSucceeds(getDocs(query(collection(boss, 'ui_history'), where('page', '==', 'home.normal')))));
+await t('user read ui_history denied', assertFails(getDocs(collection(alice, 'ui_history'))));
+await t('anon read ui_history denied', assertFails(getDocs(collection(anon, 'ui_history'))));
+await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'ui_history/H1'), { page: 'home.normal', kind: 'slot', target: 'x' }));
+await t('admin update ui_history denied', assertFails(updateDoc(doc(boss, 'ui_history/H1'), { target: 'y' })));
+await t('admin delete ui_history denied', assertFails(deleteDoc(doc(boss, 'ui_history/H1'))));
 // content/quotes
 await t('anon read content/quotes', assertSucceeds(getDoc(doc(anon, 'content/quotes'))));
 await t('admin write content/quotes', assertSucceeds(setDoc(doc(boss, 'content/quotes'), { byDate: {}, queue: ['a'] })));

@@ -20,6 +20,7 @@ import 'request_words.dart';
 import 'signature_store.dart';
 import 'store_routes.dart';
 import '../../admin/template/editable.dart';
+import '../../admin/layout/layout_sections.dart';
 
 class WordAtelierScreen extends StatelessWidget {
   const WordAtelierScreen({super.key});
@@ -268,7 +269,18 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+      // Server-driven order (Admin → UI Editor); bundled order by default.
+      children: layoutIndexed(context, 'store.atelier', const {
+        0: ('hero', 'Hero film'),
+        2: ('promo', 'Split promo banner'),
+        4: ('search', 'Search'),
+        6: ('intro', 'Your word library intro'),
+        10: ('chips', 'Category chips'),
+        12: ('promo2', 'Meaning Store banner'),
+        13: ('rows', 'Word collections'),
+        -2: ('promo3', 'Signature Store banner'),
+        -1: ('disclaimer', 'Disclaimer'),
+      }, [
         StorePixelsHero(
           onBrowseAll: _browseAll,
           onViewCart: _viewCart,
@@ -374,7 +386,7 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
           text:
               'Words shared or sold here are for educational and wellness purposes only — nothing here is medical advice. Purchases are final once unlocked. Any information you share with us is kept strictly confidential and never sold or shared with third parties.',
         ),
-      ],
+      ]),
     );
   }
 }

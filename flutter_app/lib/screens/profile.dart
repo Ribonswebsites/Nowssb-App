@@ -29,6 +29,7 @@ import 'quick_access.dart';
 import 'store.dart';
 import '../widgets/colored_split_promo_banner.dart';
 import '../admin/template/editable.dart';
+import '../admin/layout/layout_sections.dart';
 
 const _accent = Color(0xFFE3BD7D);
 const _text = Color(0xFFF5F5F3);
@@ -290,26 +291,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 constraints: const BoxConstraints(maxWidth: double.infinity),
                 child: ListView(
                   padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
-                  children: [
-                    _banner(),
-                    _profileCard(),
-                    _earnHub(),
-                    _progress(),
-                    _about(),
-                    ColoredSplitPromoBanner.forSurface(
+                  // Server-driven order (Admin → UI Editor); bundled order by default.
+      children: layoutChildren(context, 'profile', [
+                    LSection('banner', 'Banner', _banner()),
+                    LSection('card', 'Profile card', _profileCard()),
+                    LSection('earn', 'Earn hub', _earnHub()),
+                    LSection('progress', 'Progress', _progress()),
+                    LSection('about', 'About', _about()),
+                    LSection('promo', 'Split promo banner', ColoredSplitPromoBanner.forSurface(
                       SplitPromoSurface.profile,
                       onTap: () => NavScope.goTo(context, 1),
-                    ),
-                    _quickAccess(),
-                    _recentActivity(),
-                    _motto(),
-                    _weekTracker(today),
-                    _preferences(),
-                    _shop(),
-                    _account(),
-                    _quote(),
-                    _signOut(),
-                  ],
+                    )),
+                    LSection('quick', 'Quick access', _quickAccess()),
+                    LSection('recent', 'Recent activity', _recentActivity()),
+                    LSection('motto', 'Motto', _motto()),
+                    LSection('week', 'Week tracker', _weekTracker(today)),
+                    LSection('prefs', 'Preferences', _preferences()),
+                    LSection('shop', 'Shop', _shop()),
+                    LSection('account', 'Account', _account()),
+                    LSection('quote', 'Quote', _quote()),
+                    LSection('signout', 'Sign out', _signOut()),
+                  ]),
                 ),
               ),
             ),

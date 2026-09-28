@@ -16,6 +16,7 @@ import '../wordprint/word_print_screen.dart';
 import '../../screens/nwsb_sign_in_sheet.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../admin/template/editable.dart';
+import '../../admin/layout/layout_sections.dart';
 
 class EarnHubScreen extends StatelessWidget {
   const EarnHubScreen({super.key});
@@ -40,7 +41,8 @@ class EarnHubScreen extends StatelessWidget {
           final w = EconomyMirror.instance;
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
-            children: [
+            // Server-driven order (Admin → UI Editor); bundled order by default.
+      children: layoutChildren(context, 'earn', [
               if (w.uid == null)
                 GoldButton(
                   label: 'Sign in to see your balance',
@@ -55,30 +57,30 @@ class EarnHubScreen extends StatelessWidget {
                 Text('${w.circleTier} · ${w.code.isEmpty ? 'code paused' : w.code}', style: const TextStyle(color: NwsbColors.mist)),
               ],
               const SizedBox(height: 8),
-              const EconomyNote('This page is only yours. Coin and cash balances are not on the public Word Print.'),
+              const LSection('note', 'Privacy note', EconomyNote('This page is only yours. Coin and cash balances are not on the public Word Print.')),
               const SizedBox(height: 14),
-              GoldButton(label: 'NowssB Earn', onTap: () => _open(context, const CircleScreen())),
+              LSection('earn', 'NowssB Earn', GoldButton(label: 'NowssB Earn', onTap: () => _open(context, const CircleScreen()))),
               const SizedBox(height: 8),
-              GoldButton(label: 'Rewards', filled: false, onTap: () => _open(context, const VaultScreen())),
+              LSection('rewards', 'Rewards', GoldButton(label: 'Rewards', filled: false, onTap: () => _open(context, const VaultScreen()))),
               const SizedBox(height: 8),
-              GoldButton(label: 'Gifts', filled: false, onTap: () => _open(context, const GiftsScreen())),
+              LSection('gifts', 'Gifts', GoldButton(label: 'Gifts', filled: false, onTap: () => _open(context, const GiftsScreen()))),
               const SizedBox(height: 8),
-              GoldButton(label: 'Resell', filled: false, onTap: () => _open(context, const BazaarScreen())),
+              LSection('resell', 'Resell', GoldButton(label: 'Resell', filled: false, onTap: () => _open(context, const BazaarScreen()))),
               const SizedBox(height: 8),
-              GoldButton(label: 'Word Print', filled: false, onTap: () => _open(context, WordPrintScreen(uid: w.uid))),
+              LSection('wordprint', 'Word Print', GoldButton(label: 'Word Print', filled: false, onTap: () => _open(context, WordPrintScreen(uid: w.uid)))),
               const SizedBox(height: 8),
-              GoldButton(label: 'Echo Wall', filled: false, onTap: () => _open(context, const EchoWallScreen())),
+              LSection('echo', 'Echo Wall', GoldButton(label: 'Echo Wall', filled: false, onTap: () => _open(context, const EchoWallScreen()))),
               const SizedBox(height: 14),
-              GoldButton(label: 'Earnings', filled: false, onTap: () => _open(context, const EarningsScreen())),
+              LSection('earnings', 'Earnings', GoldButton(label: 'Earnings', filled: false, onTap: () => _open(context, const EarningsScreen()))),
               const SizedBox(height: 18),
-              const EditableLabel('earn_hub_screen.EarnHubScreen', 'COIN LEDGER', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12)),
+              const LSection('coins', 'Coin ledger', EditableLabel('earn_hub_screen.EarnHubScreen', 'COIN LEDGER', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12))),
               const SizedBox(height: 8),
               _ledger('coinLedger', w.uid),
               const SizedBox(height: 16),
-              const EditableLabel('earn_hub_screen.EarnHubScreen', 'CASH LEDGER', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12)),
+              const LSection('cash', 'Cash ledger', EditableLabel('earn_hub_screen.EarnHubScreen', 'CASH LEDGER', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12))),
               const SizedBox(height: 8),
               _ledger('cashLedger', w.uid),
-            ],
+            ]),
           );
         },
       ),

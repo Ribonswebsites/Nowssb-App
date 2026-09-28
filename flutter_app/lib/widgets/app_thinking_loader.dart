@@ -10,7 +10,10 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
+import '../admin/layout/scopes.dart';
 import '../admin/template/editable.dart';
+import '../admin/template/slot_keys.dart';
+import '../admin/template/ui_overrides.dart';
 
 /// Alias kept for call sites that prefer the product name.
 typedef NwsbThinkingOrb = AppThinkingLoader;
@@ -33,7 +36,13 @@ class AppThinkingLoader extends StatefulWidget {
     this.labelStyle,
     this.blackCircle = true,
     this.circlePad = 7,
+    this.slot,
   });
+
+  /// Pins this loader's orb choice (UI Editor → Animation → Thinking orb)
+  /// to a name. Without one, the section it sits in is used, then the
+  /// app-wide choice (`orb.all`).
+  final String? slot;
 
   /// Optional plain text beside/below the orb (e.g. "Thinking…", "Preparing…").
   final String? label;
@@ -80,15 +89,35 @@ class _AppThinkingLoaderState extends State<AppThinkingLoader> {
 
   @override
   Widget build(BuildContext context) {
+    UiScope.watch(context);
+    final section = SectionScope.maybeOf(context);
+    final key = widget.slot ??
+        (section != null ? 'orb.${section.pageId}.${section.sectionId}' : 'orb.all');
+    slotSeen(context, key, SlotType.orb, _state.name);
+    var look = effectiveOverride(context, key)?.style;
+    if ((look == null || look.isEmpty) && key != 'orb.all') {
+      look = effectiveOverride(context, 'orb.all')?.style;
+    }
+    look ??= const {};
+    var state = _state;
+    final pick = look['orb'];
+    if (pick is String) {
+      for (final s in OrbState.values) {
+        if (s.name == pick) state = s;
+      }
+    }
+    final size = look['orbSize'] is num ? (look['orbSize'] as num).toDouble() : widget.size;
+    final blackCircle = look['orbCircle'] is bool ? look['orbCircle'] as bool : widget.blackCircle;
+
     final orb = ThinkingOrb(
-      state: _state,
-      size: widget.size,
+      state: state,
+      size: size,
       theme: widget.theme,
     );
 
     final Widget orbWidget;
-    if (widget.blackCircle) {
-      final circle = widget.size + widget.circlePad * 2;
+    if (blackCircle) {
+      final circle = size + widget.circlePad * 2;
       orbWidget = Container(
         width: circle,
         height: circle,

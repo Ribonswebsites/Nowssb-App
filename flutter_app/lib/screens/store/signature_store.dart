@@ -16,6 +16,7 @@ import 'store_select_sheet.dart';
 import 'store_routes.dart';
 import 'request_words.dart';
 import '../../admin/template/editable.dart';
+import '../../admin/layout/layout_sections.dart';
 
 class SignatureStoreScreen extends StatelessWidget {
   const SignatureStoreScreen({super.key});
@@ -60,18 +61,19 @@ class _SignatureBody extends StatelessWidget {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+      // Server-driven order (Admin → UI Editor); bundled order by default.
+      children: layoutChildren(context, 'store.signature', [
         // Video hero — no stacked title overlay (header has subtitle).
-        StorePixelsHero(
+        const LSection('hero', 'Hero film', StorePixelsHero(
           videoAsset: 'assets/video/signature-store-hero.mp4',
           videoTitle: '',
           height: 320,
-        ),
+        )),
         // Subscribe banner uses #3 only — never Signature hero film.
-        const StoreSubscribeBanner(
+        const LSection('subscribe', 'Subscribe banner', StoreSubscribeBanner(
           videoAsset: StoreSubscribeBanner.kSubscriptionOfferVideo,
-        ),
-        RmCatBanner(
+        )),
+        LSection('words', 'Signature collection', RmCatBanner(
           title: 'Signature Collection',
           sub: 'One per collection — the rarest Signature each one has',
           pillLabel: 'SIGNATURE',
@@ -89,7 +91,7 @@ class _SignatureBody extends StatelessWidget {
               signature: true,
             ),
           ),
-        ),
+        )),
         RmWordRow(
           children: [
             for (final s in w1)
@@ -109,12 +111,12 @@ class _SignatureBody extends StatelessWidget {
               ),
           ],
         ),
-        ColoredSplitPromoBanner.forSurface(
+        LSection('promo', 'Request words banner', ColoredSplitPromoBanner.forSurface(
           SplitPromoSurface.signatureStore,
           onTap: () => openRequestWords(context),
           margin: const EdgeInsets.only(bottom: 8),
-        ),
-        if (w2.isNotEmpty) ...[
+        )),
+        if (w2.isNotEmpty) LSection.group('words2', 'Signature collection II', align: CrossAxisAlignment.start, [
           RmCatBanner(
             title: 'Signature Collection · II',
             sub: 'The rest of the rare Signature set',
@@ -153,8 +155,8 @@ class _SignatureBody extends StatelessWidget {
                 ),
             ],
           ),
-        ],
-        RmCatBanner(
+        ]),
+        LSection('meanings', 'Signature meanings', RmCatBanner(
           title: 'Signature Meanings',
           sub: 'The full decoded origin — Signature grade',
           pillLabel: 'MEANINGS',
@@ -172,7 +174,7 @@ class _SignatureBody extends StatelessWidget {
               signature: true,
             ),
           ),
-        ),
+        )),
         MsGrid(
           children: [
             for (final e in m1)
@@ -197,7 +199,7 @@ class _SignatureBody extends StatelessWidget {
               ),
           ],
         ),
-        if (m2.isNotEmpty) ...[
+        if (m2.isNotEmpty) LSection.group('meanings2', 'Signature meanings II', align: CrossAxisAlignment.start, [
           RmCatBanner(
             title: 'Signature Meanings · II',
             sub: 'The rest of the decoded Signature set',
@@ -241,9 +243,9 @@ class _SignatureBody extends StatelessWidget {
                 ),
             ],
           ),
-        ],
+        ]),
         const SizedBox(height: 18),
-        Container(
+        LSection('info', 'About signatures', Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: const Color(0x0AFFFFFF),
@@ -280,20 +282,20 @@ class _SignatureBody extends StatelessWidget {
               ),
             ],
           ),
-        ),
+        )),
         const SizedBox(height: 36),
-        ColoredSplitPromoBanner(
+        LSection('promo2', 'Promo banner', ColoredSplitPromoBanner(
           spec: SplitPromoExtras.at(10, onTap: () => openRequestWords(context)),
           margin: const EdgeInsets.only(bottom: 40),
-        ),
-        ColoredSplitPromoBanner(
+        )),
+        LSection('promo3', 'Promo banner 2', ColoredSplitPromoBanner(
           spec: SplitPromoExtras.at(11, onTap: () => openRequestWords(context)),
-        ),
-        const StoreDisclaimer(
+        )),
+        const LSection('disclaimer', 'Disclaimer', StoreDisclaimer(
           text:
               'Signatures are one-of-a-kind. Owned once, never restocked. For educational and wellness purposes only.',
-        ),
-      ],
+        )),
+      ]),
     );
   }
 }
