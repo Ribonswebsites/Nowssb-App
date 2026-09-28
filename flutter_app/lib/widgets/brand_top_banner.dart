@@ -12,6 +12,8 @@ class BrandTopBanner extends StatelessWidget {
     this.bare = false,
     this.title = 'NowssB',
     this.mark,
+    this.art = 'assets/banners/brand-cleo.png',
+    this.artAlignment = Alignment.topCenter,
   });
 
   final VoidCallback? onTap;
@@ -23,6 +25,10 @@ class BrandTopBanner extends StatelessWidget {
 
   /// When set, a white circle with this SVG replaces the disc logo.
   final String? mark;
+
+  /// Portrait cropped on the right of the black banner.
+  final String art;
+  final Alignment artAlignment;
 
   @override
   Widget build(BuildContext context) {
@@ -84,9 +90,9 @@ class BrandTopBanner extends StatelessWidget {
                   width: h,
                   height: h,
                   child: EditableImage.asset(
-                    'assets/banners/brand-cleo.png',
+                    art,
                     fit: BoxFit.cover,
-                    alignment: Alignment.topCenter,
+                    alignment: artAlignment,
                     errorBuilder: (_, __, ___) => const ColoredBox(
                       color: Color(0xFF120818),
                     ),

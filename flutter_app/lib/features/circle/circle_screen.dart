@@ -95,6 +95,8 @@ class _CircleScreenState extends State<CircleScreen> {
                 bare: true,
                 title: 'NowssB Earn',
                 mark: NwsbMarks.piggy,
+                art: 'assets/banners/earn/bag-blonde.jpg',
+                artAlignment: const Alignment(0.12, -0.02),
                 onTap: _welcome,
               ),
               const SizedBox(height: 12),
@@ -345,6 +347,14 @@ class _CircleScreenState extends State<CircleScreen> {
   }
 }
 
+class _RailCard {
+  const _RailCard(this.label, this.image, this.tint, this.open);
+  final String label;
+  final String image;
+  final Color tint;
+  final void Function(BuildContext) open;
+}
+
 class _EarnCardRail extends StatefulWidget {
   const _EarnCardRail();
 
@@ -353,21 +363,21 @@ class _EarnCardRail extends StatefulWidget {
 }
 
 class _EarnCardRailState extends State<_EarnCardRail> {
-  late final PageController _pages = PageController();
+  late final PageController _pages = PageController(viewportFraction: 0.5);
   Timer? _timer;
   var _index = 0;
 
-  static const _cards = <(String, String, Color, void Function(BuildContext))>[
-    ('NowssB Gifts', NwsbMarks.gift, Color(0xFF4A1942), openGifts),
-    ('NowssB Rewards', NwsbMarks.earn, Color(0xFF1A3058), openRewards),
-    ('Your Earning', NwsbMarks.piggy, Color(0xFF3A2610), openEarnings),
-    ('NowssB coins earned', NwsbMarks.earn, Color(0xFF12362C), openCoins),
+  static const _cards = <_RailCard>[
+    _RailCard('NowssB Gifts', 'assets/banners/earn/sit-dark.png', Color(0xFF6A1B4D), openGifts),
+    _RailCard('NowssB Rewards', 'assets/banners/earn/yoga-light.png', Color(0xFF1E3A8A), openRewards),
+    _RailCard('Your Earning', 'assets/banners/earn/man-light.png', Color(0xFF8A5A12), openEarnings),
+    _RailCard('NowssB coins earned', 'assets/banners/earn/yoga-dark.png', Color(0xFF0F6E56), openCoins),
   ];
 
   @override
   void initState() {
     super.initState();
-    if (bool.fromEnvironment('FLUTTER_TEST')) return;
+    if (const bool.fromEnvironment('FLUTTER_TEST')) return;
     _timer = Timer.periodic(const Duration(milliseconds: 2600), (_) {
       if (!mounted || !_pages.hasClients) return;
       _index = (_index + 1) % _cards.length;
@@ -386,51 +396,44 @@ class _EarnCardRailState extends State<_EarnCardRail> {
   Widget build(BuildContext context) {
     return GlassWrap(
       margin: EdgeInsets.zero,
-      padding: const EdgeInsets.all(6),
+      padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
       child: SizedBox(
-        height: 72,
+        height: 172,
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Expanded(
-              flex: 7,
-              child: _tile(
-                label: 'NowssB Earn',
-                color: Colors.black,
-                onTap: () {},
-                child: const SizedBox(
-                  width: 40,
-                  height: 52,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                    child: FlipPortrait(
-                      front: 'assets/banners/earn/hands-light.png',
-                      back: 'assets/banners/earn/hands-dark.png',
-                      mark: NwsbMarks.piggy,
-                      markSize: 18,
-                      fit: BoxFit.cover,
-                      alignment: Alignment(0, -0.25),
-                      markAt: Alignment(0, -0.48),
-                    ),
-                  ),
-                ),
-              ),
+            _photoCard(
+              width: 108,
+              height: 172,
+              label: 'NowssB Earn',
+              image: 'assets/banners/earn/hands-raise.png',
+              tint: const Color(0xFF3A1868),
+              onTap: () {},
             ),
-            const SizedBox(width: 6),
+            const SizedBox(width: 8),
             Expanded(
-              flex: 5,
-              child: PageView.builder(
-                controller: _pages,
-                itemCount: _cards.length,
-                onPageChanged: (i) => _index = i,
-                itemBuilder: (_, i) {
-                  final card = _cards[i];
-                  return _tile(
-                    label: card.$1,
-                    color: card.$3,
-                    onTap: () => card.$4(context),
-                    child: NwsbIcon(card.$2, size: 22, color: Colors.white),
-                  );
-                },
+              child: SizedBox(
+                height: 118,
+                child: PageView.builder(
+                  controller: _pages,
+                  padEnds: false,
+                  itemCount: _cards.length,
+                  onPageChanged: (i) => _index = i,
+                  itemBuilder: (_, i) {
+                    final card = _cards[i];
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: _photoCard(
+                        width: double.infinity,
+                        height: 118,
+                        label: card.label,
+                        image: card.image,
+                        tint: card.tint,
+                        onTap: () => card.open(context),
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
           ],
@@ -439,31 +442,54 @@ class _EarnCardRailState extends State<_EarnCardRail> {
     );
   }
 
-  Widget _tile({
+  Widget _photoCard({
+    required double width,
+    required double height,
     required String label,
-    required Color color,
+    required String image,
+    required Color tint,
     required VoidCallback onTap,
-    required Widget child,
   }) {
     return GestureDetector(
       onTap: onTap,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-          child: Row(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: SizedBox(
+          width: width,
+          height: height,
+          child: Stack(
+            fit: StackFit.expand,
             children: [
-              child,
-              const SizedBox(width: 8),
-              Expanded(
-                child: EditableLabel('circle_screen.EarnCardRail',
-                  label,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 11, height: 1.15),
+              EditableImage.asset(
+                image,
+                fit: BoxFit.cover,
+                alignment: const Alignment(0, -0.1),
+                color: tint.withValues(alpha: 0.42),
+                colorBlendMode: BlendMode.srcATop,
+                slot: 'circle_screen.EarnCardRail',
+              ),
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      tint.withValues(alpha: 0.05),
+                      tint.withValues(alpha: 0.78),
+                    ],
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8, 8, 8, 10),
+                child: Align(
+                  alignment: Alignment.bottomLeft,
+                  child: EditableLabel('circle_screen.EarnCardRail',
+                    label,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13, height: 1.12),
+                  ),
                 ),
               ),
             ],

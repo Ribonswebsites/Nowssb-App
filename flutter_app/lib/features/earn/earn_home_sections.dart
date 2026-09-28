@@ -115,7 +115,7 @@ class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
   Widget build(BuildContext context) {
     final neu = HomeSkinScope.of(context) == HomeSkin.normal;
     return SizedBox(
-      height: 540,
+      height: 660,
       child: NotificationListener<ScrollNotification>(
         onNotification: (n) {
           if (n is ScrollStartNotification && n.dragDetails != null) {
@@ -253,7 +253,7 @@ class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
         GestureDetector(
           onTap: _openEarn,
           child: Container(
-            height: 112,
+            height: 96,
             clipBehavior: Clip.antiAlias,
             decoration: BoxDecoration(
               color: const Color(0xFF000000),
@@ -261,24 +261,17 @@ class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
             ),
             child: Row(
               children: [
-                SizedBox(
-                  width: 108,
-                  height: 112,
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.horizontal(left: Radius.circular(16)),
-                    child: const FlipPortrait(
-                      front: 'assets/banners/earn/hands-light.png',
-                      back: 'assets/banners/earn/hands-dark.png',
-                      mark: NwsbMarks.piggy,
-                      fit: BoxFit.cover,
-                      alignment: Alignment(0, -0.2),
-                      markAt: Alignment(0, -0.55),
-                    ),
-                  ),
+                const SizedBox(width: 12),
+                Container(
+                  width: 52,
+                  height: 52,
+                  decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                  alignment: Alignment.center,
+                  child: const NwsbIcon(NwsbMarks.piggy, size: 26, color: Colors.black),
                 ),
                 const Expanded(
                   child: Padding(
-                    padding: EdgeInsets.fromLTRB(12, 12, 12, 12),
+                    padding: EdgeInsets.fromLTRB(12, 8, 8, 8),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -289,20 +282,20 @@ class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 26,
+                            fontSize: 22,
                             fontWeight: FontWeight.w900,
                             height: 1,
                             letterSpacing: -0.4,
                           ),
                         ),
-                        SizedBox(height: 6),
+                        SizedBox(height: 4),
                         EditableLabel('earn_home_sections.EarnUmbrellaSection',
                           'Earn',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 20,
+                            fontSize: 18,
                             fontWeight: FontWeight.w800,
                             height: 1.05,
                           ),
@@ -311,8 +304,49 @@ class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
                     ),
                   ),
                 ),
+                const SizedBox(
+                  width: 96,
+                  height: 96,
+                  child: EditableImage.asset(
+                    'assets/banners/earn/bag-blonde.jpg',
+                    fit: BoxFit.cover,
+                    alignment: Alignment(0.1, -0.05),
+                    slot: 'earn_home_sections.EarnUmbrellaSection',
+                  ),
+                ),
               ],
             ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        const SizedBox(
+          height: 118,
+          child: Row(
+            children: [
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.all(Radius.circular(14)),
+                  child: FlipPortrait(
+                    front: 'assets/banners/earn/hands-light.png',
+                    back: 'assets/banners/earn/hands-dark.png',
+                    fit: BoxFit.cover,
+                    alignment: Alignment(0, -0.05),
+                  ),
+                ),
+              ),
+              SizedBox(width: 8),
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.all(Radius.circular(14)),
+                  child: FlipPortrait(
+                    front: 'assets/banners/earn/sit-light.png',
+                    back: 'assets/banners/earn/sit-dark.png',
+                    fit: BoxFit.cover,
+                    alignment: Alignment(0, 0.72),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
         const SizedBox(height: 8),
@@ -374,82 +408,92 @@ class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
         borderRadius: BorderRadius.circular(14),
       ),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-        child: Row(
+        padding: const EdgeInsets.fromLTRB(12, 12, 10, 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Expanded(
-              flex: 10,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: const FlipPortrait(
-                  front: 'assets/banners/earn/sit-light.png',
-                  back: 'assets/banners/earn/sit-dark.png',
-                  fit: BoxFit.cover,
-                  alignment: Alignment.center,
-                ),
+            const EditableLabel('earn_home_sections.EarnUmbrellaSection',
+              'How you get paid',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                height: 1.05,
+                fontWeight: FontWeight.w800,
               ),
             ),
-            const SizedBox(width: 10),
+            const SizedBox(height: 4),
+            const EditableLabel('earn_home_sections.EarnUmbrellaSection',
+              'Net after the store fee. Not the sticker price.',
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: Color(0xCCFFFFFF), fontSize: 14, fontWeight: FontWeight.w600, height: 1.25),
+            ),
+            const SizedBox(height: 10),
             Expanded(
-              flex: 13,
-              child: Column(
+              child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const EditableLabel('earn_home_sections.EarnUmbrellaSection',
-                    'How you get paid',
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      height: 1.05,
-                      fontWeight: FontWeight.w800,
+                  Expanded(
+                    flex: 12,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        for (final tier in _earnTiers)
+                          Expanded(
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    tier.name,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w800, height: 1.05),
+                                  ),
+                                  Text(
+                                    tier.lines.first,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(color: Color(0xD9FFFFFF), fontSize: 13, height: 1.2),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: GestureDetector(
+                            onTap: _openEarn,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(99),
+                              ),
+                              child: const EditableLabel('earn_home_sections.EarnUmbrellaSection',
+                                'Open Earn',
+                                style: TextStyle(color: Color(0xFF111111), fontWeight: FontWeight.w800, fontSize: 14),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  const EditableLabel('earn_home_sections.EarnUmbrellaSection',
-                    'Net after the store fee. Not the sticker price.',
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(color: Color(0xCCFFFFFF), fontSize: 11, fontWeight: FontWeight.w600, height: 1.25),
-                  ),
-                  const SizedBox(height: 6),
-                  for (final tier in _earnTiers)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 3),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            tier.name,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w800, height: 1.1),
-                          ),
-                          Text(
-                            tier.lines.first,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 10, height: 1.15),
-                          ),
-                        ],
-                      ),
-                    ),
-                  const Spacer(),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: GestureDetector(
-                      onTap: _openEarn,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(99),
-                        ),
-                        child: const EditableLabel('earn_home_sections.EarnUmbrellaSection',
-                          'Open Earn',
-                          style: TextStyle(color: Color(0xFF111111), fontWeight: FontWeight.w800, fontSize: 13),
-                        ),
+                  const SizedBox(width: 10),
+                  const Expanded(
+                    flex: 10,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.all(Radius.circular(14)),
+                      child: FlipPortrait(
+                        front: 'assets/banners/earn/sit-light.png',
+                        back: 'assets/banners/earn/sit-dark.png',
+                        fit: BoxFit.cover,
+                        alignment: Alignment(0, 0.78),
                       ),
                     ),
                   ),
