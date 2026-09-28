@@ -37,6 +37,7 @@ import 'sound_library.dart';
 import 'aura_sound_library.dart';
 import 'store.dart';
 import 'sound_settings_sheet.dart';
+import 'player_settings.dart';
 import 'sentence_builder.dart';
 import 'select_level.dart';
 import 'player_dial.dart';
@@ -114,6 +115,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
   var _repTarget = 7;
   var _shuffle = false;
   var _volume = 1.0;
+  var _pull = 0.0;
+  var _pullStamp = 0;
   var _handingOff = false;
   var _practiceOpen = false;
   var _bottomPage = 0;
@@ -506,11 +509,11 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                                 },
                               ),
                               _quickBtn(
-                                'Hear it again',
-                                Icons.replay_rounded,
+                                'Sounds Equalizer',
+                                Icons.graphic_eq_rounded,
                                 () {
                                   Navigator.of(ctx).pop();
-                                  unawaited(_prepareAndPlay());
+                                  showSoundSettingsSheet(context);
                                 },
                               ),
                               _quickBtn(
@@ -623,7 +626,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
         );
         return SlideTransition(
           position: Tween<Offset>(
-            begin: const Offset(0, -1),
+            begin: const Offset(0, 1),
             end: Offset.zero,
           ).animate(curved),
           child: child,
@@ -763,7 +766,9 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
   }
 
   void _openSettings() {
-    showSoundSettingsSheet(context);
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const PlayerSettingsScreen()),
+    );
   }
 
   void _openSettingsLegacy() {
@@ -1030,7 +1035,18 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
             ),
             const Positioned.fill(child: ColoredBox(color: Color(0x55000000))),
             SafeArea(
-              child: LayoutBuilder(
+              child: Listener(
+                onPointerDown: (_) {
+                  _pull = 0;
+                  _pullStamp = DateTime.now().millisecondsSinceEpoch;
+                },
+                onPointerMove: (e) => _pull += e.delta.dy,
+                onPointerUp: (_) {
+                  final ms = DateTime.now().millisecondsSinceEpoch - _pullStamp;
+                  if (_pull < -90 && ms < 450) _openQueueSheet(context);
+                  _pull = 0;
+                },
+                child: LayoutBuilder(
                 builder: (context, constraints) {
                   final stageWidth = math.min(constraints.maxWidth - 24, 340.0);
                   return SingleChildScrollView(
@@ -1042,21 +1058,11 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          GestureDetector(
-                            onVerticalDragEnd: (d) {
-                              final v = d.primaryVelocity ?? 0;
-                              if (v > 220) {
-                                _openQueueSheet(context);
-                              } else if (v < -280) {
-                                _openAuraClock();
-                              }
-                            },
-                            child: _PlayerHeader(
+                          _PlayerHeader(
                               onBack: _minimizeToPill,
                               onSettings: _openSettings,
                               onMore: _openAuraClock,
                             ),
-                          ),
                           const SizedBox(height: 12),
                           Center(
                             child: SizedBox(
@@ -1228,6 +1234,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                     ),
                   );
                 },
+                ),
               ),
             ),
           ],
@@ -1959,14 +1966,18 @@ class _QueueSheetState extends State<_QueueSheet> {
     final word = _currentWord;
     final theme = _currentTheme;
     final art = (word?.img.isNotEmpty == true) ? word!.img : theme.image;
-    final t = _collapse;
-    // Continuous collapse — no stage jump-cuts. Hero owns geometry via localT.
-    final controlsOpacity = (1.0 - t / 0.55).clamp(0.0, 1.0);
-    final miniOpacity = ((t - 0.4) / 0.6).clamp(0.0, 1.0);
 
     final heroVideo = kPlayerBoxFilms[widget.index % kPlayerBoxFilms.length];
 
-    return PopScope(
+    return NotificationListener<ScrollNotification>(
+      onNotification: (n) {
+        final atTop = !_scrollCtrl.hasClients || _scrollCtrl.offset <= 1;
+        if (atTop && n is OverscrollNotification && n.overscroll < -16) {
+          Navigator.of(context).maybePop();
+        }
+        return false;
+      },
+      child: PopScope(
       canPop: true,
       child: Material(
         color: Colors.transparent,
@@ -2306,12 +2317,16 @@ class _QueueSheetState extends State<_QueueSheet> {
               top: media.padding.top + 6,
               left: 0,
               right: 0,
-              child: IgnorePointer(
-                ignoring: miniOpacity > 0.55,
-                child: Opacity(
-                  opacity:
-                      (1.0 - miniOpacity).clamp(0.0, 1.0) *
-                      controlsOpacity.clamp(0.4, 1.0),
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onVerticalDragEnd: (d) {
+                  if ((d.primaryVelocity ?? 0) > 160) {
+                    Navigator.of(context).maybePop();
+                  }
+                },
+                onTap: () => Navigator.of(context).maybePop(),
+                child: SizedBox(
+                  height: 28,
                   child: Center(
                     child: Container(
                       width: 42,
@@ -2328,6 +2343,7 @@ class _QueueSheetState extends State<_QueueSheet> {
           ],
         ),
       ),
+    ),
     );
   }
 }

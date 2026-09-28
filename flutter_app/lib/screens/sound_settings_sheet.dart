@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
 import '../data/settings.dart';
-import '../widgets/brand_top_banner.dart';
-import '../widgets/nwsb_icon.dart';
+import '../widgets/colored_split_promo_banner.dart';
 
 /// Equalizer, boost, presets, and the on-device spatial voice.
 /// Opened from the player settings button and from Equalizer in Music Player Settings.
@@ -88,6 +87,29 @@ class _SoundSettingsSheetState extends State<SoundSettingsSheet> {
     }
   }
 
+  void _how() {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF14121A),
+        title: const Text(
+          'Sounds Settings',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
+        ),
+        content: const Text(
+          'Flat, Bass, Vocal, Bright, and Wide are starting points. Drag a fader to shape that band. Boost makes the voice louder and deeper. Spatial plays the word, then a softer reflection on this phone.',
+          style: TextStyle(color: Color(0xCCFFFFFF), height: 1.35),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Got it'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final s = Settings.instance;
@@ -101,11 +123,17 @@ class _SoundSettingsSheetState extends State<SoundSettingsSheet> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const BrandTopBanner(
-                  bare: true,
-                  compact: true,
-                  title: 'Sounds Settings',
-                  mark: NwsbMarks.sound,
+                ColoredSplitPromoBanner(
+                  margin: EdgeInsets.zero,
+                  height: 118,
+                  spec: SplitPromoSpec(
+                    title: 'Sounds\nSettings',
+                    cta: 'How it works',
+                    leftColor: const Color(0xFF1A2744),
+                    rightColor: const Color(0xFF7C4DFF),
+                    art: SplitPromoArts.redHairBlazer,
+                    onTap: _how,
+                  ),
                 ),
                 const SizedBox(height: 14),
                 SizedBox(
@@ -176,7 +204,7 @@ class _SoundSettingsSheetState extends State<SoundSettingsSheet> {
                   contentPadding: EdgeInsets.zero,
                   title: const Text('Spatial audio', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
                   subtitle: const Text(
-                    'Wide voice: the word, then a softer reflection on this phone.',
+                    'Tap How it works on the banner.',
                     style: TextStyle(color: Color(0xFF8E8E93), fontSize: 12),
                   ),
                   value: s.spatialAudio,
