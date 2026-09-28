@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import '../admin/template/editable.dart';
 
 /// A small, always-on brand animation for fixed app headers.
 ///
@@ -72,7 +73,7 @@ class _LoopingLogoMarkState extends State<LoopingLogoMark>
                     ],
                   ),
                   child: ClipOval(
-                    child: Image.asset(
+                    child: EditableImage.asset(
                       'assets/icons/logo-disc.webp',
                       fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) => const ColoredBox(
@@ -83,6 +84,7 @@ class _LoopingLogoMarkState extends State<LoopingLogoMark>
                           size: 22,
                         ),
                       ),
+                      slot: 'looping_logo_mark.LoopingLogoMark',
                     ),
                   ),
                 ),

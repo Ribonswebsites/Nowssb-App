@@ -10,6 +10,9 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../admin/admin_home.dart';
+import '../admin/admin_state.dart';
+import '../admin/template/ui_overrides.dart';
 import '../data/practice_progress.dart';
 import '../data/settings.dart';
 import '../media/onboarding_warmup.dart';
@@ -26,6 +29,7 @@ import 'quick_access.dart';
 import 'quotes_live.dart';
 import 'store/request_words.dart';
 import 'widgets_page.dart';
+import '../admin/template/editable.dart';
 
 class AppSettingsScreen extends StatefulWidget {
   const AppSettingsScreen({super.key});
@@ -194,6 +198,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    UiScope.watch(context); // the Admin row follows the admin flag live
     final s = Settings.instance;
     final top = MediaQuery.paddingOf(context).top;
     final bottom = MediaQuery.paddingOf(context).bottom;
@@ -243,7 +248,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    const Text(
+                    const EditableLabel('app_settings.AppSettingsScreen',
                       'NOWSBANSIU',
                       style: TextStyle(
                         fontSize: 10,
@@ -253,7 +258,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    const Text(
+                    const EditableLabel('app_settings.AppSettingsScreen',
                       'Settings',
                       style: TextStyle(
                         fontSize: 17,
@@ -297,7 +302,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
+                                EditableLabel('app_settings.AppSettingsScreen',
                                   'Your profile',
                                   style: TextStyle(
                                     color: Colors.white,
@@ -306,7 +311,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                                   ),
                                 ),
                                 SizedBox(height: 2),
-                                Text(
+                                EditableLabel('app_settings.AppSettingsScreen',
                                   'Account · plan · edit',
                                   style: TextStyle(
                                     color: Color(0x85FFFFFF),
@@ -432,13 +437,6 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                               sub: 'Customize bottom navigation',
                               onTap: () => _push(const QuickAccessScreen()),
                             ),
-                          if (_match('Today\'s quote', 'live'))
-                            _NavRow(
-                              icon: Icons.format_quote_rounded,
-                              title: "Today's quote",
-                              sub: 'Type the line that lives on the home',
-                              onTap: () => _push(const QuoteAdminScreen()),
-                            ),
                           if (_match('Player Settings'))
                             _NavRow(
                               icon: Icons.tune_rounded,
@@ -455,7 +453,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                         children: [
                           Padding(
                             padding: const EdgeInsets.fromLTRB(4, 0, 4, 12),
-                            child: Text(
+                            child: EditableLabel('app_settings.AppSettingsScreen',
                               'Choose your Fashion home theme. Applies to the Fashion screen.',
                               style: TextStyle(
                                 fontSize: 11,
@@ -785,12 +783,15 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                               sub: 'Ask the atelier for a new word',
                               onTap: () => openRequestWords(context),
                             ),
-                          if (_match('Fulfill') || _match('Admin') || _match('Request'))
+                          // Only for an account the server marks as admin
+                          // (Firestore admins/{uid}) — see lib/admin.
+                          if (AdminState.instance.isAdmin &&
+                              (_match('Admin') || _match('Template') || _match('Edit')))
                             _NavRow(
                               icon: Icons.admin_panel_settings_outlined,
-                              title: 'Fulfill Word Requests',
-                              sub: 'Admin — mark requests fulfilled',
-                              onTap: () => openRequestWordsAdmin(context),
+                              title: 'Admin',
+                              sub: 'Words · quotes · requests · template editor',
+                              onTap: () => openAdminHome(context),
                             ),
                           if (_match('About'))
                             _NavRow(
@@ -839,23 +840,23 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF14171E),
-        title: const Text('About NowssB',
+        title: const EditableLabel('app_settings.AppSettingsScreen', 'About NowssB',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
-        content: const Text(
+        content: const EditableLabel('app_settings.AppSettingsScreen',
           'NowssB · Shabdapathy\nNatural Origin Word Science\nVersion 9.5.0\n\nnowssb.com',
           style: TextStyle(color: Color(0xE6FFFFFF), height: 1.45),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Close'),
+            child: const EditableLabel('app_settings.AppSettingsScreen', 'Close'),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
               _openTerms();
             },
-            child: const Text('Website'),
+            child: const EditableLabel('app_settings.AppSettingsScreen', 'Website'),
           ),
         ],
       ),
@@ -878,14 +879,14 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setLocal) => AlertDialog(
           backgroundColor: const Color(0xFF14171E),
-          title: const Text('Privacy',
+          title: const EditableLabel('app_settings.AppSettingsScreen', 'Privacy',
               style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
-                title: const Text('Show practice stats',
+                title: const EditableLabel('app_settings.AppSettingsScreen', 'Show practice stats',
                     style: TextStyle(color: Colors.white)),
                 value: stats,
                 onChanged: (v) async {
@@ -895,7 +896,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
               ),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
-                title: const Text('Public profile',
+                title: const EditableLabel('app_settings.AppSettingsScreen', 'Public profile',
                     style: TextStyle(color: Colors.white)),
                 value: profile,
                 onChanged: (v) async {
@@ -908,7 +909,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('Done'),
+              child: const EditableLabel('app_settings.AppSettingsScreen', 'Done'),
             ),
           ],
         ),
@@ -925,13 +926,13 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setLocal) => AlertDialog(
           backgroundColor: const Color(0xFF14171E),
-          title: const Text('Messages',
+          title: const EditableLabel('app_settings.AppSettingsScreen', 'Messages',
               style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
           content: SwitchListTile(
             contentPadding: EdgeInsets.zero,
-            title: const Text('Allow messages',
+            title: const EditableLabel('app_settings.AppSettingsScreen', 'Allow messages',
                 style: TextStyle(color: Colors.white)),
-            subtitle: const Text('Turn off to stop new messages on this phone',
+            subtitle: const EditableLabel('app_settings.AppSettingsScreen', 'Turn off to stop new messages on this phone',
                 style: TextStyle(color: Color(0x99FFFFFF))),
             value: messages,
             onChanged: (v) async {
@@ -942,7 +943,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('Done'),
+              child: const EditableLabel('app_settings.AppSettingsScreen', 'Done'),
             ),
           ],
         ),
@@ -969,20 +970,20 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF14171E),
-        title: const Text('Clear practice history?',
+        title: const EditableLabel('app_settings.AppSettingsScreen', 'Clear practice history?',
             style: TextStyle(color: Colors.white)),
-        content: const Text(
+        content: const EditableLabel('app_settings.AppSettingsScreen',
           'Session logs will be removed. This cannot be undone.',
           style: TextStyle(color: Color(0xB3FFFFFF)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel'),
+            child: const EditableLabel('app_settings.AppSettingsScreen', 'Cancel'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Clear', style: TextStyle(color: Color(0xFFF87171))),
+            child: const EditableLabel('app_settings.AppSettingsScreen', 'Clear', style: TextStyle(color: Color(0xFFF87171))),
           ),
         ],
       ),
@@ -1006,7 +1007,7 @@ class _Badge extends StatelessWidget {
         borderRadius: BorderRadius.circular(6),
         border: Border.all(color: const Color(0x4DE8D5A3)),
       ),
-      child: Text(
+      child: EditableLabel('app_settings.Badge',
         label,
         style: const TextStyle(
           fontSize: 9,
@@ -1033,7 +1034,7 @@ class _Sec extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.only(left: 4, bottom: 10),
-            child: Text(
+            child: EditableLabel('app_settings.Sec',
               label,
               style: const TextStyle(
                 fontSize: 10,
@@ -1085,7 +1086,7 @@ class _NavRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                EditableLabel('app_settings.NavRow',
                   title,
                   style: TextStyle(
                     color: danger ? const Color(0xD9F87171) : Colors.white,
@@ -1149,7 +1150,7 @@ class _ToggleRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                EditableLabel('app_settings.ToggleRow',
                   title,
                   style: const TextStyle(
                     color: Colors.white,
@@ -1158,7 +1159,7 @@ class _ToggleRow extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 2),
-                Text(
+                EditableLabel('app_settings.ToggleRow',
                   sub,
                   style: const TextStyle(
                     color: Color(0x73FFFFFF),
@@ -1211,7 +1212,7 @@ class _PillRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                EditableLabel('app_settings.PillRow',
                   title,
                   style: const TextStyle(
                     color: Colors.white,
@@ -1220,7 +1221,7 @@ class _PillRow extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 2),
-                Text(
+                EditableLabel('app_settings.PillRow',
                   sub,
                   style: const TextStyle(
                     color: Color(0x73FFFFFF),
@@ -1299,7 +1300,7 @@ class _ThemeCard extends StatelessWidget {
                           : const Color(0xBFFFFFFF),
                     ),
                   ),
-                  Text(
+                  EditableLabel('app_settings.ThemeCard',
                     sub,
                     style: const TextStyle(
                       fontSize: 7,

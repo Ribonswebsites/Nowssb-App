@@ -8,6 +8,7 @@ import '../economy/play_billing.dart';
 import '../../widgets/brand_top_banner.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/nwsb_icon.dart';
+import '../../admin/template/editable.dart';
 
 class VaultScreen extends StatelessWidget {
   const VaultScreen({super.key});
@@ -62,7 +63,7 @@ class VaultScreen extends StatelessWidget {
                   await Clipboard.setData(ClipboardData(text: text));
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Friend invite copied.')),
+                      const SnackBar(content: EditableLabel('vault_screen.VaultScreen', 'Friend invite copied.')),
                     );
                   }
                 },
@@ -79,14 +80,14 @@ class VaultScreen extends StatelessWidget {
                 onTap: () => runPrivate(context, () => EconomyApi.call('reportPractice')),
               ),
               const SizedBox(height: 22),
-              const Text('QUESTS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.4, fontSize: 12)),
+              const EditableLabel('vault_screen.VaultScreen', 'QUESTS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.4, fontSize: 12)),
               const SizedBox(height: 8),
               _quest(context, 'practice5', 'Practice 5 words', w.practice, 5, 25),
               _quest(context, 'streak3', 'Hold a 3-day streak', w.streak, 3, 30),
               _quest(context, 'listen1', 'Open the player', w.playerOpens, 1, 15),
               _quest(context, 'buy1', 'Complete one purchase', w.purchases, 1, 20),
               const SizedBox(height: 18),
-              const Text('COIN SPENDS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.4, fontSize: 12)),
+              const EditableLabel('vault_screen.VaultScreen', 'COIN SPENDS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.4, fontSize: 12)),
               const SizedBox(height: 8),
               _spend(context, 'Streak freeze · 40', 'freeze'),
               _spend(context, 'Practice credit · 15', 'practice'),
@@ -94,7 +95,7 @@ class VaultScreen extends StatelessWidget {
               _spend(context, 'Gold frame · 80', 'cosmetic', {'cosmeticId': 'frame_gold'}),
               _spend(context, 'Verified buyer badge · 30', 'badge', {'badge': 'verified-buyer'}),
               const SizedBox(height: 18),
-              const Text('PLAY PURCHASES', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.4, fontSize: 12)),
+              const EditableLabel('vault_screen.VaultScreen', 'PLAY PURCHASES', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.4, fontSize: 12)),
               const SizedBox(height: 8),
               _buy(context, 'Word', 'nwsb_word', 99, 'word', 'Word'),
               _buy(context, 'Meaning', 'nwsb_meaning', 99, 'meaning', 'Meaning'),
@@ -105,7 +106,7 @@ class VaultScreen extends StatelessWidget {
               _buy(context, 'Frequency X', 'nwsb_sub_frequency_x', 1999, 'subscription', 'Frequency X'),
               _buy(context, 'Restore streak', 'nwsb_streak_restore', 199, 'streak', 'Streak restore'),
               const SizedBox(height: 18),
-              const Text('MILESTONE CHEST', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.4, fontSize: 12)),
+              const EditableLabel('vault_screen.VaultScreen', 'MILESTONE CHEST', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.4, fontSize: 12)),
               const SizedBox(height: 8),
               const _MilestoneForm(),
               const SizedBox(height: 12),

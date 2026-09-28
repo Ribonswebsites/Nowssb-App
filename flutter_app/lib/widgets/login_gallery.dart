@@ -8,6 +8,7 @@ import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 
 import 'glass_wrap.dart';
+import '../admin/template/editable.dart';
 
 class LoginGallery extends StatefulWidget {
   const LoginGallery({super.key, required this.child});
@@ -157,11 +158,12 @@ class _LoginGalleryState extends State<LoginGallery>
                 if (c > 0) SizedBox(width: gap),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10),
-                  child: Image.asset(
+                  child: EditableImage.asset(
                     _cards[r * 4 + c],
                     width: tile,
                     height: tile,
                     fit: BoxFit.cover,
+                    slot: 'login_gallery.LoginGallery',
                   ),
                 ),
               ],

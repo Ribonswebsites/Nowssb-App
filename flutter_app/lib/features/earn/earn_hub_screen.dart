@@ -15,6 +15,7 @@ import '../vault/vault_screen.dart';
 import '../wordprint/word_print_screen.dart';
 import '../../screens/nwsb_sign_in_sheet.dart';
 import '../../widgets/colored_split_promo_banner.dart';
+import '../../admin/template/editable.dart';
 
 class EarnHubScreen extends StatelessWidget {
   const EarnHubScreen({super.key});
@@ -70,11 +71,11 @@ class EarnHubScreen extends StatelessWidget {
               const SizedBox(height: 14),
               GoldButton(label: 'Earnings', filled: false, onTap: () => _open(context, const EarningsScreen())),
               const SizedBox(height: 18),
-              const Text('COIN LEDGER', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12)),
+              const EditableLabel('earn_hub_screen.EarnHubScreen', 'COIN LEDGER', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12)),
               const SizedBox(height: 8),
               _ledger('coinLedger', w.uid),
               const SizedBox(height: 16),
-              const Text('CASH LEDGER', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12)),
+              const EditableLabel('earn_hub_screen.EarnHubScreen', 'CASH LEDGER', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12)),
               const SizedBox(height: 8),
               _ledger('cashLedger', w.uid),
             ],

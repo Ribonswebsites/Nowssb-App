@@ -45,6 +45,7 @@ class NormalGlassBackground extends StatelessWidget {
               loop: true,
               autoplay: true,
               showPoster: true,
+              slot: 'glassmorphism_theme.NormalGlassBackground',
             ),
           ),
         ),

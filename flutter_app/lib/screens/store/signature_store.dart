@@ -15,6 +15,7 @@ import 'store_home_sections.dart';
 import 'store_select_sheet.dart';
 import 'store_routes.dart';
 import 'request_words.dart';
+import '../../admin/template/editable.dart';
 
 class SignatureStoreScreen extends StatelessWidget {
   const SignatureStoreScreen({super.key});
@@ -257,19 +258,19 @@ class _SignatureBody extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Signature · Request',
+                    EditableLabel('signature_store.SignatureBody', 'Signature · Request',
                         style: TextStyle(
                             fontSize: 9,
                             letterSpacing: 1.5,
                             color: NwsbColors.gold)),
                     SizedBox(height: 4),
-                    Text('Request a Signature',
+                    EditableLabel('signature_store.SignatureBody', 'Request a Signature',
                         style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
                             color: Colors.white)),
                     SizedBox(height: 3),
-                    Text(
+                    EditableLabel('signature_store.SignatureBody',
                       'Personally crafted & delivered within 48 hours.',
                       style:
                           TextStyle(fontSize: 12, color: Color(0x8CFFFFFF)),

@@ -12,6 +12,7 @@ import '../data/settings.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
+import '../admin/template/editable.dart';
 
 class AppBackdrop extends StatelessWidget {
   const AppBackdrop({super.key});
@@ -50,15 +51,17 @@ class AppBackdrop extends StatelessWidget {
         priority: ClipPriority.feature,
         autoplay: true,
         loop: true,
+        slot: 'app_backdrop.AppBackdrop',
       );
     }
     final image = settings.fashionImageAsset;
     if (image != null) {
-      return Image.asset(
+      return EditableImage.asset(
         image,
         fit: BoxFit.cover,
         alignment: Alignment.center,
         errorBuilder: (_, __, ___) => const ColoredBox(color: NwsbColors.deep),
+        slot: 'app_backdrop.AppBackdrop',
       );
     }
     return const ColoredBox(color: NwsbColors.deep);

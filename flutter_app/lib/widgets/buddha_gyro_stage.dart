@@ -16,6 +16,7 @@ import 'package:sensors_plus/sensors_plus.dart';
 import 'app_thinking_loader.dart';
 import 'glass_wrap.dart';
 import 'neumorphic.dart';
+import '../admin/template/editable.dart';
 
 const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
 
@@ -98,7 +99,7 @@ class _BuddhaGyroStageState extends State<BuddhaGyroStage> {
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-          child: Text(
+          child: EditableLabel('buddha_gyro_stage.BuddhaGyroStage',
             "Today's Quotes",
             style: TextStyle(
               fontSize: 21,
@@ -195,10 +196,11 @@ class _BuddhaGyroStageState extends State<BuddhaGyroStage> {
                     child: Transform(
                       alignment: Alignment.center,
                       transform: plateTilt,
-                      child: Image.asset(
+                      child: EditableImage.asset(
                         'assets/banners/gyro/words-bg.png',
                         fit: BoxFit.contain,
                         filterQuality: FilterQuality.high,
+                        slot: 'buddha_gyro_stage.BuddhaGyroStage',
                       ),
                     ),
                   ),
@@ -214,10 +216,11 @@ class _BuddhaGyroStageState extends State<BuddhaGyroStage> {
                         clipBehavior: Clip.none,
                         children: [
                           Positioned.fill(
-                            child: Image.asset(
+                            child: EditableImage.asset(
                               figure,
                               fit: BoxFit.fill,
                               filterQuality: FilterQuality.high,
+                              slot: 'buddha_gyro_stage.BuddhaGyroStage',
                             ),
                           ),
                           if (orb)
@@ -268,7 +271,7 @@ class _BuddhaGyroStageState extends State<BuddhaGyroStage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  EditableLabel('buddha_gyro_stage.BuddhaGyroStage',
                     "This week's quotes",
                     style: TextStyle(
                       color: Color(0xFFE8D5A3),
@@ -276,7 +279,7 @@ class _BuddhaGyroStageState extends State<BuddhaGyroStage> {
                       fontWeight: FontWeight.w800,
                     ),
                   ),
-                  Text(
+                  EditableLabel('buddha_gyro_stage.BuddhaGyroStage',
                     'Today, last day, and the rest of the week.',
                     style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 11.5),
                   ),
@@ -289,7 +292,7 @@ class _BuddhaGyroStageState extends State<BuddhaGyroStage> {
                 color: const Color(0xFFE8D5A3),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Text(
+              child: const EditableLabel('buddha_gyro_stage.BuddhaGyroStage',
                 'Enter',
                 style: TextStyle(
                   color: Color(0xFF1A1A2E),

@@ -10,7 +10,6 @@ import 'dart:async';
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
@@ -21,6 +20,7 @@ import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../widgets/app_thinking_loader.dart';
 import '../widgets/glass_wrap.dart';
+import '../admin/template/editable.dart';
 
 enum _PracticeStatus {
   ready,
@@ -63,7 +63,7 @@ class PracticeDockOrb extends StatelessWidget {
               width: 52,
               height: 38,
               child: Center(
-                child: SvgPicture.asset(
+                child: EditableSvg.asset(
                   'assets/icons/microphone.svg',
                   width: 22,
                   height: 22,
@@ -71,10 +71,12 @@ class PracticeDockOrb extends StatelessWidget {
                     Colors.white,
                     BlendMode.srcIn,
                   ),
+                  slot: 'practice_overlay.PracticeDockOrb',
                 ),
               ),
             ),
-            const Text(
+            const EditableLabel(
+              'practice_overlay.PracticeDockOrb',
               'PRACTICE',
               style: TextStyle(
                 color: Colors.white,
@@ -455,7 +457,8 @@ class _WordBreakTab extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  EditableLabel(
+                    'practice_overlay.WordBreakTab',
                     title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -515,7 +518,8 @@ class _BlackTab extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  const EditableLabel(
+                    'practice_overlay.BlackTab',
                     'PRACTICE',
                     style: TextStyle(
                       color: Color(0xFFB8B8BC),
@@ -540,13 +544,14 @@ class _BlackTab extends StatelessWidget {
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(5),
-                          child: Image.asset(
+                          child: EditableImage.asset(
                             _storeMark,
                             width: 18,
                             height: 18,
                             fit: BoxFit.cover,
                             errorBuilder: (_, __, ___) =>
                                 const SizedBox.shrink(),
+                            slot: 'practice_overlay.BlackTab',
                           ),
                         ),
                       ),
@@ -581,7 +586,8 @@ class _BlackTab extends StatelessWidget {
           const SizedBox(height: 10),
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 8),
-            child: Text(
+            child: EditableLabel(
+              'practice_overlay.BlackTab',
               'Wait for you to say it — then tap Start',
               textAlign: TextAlign.center,
               style: TextStyle(
@@ -607,7 +613,8 @@ class _BlackTab extends StatelessWidget {
                       backgroundColor: Colors.transparent,
                       shape: const StadiumBorder(),
                     ),
-                    child: const Text(
+                    child: const EditableLabel(
+                      'practice_overlay.BlackTab',
                       'Replay',
                       style: TextStyle(
                         fontSize: 15,
@@ -677,6 +684,7 @@ class _OrbFilm extends StatelessWidget {
                 loop: true,
                 autoplay: true,
                 showPoster: true,
+                slot: 'practice_overlay.OrbFilm',
               ),
             ),
           ),

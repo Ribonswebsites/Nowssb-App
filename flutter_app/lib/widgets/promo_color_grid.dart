@@ -11,6 +11,7 @@ import 'glass_wrap.dart';
 import 'home_skin.dart';
 import 'neumorphic.dart';
 import 'nwsb_icon.dart';
+import '../admin/template/editable.dart';
 
 class PromoColorGrid extends StatefulWidget {
   const PromoColorGrid({super.key, required this.onOpen});
@@ -82,7 +83,7 @@ class _PromoColorGridState extends State<PromoColorGrid> {
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 4, bottom: 10),
-          child: Text(
+          child: EditableLabel('promo_color_grid.PromoColorGrid',
             'Open a door',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: ink),
           ),
@@ -146,11 +147,12 @@ class _PromoColorGridState extends State<PromoColorGrid> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.fromLTRB(2, 26, 2, 20),
-                    child: Image.asset(
+                    child: EditableImage.asset(
                       cell.art,
                       fit: BoxFit.contain,
                       alignment: Alignment.bottomCenter,
                       filterQuality: FilterQuality.high,
+                      slot: 'promo_color_grid.PromoColorGrid',
                     ),
                   ),
                   Positioned(

@@ -11,6 +11,7 @@ import '../../widgets/app_backdrop.dart';
 import '../../widgets/cart_add_animation.dart';
 import '../../features/economy/money.dart';
 import 'bag_ui.dart';
+import '../../admin/template/editable.dart';
 
 String _inr(num value) {
   if (value <= 0) return 'Included';
@@ -52,7 +53,7 @@ class CartPage extends StatelessWidget {
               ),
               if (bag.orders.isNotEmpty) ...[
                 const SizedBox(height: 28),
-                const Text(
+                const EditableLabel('cart_pages.CartPage',
                   'RECENT ORDERS',
                   style: TextStyle(
                     fontSize: 10,
@@ -239,7 +240,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
               if (bag.cart.isEmpty)
                 const Padding(
                   padding: EdgeInsets.only(bottom: 16),
-                  child: Text(
+                  child: EditableLabel('cart_pages.CheckoutPage',
                     'Your cart is empty.',
                     style: TextStyle(color: Color(0x99FFFFFF)),
                   ),
@@ -279,7 +280,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   ),
               ],
               const SizedBox(height: 22),
-              const Text(
+              const EditableLabel('cart_pages.CheckoutPage',
                 'DELIVER TO',
                 style: TextStyle(
                   fontSize: 10,
@@ -297,7 +298,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
               ),
               _Field(controller: _address, hint: 'Address', maxLines: 3),
               const SizedBox(height: 18),
-              const Text(
+              const EditableLabel('cart_pages.CheckoutPage',
                 'PAY WITH',
                 style: TextStyle(
                   fontSize: 10,
@@ -336,7 +337,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     'Use ${quote.coins} NowssB Coins',
                     style: const TextStyle(color: Colors.white, fontSize: 14),
                   ),
-                  subtitle: const Text(
+                  subtitle: const EditableLabel('cart_pages.CheckoutPage',
                     'At most 30% of this order',
                     style: TextStyle(color: Color(0x99FFFFFF), fontSize: 12),
                   ),
@@ -422,7 +423,7 @@ class _BagScaffold extends StatelessWidget {
                                 color: NwsbColors.gold,
                               ),
                             ),
-                            Text(
+                            EditableLabel('cart_pages.BagScaffold',
                               title,
                               style: const TextStyle(
                                 fontSize: 22,
@@ -507,7 +508,7 @@ class _CartTile extends StatelessWidget {
                     const Spacer(),
                     GestureDetector(
                       onTap: () => bag.removeCart(item.id),
-                      child: const Text(
+                      child: const EditableLabel('cart_pages.CartTile',
                         'Remove',
                         style: TextStyle(
                           fontSize: 11,
@@ -578,7 +579,7 @@ class _WishTile extends StatelessWidget {
                           item: item,
                         );
                       },
-                      child: const Text(
+                      child: const EditableLabel('cart_pages.WishTile',
                         'Add to cart',
                         style: TextStyle(
                           fontSize: 12,
@@ -590,7 +591,7 @@ class _WishTile extends StatelessWidget {
                     const Spacer(),
                     GestureDetector(
                       onTap: () => bag.removeWishlist(item.id),
-                      child: const Text(
+                      child: const EditableLabel('cart_pages.WishTile',
                         'Remove',
                         style: TextStyle(
                           fontSize: 11,
@@ -657,7 +658,7 @@ class _TotalRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Text(label, style: const TextStyle(color: Color(0x99FFFFFF))),
+        EditableLabel('cart_pages.TotalRow', label, style: const TextStyle(color: Color(0x99FFFFFF))),
         const Spacer(),
         Text(
           value,
@@ -691,7 +692,7 @@ class _GoldBtn extends StatelessWidget {
             colors: [Color(0xF2E8D5A3), Color(0xE6C8A96E)],
           ),
         ),
-        child: Text(
+        child: EditableLabel('cart_pages.GoldBtn',
           label,
           style: const TextStyle(
             fontSize: 14,
@@ -766,7 +767,7 @@ class _PageEmpty extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
+            EditableLabel('cart_pages.PageEmpty',
               title,
               style: const TextStyle(
                 color: Colors.white,
@@ -775,7 +776,7 @@ class _PageEmpty extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            Text(
+            EditableLabel('cart_pages.PageEmpty',
               body,
               textAlign: TextAlign.center,
               style: const TextStyle(color: Color(0x99FFFFFF), height: 1.5),

@@ -23,6 +23,7 @@ import '../theme/tokens.dart';
 import 'app_backdrop.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
+import '../admin/template/editable.dart';
 
 class IntroGate extends StatefulWidget {
   const IntroGate({
@@ -170,7 +171,7 @@ class _Intro extends StatelessWidget {
           const AppBackdrop(),
           if (art != null && fullBleed)
             Positioned.fill(
-              child: Image.asset(art!, fit: BoxFit.cover, gaplessPlayback: true),
+              child: EditableImage.asset(art!, fit: BoxFit.cover, gaplessPlayback: true, slot: 'intro_gate.Intro'),
             )
           else if (art != null)
             Positioned(
@@ -180,11 +181,12 @@ class _Intro extends StatelessWidget {
               height: 300,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(22),
-                child: Image.asset(
+                child: EditableImage.asset(
                   art!,
                   fit: BoxFit.cover,
                   gaplessPlayback: true,
                   errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                  slot: 'intro_gate.Intro',
                 ),
               ),
             )
@@ -194,6 +196,7 @@ class _Intro extends StatelessWidget {
                 asset: film!,
                 priority: ClipPriority.feature,
                 autoplay: true,
+                slot: 'intro_gate.Intro',
               ),
             ),
           // The vignette. Deep enough at the foot that a title and a
@@ -263,9 +266,9 @@ class _Intro extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (!fullBleed) ...[
-                        Text(eyebrow, style: const TextStyle(fontSize: 10, letterSpacing: 3, fontWeight: FontWeight.w700, color: NwsbColors.gold)),
+                        EditableLabel('intro_gate.Intro', eyebrow, style: const TextStyle(fontSize: 10, letterSpacing: 3, fontWeight: FontWeight.w700, color: NwsbColors.gold)),
                         const SizedBox(height: 12),
-                        Text(title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 42, fontWeight: FontWeight.w300, color: Colors.white, height: 1.05)),
+                        EditableLabel('intro_gate.Intro', title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 42, fontWeight: FontWeight.w300, color: Colors.white, height: 1.05)),
                       ],
                       const SizedBox(height: 18),
                       Container(
@@ -274,7 +277,7 @@ class _Intro extends StatelessWidget {
                         color: const Color(0x59FFFFFF),
                       ),
                       const SizedBox(height: 18),
-                      Text(
+                      EditableLabel('intro_gate.Intro',
                         body,
                         maxLines: 5,
                         overflow: TextOverflow.ellipsis,
@@ -292,7 +295,7 @@ class _Intro extends StatelessWidget {
                           children: [
                             for (var i = 0; i < stats.length; i++) ...[
                               if (i > 0)
-                                const Text('·',
+                                const EditableLabel('intro_gate.Intro', '·',
                                     style: TextStyle(color: Color(0x59FFFFFF))),
                               Text(
                                 stats[i],

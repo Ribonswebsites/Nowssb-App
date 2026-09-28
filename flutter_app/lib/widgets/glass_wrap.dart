@@ -30,6 +30,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 
 import 'nwsb_icon.dart';
+import '../admin/template/editable.dart';
 
 /// `body.fashcorner-rounded` — 18px, the Fashion home's default corner.
 const double kGlassRadius = 18;
@@ -149,7 +150,7 @@ class SectionHead extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
+                EditableLabel('glass_wrap.SectionHead',
                   eyebrow,
                   style: const TextStyle(
                     fontSize: 15,
@@ -158,7 +159,7 @@ class SectionHead extends StatelessWidget {
                     height: 1.35,
                   ),
                 ),
-                Text(
+                EditableLabel('glass_wrap.SectionHead',
                   title,
                   style: const TextStyle(
                     fontSize: 21,

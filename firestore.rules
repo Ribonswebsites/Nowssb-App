@@ -2,14 +2,36 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() { return request.auth != null; }
-    function isAdmin() { return signedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)); }
+    // An admin is a uid with a document at admins/{uid} (no custom claims
+    // needed — works on the free Spark plan). A custom claim admin:true also
+    // counts, for accounts marked that way.
+    function isAdmin() { return signedIn() && (exists(/databases/$(database)/documents/admins/$(request.auth.uid)) || request.auth.token.get('admin', false) == true); }
+
+    // Fields on users/{uid} that only an admin (or, later, a verified server)
+    // may set. A person can still save their profile, prefs, sessions, etc.
+    function privilegedUserFields() {
+      return ['isPro', 'tier', 'subscription', 'subscriptionStatus', 'subscriptionId', 'subscriptionBilling',
+              'subscriptionStartDate', 'subscriptionEndDate', 'subscriptionPaymentId', 'subscriptionExpiresAt',
+              'subscriptionPlan', 'subscriptionTier', 'subscriptionUntil', 'plan', 'subUntil', 'entitlement',
+              'entitlements', 'blocked', 'blockedAt', 'blockedBy', 'blockedReason', 'removedAt', 'disabled',
+              'role', 'roles', 'admin', 'isAdmin', 'coins', 'balance', 'wallet', 'adminGifts'];
+    }
+    // isPro:false and tier:null are harmless (a downgrade), so the website's
+    // sign-up writes keep working.
+    function userFieldsOk(data, changed) {
+      return !changed.difference(['isPro', 'tier'].toSet()).hasAny(privilegedUserFields())
+        && (!('isPro' in changed) || data.isPro == false)
+        && (!('tier' in changed) || data.tier == null)
+        && (!('lastSeenAt' in changed) || data.lastSeenAt == request.time);
+    }
     function isSelf(uid) { return signedIn() && request.auth.uid == uid; }
     function isParticipant(chatId) { return signedIn() && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants; }
     function isCallParty(callId) { return signedIn() && (get(/databases/$(database)/documents/calls/$(callId)).data.callerUid == request.auth.uid || get(/databases/$(database)/documents/calls/$(callId)).data.calleeUid == request.auth.uid); }
     match /admins/{uid} { allow get: if isSelf(uid) || isAdmin(); allow list, write: if false; }
     match /users/{uid} {
       allow read: if isSelf(uid) || isAdmin();
-      allow create, update: if isSelf(uid) || isAdmin();
+      allow create: if isAdmin() || (isSelf(uid) && userFieldsOk(request.resource.data, request.resource.data.keys().toSet()));
+      allow update: if isAdmin() || (isSelf(uid) && userFieldsOk(request.resource.data, request.resource.data.diff(resource.data).affectedKeys()));
       allow delete: if isAdmin();
       match /inbox/{msgId} { allow read, delete: if isSelf(uid) || isAdmin(); allow update: if isSelf(uid); allow create: if isAdmin(); }
 
@@ -26,7 +48,26 @@ service cloud.firestore {
     }
     match /content/{docId} { allow read: if true; allow write: if isAdmin(); }
     match /content/{docId}/{sub=**} { allow read: if true; allow write: if isAdmin(); }
-    match /requests/{id} { allow create: if signedIn() && request.resource.data.uid == request.auth.uid; allow get: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin()); allow list, update, delete: if isAdmin(); }
+    match /requests/{id} {
+      allow create: if signedIn() && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['kind', 'word', 'notes', 'price', 'currency', 'uid', 'email', 'name', 'status', 'at', 'source'])
+        && request.resource.data.word is string && request.resource.data.word.size() > 0 && request.resource.data.word.size() <= 80
+        && request.resource.data.status == 'new'
+        && (!('notes' in request.resource.data) || (request.resource.data.notes is string && request.resource.data.notes.size() <= 500));
+      allow get, list: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin());
+      allow update, delete: if isAdmin();
+    }
+
+    // Admin mode (Flutter lib/admin). Published words and template overrides
+    // are read by every app, signed in or not; only admins write them.
+    match /words/{key} { allow read: if true; allow write: if isAdmin(); }
+    match /word_drafts/{key} { allow read, write: if isAdmin(); }
+    match /ui_overrides/{id} { allow read: if true; allow write: if isAdmin(); }
+    match /adminLog/{id} {
+      allow read: if isAdmin();
+      allow create: if isAdmin() && request.resource.data.uid == request.auth.uid;
+      allow update, delete: if false;
+    }
     match /pushSubs/{id} { allow get, list, delete: if isAdmin(); allow create, update: if signedIn(); }
     match /posts/{postId} {
       allow get, list: if resource.data.visibility == 'public' || (signedIn() && (resource.data.uid == request.auth.uid || isAdmin()));
@@ -111,7 +152,8 @@ service cloud.firestore {
       allow update: if isSelf(uid)
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read'])
         && request.resource.data.read == true;
-      allow create, delete: if false;
+      allow create: if isAdmin();
+      allow delete: if false;
     }
     match /users/{uid}/prefs/{docId} {
       allow read: if isSelf(uid);

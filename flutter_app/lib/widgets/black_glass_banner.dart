@@ -13,6 +13,7 @@ import 'package:flutter/services.dart';
 
 import 'home_parts.dart';
 import 'nwsb_icon.dart';
+import '../admin/template/editable.dart';
 
 /// Notifications-sheet blur (CSS blur(26px) → sigma ≈ 13).
 const double kNotifGlassSigma = 13;
@@ -73,7 +74,7 @@ class BlackGlassBanner extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
+                        EditableLabel('black_glass_banner.BlackGlassBanner',
                           title,
                           style: const TextStyle(
                             color: Colors.white,
@@ -321,7 +322,7 @@ class CustomizeBlackBanner extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Text(
+                EditableLabel('black_glass_banner.CustomizeBlackBanner',
                   title,
                   style: const TextStyle(
                     color: Colors.white,

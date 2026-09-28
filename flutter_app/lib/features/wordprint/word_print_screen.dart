@@ -5,6 +5,7 @@ import '../../data/firebase.dart';
 import '../../theme/tokens.dart';
 import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
+import '../../admin/template/editable.dart';
 
 class WordPrintScreen extends StatefulWidget {
   const WordPrintScreen({super.key, this.uid});
@@ -121,7 +122,7 @@ class _WordPrintScreenState extends State<WordPrintScreen> {
     if (!mounted) return;
     setState(() => _found = found.docs.isEmpty ? null : found.docs.first.id);
     if (found.docs.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No Word Print with that handle.')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: EditableLabel('word_print_screen.WordPrintScreen', 'No Word Print with that handle.')));
     }
   }
 }

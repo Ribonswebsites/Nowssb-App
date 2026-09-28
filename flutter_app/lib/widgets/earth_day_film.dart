@@ -12,6 +12,7 @@ import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../shell/nav_shell.dart';
 import 'app_thinking_loader.dart';
+import '../admin/template/editable.dart';
 
 class EarthDayFilm extends StatelessWidget {
   const EarthDayFilm({super.key, this.height = 228});
@@ -58,6 +59,7 @@ class EarthDayFilm extends StatelessWidget {
                 asset: 'assets/video/earth-$part.mp4',
                 priority: ClipPriority.decoration,
                 fit: BoxFit.cover,
+                slot: 'earth_day_film.EarthDayFilm',
               ),
               Positioned(
                 top: 12,
@@ -65,7 +67,7 @@ class EarthDayFilm extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    const EditableLabel('earth_day_film.EarthDayFilm',
                       'NowssB',
                       style: TextStyle(
                         color: Colors.white,
@@ -127,7 +129,7 @@ class EarthDayFilm extends StatelessWidget {
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(99),
                         ),
-                        child: const Text(
+                        child: const EditableLabel('earth_day_film.EarthDayFilm',
                           'Start your practice',
                           style: TextStyle(
                             color: Color(0xFF111111),

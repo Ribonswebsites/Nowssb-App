@@ -20,6 +20,7 @@ import '../../widgets/glass_wrap.dart';
 import 'store_actions.dart';
 import 'store_cards.dart';
 import '../../widgets/app_thinking_loader.dart';
+import '../../admin/template/editable.dart';
 
 // ─── #2 Store hero video (Ribons Original copy block removed) ────────────────
 
@@ -59,7 +60,7 @@ class StorePixelsHero extends StatelessWidget {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                NwsbVideo(asset: videoAsset!, priority: ClipPriority.feature),
+                NwsbVideo(asset: videoAsset!, priority: ClipPriority.feature, slot: 'store_home_sections.StorePixelsHero'),
                 if (videoTitle.trim().isNotEmpty) ...[
                   const DecoratedBox(
                     decoration: BoxDecoration(
@@ -139,6 +140,7 @@ class StoreSubscribeBanner extends StatelessWidget {
                     autoplay: true,
                     loop: true,
                     showPoster: false,
+                    slot: 'store_home_sections.StoreSubscribeBanner',
                   ),
                 ),
                 // Light edge wash only — keep the clip visible.
@@ -320,11 +322,12 @@ class _RecommendedCard extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Image.asset(
+            EditableImage.asset(
               data.art,
               fit: BoxFit.cover,
               errorBuilder: (_, __, ___) =>
                   const ColoredBox(color: Color(0xFF0A0F1C)),
+                  slot: 'store_home_sections.RecommendedCard',
             ),
             const DecoratedBox(
               decoration: BoxDecoration(
@@ -442,7 +445,7 @@ class StoreFeaturedBundleSection extends StatelessWidget {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12),
-                        child: Image.asset(
+                        child: EditableImage.asset(
                           kStoreProductArt,
                           width: 78,
                           height: 78,
@@ -452,6 +455,7 @@ class StoreFeaturedBundleSection extends StatelessWidget {
                             height: 78,
                             child: ColoredBox(color: Color(0xFF0A0F1C)),
                           ),
+                          slot: 'store_home_sections.StoreFeaturedBundleSection',
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -459,7 +463,7 @@ class StoreFeaturedBundleSection extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            const EditableLabel('store_home_sections.StoreFeaturedBundleSection',
                               'Warriors Edition',
                               style: TextStyle(
                                 fontSize: 16,
@@ -526,7 +530,7 @@ class _BundleListRow extends StatelessWidget {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
-            child: Image.asset(
+            child: EditableImage.asset(
               row.art,
               width: 42,
               height: 42,
@@ -536,6 +540,7 @@ class _BundleListRow extends StatelessWidget {
                 height: 42,
                 child: ColoredBox(color: Color(0xFF0A0F1C)),
               ),
+              slot: 'store_home_sections.BundleListRow',
             ),
           ),
           const SizedBox(width: 10),
@@ -589,7 +594,7 @@ class _ItemCountPill extends StatelessWidget {
             color: NwsbColors.goldLight,
           ),
           const SizedBox(width: 5),
-          Text(
+          EditableLabel('store_home_sections.ItemCountPill',
             label,
             style: const TextStyle(
               fontSize: 10,
@@ -614,7 +619,7 @@ class _SectionHeader extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: Text(
+          child: EditableLabel('store_home_sections.SectionHeader',
             title,
             style: const TextStyle(
               fontSize: 18,
@@ -705,6 +710,7 @@ class StoreGlassFilmBanner extends StatelessWidget {
               autoplay: true,
               loop: true,
               showPoster: true,
+              slot: 'store_home_sections.StoreGlassFilmBanner',
             ),
           ),
         ),
@@ -760,7 +766,7 @@ class StoreLimitedTimeFreeSection extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               const Expanded(
-                child: Text(
+                child: EditableLabel('store_home_sections.StoreLimitedTimeFreeSection',
                   'Limited Time Free',
                   style: TextStyle(
                     fontSize: 16,
@@ -868,7 +874,7 @@ class StoreLimitedTimeFreeSection extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(12),
                                     child: AspectRatio(
                                       aspectRatio: 1,
-                                      child: Image.asset(
+                                      child: EditableImage.asset(
                                         tr.$3,
                                         fit: BoxFit.cover,
                                         gaplessPlayback: true,
@@ -883,6 +889,7 @@ class StoreLimitedTimeFreeSection extends StatelessWidget {
                                             ),
                                           ),
                                         ),
+                                        slot: 'store_home_sections.StoreLimitedTimeFreeSection',
                                       ),
                                     ),
                                   ),
@@ -994,11 +1001,12 @@ class StoreBrowseByGoalSection extends StatelessWidget {
                           child: ClipOval(
                             child: ColoredBox(
                               color: meanings ? g.$3 : const Color(0xFF0A0F1C),
-                              child: Image.asset(
+                              child: EditableImage.asset(
                                 g.$2,
                                 fit: BoxFit.cover,
                                 errorBuilder: (_, __, ___) =>
                                     const ColoredBox(color: Color(0xFF0A0F1C)),
+                                    slot: 'store_home_sections.StoreBrowseByGoalSection',
                               ),
                             ),
                           ),
@@ -1146,7 +1154,7 @@ class StoreFeaturedPlaylistSection extends StatelessWidget {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12),
-                        child: Image.asset(
+                        child: EditableImage.asset(
                           meanings ? kMsMeaningIconAsset : kStoreProductArt,
                           width: 78,
                           height: 78,
@@ -1156,6 +1164,7 @@ class StoreFeaturedPlaylistSection extends StatelessWidget {
                             height: 78,
                             child: ColoredBox(color: Color(0xFF0A0F1C)),
                           ),
+                          slot: 'store_home_sections.StoreFeaturedPlaylistSection',
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -1163,7 +1172,7 @@ class StoreFeaturedPlaylistSection extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
+                            EditableLabel('store_home_sections.StoreFeaturedPlaylistSection',
                               'Inner Balance',
                               style: TextStyle(
                                 fontSize: 16,
@@ -1172,7 +1181,7 @@ class StoreFeaturedPlaylistSection extends StatelessWidget {
                               ),
                             ),
                             SizedBox(height: 4),
-                            Text(
+                            EditableLabel('store_home_sections.StoreFeaturedPlaylistSection',
                               'If you\'re looking for some chill tones to restore balance and deep focus…',
                               style: TextStyle(
                                 fontSize: 11,
@@ -1323,7 +1332,7 @@ class StoreGlassPlaylistCarousel extends StatelessWidget {
                           children: [
                             ClipRRect(
                               borderRadius: BorderRadius.circular(12),
-                              child: Image.asset(
+                              child: EditableImage.asset(
                                 c.art,
                                 width: 70,
                                 height: 70,
@@ -1333,6 +1342,7 @@ class StoreGlassPlaylistCarousel extends StatelessWidget {
                                   height: 70,
                                   child: ColoredBox(color: Color(0xFF0A0F1C)),
                                 ),
+                                slot: 'store_home_sections.StoreGlassPlaylistCarousel',
                               ),
                             ),
                             const SizedBox(width: 10),
@@ -1382,7 +1392,7 @@ class StoreGlassPlaylistCarousel extends StatelessWidget {
                             children: [
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
-                                child: Image.asset(
+                                child: EditableImage.asset(
                                   c.art,
                                   width: 40,
                                   height: 40,
@@ -1392,6 +1402,7 @@ class StoreGlassPlaylistCarousel extends StatelessWidget {
                                     height: 40,
                                     child: ColoredBox(color: Color(0xFF0A0F1C)),
                                   ),
+                                  slot: 'store_home_sections.StoreGlassPlaylistCarousel',
                                 ),
                               ),
                               const SizedBox(width: 10),
@@ -1591,7 +1602,7 @@ class StoreNotifBanner extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: Text(
+                child: EditableLabel('store_home_sections.StoreNotifBanner',
                   heading,
                   style: TextStyle(
                     fontSize: 13,
@@ -1606,7 +1617,7 @@ class StoreNotifBanner extends StatelessWidget {
           ),
           if (sub.isNotEmpty) ...[
             const SizedBox(height: 4),
-            Text(
+            EditableLabel('store_home_sections.StoreNotifBanner',
               sub,
               style: const TextStyle(fontSize: 11, color: Color(0x88FFFFFF)),
             ),
@@ -1791,7 +1802,7 @@ class _StoreViewAllOverlayState extends State<_StoreViewAllOverlay> {
                       Row(
                         children: [
                           Expanded(
-                            child: Text(
+                            child: EditableLabel('store_home_sections.StoreViewAllOverlay',
                               widget.title,
                               style: const TextStyle(
                                 fontSize: 16,
@@ -1870,13 +1881,14 @@ class _StoreViewAllOverlayState extends State<_StoreViewAllOverlay> {
                                     child: Stack(
                                       fit: StackFit.expand,
                                       children: [
-                                        Image.asset(
+                                        EditableImage.asset(
                                           item.art,
                                           fit: BoxFit.cover,
                                           errorBuilder: (_, __, ___) =>
                                               const ColoredBox(
                                                 color: Color(0xFF0A0F1C),
                                               ),
+                                              slot: 'store_home_sections.StoreViewAllOverlay',
                                         ),
                                         const DecoratedBox(
                                           decoration: BoxDecoration(
@@ -2196,6 +2208,7 @@ class _MosaicTile extends StatelessWidget {
               autoplay: true,
               loop: true,
               showPoster: true,
+              slot: 'store_home_sections.MosaicTile',
             ),
             const DecoratedBox(
               decoration: BoxDecoration(
@@ -2213,7 +2226,7 @@ class _MosaicTile extends StatelessWidget {
                 children: [
                   NwsbIcon(mark, size: 22, color: const Color(0xFFE8D5A3)),
                   const Spacer(),
-                  Text(
+                  EditableLabel('store_home_sections.MosaicTile',
                     title,
                     style: const TextStyle(
                       color: Colors.white,
@@ -2221,7 +2234,7 @@ class _MosaicTile extends StatelessWidget {
                       fontWeight: FontWeight.w800,
                     ),
                   ),
-                  Text(
+                  EditableLabel('store_home_sections.MosaicTile',
                     sub,
                     style: const TextStyle(
                       color: Color(0xB8FFFFFF),
@@ -2268,7 +2281,7 @@ class _MosaicBar extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  EditableLabel('store_home_sections.MosaicBar',
                     title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -2278,7 +2291,7 @@ class _MosaicBar extends StatelessWidget {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  Text(
+                  EditableLabel('store_home_sections.MosaicBar',
                     sub,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -2326,7 +2339,7 @@ class _MosaicPill extends StatelessWidget {
             children: [
               NwsbIcon(mark, size: 14, color: const Color(0xFFE8D5A3)),
               const SizedBox(width: 7),
-              Text(
+              EditableLabel('store_home_sections.MosaicPill',
                 label,
                 style: const TextStyle(
                   color: Colors.white,
@@ -2385,7 +2398,7 @@ class StoreHalfOffRail extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
+                              EditableLabel('store_home_sections.StoreHalfOffRail',
                                 'Deal of the Day',
                                 style: TextStyle(
                                   color: Color(0xFFE8D5A3),
@@ -2394,7 +2407,7 @@ class StoreHalfOffRail extends StatelessWidget {
                                 ),
                               ),
                               SizedBox(height: 6),
-                              Text(
+                              EditableLabel('store_home_sections.StoreHalfOffRail',
                                 'Up To\n50% Off',
                                 style: TextStyle(
                                   color: Colors.white,
@@ -2404,7 +2417,7 @@ class StoreHalfOffRail extends StatelessWidget {
                                 ),
                               ),
                               Spacer(),
-                              Text(
+                              EditableLabel('store_home_sections.StoreHalfOffRail',
                                 'Words at half price. Limited.',
                                 style: TextStyle(color: Color(0xD9FFFFFF), fontSize: 12),
                               ),
@@ -2419,11 +2432,12 @@ class StoreHalfOffRail extends StatelessWidget {
                         fit: StackFit.expand,
                         children: [
                           const ColoredBox(color: Color(0xFF120814)),
-                          Image.asset(
+                          EditableImage.asset(
                             'assets/store/signature-portrait.jpg',
                             fit: BoxFit.contain,
                             alignment: Alignment.center,
                             errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                            slot: 'store_home_sections.StoreHalfOffRail',
                           ),
                           Positioned(
                             right: 8,
@@ -2436,7 +2450,7 @@ class StoreHalfOffRail extends StatelessWidget {
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(99),
                                 ),
-                                child: const Text(
+                                child: const EditableLabel('store_home_sections.StoreHalfOffRail',
                                   'View all',
                                   style: TextStyle(
                                     color: Color(0xFF111111),
@@ -2482,9 +2496,10 @@ class StoreHalfOffRail extends StatelessWidget {
                                 color: _backs[i % _backs.length],
                                 child: Padding(
                                   padding: const EdgeInsets.all(10),
-                                  child: Image.asset(
+                                  child: EditableImage.asset(
                                     'assets/store/nowssb-bag-headphones.webp',
                                     fit: BoxFit.contain,
+                                    slot: 'store_home_sections.StoreHalfOffRail',
                                   ),
                                 ),
                               ),
@@ -2505,7 +2520,7 @@ class StoreHalfOffRail extends StatelessWidget {
                                     fontSize: 13,
                                   ),
                                 ),
-                                const Text(
+                                const EditableLabel('store_home_sections.StoreHalfOffRail',
                                   '50% OFF',
                                   style: TextStyle(
                                     color: Color(0xFFE8D5A3),

@@ -30,6 +30,7 @@ import 'progress/progress_screen.dart';
 import 'quick_access.dart';
 import 'sound_library.dart';
 import 'store/meaning_store.dart';
+import '../admin/template/editable.dart';
 
 class WidgetsPage extends StatefulWidget {
   const WidgetsPage({super.key});
@@ -77,19 +78,22 @@ class _WidgetsPageState extends State<WidgetsPage> {
                 ? NwsbVideo(
                     asset: s.fashionVideoAsset,
                     fit: BoxFit.cover,
+                    slot: 'widgets_page.WidgetsPage',
                   )
                 : (s.fashionImageAsset != null
-                    ? Image.asset(
+                    ? EditableImage.asset(
                         s.fashionImageAsset!,
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) => const ColoredBox(
                           color: Color(0xFF05070E),
                         ),
+                        slot: 'widgets_page.WidgetsPage',
                       )
-                    : Image.asset(
+                    : EditableImage.asset(
                         'assets/fashion/fp-intro.webp',
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) => const AppBackdrop(),
+                        slot: 'widgets_page.WidgetsPage',
                       )),
           ),
           // .st-page scrim
@@ -131,7 +135,7 @@ class _WidgetsPageState extends State<WidgetsPage> {
                       ),
                     ),
                     const SizedBox(width: 14),
-                    const Text(
+                    const EditableLabel('widgets_page.WidgetsPage',
                       'Hero header',
                       style: TextStyle(
                         fontSize: 17,
@@ -152,7 +156,7 @@ class _WidgetsPageState extends State<WidgetsPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          EditableLabel('widgets_page.WidgetsPage',
                             'Your hero header',
                             style: TextStyle(
                               fontSize: 30,
@@ -163,7 +167,7 @@ class _WidgetsPageState extends State<WidgetsPage> {
                             ),
                           ),
                           SizedBox(height: 8),
-                          Text(
+                          EditableLabel('widgets_page.WidgetsPage',
                             'Three ways the top of your home can look. Pick one — it changes straight away.',
                             style: TextStyle(
                               fontSize: 13,
@@ -247,7 +251,7 @@ class _Rail extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                EditableLabel('widgets_page.Rail',
                   title,
                   style: const TextStyle(
                     fontSize: 15,
@@ -372,11 +376,12 @@ class _HeroCard extends StatelessWidget {
                       Positioned.fill(
                         child: Opacity(
                           opacity: 0.55,
-                          child: Image.asset(
+                          child: EditableImage.asset(
                             'assets/fashion/fp-intro.webp',
                             fit: BoxFit.cover,
                             errorBuilder: (_, __, ___) =>
                                 const SizedBox.shrink(),
+                                slot: 'widgets_page.HeroCard',
                           ),
                         ),
                       ),
@@ -397,7 +402,7 @@ class _HeroCard extends StatelessWidget {
                             ],
                           ),
                           alignment: Alignment.center,
-                          child: const Text(
+                          child: const EditableLabel('widgets_page.HeroCard',
                             'TV',
                             style: TextStyle(
                               color: Color(0x66FFFFFF),
@@ -413,7 +418,7 @@ class _HeroCard extends StatelessWidget {
                         padding: EdgeInsets.all(12),
                         child: Align(
                           alignment: Alignment.topLeft,
-                          child: Text(
+                          child: EditableLabel('widgets_page.HeroCard',
                             'Nowsbansiu',
                             style: TextStyle(
                               color: Colors.white,
@@ -436,7 +441,7 @@ class _HeroCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      EditableLabel('widgets_page.HeroCard',
                         title,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -447,7 +452,7 @@ class _HeroCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 3),
-                      Text(
+                      EditableLabel('widgets_page.HeroCard',
                         sub,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -468,7 +473,7 @@ class _HeroCard extends StatelessWidget {
                       color: const Color(0x33E8D5A3),
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: const Text(
+                    child: const EditableLabel('widgets_page.HeroCard',
                       'In use',
                       style: TextStyle(
                         fontSize: 11,
@@ -488,7 +493,7 @@ class _HeroCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(color: const Color(0x33FFFFFF)),
                       ),
-                      child: const Text(
+                      child: const EditableLabel('widgets_page.HeroCard',
                         'Apply now',
                         style: TextStyle(
                           fontSize: 11,
@@ -733,7 +738,7 @@ class _GoCard extends StatelessWidget {
                 ],
               ],
             ),
-            Text(
+            EditableLabel('widgets_page.GoCard',
               title,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -744,7 +749,7 @@ class _GoCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 4),
-            Text(
+            EditableLabel('widgets_page.GoCard',
               sub,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,

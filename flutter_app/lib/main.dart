@@ -20,6 +20,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'admin/admin_state.dart';
+import 'admin/edit_fab.dart';
+import 'admin/template/ui_overrides.dart';
 import 'app_update.dart';
 import 'data/content.dart';
 import 'data/earn_wallet.dart';
@@ -27,6 +30,9 @@ import 'data/firebase.dart';
 import 'features/economy/economy_api.dart';
 import 'features/economy/money.dart';
 import 'data/notifications.dart';
+import 'data/presence.dart';
+import 'data/quotes_remote.dart';
+import 'data/word_requests.dart';
 import 'data/cart_bag.dart';
 import 'data/settings.dart';
 import 'media/video_pool.dart';
@@ -36,6 +42,7 @@ import 'widgets/motion.dart';
 import 'shell/nav_shell.dart';
 import 'theme/theme.dart';
 import 'theme/tokens.dart';
+import 'admin/template/editable.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -62,6 +69,18 @@ Future<void> main() async {
   await EconomyMirror.instance.start();
   await FxBook.instance.start();
   await ContentStore.instance.start();
+
+  // Admin mode and the live template layer (lib/admin). Overrides load from
+  // the phone before the first frame, so a replaced picture or line shows
+  // at once instead of flashing the default; the Firestore watch follows.
+  await UiOverrides.instance.start();
+  await EditMode.instance.load();
+  await SlotRegistry.instance.load();
+  AdminState.instance.start();
+  QuoteStore.instance.addListener(Settings.instance.remoteChanged);
+  await QuoteStore.instance.start();
+  WordRequestStore.instance.startSync();
+  Presence.instance.start();
 
   // Nothing decodes underneath the start animation. Released by the splash
   // when it finishes, and by the eight-second ceiling if it never does.
@@ -154,7 +173,7 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
               ],
             ]),
             actions: [
-              if (!updating) TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Later')),
+              if (!updating) TextButton(onPressed: () => Navigator.of(context).pop(), child: const EditableLabel('main.NowssbApp', 'Later')),
               FilledButton(
                 style: FilledButton.styleFrom(backgroundColor: NwsbColors.goldLight, foregroundColor: NwsbColors.deep),
                 onPressed: updating ? null : () async {
@@ -179,25 +198,29 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      navigatorKey: _navigatorKey,
-      title: 'NowssB',
-      debugShowCheckedModeBanner: false,
-      theme: NwsbTheme.light,
-      darkTheme: NwsbTheme.dark,
-      themeMode: ThemeMode.light,
-      color: NwsbColors.deep,
-      scrollBehavior: const NwsbScrollBehavior(),
-      home: Stack(
-        children: [
-          const AuthGate(child: NavShell()),
-          if (!_splashDone)
-            Splash(onDone: () {
-              VideoPool.instance.unhold();
-              setState(() => _splashDone = true);
-              unawaited(_checkForUpdate());
-            }),
-        ],
+    return UiScope(
+      child: MaterialApp(
+        navigatorKey: _navigatorKey,
+        builder: (context, child) =>
+            AdminEditFab(navigatorKey: _navigatorKey, child: child ?? const SizedBox()),
+        title: 'NowssB',
+        debugShowCheckedModeBanner: false,
+        theme: NwsbTheme.light,
+        darkTheme: NwsbTheme.dark,
+        themeMode: ThemeMode.light,
+        color: NwsbColors.deep,
+        scrollBehavior: const NwsbScrollBehavior(),
+        home: Stack(
+          children: [
+            const AuthGate(child: NavShell()),
+            if (!_splashDone)
+              Splash(onDone: () {
+                VideoPool.instance.unhold();
+                setState(() => _splashDone = true);
+                unawaited(_checkForUpdate());
+              }),
+          ],
+        ),
       ),
     );
   }

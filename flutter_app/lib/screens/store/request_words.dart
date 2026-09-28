@@ -1,4 +1,5 @@
-/// Request Words sub-page + admin fulfillment list.
+/// Request Words sub-page. Fulfilling requests lives in admin mode
+/// (lib/admin/requests_admin.dart), for server-marked admins only.
 library;
 
 import 'package:flutter/material.dart';
@@ -12,16 +13,11 @@ import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import '../../widgets/app_thinking_loader.dart';
 import 'store_cards.dart';
 import 'store_home_sections.dart';
+import '../../admin/template/editable.dart';
 
 void openRequestWords(BuildContext context) {
   Navigator.of(context).push(
     MaterialPageRoute<void>(builder: (_) => const RequestWordsScreen()),
-  );
-}
-
-void openRequestWordsAdmin(BuildContext context) {
-  Navigator.of(context).push(
-    MaterialPageRoute<void>(builder: (_) => const RequestWordsAdminScreen()),
   );
 }
 
@@ -66,7 +62,7 @@ class _RequestWordsScreenState extends State<RequestWordsScreen> {
       _notes.clear();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Request sent — our atelier will fulfill it'),
+          content: EditableLabel('request_words.RequestWordsScreen', 'Request sent — our atelier will fulfill it'),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -92,20 +88,13 @@ class _RequestWordsScreenState extends State<RequestWordsScreen> {
                   icon: const Icon(Icons.arrow_back_ios_new, size: 18, color: Colors.white),
                 ),
                 const Expanded(
-                  child: Text(
+                  child: EditableLabel('request_words.RequestWordsScreen',
                     'Request Words',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
                       color: Colors.white,
                     ),
-                  ),
-                ),
-                TextButton(
-                  onPressed: () => openRequestWordsAdmin(context),
-                  child: const Text(
-                    'Admin',
-                    style: TextStyle(color: NwsbColors.goldLight, fontWeight: FontWeight.w700),
                   ),
                 ),
               ],
@@ -124,7 +113,7 @@ class _RequestWordsScreenState extends State<RequestWordsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text(
+                  const EditableLabel('request_words.RequestWordsScreen',
                     'Word',
                     style: TextStyle(
                       fontSize: 11,
@@ -159,7 +148,7 @@ class _RequestWordsScreenState extends State<RequestWordsScreen> {
                     ),
                   ),
                   const SizedBox(height: 14),
-                  const Text(
+                  const EditableLabel('request_words.RequestWordsScreen',
                     'Notes (optional)',
                     style: TextStyle(
                       fontSize: 11,
@@ -211,7 +200,7 @@ class _RequestWordsScreenState extends State<RequestWordsScreen> {
                       ),
                       child: _busy
                           ? const AppThinkingLoader(size: 28, state: OrbState.composing, circlePad: 6)
-                          : const Text(
+                          : const EditableLabel('request_words.RequestWordsScreen',
                               'Submit Request',
                               style: TextStyle(
                                 fontSize: 14,
@@ -230,7 +219,7 @@ class _RequestWordsScreenState extends State<RequestWordsScreen> {
               onTap: () => NavScope.goTo(context, 1),
             ),
             const SizedBox(height: 8),
-            const Text(
+            const EditableLabel('request_words.RequestWordsScreen',
               'Your recent requests',
               style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: Colors.white),
             ),
@@ -240,7 +229,7 @@ class _RequestWordsScreenState extends State<RequestWordsScreen> {
               builder: (context, _) {
                 final items = WordRequestStore.instance.items;
                 if (items.isEmpty) {
-                  return const Text(
+                  return const EditableLabel('request_words.RequestWordsScreen',
                     'No requests yet — submit one above.',
                     style: TextStyle(color: Color(0x66FFFFFF), fontSize: 13),
                   );
@@ -315,165 +304,5 @@ class _RequestWordsScreenState extends State<RequestWordsScreen> {
         ),
       ),
     );
-  }
-}
-
-class RequestWordsAdminScreen extends StatefulWidget {
-  const RequestWordsAdminScreen({super.key});
-
-  @override
-  State<RequestWordsAdminScreen> createState() => _RequestWordsAdminScreenState();
-}
-
-class _RequestWordsAdminScreenState extends State<RequestWordsAdminScreen> {
-  @override
-  void initState() {
-    super.initState();
-    WordRequestStore.instance.ensureLoaded();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF060C18),
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(8, 8, 16, 8),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(Icons.arrow_back_ios_new, size: 18, color: Colors.white),
-                  ),
-                  const Expanded(
-                    child: Text(
-                      'Fulfill Word Requests',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: AnimatedBuilder(
-                animation: WordRequestStore.instance,
-                builder: (context, _) {
-                  final items = WordRequestStore.instance.items;
-                  if (items.isEmpty) {
-                    return const Center(
-                      child: Text(
-                        'No word requests yet.',
-                        style: TextStyle(color: Color(0x66FFFFFF)),
-                      ),
-                    );
-                  }
-                  return ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 32),
-                    itemCount: items.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 10),
-                    itemBuilder: (context, i) {
-                      final r = items[i];
-                      return StoreGlassPanel(
-                        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    r.word,
-                                    style: const TextStyle(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.w800,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                                Text(
-                                  r.fulfilled ? 'Done' : 'Open',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w700,
-                                    color: r.fulfilled
-                                        ? const Color(0xFF81C784)
-                                        : NwsbColors.goldLight,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            if (r.notes.isNotEmpty) ...[
-                              const SizedBox(height: 6),
-                              Text(
-                                r.notes,
-                                style: const TextStyle(fontSize: 12, color: Color(0x99FFFFFF)),
-                              ),
-                            ],
-                            const SizedBox(height: 6),
-                            Text(
-                              'Requested ${_fmt(r.createdAt)}',
-                              style: const TextStyle(fontSize: 10, color: Color(0x55FFFFFF)),
-                            ),
-                            const SizedBox(height: 12),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: GestureDetector(
-                                    onTap: () async {
-                                      if (r.fulfilled) {
-                                        await WordRequestStore.instance.reopen(r.id);
-                                      } else {
-                                        await WordRequestStore.instance.markFulfilled(r.id);
-                                      }
-                                    },
-                                    child: Container(
-                                      height: 40,
-                                      alignment: Alignment.center,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(20),
-                                        gradient: LinearGradient(
-                                          colors: r.fulfilled
-                                              ? const [Color(0xFF37474F), Color(0xFF263238)]
-                                              : const [Color(0xFFE8D5A3), Color(0xFFC8A96E)],
-                                        ),
-                                      ),
-                                      child: Text(
-                                        r.fulfilled ? 'Reopen' : 'Mark Fulfilled',
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w800,
-                                          color: r.fulfilled ? Colors.white : const Color(0xFF060C18),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  String _fmt(DateTime d) {
-    final local = d.toLocal();
-    String two(int n) => n.toString().padLeft(2, '0');
-    return '${local.year}-${two(local.month)}-${two(local.day)} ${two(local.hour)}:${two(local.minute)}';
   }
 }

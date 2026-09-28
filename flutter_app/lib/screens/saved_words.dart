@@ -13,6 +13,7 @@ import '../data/models.dart';
 import '../theme/player_aura.dart';
 import 'player_settings.dart';
 import 'practice_player.dart';
+import '../admin/template/editable.dart';
 
 class SavedWordsScreen extends StatefulWidget {
   const SavedWordsScreen({super.key});
@@ -87,11 +88,12 @@ class _SavedWordsScreenState extends State<SavedWordsScreen> {
           color: _backs[i % _backs.length],
           child: Padding(
             padding: const EdgeInsets.all(2),
-            child: Image.asset(
+            child: EditableImage.asset(
               asset,
               fit: BoxFit.contain,
               alignment: Alignment.bottomCenter,
               errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF1A1A1A)),
+              slot: 'saved_words.SavedWordsScreen',
             ),
           ),
         ),
@@ -147,7 +149,7 @@ class _SavedWordsScreenState extends State<SavedWordsScreen> {
               ),
               const Padding(
                 padding: EdgeInsets.fromLTRB(22, 8, 22, 0),
-                child: Text(
+                child: EditableLabel('saved_words.SavedWordsScreen',
                   'LIBRARY',
                   style: TextStyle(
                     color: Colors.white,
@@ -178,7 +180,7 @@ class _SavedWordsScreenState extends State<SavedWordsScreen> {
                             return const Center(
                               child: Padding(
                                 padding: EdgeInsets.all(28),
-                                child: Text(
+                                child: EditableLabel('saved_words.SavedWordsScreen',
                                   'No saved words yet. Save a word from the player and it stays in this library.',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(color: Color(0xB3FFFFFF), height: 1.4),

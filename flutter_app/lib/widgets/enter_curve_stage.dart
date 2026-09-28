@@ -18,6 +18,7 @@ import 'hero_curve_stage.dart';
 import 'nwsb_icon.dart';
 import 'scroll_progress_rail.dart';
 import '../data/content.dart';
+import '../admin/template/editable.dart';
 
 const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
 
@@ -290,7 +291,7 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    EditableLabel('enter_curve_stage.EnterCurveStage',
                       "Today's offer",
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -301,7 +302,7 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
                       ),
                     ),
                     SizedBox(height: 4),
-                    Text(
+                    EditableLabel('enter_curve_stage.EnterCurveStage',
                       'Featured healing word — limited shop drop for mind & organ.',
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -312,7 +313,7 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
                       ),
                     ),
                     SizedBox(height: 6),
-                    Text(
+                    EditableLabel('enter_curve_stage.EnterCurveStage',
                       'Tap Shop Now to claim today’s frequency.',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -332,7 +333,7 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
         Expanded(
           child: words.isEmpty
               ? const Center(
-                  child: Text(
+                  child: EditableLabel('enter_curve_stage.EnterCurveStage',
                     'Words land here as the library loads.',
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 13),
@@ -460,7 +461,7 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
                       Icon(Icons.shopping_cart_outlined,
                           size: 14, color: Color(0xFF1A1A2E)),
                       SizedBox(width: 6),
-                      Text(
+                      EditableLabel('enter_curve_stage.EnterCurveStage',
                         'Shop Now',
                         style: TextStyle(
                           fontSize: 12,
@@ -487,7 +488,7 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
           padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
           child: Column(
             children: [
-              const Text(
+              const EditableLabel('enter_curve_stage.EnterCurveStage',
                 'NowssB.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -625,12 +626,13 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
                     alignment: const Alignment(0.04, 0.96),
                     child: FractionallySizedBox(
                       heightFactor: 0.72,
-                      child: Image.asset(
+                      child: EditableImage.asset(
                         subject,
                         fit: BoxFit.contain,
                         alignment: Alignment.bottomCenter,
                         filterQuality: FilterQuality.high,
                         errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                        slot: 'enter_curve_stage.EnterCurveStage',
                       ),
                     ),
                   ),
@@ -734,12 +736,13 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
                   alignment: const Alignment(0.04, 0.95),
                   child: FractionallySizedBox(
                     heightFactor: compact ? 0.88 : 0.50,
-                    child: Image.asset(
+                    child: EditableImage.asset(
                       subject,
                       fit: BoxFit.contain,
                       alignment: Alignment.bottomCenter,
                       filterQuality: FilterQuality.high,
                       errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                      slot: 'enter_curve_stage.EnterCurveStage',
                     ),
                   ),
                 ),
@@ -804,12 +807,13 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
         ],
       ),
       clipBehavior: Clip.antiAlias,
-      child: Image.asset(
+      child: EditableImage.asset(
         asset,
         fit: BoxFit.cover,
         filterQuality: FilterQuality.medium,
         errorBuilder: (_, __, ___) =>
             const ColoredBox(color: Color(0xFF111111)),
+            slot: 'enter_curve_stage.EnterCurveStage',
       ),
     );
   }
@@ -836,13 +840,14 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Image.asset(
+            EditableImage.asset(
               dest.banner,
               fit: BoxFit.cover,
               alignment: Alignment.centerLeft,
               filterQuality: FilterQuality.medium,
               errorBuilder: (_, __, ___) =>
                   const ColoredBox(color: Color(0xFF111111)),
+                  slot: 'enter_curve_stage.EnterCurveStage',
             ),
             Positioned(
               top: 6,
@@ -917,7 +922,7 @@ class _WhiteEnter extends StatelessWidget {
         child: const Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
+            EditableLabel('enter_curve_stage.WhiteEnter',
               'Enter',
               style: TextStyle(
                 color: Colors.black,

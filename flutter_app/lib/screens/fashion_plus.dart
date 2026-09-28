@@ -16,6 +16,7 @@ import '../data/settings.dart';
 import '../theme/tokens.dart';
 import '../widgets/intro_gate.dart';
 import '../widgets/page_shell.dart';
+import '../admin/template/editable.dart';
 
 class FashionPlusScreen extends StatefulWidget {
   const FashionPlusScreen({super.key});
@@ -274,7 +275,7 @@ class _BackgroundChoice extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ChoiceChip(
-        label: Text(label),
+        label: EditableLabel('fashion_plus.BackgroundChoice', label),
         selected: selected,
         onSelected: (_) => onTap(),
         selectedColor: NwsbColors.goldLight,
@@ -316,7 +317,7 @@ class _ChangeRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
+                EditableLabel('fashion_plus.ChangeRow',
                   title,
                   style: const TextStyle(
                     fontSize: 14,
@@ -325,7 +326,7 @@ class _ChangeRow extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 2),
-                Text(
+                EditableLabel('fashion_plus.ChangeRow',
                   sub,
                   style:
                       const TextStyle(fontSize: 11.5, color: Color(0x8CFFFFFF)),

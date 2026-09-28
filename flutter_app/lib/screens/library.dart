@@ -17,6 +17,7 @@ import '../widgets/page_shell.dart';
 import '../widgets/colored_split_promo_banner.dart';
 import '../shell/nav_shell.dart';
 import 'word_detail.dart';
+import '../admin/template/editable.dart';
 
 class LibraryScreen extends StatefulWidget {
   const LibraryScreen({super.key});
@@ -204,7 +205,7 @@ class _Chip extends StatelessWidget {
               color: on ? Colors.white : const Color(0x24FFFFFF),
             ),
           ),
-          child: Text(
+          child: EditableLabel('library.Chip',
             label,
             style: TextStyle(
               fontSize: 12,

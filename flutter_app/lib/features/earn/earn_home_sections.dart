@@ -27,6 +27,7 @@ import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
 import '../gifts/gifts_screen.dart';
 import '../vault/vault_screen.dart';
+import '../../admin/template/editable.dart';
 
 const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
 
@@ -177,7 +178,7 @@ class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
+            const EditableLabel('earn_home_sections.EarnUmbrellaSection',
               'NowssB Earn',
               style: TextStyle(
                 color: Colors.white,
@@ -187,7 +188,7 @@ class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
               ),
             ),
             const SizedBox(height: 6),
-            const Text(
+            const EditableLabel('earn_home_sections.EarnUmbrellaSection',
               'Commission on net. Two levels. Never a third.',
               style: TextStyle(
                 color: Color(0xCCFFFFFF),
@@ -198,11 +199,12 @@ class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
             ),
             Expanded(
               child: ClipRect(
-                child: Image.asset(
+                child: EditableImage.asset(
                   'assets/banners/brand-cleo.png',
                   fit: BoxFit.fitHeight,
                   alignment: Alignment.bottomRight,
                   errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                  slot: 'earn_home_sections.EarnUmbrellaSection',
                 ),
               ),
             ),
@@ -210,7 +212,7 @@ class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
             Row(
               children: [
                 const Expanded(
-                  child: Text(
+                  child: EditableLabel('earn_home_sections.EarnUmbrellaSection',
                     'Join today',
                     style: TextStyle(
                       color: Colors.white,
@@ -227,7 +229,7 @@ class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(99),
                     ),
-                    child: const Text(
+                    child: const EditableLabel('earn_home_sections.EarnUmbrellaSection',
                       'Open Earn',
                       style: TextStyle(
                         color: Color(0xFF111111),
@@ -266,7 +268,7 @@ class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
+                        EditableLabel('earn_home_sections.EarnUmbrellaSection',
                           'NowssB',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -279,7 +281,7 @@ class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
                           ),
                         ),
                         SizedBox(height: 6),
-                        Text(
+                        EditableLabel('earn_home_sections.EarnUmbrellaSection',
                           'Earn',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -373,7 +375,7 @@ class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
+            const EditableLabel('earn_home_sections.EarnUmbrellaSection',
               'How you get paid',
               style: TextStyle(
                 color: Colors.white,
@@ -383,7 +385,7 @@ class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
               ),
             ),
             const SizedBox(height: 6),
-            const Text(
+            const EditableLabel('earn_home_sections.EarnUmbrellaSection',
               'Net after the store fee. Not the sticker price.',
               style: TextStyle(color: Color(0xCCFFFFFF), fontSize: 13, fontWeight: FontWeight.w600),
             ),
@@ -422,7 +424,7 @@ class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(99),
                   ),
-                  child: const Text(
+                  child: const EditableLabel('earn_home_sections.EarnUmbrellaSection',
                     'Open Earn',
                     style: TextStyle(color: Color(0xFF111111), fontWeight: FontWeight.w800),
                   ),
@@ -442,7 +444,7 @@ class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
         color: const Color(0xFFE8D5A3),
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Text(
+      child: EditableLabel('earn_home_sections.EarnUmbrellaSection',
         label,
         style: const TextStyle(
           fontSize: 11,
@@ -717,7 +719,7 @@ Future<void> copyFriendInvite(BuildContext context) async {
   await Clipboard.setData(ClipboardData(text: text));
   if (context.mounted) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Friend invite copied.')),
+      const SnackBar(content: EditableLabel('earn_home_sections.shared', 'Friend invite copied.')),
     );
   }
 }

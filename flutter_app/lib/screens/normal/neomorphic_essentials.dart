@@ -11,6 +11,7 @@ import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/app_thinking_loader.dart';
 import 'glassmorphism_theme.dart';
+import '../../admin/template/editable.dart';
 
 class NmSuppliedEssentials extends StatefulWidget {
   const NmSuppliedEssentials({super.key});
@@ -36,7 +37,7 @@ class _NmSuppliedEssentialsState extends State<NmSuppliedEssentials> {
         children: [
           const Padding(
             padding: EdgeInsets.only(left: 4, bottom: 18),
-            child: Text('Your essentials',
+            child: EditableLabel('neomorphic_essentials.NmSuppliedEssentials', 'Your essentials',
                 style: TextStyle(
                     fontSize: 21, fontWeight: FontWeight.w700, color: _text)),
           ),
@@ -264,14 +265,14 @@ class _HeroEssential extends StatelessWidget {
                         decoration: BoxDecoration(
                             color: const Color(0x8CFFFFFF),
                             borderRadius: BorderRadius.circular(20)),
-                        child: const Text('● ● ●  543',
+                        child: const EditableLabel('neomorphic_essentials.HeroEssential', '● ● ●  543',
                             style: TextStyle(
                                 fontSize: 12.5,
                                 color: _ink,
                                 fontWeight: FontWeight.w700)),
                       ),
                       const Spacer(),
-                      const Text('•••',
+                      const EditableLabel('neomorphic_essentials.HeroEssential', '•••',
                           style: TextStyle(
                               fontWeight: FontWeight.w800, color: _ink)),
                     ]),
@@ -280,7 +281,7 @@ class _HeroEssential extends StatelessWidget {
                       Icon(icon, size: 17, color: _ink),
                       const SizedBox(width: 8),
                       Expanded(
-                          child: Text(title,
+                          child: EditableLabel('neomorphic_essentials.HeroEssential', title,
                               style: const TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w800,
@@ -292,7 +293,7 @@ class _HeroEssential extends StatelessWidget {
                           size: 15, color: _inkSoft),
                       const SizedBox(width: 6),
                       Expanded(
-                          child: Text(subtitle,
+                          child: EditableLabel('neomorphic_essentials.HeroEssential', subtitle,
                               style: const TextStyle(
                                   fontSize: 14.5,
                                   fontWeight: FontWeight.w600,
@@ -361,7 +362,7 @@ class _PillEssential extends StatelessWidget {
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                Text(title,
+                EditableLabel('neomorphic_essentials.PillEssential', title,
                     style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'nwsb_icon.dart';
+import '../admin/template/editable.dart';
 
 /// Black home / menu banner: logo and NowssB on the left, portrait on the right.
 class BrandTopBanner extends StatelessWidget {
@@ -55,17 +56,18 @@ class BrandTopBanner extends StatelessWidget {
                   )
                 else
                   ClipOval(
-                    child: Image.asset(
+                    child: EditableImage.asset(
                       'assets/icons/logo-disc.webp',
                       width: disc,
                       height: disc,
                       fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) => SizedBox(width: disc, height: disc),
+                      slot: 'brand_top_banner.BrandTopBanner',
                     ),
                   ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Text(
+                  child: EditableLabel('brand_top_banner.BrandTopBanner',
                     title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -81,13 +83,14 @@ class BrandTopBanner extends StatelessWidget {
                 SizedBox(
                   width: h,
                   height: h,
-                  child: Image.asset(
+                  child: EditableImage.asset(
                     'assets/banners/brand-cleo.png',
                     fit: BoxFit.cover,
                     alignment: Alignment.topCenter,
                     errorBuilder: (_, __, ___) => const ColoredBox(
                       color: Color(0xFF120818),
                     ),
+                    slot: 'brand_top_banner.BrandTopBanner',
                   ),
                 ),
               ],

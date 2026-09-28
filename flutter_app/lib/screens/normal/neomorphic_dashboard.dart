@@ -12,6 +12,7 @@ import '../../data/practice_progress.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/neumorphic.dart';
 import '../practice.dart';
+import '../../admin/template/editable.dart';
 
 typedef DashboardPracticeLauncher = void Function(List<Word> words, String title);
 
@@ -91,12 +92,12 @@ class _FocusCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                const EditableLabel('neomorphic_dashboard.FocusCard',
                   "Today's practice",
                   style: TextStyle(fontSize: 13, color: NmSuppliedDashboard._textMid),
                 ),
                 const SizedBox(height: 10),
-                Text(
+                EditableLabel('neomorphic_dashboard.FocusCard',
                   title,
                   style: TextStyle(
                     fontSize: 26,
@@ -113,7 +114,7 @@ class _FocusCard extends StatelessWidget {
                     const _FocusDot(),
                     Text(count == 0 ? 'No words yet' : '$count word${count == 1 ? '' : 's'}', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: NmSuppliedDashboard._textDark)),
                     const _FocusDot(),
-                    const Text('Plays aloud', style: TextStyle(fontSize: 13, color: NmSuppliedDashboard._textMid)),
+                    const EditableLabel('neomorphic_dashboard.FocusCard', 'Plays aloud', style: TextStyle(fontSize: 13, color: NmSuppliedDashboard._textMid)),
                   ],
                 ),
                 const SizedBox(height: 20),
@@ -135,7 +136,7 @@ class _FocusCard extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text('Play session', style: TextStyle(color: Color(0xFFF3F0FF), fontSize: 14, fontWeight: FontWeight.w600)),
+                          EditableLabel('neomorphic_dashboard.FocusCard', 'Play session', style: TextStyle(color: Color(0xFFF3F0FF), fontSize: 14, fontWeight: FontWeight.w600)),
                           SizedBox(width: 10),
                           Icon(Icons.play_arrow_rounded, size: 17, color: Color(0xFFF3F0FF)),
                         ],
@@ -216,12 +217,12 @@ class _SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) => Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: NmSuppliedDashboard._textDark)),
+          EditableLabel('neomorphic_dashboard.SectionHeader', title, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: NmSuppliedDashboard._textDark)),
           GestureDetector(
             onTap: onTap,
             child: const Row(
               children: [
-                Text('View all', style: TextStyle(fontSize: 13, color: NmSuppliedDashboard._textMid)),
+                EditableLabel('neomorphic_dashboard.SectionHeader', 'View all', style: TextStyle(fontSize: 13, color: NmSuppliedDashboard._textMid)),
                 SizedBox(width: 4),
                 Icon(Icons.chevron_right, size: 16, color: NmSuppliedDashboard._textMid),
               ],
@@ -290,7 +291,7 @@ class _Metric extends StatelessWidget {
             const SizedBox(height: 10),
             Text(value, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: NmSuppliedDashboard._textDark)),
             const SizedBox(height: 3),
-            Text(label, maxLines: 2, textAlign: TextAlign.center, style: const TextStyle(fontSize: 10.5, color: NmSuppliedDashboard._textMid)),
+            EditableLabel('neomorphic_dashboard.Metric', label, maxLines: 2, textAlign: TextAlign.center, style: const TextStyle(fontSize: 10.5, color: NmSuppliedDashboard._textMid)),
             const SizedBox(height: 6),
             Text(delta, style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600, color: deltaColor)),
           ],
@@ -348,9 +349,9 @@ class _UpNextRow extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: NmSuppliedDashboard._textDark)),
+                  EditableLabel('neomorphic_dashboard.UpNextRow', title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: NmSuppliedDashboard._textDark)),
                   const SizedBox(height: 2),
-                  Text(subtitle, style: const TextStyle(fontSize: 12.5, color: NmSuppliedDashboard._textMid)),
+                  EditableLabel('neomorphic_dashboard.UpNextRow', subtitle, style: const TextStyle(fontSize: 12.5, color: NmSuppliedDashboard._textMid)),
                 ],
               ),
             ),

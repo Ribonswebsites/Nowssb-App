@@ -24,6 +24,7 @@ import '../../widgets/home_parts.dart';
 import '../quick_access.dart';
 import '../fashion_plus.dart';
 import '../widgets_page.dart';
+import '../../admin/template/editable.dart';
 
 const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
 
@@ -231,7 +232,7 @@ class _TilesRail extends StatelessWidget {
         const Icon(Icons.chevron_left, size: 15, color: NwsbColors.goldLight),
         const SizedBox(width: 6),
         const Flexible(
-          child: Text(
+          child: EditableLabel('sections_mid.TilesRail',
             'Tap to restyle',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -242,7 +243,7 @@ class _TilesRail extends StatelessWidget {
         Container(width: 1, height: 14, color: const Color(0x24FFFFFF)),
         const SizedBox(width: 10),
         const Flexible(
-          child: Text(
+          child: EditableLabel('sections_mid.TilesRail',
             'Begin your healing',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -386,6 +387,7 @@ class _Tile extends StatelessWidget {
                                 fallback: const ColoredBox(
                                   color: Color(0x1AE8D5A3),
                                 ),
+                                slot: 'sections_mid.Tile',
                               )),
                   ),
                   const SizedBox(width: 8),
@@ -397,7 +399,7 @@ class _Tile extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        EditableLabel('sections_mid.Tile',
                           title,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -409,7 +411,7 @@ class _Tile extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 2),
-                        Text(
+                        EditableLabel('sections_mid.Tile',
                           sub,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -463,7 +465,7 @@ class _BannerTile extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Image.asset(
+            EditableImage.asset(
               dest.banner,
               fit: BoxFit.contain,
               alignment: Alignment.centerLeft,
@@ -475,6 +477,7 @@ class _BannerTile extends StatelessWidget {
               },
               errorBuilder: (_, __, ___) =>
                   const ColoredBox(color: Color(0xFF111111)),
+                  slot: 'sections_mid.BannerTile',
             ),
             // Top-right destination mark (restored SVG — was missing/broken).
             Positioned(
@@ -542,7 +545,7 @@ class _TileEnter extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
+          EditableLabel('sections_mid.TileEnter',
             'Enter',
             style: TextStyle(
               fontSize: font,
@@ -608,7 +611,7 @@ class FashStore extends StatelessWidget {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    const NwsbVideo(asset: 'assets/video/store-section.mp4'),
+                    const NwsbVideo(asset: 'assets/video/store-section.mp4', slot: 'sections_mid.FashStore'),
                     const DecoratedBox(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
@@ -628,7 +631,7 @@ class FashStore extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          const EditableLabel('sections_mid.FashStore',
                             'Shabdapathy · Collections',
                             style: TextStyle(
                               fontSize: 10.5,
@@ -740,6 +743,7 @@ class FashTrending extends StatelessWidget {
                       asset:
                           'assets/video/7e4d709136dc254a_grok_video_2026-07-18-15-53-02_ubjx5b.mp4',
                       fit: BoxFit.cover,
+                      slot: 'sections_mid.FashTrending',
                     ),
                     const DecoratedBox(
                       decoration: BoxDecoration(
@@ -807,7 +811,7 @@ class _CustomizeExperienceBanner extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             const Expanded(
-              child: Text(
+              child: EditableLabel('sections_mid.CustomizeExperienceBanner',
                 'Customized\nyou app experience',
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -1015,7 +1019,7 @@ class _CustIntroCard extends StatelessWidget {
           padding: EdgeInsets.fromLTRB(16, 4, 16, 8),
           child: Column(
             children: [
-              Text(
+              EditableLabel('sections_mid.CustIntroCard',
                 'NowssB.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -1027,7 +1031,7 @@ class _CustIntroCard extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 6),
-              Text(
+              EditableLabel('sections_mid.CustIntroCard',
                 'Make this home yours',
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -1043,7 +1047,7 @@ class _CustIntroCard extends StatelessWidget {
         Expanded(child: _CustIntroStage()),
         Padding(
           padding: EdgeInsets.fromLTRB(16, 12, 16, 2),
-          child: Text(
+          child: EditableLabel('sections_mid.CustIntroCard',
             'Themes · Background · Start art · Access',
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -1057,7 +1061,7 @@ class _CustIntroCard extends StatelessWidget {
         ),
         Padding(
           padding: EdgeInsets.fromLTRB(16, 4, 16, 4),
-          child: Text(
+          child: EditableLabel('sections_mid.CustIntroCard',
             'Four doors. One tap. The home follows you.',
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -1123,12 +1127,13 @@ class _CustIntroStage extends StatelessWidget {
               alignment: const Alignment(0.04, 0.96),
               child: FractionallySizedBox(
                 heightFactor: 0.72,
-                child: Image.asset(
+                child: EditableImage.asset(
                   EnterCurveAssets.pointer,
                   fit: BoxFit.contain,
                   alignment: Alignment.bottomCenter,
                   filterQuality: FilterQuality.high,
                   errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                  slot: 'sections_mid.CustIntroStage',
                 ),
               ),
             ),
@@ -1146,11 +1151,12 @@ class _CustIntroStage extends StatelessWidget {
         child: SizedBox(
           width: 152,
           height: 86,
-          child: Image.asset(
+          child: EditableImage.asset(
             asset,
             fit: BoxFit.cover,
             errorBuilder: (_, __, ___) =>
                 const ColoredBox(color: Color(0xFF111111)),
+                slot: 'sections_mid.CustIntroStage',
           ),
         ),
       ),
@@ -1177,7 +1183,7 @@ class _CustPanelCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
+                  EditableLabel('sections_mid.CustPanelCard',
                     'Customize',
                     style: TextStyle(
                       fontSize: 17,
@@ -1185,7 +1191,7 @@ class _CustPanelCard extends StatelessWidget {
                       color: Colors.white,
                     ),
                   ),
-                  Text(
+                  EditableLabel('sections_mid.CustPanelCard',
                     'Make this home yours',
                     style: TextStyle(fontSize: 12, color: Color(0x8CFFFFFF)),
                   ),
@@ -1379,13 +1385,13 @@ class _FashionCustomizeRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title,
+                EditableLabel('sections_mid.FashionCustomizeRow', title,
                     style: const TextStyle(
                         color: Colors.white,
                         fontSize: 17,
                         fontWeight: FontWeight.w700)),
                 const SizedBox(height: 3),
-                Text(sub,
+                EditableLabel('sections_mid.FashionCustomizeRow', sub,
                     style: const TextStyle(
                         color: Color(0x8CFFFFFF), fontSize: 13)),
               ],
@@ -1433,12 +1439,13 @@ class FashPlusMini extends StatelessWidget {
               SizedBox(
                 width: 46,
                 height: 46,
-                child: Image.asset(
+                child: EditableImage.asset(
                   'assets/fashion/fashion-icon.webp',
                   errorBuilder: (_, __, ___) => const Icon(
                       Icons.auto_awesome_motion_outlined,
                       size: 22,
                       color: NwsbColors.goldLight),
+                      slot: 'sections_mid.FashPlusMini',
                 ),
               ),
               const SizedBox(width: 14),
@@ -1447,7 +1454,7 @@ class FashPlusMini extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text(
+                    const EditableLabel('sections_mid.FashPlusMini',
                       'Experience',
                       style: TextStyle(
                         fontSize: 11,
@@ -1455,7 +1462,7 @@ class FashPlusMini extends StatelessWidget {
                         color: NwsbColors.gold,
                       ),
                     ),
-                    const Text(
+                    const EditableLabel('sections_mid.FashPlusMini',
                       'Fashion Plus',
                       style: TextStyle(
                         fontSize: 18,
@@ -1534,7 +1541,7 @@ class FashPrescription extends StatelessWidget {
             child: const AspectRatio(
               aspectRatio: 16 / 9,
               child: ClipRect(
-                child: NwsbVideo(asset: 'assets/video/rx-banner.mp4'),
+                child: NwsbVideo(asset: 'assets/video/rx-banner.mp4', slot: 'sections_mid.FashPrescription'),
               ),
             ),
           ),
@@ -1552,7 +1559,7 @@ class FashPrescription extends StatelessWidget {
                     ),
                     const SizedBox(width: 10),
                     const Flexible(
-                      child: Text(
+                      child: EditableLabel('sections_mid.FashPrescription',
                         'AI PRESCRIPTION',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -1656,7 +1663,7 @@ class FashPrescription extends StatelessWidget {
                 Row(
                   children: [
                     const Flexible(
-                      child: Text(
+                      child: EditableLabel('sections_mid.FashPrescription',
                         'Tap word to practice',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -1711,7 +1718,9 @@ class FashConnect extends StatelessWidget {
                           'https://media.nowssb.com/migrated-images/b20d675b826ef760_grok_image_1784144472932_h242ko.jpg',
                       fallback: NwsbVideo(
                         asset: 'assets/video/connect-banner.mp4',
+                        slot: 'sections_mid.FashConnect',
                       ),
+                      slot: 'sections_mid.FashConnect',
                     ),
                     const DecoratedBox(
                       decoration: BoxDecoration(

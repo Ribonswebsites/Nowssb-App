@@ -20,6 +20,7 @@ import '../../widgets/nwsb_icon.dart';
 import '../../widgets/app_thinking_loader.dart';
 import '../../features/economy/money.dart';
 import 'store_actions.dart';
+import '../../admin/template/editable.dart';
 
 String inr(num value) {
   if (value <= 0) return 'Included';
@@ -147,7 +148,7 @@ class StoreNetImage extends StatelessWidget {
   Widget build(BuildContext context) {
     if (url.isEmpty) return _composing;
     if (url.startsWith('assets/')) {
-      return Image.asset(
+      return EditableImage.asset(
         url,
         fit: fit,
         gaplessPlayback: true,
@@ -157,6 +158,7 @@ class StoreNetImage extends StatelessWidget {
           return _composing;
         },
         errorBuilder: (_, __, ___) => _composing,
+        slot: 'store_cards.StoreNetImage',
       );
     }
     return CachedNetworkImage(
@@ -262,7 +264,7 @@ class RmCatBanner extends StatelessWidget {
                         child: Row(
                           children: [
                             Flexible(
-                              child: Text(
+                              child: EditableLabel('store_cards.RmCatBanner',
                                 title,
                                 style: TextStyle(
                                   fontSize: 15,
@@ -307,7 +309,7 @@ class RmCatBanner extends StatelessWidget {
                   ),
                   if (sub.isNotEmpty) ...[
                     const SizedBox(height: 3),
-                    Text(
+                    EditableLabel('store_cards.RmCatBanner',
                       sub,
                       style: const TextStyle(
                         fontSize: 11,
@@ -381,7 +383,7 @@ class StoreBlackPill extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(18, 8, 10, 8),
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: Text(
+                child: EditableLabel('store_cards.StoreBlackPill',
                   label,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -491,7 +493,7 @@ class _StorePillRippleArtState extends State<StorePillRippleArt>
                   ColoredBox(color: const Color(0xFF0A0F1C)),
                   Padding(
                     padding: EdgeInsets.all(d * 0.16),
-                    child: Image.asset(
+                    child: EditableImage.asset(
                       widget.asset,
                       fit: BoxFit.contain,
                       errorBuilder: (_, __, ___) {
@@ -499,19 +501,22 @@ class _StorePillRippleArtState extends State<StorePillRippleArt>
                           return Image.network(
                             widget.fallbackLogoUrl!,
                             fit: BoxFit.contain,
-                            errorBuilder: (_, __, ___) => Image.asset(
+                            errorBuilder: (_, __, ___) => EditableImage.asset(
                               widget.fallbackLogoAsset ?? kStoreProductArt,
                               fit: BoxFit.contain,
+                              slot: 'store_cards.StorePillRippleArt',
                             ),
                           );
                         }
-                        return Image.asset(
+                        return EditableImage.asset(
                           widget.fallbackLogoAsset ?? kStoreProductArt,
                           fit: BoxFit.contain,
                           errorBuilder: (_, __, ___) =>
                               const ColoredBox(color: Color(0xFF0A0F1C)),
+                              slot: 'store_cards.StorePillRippleArt',
                         );
                       },
+                      slot: 'store_cards.StorePillRippleArt',
                     ),
                   ),
                   AnimatedBuilder(
@@ -629,7 +634,7 @@ class StoreViewAllControl extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
+              EditableLabel('store_cards.StoreViewAllControl',
                 label,
                 style: const TextStyle(
                   fontSize: 12,
@@ -666,7 +671,7 @@ class RmRowHeader extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: Text(
+            child: EditableLabel('store_cards.RmRowHeader',
               title,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -763,7 +768,7 @@ class RmRowVid extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           child: AspectRatio(
             aspectRatio: 16 / 6.4,
-            child: NwsbVideo(asset: url, priority: ClipPriority.feature),
+            child: NwsbVideo(asset: url, priority: ClipPriority.feature, slot: 'store_cards.RmRowVid'),
           ),
         ),
       ),
@@ -1095,7 +1100,7 @@ class RmWordCard extends StatelessWidget {
                                         child: const Row(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
-                                            Text(
+                                            EditableLabel('store_cards.RmWordCard',
                                               'Buy Now',
                                               style: TextStyle(
                                                 fontSize: 11,
@@ -1181,7 +1186,7 @@ class _SignatureTag extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(4),
       ),
-      child: const Text(
+      child: const EditableLabel('store_cards.SignatureTag',
         'Signature',
         style: TextStyle(
           fontSize: 8,
@@ -1484,7 +1489,7 @@ class StoreFilterChip extends StatelessWidget {
                 color: Color(0x33000000), blurRadius: 8, offset: Offset(0, 3)),
           ],
         ),
-        child: Text(
+        child: EditableLabel('store_cards.StoreFilterChip',
           label,
           style: TextStyle(
             fontSize: 9,
@@ -1531,13 +1536,14 @@ class StoreSearchBar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Image.asset(
+          EditableImage.asset(
             'assets/icons/search.webp',
             width: 18,
             height: 18,
             fit: BoxFit.contain,
             color: Colors.white,
             colorBlendMode: BlendMode.srcIn,
+            slot: 'store_cards.StoreSearchBar',
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -1585,7 +1591,7 @@ class StoreSearchBar extends StatelessWidget {
                       offset: Offset(0, 2)),
                 ],
               ),
-              child: const Text(
+              child: const EditableLabel('store_cards.StoreSearchBar',
                 'GO',
                 style: TextStyle(
                   fontSize: 11,
@@ -1612,7 +1618,7 @@ class StoreDisclaimer extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          const EditableLabel('store_cards.StoreDisclaimer',
             'Disclaimer & Confidentiality',
             style: TextStyle(
               fontSize: 11,
@@ -1621,7 +1627,7 @@ class StoreDisclaimer extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          Text(
+          EditableLabel('store_cards.StoreDisclaimer',
             text,
             style: const TextStyle(
               fontSize: 11,
@@ -1631,7 +1637,7 @@ class StoreDisclaimer extends StatelessWidget {
           ),
           const SizedBox(height: 22),
           const Center(
-            child: Text(
+            child: EditableLabel('store_cards.StoreDisclaimer',
               'NowssB\n© 2026 Adv. Sanjaykumar Gadge · Shabdapathy',
               textAlign: TextAlign.center,
               style: TextStyle(

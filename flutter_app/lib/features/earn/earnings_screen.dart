@@ -10,6 +10,7 @@ import '../economy/money.dart';
 import '../../widgets/brand_top_banner.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/nwsb_icon.dart';
+import '../../admin/template/editable.dart';
 
 class EarningsScreen extends StatefulWidget {
   const EarningsScreen({super.key});
@@ -65,7 +66,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
             : rail == 'razorpayx'
                 ? 'India payouts will settle in INR to your UPI.'
                 : 'Payout account saved.';
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: EditableLabel('earnings_screen.EarningsScreen', text)));
   }
 
   @override
@@ -107,10 +108,10 @@ class _EarningsScreenState extends State<EarningsScreen> {
                         : 'Everywhere else uses Stripe Connect. You finish identity checks in Stripe, then payouts go to your local bank.',
               ),
               const SizedBox(height: 12),
-              const Text('Lifetime', style: TextStyle(color: NwsbColors.mist, fontSize: 12)),
+              const EditableLabel('earnings_screen.EarningsScreen', 'Lifetime', style: TextStyle(color: NwsbColors.mist, fontSize: 12)),
               MoneyCount(cents: w.lifetimeCents),
               const SizedBox(height: 4),
-              const Text('Available', style: TextStyle(color: NwsbColors.mist, fontSize: 12)),
+              const EditableLabel('earnings_screen.EarningsScreen', 'Available', style: TextStyle(color: NwsbColors.mist, fontSize: 12)),
               MoneyCount(cents: w.cash),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(

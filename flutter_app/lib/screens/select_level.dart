@@ -8,6 +8,7 @@ import '../widgets/app_thinking_loader.dart';
 import '../widgets/colored_split_promo_banner.dart';
 import '../widgets/nwsb_icon.dart';
 import 'practice.dart';
+import '../admin/template/editable.dart';
 
 class SelectLevelScreen extends StatefulWidget {
   const SelectLevelScreen({super.key, this.initialLevel = 3});
@@ -72,6 +73,7 @@ class _SelectLevelScreenState extends State<SelectLevelScreen> {
                                 autoplay: true,
                                 loop: true,
                                 showPoster: false,
+                                slot: 'select_level.SelectLevelScreen',
                               ),
                             ),
                           ],
@@ -83,7 +85,7 @@ class _SelectLevelScreenState extends State<SelectLevelScreen> {
                 const SizedBox(height: 18),
                 Row(mainAxisAlignment: MainAxisAlignment.center, children: const [
                   SizedBox(width: 44, child: Divider(color: Color(0x59FFFFFF))),
-                  Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: Text('SELECT STAGE', style: TextStyle(color: Color(0x8CFFFFFF), fontSize: 12, letterSpacing: 4, fontWeight: FontWeight.w500))),
+                  Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: EditableLabel('select_level.SelectLevelScreen', 'SELECT STAGE', style: TextStyle(color: Color(0x8CFFFFFF), fontSize: 12, letterSpacing: 4, fontWeight: FontWeight.w500))),
                   SizedBox(width: 44, child: Divider(color: Color(0x59FFFFFF))),
                 ]),
                 const SizedBox(height: 18),
@@ -190,5 +192,5 @@ class _ActionRow extends StatelessWidget {
   final VoidCallback onTap;
   final bool compact;
   @override
-  Widget build(BuildContext context) => GestureDetector(onTap: onTap, child: Container(padding: EdgeInsets.symmetric(horizontal: compact ? 14 : 20, vertical: compact ? 8 : 16), decoration: BoxDecoration(borderRadius: BorderRadius.circular(99), color: const Color(0x0AFFFFFF), border: Border.all(color: const Color(0x24FFFFFF))), child: Row(children: [Icon(icon, color: Colors.white70, size: compact ? 14 : 18), const SizedBox(width: 10), Expanded(child: Text(label, style: TextStyle(color: Colors.white, fontSize: compact ? 10 : 12, letterSpacing: compact ? 1.4 : 2.2))), if (trailing != null) Icon(trailing, color: Colors.white70, size: compact ? 16 : 18)])));
+  Widget build(BuildContext context) => GestureDetector(onTap: onTap, child: Container(padding: EdgeInsets.symmetric(horizontal: compact ? 14 : 20, vertical: compact ? 8 : 16), decoration: BoxDecoration(borderRadius: BorderRadius.circular(99), color: const Color(0x0AFFFFFF), border: Border.all(color: const Color(0x24FFFFFF))), child: Row(children: [Icon(icon, color: Colors.white70, size: compact ? 14 : 18), const SizedBox(width: 10), Expanded(child: EditableLabel('select_level.ActionRow', label, style: TextStyle(color: Colors.white, fontSize: compact ? 10 : 12, letterSpacing: compact ? 1.4 : 2.2))), if (trailing != null) Icon(trailing, color: Colors.white70, size: compact ? 16 : 18)])));
 }

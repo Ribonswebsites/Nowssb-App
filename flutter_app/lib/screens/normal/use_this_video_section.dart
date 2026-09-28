@@ -1,13 +1,13 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/home_skin.dart';
 import 'glassmorphism_theme.dart';
+import '../../admin/template/editable.dart';
 
 const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
 
@@ -45,6 +45,7 @@ class NmUseThisVideoSection extends StatelessWidget {
                   asset: 'assets/video/grok-video-use-this.mp4',
                   priority: ClipPriority.feature,
                   fit: BoxFit.cover,
+                  slot: 'use_this_video_section.NmUseThisVideoSection',
                 ),
               ),
               Positioned.fill(
@@ -201,9 +202,9 @@ class _RingAction extends StatelessWidget {
                 child: svg
                     ? Padding(
                         padding: const EdgeInsets.all(8),
-                        child: SvgPicture.asset(asset, fit: BoxFit.contain),
+                        child: EditableSvg.asset(asset, fit: BoxFit.contain, slot: 'use_this_video_section.RingAction'),
                       )
-                    : Image.asset(asset, fit: BoxFit.cover),
+                    : EditableImage.asset(asset, fit: BoxFit.cover, slot: 'use_this_video_section.RingAction'),
               ),
             ),
           ),

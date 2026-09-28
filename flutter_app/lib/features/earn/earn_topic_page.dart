@@ -7,6 +7,7 @@ import '../economy/economy_theme.dart';
 import '../gifts/gifts_screen.dart';
 import '../vault/vault_screen.dart';
 import 'earnings_screen.dart';
+import '../../admin/template/editable.dart';
 
 /// Same shell as NowssB Earn: scrolling black banner, glass, a black card.
 class EarnTopicPage extends StatelessWidget {
@@ -48,9 +49,9 @@ class EarnTopicPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(headline, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
+                  EditableLabel('earn_topic_page.EarnTopicPage', headline, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
                   const SizedBox(height: 8),
-                  Text(body, style: const TextStyle(color: Color(0xCCFFFFFF), height: 1.4)),
+                  EditableLabel('earn_topic_page.EarnTopicPage', body, style: const TextStyle(color: Color(0xCCFFFFFF), height: 1.4)),
                   if (actionLabel != null && action != null) ...[
                     const SizedBox(height: 16),
                     Align(

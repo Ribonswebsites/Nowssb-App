@@ -9,6 +9,7 @@ import '../economy/money.dart';
 import '../economy/play_billing.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../screens/subscription.dart';
+import '../../admin/template/editable.dart';
 
 class BazaarScreen extends StatelessWidget {
   const BazaarScreen({super.key, this.embedded = false});
@@ -47,15 +48,15 @@ class BazaarScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          const Text('WORDS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12)),
+          const EditableLabel('bazaar_screen.BazaarScreen', 'WORDS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12)),
           const SizedBox(height: 8),
           const _SampleWords(),
           const SizedBox(height: 18),
-          const Text('YOUR OWNED WORDS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12)),
+          const EditableLabel('bazaar_screen.BazaarScreen', 'YOUR OWNED WORDS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12)),
           const SizedBox(height: 8),
           const _OwnedList(),
           const SizedBox(height: 18),
-          const Text('LIVE LISTINGS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12)),
+          const EditableLabel('bazaar_screen.BazaarScreen', 'LIVE LISTINGS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12)),
           const SizedBox(height: 8),
           const _LiveListings(),
         ],
@@ -138,7 +139,7 @@ class _ListCardState extends State<_ListCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(color: Colors.white)),
+          EditableLabel('bazaar_screen.ListCard', title, style: const TextStyle(color: Colors.white)),
           TextField(
             controller: _price,
             keyboardType: TextInputType.number,
@@ -203,7 +204,7 @@ class _SampleWords extends StatelessWidget {
                         SnackBar(content: Text('Own ${word.$1} before you list it.')),
                       );
                     }),
-                    child: const Text('List'),
+                    child: const EditableLabel('bazaar_screen.SampleWords', 'List'),
                   ),
                 ],
               ),

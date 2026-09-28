@@ -19,6 +19,7 @@ import 'package:flutter/material.dart';
 
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
+import '../admin/template/editable.dart';
 
 /// A bezel: its picture, the aperture inset as fractions of the box, and the
 /// shape of the render so the frame is never squashed.
@@ -330,6 +331,7 @@ class TvFrame extends StatelessWidget {
                                 autoplay: autoplay,
                                 showPoster: showPoster,
                                 fit: BoxFit.cover,
+                                slot: 'tv_frame.TvFrame',
                               ),
                             )
                           : null,
@@ -388,10 +390,11 @@ class _Bezel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (frame.image.isNotEmpty) {
-      return Image.asset(
+      return EditableImage.asset(
         frame.image,
         fit: BoxFit.fill,
         errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+        slot: 'tv_frame.Bezel',
       );
     }
 
@@ -423,33 +426,36 @@ class _Bezel extends StatelessWidget {
               right: 0,
               top: 0,
               bottom: railBottom,
-              child: Image.asset(
+              child: EditableImage.asset(
                 'assets/frames/tv-l-mid.webp',
                 scale: _tvRailNaturalWidth / c.maxWidth,
                 fit: BoxFit.none,
                 repeat: ImageRepeat.repeatY,
                 alignment: Alignment.topCenter,
                 errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                slot: 'tv_frame.Bezel',
               ),
             ),
             Positioned(
               left: 0,
               right: 0,
               top: 0,
-              child: Image.asset(
+              child: EditableImage.asset(
                 'assets/frames/tv-l-top.webp',
                 fit: BoxFit.fitWidth,
                 errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                slot: 'tv_frame.Bezel',
               ),
             ),
             Positioned(
               left: 0,
               right: 0,
               bottom: 0,
-              child: Image.asset(
+              child: EditableImage.asset(
                 'assets/frames/tv-l-bottom.webp',
                 fit: BoxFit.fitWidth,
                 errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                slot: 'tv_frame.Bezel',
               ),
             ),
           ],

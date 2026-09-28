@@ -10,6 +10,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import '../admin/template/editable.dart';
 
 /// Brand stills — committed under assets/flip_brand (no recompression).
 const kFlipBrandAssets = <String>[
@@ -325,7 +326,8 @@ class _FlipBrandShowcaseState extends State<FlipBrandShowcase>
           child: ColoredBox(
             color: const Color(0xFF111111),
             child: Image(
-              image: AssetImage(kFlipBrandAssets[i]),
+              image: slotImageProvider(context, 'flip_brand_showcase.FlipBrandShowcase',
+                  kFlipBrandAssets[i], AssetImage(kFlipBrandAssets[i])),
               fit: BoxFit.cover,
               width: double.infinity,
               height: double.infinity,

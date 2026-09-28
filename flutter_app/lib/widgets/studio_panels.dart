@@ -11,6 +11,7 @@ import '../screens/progress/progress_screen.dart';
 import '../screens/sound_library.dart';
 import '../shell/nav_shell.dart';
 import 'glass_wrap.dart';
+import '../admin/template/editable.dart';
 
 void openPracticeTab(BuildContext context, int tab) {
   final scope = context.getInheritedWidgetOfExactType<NavScope>();
@@ -148,7 +149,7 @@ class _PracticeCoursesPanelState extends State<PracticeCoursesPanel> {
                           ),
                           Align(
                             alignment: Alignment.centerRight,
-                            child: Image.asset(art, fit: BoxFit.contain, height: 248),
+                            child: EditableImage.asset(art, fit: BoxFit.contain, height: 248, slot: 'studio_panels.PracticeCoursesPanel'),
                           ),
                           const DecoratedBox(
                             decoration: BoxDecoration(
@@ -175,12 +176,12 @@ class _PracticeCoursesPanelState extends State<PracticeCoursesPanel> {
                                         color: Colors.white,
                                         borderRadius: BorderRadius.circular(99),
                                       ),
-                                      child: const Text('Active', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
+                                      child: const EditableLabel('studio_panels.PracticeCoursesPanel', 'Active', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
                                     ),
                                   ],
                                 ),
                                 const Spacer(),
-                                Text(
+                                EditableLabel('studio_panels.PracticeCoursesPanel',
                                   title,
                                   style: const TextStyle(
                                     color: Colors.white,
@@ -197,7 +198,7 @@ class _PracticeCoursesPanelState extends State<PracticeCoursesPanel> {
                                     Text(p.timeLabel, style: const TextStyle(color: Colors.white, fontSize: 13)),
                                     const SizedBox(width: 10),
                                     const Icon(Icons.star_rounded, color: Color(0xFFFFD15C), size: 16),
-                                    const Text(' 4.7', style: TextStyle(color: Colors.white, fontSize: 13)),
+                                    const EditableLabel('studio_panels.PracticeCoursesPanel', ' 4.7', style: TextStyle(color: Colors.white, fontSize: 13)),
                                     const SizedBox(width: 10),
                                     const Icon(Icons.play_circle_outline, color: Colors.white, size: 16),
                                     Text(' $done', style: const TextStyle(color: Colors.white, fontSize: 13)),
@@ -213,7 +214,7 @@ class _PracticeCoursesPanelState extends State<PracticeCoursesPanel> {
                                     const Spacer(),
                                     GestureDetector(
                                       onTap: _progress ? _openProgress : _openPractice,
-                                      child: const Text(
+                                      child: const EditableLabel('studio_panels.PracticeCoursesPanel',
                                         'Continue  ›',
                                         style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16),
                                       ),
@@ -249,11 +250,12 @@ class _PracticeCoursesPanelState extends State<PracticeCoursesPanel> {
                         children: [
                           ClipRRect(
                             borderRadius: BorderRadius.circular(18),
-                            child: Image.asset(
+                            child: EditableImage.asset(
                               _lower[_chip].$1,
                               width: 112,
                               height: 112,
                               fit: BoxFit.cover,
+                              slot: 'studio_panels.PracticeCoursesPanel',
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -307,7 +309,7 @@ class _PracticeCoursesPanelState extends State<PracticeCoursesPanel> {
           borderRadius: BorderRadius.circular(99),
           border: Border.all(color: on ? Colors.white38 : Colors.white12),
         ),
-        child: Text(
+        child: EditableLabel('studio_panels.PracticeCoursesPanel',
           label,
           style: TextStyle(color: on ? Colors.white : Colors.white70, fontWeight: FontWeight.w700, fontSize: 13),
         ),
@@ -349,7 +351,7 @@ class _PracticeCoursesPanelState extends State<PracticeCoursesPanel> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          ClipOval(child: Image.asset(_profile, width: 22, height: 22, fit: BoxFit.cover)),
+          ClipOval(child: EditableImage.asset(_profile, width: 22, height: 22, fit: BoxFit.cover, slot: 'studio_panels.PracticeCoursesPanel')),
           const SizedBox(width: 4),
           Text(extra, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 11)),
         ],
@@ -387,7 +389,7 @@ class PracticeCourseRail extends StatelessWidget {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    Image.asset(item.$1, fit: BoxFit.cover),
+                    EditableImage.asset(item.$1, fit: BoxFit.cover, slot: 'studio_panels.PracticeCourseRail'),
                     const DecoratedBox(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(

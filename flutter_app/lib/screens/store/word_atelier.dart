@@ -19,6 +19,7 @@ import 'meaning_store.dart';
 import 'request_words.dart';
 import 'signature_store.dart';
 import 'store_routes.dart';
+import '../../admin/template/editable.dart';
 
 class WordAtelierScreen extends StatelessWidget {
   const WordAtelierScreen({super.key});
@@ -83,7 +84,7 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
   void _viewCart() {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Your cart is waiting in Profile → Cart'),
+        content: EditableLabel('word_atelier.WordAtelierBody', 'Your cart is waiting in Profile → Cart'),
         behavior: SnackBarBehavior.floating,
         duration: Duration(seconds: 2),
       ),
@@ -178,7 +179,7 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
         if (cards.isEmpty) {
           return const Padding(
             padding: EdgeInsets.symmetric(vertical: 18),
-            child: Text(
+            child: EditableLabel('word_atelier.WordAtelierBody',
               'No words match this search in this collection.',
               style: TextStyle(color: Color(0x8CFFFFFF), fontSize: 12),
             ),
@@ -305,7 +306,7 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
           ),
         ),
         const SizedBox(height: 16),
-        const Text(
+        const EditableLabel('word_atelier.WordAtelierBody',
           'YOUR WORD LIBRARY',
           style: TextStyle(
               fontSize: 10,
@@ -314,7 +315,7 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
               color: NwsbColors.gold),
         ),
         const SizedBox(height: 6),
-        const Text(
+        const EditableLabel('word_atelier.WordAtelierBody',
           'Every word carries a vibrational signature.',
           style: TextStyle(fontSize: 13, color: Color(0x99FFFFFF)),
         ),

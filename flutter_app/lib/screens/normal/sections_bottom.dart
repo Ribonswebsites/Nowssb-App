@@ -24,6 +24,7 @@ import '../../theme/tokens.dart';
 import '../../widgets/home_parts.dart';
 import '../../widgets/neu_wrap.dart';
 import '../../widgets/tv_frame.dart';
+import '../../admin/template/editable.dart';
 
 /// 15 · connect — index.html:1377. `.nmh-connect-sec` on the slim portrait
 /// tablet: the clip, the scrim, the mark, the wordmark, the paragraph and
@@ -70,6 +71,7 @@ class NmConnect extends StatelessWidget {
                       fit: BoxFit.contain,
                       fallback: Icon(Icons.people_outline,
                           size: 24, color: NwsbColors.goldLight),
+                          slot: 'normal_sections_bottom.NmConnect',
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -123,7 +125,7 @@ class NmConnect extends StatelessWidget {
                         child: const Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text(
+                            EditableLabel('normal_sections_bottom.NmConnect',
                               'Enter Connect',
                               style: TextStyle(
                                 fontSize: 12,
@@ -202,6 +204,7 @@ class NmTrendShop extends StatelessWidget {
               child: NwsbVideo(
                 asset: 'assets/video/store-banner-fash.mp4',
                 priority: ClipPriority.decoration,
+                slot: 'normal_sections_bottom.NmTrendShop',
               ),
             ),
           ),
@@ -273,7 +276,7 @@ class NmTrendShop extends StatelessWidget {
                       Icon(Icons.shopping_cart_outlined,
                           size: 15, color: NwsbColors.ink),
                       SizedBox(width: 7),
-                      Text(
+                      EditableLabel('normal_sections_bottom.NmTrendShop',
                         'Shop Now',
                         style: TextStyle(
                           fontSize: 12.5,
@@ -310,7 +313,7 @@ class NmFashionSwitch extends StatelessWidget {
           const Row(children: [
             _FashionCircle(size: 44, icon: Icons.auto_awesome_rounded),
             SizedBox(width: 14),
-            Expanded(child: Text('Discover the experience', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, letterSpacing: .2, color: Color(0xFF2B2F3A)))),
+            Expanded(child: EditableLabel('normal_sections_bottom.NmFashionSwitch', 'Discover the experience', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, letterSpacing: .2, color: Color(0xFF2B2F3A)))),
           ]),
           const Padding(padding: EdgeInsets.fromLTRB(4, 18, 4, 18), child: Divider(height: 1, thickness: 1, color: Color(0x1F2B2F3A))),
           GestureDetector(
@@ -327,7 +330,7 @@ class NmFashionSwitch extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
+                    EditableLabel('normal_sections_bottom.NmFashionSwitch',
                       'EXPERIENCE',
                       style: TextStyle(
                         fontSize: 10,
@@ -337,7 +340,7 @@ class NmFashionSwitch extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 4),
-                    Text(
+                    EditableLabel('normal_sections_bottom.NmFashionSwitch',
                       'Fashion Mode',
                       style: TextStyle(
                         fontSize: 18,
@@ -347,7 +350,7 @@ class NmFashionSwitch extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 3),
-                    Text(
+                    EditableLabel('normal_sections_bottom.NmFashionSwitch',
                       'Dark · Cinematic · Editorial',
                       style: TextStyle(
                         fontSize: 12,

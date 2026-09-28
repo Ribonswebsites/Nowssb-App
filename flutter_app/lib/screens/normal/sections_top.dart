@@ -31,6 +31,7 @@ import '../../widgets/neumorphic.dart';
 import '../../widgets/black_glass_banner.dart';
 import '../start_today_carousel.dart';
 import '../streak_store_carousel.dart';
+import '../../admin/template/editable.dart';
 
 const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
 
@@ -97,7 +98,7 @@ class NmGreeting extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 2),
-                const Text(
+                const EditableLabel('normal_sections_top.NmGreeting',
                   "Ready for today's healing practice?",
                   style: TextStyle(fontSize: 12.5, color: NwsbColors.inkFaint),
                 ),
@@ -233,7 +234,7 @@ class NmStreakBody extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Text(
+        const EditableLabel('normal_sections_top.NmStreakBody',
           'Start Building Your Streak Today',
           style: TextStyle(
             fontSize: 21,
@@ -244,7 +245,7 @@ class NmStreakBody extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 6),
-        const Text(
+        const EditableLabel('normal_sections_top.NmStreakBody',
           'Practice daily to keep it alive — and unlock exclusive offers',
           style: TextStyle(
             fontSize: 13,
@@ -287,7 +288,7 @@ class NmStreakBody extends StatelessWidget {
                       height: 1,
                     ),
                   ),
-                  const Text(
+                  const EditableLabel('normal_sections_top.NmStreakBody',
                     'day streak',
                     style: TextStyle(fontSize: 11, color: NwsbColors.inkFaint),
                   ),
@@ -296,7 +297,7 @@ class NmStreakBody extends StatelessWidget {
               const Spacer(),
               const SizedBox(width: 10),
               const Flexible(
-                child: Text(
+                child: EditableLabel('normal_sections_top.NmStreakBody',
                   'KEEP GOING',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -529,6 +530,7 @@ class _NmPromoDiscState extends State<NmPromoDisc>
                                         size: 22,
                                         color: Color(0xB3FFFFFF),
                                       ),
+                                      slot: 'normal_sections_top.NmPromoDisc',
                                     ),
                                   ),
                                 ),
@@ -599,8 +601,9 @@ class NmPractice extends StatelessWidget {
                 asset: practiceVid,
                 priority: ClipPriority.feature,
                 fit: BoxFit.cover,
+                slot: 'normal_sections_top.NmPractice',
               )
-            : const NwsbImage(url: practiceStill);
+            : const NwsbImage(url: practiceStill, slot: 'normal_sections_top.NmPractice');
         return GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
@@ -628,7 +631,7 @@ class NmPractice extends StatelessWidget {
                 const Positioned(
                   left: 16,
                   top: 14,
-                  child: Text(
+                  child: EditableLabel('normal_sections_top.NmPractice',
                     "TODAY'S PRACTICE",
                     style: TextStyle(
                       fontSize: 11,
@@ -649,6 +652,7 @@ class NmPractice extends StatelessWidget {
                       fit: BoxFit.contain,
                       fallback: Icon(Icons.headphones,
                           color: Color(0xFFE8D5A3), size: 28),
+                          slot: 'normal_sections_top.NmPractice',
                     ),
                   ),
                 ),
@@ -749,7 +753,7 @@ class NmTiles extends StatelessWidget {
             const Icon(Icons.chevron_left, size: 15, color: NwsbColors.gold),
             const SizedBox(width: 6),
             const Flexible(
-              child: Text(
+              child: EditableLabel('normal_sections_top.NmTiles',
                 'Tap to restyle',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -760,7 +764,7 @@ class NmTiles extends StatelessWidget {
             Container(width: 1, height: 14, color: const Color(0x1A000000)),
             const SizedBox(width: 10),
             const Flexible(
-              child: Text(
+              child: EditableLabel('normal_sections_top.NmTiles',
                 'Begin your healing',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -826,6 +830,7 @@ class _NmTile extends StatelessWidget {
             NwsbImage(
               url: cover,
               fallback: const ColoredBox(color: NwsbColors.surface),
+              slot: 'normal_sections_top.NmTile',
             ),
             // `.nmh-tile-cover-scrim` — the art is a wash behind the words,
             // not a photograph in front of them.
@@ -857,7 +862,7 @@ class _NmTile extends StatelessWidget {
                   Container(
                       height: 1, width: 26, color: const Color(0x1A000000)),
                   const SizedBox(height: 9),
-                  Text(
+                  EditableLabel('normal_sections_top.NmTile',
                     title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -868,7 +873,7 @@ class _NmTile extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 2),
-                  Text(
+                  EditableLabel('normal_sections_top.NmTile',
                     sub,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -906,7 +911,7 @@ class NmStore extends StatelessWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  const NwsbVideo(asset: 'assets/video/store-section.mp4'),
+                  const NwsbVideo(asset: 'assets/video/store-section.mp4', slot: 'normal_sections_top.NmStore'),
                   const DecoratedBox(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
@@ -926,7 +931,7 @@ class NmStore extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        const EditableLabel('normal_sections_top.NmStore',
                           'Shabdapathy · Collections',
                           style: TextStyle(
                             fontSize: 10.5,
@@ -1000,7 +1005,7 @@ class NmStore extends StatelessWidget {
                           child: const Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(
+                              EditableLabel('normal_sections_top.NmStore',
                                 'Explore Store',
                                 style: TextStyle(
                                   fontSize: 13,
@@ -1055,11 +1060,12 @@ class NmReader extends StatelessWidget {
                 poster: 'assets/video/reader-section-poster.webp',
                 priority: ClipPriority.decoration,
                 fit: BoxFit.cover,
+                slot: 'normal_sections_top.NmReader',
               ),
             ),
           ),
         ),
-        const Text(
+        const EditableLabel('normal_sections_top.NmReader',
           'NowssB',
           style: TextStyle(fontSize: 14, color: NwsbColors.inkSoft),
         ),
@@ -1074,7 +1080,7 @@ class NmReader extends StatelessWidget {
             letterSpacing: -0.5,
           ),
         ),
-        const Text(
+        const EditableLabel('normal_sections_top.NmReader',
           'Read every meaning, and every eBook.',
           style: TextStyle(fontSize: 13, color: NwsbColors.inkSoft),
         ),
@@ -1119,6 +1125,7 @@ class NmTrending extends StatelessWidget {
                         'assets/video/7e4d709136dc254a_grok_video_2026-07-18-15-53-02_ubjx5b.mp4',
                     priority: ClipPriority.decoration,
                     fit: BoxFit.cover,
+                    slot: 'normal_sections_top.NmTrending',
                   ),
                   const DecoratedBox(
                     decoration: BoxDecoration(
@@ -1181,7 +1188,7 @@ class NmCustomize extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
+                  EditableLabel('normal_sections_top.NmCustomize',
                     'Customize',
                     style: TextStyle(
                       fontSize: 17,
@@ -1189,7 +1196,7 @@ class NmCustomize extends StatelessWidget {
                       color: NwsbColors.ink,
                     ),
                   ),
-                  Text(
+                  EditableLabel('normal_sections_top.NmCustomize',
                     'Make this home yours',
                     style: TextStyle(fontSize: 12, color: NwsbColors.inkFaint),
                   ),

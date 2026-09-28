@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../media/nwsb_image.dart';
 import '../theme/player_aura.dart';
+import '../admin/template/editable.dart';
 
 /// Same rotating stills as `PI_ART` in app/js/part004.js.
 const kPlayerIntroArt = <String>[
@@ -126,6 +127,7 @@ class _PlayerIntroScreenState extends State<PlayerIntroScreen> {
               url: _art!,
               fit: BoxFit.cover,
               fallback: const ColoredBox(color: Color(0xFF060C18)),
+              slot: 'player_intro.PlayerIntroScreen',
             ),
           const DecoratedBox(
             decoration: BoxDecoration(
@@ -153,7 +155,7 @@ class _PlayerIntroScreenState extends State<PlayerIntroScreen> {
                     children: [
                       PlayerAuraBackButton(onTap: widget.onBack),
                       const Spacer(),
-                      Text(
+                      EditableLabel('player_intro.PlayerIntroScreen',
                         'NOWSSB',
                         style: playerAuraText(
                           size: 9,
@@ -228,7 +230,7 @@ class _PlayerIntroScreenState extends State<PlayerIntroScreen> {
                         child: const Padding(
                           padding:
                               EdgeInsets.symmetric(horizontal: 8, vertical: 15),
-                          child: Text(
+                          child: EditableLabel('player_intro.PlayerIntroScreen',
                             'SKIP',
                             style: TextStyle(
                               color: Color(0x73FFFFFF),
@@ -253,7 +255,7 @@ class _PlayerIntroScreenState extends State<PlayerIntroScreen> {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(
+                                EditableLabel('player_intro.PlayerIntroScreen',
                                   'BEGIN',
                                   style: TextStyle(
                                     color: Color(0xFF060C18),

@@ -44,6 +44,12 @@ dependencies:
   file_picker: ^8.1.4
   flutter_thinking_orbs: ^0.1.0
   sensors_plus: ^6.1.1
+  # Admin mode (lib/admin): a word's own recording plays with just_audio and
+  # is kept on the phone by flutter_cache_manager (also what caches template
+  # pictures/clips replaced from the live template editor). Media lives on
+  # Cloudflare R2 — see functions/api/admin/upload-url.js.
+  just_audio: ^0.9.46
+  flutter_cache_manager: ^3.4.1
 
 dependency_overrides:
   # record 5.2.1's broad Linux constraint otherwise resolves to 0.7.2,

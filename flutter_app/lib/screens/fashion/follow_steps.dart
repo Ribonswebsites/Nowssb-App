@@ -35,6 +35,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/tokens.dart';
 import '../../widgets/nwsb_icon.dart';
+import '../../admin/template/editable.dart';
 
 /// The guide's own marks — part084.js:50-63.
 ///
@@ -683,7 +684,7 @@ class FstTitle extends StatelessWidget {
             ),
           ),
           SizedBox(height: 8),
-          Text(
+          EditableLabel('follow_steps.FstTitle',
             'Follow the steps',
             style: TextStyle(
               fontSize: 11,

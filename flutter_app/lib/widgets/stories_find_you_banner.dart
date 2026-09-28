@@ -10,6 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'glass_wrap.dart';
 import 'neumorphic.dart';
 import '../theme/tokens.dart';
+import '../admin/template/editable.dart';
 
 class StoriesFindYouBanner extends StatelessWidget {
   const StoriesFindYouBanner({
@@ -75,7 +76,7 @@ class StoriesFindYouBanner extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
+                    EditableLabel('stories_find_you_banner.StoriesFindYouBanner',
                       'SOUND\nTHAT\nFINDS YOU',
                       style: GoogleFonts.anton(
                         color: _ink,
@@ -84,7 +85,7 @@ class StoriesFindYouBanner extends StatelessWidget {
                         letterSpacing: 0.2,
                       ),
                     ),
-                    Text(
+                    EditableLabel('stories_find_you_banner.StoriesFindYouBanner',
                       'There are no limitations to the\nfrequency at NowssB.',
                       style: GoogleFonts.libreBaskerville(
                         color: Colors.white,
@@ -290,11 +291,12 @@ class _Book extends StatelessWidget {
   }
 
   Widget _photo({Alignment alignment = const Alignment(0, -0.55)}) {
-    return Image.asset(
+    return EditableImage.asset(
       spec.image,
       fit: BoxFit.cover,
       alignment: alignment,
       errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+      slot: 'stories_find_you_banner.Book',
     );
   }
 }

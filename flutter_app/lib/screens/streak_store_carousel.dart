@@ -187,6 +187,7 @@ class _VideoBannerCard extends StatelessWidget {
                   asset: asset,
                   priority: priority,
                   fit: BoxFit.cover,
+                  slot: 'streak_store_carousel.VideoBannerCard',
                 ),
               ),
             ),

@@ -13,6 +13,7 @@ import 'package:flutter/services.dart';
 import '../data/notifications.dart';
 import '../theme/tokens.dart';
 import 'notifications_settings.dart';
+import '../admin/template/editable.dart';
 
 Future<void> showNotificationsSheet(BuildContext context) {
   HapticFeedback.lightImpact();
@@ -178,7 +179,7 @@ class _SheetHead extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                const EditableLabel('notifications_sheet.SheetHead',
                   'Notifications',
                   style: TextStyle(
                     fontSize: 17,
@@ -188,7 +189,7 @@ class _SheetHead extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 3),
-                Text(
+                EditableLabel('notifications_sheet.SheetHead',
                   subtitle,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -273,7 +274,7 @@ class _SheetFoot extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: const Color(0x21FFFFFF)),
                 ),
-                child: const Text(
+                child: const EditableLabel('notifications_sheet.SheetFoot',
                   'CLEAR ALL',
                   style: TextStyle(
                     fontSize: 10,
@@ -298,7 +299,7 @@ class _SheetFoot extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: Colors.white),
                 ),
-                child: const Text(
+                child: const EditableLabel('notifications_sheet.SheetFoot',
                   'MANAGE',
                   style: TextStyle(
                     fontSize: 10,

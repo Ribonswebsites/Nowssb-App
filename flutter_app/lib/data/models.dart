@@ -80,6 +80,10 @@ class Word {
     required this.time,
     required this.price,
     required this.img,
+    this.audio = '',
+    this.description = '',
+    this.meanings = const [],
+    this.stage = '',
   });
 
   final String key;
@@ -108,6 +112,64 @@ class Word {
 
   final num price;
   final String img;
+
+  /// The one recording of this word, uploaded from admin mode (Cloudflare
+  /// R2). Empty means the app falls back to text-to-speech.
+  final String audio;
+
+  /// A longer write-up than [meaning], from admin mode. Optional.
+  final String description;
+
+  /// Several short meanings, from admin mode. Optional.
+  final List<String> meanings;
+
+  /// An optional per-word stage label. Stored, not used by the user flow —
+  /// stages are still worked out from practice minutes.
+  final String stage;
+
+  /// The recording to play: this word's own voice first, then the older
+  /// male/female fields the studio used to fill.
+  String get voice => audio.isNotEmpty
+      ? audio
+      : (audioMale.isNotEmpty ? audioMale : audioFemale);
+
+  /// The same shape [from] reads, for the admin editor and the cache.
+  Map<String, dynamic> toMap() => {
+        'key': key,
+        'word': word,
+        'deva': deva,
+        'translit': translit,
+        'phonetic': phonetic,
+        'parts': [
+          for (final p in parts)
+            {
+              'roman': p.roman,
+              'deva': p.deva,
+              'hold': p.hold,
+              'say': p.say,
+              'audio': p.audio,
+            }
+        ],
+        'audioMale': audioMale,
+        'audioFemale': audioFemale,
+        'organ': organ,
+        'origin': origin,
+        'benefit': benefit,
+        'meaning': meaning,
+        'mouthPos': mouthPos,
+        'resonance': resonance,
+        'mistake': mistake,
+        'tip': tip,
+        'categories': categories,
+        'gender': gender,
+        'time': time,
+        'price': price,
+        'img': img,
+        'audio': audio,
+        'description': description,
+        'meanings': meanings,
+        'stage': stage,
+      };
 
   /// Kept in step with [parts], the way part073.js keeps `syllables` filled
   /// from `parts` so every screen that already drew syllables keeps working.
@@ -174,6 +236,15 @@ class Word {
           : 'any',
       price: _num(raw['price']),
       img: _str(raw['img']),
+      audio: _str(raw['audio']),
+      description: _str(raw['description']),
+      meanings: raw['meanings'] is List
+          ? (raw['meanings'] as List)
+              .map((m) => '$m'.trim())
+              .where((m) => m.isNotEmpty)
+              .toList()
+          : const [],
+      stage: _str(raw['stage']),
     );
   }
 }

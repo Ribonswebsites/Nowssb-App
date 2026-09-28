@@ -9,6 +9,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import '../data/firebase.dart';
 import '../widgets/login_gallery.dart';
 import '../widgets/nwsb_icon.dart';
+import '../admin/template/editable.dart';
 
 class NwsbSignInPage extends StatefulWidget {
   const NwsbSignInPage({super.key});
@@ -121,13 +122,13 @@ class _NwsbSignInPageState extends State<NwsbSignInPage> {
                   icon: const NwsbIcon(NwsbMarks.house, color: Colors.white),
                 ),
               ),
-              const Text(
+              const EditableLabel('nwsb_sign_in_sheet.NwsbSignInPage',
                 'Sign in to NowssB',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 8),
-              const Text(
+              const EditableLabel('nwsb_sign_in_sheet.NwsbSignInPage',
                 'You come straight back to this page.',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.white70),
@@ -164,7 +165,7 @@ class _NwsbSignInPageState extends State<NwsbSignInPage> {
                   _showPhone = false;
                   _error = null;
                 }),
-                child: const Text('Continue with Email'),
+                child: const EditableLabel('nwsb_sign_in_sheet.NwsbSignInPage', 'Continue with Email'),
               ),
               if (_showEmail) ...[
                 const SizedBox(height: 8),
@@ -174,7 +175,7 @@ class _NwsbSignInPageState extends State<NwsbSignInPage> {
                 Row(
                   children: [
                     Checkbox(value: _create, onChanged: (v) => setState(() => _create = v == true)),
-                    const Text('Create account', style: TextStyle(color: Colors.white70)),
+                    const EditableLabel('nwsb_sign_in_sheet.NwsbSignInPage', 'Create account', style: TextStyle(color: Colors.white70)),
                   ],
                 ),
                 FilledButton(
@@ -202,7 +203,7 @@ class _NwsbSignInPageState extends State<NwsbSignInPage> {
                   _showEmail = false;
                   _error = null;
                 }),
-                child: const Text('Continue with Phone'),
+                child: const EditableLabel('nwsb_sign_in_sheet.NwsbSignInPage', 'Continue with Phone'),
               ),
               if (_showPhone) ...[
                 const SizedBox(height: 8),

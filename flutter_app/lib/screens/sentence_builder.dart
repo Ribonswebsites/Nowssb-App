@@ -22,6 +22,7 @@ import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import '../widgets/app_thinking_loader.dart';
 import 'store.dart';
 import 'store/word_atelier.dart';
+import '../admin/template/editable.dart';
 
 /// Subconscious tier → max words selectable when combining.
 /// Starts at 2 (free); highest tier caps at 6.
@@ -183,7 +184,7 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
     HapticFeedback.selectionClick();
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Listen opens from your owned words in Practice.'),
+        content: EditableLabel('sentence_builder.SentenceBuilderScreen', 'Listen opens from your owned words in Practice.'),
         behavior: SnackBarBehavior.floating,
         duration: Duration(seconds: 2),
       ),
@@ -273,7 +274,7 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
                       _RoundBack(onTap: () => Navigator.of(context).maybePop()),
                       const SizedBox(width: 12),
                       const Expanded(
-                        child: Text(
+                        child: EditableLabel('sentence_builder.SentenceBuilderScreen',
                           'Sentence',
                           style: TextStyle(
                             color: Colors.white,
@@ -352,7 +353,7 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
                       // 2) Heading BELOW the black banner
                       const Padding(
                         padding: EdgeInsets.fromLTRB(4, 10, 4, 12),
-                        child: Text(
+                        child: EditableLabel('sentence_builder.SentenceBuilderScreen',
                           'Building your sentence',
                           style: TextStyle(
                             color: Colors.white,
@@ -398,7 +399,7 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Text(
+                                          EditableLabel('sentence_builder.SentenceBuilderScreen',
                                             'Combine studio',
                                             style: TextStyle(
                                               color: Colors.white,
@@ -407,7 +408,7 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
                                             ),
                                           ),
                                           SizedBox(height: 2),
-                                          Text(
+                                          EditableLabel('sentence_builder.SentenceBuilderScreen',
                                             'Pick words · weave · speak as one breath',
                                             style: TextStyle(
                                               color: Color(0x8CFFFFFF),
@@ -501,7 +502,7 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
                                         ),
                                         const SizedBox(height: 14),
                                         if (active.isEmpty)
-                                          const Text(
+                                          const EditableLabel('sentence_builder.SentenceBuilderScreen',
                                             'No words in this pool yet.',
                                             style: TextStyle(
                                               color: Color(0x73FFFFFF),
@@ -527,7 +528,7 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
                                                               context)
                                                           .showSnackBar(
                                                         const SnackBar(
-                                                          content: Text(
+                                                          content: EditableLabel('sentence_builder.SentenceBuilderScreen',
                                                               'Unlock this word in the Store to combine it.'),
                                                           behavior:
                                                               SnackBarBehavior
@@ -609,7 +610,7 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
                                                             ),
                                                             const SizedBox(
                                                                 width: 10),
-                                                            Text(
+                                                            EditableLabel('sentence_builder.SentenceBuilderScreen',
                                                               'Combine into sentence',
                                                               style: TextStyle(
                                                                 color: enabled
@@ -655,7 +656,7 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          const Text(
+                                          const EditableLabel('sentence_builder.SentenceBuilderScreen',
                                             'YOUR SENTENCE',
                                             style: TextStyle(
                                               color: Color(0xFFE8D5A3),
@@ -686,7 +687,7 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
                                                 borderRadius:
                                                     BorderRadius.circular(14),
                                               ),
-                                              child: const Text(
+                                              child: const EditableLabel('sentence_builder.SentenceBuilderScreen',
                                                 'Rewrite and Request',
                                                 style: TextStyle(
                                                   color: Color(0xFF0A0A12),
@@ -713,7 +714,7 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
                             builder: (_) => const StoreScreen(),
                           ),
                         ),
-                        child: const Text(
+                        child: const EditableLabel('sentence_builder.SentenceBuilderScreen',
                           'Open full Store',
                           style: TextStyle(color: Color(0xB8FFFFFF)),
                         ),
@@ -770,7 +771,7 @@ class _WordPoolTab extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                EditableLabel('sentence_builder.WordPoolTab',
                   label,
                   style: TextStyle(
                     color: selected ? Colors.white : const Color(0xB8FFFFFF),
@@ -830,7 +831,7 @@ class _ActionRow extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              EditableLabel('sentence_builder.ActionRow',
                 title,
                 style: const TextStyle(
                   color: Colors.white,
@@ -839,7 +840,7 @@ class _ActionRow extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 2),
-              Text(
+              EditableLabel('sentence_builder.ActionRow',
                 sub,
                 style: const TextStyle(
                   color: Color(0x73FFFFFF),
@@ -923,7 +924,7 @@ class _RequestCustomSheetState extends State<_RequestCustomSheet> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  const EditableLabel('sentence_builder.RequestCustomSheet',
                     'Describe the words you need',
                     style: TextStyle(
                       color: Colors.white,
@@ -971,7 +972,7 @@ class _RequestCustomSheetState extends State<_RequestCustomSheet> {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Text(
+                child: const EditableLabel('sentence_builder.RequestCustomSheet',
                   'Rewrite and Request',
                   style: TextStyle(
                     color: Color(0xFF0A0A12),
@@ -1052,7 +1053,7 @@ class _WordChip extends StatelessWidget {
                     : const Color(0x33FFFFFF),
           ),
         ),
-        child: Text(
+        child: EditableLabel('sentence_builder.WordChip',
           label,
           style: TextStyle(
             color: selected

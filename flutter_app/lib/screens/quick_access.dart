@@ -17,6 +17,7 @@ import '../theme/tokens.dart';
 import '../widgets/app_backdrop.dart';
 import '../widgets/app_thinking_loader.dart';
 import '../widgets/tv_frame.dart';
+import '../admin/template/editable.dart';
 
 class QuickAccessScreen extends StatefulWidget {
   const QuickAccessScreen({super.key});
@@ -200,7 +201,7 @@ class _QuickAccessScreenState extends State<QuickAccessScreen> {
     );
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Applied to your nav ✓')),
+      const SnackBar(content: EditableLabel('quick_access.QuickAccessScreen', 'Applied to your nav ✓')),
     );
   }
 
@@ -242,6 +243,7 @@ class _QuickAccessScreenState extends State<QuickAccessScreen> {
                   autoplay: true,
                   loop: true,
                   showPoster: true,
+                  slot: 'quick_access.QuickAccessScreen',
                 ),
               ),
             ),
@@ -258,7 +260,7 @@ class _QuickAccessScreenState extends State<QuickAccessScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
+                            EditableLabel('quick_access.QuickAccessScreen',
                               'CUSTOMIZE YOUR NAVIGATION',
                               style: TextStyle(
                                 color: NwsbColors.mist,
@@ -268,7 +270,7 @@ class _QuickAccessScreenState extends State<QuickAccessScreen> {
                               ),
                             ),
                             SizedBox(height: 8),
-                            Text(
+                            EditableLabel('quick_access.QuickAccessScreen',
                               'Quick access',
                               style: TextStyle(
                                 color: Colors.white,
@@ -278,7 +280,7 @@ class _QuickAccessScreenState extends State<QuickAccessScreen> {
                               ),
                             ),
                             SizedBox(height: 6),
-                            Text(
+                            EditableLabel('quick_access.QuickAccessScreen',
                               'Reshape your bottom navigation — shape, colour, and the icons it shows.',
                               style: TextStyle(
                                 color: Colors.white60,
@@ -296,7 +298,7 @@ class _QuickAccessScreenState extends State<QuickAccessScreen> {
                                 ),
                                 SizedBox(width: 12),
                                 Expanded(
-                                  child: Text(
+                                  child: EditableLabel('quick_access.QuickAccessScreen',
                                     'Live preview updates as you pick tiles',
                                     style: TextStyle(
                                       color: Color(0xCCFFFFFF),
@@ -381,7 +383,7 @@ class _QuickAccessScreenState extends State<QuickAccessScreen> {
                             _SecLabel(
                                 'In your nav · ${slots.length} / $maxSlots'),
                             const SizedBox(height: 8),
-                            const Text(
+                            const EditableLabel('quick_access.QuickAccessScreen',
                               'Up to five destinations plus a + slot. Tap a black tile to remove it. Tap + to open the available set in a separate panel.',
                               style: TextStyle(
                                 color: Colors.white54,
@@ -417,12 +419,12 @@ class _QuickAccessScreenState extends State<QuickAccessScreen> {
                                       foregroundColor: Colors.white70,
                                       visualDensity: VisualDensity.compact,
                                     ),
-                                    child: const Text('Close'),
+                                    child: const EditableLabel('quick_access.QuickAccessScreen', 'Close'),
                                   ),
                                 ],
                               ),
                               const SizedBox(height: 6),
-                              const Text(
+                              const EditableLabel('quick_access.QuickAccessScreen',
                                 'Pick a feature to fill the + slot.',
                                 style: TextStyle(
                                   color: Colors.white54,
@@ -448,7 +450,7 @@ class _QuickAccessScreenState extends State<QuickAccessScreen> {
                         child: ElevatedButton.icon(
                           onPressed: _apply,
                           icon: const Icon(Icons.check),
-                          label: const Text('Apply Changes'),
+                          label: const EditableLabel('quick_access.QuickAccessScreen', 'Apply Changes'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: NwsbColors.goldLight,
                             foregroundColor: NwsbColors.deep,
@@ -485,7 +487,7 @@ class _TopBar extends StatelessWidget {
             icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
           ),
           const Expanded(
-            child: Text(
+            child: EditableLabel('quick_access.TopBar',
               'Quick access',
               textAlign: TextAlign.center,
               style: TextStyle(
@@ -497,7 +499,7 @@ class _TopBar extends StatelessWidget {
           ),
           TextButton(
             onPressed: onReset,
-            child: const Text(
+            child: const EditableLabel('quick_access.TopBar',
               'Reset',
               style: TextStyle(color: NwsbColors.goldLight),
             ),
@@ -743,7 +745,7 @@ class _BlackTile extends StatelessWidget {
                   children: [
                     _NetIcon(img, 22),
                     const SizedBox(height: 4),
-                    Text(
+                    EditableLabel('quick_access.BlackTile',
                       label,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -760,7 +762,7 @@ class _BlackTile extends StatelessWidget {
             Positioned(
               top: 4,
               right: 6,
-              child: Text(
+              child: EditableLabel('quick_access.BlackTile',
                 badge,
                 style: const TextStyle(
                   color: NwsbColors.goldLight,
@@ -801,7 +803,7 @@ class _PlusTile extends StatelessWidget {
           children: [
             Icon(Icons.add_rounded, color: NwsbColors.goldLight, size: 26),
             SizedBox(height: 2),
-            Text(
+            EditableLabel('quick_access.PlusTile',
               'Add',
               style: TextStyle(
                 color: NwsbColors.goldLight,
@@ -862,7 +864,7 @@ class _FeatureGrid extends StatelessWidget {
     if (ids.isEmpty) {
       return const Padding(
         padding: EdgeInsets.symmetric(vertical: 8),
-        child: Text(
+        child: EditableLabel('quick_access.FeatureGrid',
           'All features are in your nav',
           style: TextStyle(color: Colors.white38, fontSize: 12),
         ),

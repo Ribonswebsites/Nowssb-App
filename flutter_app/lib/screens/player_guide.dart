@@ -14,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../media/nwsb_image.dart';
 import '../media/onboarding_warmup.dart';
+import '../admin/template/editable.dart';
 
 const kPlayerGuideSeenKey = 'nwsb_player_guide_seen';
 
@@ -221,6 +222,7 @@ class _PlayerGuideScreenState extends State<PlayerGuideScreen> {
                             fit: BoxFit.cover,
                             alignment: Alignment.topCenter,
                             fallback: const ColoredBox(color: _navy),
+                            slot: 'player_guide.PlayerGuideScreen',
                           ),
                           const DecoratedBox(
                             decoration: BoxDecoration(
@@ -294,7 +296,7 @@ class _PlayerGuideScreenState extends State<PlayerGuideScreen> {
                                           color: Colors.white,
                                         ),
                                         const SizedBox(width: 8),
-                                        Text(
+                                        EditableLabel('player_guide.PlayerGuideScreen',
                                           'Try it now',
                                           style: _dm(
                                             size: 14,
@@ -396,6 +398,7 @@ class _PlayerGuideScreenState extends State<PlayerGuideScreen> {
                               child: NwsbImage(
                                 url: _slide.icon,
                                 fit: BoxFit.cover,
+                                slot: 'player_guide.PlayerGuideScreen',
                               ),
                             ),
                           ],
@@ -465,7 +468,7 @@ class _PlayerGuideScreenState extends State<PlayerGuideScreen> {
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Text(
+                                      EditableLabel('player_guide.PlayerGuideScreen',
                                         'Begin',
                                         style: _dm(
                                           size: 14,

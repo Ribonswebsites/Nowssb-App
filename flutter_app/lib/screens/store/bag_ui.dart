@@ -12,16 +12,18 @@ import '../../theme/tokens.dart';
 import '../../widgets/nwsb_icon.dart';
 import 'cart_pages.dart';
 import 'store_cards.dart';
+import '../../admin/template/editable.dart';
 
 enum BagKind { cart, wishlist }
 
 Widget bagThumb(String src, {double size = 46}) {
   Widget child;
   if (src.startsWith('assets/')) {
-    child = Image.asset(
+    child = EditableImage.asset(
       src,
       fit: BoxFit.cover,
       errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black),
+      slot: 'bag_ui.shared',
     );
   } else if (src.startsWith('http://') || src.startsWith('https://')) {
     child = CachedNetworkImage(
@@ -324,7 +326,7 @@ class _SheetHead extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                EditableLabel('bag_ui.SheetHead',
                   title,
                   style: const TextStyle(
                     fontSize: 17,
@@ -334,7 +336,7 @@ class _SheetHead extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 3),
-                Text(
+                EditableLabel('bag_ui.SheetHead',
                   subtitle,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

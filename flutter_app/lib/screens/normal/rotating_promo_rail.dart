@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/tokens.dart';
 import '../../widgets/nwsb_icon.dart';
+import '../../admin/template/editable.dart';
 
 /// Shared card height for grid and every expanded row.
 const double kRhythmCardHeight = 146;
@@ -95,7 +96,7 @@ class _NormalPromoRailState extends State<NormalPromoRail>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          const EditableLabel('rotating_promo_rail.NormalPromoRail',
             'More ways to keep your rhythm',
             style: TextStyle(
               color: NwsbColors.inkSoft,
@@ -380,7 +381,7 @@ class _IconDisc extends StatelessWidget {
                 ],
               ),
               child: Center(
-                child: Image.asset(
+                child: EditableImage.asset(
                   icon,
                   width: 32,
                   height: 32,
@@ -390,6 +391,7 @@ class _IconDisc extends StatelessWidget {
                     color: Colors.white,
                     size: 32,
                   ),
+                  slot: 'rotating_promo_rail.IconDisc',
                 ),
               ),
             ),

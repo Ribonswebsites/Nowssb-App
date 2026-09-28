@@ -4,6 +4,7 @@ library;
 import 'package:flutter/material.dart';
 
 import 'glassmorphism_theme.dart';
+import '../../admin/template/editable.dart';
 
 class NmSuppliedActionBar extends StatelessWidget {
   const NmSuppliedActionBar({
@@ -43,7 +44,7 @@ class NmSuppliedActionBar extends StatelessWidget {
               ),
               const SizedBox(width: 14),
               Expanded(
-                child: Text(
+                child: EditableLabel('neomorphic_action_bar.NmSuppliedActionBar',
                   'How can we help today?',
                   style: TextStyle(
                     fontSize: 20,
@@ -97,7 +98,7 @@ class NmSuppliedActionBar extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: Text(
+                  child: EditableLabel('neomorphic_action_bar.NmSuppliedActionBar',
                     'Personal Coach',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -138,7 +139,7 @@ class NmSuppliedActionBar extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
+                        EditableLabel('neomorphic_action_bar.NmSuppliedActionBar',
                           'Enter',
                           style: TextStyle(
                             fontSize: 15,

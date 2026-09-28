@@ -15,6 +15,7 @@ import '../../data/notifications.dart';
 import '../../data/settings.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/nwsb_icon.dart';
+import '../../admin/template/editable.dart';
 
 /// Blur / glass mark — not in [NwsbMarks]; drawn to match stroke style.
 const _kBlurMark =
@@ -467,7 +468,7 @@ class _SheetHead extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                EditableLabel('header_actions_sheet.SheetHead',
                   'Quick actions',
                   style: TextStyle(
                     fontSize: 17,
@@ -477,7 +478,7 @@ class _SheetHead extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 3),
-                Text(
+                EditableLabel('header_actions_sheet.SheetHead',
                   'Swipe · centre to open',
                   style: TextStyle(
                     fontSize: 11.5,
@@ -526,7 +527,7 @@ class _CenterLabel extends StatelessWidget {
     final i = itemCount <= 0 ? 0 : _wrapIndex(focus.round(), itemCount);
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 220),
-      child: Text(
+      child: EditableLabel('header_actions_sheet.CenterLabel',
         label,
         key: ValueKey('$i-$label-$glassOn'),
         textAlign: TextAlign.center,
@@ -891,7 +892,7 @@ class _CustomizeShortcutsSheetState extends State<_CustomizeShortcutsSheet> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  const Text(
+                  const EditableLabel('header_actions_sheet.CustomizeShortcutsSheet',
                     'Customize shortcuts',
                     textAlign: TextAlign.center,
                     style: TextStyle(
@@ -901,7 +902,7 @@ class _CustomizeShortcutsSheetState extends State<_CustomizeShortcutsSheet> {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
+                  const EditableLabel('header_actions_sheet.CustomizeShortcutsSheet',
                     'Choose up to 6 · Add stays at the end',
                     textAlign: TextAlign.center,
                     style: TextStyle(
@@ -939,7 +940,7 @@ class _CustomizeShortcutsSheetState extends State<_CustomizeShortcutsSheet> {
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
-                    child: const Text(
+                    child: const EditableLabel('header_actions_sheet.CustomizeShortcutsSheet',
                       'Save shortcuts',
                       style: TextStyle(fontWeight: FontWeight.w700),
                     ),

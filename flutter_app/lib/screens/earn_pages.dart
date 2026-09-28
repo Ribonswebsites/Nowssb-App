@@ -16,6 +16,7 @@ import '../data/models.dart';
 import '../data/practice_progress.dart';
 import '../theme/tokens.dart';
 import '../widgets/app_backdrop.dart';
+import '../admin/template/editable.dart';
 
 class EarnScreen extends StatelessWidget {
   const EarnScreen({super.key});
@@ -148,7 +149,7 @@ class EarnScreen extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
           children: [
-            const Text(
+            const EditableLabel('earn_pages.EarnScreen',
               'Buy a word',
               style: TextStyle(
                 color: Colors.white,
@@ -217,7 +218,7 @@ class EarnScreen extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
           children: [
-            const Text(
+            const EditableLabel('earn_pages.EarnScreen',
               'Buy a meaning',
               style: TextStyle(
                 color: Colors.white,
@@ -387,8 +388,8 @@ class _SellShopScreenState extends State<SellShopScreen> {
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('List')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const EditableLabel('earn_pages.SellShopScreen', 'Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const EditableLabel('earn_pages.SellShopScreen', 'List')),
         ],
       ),
     );
@@ -406,7 +407,7 @@ class _SellShopScreenState extends State<SellShopScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF0C1220),
-        title: const Text('Confirm sale', style: TextStyle(color: Colors.white)),
+        title: const EditableLabel('earn_pages.SellShopScreen', 'Confirm sale', style: TextStyle(color: Colors.white)),
         content: Text(
           'This removes ${listing.title} from your library and pays $cut coins '
           '(${EarnWallet.instance.commissionPercent}% of ${FxBook.instance.formatRupees(listing.price)}). '
@@ -414,8 +415,8 @@ class _SellShopScreenState extends State<SellShopScreen> {
           style: const TextStyle(color: Color(0xCCFFFFFF), height: 1.4),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Confirm sale')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const EditableLabel('earn_pages.SellShopScreen', 'Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const EditableLabel('earn_pages.SellShopScreen', 'Confirm sale')),
         ],
       ),
     );
@@ -611,7 +612,7 @@ class _NetworkScreenState extends State<NetworkScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    const EditableLabel('earn_pages.NetworkScreen',
                       'YOUR CODE',
                       style: TextStyle(
                         color: NwsbColors.gold,
@@ -890,7 +891,7 @@ class _BalanceCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          const Text(
+          const EditableLabel('earn_pages.BalanceCard',
             'NowssB Coins',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
           ),
@@ -1008,7 +1009,7 @@ class _PaySheetState extends State<_PaySheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          EditableLabel('earn_pages.PaySheet',
             widget.title,
             style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800),
           ),
@@ -1031,7 +1032,7 @@ class _PaySheetState extends State<_PaySheet> {
               style: const TextStyle(color: NwsbColors.goldLight),
             ),
           ),
-          const Text(
+          const EditableLabel('earn_pages.PaySheet',
             'The cash share is saved as an order. A real card or UPI charge needs Razorpay or Play Billing.',
             style: TextStyle(color: Color(0x99FFFFFF), fontSize: 12, height: 1.35),
           ),
@@ -1094,7 +1095,7 @@ class _EarnScaffold extends StatelessWidget {
                               fontWeight: FontWeight.w700,
                             ),
                           ),
-                          Text(
+                          EditableLabel('earn_pages.EarnScaffold',
                             title,
                             style: const TextStyle(
                               color: Colors.white,
@@ -1142,7 +1143,7 @@ class _Note extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
+    return EditableLabel('earn_pages.Note',
       text,
       style: const TextStyle(color: Color(0x99FFFFFF), fontSize: 12.5, height: 1.4),
     );
@@ -1155,7 +1156,7 @@ class _Eyebrow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
+    return EditableLabel('earn_pages.Eyebrow',
       text,
       style: const TextStyle(
         color: NwsbColors.gold,
@@ -1179,11 +1180,11 @@ class _Rate extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: Text(title, style: const TextStyle(color: Colors.white, fontSize: 13)),
+            child: EditableLabel('earn_pages.Rate', title, style: const TextStyle(color: Colors.white, fontSize: 13)),
           ),
           const SizedBox(width: 8),
           Flexible(
-            child: Text(
+            child: EditableLabel('earn_pages.Rate',
               detail,
               textAlign: TextAlign.end,
               style: const TextStyle(color: NwsbColors.goldLight, fontSize: 12),
@@ -1209,7 +1210,7 @@ class _GoldBtn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final labelWidget = Text(
+    final labelWidget = EditableLabel('earn_pages.GoldBtn',
       label,
       textAlign: TextAlign.center,
       style: TextStyle(

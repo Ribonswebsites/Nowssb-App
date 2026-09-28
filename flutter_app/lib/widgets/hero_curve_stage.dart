@@ -16,6 +16,7 @@ import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import '../screens/fashion/header.dart';
 import 'app_thinking_loader.dart';
 import 'glass_wrap.dart';
+import '../admin/template/editable.dart';
 
 const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
 
@@ -255,7 +256,7 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
                         0, 0, 1, 0, 0,
                         0, 0, 0, 2.2, 0,
                       ]),
-                      child: Image.asset(
+                      child: EditableImage.asset(
                         subject,
                         fit: BoxFit.contain,
                         alignment: Alignment.bottomCenter,
@@ -263,6 +264,7 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
                         gaplessPlayback: true,
                         errorBuilder: (_, __, ___) =>
                             const SizedBox.shrink(),
+                            slot: 'hero_curve_stage.HeroCurveStage',
                       ),
                     ),
                   ],
@@ -320,12 +322,13 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(9),
-                child: Image.asset(
+                child: EditableImage.asset(
                   asset,
                   fit: BoxFit.cover,
                   filterQuality: FilterQuality.medium,
                   errorBuilder: (_, __, ___) =>
                       const ColoredBox(color: Color(0xFF111111)),
+                      slot: 'hero_curve_stage.HeroCurveStage',
                 ),
               ),
             ),
@@ -431,7 +434,7 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
                             0, 0, 1, 0, 0,
                             0, 0, 0, 2.2, 0,
                           ]),
-                          child: Image.asset(
+                          child: EditableImage.asset(
                             subject,
                             fit: BoxFit.contain,
                             alignment: Alignment.bottomCenter,
@@ -439,6 +442,7 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
                             gaplessPlayback: true,
                             errorBuilder: (_, __, ___) =>
                                 const SizedBox.shrink(),
+                                slot: 'hero_curve_stage.HeroCurveStage',
                           ),
                         ),
                       ],
@@ -487,12 +491,13 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
                 ],
               ),
               clipBehavior: Clip.antiAlias,
-              child: Image.asset(
+              child: EditableImage.asset(
                 asset,
                 fit: BoxFit.cover,
                 filterQuality: FilterQuality.medium,
                 errorBuilder: (_, __, ___) =>
                     const ColoredBox(color: Color(0xFF111111)),
+                    slot: 'hero_curve_stage.HeroCurveStage',
               ),
             ),
           ),
@@ -512,7 +517,7 @@ class _CurveCopy extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
+          EditableLabel('hero_curve_stage.CurveCopy',
             '“With no weapon in his hand, the Enlightened and Brilliant Buddha ruled the world—not by the sword, but by the power of words.”',
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -552,7 +557,7 @@ class _HeroChrome extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Text(
+              const EditableLabel('hero_curve_stage.HeroChrome',
                 'NowssB.',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -583,7 +588,7 @@ class _HeroChrome extends StatelessWidget {
                     children: [
                       Icon(Icons.apps_rounded, size: 16, color: Colors.white),
                       SizedBox(width: 6),
-                      Text(
+                      EditableLabel('hero_curve_stage.HeroChrome',
                         'Quick action',
                         style: TextStyle(
                           color: Colors.white,

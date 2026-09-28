@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../admin/template/editable.dart';
 
 const _surveySeenKey = 'hasSeenPronunciationSurvey';
 const _purple = Color(0xFF8B5CF6);
@@ -307,7 +308,7 @@ class _PronunciationSurveySheetState extends State<PronunciationSurveySheet>
                         const Padding(
                           padding: EdgeInsets.only(top: 10),
                           child: Center(
-                            child: Text(
+                            child: EditableLabel('pronunciation_survey.PronunciationSurveySheet',
                               'Thank you for helping us improve.',
                               style: TextStyle(
                                   color: Colors.white70, fontSize: 12),

@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import 'nwsb_icon.dart';
+import '../admin/template/editable.dart';
 
 const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
 
@@ -87,11 +88,12 @@ class _FlipPortraitState extends State<FlipPortrait> with SingleTickerProviderSt
       fit: StackFit.expand,
       children: [
         ColoredBox(color: Colors.black),
-        Image.asset(
+        EditableImage.asset(
           asset,
           fit: BoxFit.contain,
           alignment: Alignment.bottomCenter,
           errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black),
+          slot: 'flip_portrait.FlipPortrait',
         ),
         if (widget.mark != null)
           Align(

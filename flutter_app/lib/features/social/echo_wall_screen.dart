@@ -11,6 +11,7 @@ import '../../theme/tokens.dart';
 import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
 import 'echo_moderation_screen.dart';
+import '../../admin/template/editable.dart';
 
 class EchoWallScreen extends StatefulWidget {
   const EchoWallScreen({super.key});
@@ -177,7 +178,7 @@ class _EchoWallScreenState extends State<EchoWallScreen> {
     } on EconomyException catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
     } catch (_) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('That image did not upload. Try again.')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: EditableLabel('echo_wall_screen.EchoWallScreen', 'That image did not upload. Try again.')));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -242,13 +243,13 @@ class _PostCard extends StatelessWidget {
                       'targetId': doc.id,
                       'reason': 'report',
                     })),
-                child: const Text('Report', style: TextStyle(color: NwsbColors.mist)),
+                child: const EditableLabel('echo_wall_screen.PostCard', 'Report', style: TextStyle(color: NwsbColors.mist)),
               ),
             ],
           ),
           TextButton(
             onPressed: () => runPrivate(context, () => EconomyApi.call('blockEchoUser', {'targetUid': data['authorUid']})),
-            child: const Text('Block author', style: TextStyle(color: NwsbColors.mist, fontSize: 12)),
+            child: const EditableLabel('echo_wall_screen.PostCard', 'Block author', style: TextStyle(color: NwsbColors.mist, fontSize: 12)),
           ),
         ],
       ),
@@ -261,11 +262,11 @@ class _PostCard extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: NwsbColors.plate,
-        title: const Text('Comment', style: TextStyle(color: Colors.white)),
+        title: const EditableLabel('echo_wall_screen.PostCard', 'Comment', style: TextStyle(color: Colors.white)),
         content: TextField(controller: controller, style: const TextStyle(color: Colors.white)),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.pop(context, controller.text.trim()), child: const Text('Send')),
+          TextButton(onPressed: () => Navigator.pop(context), child: const EditableLabel('echo_wall_screen.PostCard', 'Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context, controller.text.trim()), child: const EditableLabel('echo_wall_screen.PostCard', 'Send')),
         ],
       ),
     );

@@ -20,6 +20,7 @@ import '../../widgets/black_glass_banner.dart';
 import '../../widgets/home_parts.dart';
 import '../start_today_carousel.dart';
 import '../streak_store_carousel.dart';
+import '../../admin/template/editable.dart';
 
 /// 1 · greet — index.html:1758. Not wrapped; it sits loose under the hero.
 class FashGreeting extends StatelessWidget {
@@ -32,7 +33,7 @@ class FashGreeting extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          EditableLabel('fashion_sections_top.FashGreeting',
             'Begin Your\nHealing Path',
             style: TextStyle(
               fontSize: 34,
@@ -160,6 +161,7 @@ class _StreakBoxes extends StatelessWidget {
                     Expanded(child: _GlassBox(child: SizedBox.expand())),
                   ],
                 ),
+                slot: 'fashion_sections_top.StreakBoxes',
               ),
             ),
             const Align(
@@ -224,7 +226,7 @@ class _BoxLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
+    return EditableLabel('fashion_sections_top.BoxLabel',
       text,
       textAlign: TextAlign.center,
       style: TextStyle(
@@ -261,7 +263,7 @@ class _HhrButton extends StatelessWidget {
         children: [
           Icon(icon, size: 21, color: Colors.white),
           const SizedBox(height: 7),
-          Text(
+          EditableLabel('fashion_sections_top.HhrButton',
             label,
             style: const TextStyle(
               fontSize: 12,
@@ -334,8 +336,9 @@ class FashPractice extends StatelessWidget {
                             asset: practiceVid,
                             priority: ClipPriority.feature,
                             fit: BoxFit.cover,
+                            slot: 'fashion_sections_top.FashPractice',
                           )
-                        : const NwsbImage(url: practiceStill);
+                        : const NwsbImage(url: practiceStill, slot: 'fashion_sections_top.FashPractice');
                     // Card 1 — NowssB Player exactly as before (no redesign).
                     return GestureDetector(
                       onTap: onTap,
@@ -365,7 +368,7 @@ class FashPractice extends StatelessWidget {
                             const Positioned(
                               left: 16,
                               top: 14,
-                              child: Text(
+                              child: EditableLabel('fashion_sections_top.FashPractice',
                                 "TODAY'S PRACTICE",
                                 style: TextStyle(
                                   fontSize: 11,
@@ -434,6 +437,7 @@ class FashReader extends StatelessWidget {
                 asset: 'assets/video/reader-section.mp4',
                 poster: 'assets/video/reader-section-poster.webp',
                 fit: BoxFit.cover,
+                slot: 'fashion_sections_top.FashReader',
               ),
             ),
           ),
@@ -441,13 +445,13 @@ class FashReader extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              const EditableLabel('fashion_sections_top.FashReader',
                 'NowssB',
                 style: TextStyle(fontSize: 14, color: Color(0x99FFFFFF)),
               ),
               TitleWithGlassEnter(title: 'Reader', onTap: onTap),
               const SizedBox(height: 6),
-              const Text(
+              const EditableLabel('fashion_sections_top.FashReader',
                 'Read every meaning, and every eBook.',
                 style: TextStyle(fontSize: 13, color: Color(0xB3FFFFFF)),
               ),
@@ -500,7 +504,7 @@ class FashStreakBody extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Text(
+        const EditableLabel('fashion_sections_top.FashStreakBody',
           'Start Building Your Streak Today',
           style: TextStyle(
             fontSize: 22,
@@ -510,7 +514,7 @@ class FashStreakBody extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        const Text(
+        const EditableLabel('fashion_sections_top.FashStreakBody',
           'Practice daily to keep it alive — and unlock exclusive offers',
           style: TextStyle(
             fontSize: 13,

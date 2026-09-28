@@ -4,6 +4,7 @@ library;
 import 'package:flutter/material.dart';
 
 import 'progress_tokens.dart';
+import '../../admin/template/editable.dart';
 
 class ProgressSessionsCard extends StatelessWidget {
   const ProgressSessionsCard({
@@ -26,13 +27,13 @@ class ProgressSessionsCard extends StatelessWidget {
           children: [
             _Check(),
             SizedBox(height: 16),
-            Text(
+            EditableLabel('progress_sessions.ProgressSessionsCard',
               'No sessions recorded yet',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400, color: MpColors.white),
             ),
             SizedBox(height: 7),
-            Text(
+            EditableLabel('progress_sessions.ProgressSessionsCard',
               'Complete your first practice session and your real progress will appear here — every rep, every word, every day.',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 13, height: 1.65, color: MpColors.dim),
@@ -68,7 +69,7 @@ class _Check extends StatelessWidget {
         shape: BoxShape.circle,
         border: Border.all(color: const Color(0x21FFFFFF)),
       ),
-      child: const Text('✓', style: TextStyle(fontSize: 20, color: Color(0xFF74797B))),
+      child: const EditableLabel('progress_sessions.Check', '✓', style: TextStyle(fontSize: 20, color: Color(0xFF74797B))),
     );
   }
 }
@@ -112,7 +113,7 @@ class _SessionRow extends StatelessWidget {
               children: [
                 Text(word, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: MpColors.white)),
                 const SizedBox(height: 3),
-                Text(detail, style: const TextStyle(fontSize: 12, color: MpColors.dim)),
+                EditableLabel('progress_sessions.SessionRow', detail, style: const TextStyle(fontSize: 12, color: MpColors.dim)),
               ],
             ),
           ),

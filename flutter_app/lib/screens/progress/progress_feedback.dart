@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'progress_tokens.dart';
+import '../../admin/template/editable.dart';
 
 class ProgressFeedbackSection extends StatefulWidget {
   const ProgressFeedbackSection({super.key});
@@ -105,7 +106,7 @@ class _ProgressFeedbackSectionState extends State<ProgressFeedbackSection> {
           onToggle: _toggle,
         ),
         const SizedBox(height: 24),
-        const Text(
+        const EditableLabel('progress_feedback.ProgressFeedbackSection',
           'Anything else you want to tell us?',
           style: TextStyle(fontSize: 17, color: MpColors.white),
         ),
@@ -179,7 +180,7 @@ class _Question extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: const TextStyle(fontSize: 17, color: MpColors.white)),
+        EditableLabel('progress_feedback.Question', title, style: const TextStyle(fontSize: 17, color: MpColors.white)),
         const SizedBox(height: 11),
         Wrap(
           spacing: 8,

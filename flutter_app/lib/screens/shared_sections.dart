@@ -30,6 +30,7 @@ import '../widgets/home_parts.dart';
 import '../widgets/neu_wrap.dart';
 import '../widgets/home_skin.dart';
 import '../widgets/tv_frame.dart';
+import '../admin/template/editable.dart';
 
 /// 16 · subvid — the shared subscription tier page used by both homes.
 class SubscriptionSection extends StatelessWidget {
@@ -53,7 +54,7 @@ class SubscriptionSection extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('SUBSCRIPTION TIER UPGRADE',
+                  const EditableLabel('shared_sections.SubscriptionSection', 'SUBSCRIPTION TIER UPGRADE',
                       style: TextStyle(
                           color: Colors.white,
                           fontSize: 10,
@@ -72,7 +73,7 @@ class SubscriptionSection extends StatelessWidget {
             mark: NwsbMarks.crown,
           ),
           const SizedBox(height: 4),
-          const Text('Unlock a deeper practice, one tier at a time.',
+          const EditableLabel('shared_sections.SubscriptionSection', 'Unlock a deeper practice, one tier at a time.',
               style: TextStyle(color: Color(0x99FFFFFF), fontSize: 12)),
           const SizedBox(height: 12),
           _SubscriptionTierStack(onTap: onTap),
@@ -203,7 +204,7 @@ class _SubMarqueeTextState extends State<_SubMarqueeText>
             child: child,
           );
         },
-        child: Text(
+        child: EditableLabel('shared_sections.SubMarqueeText',
           widget.text,
           maxLines: 1,
           softWrap: false,
@@ -279,7 +280,7 @@ class _SubscriptionCta extends StatelessWidget {
               borderRadius: BorderRadius.circular(999)),
           child: Row(children: [
             const Expanded(
-              child: Text('Upgrade Now',
+              child: EditableLabel('shared_sections.SubscriptionCta', 'Upgrade Now',
                   style: TextStyle(
                       color: Color(0xFF090B11),
                       fontSize: 11,
@@ -383,7 +384,7 @@ class _SubscriptionTierRow extends StatelessWidget {
                                 fontWeight: FontWeight.w800),
                             duration: const Duration(milliseconds: 3200),
                           ),
-                          Text(detail,
+                          EditableLabel('shared_sections.SubscriptionTierRow', detail,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
@@ -650,7 +651,7 @@ class _Opt extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 1),
-            Text(
+            EditableLabel('shared_sections.Opt',
               label,
               maxLines: 1,
               softWrap: false,
@@ -715,7 +716,7 @@ class StoreBannerSection extends StatelessWidget {
               behavior: HitTestBehavior.opaque,
               child: const AspectRatio(
                 aspectRatio: 1136 / 800,
-                child: ClipRect(child: NwsbVideo(asset: _clip)),
+                child: ClipRect(child: NwsbVideo(asset: _clip, slot: 'shared_sections.StoreBannerSection')),
               ),
             ),
           const SizedBox(height: 14),
@@ -749,6 +750,7 @@ class RoutinesSection extends StatelessWidget {
               url:
                   'https://media.nowssb.com/migrated-images/4f13105270db8787_grok_image_1778070967319_ys14eq.jpg',
               fallback: ColoredBox(color: Color(0xFF060C18)),
+              slot: 'shared_sections.RoutinesSection',
             ),
             label: fashion ? 'My Routine' : 'My Routines',
             title: 'Daily Practice System',
@@ -888,7 +890,7 @@ class _QuickButton extends StatelessWidget {
         children: [
           NwsbIcon(mark, size: 22, viewBox: markViewBox),
           const SizedBox(height: 8),
-          Text(
+          EditableLabel('shared_sections.QuickButton',
             label,
             style: const TextStyle(fontSize: 12, color: Color(0xB8FFFFFF)),
           ),
@@ -927,6 +929,7 @@ class EbooksSection extends StatelessWidget {
                       'assets/video/beaf11ea10561d43_grok_video_2026-07-30-15-35-40_xwm1ei.mp4',
                   priority: ClipPriority.decoration,
                   fit: BoxFit.cover,
+                  slot: 'shared_sections.EbooksSection',
                 ),
               ),
             ),
@@ -935,11 +938,11 @@ class EbooksSection extends StatelessWidget {
           const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              EditableLabel('shared_sections.EbooksSection',
                 'NowssB',
                 style: TextStyle(fontSize: 14, color: Color(0x99FFFFFF)),
               ),
-              Text(
+              EditableLabel('shared_sections.EbooksSection',
                 'eBooks',
                 style: TextStyle(
                   fontSize: 26,
@@ -949,7 +952,7 @@ class EbooksSection extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 6),
-              Text(
+              EditableLabel('shared_sections.EbooksSection',
                 'Word science and sound healing, read anywhere.',
                 style: TextStyle(fontSize: 13, color: Color(0xB3FFFFFF)),
               ),
@@ -1207,6 +1210,7 @@ class _HealJourneyCard extends StatelessWidget {
               poster: poster,
               fit: BoxFit.cover,
               showPoster: true,
+              slot: 'shared_sections.HealJourneyCard',
             ),
             const DecoratedBox(
               decoration: BoxDecoration(
@@ -1235,7 +1239,7 @@ class _HealJourneyCard extends StatelessWidget {
                             size: 17, color: NwsbColors.goldLight),
                       ),
                       const SizedBox(width: 10),
-                      Text(
+                      EditableLabel('shared_sections.HealJourneyCard',
                         eyebrow,
                         style: const TextStyle(
                           fontSize: 12,
@@ -1247,7 +1251,7 @@ class _HealJourneyCard extends StatelessWidget {
                     ],
                   ),
                   const Spacer(),
-                  Text(
+                  EditableLabel('shared_sections.HealJourneyCard',
                     title,
                     style: const TextStyle(
                       fontSize: 30,
@@ -1257,7 +1261,7 @@ class _HealJourneyCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  Text(
+                  EditableLabel('shared_sections.HealJourneyCard',
                     sub,
                     style: const TextStyle(
                       fontSize: 12.5,
@@ -1270,7 +1274,7 @@ class _HealJourneyCard extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 12),
                     color: Colors.white,
-                    child: Text(
+                    child: EditableLabel('shared_sections.HealJourneyCard',
                       cta,
                       style: const TextStyle(
                         fontSize: 13,
@@ -1336,7 +1340,7 @@ class _ChoosePathLaptopCard extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        EditableLabel('shared_sections.ChoosePathLaptopCard',
                           'Body, organ and mind',
                           style: TextStyle(
                             fontSize: 11,
@@ -1346,7 +1350,7 @@ class _ChoosePathLaptopCard extends StatelessWidget {
                           ),
                         ),
                         SizedBox(height: 2),
-                        Text(
+                        EditableLabel('shared_sections.ChoosePathLaptopCard',
                           'Choose Your Path',
                           style: TextStyle(
                             fontSize: 18,
@@ -1393,7 +1397,7 @@ class _ChoosePathLaptopCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-              const Text(
+              const EditableLabel('shared_sections.ChoosePathLaptopCard',
                 'Female or Male — customise for your body',
                 style: TextStyle(
                   fontSize: 12,
@@ -1426,7 +1430,7 @@ class _GenderSide extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
+                EditableLabel('shared_sections.GenderSide',
                   label,
                   style: const TextStyle(
                     fontSize: 17,
@@ -1566,11 +1570,12 @@ class _HomeFooterSectionState extends State<HomeFooterSection>
         opacity: opacity,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(blend < 0.35 ? 8 : 14),
-          child: Image.asset(
+          child: EditableImage.asset(
             _shots[idx],
             fit: BoxFit.cover,
             alignment: Alignment.center,
             errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF0A0F1C)),
+            slot: 'shared_sections.HomeFooterSection',
           ),
         ),
       ),
@@ -1602,7 +1607,7 @@ class _HomeFooterSectionState extends State<HomeFooterSection>
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Across Every Language',
+                            EditableLabel('shared_sections.HomeFooterSection', 'Across Every Language',
                                 style: TextStyle(
                                     fontSize: 9,
                                     letterSpacing: 4,
@@ -1634,7 +1639,7 @@ class _HomeFooterSectionState extends State<HomeFooterSection>
                             SizedBox(height: 14),
                             SizedBox(
                               width: 260,
-                              child: Text(
+                              child: EditableLabel('shared_sections.HomeFooterSection',
                                   'Different words. One root. All languages descend from the same vibrational origin.',
                                   style: TextStyle(
                                       fontSize: 12,
@@ -1677,10 +1682,11 @@ class _HomeFooterSectionState extends State<HomeFooterSection>
                                       width: tabW,
                                       height: tabH,
                                       child: IgnorePointer(
-                                        child: Image.asset(
+                                        child: EditableImage.asset(
                                           'assets/frames/footer-frame.webp',
                                           fit: BoxFit.fill,
                                           errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                                          slot: 'shared_sections.HomeFooterSection',
                                         ),
                                       ),
                                     ),
@@ -1807,7 +1813,7 @@ class _HomeFooterSectionState extends State<HomeFooterSection>
                                 ],
                               ),
                               const SizedBox(height: 18),
-                              const Text(
+                              const EditableLabel('shared_sections.HomeFooterSection',
                                   '© 2026 Adv. Sanjaykumar Gadge · Shabdapathy',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(

@@ -6,6 +6,7 @@ import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 import 'practice_player.dart';
+import '../admin/template/editable.dart';
 
 class HealingPathScreen extends StatefulWidget {
   const HealingPathScreen({super.key, this.initialGender});
@@ -322,6 +323,7 @@ class _HealingPathScreenState extends State<HealingPathScreen> {
                 poster: _healingBgPoster,
                 priority: ClipPriority.feature,
                 fit: BoxFit.cover,
+                slot: 'healing_path.HealingPathScreen',
               ),
             ),
             const Positioned.fill(
@@ -358,11 +360,11 @@ class _HealingPathScreenState extends State<HealingPathScreen> {
 
   Widget _genderPage() =>
       ListView(padding: const EdgeInsets.fromLTRB(20, 28, 20, 40), children: [
-        const Text('Personalised For You',
+        const EditableLabel('healing_path.HealingPathScreen', 'Personalised For You',
             style: TextStyle(
                 color: Color(0xB3E8D5A3), fontSize: 12, letterSpacing: 1.4)),
         const SizedBox(height: 10),
-        const Text('Choose Your\nPath',
+        const EditableLabel('healing_path.HealingPathScreen', 'Choose Your\nPath',
             style: TextStyle(
                 color: Colors.white,
                 fontSize: 42,
@@ -402,7 +404,7 @@ class _HealingPathScreenState extends State<HealingPathScreen> {
             )),
         const SizedBox(height: 14),
         const Center(
-            child: Text('Tap to explore your categories',
+            child: EditableLabel('healing_path.HealingPathScreen', 'Tap to explore your categories',
                 style: TextStyle(
                     color: Color(0x4DFFFFFF), fontSize: 10, letterSpacing: 1))),
       ]);
@@ -430,7 +432,7 @@ class _HealingPathScreenState extends State<HealingPathScreen> {
         children: [
           _CategoryHero(gender: gender),
           const SizedBox(height: 20),
-          const Text('CHOOSE YOUR FOCUS',
+          const EditableLabel('healing_path.HealingPathScreen', 'CHOOSE YOUR FOCUS',
               style: TextStyle(
                   color: Color(0xB3E8D5A3), fontSize: 11, letterSpacing: 2.2)),
           const SizedBox(height: 12),
@@ -511,7 +513,7 @@ class _HealingPathScreenState extends State<HealingPathScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  const Text('Tap to enter',
+                  const EditableLabel('healing_path.HealingPathScreen', 'Tap to enter',
                       style: TextStyle(
                           color: Color(0x99060C18),
                           fontSize: 10,
@@ -622,7 +624,7 @@ class _HealingPathScreenState extends State<HealingPathScreen> {
                               : Colors.white12,
                           width: _tab == index ? 2 : 1))),
               child: Center(
-                  child: Text(label,
+                  child: EditableLabel('healing_path.HealingPathScreen', label,
                       style: TextStyle(
                           color: _tab == index ? Colors.white : Colors.white54,
                           fontSize: 13,
@@ -681,7 +683,7 @@ class _HealingPathScreenState extends State<HealingPathScreen> {
 Widget _healImage(String path, {BoxFit fit = BoxFit.cover, Widget? error}) {
   final err = error ?? const ColoredBox(color: Color(0xFF121A2A));
   if (path.startsWith('assets/')) {
-    return Image.asset(path, fit: fit, errorBuilder: (_, __, ___) => err);
+    return EditableImage.asset(path, fit: fit, errorBuilder: (_, __, ___) => err, slot: 'healing_path.shared');
   }
   return Image.network(path, fit: fit, errorBuilder: (_, __, ___) => err);
 }
@@ -695,7 +697,7 @@ class _Background extends StatelessWidget {
           color: const Color(0xFF060C18),
           image: DecorationImage(
               image: image.startsWith('assets/')
-                  ? AssetImage(image)
+                  ? slotImageProvider(context, 'healing_path.Background', image, AssetImage(image))
                   : NetworkImage(image),
               fit: BoxFit.cover,
               opacity: .17)));
@@ -713,7 +715,7 @@ class _Header extends StatelessWidget {
             onPressed: onBack,
             icon: const Icon(Icons.arrow_back, color: Colors.white)),
         const SizedBox(width: 6),
-        Text(title,
+        EditableLabel('healing_path.Header', title,
             style: const TextStyle(
                 color: Colors.white, fontSize: 17, fontWeight: FontWeight.w700))
       ]));
@@ -756,7 +758,7 @@ class _GenderCard extends StatelessWidget {
                         color: Colors.black.withOpacity(.45),
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: const Text('For You',
+                      child: const EditableLabel('healing_path.GenderCard', 'For You',
                           style: TextStyle(
                               color: Color(0xFFE8D5A3),
                               fontSize: 10,
@@ -769,13 +771,13 @@ class _GenderCard extends StatelessWidget {
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(title,
+                          EditableLabel('healing_path.GenderCard', title,
                               style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 22,
                                   fontWeight: FontWeight.w700)),
                           const SizedBox(height: 4),
-                          Text(subtitle,
+                          EditableLabel('healing_path.GenderCard', subtitle,
                               style: const TextStyle(
                                   color: Colors.white70, fontSize: 11)),
                         ])),
@@ -912,7 +914,7 @@ class _InfoCard extends StatelessWidget {
           border: Border.all(color: color.withOpacity(.15)),
           borderRadius: BorderRadius.circular(14)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(label,
+        EditableLabel('healing_path.InfoCard', label,
             style: TextStyle(
                 color: color.withOpacity(.7),
                 fontSize: 10,
@@ -934,13 +936,13 @@ class _EmptyState extends StatelessWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         const Icon(Icons.access_time, color: Colors.white38, size: 38),
         const SizedBox(height: 12),
-        Text(title,
+        EditableLabel('healing_path.Empty', title,
             style: const TextStyle(
                 color: Colors.white70,
                 fontSize: 16,
                 fontWeight: FontWeight.w600)),
         const SizedBox(height: 8),
-        Text(body,
+        EditableLabel('healing_path.Empty', body,
             style: const TextStyle(
                 color: Colors.white54, fontSize: 13, height: 1.6))
       ]));

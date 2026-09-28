@@ -13,6 +13,7 @@ import '../theme/player_aura.dart';
 import '../widgets/colored_split_promo_banner.dart';
 import 'player_settings.dart';
 import 'sound_settings_sheet.dart';
+import '../admin/template/editable.dart';
 
 class PlayerDial extends StatefulWidget {
   const PlayerDial({
@@ -335,7 +336,7 @@ class _PlayerDialState extends State<PlayerDial> with SingleTickerProviderStateM
                     alignment: Alignment.centerLeft,
                     child: GestureDetector(
                       onTap: _openFullSettings,
-                      child: const Text(
+                      child: const EditableLabel('player_dial.PlayerDial',
                         'MUSIC PLAYER SETTINGS',
                         style: TextStyle(
                           color: Color(0x99B3BDCA),
@@ -397,7 +398,7 @@ class _PlayerDialState extends State<PlayerDial> with SingleTickerProviderStateM
                         },
                         child: const Padding(
                           padding: EdgeInsets.symmetric(vertical: 8),
-                          child: Text(
+                          child: EditableLabel('player_dial.PlayerDial',
                             'SWIPE UP FOR MORE',
                             textAlign: TextAlign.center,
                             style: TextStyle(color: Color(0x47FFFFFF), fontSize: 10, letterSpacing: 2.2),
@@ -448,7 +449,7 @@ class _PlayerDialState extends State<PlayerDial> with SingleTickerProviderStateM
             Icon(icon, color: Colors.white, size: 18),
             const SizedBox(width: 12),
             Expanded(
-              child: Text(
+              child: EditableLabel('player_dial.PlayerDial',
                 label,
                 style: const TextStyle(color: Colors.white, fontSize: 12, letterSpacing: 2),
               ),

@@ -86,6 +86,7 @@ import 'progress/progress_screen.dart';
 import 'reader/reader_hub.dart';
 import 'subscription.dart';
 import 'store/ebooks_store.dart';
+import '../admin/template/editable.dart';
 
 /// `REG.norm.items` — app/js/part062.js:41-100, key for key and in order.
 const kNormalSectionOrder = <String>[
@@ -508,7 +509,7 @@ class _HomeNormalState extends State<HomeNormal> {
             alignment: Alignment.centerLeft,
             child: TextButton(
               onPressed: () => _go(1),
-              child: const Text('Play session'),
+              child: const EditableLabel('home_normal.HomeNormal', 'Play session'),
             ),
           ),
           Expanded(
@@ -625,7 +626,7 @@ class _TopRow extends StatelessWidget {
                   ],
           ),
           child: ClipOval(
-            child: Image.asset(
+            child: EditableImage.asset(
               'assets/icons/logo-disc.webp',
               width: 46,
               height: 46,
@@ -635,6 +636,7 @@ class _TopRow extends StatelessWidget {
                 color: Color(0xFFFFA21A),
                 size: 24,
               ),
+              slot: 'home_normal.TopRow',
             ),
           ),
         ),
@@ -647,7 +649,7 @@ class _TopRow extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
+              EditableLabel('home_normal.TopRow',
                 'NowssB',
                 style: Theme.of(context).textTheme.titleMedium!.copyWith(
                       fontSize: 15,
@@ -655,7 +657,7 @@ class _TopRow extends StatelessWidget {
                       letterSpacing: -0.3,
                     ),
               ),
-              Text(
+              EditableLabel('home_normal.TopRow',
                 'NOWSBANSIU EDITION',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

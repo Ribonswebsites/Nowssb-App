@@ -33,6 +33,7 @@ import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
 import '../widgets/nwsb_icon.dart';
 import 'black_glass_banner.dart';
+import '../admin/template/editable.dart';
 
 /// Opens the website hamburger (`#menuDrawer`) over the current route.
 Future<void> showHomeMenuDrawer(
@@ -411,7 +412,7 @@ class HomeMenuDrawer extends StatelessWidget {
                       ),
                       Padding(
                         padding: EdgeInsets.fromLTRB(light ? 24 : 4, 40, light ? 24 : 4, 0),
-                        child: Text(
+                        child: EditableLabel('home_menu_drawer.HomeMenuDrawer',
                           'Shabdapathy · v9.5',
                           style: TextStyle(
                             fontSize: 9,
@@ -583,7 +584,7 @@ class _Row extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  EditableLabel('home_menu_drawer.Row',
                     label,
                     style: const TextStyle(
                       color: Colors.white,
@@ -592,7 +593,7 @@ class _Row extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 2),
-                  Text(
+                  EditableLabel('home_menu_drawer.Row',
                     sub,
                     style: const TextStyle(
                       color: Color(0x73FFFFFF),
@@ -657,7 +658,7 @@ class _Row extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    EditableLabel('home_menu_drawer.Row',
                       label,
                       style: TextStyle(
                         fontSize: 15,
@@ -666,7 +667,7 @@ class _Row extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 2),
-                    Text(
+                    EditableLabel('home_menu_drawer.Row',
                       sub,
                       style: TextStyle(fontSize: 12, color: subColor),
                     ),
@@ -693,7 +694,7 @@ class _RoutinesPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: const Color(0xFF060C18),
         foregroundColor: Colors.white,
-        title: const Text('My Routines'),
+        title: const EditableLabel('home_menu_drawer.RoutinesPage', 'My Routines'),
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),

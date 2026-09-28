@@ -25,6 +25,7 @@ import 'reader/reader_hub.dart';
 import 'sound_library.dart';
 import 'store.dart';
 import 'subscription.dart';
+import '../admin/template/editable.dart';
 
 const _days = <String>[
   'Monday',
@@ -135,7 +136,7 @@ class _LiveQuoteTabState extends State<LiveQuoteTab> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            const EditableLabel('quotes_live.LiveQuoteTab',
                               'Today quotes to live by',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -260,7 +261,7 @@ class _QuotesWeekScreenState extends State<QuotesWeekScreen> {
                         icon: Icon(Icons.arrow_back_rounded, color: ink),
                       ),
                       Expanded(
-                        child: Text(
+                        child: EditableLabel('quotes_live.QuotesWeekScreen',
                           "Today's Quotes",
                           style: TextStyle(
                             fontSize: 22,
@@ -501,7 +502,7 @@ class _QuotesWeekScreenState extends State<QuotesWeekScreen> {
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(4, 4, 4, 8),
-          child: Text(
+          child: EditableLabel('quotes_live.QuotesWeekScreen',
             'This week',
             style: TextStyle(color: ink, fontSize: 18, fontWeight: FontWeight.w800),
           ),
@@ -527,10 +528,11 @@ class _QuotesWeekScreenState extends State<QuotesWeekScreen> {
                         ColoredBox(color: art.$2),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(6, 8, 6, 28),
-                          child: Image.asset(
+                          child: EditableImage.asset(
                             art.$1,
                             fit: BoxFit.contain,
                             alignment: Alignment.bottomCenter,
+                            slot: 'quotes_live.QuotesWeekScreen',
                           ),
                         ),
                         Positioned(
@@ -593,7 +595,7 @@ class _QuotesWeekScreenState extends State<QuotesWeekScreen> {
                     child: Row(
                       children: [
                         const Expanded(
-                          child: Text(
+                          child: EditableLabel('quotes_live.QuotesWeekScreen',
                             'Which day, which quote',
                             style: TextStyle(
                               color: Colors.white,
@@ -761,7 +763,7 @@ class _QuotesWeekScreenState extends State<QuotesWeekScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
+          const EditableLabel('quotes_live.QuotesWeekScreen',
             'Share your thoughts',
             style: TextStyle(
               color: Color(0xFFE8D5A3),
@@ -770,7 +772,7 @@ class _QuotesWeekScreenState extends State<QuotesWeekScreen> {
             ),
           ),
           const SizedBox(height: 4),
-          const Text(
+          const EditableLabel('quotes_live.QuotesWeekScreen',
             'The day’s quotes are written by us. Type a line of your own and share it with everyone.',
             style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 12, height: 1.3),
           ),
@@ -798,7 +800,7 @@ class _QuotesWeekScreenState extends State<QuotesWeekScreen> {
                 color: const Color(0xFFE8D5A3),
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: const Text(
+              child: const EditableLabel('quotes_live.QuotesWeekScreen',
                 'Share your thoughts',
                 style: TextStyle(
                   color: Color(0xFF1A1A2E),
@@ -848,7 +850,7 @@ class _QuotesWeekScreenState extends State<QuotesWeekScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    EditableLabel('quotes_live.QuotesWeekScreen',
                       title,
                       style: const TextStyle(
                         color: Colors.white,
@@ -856,7 +858,7 @@ class _QuotesWeekScreenState extends State<QuotesWeekScreen> {
                         fontSize: 14,
                       ),
                     ),
-                    Text(
+                    EditableLabel('quotes_live.QuotesWeekScreen',
                       sub,
                       style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12),
                     ),
@@ -956,7 +958,7 @@ class _WeekQuotesBoxState extends State<_WeekQuotesBox> {
                         ),
                       ),
                       const SizedBox(height: 6),
-                      Text(
+                      EditableLabel('quotes_live.WeekQuotesBox',
                         headline,
                         style: const TextStyle(
                           color: Colors.white,
@@ -997,7 +999,7 @@ class _WeekQuotesBoxState extends State<_WeekQuotesBox> {
           children: [
             Icon(icon, size: 16, color: on ? const Color(0xFF1A1A2E) : Colors.white),
             const SizedBox(width: 6),
-            Text(
+            EditableLabel('quotes_live.WeekQuotesBox',
               label,
               style: TextStyle(
                 color: on ? const Color(0xFF1A1A2E) : Colors.white,
@@ -1111,7 +1113,7 @@ class _QuoteMonthSheetState extends State<_QuoteMonthSheet> {
                   child: Row(
                     children: [
                       const Expanded(
-                        child: Text(
+                        child: EditableLabel('quotes_live.QuoteMonthSheet',
                           'Calendar',
                           style: TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.w800),
                         ),
@@ -1346,7 +1348,7 @@ class _QuoteMonthSheetState extends State<_QuoteMonthSheet> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            EditableLabel('quotes_live.QuoteMonthSheet',
               label,
               style: const TextStyle(color: Color(0xE6FFFFFF), fontSize: 12, fontWeight: FontWeight.w600),
             ),
@@ -1366,118 +1368,4 @@ class _SharedLine {
   const _SharedLine(this.name, this.text);
   final String name;
   final String text;
-}
-
-class QuoteAdminScreen extends StatefulWidget {
-  const QuoteAdminScreen({super.key});
-
-  @override
-  State<QuoteAdminScreen> createState() => _QuoteAdminScreenState();
-}
-
-class _QuoteAdminScreenState extends State<QuoteAdminScreen> {
-  late final TextEditingController _live;
-  late final List<TextEditingController> _days;
-
-  @override
-  void initState() {
-    super.initState();
-    final s = Settings.instance;
-    _live = TextEditingController(text: s.liveQuote);
-    _days = List.generate(7, (i) {
-      final custom = i < s.weekQuotes.length ? s.weekQuotes[i] : '';
-      return TextEditingController(text: custom);
-    });
-  }
-
-  @override
-  void dispose() {
-    _live.dispose();
-    for (final c in _days) {
-      c.dispose();
-    }
-    super.dispose();
-  }
-
-  Future<void> _save() async {
-    await Settings.instance.setLiveQuote(_live.text);
-    for (var i = 0; i < 7; i++) {
-      await Settings.instance.setWeekQuote(i, _days[i].text);
-    }
-    if (mounted) Navigator.maybePop(context);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF07060C),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF07060C),
-        foregroundColor: Colors.white,
-        title: const Text("Quotes to live by"),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
-        children: [
-          const Text(
-            'Type the line. It shows on the home tab and on that day of the week. Leave a day blank to keep the built-in line.',
-            style: TextStyle(color: Color(0xB3FFFFFF), height: 1.35),
-          ),
-          const SizedBox(height: 14),
-          _field('Today’s live line', _live),
-          for (var i = 0; i < 7; i++) _field(_daysName(i), _days[i]),
-          const SizedBox(height: 12),
-          GestureDetector(
-            onTap: _save,
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              decoration: BoxDecoration(
-                color: const Color(0xFFE8D5A3),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              alignment: Alignment.center,
-              child: const Text(
-                'Save quotes',
-                style: TextStyle(
-                  color: Color(0xFF1A1A2E),
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  String _daysName(int i) {
-    const names = [
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
-      'Sunday',
-    ];
-    return names[i];
-  }
-
-  Widget _field(String label, TextEditingController c) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: TextField(
-        controller: c,
-        maxLines: 2,
-        style: const TextStyle(color: Colors.white),
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: const TextStyle(color: Color(0xFFE8D5A3)),
-          filled: true,
-          fillColor: const Color(0xFF14121A),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-        ),
-      ),
-    );
-  }
 }

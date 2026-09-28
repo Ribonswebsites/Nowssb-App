@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import '../../data/models.dart';
 import '../../data/practice_progress.dart';
 import 'progress_tokens.dart';
+import '../../admin/template/editable.dart';
 
 const kGlassBodyMapAsset = 'assets/progress/glass-body-map.png';
 /// Same CDN URL the website HBM controller uses (runtime fallback).
@@ -105,7 +106,7 @@ class _ProgressBodyMapState extends State<ProgressBodyMap> {
       children: [
         Row(
           children: [
-            const Text(
+            const EditableLabel('progress_body_map.ProgressBodyMap',
               'Healing Body Map',
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: MpColors.white),
             ),
@@ -127,16 +128,18 @@ class _ProgressBodyMapState extends State<ProgressBodyMap> {
                 Positioned.fill(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(24, 12, 24, 56),
-                    child: Image.asset(
+                    child: EditableImage.asset(
                       kGlassBodyMapAsset,
                       fit: BoxFit.contain,
-                      errorBuilder: (_, __, ___) => Image.network(
+                      errorBuilder: (_, __, ___) => EditableImage.network(
                         kGlassBodyMapUrl,
                         fit: BoxFit.contain,
                         errorBuilder: (_, __, ___) => const Center(
                           child: Icon(Icons.accessibility_new, color: Color(0x66FFFFFF), size: 48),
                         ),
+                        slot: 'progress_body_map.ProgressBodyMap',
                       ),
+                      slot: 'progress_body_map.ProgressBodyMap',
                     ),
                   ),
                 ),
@@ -217,7 +220,7 @@ class _ProgressBodyMapState extends State<ProgressBodyMap> {
                   left: 18,
                   right: 18,
                   bottom: 16,
-                  child: Text(
+                  child: EditableLabel('progress_body_map.ProgressBodyMap',
                     'Explore the areas you want to understand and improve through your practice.',
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 11, height: 1.55, color: Color(0xFFA2A7A8)),

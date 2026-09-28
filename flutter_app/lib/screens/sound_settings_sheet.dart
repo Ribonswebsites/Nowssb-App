@@ -3,6 +3,7 @@ import 'package:flutter_tts/flutter_tts.dart';
 
 import '../data/settings.dart';
 import '../widgets/colored_split_promo_banner.dart';
+import '../admin/template/editable.dart';
 
 /// Equalizer, boost, presets, and the on-device spatial voice.
 /// Opened from the player settings button and from Equalizer in Music Player Settings.
@@ -79,7 +80,7 @@ class _SoundSettingsSheetState extends State<SoundSettingsSheet> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Voice preview needs speech on this phone.')),
+          const SnackBar(content: EditableLabel('sound_settings_sheet.SoundSettingsSheet', 'Voice preview needs speech on this phone.')),
         );
       }
     } finally {
@@ -92,18 +93,18 @@ class _SoundSettingsSheetState extends State<SoundSettingsSheet> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF14121A),
-        title: const Text(
+        title: const EditableLabel('sound_settings_sheet.SoundSettingsSheet',
           'Sounds Settings',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
         ),
-        content: const Text(
+        content: const EditableLabel('sound_settings_sheet.SoundSettingsSheet',
           'Flat, Bass, Vocal, Bright, and Wide are starting points. Drag a fader to shape that band. Boost makes the voice louder and deeper. Spatial plays the word, then a softer reflection on this phone.',
           style: TextStyle(color: Color(0xCCFFFFFF), height: 1.35),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Got it'),
+            child: const EditableLabel('sound_settings_sheet.SoundSettingsSheet', 'Got it'),
           ),
         ],
       ),
@@ -193,8 +194,8 @@ class _SoundSettingsSheetState extends State<SoundSettingsSheet> {
                 ),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('Boost sound', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
-                  subtitle: const Text('Louder, deeper voice', style: TextStyle(color: Color(0xFF8E8E93), fontSize: 12)),
+                  title: const EditableLabel('sound_settings_sheet.SoundSettingsSheet', 'Boost sound', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+                  subtitle: const EditableLabel('sound_settings_sheet.SoundSettingsSheet', 'Louder, deeper voice', style: TextStyle(color: Color(0xFF8E8E93), fontSize: 12)),
                   value: s.bassBoost,
                   activeThumbColor: Colors.white,
                   activeTrackColor: const Color(0xFFE8D5A3),
@@ -202,8 +203,8 @@ class _SoundSettingsSheetState extends State<SoundSettingsSheet> {
                 ),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('Spatial audio', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
-                  subtitle: const Text(
+                  title: const EditableLabel('sound_settings_sheet.SoundSettingsSheet', 'Spatial audio', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+                  subtitle: const EditableLabel('sound_settings_sheet.SoundSettingsSheet',
                     'Tap How it works on the banner.',
                     style: TextStyle(color: Color(0xFF8E8E93), fontSize: 12),
                   ),
@@ -305,7 +306,7 @@ class _Fader extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 6),
-        Text(label, style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 10)),
+        EditableLabel('sound_settings_sheet.Fader', label, style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 10)),
       ],
     );
   }

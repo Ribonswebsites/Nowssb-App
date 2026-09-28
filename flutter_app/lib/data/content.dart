@@ -35,6 +35,15 @@ class ContentStore extends ChangeNotifier {
   static const _kBooks = 'nwsb_content_books';
   static const _kWords = 'nwsb_content_words';
   static const _kMeanings = 'nwsb_content_meanings';
+  static const _kPublished = 'nwsb_content_words_published_v1';
+
+  /// The library before admin-mode edits: shipped → cached → content/library.
+  List<Word> _base = const [];
+
+  /// Admin-mode words — the `words/{key}` collection, raw, by key. A doc
+  /// with `status: 'archived'` takes the word out; any other doc replaces
+  /// (or adds) the word with that key.
+  Map<String, Map<String, dynamic>> _published = const {};
 
   List<Word> _library = const [];
   List<Book> _books = const [];
@@ -59,6 +68,7 @@ class ContentStore extends ChangeNotifier {
 
     await _loadShipped();
     await _loadCached();
+    _recompute();
     notifyListeners();
 
     _watch();
@@ -66,7 +76,7 @@ class ContentStore extends ChangeNotifier {
 
   // ── 1. What ships ──────────────────────────────────────────────────
   Future<void> _loadShipped() async {
-    _library = await _bundle('assets/content/library.json', Word.from);
+    _base = await _bundle('assets/content/library.json', Word.from);
     _books = await _bundle('assets/content/books.json', Book.from);
     _shelves = await _bundle('assets/content/words.json', Shelf.from);
     _meanings = await _bundle('assets/content/meanings.json', Meaning.from);
@@ -88,7 +98,20 @@ class ContentStore extends ChangeNotifier {
   // ── 2. The last copy seen ──────────────────────────────────────────
   Future<void> _loadCached() async {
     final p = await SharedPreferences.getInstance();
-    _library = _cached(p, _kLibrary, Word.from) ?? _library;
+    _base = _cached(p, _kLibrary, Word.from) ?? _base;
+    try {
+      final raw = p.getString(_kPublished);
+      if (raw != null && raw.isNotEmpty) {
+        final m = jsonDecode(raw);
+        if (m is Map) {
+          _published = {
+            for (final e in m.entries)
+              if (e.value is Map)
+                '${e.key}': Map<String, dynamic>.from(e.value as Map),
+          };
+        }
+      }
+    } catch (_) {}
     _books = _cached(p, _kBooks, Book.from) ?? _books;
     _shelves = _cached(p, _kWords, Shelf.from) ?? _shelves;
     _meanings = _cached(p, _kMeanings, Meaning.from) ?? _meanings;
@@ -128,7 +151,11 @@ class ContentStore extends ChangeNotifier {
     if (!NwsbFirebase.ready) return;
 
     final db = FirebaseFirestore.instance;
-    _bind(db, 'library', _kLibrary, Word.from, (v) => _library = v);
+    _bind(db, 'library', _kLibrary, Word.from, (v) {
+      _base = v;
+      _recompute();
+    });
+    _watchPublished(db);
     _bind(db, 'books', _kBooks, Book.from, (v) => _books = v);
     _bind(db, 'words', _kWords, Shelf.from, (v) => _shelves = v);
     _bind(db, 'meanings', _kMeanings, Meaning.from, (v) => _meanings = v);
@@ -161,8 +188,75 @@ class ContentStore extends ChangeNotifier {
     );
   }
 
+  // ── 4. Admin-mode words (words/{key}) ──────────────────────────────
+  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _wordsSub;
+
+  void _watchPublished(FirebaseFirestore db) {
+    _wordsSub = db.collection('words').snapshots().listen(
+      (snap) {
+        // A first answer from an empty local cache is not "no words".
+        if (snap.metadata.isFromCache && snap.docs.isEmpty) return;
+        final next = <String, Map<String, dynamic>>{};
+        for (final d in snap.docs) {
+          final m = Map<String, dynamic>.from(d.data());
+          m.remove('updatedAt');
+          m.remove('createdAt');
+          m['key'] ??= d.id;
+          next[d.id] = m;
+        }
+        _published = next;
+        _recompute();
+        notifyListeners();
+        _cachePublished();
+      },
+      onError: (e) => debugPrint('NowssB content: words — $e'),
+    );
+  }
+
+  Future<void> _cachePublished() async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.setString(_kPublished, jsonEncode(_published));
+    } catch (_) {}
+  }
+
+  /// Base library with admin-mode edits laid over it, in the base order;
+  /// brand-new words go at the end.
+  void _recompute() {
+    if (_published.isEmpty) {
+      _library = _base;
+      return;
+    }
+    final out = <Word>[];
+    final seen = <String>{};
+    for (final w in _base) {
+      seen.add(w.key);
+      final over = _published[w.key];
+      if (over == null) {
+        out.add(w);
+        continue;
+      }
+      if (over['status'] == 'archived') continue;
+      out.add(Word.from(over) ?? w);
+    }
+    for (final e in _published.entries) {
+      if (seen.contains(e.key) || e.value['status'] == 'archived') continue;
+      final w = Word.from(e.value);
+      if (w != null) out.add(w);
+    }
+    _library = out;
+  }
+
+  /// The admin-mode doc for [key], raw, if there is one.
+  Map<String, dynamic>? publishedFor(String key) => _published[key];
+
+  /// Every word the app knows about including archived admin-mode ones —
+  /// for the admin word list.
+  List<Word> get baseLibrary => _base;
+
   @override
   void dispose() {
+    _wordsSub?.cancel();
     for (final s in _subs) {
       s.cancel();
     }

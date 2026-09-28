@@ -6,6 +6,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../admin/template/editable.dart';
 
 /// Bundled right-side studio shots — commit as-is, never recompress.
 abstract final class SplitPromoArts {
@@ -389,13 +390,14 @@ class ColoredSplitPromoBanner extends StatelessWidget {
                           ),
                           Padding(
                             padding: const EdgeInsets.fromLTRB(4, 4, 0, 0),
-                            child: Image.asset(
+                            child: EditableImage.asset(
                               spec.art,
                               fit: BoxFit.contain,
                               alignment: Alignment.bottomCenter,
                               filterQuality: FilterQuality.high,
                               errorBuilder: (_, __, ___) =>
                                   const SizedBox.shrink(),
+                                  slot: 'colored_split_promo_banner.ColoredSplitPromoBanner',
                             ),
                           ),
                         ],

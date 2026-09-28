@@ -8,6 +8,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../widgets/nwsb_icon.dart';
+import '../admin/template/editable.dart';
 
 /// Horizontal 3-card practice carousel for the single Today's Practice block.
 ///
@@ -137,7 +138,7 @@ class _PracticeTodayArtCard extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(18),
         clipBehavior: Clip.antiAlias,
-        child: Image.asset(
+        child: EditableImage.asset(
           PracticeCarousel.practiceTodayArt,
           fit: BoxFit.cover,
           width: double.infinity,
@@ -150,6 +151,7 @@ class _PracticeTodayArtCard extends StatelessWidget {
               child: Icon(Icons.headphones, color: Colors.white54, size: 42),
             ),
           ),
+          slot: 'start_today_carousel.PracticeTodayArtCard',
         ),
       ),
     );
@@ -190,14 +192,16 @@ class _PlayerDeviceCard extends StatelessWidget {
             Center(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(28, 28, 28, 24),
-                child: Image.asset(
+                child: EditableImage.asset(
                   PracticeCarousel.playerDeviceArt,
                   fit: BoxFit.contain,
                   filterQuality: FilterQuality.high,
-                  errorBuilder: (_, __, ___) => Image.asset(
+                  errorBuilder: (_, __, ___) => EditableImage.asset(
                     'assets/banners/promo/player.png',
                     fit: BoxFit.contain,
+                    slot: 'start_today_carousel.PlayerDeviceCard',
                   ),
+                  slot: 'start_today_carousel.PlayerDeviceCard',
                 ),
               ),
             ),

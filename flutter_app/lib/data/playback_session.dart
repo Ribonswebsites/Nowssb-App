@@ -14,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'models.dart';
 import 'practice_progress.dart';
+import 'word_voice.dart';
 
 enum HearingTier { quiet, loud, danger }
 
@@ -248,6 +249,7 @@ class PlaybackSession extends ChangeNotifier {
   Future<void> pause() async {
     try {
       await _tts.stop();
+      unawaited(WordVoice.instance.stop());
     } catch (_) {}
     _playing = false;
     _stopDoseClock();
@@ -264,6 +266,7 @@ class PlaybackSession extends ChangeNotifier {
     if (_playing) {
       try {
         await _tts.stop();
+        unawaited(WordVoice.instance.stop());
       } catch (_) {}
     }
     _playing = true;
@@ -276,7 +279,9 @@ class PlaybackSession extends ChangeNotifier {
       await _tts.setSpeechRate(0.34);
       await _tts.setPitch(1.0);
       await _tts.setVolume(volume);
-      await _tts.speak(w.word);
+      if (!await WordVoice.instance.play(w, volume: volume)) {
+        await _tts.speak(w.word);
+      }
       final elapsed = DateTime.now().difference(_startedAt ?? DateTime.now()).inSeconds;
       await PracticeProgress.instance.recordCompletedWord(
         w,

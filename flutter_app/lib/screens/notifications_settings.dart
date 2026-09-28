@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import '../data/notifications.dart';
 import '../theme/tokens.dart';
 import '../widgets/page_shell.dart';
+import '../admin/template/editable.dart';
 
 class NotificationsSettingsPage extends StatelessWidget {
   const NotificationsSettingsPage({super.key});
@@ -58,7 +59,7 @@ class NotificationsSettingsPage extends StatelessWidget {
                                   border: Border.all(
                                       color: const Color(0x4DE8D5A3)),
                                 ),
-                                child: const Text(
+                                child: const EditableLabel('notifications_settings.NotificationsSettingsPage',
                                   'CLEAR ALL',
                                   style: TextStyle(
                                     fontSize: 9,
@@ -157,7 +158,7 @@ class _MasterCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                const EditableLabel('notifications_settings.MasterCard',
                   'All Notifications',
                   style: TextStyle(
                     fontSize: 15,
@@ -234,7 +235,7 @@ class _SettingsEmpty extends StatelessWidget {
             child: CustomPaint(painter: _EmptyBellPainter()),
           ),
           const SizedBox(height: 12),
-          const Text(
+          const EditableLabel('notifications_settings.SettingsEmpty',
             'You are all caught up',
             style: TextStyle(
               fontSize: 14,
@@ -243,7 +244,7 @@ class _SettingsEmpty extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 6),
-          const Text(
+          const EditableLabel('notifications_settings.SettingsEmpty',
             'New updates land here — orders, messages, offers, your routine and everything else you have switched on below.',
             textAlign: TextAlign.center,
             style: TextStyle(

@@ -12,11 +12,11 @@ library;
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import 'progress_tokens.dart';
+import '../../admin/template/editable.dart';
 
 const kProgressScene1 = 'assets/video/my-progress-scene-1.mp4';
 /// Scroll-up page backdrop (smoke / silk) — full bleed, not a card.
@@ -45,6 +45,7 @@ class ProgressHeroBgVideo extends StatelessWidget {
               // Slight top bias so the orb sits under the header and the
               // water ripple under the sphere stays in frame.
               alignment: Alignment(0, -0.12),
+              slot: 'progress_hero.ProgressHeroBgVideo',
             ),
           ),
         ),
@@ -73,6 +74,7 @@ class ProgressScrollBgVideo extends StatelessWidget {
               loop: true,
               autoplay: true,
               alignment: Alignment.center,
+              slot: 'progress_hero.ProgressScrollBgVideo',
             ),
           ),
         ),
@@ -172,13 +174,14 @@ class ProgressHeader extends StatelessWidget {
                       color: Color(0xF2FFFFFF),
                       shape: BoxShape.circle,
                     ),
-                    child: SvgPicture.asset(
+                    child: EditableSvg.asset(
                       'assets/icons/icon_01.svg',
                       width: 22,
                       height: 22,
                       colorFilter: const ColorFilter.mode(Color(0xFF080909), BlendMode.srcIn),
                       placeholderBuilder: (_) =>
                           const Icon(Icons.chevron_left, size: 28, color: Color(0xFF080909)),
+                          slot: 'progress_hero.ProgressHeader',
                     ),
                   ),
                 ),
@@ -188,7 +191,7 @@ class ProgressHeader extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  EditableLabel('progress_hero.ProgressHeader',
                     'My Progress',
                     style: TextStyle(
                       fontSize: 27,
@@ -199,7 +202,7 @@ class ProgressHeader extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 6),
-                  Text(
+                  EditableLabel('progress_hero.ProgressHeader',
                     'HEALING JOURNEY',
                     style: TextStyle(
                       fontSize: 10,
@@ -274,7 +277,7 @@ class ProgressOrbHero extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                    Text(
+                    EditableLabel('progress_hero.ProgressOrbHero',
                       'TOTAL SESSIONS',
                       textAlign: TextAlign.center,
                       style: TextStyle(
@@ -330,7 +333,7 @@ class ProgressOrbHero extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 5),
-                    Text(
+                    EditableLabel('progress_hero.ProgressOrbHero',
                       'MEDITATION TIME',
                       textAlign: TextAlign.center,
                       style: TextStyle(

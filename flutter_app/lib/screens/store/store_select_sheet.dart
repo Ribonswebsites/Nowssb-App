@@ -12,6 +12,7 @@ import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../widgets/app_thinking_loader.dart';
+import '../../admin/template/editable.dart';
 
 class StoreSelectEntry {
   const StoreSelectEntry({
@@ -143,11 +144,12 @@ class StoreSelectSheet extends StatelessWidget {
                       autoplay: true,
                       loop: true,
                       showPoster: false,
+                      slot: 'store_select_sheet.StoreSelectSheet',
                     ),
                   ),
                 ),
                 const SizedBox(height: 14),
-                const Text(
+                const EditableLabel('store_select_sheet.StoreSelectSheet',
                   'Please select the store',
                   textAlign: TextAlign.center,
                   style: TextStyle(
@@ -224,7 +226,7 @@ class _StoreSelectCard extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              Image.asset(
+              EditableImage.asset(
                 entry.art,
                 fit: BoxFit.cover,
                 gaplessPlayback: true,
@@ -248,6 +250,7 @@ class _StoreSelectCard extends StatelessWidget {
                         color: Color(0x66FFFFFF)),
                   ),
                 ),
+                slot: 'store_select_sheet.StoreSelectCard',
               ),
               if (active) ...[
                 const DecoratedBox(

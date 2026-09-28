@@ -38,6 +38,7 @@ import 'store.dart';
 import 'store/meaning_store.dart';
 import 'currently_playing_album.dart';
 import 'word_detail.dart';
+import '../admin/template/editable.dart';
 
 /// Collection banner file for each Atelier id — same table as part080 COLS.
 const Map<String, String> _kColFiles = {
@@ -609,7 +610,7 @@ class _SlmFeed extends StatelessWidget {
             NestedDarkWrap(
               margin: const EdgeInsets.only(bottom: 10),
               padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-              child: const Text(
+              child: const EditableLabel('sound_library.SlmFeed',
                 'Currently Playing',
                 style: TextStyle(
                   color: Colors.white,
@@ -680,7 +681,7 @@ class _SlmFeed extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (eyebrow != null) ...[
-                        Text(
+                        EditableLabel('sound_library.SlmFeed',
                           eyebrow,
                           style: const TextStyle(
                             color: Color(0xFF8A8A8A),
@@ -691,7 +692,7 @@ class _SlmFeed extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                       ],
-                      Text(
+                      EditableLabel('sound_library.SlmFeed',
                         title,
                         style: const TextStyle(
                           color: Colors.white,
@@ -718,7 +719,7 @@ class _SlmFeed extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(20, 40, 20, 20),
         child: Column(
           children: [
-            const Text(
+            const EditableLabel('sound_library.SlmFeed',
               'Nothing in this filter yet.',
               style: TextStyle(color: Color(0x99FFFFFF), fontSize: 14),
             ),
@@ -743,7 +744,7 @@ class _SlmFeed extends StatelessWidget {
               child: Row(
                 children: [
                   Expanded(
-                    child: Text(
+                    child: EditableLabel('sound_library.SlmFeed',
                       title,
                       style: const TextStyle(
                         color: Colors.white,
@@ -777,7 +778,7 @@ class _SlmFeed extends StatelessWidget {
           borderRadius: BorderRadius.circular(999),
           border: Border.all(color: const Color(0x66FFFFFF)),
         ),
-        child: Text(
+        child: EditableLabel('sound_library.SlmFeed',
           label,
           style: const TextStyle(color: Colors.white, fontSize: 12.5),
         ),
@@ -815,11 +816,12 @@ class _SlmFeed extends StatelessWidget {
                   width: 42,
                   height: 42,
                   child: ClipOval(
-                    child: Image.asset(
+                    child: EditableImage.asset(
                       'assets/store/intro-store.webp',
                       fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) =>
                           const ColoredBox(color: Color(0xFF1A1A1A)),
+                          slot: 'sound_library.SlmFeed',
                     ),
                   ),
                 ),
@@ -827,7 +829,7 @@ class _SlmFeed extends StatelessWidget {
                 const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    EditableLabel('sound_library.SlmFeed',
                       'YOUR PRACTICE',
                       style: TextStyle(
                         color: Color(0x99FFFFFF),
@@ -836,7 +838,7 @@ class _SlmFeed extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    Text(
+                    EditableLabel('sound_library.SlmFeed',
                       'Speed dial',
                       style: TextStyle(
                         color: Colors.white,
@@ -921,11 +923,12 @@ class _SlmFeed extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              child: Image.asset(
+                              child: EditableImage.asset(
                                 src,
                                 fit: BoxFit.cover,
                                 errorBuilder: (_, __, ___) =>
                                     const ColoredBox(color: Color(0xFF1A1A1A)),
+                                    slot: 'sound_library.SlmFeed',
                               ),
                             ),
                             ),
@@ -986,11 +989,12 @@ class _SlmFeed extends StatelessWidget {
               width: 76,
               child: FramedSlot(
                 frame: DeviceFrame.tab6Landscape,
-                child: Image.asset(
+                child: EditableImage.asset(
                   art(w.word),
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) =>
                       const ColoredBox(color: Color(0xFF1A1A1A)),
+                      slot: 'sound_library.SlmFeed',
                 ),
               ),
             ),
@@ -999,7 +1003,7 @@ class _SlmFeed extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  EditableLabel('sound_library.SlmFeed',
                     label,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -1010,7 +1014,7 @@ class _SlmFeed extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 2),
-                  Text(
+                  EditableLabel('sound_library.SlmFeed',
                     subtitle,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -1143,7 +1147,7 @@ class _SlmFeed extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    const EditableLabel('sound_library.SlmFeed',
                       'Finish a practice session and the sentence you built is saved here.',
                       style: TextStyle(
                           color: Color(0x99FFFFFF), fontSize: 13, height: 1.45),
@@ -1168,11 +1172,12 @@ class _SlmFeed extends StatelessWidget {
                             width: 76,
                             child: FramedSlot(
                               frame: DeviceFrame.tab6Landscape,
-                              child: Image.asset(
+                              child: EditableImage.asset(
                                 art(it.trio.first.word),
                                 fit: BoxFit.cover,
                                 errorBuilder: (_, __, ___) =>
                                     const ColoredBox(color: Color(0xFF1A1A1A)),
+                                    slot: 'sound_library.SlmFeed',
                               ),
                             ),
                           ),
@@ -1247,11 +1252,12 @@ class _SlmFeed extends StatelessWidget {
                   children: [
                     FramedSlot(
                       frame: DeviceFrame.tab4Landscape,
-                      child: Image.asset(
+                      child: EditableImage.asset(
                         _colAsset(c),
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) =>
                             const ColoredBox(color: Color(0xFF1A1A1A)),
+                            slot: 'sound_library.SlmFeed',
                       ),
                     ),
                     const SizedBox(height: 6),
@@ -1310,11 +1316,12 @@ class _SlmFeed extends StatelessWidget {
                   children: [
                     FramedSlot(
                       frame: DeviceFrame.tab4Landscape,
-                      child: Image.asset(
+                      child: EditableImage.asset(
                         art(w.word),
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) =>
                             const ColoredBox(color: Color(0xFF1A1A1A)),
+                            slot: 'sound_library.SlmFeed',
                       ),
                     ),
                     const SizedBox(height: 6),
@@ -1381,12 +1388,13 @@ class _SlmFeed extends StatelessWidget {
                         physics: const NeverScrollableScrollPhysics(),
                         children: [
                           for (var q = 0; q < 4; q++)
-                            Image.asset(
+                            EditableImage.asset(
                               _colAsset(kRmCategories[
                                   (_hash(c) + q * 4) % kRmCategories.length]),
                               fit: BoxFit.cover,
                               errorBuilder: (_, __, ___) =>
                                   const ColoredBox(color: Color(0xFF1A1A1A)),
+                                  slot: 'sound_library.SlmFeed',
                             ),
                         ],
                       ),
@@ -1450,13 +1458,14 @@ class _SlmFeed extends StatelessWidget {
                             child: FramedSlot(
                               frame: DeviceFrame.tab6Landscape,
                               child: m.img.isNotEmpty
-                                  ? NwsbImage(url: m.img)
-                                  : Image.asset(
+                                  ? NwsbImage(url: m.img, slot: 'sound_library.SlmFeed')
+                                  : EditableImage.asset(
                                       art(m.name),
                                       fit: BoxFit.cover,
                                       errorBuilder: (_, __, ___) =>
                                           const ColoredBox(
                                               color: Color(0xFF1A1A1A)),
+                                              slot: 'sound_library.SlmFeed',
                                     ),
                             ),
                           ),
@@ -1549,7 +1558,7 @@ class _StoreFilmReelState extends State<_StoreFilmReel> {
           child: Row(
             children: [
               const Expanded(
-                child: Text(
+                child: EditableLabel('sound_library.StoreFilmReel',
                   'From the Store',
                   style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700),
                 ),
@@ -1588,6 +1597,7 @@ class _StoreFilmReelState extends State<_StoreFilmReel> {
                               asset: x.asset,
                               priority: ClipPriority.decoration,
                               fit: BoxFit.cover,
+                              slot: 'sound_library.StoreFilmReel',
                             ),
                           ),
                         ),
@@ -1710,7 +1720,7 @@ class _SlmHead extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
                 const Expanded(
-                  child: Text(
+                  child: EditableLabel('sound_library.SlmHead',
                     'NowssB',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -1739,7 +1749,7 @@ class _SlmHead extends StatelessWidget {
                   child: CircleAvatar(
                     radius: 14,
                     backgroundColor: const Color(0x33FFFFFF),
-                    child: Text(
+                    child: EditableLabel('sound_library.SlmHead',
                       'N',
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.9),
@@ -1840,11 +1850,12 @@ class _FeaturedMainCard extends StatelessWidget {
                   child: SizedBox(
                     width: 64,
                     height: 64,
-                    child: Image.asset(
+                    child: EditableImage.asset(
                       art,
                       fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) =>
                           const ColoredBox(color: Color(0xFF333333)),
+                          slot: 'sound_library.FeaturedMainCard',
                     ),
                   ),
                 ),
@@ -1897,7 +1908,7 @@ class _FeaturedMainCard extends StatelessWidget {
                           Icon(Icons.play_arrow_rounded,
                               color: Colors.black, size: 22),
                           SizedBox(width: 4),
-                          Text(
+                          EditableLabel('sound_library.FeaturedMainCard',
                             'Play',
                             style: TextStyle(
                               color: Colors.black,
@@ -1925,7 +1936,7 @@ class _FeaturedMainCard extends StatelessWidget {
                         children: [
                           Icon(Icons.add, color: Colors.white, size: 20),
                           SizedBox(width: 4),
-                          Text(
+                          EditableLabel('sound_library.FeaturedMainCard',
                             'Save',
                             style: TextStyle(
                               color: Colors.white,
@@ -1989,11 +2000,12 @@ class _HitsRail extends StatelessWidget {
                         child: SizedBox(
                           width: size,
                           height: size,
-                          child: Image.asset(
+                          child: EditableImage.asset(
                             art(w.word),
                             fit: BoxFit.cover,
                             errorBuilder: (_, __, ___) =>
                                 const ColoredBox(color: _kYtmCard),
+                                slot: 'sound_library.HitsRail',
                           ),
                         ),
                       ),
@@ -2112,11 +2124,12 @@ class _YtmTrackRow extends StatelessWidget {
                 child: SizedBox(
                   width: 56,
                   height: 56,
-                  child: Image.asset(
+                  child: EditableImage.asset(
                     art,
                     fit: BoxFit.cover,
                     errorBuilder: (_, __, ___) =>
                         const ColoredBox(color: _kYtmCard),
+                        slot: 'sound_library.YtmTrackRow',
                   ),
                 ),
               ),
@@ -2136,7 +2149,7 @@ class _YtmTrackRow extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 2),
-                    Text(
+                    EditableLabel('sound_library.YtmTrackRow',
                       sub,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -2177,7 +2190,7 @@ class _PlayAllPill extends StatelessWidget {
           color: const Color(0xFF2A2A2A),
           borderRadius: BorderRadius.circular(999),
         ),
-        child: const Text(
+        child: const EditableLabel('sound_library.PlayAllPill',
           'Play all',
           style: TextStyle(
             color: Colors.white,
@@ -2310,11 +2323,12 @@ class _CurrentlyPlayingRailState extends State<_CurrentlyPlayingRail>
                     child: SizedBox(
                       width: size,
                       height: size,
-                      child: Image.asset(
+                      child: EditableImage.asset(
                         widget.art(w.word),
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) =>
                             const ColoredBox(color: _kYtmCard),
+                            slot: 'sound_library.CurrentlyPlayingRail',
                       ),
                     ),
                   ),
@@ -2504,7 +2518,7 @@ class _BuyRequestCta extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    EditableLabel('sound_library.BuyRequestCta',
                       'Buy Request',
                       style: TextStyle(
                         color: Colors.white,
@@ -2513,7 +2527,7 @@ class _BuyRequestCta extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 2),
-                    Text(
+                    EditableLabel('sound_library.BuyRequestCta',
                       'Open the Store to request or purchase words',
                       style: TextStyle(color: _kYtmMuted, fontSize: 12.5),
                     ),
@@ -2556,11 +2570,12 @@ class _AtelierWordsScreen extends StatelessWidget {
                 fit: StackFit.expand,
                 children: [
                   Positioned.fill(
-                    child: Image.asset(
+                    child: EditableImage.asset(
                       _colAsset(category),
                       fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) =>
                           const ColoredBox(color: Color(0xFF111111)),
+                          slot: 'sound_library.AtelierWordsScreen',
                     ),
                   ),
                   Positioned.fill(
@@ -2624,7 +2639,7 @@ class _AtelierWordsScreen extends StatelessWidget {
           SliverToBoxAdapter(
             child: const Padding(
               padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
-              child: Text(
+              child: EditableLabel('sound_library.AtelierWordsScreen',
                 'Word list',
                 style: TextStyle(
                   color: Colors.white,
@@ -2661,11 +2676,12 @@ class _AtelierWordsScreen extends StatelessWidget {
                     child: SizedBox(
                       width: 48,
                       height: 48,
-                      child: Image.asset(
+                      child: EditableImage.asset(
                         _colAsset(category),
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) =>
                             const ColoredBox(color: _kYtmCard),
+                            slot: 'sound_library.AtelierWordsScreen',
                       ),
                     ),
                   ),
@@ -2858,6 +2874,7 @@ class _SoundCategoryScreenState extends State<SoundCategoryScreen> {
                           autoplay: true,
                           loop: true,
                           showPoster: true,
+                          slot: 'sound_library.SoundCategoryScreen',
                         ),
                       ),
                     ),
@@ -2883,7 +2900,7 @@ class _SoundCategoryScreenState extends State<SoundCategoryScreen> {
                             color: const Color(0xFFE8E8E8),
                             borderRadius: BorderRadius.circular(999),
                           ),
-                          child: const Text(
+                          child: const EditableLabel('sound_library.SoundCategoryScreen',
                             'Subscribe',
                             style: TextStyle(
                               color: Colors.black,
@@ -2922,7 +2939,7 @@ class _SoundCategoryScreenState extends State<SoundCategoryScreen> {
                   children: [
                     const Padding(
                       padding: EdgeInsets.fromLTRB(4, 0, 4, 10),
-                      child: Text(
+                      child: EditableLabel('sound_library.SoundCategoryScreen',
                         'Currently Playing',
                         style: TextStyle(
                           color: Colors.white,
@@ -2971,7 +2988,7 @@ class _SoundCategoryScreenState extends State<SoundCategoryScreen> {
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 18, 16, 10),
-                child: Text(
+                child: EditableLabel('sound_library.SoundCategoryScreen',
                   'Top songs',
                   style: const TextStyle(
                     color: Colors.white,
@@ -3008,7 +3025,7 @@ class _SoundCategoryScreenState extends State<SoundCategoryScreen> {
             const SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.all(24),
-                child: Text(
+                child: EditableLabel('sound_library.SoundCategoryScreen',
                   'No words in this category yet.',
                   style: TextStyle(color: Color(0x99FFFFFF)),
                 ),
@@ -3037,11 +3054,12 @@ class _SoundCategoryScreenState extends State<SoundCategoryScreen> {
                             child: SizedBox(
                               width: 52,
                               height: 52,
-                              child: Image.asset(
+                              child: EditableImage.asset(
                                 _art(w.word),
                                 fit: BoxFit.cover,
                                 errorBuilder: (_, __, ___) =>
                                     const ColoredBox(color: _kYtmCard),
+                                    slot: 'sound_library.SoundCategoryScreen',
                               ),
                             ),
                           ),

@@ -16,7 +16,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/earn_wallet.dart';
@@ -49,7 +48,9 @@ import 'practice_overlay.dart';
 import '../widgets/pronunciation_survey.dart';
 import '../data/settings.dart';
 import '../data/playback_session.dart';
+import '../data/word_voice.dart';
 import 'store/request_words.dart';
+import '../admin/template/editable.dart';
 
 String _fmtClock(num sec) {
   final s = sec.round().clamp(0, 24 * 3600);
@@ -238,6 +239,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     // When minimizing to the floating pill, PlaybackSession owns audio.
     if (!_handingOff) {
       unawaited(_tts.stop());
+      unawaited(WordVoice.instance.stop());
     }
     super.dispose();
   }
@@ -263,6 +265,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     if (mins <= 0) return;
     _sleepTimer = Timer(Duration(minutes: mins), () {
       unawaited(_tts.stop());
+      unawaited(WordVoice.instance.stop());
       if (mounted) setState(() => _playing = false);
     });
   }
@@ -354,9 +357,11 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       await _tts.setPitch(pitch.clamp(0.5, 2.0));
       await _tts.setVolume(volume.clamp(0.0, 1.0));
       await _tts.stop();
+      unawaited(WordVoice.instance.stop());
       final started = DateTime.now();
-      await _tts.speak(_word.word);
-      if (prefs.spatialAudio) {
+      final ownVoice = await WordVoice.instance.play(_word, volume: volume);
+      if (!ownVoice) await _tts.speak(_word.word);
+      if (prefs.spatialAudio && !ownVoice) {
         await _tts.setPitch((pitch * 1.16).clamp(0.5, 2.0));
         await _tts.setVolume((volume * 0.42).clamp(0.0, 1.0));
         final echo = _word.word.trim();
@@ -385,6 +390,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     _handingOff = true;
     try {
       await _tts.stop();
+      unawaited(WordVoice.instance.stop());
     } catch (_) {}
     await PlaybackSession.instance.adoptFromPlayer(
       words: widget.words,
@@ -400,6 +406,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
   Future<void> _togglePlay() async {
     if (_playing) {
       await _tts.stop();
+      unawaited(WordVoice.instance.stop());
       if (mounted) setState(() => _playing = false);
       return;
     }
@@ -412,6 +419,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
         : DateTime.now().difference(_startedAt!).inMilliseconds / 1000;
     if (elapsed > 1.5) {
       await _tts.stop();
+      unawaited(WordVoice.instance.stop());
       if (mounted)
         setState(() {
           _playing = false;
@@ -434,6 +442,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       next = math.Random().nextInt(widget.words.length);
     }
     await _tts.stop();
+    unawaited(WordVoice.instance.stop());
     setState(() {
       _index = next;
       _liked = false;
@@ -476,7 +485,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              const Text(
+                              const EditableLabel(
+                                'practice_player.PracticePlayerScreen',
                                 'Quick tools',
                                 style: TextStyle(
                                   color: Colors.white,
@@ -572,7 +582,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                 Icon(icon, color: const Color(0xFFE8D5A3), size: 18),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: Text(
+                  child: EditableLabel(
+                    'practice_player.PracticePlayerScreen',
                     label,
                     style: const TextStyle(
                       color: Colors.white,
@@ -611,6 +622,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
             return;
           }
           await _tts.stop();
+          unawaited(WordVoice.instance.stop());
           setState(() {
             _index = i;
             _liked = false;
@@ -659,6 +671,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       if (next < 0) next += widget.words.length;
     }
     await _tts.stop();
+    unawaited(WordVoice.instance.stop());
     final fade = switch (Settings.instance.crossfade) {
       '3 Sec' => 3,
       '5 Sec' => 5,
@@ -827,7 +840,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                       ),
                     ),
                     const Expanded(
-                      child: Text(
+                      child: EditableLabel(
+                        'practice_player.PracticePlayerScreen',
                         'NowssB Player',
                         textAlign: TextAlign.center,
                         style: TextStyle(
@@ -869,7 +883,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                         size: 30,
                       ),
                       SizedBox(height: 5),
-                      Text(
+                      EditableLabel(
+                        'practice_player.PracticePlayerScreen',
                         'SETTINGS',
                         style: TextStyle(
                           color: Colors.white70,
@@ -890,7 +905,10 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                 accent: _theme.accent,
                 onTap: () => ScaffoldMessenger.of(this.context).showSnackBar(
                   const SnackBar(
-                    content: Text('NowssB uses your selected device voice.'),
+                    content: EditableLabel(
+                      'practice_player.PracticePlayerScreen',
+                      'NowssB uses your selected device voice.',
+                    ),
                   ),
                 ),
               ),
@@ -949,7 +967,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                 left: 24,
                 right: 24,
                 bottom: 20,
-                child: Text(
+                child: EditableLabel(
+                  'practice_player.PracticePlayerScreen',
                   'Choose a player control',
                   textAlign: TextAlign.center,
                   style: TextStyle(
@@ -976,7 +995,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
           foregroundColor: Colors.white,
         ),
         body: const Center(
-          child: Text(
+          child: EditableLabel(
+            'practice_player.PracticePlayerScreen',
             'Choose words for your routine before starting a session.',
             textAlign: TextAlign.center,
             style: TextStyle(color: Colors.white70),
@@ -1034,6 +1054,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                     autoplay: true,
                     loop: true,
                     showPoster: false,
+                    slot: 'practice_player.PracticePlayerScreen',
                   ),
                 ),
               ),
@@ -1092,6 +1113,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                                   ),
                                   onSyllable: (part) async {
                                     await _tts.stop();
+                                    unawaited(WordVoice.instance.stop());
                                     await _tts.speak(
                                       part.roman.isNotEmpty
                                           ? part.roman
@@ -1213,6 +1235,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                                         return;
                                       }
                                       await _tts.stop();
+                                      unawaited(WordVoice.instance.stop());
                                       setState(() {
                                         _index = i;
                                         _liked = false;
@@ -1266,10 +1289,11 @@ class _PlayerThemeArtwork extends StatelessWidget {
         errorBuilder: (_, __, ___) => const ColoredBox(color: NwsbColors.deep),
       );
     }
-    return Image.asset(
+    return EditableImage.asset(
       theme.image,
       fit: BoxFit.cover,
       errorBuilder: (_, __, ___) => const ColoredBox(color: NwsbColors.deep),
+      slot: 'practice_player.PlayerThemeArtwork',
     );
   }
 }
@@ -1300,7 +1324,8 @@ class _PlayerHeader extends StatelessWidget {
         const Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
+            EditableLabel(
+              'practice_player.PlayerHeader',
               'NOW PLAYING',
               style: TextStyle(
                 color: Color(0xFF9A9A9E),
@@ -1339,9 +1364,10 @@ class _StatsRow extends StatelessWidget {
         children: [
           const ColoredBox(color: Colors.black),
           IgnorePointer(
-            child: Image.asset(
+            child: EditableImage.asset(
               'assets/frames/word-acts-tab.webp',
               fit: BoxFit.fill,
+              slot: 'practice_player.StatsRow',
             ),
           ),
           Padding(
@@ -1447,7 +1473,8 @@ class _ProfileHeader extends StatelessWidget {
             ],
           ),
           alignment: Alignment.center,
-          child: Text(
+          child: EditableLabel(
+            'practice_player.ProfileHeader',
             'H',
             style: TextStyle(
               color: const Color(0xFF0A0A12),
@@ -1461,7 +1488,8 @@ class _ProfileHeader extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              EditableLabel(
+                'practice_player.ProfileHeader',
                 'Healer',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -1476,7 +1504,8 @@ class _ProfileHeader extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 2),
-              Text(
+              EditableLabel(
+                'practice_player.ProfileHeader',
                 'Healing through words',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -1649,7 +1678,8 @@ class _NextUpCard extends StatelessWidget {
         clipBehavior: Clip.hardEdge,
         child: next == null
             ? const Center(
-                child: Text(
+                child: EditableLabel(
+                  'practice_player.NextUpCard',
                   'End of queue',
                   style: TextStyle(color: Color(0xFF8E8E93), fontSize: 12),
                 ),
@@ -1673,7 +1703,8 @@ class _NextUpCard extends StatelessWidget {
                     child: Row(
                       children: [
                         const Expanded(
-                          child: Text(
+                          child: EditableLabel(
+                            'practice_player.NextUpCard',
                             'UP NEXT',
                             style: TextStyle(
                               color: Color(0xFF8D8D92),
@@ -1728,13 +1759,15 @@ class _NextUpCard extends StatelessWidget {
                                                     color: Color(0xFF111111),
                                                   ),
                                             )
-                                          : Image.asset(
+                                          : EditableImage.asset(
                                               art,
                                               fit: BoxFit.cover,
                                               errorBuilder: (_, __, ___) =>
                                                   const ColoredBox(
                                                     color: Color(0xFF111111),
                                                   ),
+                                              slot:
+                                                  'practice_player.NextUpCard',
                                             ))
                                     : const ColoredBox(
                                         color: Color(0xFF111111),
@@ -1954,7 +1987,10 @@ class _QueueSheetState extends State<_QueueSheet> {
     setState(() => _saved = true);
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Saved to your library'),
+        content: EditableLabel(
+          'practice_player.QueueSheet',
+          'Saved to your library',
+        ),
         duration: Duration(seconds: 2),
         behavior: SnackBarBehavior.floating,
       ),
@@ -2000,6 +2036,7 @@ class _QueueSheetState extends State<_QueueSheet> {
                     priority: ClipPriority.decoration,
                     autoplay: true,
                     loop: true,
+                    slot: 'practice_player.QueueSheet',
                   ),
                 ),
               ),
@@ -2132,7 +2169,8 @@ class _QueueSheetState extends State<_QueueSheet> {
                             const SliverFillRemaining(
                               hasScrollBody: false,
                               child: Center(
-                                child: Text(
+                                child: EditableLabel(
+                                  'practice_player.QueueSheet',
                                   'No tracks in this filter',
                                   style: TextStyle(
                                     color: Color(0xFF8E8E93),
@@ -2233,7 +2271,7 @@ class _QueueSheetState extends State<_QueueSheet> {
                                                                     ),
                                                                   ),
                                                             )
-                                                          : Image.asset(
+                                                          : EditableImage.asset(
                                                               rowArt,
                                                               fit: BoxFit.cover,
                                                               errorBuilder:
@@ -2246,6 +2284,7 @@ class _QueueSheetState extends State<_QueueSheet> {
                                                                       0xFF111111,
                                                                     ),
                                                                   ),
+                                                              slot: 'practice_player.QueueSheet',
                                                             ),
                                                       if (isCurrent)
                                                         const Align(
@@ -2477,6 +2516,7 @@ class _YtmCollapsingHero extends StatelessWidget {
                 autoplay: true,
                 loop: true,
                 showPoster: true,
+                slot: 'practice_player.YtmCollapsingHero',
               )
             else if (art.startsWith('http'))
               Image.network(
@@ -2486,11 +2526,12 @@ class _YtmCollapsingHero extends StatelessWidget {
                     const ColoredBox(color: Color(0xFF111111)),
               )
             else
-              Image.asset(
+              EditableImage.asset(
                 art,
                 fit: BoxFit.cover,
                 errorBuilder: (_, __, ___) =>
                     const ColoredBox(color: Color(0xFF111111)),
+                slot: 'practice_player.YtmCollapsingHero',
               ),
           ],
         ),
@@ -2590,6 +2631,7 @@ class _YtmCollapsingHero extends StatelessWidget {
                                       priority: ClipPriority.feature,
                                       autoplay: true,
                                       loop: true,
+                                      slot: 'practice_player.YtmCollapsingHero',
                                     )
                                   : const ColoredBox(color: Color(0xFF111111)),
                             ),
@@ -2610,7 +2652,8 @@ class _YtmCollapsingHero extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
+                          EditableLabel(
+                            'practice_player.YtmCollapsingHero',
                             title,
                             maxLines: 2,
                             overflow: TextOverflow.fade,
@@ -2624,7 +2667,8 @@ class _YtmCollapsingHero extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 2),
-                          Text(
+                          EditableLabel(
+                            'practice_player.YtmCollapsingHero',
                             subtitle,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -2697,7 +2741,8 @@ class _YtmCollapsingHero extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
+                  EditableLabel(
+                    'practice_player.YtmCollapsingHero',
                     title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -2709,7 +2754,8 @@ class _YtmCollapsingHero extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 2),
-                  Text(
+                  EditableLabel(
+                    'practice_player.YtmCollapsingHero',
                     subtitle,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -2777,7 +2823,8 @@ class _QueueStickyHeadDelegate extends SliverPersistentHeaderDelegate {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      const EditableLabel(
+                        'practice_player.QueueStickyHeadDelegate',
                         'Playing from',
                         style: TextStyle(
                           color: Color(0xFF9A9AA0),
@@ -2902,11 +2949,12 @@ class _StoreGlassVideoBox extends StatelessWidget {
               fit: StackFit.expand,
               children: [
                 const ColoredBox(color: Color(0xFF050505)),
-                Image.asset(
+                EditableImage.asset(
                   _asset,
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) =>
                       const ColoredBox(color: Color(0xFF111111)),
+                  slot: 'practice_player.StoreGlassVideoBox',
                 ),
                 DecoratedBox(
                   decoration: BoxDecoration(
@@ -2981,6 +3029,7 @@ class _VisualStage extends StatelessWidget {
               autoplay: true,
               loop: true,
               showPoster: true,
+              slot: 'practice_player.VisualStage',
             ),
             const DecoratedBox(
               decoration: BoxDecoration(
@@ -3882,7 +3931,8 @@ class _SyllablePill extends StatelessWidget {
           color: const Color(0xFFF5F5F5),
           borderRadius: BorderRadius.circular(99),
         ),
-        child: Text(
+        child: EditableLabel(
+          'practice_player.SyllablePill',
           text,
           style: const TextStyle(
             color: Color(0xFF0A0A0B),
@@ -4044,13 +4094,14 @@ class _TransportTube extends StatelessWidget {
           child: SizedBox(
             width: 58,
             height: 58,
-            child: Image.asset(
+            child: EditableImage.asset(
               playing
                   ? 'assets/player/lgp-pause.png'
                   : 'assets/player/lgp-play.png',
               fit: BoxFit.contain,
               errorBuilder: (_, __, ___) =>
                   Image.network(playing ? _pause : _play, fit: BoxFit.contain),
+              slot: 'practice_player.TransportTube',
             ),
           ),
         ),
@@ -4100,7 +4151,8 @@ class _QueueFilterPill extends StatelessWidget {
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          child: Text(
+          child: EditableLabel(
+            'practice_player.QueueFilterPill',
             label,
             style: TextStyle(
               color: selected
@@ -4355,7 +4407,7 @@ class _ImageControl extends StatelessWidget {
         child: SizedBox(
           width: size,
           height: size,
-          child: Image.asset(
+          child: EditableImage.asset(
             asset,
             fit: BoxFit.contain,
             errorBuilder: (_, __, ___) => network != null
@@ -4377,6 +4429,7 @@ class _ImageControl extends StatelessWidget {
                     color: Colors.white,
                     size: size * .68,
                   ),
+            slot: 'practice_player.ImageControl',
           ),
         ),
       ),
@@ -4423,7 +4476,8 @@ class _RadialOption extends StatelessWidget {
             children: [
               Icon(icon, color: accent, size: 20),
               const SizedBox(height: 4),
-              Text(
+              EditableLabel(
+                'practice_player.RadialOption',
                 label,
                 style: const TextStyle(
                   color: Colors.white70,
@@ -4628,7 +4682,8 @@ class _InfoFact extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        EditableLabel(
+          'practice_player.InfoFact',
           label,
           style: TextStyle(
             color: accent,
@@ -4809,7 +4864,8 @@ class _PracticeNotesSheet extends StatelessWidget {
                     Row(
                       children: [
                         const Expanded(
-                          child: Text(
+                          child: EditableLabel(
+                            'practice_player.PracticeNotesSheet',
                             'NOTES',
                             style: TextStyle(
                               color: Colors.white70,
@@ -4886,7 +4942,8 @@ class _PracticeNotesSheet extends StatelessWidget {
                           ),
                           const SizedBox(width: 10),
                           const Expanded(
-                            child: Text(
+                            child: EditableLabel(
+                              'practice_player.PracticeNotesSheet',
                               'Play the reference. Speak naturally. The practice engine compares your spoken word with the target sound.',
                               style: TextStyle(
                                 color: Colors.white70,
@@ -4921,7 +4978,8 @@ class _PracticeNotesSheet extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            EditableLabel(
+              'practice_player.PracticeNotesSheet',
               title,
               style: const TextStyle(
                 color: Colors.white54,
@@ -4931,7 +4989,8 @@ class _PracticeNotesSheet extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 7),
-            Text(
+            EditableLabel(
+              'practice_player.PracticeNotesSheet',
               body,
               style: const TextStyle(
                 color: Colors.white,

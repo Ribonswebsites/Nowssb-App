@@ -14,6 +14,7 @@ import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import 'app_backdrop.dart';
 import '../screens/store/bag_ui.dart';
+import '../admin/template/editable.dart';
 
 class PageShell extends StatefulWidget {
   const PageShell({
@@ -82,6 +83,7 @@ class _PageShellState extends State<PageShell> {
                     priority: ClipPriority.decoration,
                     autoplay: true,
                     loop: true,
+                    slot: 'page_shell.PageShell',
                   )
                 : const AppBackdrop(),
           ),
@@ -190,7 +192,7 @@ class _PageShellState extends State<PageShell> {
                                 ),
                                 const SizedBox(height: 4),
                               ],
-                              Text(
+                              EditableLabel('page_shell.PageShell',
                                 widget.title,
                                 style: const TextStyle(
                                   fontSize: 28,
@@ -238,7 +240,7 @@ class _PageShellState extends State<PageShell> {
                                 children: [
                                   Icon(Icons.storefront_outlined, size: 18, color: Colors.white),
                                   SizedBox(width: 6),
-                                  Text(
+                                  EditableLabel('page_shell.PageShell',
                                     'Stores',
                                     style: TextStyle(
                                       fontSize: 12,
@@ -301,14 +303,14 @@ class DarkHead extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
+              EditableLabel('page_shell.DarkHead',
                 eyebrow,
                 style: const TextStyle(
                   fontSize: 12,
                   color: Color(0x99FFFFFF),
                 ),
               ),
-              Text(
+              EditableLabel('page_shell.DarkHead',
                 title,
                 style: const TextStyle(
                   fontSize: 18,
@@ -393,7 +395,7 @@ class WordRow extends StatelessWidget {
                   ),
                   if (sub.isNotEmpty) ...[
                     const SizedBox(height: 2),
-                    Text(
+                    EditableLabel('page_shell.WordRow',
                       sub,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,

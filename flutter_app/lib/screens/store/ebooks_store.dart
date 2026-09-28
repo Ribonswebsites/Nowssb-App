@@ -19,6 +19,7 @@ import 'store_home_sections.dart';
 import 'store_select_sheet.dart';
 import 'store_routes.dart';
 import '../sound_library.dart';
+import '../../admin/template/editable.dart';
 
 class EbooksStoreScreen extends StatelessWidget {
   const EbooksStoreScreen({super.key});
@@ -94,6 +95,7 @@ class _EbooksBody extends StatelessWidget {
                   asset: 'assets/video/hero-ebooks.mp4',
                   poster: 'assets/video/hero-ebooks-poster.webp',
                   priority: ClipPriority.feature,
+                  slot: 'ebooks_store.EbooksBody',
                 ),
                 const DecoratedBox(
                   decoration: BoxDecoration(
@@ -115,7 +117,7 @@ class _EbooksBody extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
+                            EditableLabel('ebooks_store.EbooksBody',
                               'READ · LEARN · PRACTICE',
                               style: TextStyle(
                                 fontSize: 10,
@@ -125,7 +127,7 @@ class _EbooksBody extends StatelessWidget {
                               ),
                             ),
                             SizedBox(height: 6),
-                            Text(
+                            EditableLabel('ebooks_store.EbooksBody',
                               'The NowssB Ebooks',
                               style: TextStyle(
                                 fontSize: 24,
@@ -138,19 +140,21 @@ class _EbooksBody extends StatelessWidget {
                       ),
                       ClipRRect(
                         borderRadius: BorderRadius.circular(14),
-                        child: Image.asset(
+                        child: EditableImage.asset(
                           kEbProductArt,
                           width: 56,
                           height: 56,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Image.asset(
+                          errorBuilder: (_, __, ___) => EditableImage.asset(
                             kEbIntroArt,
                             width: 56,
                             height: 56,
                             fit: BoxFit.cover,
                             errorBuilder: (_, __, ___) =>
                                 const SizedBox(width: 56, height: 56),
+                                slot: 'ebooks_store.EbooksBody',
                           ),
+                          slot: 'ebooks_store.EbooksBody',
                         ),
                       ),
                     ],
@@ -231,7 +235,7 @@ class _EbookBrowseStrip extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          const EditableLabel('ebooks_store.EbookBrowseStrip',
             'Browse ebooks',
             style: TextStyle(
               fontSize: 16,
@@ -272,11 +276,12 @@ class _EbookBrowseStrip extends StatelessWidget {
                           child: ClipOval(
                             child: ColoredBox(
                               color: g.$3,
-                              child: Image.asset(
+                              child: EditableImage.asset(
                                 g.$2,
                                 fit: BoxFit.cover,
                                 errorBuilder: (_, __, ___) =>
                                     const ColoredBox(color: Color(0xFF0A0F1C)),
+                                    slot: 'ebooks_store.EbookBrowseStrip',
                               ),
                             ),
                           ),
@@ -455,7 +460,7 @@ class _EbookRow extends StatelessWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Text(
+                            const EditableLabel('ebooks_store.EbookRow',
                               'Buy Now',
                               style: TextStyle(
                                 fontSize: 12,
@@ -466,7 +471,7 @@ class _EbookRow extends StatelessWidget {
                             const SizedBox(width: 8),
                             ClipRRect(
                               borderRadius: BorderRadius.circular(4),
-                              child: Image.asset(
+                              child: EditableImage.asset(
                                 kEbProductArt,
                                 width: 18,
                                 height: 18,
@@ -476,6 +481,7 @@ class _EbookRow extends StatelessWidget {
                                   size: 16,
                                   color: NwsbColors.ink,
                                 ),
+                                slot: 'ebooks_store.EbookRow',
                               ),
                             ),
                           ],

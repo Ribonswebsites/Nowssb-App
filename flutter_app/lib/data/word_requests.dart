@@ -1,10 +1,18 @@
-/// Persisted user word requests + admin fulfillment (SharedPreferences).
+/// Word requests: kept on this phone (the person's own list) AND sent to
+/// Firestore `requests` — the same collection the website writes and the
+/// studio / admin mode reads. A request made while signed out (or offline)
+/// is parked and goes out the next time someone is signed in.
 library;
 
+import 'dart:async';
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'firebase.dart';
 
 class WordRequest {
   WordRequest({
@@ -50,6 +58,74 @@ class WordRequestStore extends ChangeNotifier {
   static final WordRequestStore instance = WordRequestStore._();
 
   static const _prefsKey = 'nwsb_word_requests_v1';
+  static const _queueKey = 'nwsb_word_requests_outbox_v1';
+  StreamSubscription<User?>? _authSub;
+
+  /// Flushes parked requests whenever someone signs in.
+  void startSync() {
+    if (!NwsbFirebase.ready || _authSub != null) return;
+    _authSub = FirebaseAuth.instance.authStateChanges().listen((u) {
+      if (u != null) unawaited(_flush());
+    });
+  }
+
+  Map<String, dynamic> _row(User u, String word, String notes, int at) => {
+        'kind': 'word',
+        'word': word.length > 80 ? word.substring(0, 80) : word,
+        'notes': notes.length > 500 ? notes.substring(0, 500) : notes,
+        'uid': u.uid,
+        'email': u.email,
+        'name': u.displayName,
+        'status': 'new',
+        'at': at,
+        'source': 'flutter',
+      };
+
+  /// Sends one request, or parks it. Never throws.
+  Future<bool> _send(String word, String notes, int at) async {
+    final u = NwsbFirebase.ready ? FirebaseAuth.instance.currentUser : null;
+    if (u != null) {
+      try {
+        await FirebaseFirestore.instance
+            .collection('requests')
+            .add(_row(u, word, notes, at))
+            .timeout(const Duration(seconds: 12));
+        return true;
+      } catch (e) {
+        debugPrint('NowssB request not sent: $e');
+      }
+    }
+    try {
+      final p = await SharedPreferences.getInstance();
+      final q = p.getStringList(_queueKey) ?? <String>[];
+      q.add(jsonEncode({'word': word, 'notes': notes, 'at': at}));
+      await p.setStringList(_queueKey, q.length > 30 ? q.sublist(q.length - 30) : q);
+    } catch (_) {}
+    return false;
+  }
+
+  Future<void> _flush() async {
+    final u = FirebaseAuth.instance.currentUser;
+    if (u == null) return;
+    final p = await SharedPreferences.getInstance();
+    final q = p.getStringList(_queueKey) ?? const <String>[];
+    if (q.isEmpty) return;
+    await p.remove(_queueKey);
+    final failed = <String>[];
+    for (final raw in q) {
+      try {
+        final m = jsonDecode(raw) as Map;
+        await FirebaseFirestore.instance.collection('requests').add(_row(
+            u, '${m['word']}', '${m['notes'] ?? ''}', (m['at'] as num).toInt()));
+      } catch (_) {
+        failed.add(raw);
+      }
+    }
+    if (failed.isNotEmpty) {
+      final now = p.getStringList(_queueKey) ?? <String>[];
+      await p.setStringList(_queueKey, [...failed, ...now]);
+    }
+  }
 
   final List<WordRequest> _items = [];
   bool _loaded = false;
@@ -106,6 +182,7 @@ class WordRequestStore extends ChangeNotifier {
     _items.insert(0, req);
     await _persist();
     notifyListeners();
+    unawaited(_send(req.word, req.notes, req.createdAt.millisecondsSinceEpoch));
     return req;
   }
 

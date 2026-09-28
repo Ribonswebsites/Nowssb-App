@@ -38,6 +38,7 @@ import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/tv_frame.dart';
 import 'follow_steps.dart';
+import '../../admin/template/editable.dart';
 
 const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
 
@@ -400,7 +401,7 @@ class _HeroCard extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           const _Sep(),
-                          const Text(
+                          const EditableLabel('hero.HeroCard',
                             'LEARN',
                             maxLines: 1,
                             style: TextStyle(
@@ -570,7 +571,7 @@ class _ShopChip extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
+                EditableLabel('hero.ShopChip',
                   "TODAY'S",
                   style: TextStyle(
                     fontSize: 11,
@@ -580,7 +581,7 @@ class _ShopChip extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 1),
-                Text(
+                EditableLabel('hero.ShopChip',
                   'Words & meanings',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -626,7 +627,7 @@ class _QuickAccessChip extends StatelessWidget {
           children: [
             Icon(Icons.apps_rounded, size: 16, color: Colors.white),
             SizedBox(width: 6),
-            Text(
+            EditableLabel('hero.QuickAccessChip',
               'Quick action',
               style: TextStyle(
                 color: Colors.white,
@@ -660,7 +661,7 @@ class _SearchPill extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
+            const EditableLabel('hero.SearchPill',
               'SEARCH',
               style: TextStyle(
                 fontSize: 11,
@@ -681,10 +682,11 @@ class _SearchPill extends StatelessWidget {
               // is in the repository — the one mark on this card that is a
               // picture rather than a path.
               padding: const EdgeInsets.all(8),
-              child: Image.asset(
+              child: EditableImage.asset(
                 'assets/icons/search.webp',
                 errorBuilder: (_, __, ___) =>
                     const Icon(Icons.search, size: 19, color: Colors.white),
+                    slot: 'hero.SearchPill',
               ),
             ),
           ],
@@ -716,7 +718,7 @@ class _FootButton extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Flexible(
-              child: Text(
+              child: EditableLabel('hero.FootButton',
                 label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

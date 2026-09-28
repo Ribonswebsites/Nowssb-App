@@ -15,6 +15,7 @@ import '../word_detail.dart';
 import 'bag_ui.dart';
 import 'store_actions.dart';
 import 'store_cards.dart';
+import '../../admin/template/editable.dart';
 
 void openAtelierWord(
   BuildContext context, {
@@ -171,7 +172,7 @@ class _StoreProductPageState extends State<StoreProductPage> {
                     icon: const Icon(Icons.arrow_back, color: Colors.white),
                   ),
                   Expanded(
-                    child: Text(
+                    child: EditableLabel('product_detail.StoreProductPage',
                       title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -196,6 +197,7 @@ class _StoreProductPageState extends State<StoreProductPage> {
                       child: NwsbVideo(
                         asset: heroVideo!,
                         priority: ClipPriority.feature,
+                        slot: 'product_detail.StoreProductPage',
                       ),
                     ),
                     const SizedBox(height: 0),
@@ -216,7 +218,7 @@ class _StoreProductPageState extends State<StoreProductPage> {
                           ),
                         ),
                         const SizedBox(height: 6),
-                        Text(
+                        EditableLabel('product_detail.StoreProductPage',
                           title,
                           style: const TextStyle(
                             fontSize: 30,
@@ -301,7 +303,7 @@ class _StoreProductPageState extends State<StoreProductPage> {
                           },
                         ),
                         const SizedBox(height: 22),
-                        const Text(
+                        const EditableLabel('product_detail.StoreProductPage',
                           'ABOUT',
                           style: TextStyle(
                             fontSize: 9,
@@ -320,7 +322,7 @@ class _StoreProductPageState extends State<StoreProductPage> {
                           ),
                         ),
                         const SizedBox(height: 22),
-                        const Text(
+                        const EditableLabel('product_detail.StoreProductPage',
                           "WHAT'S INCLUDED",
                           style: TextStyle(
                             fontSize: 9,
@@ -419,7 +421,7 @@ class _ActBtn extends StatelessWidget {
             if (filled) const SizedBox(width: 8),
             if (!filled) NwsbIcon(mark, size: 16, color: ink),
             if (!filled) const SizedBox(width: 8),
-            Text(
+            EditableLabel('product_detail.ActBtn',
               label,
               style: TextStyle(
                 fontSize: 13,

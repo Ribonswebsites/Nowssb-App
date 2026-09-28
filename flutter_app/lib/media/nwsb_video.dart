@@ -16,6 +16,10 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import '../admin/admin_state.dart';
+import '../admin/template/editable.dart' show SlotBadge;
+import '../admin/template/slot_keys.dart';
+import '../admin/template/ui_overrides.dart';
 import 'video_pool.dart';
 
 class NwsbVideo extends StatefulWidget {
@@ -29,7 +33,19 @@ class NwsbVideo extends StatefulWidget {
     this.autoplay = true,
     this.alignment = Alignment.center,
     this.showPoster = true,
+    this.slot,
+    this.id,
   });
+
+  /// Live template editor: where this clip is (`<file>.<Class>` or a
+  /// section name). The owner can replace the clip from admin edit mode and
+  /// every app plays the replacement — see lib/admin/README.md.
+  final String? slot;
+
+  /// Optional exact element name; defaults to the clip's file name.
+  final String? id;
+
+  String get slotKey => '${slot ?? 'app'}.${id ?? slotMediaId(asset)}';
 
   /// Bundled path, e.g. 'assets/video/store-section.mp4'.
   final String asset;
@@ -80,6 +96,26 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
   /// is its poster, and its poster is a picture.
   VideoLease? _lease;
 
+  /// What actually plays: the owner's replacement once it is downloaded to
+  /// this phone, otherwise the bundled clip. The bundled clip keeps playing
+  /// while a replacement downloads, so the surface is never blank.
+  late String _src = _resolve();
+
+  String _resolve() {
+    final o = UiOverrides.instance.mediaFor(widget.slotKey, SlotType.video);
+    if (o == null) return widget.asset;
+    return UiOverrides.instance.fileFor(o.url) ?? widget.asset;
+  }
+
+  void _resync() {
+    final next = _resolve();
+    if (next == _src) return;
+    _src = next;
+    _drop();
+    _take();
+    if (mounted) setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
@@ -93,6 +129,8 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    UiScope.watch(context);
+    _resync();
     // Inherited route / Visibility are available here — promote feature
     // clips (orb, tab, page bg) to distance 0 immediately so they open
     // before layout settles, without letting hidden IndexedStack tabs steal
@@ -114,7 +152,7 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
 
   void _take() {
     final l = VideoPool.instance.lease(
-      widget.asset,
+      _src,
       priority: widget.priority,
       loop: widget.loop,
     );
@@ -173,7 +211,10 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
     super.didUpdateWidget(old);
     // A changed clip, or the motion switch moving under it. Both are the
     // same thing here: let go of what was held, take what is now wanted.
-    if (old.asset != widget.asset || old.loop != widget.loop) {
+    if (old.asset != widget.asset ||
+        old.loop != widget.loop ||
+        old.slotKey != widget.slotKey) {
+      _src = _resolve();
       _drop();
       _take();
       if (mounted) setState(() {});
@@ -287,6 +328,18 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    SlotRegistry.instance.see(widget.slotKey, SlotType.video, widget.asset);
+    final clip = _clip();
+    if (!EditMode.instance.on) return clip;
+    return SlotBadge(
+      slotKey: widget.slotKey,
+      type: SlotType.video,
+      defaultValue: widget.asset,
+      child: clip,
+    );
+  }
+
+  Widget _clip() {
     final c = _lease?.controller;
     final ready = (_lease?.isReady ?? false) && c != null;
 

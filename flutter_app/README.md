@@ -59,3 +59,12 @@ passwords, in **Settings → Secrets and variables → Actions**:
 `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`,
 `ANDROID_KEY_PASSWORD`. The keystore never enters this repository —
 `.gitignore` refuses `*.keystore`, `*.jks` and `key.properties`.
+
+## Admin mode / live template editor
+
+The owner can replace pictures, clips and copy live from inside the app
+(admin accounts only). **New UI must use the editable wrappers**
+(`EditableLabel`, `EditableImage`, `EditableSvg`, `NwsbVideo(slot:)`,
+`NwsbImage(slot:)`) instead of `Text('…')` / `Image.asset` /
+`SvgPicture.asset` for anything fixed — see `lib/admin/README.md`.
+

@@ -6,6 +6,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../data/cart_bag.dart';
 import '../theme/tokens.dart';
 import 'nwsb_icon.dart';
+import '../admin/template/editable.dart';
 
 /// Recreates the reference micro-interaction: the product pops out of the
 /// pressed button, the cart rolls in to catch it, then exits toward the cart
@@ -251,7 +252,7 @@ class _FlyingItem extends StatelessWidget {
           width: size,
           height: size,
           child: item.image.startsWith('assets/')
-              ? Image.asset(item.image, fit: BoxFit.cover)
+              ? EditableImage.asset(item.image, fit: BoxFit.cover, slot: 'cart_add_animation.FlyingItem')
               : CachedNetworkImage(
                   imageUrl: item.image,
                   fit: BoxFit.cover,

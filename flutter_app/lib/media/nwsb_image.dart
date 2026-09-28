@@ -36,6 +36,10 @@ library;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
+import '../admin/admin_state.dart';
+import '../admin/template/editable.dart' show SlotBadge, overrideImageProvider;
+import '../admin/template/slot_keys.dart';
+import '../admin/template/ui_overrides.dart';
 import 'media_map.dart';
 
 class NwsbImage extends StatelessWidget {
@@ -45,7 +49,18 @@ class NwsbImage extends StatelessWidget {
     this.fit = BoxFit.cover,
     this.alignment = Alignment.center,
     this.fallback,
+    this.slot,
+    this.id,
   });
+
+  /// Live template editor slot (see lib/admin/README.md). The owner can
+  /// replace this picture from admin edit mode.
+  final String? slot;
+
+  /// Optional exact element name; defaults to the picture's file name.
+  final String? id;
+
+  String get slotKey => '${slot ?? 'app'}.${id ?? slotMediaId(url)}';
 
   /// The address as it is written in index.html — remote or `./assets/…`.
   /// Copied verbatim so the two files can be compared line for line.
@@ -81,6 +96,26 @@ class NwsbImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    UiScope.watch(context);
+    final key = slotKey;
+    SlotRegistry.instance.see(key, SlotType.image, url);
+    final o = UiOverrides.instance.mediaFor(key, SlotType.image);
+    final Widget child = o == null
+        ? _picture()
+        : Image(
+            image: overrideImageProvider(o.url),
+            fit: fit,
+            alignment: alignment,
+            gaplessPlayback: true,
+            frameBuilder: (context, img, frame, sync) =>
+                (frame == null && !sync) ? _picture() : img,
+            errorBuilder: (_, __, ___) => _picture(),
+          );
+    if (!EditMode.instance.on) return child;
+    return SlotBadge(slotKey: key, type: SlotType.image, defaultValue: url, child: child);
+  }
+
+  Widget _picture() {
     final path = resolve(url);
 
     if (path != null) {

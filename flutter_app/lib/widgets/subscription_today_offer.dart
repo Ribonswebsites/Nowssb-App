@@ -14,6 +14,7 @@ import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import 'app_thinking_loader.dart';
 import 'glass_wrap.dart';
 import 'neumorphic.dart';
+import '../admin/template/editable.dart';
 
 const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
 
@@ -224,7 +225,7 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
+            const EditableLabel('subscription_today_offer.SubscriptionTodayOffer',
               'Subscription',
               style: TextStyle(
                 color: Colors.white,
@@ -234,7 +235,7 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
               ),
             ),
             const SizedBox(height: 6),
-            const Text(
+            const EditableLabel('subscription_today_offer.SubscriptionTodayOffer',
               'First tier free. Every other tier is half off today.',
               style: TextStyle(
                 color: Color(0xCCFFFFFF),
@@ -245,12 +246,13 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
             ),
             Expanded(
               child: ClipRect(
-                child: Image.asset(
+                child: EditableImage.asset(
                   'assets/banners/point-subscribe.jpg',
                   fit: BoxFit.fitHeight,
                   alignment: Alignment.bottomRight,
                   width: double.infinity,
                   height: double.infinity,
+                  slot: 'subscription_today_offer.SubscriptionTodayOffer',
                 ),
               ),
             ),
@@ -258,7 +260,7 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
             Row(
               children: [
                 const Expanded(
-                  child: Text(
+                  child: EditableLabel('subscription_today_offer.SubscriptionTodayOffer',
                     'Join today',
                     style: TextStyle(
                       color: Colors.white,
@@ -275,7 +277,7 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(99),
                     ),
-                    child: const Text(
+                    child: const EditableLabel('subscription_today_offer.SubscriptionTodayOffer',
                       'Subscribe',
                       style: TextStyle(
                         color: Color(0xFF111111),
@@ -312,7 +314,7 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
+                      EditableLabel('subscription_today_offer.SubscriptionTodayOffer',
                         'NowssB',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -325,7 +327,7 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
                         ),
                       ),
                       SizedBox(height: 6),
-                      Text(
+                      EditableLabel('subscription_today_offer.SubscriptionTodayOffer',
                         'Subscription',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -343,10 +345,11 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
               SizedBox(
                 width: 124,
                 height: 136,
-                child: Image.asset(
+                child: EditableImage.asset(
                   'assets/subscription/sub-hero.png',
                   fit: BoxFit.cover,
                   alignment: Alignment.topCenter,
+                  slot: 'subscription_today_offer.SubscriptionTodayOffer',
                 ),
               ),
             ],
@@ -589,7 +592,7 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                EditableLabel('subscription_today_offer.SubscriptionTodayOffer',
                   title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -610,7 +613,7 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
                       color: Colors.white,
                     ),
                   ),
-                Text(
+                EditableLabel('subscription_today_offer.SubscriptionTodayOffer',
                   sub,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -649,7 +652,7 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
             Container(width: 1, height: 22, color: const Color(0x33FFFFFF)),
             const SizedBox(width: 10),
             Expanded(
-              child: Text(
+              child: EditableLabel('subscription_today_offer.SubscriptionTodayOffer',
                 label,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -765,11 +768,12 @@ class _OfferFlipState extends State<_OfferFlip> with SingleTickerProviderStateMi
       child: Stack(
         fit: StackFit.expand,
         children: [
-          Image.asset(
+          EditableImage.asset(
             asset,
             fit: BoxFit.cover,
             alignment: Alignment.centerLeft,
             errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black),
+            slot: 'subscription_today_offer.OfferFlip',
           ),
           const DecoratedBox(
             decoration: BoxDecoration(
@@ -790,7 +794,7 @@ class _OfferFlipState extends State<_OfferFlip> with SingleTickerProviderStateMi
             left: 10,
             right: 8,
             top: 28,
-            child: Text(
+            child: EditableLabel('subscription_today_offer.OfferFlip',
               widget.title,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,

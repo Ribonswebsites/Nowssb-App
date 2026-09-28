@@ -16,6 +16,7 @@ import '../../theme/tokens.dart';
 import '../../widgets/black_glass_banner.dart';
 import 'glassmorphism_theme.dart';
 import 'essentials_process_line.dart';
+import '../../admin/template/editable.dart';
 
 class NmHorizontalRoutineCards extends StatefulWidget {
   const NmHorizontalRoutineCards({super.key, this.fashion = false});
@@ -109,14 +110,14 @@ class _NmHorizontalRoutineCardsState extends State<NmHorizontalRoutineCards> {
             child: Row(
               children: [
                 Expanded(
-                    child: Text(title,
+                    child: EditableLabel('horizontal_routine_cards.NmHorizontalRoutineCards', title,
                         style: TextStyle(
                             fontSize: 21,
                             fontWeight: FontWeight.w700,
                             color: glass || widget.fashion
                                 ? Colors.white
                                 : const Color(0xFF2B2D33)))),
-                Text('6 cards',
+                EditableLabel('horizontal_routine_cards.NmHorizontalRoutineCards', '6 cards',
                     style: TextStyle(
                         fontSize: 12,
                         color: glass || widget.fashion
@@ -204,11 +205,11 @@ class _EssentialCard extends StatelessWidget {
             const SizedBox(height: 10),
             ClipRRect(
                 borderRadius: BorderRadius.circular(16),
-                child: Image.asset(card.image,
+                child: EditableImage.asset(card.image,
                     height: 152,
                     width: double.infinity,
                     fit: BoxFit.cover,
-                    alignment: Alignment.topCenter)),
+                    alignment: Alignment.topCenter, slot: 'horizontal_routine_cards.EssentialCard')),
             const SizedBox(height: 12),
             Text(card.meta,
                 style: TextStyle(
@@ -324,8 +325,8 @@ class _EssentialCard extends StatelessWidget {
                       offset: Offset(0, 5)),
                 ],
               ),
-              child: Image.asset('assets/banners/promo/store.png',
-                  fit: BoxFit.contain),
+              child: EditableImage.asset('assets/banners/promo/store.png',
+                  fit: BoxFit.contain, slot: 'horizontal_routine_cards.EssentialCard'),
             ),
           ),
           Positioned(
@@ -345,8 +346,8 @@ class _EssentialCard extends StatelessWidget {
                         blurRadius: 12,
                         offset: Offset(0, 5))
                   ]),
-              child: Image.asset('assets/banners/promo/store.png',
-                  fit: BoxFit.contain),
+              child: EditableImage.asset('assets/banners/promo/store.png',
+                  fit: BoxFit.contain, slot: 'horizontal_routine_cards.EssentialCard'),
             ),
           ),
         ],

@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -29,6 +28,7 @@ import 'progress/progress_screen.dart';
 import 'quick_access.dart';
 import 'store.dart';
 import '../widgets/colored_split_promo_banner.dart';
+import '../admin/template/editable.dart';
 
 const _accent = Color(0xFFE3BD7D);
 const _text = Color(0xFFF5F5F3);
@@ -337,11 +337,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             if (banner != null && banner.startsWith('http'))
               CachedNetworkImage(imageUrl: banner, fit: BoxFit.cover)
             else
-              Image.asset('assets/profile_source/img-banner.png', fit: BoxFit.cover),
+              EditableImage.asset('assets/profile_source/img-banner.png', fit: BoxFit.cover, slot: 'profile.ProfileScreen'),
             DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.black.withOpacity(.02), Colors.black.withOpacity(.28), Colors.black.withOpacity(.82)]))),
             Positioned(top: 14, left: 14, child: _circleButton(asset: 'assets/icons/icon_01.svg', onTap: _handleBack)),
             Positioned(top: 14, right: 14, child: _circleButton(asset: 'assets/icons/icon_26.svg', onTap: _pickBanner)),
-            const Positioned(left: 22, right: 22, bottom: 24, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('My Profile', style: TextStyle(fontSize: 34, height: 1, fontWeight: FontWeight.w500, letterSpacing: -1.2, color: Colors.white)), SizedBox(height: 7), Text('YOUR PERSONAL SPACE', style: TextStyle(fontSize: 10, letterSpacing: 1.8, color: Color(0x9EFFFFFF)))])),
+            const Positioned(left: 22, right: 22, bottom: 24, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [EditableLabel('profile.ProfileScreen', 'My Profile', style: TextStyle(fontSize: 34, height: 1, fontWeight: FontWeight.w500, letterSpacing: -1.2, color: Colors.white)), SizedBox(height: 7), EditableLabel('profile.ProfileScreen', 'YOUR PERSONAL SPACE', style: TextStyle(fontSize: 10, letterSpacing: 1.8, color: Color(0x9EFFFFFF)))])),
           ],
         ),
       );
@@ -359,9 +359,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Choose a banner', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+              const EditableLabel('profile.ProfileScreen', 'Choose a banner', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
               const SizedBox(height: 6),
-              const Text('Same prebuilt library as the website profile.', style: TextStyle(fontSize: 12, color: _dim)),
+              const EditableLabel('profile.ProfileScreen', 'Same prebuilt library as the website profile.', style: TextStyle(fontSize: 12, color: _dim)),
               const SizedBox(height: 14),
               SizedBox(
                 height: 210,
@@ -408,7 +408,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 width: 132,
                 child: Stack(children: [
                   const Positioned.fill(child: ColoredBox(color: Color(0xFF0A0A0A))),
-                  Positioned.fill(child: Transform.scale(scale: 1.16, child: Opacity(opacity: .98, child: Image.asset('assets/profile_source/img-ring.png', fit: BoxFit.cover, alignment: const Alignment(.0, -.16))))),
+                  Positioned.fill(child: Transform.scale(scale: 1.16, child: Opacity(opacity: .98, child: EditableImage.asset('assets/profile_source/img-ring.png', fit: BoxFit.cover, alignment: const Alignment(.0, -.16), slot: 'profile.ProfileScreen')))),
                   Positioned(
                     top: 18,
                     right: 17,
@@ -438,11 +438,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    const Text('PRACTITIONER', style: TextStyle(fontSize: 11, letterSpacing: 2, color: _accent, fontWeight: FontWeight.w600)),
+                    const EditableLabel('profile.ProfileScreen', 'PRACTITIONER', style: TextStyle(fontSize: 11, letterSpacing: 2, color: _accent, fontWeight: FontWeight.w600)),
                     const SizedBox(height: 4),
-                    Row(children: [Flexible(child: Text(_nameController.text, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600, letterSpacing: -.2))), const SizedBox(width: 8), InkWell(onTap: _editName, child: SvgPicture.asset('assets/icons/icon_03.svg', width: 13, height: 13, colorFilter: const ColorFilter.mode(_dim, BlendMode.srcIn)))]),
+                    Row(children: [Flexible(child: Text(_nameController.text, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600, letterSpacing: -.2))), const SizedBox(width: 8), InkWell(onTap: _editName, child: EditableSvg.asset('assets/icons/icon_03.svg', width: 13, height: 13, colorFilter: const ColorFilter.mode(_dim, BlendMode.srcIn), slot: 'profile.ProfileScreen'))]),
                     const SizedBox(height: 6),
-                    const Flexible(child: Text('Practicing daily, growing steadily.', maxLines: 2, style: TextStyle(fontSize: 12.5, height: 1.45, color: _dim))),
+                    const Flexible(child: EditableLabel('profile.ProfileScreen', 'Practicing daily, growing steadily.', maxLines: 2, style: TextStyle(fontSize: 12.5, height: 1.45, color: _dim))),
                     const SizedBox(height: 9),
                     Container(padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 5), decoration: BoxDecoration(color: const Color(0x08FFFFFF), border: const Border.fromBorderSide(BorderSide(color: _border)), borderRadius: BorderRadius.circular(999)), child: Row(mainAxisSize: MainAxisSize.min, children: [Container(width: 6, height: 6, decoration: const BoxDecoration(color: _accent, shape: BoxShape.circle, boxShadow: [BoxShadow(color: _accent, blurRadius: 6)])), const SizedBox(width: 6), Text(_planName == 'Free' ? 'Free Plan' : _planName, style: const TextStyle(fontSize: 11.5, letterSpacing: .45))])),
                   ]),
@@ -514,9 +514,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Send or redeem', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: _accent)),
+                  EditableLabel('profile.ProfileScreen', 'Send or redeem', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: _accent)),
                   SizedBox(height: 6),
-                  Text('A real purchase, shared as a code', style: TextStyle(fontSize: 12.5, color: _dim)),
+                  EditableLabel('profile.ProfileScreen', 'A real purchase, shared as a code', style: TextStyle(fontSize: 12.5, color: _dim)),
                 ],
               ),
             ),
@@ -537,7 +537,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     style: const TextStyle(fontFamily: _mono, fontSize: 22, fontWeight: FontWeight.w600, color: _accent),
                   ),
                   const SizedBox(height: 6),
-                  const Text('Sales and referrals · payout history', style: TextStyle(fontSize: 12.5, color: _dim)),
+                  const EditableLabel('profile.ProfileScreen', 'Sales and referrals · payout history', style: TextStyle(fontSize: 12.5, color: _dim)),
                 ],
               ),
             ),
@@ -557,7 +557,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             borderRadius: BorderRadius.circular(14),
             border: const Border.fromBorderSide(BorderSide(color: _border)),
           ),
-          child: Text(label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: _text)),
+          child: EditableLabel('profile.ProfileScreen', label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: _text)),
         ),
       );
 
@@ -634,9 +634,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         image: 'assets/profile_source/img-about.jpeg',
         overlay: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xB8000000), Color(0x61000000), Color(0xBF000000)]),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [SvgPicture.asset('assets/icons/icon_04.svg', width: 15, height: 15, colorFilter: const ColorFilter.mode(_dim, BlendMode.srcIn)), const SizedBox(width: 9), const Text('About NowssB', style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600))]),
+          Row(children: [EditableSvg.asset('assets/icons/icon_04.svg', width: 15, height: 15, colorFilter: const ColorFilter.mode(_dim, BlendMode.srcIn), slot: 'profile.ProfileScreen'), const SizedBox(width: 9), const EditableLabel('profile.ProfileScreen', 'About NowssB', style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600))]),
           const SizedBox(height: 14),
-          const FractionallySizedBox(widthFactor: .78, child: Text('Before a word had a spelling, it had a sound. NowssB works backward from the dictionary — past the meaning, past the letters — to the breath and vibration a word first came from, so you practice the origin, not just the definition.', style: TextStyle(fontSize: 14, height: 1.65, color: _dim))),
+          const FractionallySizedBox(widthFactor: .78, child: EditableLabel('profile.ProfileScreen', 'Before a word had a spelling, it had a sound. NowssB works backward from the dictionary — past the meaning, past the letters — to the breath and vibration a word first came from, so you practice the origin, not just the definition.', style: TextStyle(fontSize: 14, height: 1.65, color: _dim))),
         ]),
       );
 
@@ -662,7 +662,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           padding: const EdgeInsets.fromLTRB(3, 14, 3, 11),
           decoration: BoxDecoration(color: const Color(0x0FFFFFFF), border: const Border.fromBorderSide(BorderSide(color: _borderSoft)), borderRadius: BorderRadius.circular(16)),
           child: Column(children: [
-            Container(width: 34, height: 34, decoration: BoxDecoration(color: const Color(0x59000000), border: const Border.fromBorderSide(BorderSide(color: _borderSoft)), borderRadius: BorderRadius.circular(11)), child: Center(child: SvgPicture.asset('assets/icons/icon_${iconIndex.toString().padLeft(2, '0')}.svg', width: 16, height: 16, colorFilter: const ColorFilter.mode(_text, BlendMode.srcIn)))),
+            Container(width: 34, height: 34, decoration: BoxDecoration(color: const Color(0x59000000), border: const Border.fromBorderSide(BorderSide(color: _borderSoft)), borderRadius: BorderRadius.circular(11)), child: Center(child: EditableSvg.asset('assets/icons/icon_${iconIndex.toString().padLeft(2, '0')}.svg', width: 16, height: 16, colorFilter: const ColorFilter.mode(_text, BlendMode.srcIn), slot: 'profile.ProfileScreen'))),
             const SizedBox(height: 8),
             Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center, style: const TextStyle(fontSize: 10, color: _dim)),
           ]),
@@ -680,7 +680,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: items.isEmpty
             ? const Padding(
                 padding: EdgeInsets.all(16),
-                child: Text('Coins, sales, and referrals show up here.', style: TextStyle(fontSize: 13, color: _dim)),
+                child: EditableLabel('profile.ProfileScreen', 'Coins, sales, and referrals show up here.', style: TextStyle(fontSize: 13, color: _dim)),
               )
             : Column(children: [
                 for (var i = 0; i < items.length && i < 6; i++)
@@ -712,7 +712,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         image: 'assets/profile_source/img-motto.jpeg',
         overlay: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0x8C000000), Color(0x40000000), Color(0x99000000)]),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [const Text('“', style: TextStyle(fontFamily: 'Georgia', fontSize: 26, color: _accent)), const SizedBox(width: 8), const Text('MY MOTTO', style: TextStyle(fontSize: 11, letterSpacing: 2, color: _dim, fontWeight: FontWeight.w600))]),
+          Row(children: [const EditableLabel('profile.ProfileScreen', '“', style: TextStyle(fontFamily: 'Georgia', fontSize: 26, color: _accent)), const SizedBox(width: 8), const EditableLabel('profile.ProfileScreen', 'MY MOTTO', style: TextStyle(fontSize: 11, letterSpacing: 2, color: _dim, fontWeight: FontWeight.w600))]),
           const SizedBox(height: 16),
           const FractionallySizedBox(widthFactor: .66, child: Text.rich(TextSpan(children: [TextSpan(text: 'My Focus.\nBreathe.\nLet go.\n'), TextSpan(text: 'Grow.', style: TextStyle(color: _accent))]), style: TextStyle(fontSize: 25, height: 1.22, fontWeight: FontWeight.w300))),
           const SizedBox(height: 14),
@@ -723,7 +723,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _compactQuick(String label, String value, int icon) => Container(
         padding: const EdgeInsets.fromLTRB(7, 8, 7, 9),
         decoration: BoxDecoration(color: const Color(0x85040405), border: const Border.fromBorderSide(BorderSide(color: _borderSoft)), borderRadius: BorderRadius.circular(16)),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Container(width: 30, height: 30, decoration: BoxDecoration(color: const Color(0x29E3BD7D), border: Border.all(color: const Color(0x59E3BD7D)), borderRadius: BorderRadius.circular(10)), child: Center(child: SvgPicture.asset('assets/icons/icon_${icon.toString().padLeft(2, '0')}.svg', width: 14, height: 14, colorFilter: const ColorFilter.mode(_accent, BlendMode.srcIn)))), SvgPicture.asset('assets/icons/icon_${(icon + 1).toString().padLeft(2, '0')}.svg', width: 12, height: 12, colorFilter: const ColorFilter.mode(_faint, BlendMode.srcIn))]), const SizedBox(height: 9), Text(label.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 7, letterSpacing: .7, color: _dim)), const SizedBox(height: 3), Text(value, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600))]),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Container(width: 30, height: 30, decoration: BoxDecoration(color: const Color(0x29E3BD7D), border: Border.all(color: const Color(0x59E3BD7D)), borderRadius: BorderRadius.circular(10)), child: Center(child: EditableSvg.asset('assets/icons/icon_${icon.toString().padLeft(2, '0')}.svg', width: 14, height: 14, colorFilter: const ColorFilter.mode(_accent, BlendMode.srcIn), slot: 'profile.ProfileScreen'))), EditableSvg.asset('assets/icons/icon_${(icon + 1).toString().padLeft(2, '0')}.svg', width: 12, height: 12, colorFilter: const ColorFilter.mode(_faint, BlendMode.srcIn), slot: 'profile.ProfileScreen')]), const SizedBox(height: 9), Text(label.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 7, letterSpacing: .7, color: _dim)), const SizedBox(height: 3), Text(value, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600))]),
       );
 
   Widget _weekTracker(int today) => Container(
@@ -749,13 +749,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _listRow('Practice Duration', trailing: Row(mainAxisSize: MainAxisSize.min, children: [_roundAction('assets/icons/icon_24.svg', () async { final v = math.max(5, _duration - 5).toInt(); setState(() => _duration = v); await _prefs.setInt('nowssb_duration', v); }), const SizedBox(width: 14), SizedBox(width: 56, child: Text('$_duration min', textAlign: TextAlign.center, style: const TextStyle(fontFamily: _mono, fontSize: 14))), const SizedBox(width: 14), _roundAction('assets/icons/icon_25.svg', () async { final v = math.min(60, _duration + 5).toInt(); setState(() => _duration = v); await _prefs.setInt('nowssb_duration', v); })])),
         _listRow('Daily Reminder', trailing: InkWell(onTap: _pickReminder, borderRadius: BorderRadius.circular(999), child: Container(padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6), decoration: BoxDecoration(color: const Color(0x08FFFFFF), border: const Border.fromBorderSide(BorderSide(color: _border)), borderRadius: BorderRadius.circular(999)), child: Text(_reminderText, style: const TextStyle(fontFamily: _mono, fontSize: 13.5))))),
         _listRow('Playback Voice', trailing: Container(padding: const EdgeInsets.all(2), decoration: BoxDecoration(border: const Border.fromBorderSide(BorderSide(color: _border)), borderRadius: BorderRadius.circular(999)), child: Row(mainAxisSize: MainAxisSize.min, children: [_voiceButton('Female'), _voiceButton('Male')]))),
-        _listRow('App Version', muted: true, trailing: const Text('v2.4.1', style: TextStyle(fontSize: 13, color: _dim))),
+        _listRow('App Version', muted: true, trailing: const EditableLabel('profile.ProfileScreen', 'v2.4.1', style: TextStyle(fontSize: 13, color: _dim))),
       ]);
 
   Widget _voiceButton(String label) => InkWell(
         onTap: () async { final v = label.toLowerCase(); setState(() => _voice = v); await _prefs.setString('nowssb_voice', v); },
         borderRadius: BorderRadius.circular(999),
-        child: AnimatedContainer(duration: const Duration(milliseconds: 160), padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 6), decoration: BoxDecoration(color: _voice == label.toLowerCase() ? const Color(0xFFF2F2F0) : Colors.transparent, borderRadius: BorderRadius.circular(999)), child: Text(label, style: TextStyle(fontSize: 12.5, color: _voice == label.toLowerCase() ? Colors.black : _dim))),
+        child: AnimatedContainer(duration: const Duration(milliseconds: 160), padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 6), decoration: BoxDecoration(color: _voice == label.toLowerCase() ? const Color(0xFFF2F2F0) : Colors.transparent, borderRadius: BorderRadius.circular(999)), child: EditableLabel('profile.ProfileScreen', label, style: TextStyle(fontSize: 12.5, color: _voice == label.toLowerCase() ? Colors.black : _dim))),
       );
 
   Widget _shop() => _sectionList('Shop & Orders', [
@@ -763,8 +763,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ]);
 
   Widget _account() => _sectionList('Account', [
-        _listRow('Member Since', trailing: const Text('Jan 2025', style: TextStyle(fontSize: 13, color: _dim))),
-        _listRow('Current Plan', trailing: Row(mainAxisSize: MainAxisSize.min, children: [Text(_planName, style: const TextStyle(fontSize: 13, color: _dim)), const SizedBox(width: 10), InkWell(onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarnHubScreen())), child: const Text('Upgrade', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, decoration: TextDecoration.underline)))])),
+        _listRow('Member Since', trailing: const EditableLabel('profile.ProfileScreen', 'Jan 2025', style: TextStyle(fontSize: 13, color: _dim))),
+        _listRow('Current Plan', trailing: Row(mainAxisSize: MainAxisSize.min, children: [Text(_planName, style: const TextStyle(fontSize: 13, color: _dim)), const SizedBox(width: 10), InkWell(onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarnHubScreen())), child: const EditableLabel('profile.ProfileScreen', 'Upgrade', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, decoration: TextDecoration.underline)))])),
       ]);
 
   Widget _quote() => GlassCard(
@@ -773,29 +773,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
         padding: const EdgeInsets.fromLTRB(24, 28, 24, 28),
         image: 'assets/profile_source/img-quote.jpeg',
         overlay: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xB3000000), Color(0x52000000), Color(0xC7000000)]),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [const Text('“', style: TextStyle(fontFamily: 'Georgia', fontSize: 38, color: _faint, height: 1)), const SizedBox(height: 8), const FractionallySizedBox(widthFactor: .70, child: Text('Long before there was language, there was only sound.', style: TextStyle(fontSize: 17, height: 1.5))), const SizedBox(height: 16), const Text('— THE IDEA BEHIND NOWSSB', style: TextStyle(fontSize: 11, letterSpacing: 1.3, color: _dim))]),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [const EditableLabel('profile.ProfileScreen', '“', style: TextStyle(fontFamily: 'Georgia', fontSize: 38, color: _faint, height: 1)), const SizedBox(height: 8), const FractionallySizedBox(widthFactor: .70, child: EditableLabel('profile.ProfileScreen', 'Long before there was language, there was only sound.', style: TextStyle(fontSize: 17, height: 1.5))), const SizedBox(height: 16), const EditableLabel('profile.ProfileScreen', '— THE IDEA BEHIND NOWSSB', style: TextStyle(fontSize: 11, letterSpacing: 1.3, color: _dim))]),
       );
 
   Widget _signOut() => InkWell(
         onTap: () { _showToast('Signed out'); _handleBack(); },
         borderRadius: BorderRadius.circular(22),
-        child: Container(margin: const EdgeInsets.only(bottom: 30), padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: const Color(0x08FFFFFF), border: const Border.fromBorderSide(BorderSide(color: _border)), borderRadius: BorderRadius.circular(22)), alignment: Alignment.center, child: const Text('Sign Out', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500))),
+        child: Container(margin: const EdgeInsets.only(bottom: 30), padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: const Color(0x08FFFFFF), border: const Border.fromBorderSide(BorderSide(color: _border)), borderRadius: BorderRadius.circular(22)), alignment: Alignment.center, child: const EditableLabel('profile.ProfileScreen', 'Sign Out', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500))),
       );
 
   Widget _sectionList(String title, List<Widget> rows) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [SectionLabel(title), GlassCard(margin: const EdgeInsets.only(bottom: 40), padding: const EdgeInsets.all(4), child: Column(children: rows))]);
 
-  Widget _listRow(String label, {required Widget trailing, bool muted = false}) => Container(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16), decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: _borderSoft))), child: Row(children: [Expanded(child: Text(label, style: TextStyle(fontSize: 14.5, color: muted ? _faint : _text))), const SizedBox(width: 12), trailing]));
+  Widget _listRow(String label, {required Widget trailing, bool muted = false}) => Container(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16), decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: _borderSoft))), child: Row(children: [Expanded(child: EditableLabel('profile.ProfileScreen', label, style: TextStyle(fontSize: 14.5, color: muted ? _faint : _text))), const SizedBox(width: 12), trailing]));
 
-  Widget _shopRow(String label, String count, int icon) => InkWell(onTap: () => _openShop(label), child: Container(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: _borderSoft))), child: Row(children: [Container(width: 34, height: 34, decoration: BoxDecoration(border: Border.all(color: _borderSoft), borderRadius: BorderRadius.circular(11)), child: Center(child: SvgPicture.asset('assets/icons/icon_${icon.toString().padLeft(2, '0')}.svg', width: 16, height: 16, colorFilter: const ColorFilter.mode(_text, BlendMode.srcIn)))), const SizedBox(width: 13), Expanded(child: Text(label, style: const TextStyle(fontSize: 14.5))), Text(count, style: const TextStyle(fontFamily: _mono, fontSize: 12.5, color: _faint)), const SizedBox(width: 6), SvgPicture.asset('assets/icons/icon_16.svg', width: 14, height: 14, colorFilter: const ColorFilter.mode(_faint, BlendMode.srcIn))])));
+  Widget _shopRow(String label, String count, int icon) => InkWell(onTap: () => _openShop(label), child: Container(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: _borderSoft))), child: Row(children: [Container(width: 34, height: 34, decoration: BoxDecoration(border: Border.all(color: _borderSoft), borderRadius: BorderRadius.circular(11)), child: Center(child: EditableSvg.asset('assets/icons/icon_${icon.toString().padLeft(2, '0')}.svg', width: 16, height: 16, colorFilter: const ColorFilter.mode(_text, BlendMode.srcIn), slot: 'profile.ProfileScreen'))), const SizedBox(width: 13), Expanded(child: EditableLabel('profile.ProfileScreen', label, style: const TextStyle(fontSize: 14.5))), Text(count, style: const TextStyle(fontFamily: _mono, fontSize: 12.5, color: _faint)), const SizedBox(width: 6), EditableSvg.asset('assets/icons/icon_16.svg', width: 14, height: 14, colorFilter: const ColorFilter.mode(_faint, BlendMode.srcIn), slot: 'profile.ProfileScreen')])));
 
-  Widget _viewAll({required String icon, required VoidCallback onTap, bool pill = false}) => InkWell(onTap: onTap, borderRadius: BorderRadius.circular(999), child: Container(padding: pill ? const EdgeInsets.symmetric(horizontal: 9, vertical: 6) : EdgeInsets.zero, decoration: pill ? BoxDecoration(color: const Color(0x08FFFFFF), border: const Border.fromBorderSide(BorderSide(color: _border)), borderRadius: BorderRadius.circular(999)) : null, child: Row(mainAxisSize: MainAxisSize.min, children: [const Text('View All', style: TextStyle(fontSize: 12, color: _dim)), const SizedBox(width: 5), SvgPicture.asset(icon, width: pill ? 16 : 13, height: pill ? 16 : 13, colorFilter: const ColorFilter.mode(_dim, BlendMode.srcIn))])));
+  Widget _viewAll({required String icon, required VoidCallback onTap, bool pill = false}) => InkWell(onTap: onTap, borderRadius: BorderRadius.circular(999), child: Container(padding: pill ? const EdgeInsets.symmetric(horizontal: 9, vertical: 6) : EdgeInsets.zero, decoration: pill ? BoxDecoration(color: const Color(0x08FFFFFF), border: const Border.fromBorderSide(BorderSide(color: _border)), borderRadius: BorderRadius.circular(999)) : null, child: Row(mainAxisSize: MainAxisSize.min, children: [const EditableLabel('profile.ProfileScreen', 'View All', style: TextStyle(fontSize: 12, color: _dim)), const SizedBox(width: 5), EditableSvg.asset(icon, width: pill ? 16 : 13, height: pill ? 16 : 13, colorFilter: const ColorFilter.mode(_dim, BlendMode.srcIn), slot: 'profile.ProfileScreen')])));
 
-  Widget _svgIcon(String asset, double size, Color color) => SvgPicture.asset(
+  Widget _svgIcon(String asset, double size, Color color) => EditableSvg.asset(
         asset,
         width: size,
         height: size,
         colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
         placeholderBuilder: (_) => Icon(Icons.circle_outlined, size: size, color: color.withOpacity(.45)),
+        slot: 'profile.ProfileScreen',
       );
 
   Widget _circleButton({required String asset, required VoidCallback onTap, double size = 38}) => Material(color: Colors.transparent, child: InkWell(onTap: onTap, customBorder: const CircleBorder(), child: Container(width: size, height: size, decoration: BoxDecoration(color: const Color(0x52000000), shape: BoxShape.circle, border: const Border.fromBorderSide(BorderSide(color: Color(0x29FFFFFF)))), child: Center(child: _svgIcon(asset, size * .47, _text)))));
@@ -805,7 +806,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _recentSheet() => Stack(children: [
         Positioned.fill(child: GestureDetector(onTap: () => setState(() => _recentOpen = false), child: Container(color: Colors.black.withOpacity(.68)))),
         Align(alignment: Alignment.bottomCenter, child: SafeArea(top: false, child: Padding(padding: const EdgeInsets.all(16), child: _AnimatedSheet(child: GlassCard(radius: 28, padding: const EdgeInsets.all(20), backgroundColor: const Color(0xE60A0A0C), child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [const SectionLabel('Activity Library', bottom: 6), const Text('More recent sessions', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, letterSpacing: -.4))])), _circleButton(asset: 'assets/icons/icon_32.svg', onTap: () => setState(() => _recentOpen = false))]),
+          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [const SectionLabel('Activity Library', bottom: 6), const EditableLabel('profile.ProfileScreen', 'More recent sessions', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, letterSpacing: -.4))])), _circleButton(asset: 'assets/icons/icon_32.svg', onTap: () => setState(() => _recentOpen = false))]),
           const SizedBox(height: 16),
           SizedBox(height: 38, child: ListView(scrollDirection: Axis.horizontal, children: ['All','Meditation','Breathwork','Sleep'].map((x) => Padding(padding: const EdgeInsets.only(right: 7), child: _SheetTab(label: x))).toList())),
           const SizedBox(height: 14),
@@ -819,7 +820,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 class _Background extends StatelessWidget {
   const _Background();
   @override
-  Widget build(BuildContext context) => DecoratedBox(decoration: BoxDecoration(image: const DecorationImage(image: AssetImage('assets/profile_source/img-bg.jpeg'), fit: BoxFit.cover, alignment: Alignment.topCenter), gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x26000000), Color(0xB8000000), Color(0xEA000000)])), child: const SizedBox.expand());
+  Widget build(BuildContext context) => DecoratedBox(decoration: BoxDecoration(image: DecorationImage(image: slotImageProvider(context, 'profile.Background', 'assets/profile_source/img-bg.jpeg', const AssetImage('assets/profile_source/img-bg.jpeg')), fit: BoxFit.cover, alignment: Alignment.topCenter), gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x26000000), Color(0xB8000000), Color(0xEA000000)])), child: const SizedBox.expand());
 }
 
 class _GrainPainter extends CustomPainter {
@@ -850,7 +851,7 @@ class GlassCard extends StatelessWidget {
   Widget build(BuildContext context) => Container(
         margin: margin,
         constraints: minHeight == null ? null : BoxConstraints(minHeight: minHeight!),
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(radius), border: const Border.fromBorderSide(BorderSide(color: _borderSoft)), color: backgroundColor ?? _surface, image: image == null ? null : DecorationImage(image: AssetImage(image!), fit: BoxFit.cover, alignment: Alignment.center)),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(radius), border: const Border.fromBorderSide(BorderSide(color: _borderSoft)), color: backgroundColor ?? _surface, image: image == null ? null : DecorationImage(image: slotImageProvider(context, 'profile.GlassCard', image!, AssetImage(image!)), fit: BoxFit.cover, alignment: Alignment.center)),
         clipBehavior: Clip.antiAlias,
         child: ClipRRect(borderRadius: BorderRadius.circular(radius), child: Stack(children: [if (overlay != null) Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(gradient: overlay))), Padding(padding: padding, child: child)])),
       );
@@ -912,6 +913,6 @@ class _AnimatedSheetState extends State<_AnimatedSheet> with SingleTickerProvide
 }
 
 class _SheetTab extends StatefulWidget { final String label; const _SheetTab({required this.label}); @override State<_SheetTab> createState()=>_SheetTabState(); }
-class _SheetTabState extends State<_SheetTab> { bool active = false; @override Widget build(BuildContext context)=>InkWell(onTap:()=>setState(()=>active=!active),borderRadius:BorderRadius.circular(999),child:AnimatedContainer(duration:const Duration(milliseconds:160),padding:const EdgeInsets.symmetric(horizontal:12,vertical:8),decoration:BoxDecoration(color:active?const Color(0x26E3BD7D):const Color(0x08FFFFFF),border:Border.all(color:active?const Color(0x59E3BD7D):_borderSoft),borderRadius:BorderRadius.circular(999)),child:Text(widget.label,style:TextStyle(fontSize:12,color:active?_accent:_dim)))); }
+class _SheetTabState extends State<_SheetTab> { bool active = false; @override Widget build(BuildContext context)=>InkWell(onTap:()=>setState(()=>active=!active),borderRadius:BorderRadius.circular(999),child:AnimatedContainer(duration:const Duration(milliseconds:160),padding:const EdgeInsets.symmetric(horizontal:12,vertical:8),decoration:BoxDecoration(color:active?const Color(0x26E3BD7D):const Color(0x08FFFFFF),border:Border.all(color:active?const Color(0x59E3BD7D):_borderSoft),borderRadius:BorderRadius.circular(999)),child:EditableLabel('profile.SheetTab', widget.label,style:TextStyle(fontSize:12,color:active?_accent:_dim)))); }
 
-class _MoreCard extends StatelessWidget { final String title,sub,image; const _MoreCard(this.title,this.sub,this.image); @override Widget build(BuildContext context)=>Container(padding:const EdgeInsets.all(8),decoration:BoxDecoration(color:const Color(0x06FFFFFF),border:Border.all(color:_borderSoft),borderRadius:BorderRadius.circular(18)),child:Row(children:[ClipRRect(borderRadius:BorderRadius.circular(13),child:Image.asset(image,width:54,height:54,fit:BoxFit.cover)),const SizedBox(width:10),Expanded(child:Column(mainAxisAlignment:MainAxisAlignment.center,crossAxisAlignment:CrossAxisAlignment.start,children:[Text(title,maxLines:1,overflow:TextOverflow.ellipsis,style:const TextStyle(fontSize:12.5,fontWeight:FontWeight.w600)),const SizedBox(height:4),Text(sub,maxLines:1,overflow:TextOverflow.ellipsis,style:const TextStyle(fontSize:10.5,color:_faint))])),Container(width:24,height:24,decoration:BoxDecoration(shape:BoxShape.circle,border:Border.all(color:_borderSoft)),alignment:Alignment.center,child:const Text('↗',style:TextStyle(fontSize:12,color:_dim)))])); }
+class _MoreCard extends StatelessWidget { final String title,sub,image; const _MoreCard(this.title,this.sub,this.image); @override Widget build(BuildContext context)=>Container(padding:const EdgeInsets.all(8),decoration:BoxDecoration(color:const Color(0x06FFFFFF),border:Border.all(color:_borderSoft),borderRadius:BorderRadius.circular(18)),child:Row(children:[ClipRRect(borderRadius:BorderRadius.circular(13),child:EditableImage.asset(image,width:54,height:54,fit:BoxFit.cover, slot: 'profile.MoreCard')),const SizedBox(width:10),Expanded(child:Column(mainAxisAlignment:MainAxisAlignment.center,crossAxisAlignment:CrossAxisAlignment.start,children:[EditableLabel('profile.MoreCard', title,maxLines:1,overflow:TextOverflow.ellipsis,style:const TextStyle(fontSize:12.5,fontWeight:FontWeight.w600)),const SizedBox(height:4),EditableLabel('profile.MoreCard', sub,maxLines:1,overflow:TextOverflow.ellipsis,style:const TextStyle(fontSize:10.5,color:_faint))])),Container(width:24,height:24,decoration:BoxDecoration(shape:BoxShape.circle,border:Border.all(color:_borderSoft)),alignment:Alignment.center,child:const EditableLabel('profile.MoreCard', '↗',style:TextStyle(fontSize:12,color:_dim)))])); }

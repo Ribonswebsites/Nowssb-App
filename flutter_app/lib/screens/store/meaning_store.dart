@@ -26,6 +26,7 @@ import 'store_select_sheet.dart';
 import 'request_words.dart';
 import 'store_routes.dart';
 import 'signature_store.dart';
+import '../../admin/template/editable.dart';
 
 
 /// Warm Meaning + picker + ebook arts before painting (no empty black flash).
@@ -312,7 +313,7 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 48),
             child: Center(
-                child: Text('No meanings match.',
+                child: EditableLabel('meaning_store.MeaningStoreBody', 'No meanings match.',
                     style: TextStyle(color: Color(0x8CFFFFFF)))),
           ),
         ColoredSplitPromoBanner(

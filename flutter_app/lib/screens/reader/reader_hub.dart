@@ -19,6 +19,7 @@ import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/home_parts.dart';
 import '../store/ebooks_store.dart';
 import 'reader_book.dart';
+import '../../admin/template/editable.dart';
 
 class ReaderHubScreen extends StatefulWidget {
   const ReaderHubScreen({super.key});
@@ -95,7 +96,7 @@ class _ReaderHubScreenState extends State<ReaderHubScreen> {
                         child: const Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
+                            EditableLabel('reader_hub.ReaderHubScreen',
                               'Reader',
                               style: TextStyle(
                                 fontSize: 19,
@@ -104,7 +105,7 @@ class _ReaderHubScreenState extends State<ReaderHubScreen> {
                               ),
                             ),
                             SizedBox(height: 2),
-                            Text(
+                            EditableLabel('reader_hub.ReaderHubScreen',
                               'Two ways to read what NowssB holds',
                               style: TextStyle(
                                 fontSize: 11.5,
@@ -140,6 +141,7 @@ class _ReaderHubScreenState extends State<ReaderHubScreen> {
                             poster: 'assets/video/reader-section-poster.webp',
                             fit: BoxFit.cover,
                             priority: ClipPriority.decoration,
+                            slot: 'reader_hub.ReaderHubScreen',
                           ),
                         ),
                       ),
@@ -257,9 +259,9 @@ class _HubCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
               ),
               clipBehavior: Clip.antiAlias,
-              child: NwsbImage(url: image),
+              child: NwsbImage(url: image, slot: 'reader_hub.HubCard'),
             ),
-            Text(
+            EditableLabel('reader_hub.HubCard',
               title,
               style: const TextStyle(
                 fontSize: 17,
@@ -268,7 +270,7 @@ class _HubCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 5),
-            Text(
+            EditableLabel('reader_hub.HubCard',
               sub,
               style: const TextStyle(
                 fontSize: 12,

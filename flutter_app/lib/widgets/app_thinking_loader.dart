@@ -10,6 +10,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
+import '../admin/template/editable.dart';
 
 /// Alias kept for call sites that prefer the product name.
 typedef NwsbThinkingOrb = AppThinkingLoader;
@@ -124,7 +125,7 @@ class _AppThinkingLoaderState extends State<AppThinkingLoader> {
           fontWeight: FontWeight.w500,
         );
 
-    final text = Text(label, style: style, textAlign: TextAlign.center);
+    final text = EditableLabel('app_thinking_loader.AppThinkingLoader', label, style: style, textAlign: TextAlign.center);
 
     if (widget.axis == Axis.horizontal) {
       return Row(

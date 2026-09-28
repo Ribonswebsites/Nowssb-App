@@ -27,6 +27,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../media/video_pool.dart';
+import '../admin/template/editable.dart';
 
 class PoolHud extends StatefulWidget {
   const PoolHud({super.key});
@@ -117,7 +118,7 @@ class _PoolHudState extends State<PoolHud> {
                   color: Color(0xFFFFD9DD),
                 ),
               ),
-            const Text(
+            const EditableLabel('pool_hud.PoolHud',
               'tap to hide · debug only',
               style: TextStyle(fontSize: 8, color: Color(0x8CFFFFFF)),
             ),

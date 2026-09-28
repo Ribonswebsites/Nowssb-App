@@ -16,6 +16,7 @@ import '../widgets/brand_top_banner.dart';
 import '../widgets/login_gallery.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import '../widgets/app_thinking_loader.dart';
+import '../admin/template/editable.dart';
 
 class AuthGate extends StatefulWidget {
   const AuthGate({super.key, required this.child});
@@ -274,7 +275,7 @@ class _AuthGateState extends State<AuthGate> {
         children: [
           const BrandTopBanner(bare: true, compact: true),
           const SizedBox(height: 10),
-          const Text(
+          const EditableLabel('auth_gate.AuthGate',
             'Natural Origin Word Science',
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -285,7 +286,7 @@ class _AuthGateState extends State<AuthGate> {
             ),
           ),
           const SizedBox(height: 14),
-          const Text(
+          const EditableLabel('auth_gate.AuthGate',
             'Welcome back',
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -343,7 +344,7 @@ class _AuthGateState extends State<AuthGate> {
               foregroundColor: const Color(0xFFD4AF37),
               padding: const EdgeInsets.symmetric(vertical: 10),
             ),
-            child: const Text(
+            child: const EditableLabel('auth_gate.AuthGate',
               'Explore without account →',
               style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, letterSpacing: 0.2),
             ),
@@ -368,7 +369,7 @@ class _AuthGateState extends State<AuthGate> {
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     alignment: Alignment.centerLeft,
-                    child: Text('Continue with Google'),
+                    child: EditableLabel('auth_gate.AuthGate', 'Continue with Google'),
                   ),
                 ),
               ],
@@ -388,7 +389,7 @@ class _AuthGateState extends State<AuthGate> {
         children: [
           Icon(icon, size: 20),
           const SizedBox(width: 12),
-          Expanded(child: Text(label)),
+          Expanded(child: EditableLabel('auth_gate.AuthGate', label)),
           Icon(open ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
               size: 20),
         ],
@@ -427,7 +428,7 @@ class _AuthGateState extends State<AuthGate> {
           Expanded(child: Divider(color: Colors.white24, height: 1)),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 14),
-            child: Text('OR',
+            child: EditableLabel('auth_gate.AuthGate', 'OR',
                 style: TextStyle(
                     color: Colors.white38, fontSize: 10, letterSpacing: 2.4)),
           ),

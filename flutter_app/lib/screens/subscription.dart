@@ -8,6 +8,7 @@ import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 import '../widgets/glass_wrap.dart';
+import '../admin/template/editable.dart';
 
 class SubscriptionScreen extends StatefulWidget {
   const SubscriptionScreen({super.key});
@@ -111,6 +112,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                 priority: ClipPriority.feature,
                 fit: BoxFit.cover,
                 showPoster: false,
+                slot: 'subscription.SubscriptionScreen',
               ),
             ),
             const Positioned.fill(
@@ -139,7 +141,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                     icon: const Icon(Icons.arrow_back_rounded,
                         color: Colors.white),
                   ),
-                  title: const Text('Subscription',
+                  title: const EditableLabel('subscription.SubscriptionScreen', 'Subscription',
                       style: TextStyle(
                           color: Colors.white, fontWeight: FontWeight.w800)),
                   centerTitle: true,
@@ -164,6 +166,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
               priority: ClipPriority.feature,
               fit: BoxFit.cover,
               showPoster: false,
+              slot: 'subscription.SubscriptionScreen',
             ),
           ),
         ),
@@ -193,7 +196,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                       ? NwsbColors.goldLight
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(999)),
-              child: Text(label,
+              child: EditableLabel('subscription.SubscriptionScreen', label,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: yearly == value ? NwsbColors.deep : Colors.white70,
@@ -206,7 +209,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
             padding: EdgeInsets.fromLTRB(18, 20, 18, 10),
             child: Align(
               alignment: Alignment.centerLeft,
-              child: Text('Choose your frequency',
+              child: EditableLabel('subscription.SubscriptionScreen', 'Choose your frequency',
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 20,
@@ -265,7 +268,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            const EditableLabel('subscription.SubscriptionScreen',
               'Disclaimer & Confidentiality',
               style: TextStyle(
                 fontSize: 11,
@@ -274,7 +277,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
+            const EditableLabel('subscription.SubscriptionScreen',
               'Subscriptions, trials and word access are for educational and wellness purposes only — they are not medical advice and do not replace professional care. The 30-day free trial converts to a paid plan unless you cancel before it ends. Paid plans renew automatically until cancelled. Any information you share with us is kept strictly confidential and never sold.',
               style: TextStyle(
                 fontSize: 11,
@@ -309,7 +312,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                             size: 16, color: NwsbColors.goldLight),
                         SizedBox(width: 10),
                         Expanded(
-                          child: Text(
+                          child: EditableLabel('subscription.SubscriptionScreen',
                             'Terms & Conditions',
                             style: TextStyle(
                               color: Colors.white,
@@ -328,7 +331,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
             ),
             const SizedBox(height: 22),
             const Center(
-              child: Text(
+              child: EditableLabel('subscription.SubscriptionScreen',
                 'NowssB\n© 2026 Adv. Sanjaykumar Gadge · Shabdapathy',
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -507,7 +510,7 @@ class _Included extends StatelessWidget {
             borderRadius: BorderRadius.circular(999),
             border: Border.all(color: GlassWrap.line),
           ),
-          child: const Text(
+          child: const EditableLabel('subscription.Included',
             "What's Included",
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -571,7 +574,7 @@ class _Included extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Flexible(
-                  child: Text(
+                  child: EditableLabel('subscription.Included',
                     cta,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -685,11 +688,12 @@ class _FlipPhotoState extends State<_FlipPhoto>
       child: Stack(
         fit: StackFit.expand,
         children: [
-          Image.asset(
+          EditableImage.asset(
             asset,
             fit: BoxFit.cover,
             alignment: Alignment.centerLeft,
             errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black),
+            slot: 'subscription.FlipPhoto',
           ),
           const DecoratedBox(
             decoration: BoxDecoration(
@@ -710,7 +714,7 @@ class _FlipPhotoState extends State<_FlipPhoto>
             left: 10,
             right: 10,
             top: 10,
-            child: Text(
+            child: EditableLabel('subscription.FlipPhoto',
               widget.title,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -788,6 +792,7 @@ class SubscriptionTermsScreen extends StatelessWidget {
               priority: ClipPriority.feature,
               fit: BoxFit.cover,
               showPoster: false,
+              slot: 'subscription.SubscriptionTermsScreen',
             ),
           ),
           const Positioned.fill(
@@ -806,7 +811,7 @@ class SubscriptionTermsScreen extends StatelessWidget {
                             color: Colors.white),
                       ),
                       const Expanded(
-                        child: Text(
+                        child: EditableLabel('subscription.SubscriptionTermsScreen',
                           'Terms & Conditions',
                           textAlign: TextAlign.center,
                           style: TextStyle(
@@ -862,7 +867,7 @@ class SubscriptionTermsScreen extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 18),
                                 ],
-                                const Text(
+                                const EditableLabel('subscription.SubscriptionTermsScreen',
                                   'NowssB · © 2026 Adv. Sanjaykumar Gadge · Shabdapathy',
                                   style: TextStyle(
                                     color: Color(0x73FFFFFF),

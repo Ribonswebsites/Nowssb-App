@@ -28,6 +28,7 @@ import 'package:flutter/material.dart';
 import '../media/nwsb_image.dart';
 import '../theme/tokens.dart';
 import 'nwsb_icon.dart';
+import '../admin/template/editable.dart';
 
 const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
 
@@ -121,12 +122,12 @@ class _AnimatedHeadingState extends State<AnimatedHeading>
                         top: 0,
                         child: Row(
                           children: [
-                            Text(widget.text,
+                            EditableLabel('home_parts.AnimatedHeading', widget.text,
                                 maxLines: 1,
                                 softWrap: false,
                                 style: widget.style),
                             SizedBox(width: gap),
-                            Text(widget.text,
+                            EditableLabel('home_parts.AnimatedHeading', widget.text,
                                 maxLines: 1,
                                 softWrap: false,
                                 style: widget.style),
@@ -140,7 +141,7 @@ class _AnimatedHeadingState extends State<AnimatedHeading>
             ),
           );
         }
-        return _animatedTransform(Text(widget.text,
+        return _animatedTransform(EditableLabel('home_parts.AnimatedHeading', widget.text,
             maxLines: widget.maxLines,
             overflow: widget.overflow,
             style: widget.style));
@@ -180,7 +181,7 @@ class _AnimatedHeadingState extends State<AnimatedHeading>
       },
       child: child is Text
           ? child
-          : Text(widget.text,
+          : EditableLabel('home_parts.AnimatedHeading', widget.text,
               maxLines: widget.maxLines,
               overflow: widget.overflow,
               style: widget.style),
@@ -274,6 +275,7 @@ class Spill extends StatelessWidget {
                                     viewBox: markViewBox,
                                     color: NwsbColors.goldLight),
                               ),
+                              slot: 'home_parts.Spill',
                             ),
                     ),
                     const SizedBox(width: 10),
@@ -366,6 +368,7 @@ class SecBanner extends StatelessWidget {
                             viewBox: markViewBox,
                             color: NwsbColors.goldLight),
                       ),
+                      slot: 'home_parts.SecBanner',
                     ),
             ),
             const SizedBox(width: 12),
@@ -376,7 +379,7 @@ class SecBanner extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
+                  EditableLabel('home_parts.SecBanner',
                     title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -386,7 +389,7 @@ class SecBanner extends StatelessWidget {
                         color: Colors.white),
                   ),
                   const SizedBox(height: 2),
-                  Text(
+                  EditableLabel('home_parts.SecBanner',
                     sub,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -506,7 +509,7 @@ class EnterPill extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
+          EditableLabel('home_parts.EnterPill',
             label,
             style: const TextStyle(
               fontSize: 13,
@@ -570,7 +573,7 @@ class GlassEnterPill extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
+                EditableLabel('home_parts.GlassEnterPill',
                   label,
                   style: const TextStyle(
                     fontSize: 13,
@@ -664,7 +667,7 @@ class PhotoCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    EditableLabel('home_parts.PhotoCard',
                       label,
                       style: TextStyle(
                         fontSize: 11,
@@ -690,7 +693,7 @@ class PhotoCard extends StatelessWidget {
                     ),
                     const Spacer(),
                     Flexible(
-                      child: Text(
+                      child: EditableLabel('home_parts.PhotoCard',
                         sub,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -749,7 +752,7 @@ class ScreenCta extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
+                EditableLabel('home_parts.ScreenCta',
                   label,
                   style: const TextStyle(
                     fontSize: 12.5,
@@ -842,7 +845,7 @@ class _GentleMarqueeTextState extends State<GentleMarqueeText>
   Widget build(BuildContext context) {
     final disabled = MediaQuery.maybeOf(context)?.disableAnimations ?? false;
     if (disabled || !TickerMode.of(context)) {
-      return Text(
+      return EditableLabel('home_parts.GentleMarqueeText',
         widget.text,
         maxLines: widget.maxLines,
         softWrap: false,
@@ -880,17 +883,17 @@ class _GentleMarqueeTextState extends State<GentleMarqueeText>
                       top: (height - painter.height) / 2,
                       child: Row(
                         children: [
-                          Text(widget.text,
+                          EditableLabel('home_parts.GentleMarqueeText', widget.text,
                               maxLines: 1,
                               softWrap: false,
                               style: widget.style),
                           const SizedBox(width: gap),
-                          Text(widget.text,
+                          EditableLabel('home_parts.GentleMarqueeText', widget.text,
                               maxLines: 1,
                               softWrap: false,
                               style: widget.style),
                           const SizedBox(width: gap),
-                          Text(widget.text,
+                          EditableLabel('home_parts.GentleMarqueeText', widget.text,
                               maxLines: 1,
                               softWrap: false,
                               style: widget.style),
@@ -940,7 +943,7 @@ class SectionMotionBanner extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
+          EditableLabel('home_parts.SectionMotionBanner',
             title,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -997,6 +1000,7 @@ class TrendBannerLockup extends StatelessWidget {
                 child: NwsbImage(
                   url: TrendBannerLockup.iconUrl,
                   fit: BoxFit.contain,
+                  slot: 'home_parts.TrendBannerLockup',
                 ),
               ),
               const SizedBox(width: 10),
@@ -1054,7 +1058,7 @@ class TitleWithGlassEnter extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
-          child: Text(
+          child: EditableLabel('home_parts.TitleWithGlassEnter',
             title,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,

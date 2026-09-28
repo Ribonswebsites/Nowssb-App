@@ -31,6 +31,7 @@ import 'store/request_words.dart';
 import 'store/signature_store.dart';
 import 'subscription.dart';
 import 'store/word_atelier.dart';
+import '../admin/template/editable.dart';
 
 class StoreScreen extends StatelessWidget {
   const StoreScreen({super.key});
@@ -61,7 +62,7 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('NowssB Store',
+                  EditableLabel('store.StoreHomeContent', 'NowssB Store',
                       style: TextStyle(
                           color: Colors.white,
                           fontSize: 34,
@@ -69,7 +70,7 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
                           fontWeight: FontWeight.w800,
                           letterSpacing: -1.0)),
                   SizedBox(height: 8),
-                  Text('Own the words. Unlock the meanings.',
+                  EditableLabel('store.StoreHomeContent', 'Own the words. Unlock the meanings.',
                       style: TextStyle(
                           color: Color(0xAFFFFFFF), fontSize: 13, height: 1.3)),
                 ],
@@ -110,7 +111,7 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
       ),
       // Kept visually empty for existing deep-link smoke tests; the old hero
       // itself is intentionally gone from the rendered Store page.
-      const Opacity(opacity: 0, child: Text('Enter Store')),
+      const Opacity(opacity: 0, child: EditableLabel('store.StoreHomeContent', 'Enter Store')),
       const _StoreDepartmentLabel('WORD ATELIER'),
       _StoreGlassSection(
         children: [
@@ -215,14 +216,14 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
       ),
       const Padding(
         padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
-        child: Text(
+        child: EditableLabel('store.StoreHomeContent',
           'Disclaimer & Confidentiality\n\nWords, meanings, ebooks and verification badges shared or sold here are for educational and wellness purposes only — nothing here is medical advice. Purchases are final once unlocked. Any information you share with us is kept strictly confidential and never sold or shared with third parties.',
           style: TextStyle(fontSize: 11, height: 1.5, color: Color(0x73FFFFFF)),
         ),
       ),
       const Padding(
         padding: EdgeInsets.symmetric(vertical: 24),
-        child: Text(
+        child: EditableLabel('store.StoreHomeContent',
           'NowssB\n© 2026 Adv. Sanjaykumar Gadge · Shabdapathy',
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 11, height: 1.6, color: Color(0x73FFFFFF)),
@@ -243,6 +244,7 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
               autoplay: true,
               loop: true,
               fit: BoxFit.cover,
+              slot: 'store.StoreHomeContent',
             ),
           ),
           const Positioned.fill(
@@ -313,7 +315,7 @@ class _StoreTab extends StatelessWidget {
             borderRadius: BorderRadius.circular(999),
             border: Border.all(color: const Color(0x55C8A96E)),
           ),
-          child: Text(
+          child: EditableLabel('store.StoreTab',
             label,
             style: TextStyle(
               color: selected ? NwsbColors.ink : Colors.white,
@@ -377,7 +379,7 @@ class _StoreImageRotatorState extends State<_StoreImageRotator> {
                 if (current != null) current,
               ],
             ),
-            child: Image.asset(
+            child: EditableImage.asset(
               _images[_index],
               key: ValueKey(_images[_index]),
               fit: BoxFit.cover,
@@ -390,6 +392,7 @@ class _StoreImageRotatorState extends State<_StoreImageRotator> {
                       color: Color(0x66FFFFFF), size: 34),
                 ),
               ),
+              slot: 'store.StoreImageRotator',
             ),
           ),
         ),
@@ -448,7 +451,7 @@ class _StoreDepartmentLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
-        child: Text(label,
+        child: EditableLabel('store.StoreDepartmentLabel', label,
             style: const TextStyle(
                 fontSize: 10, letterSpacing: 2.2, color: NwsbColors.gold)),
       );
@@ -461,11 +464,12 @@ class _StoreBanner extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Image.network(
+            EditableImage.network(
               'https://media.nowssb.com/migrated-images/d748b5f773a2d866_grok_image_1778576400577_mnxqkd.jpg',
               fit: BoxFit.cover,
               errorBuilder: (_, __, ___) =>
                   const ColoredBox(color: Colors.black),
+                  slot: 'store.StoreBanner',
             ),
             const DecoratedBox(
               decoration: BoxDecoration(
@@ -483,19 +487,19 @@ class _StoreBanner extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('SHABDAPATHY · COLLECTIONS',
+                  EditableLabel('store.StoreBanner', 'SHABDAPATHY · COLLECTIONS',
                       style: TextStyle(
                           fontSize: 10,
                           letterSpacing: 2.5,
                           color: NwsbColors.gold)),
                   SizedBox(height: 8),
-                  Text('The NowssB Store',
+                  EditableLabel('store.StoreBanner', 'The NowssB Store',
                       style: TextStyle(
                           fontSize: 30,
                           fontWeight: FontWeight.w300,
                           color: Colors.white)),
                   SizedBox(height: 5),
-                  Text('Word Library · Meaning Library · NowssB Signature',
+                  EditableLabel('store.StoreBanner', 'Word Library · Meaning Library · NowssB Signature',
                       style: TextStyle(fontSize: 11, color: Color(0xB3FFFFFF))),
                 ],
               ),
@@ -549,7 +553,7 @@ class _StoreVideoSection extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          NwsbVideo(asset: asset, priority: ClipPriority.feature),
+          NwsbVideo(asset: asset, priority: ClipPriority.feature, slot: 'store.StoreVideoSection'),
           const DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -564,20 +568,20 @@ class _StoreVideoSection extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(eyebrow,
+                EditableLabel('store.StoreVideoSection', eyebrow,
                     style: const TextStyle(
                         fontSize: 10,
                         letterSpacing: 2.2,
                         color: NwsbColors.gold)),
                 const Spacer(),
-                Text(title,
+                EditableLabel('store.StoreVideoSection', title,
                     style: const TextStyle(
                         fontSize: 28,
                         height: 1.05,
                         fontWeight: FontWeight.w300,
                         color: Colors.white)),
                 const SizedBox(height: 12),
-                Text(sub,
+                EditableLabel('store.StoreVideoSection', sub,
                     style: const TextStyle(
                         fontSize: 12, height: 1.45, color: Color(0xCCFFFFFF))),
                 const SizedBox(height: 12),
@@ -625,7 +629,7 @@ class _StoreChip extends StatelessWidget {
         decoration: BoxDecoration(
             color: const Color(0x18FFFFFF),
             border: Border.all(color: const Color(0x26FFFFFF))),
-        child: Text(text,
+        child: EditableLabel('store.StoreChip', text,
             style: const TextStyle(
                 fontSize: 8, letterSpacing: 1.5, color: Color(0xCCFFFFFF))),
       );
@@ -659,6 +663,7 @@ class _SignatureDoor extends StatelessWidget {
                 autoplay: true,
                 loop: true,
                 showPoster: false,
+                slot: 'store.SignatureDoor',
               ),
             ),
             const DecoratedBox(
@@ -675,22 +680,22 @@ class _SignatureDoor extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('SHABDAPATHY · THE RAREST',
+                  EditableLabel('store.SignatureDoor', 'SHABDAPATHY · THE RAREST',
                       style: TextStyle(
                           fontSize: 10,
                           letterSpacing: 2.2,
                           color: NwsbColors.gold)),
                   Spacer(),
-                  Text('Words & Meanings',
+                  EditableLabel('store.SignatureDoor', 'Words & Meanings',
                       style: TextStyle(
                           fontSize: 25,
                           color: Colors.white,
                           fontWeight: FontWeight.w300)),
                   SizedBox(height: 6),
-                  Text('One per category. Owned once, never restocked.',
+                  EditableLabel('store.SignatureDoor', 'One per category. Owned once, never restocked.',
                       style: TextStyle(fontSize: 11, color: Color(0xB3FFFFFF))),
                   SizedBox(height: 12),
-                  Text('15 Words   ·   5 Meanings',
+                  EditableLabel('store.SignatureDoor', '15 Words   ·   5 Meanings',
                       style: TextStyle(
                           fontSize: 10,
                           letterSpacing: 1.5,
@@ -724,6 +729,7 @@ class _StoreCompactVideoBanner extends StatelessWidget {
               autoplay: true,
               loop: true,
               showPoster: true,
+              slot: 'store.StoreCompactVideoBanner',
             ),
           ),
         ),
@@ -761,6 +767,7 @@ class _StoreVideoBanner extends StatelessWidget {
                   autoplay: true,
                   loop: true,
                   showPoster: poster != null,
+                  slot: 'store.StoreVideoBanner',
                 ),
               ),
             ),
@@ -807,19 +814,19 @@ class _MiniStoreCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(eyebrow,
+                  EditableLabel('store.MiniStoreCard', eyebrow,
                       style: const TextStyle(
                           fontSize: 9,
                           letterSpacing: 1.2,
                           color: Color(0x99FFFFFF))),
                   const SizedBox(height: 3),
-                  Text(title,
+                  EditableLabel('store.MiniStoreCard', title,
                       style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                           color: Colors.white)),
                   const SizedBox(height: 3),
-                  Text(sub,
+                  EditableLabel('store.MiniStoreCard', sub,
                       style: const TextStyle(
                           fontSize: 11, height: 1.3, color: Color(0x8CFFFFFF))),
                 ],

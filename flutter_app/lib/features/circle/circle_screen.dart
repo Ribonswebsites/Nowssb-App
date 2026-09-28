@@ -17,6 +17,7 @@ import '../earn/earn_topic_page.dart';
 import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
 import '../economy/money.dart';
+import '../../admin/template/editable.dart';
 
 class CircleScreen extends StatefulWidget {
   const CircleScreen({super.key});
@@ -47,7 +48,7 @@ class _CircleScreenState extends State<CircleScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF14121A),
-        title: const Text(
+        title: const EditableLabel('circle_screen.CircleScreen',
           'Welcome to NowssB Earn',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
         ),
@@ -61,7 +62,7 @@ class _CircleScreenState extends State<CircleScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Continue'),
+            child: const EditableLabel('circle_screen.CircleScreen', 'Continue'),
           ),
         ],
       ),
@@ -117,10 +118,11 @@ class _CircleScreenState extends State<CircleScreen> {
                           height: 108,
                           child: ColoredBox(
                             color: const Color(0xFFE6B325),
-                            child: Image.asset(
+                            child: EditableImage.asset(
                               SplitPromoArts.egyptianLotus,
                               fit: BoxFit.contain,
                               alignment: Alignment.bottomCenter,
+                              slot: 'circle_screen.CircleScreen',
                             ),
                           ),
                         ),
@@ -130,7 +132,7 @@ class _CircleScreenState extends State<CircleScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            const EditableLabel('circle_screen.CircleScreen',
                               'Earning status',
                               style: TextStyle(color: NwsbColors.gold, fontSize: 11, letterSpacing: 1.1, fontWeight: FontWeight.w700),
                             ),
@@ -190,7 +192,7 @@ class _CircleScreenState extends State<CircleScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('AGENT LADDER', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12, fontWeight: FontWeight.w700)),
+                      const EditableLabel('circle_screen.CircleScreen', 'AGENT LADDER', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12, fontWeight: FontWeight.w700)),
                       const SizedBox(height: 10),
                       for (final step in const [
                         ('Starter Agent', '0–99 units · 10% of net'),
@@ -253,7 +255,7 @@ class _CircleScreenState extends State<CircleScreen> {
                       : () async {
                           await Clipboard.setData(ClipboardData(text: w.code));
                           if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Code copied.')));
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: EditableLabel('circle_screen.CircleScreen', 'Code copied.')));
                           }
                         },
                 ),
@@ -275,7 +277,7 @@ class _CircleScreenState extends State<CircleScreen> {
                         : () => NwsbSignInPage.open(context),
               ),
               const SizedBox(height: 18),
-              const Text('YOUR LEGS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12)),
+              const EditableLabel('circle_screen.CircleScreen', 'YOUR LEGS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12)),
               const SizedBox(height: 8),
               const EconomyNote(
                 'You see yourself and the agents you recruited. Tap would open only that recruit’s own view, still capped at one level under them. A third level is never shown and never paid.',
@@ -303,7 +305,7 @@ class _CircleScreenState extends State<CircleScreen> {
                 ),
               ),
               const SizedBox(height: 18),
-              const Text('LEDGER', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12)),
+              const EditableLabel('circle_screen.CircleScreen', 'LEDGER', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12)),
               const SizedBox(height: 8),
               if (!NwsbFirebase.ready || w.uid == null)
                 const EconomyNote('Sign in to see referral payments.')
@@ -332,7 +334,7 @@ class _CircleScreenState extends State<CircleScreen> {
                   },
                 ),
               const SizedBox(height: 18),
-              const Text('AGENT TIERS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12)),
+              const EditableLabel('circle_screen.CircleScreen', 'AGENT TIERS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12)),
               const SizedBox(height: 8),
               const _TierRail(),
             ],
@@ -439,7 +441,7 @@ class _EarnCardRailState extends State<_EarnCardRail> {
                 left: 8,
                 right: 8,
                 bottom: 6,
-                child: Text(
+                child: EditableLabel('circle_screen.EarnCardRail',
                   label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -496,7 +498,7 @@ class _TierRail extends StatelessWidget {
                   const SizedBox(height: 6),
                   Text(tier.$2, style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12)),
                   const Spacer(),
-                  const Text('Open this tier', style: TextStyle(color: Color(0xFFE8D5A3), fontWeight: FontWeight.w700, fontSize: 12)),
+                  const EditableLabel('circle_screen.TierRail', 'Open this tier', style: TextStyle(color: Color(0xFFE8D5A3), fontWeight: FontWeight.w700, fontSize: 12)),
                 ],
               ),
             ),

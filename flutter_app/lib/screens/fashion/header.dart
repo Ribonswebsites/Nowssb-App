@@ -17,6 +17,7 @@ import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/app_thinking_loader.dart';
 import '../../widgets/nwsb_icon.dart';
+import '../../admin/template/editable.dart';
 
 class HomeHeader extends StatelessWidget {
   const HomeHeader({
@@ -61,11 +62,12 @@ class HomeHeader extends StatelessWidget {
           child: Row(
             children: [
               ClipOval(
-                child: Image.asset(
+                child: EditableImage.asset(
                   'assets/icons/logo-disc.webp',
                   width: 48,
                   height: 48,
                   fit: BoxFit.cover,
+                  slot: 'header.HomeHeader',
                 ),
               ),
               const SizedBox(width: 12),
@@ -257,7 +259,7 @@ class HeroGreeting extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
-                const Text(
+                const EditableLabel('header.HeroGreeting',
                   "Ready for today's healing practice?",
                   style: TextStyle(fontSize: 13.5, color: Color(0x8CFFFFFF)),
                 ),
@@ -314,7 +316,7 @@ class FashionGreetingSearch extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text(
+                  const EditableLabel('header.FashionGreetingSearch',
                     'Search',
                     style: TextStyle(
                       color: Color(0xCCFFFFFF),
@@ -341,7 +343,7 @@ class FashionGreetingSearch extends StatelessWidget {
                         ),
                         const SizedBox(width: 10),
                         const Expanded(
-                          child: Text(
+                          child: EditableLabel('header.FashionGreetingSearch',
                             'Search any word or meaning…',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -356,7 +358,7 @@ class FashionGreetingSearch extends StatelessWidget {
                         SizedBox(
                           width: 22,
                           height: 22,
-                          child: Image.asset(
+                          child: EditableImage.asset(
                             'assets/icons/search.webp',
                             color: Colors.white70,
                             errorBuilder: (_, __, ___) => const Icon(
@@ -364,6 +366,7 @@ class FashionGreetingSearch extends StatelessWidget {
                               size: 20,
                               color: Colors.white70,
                             ),
+                            slot: 'header.FashionGreetingSearch',
                           ),
                         ),
                       ],
@@ -589,7 +592,7 @@ class _DestinationSearchSheetState extends State<_DestinationSearchSheet> {
                                     ),
                                   ListTile(
                                     dense: true,
-                                    title: Text(
+                                    title: EditableLabel('header.DestinationSearchSheet',
                                       label,
                                       style: const TextStyle(
                                         color: Colors.white,

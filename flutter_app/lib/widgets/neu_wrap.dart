@@ -31,6 +31,7 @@ import 'nwsb_icon.dart';
 
 import '../theme/tokens.dart';
 import '../screens/normal/glassmorphism_theme.dart';
+import '../admin/template/editable.dart';
 
 class SecWrap extends StatelessWidget {
   const SecWrap({
@@ -156,7 +157,7 @@ class WrapHead extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
+                EditableLabel('neu_wrap.WrapHead',
                   eyebrow,
                   style: const TextStyle(
                     fontSize: 15,
@@ -167,7 +168,7 @@ class WrapHead extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 1),
-                Text(
+                EditableLabel('neu_wrap.WrapHead',
                   title,
                   style: const TextStyle(
                     fontSize: 24,

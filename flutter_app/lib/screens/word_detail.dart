@@ -22,6 +22,7 @@ import 'package:flutter/material.dart';
 import '../data/models.dart';
 import '../theme/tokens.dart';
 import '../widgets/app_backdrop.dart';
+import '../admin/template/editable.dart';
 
 class WordDetail extends StatelessWidget {
   const WordDetail({super.key, required this.word});
@@ -145,7 +146,7 @@ class _TopBar extends StatelessWidget {
           ),
           const SizedBox(width: 14),
           Expanded(
-            child: Text(
+            child: EditableLabel('word_detail.TopBar',
               title,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -225,7 +226,7 @@ class _SectionLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
+    return EditableLabel('word_detail.SectionLabel',
       text,
       style: const TextStyle(
         fontSize: 10,
@@ -350,7 +351,7 @@ class _Fact extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                EditableLabel('word_detail.Fact',
                   label,
                   style: TextStyle(
                     fontSize: 9,

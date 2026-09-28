@@ -35,6 +35,7 @@
 library;
 
 import 'dart:async';
+import 'dart:io' show File;
 import 'package:flutter/foundation.dart';
 import 'package:video_player/video_player.dart';
 
@@ -808,10 +809,16 @@ class VideoPool {
     // when a second muted loop calls play(), which is exactly the
     // "only one video plays on device" bug — even with plenty of decoder seats.
     final opts = VideoPlayerOptions(mixWithOthers: true);
+    // A path starting with '/' is a downloaded replacement clip from the
+    // live template editor (lib/admin/template), already on this phone.
     final c = _isRemote(l.assetPath)
         ? VideoPlayerController.networkUrl(Uri.parse(l.assetPath),
             videoPlayerOptions: opts)
-        : VideoPlayerController.asset(l.assetPath, videoPlayerOptions: opts);
+        : l.assetPath.startsWith('/')
+            ? VideoPlayerController.file(File(l.assetPath),
+                videoPlayerOptions: opts)
+            : VideoPlayerController.asset(l.assetPath,
+                videoPlayerOptions: opts);
     l._controller = c;
 
     try {

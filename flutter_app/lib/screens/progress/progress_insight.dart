@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../data/practice_progress.dart';
 import 'progress_tokens.dart';
+import '../../admin/template/editable.dart';
 
 class ProgressInsight extends StatelessWidget {
   const ProgressInsight({super.key, required this.progress});
@@ -20,16 +21,16 @@ class ProgressInsight extends StatelessWidget {
         children: [
           const Row(
             children: [
-              Text('■', style: TextStyle(fontSize: 9, color: Color(0xFFBFC5C7))),
+              EditableLabel('progress_insight.ProgressInsight', '■', style: TextStyle(fontSize: 9, color: Color(0xFFBFC5C7))),
               SizedBox(width: 8),
-              Text(
+              EditableLabel('progress_insight.ProgressInsight',
                 'SHABDAPATHY · AI ANALYSIS',
                 style: TextStyle(fontSize: 9, letterSpacing: 2.8, color: Color(0xFFBFC5C7)),
               ),
             ],
           ),
           const SizedBox(height: 15),
-          Text(
+          EditableLabel('progress_insight.ProgressInsight',
             text,
             style: const TextStyle(fontSize: 16, height: 1.75, color: Color(0xFFA8ADAF)),
           ),

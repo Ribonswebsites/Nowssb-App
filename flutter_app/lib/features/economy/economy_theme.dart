@@ -6,6 +6,7 @@ import '../../theme/tokens.dart';
 import '../../widgets/app_backdrop.dart';
 import 'economy_api.dart';
 import 'money.dart';
+import '../../admin/template/editable.dart';
 
 class EconomyPage extends StatelessWidget {
   const EconomyPage({
@@ -53,7 +54,7 @@ class EconomyPage extends StatelessWidget {
                         icon: const Icon(Icons.arrow_back, color: NwsbColors.goldLight),
                       ),
                       Expanded(
-                        child: Text(
+                        child: EditableLabel('economy_theme.EconomyPage',
                           title,
                           style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700),
                         ),
@@ -89,9 +90,9 @@ class EconomyMessage extends StatelessWidget {
           children: [
             const NwsbIcon(NwsbMarks.earn, color: NwsbColors.gold, size: 36),
             const SizedBox(height: 14),
-            Text(title, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700)),
+            EditableLabel('economy_theme.EconomyMessage', title, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700)),
             const SizedBox(height: 8),
-            Text(body, textAlign: TextAlign.center, style: const TextStyle(color: NwsbColors.mist, height: 1.4)),
+            EditableLabel('economy_theme.EconomyMessage', body, textAlign: TextAlign.center, style: const TextStyle(color: NwsbColors.mist, height: 1.4)),
             if (action != null) ...[
               const SizedBox(height: 16),
               GoldButton(label: action!, onTap: onAction),
@@ -188,7 +189,7 @@ class GoldButton extends StatelessWidget {
             side: filled ? BorderSide.none : const BorderSide(color: Color(0x55C8A96E)),
           ),
         ),
-        child: Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
+        child: EditableLabel('economy_theme.GoldButton', label, style: const TextStyle(fontWeight: FontWeight.w600)),
       ),
     );
   }
@@ -200,7 +201,7 @@ class EconomyNote extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(text, style: const TextStyle(color: NwsbColors.mist, fontSize: 13, height: 1.4));
+    return EditableLabel('economy_theme.EconomyNote', text, style: const TextStyle(color: NwsbColors.mist, fontSize: 13, height: 1.4));
   }
 }
 
@@ -215,7 +216,7 @@ Future<void> runEconomy(BuildContext context, Future<void> Function() action) as
     await action();
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Done.')),
+        const SnackBar(content: EditableLabel('economy_theme.shared', 'Done.')),
       );
     }
   } on EconomyException catch (e) {
@@ -230,7 +231,7 @@ Future<void> runEconomy(BuildContext context, Future<void> Function() action) as
   } catch (_) {
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('That did not go through. Try again.')),
+        const SnackBar(content: EditableLabel('economy_theme.shared', 'That did not go through. Try again.')),
       );
     }
   }

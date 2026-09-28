@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import '../data/settings.dart';
 import '../theme/player_aura.dart';
 import '../widgets/colored_split_promo_banner.dart';
+import '../admin/template/editable.dart';
 
 class PlayerSettingsScreen extends StatefulWidget {
   const PlayerSettingsScreen({super.key});
@@ -148,7 +149,7 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
                       onTap: () => Navigator.maybePop(context),
                     ),
                     const Spacer(),
-                    Text(
+                    EditableLabel('player_settings.PlayerSettingsScreen',
                       'NowssB',
                       style: playerAuraText(
                         size: 12,
@@ -164,7 +165,7 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
                 alignment: Alignment.centerLeft,
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(24, 18, 24, 12),
-                  child: Text(
+                  child: EditableLabel('player_settings.PlayerSettingsScreen',
                     'MUSIC PLAYER\nSETTINGS',
                     style: playerAuraText(
                       size: 29,

@@ -22,6 +22,7 @@ import '../widgets/colored_split_promo_banner.dart';
 import 'sound_library.dart';
 import 'practice_player.dart';
 import 'word_detail.dart';
+import '../admin/template/editable.dart';
 
 String nwsbSlot([DateTime? at]) {
   final h = (at ?? DateTime.now()).hour;
@@ -217,7 +218,7 @@ class _SessionCard extends StatelessWidget {
                 ElevatedButton.icon(
                   onPressed: onStart,
                   icon: const Icon(Icons.play_arrow_rounded, size: 19),
-                  label: const Text('Start Player'),
+                  label: const EditableLabel('practice.SessionCard', 'Start Player'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: NwsbColors.goldLight,
                     foregroundColor: NwsbColors.deep,
@@ -244,7 +245,7 @@ class _Empty extends StatelessWidget {
         children: [
           Icon(Icons.cloud_off, size: 34, color: Color(0x66FFFFFF)),
           SizedBox(height: 14),
-          Text(
+          EditableLabel('practice.Empty',
             'No words yet.',
             style: TextStyle(fontSize: 15, color: Color(0xB3FFFFFF)),
           ),

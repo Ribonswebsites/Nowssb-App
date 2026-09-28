@@ -12,6 +12,7 @@ import '../../widgets/nwsb_icon.dart';
 import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
 import '../economy/money.dart';
+import '../../admin/template/editable.dart';
 
 class GiftItem {
   const GiftItem(this.id, this.label, this.cents);
@@ -276,7 +277,7 @@ class _GiftsScreenState extends State<GiftsScreen> {
             borderRadius: BorderRadius.circular(999),
             border: Border.all(color: on ? NwsbColors.goldLight : const Color(0x33FFFFFF)),
           ),
-          child: Text(
+          child: EditableLabel('gifts_screen.GiftsScreen',
             label,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,

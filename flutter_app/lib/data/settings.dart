@@ -17,6 +17,8 @@ library;
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'quotes_remote.dart';
+
 class Settings extends ChangeNotifier {
   Settings._();
   static final Settings instance = Settings._();
@@ -45,8 +47,6 @@ class Settings extends ChangeNotifier {
   static const _kNavSlots = 'nwsb_nav_slots';
   static const _kHero = 'nwsb_hero_style';
   static const _kQuickActions = 'nwsb_quick_actions';
-  static const _kLiveQuote = 'nwsb_live_quote';
-  static const _kWeekQuotes = 'nwsb_week_quotes';
   static const _kThoughts = 'nwsb_shared_thoughts';
 
   /// One selected Fashion Plus film plays behind every primary page while
@@ -132,8 +132,6 @@ class Settings extends ChangeNotifier {
     'fashion',
   ];
   List<String> _quickActions = List<String>.from(defaultQuickActions);
-  String _liveQuote = '';
-  List<String> _weekQuotes = List<String>.filled(7, '');
   List<String> _sharedThoughts = const [];
 
   /// Motion mode: do page backgrounds play, or hold their first frame?
@@ -174,12 +172,13 @@ class Settings extends ChangeNotifier {
   /// Shortcut ids shown in the Normal home Quick actions carousel.
   List<String> get quickActions => List.unmodifiable(_quickActions);
 
-  /// Admin override for the top "quotes to live by" tab. Empty uses today's
-  /// weekday line.
-  String get liveQuote => _liveQuote;
+  /// A line pinned for today from admin mode (content/quotes `live`).
+  /// Empty uses today's line from [quoteFor].
+  String get liveQuote => QuoteStore.instance.live;
 
-  /// Seven lines, Monday first. Empty slots fall back to the built-in line.
-  List<String> get weekQuotes => List.unmodifiable(_weekQuotes);
+  /// Quotes published from admin mode changed — screens that show a quote
+  /// rebuild through this notifier.
+  void remoteChanged() => notifyListeners();
 
   /// Lines a person typed to share. Kept on this phone even when unsigned.
   List<String> get sharedThoughts => List.unmodifiable(_sharedThoughts);
@@ -194,14 +193,14 @@ class Settings extends ChangeNotifier {
       'Last light is for the word you still need.',
       'Rest is a practice. Let the tone finish.',
     ];
+    final published = QuoteStore.instance.lineFor(day);
+    if (published.isNotEmpty) return published;
     final i = (day.weekday - 1).clamp(0, 6);
-    final custom = i < _weekQuotes.length ? _weekQuotes[i].trim() : '';
-    if (custom.isNotEmpty) return custom;
     return fallback[i];
   }
 
   String get todayQuote {
-    final live = _liveQuote.trim();
+    final live = liveQuote.trim();
     if (live.isNotEmpty) return live;
     return quoteFor(DateTime.now());
   }
@@ -245,11 +244,6 @@ class Settings extends ChangeNotifier {
       final qa = p.getStringList(_kQuickActions);
       if (qa != null && qa.isNotEmpty) {
         _quickActions = sanitizeQuickActions(qa);
-      }
-      _liveQuote = p.getString(_kLiveQuote) ?? '';
-      final week = p.getStringList(_kWeekQuotes);
-      if (week != null && week.isNotEmpty) {
-        _weekQuotes = List<String>.generate(7, (i) => i < week.length ? week[i] : '');
       }
       _sharedThoughts = p.getStringList(_kThoughts) ?? const [];
       _showSplash = !(p.getBool(_kLaunched) ?? false);
@@ -298,22 +292,6 @@ class Settings extends ChangeNotifier {
 
   static int _validImageIndex(int index) =>
       index >= 0 && index < fashionImages.length ? index : -1;
-
-  Future<void> setLiveQuote(String value) async {
-    _liveQuote = value.trim();
-    await _saveString(_kLiveQuote, _liveQuote);
-    notifyListeners();
-  }
-
-  Future<void> setWeekQuote(int index, String value) async {
-    if (index < 0 || index > 6) return;
-    _weekQuotes[index] = value.trim();
-    try {
-      final p = await SharedPreferences.getInstance();
-      await p.setStringList(_kWeekQuotes, _weekQuotes);
-    } catch (_) {}
-    notifyListeners();
-  }
 
   Future<void> addSharedThought(String value) async {
     final text = value.trim();

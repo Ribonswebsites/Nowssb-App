@@ -24,6 +24,7 @@ import '../../widgets/home_parts.dart';
 import '../../widgets/home_skin.dart';
 import '../../widgets/enter_curve_stage.dart';
 import '../../widgets/tv_frame.dart';
+import '../../admin/template/editable.dart';
 
 /// 19 · offer — index.html:2252. The coupon art — a clip, not a picture,
 /// since app/js/part067.js:110 turned it into one — with Shop Now on it, and
@@ -50,6 +51,7 @@ class FashOffer extends StatelessWidget {
                     const NwsbVideo(
                       asset: 'assets/video/coupon-a.mp4',
                       priority: ClipPriority.decoration,
+                      slot: 'fashion_sections_bottom.FashOffer',
                     ),
                     Align(
                       alignment: Alignment.centerRight,
@@ -93,6 +95,7 @@ class FashShabdapathy extends StatelessWidget {
               url:
                   'https://media.nowssb.com/migrated-images/ed00ad1316e7a4d3_file_000000002a1481fbae984a694c298783_lkwus2.png',
               fallback: ColoredBox(color: Color(0xFF060C18)),
+              slot: 'fashion_sections_bottom.FashShabdapathy',
             ),
             label: 'Featured',
             title: 'Shabdapathy Foundations',
@@ -164,6 +167,7 @@ class FashWordSearch extends StatelessWidget {
                 url:
                     'https://media.nowssb.com/migrated-images/d28e15ab1538eb5f_grok_image_1778655491471_ss3vax.jpg',
                 fallback: ColoredBox(color: Color(0xFF0A0F1C)),
+                slot: 'fashion_sections_bottom.FashWordSearch',
               ),
             ),
           ),
@@ -202,6 +206,7 @@ class FashMeaningSearch extends StatelessWidget {
                 url:
                     'https://media.nowssb.com/migrated-images/59930cdf0d0e23bb_grok_image_1778656028544_cih9iy.jpg',
                 fallback: ColoredBox(color: Color(0xFF0A0F1C)),
+                slot: 'fashion_sections_bottom.FashMeaningSearch',
               ),
             ),
           ),
@@ -261,7 +266,7 @@ class _SearchPanelState extends State<_SearchPanel> {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              NwsbVideo(asset: widget.clip, priority: ClipPriority.decoration),
+              NwsbVideo(asset: widget.clip, priority: ClipPriority.decoration, slot: 'fashion_sections_bottom.SearchPanel'),
               const DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -277,7 +282,7 @@ class _SearchPanelState extends State<_SearchPanel> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text(
+                    EditableLabel('fashion_sections_bottom.SearchPanel',
                       widget.eyebrow,
                       style: const TextStyle(
                         fontSize: 11,
@@ -287,7 +292,7 @@ class _SearchPanelState extends State<_SearchPanel> {
                       ),
                     ),
                     const SizedBox(height: 6),
-                    Text(
+                    EditableLabel('fashion_sections_bottom.SearchPanel',
                       widget.title,
                       style: const TextStyle(
                         fontSize: 26,
@@ -297,7 +302,7 @@ class _SearchPanelState extends State<_SearchPanel> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Text(
+                    EditableLabel('fashion_sections_bottom.SearchPanel',
                       widget.sub,
                       style: const TextStyle(
                         fontSize: 12.5,
@@ -402,7 +407,7 @@ class FashShabdaVideo extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
+                      EditableLabel('fashion_sections_bottom.FashShabdaVideo',
                         'Shabdapathy',
                         style: TextStyle(
                           fontSize: 10,
@@ -441,7 +446,7 @@ class FashShabdaVideo extends StatelessWidget {
                         ),
                       ),
                       SizedBox(height: 10),
-                      Text(
+                      EditableLabel('fashion_sections_bottom.FashShabdaVideo',
                         'Natural Origin of Word Science',
                         style:
                             TextStyle(fontSize: 11, color: Color(0x99FFFFFF)),
@@ -455,7 +460,7 @@ class FashShabdaVideo extends StatelessWidget {
               padding: EdgeInsets.all(16),
               child: Align(
                 alignment: Alignment.bottomRight,
-                child: Text(
+                child: EditableLabel('fashion_sections_bottom.FashShabdaVideo',
                   'Nowsbansiu',
                   style: TextStyle(
                     fontSize: 11,

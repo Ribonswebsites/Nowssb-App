@@ -23,6 +23,7 @@ import '../../theme/tokens.dart';
 import '../../widgets/app_thinking_loader.dart';
 import 'reader_epub.dart';
 import 'reader_lookup.dart';
+import '../../admin/template/editable.dart';
 
 const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
 
@@ -507,20 +508,20 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
                   ? const Icon(Icons.file_upload_outlined, color: Colors.white)
                   : (cover.isEmpty
                       ? const SizedBox.shrink()
-                      : NwsbImage(url: cover)),
+                      : NwsbImage(url: cover, slot: 'reader_book.ReaderBookScreen')),
             ),
             const SizedBox(width: 13),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title,
+                  EditableLabel('reader_book.ReaderBookScreen', title,
                       style: const TextStyle(
                           color: Colors.white,
                           fontSize: 14,
                           fontWeight: FontWeight.w700)),
                   const SizedBox(height: 3),
-                  Text(sub,
+                  EditableLabel('reader_book.ReaderBookScreen', sub,
                       style: const TextStyle(
                           color: Color(0x80FFFFFF),
                           fontSize: 11.5,
@@ -585,7 +586,7 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
                   else ...[
                     _iconBtn(
                       onTap: () => setState(() => _settings = !_settings),
-                      child: const Text('Aa',
+                      child: const EditableLabel('reader_book.ReaderBookScreen', 'Aa',
                           style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w700,
@@ -644,7 +645,7 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
                     children: [
                       GestureDetector(
                         onTap: () => setState(() => _toc = true),
-                        child: const Text('Contents',
+                        child: const EditableLabel('reader_book.ReaderBookScreen', 'Contents',
                             style: TextStyle(color: Color(0xB3FFFFFF))),
                       ),
                       Text('${_idx + 1} of $n'),
@@ -729,7 +730,7 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
                       color: _pageFg.withValues(alpha: 0.4)),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Text('✦',
+                    child: EditableLabel('reader_book.ReaderBookScreen', '✦',
                         style: TextStyle(
                             fontSize: 11,
                             color: _pageFg.withValues(alpha: 0.4))),
@@ -758,7 +759,7 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
               Padding(
                 padding:
                     const EdgeInsets.symmetric(vertical: 26, horizontal: 6),
-                child: Text(
+                child: EditableLabel('reader_book.ReaderBookScreen',
                   'This chapter has no text in the app yet. When it is added it will open here, in this reader.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
@@ -956,7 +957,7 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
                     color: _swipeOn
                         ? NwsbColors.goldLight
                         : const Color(0xB3FFFFFF)),
-                label: Text('Highlight',
+                label: EditableLabel('reader_book.ReaderBookScreen', 'Highlight',
                     style: TextStyle(
                         color: _swipeOn
                             ? NwsbColors.goldLight
@@ -991,7 +992,7 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
             if (left)
               const Icon(Icons.chevron_left,
                   size: 15, color: Color(0xD9FFFFFF)),
-            Text(label,
+            EditableLabel('reader_book.ReaderBookScreen', label,
                 style: TextStyle(
                     color:
                         off ? const Color(0x47FFFFFF) : const Color(0xD9FFFFFF),
@@ -1058,7 +1059,7 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
           Expanded(
             child: Column(
               children: [
-                Text(title,
+                EditableLabel('reader_book.ReaderBookScreen', title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -1066,7 +1067,7 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
                         fontSize: 15,
                         fontWeight: FontWeight.w700)),
                 if (sub.isNotEmpty)
-                  Text(sub,
+                  EditableLabel('reader_book.ReaderBookScreen', sub,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
@@ -1122,7 +1123,7 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
             cell(
               key: const Key('rd-rail-settings'),
               onTap: () => setState(() => _settings = !_settings),
-              child: const Text('Aa',
+              child: const EditableLabel('reader_book.ReaderBookScreen', 'Aa',
                   style: TextStyle(
                       color: Color(0xD1FFFFFF), fontWeight: FontWeight.w700)),
             ),
@@ -1238,7 +1239,7 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
               'Text Size',
               Row(
                 children: [
-                  const Text('A',
+                  const EditableLabel('reader_book.ReaderBookScreen', 'A',
                       style: TextStyle(color: Color(0x99FFFFFF), fontSize: 11)),
                   Expanded(
                     child: Slider(
@@ -1250,7 +1251,7 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
                       onChanged: (v) => _store.setPref(size: v.round()),
                     ),
                   ),
-                  const Text('A',
+                  const EditableLabel('reader_book.ReaderBookScreen', 'A',
                       style: TextStyle(color: Color(0xD9FFFFFF), fontSize: 17)),
                 ],
               ),
@@ -1330,7 +1331,7 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
                               width: 1.5,
                             ),
                           ),
-                          child: Text('Aa',
+                          child: EditableLabel('reader_book.ReaderBookScreen', 'Aa',
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
@@ -1348,7 +1349,7 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
               'Brightness',
               Row(
                 children: [
-                  const Text('☀',
+                  const EditableLabel('reader_book.ReaderBookScreen', '☀',
                       style: TextStyle(fontSize: 11, color: Color(0x80FFFFFF))),
                   Expanded(
                     child: Slider(
@@ -1359,7 +1360,7 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
                       onChanged: (v) => _store.setPref(bright: v.round()),
                     ),
                   ),
-                  const Text('☀',
+                  const EditableLabel('reader_book.ReaderBookScreen', '☀',
                       style: TextStyle(fontSize: 15, color: Color(0xCCFFFFFF))),
                 ],
               ),
@@ -1377,7 +1378,7 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
         children: [
           SizedBox(
             width: 74,
-            child: Text(label,
+            child: EditableLabel('reader_book.ReaderBookScreen', label,
                 style: const TextStyle(
                     color: Color(0x8CFFFFFF),
                     fontSize: 11,
@@ -1428,13 +1429,13 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(title,
+                        EditableLabel('reader_book.ReaderBookScreen', title,
                             style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 15,
                                 fontWeight: FontWeight.w700)),
                         if (sub.isNotEmpty)
-                          Text(sub,
+                          EditableLabel('reader_book.ReaderBookScreen', sub,
                               style: const TextStyle(
                                   color: Color(0x80FFFFFF), fontSize: 11.5)),
                       ],
@@ -1535,7 +1536,7 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
             children: [
               Icon(ic, color: Colors.white, size: 20),
               const SizedBox(height: 8),
-              Text(label,
+              EditableLabel('reader_book.ReaderBookScreen', label,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                       color: Colors.white,
@@ -1603,27 +1604,27 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
             ],
           ),
           const SizedBox(height: 18),
-          const Text('Highlights on this page',
+          const EditableLabel('reader_book.ReaderBookScreen', 'Highlights on this page',
               style: TextStyle(
                   color: Color(0x8CFFFFFF),
                   fontSize: 11,
                   fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
           if (pm.hl.isEmpty)
-            const Text('Select any text on the page to highlight it.',
+            const EditableLabel('reader_book.ReaderBookScreen', 'Select any text on the page to highlight it.',
                 style: TextStyle(color: Color(0x66FFFFFF), fontSize: 12.5))
           else
             for (var i = 0; i < pm.hl.length; i++)
               _mkRow(pm.hl[i], () => _store.drop(_bookKey, _idx, 'hl', i)),
           const SizedBox(height: 16),
-          const Text('Notes on this page',
+          const EditableLabel('reader_book.ReaderBookScreen', 'Notes on this page',
               style: TextStyle(
                   color: Color(0x8CFFFFFF),
                   fontSize: 11,
                   fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
           if (pm.notes.isEmpty)
-            const Text('No notes yet.',
+            const EditableLabel('reader_book.ReaderBookScreen', 'No notes yet.',
                 style: TextStyle(color: Color(0x66FFFFFF), fontSize: 12.5))
           else
             for (var i = 0; i < pm.notes.length; i++)
@@ -1733,7 +1734,7 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
                   _toastNow('Note saved');
                   _haptic(28);
                 },
-                child: const Text('Add'),
+                child: const EditableLabel('reader_book.ReaderBookScreen', 'Add'),
               ),
             ],
           ),
@@ -1776,7 +1777,7 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
           ),
           const SizedBox(height: 16),
           if (rows.isEmpty)
-            const Text(
+            const EditableLabel('reader_book.ReaderBookScreen',
               'Nothing yet. Turn on Swipe Highlight and tap a paragraph — it is painted on the page and lands here at the same time.',
               style: TextStyle(
                   color: Color(0x73FFFFFF), fontSize: 13, height: 1.5),
@@ -1822,7 +1823,7 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
                                 style: const TextStyle(
                                     color: Color(0x80FFFFFF), fontSize: 11)),
                           if (r.auto)
-                            const Text('swiped',
+                            const EditableLabel('reader_book.ReaderBookScreen', 'swiped',
                                 style: TextStyle(
                                     color: NwsbColors.goldLight, fontSize: 10)),
                         ],
@@ -1864,7 +1865,7 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
           children: [
             Icon(ic, size: 14, color: Colors.white),
             const SizedBox(width: 6),
-            Text(label,
+            EditableLabel('reader_book.ReaderBookScreen', label,
                 style: const TextStyle(color: Colors.white, fontSize: 11.5)),
           ],
         ),
@@ -1933,7 +1934,7 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
                       ),
                     TextButton(
                       onPressed: () => setState(() => _remind = false),
-                      child: const Text('Cancel'),
+                      child: const EditableLabel('reader_book.ReaderBookScreen', 'Cancel'),
                     ),
                   ],
                 ),
@@ -1994,7 +1995,7 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
           ],
           const SizedBox(height: 16),
           if (_webWait)
-            const Text('Looking it up…',
+            const EditableLabel('reader_book.ReaderBookScreen', 'Looking it up…',
                 style: TextStyle(color: Color(0x80FFFFFF), fontSize: 13))
           else if (_webBody.isEmpty)
             Text(
@@ -2011,7 +2012,7 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
             const SizedBox(height: 12),
             TextButton(
               onPressed: _saveWeb,
-              child: const Text('Save to notepad'),
+              child: const EditableLabel('reader_book.ReaderBookScreen', 'Save to notepad'),
             ),
           ],
           const SizedBox(height: 16),

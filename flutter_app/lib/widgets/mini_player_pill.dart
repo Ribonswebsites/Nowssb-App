@@ -9,6 +9,7 @@ import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../data/playback_session.dart';
 import 'app_thinking_loader.dart';
+import '../admin/template/editable.dart';
 
 const _storeMark = 'assets/store/nowssb-bag-headphones.webp';
 
@@ -76,13 +77,14 @@ class MiniPlayerPill extends StatelessWidget {
                                               color: Color(0xFF222228),
                                             ),
                                           )
-                                        : Image.asset(
+                                        : EditableImage.asset(
                                             art,
                                             fit: BoxFit.cover,
                                             errorBuilder: (_, __, ___) =>
                                                 const ColoredBox(
                                               color: Color(0xFF222228),
                                             ),
+                                            slot: 'mini_player_pill.MiniPlayerPill',
                                           ),
                               ),
                               Positioned(
@@ -90,13 +92,14 @@ class MiniPlayerPill extends StatelessWidget {
                                 bottom: 2,
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(5),
-                                  child: Image.asset(
+                                  child: EditableImage.asset(
                                     _storeMark,
                                     width: 14,
                                     height: 14,
                                     fit: BoxFit.cover,
                                     errorBuilder: (_, __, ___) =>
                                         const SizedBox.shrink(),
+                                        slot: 'mini_player_pill.MiniPlayerPill',
                                   ),
                                 ),
                               ),
@@ -121,7 +124,7 @@ class MiniPlayerPill extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
+                              EditableLabel('mini_player_pill.MiniPlayerPill',
                                 title,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,

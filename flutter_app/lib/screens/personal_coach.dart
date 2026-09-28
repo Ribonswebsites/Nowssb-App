@@ -21,6 +21,7 @@ import '../widgets/app_thinking_loader.dart';
 import 'practice_player.dart';
 import '../widgets/colored_split_promo_banner.dart';
 import 'sound_library.dart';
+import '../admin/template/editable.dart';
 
 const _coachApi = 'https://nowssb-api.ribonpatil2.workers.dev/api/assistant/chat';
 const _coachHero = 'assets/coach/personal_coach_hero.jpg';
@@ -220,7 +221,7 @@ class _PersonalCoachScreenState extends State<PersonalCoachScreen> {
         const SizedBox(height: 16),
         const _QuoteCard(),
         const SizedBox(height: 22),
-        const Text('Chat with your coach', style: TextStyle(color: Color(0xFFB5B5BA), fontSize: 17, fontWeight: FontWeight.w600)),
+        const EditableLabel('personal_coach.PersonalCoachScreen', 'Chat with your coach', style: TextStyle(color: Color(0xFFB5B5BA), fontSize: 17, fontWeight: FontWeight.w600)),
         const SizedBox(height: 10),
         _composer(data, signedIn),
         if (_notice != null) Padding(padding: const EdgeInsets.only(top: 10), child: Text(_notice!, style: const TextStyle(color: Color(0xFFE2B8BA), height: 1.4))),
@@ -252,17 +253,17 @@ class _PersonalCoachScreenState extends State<PersonalCoachScreen> {
           height: 260,
           decoration: BoxDecoration(color: const Color(0xFF09090B), border: Border.all(color: Colors.white.withOpacity(.08))),
           child: Stack(fit: StackFit.expand, children: [
-            Image.asset(_coachHero, fit: BoxFit.cover, alignment: Alignment.topCenter),
+            EditableImage.asset(_coachHero, fit: BoxFit.cover, alignment: Alignment.topCenter, slot: 'personal_coach.PersonalCoachScreen'),
             DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.black.withOpacity(.05), Colors.black.withOpacity(.80)], stops: const [.25, 1]))),
             Padding(
               padding: const EdgeInsets.all(24),
               child: Column(mainAxisAlignment: MainAxisAlignment.end, crossAxisAlignment: CrossAxisAlignment.start, children: [
-                const Text('Personal\nCoach', style: TextStyle(color: Colors.white, fontSize: 36, height: .94, fontWeight: FontWeight.w800, letterSpacing: -.8)),
+                const EditableLabel('personal_coach.PersonalCoachScreen', 'Personal\nCoach', style: TextStyle(color: Colors.white, fontSize: 36, height: .94, fontWeight: FontWeight.w800, letterSpacing: -.8)),
                 const SizedBox(height: 12),
                 const SizedBox(width: 46, child: Divider(color: Colors.white54, height: 1)),
                 const SizedBox(height: 12),
-                const Text('Your goals. My guidance.\nUnstoppable you.', style: TextStyle(color: Color(0xFFC6C6CC), fontSize: 16, height: 1.42)),
-                if (words.isNotEmpty) TextButton.icon(onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => PracticePlayerScreen(words: words, title: 'Personal Coach Session'))), style: TextButton.styleFrom(foregroundColor: Colors.white, padding: const EdgeInsets.only(top: 10)), icon: const Icon(Icons.play_arrow_rounded), label: const Text('Start focused practice')),
+                const EditableLabel('personal_coach.PersonalCoachScreen', 'Your goals. My guidance.\nUnstoppable you.', style: TextStyle(color: Color(0xFFC6C6CC), fontSize: 16, height: 1.42)),
+                if (words.isNotEmpty) TextButton.icon(onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => PracticePlayerScreen(words: words, title: 'Personal Coach Session'))), style: TextButton.styleFrom(foregroundColor: Colors.white, padding: const EdgeInsets.only(top: 10)), icon: const Icon(Icons.play_arrow_rounded), label: const EditableLabel('personal_coach.PersonalCoachScreen', 'Start focused practice')),
               ]),
             ),
           ]),
@@ -382,9 +383,9 @@ class _MetricCard extends StatelessWidget {
   final double? progress;
   @override
   Widget build(BuildContext context) => _Panel(height: progress == null ? 142 : 132, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        _Label(label), const SizedBox(height: 9), Text(title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 21, height: 1.14, fontWeight: FontWeight.w500)), const Spacer(),
+        _Label(label), const SizedBox(height: 9), EditableLabel('personal_coach.MetricCard', title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 21, height: 1.14, fontWeight: FontWeight.w500)), const Spacer(),
         if (progress != null) ...[LinearProgressIndicator(value: progress, minHeight: 2, color: Colors.white, backgroundColor: Colors.white12), const SizedBox(height: 8)],
-        Text(detail, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xFF94949A), fontSize: 12)),
+        EditableLabel('personal_coach.MetricCard', detail, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xFF94949A), fontSize: 12)),
       ]));
 }
 
@@ -398,11 +399,11 @@ class _Panel extends StatelessWidget {
 class _QuoteCard extends StatelessWidget {
   const _QuoteCard();
   @override
-  Widget build(BuildContext context) => Container(height: 176, padding: const EdgeInsets.all(26), decoration: BoxDecoration(color: const Color(0xFF080809), borderRadius: BorderRadius.circular(26), border: Border.all(color: Colors.white.withOpacity(.09))), child: Stack(children: [Positioned(right: -22, bottom: -20, child: Icon(Icons.waves_rounded, color: Colors.white.withOpacity(.16), size: 160)), const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('“', style: TextStyle(color: Color(0xFFECECEF), fontSize: 44, height: .6, fontWeight: FontWeight.w700)), Spacer(), Text('Discipline today,\nfreedom tomorrow.', style: TextStyle(color: Colors.white, fontSize: 26, height: 1.2, fontWeight: FontWeight.w500))]) ]));
+  Widget build(BuildContext context) => Container(height: 176, padding: const EdgeInsets.all(26), decoration: BoxDecoration(color: const Color(0xFF080809), borderRadius: BorderRadius.circular(26), border: Border.all(color: Colors.white.withOpacity(.09))), child: Stack(children: [Positioned(right: -22, bottom: -20, child: Icon(Icons.waves_rounded, color: Colors.white.withOpacity(.16), size: 160)), const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [EditableLabel('personal_coach.QuoteCard', '“', style: TextStyle(color: Color(0xFFECECEF), fontSize: 44, height: .6, fontWeight: FontWeight.w700)), Spacer(), EditableLabel('personal_coach.QuoteCard', 'Discipline today,\nfreedom tomorrow.', style: TextStyle(color: Colors.white, fontSize: 26, height: 1.2, fontWeight: FontWeight.w500))]) ]));
 }
 
-class _Label extends StatelessWidget { const _Label(this.text); final String text; @override Widget build(BuildContext context) => Text(text, style: const TextStyle(color: Color(0xFFA2A2A8), fontSize: 16, fontWeight: FontWeight.w600)); }
-class _CoachChip extends StatelessWidget { const _CoachChip(this.icon, this.label, this.onTap); final IconData icon; final String label; final VoidCallback onTap; @override Widget build(BuildContext context) => ActionChip(avatar: Icon(icon, size: 17, color: const Color(0xFFD9D9DE)), label: Text(label), labelStyle: const TextStyle(color: Color(0xFFE2E2E5), fontSize: 14, fontWeight: FontWeight.w600), backgroundColor: const Color(0xFF131316), side: BorderSide(color: Colors.white.withOpacity(.12)), shape: const StadiumBorder(), onPressed: onTap); }
+class _Label extends StatelessWidget { const _Label(this.text); final String text; @override Widget build(BuildContext context) => EditableLabel('personal_coach.Label', text, style: const TextStyle(color: Color(0xFFA2A2A8), fontSize: 16, fontWeight: FontWeight.w600)); }
+class _CoachChip extends StatelessWidget { const _CoachChip(this.icon, this.label, this.onTap); final IconData icon; final String label; final VoidCallback onTap; @override Widget build(BuildContext context) => ActionChip(avatar: Icon(icon, size: 17, color: const Color(0xFFD9D9DE)), label: EditableLabel('personal_coach.CoachChip', label), labelStyle: const TextStyle(color: Color(0xFFE2E2E5), fontSize: 14, fontWeight: FontWeight.w600), backgroundColor: const Color(0xFF131316), side: BorderSide(color: Colors.white.withOpacity(.12)), shape: const StadiumBorder(), onPressed: onTap); }
 class _OrbitMark extends StatelessWidget { const _OrbitMark(); @override Widget build(BuildContext context) => const Icon(Icons.gps_fixed_rounded, color: Colors.white, size: 30); }
 
 class _CoachData {

@@ -8,6 +8,7 @@ import '../data/models.dart';
 import '../widgets/app_thinking_loader.dart';
 import '../widgets/glass_wrap.dart';
 import '../widgets/nwsb_icon.dart';
+import '../admin/template/editable.dart';
 
 class CurrentlyPlayingAlbum extends StatelessWidget {
   const CurrentlyPlayingAlbum({
@@ -44,7 +45,7 @@ class CurrentlyPlayingAlbum extends StatelessWidget {
     if (words.isEmpty) {
       return const Padding(
         padding: EdgeInsets.all(32),
-        child: Text(
+        child: EditableLabel('currently_playing_album.CurrentlyPlayingAlbum',
           'Nothing is playing yet. Start a session and it lands here.',
           textAlign: TextAlign.center,
           style: TextStyle(color: Color(0x99FFFFFF)),
@@ -81,7 +82,7 @@ class CurrentlyPlayingAlbum extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const Text(
+                  const EditableLabel('currently_playing_album.CurrentlyPlayingAlbum',
                     'NOWSSB',
                     style: TextStyle(
                       color: Colors.white,
@@ -108,11 +109,12 @@ class CurrentlyPlayingAlbum extends StatelessWidget {
                     child: SizedBox(
                       width: 228,
                       height: 228,
-                      child: Image.asset(
+                      child: EditableImage.asset(
                         cover,
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) =>
                             const ColoredBox(color: Color(0xFF1A1A1A)),
+                            slot: 'currently_playing_album.CurrentlyPlayingAlbum',
                       ),
                     ),
                   ),
@@ -179,7 +181,7 @@ class CurrentlyPlayingAlbum extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
+                            EditableLabel('currently_playing_album.CurrentlyPlayingAlbum',
                               'Sample this',
                               style: TextStyle(
                                 color: Color(0x99FFFFFF),
@@ -187,7 +189,7 @@ class CurrentlyPlayingAlbum extends StatelessWidget {
                               ),
                             ),
                             SizedBox(height: 4),
-                            Text(
+                            EditableLabel('currently_playing_album.CurrentlyPlayingAlbum',
                               'Tap to preview this album and find your favorites',
                               style: TextStyle(
                                 color: Colors.white,
@@ -214,12 +216,13 @@ class CurrentlyPlayingAlbum extends StatelessWidget {
                                     child: SizedBox(
                                       width: 36,
                                       height: 48,
-                                      child: Image.asset(
+                                      child: EditableImage.asset(
                                         art(words[i].word),
                                         fit: BoxFit.cover,
                                         errorBuilder: (_, __, ___) =>
                                             const ColoredBox(
                                                 color: Color(0xFF333333)),
+                                                slot: 'currently_playing_album.CurrentlyPlayingAlbum',
                                       ),
                                     ),
                                   ),
@@ -258,11 +261,12 @@ class CurrentlyPlayingAlbum extends StatelessWidget {
                         child: SizedBox(
                           width: 42,
                           height: 42,
-                          child: Image.asset(
+                          child: EditableImage.asset(
                             cover,
                             fit: BoxFit.cover,
                             errorBuilder: (_, __, ___) =>
                                 const ColoredBox(color: Color(0xFF333333)),
+                                slot: 'currently_playing_album.CurrentlyPlayingAlbum',
                           ),
                         ),
                       ),
@@ -368,7 +372,7 @@ class CurrentlyPlayingAlbum extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 2),
-                  Text(
+                  EditableLabel('currently_playing_album.CurrentlyPlayingAlbum',
                     sub,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

@@ -33,6 +33,7 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 import '../media/onboarding_warmup.dart';
+import '../admin/template/editable.dart';
 
 class Splash extends StatefulWidget {
   const Splash({super.key, required this.onDone});
@@ -163,11 +164,12 @@ class _SplashState extends State<Splash> {
           else
             // The clip's own first frame while it opens, so the launch is
             // never a black hole even for the half-second before playback.
-            Image.asset(
+            EditableImage.asset(
               'assets/video/start-animation-poster.webp',
               fit: BoxFit.cover,
               errorBuilder: (_, __, ___) =>
                   const ColoredBox(color: Colors.black),
+                  slot: 'splash.Splash',
             ),
         ],
       ),
