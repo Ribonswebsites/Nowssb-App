@@ -16,6 +16,9 @@ class FlipPortrait extends StatefulWidget {
     required this.back,
     this.mark,
     this.markAt = const Alignment(0, -0.62),
+    this.markSize = 34,
+    this.fit = BoxFit.contain,
+    this.alignment = Alignment.bottomCenter,
   });
 
   final String front;
@@ -24,6 +27,9 @@ class FlipPortrait extends StatefulWidget {
   /// Optional mark drawn between the hands, in a white circle.
   final String? mark;
   final Alignment markAt;
+  final double markSize;
+  final BoxFit fit;
+  final Alignment alignment;
 
   @override
   State<FlipPortrait> createState() => _FlipPortraitState();
@@ -90,8 +96,8 @@ class _FlipPortraitState extends State<FlipPortrait> with SingleTickerProviderSt
         ColoredBox(color: Colors.black),
         EditableImage.asset(
           asset,
-          fit: BoxFit.contain,
-          alignment: Alignment.bottomCenter,
+          fit: widget.fit,
+          alignment: widget.alignment,
           errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black),
           slot: 'flip_portrait.FlipPortrait',
         ),
@@ -99,11 +105,11 @@ class _FlipPortraitState extends State<FlipPortrait> with SingleTickerProviderSt
           Align(
             alignment: widget.markAt,
             child: Container(
-              width: 34,
-              height: 34,
+              width: widget.markSize,
+              height: widget.markSize,
               decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
               alignment: Alignment.center,
-              child: NwsbIcon(widget.mark!, size: 18, color: Colors.black),
+              child: NwsbIcon(widget.mark!, size: widget.markSize * 0.55, color: Colors.black),
             ),
           ),
       ],

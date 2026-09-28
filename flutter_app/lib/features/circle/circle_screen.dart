@@ -357,11 +357,11 @@ class _EarnCardRailState extends State<_EarnCardRail> {
   Timer? _timer;
   var _index = 0;
 
-  static const _cards = <(String, String, void Function(BuildContext))>[
-    ('NowssB Gifts', NwsbMarks.gift, openGifts),
-    ('NowssB Rewards', NwsbMarks.earn, openRewards),
-    ('Your Earning', NwsbMarks.piggy, openEarnings),
-    ('NowssB coins earned', NwsbMarks.earn, openCoins),
+  static const _cards = <(String, String, Color, void Function(BuildContext))>[
+    ('NowssB Gifts', NwsbMarks.gift, Color(0xFF4A1942), openGifts),
+    ('NowssB Rewards', NwsbMarks.earn, Color(0xFF1A3058), openRewards),
+    ('Your Earning', NwsbMarks.piggy, Color(0xFF3A2610), openEarnings),
+    ('NowssB coins earned', NwsbMarks.earn, Color(0xFF12362C), openCoins),
   ];
 
   @override
@@ -386,36 +386,49 @@ class _EarnCardRailState extends State<_EarnCardRail> {
   Widget build(BuildContext context) {
     return GlassWrap(
       margin: EdgeInsets.zero,
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(6),
       child: SizedBox(
-        height: 132,
+        height: 72,
         child: Row(
           children: [
             Expanded(
-              flex: 3,
-              child: _blackCard(
+              flex: 7,
+              child: _tile(
                 label: 'NowssB Earn',
+                color: Colors.black,
                 onTap: () {},
-                child: const FlipPortrait(
-                  front: 'assets/banners/earn/hands-light.png',
-                  back: 'assets/banners/earn/hands-dark.png',
-                  mark: NwsbMarks.piggy,
+                child: const SizedBox(
+                  width: 40,
+                  height: 52,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                    child: FlipPortrait(
+                      front: 'assets/banners/earn/hands-light.png',
+                      back: 'assets/banners/earn/hands-dark.png',
+                      mark: NwsbMarks.piggy,
+                      markSize: 18,
+                      fit: BoxFit.cover,
+                      alignment: Alignment(0, -0.25),
+                      markAt: Alignment(0, -0.48),
+                    ),
+                  ),
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 6),
             Expanded(
-              flex: 2,
+              flex: 5,
               child: PageView.builder(
                 controller: _pages,
                 itemCount: _cards.length,
                 onPageChanged: (i) => _index = i,
                 itemBuilder: (_, i) {
                   final card = _cards[i];
-                  return _blackCard(
+                  return _tile(
                     label: card.$1,
-                    onTap: () => card.$3(context),
-                    child: Center(child: NwsbIcon(card.$2, size: 36, color: Colors.white)),
+                    color: card.$3,
+                    onTap: () => card.$4(context),
+                    child: NwsbIcon(card.$2, size: 22, color: Colors.white),
                   );
                 },
               ),
@@ -426,26 +439,31 @@ class _EarnCardRailState extends State<_EarnCardRail> {
     );
   }
 
-  Widget _blackCard({required String label, required VoidCallback onTap, required Widget child}) {
+  Widget _tile({
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+    required Widget child,
+  }) {
     return GestureDetector(
       onTap: onTap,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(14),
-        child: ColoredBox(
-          color: Colors.black,
-          child: Stack(
-            fit: StackFit.expand,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          child: Row(
             children: [
               child,
-              Positioned(
-                left: 8,
-                right: 8,
-                bottom: 6,
+              const SizedBox(width: 8),
+              Expanded(
                 child: EditableLabel('circle_screen.EarnCardRail',
                   label,
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 12),
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 11, height: 1.15),
                 ),
               ),
             ],
@@ -456,50 +474,198 @@ class _EarnCardRailState extends State<_EarnCardRail> {
   }
 }
 
-class _TierRail extends StatelessWidget {
+class _TierRail extends StatefulWidget {
   const _TierRail();
 
-  static const _tiers = <(String, String, String)>[
-    ('Starter Agent', '0–99 units · 10% of net', 'The first agent tier. Your code works on any purchase. Commission is 10% of NowssB’s net after the store fee, not the sticker price.'),
-    ('Rising Agent', '100 units · 15% of net', 'At 100 units the rate rises to 15% of net. The units you already have stay.'),
-    ('Pro Agent', '300 units · 20% of net', 'At 300 units the rate is 20% of net. A direct recruit pays you 5% of their commission, and only while both paid plans are active.'),
-    ('Elite Agent', '500 units · 25% of net', 'At 500 units the rate is 25% of net. Two levels only. There is no third.'),
-    ('Master Agent', '1000 units · 30% of net', 'Master is the cap: 30% of net. An invite by itself pays nothing. Payouts wait for review before money moves.'),
+  @override
+  State<_TierRail> createState() => _TierRailState();
+}
+
+class _TierFace {
+  const _TierFace({
+    required this.name,
+    required this.rate,
+    required this.detail,
+    required this.note,
+    required this.front,
+    required this.back,
+    required this.accent,
+    required this.wash,
+    this.mark,
+  });
+
+  final String name;
+  final String rate;
+  final String detail;
+  final String note;
+  final String front;
+  final String back;
+  final Color accent;
+  final Color wash;
+  final String? mark;
+}
+
+class _TierRailState extends State<_TierRail> {
+  static const _tiers = <_TierFace>[
+    _TierFace(
+      name: 'Starter Agent',
+      rate: '10%',
+      detail: '0–99 units · 10% of net',
+      note: 'Your code works on any purchase. Commission is 10% of net after the store fee.',
+      front: 'assets/banners/earn/hands-light.png',
+      back: 'assets/banners/earn/hands-dark.png',
+      accent: Color(0xFFE8D5A3),
+      wash: Color(0xFF1A1024),
+      mark: NwsbMarks.piggy,
+    ),
+    _TierFace(
+      name: 'Rising Agent',
+      rate: '15%',
+      detail: '100 units · 15% of net',
+      note: 'At 100 units the rate rises to 15% of net. The units you already have stay.',
+      front: 'assets/banners/earn/sit-light.png',
+      back: 'assets/banners/earn/sit-dark.png',
+      accent: Color(0xFFE6B325),
+      wash: Color(0xFF24180C),
+    ),
+    _TierFace(
+      name: 'Pro Agent',
+      rate: '20%',
+      detail: '300 units · 20% of net',
+      note: 'A direct recruit pays you 5% of their commission, only while both plans are active.',
+      front: 'assets/banners/earn/yoga-light.png',
+      back: 'assets/banners/earn/yoga-dark.png',
+      accent: Color(0xFF7DDE92),
+      wash: Color(0xFF0C1C20),
+    ),
+    _TierFace(
+      name: 'Elite Agent',
+      rate: '25%',
+      detail: '500 units · 25% of net',
+      note: 'Two levels only. There is no third. An invite by itself pays nothing.',
+      front: 'assets/banners/earn/man-light.png',
+      back: 'assets/banners/earn/man-dark.png',
+      accent: Color(0xFF8EB4FF),
+      wash: Color(0xFF12182A),
+    ),
+    _TierFace(
+      name: 'Master Agent',
+      rate: '30%',
+      detail: '1000 units · 30% of net',
+      note: 'Master is the cap: 30% of net. Payouts wait for review before money moves.',
+      front: 'assets/banners/earn/sit-dark.png',
+      back: 'assets/banners/earn/sit-light.png',
+      accent: Color(0xFFFFD36A),
+      wash: Color(0xFF1A1408),
+    ),
   ];
+
+  late final PageController _pages = PageController(viewportFraction: 0.88);
+
+  @override
+  void dispose() {
+    _pages.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 168,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
+      height: 232,
+      child: PageView.builder(
+        controller: _pages,
         itemCount: _tiers.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 10),
         itemBuilder: (_, i) {
           final tier = _tiers[i];
-          return GestureDetector(
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => AgentTierPage(name: tier.$1, detail: tier.$2, note: tier.$3),
+          return Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: GestureDetector(
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => AgentTierPage(name: tier.name, detail: tier.detail, note: tier.note),
+                ),
               ),
-            ),
-            child: Container(
-              width: 220,
-              padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
-              decoration: BoxDecoration(
-                color: Colors.black,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0x33FFFFFF)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(tier.$1, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)),
-                  const SizedBox(height: 6),
-                  Text(tier.$2, style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12)),
-                  const Spacer(),
-                  const EditableLabel('circle_screen.TierRail', 'Open this tier', style: TextStyle(color: Color(0xFFE8D5A3), fontWeight: FontWeight.w700, fontSize: 12)),
-                ],
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: tier.wash,
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: const Color(0x33FFFFFF)),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              tier.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 15),
+                            ),
+                          ),
+                          Text(tier.rate, style: TextStyle(color: tier.accent, fontWeight: FontWeight.w800, fontSize: 13)),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Expanded(
+                        child: Row(
+                          children: [
+                            Expanded(
+                              flex: 10,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: FlipPortrait(
+                                  front: tier.front,
+                                  back: tier.back,
+                                  mark: tier.mark,
+                                  fit: BoxFit.cover,
+                                  alignment: const Alignment(0, -0.15),
+                                  markAt: const Alignment(0, -0.5),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              flex: 12,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    tier.detail,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(color: Color(0xCCFFFFFF), fontSize: 11, height: 1.25, fontWeight: FontWeight.w700),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    tier.note,
+                                    maxLines: 4,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(color: Colors.white, fontSize: 11, height: 1.25),
+                                  ),
+                                  const Spacer(),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                    decoration: BoxDecoration(color: tier.accent, borderRadius: BorderRadius.circular(99)),
+                                    child: const Text(
+                                      'Open this tier',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(color: Color(0xFF1A1A2E), fontWeight: FontWeight.w800, fontSize: 11),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           );

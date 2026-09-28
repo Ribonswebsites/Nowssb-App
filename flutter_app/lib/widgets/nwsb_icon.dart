@@ -56,11 +56,23 @@ class NwsbIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var vb = '0 0 $viewBox $viewBox';
+    var inner = body;
+    var filled = false;
+    const tag = 'FILLED:';
+    if (body.startsWith(tag)) {
+      final bar = body.indexOf('|');
+      vb = body.substring(tag.length, bar);
+      inner = body.substring(bar + 1);
+      filled = true;
+    }
+    final svg = filled
+        ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="$vb" fill="currentColor" stroke="none">$inner</svg>'
+        : '<svg xmlns="http://www.w3.org/2000/svg" viewBox="$vb" fill="none" '
+            'stroke="currentColor" stroke-width="$strokeWidth" '
+            'stroke-linecap="$cap" stroke-linejoin="round">$inner</svg>';
     return SvgPicture.string(
-      '<svg xmlns="http://www.w3.org/2000/svg" '
-      'viewBox="0 0 $viewBox $viewBox" fill="none" '
-      'stroke="currentColor" stroke-width="$strokeWidth" '
-      'stroke-linecap="$cap" stroke-linejoin="round">$body</svg>',
+      svg,
       width: size,
       height: size,
       colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
@@ -283,17 +295,11 @@ class NwsbMarks {
       ' 0 1.2-1.1 2.1-2.7 2.1-1.2 0-2.2-.5-2.7-1.5"/>'
       '<path d="M12 5.6v1.9M12 16.5v1.9"/>';
 
-  /// Piggy bank — NowssB Earn.
-  static const piggy = '<ellipse cx="11.2" cy="13.2" rx="6.6" ry="4.8"/>'
-      '<path d="M9.2 8.6c.6-1.8 2-2.6 3.4-2.2"/>'
-      '<path d="M12.2 6.4v1.8"/>'
-      '<circle cx="8.4" cy="12.4" r="0.7"/>'
-      '<path d="M16.6 12.6h1.6"/>'
-      '<circle cx="18.8" cy="12.6" r="1.35"/>'
-      '<path d="M7.4 17.4v1.5M10.4 17.8v1.4M13.6 17.6v1.4"/>';
+  /// Same piggy as the home Earn button (`Icons.savings_outlined`).
+  static const piggy = 'FILLED:0 -960 960 960|'
+      '<path d="M640-520q17 0 28.5-11.5T680-560q0-17-11.5-28.5T640-600q-17 0-28.5 11.5T600-560q0 17 11.5 28.5T640-520Zm-320-80h200v-80H320v80ZM180-120q-34-114-67-227.5T80-580q0-92 64-156t156-64h200q29-38 70.5-59t89.5-21q25 0 42.5 17.5T720-820q0 6-1.5 12t-3.5 11q-4 11-7.5 22.5T702-751l91 91h87v279l-113 37-67 224H480v-80h-80v80H180Zm60-80h80v-80h240v80h80l62-206 98-33v-141h-40L620-720q0-20 2.5-38.5T630-796q-29 8-51 27.5T547-720H300q-58 0-99 41t-41 99q0 98 27 191.5T240-200Zm240-298Z"/>';
 
-  /// Gift box — NowssB Gifts. Not the shop bag.
-  static const gift = '<rect x="3.5" y="10.5" width="17" height="9" rx="1.4"/>'
-      '<path d="M3.5 14.2h17M12 10.5v9"/>'
-      '<path d="M12 10.5c-1-2.2-3.8-3-4.8-1.5S8.6 11.2 12 10.5c3.4.7 4-1.2 5-2.5S13 8.3 12 10.5z"/>';
+  /// Gift with a bow. Not the shop bag, not a plain rectangle.
+  static const gift = 'FILLED:0 0 24 24|'
+      '<path d="M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z"/>';
 }
