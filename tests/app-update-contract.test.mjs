@@ -41,15 +41,40 @@ test('installed WebView checks a no-cache manifest and opens the official update
 
 test('installed Flutter checks its real release manifest after splash and on foreground return', () => {
   const update = read('flutter_app/lib/app_update.dart');
+  const prompt = read('flutter_app/lib/widgets/update_prompt.dart');
   const app = read('flutter_app/lib/main.dart');
-  const pubspec = read('flutter_app/pubspec.yaml');
+  const workflow = read('.github/workflows/flutter-apk.yml');
+  const android = read('tools/flutter-android.mjs');
+  const manifest = read('tools/flutter-update-manifest.mjs');
 
+  // Detection: the release manifest against the build number baked in.
   assert.match(update, /NowssB-Flutter-update\.json/);
   assert.match(update, /int\.fromEnvironment\('NWSB_BUILD_NUMBER'/);
   assert.match(update, /build <= currentBuild/);
-  assert.match(app, /NwsbAppUpdate\.findNewer/);
-  assert.match(app, /LaunchMode\.externalApplication/);
-  assert.match(app, /launchUrl\(update\.apkUrl/);
+  assert.match(update, /minBuild/);
+  // Resumable, verified download that outlives the dialog.
+  assert.match(update, /bytes=\$offset-/);
+  assert.match(update, /response\.timeout\(stallTimeout\)/);
+  assert.match(update, /sha256/);
+  assert.match(update, /startDownloadService/);
+  // Reminders: a dismissal is never persisted; cold start always prompts.
+  assert.match(update, /remindEvery/);
+  assert.doesNotMatch(update, /setInt\([^)]*dismiss/i);
+  assert.match(app, /NwsbUpdater\.instance\.check/);
+  assert.match(app, /_checkForUpdate\(coldStart: true\)/);
   assert.match(app, /AppLifecycleState\.resumed[\s\S]*_checkForUpdate/);
-  assert.match(pubspec, /url_launcher: \^6\.3\.2/);
+  assert.match(app, /NwsbUpdateLayer/);
+  assert.match(prompt, /Update available/);
+  assert.match(prompt, /Update required/);
+  // Release, per-ABI, stable-key APKs for the update channel; debug artifact kept.
+  assert.match(workflow, /name: nowssb-flutter-debug-apk/);
+  assert.match(workflow, /--split-per-abi/);
+  assert.match(workflow, /tools\/flutter-update-manifest\.mjs/);
+  assert.match(workflow, /ANDROID_KEYSTORE_BASE64/);
+  assert.match(workflow, /upload "\$UPDATE_FILE"/);
+  assert.match(android, /UpdateDownloadService/);
+  assert.match(android, /force-version-code-ignoring-abi=true/);
+  assert.match(android, /nwsbRelease/);
+  assert.match(manifest, /minBuild/);
+  assert.match(manifest, /sha256/);
 });

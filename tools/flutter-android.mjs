@@ -287,14 +287,36 @@ if (m.includes('android.speech.tts.engine.TTS_SERVICE')) {
 }
 writeFileSync(manifest, m);
 
-// ── in-app APK installer ───────────────────────────────────────────────
-// The update screen downloads into the app sandbox and calls this channel.
-// FileProvider is required because Android will not accept a file:// URI.
+// ── in-app updater: installer, download service, release signing ─────
+// The update prompt (lib/app_update.dart) downloads into the app sandbox
+// and calls the `com.nowssb.app/update` channel:
+//
+//   installApk               hand the verified file to Android's installer.
+//                            FileProvider is required because Android will
+//                            not accept a file:// URI.
+//   supportedAbis            Build.SUPPORTED_ABIS, so the smaller per-ABI
+//                            APK can be chosen.
+//   canInstallPackages       whether "Install unknown apps" is allowed yet.
+//   startDownloadService     a small foreground service with a progress
+//   updateDownloadProgress   notification. It keeps the process at
+//   stopDownloadService      foreground priority while ~400 MB downloads, so
+//                            leaving the app does not get the download killed.
+//                            The bytes are fetched by Dart (HTTP Range resume,
+//                            retries); the service only holds the process up.
 if (!m.includes('android.permission.REQUEST_INSTALL_PACKAGES')) {
   m = m.replace(
     '<uses-permission android:name="android.permission.INTERNET"/>',
     '<uses-permission android:name="android.permission.INTERNET"/>\n' +
     '    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>',
+  );
+}
+if (!m.includes('android.permission.FOREGROUND_SERVICE_DATA_SYNC')) {
+  m = m.replace(
+    '<uses-permission android:name="android.permission.INTERNET"/>',
+    '<uses-permission android:name="android.permission.INTERNET"/>\n' +
+    '    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>\n' +
+    '    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>\n' +
+    '    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>',
   );
 }
 if (!m.includes('androidx.core.content.FileProvider')) {
@@ -312,6 +334,16 @@ if (!m.includes('androidx.core.content.FileProvider')) {
     `</application>`,
   );
 }
+if (!m.includes('.UpdateDownloadService')) {
+  m = m.replace(
+    '</application>',
+    `    <service\n` +
+    `        android:name=".UpdateDownloadService"\n` +
+    `        android:exported="false"\n` +
+    `        android:foregroundServiceType="dataSync" />\n` +
+    `</application>`,
+  );
+}
 writeFileSync(manifest, m);
 
 const xmlDir = join(android, 'app', 'src', 'main', 'res', 'xml');
@@ -322,8 +354,9 @@ writeFileSync(join(xmlDir, 'update_paths.xml'),
   '    <files-path name="updates" path="." />\n' +
   '</paths>\n');
 
-const activity = join(android, 'app', 'src', 'main', 'kotlin', 'com', 'nowssb', 'nowssb', 'MainActivity.kt');
-mkdirSync(dirname(activity), { recursive: true });
+const kotlinDir = join(android, 'app', 'src', 'main', 'kotlin', 'com', 'nowssb', 'nowssb');
+const activity = join(kotlinDir, 'MainActivity.kt');
+mkdirSync(kotlinDir, { recursive: true });
 writeFileSync(activity, `package com.nowssb.nowssb
 
 import android.content.Intent
@@ -341,25 +374,255 @@ class MainActivity : FlutterActivity() {
         super.configureFlutterEngine(flutterEngine)
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "com.nowssb.app/update")
             .setMethodCallHandler { call, result ->
-                if (call.method != "installApk") { result.notImplemented(); return@setMethodCallHandler }
-                val file = File(call.argument<String>("path") ?: "")
-                if (!file.exists()) { result.error("MISSING_APK", "Downloaded APK is missing", null); return@setMethodCallHandler }
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !packageManager.canRequestPackageInstalls()) {
-                    startActivity(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:$packageName")))
-                    result.error("INSTALL_PERMISSION", "Allow NowssB to install updates, then try again", null)
-                    return@setMethodCallHandler
+                when (call.method) {
+                    "installApk" -> {
+                        val file = File(call.argument<String>("path") ?: "")
+                        if (!file.exists()) { result.error("MISSING_APK", "Downloaded APK is missing", null); return@setMethodCallHandler }
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !packageManager.canRequestPackageInstalls()) {
+                            startActivity(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:$packageName")))
+                            result.error("INSTALL_PERMISSION", "Allow NowssB to install updates, then try again", null)
+                            return@setMethodCallHandler
+                        }
+                        val uri = FileProvider.getUriForFile(this, "$packageName.fileprovider", file)
+                        startActivity(Intent(Intent.ACTION_VIEW).apply {
+                            setDataAndType(uri, "application/vnd.android.package-archive")
+                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
+                        })
+                        result.success(null)
+                    }
+                    "supportedAbis" -> result.success(Build.SUPPORTED_ABIS.toList())
+                    "canInstallPackages" -> result.success(
+                        Build.VERSION.SDK_INT < Build.VERSION_CODES.O || packageManager.canRequestPackageInstalls()
+                    )
+                    "startDownloadService" -> {
+                        result.success(UpdateDownloadService.start(this, call.argument<String>("text") ?: "Downloading update"))
+                    }
+                    "updateDownloadProgress" -> {
+                        UpdateDownloadService.progress(
+                            this,
+                            call.argument<String>("text") ?: "Downloading update",
+                            call.argument<Int>("percent") ?: -1,
+                        )
+                        result.success(null)
+                    }
+                    "stopDownloadService" -> {
+                        UpdateDownloadService.stop(this, call.argument<String>("doneText"))
+                        result.success(null)
+                    }
+                    else -> result.notImplemented()
                 }
-                val uri = FileProvider.getUriForFile(this, "$packageName.fileprovider", file)
-                startActivity(Intent(Intent.ACTION_VIEW).apply {
-                    setDataAndType(uri, "application/vnd.android.package-archive")
-                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
-                })
-                result.success(null)
             }
     }
 }
 `);
-done.push('configured in-app APK download installer');
+
+writeFileSync(join(kotlinDir, 'UpdateDownloadService.kt'), `package com.nowssb.nowssb
+
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.app.Service
+import android.content.Context
+import android.content.Intent
+import android.content.pm.ServiceInfo
+import android.os.Build
+import android.os.IBinder
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
+
+/**
+ * Holds the app process at foreground priority while the in-app updater
+ * downloads, and shows the progress in a notification. It does no
+ * networking itself: Dart streams the bytes (with Range resume and retries)
+ * and pushes progress here. If the task is swiped away the service stops;
+ * the partial file stays on disk and the next launch resumes from it.
+ */
+class UpdateDownloadService : Service() {
+    companion object {
+        private const val CHANNEL_ID = "nowssb_app_update"
+        private const val NOTIFICATION_ID = 73017
+        private const val EXTRA_TEXT = "text"
+
+        private fun channel(context: Context) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
+            val manager = context.getSystemService(NotificationManager::class.java) ?: return
+            if (manager.getNotificationChannel(CHANNEL_ID) != null) return
+            manager.createNotificationChannel(
+                NotificationChannel(CHANNEL_ID, "App updates", NotificationManager.IMPORTANCE_LOW).apply {
+                    description = "Progress of NowssB update downloads"
+                    setShowBadge(false)
+                }
+            )
+        }
+
+        private fun openApp(context: Context): PendingIntent? {
+            val launch = context.packageManager.getLaunchIntentForPackage(context.packageName) ?: return null
+            launch.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            return PendingIntent.getActivity(
+                context, 0, launch,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
+        }
+
+        fun build(context: Context, text: String, percent: Int, ongoing: Boolean = true): Notification {
+            channel(context)
+            val builder = NotificationCompat.Builder(context, CHANNEL_ID)
+                .setSmallIcon(if (ongoing) android.R.drawable.stat_sys_download else android.R.drawable.stat_sys_download_done)
+                .setContentTitle("NowssB update")
+                .setContentText(text)
+                .setOnlyAlertOnce(true)
+                .setSilent(true)
+                .setOngoing(ongoing)
+                .setAutoCancel(!ongoing)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setContentIntent(openApp(context))
+            if (ongoing) builder.setProgress(100, percent.coerceIn(0, 100), percent < 0)
+            return builder.build()
+        }
+
+        private fun post(context: Context, notification: Notification) {
+            try {
+                context.getSystemService(NotificationManager::class.java)?.notify(NOTIFICATION_ID, notification)
+            } catch (_: Exception) {
+                // Notifications denied: the download carries on regardless.
+            }
+        }
+
+        fun start(context: Context, text: String): Boolean = try {
+            ContextCompat.startForegroundService(
+                context,
+                Intent(context, UpdateDownloadService::class.java).putExtra(EXTRA_TEXT, text),
+            )
+            true
+        } catch (_: Exception) {
+            // Android 12+ refuses to start a foreground service from the
+            // background. The download still runs while the process lives.
+            false
+        }
+
+        fun progress(context: Context, text: String, percent: Int) {
+            post(context, build(context, text, percent))
+        }
+
+        fun stop(context: Context, doneText: String?) {
+            try {
+                context.stopService(Intent(context, UpdateDownloadService::class.java))
+            } catch (_: Exception) {
+            }
+            val manager = context.getSystemService(NotificationManager::class.java)
+            if (doneText.isNullOrEmpty()) {
+                manager?.cancel(NOTIFICATION_ID)
+            } else {
+                post(context, build(context, doneText, 100, ongoing = false))
+            }
+        }
+    }
+
+    override fun onBind(intent: Intent?): IBinder? = null
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        val notification = build(this, intent?.getStringExtra(EXTRA_TEXT) ?: "Downloading update", -1)
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+            } else {
+                startForeground(NOTIFICATION_ID, notification)
+            }
+        } catch (_: Exception) {
+            stopSelf()
+        }
+        return START_NOT_STICKY
+    }
+
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        stopSelf()
+        super.onTaskRemoved(rootIntent)
+    }
+
+    // Android 15 caps dataSync services at six hours a day. Stop cleanly; the
+    // Dart download keeps going while the app is open and resumes otherwise.
+    override fun onTimeout(startId: Int, fgsType: Int) {
+        stopSelf()
+    }
+}
+`);
+done.push('configured in-app updater (installer, ABI query, download service)');
+
+// ── release signing for the update channel ─────────────────────────────
+// Every GitHub runner generates a brand-new ~/.android/debug.keystore, so
+// each CI build used to be signed by a different throwaway key and Android
+// refused to install any build over another ("App not installed"). When the
+// workflow writes android/key.properties (from repository secrets, on the
+// runner only — .gitignore refuses key.properties and *.keystore) the
+// release build is signed with that one stable key. Without the file the
+// release build falls back to the debug key exactly as flutter create wrote.
+// The debug build type is never touched.
+{
+  let g = readFileSync(appGradle, 'utf8');
+  if (g.includes('nwsbKeyProperties')) {
+    already.push('release signing config');
+  } else {
+    g = 'import java.io.FileInputStream\nimport java.util.Properties\n\n' + g;
+    g = g.replace(
+      /\nandroid \{\n/,
+      `\n// Stable release key, when the CI run provides one (see flutter-apk.yml).\n` +
+      `val nwsbKeyProperties = Properties().apply {\n` +
+      `    val file = rootProject.file("key.properties")\n` +
+      `    if (file.exists()) FileInputStream(file).use { load(it) }\n` +
+      `}\n` +
+      `val nwsbHasReleaseKey = nwsbKeyProperties.getProperty("storeFile") != null\n\n` +
+      `android {\n` +
+      `    signingConfigs {\n` +
+      `        create("nwsbRelease") {\n` +
+      `            if (nwsbHasReleaseKey) {\n` +
+      `                storeFile = file(nwsbKeyProperties.getProperty("storeFile"))\n` +
+      `                storePassword = nwsbKeyProperties.getProperty("storePassword")\n` +
+      `                keyAlias = nwsbKeyProperties.getProperty("keyAlias")\n` +
+      `                keyPassword = nwsbKeyProperties.getProperty("keyPassword")\n` +
+      `            }\n` +
+      `        }\n` +
+      `    }\n`,
+    );
+    const before = g;
+    g = g.replace(
+      /(release \{[\s\S]*?)signingConfig = signingConfigs\.getByName\("debug"\)/,
+      `$1signingConfig = if (nwsbHasReleaseKey) signingConfigs.getByName("nwsbRelease") else signingConfigs.getByName("debug")`,
+    );
+    if (g === before || !g.includes('val nwsbKeyProperties')) {
+      throw new Error('app/build.gradle.kts: could not wire the release signing config');
+    }
+    writeFileSync(appGradle, g);
+    done.push('release signing from key.properties (debug key fallback)');
+  }
+}
+
+// ── gradle.properties: release builds that behave like the debug build ──
+//   shrink=false                       no R8 on the release build: plugins
+//                                      that reflect (notifications, audio,
+//                                      recording) behave exactly as in the
+//                                      unshrunk debug build. Costs ~2 MB of
+//                                      dex on a ~400 MB APK.
+//   force-version-code-ignoring-abi    per-ABI APKs keep the pubspec build
+//                                      number as versionCode instead of
+//                                      1000*abi+build, so the universal APK
+//                                      from the website and the per-ABI APK
+//                                      from the updater can replace each
+//                                      other in either direction.
+{
+  const gp = join(android, 'gradle.properties');
+  let p = existsSync(gp) ? readFileSync(gp, 'utf8') : '';
+  const add = [];
+  if (!/^shrink=/m.test(p)) add.push('shrink=false');
+  if (!/^force-version-code-ignoring-abi=/m.test(p)) add.push('force-version-code-ignoring-abi=true');
+  if (add.length) {
+    p = p.replace(/\n?$/, '\n') + '# NowssB (tools/flutter-android.mjs)\n' + add.join('\n') + '\n';
+    writeFileSync(gp, p);
+    done.push(`gradle.properties: ${add.join(', ')}`);
+  } else {
+    already.push('gradle.properties release flags');
+  }
+}
 
 // ── the config itself ──────────────────────────────────────────────────
 // Not a secret: google-services.json ships inside every copy of the APK and

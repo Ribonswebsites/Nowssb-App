@@ -41,10 +41,10 @@ import 'media/video_pool.dart';
 import 'screens/auth_gate.dart';
 import 'screens/splash.dart';
 import 'widgets/motion.dart';
+import 'widgets/update_prompt.dart';
 import 'shell/nav_shell.dart';
 import 'theme/theme.dart';
 import 'theme/tokens.dart';
-import 'admin/template/editable.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -110,12 +110,17 @@ class NowssbApp extends StatefulWidget {
 class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
   final _navigatorKey = GlobalKey<NavigatorState>();
   bool _checkingForUpdate = false;
-  int _shownUpdateBuild = 0;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    // Read the manifest while the splash plays, so the prompt is ready when
+    // it ends; this also resumes a download a previous launch left partial.
+    unawaited(NwsbUpdater.instance.check(force: true));
+    if (_splashDone) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _checkForUpdate(coldStart: true));
+    }
   }
 
   @override
@@ -132,6 +137,7 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       VideoPool.instance.resume();
+      unawaited(NwsbUpdater.instance.onResumed());
       _checkForUpdate();
       if (NwsbFirebase.ready && FirebaseAuth.instance.currentUser != null) {
         unawaited(EarnWallet.instance.onSignedIn());
@@ -139,6 +145,7 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
     } else if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.hidden ||
         state == AppLifecycleState.detached) {
+      NwsbUpdater.instance.setForeground(false);
       VideoPool.instance.releaseAll();
     }
   }
@@ -148,54 +155,21 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
   /// is already laid out and there is no second wait.
   bool _splashDone = !Settings.instance.showSplash;
 
-  Future<void> _checkForUpdate() async {
+  /// Update check and prompt (lib/app_update.dart). Cold start: always
+  /// re-reads the manifest and always prompts. Back in the app: re-reads at
+  /// most every few minutes and prompts again once the reminder interval
+  /// since the last "Later" has passed. Nothing about a dismissal is saved.
+  Future<void> _checkForUpdate({bool coldStart = false}) async {
     if (_checkingForUpdate || !_splashDone) return;
     _checkingForUpdate = true;
     try {
-      final update = await NwsbAppUpdate.findNewer();
-      if (!mounted || update == null || update.build <= _shownUpdateBuild) return;
+      final updater = NwsbUpdater.instance;
+      await updater.check(force: coldStart);
+      if (!mounted || updater.available == null || updater.required) return;
+      if (nwsbUpdateDialogOpen || !updater.shouldPrompt(coldStart: coldStart)) return;
       final context = _navigatorKey.currentContext;
-      if (context == null) return;
-      _shownUpdateBuild = update.build;
-      double? progress;
-      bool updating = false;
-      String status = 'The update will download inside NowssB, then Android will show its install confirmation.';
-      await showDialog<void>(
-        context: context,
-        barrierDismissible: true,
-        builder: (context) => StatefulBuilder(builder: (context, setDialogState) {
-          return AlertDialog(
-            backgroundColor: const Color(0xFF102037),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-            title: Text(updating ? 'Updating NowssB…' : 'A new NowssB update is ready', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
-            content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(status, style: const TextStyle(color: Color(0xCCFFFFFF), height: 1.45)),
-              if (updating) ...[
-                const SizedBox(height: 18),
-                LinearProgressIndicator(value: progress, color: NwsbColors.goldLight, backgroundColor: Colors.white24),
-                const SizedBox(height: 8),
-                Text(progress == null ? 'Downloading update…' : 'Downloading ${(progress! * 100).round()}%', style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12)),
-              ],
-            ]),
-            actions: [
-              if (!updating) TextButton(onPressed: () => Navigator.of(context).pop(), child: const EditableLabel('main.NowssbApp', 'Later')),
-              FilledButton(
-                style: FilledButton.styleFrom(backgroundColor: NwsbColors.goldLight, foregroundColor: NwsbColors.deep),
-                onPressed: updating ? null : () async {
-                  setDialogState(() { updating = true; status = 'Downloading the update inside the app…'; });
-                  try {
-                    await NwsbAppUpdate.downloadAndInstall(update, onProgress: (value) => setDialogState(() => progress = value));
-                    if (context.mounted) setDialogState(() { updating = false; status = 'Update downloaded. Opening Android installer…'; });
-                  } catch (_) {
-                    if (context.mounted) setDialogState(() { updating = false; status = 'Update failed. Check your connection and try again.'; });
-                  }
-                },
-                child: Text(updating ? 'Updating…' : 'Update now'),
-              ),
-            ],
-          );
-        }),
-      );
+      if (context == null || !context.mounted) return;
+      unawaited(showNwsbUpdateDialog(context));
     } finally {
       _checkingForUpdate = false;
     }
@@ -206,8 +180,9 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
     return UiScope(
       child: MaterialApp(
         navigatorKey: _navigatorKey,
-        builder: (context, child) =>
-            AdminEditFab(navigatorKey: _navigatorKey, child: child ?? const SizedBox()),
+        builder: (context, child) => NwsbUpdateLayer(
+            navigatorKey: _navigatorKey,
+            child: AdminEditFab(navigatorKey: _navigatorKey, child: child ?? const SizedBox())),
         title: 'NowssB',
         debugShowCheckedModeBanner: false,
         theme: NwsbTheme.light,
@@ -222,7 +197,7 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
               Splash(onDone: () {
                 VideoPool.instance.unhold();
                 setState(() => _splashDone = true);
-                unawaited(_checkForUpdate());
+                unawaited(_checkForUpdate(coldStart: true));
               }),
           ],
         ),
