@@ -1047,193 +1047,197 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                   _pull = 0;
                 },
                 child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final stageWidth = math.min(constraints.maxWidth - 24, 340.0);
-                  return SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minHeight: math.max(0, constraints.maxHeight - 28),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          _PlayerHeader(
+                  builder: (context, constraints) {
+                    final stageWidth = math.min(
+                      constraints.maxWidth - 24,
+                      340.0,
+                    );
+                    return SingleChildScrollView(
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: math.max(0, constraints.maxHeight - 28),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            _PlayerHeader(
                               onBack: _minimizeToPill,
                               onSettings: _openSettings,
                               onMore: _openAuraClock,
                             ),
-                          const SizedBox(height: 12),
-                          Center(
-                            child: SizedBox(
-                              width: stageWidth,
-                              child: _VisualStage(
-                                word: _word,
-                                video: _theme.video,
-                                playing: _playing,
-                                accent: theme.accent,
-                                onReplay: _prepareAndPlay,
-                                onCopy: _copyWord,
-                                onSettings: _openSettings,
-                                onInfo: _openInfo,
-                                onLevel: _openLevel,
-                                onStore: () => Navigator.of(context).push(
-                                  MaterialPageRoute<void>(
-                                    builder: (_) => const StoreScreen(),
-                                  ),
-                                ),
-                                onSyllable: (part) async {
-                                  await _tts.stop();
-                                  await _tts.speak(
-                                    part.roman.isNotEmpty
-                                        ? part.roman
-                                        : part.deva,
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 18),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  _prettyTitle(_word.word),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    color: Color(0xFFF4F4F5),
-                                    fontSize: 28,
-                                    fontWeight: FontWeight.w800,
-                                    height: 1.1,
-                                    letterSpacing: -0.6,
-                                  ),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: _toggleLike,
-                                child: SizedBox(
-                                  width: 44,
-                                  height: 44,
-                                  child: Icon(
-                                    _liked
-                                        ? Icons.favorite_rounded
-                                        : Icons.favorite_border_rounded,
-                                    color: _liked
-                                        ? const Color(0xFFF5F5F7)
-                                        : const Color(0xFF8B8B90),
-                                    size: 22,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 6),
-                          ClipRect(
-                            child: SizedBox(
-                              height: 20,
-                              width: double.infinity,
-                              child: _SubtitleMarquee(
-                                lines: _marqueeLines,
-                                animation: _marqueeController,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          _ProgressBar(
-                            playing: _playing,
-                            durationSec: _wordSecs(_word),
-                          ),
-                          const SizedBox(height: 8),
-                          _PlainTransportRow(
-                            playing: _playing,
-                            shuffle: _shuffle,
-                            loop: _loop,
-                            onShuffle: _toggleShuffle,
-                            onPrevious: _skipPrev,
-                            onPlay: _togglePlay,
-                            onNext: () => _move(1),
-                            onRepeat: () => setState(() => _loop = !_loop),
-                          ),
-                          const SizedBox(height: 16),
-                          if (_completed || _error != null) ...[
-                            const SizedBox(height: 8),
-                            Text(
-                              _error ?? 'Completed and added to your progress.',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: _error == null
-                                    ? Colors.white70
-                                    : const Color(0xFFFFB4B4),
-                                fontSize: 12,
-                                height: 1.4,
-                              ),
-                            ),
-                          ],
-                          const SizedBox(height: 10),
-                          SizedBox(
-                            width: stageWidth,
-                            height: 128,
-                            child: PageView(
-                              controller: _bottomPageController,
-                              physics: const BouncingScrollPhysics(),
-                              onPageChanged: (p) {
-                                setState(() => _bottomPage = p);
-                                _kickBottomAuto();
-                              },
-                              children: [
-                                _WordActionStrip(
+                            const SizedBox(height: 12),
+                            Center(
+                              child: SizedBox(
+                                width: stageWidth,
+                                child: _VisualStage(
+                                  word: _word,
+                                  video: _theme.video,
+                                  playing: _playing,
                                   accent: theme.accent,
-                                  video: _actionsTabVideo,
-                                  onSentence: _openSentence,
-                                  onPractice: () =>
-                                      unawaited(_handlePracticeTap()),
+                                  onReplay: _prepareAndPlay,
+                                  onCopy: _copyWord,
+                                  onSettings: _openSettings,
+                                  onInfo: _openInfo,
+                                  onLevel: _openLevel,
                                   onStore: () => Navigator.of(context).push(
                                     MaterialPageRoute<void>(
                                       builder: (_) => const StoreScreen(),
                                     ),
                                   ),
-                                ),
-                                _NextUpCard(
-                                  words: widget.words,
-                                  index: _index,
-                                  themes: _playerThemes,
-                                  onPlayAt: (i) async {
-                                    if (i == _index) {
-                                      await _prepareAndPlay();
-                                      return;
-                                    }
+                                  onSyllable: (part) async {
                                     await _tts.stop();
-                                    setState(() {
-                                      _index = i;
-                                      _liked = false;
-                                      _completed = false;
-                                      _error = null;
-                                    });
-                                    await _loadLiked();
-                                    await _prepareAndPlay();
+                                    await _tts.speak(
+                                      part.roman.isNotEmpty
+                                          ? part.roman
+                                          : part.deva,
+                                    );
                                   },
-                                  onOpenSoundLibrary: () =>
-                                      _openSoundLibrary(context),
-                                  onOpenQueue: () => _openQueueSheet(context),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 18),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    _prettyTitle(_word.word),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      color: Color(0xFFF4F4F5),
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.w800,
+                                      height: 1.1,
+                                      letterSpacing: -0.6,
+                                    ),
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: _toggleLike,
+                                  child: SizedBox(
+                                    width: 44,
+                                    height: 44,
+                                    child: Icon(
+                                      _liked
+                                          ? Icons.favorite_rounded
+                                          : Icons.favorite_border_rounded,
+                                      color: _liked
+                                          ? const Color(0xFFF5F5F7)
+                                          : const Color(0xFF8B8B90),
+                                      size: 22,
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              _BottomDot(active: _bottomPage == 0),
-                              const SizedBox(width: 6),
-                              _BottomDot(active: _bottomPage == 1),
+                            const SizedBox(height: 6),
+                            ClipRect(
+                              child: SizedBox(
+                                height: 20,
+                                width: double.infinity,
+                                child: _SubtitleMarquee(
+                                  lines: _marqueeLines,
+                                  animation: _marqueeController,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            _ProgressBar(
+                              playing: _playing,
+                              durationSec: _wordSecs(_word),
+                            ),
+                            const SizedBox(height: 8),
+                            _PlainTransportRow(
+                              playing: _playing,
+                              shuffle: _shuffle,
+                              loop: _loop,
+                              onShuffle: _toggleShuffle,
+                              onPrevious: _skipPrev,
+                              onPlay: _togglePlay,
+                              onNext: () => _move(1),
+                              onRepeat: () => setState(() => _loop = !_loop),
+                            ),
+                            const SizedBox(height: 16),
+                            if (_completed || _error != null) ...[
+                              const SizedBox(height: 8),
+                              Text(
+                                _error ??
+                                    'Completed and added to your progress.',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: _error == null
+                                      ? Colors.white70
+                                      : const Color(0xFFFFB4B4),
+                                  fontSize: 12,
+                                  height: 1.4,
+                                ),
+                              ),
                             ],
-                          ),
-                        ],
+                            const SizedBox(height: 10),
+                            SizedBox(
+                              width: stageWidth,
+                              height: 128,
+                              child: PageView(
+                                controller: _bottomPageController,
+                                physics: const BouncingScrollPhysics(),
+                                onPageChanged: (p) {
+                                  setState(() => _bottomPage = p);
+                                  _kickBottomAuto();
+                                },
+                                children: [
+                                  _WordActionStrip(
+                                    accent: theme.accent,
+                                    video: _actionsTabVideo,
+                                    onSentence: _openSentence,
+                                    onPractice: () =>
+                                        unawaited(_handlePracticeTap()),
+                                    onStore: () => Navigator.of(context).push(
+                                      MaterialPageRoute<void>(
+                                        builder: (_) => const StoreScreen(),
+                                      ),
+                                    ),
+                                  ),
+                                  _NextUpCard(
+                                    words: widget.words,
+                                    index: _index,
+                                    themes: _playerThemes,
+                                    onPlayAt: (i) async {
+                                      if (i == _index) {
+                                        await _prepareAndPlay();
+                                        return;
+                                      }
+                                      await _tts.stop();
+                                      setState(() {
+                                        _index = i;
+                                        _liked = false;
+                                        _completed = false;
+                                        _error = null;
+                                      });
+                                      await _loadLiked();
+                                      await _prepareAndPlay();
+                                    },
+                                    onOpenSoundLibrary: () =>
+                                        _openSoundLibrary(context),
+                                    onOpenQueue: () => _openQueueSheet(context),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                _BottomDot(active: _bottomPage == 0),
+                                const SizedBox(width: 6),
+                                _BottomDot(active: _bottomPage == 1),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
                 ),
               ),
             ),
@@ -1978,372 +1982,382 @@ class _QueueSheetState extends State<_QueueSheet> {
         return false;
       },
       child: PopScope(
-      canPop: true,
-      child: Material(
-        color: Colors.transparent,
-        child: Stack(
-          children: [
-            const Positioned.fill(
-              child: IgnorePointer(
-                child: NwsbVideo(
-                  asset: kPlayerPageFilm,
-                  fit: BoxFit.cover,
-                  priority: ClipPriority.decoration,
-                  autoplay: true,
-                  loop: true,
+        canPop: true,
+        child: Material(
+          color: Colors.transparent,
+          child: Stack(
+            children: [
+              const Positioned.fill(
+                child: IgnorePointer(
+                  child: NwsbVideo(
+                    asset: kPlayerPageFilm,
+                    fit: BoxFit.cover,
+                    priority: ClipPriority.decoration,
+                    autoplay: true,
+                    loop: true,
+                  ),
                 ),
               ),
-            ),
-            // Dimmed player backdrop — continuous with sheet rise
-            Positioned.fill(
-              child: GestureDetector(
-                onTap: () => Navigator.of(context).maybePop(),
-                child: ColoredBox(color: Color.fromRGBO(0, 0, 0, 0.18)),
-              ),
-            ),
-            // Continuous NestedScrollView / CustomScrollView (YTM)
-            Positioned.fill(
-              child: NestedScrollView(
-                controller: _scrollCtrl,
-                physics: const BouncingScrollPhysics(
-                  parent: AlwaysScrollableScrollPhysics(),
+              // Dimmed player backdrop — continuous with sheet rise
+              Positioned.fill(
+                child: GestureDetector(
+                  onTap: () => Navigator.of(context).maybePop(),
+                  child: ColoredBox(color: Color.fromRGBO(0, 0, 0, 0.18)),
                 ),
-                headerSliverBuilder: (context, innerBoxIsScrolled) {
-                  return [
-                    SliverOverlapAbsorber(
-                      handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
-                        context,
-                      ),
-                      sliver: SliverAppBar(
-                        pinned: true,
-                        stretch: true,
-                        primary: true,
-                        automaticallyImplyLeading: false,
-                        backgroundColor: const Color(0xFF000000),
-                        elevation: 0,
-                        scrolledUnderElevation: 0,
-                        // Collapsed height = sticky mini row (thumb + title + play).
-                        toolbarHeight: _collapseExtent,
-                        collapsedHeight: media.padding.top + _collapseExtent,
-                        expandedHeight: media.padding.top + _expandExtent,
-                        flexibleSpace: ClipRect(
-                          child: LayoutBuilder(
-                            builder: (context, constraints) {
-                              // Source of truth: FlexibleSpaceBarSettings every frame.
-                              final settings = context
-                                  .dependOnInheritedWidgetOfExactType<
-                                    FlexibleSpaceBarSettings
-                                  >();
-                              double localT;
-                              if (settings != null) {
-                                final range =
-                                    (settings.maxExtent - settings.minExtent)
-                                        .clamp(1.0, 10000.0);
-                                localT =
-                                    ((settings.maxExtent -
-                                                settings.currentExtent) /
-                                            range)
-                                        .clamp(0.0, 1.0);
-                              } else {
-                                final maxH = media.padding.top + _expandExtent;
-                                final minH =
-                                    media.padding.top + _collapseExtent;
-                                final h = constraints.maxHeight.clamp(
-                                  minH,
-                                  maxH,
-                                );
-                                localT = ((maxH - h) / (maxH - minH)).clamp(
-                                  0.0,
-                                  1.0,
-                                );
-                              }
-                              return _YtmCollapsingHero(
-                                topPad: media.padding.top,
-                                collapse: localT,
-                                maxHeight: constraints.maxHeight,
-                                art: art,
-                                video: heroVideo,
-                                title: word?.word ?? 'NowssB',
-                                subtitle: 'NowssB',
-                                playing: widget.playing,
-                                durationSec: word == null
-                                    ? 12.0
-                                    : _wordSecs(word),
-                                shuffle: false,
-                                loop: false,
-                                artMax: _heroArtMax,
-                                onPlay: widget.onTogglePlay,
-                                onPrevious: () {
-                                  if (widget.words.isEmpty) return;
-                                  final i =
-                                      (widget.index - 1) % widget.words.length;
-                                  widget.onPlayAt(
-                                    i < 0 ? widget.words.length - 1 : i,
+              ),
+              // Continuous NestedScrollView / CustomScrollView (YTM)
+              Positioned.fill(
+                child: NestedScrollView(
+                  controller: _scrollCtrl,
+                  physics: const BouncingScrollPhysics(
+                    parent: AlwaysScrollableScrollPhysics(),
+                  ),
+                  headerSliverBuilder: (context, innerBoxIsScrolled) {
+                    return [
+                      SliverOverlapAbsorber(
+                        handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
+                          context,
+                        ),
+                        sliver: SliverAppBar(
+                          pinned: true,
+                          stretch: true,
+                          primary: true,
+                          automaticallyImplyLeading: false,
+                          backgroundColor: const Color(0xFF000000),
+                          elevation: 0,
+                          scrolledUnderElevation: 0,
+                          // Collapsed height = sticky mini row (thumb + title + play).
+                          toolbarHeight: _collapseExtent,
+                          collapsedHeight: media.padding.top + _collapseExtent,
+                          expandedHeight: media.padding.top + _expandExtent,
+                          flexibleSpace: ClipRect(
+                            child: LayoutBuilder(
+                              builder: (context, constraints) {
+                                // Source of truth: FlexibleSpaceBarSettings every frame.
+                                final settings = context
+                                    .dependOnInheritedWidgetOfExactType<
+                                      FlexibleSpaceBarSettings
+                                    >();
+                                double localT;
+                                if (settings != null) {
+                                  final range =
+                                      (settings.maxExtent - settings.minExtent)
+                                          .clamp(1.0, 10000.0);
+                                  localT =
+                                      ((settings.maxExtent -
+                                                  settings.currentExtent) /
+                                              range)
+                                          .clamp(0.0, 1.0);
+                                } else {
+                                  final maxH =
+                                      media.padding.top + _expandExtent;
+                                  final minH =
+                                      media.padding.top + _collapseExtent;
+                                  final h = constraints.maxHeight.clamp(
+                                    minH,
+                                    maxH,
                                   );
-                                },
-                                onNext: () {
-                                  if (widget.words.isEmpty) return;
-                                  widget.onPlayAt(
-                                    (widget.index + 1) % widget.words.length,
+                                  localT = ((maxH - h) / (maxH - minH)).clamp(
+                                    0.0,
+                                    1.0,
                                   );
-                                },
-                                onClose: () => Navigator.of(context).maybePop(),
-                              );
-                            },
+                                }
+                                return _YtmCollapsingHero(
+                                  topPad: media.padding.top,
+                                  collapse: localT,
+                                  maxHeight: constraints.maxHeight,
+                                  art: art,
+                                  video: heroVideo,
+                                  title: word?.word ?? 'NowssB',
+                                  subtitle: 'NowssB',
+                                  playing: widget.playing,
+                                  durationSec: word == null
+                                      ? 12.0
+                                      : _wordSecs(word),
+                                  shuffle: false,
+                                  loop: false,
+                                  artMax: _heroArtMax,
+                                  onPlay: widget.onTogglePlay,
+                                  onPrevious: () {
+                                    if (widget.words.isEmpty) return;
+                                    final i =
+                                        (widget.index - 1) %
+                                        widget.words.length;
+                                    widget.onPlayAt(
+                                      i < 0 ? widget.words.length - 1 : i,
+                                    );
+                                  },
+                                  onNext: () {
+                                    if (widget.words.isEmpty) return;
+                                    widget.onPlayAt(
+                                      (widget.index + 1) % widget.words.length,
+                                    );
+                                  },
+                                  onClose: () =>
+                                      Navigator.of(context).maybePop(),
+                                );
+                              },
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    SliverPersistentHeader(
-                      pinned: true,
-                      delegate: _QueueStickyHeadDelegate(
-                        mixLabel: _mixLabel,
-                        saved: _saved,
-                        filter: _filter,
-                        onSave: _saveMix,
-                        onFilter: (f) => setState(() => _filter = f),
-                      ),
-                    ),
-                  ];
-                },
-                body: Builder(
-                  builder: (context) {
-                    return CustomScrollView(
-                      slivers: [
-                        SliverOverlapInjector(
-                          handle:
-                              NestedScrollView.sliverOverlapAbsorberHandleFor(
-                                context,
-                              ),
+                      SliverPersistentHeader(
+                        pinned: true,
+                        delegate: _QueueStickyHeadDelegate(
+                          mixLabel: _mixLabel,
+                          saved: _saved,
+                          filter: _filter,
+                          onSave: _saveMix,
+                          onFilter: (f) => setState(() => _filter = f),
                         ),
-                        if (filtered.isEmpty)
-                          const SliverFillRemaining(
-                            hasScrollBody: false,
-                            child: Center(
-                              child: Text(
-                                'No tracks in this filter',
-                                style: TextStyle(
-                                  color: Color(0xFF8E8E93),
-                                  fontSize: 13,
+                      ),
+                    ];
+                  },
+                  body: Builder(
+                    builder: (context) {
+                      return CustomScrollView(
+                        slivers: [
+                          SliverOverlapInjector(
+                            handle:
+                                NestedScrollView.sliverOverlapAbsorberHandleFor(
+                                  context,
+                                ),
+                          ),
+                          if (filtered.isEmpty)
+                            const SliverFillRemaining(
+                              hasScrollBody: false,
+                              child: Center(
+                                child: Text(
+                                  'No tracks in this filter',
+                                  style: TextStyle(
+                                    color: Color(0xFF8E8E93),
+                                    fontSize: 13,
+                                  ),
                                 ),
                               ),
-                            ),
-                          )
-                        else
-                          SliverPadding(
-                            padding: EdgeInsets.fromLTRB(
-                              10,
-                              4,
-                              10,
-                              28 + media.padding.bottom,
-                            ),
-                            sliver: SliverReorderableList(
-                              itemCount: filtered.length,
-                              onReorderItem: (oldIndex, newIndex) {
-                                final vis = List<int>.from(filtered);
-                                final item = vis.removeAt(oldIndex);
-                                vis.insert(newIndex.clamp(0, vis.length), item);
-                                setState(() {
-                                  final visSet = vis.toSet();
-                                  final out = <int>[];
-                                  var vi = 0;
-                                  final base = List<int>.from(_order);
-                                  for (final idx in base) {
-                                    if (visSet.contains(idx)) {
-                                      if (vi < vis.length) out.add(vis[vi++]);
-                                    } else {
-                                      out.add(idx);
+                            )
+                          else
+                            SliverPadding(
+                              padding: EdgeInsets.fromLTRB(
+                                10,
+                                4,
+                                10,
+                                28 + media.padding.bottom,
+                              ),
+                              sliver: SliverReorderableList(
+                                itemCount: filtered.length,
+                                onReorderItem: (oldIndex, newIndex) {
+                                  final vis = List<int>.from(filtered);
+                                  final item = vis.removeAt(oldIndex);
+                                  vis.insert(
+                                    newIndex.clamp(0, vis.length),
+                                    item,
+                                  );
+                                  setState(() {
+                                    final visSet = vis.toSet();
+                                    final out = <int>[];
+                                    var vi = 0;
+                                    final base = List<int>.from(_order);
+                                    for (final idx in base) {
+                                      if (visSet.contains(idx)) {
+                                        if (vi < vis.length) out.add(vis[vi++]);
+                                      } else {
+                                        out.add(idx);
+                                      }
                                     }
-                                  }
-                                  while (vi < vis.length) {
-                                    out.add(vis[vi++]);
-                                  }
-                                  final seen = <int>{};
-                                  _order = [
-                                    for (final i in out)
-                                      if (seen.add(i)) i,
-                                  ];
-                                });
-                              },
-                              itemBuilder: (context, i) {
-                                final orig = filtered[i];
-                                final w = widget.words[orig];
-                                final rowArt = w.img.isNotEmpty
-                                    ? w.img
-                                    : widget
-                                          .themes[orig % widget.themes.length]
-                                          .image;
-                                final isCurrent = orig == widget.index;
-                                return ReorderableDelayedDragStartListener(
-                                  key: ValueKey('q-$orig-${w.word}'),
-                                  index: i,
-                                  child: Material(
-                                    color: isCurrent
-                                        ? const Color(0x28FFFFFF)
-                                        : Colors.transparent,
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: InkWell(
+                                    while (vi < vis.length) {
+                                      out.add(vis[vi++]);
+                                    }
+                                    final seen = <int>{};
+                                    _order = [
+                                      for (final i in out)
+                                        if (seen.add(i)) i,
+                                    ];
+                                  });
+                                },
+                                itemBuilder: (context, i) {
+                                  final orig = filtered[i];
+                                  final w = widget.words[orig];
+                                  final rowArt = w.img.isNotEmpty
+                                      ? w.img
+                                      : widget
+                                            .themes[orig % widget.themes.length]
+                                            .image;
+                                  final isCurrent = orig == widget.index;
+                                  return ReorderableDelayedDragStartListener(
+                                    key: ValueKey('q-$orig-${w.word}'),
+                                    index: i,
+                                    child: Material(
+                                      color: isCurrent
+                                          ? const Color(0x28FFFFFF)
+                                          : Colors.transparent,
                                       borderRadius: BorderRadius.circular(12),
-                                      onTap: () => widget.onPlayAt(orig),
-                                      child: Padding(
-                                        padding: const EdgeInsets.fromLTRB(
-                                          8,
-                                          8,
-                                          4,
-                                          8,
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(6),
-                                              child: SizedBox(
-                                                width: 48,
-                                                height: 48,
-                                                child: Stack(
-                                                  fit: StackFit.expand,
-                                                  children: [
-                                                    rowArt.startsWith('http')
-                                                        ? Image.network(
-                                                            rowArt,
-                                                            fit: BoxFit.cover,
-                                                            errorBuilder:
-                                                                (
-                                                                  _,
-                                                                  __,
-                                                                  ___,
-                                                                ) => const ColoredBox(
-                                                                  color: Color(
-                                                                    0xFF111111,
+                                      child: InkWell(
+                                        borderRadius: BorderRadius.circular(12),
+                                        onTap: () => widget.onPlayAt(orig),
+                                        child: Padding(
+                                          padding: const EdgeInsets.fromLTRB(
+                                            8,
+                                            8,
+                                            4,
+                                            8,
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(6),
+                                                child: SizedBox(
+                                                  width: 48,
+                                                  height: 48,
+                                                  child: Stack(
+                                                    fit: StackFit.expand,
+                                                    children: [
+                                                      rowArt.startsWith('http')
+                                                          ? Image.network(
+                                                              rowArt,
+                                                              fit: BoxFit.cover,
+                                                              errorBuilder:
+                                                                  (
+                                                                    _,
+                                                                    __,
+                                                                    ___,
+                                                                  ) => const ColoredBox(
+                                                                    color: Color(
+                                                                      0xFF111111,
+                                                                    ),
                                                                   ),
-                                                                ),
-                                                          )
-                                                        : Image.asset(
-                                                            rowArt,
-                                                            fit: BoxFit.cover,
-                                                            errorBuilder:
-                                                                (
-                                                                  _,
-                                                                  __,
-                                                                  ___,
-                                                                ) => const ColoredBox(
-                                                                  color: Color(
-                                                                    0xFF111111,
+                                                            )
+                                                          : Image.asset(
+                                                              rowArt,
+                                                              fit: BoxFit.cover,
+                                                              errorBuilder:
+                                                                  (
+                                                                    _,
+                                                                    __,
+                                                                    ___,
+                                                                  ) => const ColoredBox(
+                                                                    color: Color(
+                                                                      0xFF111111,
+                                                                    ),
                                                                   ),
-                                                                ),
-                                                          ),
-                                                    if (isCurrent)
-                                                      const Align(
-                                                        alignment: Alignment
-                                                            .bottomRight,
-                                                        child: Padding(
-                                                          padding:
-                                                              EdgeInsets.all(3),
-                                                          child: Icon(
-                                                            Icons
-                                                                .equalizer_rounded,
-                                                            color: Color(
-                                                              0xFFF5F5F7,
                                                             ),
-                                                            size: 16,
+                                                      if (isCurrent)
+                                                        const Align(
+                                                          alignment: Alignment
+                                                              .bottomRight,
+                                                          child: Padding(
+                                                            padding:
+                                                                EdgeInsets.all(
+                                                                  3,
+                                                                ),
+                                                            child: Icon(
+                                                              Icons
+                                                                  .equalizer_rounded,
+                                                              color: Color(
+                                                                0xFFF5F5F7,
+                                                              ),
+                                                              size: 16,
+                                                            ),
                                                           ),
                                                         ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 12),
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      w.word,
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: TextStyle(
+                                                        color: const Color(
+                                                          0xFFF5F5F7,
+                                                        ),
+                                                        fontSize: 15,
+                                                        fontWeight: isCurrent
+                                                            ? FontWeight.w700
+                                                            : FontWeight.w600,
+                                                        letterSpacing: -0.15,
                                                       ),
+                                                    ),
+                                                    const SizedBox(height: 2),
+                                                    Text(
+                                                      'NowssB · ${_wordClock(w)}',
+                                                      style: const TextStyle(
+                                                        color: Color(
+                                                          0xFF8E8E93,
+                                                        ),
+                                                        fontSize: 12,
+                                                      ),
+                                                    ),
                                                   ],
                                                 ),
                                               ),
-                                            ),
-                                            const SizedBox(width: 12),
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    w.word,
-                                                    maxLines: 1,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    style: TextStyle(
-                                                      color: const Color(
-                                                        0xFFF5F5F7,
-                                                      ),
-                                                      fontSize: 15,
-                                                      fontWeight: isCurrent
-                                                          ? FontWeight.w700
-                                                          : FontWeight.w600,
-                                                      letterSpacing: -0.15,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(height: 2),
-                                                  Text(
-                                                    'NowssB · ${_wordClock(w)}',
-                                                    style: const TextStyle(
-                                                      color: Color(0xFF8E8E93),
-                                                      fontSize: 12,
-                                                    ),
-                                                  ),
-                                                ],
+                                              const Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                  horizontal: 10,
+                                                  vertical: 10,
+                                                ),
+                                                child: Icon(
+                                                  Icons.drag_handle_rounded,
+                                                  color: Color(0xFF8E8E93),
+                                                  size: 22,
+                                                ),
                                               ),
-                                            ),
-                                            const Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                horizontal: 10,
-                                                vertical: 10,
-                                              ),
-                                              child: Icon(
-                                                Icons.drag_handle_rounded,
-                                                color: Color(0xFF8E8E93),
-                                                size: 22,
-                                              ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                );
-                              },
+                                  );
+                                },
+                              ),
                             ),
-                          ),
-                      ],
-                    );
-                  },
+                        ],
+                      );
+                    },
+                  ),
                 ),
               ),
-            ),
-            // Grab affordance at mid open
-            Positioned(
-              top: media.padding.top + 6,
-              left: 0,
-              right: 0,
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onVerticalDragEnd: (d) {
-                  if ((d.primaryVelocity ?? 0) > 160) {
-                    Navigator.of(context).maybePop();
-                  }
-                },
-                onTap: () => Navigator.of(context).maybePop(),
-                child: SizedBox(
-                  height: 28,
-                  child: Center(
-                    child: Container(
-                      width: 42,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: const Color(0x7AFFFFFF),
-                        borderRadius: BorderRadius.circular(99),
+              // Grab affordance at mid open
+              Positioned(
+                top: media.padding.top + 6,
+                left: 0,
+                right: 0,
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onVerticalDragEnd: (d) {
+                    if ((d.primaryVelocity ?? 0) > 160) {
+                      Navigator.of(context).maybePop();
+                    }
+                  },
+                  onTap: () => Navigator.of(context).maybePop(),
+                  child: SizedBox(
+                    height: 28,
+                    child: Center(
+                      child: Container(
+                        width: 42,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: const Color(0x7AFFFFFF),
+                          borderRadius: BorderRadius.circular(99),
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ),
     );
   }
 }
