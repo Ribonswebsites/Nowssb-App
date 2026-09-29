@@ -50,7 +50,6 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
 
   bool _screenWake = true;
   bool _appearDiscover = true;
-  String _voice = 'Female';
 
   @override
   void initState() {
@@ -77,7 +76,6 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
       setState(() {
         _screenWake = p.getBool('ss_screen_wake') ?? true;
         _appearDiscover = p.getBool('ss_appear_discover') ?? true;
-        _voice = p.getString('ss_voice') ?? 'Female';
       });
       await DeviceFlags.keepAwake(_screenWake);
     } catch (_) {}
@@ -90,20 +88,6 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
     } catch (_) {}
   }
 
-  Future<void> _saveString(String k, String v) async {
-    try {
-      final p = await SharedPreferences.getInstance();
-      await p.setString(k, v);
-    } catch (_) {}
-  }
-
-  Future<void> _saveInt(String k, int v) async {
-    try {
-      final p = await SharedPreferences.getInstance();
-      await p.setInt(k, v);
-    } catch (_) {}
-  }
-
   bool _match(String label, [String? sub]) {
     if (_q.isEmpty) return true;
     return label.toLowerCase().contains(_q) ||
@@ -112,12 +96,6 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
 
   void _push(Widget page) {
     Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => page));
-  }
-
-  void _cycleVoice() {
-    setState(() => _voice = _voice == 'Female' ? 'Male' : 'Female');
-    _saveString('ss_voice', _voice);
-    HapticFeedback.selectionClick();
   }
 
   void _cycleNav() {
@@ -133,9 +111,6 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
     final s = Settings.instance;
     final top = MediaQuery.paddingOf(context).top;
     final bottom = MediaQuery.paddingOf(context).bottom;
-    final speedLabel = (s.speed - 1).abs() < 0.01
-        ? '1.0× Normal'
-        : '${s.speed}×';
 
     return Scaffold(
       backgroundColor: const Color(0xFF060C18),
@@ -180,7 +155,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                     ),
                     const SizedBox(width: 12),
                     const EditableLabel('app_settings.AppSettingsScreen',
-                      'NOWSBANSIU',
+                      'NOWSSB',
                       style: TextStyle(
                         fontSize: 10,
                         letterSpacing: 2,
@@ -355,37 +330,10 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                             ),
                         ],
                       ),
-                    if (_match('Voice') ||
-                        _match('Playback') ||
-                        _match('Screen') ||
-                        _match('Nav'))
+                    if (_match('Screen') || _match('Nav'))
                       _Sec(
-                        label: 'PLAYBACK',
+                        label: 'DEVICE',
                         children: [
-                          if (_match('Voice'))
-                            _PillRow(
-                              icon: Icons.record_voice_over_outlined,
-                              title: 'Voice',
-                              sub: '$_voice voice in the player',
-                              pill: _voice,
-                              onTap: _cycleVoice,
-                            ),
-                          if (_match('Playback'))
-                            _PillRow(
-                              icon: Icons.speed,
-                              title: 'Playback Speed',
-                              sub: speedLabel,
-                              pill: s.speed == 1 ? '1.0×' : '${s.speed}×',
-                              onTap: () {
-                                final opts = [0.75, 1.0, 1.25, 1.5];
-                                final i = opts.indexWhere(
-                                    (x) => (x - s.speed).abs() < 0.01);
-                                final next = opts[((i < 0 ? 1 : i) + 1) %
-                                    opts.length];
-                                s.setSpeed(next);
-                                HapticFeedback.selectionClick();
-                              },
-                            ),
                           if (_match('Screen'))
                             _ToggleRow(
                               icon: Icons.phone_android,

@@ -420,8 +420,20 @@ class _HomeFashionState extends State<HomeFashion> {
         )),
         (
           'store',
-          SubscriptionTodayOffer(
-            onClaim: () => _push(const SubscriptionScreen()),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+                child: ColoredSplitPromoBanner(
+                  spec: SplitPromoExtras.at(6, onTap: () => _go(3)),
+                  margin: EdgeInsets.zero,
+                ),
+              ),
+              SubscriptionTodayOffer(
+                onClaim: () => _push(const SubscriptionScreen()),
+              ),
+            ],
           ),
         ),
         ('trendwd', FashTrending(onTap: () => _go(2))),

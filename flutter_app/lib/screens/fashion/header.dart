@@ -71,34 +71,21 @@ class HomeHeader extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              // `Nowsb` heavy, `ansiu` light — one word with a break in the
-              // weight, the way the mark is drawn everywhere else.
-              const Flexible(
-                child: Text.rich(
-                  TextSpan(
-                    style: TextStyle(
-                      fontSize: 22,
-                      color: Colors.white,
-                      shadows: [
-                        Shadow(
-                            color: Color(0x80000000),
-                            blurRadius: 8,
-                            offset: Offset(0, 1)),
-                      ],
+              const Text(
+                'NowssB',
+                maxLines: 1,
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                  letterSpacing: -0.3,
+                  shadows: [
+                    Shadow(
+                      color: Color(0x80000000),
+                      blurRadius: 8,
+                      offset: Offset(0, 1),
                     ),
-                    children: [
-                      TextSpan(
-                        text: 'Nowsb',
-                        style: TextStyle(fontWeight: FontWeight.w800),
-                      ),
-                      TextSpan(
-                        text: 'ansiu',
-                        style: TextStyle(fontWeight: FontWeight.w300),
-                      ),
-                    ],
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                  ],
                 ),
               ),
               const SizedBox(width: 8),

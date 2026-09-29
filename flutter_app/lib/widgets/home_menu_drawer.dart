@@ -187,10 +187,10 @@ class HomeMenuDrawer extends StatelessWidget {
                           TextSpan(
                             children: [
                               TextSpan(
-                                text: 'NOWSBANSIU',
+                                text: 'NOWSSB',
                                 style: TextStyle(
                                   fontSize: 10,
-                                  letterSpacing: 2,
+                                  letterSpacing: 1.2,
                                   fontWeight: FontWeight.w700,
                                   color: NwsbColors.goldLight,
                                 ),
@@ -267,7 +267,7 @@ class HomeMenuDrawer extends StatelessWidget {
                             light: light,
                             mark: _mark['science']!,
                             label: 'Word Science',
-                            sub: 'NOWSBANSIU system',
+                            sub: 'NowssB system',
                             onTap: () => _goTab(context, 2),
                           ),
                           _Row(

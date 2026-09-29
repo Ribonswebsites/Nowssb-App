@@ -116,7 +116,7 @@ class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
   Widget build(BuildContext context) {
     final neu = HomeSkinScope.of(context) == HomeSkin.normal;
     return SizedBox(
-      height: 660,
+      height: 440,
       child: NotificationListener<ScrollNotification>(
         onNotification: (n) {
           if (n is ScrollStartNotification && n.dragDetails != null) {
@@ -199,13 +199,18 @@ class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
               ),
             ),
             Expanded(
-              child: ClipRect(
-                child: EditableImage.asset(
-                  'assets/banners/brand-cleo.png',
-                  fit: BoxFit.fitHeight,
-                  alignment: Alignment.bottomRight,
-                  errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-                  slot: 'earn_home_sections.EarnUmbrellaSection',
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: FractionallySizedBox(
+                  widthFactor: 0.42,
+                  heightFactor: 0.78,
+                  child: EditableImage.asset(
+                    'assets/banners/brand-cleo.png',
+                    fit: BoxFit.contain,
+                    alignment: Alignment.center,
+                    errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                    slot: 'earn_home_sections.EarnUmbrellaSection',
+                  ),
                 ),
               ),
             ),
@@ -330,11 +335,40 @@ class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
                 flex: 9,
                 child: ClipRRect(
                   borderRadius: BorderRadius.all(Radius.circular(14)),
-                  child: FlipPortrait(
-                    front: 'assets/banners/earn/hands-light.png',
-                    back: 'assets/banners/earn/hands-dark.png',
-                    fit: BoxFit.cover,
-                    alignment: Alignment(0, -0.08),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      FlipPortrait(
+                        front: 'assets/banners/earn/hands-light.png',
+                        back: 'assets/banners/earn/hands-dark.png',
+                        fit: BoxFit.cover,
+                        alignment: Alignment(0, -0.08),
+                      ),
+                      DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.center,
+                            colors: [Color(0xCC000000), Color(0x00000000)],
+                          ),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(8, 8, 8, 0),
+                          child: Text(
+                            'Your share\nof the net.',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w800,
+                              height: 1.2,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -481,6 +515,14 @@ class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
                           Expanded(
                             child: Row(
                               children: [
+                                Container(
+                                  width: 26,
+                                  height: 26,
+                                  decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                                  alignment: Alignment.center,
+                                  child: NwsbIcon(tier.mark, size: 14, color: Colors.black),
+                                ),
+                                const SizedBox(width: 8),
                                 Expanded(
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -500,14 +542,6 @@ class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
                                       ),
                                     ],
                                   ),
-                                ),
-                                const SizedBox(width: 6),
-                                Container(
-                                  width: 28,
-                                  height: 28,
-                                  decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                                  alignment: Alignment.center,
-                                  child: NwsbIcon(tier.mark, size: 15, color: Colors.black),
                                 ),
                               ],
                             ),
@@ -543,7 +577,7 @@ class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
 
   Widget _badge(String label) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
         color: const Color(0xFFE8D5A3),
         borderRadius: BorderRadius.circular(20),

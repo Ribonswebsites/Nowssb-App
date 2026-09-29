@@ -78,7 +78,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _soundOn = true;
   int _duration = 15;
   TimeOfDay _reminder = const TimeOfDay(hour: 7, minute: 0);
-  String _voice = 'female';
   final Map<int, bool> _weekDone = {};
   bool _loading = true;
   bool _recentOpen = false;
@@ -144,7 +143,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final parts = savedTime.split(':');
       _reminder = TimeOfDay(hour: int.tryParse(parts[0]) ?? 7, minute: int.tryParse(parts[1]) ?? 0);
     }
-    _voice = _prefs.getString('nowssb_voice') ?? 'female';
     _bannerUrl = _prefs.getString('nwsb_local_banner');
     _avatarUrl = _prefs.getString('nwsb_local_photo');
     for (int i = 0; i < 7; i++) {
@@ -718,7 +716,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 16),
           const FractionallySizedBox(widthFactor: .66, child: Text.rich(TextSpan(children: [TextSpan(text: 'My Focus.\nBreathe.\nLet go.\n'), TextSpan(text: 'Grow.', style: TextStyle(color: _accent))]), style: TextStyle(fontSize: 25, height: 1.22, fontWeight: FontWeight.w300))),
           const SizedBox(height: 14),
-          Row(children: [Expanded(child: _compactQuick('Practice', '$_duration min', 15)), const SizedBox(width: 5), Expanded(child: _compactQuick('Reminder', _reminderText, 17)), const SizedBox(width: 5), Expanded(child: _compactQuick('Voice', _voice == 'female' ? 'Female' : 'Male', 19)), const SizedBox(width: 5), Expanded(child: _compactQuick('Plan', _planName, 21))]),
+          Row(children: [Expanded(child: _compactQuick('Practice', '$_duration min', 15)), const SizedBox(width: 5), Expanded(child: _compactQuick('Reminder', _reminderText, 17)), const SizedBox(width: 5), Expanded(child: _compactQuick('Plan', _planName, 21))]),
         ]),
       );
 
@@ -750,15 +748,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _listRow('Sound Feedback', trailing: ToggleSwitch(value: _soundOn, onChanged: (v) async { setState(() => _soundOn = v); await _prefs.setString('nowssb_sound', v ? 'on' : 'off'); })),
         _listRow('Practice Duration', trailing: Row(mainAxisSize: MainAxisSize.min, children: [_roundAction('assets/icons/icon_24.svg', () async { final v = math.max(5, _duration - 5).toInt(); setState(() => _duration = v); await _prefs.setInt('nowssb_duration', v); }), const SizedBox(width: 14), SizedBox(width: 56, child: Text('$_duration min', textAlign: TextAlign.center, style: const TextStyle(fontFamily: _mono, fontSize: 14))), const SizedBox(width: 14), _roundAction('assets/icons/icon_25.svg', () async { final v = math.min(60, _duration + 5).toInt(); setState(() => _duration = v); await _prefs.setInt('nowssb_duration', v); })])),
         _listRow('Daily Reminder', trailing: InkWell(onTap: _pickReminder, borderRadius: BorderRadius.circular(999), child: Container(padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6), decoration: BoxDecoration(color: const Color(0x08FFFFFF), border: const Border.fromBorderSide(BorderSide(color: _border)), borderRadius: BorderRadius.circular(999)), child: Text(_reminderText, style: const TextStyle(fontFamily: _mono, fontSize: 13.5))))),
-        _listRow('Playback Voice', trailing: Container(padding: const EdgeInsets.all(2), decoration: BoxDecoration(border: const Border.fromBorderSide(BorderSide(color: _border)), borderRadius: BorderRadius.circular(999)), child: Row(mainAxisSize: MainAxisSize.min, children: [_voiceButton('Female'), _voiceButton('Male')]))),
         _listRow('App Version', muted: true, trailing: const EditableLabel('profile.ProfileScreen', 'v2.4.1', style: TextStyle(fontSize: 13, color: _dim))),
       ]);
-
-  Widget _voiceButton(String label) => InkWell(
-        onTap: () async { final v = label.toLowerCase(); setState(() => _voice = v); await _prefs.setString('nowssb_voice', v); },
-        borderRadius: BorderRadius.circular(999),
-        child: AnimatedContainer(duration: const Duration(milliseconds: 160), padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 6), decoration: BoxDecoration(color: _voice == label.toLowerCase() ? const Color(0xFFF2F2F0) : Colors.transparent, borderRadius: BorderRadius.circular(999)), child: EditableLabel('profile.ProfileScreen', label, style: TextStyle(fontSize: 12.5, color: _voice == label.toLowerCase() ? Colors.black : _dim))),
-      );
 
   Widget _shop() => _sectionList('Shop & Orders', [
         _shopRow('Cart', '2', 26), _shopRow('Wishlist', '5', 28), _shopRow('Orders', '3', 30),

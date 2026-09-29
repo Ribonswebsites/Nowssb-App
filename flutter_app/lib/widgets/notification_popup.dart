@@ -24,11 +24,13 @@ class _NotificationPopupHostState extends State<NotificationPopupHost> {
     super.initState();
     NwsbEffects.instance.bind();
     NotificationBanner.items.addListener(_onItems);
+    NotificationBanner.showPopups.addListener(_onItems);
   }
 
   @override
   void dispose() {
     NotificationBanner.items.removeListener(_onItems);
+    NotificationBanner.showPopups.removeListener(_onItems);
     super.dispose();
   }
 
@@ -40,10 +42,11 @@ class _NotificationPopupHostState extends State<NotificationPopupHost> {
   Widget build(BuildContext context) {
     final list = NotificationBanner.items.value;
     final signedIn = FirebaseAuth.instance.currentUser != null;
+    final allow = NotificationBanner.showPopups.value;
     return Stack(
       children: [
         widget.child,
-        if (signedIn && list.isNotEmpty)
+        if (signedIn && allow && list.isNotEmpty)
           Positioned(
             top: 0,
             left: 12,

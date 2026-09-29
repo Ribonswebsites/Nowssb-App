@@ -116,6 +116,7 @@ class NowssbApp extends StatefulWidget {
 
 class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
   final _navigatorKey = GlobalKey<NavigatorState>();
+  final _popupRoutes = HomePopupRouteObserver();
   bool _checkingForUpdate = false;
 
   @override
@@ -190,6 +191,7 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
     return UiScope(
       child: MaterialApp(
         navigatorKey: _navigatorKey,
+        navigatorObservers: [_popupRoutes],
         builder: (context, child) => NwsbUpdateLayer(
             navigatorKey: _navigatorKey,
             child: AdminEditFab(

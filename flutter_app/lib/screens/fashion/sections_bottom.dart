@@ -461,7 +461,7 @@ class FashShabdaVideo extends StatelessWidget {
               child: Align(
                 alignment: Alignment.bottomRight,
                 child: EditableLabel('fashion_sections_bottom.FashShabdaVideo',
-                  'Nowsbansiu',
+                  'NowssB',
                   style: TextStyle(
                     fontSize: 11,
                     letterSpacing: 1.5,

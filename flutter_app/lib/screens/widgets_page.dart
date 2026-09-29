@@ -421,7 +421,7 @@ class _HeroCard extends StatelessWidget {
                         child: Align(
                           alignment: Alignment.topLeft,
                           child: EditableLabel('widgets_page.HeroCard',
-                            'Nowsbansiu',
+                            'NowssB',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 13,

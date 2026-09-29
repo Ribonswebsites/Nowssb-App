@@ -1131,6 +1131,13 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                             const SizedBox(height: 18),
                             Row(
                               children: [
+                                const AppThinkingLoader(
+                                  size: 72,
+                                  state: OrbState.composing,
+                                  blackCircle: true,
+                                  circlePad: 8,
+                                ),
+                                const SizedBox(width: 12),
                                 Expanded(
                                   child: Text(
                                     _prettyTitle(_word.word),
@@ -3072,56 +3079,9 @@ class _VisualStage extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      _StoreGlassVideoBox(onTap: onStore, size: 56),
-                      Expanded(
-                        child: Center(
-                          child: GlassWrap(
-                            margin: EdgeInsets.zero,
-                            padding: const EdgeInsets.all(4),
-                            radius: 28,
-                            child: Container(
-                              padding: const EdgeInsets.fromLTRB(10, 8, 16, 8),
-                              decoration: BoxDecoration(
-                                color: const Color(0xF00C0C0E),
-                                borderRadius: BorderRadius.circular(24),
-                                border: Border.all(
-                                  color: const Color(0x22FFFFFF),
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const AppThinkingLoader(
-                                    size: 34,
-                                    state: OrbState.composing,
-                                    circlePad: 7,
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Flexible(
-                                    child: Text(
-                                      word.word.toUpperCase(),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w800,
-                                        letterSpacing: 1.6,
-                                        height: 1.05,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 56),
-                    ],
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: _StoreGlassVideoBox(onTap: onStore, size: 56),
                   ),
                 ],
               ),

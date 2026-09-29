@@ -19,6 +19,7 @@ import '../screens/store.dart';
 import '../screens/quick_access.dart';
 import '../widgets/pool_hud.dart';
 import '../widgets/mini_player_pill.dart';
+import '../data/phone_notifications.dart';
 import '../data/playback_session.dart';
 
 class NavShell extends StatefulWidget {
@@ -59,6 +60,7 @@ class _NavShellState extends State<NavShell> {
     super.initState();
     Settings.instance.addListener(_onSettings);
     PlaybackSession.instance.addListener(_onSettings);
+    NotificationBanner.setOnHome(_i == 0);
     unawaited(PlaybackSession.instance.ensureLoaded());
   }
 
@@ -141,6 +143,7 @@ class _NavShellState extends State<NavShell> {
 
   void _goToTab(int tab) {
     _popShellOverlays();
+    NotificationBanner.setOnHome(tab == 0);
     if (tab == _i) return;
     Settings.instance.fadeBackgroundForNavigation();
     setState(() => _i = tab);

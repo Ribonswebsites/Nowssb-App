@@ -20,7 +20,6 @@ import 'package:flutter/material.dart';
 
 import '../data/settings.dart';
 import '../theme/tokens.dart';
-import 'app_backdrop.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../admin/template/editable.dart';
@@ -168,26 +167,16 @@ class _Intro extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          const AppBackdrop(),
-          if (art != null && fullBleed)
+          const ColoredBox(color: Color(0xFF050506)),
+          if (art != null)
             Positioned.fill(
-              child: EditableImage.asset(art!, fit: BoxFit.cover, gaplessPlayback: true, slot: 'intro_gate.Intro'),
-            )
-          else if (art != null)
-            Positioned(
-              top: 78,
-              left: 16,
-              right: 16,
-              height: 300,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(22),
-                child: EditableImage.asset(
-                  art!,
-                  fit: BoxFit.cover,
-                  gaplessPlayback: true,
-                  errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-                  slot: 'intro_gate.Intro',
-                ),
+              child: EditableImage.asset(
+                art!,
+                fit: BoxFit.contain,
+                alignment: Alignment.center,
+                gaplessPlayback: true,
+                errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                slot: 'intro_gate.Intro',
               ),
             )
           else if (film != null)
@@ -199,20 +188,18 @@ class _Intro extends StatelessWidget {
                 slot: 'intro_gate.Intro',
               ),
             ),
-          // The vignette. Deep enough at the foot that a title and a
-          // paragraph hold their contrast over any frame of any clip.
           const DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
+                  Color(0x00000000),
+                  Color(0x00000000),
                   Color(0x99060C18),
-                  Color(0x66060C18),
-                  Color(0xE6060C18),
-                  Color(0xFA040912),
+                  Color(0xE6040912),
                 ],
-                stops: [0, 0.35, 0.72, 1],
+                stops: [0, 0.42, 0.78, 1],
               ),
             ),
           ),

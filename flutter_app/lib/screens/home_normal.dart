@@ -429,6 +429,13 @@ class _HomeNormalState extends State<HomeNormal> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+                child: ColoredSplitPromoBanner(
+                  spec: SplitPromoExtras.at(8, onTap: () => _go(3)),
+                  margin: EdgeInsets.zero,
+                ),
+              ),
               SubscriptionTodayOffer(
                 neumorphic: true,
                 onClaim: () => _push(const SubscriptionScreen()),
@@ -573,13 +580,6 @@ class _HomeNormalState extends State<HomeNormal> {
               }),
             ),
           ),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: TextButton(
-              onPressed: () => _go(1),
-              child: const EditableLabel('home_normal.HomeNormal', 'Play session'),
-            ),
-          ),
           Expanded(
             child: ListView.builder(
               // Modest look-ahead: enough for smooth scroll, not enough to
@@ -710,12 +710,12 @@ class _TopRow extends StatelessWidget {
                     ),
               ),
               EditableLabel('home_normal.TopRow',
-                'NOWSBANSIU EDITION',
+                'NowssB',
                 maxLines: 1,
-                overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.labelSmall!.copyWith(
-                      fontSize: 9,
-                      letterSpacing: 2,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.2,
                     ),
               ),
             ],

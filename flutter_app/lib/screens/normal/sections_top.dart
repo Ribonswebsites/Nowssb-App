@@ -727,7 +727,7 @@ class NmTiles extends StatelessWidget {
     ),
     (
       'Word Science',
-      'NOWSBANSIU texts',
+      'NowssB texts',
       'https://media.nowssb.com/migrated-images/47036d4cd4790929_file_00000000a24081fa83eeab9164647db8_w2fzuq.png',
       Icons.science_outlined,
       2,

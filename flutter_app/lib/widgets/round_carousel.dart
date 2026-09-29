@@ -1,9 +1,9 @@
 /// A spinning ring of photographs.
 ///
-/// Port of the Originkit round carousel: each face sits on a cylinder,
-/// the ring turns on its own, and a sideways drag takes the wheel. The
-/// maths is the same — radius from the card width and the count, a
-/// perspective, a slight tilt — drawn with [Transform] instead of CSS.
+/// Port of the Originkit round carousel. Nested Flutter transforms flatten
+/// 3D, which painted an empty stage, so each card is placed by hand: sine
+/// for the side position, cosine for depth, then scale, fade, and a slight
+/// turn. Drag takes the wheel. The stage is black so the faces read.
 library;
 
 import 'dart:math' as math;
@@ -22,14 +22,14 @@ class RoundCarousel extends StatefulWidget {
     this.spacing = 3,
   });
 
-  /// Asset paths, in ring order. At least four, or the cylinder collapses.
+  /// Asset paths, in ring order. At least two, or there is nothing to turn.
   final List<String> images;
 
   /// Matches the web control: degrees per second is `speed * 6`.
   final double speed;
   final double sensitivity;
 
-  /// Degrees, tipping the ring back so the far faces read as further away.
+  /// Degrees. Tips the far cards up so the cylinder reads.
   final double tilt;
   final double perspective;
   final double cornerRadius;
@@ -96,23 +96,26 @@ class _RoundCarouselState extends State<RoundCarousel>
 
     return LayoutBuilder(
       builder: (context, c) {
-        final cardW = (c.maxWidth * 0.42).clamp(128.0, 176.0);
+        final stageW = c.maxWidth.isFinite ? c.maxWidth : 360.0;
+        final cardW = (stageW * 0.34).clamp(108.0, 148.0);
         final cardH = cardW * 1.28;
         final count = images.length;
-        final angle = 2 * math.pi / count;
+        final step = 2 * math.pi / count;
         final factor = 1 + widget.spacing * 0.15;
-        final radius = (cardW * factor) / (2 * math.tan(math.pi / count));
-        final tilt = widget.tilt * math.pi / 180;
+        final natural = (cardW * factor) / (2 * math.tan(math.pi / count));
+        final radius = math.min(stageW * 0.40, natural);
         final rot = _rot * math.pi / 180;
+        final persp = (1 / math.max(400.0, widget.perspective)) * 5.2;
 
         final order = List<int>.generate(count, (i) => i)
           ..sort((a, b) {
-            final fa = math.cos(rot + a * angle);
-            final fb = math.cos(rot + b * angle);
-            return fa.compareTo(fb);
+            final da = math.cos(rot + a * step);
+            final db = math.cos(rot + b * step);
+            return da.compareTo(db);
           });
 
         return GestureDetector(
+          behavior: HitTestBehavior.opaque,
           onHorizontalDragStart: (_) {
             _drag = true;
             _vel = 0;
@@ -126,41 +129,27 @@ class _RoundCarouselState extends State<RoundCarousel>
           },
           onHorizontalDragEnd: (_) => _drag = false,
           onHorizontalDragCancel: () => _drag = false,
-          child: SizedBox(
-            height: cardH + 36,
-            width: double.infinity,
-            child: ClipRect(
-              child: Transform(
-                alignment: Alignment.center,
-                filterQuality: FilterQuality.medium,
-                transform: Matrix4.identity()
-                  ..setEntry(3, 2, 1 / widget.perspective)
-                  ..rotateX(tilt),
-                child: Transform(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(18),
+            child: ColoredBox(
+              color: const Color(0xFF050506),
+              child: SizedBox(
+                height: cardH + 22,
+                width: double.infinity,
+                child: Stack(
                   alignment: Alignment.center,
-                  transform: Matrix4.identity()
-                    ..translateByDouble(0.0, 0.0, -radius, 1.0)
-                    ..rotateY(rot),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      for (final i in order)
-                        Transform(
-                          alignment: Alignment.center,
-                          filterQuality: FilterQuality.medium,
-                          transform: Matrix4.identity()
-                            ..rotateY(i * angle)
-                            ..translateByDouble(0.0, 0.0, radius, 1.0),
-                          child: _Face(
-                            asset: images[i],
-                            width: cardW,
-                            height: cardH,
-                            radius: widget.cornerRadius,
-                            opacity: _fade(math.cos(rot + i * angle)),
-                          ),
-                        ),
-                    ],
-                  ),
+                  clipBehavior: Clip.hardEdge,
+                  children: [
+                    for (final i in order)
+                      _card(
+                        asset: images[i],
+                        angle: rot + i * step,
+                        radius: radius,
+                        cardW: cardW,
+                        cardH: cardH,
+                        persp: persp,
+                      ),
+                  ],
                 ),
               ),
             ),
@@ -170,8 +159,41 @@ class _RoundCarouselState extends State<RoundCarousel>
     );
   }
 
-  double _fade(double facing) {
-    return ((facing + 0.35) / 1.2).clamp(0.18, 1);
+  Widget _card({
+    required String asset,
+    required double angle,
+    required double radius,
+    required double cardW,
+    required double cardH,
+    required double persp,
+  }) {
+    final depth = math.cos(angle);
+    final front = ((depth + 1) / 2).clamp(0.0, 1.0);
+    final x = math.sin(angle) * radius;
+    final y = (1 - front) * widget.tilt * 0.55;
+    final scale = 0.56 + 0.44 * front;
+    final opacity = (0.34 + 0.66 * front).clamp(0.34, 1.0);
+    final yaw = -math.sin(angle) * 0.52;
+    final m = Matrix4.identity()
+      ..setEntry(3, 2, persp)
+      ..translateByDouble(x, y, 0.0, 1.0)
+      ..rotateY(yaw)
+      ..scaleByDouble(scale, scale, 1.0, 1.0);
+
+    return Transform(
+      alignment: Alignment.center,
+      filterQuality: FilterQuality.medium,
+      transform: m,
+      child: Opacity(
+        opacity: opacity,
+        child: _Face(
+          asset: asset,
+          width: cardW,
+          height: cardH,
+          radius: widget.cornerRadius,
+        ),
+      ),
+    );
   }
 }
 
@@ -181,42 +203,37 @@ class _Face extends StatelessWidget {
     required this.width,
     required this.height,
     required this.radius,
-    required this.opacity,
   });
 
   final String asset;
   final double width;
   final double height;
   final double radius;
-  final double opacity;
 
   @override
   Widget build(BuildContext context) {
-    return Opacity(
-      opacity: opacity,
-      child: Container(
-        width: width,
-        height: height,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(radius),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x59000000),
-              blurRadius: 24,
-              offset: Offset(0, 10),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(radius),
-          child: Image.asset(
-            asset,
-            width: width,
-            height: height,
-            fit: BoxFit.cover,
-            gaplessPlayback: true,
-            errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF141414)),
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(radius),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x99000000),
+            blurRadius: 18,
+            offset: Offset(0, 8),
           ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(radius),
+        child: Image.asset(
+          asset,
+          width: width,
+          height: height,
+          fit: BoxFit.cover,
+          gaplessPlayback: true,
+          errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF141414)),
         ),
       ),
     );

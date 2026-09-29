@@ -16,6 +16,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -314,9 +315,33 @@ class PhoneNotifications {
 }
 
 /// In-app banner. The host mounts once under MaterialApp.
+///
+/// Popups belong on the home tab, and only when nothing is pushed over it.
+/// Agreement pages, store intros, and every other tab stay quiet.
 class NotificationBanner {
   NotificationBanner._();
   static final items = ValueNotifier<List<NotifItem>>(const []);
+  static final showPopups = ValueNotifier<bool>(true);
+
+  static bool _onHome = true;
+  static bool _routeRoot = true;
+
+  static void setOnHome(bool value) {
+    if (_onHome == value) return;
+    _onHome = value;
+    _publish();
+  }
+
+  static void setRouteRoot(bool value) {
+    if (_routeRoot == value) return;
+    _routeRoot = value;
+    _publish();
+  }
+
+  static void _publish() {
+    final next = _onHome && _routeRoot;
+    if (showPopups.value != next) showPopups.value = next;
+  }
 
   static void push(NotifItem item) {
     if (FirebaseAuth.instance.currentUser == null) return;
@@ -326,4 +351,27 @@ class NotificationBanner {
   static void dismiss(NotifItem item) {
     items.value = items.value.where((e) => e != item).toList();
   }
+}
+
+/// Hides in-app banners as soon as a page is pushed over the shell.
+class HomePopupRouteObserver extends NavigatorObserver {
+  void _sync() {
+    final nav = navigator;
+    if (nav == null) return;
+    NotificationBanner.setRouteRoot(!nav.canPop());
+  }
+
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) => _sync();
+
+  @override
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) => _sync();
+
+  @override
+  void didRemove(Route<dynamic> route, Route<dynamic>? previousRoute) =>
+      _sync();
+
+  @override
+  void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) =>
+      _sync();
 }

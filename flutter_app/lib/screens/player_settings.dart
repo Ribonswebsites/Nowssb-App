@@ -23,7 +23,6 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
 
   static const _eqOptions = ['Flat', 'Bass', 'Treble', 'Vocal', 'Electronic'];
   static const _qualityOptions = ['Low', 'Normal', 'High', 'Lossless'];
-  static const _speedOptions = ['0.5x', '0.75x', 'Normal', '1.25x', '1.5x', '2x'];
   static const _crossfadeOptions = ['Off', '3 Sec', '5 Sec', '8 Sec', '12 Sec'];
   static const _sleepOptions = ['Off', '15 Min', '30 Min', '45 Min', '1 Hour'];
   static const _playlistOptions = ['Classic', 'Grid', 'Compact'];
@@ -76,23 +75,6 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
       _ => 'flat',
     };
     s.setEq(key);
-  }
-
-  String get _speedLabel {
-    if ((s.speed - 1).abs() < 0.01) return 'Normal';
-    return s.speed == s.speed.roundToDouble() ? '${s.speed.toInt()}x' : '${s.speed}x';
-  }
-
-  void _setSpeed(String label) {
-    final value = switch (label) {
-      '0.5x' => .5,
-      '0.75x' => .75,
-      '1.25x' => 1.25,
-      '1.5x' => 1.5,
-      '2x' => 2.0,
-      _ => 1.0,
-    };
-    s.setSpeed(value);
   }
 
   Future<void> _choose(String title, List<String> options, String current, ValueChanged<String> onPick) async {
@@ -194,8 +176,6 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
                     LSection('quality', 'Audio quality', _nav(Icons.graphic_eq, 'Audio Quality', s.quality,
                         () => _choose('Audio Quality', _qualityOptions, s.quality, s.setQuality))),
                     LSection('bass', 'Bass boost', _toggle(Icons.multitrack_audio, 'Bass Boost', s.bassBoost, s.toggleBass)),
-                    LSection('speed', 'Playback speed', _nav(Icons.speed, 'Playback Speed', _speedLabel,
-                        () => _choose('Playback Speed', _speedOptions, _speedLabel, _setSpeed))),
                     LSection('crossfade', 'Crossfade', _nav(Icons.compare_arrows, 'Crossfade', s.crossfade,
                         () => _choose('Crossfade', _crossfadeOptions, s.crossfade, s.setCrossfade))),
                     LSection('sleep', 'Sleep timer', _nav(Icons.timer_outlined, 'Sleep Timer', s.sleepTimer,

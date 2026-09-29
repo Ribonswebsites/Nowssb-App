@@ -120,7 +120,7 @@ class _FashTilesState extends State<FashTiles> {
     ),
     (
       'Word Science',
-      'NOWSBANSIU texts',
+      'NowssB texts',
       '',
       NwsbMarks.wordBag,
       2,

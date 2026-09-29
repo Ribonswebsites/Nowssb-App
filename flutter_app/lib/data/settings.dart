@@ -54,10 +54,14 @@ class Settings extends ChangeNotifier {
   static const fashionVideos = <String>[
     'assets/video/fashion-plus-bg-5.mp4',
     'assets/video/fashion-plus-bg-6.mp4',
+    'assets/video/fashion-plus-bg-ember.mp4',
+    'assets/video/fashion-plus-bg-silver.mp4',
   ];
   static const fashionVideoNames = <String>[
     'Falling Diamonds',
     'Violet Silk',
+    'Ember Silk',
+    'Silver Thread',
   ];
 
   /// A saved still is used only while Fashion Plus is off. With no saved
