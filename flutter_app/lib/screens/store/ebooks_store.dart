@@ -18,6 +18,7 @@ import 'store_cards.dart';
 import 'store_home_sections.dart';
 import 'store_select_sheet.dart';
 import 'store_routes.dart';
+import 'store_terms_sheet.dart';
 import '../sound_library.dart';
 import '../../admin/template/editable.dart';
 import '../../admin/layout/layout_sections.dart';
@@ -26,7 +27,10 @@ class EbooksStoreScreen extends StatelessWidget {
   const EbooksStoreScreen({super.key});
 
   @override
-  Widget build(BuildContext context) => PageShell(
+  Widget build(BuildContext context) => StoreTermsHost(
+        which: 'ebooks',
+        head: 'Ebooks described by sound',
+        child: PageShell(
         eyebrow: 'NowssB Store',
         title: 'The NowssB Ebooks',
         film: 'assets/video/player-bg-loop.mp4',
@@ -44,6 +48,7 @@ class EbooksStoreScreen extends StatelessWidget {
             sliver: SliverList.list(children: const [_EbooksBody()]),
           ),
         ],
+        ),
       );
 }
 

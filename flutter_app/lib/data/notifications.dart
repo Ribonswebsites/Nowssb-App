@@ -119,31 +119,20 @@ class NotifStore extends ChangeNotifier {
   static const kFeed = 'nwsb_notif_feed';
   static const feedMax = 60;
 
-  /// Same GROUPS as part064.js.
+  /// Only the kinds the app actually sends. Social and delivery rows that
+  /// never fired were removed so the page stays short.
   static const groups = <NotifGroup>[
-    NotifGroup(name: 'NowssB Connect', items: [
-      NotifKind(k: 'messages', label: 'Messages', sub: 'New texts from people you follow'),
-      NotifKind(k: 'posts', label: 'Posts & Reels', sub: 'New posts and reels on your feed'),
-      NotifKind(k: 'reactions', label: 'Likes & Comments', sub: 'When someone reacts to what you shared'),
-      NotifKind(k: 'follows', label: 'New Followers', sub: 'When someone starts following you'),
-    ]),
-    NotifGroup(name: 'Store & Orders', items: [
-      NotifKind(k: 'orders', label: 'Order Updates', sub: 'Confirmed, packed and completed'),
-      NotifKind(k: 'delivery', label: 'On Its Way', sub: 'Where your order is and how long it will take'),
-      NotifKind(k: 'cart', label: 'Cart Reminders', sub: 'Words still in your cart, before they are gone'),
-      NotifKind(k: 'arrivals', label: 'New Arrivals', sub: 'New words, meanings and drops'),
-      NotifKind(k: "offers", label: "Today's Offers", sub: 'Coupons and limited-time discounts'),
-      NotifKind(k: "trending", label: "Today's Trending", sub: 'The word healing the most today'),
-    ]),
     NotifGroup(name: 'Your Practice', items: [
-      NotifKind(k: 'routine', label: 'Daily Routine', sub: 'Reminders for each routine slot'),
-      NotifKind(k: 'rx', label: 'AI Prescription', sub: 'When your daily words are ready'),
-      NotifKind(k: 'streak', label: 'Streak', sub: 'Before your streak is about to break'),
-      NotifKind(k: 'reader', label: 'Reading Reminders', sub: 'Reminders you set yourself in the Reader'),
+      NotifKind(k: 'routine', label: 'Daily words', sub: 'A reminder in your morning, local time'),
+      NotifKind(k: 'streak', label: 'Streak', sub: 'Evening reminder if you have not practiced'),
+      NotifKind(k: 'reader', label: 'Reading', sub: 'Reminders you set in the Reader'),
+    ]),
+    NotifGroup(name: 'Offers', items: [
+      NotifKind(k: 'offers', label: "Today's offer", sub: 'Subscription price for your country, once a day'),
     ]),
     NotifGroup(name: 'Account', items: [
       NotifKind(k: 'subscription', label: 'Subscription', sub: 'Renewals, plan changes and billing'),
-      NotifKind(k: 'support', label: 'Support', sub: 'Replies to your support requests'),
+      NotifKind(k: 'orders', label: 'Orders', sub: 'Confirmed and completed store orders'),
     ]),
   ];
 

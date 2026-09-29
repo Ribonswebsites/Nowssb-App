@@ -3,6 +3,7 @@ library;
 
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../data/notifications.dart';
@@ -38,10 +39,11 @@ class _NotificationPopupHostState extends State<NotificationPopupHost> {
   @override
   Widget build(BuildContext context) {
     final list = NotificationBanner.items.value;
+    final signedIn = FirebaseAuth.instance.currentUser != null;
     return Stack(
       children: [
         widget.child,
-        if (list.isNotEmpty)
+        if (signedIn && list.isNotEmpty)
           Positioned(
             top: 0,
             left: 12,

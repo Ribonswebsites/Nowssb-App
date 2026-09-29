@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/earn_wallet.dart';
 import '../data/firebase.dart';
+import '../data/phone_notifications.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import '../widgets/app_thinking_loader.dart';
 import '../widgets/login_stage.dart';
@@ -64,6 +65,9 @@ class _AuthGateState extends State<AuthGate> {
     final remember = prefs.getBool('nwsb.rememberMe') ?? true;
     if (mounted) setState(() => _remember = remember);
     if (!remember && NwsbFirebase.ready) {
+      try {
+        await _google.signOut();
+      } catch (_) {}
       await FirebaseAuth.instance.signOut();
     }
   }
@@ -101,6 +105,9 @@ class _AuthGateState extends State<AuthGate> {
           'Sign-in is taking too long. Check your connection and try again.',
         ),
       );
+      if (FirebaseAuth.instance.currentUser != null) {
+        PhoneNotifications.instance.armSession();
+      }
     } on _AuthMessage catch (error) {
       if (mounted) setState(() => _error = error.message);
     } on FirebaseAuthException catch (error) {
@@ -121,6 +128,13 @@ class _AuthGateState extends State<AuthGate> {
           );
         }
         try {
+          // Drop the cached Google account so the chooser is shown every time.
+          try {
+            await _google.signOut();
+          } catch (_) {}
+          try {
+            await _google.disconnect();
+          } catch (_) {}
           final account = await _google.signIn();
           if (account == null) return;
           final credentials = await account.authentication;
@@ -352,7 +366,10 @@ class _AuthGateState extends State<AuthGate> {
           _notice = null;
         }),
         onToggleObscure: () => setState(() => _obscure = !_obscure),
-        onToggleRemember: () => setState(() => _remember = !_remember),
+        onToggleRemember: () {
+          setState(() => _remember = !_remember);
+          unawaited(_saveRemember());
+        },
         onExplore: _busy ? null : () => setState(() => _guest = true),
       ),
     );

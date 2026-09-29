@@ -11,12 +11,12 @@ import 'package:google_fonts/google_fonts.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 
-/// Primary player-box film (liquid glass wave). Intro/setup must not use this.
-const kPlayerBoxFilm = 'assets/video/player-box-liquid.mp4';
+/// Primary player-box film. Intro and settings must not use this clip.
+const kPlayerBoxFilm = 'assets/video/player-box-rings.mp4';
 
-/// The two films the player box actually plays — liquid glass + sine wave.
-const kPlayerBoxWaveFilm = 'assets/video/player-box-wave.mp4';
-const kPlayerBoxFilms = <String>[kPlayerBoxFilm, kPlayerBoxWaveFilm];
+/// Same film for every word so the center box does not swap looks.
+const kPlayerBoxWaveFilm = 'assets/video/player-box-rings.mp4';
+const kPlayerBoxFilms = <String>[kPlayerBoxFilm];
 
 /// Charcoal AURA film — leftover intro rooms.
 const kPlayerAuraFilm = 'assets/video/player-aura-bg.mp4';

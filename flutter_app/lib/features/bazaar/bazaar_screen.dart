@@ -9,6 +9,7 @@ import '../economy/money.dart';
 import '../economy/play_billing.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/glass_wrap.dart';
+import '../../screens/store/store_terms_sheet.dart';
 import '../../screens/subscription.dart';
 import '../../admin/template/editable.dart';
 
@@ -84,9 +85,13 @@ class BazaarScreen extends StatelessWidget {
       ),
     );
     if (embedded) return listening;
-    return EconomyPage(
-      title: 'Resell',
-      child: listening,
+    return StoreTermsHost(
+      which: 'bazaar',
+      head: 'Before you resell',
+      child: EconomyPage(
+        title: 'Resell',
+        child: listening,
+      ),
     );
   }
 }

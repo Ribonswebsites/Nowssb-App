@@ -15,7 +15,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'models.dart';
 import 'practice_progress.dart';
 import 'word_voice.dart';
-import '../widgets/listening_visual.dart';
 
 enum HearingTier { quiet, loud, danger }
 
@@ -193,7 +192,6 @@ class PlaybackSession extends ChangeNotifier {
       await play();
     } else {
       _playing = false;
-      ListeningMeter.instance.setSpeaking(false);
       _stopDoseClock();
       notifyListeners();
     }
@@ -254,7 +252,6 @@ class PlaybackSession extends ChangeNotifier {
       unawaited(WordVoice.instance.stop());
     } catch (_) {}
     _playing = false;
-    ListeningMeter.instance.setSpeaking(false);
     _stopDoseClock();
     notifyListeners();
   }
@@ -273,7 +270,6 @@ class PlaybackSession extends ChangeNotifier {
       } catch (_) {}
     }
     _playing = true;
-    ListeningMeter.instance.setSpeaking(true, volume: volume);
     _startedAt = DateTime.now();
     _startDoseClock();
     notifyListeners();
@@ -300,7 +296,6 @@ class PlaybackSession extends ChangeNotifier {
     } finally {
       if (_playing && !_loop) {
         _playing = false;
-        ListeningMeter.instance.setSpeaking(false);
         _stopDoseClock();
         notifyListeners();
       }

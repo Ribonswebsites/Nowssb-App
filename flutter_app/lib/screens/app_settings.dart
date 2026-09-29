@@ -4,15 +4,20 @@
 /// Settings row. Persists toggles via SharedPreferences. No emoji.
 library;
 
+import 'dart:ui' show ImageFilter;
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../admin/admin_home.dart';
 import '../admin/admin_state.dart';
 import '../admin/template/ui_overrides.dart';
+import '../data/device_flags.dart';
+import '../data/phone_notifications.dart';
 import '../data/practice_progress.dart';
 import '../data/settings.dart';
 import '../media/onboarding_warmup.dart';
@@ -24,6 +29,7 @@ import 'fashion_plus.dart';
 import 'notifications_settings.dart';
 import 'player_settings.dart';
 import 'player_guide.dart';
+import 'auth_gate.dart';
 import 'profile.dart';
 import 'quick_access.dart';
 import 'quotes_live.dart';
@@ -42,23 +48,9 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
   final _search = TextEditingController();
   String _q = '';
 
-  bool _uiSound = true;
-  bool _autoAdvance = false;
   bool _screenWake = true;
-  bool _haptic = true;
-  bool _autoPlay = false;
-  bool _reduceMotion = false;
-  bool _boldText = false;
-  bool _practiceReminders = true;
-  bool _newWordAlerts = true;
   bool _appearDiscover = true;
   String _voice = 'Female';
-  String _ambient = 'Off';
-  int _wordsPer = 5;
-  int _reps = 7;
-  String _sensitivity = 'Normal';
-  String _textSize = 'M';
-  String _theme = 'default';
 
   @override
   void initState() {
@@ -83,24 +75,11 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
     try {
       final p = await SharedPreferences.getInstance();
       setState(() {
-        _uiSound = p.getBool('ss_ui_sound') ?? true;
-        _autoAdvance = p.getBool('ss_auto_advance') ?? false;
         _screenWake = p.getBool('ss_screen_wake') ?? true;
-        _haptic = p.getBool('ss_haptic') ?? true;
-        _autoPlay = p.getBool('ss_autoplay') ?? false;
-        _reduceMotion = p.getBool('ss_reduce_motion') ?? false;
-        _boldText = p.getBool('ss_bold_text') ?? false;
-        _practiceReminders = p.getBool('ss_practice_reminders') ?? true;
-        _newWordAlerts = p.getBool('ss_new_word') ?? true;
         _appearDiscover = p.getBool('ss_appear_discover') ?? true;
         _voice = p.getString('ss_voice') ?? 'Female';
-        _ambient = p.getString('ss_ambient') ?? 'Off';
-        _wordsPer = p.getInt('ss_words_per') ?? 5;
-        _reps = p.getInt('ss_reps') ?? 7;
-        _sensitivity = p.getString('ss_sensitivity') ?? 'Normal';
-        _textSize = p.getString('ss_text_size') ?? 'M';
-        _theme = p.getString('ss_theme') ?? 'default';
       });
+      await DeviceFlags.keepAwake(_screenWake);
     } catch (_) {}
   }
 
@@ -141,58 +120,10 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
     HapticFeedback.selectionClick();
   }
 
-  void _cycleAmbient() {
-    const opts = ['Off', 'Rain', 'Drone', 'Bowl'];
-    setState(() => _ambient = opts[(opts.indexOf(_ambient) + 1) % opts.length]);
-    _saveString('ss_ambient', _ambient);
-    HapticFeedback.selectionClick();
-  }
-
-  void _cycleWords() {
-    const opts = [3, 5, 7, 9];
-    setState(() => _wordsPer = opts[(opts.indexOf(_wordsPer) + 1) % opts.length]);
-    _saveInt('ss_words_per', _wordsPer);
-    HapticFeedback.selectionClick();
-  }
-
-  void _cycleReps() {
-    const opts = [3, 5, 7, 9, 12];
-    setState(() => _reps = opts[(opts.indexOf(_reps) + 1) % opts.length]);
-    _saveInt('ss_reps', _reps);
-    HapticFeedback.selectionClick();
-  }
-
-  void _cycleSens() {
-    const opts = ['Gentle', 'Normal', 'Strict'];
-    setState(() =>
-        _sensitivity = opts[(opts.indexOf(_sensitivity) + 1) % opts.length]);
-    _saveString('ss_sensitivity', _sensitivity);
-    HapticFeedback.selectionClick();
-  }
-
-  void _cycleText() {
-    const opts = ['S', 'M', 'L', 'XL'];
-    setState(() => _textSize = opts[(opts.indexOf(_textSize) + 1) % opts.length]);
-    _saveString('ss_text_size', _textSize);
-    HapticFeedback.selectionClick();
-  }
-
   void _cycleNav() {
     final s = Settings.instance;
     final next = s.navColor == 'glass' ? 'black' : 'glass';
     s.setNavConfig(color: next);
-    HapticFeedback.selectionClick();
-  }
-
-  void _setTheme(String id) {
-    setState(() => _theme = id);
-    _saveString('ss_theme', id);
-    final s = Settings.instance;
-    if (id == 'neo') {
-      s.setFashionHome(false);
-    } else {
-      s.setFashionHome(true);
-    }
     HapticFeedback.selectionClick();
   }
 
@@ -364,30 +295,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                         ],
                       ),
                     ),
-                    if (_match('NowssB Plans', 'upgrade') ||
-                        _match('My Certificates'))
-                      _Sec(
-                        label: 'MEMBERSHIP',
-                        children: [
-                          if (_match('NowssB Plans', 'upgrade'))
-                            _NavRow(
-                              icon: Icons.workspace_premium_outlined,
-                              title: 'NowssB Plans',
-                              sub: 'View or upgrade your plan',
-                              onTap: () => _toast('Plans open with Frequency.'),
-                            ),
-                          if (_match('My Certificates'))
-                            _NavRow(
-                              icon: Icons.military_tech_outlined,
-                              title: 'My Certificates',
-                              sub: 'Word Mastery achievements',
-                              last: true,
-                              onTap: () => _toast('Certificates coming soon.'),
-                            ),
-                        ],
-                      ),
-                    if (_match('Screen Meditation') ||
-                        _match('Player Guide') ||
+                    if (_match('Player Guide') ||
                         _match('Hero header') ||
                         _match('Fashion Plus') ||
                         _match('Quick Access') ||
@@ -447,74 +355,22 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                             ),
                         ],
                       ),
-                    if (_match('theme', 'black') || _match('Default') || _match('Glass'))
-                      _Sec(
-                        label: 'BLACK EDITION',
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(4, 0, 4, 12),
-                            child: EditableLabel('app_settings.AppSettingsScreen',
-                              'Choose your Fashion home theme. Applies to the Fashion screen.',
-                              style: TextStyle(
-                                fontSize: 11,
-                                height: 1.5,
-                                color: Colors.white.withOpacity(0.32),
-                              ),
-                            ),
-                          ),
-                          Row(
-                            children: [
-                              for (final t in const [
-                                ('default', 'Default', 'Glass'),
-                                ('black', 'Black', 'Void'),
-                                ('neo', 'Neo', 'Depth'),
-                                ('glass-black', 'Glass', 'Dark'),
-                              ])
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 4),
-                                    child: _ThemeCard(
-                                      id: t.$1,
-                                      title: t.$2,
-                                      sub: t.$3,
-                                      selected: _theme == t.$1,
-                                      onTap: () => _setTheme(t.$1),
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                        ],
-                      ),
                     if (_match('Voice') ||
-                        _match('UI Sound') ||
-                        _match('Playback Speed') ||
-                        _match('Ambient'))
+                        _match('Playback') ||
+                        _match('Screen') ||
+                        _match('Nav'))
                       _Sec(
-                        label: 'AUDIO & PLAYBACK',
+                        label: 'PLAYBACK',
                         children: [
                           if (_match('Voice'))
                             _PillRow(
                               icon: Icons.record_voice_over_outlined,
-                              title: 'Voice Preference',
-                              sub: '$_voice voice',
+                              title: 'Voice',
+                              sub: '$_voice voice in the player',
                               pill: _voice,
                               onTap: _cycleVoice,
                             ),
-                          if (_match('UI Sound'))
-                            _ToggleRow(
-                              icon: Icons.volume_up_outlined,
-                              title: 'UI Sound Feedback',
-                              sub: 'Interaction sounds',
-                              value: _uiSound,
-                              onChanged: (v) {
-                                setState(() => _uiSound = v);
-                                _saveBool('ss_ui_sound', v);
-                              },
-                            ),
-                          if (_match('Playback Speed'))
+                          if (_match('Playback'))
                             _PillRow(
                               icon: Icons.speed,
                               title: 'Playback Speed',
@@ -530,189 +386,39 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                                 HapticFeedback.selectionClick();
                               },
                             ),
-                          if (_match('Ambient'))
-                            _PillRow(
-                              icon: Icons.graphic_eq,
-                              title: 'Ambient Sound',
-                              sub: _ambient == 'Off'
-                                  ? 'Off — silence during practice'
-                                  : _ambient,
-                              pill: _ambient,
-                              last: true,
-                              onTap: _cycleAmbient,
-                            ),
-                        ],
-                      ),
-                    if (_match('Words per') ||
-                        _match('Repetitions') ||
-                        _match('Scoring') ||
-                        _match('Auto-Advance') ||
-                        _match('Keep Screen'))
-                      _Sec(
-                        label: 'PRACTICE',
-                        children: [
-                          if (_match('Words per'))
-                            _PillRow(
-                              icon: Icons.format_list_numbered,
-                              title: 'Words per Session',
-                              sub: '$_wordsPer words per practice',
-                              pill: '$_wordsPer',
-                              onTap: _cycleWords,
-                            ),
-                          if (_match('Repetitions'))
-                            _PillRow(
-                              icon: Icons.repeat,
-                              title: 'Repetitions per Word',
-                              sub: '$_reps× per word',
-                              pill: '$_reps×',
-                              onTap: _cycleReps,
-                            ),
-                          if (_match('Scoring'))
-                            _PillRow(
-                              icon: Icons.tune,
-                              title: 'Scoring Sensitivity',
-                              sub: '$_sensitivity — match threshold',
-                              pill: _sensitivity,
-                              onTap: _cycleSens,
-                            ),
-                          if (_match('Auto-Advance'))
-                            _ToggleRow(
-                              icon: Icons.skip_next_outlined,
-                              title: 'Auto-Advance Words',
-                              sub: 'Move to next word after reps complete',
-                              value: _autoAdvance,
-                              onChanged: (v) {
-                                setState(() => _autoAdvance = v);
-                                _saveBool('ss_auto_advance', v);
-                              },
-                            ),
-                          if (_match('Keep Screen'))
+                          if (_match('Screen'))
                             _ToggleRow(
                               icon: Icons.phone_android,
                               title: 'Keep Screen Awake',
-                              sub: 'Prevent sleep during practice sessions',
+                              sub: 'Stay on while NowssB is open',
                               value: _screenWake,
-                              last: true,
                               onChanged: (v) {
                                 setState(() => _screenWake = v);
                                 _saveBool('ss_screen_wake', v);
+                                DeviceFlags.keepAwake(v);
                               },
                             ),
-                        ],
-                      ),
-                    if (_match('Haptic') ||
-                        _match('Auto-Play') ||
-                        _match('Nav Bar'))
-                      _Sec(
-                        label: 'EXPERIENCE',
-                        children: [
-                          if (_match('Haptic'))
-                            _ToggleRow(
-                              icon: Icons.vibration,
-                              title: 'Haptic Feedback',
-                              sub: 'Vibration on key interactions',
-                              value: _haptic,
-                              onChanged: (v) {
-                                setState(() => _haptic = v);
-                                _saveBool('ss_haptic', v);
-                              },
-                            ),
-                          if (_match('Auto-Play'))
-                            _ToggleRow(
-                              icon: Icons.play_circle_outline,
-                              title: 'Auto-Play Next Session',
-                              sub: 'Continue to next routine automatically',
-                              value: _autoPlay,
-                              onChanged: (v) {
-                                setState(() => _autoPlay = v);
-                                _saveBool('ss_autoplay', v);
-                              },
-                            ),
-                          if (_match('Nav Bar'))
+                          if (_match('Nav'))
                             _PillRow(
                               icon: Icons.space_dashboard_outlined,
-                              title: 'Nav Bar Style',
+                              title: 'Nav Bar',
                               sub: s.navColor == 'glass'
-                                  ? 'Glassmorphism — frosted translucent'
-                                  : 'Black — solid void',
+                                  ? 'Glass'
+                                  : 'Black',
                               pill: s.navColor == 'glass' ? 'Glass' : 'Black',
                               last: true,
                               onTap: _cycleNav,
                             ),
                         ],
                       ),
-                    if (_match('Text Size') ||
-                        _match('Reduce Motion') ||
-                        _match('Bold Text'))
-                      _Sec(
-                        label: 'ACCESSIBILITY',
-                        children: [
-                          if (_match('Text Size'))
-                            _PillRow(
-                              icon: Icons.text_fields,
-                              title: 'Text Size',
-                              sub: '$_textSize — readability',
-                              pill: _textSize,
-                              onTap: _cycleText,
-                            ),
-                          if (_match('Reduce Motion'))
-                            _ToggleRow(
-                              icon: Icons.motion_photos_off_outlined,
-                              title: 'Reduce Motion',
-                              sub: 'Minimize transitions and animations',
-                              value: _reduceMotion,
-                              onChanged: (v) {
-                                setState(() => _reduceMotion = v);
-                                _saveBool('ss_reduce_motion', v);
-                              },
-                            ),
-                          if (_match('Bold Text'))
-                            _ToggleRow(
-                              icon: Icons.format_bold,
-                              title: 'Bold Text',
-                              sub: 'Heavier font weight for readability',
-                              value: _boldText,
-                              last: true,
-                              onChanged: (v) {
-                                setState(() => _boldText = v);
-                                _saveBool('ss_bold_text', v);
-                              },
-                            ),
-                        ],
-                      ),
-                    if (_match('Practice Reminders') ||
-                        _match('New Words') ||
-                        _match('Notifications'))
+                    if (_match('Notification'))
                       _Sec(
                         label: 'NOTIFICATIONS',
                         children: [
-                          if (_match('Practice Reminders') ||
-                              _match('Notifications'))
-                            _ToggleRow(
-                              icon: Icons.notifications_none,
-                              title: 'Practice Reminders',
-                              sub: 'Daily routine alerts',
-                              value: _practiceReminders,
-                              onChanged: (v) {
-                                setState(() => _practiceReminders = v);
-                                _saveBool('ss_practice_reminders', v);
-                              },
-                            ),
-                          if (_match('New Words'))
-                            _ToggleRow(
-                              icon: Icons.auto_stories_outlined,
-                              title: 'New Words Alerts',
-                              sub: 'When library updates',
-                              value: _newWordAlerts,
-                              onChanged: (v) {
-                                setState(() => _newWordAlerts = v);
-                                _saveBool('ss_new_word', v);
-                              },
-                            ),
                           _NavRow(
-                            icon: Icons.tune,
-                            title: 'Notification settings',
-                            sub: 'Manage channels on this phone',
+                            icon: Icons.notifications_none,
+                            title: 'Notifications',
+                            sub: 'Daily words, streak and today’s offer',
                             last: true,
                             onTap: () =>
                                 _push(const NotificationsSettingsPage()),
@@ -952,11 +658,30 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
   }
 
   Future<void> _signOut() async {
+    final ok = await showDialog<bool>(
+      context: context,
+      barrierColor: const Color(0xB3000000),
+      builder: (ctx) => const _SignOutDialog(),
+    );
+    if (ok != true || !mounted) return;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('nwsb.rememberMe', false);
+    const webClient =
+        '1024709686012-h1h9glk84uti9cbqpht5d09igdqb8pgu.apps.googleusercontent.com';
+    final google = GoogleSignIn(scopes: const ['email'], serverClientId: webClient);
+    try {
+      await google.disconnect();
+    } catch (_) {}
+    try {
+      await google.signOut();
+    } catch (_) {}
     try {
       await FirebaseAuth.instance.signOut();
     } catch (_) {}
+    NotificationBanner.items.value = const [];
+    AuthGate.askForAccount();
     if (!mounted) return;
-    _toast('Signed out.');
+    Navigator.of(context, rootNavigator: true).popUntil((route) => route.isFirst);
   }
 
   void _toast(String msg) {
@@ -992,6 +717,116 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
       await PracticeProgress.instance.clearAll();
       if (mounted) _toast('Practice history cleared.');
     }
+  }
+}
+
+class _SignOutDialog extends StatelessWidget {
+  const _SignOutDialog();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 28),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(28),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
+            child: Material(
+              color: const Color(0xE6101014),
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(22, 22, 22, 18),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(28),
+                  border: Border.all(color: const Color(0x33FFFFFF)),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 56,
+                      height: 56,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.logout_rounded, color: Colors.black),
+                    ),
+                    const SizedBox(height: 14),
+                    const Text(
+                      'Sign out?',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    const Text(
+                      'You will need to choose an account the next time you sign in.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Color(0xB3FFFFFF), height: 1.4),
+                    ),
+                    const SizedBox(height: 18),
+                    SizedBox(
+                      width: double.infinity,
+                      child: Material(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(999),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(999),
+                          onTap: () => Navigator.pop(context, true),
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 14),
+                            child: Text(
+                              'Sign out',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(999),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                        child: Material(
+                          color: const Color(0x22FFFFFF),
+                          child: InkWell(
+                            onTap: () => Navigator.pop(context, false),
+                            child: Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(999),
+                                border: Border.all(color: const Color(0x55FFFFFF)),
+                              ),
+                              child: const Text(
+                                'Stay signed in',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 

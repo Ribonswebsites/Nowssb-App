@@ -9,6 +9,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/firebase.dart';
+import '../data/phone_notifications.dart';
 import '../widgets/login_stage.dart';
 
 class NwsbSignInPage extends StatefulWidget {
@@ -77,6 +78,9 @@ class _NwsbSignInPageState extends State<NwsbSignInPage> {
     try {
       if (!NwsbFirebase.ready) throw 'Firebase is not ready in this build.';
       await action();
+      if (FirebaseAuth.instance.currentUser != null) {
+        PhoneNotifications.instance.armSession();
+      }
       if (mounted && FirebaseAuth.instance.currentUser != null) {
         Navigator.of(context).pop(true);
       }
@@ -193,6 +197,12 @@ class _NwsbSignInPageState extends State<NwsbSignInPage> {
 
   Future<void> _googleLogin() => _run(() async {
         try {
+          try {
+            await _google.signOut();
+          } catch (_) {}
+          try {
+            await _google.disconnect();
+          } catch (_) {}
           final account = await _google.signIn();
           if (account == null) return;
           final credentials = await account.authentication;

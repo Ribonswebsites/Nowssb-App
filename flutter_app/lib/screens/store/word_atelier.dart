@@ -19,6 +19,7 @@ import 'meaning_store.dart';
 import 'request_words.dart';
 import 'signature_store.dart';
 import 'store_routes.dart';
+import 'store_terms_sheet.dart';
 import '../../admin/template/editable.dart';
 import '../../admin/layout/layout_sections.dart';
 
@@ -26,7 +27,10 @@ class WordAtelierScreen extends StatelessWidget {
   const WordAtelierScreen({super.key});
 
   @override
-  Widget build(BuildContext context) => PageShell(
+  Widget build(BuildContext context) => StoreTermsHost(
+        which: 'word',
+        head: 'Words described by sound',
+        child: PageShell(
         eyebrow: '',
         title: 'NowssB Store',
         subtitle: 'The Word Atelier',
@@ -44,6 +48,7 @@ class WordAtelierScreen extends StatelessWidget {
             sliver: SliverList.list(children: const [_WordAtelierBody()]),
           ),
         ],
+        ),
       );
 }
 

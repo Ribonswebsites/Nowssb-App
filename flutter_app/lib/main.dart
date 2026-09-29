@@ -31,6 +31,7 @@ import 'data/earn_wallet.dart';
 import 'data/firebase.dart';
 import 'features/economy/economy_api.dart';
 import 'features/economy/money.dart';
+import 'data/device_flags.dart';
 import 'data/notifications.dart';
 import 'data/phone_notifications.dart';
 import 'data/presence.dart';
@@ -211,6 +212,7 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
                 setState(() => _splashDone = true);
                 unawaited(_checkForUpdate(coldStart: true));
                 unawaited(PhoneNotifications.instance.announceAfterLaunch());
+                unawaited(DeviceFlags.applySaved());
               }),
           ],
         ),

@@ -1,11 +1,8 @@
 /// The native counterpart to www/nowssb-player.js.
 ///
-/// It uses the two local player-box films ([kPlayerBoxFilms]) — liquid glass
-/// and sine wave — cycling by word, the same clips as the WebView player.
-/// assets, word-action clip, and the same five-item control treatment as the
-/// WebView Player. Speech remains native text-to-speech and completed words
-/// are recorded locally, so the visual port does not replace a real session
-/// with a mock screen.
+/// The center box plays the neon rings film at the same size as before.
+/// The page behind it stays on [kPlayerPageFilm]. Speech remains native
+/// text-to-speech and completed words are recorded locally.
 library;
 
 import 'dart:async';
@@ -13,10 +10,6 @@ import 'dart:math' as math;
 import 'dart:ui' show ImageFilter, lerpDouble;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_liquid_glass_plus/buttons/liquid_glass_chip.dart';
-import 'package:flutter_liquid_glass_plus/buttons/liquid_glass_icon_button.dart';
-import 'package:flutter_liquid_glass_plus/buttons/liquid_glass_slider.dart';
-import 'package:flutter_liquid_glass_plus/enum/liquid_glass_quality.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
@@ -36,9 +29,7 @@ import '../widgets/nwsb_icon.dart';
 import '../widgets/black_glass_banner.dart';
 import '../widgets/colored_split_promo_banner.dart';
 import '../theme/tokens.dart';
-import '../theme/liquid_glass_theme.dart';
 import '../theme/player_aura.dart';
-import '../widgets/player_liquid_core.dart';
 import 'sound_library.dart';
 import 'aura_sound_library.dart';
 import 'store.dart';
@@ -359,6 +350,12 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       }
       await _tts.awaitSpeakCompletion(true);
       await _tts.setLanguage('en-US');
+      final voiceStore = await SharedPreferences.getInstance();
+      final voicePref = voiceStore.getString('ss_voice') ?? 'Female';
+      if (voicePref == 'Male') {
+        pitch = (pitch * 0.72).clamp(0.5, 2.0);
+        rate = (rate * 0.92).clamp(0.2, 0.85);
+      }
       await _tts.setSpeechRate(rate);
       await _tts.setPitch(pitch.clamp(0.5, 2.0));
       await _tts.setVolume(volume.clamp(0.0, 1.0));
@@ -514,11 +511,10 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                                 Icons.volume_up_outlined,
                                 () {},
                               ),
-                              LGSlider(
+                              Slider(
                                 value: volume,
-                                useOwnLayer: true,
-                                quality: LGQuality.standard,
-                                settings: NwsbGlassTheme.settings,
+                                activeColor: Colors.white,
+                                inactiveColor: const Color(0x33FFFFFF),
                                 onChanged: (v) {
                                   setLocal(() => volume = v);
                                   setState(() => _volume = v);
@@ -2912,12 +2908,9 @@ class _QueueStickyHeadDelegate extends SliverPersistentHeaderDelegate {
                 ])
                   Padding(
                     padding: const EdgeInsets.only(right: 8),
-                    child: LGChip(
+                    child: _QueueFilterPill(
                       label: entry.$2,
                       selected: filter == entry.$1,
-                      useOwnLayer: true,
-                      quality: LGQuality.standard,
-                      settings: NwsbGlassTheme.settings,
                       onTap: () => onFilter(entry.$1),
                     ),
                   ),
@@ -3033,7 +3026,16 @@ class _VisualStage extends StatelessWidget {
           fit: StackFit.expand,
           children: [
             const ColoredBox(color: Colors.black),
-            PlayerLiquidCore(playing: playing),
+            NwsbVideo(
+              asset: video,
+              fit: BoxFit.cover,
+              alignment: Alignment.center,
+              priority: ClipPriority.feature,
+              autoplay: true,
+              loop: true,
+              showPoster: true,
+              slot: 'practice_player.VisualStage',
+            ),
             const DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -4311,14 +4313,14 @@ class _BareIconButton extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => LGIconButton(
-    icon: icon,
-    onPressed: onTap,
-    size: 42,
-    iconSize: 24,
-    useOwnLayer: true,
-    quality: LGQuality.standard,
-    settings: NwsbGlassTheme.settings,
+  Widget build(BuildContext context) => GestureDetector(
+    onTap: onTap,
+    behavior: HitTestBehavior.opaque,
+    child: SizedBox(
+      width: 42,
+      height: 42,
+      child: Icon(icon, color: Colors.white, size: 26),
+    ),
   );
 }
 

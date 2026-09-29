@@ -25,6 +25,7 @@ import 'store_home_sections.dart';
 import 'store_select_sheet.dart';
 import 'request_words.dart';
 import 'store_routes.dart';
+import 'store_terms_sheet.dart';
 import 'signature_store.dart';
 import '../../admin/template/editable.dart';
 import '../../admin/layout/layout_sections.dart';
@@ -58,7 +59,10 @@ class MeaningStoreScreen extends StatelessWidget {
   const MeaningStoreScreen({super.key});
 
   @override
-  Widget build(BuildContext context) => PageShell(
+  Widget build(BuildContext context) => StoreTermsHost(
+        which: 'meaning',
+        head: 'Meanings described by sound',
+        child: PageShell(
         eyebrow: '',
         title: 'NowssB Store',
         subtitle: 'The Meaning Store',
@@ -77,6 +81,7 @@ class MeaningStoreScreen extends StatelessWidget {
             sliver: SliverList.list(children: const [_MeaningStoreBody()]),
           ),
         ],
+        ),
       );
 }
 

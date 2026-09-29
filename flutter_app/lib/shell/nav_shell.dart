@@ -5,8 +5,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_liquid_glass_plus/surfaces/liquid_glass_bottom_bar.dart';
-import '../theme/liquid_glass_theme.dart';
 import '../theme/tokens.dart';
 import '../data/settings.dart';
 import '../data/content.dart';
@@ -61,7 +59,6 @@ class _NavShellState extends State<NavShell> {
     super.initState();
     Settings.instance.addListener(_onSettings);
     PlaybackSession.instance.addListener(_onSettings);
-    NwsbEffects.instance.addListener(_onSettings);
     unawaited(PlaybackSession.instance.ensureLoaded());
   }
 
@@ -69,7 +66,6 @@ class _NavShellState extends State<NavShell> {
   void dispose() {
     Settings.instance.removeListener(_onSettings);
     PlaybackSession.instance.removeListener(_onSettings);
-    NwsbEffects.instance.removeListener(_onSettings);
     super.dispose();
   }
 
@@ -238,31 +234,6 @@ class _NavShellState extends State<NavShell> {
           'https://media.nowssb.com/migrated-images/47f9e2c9fad5a78f_file_00000000be547207aaa56f43cfef4f67_nxhvw0.png'
     },
   };
-  IconData _navIcon(String id) {
-    switch (id) {
-      case 'connect':
-        return Icons.groups_outlined;
-      case 'practice':
-        return Icons.graphic_eq_rounded;
-      case 'library':
-        return Icons.library_music_outlined;
-      case 'store':
-        return Icons.storefront_outlined;
-      case 'profile':
-        return Icons.person_outline_rounded;
-      case 'progress':
-        return Icons.insights_outlined;
-      case 'search':
-        return Icons.search_rounded;
-      case 'cart':
-        return Icons.shopping_bag_outlined;
-      case 'settings':
-        return Icons.settings_outlined;
-      default:
-        return Icons.circle_outlined;
-    }
-  }
-
   int? _primaryTab(String id) => const {
         'connect': 0,
         'practice': 1,
@@ -399,39 +370,87 @@ class _NavShellState extends State<NavShell> {
                       padding: const EdgeInsets.symmetric(horizontal: 14),
                       child: Builder(builder: (context) {
                         final settings = Settings.instance;
-                        final slots = settings.navSlots;
-                        if (slots.isEmpty) return const SizedBox.shrink();
-                        var selected = 0;
-                        for (var i = 0; i < slots.length; i++) {
-                          if (_primaryTab(slots[i]) == _i) {
-                            selected = i;
-                            break;
-                          }
-                        }
-                        final reduced = NwsbEffects.instance.reduced;
-                        return LGBottomBar(
-                          tabs: [
-                            for (final id in slots)
-                              LGBottomBarTab(
-                                label: _navFeatures[id]?['label'] ?? id,
-                                icon: _navIcon(id),
-                                glowColor: NwsbColors.goldLight,
-                              ),
-                          ],
-                          selectedIndex: selected,
-                          onTabSelected: (i) => _goToSlot(slots[i]),
-                          glassSettings: NwsbGlassTheme.liveSettings(reduced),
-                          quality: NwsbGlassTheme.qualityFor(
-                            reduced: reduced,
-                            fixed: true,
+                        final radius = settings.navShape == 'pill'
+                            ? 40.0
+                            : settings.navShape == 'rect'
+                                ? (settings.navCorner == 'rounded' ? 20.0 : 2.0)
+                                : 33.0;
+                        final background = settings.navColor == 'black'
+                            ? const Color(0xF5000000)
+                            : const Color(0xF5182033);
+                        return Container(
+                          height: 58,
+                          decoration: BoxDecoration(
+                            color: background,
+                            borderRadius: BorderRadius.circular(radius),
+                            border: Border.all(color: const Color(0x22FFFFFF)),
                           ),
-                          barHeight: 58,
-                          verticalPadding: 0,
-                          horizontalPadding: 4,
-                          showLabel: true,
-                          iconSize: 22,
-                          selectedIconColor: NwsbColors.goldLight,
-                          unselectedIconColor: const Color(0x99FFFFFF),
+                          child: Row(children: [
+                            for (var i = 0;
+                                i < settings.navSlots.length;
+                                i++) ...[
+                              if (i > 0)
+                                Container(
+                                  width: 1,
+                                  height: 18,
+                                  margin:
+                                      const EdgeInsets.symmetric(horizontal: 2),
+                                  color: const Color(0x33FFFFFF),
+                                ),
+                              Expanded(
+                                child: GestureDetector(
+                                  behavior: HitTestBehavior.opaque,
+                                  onTap: () =>
+                                      _goToSlot(settings.navSlots[i]),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Image.network(
+                                        _navFeatures[settings.navSlots[i]]
+                                                ?['img'] ??
+                                            '',
+                                        width: 28,
+                                        height: 28,
+                                        fit: BoxFit.contain,
+                                        errorBuilder: (_, __, ___) => Icon(
+                                          Icons.circle_outlined,
+                                          size: 22,
+                                          color: settings.navSlots[i] ==
+                                                      'connect' ||
+                                                  _primaryTab(settings
+                                                          .navSlots[i]) ==
+                                                      _i
+                                              ? NwsbColors.goldLight
+                                              : const Color(0x99FFFFFF),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 3),
+                                      Text(
+                                        _navFeatures[settings.navSlots[i]]
+                                                ?['label'] ??
+                                            settings.navSlots[i],
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 9,
+                                          fontWeight: _primaryTab(settings
+                                                      .navSlots[i]) ==
+                                                  _i
+                                              ? FontWeight.w700
+                                              : FontWeight.w400,
+                                          color: _primaryTab(settings
+                                                      .navSlots[i]) ==
+                                                  _i
+                                              ? NwsbColors.goldLight
+                                              : const Color(0x99FFFFFF),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ]),
                         );
                       }),
                     ),

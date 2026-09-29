@@ -81,6 +81,7 @@ flutter:
     # Every clip and its poster, on the phone after the download.
     - assets/video/
     - assets/videos/
+    - assets/notifications/
 
     # The app's own artwork and Store intro-page paintings.
     - assets/frames/

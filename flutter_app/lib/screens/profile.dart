@@ -17,13 +17,10 @@ import '../features/economy/economy_theme.dart';
 import '../features/economy/money.dart';
 import '../features/gifts/gifts_screen.dart';
 import '../features/vault/vault_screen.dart';
-import '../data/playback_session.dart';
 import '../data/practice_progress.dart';
 import '../shell/nav_shell.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import '../widgets/app_thinking_loader.dart';
-import '../theme/liquid_glass_theme.dart';
-import '../widgets/listening_visual.dart';
 import 'sound_library.dart';
 import 'player_settings.dart';
 import 'practice.dart';
@@ -411,37 +408,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               SizedBox(
                 width: 132,
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
+                child: Stack(children: [
                   const Positioned.fill(child: ColoredBox(color: Color(0xFF0A0A0A))),
                   Positioned.fill(child: Transform.scale(scale: 1.16, child: Opacity(opacity: .98, child: EditableImage.asset('assets/profile_source/img-ring.png', fit: BoxFit.cover, alignment: const Alignment(.0, -.16), slot: 'profile.ProfileScreen')))),
                   Positioned(
                     top: 18,
                     right: 17,
-                    child: SizedBox(
-                      width: 76,
-                      height: 76,
-                      child: Stack(
-                        clipBehavior: Clip.none,
-                        alignment: Alignment.center,
-                        children: [
-                          Positioned(
-                            left: -28,
-                            top: -28,
-                            width: 132,
-                            height: 132,
-                            child: ListenableBuilder(
-                              listenable: PlaybackSession.instance,
-                              builder: (context, _) => ListeningRings(
-                                playing: PlaybackSession.instance.playing ||
-                                    PlaybackSession.instance.active,
-                                showOrb: !NwsbEffects.instance.reduced,
-                                orbRadius: 28,
-                              ),
-                            ),
-                          ),
-                          Container(
+                    child: Container(
                       width: 76,
                       height: 76,
                       clipBehavior: Clip.antiAlias,
@@ -458,9 +431,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               fit: BoxFit.cover,
                               errorWidget: (_, __, ___) => Center(child: Text((_nameController.text.trim().isEmpty ? 'P' : _nameController.text.trim().substring(0, 1)).toUpperCase(), style: const TextStyle(fontFamily: _mono, fontSize: 24, fontWeight: FontWeight.w600, color: _text))),
                             ),
-                          ),
-                        ],
-                      ),
                     ),
                   ),
                   Positioned(right: 10, bottom: 10, child: _circleButton(asset: 'assets/icons/icon_02.svg', size: 28, onTap: _pickPhoto)),

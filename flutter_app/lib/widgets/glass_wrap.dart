@@ -28,10 +28,7 @@ library;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_liquid_glass_plus/buttons/liquid_glass_panel.dart';
-import 'package:flutter_liquid_glass_plus/flutter_liquid_glass.dart';
 
-import '../theme/liquid_glass_theme.dart';
 import 'nwsb_icon.dart';
 import '../admin/template/editable.dart';
 
@@ -60,42 +57,36 @@ class GlassWrap extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: NwsbEffects.instance,
-      builder: (context, _) {
-        final reduced = NwsbEffects.instance.reduced;
-        if (reduced) return _plain(sigma: 4);
-        return Padding(
-          padding: margin,
-          child: LGPanel(
-            padding: padding,
-            useOwnLayer: true,
-            quality: NwsbGlassTheme.qualityFor(reduced: false),
-            settings: NwsbGlassTheme.settings,
-            shape: LiquidRoundedSuperellipse(borderRadius: radius),
-            child: child,
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _plain({required double sigma}) {
     final r = BorderRadius.circular(radius);
     return Padding(
       padding: margin,
-      child: ClipRRect(
-        borderRadius: r,
-        child: BackdropFilter(
-          filter: ui.ImageFilter.blur(sigmaX: sigma, sigmaY: sigma),
-          child: Container(
-            padding: padding,
-            decoration: BoxDecoration(
-              color: fill,
-              borderRadius: r,
-              border: Border.all(color: line),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: r,
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x57000000), // rgba(0,0,0,0.34)
+              offset: Offset(0, 16),
+              blurRadius: 40,
             ),
-            child: child,
+          ],
+        ),
+        // The clip is what stops the backdrop filter bleeding past the pane,
+        // and it has to be the SAME shape as the border or the blur squares
+        // off the corners the border rounds.
+        child: ClipRRect(
+          borderRadius: r,
+          child: BackdropFilter(
+            filter: ui.ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
+            child: Container(
+              padding: padding,
+              decoration: BoxDecoration(
+                color: fill,
+                borderRadius: r,
+                border: Border.all(color: line),
+              ),
+              child: child,
+            ),
           ),
         ),
       ),

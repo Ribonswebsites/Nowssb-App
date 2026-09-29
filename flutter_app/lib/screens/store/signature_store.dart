@@ -14,6 +14,7 @@ import 'store_cards.dart';
 import 'store_home_sections.dart';
 import 'store_select_sheet.dart';
 import 'store_routes.dart';
+import 'store_terms_sheet.dart';
 import 'request_words.dart';
 import '../../admin/template/editable.dart';
 import '../../admin/layout/layout_sections.dart';
@@ -22,7 +23,10 @@ class SignatureStoreScreen extends StatelessWidget {
   const SignatureStoreScreen({super.key});
 
   @override
-  Widget build(BuildContext context) => PageShell(
+  Widget build(BuildContext context) => StoreTermsHost(
+        which: 'signature',
+        head: 'Signatures described by sound',
+        child: PageShell(
         eyebrow: '',
         title: 'NowssB Store',
         subtitle: 'The Signature Store',
@@ -41,6 +45,7 @@ class SignatureStoreScreen extends StatelessWidget {
             sliver: SliverList.list(children: const [_SignatureBody()]),
           ),
         ],
+        ),
       );
 }
 

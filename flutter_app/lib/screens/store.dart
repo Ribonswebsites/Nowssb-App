@@ -29,8 +29,9 @@ import 'store/ebooks_store.dart';
 import 'store/meaning_store.dart';
 import 'store/request_words.dart';
 import 'store/signature_store.dart';
-import 'subscription.dart';
 import 'store/word_atelier.dart';
+import 'subscription.dart';
+import 'store/store_terms_sheet.dart';
 import '../admin/template/editable.dart';
 import '../admin/layout/layout_sections.dart';
 
@@ -38,7 +39,11 @@ class StoreScreen extends StatelessWidget {
   const StoreScreen({super.key});
 
   @override
-  Widget build(BuildContext context) => const _StoreHomeContent();
+  Widget build(BuildContext context) => const StoreTermsHost(
+        which: 'hub',
+        head: 'Before you enter the store',
+        child: _StoreHomeContent(),
+      );
 }
 
 class _StoreHomeContent extends StatefulWidget {

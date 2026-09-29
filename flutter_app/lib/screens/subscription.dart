@@ -12,6 +12,7 @@ import '../admin/template/editable.dart';
 import '../admin/layout/layout_sections.dart';
 import '../data/billing_config.dart';
 import '../data/play_subscriptions.dart';
+import 'store/store_terms_sheet.dart';
 
 class SubscriptionScreen extends StatefulWidget {
   const SubscriptionScreen({super.key});
@@ -30,6 +31,14 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     planController = PageController(viewportFraction: 0.88);
     PlaySubscriptions.instance.addListener(_billingChanged);
     PlaySubscriptions.instance.start();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      askStoreTerms(
+        context,
+        which: 'subscription',
+        head: 'Before you subscribe',
+      );
+    });
   }
 
   @override
