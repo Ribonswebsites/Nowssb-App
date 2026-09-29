@@ -16,6 +16,7 @@ import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 import '../widgets/app_backdrop.dart';
 import '../widgets/app_thinking_loader.dart';
+import '../widgets/banner_mix.dart';
 import '../widgets/tv_frame.dart';
 import '../admin/template/editable.dart';
 import '../admin/layout/layout_sections.dart';
@@ -314,6 +315,8 @@ class _QuickAccessScreenState extends State<QuickAccessScreen> {
                           ],
                         ),
                       )),
+                      const SizedBox(height: 14),
+                      const LSection('banners', 'Banner mix', BannerMix(seed: 1)),
                       const SizedBox(height: 14),
                       LSection('nav', 'Nav preview', _GlassCard(
                         child: Column(

@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 
 import '../../screens/nwsb_sign_in_sheet.dart';
 import '../../screens/subscription.dart';
+import '../../widgets/banner_mix.dart';
 import '../../widgets/brand_top_banner.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/flip_portrait.dart';
@@ -278,6 +279,8 @@ class _CircleScreenState extends State<CircleScreen> {
                         ? null
                         : () => NwsbSignInPage.open(context),
               ),
+              const SizedBox(height: 18),
+              const BannerMix(seed: 3),
               const SizedBox(height: 18),
               const EditableLabel('circle_screen.CircleScreen', 'YOUR LEGS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12)),
               const SizedBox(height: 8),

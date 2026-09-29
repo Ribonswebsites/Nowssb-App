@@ -44,6 +44,7 @@ import '../widgets/promo_color_grid.dart';
 import 'quotes_live.dart';
 import 'player_settings.dart';
 import 'fashion/header.dart';
+import 'daily_tasks.dart';
 import 'fashion/hero.dart';
 import 'fashion/round_ring_section.dart';
 import 'fashion/sections_bottom.dart';
@@ -365,7 +366,13 @@ class _HomeFashionState extends State<HomeFashion> {
         ('roundring', const RoundRingSection()),
         (
           'practice',
-          FashPractice(onTap: () => _go(1)),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              FashPractice(onTap: () => _go(1)),
+              const DailyTasksSection(fashion: true),
+            ],
+          ),
         ),
         ('routineCards', Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,

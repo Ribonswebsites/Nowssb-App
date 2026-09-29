@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 
 import '../../data/store_catalog.dart';
 import '../../theme/tokens.dart';
+import '../../widgets/banner_mix.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/page_shell.dart';
 import 'product_detail.dart';
@@ -293,6 +294,8 @@ class _SignatureBody extends StatelessWidget {
           spec: SplitPromoExtras.at(10, onTap: () => openRequestWords(context)),
           margin: const EdgeInsets.only(bottom: 40),
         )),
+        const LSection('mix', 'Banner mix', BannerMix(seed: 0)),
+        const SizedBox(height: 12),
         LSection('promo3', 'Promo banner 2', ColoredSplitPromoBanner(
           spec: SplitPromoExtras.at(11, onTap: () => openRequestWords(context)),
         )),

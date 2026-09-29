@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../theme/tokens.dart';
+import '../../widgets/banner_mix.dart';
 import '../../widgets/brand_top_banner.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/nwsb_icon.dart';
@@ -237,6 +238,8 @@ class _GiftsScreenState extends State<GiftsScreen> {
                   onTap: () => setState(() => _tab = 0),
                 ),
               ),
+              const SizedBox(height: 12),
+              const BannerMix(seed: 5),
               const SizedBox(height: 12),
               Row(
                 children: [

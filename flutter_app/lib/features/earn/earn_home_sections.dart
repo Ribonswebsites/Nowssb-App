@@ -199,52 +199,60 @@ class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
               ),
             ),
             Expanded(
-              child: Align(
-                alignment: Alignment.centerRight,
-                child: FractionallySizedBox(
-                  widthFactor: 0.42,
-                  heightFactor: 0.78,
-                  child: EditableImage.asset(
-                    'assets/banners/brand-cleo.png',
-                    fit: BoxFit.contain,
-                    alignment: Alignment.center,
-                    errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-                    slot: 'earn_home_sections.EarnUmbrellaSection',
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Expanded(
+                    flex: 7,
+                    child: EditableImage.asset(
+                      'assets/banners/brand-cleo.png',
+                      fit: BoxFit.contain,
+                      alignment: Alignment.bottomLeft,
+                      errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                      slot: 'earn_home_sections.EarnUmbrellaSection',
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    flex: 4,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const EditableLabel(
+                          'earn_home_sections.EarnUmbrellaSection',
+                          'Join today',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        GestureDetector(
+                          onTap: _openEarn,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(99),
+                            ),
+                            child: const EditableLabel(
+                              'earn_home_sections.EarnUmbrellaSection',
+                              'Open Earn',
+                              style: TextStyle(
+                                color: Color(0xFF111111),
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                const Expanded(
-                  child: EditableLabel('earn_home_sections.EarnUmbrellaSection',
-                    'Join today',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: _openEarn,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(99),
-                    ),
-                    child: const EditableLabel('earn_home_sections.EarnUmbrellaSection',
-                      'Open Earn',
-                      style: TextStyle(
-                        color: Color(0xFF111111),
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
             ),
           ],
         ),

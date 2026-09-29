@@ -180,13 +180,15 @@ class GoldButton extends StatelessWidget {
       child: TextButton(
         onPressed: onTap,
         style: TextButton.styleFrom(
-          backgroundColor: filled ? NwsbColors.gold : Colors.transparent,
-          foregroundColor: filled ? NwsbColors.ink : NwsbColors.goldLight,
+          backgroundColor: filled ? NwsbColors.gold : const Color(0xF0000000),
+          foregroundColor: filled ? NwsbColors.ink : Colors.white,
           disabledForegroundColor: NwsbColors.mist.withOpacity(0.4),
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
-            side: filled ? BorderSide.none : const BorderSide(color: Color(0x55C8A96E)),
+            side: BorderSide(
+              color: filled ? Colors.transparent : const Color(0x33FFFFFF),
+            ),
           ),
         ),
         child: EditableLabel('economy_theme.GoldButton', label, style: const TextStyle(fontWeight: FontWeight.w600)),

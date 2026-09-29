@@ -71,19 +71,37 @@ class HomeHeader extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              const Text(
-                'NowssB',
-                maxLines: 1,
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                  letterSpacing: -0.3,
-                  shadows: [
-                    Shadow(
-                      color: Color(0x80000000),
-                      blurRadius: 8,
-                      offset: Offset(0, 1),
+              const Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'NowssB',
+                      maxLines: 1,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                        height: 1.05,
+                        shadows: [
+                          Shadow(
+                            color: Color(0x80000000),
+                            blurRadius: 8,
+                            offset: Offset(0, 1),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Text(
+                      'by Nowsbansiu',
+                      maxLines: 1,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFFE4C56A),
+                        height: 1.15,
+                      ),
                     ),
                   ],
                 ),

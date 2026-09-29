@@ -5,6 +5,7 @@ import '../../theme/tokens.dart';
 import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
 import '../economy/play_billing.dart';
+import '../../widgets/banner_mix.dart';
 import '../../widgets/brand_top_banner.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/nwsb_icon.dart';
@@ -87,6 +88,8 @@ class VaultScreen extends StatelessWidget {
               _quest(context, 'streak3', 'Hold a 3-day streak', w.streak, 3, 30),
               _quest(context, 'listen1', 'Open the player', w.playerOpens, 1, 15),
               _quest(context, 'buy1', 'Complete one purchase', w.purchases, 1, 20),
+              const SizedBox(height: 18),
+              const BannerMix(seed: 4),
               const SizedBox(height: 18),
               const EditableLabel('vault_screen.VaultScreen', 'COIN SPENDS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.4, fontSize: 12)),
               const SizedBox(height: 8),

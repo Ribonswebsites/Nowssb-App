@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import '../data/settings.dart';
 import '../theme/tokens.dart';
 import '../widgets/intro_gate.dart';
+import '../widgets/banner_mix.dart';
 import '../widgets/page_shell.dart';
 import '../admin/template/editable.dart';
 import '../admin/layout/layout_sections.dart';
@@ -88,6 +89,8 @@ class _FashionPlusScreenState extends State<FashionPlusScreen> {
                 on: on,
                 onChanged: (v) => Settings.instance.setFashionPlus(v),
               )),
+              const SizedBox(height: 14),
+              const LSection('banners', 'Banner mix', BannerMix(seed: 2)),
               const SizedBox(height: 14),
               const LSection('backgrounds', 'Background chooser', _BackgroundChooser()),
               const SizedBox(height: 24),

@@ -11,6 +11,7 @@ import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/page_shell.dart';
+import '../../widgets/banner_mix.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import 'product_detail.dart';
 import 'store_actions.dart';
@@ -205,6 +206,8 @@ class _EbooksBody extends StatelessWidget {
           ),
           margin: const EdgeInsets.only(bottom: 48),
         )),
+        const LSection('mix', 'Banner mix', BannerMix(seed: 0)),
+        const SizedBox(height: 12),
         LSection('promo3', 'Promo banner 2', ColoredSplitPromoBanner(
           spec: SplitPromoExtras.at(
             13,

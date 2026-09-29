@@ -162,6 +162,7 @@ class _Intro extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (art != null) return _artPage(context);
     return Material(
       color: NwsbColors.deep,
       child: Stack(
@@ -331,6 +332,95 @@ class _Intro extends StatelessWidget {
                       ),
                     ),
                     ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// The still is the page. No film behind it, and no cropped card.
+  Widget _artPage(BuildContext context) {
+    return Material(
+      color: Colors.black,
+      child: Column(
+        children: [
+          SafeArea(
+            bottom: false,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: onBack ?? () => Navigator.of(context).maybePop(),
+                    behavior: HitTestBehavior.opaque,
+                    child: Container(
+                      width: 42,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: const Color(0x1AFFFFFF),
+                        border: Border.all(color: const Color(0x33FFFFFF)),
+                      ),
+                      child: const Icon(Icons.arrow_back, size: 18, color: Color(0xBFFFFFFF)),
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      tag,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 10, letterSpacing: 2, color: Color(0xBFFFFFFF)),
+                    ),
+                  ),
+                  const SizedBox(width: 42),
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            child: EditableImage.asset(
+              art!,
+              width: double.infinity,
+              fit: BoxFit.contain,
+              alignment: Alignment.center,
+              gaplessPlayback: true,
+              errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+              slot: 'intro_gate.Intro',
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 8, 24, 28),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (!fullBleed) ...[
+                  EditableLabel('intro_gate.Intro', eyebrow, style: const TextStyle(fontSize: 10, letterSpacing: 3, fontWeight: FontWeight.w700, color: NwsbColors.gold)),
+                  const SizedBox(height: 8),
+                  EditableLabel('intro_gate.Intro', title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 36, fontWeight: FontWeight.w300, color: Colors.white, height: 1.05)),
+                  const SizedBox(height: 12),
+                ],
+                EditableLabel('intro_gate.Intro', body, maxLines: 4, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13.5, color: Color(0xB3FFFFFF), height: 1.45)),
+                const SizedBox(height: 16),
+                Material(
+                  color: Colors.white,
+                  child: InkWell(
+                    onTap: onEnter,
+                    child: SizedBox(
+                      height: 54,
+                      width: double.infinity,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(enterLabel, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, letterSpacing: 1.5, color: NwsbColors.ink)),
+                          const SizedBox(width: 14),
+                          const Icon(Icons.arrow_forward, size: 17, color: NwsbColors.ink),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ],

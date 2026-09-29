@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
+import '../widgets/banner_mix.dart';
 import '../widgets/black_glass_banner.dart';
 import '../widgets/colored_split_promo_banner.dart';
 import '../widgets/nwsb_icon.dart';
@@ -118,6 +119,10 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
       // Kept visually empty for existing deep-link smoke tests; the old hero
       // itself is intentionally gone from the rendered Store page.
       const Opacity(opacity: 0, child: EditableLabel('store.StoreHomeContent', 'Enter Store')),
+      const Padding(
+        padding: EdgeInsets.fromLTRB(12, 4, 12, 10),
+        child: BannerMix(seed: 6),
+      ),
       const _StoreDepartmentLabel('WORD ATELIER'),
       _StoreGlassSection(
         children: [

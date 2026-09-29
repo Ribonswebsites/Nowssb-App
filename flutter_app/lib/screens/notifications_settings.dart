@@ -7,6 +7,8 @@ import 'package:flutter/services.dart';
 
 import '../data/notifications.dart';
 import '../theme/tokens.dart';
+import '../widgets/banner_mix.dart';
+import '../widgets/glass_wrap.dart';
 import '../widgets/page_shell.dart';
 import '../admin/template/editable.dart';
 
@@ -71,6 +73,9 @@ class NotificationsSettingsPage extends StatelessWidget {
                               ),
                             ),
                     ),
+                    const SizedBox(height: 12),
+                    const BannerMix(seed: 0),
+                    const SizedBox(height: 6),
                     if (store.feed.isEmpty)
                       const _SettingsEmpty()
                     else
@@ -89,14 +94,18 @@ class NotificationsSettingsPage extends StatelessWidget {
                           ),
                         ),
                       ),
-                      _KindGroup(
-                        group: g,
-                        masterOn: store.master,
-                        off: store.offSet,
-                        onToggle: (k) {
-                          store.toggleKind(k);
-                          HapticFeedback.lightImpact();
-                        },
+                      GlassWrap(
+                        margin: EdgeInsets.zero,
+                        padding: const EdgeInsets.all(8),
+                        child: _KindGroup(
+                          group: g,
+                          masterOn: store.master,
+                          off: store.offSet,
+                          onToggle: (k) {
+                            store.toggleKind(k);
+                            HapticFeedback.lightImpact();
+                          },
+                        ),
                       ),
                     ],
                     const SizedBox(height: 24),
