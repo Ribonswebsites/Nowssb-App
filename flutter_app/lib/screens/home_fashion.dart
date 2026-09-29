@@ -45,6 +45,7 @@ import 'quotes_live.dart';
 import 'player_settings.dart';
 import 'fashion/header.dart';
 import 'fashion/hero.dart';
+import 'fashion/round_ring_section.dart';
 import 'fashion/sections_bottom.dart';
 import 'shared_sections.dart';
 import 'fashion/sections_mid.dart';
@@ -82,6 +83,7 @@ import 'store/meaning_store.dart';
 const kFashionSectionOrder = <String>[
   'greet',
   'herorow',
+  'roundring',
   'practice',
   'routineCards',
   'coachCards',
@@ -129,6 +131,7 @@ const kFashionDefOff = <String>{'routines', 'shabda', 'wsearch', 'msearch'};
 const kFashionSectionTitles = <String, String>{
   'greet': 'Greeting line',
   'herorow': 'Hero row & split banner',
+  'roundring': 'Round ring',
   'practice': 'Practice card',
   'routineCards': 'Routine cards, Earth Day film & colour grid',
   'mainops': 'Main options',
@@ -359,6 +362,7 @@ class _HomeFashionState extends State<HomeFashion> {
             ],
           ),
         ),
+        ('roundring', const RoundRingSection()),
         (
           'practice',
           FashPractice(onTap: () => _go(1)),
