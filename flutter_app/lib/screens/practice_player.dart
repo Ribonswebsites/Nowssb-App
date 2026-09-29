@@ -4312,14 +4312,14 @@ class _BareIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => LGIconButton(
-        icon: icon,
-        onPressed: onTap,
-        size: 42,
-        iconSize: 24,
-        useOwnLayer: true,
-        quality: LGQuality.standard,
-        settings: NwsbGlassTheme.settings,
-      );
+    icon: icon,
+    onPressed: onTap,
+    size: 42,
+    iconSize: 24,
+    useOwnLayer: true,
+    quality: LGQuality.standard,
+    settings: NwsbGlassTheme.settings,
+  );
 }
 
 class _Equalizer extends StatelessWidget {
