@@ -152,6 +152,9 @@ class NotifStore extends ChangeNotifier {
       for (final i in g.items) i.k,
   ];
 
+  /// Fired for every item that is actually kept. Phone + banner listen here.
+  static void Function(NotifItem item)? onDelivered;
+
   bool _master = true;
   List<String> _off = [];
   List<NotifItem> _feed = [];
@@ -301,6 +304,7 @@ class NotifStore extends ChangeNotifier {
     _feed = [item, ..._feed].take(feedMax).toList();
     await _persistFeed();
     notifyListeners();
+    onDelivered?.call(item);
     return true;
   }
 

@@ -54,6 +54,9 @@ dependencies:
   # Cloudflare R2 — see functions/api/admin/upload-url.js.
   just_audio: ^0.9.46
   flutter_cache_manager: ^3.4.1
+  flutter_liquid_glass_plus: ^0.0.7
+  liquid_glass_animation: ^0.0.1
+  siri_orb: ^0.0.3
 
 dependency_overrides:
   # record 5.2.1's broad Linux constraint otherwise resolves to 0.7.2,

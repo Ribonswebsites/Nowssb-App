@@ -9,6 +9,10 @@ library;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_liquid_glass_plus/buttons/liquid_glass_panel.dart';
+import 'package:flutter_liquid_glass_plus/flutter_liquid_glass.dart';
+
+import '../theme/liquid_glass_theme.dart';
 import 'package:flutter/services.dart';
 
 import 'home_parts.dart';
@@ -211,28 +215,38 @@ class HeavyGlassPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: NwsbEffects.instance,
+      builder: (context, _) {
+        if (NwsbEffects.instance.reduced) return _plain();
+        return Padding(
+          padding: margin,
+          child: LGPanel(
+            padding: padding,
+            useOwnLayer: true,
+            quality: NwsbGlassTheme.qualityFor(reduced: false),
+            settings: NwsbGlassTheme.settings,
+            shape: LiquidRoundedSuperellipse(borderRadius: radius),
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _plain() {
     final r = BorderRadius.circular(radius);
     return Padding(
       padding: margin,
       child: ClipRRect(
         borderRadius: r,
         child: BackdropFilter(
-          filter: ui.ImageFilter.blur(
-            sigmaX: kHeavyGlassSigma,
-            sigmaY: kHeavyGlassSigma,
-          ),
+          filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
           child: DecoratedBox(
             decoration: BoxDecoration(
               color: const Color(0x12FFFFFF),
               borderRadius: r,
               border: Border.all(color: const Color(0x2EFFFFFF)),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0xA6000000),
-                  blurRadius: 48,
-                  offset: Offset(0, 18),
-                ),
-              ],
             ),
             child: Padding(padding: padding, child: child),
           ),

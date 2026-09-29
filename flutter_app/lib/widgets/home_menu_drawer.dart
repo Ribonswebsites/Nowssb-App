@@ -8,6 +8,9 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_liquid_glass_plus/buttons/liquid_glass_icon_button.dart';
+import 'package:flutter_liquid_glass_plus/enum/liquid_glass_quality.dart';
+import 'package:flutter_liquid_glass_plus/surfaces/liquid_glass_appbar.dart';
 import 'package:flutter/services.dart';
 
 import 'brand_top_banner.dart';
@@ -30,6 +33,7 @@ import '../screens/shared_sections.dart';
 import '../screens/sound_library.dart';
 import '../screens/store/meaning_store.dart';
 import '../shell/nav_shell.dart';
+import '../theme/liquid_glass_theme.dart';
 import '../theme/tokens.dart';
 import '../widgets/nwsb_icon.dart';
 import 'black_glass_banner.dart';
@@ -125,12 +129,10 @@ class HomeMenuDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final top = MediaQuery.paddingOf(context).top;
     final bottom = MediaQuery.paddingOf(context).bottom;
     // Fashion menu mirrors AppSettingsScreen exactly (solid deep + gold wash,
     // not the old photo backdrop). Normal keeps neumorphic light look.
     final bg = light ? const Color(0xFFEEF1F7) : const Color(0xFF060C18);
-    final headerBg = light ? const Color(0xFFEEF1F7) : const Color(0xEB060C18);
     final titleColor = light ? NwsbColors.ink : Colors.white;
     final footerColor =
         light ? const Color(0x66000000) : const Color(0x4DFFFFFF);
@@ -161,56 +163,39 @@ class HomeMenuDrawer extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Container(
-                  padding: EdgeInsets.fromLTRB(
-                    light ? 20 : 12,
-                    top + (light ? 14 : 10),
-                    light ? 20 : 16,
-                    light ? 16 : 14,
-                  ),
-                  decoration: BoxDecoration(
-                    color: headerBg,
-                    border: Border(
-                      bottom: BorderSide(
-                        color: light
-                            ? const Color(0x12000000)
-                            : const Color(0x12FFFFFF),
-                      ),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      _BackBtn(light: light, onTap: () => _close(context)),
-                      const SizedBox(width: 12),
-                      Flexible(
-                        child: Text.rich(
-                          TextSpan(
-                            children: [
-                              TextSpan(
-                                text: 'NOWSBANSIU',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  letterSpacing: 2,
-                                  fontWeight: FontWeight.w700,
-                                  color: NwsbColors.goldLight,
-                                ),
-                              ),
-                              const TextSpan(text: '  '),
-                              TextSpan(
-                                text: 'Your Menu',
-                                style: TextStyle(
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w800,
-                                  color: titleColor,
-                                ),
-                              ),
-                            ],
+                LGAppBar(
+                  useOwnLayer: true,
+                  centerTitle: false,
+                  quality: LGQuality.standard,
+                  settings: NwsbGlassTheme.settings,
+                  preferredSize: const Size.fromHeight(52),
+                  backgroundColor: Colors.transparent,
+                  leading: _BackBtn(light: light, onTap: () => _close(context)),
+                  title: Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: 'NOWSBANSIU',
+                          style: TextStyle(
+                            fontSize: 10,
+                            letterSpacing: 2,
+                            fontWeight: FontWeight.w700,
+                            color: NwsbColors.goldLight,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                    ],
+                        const TextSpan(text: '  '),
+                        TextSpan(
+                          text: 'Your Menu',
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w800,
+                            color: titleColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 Expanded(
@@ -441,31 +426,14 @@ class _BackBtn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        width: 42,
-        height: 42,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          shape: BoxShape.circle,
-          boxShadow: light
-              ? const [
-                  BoxShadow(
-                    color: Color(0x1A000000),
-                    blurRadius: 10,
-                    offset: Offset(3, 3),
-                  ),
-                ]
-              : null,
-        ),
-        child: Icon(
-          light ? Icons.arrow_back_ios_new_rounded : Icons.arrow_back,
-          size: light ? 16 : 19,
-          color: NwsbColors.ink,
-        ),
-      ),
+    return LGIconButton(
+      icon: light ? Icons.arrow_back_ios_new_rounded : Icons.arrow_back,
+      onPressed: onTap,
+      size: 42,
+      iconSize: light ? 16 : 18,
+      useOwnLayer: true,
+      quality: LGQuality.standard,
+      settings: NwsbGlassTheme.settings,
     );
   }
 }

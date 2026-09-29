@@ -14,6 +14,7 @@ import '../admin/layout/scopes.dart';
 import '../admin/template/editable.dart';
 import '../admin/template/slot_keys.dart';
 import '../admin/template/ui_overrides.dart';
+import '../widgets/listening_visual.dart';
 
 /// Alias kept for call sites that prefer the product name.
 typedef NwsbThinkingOrb = AppThinkingLoader;
@@ -133,8 +134,31 @@ class _AppThinkingLoaderState extends State<AppThinkingLoader> {
       orbWidget = orb;
     }
 
+    Widget framed = orbWidget;
+    if (state == OrbState.listening) {
+      final circle = size + widget.circlePad * 2;
+      framed = SizedBox(
+        width: circle,
+        height: circle,
+        child: Stack(
+          clipBehavior: Clip.none,
+          alignment: Alignment.center,
+          children: [
+            Positioned(
+              left: -circle * 0.45,
+              top: -circle * 0.45,
+              width: circle * 1.9,
+              height: circle * 1.9,
+              child: const ListeningRings(playing: true, showOrb: false),
+            ),
+            framed,
+          ],
+        ),
+      );
+    }
+
     final label = widget.label;
-    if (label == null || label.isEmpty) return orbWidget;
+    if (label == null || label.isEmpty) return framed;
 
     final brightness = Theme.of(context).brightness;
     final style = widget.labelStyle ??
@@ -160,7 +184,7 @@ class _AppThinkingLoaderState extends State<AppThinkingLoader> {
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          orbWidget,
+          framed,
           const SizedBox(width: 12),
           Flexible(child: text),
         ],

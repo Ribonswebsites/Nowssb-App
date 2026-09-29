@@ -17,6 +17,7 @@ library;
 
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -31,6 +32,7 @@ import 'data/firebase.dart';
 import 'features/economy/economy_api.dart';
 import 'features/economy/money.dart';
 import 'data/notifications.dart';
+import 'data/phone_notifications.dart';
 import 'data/presence.dart';
 import 'data/quotes_remote.dart';
 import 'data/word_requests.dart';
@@ -41,6 +43,7 @@ import 'media/video_pool.dart';
 import 'screens/auth_gate.dart';
 import 'screens/splash.dart';
 import 'widgets/motion.dart';
+import 'widgets/notification_popup.dart';
 import 'widgets/update_prompt.dart';
 import 'shell/nav_shell.dart';
 import 'theme/theme.dart';
@@ -59,6 +62,9 @@ Future<void> main() async {
   // Firebase until google-services.json lands, and that must be an app that
   // shows the words it shipped with, not a crash on launch.
   await NwsbFirebase.start();
+  if (NwsbFirebase.ready) {
+    FirebaseMessaging.onBackgroundMessage(nwsbFcmBackground);
+  }
 
   // Stages one and two of the content contract — what ships, and the last
   // copy seen — are local, so the first screen has something real to draw
@@ -119,7 +125,10 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
     // it ends; this also resumes a download a previous launch left partial.
     unawaited(NwsbUpdater.instance.check(force: true));
     if (_splashDone) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => _checkForUpdate(coldStart: true));
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _checkForUpdate(coldStart: true);
+        unawaited(PhoneNotifications.instance.announceAfterLaunch());
+      });
     }
   }
 
@@ -182,7 +191,10 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
         navigatorKey: _navigatorKey,
         builder: (context, child) => NwsbUpdateLayer(
             navigatorKey: _navigatorKey,
-            child: AdminEditFab(navigatorKey: _navigatorKey, child: child ?? const SizedBox())),
+            child: AdminEditFab(
+              navigatorKey: _navigatorKey,
+              child: NotificationPopupHost(child: child ?? const SizedBox()),
+            )),
         title: 'NowssB',
         debugShowCheckedModeBanner: false,
         theme: NwsbTheme.light,
@@ -198,6 +210,7 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
                 VideoPool.instance.unhold();
                 setState(() => _splashDone = true);
                 unawaited(_checkForUpdate(coldStart: true));
+                unawaited(PhoneNotifications.instance.announceAfterLaunch());
               }),
           ],
         ),

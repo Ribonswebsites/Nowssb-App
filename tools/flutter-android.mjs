@@ -310,13 +310,38 @@ if (!m.includes('android.permission.REQUEST_INSTALL_PACKAGES')) {
     '    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>',
   );
 }
+if (!m.includes('android.permission.POST_NOTIFICATIONS')) {
+  m = m.replace(
+    '<uses-permission android:name="android.permission.INTERNET"/>',
+    '<uses-permission android:name="android.permission.INTERNET"/>\n' +
+    '    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>\n' +
+    '    <uses-permission android:name="android.permission.VIBRATE"/>\n' +
+    '    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>\n' +
+    '    <uses-permission android:name="android.permission.WAKE_LOCK"/>',
+  );
+}
+if (!m.includes('default_notification_channel_id')) {
+  m = m.replace(
+    '<application',
+    '<application',
+  );
+  m = m.replace(
+    '</application>',
+    `    <meta-data\n` +
+    `        android:name="com.google.firebase.messaging.default_notification_channel_id"\n` +
+    `        android:value="nowssb_alerts" />\n` +
+    `    <meta-data\n` +
+    `        android:name="com.google.firebase.messaging.default_notification_icon"\n` +
+    `        android:resource="@drawable/ic_stat_nowssb" />\n` +
+    `</application>`,
+  );
+}
 if (!m.includes('android.permission.FOREGROUND_SERVICE_DATA_SYNC')) {
   m = m.replace(
     '<uses-permission android:name="android.permission.INTERNET"/>',
     '<uses-permission android:name="android.permission.INTERNET"/>\n' +
     '    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>\n' +
-    '    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>\n' +
-    '    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>',
+    '    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>',
   );
 }
 if (!m.includes('androidx.core.content.FileProvider')) {
@@ -345,6 +370,17 @@ if (!m.includes('.UpdateDownloadService')) {
   );
 }
 writeFileSync(manifest, m);
+
+const drawableDir = join(android, 'app', 'src', 'main', 'res', 'drawable');
+mkdirSync(drawableDir, { recursive: true });
+writeFileSync(join(drawableDir, 'ic_stat_nowssb.xml'),
+  '<?xml version="1.0" encoding="utf-8"?>\n' +
+  '<vector xmlns:android="http://schemas.android.com/apk/res/android"\n' +
+  '    android:width="24dp" android:height="24dp"\n' +
+  '    android:viewportWidth="24" android:viewportHeight="24">\n' +
+  '    <path android:fillColor="#FFFFFFFF"\n' +
+  '        android:pathData="M12,22a2,2 0,0 0,2 -2h-4a2,2 0,0 0,2 2zM18,16v-5a6,6 0,0 0,-5 -5.91V4a1,1 0,0 0,-2 0v1.09A6,6 0,0 0,6 11v5l-2,2v1h16v-1z"/>\n' +
+  '</vector>\n');
 
 const xmlDir = join(android, 'app', 'src', 'main', 'res', 'xml');
 mkdirSync(xmlDir, { recursive: true });
