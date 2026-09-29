@@ -120,20 +120,34 @@ class _AuthGateState extends State<AuthGate> {
             'Google sign-in is not configured in this build. Use email or continue as a guest.',
           );
         }
-        final account = await _google.signIn();
-        if (account == null) return;
-        final credentials = await account.authentication;
-        if (credentials.idToken == null && credentials.accessToken == null) {
-          throw const _AuthMessage(
-            'Google did not return a credential. Check the Android app registration and signing certificate in Firebase.',
+        try {
+          final account = await _google.signIn();
+          if (account == null) return;
+          final credentials = await account.authentication;
+          if (credentials.idToken == null && credentials.accessToken == null) {
+            throw const _AuthMessage(
+              'Google did not return a credential. Check the Android app registration and signing certificate in Firebase.',
+            );
+          }
+          await FirebaseAuth.instance.signInWithCredential(
+            GoogleAuthProvider.credential(
+              accessToken: credentials.accessToken,
+              idToken: credentials.idToken,
+            ),
           );
+        } on PlatformException catch (error) {
+          final details = '${error.code} ${error.message ?? ''}'.toLowerCase();
+          final blocked = details.contains('10') ||
+              details.contains('12500') ||
+              details.contains('developer_error') ||
+              details.contains('sign_in_failed');
+          if (!blocked) rethrow;
+          // The plugin path fails when this APK's certificate is not the one
+          // Firebase has. The provider flow uses the same project and still
+          // completes when that client can sign in through the browser.
+          final provider = GoogleAuthProvider()..addScope('email');
+          await FirebaseAuth.instance.signInWithProvider(provider);
         }
-        await FirebaseAuth.instance.signInWithCredential(
-          GoogleAuthProvider.credential(
-            accessToken: credentials.accessToken,
-            idToken: credentials.idToken,
-          ),
-        );
       });
 
   Future<void> _emailLogin() => _run(() async {

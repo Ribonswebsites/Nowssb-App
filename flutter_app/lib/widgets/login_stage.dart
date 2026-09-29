@@ -55,7 +55,7 @@ class LoginStage extends StatelessWidget {
   Widget build(BuildContext context) {
     final pad = MediaQuery.paddingOf(context);
     final h = MediaQuery.sizeOf(context).height;
-    final faceGap = (h * 0.16).clamp(72.0, 150.0);
+    final faceGap = (h * 0.16).clamp(72.0, 150.0) + 64;
     return Stack(
       fit: StackFit.expand,
       children: [
@@ -103,22 +103,21 @@ class LoginStage extends StatelessWidget {
                 'login_stage.LoginStage',
                 'NOWSBANSIU',
                 style: TextStyle(
-                  color: Color(0xFFC9A36A),
-                  fontSize: 11,
-                  letterSpacing: 4.2,
-                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                  fontSize: 12,
+                  letterSpacing: 3.4,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
               const SizedBox(height: 6),
               const Text(
                 'NowssB',
                 style: TextStyle(
-                  fontFamily: 'serif',
                   color: Colors.white,
-                  fontSize: 58,
-                  fontWeight: FontWeight.w500,
+                  fontSize: 52,
+                  fontWeight: FontWeight.w700,
                   height: 0.95,
-                  letterSpacing: 0.4,
+                  letterSpacing: 0.2,
                 ),
               ),
               const SizedBox(height: 8),

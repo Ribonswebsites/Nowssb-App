@@ -557,7 +557,8 @@ done.push('configured in-app updater (installer, ABI query, download service)');
 // runner only — .gitignore refuses key.properties and *.keystore) the
 // release build is signed with that one stable key. Without the file the
 // release build falls back to the debug key exactly as flutter create wrote.
-// The debug build type is never touched.
+// When the stable key is present the debug build uses it too, so Google
+// sign-in keeps one certificate instead of a new debug keystore every run.
 {
   let g = readFileSync(appGradle, 'utf8');
   if (g.includes('nwsbKeyProperties')) {
@@ -589,6 +590,12 @@ done.push('configured in-app updater (installer, ABI query, download service)');
       /(release \{[\s\S]*?)signingConfig = signingConfigs\.getByName\("debug"\)/,
       `$1signingConfig = if (nwsbHasReleaseKey) signingConfigs.getByName("nwsbRelease") else signingConfigs.getByName("debug")`,
     );
+    if (!g.includes('buildTypes {\n        debug {')) {
+      g = g.replace(
+        /buildTypes \{\n/,
+        'buildTypes {\n        debug {\n            if (nwsbHasReleaseKey) {\n                signingConfig = signingConfigs.getByName("nwsbRelease")\n            }\n        }\n',
+      );
+    }
     if (g === before || !g.includes('val nwsbKeyProperties')) {
       throw new Error('app/build.gradle.kts: could not wire the release signing config');
     }

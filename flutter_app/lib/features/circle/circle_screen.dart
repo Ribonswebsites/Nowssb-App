@@ -363,9 +363,12 @@ class _EarnCardRail extends StatefulWidget {
 }
 
 class _EarnCardRailState extends State<_EarnCardRail> {
-  late final PageController _pages = PageController(viewportFraction: 0.5);
+  static const _loop = 80;
+  late final PageController _pages = PageController(
+    viewportFraction: 0.52,
+    initialPage: _cards.length * (_loop ~/ 2),
+  );
   Timer? _timer;
-  var _index = 0;
 
   static const _cards = <_RailCard>[
     _RailCard('NowssB Gifts', 'assets/banners/earn/sit-dark.png', Color(0xFF6A1B4D), openGifts),
@@ -378,10 +381,10 @@ class _EarnCardRailState extends State<_EarnCardRail> {
   void initState() {
     super.initState();
     if (const bool.fromEnvironment('FLUTTER_TEST')) return;
-    _timer = Timer.periodic(const Duration(milliseconds: 2600), (_) {
+    _timer = Timer.periodic(const Duration(milliseconds: 2400), (_) {
       if (!mounted || !_pages.hasClients) return;
-      _index = (_index + 1) % _cards.length;
-      _pages.animateToPage(_index, duration: const Duration(milliseconds: 420), curve: Curves.easeOutCubic);
+      final current = _pages.page?.round() ?? _cards.length * (_loop ~/ 2);
+      _pages.animateToPage(current + 1, duration: const Duration(milliseconds: 520), curve: Curves.easeOutCubic);
     });
   }
 
@@ -402,13 +405,10 @@ class _EarnCardRailState extends State<_EarnCardRail> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            _photoCard(
+            _plainPhoto(
               width: 108,
               height: 172,
-              label: 'NowssB Earn',
               image: 'assets/banners/earn/hands-raise.png',
-              tint: const Color(0xFF3A1868),
-              onTap: () {},
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -417,10 +417,9 @@ class _EarnCardRailState extends State<_EarnCardRail> {
                 child: PageView.builder(
                   controller: _pages,
                   padEnds: false,
-                  itemCount: _cards.length,
-                  onPageChanged: (i) => _index = i,
+                  itemCount: _cards.length * _loop,
                   itemBuilder: (_, i) {
-                    final card = _cards[i];
+                    final card = _cards[i % _cards.length];
                     return Padding(
                       padding: const EdgeInsets.only(right: 8),
                       child: _photoCard(
@@ -437,6 +436,26 @@ class _EarnCardRailState extends State<_EarnCardRail> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _plainPhoto({
+    required double width,
+    required double height,
+    required String image,
+  }) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: SizedBox(
+        width: width,
+        height: height,
+        child: EditableImage.asset(
+          image,
+          fit: BoxFit.cover,
+          alignment: const Alignment(0, -0.05),
+          slot: 'circle_screen.EarnCardRail',
         ),
       ),
     );

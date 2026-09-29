@@ -8,6 +8,7 @@ import '../economy/economy_theme.dart';
 import '../economy/money.dart';
 import '../economy/play_billing.dart';
 import '../../widgets/colored_split_promo_banner.dart';
+import '../../widgets/glass_wrap.dart';
 import '../../screens/subscription.dart';
 import '../../admin/template/editable.dart';
 
@@ -29,28 +30,48 @@ class BazaarScreen extends StatelessWidget {
             margin: EdgeInsets.zero,
             spec: SplitPromoSpec(
               title: 'Resell',
-              cta: 'List a word',
+              cta: 'Browse listings',
               leftColor: Color(0xFF3D2914),
               rightColor: Color(0xFFE07A3D),
-              art: SplitPromoArts.redLotus,
+              art: SplitPromoArts.whiteRobot,
             ),
           ),
           const SizedBox(height: 12),
-          const EconomyNote(
-            'Resale price stays between 50% and 150% of the original. The platform cut starts at 20% and falls toward 10% as you sell more. 3% goes to the content owner. No refunds on resold items. NowssB can delist a listing. You must own the word before you list it.',
-          ),
-          const SizedBox(height: 8),
-          GoldButton(
-            label: 'Terms and conditions',
-            filled: false,
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(builder: (_) => const SubscriptionTermsScreen()),
+          const ColoredSplitPromoBanner(
+            margin: EdgeInsets.zero,
+            spec: SplitPromoSpec(
+              title: 'List a word',
+              cta: 'Open your words',
+              leftColor: Color(0xFF24143D),
+              rightColor: Color(0xFFC8A96E),
+              art: SplitPromoArts.blondeLotus,
             ),
           ),
-          const SizedBox(height: 16),
-          const EditableLabel('bazaar_screen.BazaarScreen', 'WORDS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12)),
-          const SizedBox(height: 8),
-          const _SampleWords(),
+          const SizedBox(height: 12),
+          GlassWrap(
+            margin: EdgeInsets.zero,
+            padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const EconomyNote(
+                  'Resale price stays between 50% and 150% of the original. The platform cut starts at 20% and falls toward 10% as you sell more. 3% goes to the content owner. No refunds on resold items. NowssB can delist a listing. You must own the word before you list it.',
+                ),
+                const SizedBox(height: 8),
+                GoldButton(
+                  label: 'Terms and conditions',
+                  filled: false,
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(builder: (_) => const SubscriptionTermsScreen()),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const EditableLabel('bazaar_screen.BazaarScreen', 'WORDS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12)),
+                const SizedBox(height: 8),
+                const _SampleWords(),
+              ],
+            ),
+          ),
           const SizedBox(height: 18),
           const EditableLabel('bazaar_screen.BazaarScreen', 'YOUR OWNED WORDS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12)),
           const SizedBox(height: 8),
@@ -65,16 +86,6 @@ class BazaarScreen extends StatelessWidget {
     if (embedded) return listening;
     return EconomyPage(
       title: 'Resell',
-      banner: ColoredSplitPromoBanner(
-        margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-        spec: SplitPromoSpec(
-          title: 'Resell',
-          cta: 'Browse listings',
-          leftColor: const Color(0xFF3D2914),
-          rightColor: const Color(0xFFE07A3D),
-          art: SplitPromoArts.redLotus,
-        ),
-      ),
       child: listening,
     );
   }

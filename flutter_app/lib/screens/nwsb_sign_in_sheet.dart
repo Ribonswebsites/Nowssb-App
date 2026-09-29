@@ -4,6 +4,7 @@ library;
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -89,6 +90,15 @@ class _NwsbSignInPageState extends State<NwsbSignInPage> {
   }
 
   String _message(Object error) {
+    if (error is PlatformException) {
+      final details = '${error.code} ${error.message ?? ''}'.toLowerCase();
+      if (details.contains('10') || details.contains('12500') || details.contains('developer_error') || details.contains('sign_in_failed')) {
+        return 'Google sign-in is not authorised for this Android build. '
+            'Add package com.nowssb.app and this build’s SHA-1/SHA-256 '
+            'certificates to the NowssB Firebase Android app.';
+      }
+      return error.message ?? 'Google sign-in could not be completed.';
+    }
     final code = error is FirebaseAuthException ? error.code : '';
     switch (code) {
       case 'network-request-failed':
@@ -182,18 +192,29 @@ class _NwsbSignInPageState extends State<NwsbSignInPage> {
       });
 
   Future<void> _googleLogin() => _run(() async {
-        final account = await _google.signIn();
-        if (account == null) return;
-        final credentials = await account.authentication;
-        if (credentials.idToken == null && credentials.accessToken == null) {
-          throw 'Google did not return a credential.';
+        try {
+          final account = await _google.signIn();
+          if (account == null) return;
+          final credentials = await account.authentication;
+          if (credentials.idToken == null && credentials.accessToken == null) {
+            throw 'Google did not return a credential.';
+          }
+          await FirebaseAuth.instance.signInWithCredential(
+            GoogleAuthProvider.credential(
+              accessToken: credentials.accessToken,
+              idToken: credentials.idToken,
+            ),
+          );
+        } on PlatformException catch (error) {
+          final details = '${error.code} ${error.message ?? ''}'.toLowerCase();
+          final blocked = details.contains('10') ||
+              details.contains('12500') ||
+              details.contains('developer_error') ||
+              details.contains('sign_in_failed');
+          if (!blocked) rethrow;
+          final provider = GoogleAuthProvider()..addScope('email');
+          await FirebaseAuth.instance.signInWithProvider(provider);
         }
-        await FirebaseAuth.instance.signInWithCredential(
-          GoogleAuthProvider.credential(
-            accessToken: credentials.accessToken,
-            idToken: credentials.idToken,
-          ),
-        );
       });
 
   @override
