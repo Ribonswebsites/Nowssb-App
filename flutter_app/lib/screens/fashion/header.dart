@@ -80,7 +80,7 @@ class HomeHeader extends StatelessWidget {
                       'NowssB',
                       maxLines: 1,
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 22,
                         fontWeight: FontWeight.w800,
                         color: Colors.white,
                         height: 1.05,
@@ -91,16 +91,6 @@ class HomeHeader extends StatelessWidget {
                             offset: Offset(0, 1),
                           ),
                         ],
-                      ),
-                    ),
-                    Text(
-                      'by Nowsbansiu',
-                      maxLines: 1,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFFE4C56A),
-                        height: 1.15,
                       ),
                     ),
                   ],

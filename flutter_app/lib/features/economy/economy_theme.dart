@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../../screens/nwsb_sign_in_sheet.dart';
+import '../../widgets/app_thinking_loader.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../theme/tokens.dart';
-import '../../widgets/app_backdrop.dart';
 import 'economy_api.dart';
 import 'money.dart';
 import '../../admin/template/editable.dart';
@@ -25,50 +26,53 @@ class EconomyPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: NwsbColors.deep,
-      body: Stack(
-        children: [
-          const Positioned.fill(child: AppBackdrop()),
-          const Positioned.fill(
-            child: IgnorePointer(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Color(0x66060C18), Color(0x99060C18), Color(0xCC060C18)],
+      backgroundColor: Colors.black,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(4, 4, 12, 0),
+              child: Row(
+                children: [
+                  IconButton(
+                    onPressed: () => Navigator.of(context).maybePop(),
+                    icon: const Icon(Icons.arrow_back, color: Colors.white),
                   ),
-                ),
+                  const _WhiteOrb(),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: EditableLabel('economy_theme.EconomyPage',
+                      title,
+                      style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                  if (action != null) action!,
+                ],
               ),
             ),
-          ),
-          SafeArea(
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(4, 4, 8, 0),
-                  child: Row(
-                    children: [
-                      IconButton(
-                        onPressed: () => Navigator.of(context).maybePop(),
-                        icon: const Icon(Icons.arrow_back, color: NwsbColors.goldLight),
-                      ),
-                      Expanded(
-                        child: EditableLabel('economy_theme.EconomyPage',
-                          title,
-                          style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700),
-                        ),
-                      ),
-                      if (action != null) action!,
-                    ],
-                  ),
-                ),
-                if (banner != null) banner!,
-                Expanded(child: child),
-              ],
-            ),
-          ),
-        ],
+            if (banner != null) banner!,
+            Expanded(child: child),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _WhiteOrb extends StatelessWidget {
+  const _WhiteOrb();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 36,
+      height: 36,
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+      child: const AppThinkingLoader(
+        size: 22,
+        state: OrbState.composing,
+        blackCircle: false,
       ),
     );
   }

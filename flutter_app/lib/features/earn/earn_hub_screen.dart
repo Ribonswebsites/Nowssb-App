@@ -15,6 +15,7 @@ import '../vault/vault_screen.dart';
 import '../wordprint/word_print_screen.dart';
 import '../../screens/nwsb_sign_in_sheet.dart';
 import '../../widgets/colored_split_promo_banner.dart';
+import '../../widgets/program_shelf.dart';
 import '../../admin/template/editable.dart';
 import '../../admin/layout/layout_sections.dart';
 
@@ -58,6 +59,21 @@ class EarnHubScreen extends StatelessWidget {
               ],
               const SizedBox(height: 8),
               const LSection('note', 'Privacy note', EconomyNote('This page is only yours. Coin and cash balances are not on the public Word Print.')),
+              const SizedBox(height: 8),
+              const GlassLine(text: 'Earn, rewards, gifts, resell, print, the wall. Swipe the shelf.'),
+              const SizedBox(height: 12),
+              ProgramShelf(
+                onTap: (poster) {
+                  final page = switch (poster.title) {
+                    'Rewards' => const VaultScreen(),
+                    'Gift' => const GiftsScreen(),
+                    'Partner' => WordPrintScreen(uid: w.uid),
+                    'Bonus' => const EchoWallScreen(),
+                    _ => const CircleScreen(),
+                  };
+                  _open(context, page);
+                },
+              ),
               const SizedBox(height: 14),
               LSection('earn', 'NowssB Earn', GoldButton(label: 'NowssB Earn', onTap: () => _open(context, const CircleScreen()))),
               const SizedBox(height: 8),

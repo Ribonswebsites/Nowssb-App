@@ -11,6 +11,7 @@ import '../../theme/tokens.dart';
 import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
 import 'echo_moderation_screen.dart';
+import '../../widgets/program_shelf.dart';
 import '../../admin/template/editable.dart';
 
 class EchoWallScreen extends StatefulWidget {
@@ -70,7 +71,18 @@ class _EchoWallScreenState extends State<EchoWallScreen> {
               ],
             ),
           ),
-          Expanded(child: _feed()),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+              children: [
+                const ProgramShelf(),
+                const SizedBox(height: 12),
+                const GlassLine(text: 'A short reflection. The wall is yours and the people you follow.'),
+                const SizedBox(height: 12),
+                SizedBox(height: 360, child: _feed()),
+              ],
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
             child: Column(

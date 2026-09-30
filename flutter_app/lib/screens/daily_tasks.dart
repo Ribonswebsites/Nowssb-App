@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../theme/tokens.dart';
 import '../widgets/glass_wrap.dart';
+import '../widgets/program_shelf.dart';
 
 class _Task {
   const _Task(this.id, this.title);
@@ -17,6 +18,8 @@ class _Task {
 
 class DailyTasks {
   DailyTasks._();
+
+  static final progress = ValueNotifier<double>(0);
 
   static const defaults = <_Task>[
     _Task('word', 'Sit with one word'),
@@ -73,6 +76,14 @@ class DailyTasks {
       next.remove(id);
     }
     await prefs.setStringList(_doneKey, next.toList());
+    await publish();
+  }
+
+  static Future<void> publish() async {
+    final tasks = await template();
+    final have = await done();
+    final finished = tasks.where((t) => have.contains(t.id)).length;
+    progress.value = tasks.isEmpty ? 0 : finished / tasks.length;
   }
 }
 
@@ -103,6 +114,7 @@ class _DailyTasksSectionState extends State<DailyTasksSection> {
       _tasks = tasks;
       _done = done;
     });
+    await DailyTasks.publish();
   }
 
   Future<void> _toggle(_Task task) async {
@@ -251,6 +263,7 @@ class _DailyTasksPageState extends State<DailyTasksPage> {
       _done = done;
       _ready = true;
     });
+    await DailyTasks.publish();
   }
 
   Future<void> _persist() => DailyTasks.saveTemplate(_tasks);
@@ -288,84 +301,173 @@ class _DailyTasksPageState extends State<DailyTasksPage> {
   Widget build(BuildContext context) {
     final finished = _tasks.where((t) => _done.contains(t.id)).length;
     final total = _tasks.length;
+    final value = total == 0 ? 0.0 : finished / total;
     return Scaffold(
-      backgroundColor: const Color(0xFF060C18),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        foregroundColor: Colors.white,
-        title: const Text('Today’s tasks'),
-      ),
-      body: _ready
-          ? ListView(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
-              children: [
-                Text(
-                  'These tasks are for this account. The bar on the home moves when you tick them.',
-                  style: const TextStyle(color: Color(0xB3FFFFFF), height: 1.35),
-                ),
-                const SizedBox(height: 12),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(99),
-                  child: LinearProgressIndicator(
-                    value: total == 0 ? 0 : finished / total,
-                    minHeight: 8,
-                    color: NwsbColors.gold,
-                    backgroundColor: const Color(0x33FFFFFF),
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  '$finished of $total done today',
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
-                ),
-                const SizedBox(height: 16),
-                for (final task in _tasks)
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: const Color(0x22FFFFFF)),
-                    ),
-                    child: ListTile(
-                      onTap: () => _toggle(task),
-                      leading: Icon(
-                        _done.contains(task.id)
-                            ? Icons.check_circle
-                            : Icons.circle_outlined,
-                        color: NwsbColors.gold,
+      backgroundColor: Colors.black,
+      body: SafeArea(
+        child: _ready
+            ? ListView(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+                children: [
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: () => Navigator.of(context).maybePop(),
+                        icon: const Icon(Icons.arrow_back, color: Colors.white),
                       ),
-                      title: Text(task.title, style: const TextStyle(color: Colors.white)),
-                      trailing: IconButton(
-                        onPressed: () => _remove(task),
-                        icon: const Icon(Icons.close, color: Color(0x88FFFFFF)),
-                      ),
-                    ),
-                  ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _add,
-                        style: const TextStyle(color: Colors.white),
-                        decoration: const InputDecoration(
-                          hintText: 'Add a task',
-                          hintStyle: TextStyle(color: Color(0x66FFFFFF)),
+                      const WhiteCircleOrb(size: 22),
+                      const SizedBox(width: 10),
+                      const Expanded(
+                        child: Text(
+                          'Today’s tasks',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w800,
+                          ),
                         ),
-                        onSubmitted: (_) => _addTask(),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  const ProgramShelf(),
+                  const SizedBox(height: 14),
+                  const GlassLine(
+                    text: 'Tick a task and the line on the home moves. These belong to this account.',
+                  ),
+                  const SizedBox(height: 14),
+                  GlassWrap(
+                    margin: EdgeInsets.zero,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          '$finished of $total done today',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(99),
+                          child: LinearProgressIndicator(
+                            value: value,
+                            minHeight: 8,
+                            color: NwsbColors.gold,
+                            backgroundColor: const Color(0x33FFFFFF),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  SizedBox(
+                    height: 132,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: _tasks.length,
+                      separatorBuilder: (_, __) => const SizedBox(width: 10),
+                      itemBuilder: (context, i) {
+                        final task = _tasks[i];
+                        final on = _done.contains(task.id);
+                        return GestureDetector(
+                          onTap: () => _toggle(task),
+                          child: GlassWrap(
+                            margin: EdgeInsets.zero,
+                            child: SizedBox(
+                              width: 200,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      const WhiteCircleOrb(size: 16),
+                                      const Spacer(),
+                                      Icon(
+                                        on ? Icons.check_circle : Icons.circle_outlined,
+                                        color: NwsbColors.gold,
+                                        size: 20,
+                                      ),
+                                    ],
+                                  ),
+                                  const Spacer(),
+                                  Text(
+                                    task.title,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                      decoration: on ? TextDecoration.lineThrough : null,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  for (final task in _tasks)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: GlassWrap(
+                        margin: EdgeInsets.zero,
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        child: Row(
+                          children: [
+                            IconButton(
+                              onPressed: () => _toggle(task),
+                              icon: Icon(
+                                _done.contains(task.id)
+                                    ? Icons.check_circle
+                                    : Icons.circle_outlined,
+                                color: NwsbColors.gold,
+                              ),
+                            ),
+                            Expanded(
+                              child: Text(
+                                task.title,
+                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () => _remove(task),
+                              icon: const Icon(Icons.close, color: Color(0x88FFFFFF)),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    FilledButton(
-                      onPressed: _addTask,
-                      child: const Text('Add'),
+                  const SizedBox(height: 8),
+                  GlassWrap(
+                    margin: EdgeInsets.zero,
+                    padding: const EdgeInsets.fromLTRB(12, 4, 8, 4),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _add,
+                            style: const TextStyle(color: Colors.white),
+                            decoration: const InputDecoration(
+                              hintText: 'Add a task',
+                              hintStyle: TextStyle(color: Color(0x66FFFFFF)),
+                              border: InputBorder.none,
+                            ),
+                            onSubmitted: (_) => _addTask(),
+                          ),
+                        ),
+                        TextButton(onPressed: _addTask, child: const Text('Add')),
+                      ],
                     ),
-                  ],
-                ),
-              ],
-            )
-          : const Center(child: CircularProgressIndicator()),
+                  ),
+                ],
+              )
+            : const Center(child: CircularProgressIndicator(color: Colors.white)),
+      ),
     );
   }
 }

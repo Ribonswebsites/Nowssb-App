@@ -369,8 +369,13 @@ class _HomeFashionState extends State<HomeFashion> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              FashPractice(onTap: () => _go(1)),
-              const DailyTasksSection(fashion: true),
+              FashPractice(
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const DailyTasksPage(),
+                  ),
+                ),
+              ),
             ],
           ),
         ),

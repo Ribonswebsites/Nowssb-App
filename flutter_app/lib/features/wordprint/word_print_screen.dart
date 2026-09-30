@@ -5,6 +5,7 @@ import '../../data/firebase.dart';
 import '../../theme/tokens.dart';
 import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
+import '../../widgets/program_shelf.dart';
 import '../../admin/template/editable.dart';
 
 class WordPrintScreen extends StatefulWidget {
@@ -39,6 +40,10 @@ class _WordPrintScreenState extends State<WordPrintScreen> {
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
         children: [
+          const ProgramShelf(),
+          const SizedBox(height: 12),
+          const GlassLine(text: 'A public print. Coins and cash stay off this page.'),
+          const SizedBox(height: 12),
           TextField(
             controller: _search,
             style: const TextStyle(color: Colors.white),

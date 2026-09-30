@@ -11,6 +11,7 @@ import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/glass_wrap.dart';
 import '../../screens/store/store_terms_sheet.dart';
 import '../../screens/subscription.dart';
+import '../../widgets/program_shelf.dart';
 import '../../admin/template/editable.dart';
 
 class BazaarScreen extends StatelessWidget {
@@ -27,6 +28,10 @@ class BazaarScreen extends StatelessWidget {
         physics: embedded ? const NeverScrollableScrollPhysics() : null,
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
         children: [
+          const ProgramShelf(),
+          const SizedBox(height: 12),
+          const GlassLine(text: 'Listings stay off until Play allows them. You can still read the rules.'),
+          const SizedBox(height: 12),
           const ColoredSplitPromoBanner(
             margin: EdgeInsets.zero,
             spec: SplitPromoSpec(

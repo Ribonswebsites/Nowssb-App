@@ -50,7 +50,6 @@ import '../theme/tokens.dart';
 import '../widgets/home_skin.dart';
 import 'normal/neomorphic_action_bar.dart';
 import 'normal/neomorphic_dashboard.dart';
-import 'daily_tasks.dart';
 import 'personal_coach.dart';
 import 'healing_path.dart';
 import '../media/video_pool.dart';
@@ -365,7 +364,6 @@ class _HomeNormalState extends State<HomeNormal> {
                 onStart: _openDashboardSession,
                 onProgress: _openDashboardProgress,
               ),
-              const DailyTasksSection(),
             ],
           ),
         ),
@@ -705,20 +703,11 @@ class _TopRow extends StatelessWidget {
             children: [
               EditableLabel('home_normal.TopRow',
                 'NowssB',
+                maxLines: 1,
                 style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                      fontSize: 15,
+                      fontSize: 18,
                       fontWeight: FontWeight.w800,
                       letterSpacing: -0.3,
-                    ),
-              ),
-              EditableLabel('home_normal.TopRow',
-                'by Nowsbansiu',
-                maxLines: 1,
-                style: Theme.of(context).textTheme.labelSmall!.copyWith(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0,
-                      color: const Color(0xFF8A6A22),
                     ),
               ),
             ],

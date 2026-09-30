@@ -10,6 +10,7 @@ import '../economy/money.dart';
 import '../../widgets/brand_top_banner.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/nwsb_icon.dart';
+import '../../widgets/program_shelf.dart';
 import '../../admin/template/editable.dart';
 
 class EarningsScreen extends StatefulWidget {
@@ -99,6 +100,10 @@ class _EarningsScreenState extends State<EarningsScreen> {
                   art: SplitPromoArts.blondeLotus,
                 ),
               ),
+              const SizedBox(height: 12),
+              const ProgramShelf(),
+              const SizedBox(height: 12),
+              const GlassLine(text: 'Pending for 30 days, then available. A person approves the payout.'),
               const SizedBox(height: 12),
               EconomyNote(
                 unsupported

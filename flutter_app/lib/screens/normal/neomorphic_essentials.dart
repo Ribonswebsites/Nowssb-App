@@ -10,6 +10,7 @@ import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../../theme/tokens.dart';
 import '../../widgets/app_thinking_loader.dart';
+import '../daily_tasks.dart';
 import 'glassmorphism_theme.dart';
 import '../../admin/template/editable.dart';
 
@@ -28,6 +29,29 @@ class _NmSuppliedEssentialsState extends State<NmSuppliedEssentials> {
   static const _subtext = Color(0xFF8A8F9A);
 
   @override
+  void initState() {
+    super.initState();
+    DailyTasks.progress.addListener(_tick);
+    DailyTasks.publish();
+  }
+
+  @override
+  void dispose() {
+    DailyTasks.progress.removeListener(_tick);
+    super.dispose();
+  }
+
+  void _tick() {
+    if (mounted) setState(() {});
+  }
+
+  void _openTasks() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => const DailyTasksPage()),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     final glass = NormalGlassMode.of(context);
     return Padding(
@@ -43,25 +67,33 @@ class _NmSuppliedEssentialsState extends State<NmSuppliedEssentials> {
           ),
           _TimelineEntry(
             hero: true,
-            active: true,
+            active: DailyTasks.progress.value > 0,
+            lineOn: DailyTasks.progress.value > 0,
             icon: Icons.mic_none_rounded,
             title: 'Preconceptions',
             subtitle: "Today's Meditation",
             duration: '3–20 min',
+            onTap: _openTasks,
           ),
-          const _TimelineEntry(
+          _TimelineEntry(
               icon: Icons.bedtime_outlined,
               title: 'Wind down for bed',
-              duration: '12 min'),
-          const _TimelineEntry(
+              duration: '12 min',
+              active: DailyTasks.progress.value >= 0.34,
+              lineOn: DailyTasks.progress.value >= 0.34),
+          _TimelineEntry(
               icon: Icons.nightlight_round,
               title: 'Fall asleep',
-              duration: '45 min'),
-          const _TimelineEntry(
+              duration: '45 min',
+              active: DailyTasks.progress.value >= 0.67,
+              lineOn: DailyTasks.progress.value >= 0.67),
+          _TimelineEntry(
               icon: Icons.nights_stay_outlined,
               title: 'Sleep through the night',
               duration: '45–480 min',
-              last: true),
+              active: DailyTasks.progress.value >= 1,
+              last: true,
+              onTap: _openTasks),
           if (_expanded) ...const [
             _TimelineEntry(
                 icon: Icons.wb_sunny_outlined,
@@ -136,7 +168,9 @@ class _TimelineEntry extends StatelessWidget {
     this.subtitle,
     this.hero = false,
     this.active = false,
+    this.lineOn = false,
     this.last = false,
+    this.onTap,
   });
 
   final IconData icon;
@@ -145,7 +179,9 @@ class _TimelineEntry extends StatelessWidget {
   final String? subtitle;
   final bool hero;
   final bool active;
+  final bool lineOn;
   final bool last;
+  final VoidCallback? onTap;
 
   static const _base = Color(0xFFECEEF2);
 
@@ -202,22 +238,22 @@ class _TimelineEntry extends StatelessWidget {
                 ),
                 if (!last)
                   Expanded(
-                      child: Container(
-                          width: 3,
-                          margin: const EdgeInsets.symmetric(vertical: 2),
-                          decoration: const BoxDecoration(
-                              border: Border(
-                                  left: BorderSide(
-                                      color: Color(0xFFC7CDD9),
-                                      width: 3,
-                                      style: BorderStyle.solid))))),
+                    child: Container(
+                      width: 3,
+                      margin: const EdgeInsets.symmetric(vertical: 2),
+                      color: lineOn
+                          ? const Color(0xFF7E57C2)
+                          : const Color(0xFFC7CDD9),
+                    ),
+                  ),
               ],
             ),
           ),
           const SizedBox(width: 16),
           Expanded(
               child: Padding(
-                  padding: const EdgeInsets.only(bottom: 18), child: card)),
+                  padding: const EdgeInsets.only(bottom: 18),
+                  child: GestureDetector(onTap: onTap, child: card))),
         ],
       ),
     );

@@ -97,15 +97,14 @@ class _RoundCarouselState extends State<RoundCarousel>
     return LayoutBuilder(
       builder: (context, c) {
         final stageW = c.maxWidth.isFinite ? c.maxWidth : 360.0;
-        final cardW = (stageW * 0.34).clamp(108.0, 148.0);
-        final cardH = cardW * 1.28;
+        final cardW = (stageW * 0.26).clamp(92.0, 118.0);
+        final cardH = cardW * 1.32;
         final count = images.length;
         final step = 2 * math.pi / count;
-        final factor = 1 + widget.spacing * 0.15;
-        final natural = (cardW * factor) / (2 * math.tan(math.pi / count));
-        final radius = math.min(stageW * 0.40, natural);
         final rot = _rot * math.pi / 180;
-        final persp = (1 / math.max(400.0, widget.perspective)) * 5.2;
+        final persp = 0.0022;
+        // Wide enough that the side cards sit in black, not flush in a row.
+        final radius = stageW * 0.52;
 
         final order = List<int>.generate(count, (i) => i)
           ..sort((a, b) {
@@ -134,7 +133,7 @@ class _RoundCarouselState extends State<RoundCarousel>
             child: ColoredBox(
               color: const Color(0xFF050506),
               child: SizedBox(
-                height: cardH + 22,
+                height: cardH + 56,
                 width: double.infinity,
                 child: Stack(
                   alignment: Alignment.center,
@@ -168,12 +167,14 @@ class _RoundCarouselState extends State<RoundCarousel>
     required double persp,
   }) {
     final depth = math.cos(angle);
-    final front = ((depth + 1) / 2).clamp(0.0, 1.0);
+    // The back of the cylinder stays off the stage. Three faces, like the
+    // Originkit shot: one large in front, one smaller on each side.
+    if (depth < 0.15) return const SizedBox.shrink();
+    final front = ((depth - 0.15) / 0.85).clamp(0.0, 1.0);
     final x = math.sin(angle) * radius;
-    final y = (1 - front) * widget.tilt * 0.55;
-    final scale = 0.56 + 0.44 * front;
-    final opacity = (0.34 + 0.66 * front).clamp(0.34, 1.0);
-    final yaw = -math.sin(angle) * 0.52;
+    final y = (1 - front) * -14;
+    final scale = 0.72 + 0.28 * front;
+    final yaw = -math.sin(angle) * 0.72;
     final m = Matrix4.identity()
       ..setEntry(3, 2, persp)
       ..translateByDouble(x, y, 0.0, 1.0)
@@ -184,14 +185,11 @@ class _RoundCarouselState extends State<RoundCarousel>
       alignment: Alignment.center,
       filterQuality: FilterQuality.medium,
       transform: m,
-      child: Opacity(
-        opacity: opacity,
-        child: _Face(
-          asset: asset,
-          width: cardW,
-          height: cardH,
-          radius: widget.cornerRadius,
-        ),
+      child: _Face(
+        asset: asset,
+        width: cardW,
+        height: cardH,
+        radius: widget.cornerRadius,
       ),
     );
   }
