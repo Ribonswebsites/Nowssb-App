@@ -13,6 +13,7 @@ import '../../widgets/nwsb_icon.dart';
 import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
 import '../economy/money.dart';
+import '../economy/play_billing.dart';
 import '../../admin/template/editable.dart';
 
 class GiftItem {
@@ -323,12 +324,34 @@ class _GiftsScreenState extends State<GiftsScreen> {
         ),
         const SizedBox(height: 10),
         GoldButton(
-          label: 'Create gift code',
+          label: 'Pay on Play and create the code',
           onTap: () async {
-            final gift = await GiftBook.instance.send(_item, note: _note.text.trim());
-            await Clipboard.setData(ClipboardData(text: gift.code));
-            if (!mounted) return;
-            setState(() => _message = 'Code ${gift.code} copied. Share it. It expires in 90 days if it stays unopened.');
+            final sku = switch (_item.id) {
+              'word' => 'nwsb_word',
+              'meaning' => 'nwsb_meaning',
+              'bundle' => 'nwsb_bundle_10',
+              'resonance' => 'nwsb_sub_resonance',
+              'frequency' => 'nwsb_sub_frequency',
+              _ => 'nwsb_sub_frequency_x',
+            };
+            try {
+              final result = await PlayCheckout.buy(
+                callable: 'issueGift',
+                productId: sku,
+                payload: {'itemId': _item.id, 'note': _note.text.trim()},
+              );
+              final code = '${result['code'] ?? ''}';
+              if (code.isNotEmpty) {
+                await Clipboard.setData(ClipboardData(text: code));
+              }
+              if (!mounted) return;
+              setState(() => _message = code.isEmpty
+                  ? 'Play took the payment, but no code came back.'
+                  : 'Code $code copied. It expires in 90 days if it stays unopened.');
+            } on EconomyException catch (e) {
+              if (!mounted) return;
+              setState(() => _message = e.message);
+            }
           },
         ),
         if (_message != null) ...[
@@ -358,9 +381,14 @@ class _GiftsScreenState extends State<GiftsScreen> {
         GoldButton(
           label: 'Preview and redeem',
           onTap: () async {
-            final err = await GiftBook.instance.redeem(_code.text);
-            if (!mounted) return;
-            setState(() => _message = err.isEmpty ? 'Gift opened on this account.' : err);
+            try {
+              final result = await EconomyApi.call('redeemGift', {'code': _code.text.trim()});
+              if (!mounted) return;
+              setState(() => _message = '${result['label'] ?? 'Gift'} is on this account.');
+            } on EconomyException catch (e) {
+              if (!mounted) return;
+              setState(() => _message = e.message);
+            }
           },
         ),
         if (_message != null) ...[

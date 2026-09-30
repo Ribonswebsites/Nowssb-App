@@ -170,6 +170,45 @@ function makeCode(uid) {
   return `NSB${body}`;
 }
 
+/** One roll, 0–9999. Weights are the odds. The phone never picks the prize. */
+const SCRATCH = [
+  { rarity: 'common', weight: 7000, coins: 5 },
+  { rarity: 'uncommon', weight: 2000, coins: 15 },
+  { rarity: 'rare', weight: 800, coins: 40 },
+  { rarity: 'epic', weight: 200, coins: 100 },
+];
+
+function scratchPrize(roll) {
+  const n = Math.abs(Math.round(Number(roll) || 0)) % 10000;
+  let cursor = 0;
+  for (const row of SCRATCH) {
+    cursor += row.weight;
+    if (n < cursor) return { rarity: row.rarity, coins: row.coins };
+  }
+  return { rarity: 'common', coins: 5 };
+}
+
+const GIFTS = {
+  word: { label: 'A word', cents: 99, sku: 'nwsb_word' },
+  meaning: { label: 'A meaning', cents: 99, sku: 'nwsb_meaning' },
+  bundle: { label: '10-word bundle', cents: 999, sku: 'nwsb_bundle_10' },
+  resonance: { label: 'Resonance', cents: 499, sku: 'nwsb_sub_resonance', plan: 'Resonance' },
+  frequency: { label: 'Frequency', cents: 999, sku: 'nwsb_sub_frequency', plan: 'Frequency' },
+  frequency_x: { label: 'Frequency X', cents: 1999, sku: 'nwsb_sub_frequency_x', plan: 'Frequency X' },
+};
+
+function giftItem(id) {
+  return GIFTS[String(id || '')] || null;
+}
+
+/** Partner points are perks, not cash and not coins. */
+function partnerAward(kind) {
+  if (kind === 'practice') return 1;
+  if (kind === 'purchase') return 5;
+  if (kind === 'referral') return 10;
+  return 0;
+}
+
 module.exports = {
   CASH_TIERS,
   CATALOG,
@@ -192,4 +231,7 @@ module.exports = {
   milestoneReward,
   moderateText,
   makeCode,
+  scratchPrize,
+  giftItem,
+  partnerAward,
 };

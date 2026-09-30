@@ -23,7 +23,7 @@ class PlayCheckout {
     return label;
   }
 
-  static Future<void> buy({
+  static Future<Map<String, dynamic>> buy({
     required String callable,
     required String productId,
     Map<String, dynamic> payload = const {},
@@ -40,7 +40,7 @@ class PlayCheckout {
       );
     }
     final details = response.productDetails.first;
-    final completer = Completer<void>();
+    final completer = Completer<Map<String, dynamic>>();
     late final StreamSubscription<List<PurchaseDetails>> sub;
     sub = iap.purchaseStream.listen((purchases) async {
       for (final purchase in purchases) {
@@ -59,7 +59,7 @@ class PlayCheckout {
         if (purchase.status == PurchaseStatus.purchased ||
             purchase.status == PurchaseStatus.restored) {
           try {
-            await EconomyApi.call(callable, {
+            final result = await EconomyApi.call(callable, {
               ...payload,
               'productId': productId,
               'purchaseToken': purchase.verificationData.serverVerificationData,
@@ -67,7 +67,7 @@ class PlayCheckout {
             if (purchase.pendingCompletePurchase) {
               await iap.completePurchase(purchase);
             }
-            if (!completer.isCompleted) completer.complete();
+            if (!completer.isCompleted) completer.complete(result);
           } catch (e) {
             if (!completer.isCompleted) completer.completeError(e);
           }
@@ -81,7 +81,7 @@ class PlayCheckout {
         purchaseParam: PurchaseParam(productDetails: details),
       );
       if (!started) throw EconomyException('Play did not start the purchase.');
-      await completer.future.timeout(const Duration(minutes: 3));
+      return await completer.future.timeout(const Duration(minutes: 3));
     } on TimeoutException {
       throw EconomyException('The Play purchase did not finish.');
     } finally {

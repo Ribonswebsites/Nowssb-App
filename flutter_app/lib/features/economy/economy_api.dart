@@ -172,6 +172,8 @@ class EconomyMirror extends ChangeNotifier {
   String upi = '';
   String country = '';
   String payoutRail = '';
+  int partnerPoints = 0;
+  String partnerPerk = '';
   bool live = false;
   String? uid;
 
@@ -223,6 +225,10 @@ class EconomyMirror extends ChangeNotifier {
       upi = (data['upi'] as String?) ?? '';
       country = (data['country'] as String?) ?? '';
       payoutRail = (data['payoutRail'] as String?) ?? '';
+    });
+    _watch('users/$id/partner/main', (data) {
+      partnerPoints = (data['points'] as num?)?.toInt() ?? 0;
+      partnerPerk = (data['perk'] as String?) ?? '';
     });
     _watch('users/$id/referral/main', (data) {
       code = (data['code'] as String?) ?? '';

@@ -1217,3 +1217,171 @@ exports.blockEchoUser = onCall(async (request) => {
   await db.doc(`blocks/${uid}/blocked/${target}`).set({ at: stamp() });
   return { ok: true };
 });
+
+exports.scratchCoupon = onCall(async (request) => {
+  const uid = uidOf(request);
+  const day = rules.ymd();
+  const capRef = db.doc(`users/${uid}/earnCaps/${day}`);
+  let prize = null;
+  let balance = 0;
+  await db.runTransaction(async (tx) => {
+    const walletRef = db.doc(`users/${uid}/wallet/main`);
+    const [cap, wallet] = await Promise.all([tx.get(capRef), tx.get(walletRef)]);
+    if (cap.exists && cap.data().scratch) {
+      throw new HttpsError('resource-exhausted', 'Today’s coupon is already open.');
+    }
+    if (!wallet.exists) {
+      throw new HttpsError('failed-precondition', 'Open Rewards once so the wallet exists.');
+    }
+    prize = rules.scratchPrize(crypto.randomInt(0, 10000));
+    remember(tx, uid, Number(wallet.data().coins || 0));
+    balance = writeCoins(tx, uid, prize.coins, `Coupon ${prize.rarity}`, day);
+    tx.set(capRef, {
+      scratch: true,
+      scratchRarity: prize.rarity,
+      scratchCoins: prize.coins,
+      uid,
+    }, { merge: true });
+    tx.set(db.collection('couponLedger').doc(), {
+      uid, day, rarity: prize.rarity, coins: prize.coins, at: stamp(),
+    });
+    queueNotify(tx, uid, 'Coupon', `${prize.coins} coins from today’s coupon.`, 'coins', day);
+  });
+  return { coins: prize.coins, rarity: prize.rarity, balance };
+});
+
+exports.issueGift = onCall(async (request) => {
+  const uid = uidOf(request);
+  const itemId = String(request.data?.itemId || '');
+  const note = String(request.data?.note || '').slice(0, 140);
+  const productId = String(request.data?.productId || '');
+  const token = String(request.data?.purchaseToken || '');
+  const gift = rules.giftItem(itemId);
+  if (!gift) throw new HttpsError('invalid-argument', 'That gift is not in the catalog.');
+  const charged = rules.catalogItem(productId);
+  if (!charged || charged.price !== gift.cents) {
+    throw new HttpsError('failed-precondition', 'The Play product does not match this gift.');
+  }
+  const play = await verifyPlayProduct(productId, token);
+  const id = receiptId(token);
+  const code = `GFT${rules.makeCode(uid).slice(3)}`;
+  const receiptRef = db.doc(`playReceipts/${id}`);
+  const giftRef = db.doc(`gifts/${code}`);
+  await db.runTransaction(async (tx) => {
+    const [existing, giftDoc, wallet, referral] = await Promise.all([
+      tx.get(receiptRef),
+      tx.get(giftRef),
+      tx.get(db.doc(`users/${uid}/wallet/main`)),
+      tx.get(db.doc(`users/${uid}/referral/main`)),
+    ]);
+    if (existing.exists) throw new HttpsError('already-exists', 'That Play receipt was already used.');
+    if (giftDoc.exists) throw new HttpsError('already-exists', 'Try the gift again.');
+    const circle = await loadCircle(tx, uid);
+    const data = wallet.exists ? wallet.data() : {};
+    tx.set(receiptRef, {
+      uid, productId, orderId: play.orderId, itemId, kind: 'gift', at: stamp(),
+    });
+    tx.set(giftRef, {
+      code,
+      itemId,
+      label: gift.label,
+      cents: gift.cents,
+      sku: gift.sku,
+      senderUid: uid,
+      note,
+      status: 'unredeemed',
+      createdAt: Date.now(),
+      expiresAt: Date.now() + 90 * 86400000,
+      agentCode: referral.exists ? String(referral.data().code || '') : '',
+    });
+    tx.set(db.doc(`users/${uid}/wallet/main`), {
+      purchases: Number(data.purchases || 0) + 1,
+    }, { merge: true });
+    tx.set(db.collection('giftLedger').doc(), {
+      code, senderUid: uid, itemId, cents: gift.cents, status: 'issued', at: stamp(),
+    });
+    applyCircle(tx, circle, { buyerUid: uid, price: gift.cents, paymentId: id, plan: gift.plan || '' });
+  });
+  return { ok: true, code, label: gift.label };
+});
+
+exports.redeemGift = onCall(async (request) => {
+  const uid = uidOf(request);
+  const code = String(request.data?.code || '').trim().toUpperCase();
+  if (!code.startsWith('GFT')) throw new HttpsError('invalid-argument', 'Enter the gift code.');
+  let label = 'Gift';
+  await db.runTransaction(async (tx) => {
+    const ref = db.doc(`gifts/${code}`);
+    const gift = await tx.get(ref);
+    if (!gift.exists) throw new HttpsError('not-found', 'That gift code does not exist.');
+    const data = gift.data();
+    label = String(data.label || 'Gift');
+    if (data.status === 'redeemed') throw new HttpsError('already-exists', 'This gift is already open.');
+    if (Number(data.expiresAt || 0) < Date.now()) {
+      tx.set(ref, { status: 'expired' }, { merge: true });
+      throw new HttpsError('failed-precondition', 'This gift expired.');
+    }
+    if (data.senderUid === uid) throw new HttpsError('failed-precondition', 'You cannot redeem your own gift.');
+    tx.set(ref, { status: 'redeemed', redeemedBy: uid, redeemedAt: Date.now() }, { merge: true });
+    const item = rules.giftItem(data.itemId);
+    if (item && item.plan) {
+      tx.set(db.doc(`users/${uid}/wallet/main`), {
+        plan: item.plan,
+        subUntil: Date.now() + 30 * 86400000,
+      }, { merge: true });
+      tx.set(db.doc(`users/${uid}/referral/main`), {
+        subscriptionActive: true,
+        subscriptionLapsedAt: null,
+      }, { merge: true });
+    } else {
+      tx.set(db.doc(`users/${uid}/owned/${data.itemId}`), {
+        title: data.label,
+        kind: 'gift',
+        price: data.cents,
+        from: data.senderUid,
+        at: stamp(),
+      });
+    }
+    tx.set(db.collection('giftLedger').doc(), {
+      code,
+      senderUid: data.senderUid,
+      redeemedBy: uid,
+      itemId: data.itemId,
+      status: 'redeemed',
+      at: stamp(),
+    });
+    queueNotify(tx, uid, 'Gift opened', `${label} is on your account.`, 'gift', code);
+  });
+  return { ok: true, label };
+});
+
+exports.logPartnerAction = onCall(async (request) => {
+  const uid = uidOf(request);
+  const kind = String(request.data?.kind || '');
+  const points = rules.partnerAward(kind);
+  if (!points) throw new HttpsError('invalid-argument', 'That is not a partner action.');
+  const day = rules.ymd();
+  const capRef = db.doc(`users/${uid}/earnCaps/${day}`);
+  let total = 0;
+  let perk = '';
+  await db.runTransaction(async (tx) => {
+    const field = `partner_${kind}`;
+    const [cap, row] = await Promise.all([
+      tx.get(capRef),
+      tx.get(db.doc(`users/${uid}/partner/main`)),
+    ]);
+    if (cap.exists && cap.data()[field]) {
+      throw new HttpsError('resource-exhausted', 'That partner point is already logged today.');
+    }
+    total = Number(row.data()?.points || 0) + points;
+    perk = total >= 100 ? 'Studio note' : total >= 40 ? 'Early listen' : total >= 10 ? 'Partner mark' : '';
+    tx.set(db.doc(`users/${uid}/partner/main`), {
+      points: total, perk, updatedAt: stamp(),
+    }, { merge: true });
+    tx.set(capRef, { [field]: true, uid }, { merge: true });
+    tx.set(db.collection('partnerLedger').doc(), {
+      uid, kind, points, total, at: stamp(),
+    });
+  });
+  return { ok: true, points: total, perk };
+});

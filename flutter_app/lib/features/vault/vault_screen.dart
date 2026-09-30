@@ -4,11 +4,13 @@ import 'package:flutter/services.dart';
 import '../../theme/tokens.dart';
 import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
+import '../economy/coupon_screen.dart';
 import '../economy/play_billing.dart';
 import '../../widgets/banner_mix.dart';
 import '../../widgets/brand_top_banner.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/nwsb_icon.dart';
+import '../../widgets/nwsb_coin_fly.dart';
 import '../../admin/template/editable.dart';
 import '../../screens/subscription.dart';
 
@@ -73,7 +75,31 @@ class VaultScreen extends StatelessWidget {
               const SizedBox(height: 18),
               GoldButton(
                 label: 'Claim daily login',
-                onTap: () => runPrivate(context, () => EconomyApi.call('claimDailyLogin')),
+                onTap: () async {
+                  try {
+                    final result = await EconomyApi.call('claimDailyLogin');
+                    if (!context.mounted) return;
+                    final gained = (result['coins'] as num?)?.toInt() ?? 0;
+                    await NwsbCoinFly.show(
+                      context,
+                      coins: gained == 0 ? 5 : gained,
+                      from: w.coins,
+                      to: w.coins + gained,
+                    );
+                  } on EconomyException catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+                    }
+                  }
+                },
+              ),
+              const SizedBox(height: 8),
+              GoldButton(
+                label: 'Open today’s coupon',
+                filled: false,
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(builder: (_) => const CouponScreen()),
+                ),
               ),
               const SizedBox(height: 8),
               GoldButton(

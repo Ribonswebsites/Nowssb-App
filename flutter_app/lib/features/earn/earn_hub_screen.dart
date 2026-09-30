@@ -15,6 +15,9 @@ import '../vault/vault_screen.dart';
 import '../wordprint/word_print_screen.dart';
 import '../../screens/nwsb_sign_in_sheet.dart';
 import '../../widgets/colored_split_promo_banner.dart';
+import '../economy/coupon_screen.dart';
+import '../economy/partner_screen.dart';
+import '../economy/reference_screen.dart';
 import '../../widgets/program_shelf.dart';
 import '../../admin/template/editable.dart';
 import '../../admin/layout/layout_sections.dart';
@@ -88,6 +91,12 @@ class EarnHubScreen extends StatelessWidget {
               LSection('echo', 'Echo Wall', GoldButton(label: 'Echo Wall', filled: false, onTap: () => _open(context, const EchoWallScreen()))),
               const SizedBox(height: 14),
               LSection('earnings', 'Earnings', GoldButton(label: 'Earnings', filled: false, onTap: () => _open(context, const EarningsScreen()))),
+              const SizedBox(height: 8),
+              LSection('coupon', 'Coupon', GoldButton(label: 'Coupon', filled: false, onTap: () => _open(context, const CouponScreen()))),
+              const SizedBox(height: 8),
+              LSection('reference', 'Reference', GoldButton(label: 'Reference', filled: false, onTap: () => _open(context, const ReferenceScreen()))),
+              const SizedBox(height: 8),
+              LSection('partner', 'Partner', GoldButton(label: 'Partner', filled: false, onTap: () => _open(context, const PartnerScreen()))),
               const SizedBox(height: 18),
               const LSection('coins', 'Coin ledger', EditableLabel('earn_hub_screen.EarnHubScreen', 'COIN LEDGER', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12))),
               const SizedBox(height: 8),

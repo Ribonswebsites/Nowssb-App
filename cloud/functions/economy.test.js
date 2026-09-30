@@ -29,5 +29,15 @@ assert.strictEqual(e.streakBonus(20), 40);
 assert.strictEqual(e.milestoneReward(10).cosmetic, 'frame_level10');
 assert.strictEqual(e.moderateText('hello nowssb').ok, true);
 assert.strictEqual(e.moderateText('fuck this').ok, false);
+assert.strictEqual(e.scratchPrize(0).rarity, 'common');
+assert.strictEqual(e.scratchPrize(0).coins, 5);
+assert.strictEqual(e.scratchPrize(6999).rarity, 'common');
+assert.strictEqual(e.scratchPrize(7000).rarity, 'uncommon');
+assert.strictEqual(e.scratchPrize(9000).rarity, 'rare');
+assert.strictEqual(e.scratchPrize(9800).coins, 100);
+assert.strictEqual(e.giftItem('word').cents, 99);
+assert.strictEqual(e.giftItem('nope'), null);
+assert.strictEqual(e.partnerAward('referral'), 10);
+assert.strictEqual(e.partnerAward('nope'), 0);
 
 console.log('economy rules ok');

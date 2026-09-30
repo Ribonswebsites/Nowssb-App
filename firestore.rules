@@ -144,6 +144,10 @@ service cloud.firestore {
       allow read: if isSelf(uid);
       allow write: if false;
     }
+    match /users/{uid}/partner/{docId} {
+      allow read: if isSelf(uid);
+      allow write: if false;
+    }
     match /users/{uid}/owned/{itemId} {
       allow read: if isSelf(uid);
       allow write: if false;
