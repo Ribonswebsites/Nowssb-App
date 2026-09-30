@@ -34,6 +34,7 @@ import '../data/settings.dart';
 import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
 import '../widgets/app_backdrop.dart';
+import '../widgets/four_banners.dart';
 import '../widgets/enter_curve_stage.dart';
 import '../widgets/hero_curve_stage.dart';
 import '../widgets/buddha_gyro_stage.dart';
@@ -363,7 +364,21 @@ class _HomeFashionState extends State<HomeFashion> {
             ],
           ),
         ),
-        ('roundring', const RoundRingSection()),
+        ('roundring', Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: const [
+            Padding(
+              padding: EdgeInsets.fromLTRB(16, 12, 16, 0),
+              child: FourBanners(
+                splitTitle: 'NowssB',
+                splitCta: 'Keep going',
+                blackTitle: 'Passive earning',
+                blackSub: 'The ring under this is the same set.',
+              ),
+            ),
+            RoundRingSection(),
+          ],
+        )),
         (
           'practice',
           Column(

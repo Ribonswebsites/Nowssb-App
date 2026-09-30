@@ -47,6 +47,7 @@ import '../data/practice_progress.dart';
 import '../data/settings.dart';
 import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
+import '../widgets/four_banners.dart';
 import '../widgets/home_skin.dart';
 import 'normal/neomorphic_action_bar.dart';
 import 'normal/neomorphic_dashboard.dart';
@@ -372,6 +373,15 @@ class _HomeNormalState extends State<HomeNormal> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              const Padding(
+                padding: EdgeInsets.fromLTRB(20, 0, 20, 12),
+                child: FourBanners(
+                  splitTitle: 'NowssB',
+                  splitCta: 'Open rewards',
+                  blackTitle: 'Today',
+                  blackSub: 'The line on the left moves when a task is done.',
+                ),
+              ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
                 child: ColoredSplitPromoBanner.forSurface(

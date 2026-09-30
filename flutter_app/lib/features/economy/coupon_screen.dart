@@ -4,6 +4,7 @@ library;
 import 'package:flutter/material.dart';
 
 import '../../theme/tokens.dart';
+import '../../widgets/four_banners.dart';
 import '../../widgets/program_shelf.dart';
 import 'economy_api.dart';
 import 'economy_theme.dart';
@@ -66,7 +67,12 @@ class _CouponScreenState extends State<CouponScreen> {
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
-          const ProgramShelf(),
+          const FourBanners(
+            splitTitle: 'Coupon',
+            splitCta: 'Scratch',
+            blackTitle: 'One a day',
+            blackSub: 'The server picks the prize. The foil is ours.',
+          ),
           const SizedBox(height: 12),
           const GlassLine(
             text: 'One coupon a day. The server picks the prize. Scratch the gold.',

@@ -38,7 +38,9 @@ class EconomyPage extends StatelessWidget {
                     onPressed: () => Navigator.of(context).maybePop(),
                     icon: const Icon(Icons.arrow_back, color: Colors.white),
                   ),
-                  const _WhiteOrb(),
+                  const _Mark(),
+                  const SizedBox(width: 8),
+                  const _BlackOrb(),
                   const SizedBox(width: 8),
                   Expanded(
                     child: EditableLabel('economy_theme.EconomyPage',
@@ -59,8 +61,8 @@ class EconomyPage extends StatelessWidget {
   }
 }
 
-class _WhiteOrb extends StatelessWidget {
-  const _WhiteOrb();
+class _Mark extends StatelessWidget {
+  const _Mark();
 
   @override
   Widget build(BuildContext context) {
@@ -69,11 +71,21 @@ class _WhiteOrb extends StatelessWidget {
       height: 36,
       alignment: Alignment.center,
       decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-      child: const AppThinkingLoader(
-        size: 22,
-        state: OrbState.composing,
-        blackCircle: false,
-      ),
+      child: const NwsbIcon(NwsbMarks.earn, size: 20, color: Colors.black, strokeWidth: 1.6),
+    );
+  }
+}
+
+class _BlackOrb extends StatelessWidget {
+  const _BlackOrb();
+
+  @override
+  Widget build(BuildContext context) {
+    return const AppThinkingLoader(
+      size: 18,
+      state: OrbState.composing,
+      blackCircle: true,
+      circlePad: 5,
     );
   }
 }

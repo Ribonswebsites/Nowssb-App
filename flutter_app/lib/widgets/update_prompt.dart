@@ -4,12 +4,15 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../admin/template/editable.dart';
 import '../app_update.dart';
 import '../theme/tokens.dart';
+import 'app_thinking_loader.dart';
+import 'nwsb_icon.dart';
 
-const _panel = Color(0xFF102037);
+const _panel = Color(0xFF000000);
 const _bannerHeight = 34.0;
 
 /// Wraps the app (MaterialApp.builder). While an update is pending a slim
@@ -109,11 +112,15 @@ class _UpdateBanner extends StatelessWidget {
                 ),
               Center(
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  Icon(
-                    updater.phase == NwsbUpdatePhase.ready ? Icons.install_mobile_rounded : Icons.system_update_rounded,
-                    size: 16,
-                    color: NwsbColors.goldLight,
+                  Container(
+                    width: 22,
+                    height: 22,
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                    child: const NwsbIcon(NwsbMarks.earn, size: 12, color: Colors.black, strokeWidth: 1.6),
                   ),
+                  const SizedBox(width: 8),
+                  const AppThinkingLoader(size: 12, state: OrbState.composing, blackCircle: true, circlePad: 3),
                   const SizedBox(width: 8),
                   Text(
                     label,
@@ -162,28 +169,61 @@ class _UpdateDialog extends StatelessWidget {
       builder: (context, _) {
         final phase = updater.phase;
         final busy = updater.busy;
-        return AlertDialog(
-          backgroundColor: _panel,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-          title: Text(
-            phase == NwsbUpdatePhase.ready || phase == NwsbUpdatePhase.installing
-                ? 'NowssB update downloaded'
-                : busy
-                    ? 'Updating NowssB…'
-                    : 'A new NowssB update is ready',
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
-          ),
-          content: const _UpdateBody(
-            idleText: 'The update downloads inside NowssB — it keeps going if you close this or leave the app — '
-                'then Android shows its install confirmation.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: busy ? const Text('Hide') : const EditableLabel('main.NowssbApp', 'Later'),
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(18, 18, 18, 8),
+            decoration: BoxDecoration(
+              color: Colors.black,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: const Color(0x33FFFFFF)),
             ),
-            const _PrimaryButton(),
-          ],
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 36,
+                      height: 36,
+                      alignment: Alignment.center,
+                      decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                      child: const NwsbIcon(NwsbMarks.earn, size: 18, color: Colors.black, strokeWidth: 1.6),
+                    ),
+                    const SizedBox(width: 8),
+                    const AppThinkingLoader(size: 16, state: OrbState.composing, blackCircle: true, circlePad: 4),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        phase == NwsbUpdatePhase.ready || phase == NwsbUpdatePhase.installing
+                            ? 'NowssB update downloaded'
+                            : busy
+                                ? 'Updating NowssB…'
+                                : 'A new NowssB update is ready',
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                const _UpdateBody(
+                  idleText: 'The update downloads inside NowssB — it keeps going if you close this or leave the app — '
+                      'then Android shows its install confirmation.',
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: busy ? const Text('Hide') : const EditableLabel('main.NowssbApp', 'Later'),
+                    ),
+                    const _PrimaryButton(),
+                  ],
+                ),
+              ],
+            ),
+          ),
         );
       },
     );
@@ -243,22 +283,45 @@ class _UpdateBody extends StatelessWidget {
     final showProgress = updater.busy || phase == NwsbUpdatePhase.failed;
     final p = updater.progress;
     final text = phase == NwsbUpdatePhase.idle || updater.message.isEmpty ? idleText : updater.message;
-    return Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(text, style: const TextStyle(color: Color(0xCCFFFFFF), height: 1.45)),
-      if (showProgress) ...[
-        const SizedBox(height: 18),
-        LinearProgressIndicator(
-          value: phase == NwsbUpdatePhase.verifying ? null : p,
-          color: NwsbColors.goldLight,
-          backgroundColor: Colors.white24,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          p == null ? updater.sizeLabel : '${updater.sizeLabel} · ${(p * 100).floor()}%',
-          style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (showProgress) ...[
+          SizedBox(
+            width: 3,
+            height: 64,
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                width: 3,
+                height: 64 * ((p ?? 0.08).clamp(0.06, 1.0)),
+                decoration: BoxDecoration(
+                  color: NwsbColors.goldLight,
+                  borderRadius: BorderRadius.circular(99),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+        ],
+        Expanded(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(text, style: const TextStyle(color: Color(0xCCFFFFFF), height: 1.45)),
+              if (showProgress) ...[
+                const SizedBox(height: 8),
+                Text(
+                  p == null ? updater.sizeLabel : '${updater.sizeLabel} · ${(p * 100).floor()}%',
+                  style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12),
+                ),
+              ],
+            ],
+          ),
         ),
       ],
-    ]);
+    );
   }
 }
 

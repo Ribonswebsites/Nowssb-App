@@ -14,6 +14,7 @@ import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
 import '../economy/money.dart';
 import '../economy/play_billing.dart';
+import '../../widgets/four_banners.dart';
 import '../../admin/template/editable.dart';
 
 class GiftItem {
@@ -221,6 +222,13 @@ class _GiftsScreenState extends State<GiftsScreen> {
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
             children: [
+              const FourBanners(
+                splitTitle: 'NowssB Gifts',
+                splitCta: 'Send a gift',
+                blackTitle: 'A real purchase',
+                blackSub: 'The code exists only after Play accepts it.',
+              ),
+              const SizedBox(height: 12),
               BrandTopBanner(
                 bare: true,
                 title: 'NowssB Gifts',

@@ -10,6 +10,8 @@ import '../../widgets/banner_mix.dart';
 import '../../widgets/brand_top_banner.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/nwsb_icon.dart';
+import '../../widgets/four_banners.dart';
+import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_coin_fly.dart';
 import '../../admin/template/editable.dart';
 import '../../screens/subscription.dart';
@@ -34,15 +36,13 @@ class VaultScreen extends StatelessWidget {
                 mark: NwsbMarks.earn,
               ),
               const SizedBox(height: 12),
-              const ColoredSplitPromoBanner(
-                margin: EdgeInsets.zero,
-                spec: SplitPromoSpec(
-                  title: 'NowssB Rewards',
-                  cta: 'Claim today’s coins',
-                  leftColor: Color(0xFF2A1B4D),
-                  rightColor: Color(0xFFC8A96E),
-                  art: SplitPromoArts.egyptianGold,
-                ),
+              const _TodayCard(),
+              const SizedBox(height: 12),
+              const FourBanners(
+                splitTitle: 'NowssB Rewards',
+                splitCta: 'Claim today’s coins',
+                blackTitle: 'Your coins',
+                blackSub: 'Earned only. At most 30% of a Play purchase.',
               ),
               const SizedBox(height: 12),
               CoinCount(value: w.coins),
@@ -55,59 +55,11 @@ class VaultScreen extends StatelessWidget {
               const EconomyNote(
                 'Invite a friend once. If they subscribe, you get one free month when you have no plan, or coins when you already do. No tiers and no ongoing percent — that lives in NowssB Earn.',
               ),
-              const SizedBox(height: 8),
-              GoldButton(
-                label: 'Copy friend invite',
-                filled: false,
-                onTap: () async {
-                  final code = w.code;
-                  final text = code.isEmpty
-                      ? 'Practice with me on NowssB.'
-                      : 'Practice with me on NowssB. Friend invite $code';
-                  await Clipboard.setData(ClipboardData(text: text));
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: EditableLabel('vault_screen.VaultScreen', 'Friend invite copied.')),
-                    );
-                  }
-                },
+              const SizedBox(height: 12),
+              const EconomyNote(
+                'Invite a friend once. If they subscribe, you get one free month when you have no plan, or coins when you already do. No tiers and no ongoing percent — that lives in NowssB Earn.',
               ),
               const SizedBox(height: 18),
-              GoldButton(
-                label: 'Claim daily login',
-                onTap: () async {
-                  try {
-                    final result = await EconomyApi.call('claimDailyLogin');
-                    if (!context.mounted) return;
-                    final gained = (result['coins'] as num?)?.toInt() ?? 0;
-                    await NwsbCoinFly.show(
-                      context,
-                      coins: gained == 0 ? 5 : gained,
-                      from: w.coins,
-                      to: w.coins + gained,
-                    );
-                  } on EconomyException catch (e) {
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
-                    }
-                  }
-                },
-              ),
-              const SizedBox(height: 8),
-              GoldButton(
-                label: 'Open today’s coupon',
-                filled: false,
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute<void>(builder: (_) => const CouponScreen()),
-                ),
-              ),
-              const SizedBox(height: 8),
-              GoldButton(
-                label: 'Log a practice',
-                filled: false,
-                onTap: () => runPrivate(context, () => EconomyApi.call('reportPractice')),
-              ),
-              const SizedBox(height: 22),
               const EditableLabel('vault_screen.VaultScreen', 'QUESTS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.4, fontSize: 12)),
               const SizedBox(height: 8),
               _quest(context, 'practice5', 'Practice 5 words', w.practice, 5, 25),
@@ -119,11 +71,19 @@ class VaultScreen extends StatelessWidget {
               const SizedBox(height: 18),
               const EditableLabel('vault_screen.VaultScreen', 'COIN SPENDS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.4, fontSize: 12)),
               const SizedBox(height: 8),
-              _spend(context, 'Streak freeze · 40', 'freeze'),
-              _spend(context, 'Practice credit · 15', 'practice'),
-              _spend(context, 'Early access · 50', 'early'),
-              _spend(context, 'Gold frame · 80', 'cosmetic', {'cosmeticId': 'frame_gold'}),
-              _spend(context, 'Verified buyer badge · 30', 'badge', {'badge': 'verified-buyer'}),
+              SizedBox(
+                height: 132,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    _spend(context, 'Streak freeze · 40', 'freeze'),
+                    _spend(context, 'Practice credit · 15', 'practice'),
+                    _spend(context, 'Early access · 50', 'early'),
+                    _spend(context, 'Gold frame · 80', 'cosmetic', {'cosmeticId': 'frame_gold'}),
+                    _spend(context, 'Verified buyer badge · 30', 'badge', {'badge': 'verified-buyer'}),
+                  ],
+                ),
+              ),
               const SizedBox(height: 18),
               const EditableLabel('vault_screen.VaultScreen', 'PLAY PURCHASES', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.4, fontSize: 12)),
               const SizedBox(height: 8),
@@ -158,38 +118,86 @@ class VaultScreen extends StatelessWidget {
   }
 
   Widget _quest(BuildContext context, String id, String title, int value, int goal, int reward) {
+    final frac = goal == 0 ? 0.0 : (value / goal).clamp(0, 1).toDouble();
+    final done = value >= goal;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('$title · $value/$goal · $reward coins', style: const TextStyle(color: Colors.white)),
-          const SizedBox(height: 6),
-          LinearProgressIndicator(
-            value: goal == 0 ? 0 : (value / goal).clamp(0, 1),
-            color: NwsbColors.gold,
-            backgroundColor: const Color(0x22FFFFFF),
-          ),
-          const SizedBox(height: 6),
-          GoldButton(
-            label: value >= goal ? 'Open chest' : 'In progress',
-            filled: false,
-            onTap: value >= goal
-                ? () => runPrivate(context, () => EconomyApi.call('claimQuest', {'questId': id}))
-                : null,
-          ),
-        ],
+      padding: const EdgeInsets.only(bottom: 10),
+      child: GlassWrap(
+        margin: EdgeInsets.zero,
+        padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 46,
+              height: 46,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  CircularProgressIndicator(
+                    value: frac,
+                    strokeWidth: 3,
+                    color: NwsbColors.gold,
+                    backgroundColor: const Color(0x22FFFFFF),
+                  ),
+                  Text(
+                    '$value',
+                    style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w800),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 2),
+                  Text(
+                    '$value of $goal · $reward coins',
+                    style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            if (done)
+              TextButton(
+                onPressed: () => runPrivate(context, () => EconomyApi.call('claimQuest', {'questId': id})),
+                child: const Text('Open'),
+              )
+            else
+              const Text('Open', style: TextStyle(color: Color(0x55FFFFFF), fontWeight: FontWeight.w700)),
+          ],
+        ),
       ),
     );
   }
 
   Widget _spend(BuildContext context, String label, String purpose, [Map<String, dynamic>? extra]) {
+    final cost = int.tryParse(label.split('·').last.trim()) ?? 0;
+    final have = EconomyMirror.instance.coins;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: GoldButton(
-        label: label,
-        filled: false,
+      padding: const EdgeInsets.only(right: 10),
+      child: GestureDetector(
         onTap: () => runPrivate(context, () => EconomyApi.call('spendCoins', {'purpose': purpose, ...?extra})),
+        child: GlassWrap(
+          margin: EdgeInsets.zero,
+          child: SizedBox(
+            width: 150,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(label.split('·').first.trim(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+                const Spacer(),
+                Text('$cost coins', style: const TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w800)),
+                Text(
+                  have >= cost ? 'You have $have' : 'Need ${cost - have} more',
+                  style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -224,6 +232,93 @@ class VaultScreen extends StatelessWidget {
         }),
           );
         },
+      ),
+    );
+  }
+}
+
+class _TodayCard extends StatefulWidget {
+  const _TodayCard();
+
+  @override
+  State<_TodayCard> createState() => _TodayCardState();
+}
+
+class _TodayCardState extends State<_TodayCard> {
+  String? _note;
+
+  Future<void> _claim() async {
+    final before = EconomyMirror.instance.coins;
+    try {
+      final result = await EconomyApi.call('claimDailyLogin');
+      final gained = (result['coins'] as num?)?.toInt() ?? 0;
+      if (!mounted) return;
+      setState(() => _note = '+$gained coins landed on this wallet.');
+      await NwsbCoinFly.show(
+        context,
+        coins: gained == 0 ? 5 : gained,
+        from: before,
+        to: before + gained,
+      );
+    } on EconomyException catch (e) {
+      if (!mounted) return;
+      setState(() => _note = e.message);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final w = EconomyMirror.instance;
+    final claimed = w.loginToday;
+    return GlassWrap(
+      margin: EdgeInsets.zero,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Text(
+                '${w.coins}',
+                style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w800),
+              ),
+              const SizedBox(width: 8),
+              const Text('coins', style: TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w700)),
+              const Spacer(),
+              Text(
+                'streak ${w.streak}',
+                style: const TextStyle(color: Color(0xB3FFFFFF)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            claimed
+                ? 'Today’s login is already on the wallet.'
+                : 'Today’s login is still open.',
+            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+          ),
+          Text(
+            w.scratchToday ? 'Today’s coupon is open.' : 'Today’s coupon is still sealed.',
+            style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12),
+          ),
+          if (_note != null) ...[
+            const SizedBox(height: 8),
+            Text(_note!, style: const TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w700)),
+          ],
+          const SizedBox(height: 10),
+          GoldButton(
+            label: claimed ? 'Claimed today' : 'Claim daily login',
+            onTap: claimed ? null : _claim,
+          ),
+          const SizedBox(height: 8),
+          GoldButton(
+            label: 'Open today’s coupon',
+            filled: false,
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => const CouponScreen()),
+            ),
+          ),
+        ],
       ),
     );
   }

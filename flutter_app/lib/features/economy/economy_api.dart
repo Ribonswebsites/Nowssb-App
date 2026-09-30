@@ -174,6 +174,8 @@ class EconomyMirror extends ChangeNotifier {
   String payoutRail = '';
   int partnerPoints = 0;
   String partnerPerk = '';
+  bool loginToday = false;
+  bool scratchToday = false;
   bool live = false;
   String? uid;
 
@@ -197,6 +199,8 @@ class EconomyMirror extends ChangeNotifier {
       cash = 0;
       plan = 'Free';
       code = '';
+      loginToday = false;
+      scratchToday = false;
       notifyListeners();
       return;
     }
@@ -230,6 +234,10 @@ class EconomyMirror extends ChangeNotifier {
       partnerPoints = (data['points'] as num?)?.toInt() ?? 0;
       partnerPerk = (data['perk'] as String?) ?? '';
     });
+    _watch('users/$id/earnCaps/${_todayKey()}', (data) {
+      loginToday = data['login'] == true;
+      scratchToday = data['scratch'] == true;
+    });
     _watch('users/$id/referral/main', (data) {
       code = (data['code'] as String?) ?? '';
       referredBy = (data['referredBy'] as String?) ?? '';
@@ -261,6 +269,13 @@ class EconomyMirror extends ChangeNotifier {
 
   bool get subscribed =>
       plan != 'Free' && subUntil > DateTime.now().millisecondsSinceEpoch && subscriptionActive;
+
+  String _todayKey() {
+    final n = DateTime.now().toUtc();
+    final m = n.month.toString().padLeft(2, '0');
+    final d = n.day.toString().padLeft(2, '0');
+    return '${n.year}$m$d';
+  }
 
   void _watch(String path, void Function(Map<String, dynamic> data) apply) {
     _docs.add(FirebaseFirestore.instance.doc(path).snapshots().listen((snap) {
