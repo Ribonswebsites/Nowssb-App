@@ -3,10 +3,9 @@
 library;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
-import 'app_thinking_loader.dart';
 import 'glass_wrap.dart';
+import 'nwsb_icon.dart';
 
 class ProgramPoster {
   const ProgramPoster(this.asset, this.title, this.line);
@@ -21,11 +20,15 @@ const kProgramPosters = <ProgramPoster>[
   ProgramPoster('assets/banners/programs/gift.png', 'Gift', 'Send the item itself'),
   ProgramPoster('assets/banners/programs/bonus.png', 'Bonus', 'A target, paid once'),
   ProgramPoster('assets/banners/programs/partner.png', 'Partner', 'Perks, not cash'),
+  ProgramPoster('assets/banners/programs/rewards-live.png', 'Rewards', 'The white suit'),
+  ProgramPoster('assets/banners/earn/hands-raise.png', 'Practice', 'Hands up'),
 ];
 
+/// White circle with the section's own SVG. Never the composing animation.
 class WhiteCircleOrb extends StatelessWidget {
-  const WhiteCircleOrb({super.key, this.size = 28});
+  const WhiteCircleOrb({super.key, this.size = 18, this.mark = NwsbMarks.word});
   final double size;
+  final String mark;
 
   @override
   Widget build(BuildContext context) {
@@ -35,18 +38,15 @@ class WhiteCircleOrb extends StatelessWidget {
       height: circle,
       alignment: Alignment.center,
       decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-      child: AppThinkingLoader(
-        size: size,
-        state: OrbState.composing,
-        blackCircle: false,
-      ),
+      child: NwsbIcon(mark, size: size, color: const Color(0xFF111111), strokeWidth: 1.7),
     );
   }
 }
 
 class GlassLine extends StatelessWidget {
-  const GlassLine({super.key, required this.text});
+  const GlassLine({super.key, required this.text, this.mark = NwsbMarks.word});
   final String text;
+  final String mark;
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +55,7 @@ class GlassLine extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
       child: Row(
         children: [
-          const WhiteCircleOrb(size: 22),
+          WhiteCircleOrb(size: 18, mark: mark),
           const SizedBox(width: 10),
           Expanded(
             child: Text(

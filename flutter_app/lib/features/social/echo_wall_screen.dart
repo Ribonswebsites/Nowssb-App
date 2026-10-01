@@ -11,6 +11,7 @@ import '../../theme/tokens.dart';
 import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
 import 'echo_moderation_screen.dart';
+import '../../widgets/nwsb_icon.dart';
 import '../../widgets/program_shelf.dart';
 import '../../admin/template/editable.dart';
 
@@ -51,6 +52,7 @@ class _EchoWallScreenState extends State<EchoWallScreen> {
   Widget build(BuildContext context) {
     return EconomyPage(
       title: 'Echo Wall',
+      mark: NwsbMarks.people,
       action: _admin
           ? IconButton(
               onPressed: () => Navigator.of(context).push(

@@ -232,7 +232,7 @@ class _ExpandedRow extends StatelessWidget {
       case NormalPromoRailLabels.player:
         return NwsbMarks.play;
       case NormalPromoRailLabels.earn:
-        return NwsbMarks.earn;
+        return NwsbMarks.piggy;
       default:
         return NwsbMarks.discover;
     }

@@ -3,7 +3,9 @@ import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../../screens/nwsb_sign_in_sheet.dart';
 import '../../widgets/app_thinking_loader.dart';
+import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_icon.dart';
+import '../../widgets/program_shelf.dart';
 import '../../theme/tokens.dart';
 import 'economy_api.dart';
 import 'money.dart';
@@ -14,12 +16,14 @@ class EconomyPage extends StatelessWidget {
     super.key,
     required this.title,
     required this.child,
+    this.mark = NwsbMarks.word,
     this.action,
     this.banner,
   });
 
   final String title;
   final Widget child;
+  final String mark;
   final Widget? action;
   final Widget? banner;
 
@@ -38,7 +42,7 @@ class EconomyPage extends StatelessWidget {
                     onPressed: () => Navigator.of(context).maybePop(),
                     icon: const Icon(Icons.arrow_back, color: Colors.white),
                   ),
-                  const _Mark(),
+                  _Mark(mark),
                   const SizedBox(width: 8),
                   const _BlackOrb(),
                   const SizedBox(width: 8),
@@ -62,7 +66,8 @@ class EconomyPage extends StatelessWidget {
 }
 
 class _Mark extends StatelessWidget {
-  const _Mark();
+  const _Mark(this.mark);
+  final String mark;
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +76,7 @@ class _Mark extends StatelessWidget {
       height: 36,
       alignment: Alignment.center,
       decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-      child: const NwsbIcon(NwsbMarks.earn, size: 20, color: Colors.black, strokeWidth: 1.6),
+      child: NwsbIcon(mark, size: 20, color: Colors.black, strokeWidth: 1.6),
     );
   }
 }
@@ -90,6 +95,106 @@ class _BlackOrb extends StatelessWidget {
   }
 }
 
+class BlackOffer extends StatelessWidget {
+  const BlackOffer({
+    super.key,
+    required this.title,
+    required this.mark,
+    required this.line,
+    this.progress = 0,
+    this.onTap,
+    this.selected = false,
+  });
+
+  final String title;
+  final String mark;
+  final String line;
+  final double progress;
+  final VoidCallback? onTap;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) {
+    final value = progress.clamp(0.0, 1.0);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: GlassWrap(
+        margin: EdgeInsets.zero,
+        padding: const EdgeInsets.all(6),
+        child: Material(
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(14),
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(14),
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: selected ? const Color(0xFFE4C56A) : Colors.transparent,
+                  width: 1.4,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      WhiteCircleOrb(size: 16, mark: mark),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          title,
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 15),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(99),
+                    child: TweenAnimationBuilder<double>(
+                      tween: Tween(begin: 0, end: value),
+                      duration: const Duration(milliseconds: 700),
+                      curve: Curves.easeOutCubic,
+                      builder: (context, v, _) => LinearProgressIndicator(
+                        value: v,
+                        minHeight: 4,
+                        color: const Color(0xFFE4C56A),
+                        backgroundColor: const Color(0x33FFFFFF),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      const AppThinkingLoader(
+                        size: 14,
+                        state: OrbState.composing,
+                        blackCircle: true,
+                        circlePad: 3,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          line,
+                          style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12, height: 1.3),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class EconomyMessage extends StatelessWidget {
   const EconomyMessage({super.key, required this.title, required this.body, this.action, this.onAction});
   final String title;
@@ -104,7 +209,7 @@ class EconomyMessage extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const NwsbIcon(NwsbMarks.earn, color: NwsbColors.gold, size: 36),
+            const NwsbIcon(NwsbMarks.word, color: NwsbColors.gold, size: 36),
             const SizedBox(height: 14),
             EditableLabel('economy_theme.EconomyMessage', title, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700)),
             const SizedBox(height: 8),

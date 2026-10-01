@@ -44,12 +44,21 @@ class RoundRingSection extends StatelessWidget {
             'Earn, rewards, gifts, bonus, partner. Drag the ring.',
             style: TextStyle(fontSize: 12, color: Color(0xB3F4F4F5)),
           ),
-          const SizedBox(height: 10),
-          RoundCarousel(
-            images: [for (final p in kProgramPosters) p.asset],
-            speed: 2.4,
-            tilt: -8,
-            spacing: 8,
+          const SizedBox(height: 8),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: ColoredBox(
+              color: const Color(0xFF000000),
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 8),
+                child: RoundCarousel(
+                  images: [for (final p in kProgramPosters) p.asset],
+                  speed: 2.4,
+                  tilt: -8,
+                  spacing: 2,
+                ),
+              ),
+            ),
           ),
         ],
       ),

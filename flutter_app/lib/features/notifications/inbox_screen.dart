@@ -16,6 +16,7 @@ class InboxScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return EconomyPage(
       title: 'NowssB Earn — Activity',
+      mark: NwsbMarks.bell,
       banner: const ColoredSplitPromoBanner(
         margin: EdgeInsets.fromLTRB(16, 0, 16, 8),
         spec: SplitPromoSpec(
@@ -66,7 +67,7 @@ class InboxScreen extends StatelessWidget {
                     contentPadding: EdgeInsets.zero,
                     title: Text('${data['title'] ?? 'NowssB'}', style: const TextStyle(color: Colors.white)),
                     subtitle: Text('${data['body'] ?? ''}', style: const TextStyle(color: NwsbColors.mist)),
-                    trailing: unread ? const NwsbIcon(NwsbMarks.earn, size: 16, color: NwsbColors.gold) : null,
+                    trailing: unread ? const NwsbIcon(NwsbMarks.bell, size: 16, color: NwsbColors.gold) : null,
                     onTap: unread ? () => docs[i].reference.set({'read': true}, SetOptions(merge: true)) : null,
                   );
                 },

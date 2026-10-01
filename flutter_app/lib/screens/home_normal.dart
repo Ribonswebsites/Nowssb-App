@@ -415,7 +415,7 @@ class _HomeNormalState extends State<HomeNormal> {
                   margin: EdgeInsets.zero,
                   title: 'Today',
                   subtitle: 'The line moves when a task is done.',
-                  mark: NwsbMarks.earn,
+                  mark: NwsbMarks.book,
                   onTap: () => _go(1),
                 ),
               ),

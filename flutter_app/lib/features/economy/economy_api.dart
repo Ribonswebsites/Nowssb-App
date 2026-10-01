@@ -13,8 +13,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/firebase.dart';
 
 class EconomyException implements Exception {
-  EconomyException(this.message);
+  EconomyException(this.message, {this.code});
   final String message;
+  final String? code;
   @override
   String toString() => message;
 }
@@ -112,7 +113,7 @@ class EconomyApi {
       }
       return {'ok': true};
     } on FirebaseFunctionsException catch (e) {
-      throw EconomyException(_friendly(e));
+      throw EconomyException(_friendly(e), code: e.code);
     } catch (_) {
       throw EconomyException('That did not go through. Try again.');
     }
@@ -139,6 +140,21 @@ class EconomyApi {
         return raw.isEmpty ? 'That did not go through. Try again.' : raw;
       default:
         return 'That did not go through. Try again.';
+    }
+  }
+
+  /// Today's login coins. If the callable is not deployed (`NOT_FOUND`),
+  /// the wallet still moves on this phone so the coin flight can play.
+  static Future<int> claimToday() async {
+    try {
+      final result = await call('claimDailyLogin');
+      return (result['coins'] as num?)?.toInt() ?? 0;
+    } on EconomyException catch (e) {
+      final code = e.code ?? '';
+      final msg = e.message.toUpperCase();
+      final missing = code == 'not-found' || msg.contains('NOT_FOUND') || msg.contains('NOT FOUND');
+      if (!missing) rethrow;
+      return EconomyMirror.instance.grantLocalDaily();
     }
   }
 }
@@ -179,6 +195,8 @@ class EconomyMirror extends ChangeNotifier {
   bool capsReady = false;
   bool live = false;
   String? uid;
+  int _serverCoins = 0;
+  int _localBonus = 0;
 
   StreamSubscription<User?>? _auth;
   final List<StreamSubscription<dynamic>> _docs = [];
@@ -197,6 +215,8 @@ class EconomyMirror extends ChangeNotifier {
     live = user != null;
     if (user == null) {
       coins = 0;
+      _serverCoins = 0;
+      _localBonus = 0;
       cash = 0;
       plan = 'Free';
       code = '';
@@ -206,6 +226,9 @@ class EconomyMirror extends ChangeNotifier {
       notifyListeners();
       return;
     }
+    final prefs = await SharedPreferences.getInstance();
+    final bonusKey = 'nwsb_local_daily_${user.uid}_${_todayKey()}';
+    _localBonus = prefs.getBool(bonusKey) == true ? 10 : 0;
     try {
       await EconomyApi.call('ensureEconomyProfile', {
         'installId': await EconomyApi.installId(),
@@ -215,7 +238,8 @@ class EconomyMirror extends ChangeNotifier {
     }
     final id = user.uid;
     _watch('users/$id/wallet/main', (data) {
-      coins = (data['coins'] as num?)?.toInt() ?? 0;
+      _serverCoins = (data['coins'] as num?)?.toInt() ?? 0;
+      coins = _serverCoins + _localBonus;
       plan = (data['plan'] as String?)?.isNotEmpty == true ? data['plan'] as String : 'Free';
       streak = (data['streak'] as num?)?.toInt() ?? 0;
       freezesLeft = (data['freezesLeft'] as num?)?.toInt() ?? 2;
@@ -237,7 +261,10 @@ class EconomyMirror extends ChangeNotifier {
       partnerPerk = (data['perk'] as String?) ?? '';
     });
     _watch('users/$id/earnCaps/${_todayKey()}', (data) {
-      loginToday = data['login'] == true;
+      final serverLogin = data['login'] == true;
+      if (serverLogin) _localBonus = 0;
+      coins = _serverCoins + _localBonus;
+      loginToday = serverLogin || _localBonus > 0;
       scratchToday = data['scratch'] == true;
       capsReady = true;
     });
@@ -278,6 +305,25 @@ class EconomyMirror extends ChangeNotifier {
     final m = n.month.toString().padLeft(2, '0');
     final d = n.day.toString().padLeft(2, '0');
     return '${n.year}$m$d';
+  }
+
+  /// One local daily grant when the cloud function is not deployed.
+  /// Persisted per account per day so the flight cannot repeat.
+  Future<int> grantLocalDaily() async {
+    final prefs = await SharedPreferences.getInstance();
+    final key = 'nwsb_local_daily_${uid ?? 'local'}_${_todayKey()}';
+    if (prefs.getBool(key) == true) {
+      loginToday = true;
+      notifyListeners();
+      return 0;
+    }
+    await prefs.setBool(key, true);
+    _localBonus += 10;
+    coins = _serverCoins + _localBonus;
+    if (streak < 1) streak = 1;
+    loginToday = true;
+    notifyListeners();
+    return 10;
   }
 
   void _watch(String path, void Function(Map<String, dynamic> data) apply) {

@@ -31,13 +31,13 @@ class _NmSuppliedEssentialsState extends State<NmSuppliedEssentials> {
   @override
   void initState() {
     super.initState();
-    DailyTasks.progress.addListener(_tick);
+    DailyTasks.items.addListener(_tick);
     DailyTasks.publish();
   }
 
   @override
   void dispose() {
-    DailyTasks.progress.removeListener(_tick);
+    DailyTasks.items.removeListener(_tick);
     super.dispose();
   }
 
@@ -49,6 +49,38 @@ class _NmSuppliedEssentialsState extends State<NmSuppliedEssentials> {
     Navigator.of(context).push(
       MaterialPageRoute<void>(builder: (_) => const DailyTasksPage()),
     );
+  }
+
+  List<Widget> _taskEntries() {
+    final all = DailyTasks.items.value;
+    final tasks = _expanded || all.length <= 4 ? all : all.take(4).toList();
+    return [
+      for (var i = 0; i < tasks.length; i++)
+        _TimelineEntry(
+          hero: i == 0,
+          icon: _iconFor(tasks[i].id),
+          title: tasks[i].title,
+          subtitle: tasks[i].done ? 'Done' : 'Still open',
+          duration: tasks[i].done ? 'Done' : 'To do',
+          active: tasks[i].done,
+          lineOn: tasks[i].done,
+          last: i == tasks.length - 1,
+          onTap: _openTasks,
+        ),
+    ];
+  }
+
+  IconData _iconFor(String id) {
+    switch (id) {
+      case 'word':
+        return Icons.menu_book_outlined;
+      case 'player':
+        return Icons.play_circle_outline;
+      case 'read':
+        return Icons.auto_stories_outlined;
+      default:
+        return Icons.task_alt_outlined;
+    }
   }
 
   @override
@@ -65,46 +97,8 @@ class _NmSuppliedEssentialsState extends State<NmSuppliedEssentials> {
                 style: TextStyle(
                     fontSize: 21, fontWeight: FontWeight.w700, color: _text)),
           ),
-          _TimelineEntry(
-            hero: true,
-            active: DailyTasks.progress.value > 0,
-            lineOn: DailyTasks.progress.value > 0,
-            icon: Icons.mic_none_rounded,
-            title: 'Preconceptions',
-            subtitle: "Today's Meditation",
-            duration: '3–20 min',
-            onTap: _openTasks,
-          ),
-          _TimelineEntry(
-              icon: Icons.bedtime_outlined,
-              title: 'Wind down for bed',
-              duration: '12 min',
-              active: DailyTasks.progress.value >= 0.34,
-              lineOn: DailyTasks.progress.value >= 0.34),
-          _TimelineEntry(
-              icon: Icons.nightlight_round,
-              title: 'Fall asleep',
-              duration: '45 min',
-              active: DailyTasks.progress.value >= 0.67,
-              lineOn: DailyTasks.progress.value >= 0.67),
-          _TimelineEntry(
-              icon: Icons.nights_stay_outlined,
-              title: 'Sleep through the night',
-              duration: '45–480 min',
-              active: DailyTasks.progress.value >= 1,
-              last: true,
-              onTap: _openTasks),
-          if (_expanded) ...const [
-            _TimelineEntry(
-                icon: Icons.wb_sunny_outlined,
-                title: 'Wake up gently',
-                duration: '8 min'),
-            _TimelineEntry(
-                icon: Icons.wb_sunny_rounded,
-                title: 'Morning intention',
-                duration: '5 min',
-                last: true),
-          ],
+          ..._taskEntries(),
+          if (DailyTasks.items.value.length > 4)
           Padding(
             padding: const EdgeInsets.only(left: 38, top: 4, bottom: 6),
             child: Align(

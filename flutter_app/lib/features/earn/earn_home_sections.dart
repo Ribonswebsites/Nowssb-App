@@ -50,7 +50,7 @@ const _earnTiers = <_EarnTier>[
     'Same code, higher rate',
     '15% of net after the store fee',
     'Units you already have stay',
-  ], NwsbMarks.earn),
+  ], NwsbMarks.crown),
   _EarnTier('Pro', '300 units · 20% of net', '20%', [
     '20% of net after the store fee',
     'Direct recruits pay 5% of their commission',
@@ -636,14 +636,14 @@ class YourRewardsSection extends StatelessWidget {
                   const PaneHead(
                     eyebrow: 'NowssB Rewards',
                     title: 'Coins and streak',
-                    mark: NwsbMarks.earn,
+                    mark: NwsbMarks.rewards,
                   ),
                   const SizedBox(height: 10),
                   const BrandTopBanner(
                     bare: true,
                     compact: true,
                     title: 'NowssB Rewards',
-                    mark: NwsbMarks.earn,
+                    mark: NwsbMarks.rewards,
                   ),
                   const SizedBox(height: 12),
                   if (!signedIn)
@@ -677,7 +677,7 @@ class YourRewardsSection extends StatelessWidget {
                     SecBanner(
                       title: 'Open rewards',
                       sub: 'Daily coins, quests, and chests',
-                      mark: NwsbMarks.earn,
+                      mark: NwsbMarks.rewards,
                       onTap: () => EarnUmbrellaSection._open(context, const VaultScreen()),
                     ),
                   ],

@@ -9,6 +9,7 @@ import '../economy/money.dart';
 import '../economy/play_billing.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/glass_wrap.dart';
+import '../../widgets/nwsb_icon.dart';
 import '../../screens/store/store_terms_sheet.dart';
 import '../../screens/subscription.dart';
 import '../../widgets/program_shelf.dart';
@@ -101,6 +102,7 @@ class BazaarScreen extends StatelessWidget {
       head: 'Before you resell',
       child: EconomyPage(
         title: 'Resell',
+        mark: NwsbMarks.bag,
         child: listening,
       ),
     );

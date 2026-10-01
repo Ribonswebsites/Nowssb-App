@@ -49,7 +49,7 @@ class FourBanners extends StatelessWidget {
           margin: EdgeInsets.zero,
           title: blackTitle,
           subtitle: blackSub,
-          mark: NwsbMarks.earn,
+          mark: NwsbMarks.rewards,
         ),
         const SizedBox(height: 12),
         const ProgramShelf(),

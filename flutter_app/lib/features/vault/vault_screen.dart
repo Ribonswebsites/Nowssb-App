@@ -23,6 +23,7 @@ class VaultScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return EconomyPage(
       title: 'NowssB Rewards',
+      mark: NwsbMarks.rewards,
       child: ListenableBuilder(
         listenable: EconomyMirror.instance,
         builder: (context, _) {
@@ -33,7 +34,7 @@ class VaultScreen extends StatelessWidget {
               const BrandTopBanner(
                 bare: true,
                 title: 'NowssB Rewards',
-                mark: NwsbMarks.earn,
+                mark: NwsbMarks.rewards,
               ),
               const SizedBox(height: 12),
               const _TodayCard(),
@@ -50,10 +51,6 @@ class VaultScreen extends StatelessWidget {
               const SizedBox(height: 12),
               const EconomyNote(
                 'Coins are earned. They cover at most 30% of a Play purchase. They cannot be bought, gifted, or cashed out.',
-              ),
-              const SizedBox(height: 12),
-              const EconomyNote(
-                'Invite a friend once. If they subscribe, you get one free month when you have no plan, or coins when you already do. No tiers and no ongoing percent — that lives in NowssB Earn.',
               ),
               const SizedBox(height: 12),
               const EconomyNote(
@@ -87,23 +84,19 @@ class VaultScreen extends StatelessWidget {
               const SizedBox(height: 18),
               const EditableLabel('vault_screen.VaultScreen', 'PLAY PURCHASES', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.4, fontSize: 12)),
               const SizedBox(height: 8),
-              _buy(context, 'Word', 'nwsb_word', 99, 'word', 'Word'),
-              _buy(context, 'Meaning', 'nwsb_meaning', 99, 'meaning', 'Meaning'),
-              _buy(context, '10-word bundle', 'nwsb_bundle_10', 999, 'bundle', '10-word bundle'),
-              _buy(context, 'Meaning package', 'nwsb_package', 399, 'package', 'Meaning package'),
-              // Plans are Google Play subscriptions, bought and verified on
-              // the Subscription screen (lib/data/play_subscriptions.dart).
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: GoldButton(
-                  label: 'Plans · Resonance, Frequency, Frequency X',
-                  filled: false,
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(builder: (_) => const SubscriptionScreen()),
-                  ),
+              _buy(context, 'Word', 'nwsb_word', 99, 'word', 'Word', NwsbMarks.word),
+              _buy(context, 'Meaning', 'nwsb_meaning', 99, 'meaning', 'Meaning', NwsbMarks.meaning),
+              _buy(context, '10-word bundle', 'nwsb_bundle_10', 999, 'bundle', '10-word bundle', NwsbMarks.book),
+              _buy(context, 'Meaning package', 'nwsb_package', 399, 'package', 'Meaning package', NwsbMarks.ebook),
+              BlackOffer(
+                title: 'Plans',
+                mark: NwsbMarks.crown,
+                line: '0 of 1 · Resonance, Frequency, Frequency X',
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(builder: (_) => const SubscriptionScreen()),
                 ),
               ),
-              _buy(context, 'Restore streak', 'nwsb_streak_restore', 199, 'streak', 'Streak restore'),
+              _buy(context, 'Restore streak', 'nwsb_streak_restore', 199, 'streak', 'Streak restore', NwsbMarks.flame),
               const SizedBox(height: 18),
               const EditableLabel('vault_screen.VaultScreen', 'MILESTONE CHEST', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.4, fontSize: 12)),
               const SizedBox(height: 8),
@@ -119,57 +112,20 @@ class VaultScreen extends StatelessWidget {
 
   Widget _quest(BuildContext context, String id, String title, int value, int goal, int reward) {
     final frac = goal == 0 ? 0.0 : (value / goal).clamp(0, 1).toDouble();
+    final left = (goal - value).clamp(0, goal);
     final done = value >= goal;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: GlassWrap(
-        margin: EdgeInsets.zero,
-        padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
-        child: Row(
-          children: [
-            SizedBox(
-              width: 46,
-              height: 46,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  CircularProgressIndicator(
-                    value: frac,
-                    strokeWidth: 3,
-                    color: NwsbColors.gold,
-                    backgroundColor: const Color(0x22FFFFFF),
-                  ),
-                  Text(
-                    '$value',
-                    style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w800),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
-                  const SizedBox(height: 2),
-                  Text(
-                    '$value of $goal · $reward coins',
-                    style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12),
-                  ),
-                ],
-              ),
-            ),
-            if (done)
-              TextButton(
-                onPressed: () => runPrivate(context, () => EconomyApi.call('claimQuest', {'questId': id})),
-                child: const Text('Open'),
-              )
-            else
-              const Text('Open', style: TextStyle(color: Color(0x55FFFFFF), fontWeight: FontWeight.w700)),
-          ],
-        ),
-      ),
+    final mark = switch (id) {
+      'practice5' => NwsbMarks.stages,
+      'streak3' => NwsbMarks.flame,
+      'listen1' => NwsbMarks.sound,
+      _ => NwsbMarks.bag,
+    };
+    return BlackOffer(
+      title: title,
+      mark: mark,
+      progress: frac,
+      line: '$value of $goal done · $left left · $reward coins',
+      onTap: done ? () => runPrivate(context, () => EconomyApi.call('claimQuest', {'questId': id})) : null,
     );
   }
 
@@ -202,37 +158,36 @@ class VaultScreen extends StatelessWidget {
     );
   }
 
-  Widget _buy(BuildContext context, String label, String catalogId, int price, String kind, String title) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: FutureBuilder<String>(
-        future: PlayCheckout.priceLabel(catalogId),
-        builder: (context, snap) {
-          return GoldButton(
-            label: '${label} · ${snap.data ?? 'Play price'}',
-            filled: false,
-            onTap: () => runPrivate(context, () async {
-          final quote = CashQuote.forPrice(
-            price: price,
-            balance: EconomyMirror.instance.coins,
-            catalogId: catalogId,
-          );
-          await PlayCheckout.buy(
-            callable: 'verifyPlayPurchase',
-            productId: quote.productId,
-            payload: {
-              'catalogId': catalogId,
-              'coins': quote.coins,
-              'listPrice': price,
-              'kind': kind,
-              'title': title,
-              'itemId': catalogId,
-            },
-          );
-        }),
-          );
-        },
-      ),
+  Widget _buy(BuildContext context, String label, String catalogId, int price, String kind, String title, String mark) {
+    return FutureBuilder<String>(
+      future: PlayCheckout.priceLabel(catalogId),
+      builder: (context, snap) {
+        final priceLabel = snap.data ?? 'Play price';
+        return BlackOffer(
+          title: label,
+          mark: mark,
+          line: '0 of 1 · $priceLabel',
+          onTap: () => runPrivate(context, () async {
+            final quote = CashQuote.forPrice(
+              price: price,
+              balance: EconomyMirror.instance.coins,
+              catalogId: catalogId,
+            );
+            await PlayCheckout.buy(
+              callable: 'verifyPlayPurchase',
+              productId: quote.productId,
+              payload: {
+                'catalogId': catalogId,
+                'coins': quote.coins,
+                'listPrice': price,
+                'kind': kind,
+                'title': title,
+                'itemId': catalogId,
+              },
+            );
+          }),
+        );
+      },
     );
   }
 }
@@ -250,19 +205,26 @@ class _TodayCardState extends State<_TodayCard> {
   Future<void> _claim() async {
     final before = EconomyMirror.instance.coins;
     try {
-      final result = await EconomyApi.call('claimDailyLogin');
-      final gained = (result['coins'] as num?)?.toInt() ?? 0;
+      final gained = await EconomyApi.claimToday();
       if (!mounted) return;
-      setState(() => _note = '+$gained coins landed on this wallet.');
-      await NwsbCoinFly.show(
-        context,
-        coins: gained == 0 ? 5 : gained,
-        from: before,
-        to: before + gained,
-      );
+      final after = EconomyMirror.instance.coins;
+      setState(() => _note = gained > 0
+          ? '+$gained coins landed on this wallet.'
+          : 'Today’s login is already on the wallet.');
+      if (gained > 0) {
+        await NwsbCoinFly.show(
+          context,
+          coins: gained,
+          from: before,
+          to: after,
+        );
+      }
     } on EconomyException catch (e) {
       if (!mounted) return;
-      setState(() => _note = e.message);
+      final raw = e.message.toUpperCase();
+      setState(() => _note = raw.contains('NOT_FOUND')
+          ? 'The wallet did not answer. Tap claim again.'
+          : e.message);
     }
   }
 

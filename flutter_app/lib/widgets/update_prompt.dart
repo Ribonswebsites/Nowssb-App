@@ -3,6 +3,8 @@
 /// stops a download (see lib/app_update.dart).
 library;
 
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
@@ -10,10 +12,11 @@ import '../admin/template/editable.dart';
 import '../app_update.dart';
 import '../theme/tokens.dart';
 import 'app_thinking_loader.dart';
+import 'glass_wrap.dart';
 import 'nwsb_icon.dart';
 
 const _panel = Color(0xFF000000);
-const _bannerHeight = 34.0;
+const _bannerHeight = 52.0;
 
 /// Wraps the app (MaterialApp.builder). While an update is pending a slim
 /// banner sits under the status bar — the child's top inset grows by the
@@ -73,63 +76,71 @@ class _UpdateBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final updater = NwsbUpdater.instance;
-    return Material(
-      color: _panel,
-      child: InkWell(
-        onTap: onTap,
-        child: AnimatedBuilder(
-          animation: updater,
-          builder: (context, _) {
-            final p = updater.progress;
-            final String label;
-            switch (updater.phase) {
-              case NwsbUpdatePhase.downloading:
-                label = p == null ? 'Downloading update…' : 'Downloading update · ${(p * 100).floor()}%';
-              case NwsbUpdatePhase.retrying:
-                label = 'Update paused — reconnecting…';
-              case NwsbUpdatePhase.verifying:
-                label = 'Checking update…';
-              case NwsbUpdatePhase.ready:
-              case NwsbUpdatePhase.installing:
-                label = 'Update ready — tap to install';
-              case NwsbUpdatePhase.failed:
-                label = 'Update paused — tap to continue';
-              case NwsbUpdatePhase.idle:
-                label = 'Update available — tap to update';
-            }
-            return Stack(children: [
-              if (updater.busy && p != null)
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  child: LinearProgressIndicator(
-                    value: p,
-                    minHeight: 2,
-                    color: NwsbColors.goldLight,
-                    backgroundColor: Colors.transparent,
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ui.ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+        child: Material(
+          color: const Color(0xCC000000),
+          child: InkWell(
+            onTap: onTap,
+            child: AnimatedBuilder(
+              animation: updater,
+              builder: (context, _) {
+                final p = updater.progress;
+                final String label;
+                switch (updater.phase) {
+                  case NwsbUpdatePhase.downloading:
+                    label = p == null ? 'Downloading update…' : 'Downloading update · ${(p * 100).floor()}%';
+                  case NwsbUpdatePhase.retrying:
+                    label = 'Update paused — reconnecting…';
+                  case NwsbUpdatePhase.verifying:
+                    label = 'Checking update…';
+                  case NwsbUpdatePhase.ready:
+                  case NwsbUpdatePhase.installing:
+                    label = 'Update ready — tap to install';
+                  case NwsbUpdatePhase.failed:
+                    label = 'Update paused — tap to continue';
+                  case NwsbUpdatePhase.idle:
+                    label = 'Update available — tap to update';
+                }
+                return Stack(children: [
+                  if (updater.busy && p != null)
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: LinearProgressIndicator(
+                        value: p,
+                        minHeight: 2,
+                        color: NwsbColors.goldLight,
+                        backgroundColor: Colors.transparent,
+                      ),
+                    ),
+                  const Positioned(
+                    left: 8,
+                    bottom: 4,
+                    child: AppThinkingLoader(size: 12, state: OrbState.composing, blackCircle: true, circlePad: 2),
                   ),
-                ),
-              Center(
-                child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  Container(
-                    width: 22,
-                    height: 22,
-                    alignment: Alignment.center,
-                    decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                    child: const NwsbIcon(NwsbMarks.earn, size: 12, color: Colors.black, strokeWidth: 1.6),
+                  Center(
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      Container(
+                        width: 22,
+                        height: 22,
+                        alignment: Alignment.center,
+                        decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                        child: const NwsbIcon(NwsbMarks.update, size: 12, color: Colors.black, strokeWidth: 1.6),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        label,
+                        style: const TextStyle(color: Colors.white, fontSize: 12.5, fontWeight: FontWeight.w700),
+                      ),
+                    ]),
                   ),
-                  const SizedBox(width: 8),
-                  const AppThinkingLoader(size: 12, state: OrbState.composing, blackCircle: true, circlePad: 3),
-                  const SizedBox(width: 8),
-                  Text(
-                    label,
-                    style: const TextStyle(color: Colors.white, fontSize: 12.5, fontWeight: FontWeight.w700),
-                  ),
-                ]),
-              ),
-            ]);
-          },
+                ]);
+              },
+            ),
+          ),
         ),
       ),
     );
@@ -171,57 +182,59 @@ class _UpdateDialog extends StatelessWidget {
         final busy = updater.busy;
         return Dialog(
           backgroundColor: Colors.transparent,
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(18, 18, 18, 8),
-            decoration: BoxDecoration(
-              color: Colors.black,
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: const Color(0x33FFFFFF)),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 36,
-                      height: 36,
-                      alignment: Alignment.center,
-                      decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                      child: const NwsbIcon(NwsbMarks.earn, size: 18, color: Colors.black, strokeWidth: 1.6),
-                    ),
-                    const SizedBox(width: 8),
-                    const AppThinkingLoader(size: 16, state: OrbState.composing, blackCircle: true, circlePad: 4),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        phase == NwsbUpdatePhase.ready || phase == NwsbUpdatePhase.installing
-                            ? 'NowssB update downloaded'
-                            : busy
-                                ? 'Updating NowssB…'
-                                : 'A new NowssB update is ready',
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
+          child: GlassWrap(
+            margin: EdgeInsets.zero,
+            padding: const EdgeInsets.all(6),
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(18, 18, 18, 8),
+              decoration: BoxDecoration(
+                color: Colors.black,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 36,
+                        height: 36,
+                        alignment: Alignment.center,
+                        decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                        child: const NwsbIcon(NwsbMarks.update, size: 18, color: Colors.black, strokeWidth: 1.6),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                const _UpdateBody(
-                  idleText: 'The update downloads inside NowssB — it keeps going if you close this or leave the app — '
-                      'then Android shows its install confirmation.',
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: busy ? const Text('Hide') : const EditableLabel('main.NowssbApp', 'Later'),
-                    ),
-                    const _PrimaryButton(),
-                  ],
-                ),
-              ],
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          phase == NwsbUpdatePhase.ready || phase == NwsbUpdatePhase.installing
+                              ? 'NowssB update downloaded'
+                              : busy
+                                  ? 'Updating NowssB…'
+                                  : 'A new NowssB update is ready',
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  const _UpdateBody(
+                    idleText: 'The update downloads inside NowssB — it keeps going if you close this or leave the app — '
+                        'then Android shows its install confirmation.',
+                  ),
+                  Row(
+                    children: [
+                      const AppThinkingLoader(size: 14, state: OrbState.composing, blackCircle: true, circlePad: 3),
+                      const Spacer(),
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: busy ? const Text('Hide') : const EditableLabel('main.NowssbApp', 'Later'),
+                      ),
+                      const _PrimaryButton(),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         );

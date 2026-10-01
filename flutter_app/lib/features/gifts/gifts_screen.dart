@@ -216,6 +216,7 @@ class _GiftsScreenState extends State<GiftsScreen> {
   Widget build(BuildContext context) {
     return EconomyPage(
       title: 'NowssB Gifts',
+      mark: NwsbMarks.gift,
       child: ListenableBuilder(
         listenable: GiftBook.instance,
         builder: (context, _) {
@@ -304,6 +305,23 @@ class _GiftsScreenState extends State<GiftsScreen> {
     );
   }
 
+  String _giftMark(String id) {
+    switch (id) {
+      case 'word':
+        return NwsbMarks.word;
+      case 'meaning':
+        return NwsbMarks.meaning;
+      case 'bundle':
+        return NwsbMarks.book;
+      case 'resonance':
+        return NwsbMarks.sound;
+      case 'frequency':
+        return NwsbMarks.stages;
+      default:
+        return NwsbMarks.crown;
+    }
+  }
+
   Widget _send() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -313,13 +331,15 @@ class _GiftsScreenState extends State<GiftsScreen> {
         ),
         const SizedBox(height: 12),
         for (final item in kGiftCatalog)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: GoldButton(
-              label: '${item.label} · ${FxBook.instance.formatCents(item.cents)}',
-              filled: _item.id == item.id,
-              onTap: () => setState(() => _item = item),
-            ),
+          BlackOffer(
+            title: item.label,
+            mark: _giftMark(item.id),
+            selected: _item.id == item.id,
+            progress: _item.id == item.id ? 1 : 0,
+            line: _item.id == item.id
+                ? '1 of 1 selected · ${FxBook.instance.formatCents(item.cents)}'
+                : '0 of 1 · ${FxBook.instance.formatCents(item.cents)}',
+            onTap: () => setState(() => _item = item),
           ),
         const SizedBox(height: 8),
         TextField(

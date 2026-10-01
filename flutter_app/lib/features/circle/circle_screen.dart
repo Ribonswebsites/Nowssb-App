@@ -1,17 +1,19 @@
-import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../../screens/nwsb_sign_in_sheet.dart';
 import '../../screens/subscription.dart';
+import '../../widgets/app_thinking_loader.dart';
 import '../../widgets/banner_mix.dart';
 import '../../widgets/brand_top_banner.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/flip_portrait.dart';
+import '../../widgets/four_banners.dart';
 import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_icon.dart';
+import '../../widgets/program_shelf.dart';
 import '../../data/firebase.dart';
 import '../../theme/tokens.dart';
 import '../earn/earn_topic_page.dart';
@@ -47,25 +49,56 @@ class _CircleScreenState extends State<CircleScreen> {
   void _welcome() {
     showDialog<void>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF14121A),
-        title: const EditableLabel('circle_screen.CircleScreen',
-          'Welcome to NowssB Earn',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
-        ),
-        content: const Text(
-          'Become a Partner in our journey and make this journey your Earn.\n\n'
-          'Commission is a percent of NowssB’s net after the store fee, never the sticker price. '
-          'Master Agent stops at 30%. A direct recruit pays you 5% of their commission, and only while both paid plans are active. '
-          'There is no third level. An invite by itself pays nothing. Payouts wait for review before money moves.',
-          style: TextStyle(color: Color(0xCCFFFFFF), height: 1.4),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const EditableLabel('circle_screen.CircleScreen', 'Continue'),
+      barrierColor: const Color(0x99000000),
+      builder: (ctx) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: GlassWrap(
+          margin: EdgeInsets.zero,
+          padding: const EdgeInsets.all(6),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            decoration: BoxDecoration(
+              color: Colors.black,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Row(
+                  children: [
+                    WhiteCircleOrb(size: 20, mark: NwsbMarks.piggy),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        'Welcome to NowssB Earn',
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 18),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'Become a Partner in our journey and make this journey your Earn.\n\n'
+                  'Commission is a percent of NowssB’s net after the store fee, never the sticker price. '
+                  'Master Agent stops at 30%. A direct recruit pays you 5% of their commission, and only while both paid plans are active. '
+                  'There is no third level. An invite by itself pays nothing. Payouts wait for review before money moves.',
+                  style: TextStyle(color: Color(0xCCFFFFFF), height: 1.4),
+                ),
+                Row(
+                  children: [
+                    const AppThinkingLoader(size: 14, state: OrbState.composing, blackCircle: true, circlePad: 3),
+                    const Spacer(),
+                    TextButton(
+                      onPressed: () => Navigator.of(ctx).pop(),
+                      child: const Text('Continue', style: TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w700)),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -74,6 +107,7 @@ class _CircleScreenState extends State<CircleScreen> {
   Widget build(BuildContext context) {
     return EconomyPage(
       title: 'NowssB Earn',
+      mark: NwsbMarks.piggy,
       child: ListenableBuilder(
         listenable: EconomyMirror.instance,
         builder: (context, _) {
@@ -101,7 +135,7 @@ class _CircleScreenState extends State<CircleScreen> {
                 onTap: _welcome,
               ),
               const SizedBox(height: 12),
-              const _EarnCardRail(),
+              const TrioRail(),
               const SizedBox(height: 14),
               GlassWrap(
                 margin: EdgeInsets.zero,
@@ -345,178 +379,6 @@ class _CircleScreenState extends State<CircleScreen> {
             ],
           );
         },
-      ),
-    );
-  }
-}
-
-class _RailCard {
-  const _RailCard(this.label, this.image, this.tint, this.open);
-  final String label;
-  final String image;
-  final Color tint;
-  final void Function(BuildContext) open;
-}
-
-class _EarnCardRail extends StatefulWidget {
-  const _EarnCardRail();
-
-  @override
-  State<_EarnCardRail> createState() => _EarnCardRailState();
-}
-
-class _EarnCardRailState extends State<_EarnCardRail> {
-  static const _loop = 80;
-  late final PageController _pages = PageController(
-    viewportFraction: 0.52,
-    initialPage: _cards.length * (_loop ~/ 2),
-  );
-  Timer? _timer;
-
-  static const _cards = <_RailCard>[
-    _RailCard('NowssB Gifts', 'assets/banners/earn/sit-dark.png', Color(0xFF6A1B4D), openGifts),
-    _RailCard('NowssB Rewards', 'assets/banners/earn/yoga-light.png', Color(0xFF1E3A8A), openRewards),
-    _RailCard('Your Earning', 'assets/banners/earn/man-light.png', Color(0xFF8A5A12), openEarnings),
-    _RailCard('NowssB coins earned', 'assets/banners/earn/yoga-dark.png', Color(0xFF0F6E56), openCoins),
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    if (const bool.fromEnvironment('FLUTTER_TEST')) return;
-    _timer = Timer.periodic(const Duration(milliseconds: 2400), (_) {
-      if (!mounted || !_pages.hasClients) return;
-      final current = _pages.page?.round() ?? _cards.length * (_loop ~/ 2);
-      _pages.animateToPage(current + 1, duration: const Duration(milliseconds: 520), curve: Curves.easeOutCubic);
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    _pages.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return GlassWrap(
-      margin: EdgeInsets.zero,
-      padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
-      child: SizedBox(
-        height: 172,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            _plainPhoto(
-              width: 108,
-              height: 172,
-              image: 'assets/banners/earn/hands-raise.png',
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: SizedBox(
-                height: 118,
-                child: PageView.builder(
-                  controller: _pages,
-                  padEnds: false,
-                  itemCount: _cards.length * _loop,
-                  itemBuilder: (_, i) {
-                    final card = _cards[i % _cards.length];
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: _photoCard(
-                        width: double.infinity,
-                        height: 118,
-                        label: card.label,
-                        image: card.image,
-                        tint: card.tint,
-                        onTap: () => card.open(context),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _plainPhoto({
-    required double width,
-    required double height,
-    required String image,
-  }) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: SizedBox(
-        width: width,
-        height: height,
-        child: EditableImage.asset(
-          image,
-          fit: BoxFit.cover,
-          alignment: const Alignment(0, -0.05),
-          slot: 'circle_screen.EarnCardRail',
-        ),
-      ),
-    );
-  }
-
-  Widget _photoCard({
-    required double width,
-    required double height,
-    required String label,
-    required String image,
-    required Color tint,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: SizedBox(
-          width: width,
-          height: height,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              EditableImage.asset(
-                image,
-                fit: BoxFit.cover,
-                alignment: const Alignment(0, -0.1),
-                color: tint.withValues(alpha: 0.42),
-                colorBlendMode: BlendMode.srcATop,
-                slot: 'circle_screen.EarnCardRail',
-              ),
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      tint.withValues(alpha: 0.05),
-                      tint.withValues(alpha: 0.78),
-                    ],
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(8, 8, 8, 10),
-                child: Align(
-                  alignment: Alignment.bottomLeft,
-                  child: EditableLabel('circle_screen.EarnCardRail',
-                    label,
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13, height: 1.12),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

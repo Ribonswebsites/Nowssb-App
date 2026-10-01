@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/tokens.dart';
 import '../../widgets/four_banners.dart';
+import '../../widgets/nwsb_icon.dart';
 import '../../widgets/program_shelf.dart';
 import 'economy_api.dart';
 import 'economy_theme.dart';
@@ -64,6 +65,7 @@ class _CouponScreenState extends State<CouponScreen> {
     final ready = _rarity != null;
     return EconomyPage(
       title: 'Coupon',
+      mark: NwsbMarks.coupon,
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [

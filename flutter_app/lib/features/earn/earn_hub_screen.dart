@@ -15,6 +15,7 @@ import '../vault/vault_screen.dart';
 import '../wordprint/word_print_screen.dart';
 import '../../screens/nwsb_sign_in_sheet.dart';
 import '../../widgets/colored_split_promo_banner.dart';
+import '../../widgets/nwsb_icon.dart';
 import '../economy/coupon_screen.dart';
 import '../economy/partner_screen.dart';
 import '../economy/reference_screen.dart';
@@ -29,6 +30,7 @@ class EarnHubScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return EconomyPage(
       title: 'NowssB Earn',
+      mark: NwsbMarks.piggy,
       banner: const ColoredSplitPromoBanner(
         margin: EdgeInsets.fromLTRB(16, 0, 16, 8),
         spec: SplitPromoSpec(

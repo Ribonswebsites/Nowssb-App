@@ -74,6 +74,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
   Widget build(BuildContext context) {
     return EconomyPage(
       title: 'Your Earning',
+      mark: NwsbMarks.bars,
       child: ListenableBuilder(
         listenable: EconomyMirror.instance,
         builder: (context, _) {

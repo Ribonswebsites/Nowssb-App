@@ -345,14 +345,14 @@ class HomeMenuDrawer extends StatelessWidget {
                           ),
                           _Row(
                             light: light,
-                            mark: NwsbMarks.earn,
+                            mark: NwsbMarks.piggy,
                             label: 'NowssB Earn',
                             sub: 'Agents, codes, commission',
                             onTap: () => _push(context, const CircleScreen()),
                           ),
                           _Row(
                             light: light,
-                            mark: NwsbMarks.earn,
+                            mark: NwsbMarks.rewards,
                             label: 'NowssB Rewards',
                             sub: 'Daily coins, quests, one invite',
                             onTap: () => _push(context, const VaultScreen()),
@@ -387,7 +387,7 @@ class HomeMenuDrawer extends StatelessWidget {
                           ),
                           _Row(
                             light: light,
-                            mark: NwsbMarks.earn,
+                            mark: NwsbMarks.bars,
                             label: 'Earnings',
                             sub: 'Payouts and commissions',
                             onTap: () => _push(context, const EarningsScreen()),

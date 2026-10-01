@@ -85,12 +85,12 @@ class _RoundCarouselState extends State<RoundCarousel>
     return LayoutBuilder(
       builder: (context, c) {
         final stageW = c.maxWidth.isFinite ? c.maxWidth : 340.0;
-        final cardW = (stageW * 0.34).clamp(108.0, 140.0);
-        final cardH = cardW * 1.35;
+        final cardW = (stageW * 0.46).clamp(128.0, 168.0);
+        final cardH = cardW * 1.28;
         final count = images.length;
         final step = 2 * math.pi / count;
         final rot = _rot * math.pi / 180;
-        final radius = cardW * 1.2;
+        final radius = cardW * 0.42;
 
         final order = List<int>.generate(count, (i) => i)
           ..sort((a, b) {
@@ -193,7 +193,7 @@ class _Face extends StatelessWidget {
       asset,
       width: width,
       height: height,
-      fit: BoxFit.contain,
+      fit: BoxFit.cover,
       gaplessPlayback: true,
       errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF141414)),
     );

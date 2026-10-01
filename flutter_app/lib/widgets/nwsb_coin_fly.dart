@@ -19,7 +19,7 @@ class NwsbCoinFly {
     required int from,
     required int to,
   }) {
-    final count = coins.clamp(5, 30);
+    final count = (coins * 2).clamp(16, 30);
     return showGeneralDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -46,7 +46,7 @@ class _FlyStageState extends State<_FlyStage> with SingleTickerProviderStateMixi
   @override
   void initState() {
     super.initState();
-    _move = AnimationController(vsync: this, duration: const Duration(milliseconds: 1400));
+    _move = AnimationController(vsync: this, duration: const Duration(milliseconds: 1800));
     if (_quiet) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) Navigator.of(context).pop();

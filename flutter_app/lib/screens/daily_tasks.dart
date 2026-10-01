@@ -8,24 +8,59 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../theme/tokens.dart';
 import '../widgets/glass_wrap.dart';
+import '../widgets/nwsb_icon.dart';
 import '../widgets/program_shelf.dart';
+
+class DailyTaskView {
+  const DailyTaskView(this.id, this.title, this.mark, this.done);
+  final String id;
+  final String title;
+  final String mark;
+  final bool done;
+}
 
 class _Task {
   const _Task(this.id, this.title);
   final String id;
   final String title;
+  String get mark => DailyTasks.markFor(id, title);
 }
 
 class DailyTasks {
   DailyTasks._();
 
   static final progress = ValueNotifier<double>(0);
+  static final items = ValueNotifier<List<DailyTaskView>>(const [
+    DailyTaskView('word', 'Sit with one word', NwsbMarks.book, false),
+    DailyTaskView('player', 'Open the player', NwsbMarks.sound, false),
+    DailyTaskView('read', 'Read one meaning', NwsbMarks.reader, false),
+  ]);
 
   static const defaults = <_Task>[
     _Task('word', 'Sit with one word'),
     _Task('player', 'Open the player'),
     _Task('read', 'Read one meaning'),
   ];
+
+  static String markFor(String id, String title) {
+    switch (id) {
+      case 'word':
+        return NwsbMarks.book;
+      case 'player':
+        return NwsbMarks.sound;
+      case 'read':
+        return NwsbMarks.reader;
+    }
+    const pool = <String>[
+      NwsbMarks.book,
+      NwsbMarks.sound,
+      NwsbMarks.reader,
+      NwsbMarks.flame,
+      NwsbMarks.moon,
+      NwsbMarks.sun,
+    ];
+    return pool[title.hashCode.abs() % pool.length];
+  }
 
   static String get _who {
     try {
@@ -84,6 +119,10 @@ class DailyTasks {
     final have = await done();
     final finished = tasks.where((t) => have.contains(t.id)).length;
     progress.value = tasks.isEmpty ? 0 : finished / tasks.length;
+    items.value = [
+      for (final t in tasks)
+        DailyTaskView(t.id, t.title, markFor(t.id, t.title), have.contains(t.id)),
+    ];
   }
 }
 
@@ -315,7 +354,7 @@ class _DailyTasksPageState extends State<DailyTasksPage> {
                         onPressed: () => Navigator.of(context).maybePop(),
                         icon: const Icon(Icons.arrow_back, color: Colors.white),
                       ),
-                      const WhiteCircleOrb(size: 22),
+                      const WhiteCircleOrb(size: 22, mark: NwsbMarks.book),
                       const SizedBox(width: 10),
                       const Expanded(
                         child: Text(
@@ -334,6 +373,7 @@ class _DailyTasksPageState extends State<DailyTasksPage> {
                   const SizedBox(height: 14),
                   const GlassLine(
                     text: 'Tick a task and the line on the home moves. These belong to this account.',
+                    mark: NwsbMarks.book,
                   ),
                   const SizedBox(height: 14),
                   GlassWrap(
@@ -382,7 +422,7 @@ class _DailyTasksPageState extends State<DailyTasksPage> {
                                 children: [
                                   Row(
                                     children: [
-                                      const WhiteCircleOrb(size: 16),
+                                      WhiteCircleOrb(size: 16, mark: task.mark),
                                       const Spacer(),
                                       Icon(
                                         on ? Icons.check_circle : Icons.circle_outlined,

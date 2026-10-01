@@ -4,6 +4,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../widgets/nwsb_icon.dart';
 import '../../widgets/program_shelf.dart';
 import 'economy_api.dart';
 import 'economy_theme.dart';
@@ -29,6 +30,7 @@ class _ReferenceScreenState extends State<ReferenceScreen> {
   Widget build(BuildContext context) {
     return EconomyPage(
       title: 'Reference',
+      mark: NwsbMarks.reference,
       child: ListenableBuilder(
         listenable: EconomyMirror.instance,
         builder: (context, _) {

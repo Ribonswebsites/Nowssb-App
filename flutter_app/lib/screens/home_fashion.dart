@@ -457,7 +457,7 @@ class _HomeFashionState extends State<HomeFashion> {
                 margin: EdgeInsets.zero,
                 title: 'It keeps turning',
                 subtitle: 'The ring above is this same set.',
-                mark: NwsbMarks.earn,
+                mark: NwsbMarks.rewards,
                 onTap: () => _push(const EarnHubScreen()),
               ),
             ),

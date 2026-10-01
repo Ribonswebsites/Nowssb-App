@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../data/firebase.dart';
 import '../../theme/tokens.dart';
+import '../../widgets/nwsb_icon.dart';
 import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
 
@@ -13,6 +14,7 @@ class EchoModerationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return EconomyPage(
       title: 'Echo reports',
+      mark: NwsbMarks.verified,
       child: !NwsbFirebase.ready
           ? const EconomyNote('Firebase is not connected.')
           : StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(

@@ -32,6 +32,7 @@ class EarnTopicPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return EconomyPage(
       title: title,
+      mark: mark,
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
         children: [
@@ -113,7 +114,7 @@ void openCoins(BuildContext context) {
     MaterialPageRoute<void>(
       builder: (_) => const EarnTopicPage(
         title: 'NowssB coins earned',
-        mark: NwsbMarks.earn,
+        mark: NwsbMarks.rewards,
         headline: 'Coins you earned',
         body: 'Coins come from practice, daily login, and quests. They cover at most 30% of a Play purchase. They cannot be bought, gifted, or cashed out.',
         actionLabel: 'Open rewards',

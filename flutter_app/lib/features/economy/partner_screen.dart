@@ -3,6 +3,7 @@ library;
 
 import 'package:flutter/material.dart';
 
+import '../../widgets/nwsb_icon.dart';
 import '../../widgets/program_shelf.dart';
 import 'economy_api.dart';
 import 'economy_theme.dart';
@@ -14,6 +15,7 @@ class PartnerScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return EconomyPage(
       title: 'Partner',
+      mark: NwsbMarks.crown,
       child: ListenableBuilder(
         listenable: EconomyMirror.instance,
         builder: (context, _) {

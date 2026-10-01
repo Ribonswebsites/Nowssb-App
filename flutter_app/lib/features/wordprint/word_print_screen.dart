@@ -5,6 +5,7 @@ import '../../data/firebase.dart';
 import '../../theme/tokens.dart';
 import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
+import '../../widgets/nwsb_icon.dart';
 import '../../widgets/program_shelf.dart';
 import '../../admin/template/editable.dart';
 
@@ -37,6 +38,7 @@ class _WordPrintScreenState extends State<WordPrintScreen> {
     final mine = uid != null && uid == EconomyMirror.instance.uid;
     return EconomyPage(
       title: 'Word Print',
+      mark: NwsbMarks.signature,
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
         children: [
