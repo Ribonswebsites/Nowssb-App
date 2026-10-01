@@ -7,9 +7,12 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
+import '../../widgets/app_thinking_loader.dart';
+
+import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_icon.dart';
-
 import '../../data/settings.dart';
 import '../../media/nwsb_image.dart';
 import '../../media/nwsb_video.dart';
@@ -73,51 +76,44 @@ class FashHeroRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // `.hhr-tab` IS a frame — the white bezel in assets/frames, with the
-    // clip inside its aperture and the three buttons on top of that. It was
-    // a plain dark box here, which is why this strip did not look like the
-    // one on the phone.
-    return SectionPane(
-      child: TvFrame(
-        asset: 'assets/video/word-acts.mp4',
-        frame: DeviceFrame.wordActs,
-        priority: ClipPriority.feature,
-        autoplay: true,
-        showVideo: true,
-        overlay: Stack(
-          fit: StackFit.expand,
-          children: [
-            const DecoratedBox(
-              decoration: BoxDecoration(color: Color(0x40000000)),
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: _HhrButton(
-                    icon: Icons.tune,
-                    label: 'Customize',
-                    onTap: onCustomize,
-                  ),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      child: GlassWrap(
+        margin: EdgeInsets.zero,
+        padding: const EdgeInsets.all(5),
+        child: Container(
+          height: 74,
+          decoration: BoxDecoration(
+            color: const Color(0xFF000000),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: _HhrButton(
+                  mark: NwsbMarks.sliders,
+                  label: 'Customize',
+                  onTap: onCustomize,
                 ),
-                const _HhrSep(),
-                Expanded(
-                  child: _HhrButton(
-                    icon: Icons.grid_view,
-                    label: 'Features',
-                    onTap: onFeatures,
-                  ),
+              ),
+              const _HhrSep(),
+              Expanded(
+                child: _HhrButton(
+                  mark: NwsbMarks.features,
+                  label: 'Features',
+                  onTap: onFeatures,
                 ),
-                const _HhrSep(),
-                Expanded(
-                  child: _HhrButton(
-                    icon: Icons.savings_outlined,
-                    label: 'Earn',
-                    onTap: onEarn,
-                  ),
+              ),
+              const _HhrSep(),
+              Expanded(
+                child: _HhrButton(
+                  mark: NwsbMarks.earn,
+                  label: 'Earn',
+                  onTap: onEarn,
                 ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -248,8 +244,8 @@ class _HhrSep extends StatelessWidget {
 }
 
 class _HhrButton extends StatelessWidget {
-  const _HhrButton({required this.icon, required this.label, this.onTap});
-  final IconData icon;
+  const _HhrButton({required this.mark, required this.label, this.onTap});
+  final String mark;
   final String label;
   final VoidCallback? onTap;
 
@@ -258,20 +254,36 @@ class _HhrButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 21, color: Colors.white),
-          const SizedBox(height: 7),
-          EditableLabel('fashion_sections_top.HhrButton',
-            label,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              alignment: Alignment.center,
+              decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+              child: NwsbIcon(mark, size: 16, color: const Color(0xFF111111), strokeWidth: 1.7),
             ),
-          ),
-        ],
+            const SizedBox(width: 4),
+            const AppThinkingLoader(
+              size: 14,
+              state: OrbState.composing,
+              circlePad: 3,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              label,
+              maxLines: 1,
+              style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

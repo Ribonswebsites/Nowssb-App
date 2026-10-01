@@ -59,44 +59,45 @@ class HomeHeader extends StatelessWidget {
               bottom: BorderSide(color: Color(0x1AFFFFFF)),
             ),
           ),
-          child: Row(
+          child: SizedBox(
+            width: double.infinity,
+            child: Row(
             children: [
-              ClipOval(
-                child: EditableImage.asset(
-                  'assets/icons/logo-disc.webp',
-                  width: 48,
-                  height: 48,
-                  fit: BoxFit.cover,
-                  slot: 'header.HomeHeader',
+              SizedBox(
+                width: 48,
+                height: 48,
+                child: ClipOval(
+                  child: EditableImage.asset(
+                    'assets/icons/logo-disc.webp',
+                    width: 48,
+                    height: 48,
+                    fit: BoxFit.cover,
+                    slot: 'header.HomeHeader',
+                  ),
                 ),
               ),
               const SizedBox(width: 12),
               const Flexible(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'NowssB',
-                      maxLines: 1,
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                        height: 1.05,
-                        shadows: [
-                          Shadow(
-                            color: Color(0x80000000),
-                            blurRadius: 8,
-                            offset: Offset(0, 1),
-                          ),
-                        ],
+                child: Text(
+                  'NowssB',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                    height: 1.05,
+                    shadows: [
+                      Shadow(
+                        color: Color(0x80000000),
+                        blurRadius: 8,
+                        offset: Offset(0, 1),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-              const SizedBox(width: 8),
+              const Spacer(),
               _HdrIcon(
                 mark: NwsbMarks.bell,
                 badge: notifications,
@@ -107,6 +108,7 @@ class HomeHeader extends StatelessWidget {
               const _HdrRule(),
               _HdrIcon(mark: NwsbMarks.menu, stroke: 1.9, onTap: onMenu),
             ],
+            ),
           ),
         ),
       ),

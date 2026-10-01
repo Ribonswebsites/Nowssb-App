@@ -176,6 +176,7 @@ class EconomyMirror extends ChangeNotifier {
   String partnerPerk = '';
   bool loginToday = false;
   bool scratchToday = false;
+  bool capsReady = false;
   bool live = false;
   String? uid;
 
@@ -201,6 +202,7 @@ class EconomyMirror extends ChangeNotifier {
       code = '';
       loginToday = false;
       scratchToday = false;
+      capsReady = false;
       notifyListeners();
       return;
     }
@@ -237,6 +239,7 @@ class EconomyMirror extends ChangeNotifier {
     _watch('users/$id/earnCaps/${_todayKey()}', (data) {
       loginToday = data['login'] == true;
       scratchToday = data['scratch'] == true;
+      capsReady = true;
     });
     _watch('users/$id/referral/main', (data) {
       code = (data['code'] as String?) ?? '';

@@ -4,11 +4,11 @@ library;
 
 import 'package:flutter/material.dart';
 
-import '../admin/template/editable.dart';
 import '../features/earn/earnings_screen.dart';
 import '../features/vault/vault_screen.dart';
 import 'black_glass_banner.dart';
 import 'colored_split_promo_banner.dart';
+import 'flip_portrait.dart';
 import 'glass_wrap.dart';
 import 'nwsb_icon.dart';
 import 'program_shelf.dart';
@@ -32,7 +32,7 @@ class FourBanners extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const _Trio(),
+        const TrioRail(),
         const SizedBox(height: 12),
         ColoredSplitPromoBanner(
           margin: EdgeInsets.zero,
@@ -58,51 +58,57 @@ class FourBanners extends StatelessWidget {
   }
 }
 
-class _Trio extends StatelessWidget {
-  const _Trio();
+/// Equal-height flipping cards. They scroll sideways. Every card is the
+/// same box, so the second one cannot come out shorter than the first.
+class TrioRail extends StatelessWidget {
+  const TrioRail({super.key});
+
+  static const _h = 176.0;
+  static const _w = 132.0;
 
   @override
   Widget build(BuildContext context) {
+    final cards = <_Flip>[
+      const _Flip('assets/banners/earn/hands-raise.png', 'assets/banners/earn/hands-dark.png'),
+      _Flip(
+        'assets/banners/earn/yoga-light.png',
+        'assets/banners/earn/yoga-dark.png',
+        label: 'NowssB Rewards',
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute<void>(builder: (_) => const VaultScreen()),
+        ),
+      ),
+      _Flip(
+        'assets/banners/earn/man-light.png',
+        'assets/banners/earn/man-dark.png',
+        label: 'Your Earning',
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute<void>(builder: (_) => const EarningsScreen()),
+        ),
+      ),
+      const _Flip('assets/banners/earn/sit-light.png', 'assets/banners/earn/sit-dark.png', label: 'Partner'),
+    ];
     return GlassWrap(
       margin: EdgeInsets.zero,
       padding: const EdgeInsets.all(8),
       child: SizedBox(
-        height: 168,
-        child: Row(
-          children: [
-            const Expanded(flex: 5, child: _Still('assets/banners/earn/hands-raise.png')),
-            const SizedBox(width: 8),
-            Expanded(
-              flex: 4,
-              child: _Still(
-                'assets/banners/earn/yoga-light.png',
-                label: 'NowssB Rewards',
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute<void>(builder: (_) => const VaultScreen()),
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              flex: 4,
-              child: _Still(
-                'assets/banners/earn/man-light.png',
-                label: 'Your Earning',
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute<void>(builder: (_) => const EarningsScreen()),
-                ),
-              ),
-            ),
-          ],
+        height: _h,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          clipBehavior: Clip.none,
+          itemCount: cards.length,
+          separatorBuilder: (_, __) => const SizedBox(width: 8),
+          itemBuilder: (_, i) => SizedBox(width: _w, height: _h, child: cards[i]),
         ),
       ),
     );
   }
 }
 
-class _Still extends StatelessWidget {
-  const _Still(this.asset, {this.label, this.onTap});
-  final String asset;
+class _Flip extends StatelessWidget {
+  const _Flip(this.front, this.back, {this.label, this.onTap});
+  final String front;
+  final String back;
   final String? label;
   final VoidCallback? onTap;
 
@@ -115,7 +121,8 @@ class _Still extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            EditableImage.asset(asset, fit: BoxFit.cover, slot: 'four_banners.Trio'),
+            const ColoredBox(color: Color(0xFF000000)),
+            FlipPortrait(front: front, back: back, fit: BoxFit.contain),
             if (label != null)
               const DecoratedBox(
                 decoration: BoxDecoration(
@@ -134,7 +141,7 @@ class _Still extends StatelessWidget {
                 child: Text(
                   label!,
                   maxLines: 2,
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 13),
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 13, height: 1.15),
                 ),
               ),
           ],

@@ -117,30 +117,21 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
         ? cats.take(10).toList()
         : cats;
     final sections = <Widget>[];
-    if (cats.isNotEmpty) {
-      sections.add(RmBannerRail(
-        banners: [
-          for (final cat in cats)
-            RmCatBanner(
-              title: cat.label,
-              sub: cat.sub,
-              badge: cat.badge,
-              labelColor:
-                  cat.labelColor != null ? Color(cat.labelColor!) : null,
-              logoAsset: kRmCatLogoAsset,
-              categoryId: cat.id,
-              artAsset: storeCollectionArt(cat.id),
-              pillLabel: cat.badge ?? cat.label,
-              inRail: true,
-              onViewAll: () => _openViewAll(cat.label),
-            ),
-        ],
-      ));
-    }
     // Count product rails actually emitted (search may empty some).
     var productRailIndex = 0;
     for (var i = 0; i < rowCats.length; i++) {
       final cat = rowCats[i];
+      sections.add(RmCatBanner(
+        title: cat.label,
+        sub: cat.sub,
+        badge: cat.badge,
+        labelColor: cat.labelColor != null ? Color(cat.labelColor!) : null,
+        logoAsset: kRmCatLogoAsset,
+        categoryId: cat.id,
+        artAsset: storeCollectionArt(cat.id),
+        pillLabel: cat.badge ?? cat.label,
+        onViewAll: () => _openViewAll(cat.label),
+      ));
       sections.add(RmRowHeader(
         title: cat.label,
         onViewAll: () => _openViewAll(cat.label),
@@ -365,17 +356,6 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
           ),
         ),
         const SizedBox(height: 8),
-        ColoredSplitPromoBanner(
-          spec: SplitPromoExtras.at(
-            6,
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => const MeaningStoreScreen(),
-              ),
-            ),
-          ),
-          margin: const EdgeInsets.only(top: 28, bottom: 36),
-        ),
         ...sections,
         ColoredSplitPromoBanner(
           spec: SplitPromoExtras.at(

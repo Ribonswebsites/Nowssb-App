@@ -47,7 +47,10 @@ import '../data/practice_progress.dart';
 import '../data/settings.dart';
 import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
+import '../widgets/black_glass_banner.dart';
 import '../widgets/four_banners.dart';
+import '../widgets/program_shelf.dart';
+import '../features/economy/daily_claim_sheet.dart';
 import '../widgets/home_skin.dart';
 import 'normal/neomorphic_action_bar.dart';
 import 'normal/neomorphic_dashboard.dart';
@@ -196,6 +199,10 @@ class _HomeNormalState extends State<HomeNormal> {
     PracticeProgress.instance.addListener(_onContent);
     Settings.instance.addListener(_onContent);
     unawaited(PracticeProgress.instance.start());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      DailyClaimSheet.offer(context, mounted: () => mounted);
+    });
   }
 
   @override
@@ -375,20 +382,7 @@ class _HomeNormalState extends State<HomeNormal> {
             children: [
               const Padding(
                 padding: EdgeInsets.fromLTRB(20, 0, 20, 12),
-                child: FourBanners(
-                  splitTitle: 'NowssB',
-                  splitCta: 'Open rewards',
-                  blackTitle: 'Today',
-                  blackSub: 'The line on the left moves when a task is done.',
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                child: ColoredSplitPromoBanner.forSurface(
-                  SplitPromoSurface.normalHome,
-                  onTap: () => _go(2),
-                  margin: EdgeInsets.zero,
-                ),
+                child: TrioRail(),
               ),
               const NmSuppliedEssentials(),
             ],
@@ -397,6 +391,14 @@ class _HomeNormalState extends State<HomeNormal> {
         ('routineCards', Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
+              child: ColoredSplitPromoBanner.forSurface(
+                SplitPromoSurface.normalHome,
+                onTap: () => _go(2),
+                margin: EdgeInsets.zero,
+              ),
+            ),
             const NmHorizontalRoutineCards(),
             const EarthDayFilm(),
             PromoColorGrid(onOpen: _openGrid),
@@ -404,16 +406,40 @@ class _HomeNormalState extends State<HomeNormal> {
         )),
         (
           'herovid',
-          NmStreakVideo(
-            onTap: () => _go(1),
-            onStoreTap: () => _go(3),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
+                child: BlackGlassBanner(
+                  margin: EdgeInsets.zero,
+                  title: 'Today',
+                  subtitle: 'The line moves when a task is done.',
+                  mark: NwsbMarks.earn,
+                  onTap: () => _go(1),
+                ),
+              ),
+              NmStreakVideo(
+                onTap: () => _go(1),
+                onStoreTap: () => _go(3),
+              ),
+            ],
           ),
         ),
         (
           'streak',
           NmStreak(onTap: () => _go(1)),
         ),
-        ('practice', NmPractice(onTap: () => _go(1))),
+        ('practice', Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Padding(
+              padding: EdgeInsets.fromLTRB(20, 8, 20, 8),
+              child: ProgramShelf(),
+            ),
+            NmPractice(onTap: () => _go(1)),
+          ],
+        )),
         ('mainops', MainOptionsSection(onGo: _go, onAction: _openMainOption)),
         (
           'actionbar',

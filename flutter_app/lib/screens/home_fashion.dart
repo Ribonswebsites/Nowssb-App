@@ -34,6 +34,7 @@ import '../data/settings.dart';
 import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
 import '../widgets/app_backdrop.dart';
+import '../widgets/black_glass_banner.dart';
 import '../widgets/four_banners.dart';
 import '../widgets/enter_curve_stage.dart';
 import '../widgets/hero_curve_stage.dart';
@@ -71,6 +72,9 @@ import 'store/ebooks_store.dart';
 import 'reader/reader_hub.dart';
 import 'store/request_words.dart';
 import 'sentence_builder.dart';
+import '../widgets/program_shelf.dart';
+import '../widgets/nwsb_icon.dart';
+import '../features/economy/daily_claim_sheet.dart';
 import 'app_settings.dart';
 import '../features/earn/earn_home_sections.dart';
 import '../features/earn/earn_hub_screen.dart';
@@ -185,6 +189,10 @@ class _HomeFashionState extends State<HomeFashion> {
     super.initState();
     ContentStore.instance.addListener(_onContent);
     Settings.instance.addListener(_onContent);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      DailyClaimSheet.offer(context, mounted: () => mounted);
+    });
   }
 
   @override
@@ -345,14 +353,18 @@ class _HomeFashionState extends State<HomeFashion> {
         ('greet', const FashGreeting()),
         (
           'herorow',
+          FashHeroRow(
+            onCustomize: () => _push(const WidgetsPage()),
+            onFeatures: () => _push(const WidgetsPage()),
+            onEarn: () => _push(const EarnHubScreen()),
+          ),
+        ),
+        ('roundring', const RoundRingSection()),
+        (
+          'practice',
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              FashHeroRow(
-                onCustomize: () => _push(const WidgetsPage()),
-                onFeatures: () => _push(const WidgetsPage()),
-                onEarn: () => _push(const EarnHubScreen()),
-              ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
                 child: ColoredSplitPromoBanner.forSurface(
@@ -361,29 +373,6 @@ class _HomeFashionState extends State<HomeFashion> {
                   margin: EdgeInsets.zero,
                 ),
               ),
-            ],
-          ),
-        ),
-        ('roundring', Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: const [
-            Padding(
-              padding: EdgeInsets.fromLTRB(16, 12, 16, 0),
-              child: FourBanners(
-                splitTitle: 'NowssB',
-                splitCta: 'Keep going',
-                blackTitle: 'Passive earning',
-                blackSub: 'The ring under this is the same set.',
-              ),
-            ),
-            RoundRingSection(),
-          ],
-        )),
-        (
-          'practice',
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
               FashPractice(
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute<void>(
@@ -397,6 +386,10 @@ class _HomeFashionState extends State<HomeFashion> {
         ('routineCards', Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 8, 16, 10),
+              child: TrioRail(),
+            ),
             const NmHorizontalRoutineCards(fashion: true),
             const EarthDayFilm(),
             PromoColorGrid(onOpen: _openGrid),
@@ -404,7 +397,26 @@ class _HomeFashionState extends State<HomeFashion> {
         )),
 
         ('coachCards', const SizedBox.shrink()),
-        ('mainops', MainOptionsSection(onGo: _go, onAction: _openMainOption)),
+        ('mainops', Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+              child: ColoredSplitPromoBanner(
+                margin: EdgeInsets.zero,
+                spec: SplitPromoSpec(
+                  title: 'NowssB',
+                  cta: 'Keep going',
+                  leftColor: const Color(0xFF3D2914),
+                  rightColor: const Color(0xFFE4C56A),
+                  art: SplitPromoArts.blondeLotus,
+                  onTap: () => _go(1),
+                ),
+              ),
+            ),
+            MainOptionsSection(onGo: _go, onAction: _openMainOption),
+          ],
+        )),
         (
           'actionbar',
           NmSuppliedActionBar(
@@ -418,14 +430,14 @@ class _HomeFashionState extends State<HomeFashion> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              FashReader(onTap: () => _push(const ReaderHubScreen())),
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
                 child: ColoredSplitPromoBanner(
                   spec: SplitPromoExtras.at(1, onTap: () => _go(1)),
                   margin: EdgeInsets.zero,
                 ),
               ),
+              FashReader(onTap: () => _push(const ReaderHubScreen())),
             ],
           ),
         ),
@@ -436,8 +448,32 @@ class _HomeFashionState extends State<HomeFashion> {
             onStoreTap: () => _go(3),
           ),
         ),
-        ('streak', FashStreak(onTap: () => _go(1))),
-        ('tiles', FashTiles(onTile: _go, onOpen: _openEnter)),
+        ('streak', Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+              child: BlackGlassBanner(
+                margin: EdgeInsets.zero,
+                title: 'It keeps turning',
+                subtitle: 'The ring above is this same set.',
+                mark: NwsbMarks.earn,
+                onTap: () => _push(const EarnHubScreen()),
+              ),
+            ),
+            FashStreak(onTap: () => _go(1)),
+          ],
+        )),
+        ('tiles', Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
+              child: ProgramShelf(),
+            ),
+            FashTiles(onTile: _go, onOpen: _openEnter),
+          ],
+        )),
         (
           'storiesFind',
           StoriesFindYouBanner(onTap: () => _go(2)),
