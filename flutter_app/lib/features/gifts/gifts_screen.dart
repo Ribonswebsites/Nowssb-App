@@ -230,6 +230,8 @@ class _GiftsScreenState extends State<GiftsScreen> {
                 blackSub: 'The code exists only after Play accepts it.',
               ),
               const SizedBox(height: 12),
+              const GiftOpenCard(),
+              const SizedBox(height: 12),
               BrandTopBanner(
                 bare: true,
                 title: 'NowssB Gifts',
@@ -378,7 +380,9 @@ class _GiftsScreenState extends State<GiftsScreen> {
                   : 'Code $code copied. It expires in 90 days if it stays unopened.');
             } on EconomyException catch (e) {
               if (!mounted) return;
-              setState(() => _message = e.message);
+              setState(() => _message = EconomyApi.isMissing(e)
+                  ? 'Play is not connected on this build. The daily gift above still opens.'
+                  : e.message);
             }
           },
         ),
@@ -415,7 +419,9 @@ class _GiftsScreenState extends State<GiftsScreen> {
               setState(() => _message = '${result['label'] ?? 'Gift'} is on this account.');
             } on EconomyException catch (e) {
               if (!mounted) return;
-              setState(() => _message = e.message);
+              setState(() => _message = EconomyApi.isMissing(e)
+                  ? 'Gift codes open after Play is connected. The daily gift above still collects.'
+                  : e.message);
             }
           },
         ),

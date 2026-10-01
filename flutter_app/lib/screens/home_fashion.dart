@@ -74,7 +74,6 @@ import 'store/request_words.dart';
 import 'sentence_builder.dart';
 import '../widgets/program_shelf.dart';
 import '../widgets/nwsb_icon.dart';
-import '../features/economy/daily_claim_sheet.dart';
 import 'app_settings.dart';
 import '../features/earn/earn_home_sections.dart';
 import '../features/earn/earn_hub_screen.dart';
@@ -189,10 +188,6 @@ class _HomeFashionState extends State<HomeFashion> {
     super.initState();
     ContentStore.instance.addListener(_onContent);
     Settings.instance.addListener(_onContent);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      DailyClaimSheet.offer(context, mounted: () => mounted);
-    });
   }
 
   @override

@@ -5,6 +5,7 @@ import '../../theme/tokens.dart';
 import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
 import '../economy/coupon_screen.dart';
+import '../economy/scratch_card.dart';
 import '../economy/play_billing.dart';
 import '../../widgets/banner_mix.dart';
 import '../../widgets/brand_top_banner.dart';
@@ -125,7 +126,27 @@ class VaultScreen extends StatelessWidget {
       mark: mark,
       progress: frac,
       line: '$value of $goal done · $left left · $reward coins',
-      onTap: done ? () => runPrivate(context, () => EconomyApi.call('claimQuest', {'questId': id})) : null,
+      onTap: done
+          ? () async {
+              final before = EconomyMirror.instance.coins;
+              var gained = 0;
+              try {
+                final result = await EconomyApi.call('claimQuest', {'questId': id});
+                gained = (result['coins'] as num?)?.toInt() ?? reward;
+              } on EconomyException catch (e) {
+                if (!EconomyApi.isMissing(e)) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+                  }
+                  return;
+                }
+                gained = await EconomyMirror.instance.grantOnce('quest_$id', reward, daily: false);
+              }
+              if (gained > 0 && context.mounted) {
+                await NwsbCoinFly.show(context, coins: gained, from: before, to: before + gained);
+              }
+            }
+          : null,
     );
   }
 
@@ -135,7 +156,18 @@ class VaultScreen extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(right: 10),
       child: GestureDetector(
-        onTap: () => runPrivate(context, () => EconomyApi.call('spendCoins', {'purpose': purpose, ...?extra})),
+        onTap: () async {
+          try {
+            await EconomyApi.call('spendCoins', {'purpose': purpose, ...?extra});
+          } on EconomyException catch (e) {
+            if (!EconomyApi.isMissing(e) || !context.mounted) return;
+            final ok = await EconomyMirror.instance.spendLocal(cost);
+            if (!context.mounted) return;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(ok ? 'Spent $cost coins.' : 'Not enough coins.')),
+            );
+          }
+        },
         child: GlassWrap(
           margin: EdgeInsets.zero,
           child: SizedBox(
@@ -210,13 +242,15 @@ class _TodayCardState extends State<_TodayCard> {
       final after = EconomyMirror.instance.coins;
       setState(() => _note = gained > 0
           ? '+$gained coins landed on this wallet.'
-          : 'Today’s login is already on the wallet.');
-      await NwsbCoinFly.show(
-        context,
-        coins: gained > 0 ? gained : 10,
-        from: before,
-        to: gained > 0 ? after : before,
-      );
+          : 'Today’s coins are already on the wallet.');
+      if (gained > 0 && mounted) {
+        await NwsbCoinFly.show(
+          context,
+          coins: gained,
+          from: before,
+          to: after,
+        );
+      }
     } on EconomyException catch (e) {
       if (!mounted) return;
       final raw = e.message.toUpperCase();
@@ -224,6 +258,24 @@ class _TodayCardState extends State<_TodayCard> {
           ? 'The wallet did not answer. Tap claim again.'
           : e.message);
     }
+  }
+
+  Future<void> _scratch() async {
+    final coins = 12 + DateTime.now().day % 18;
+    final before = EconomyMirror.instance.coins;
+    var gained = 0;
+    try {
+      final result = await EconomyApi.call('scratchCoupon');
+      gained = (result['coins'] as num?)?.toInt() ?? 0;
+    } on EconomyException catch (e) {
+      if (!EconomyApi.isMissing(e)) {
+        if (mounted) setState(() => _note = e.message);
+        return;
+      }
+      gained = await EconomyMirror.instance.grantOnce('scratch', coins);
+    }
+    if (!mounted || gained <= 0) return;
+    await NwsbCoinFly.show(context, coins: gained, from: before, to: before + gained);
   }
 
   @override
@@ -237,6 +289,8 @@ class _TodayCardState extends State<_TodayCard> {
         children: [
           Row(
             children: [
+              const NwsbCoinDisc(size: 36),
+              const SizedBox(width: 8),
               Text(
                 '${w.coins}',
                 style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w800),
@@ -253,8 +307,8 @@ class _TodayCardState extends State<_TodayCard> {
           const SizedBox(height: 6),
           Text(
             claimed
-                ? 'Today’s login is already on the wallet.'
-                : 'Today’s login is still open.',
+                ? 'Today’s coins are already on this wallet.'
+                : 'Tap claim. The coins fly after that, not before.',
             style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
           ),
           Text(
@@ -267,8 +321,8 @@ class _TodayCardState extends State<_TodayCard> {
           ],
           const SizedBox(height: 10),
           GoldButton(
-            label: claimed ? 'Play today’s coins' : 'Claim daily login',
-            onTap: _claim,
+            label: claimed ? 'Collected' : 'Claim today’s coins',
+            onTap: claimed ? null : _claim,
           ),
           const SizedBox(height: 8),
           GoldButton(
@@ -278,6 +332,43 @@ class _TodayCardState extends State<_TodayCard> {
               MaterialPageRoute<void>(builder: (_) => const CouponScreen()),
             ),
           ),
+          const SizedBox(height: 14),
+          const Text(
+            'SCRATCH',
+            style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontSize: 12, fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 8),
+          if (w.scratchToday)
+            const Text(
+              'Today’s coupon is already open.',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+            )
+          else
+            NwsbScratchCard(
+              onCleared: _scratch,
+              prize: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const NwsbCoinDisc(size: 64),
+                  const SizedBox(height: 8),
+                  Text(
+                    '+${12 + DateTime.now().day % 18}',
+                    style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w800),
+                  ),
+                  const Text(
+                    'NOWSSB COINS',
+                    style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 2, fontWeight: FontWeight.w700, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+          const SizedBox(height: 14),
+          const Text(
+            'GIFT',
+            style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontSize: 12, fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 8),
+          const GiftOpenCard(),
         ],
       ),
     );
@@ -332,10 +423,31 @@ class _MilestoneFormState extends State<_MilestoneForm> {
         GoldButton(
           label: 'Open chest · ${_level * 5} coins',
           filled: false,
-          onTap: () => runPrivate(context, () => EconomyApi.call('claimMilestone', {
-                'wordId': _word.text.trim(),
+          onTap: () async {
+            final word = _word.text.trim();
+            if (word.isEmpty) return;
+            final reward = _level * 5;
+            final before = EconomyMirror.instance.coins;
+            var gained = 0;
+            try {
+              final result = await EconomyApi.call('claimMilestone', {
+                'wordId': word,
                 'level': _level,
-              })),
+              });
+              gained = (result['coins'] as num?)?.toInt() ?? reward;
+            } on EconomyException catch (e) {
+              if (!EconomyApi.isMissing(e)) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+                }
+                return;
+              }
+              gained = await EconomyMirror.instance.grantOnce('chest_${word}_$_level', reward, daily: false);
+            }
+            if (gained > 0 && context.mounted) {
+              await NwsbCoinFly.show(context, coins: gained, from: before, to: before + gained);
+            }
+          },
         ),
       ],
     );

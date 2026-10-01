@@ -4,6 +4,7 @@ import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import '../../screens/nwsb_sign_in_sheet.dart';
 import '../../widgets/app_thinking_loader.dart';
 import '../../widgets/glass_wrap.dart';
+import '../../widgets/nwsb_coin_fly.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/program_shelf.dart';
 import '../../theme/tokens.dart';
@@ -253,14 +254,21 @@ class CoinCount extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween(end: value.toDouble()),
-      duration: const Duration(milliseconds: 650),
-      curve: Curves.easeOutCubic,
-      builder: (context, v, _) => Text(
-        '${v.round()}',
-        style: style ?? const TextStyle(fontSize: 42, color: NwsbColors.goldLight, fontWeight: FontWeight.w700),
-      ),
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        NwsbCoinDisc(size: 42),
+        const SizedBox(width: 8),
+        TweenAnimationBuilder<double>(
+          tween: Tween(end: value.toDouble()),
+          duration: const Duration(milliseconds: 650),
+          curve: Curves.easeOutCubic,
+          builder: (context, v, _) => Text(
+            '${v.round()}',
+            style: style ?? const TextStyle(fontSize: 42, color: NwsbColors.goldLight, fontWeight: FontWeight.w700),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -344,9 +352,13 @@ Future<void> runEconomy(BuildContext context, Future<void> Function() action) as
     }
   } on EconomyException catch (e) {
     if (context.mounted) {
+      final raw = e.message.toUpperCase();
+      final text = raw.contains('NOT_FOUND') || raw.contains('NOT FOUND')
+          ? 'Saved on this phone.'
+          : e.message;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(e.message),
+          content: Text(text),
           action: SnackBarAction(label: 'Retry', onPressed: () => runEconomy(context, action)),
         ),
       );
@@ -357,5 +369,198 @@ Future<void> runEconomy(BuildContext context, Future<void> Function() action) as
         const SnackBar(content: EditableLabel('economy_theme.shared', 'That did not go through. Try again.')),
       );
     }
+  }
+}
+
+/// Tap to take this page's coins. Nothing plays until the tap.
+class CoinCollectCard extends StatefulWidget {
+  const CoinCollectCard({super.key, required this.pageKey, required this.amount, required this.title});
+
+  final String pageKey;
+  final int amount;
+  final String title;
+
+  @override
+  State<CoinCollectCard> createState() => _CoinCollectCardState();
+}
+
+class _CoinCollectCardState extends State<CoinCollectCard> {
+  var _busy = false;
+  String? _note;
+
+  Future<void> _take() async {
+    if (_busy) return;
+    setState(() => _busy = true);
+    final before = EconomyMirror.instance.coins;
+    final gained = await EconomyMirror.instance.grantOnce(widget.pageKey, widget.amount);
+    if (!mounted) return;
+    setState(() {
+      _busy = false;
+      _note = gained > 0 ? '+$gained coins' : 'Already collected today.';
+    });
+    if (gained > 0) {
+      await NwsbCoinFly.show(
+        context,
+        coins: gained,
+        from: before,
+        to: before + gained,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassWrap(
+      margin: EdgeInsets.zero,
+      padding: const EdgeInsets.all(6),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+        decoration: BoxDecoration(
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: [
+            NwsbCoinDisc(size: 46),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(widget.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+                  Text(
+                    _note ?? '+${widget.amount} coins',
+                    style: const TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w700),
+                  ),
+                ],
+              ),
+            ),
+            FilledButton(
+              onPressed: _busy ? null : _take,
+              style: FilledButton.styleFrom(backgroundColor: const Color(0xFFE4C56A), foregroundColor: Colors.black),
+              child: Text(_busy ? '…' : 'Collect'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Daily gift. The card lifts when tapped, then the coins fly. Nothing plays on open.
+class GiftOpenCard extends StatefulWidget {
+  const GiftOpenCard({super.key, this.pageKey = 'gift', this.amount = 10, this.title = 'Daily gift'});
+
+  final String pageKey;
+  final int amount;
+  final String title;
+
+  @override
+  State<GiftOpenCard> createState() => _GiftOpenCardState();
+}
+
+class _GiftOpenCardState extends State<GiftOpenCard> with SingleTickerProviderStateMixin {
+  late final AnimationController _lift;
+  var _busy = false;
+  String? _note;
+
+  @override
+  void initState() {
+    super.initState();
+    _lift = AnimationController(vsync: this, duration: const Duration(milliseconds: 720));
+  }
+
+  @override
+  void dispose() {
+    _lift.dispose();
+    super.dispose();
+  }
+
+  Future<void> _open() async {
+    if (_busy) return;
+    setState(() => _busy = true);
+    await _lift.forward(from: 0);
+    if (!mounted) return;
+    final before = EconomyMirror.instance.coins;
+    final gained = await EconomyMirror.instance.grantOnce(widget.pageKey, widget.amount);
+    if (!mounted) return;
+    setState(() {
+      _busy = false;
+      _note = gained > 0 ? '+$gained coins' : 'Already opened today.';
+    });
+    if (gained > 0) {
+      await NwsbCoinFly.show(context, coins: gained, from: before, to: before + gained);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: _busy ? null : _open,
+      child: AnimatedBuilder(
+        animation: _lift,
+        builder: (context, _) {
+          final t = _lift.value;
+          final scale = t < 0.4 ? 1 - t * 0.15 : 1 + (t - 0.4) * 0.12;
+          return Transform.translate(
+            offset: Offset(0, -10 * t),
+            child: Transform.scale(
+              scale: scale.clamp(0.92, 1.08),
+              child: GlassWrap(
+                margin: EdgeInsets.zero,
+                padding: const EdgeInsets.all(6),
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 46,
+                            height: 46,
+                            decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                            alignment: Alignment.center,
+                            child: const NwsbIcon(NwsbMarks.gift, size: 24, color: Colors.black),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(widget.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+                                Text(
+                                  _note ?? 'Tap to open. Coins fly after it opens.',
+                                  style: const TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w700),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const NwsbCoinDisc(size: 36),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(99),
+                        child: LinearProgressIndicator(
+                          value: t == 0 ? 0.08 : t,
+                          minHeight: 3,
+                          color: const Color(0xFFE4C56A),
+                          backgroundColor: const Color(0x22FFFFFF),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
   }
 }

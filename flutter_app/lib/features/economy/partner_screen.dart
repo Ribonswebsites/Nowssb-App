@@ -26,6 +26,8 @@ class PartnerScreen extends StatelessWidget {
             children: [
               const ProgramShelf(),
               const SizedBox(height: 12),
+              const CoinCollectCard(pageKey: 'partner', amount: 10, title: 'Partner coins'),
+              const SizedBox(height: 12),
               const GlassLine(
                 text: 'Points buy a mark, an early listen, or a studio note. They never convert to money.',
               ),
@@ -65,7 +67,18 @@ class PartnerScreen extends StatelessWidget {
       child: GoldButton(
         label: label,
         filled: false,
-        onTap: () => runPrivate(context, () => EconomyApi.call('logPartnerAction', {'kind': kind})),
+        onTap: () async {
+          try {
+            await EconomyApi.call('logPartnerAction', {'kind': kind});
+          } on EconomyException catch (e) {
+            if (!EconomyApi.isMissing(e) || !context.mounted) return;
+            final add = int.tryParse(label.split('·').last.trim()) ?? 1;
+            EconomyMirror.instance.addPartnerPoints(add);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('+$add partner points on this phone.')),
+            );
+          }
+        },
       ),
     );
   }

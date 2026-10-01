@@ -133,6 +133,7 @@ class EconomyApi {
       case 'permission-denied':
         return 'That account cannot do this.';
       case 'not-found':
+        return 'Saved on this phone.';
       case 'already-exists':
       case 'failed-precondition':
       case 'resource-exhausted':
@@ -143,18 +144,21 @@ class EconomyApi {
     }
   }
 
-  /// Today's login coins. If the callable is not deployed (`NOT_FOUND`),
-  /// the wallet still moves on this phone so the coin flight can play.
+  static bool isMissing(EconomyException e) {
+    final code = e.code ?? '';
+    final msg = e.message.toUpperCase();
+    return code == 'not-found' || msg.contains('NOT_FOUND') || msg.contains('NOT FOUND');
+  }
+
+  /// Today's coins. If the callable is not deployed, the wallet still
+  /// moves on this phone so the coin flight can play after the tap.
   static Future<int> claimToday() async {
     try {
       final result = await call('claimDailyLogin');
       return (result['coins'] as num?)?.toInt() ?? 0;
     } on EconomyException catch (e) {
-      final code = e.code ?? '';
-      final msg = e.message.toUpperCase();
-      final missing = code == 'not-found' || msg.contains('NOT_FOUND') || msg.contains('NOT FOUND');
-      if (!missing) rethrow;
-      return EconomyMirror.instance.grantLocalDaily();
+      if (!isMissing(e)) rethrow;
+      return EconomyMirror.instance.grantOnce('daily', 10);
     }
   }
 }
@@ -227,8 +231,14 @@ class EconomyMirror extends ChangeNotifier {
       return;
     }
     final prefs = await SharedPreferences.getInstance();
-    final bonusKey = 'nwsb_local_daily_${user.uid}_${_todayKey()}';
-    _localBonus = prefs.getBool(bonusKey) == true ? 10 : 0;
+    final day = _todayKey();
+    _localBonus = prefs.getInt('nwsb_local_delta_${user.uid}') ??
+        prefs.getInt('nwsb_local_bonus_${user.uid}_$day') ??
+        (prefs.getBool('nwsb_local_daily_${user.uid}_$day') == true ? 10 : 0);
+    loginToday = prefs.getBool('nwsb_grant_${user.uid}_${day}_daily') == true ||
+        prefs.getBool('nwsb_local_daily_${user.uid}_$day') == true;
+    scratchToday = prefs.getBool('nwsb_grant_${user.uid}_${day}_scratch') == true;
+    coins = _serverCoins + _localBonus;
     try {
       await EconomyApi.call('ensureEconomyProfile', {
         'installId': await EconomyApi.installId(),
@@ -262,10 +272,8 @@ class EconomyMirror extends ChangeNotifier {
     });
     _watch('users/$id/earnCaps/${_todayKey()}', (data) {
       final serverLogin = data['login'] == true;
-      if (serverLogin) _localBonus = 0;
-      coins = _serverCoins + _localBonus;
-      loginToday = serverLogin || _localBonus > 0;
-      scratchToday = data['scratch'] == true;
+      loginToday = serverLogin || loginToday;
+      scratchToday = data['scratch'] == true || scratchToday;
       capsReady = true;
     });
     _watch('users/$id/referral/main', (data) {
@@ -307,24 +315,51 @@ class EconomyMirror extends ChangeNotifier {
     return '${n.year}$m$d';
   }
 
-  /// One local daily grant when the cloud function is not deployed.
-  /// Persisted per account per day so the flight cannot repeat.
-  Future<int> grantLocalDaily() async {
+  /// One local grant per key per day. The cloud function stays the source of
+  /// truth when it exists. This only runs when that function is not deployed.
+  Future<int> grantOnce(String key, int amount, {bool daily = true}) async {
     final prefs = await SharedPreferences.getInstance();
-    final key = 'nwsb_local_daily_${uid ?? 'local'}_${_todayKey()}';
-    if (prefs.getBool(key) == true) {
-      loginToday = true;
+    final id = daily
+        ? 'nwsb_grant_${uid ?? 'local'}_${_todayKey()}_$key'
+        : 'nwsb_grant_${uid ?? 'local'}_once_$key';
+    if (prefs.getBool(id) == true) {
+      if (key == 'daily') loginToday = true;
+      if (key == 'scratch') scratchToday = true;
       notifyListeners();
       return 0;
     }
-    await prefs.setBool(key, true);
-    _localBonus += 10;
+    await prefs.setBool(id, true);
+    _localBonus += amount;
     coins = _serverCoins + _localBonus;
-    if (streak < 1) streak = 1;
-    loginToday = true;
+    await prefs.setInt('nwsb_local_delta_${uid ?? 'local'}', _localBonus);
+    if (key == 'daily') {
+      loginToday = true;
+      if (streak < 1) streak = 1;
+      await prefs.setBool('nwsb_local_daily_${uid ?? 'local'}_${_todayKey()}', true);
+    }
+    if (key == 'scratch') scratchToday = true;
     notifyListeners();
-    return 10;
+    return amount;
   }
+
+  /// Local coin spend when Play/server spend is not deployed.
+  Future<bool> spendLocal(int cost) async {
+    if (cost <= 0 || coins < cost) return false;
+    final prefs = await SharedPreferences.getInstance();
+    _localBonus -= cost;
+    coins = _serverCoins + _localBonus;
+    await prefs.setInt('nwsb_local_delta_${uid ?? 'local'}', _localBonus);
+    notifyListeners();
+    return true;
+  }
+
+  void addPartnerPoints(int add) {
+    if (add <= 0) return;
+    partnerPoints += add;
+    notifyListeners();
+  }
+
+  Future<int> grantLocalDaily() => grantOnce('daily', 10);
 
   void _watch(String path, void Function(Map<String, dynamic> data) apply) {
     _docs.add(FirebaseFirestore.instance.doc(path).snapshots().listen((snap) {

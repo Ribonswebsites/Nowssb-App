@@ -37,6 +37,8 @@ class BazaarScreen extends StatelessWidget {
             blackSub: 'Half to one and a half times the original.',
           ),
           const SizedBox(height: 12),
+          const CoinCollectCard(pageKey: 'resell', amount: 8, title: 'Resell coins'),
+          const SizedBox(height: 12),
           const GlassLine(text: 'Listings stay off until Play allows them. You can still read the rules.'),
           const SizedBox(height: 12),
           const ColoredSplitPromoBanner(

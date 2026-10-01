@@ -48,7 +48,7 @@ class EarnScreen extends StatelessWidget {
               const SizedBox(height: 22),
               const _Eyebrow('HOW YOU EARN'),
               const SizedBox(height: 8),
-              const _Rate('Complete login', '+25 once, then +10 each day'),
+              const _Rate('Open the app', '+25 once, then +10 each day'),
               const _Rate('Buy a word or meaning', '+8 coins'),
               const _Rate('Buy a package', '+40 coins'),
               const _Rate('Buy a 10-word bundle', '+90 coins'),

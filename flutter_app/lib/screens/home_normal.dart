@@ -50,7 +50,6 @@ import '../theme/tokens.dart';
 import '../widgets/black_glass_banner.dart';
 import '../widgets/four_banners.dart';
 import '../widgets/program_shelf.dart';
-import '../features/economy/daily_claim_sheet.dart';
 import '../widgets/home_skin.dart';
 import 'normal/neomorphic_action_bar.dart';
 import 'normal/neomorphic_dashboard.dart';
@@ -199,10 +198,6 @@ class _HomeNormalState extends State<HomeNormal> {
     PracticeProgress.instance.addListener(_onContent);
     Settings.instance.addListener(_onContent);
     unawaited(PracticeProgress.instance.start());
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      DailyClaimSheet.offer(context, mounted: () => mounted);
-    });
   }
 
   @override

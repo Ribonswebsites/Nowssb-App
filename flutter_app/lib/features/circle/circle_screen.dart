@@ -135,6 +135,8 @@ class _CircleScreenState extends State<CircleScreen> {
                 onTap: _welcome,
               ),
               const SizedBox(height: 12),
+              const CoinCollectCard(pageKey: 'earn', amount: 10, title: 'Earn coins'),
+              const SizedBox(height: 12),
               const TrioRail(),
               const SizedBox(height: 14),
               GlassWrap(

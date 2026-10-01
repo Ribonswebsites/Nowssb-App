@@ -104,6 +104,8 @@ class _EarningsScreenState extends State<EarningsScreen> {
               const SizedBox(height: 12),
               const ProgramShelf(),
               const SizedBox(height: 12),
+              const CoinCollectCard(pageKey: 'earning', amount: 8, title: 'Earning coins'),
+              const SizedBox(height: 12),
               const GlassLine(text: 'Pending for 30 days, then available. A person approves the payout.'),
               const SizedBox(height: 12),
               EconomyNote(

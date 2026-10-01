@@ -3,6 +3,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../widgets/nwsb_coin_fly.dart';
 
@@ -26,10 +27,16 @@ class _NwsbScratchCardState extends State<NwsbScratchCard> {
 
   void _add(Offset point) {
     setState(() => _cuts.add(point));
-    if (!_opened && _cuts.length > 36) {
-      _opened = true;
-      widget.onCleared();
-    }
+    if (_cuts.length % 8 == 0) HapticFeedback.selectionClick();
+    if (!_opened && _cuts.length > 36) _finish();
+  }
+
+  void _finish() {
+    if (_opened) return;
+    _opened = true;
+    HapticFeedback.mediumImpact();
+    widget.onCleared();
+    setState(() {});
   }
 
   @override
@@ -48,26 +55,44 @@ class _NwsbScratchCardState extends State<NwsbScratchCard> {
               const ColoredBox(color: Color(0xFF0A0A0A)),
               Center(child: widget.prize),
               if (!_opened)
-                CustomPaint(
-                  painter: _FoilPainter(_cuts),
-                  child: const SizedBox.expand(),
+                IgnorePointer(
+                  child: CustomPaint(
+                    painter: _FoilPainter(_cuts),
+                    child: const SizedBox.expand(),
+                  ),
                 ),
               if (!_opened)
-                IgnorePointer(
+                const IgnorePointer(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const _Logo(),
-                      const SizedBox(height: 8),
+                      _Logo(),
+                      SizedBox(height: 8),
                       Text(
-                        'SCRATCH',
+                        'SCRATCH TO REVEAL',
                         style: TextStyle(
-                          color: Colors.black.withValues(alpha: 0.72),
+                          color: Color(0xFF111111),
                           fontWeight: FontWeight.w800,
-                          letterSpacing: 3,
+                          letterSpacing: 1.4,
+                          fontSize: 12,
                         ),
                       ),
                     ],
+                  ),
+                ),
+              if (!_opened)
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 6,
+                  child: Center(
+                    child: TextButton(
+                      onPressed: _finish,
+                      child: const Text(
+                        'REVEAL FOR ME',
+                        style: TextStyle(color: Color(0xFF111111), fontWeight: FontWeight.w800, letterSpacing: 1.1, fontSize: 11),
+                      ),
+                    ),
                   ),
                 ),
             ],
@@ -127,7 +152,7 @@ class _FoilPainter extends CustomPainter {
       canvas.drawLine(cuts[i - 1], cuts[i], erase);
     }
     for (final cut in cuts) {
-      canvas.drawCircle(cut, 8, Paint()..color = const Color(0xFF8A6A22));
+      canvas.drawCircle(cut, 22, erase);
     }
     canvas.restore();
   }

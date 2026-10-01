@@ -179,6 +179,16 @@ class _Disc extends StatelessWidget {
   final double size;
 
   @override
+  Widget build(BuildContext context) => NwsbCoinDisc(size: size);
+}
+
+/// The gold NowssB coin beside a balance. Same asset the flight uses.
+class NwsbCoinDisc extends StatelessWidget {
+  const NwsbCoinDisc({super.key, this.size = 42});
+
+  final double size;
+
+  @override
   Widget build(BuildContext context) {
     return Image.asset(
       NwsbCoinFly.disc,
@@ -188,18 +198,11 @@ class _Disc extends StatelessWidget {
       errorBuilder: (_, __, ___) => Container(
         width: size,
         height: size,
-        decoration: const BoxDecoration(
-          shape: BoxShape.circle,
-          color: Color(0xFFE4C56A),
-        ),
         alignment: Alignment.center,
+        decoration: const BoxDecoration(color: Color(0xFFE4C56A), shape: BoxShape.circle),
         child: Text(
           'N',
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.w800,
-            fontSize: size * 0.4,
-          ),
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w800, fontSize: size * 0.42),
         ),
       ),
     );

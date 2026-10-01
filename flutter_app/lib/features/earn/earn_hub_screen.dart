@@ -67,6 +67,8 @@ class EarnHubScreen extends StatelessWidget {
               const SizedBox(height: 8),
               const GlassLine(text: 'Earn, rewards, gifts, resell, print, the wall. Swipe the shelf.'),
               const SizedBox(height: 12),
+              const CoinCollectCard(pageKey: 'hub', amount: 8, title: 'Earn hub coins'),
+              const SizedBox(height: 12),
               ProgramShelf(
                 onTap: (poster) {
                   final page = switch (poster.title) {

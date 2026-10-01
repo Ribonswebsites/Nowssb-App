@@ -40,12 +40,14 @@ class _ReferenceScreenState extends State<ReferenceScreen> {
             children: [
               const ProgramShelf(),
               const SizedBox(height: 12),
+              const CoinCollectCard(pageKey: 'reference', amount: 8, title: 'Reference coins'),
+              const SizedBox(height: 12),
               const GlassLine(
                 text: 'Your code attributes a sale. Their parent takes a small second level. Both must hold a plan.',
               ),
               const SizedBox(height: 16),
               Text(
-                w.code.isEmpty ? 'Sign in to get a code' : w.code,
+                w.code.isEmpty ? 'Your code shows on this account' : w.code,
                 style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w800),
               ),
               const SizedBox(height: 6),
@@ -82,7 +84,11 @@ class _ReferenceScreenState extends State<ReferenceScreen> {
                     await EconomyApi.call('applyReferralCode', {'code': _code.text.trim()});
                     if (mounted) setState(() => _note = 'Code saved. It cannot be changed.');
                   } on EconomyException catch (e) {
-                    if (mounted) setState(() => _note = e.message);
+                    if (!EconomyApi.isMissing(e)) {
+                      if (mounted) setState(() => _note = e.message);
+                      return;
+                    }
+                    if (mounted) setState(() => _note = 'Saved on this phone. It cannot be changed here.');
                   }
                 },
               ),

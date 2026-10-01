@@ -64,12 +64,6 @@ class _AuthGateState extends State<AuthGate> {
     final prefs = await SharedPreferences.getInstance();
     final remember = prefs.getBool('nwsb.rememberMe') ?? true;
     if (mounted) setState(() => _remember = remember);
-    if (!remember && NwsbFirebase.ready) {
-      try {
-        await _google.signOut();
-      } catch (_) {}
-      await FirebaseAuth.instance.signOut();
-    }
   }
 
   Future<void> _saveRemember() async {

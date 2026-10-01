@@ -1,5 +1,4 @@
-/// The daily coin claim. It opens on the home once a signed-in account
-/// still has today's login open, and it stays on screen with the result.
+/// Daily coins. Nothing opens by itself, and nothing flies until Claim is tapped.
 library;
 
 import 'package:flutter/material.dart';
@@ -26,7 +25,7 @@ class DailyClaimSheet {
         return;
       }
       if (_open) return;
-      if (!mirror.capsReady || mirror.uid == null) return;
+      if (!mirror.capsReady || mirror.uid == null || mirror.loginToday) return;
       _open = true;
       mirror.removeListener(tick);
       showModalBottomSheet<void>(
@@ -53,12 +52,6 @@ class _DailyClaimBodyState extends State<DailyClaimBody> {
   String? _note;
   bool _busy = false;
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _claim());
-  }
-
   Future<void> _claim() async {
     if (_busy) return;
     setState(() => _busy = true);
@@ -69,13 +62,15 @@ class _DailyClaimBodyState extends State<DailyClaimBody> {
       final after = EconomyMirror.instance.coins;
       setState(() => _note = gained > 0
           ? '+$gained coins landed on this wallet.'
-          : 'Today’s login is already on the wallet.');
-      await NwsbCoinFly.show(
-        context,
-        coins: gained > 0 ? gained : 10,
-        from: before,
-        to: gained > 0 ? after : before,
-      );
+          : 'Today’s coins are already on the wallet.');
+      if (gained > 0 && mounted) {
+        await NwsbCoinFly.show(
+          context,
+          coins: gained,
+          from: before,
+          to: after,
+        );
+      }
     } on EconomyException catch (e) {
       if (!mounted) return;
       final raw = e.message.toUpperCase();
@@ -136,7 +131,7 @@ class _DailyClaimBodyState extends State<DailyClaimBody> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    _note ?? 'Claiming today’s login…',
+                    _note ?? 'Tap claim. The coins fly after that.',
                     style: const TextStyle(color: Color(0xCCFFFFFF), height: 1.3),
                   ),
                   const SizedBox(height: 14),

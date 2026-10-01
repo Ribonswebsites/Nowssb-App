@@ -54,7 +54,7 @@ class InboxScreen extends StatelessWidget {
               if (docs.isEmpty) {
                 return const EconomyMessage(
                   title: 'You are caught up',
-                  body: 'Login coins, payouts, and referral updates land here.',
+                  body: 'Daily coins, payouts, and referral updates land here.',
                 );
               }
               return ListView.builder(

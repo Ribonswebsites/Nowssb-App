@@ -116,7 +116,7 @@ void openCoins(BuildContext context) {
         title: 'NowssB coins earned',
         mark: NwsbMarks.rewards,
         headline: 'Coins you earned',
-        body: 'Coins come from practice, daily login, and quests. They cover at most 30% of a Play purchase. They cannot be bought, gifted, or cashed out.',
+        body: 'Coins come from practice, the daily claim, and quests. They cover at most 30% of a Play purchase. They cannot be bought, gifted, or cashed out.',
         actionLabel: 'Open rewards',
         action: VaultScreen(),
       ),

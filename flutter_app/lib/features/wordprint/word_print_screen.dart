@@ -44,6 +44,8 @@ class _WordPrintScreenState extends State<WordPrintScreen> {
         children: [
           const ProgramShelf(),
           const SizedBox(height: 12),
+          const CoinCollectCard(pageKey: 'print', amount: 8, title: 'Word Print coins'),
+          const SizedBox(height: 12),
           const GlassLine(text: 'A public print. Coins and cash stay off this page.'),
           const SizedBox(height: 12),
           TextField(
