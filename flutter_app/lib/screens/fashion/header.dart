@@ -62,26 +62,25 @@ class HomeHeader extends StatelessWidget {
           child: SizedBox(
             width: double.infinity,
             child: Row(
-            children: [
-              SizedBox(
-                width: 48,
-                height: 48,
-                child: ClipOval(
-                  child: EditableImage.asset(
-                    'assets/icons/logo-disc.webp',
-                    width: 48,
-                    height: 48,
-                    fit: BoxFit.cover,
-                    slot: 'header.HomeHeader',
+              children: [
+                SizedBox(
+                  width: 42,
+                  height: 42,
+                  child: ClipOval(
+                    child: EditableImage.asset(
+                      'assets/icons/logo-disc.webp',
+                      width: 42,
+                      height: 42,
+                      fit: BoxFit.cover,
+                      slot: 'header.HomeHeader',
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              const Flexible(
-                child: Text(
+                const SizedBox(width: 10),
+                const Text(
                   'NowssB',
                   maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w800,
@@ -96,18 +95,17 @@ class HomeHeader extends StatelessWidget {
                     ],
                   ),
                 ),
-              ),
-              const Spacer(),
-              _HdrIcon(
-                mark: NwsbMarks.bell,
-                badge: notifications,
-                onTap: onNotifications,
-              ),
-              const _HdrRule(),
-              _HdrIcon(mark: NwsbMarks.gear, onTap: onSettings),
-              const _HdrRule(),
-              _HdrIcon(mark: NwsbMarks.menu, stroke: 1.9, onTap: onMenu),
-            ],
+                const Spacer(),
+                _HdrIcon(
+                  mark: NwsbMarks.bell,
+                  badge: notifications,
+                  onTap: onNotifications,
+                ),
+                const _HdrRule(),
+                _HdrIcon(mark: NwsbMarks.gear, onTap: onSettings),
+                const _HdrRule(),
+                _HdrIcon(mark: NwsbMarks.menu, stroke: 1.9, onTap: onMenu),
+              ],
             ),
           ),
         ),
@@ -122,7 +120,7 @@ class _HdrRule extends StatelessWidget {
   Widget build(BuildContext context) => Container(
         width: 1,
         height: 22,
-        margin: const EdgeInsets.symmetric(horizontal: 12),
+        margin: const EdgeInsets.symmetric(horizontal: 8),
         color: const Color(0x2EFFFFFF),
       );
 }

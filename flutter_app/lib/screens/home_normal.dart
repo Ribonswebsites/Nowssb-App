@@ -729,24 +729,15 @@ class _TopRow extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 12),
-        // Flexible, not a bare Column: 'NOWSBANSIU EDITION' at 2pt of letter
-        // spacing is wider than it looks, and on a 412pt screen it pushed
-        // the header buttons clean off the right edge.
-        Flexible(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              EditableLabel('home_normal.TopRow',
-                'NowssB',
-                maxLines: 1,
-                style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -0.3,
-                    ),
-              ),
-            ],
+        const Text(
+          'NowssB',
+          maxLines: 1,
+          softWrap: false,
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.3,
+            color: Color(0xFF1A1A1A),
           ),
         ),
         const Spacer(),

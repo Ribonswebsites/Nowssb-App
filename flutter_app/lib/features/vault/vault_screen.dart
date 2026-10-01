@@ -211,14 +211,12 @@ class _TodayCardState extends State<_TodayCard> {
       setState(() => _note = gained > 0
           ? '+$gained coins landed on this wallet.'
           : 'Today’s login is already on the wallet.');
-      if (gained > 0) {
-        await NwsbCoinFly.show(
-          context,
-          coins: gained,
-          from: before,
-          to: after,
-        );
-      }
+      await NwsbCoinFly.show(
+        context,
+        coins: gained > 0 ? gained : 10,
+        from: before,
+        to: gained > 0 ? after : before,
+      );
     } on EconomyException catch (e) {
       if (!mounted) return;
       final raw = e.message.toUpperCase();
@@ -269,8 +267,8 @@ class _TodayCardState extends State<_TodayCard> {
           ],
           const SizedBox(height: 10),
           GoldButton(
-            label: claimed ? 'Claimed today' : 'Claim daily login',
-            onTap: claimed ? null : _claim,
+            label: claimed ? 'Play today’s coins' : 'Claim daily login',
+            onTap: _claim,
           ),
           const SizedBox(height: 8),
           GoldButton(

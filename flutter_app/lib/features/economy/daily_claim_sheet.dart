@@ -26,7 +26,7 @@ class DailyClaimSheet {
         return;
       }
       if (_open) return;
-      if (!mirror.capsReady || mirror.uid == null || mirror.loginToday) return;
+      if (!mirror.capsReady || mirror.uid == null) return;
       _open = true;
       mirror.removeListener(tick);
       showModalBottomSheet<void>(
@@ -70,14 +70,12 @@ class _DailyClaimBodyState extends State<DailyClaimBody> {
       setState(() => _note = gained > 0
           ? '+$gained coins landed on this wallet.'
           : 'Today’s login is already on the wallet.');
-      if (gained > 0) {
-        await NwsbCoinFly.show(
-          context,
-          coins: gained,
-          from: before,
-          to: after,
-        );
-      }
+      await NwsbCoinFly.show(
+        context,
+        coins: gained > 0 ? gained : 10,
+        from: before,
+        to: gained > 0 ? after : before,
+      );
     } on EconomyException catch (e) {
       if (!mounted) return;
       final raw = e.message.toUpperCase();
@@ -120,7 +118,7 @@ class _DailyClaimBodyState extends State<DailyClaimBody> {
                         height: 48,
                         decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
                         clipBehavior: Clip.antiAlias,
-                        child: Image.asset('assets/icons/logo-disc.webp', fit: BoxFit.cover),
+                        child: Image.asset(NwsbCoinFly.disc, fit: BoxFit.contain),
                       ),
                       const SizedBox(width: 10),
                       const Expanded(
