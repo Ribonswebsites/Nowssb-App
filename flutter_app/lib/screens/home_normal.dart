@@ -724,7 +724,7 @@ class _TopRow extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 12),
-        const Text(
+        const EditableLabel('home_normal.TopRow',
           'NowssB',
           maxLines: 1,
           softWrap: false,

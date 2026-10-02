@@ -140,7 +140,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     if (!mounted || text.isEmpty) return;
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(text)));
+      ..showSnackBar(SnackBar(content: EditableLabel('subscription.SubscriptionScreen', text)));
   }
 
   /// Play's price for this card, in the buyer's currency, when Play gave one.
@@ -177,7 +177,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
               style: const TextStyle(color: NwsbColors.goldLight, fontWeight: FontWeight.w700),
             ),
           ),
-          const Text(
+          const EditableLabel('subscription.SubscriptionScreen',
             'Payments are handled by Google Play. Manage or cancel in Google Play → Subscriptions.',
             textAlign: TextAlign.center,
             style: TextStyle(color: Color(0x73FFFFFF), fontSize: 10.5, height: 1.4),

@@ -145,7 +145,7 @@ class BlackOffer extends StatelessWidget {
                       WhiteCircleOrb(size: 16, mark: mark),
                       const SizedBox(width: 10),
                       Expanded(
-                        child: Text(
+                        child: EditableLabel('economy_theme.BlackOffer',
                           title,
                           style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 15),
                         ),
@@ -358,7 +358,7 @@ Future<void> runEconomy(BuildContext context, Future<void> Function() action) as
           : e.message;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(text),
+          content: EditableLabel('economy_theme.shared', text),
           action: SnackBarAction(label: 'Retry', onPressed: () => runEconomy(context, action)),
         ),
       );
@@ -427,7 +427,7 @@ class _CoinCollectCardState extends State<CoinCollectCard> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(widget.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+                  EditableLabel('economy_theme.CoinCollectCard', widget.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
                   Text(
                     _note ?? '+${widget.amount} coins',
                     style: const TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w700),
@@ -532,7 +532,7 @@ class _GiftOpenCardState extends State<GiftOpenCard> with SingleTickerProviderSt
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(widget.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+                                EditableLabel('economy_theme.GiftOpenCard', widget.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
                                 Text(
                                   _note ?? 'Tap to open. Coins fly after it opens.',
                                   style: const TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w700),

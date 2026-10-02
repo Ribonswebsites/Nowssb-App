@@ -9,6 +9,7 @@ import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import '../layout/carousel_fx.dart';
 import '../layout/layout_sections.dart';
 import '../template/slot_keys.dart';
+import 'animation_library.dart';
 import 'editor_controller.dart';
 import 'glass.dart';
 
@@ -69,6 +70,27 @@ class _AnimationTabState extends State<AnimationTab> with SingleTickerProviderSt
     return ListView(
       padding: const EdgeInsets.fromLTRB(14, 0, 14, 24),
       children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 6, bottom: 4),
+          child: Glass(
+            radius: 18,
+            padding: const EdgeInsets.all(12),
+            glow: kGold.withValues(alpha: 0.12),
+            onTap: () {
+              tapFeel();
+              openAnimationLibrary(context, c);
+            },
+            child: const Row(children: [
+              Icon(Icons.animation_rounded, color: kGold),
+              SizedBox(width: 10),
+              Expanded(
+                child: Text('Animation library — every entrance, page turn, auto-rotate and orb, playing large',
+                    style: TextStyle(color: Colors.white, fontSize: 12.5, fontWeight: FontWeight.w600)),
+              ),
+              Icon(Icons.open_in_full_rounded, color: kGold, size: 18),
+            ]),
+          ),
+        ),
         if (cur == null)
           const Hint('This page is one block for now — only the orb choice applies.')
         else ...[

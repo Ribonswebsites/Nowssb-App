@@ -365,7 +365,7 @@ class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
                         alignment: Alignment.topLeft,
                         child: Padding(
                           padding: EdgeInsets.fromLTRB(8, 8, 8, 0),
-                          child: Text(
+                          child: EditableLabel('earn_home_sections.EarnUmbrellaSection',
                             'Your share\nof the net.',
                             style: TextStyle(
                               color: Colors.white,

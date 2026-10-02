@@ -4,6 +4,7 @@
 /// is parked and goes out the next time someone is signed in.
 library;
 
+import 'app_control.dart';
 import 'dart:async';
 import 'dart:convert';
 
@@ -173,6 +174,8 @@ class WordRequestStore extends ChangeNotifier {
     if (cleaned.isEmpty) {
       throw ArgumentError('Word is required');
     }
+    final stop = AppControl.instance.blockFor('requests');
+    if (stop != null) throw ArgumentError(stop);
     final req = WordRequest(
       id: 'wr_${DateTime.now().millisecondsSinceEpoch}',
       word: cleaned,

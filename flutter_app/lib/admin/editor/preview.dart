@@ -262,3 +262,90 @@ String slotFriendly(String key, SlotType type, String def) {
   final f = def.split('/').last.split('?').first;
   return f.isEmpty ? key.split('.').last : f;
 }
+
+/// Full-screen live preview: the whole page exactly as users will see it,
+/// with every pending (unpublished) edit applied and fully interactive.
+/// Uses its own preview controller holding a copy of the drafts, so the
+/// editor's state is untouched.
+class FullPagePreview extends StatefulWidget {
+  const FullPagePreview({super.key, required this.c});
+  final EditorController c;
+
+  @override
+  State<FullPagePreview> createState() => _FullPagePreviewState();
+}
+
+class _FullPagePreviewState extends State<FullPagePreview> {
+  final EditorPreviewController _p = EditorPreviewController();
+  bool _chrome = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _p.draftOverrides.addAll(widget.c.preview.draftOverrides);
+    _p.draftLayouts.addAll(widget.c.preview.draftLayouts);
+  }
+
+  @override
+  void dispose() {
+    _p.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final page = appPage(widget.c.pageId) ?? kAppPages.first;
+    final n = widget.c.pendingCount;
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Stack(children: [
+        Positioned.fill(
+          child: EditorPreviewScope(
+            controller: _p,
+            child: Theme(data: NwsbTheme.light, child: HeroMode(enabled: false, child: page.build())),
+          ),
+        ),
+        Positioned(
+          right: 12,
+          bottom: MediaQuery.of(context).padding.bottom + 14,
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 220),
+            child: _chrome
+                ? Glass(
+                    key: const ValueKey('bar'),
+                    radius: 99,
+                    fill: const Color(0xCC070B14),
+                    padding: const EdgeInsets.fromLTRB(14, 6, 6, 6),
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      const Icon(Icons.visibility_rounded, color: kGold, size: 16),
+                      const SizedBox(width: 6),
+                      Text(n == 0 ? 'Live preview' : 'Preview · $n draft${n == 1 ? '' : 's'}',
+                          style: const TextStyle(color: Colors.white, fontSize: 12.5, fontWeight: FontWeight.w700)),
+                      IconButton(
+                        tooltip: 'Hide this bar',
+                        onPressed: () => setState(() => _chrome = false),
+                        icon: const Icon(Icons.visibility_off_rounded, color: kDim, size: 18),
+                      ),
+                      IconButton(
+                        tooltip: 'Back to the editor',
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: const Icon(Icons.close_rounded, color: Colors.white, size: 20),
+                      ),
+                    ]),
+                  )
+                : GestureDetector(
+                    key: const ValueKey('dot'),
+                    onTap: () => setState(() => _chrome = true),
+                    child: Container(
+                      width: 34,
+                      height: 34,
+                      decoration: BoxDecoration(color: const Color(0x99000000), shape: BoxShape.circle, border: Border.all(color: kGold)),
+                      child: const Icon(Icons.visibility_rounded, color: kGold, size: 16),
+                    ),
+                  ),
+          ),
+        ),
+      ]),
+    );
+  }
+}

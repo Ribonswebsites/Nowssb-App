@@ -14,6 +14,7 @@ import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_coin_fly.dart';
 import '../../widgets/nwsb_icon.dart';
 import 'gifts_screen.dart';
+import '../../admin/template/editable.dart';
 
 class GiftBox {
   const GiftBox(this.asset, this.title, this.line);
@@ -147,13 +148,14 @@ class GiftShowcase extends StatelessWidget {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(18),
-            child: Image.asset(
+            child: EditableImage.asset(
               'assets/gifts/gift-hero.png',
               width: w * 0.74,
               height: 320,
               fit: BoxFit.cover,
               alignment: Alignment.topCenter,
               errorBuilder: (_, __, ___) => const SizedBox(width: 220, height: 320),
+              slot: 'gift_show.GiftShowcase',
             ),
           ),
           const SizedBox(width: 12),
@@ -198,12 +200,12 @@ class GiftGallery extends StatelessWidget {
           children: [
             _Turntable(
               phase: phase,
-              child: Image.asset(box.asset, height: 108, fit: BoxFit.contain),
+              child: EditableImage.asset(box.asset, height: 108, fit: BoxFit.contain, slot: 'gift_show.GiftGallery'),
             ),
             const SizedBox(height: 8),
             Text(box.title, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13)),
             const SizedBox(height: 4),
-            Text('Open', style: const TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w700, fontSize: 12)),
+            EditableLabel('gift_show.GiftGallery', 'Open', style: const TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w700, fontSize: 12)),
           ],
         ),
       ),
@@ -384,7 +386,7 @@ class _GiftWheelState extends State<GiftWheel> with TickerProviderStateMixin {
                           ),
                         ),
                         SizedBox(height: 2),
-                        Text(
+                        EditableLabel('gift_show.GiftWheel',
                           'One spin a day. It ticks, then slows\ninto the peg.',
                           style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 12, height: 1.25),
                         ),
@@ -402,19 +404,19 @@ class _GiftWheelState extends State<GiftWheel> with TickerProviderStateMixin {
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Image.asset(NwsbCoinFly.disc, width: 16, height: 16, fit: BoxFit.contain),
+                            EditableImage.asset(NwsbCoinFly.disc, width: 16, height: 16, fit: BoxFit.contain, slot: 'gift_show.GiftWheel'),
                             const SizedBox(width: 4),
                             Text('$coins', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)),
                           ],
                         ),
-                        const Text('Your coins', style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 9)),
+                        const EditableLabel('gift_show.GiftWheel', 'Your coins', style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 9)),
                       ],
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 6),
-              const Text(
+              const EditableLabel('gift_show.GiftWheel',
                 'Premium 8%  ·  Signature 4%',
                 style: TextStyle(color: Color(0xFFE4C56A), fontSize: 12, fontWeight: FontWeight.w600),
               ),
@@ -484,9 +486,9 @@ class _GiftWheelState extends State<GiftWheel> with TickerProviderStateMixin {
                                   child: const Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Text('SPIN', style: TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w900, fontSize: 22, letterSpacing: 1.2, height: 1)),
+                                      EditableLabel('gift_show.GiftWheel', 'SPIN', style: TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w900, fontSize: 22, letterSpacing: 1.2, height: 1)),
                                       SizedBox(height: 2),
-                                      Text('1 spin daily', style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 9)),
+                                      EditableLabel('gift_show.GiftWheel', '1 spin daily', style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 9)),
                                     ],
                                   ),
                                 ),
@@ -524,9 +526,9 @@ class _GiftWheelState extends State<GiftWheel> with TickerProviderStateMixin {
                     ),
                     child: Column(
                       children: [
-                        Image.asset(NwsbCoinFly.disc, width: 22, height: 22, fit: BoxFit.contain),
-                        const Text('15', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16, height: 1.1)),
-                        const Text('per spin', style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 9)),
+                        EditableImage.asset(NwsbCoinFly.disc, width: 22, height: 22, fit: BoxFit.contain, slot: 'gift_show.GiftWheel'),
+                        const EditableLabel('gift_show.GiftWheel', '15', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16, height: 1.1)),
+                        const EditableLabel('gift_show.GiftWheel', 'per spin', style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 9)),
                       ],
                     ),
                   ),
@@ -542,7 +544,7 @@ class _GiftWheelState extends State<GiftWheel> with TickerProviderStateMixin {
                         ),
                         child: Column(
                           children: [
-                            Text(
+                            EditableLabel('gift_show.GiftWheel',
                               'SPIN THE WHEEL',
                               style: TextStyle(color: can ? const Color(0xFF1A1408) : const Color(0xFFB7A98A), fontWeight: FontWeight.w900, letterSpacing: 0.8, fontSize: 15),
                             ),
@@ -565,7 +567,7 @@ class _GiftWheelState extends State<GiftWheel> with TickerProviderStateMixin {
                   const Icon(Icons.lock_outline, size: 12, color: Color(0x99FFFFFF)),
                   const SizedBox(width: 4),
                   const Expanded(
-                    child: Text(
+                    child: EditableLabel('gift_show.GiftWheel',
                       'Come back tomorrow for your next spin.',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -885,10 +887,10 @@ class GiftPlanGrid extends StatelessWidget {
           children: [
             _Turntable(
               phase: (title.hashCode.abs() % 9) / 9,
-              child: Image.asset(asset, height: 86, fit: BoxFit.contain),
+              child: EditableImage.asset(asset, height: 86, fit: BoxFit.contain, slot: 'gift_show.GiftPlanGrid'),
             ),
             const SizedBox(height: 8),
-            Text(title, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13)),
+            EditableLabel('gift_show.GiftPlanGrid', title, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13)),
             const SizedBox(height: 2),
             Text(line, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 11, height: 1.25)),
           ],
@@ -971,7 +973,7 @@ class _RevealState extends State<_Reveal> with TickerProviderStateMixin {
                                 alignment: Alignment.center,
                                 filterQuality: FilterQuality.medium,
                                 transform: spin,
-                                child: Image.asset(widget.box.asset, fit: BoxFit.contain),
+                                child: EditableImage.asset(widget.box.asset, fit: BoxFit.contain, slot: 'gift_show.Reveal'),
                               ),
                             ),
                           ),
@@ -984,14 +986,14 @@ class _RevealState extends State<_Reveal> with TickerProviderStateMixin {
                               const SizedBox(height: 6),
                               Text(widget.code, style: const TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontWeight: FontWeight.w800, fontSize: 16)),
                               const SizedBox(height: 4),
-                              const Text('On this account. Not cash. Not a rank key.', style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 12)),
+                              const EditableLabel('gift_show.Reveal', 'On this account. Not cash. Not a rank key.', style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 12)),
                               const SizedBox(height: 10),
                               TextButton(
                                 onPressed: () async {
                                   await Clipboard.setData(ClipboardData(text: widget.code));
                                   if (context.mounted) Navigator.of(context).pop();
                                 },
-                                child: const Text('Copy code', style: TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w800)),
+                                child: const EditableLabel('gift_show.Reveal', 'Copy code', style: TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w800)),
                               ),
                             ],
                           ),

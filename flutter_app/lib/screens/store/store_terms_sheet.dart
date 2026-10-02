@@ -110,7 +110,7 @@ class _StoreTermsSheet extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  const Text(
+                  const EditableLabel('store_terms_sheet.StoreTermsSheet',
                     'Read this before you buy. Agreeing records that you have.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
@@ -120,7 +120,7 @@ class _StoreTermsSheet extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 22),
-                  const Text(
+                  const EditableLabel('store_terms_sheet.StoreTermsSheet',
                     'RESEARCH PROPOSAL',
                     style: TextStyle(
                       color: Color(0xCCE8D5A3),
@@ -130,7 +130,7 @@ class _StoreTermsSheet extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
+                  const EditableLabel('store_terms_sheet.StoreTermsSheet',
                     'Natural-Origin Word Science (NOWS): a framework for exploring the origin of human language.',
                     style: TextStyle(
                       color: Color(0xEBFFFFFF),
@@ -140,7 +140,7 @@ class _StoreTermsSheet extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
+                  const EditableLabel('store_terms_sheet.StoreTermsSheet',
                     'This store describes words and meanings by their sounds, under a hypothesis offered for testing. It is not an established finding of historical linguistics, and it is not medical advice. Purchases unlock written work produced under that framework.',
                     style: TextStyle(
                       color: Color(0x9EFFFFFF),
@@ -211,7 +211,7 @@ class _Pill extends StatelessWidget {
             borderRadius: BorderRadius.circular(999),
             border: filled ? null : Border.all(color: const Color(0x55FFFFFF)),
           ),
-          child: Text(
+          child: EditableLabel('store_terms_sheet.Pill',
             label,
             style: TextStyle(
               color: filled ? const Color(0xFF0B0B0B) : Colors.white,

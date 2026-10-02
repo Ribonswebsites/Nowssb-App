@@ -70,7 +70,7 @@ class _CircleScreenState extends State<CircleScreen> {
                     WhiteCircleOrb(size: 20, mark: NwsbMarks.piggy),
                     SizedBox(width: 10),
                     Expanded(
-                      child: Text(
+                      child: EditableLabel('circle_screen.CircleScreen',
                         'Welcome to NowssB Earn',
                         style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 18),
                       ),
@@ -91,7 +91,7 @@ class _CircleScreenState extends State<CircleScreen> {
                     const Spacer(),
                     TextButton(
                       onPressed: () => Navigator.of(ctx).pop(),
-                      child: const Text('Continue', style: TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w700)),
+                      child: const EditableLabel('circle_screen.CircleScreen', 'Continue', style: TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w700)),
                     ),
                   ],
                 ),
@@ -562,7 +562,7 @@ class _TierRailState extends State<_TierRail> {
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                     decoration: BoxDecoration(color: tier.accent, borderRadius: BorderRadius.circular(99)),
-                                    child: const Text(
+                                    child: const EditableLabel('circle_screen.TierRail',
                                       'Open this tier',
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,

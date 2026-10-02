@@ -58,6 +58,24 @@ const _tabs = <(String, IconData, String)>[
 class _UiEditorScreenState extends State<UiEditorScreen> {
   final EditorController c = EditorController();
   int? _tab;
+  bool _full = false;
+
+  Future<void> _openFull() async {
+    bigFeel();
+    // The page holds GlobalKeys: drop the small preview while the big one is up.
+    setState(() => _full = true);
+    await WidgetsBinding.instance.endOfFrame;
+    if (!mounted) return;
+    await Navigator.of(context).push(PageRouteBuilder<void>(
+      transitionDuration: const Duration(milliseconds: 320),
+      pageBuilder: (_, __, ___) => FullPagePreview(c: c),
+      transitionsBuilder: (_, a, __, child) => FadeTransition(
+        opacity: a,
+        child: ScaleTransition(scale: Tween(begin: 0.94, end: 1.0).animate(CurvedAnimation(parent: a, curve: Curves.easeOutCubic)), child: child),
+      ),
+    ));
+    if (mounted) setState(() => _full = false);
+  }
 
   @override
   void initState() {
@@ -109,12 +127,12 @@ class _UiEditorScreenState extends State<UiEditorScreen> {
             child: SafeArea(
               bottom: false,
               child: Column(children: [
-                _TopBar(c: c, onBack: () async {
+                _TopBar(c: c, onFull: _openFull, onBack: () async {
                   if (await _confirmLeave() && context.mounted) Navigator.of(context).pop();
                 }),
                 _PageRow(c: c),
                 _SectionHeader(c: c),
-                Expanded(child: EditorPreview(c: c)),
+                Expanded(child: _full ? const SizedBox.shrink() : EditorPreview(c: c)),
                 _Dots(c: c),
                 _TabPills(index: _tab, pending: c.pendingCount, onTap: _openTab),
                 AnimatedContainer(
@@ -164,9 +182,10 @@ class _UiEditorScreenState extends State<UiEditorScreen> {
 }
 
 class _TopBar extends StatelessWidget {
-  const _TopBar({required this.c, required this.onBack});
+  const _TopBar({required this.c, required this.onBack, required this.onFull});
   final EditorController c;
   final VoidCallback onBack;
+  final VoidCallback onFull;
 
   @override
   Widget build(BuildContext context) {
@@ -189,7 +208,11 @@ class _TopBar extends StatelessWidget {
                 ? 'Taps pick what to edit. Switch to "Try it" to scroll and swipe the preview like the app.'
                 : 'The preview behaves like the app. Switch back to pick things to edit.',
             onTap: () => c.setPickMode(!c.pickMode)),
-        const SizedBox(width: 6),
+        IconButton(
+          tooltip: 'Full-screen live preview with your drafts',
+          onPressed: onFull,
+          icon: const Icon(Icons.fullscreen_rounded, color: kGold, size: 24),
+        ),
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 200),
           transitionBuilder: (child, a) => ScaleTransition(scale: a, child: child),

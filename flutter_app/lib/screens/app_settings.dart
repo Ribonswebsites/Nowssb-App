@@ -701,7 +701,7 @@ class _SignOutDialog extends StatelessWidget {
                       child: const Icon(Icons.logout_rounded, color: Colors.black),
                     ),
                     const SizedBox(height: 14),
-                    const Text(
+                    const EditableLabel('app_settings.SignOutDialog',
                       'Sign out?',
                       style: TextStyle(
                         color: Colors.white,
@@ -710,7 +710,7 @@ class _SignOutDialog extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 6),
-                    const Text(
+                    const EditableLabel('app_settings.SignOutDialog',
                       'You will need to choose an account the next time you sign in.',
                       textAlign: TextAlign.center,
                       style: TextStyle(color: Color(0xB3FFFFFF), height: 1.4),
@@ -726,7 +726,7 @@ class _SignOutDialog extends StatelessWidget {
                           onTap: () => Navigator.pop(context, true),
                           child: const Padding(
                             padding: EdgeInsets.symmetric(vertical: 14),
-                            child: Text(
+                            child: EditableLabel('app_settings.SignOutDialog',
                               'Sign out',
                               textAlign: TextAlign.center,
                               style: TextStyle(
@@ -755,7 +755,7 @@ class _SignOutDialog extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(999),
                                 border: Border.all(color: const Color(0x55FFFFFF)),
                               ),
-                              child: const Text(
+                              child: const EditableLabel('app_settings.SignOutDialog',
                                 'Stay signed in',
                                 style: TextStyle(
                                   color: Colors.white,

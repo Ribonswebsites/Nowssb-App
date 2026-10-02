@@ -84,6 +84,11 @@ class Word {
     this.description = '',
     this.meanings = const [],
     this.stage = '',
+    this.video = '',
+    this.videoPoster = '',
+    this.images = const [],
+    this.stages = const [],
+    this.notes = '',
   });
 
   final String key;
@@ -127,6 +132,22 @@ class Word {
   /// stages are still worked out from practice minutes.
   final String stage;
 
+  /// A video for this word (Cloudflare R2), from admin mode. Optional.
+  final String video;
+
+  /// Still shown before the video plays. Optional.
+  final String videoPoster;
+
+  /// More pictures for this word, from admin mode. Optional.
+  final List<String> images;
+
+  /// Ordered practice stages written for this word (title + text), from
+  /// admin mode. Optional; the practice flow still works them out itself.
+  final List<WordStage> stages;
+
+  /// Free notes shown under the meanings. Optional.
+  final String notes;
+
   /// The recording to play: this word's own voice first, then the older
   /// male/female fields the studio used to fill.
   String get voice => audio.isNotEmpty
@@ -169,6 +190,11 @@ class Word {
         'description': description,
         'meanings': meanings,
         'stage': stage,
+        'video': video,
+        'videoPoster': videoPoster,
+        'images': images,
+        'stages': [for (final st in stages) st.toMap()],
+        'notes': notes,
       };
 
   /// Kept in step with [parts], the way part073.js keeps `syllables` filled
@@ -245,7 +271,35 @@ class Word {
               .toList()
           : const [],
       stage: _str(raw['stage']),
+      video: _str(raw['video']),
+      videoPoster: _str(raw['videoPoster']),
+      images: raw['images'] is List
+          ? (raw['images'] as List).map((m) => '$m'.trim()).where((m) => m.startsWith('http')).toList()
+          : const [],
+      stages: raw['stages'] is List
+          ? (raw['stages'] as List).map(WordStage.from).whereType<WordStage>().toList()
+          : const [],
+      notes: _str(raw['notes']),
     );
+  }
+}
+
+/// One written practice stage of a word (admin mode).
+class WordStage {
+  const WordStage({required this.title, required this.text, this.audio = '', this.video = ''});
+  final String title;
+  final String text;
+  final String audio;
+  final String video;
+
+  Map<String, dynamic> toMap() => {'title': title, 'text': text, 'audio': audio, 'video': video};
+
+  static WordStage? from(dynamic raw) {
+    if (raw is! Map) return null;
+    final t = '${raw['title'] ?? ''}'.trim();
+    final x = '${raw['text'] ?? ''}'.trim();
+    if (t.isEmpty && x.isEmpty) return null;
+    return WordStage(title: t, text: x, audio: '${raw['audio'] ?? ''}'.trim(), video: '${raw['video'] ?? ''}'.trim());
   }
 }
 

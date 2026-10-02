@@ -4,6 +4,7 @@ library;
 import 'dart:ui' show ImageFilter;
 
 import 'package:cloud_firestore/cloud_firestore.dart' hide Settings;
+import '../data/app_control.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
@@ -718,6 +719,11 @@ class _QuotesWeekScreenState extends State<QuotesWeekScreen> {
   Future<void> _shareThought() async {
     final text = _thought.text.trim();
     if (text.isEmpty) return;
+    final stop = AppControl.instance.blockFor('community');
+    if (stop != null) {
+      ScaffoldMessenger.maybeOf(context)?.showSnackBar(SnackBar(behavior: SnackBarBehavior.floating, content: Text(stop)));
+      return;
+    }
     await Settings.instance.addSharedThought(text);
     var shared = false;
     if (NwsbFirebase.ready) {

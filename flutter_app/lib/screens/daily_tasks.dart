@@ -10,6 +10,7 @@ import '../theme/tokens.dart';
 import '../widgets/glass_wrap.dart';
 import '../widgets/nwsb_icon.dart';
 import '../widgets/program_shelf.dart';
+import '../admin/template/editable.dart';
 
 class DailyTaskView {
   const DailyTaskView(this.id, this.title, this.mark, this.done);
@@ -189,7 +190,7 @@ class _DailyTasksSectionState extends State<DailyTasksSection> {
         children: [
           Row(
             children: [
-              Text(
+              EditableLabel('daily_tasks.DailyTasksSection',
                 'TODAY',
                 style: TextStyle(
                   fontSize: 10,
@@ -254,7 +255,7 @@ class _DailyTasksSectionState extends State<DailyTasksSection> {
             alignment: Alignment.centerLeft,
             child: TextButton(
               onPressed: _edit,
-              child: const Text('Set today’s tasks'),
+              child: const EditableLabel('daily_tasks.DailyTasksSection', 'Set today’s tasks'),
             ),
           ),
         ],
@@ -357,7 +358,7 @@ class _DailyTasksPageState extends State<DailyTasksPage> {
                       const WhiteCircleOrb(size: 22, mark: NwsbMarks.book),
                       const SizedBox(width: 10),
                       const Expanded(
-                        child: Text(
+                        child: EditableLabel('daily_tasks.DailyTasksPage',
                           'Today’s tasks',
                           style: TextStyle(
                             color: Colors.white,
@@ -500,7 +501,7 @@ class _DailyTasksPageState extends State<DailyTasksPage> {
                             onSubmitted: (_) => _addTask(),
                           ),
                         ),
-                        TextButton(onPressed: _addTask, child: const Text('Add')),
+                        TextButton(onPressed: _addTask, child: const EditableLabel('daily_tasks.DailyTasksPage', 'Add')),
                       ],
                     ),
                   ),

@@ -296,7 +296,7 @@ class _TodayCardState extends State<_TodayCard> {
                 style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w800),
               ),
               const SizedBox(width: 8),
-              const Text('coins', style: TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w700)),
+              const EditableLabel('vault_screen.TodayCard', 'coins', style: TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w700)),
               const Spacer(),
               Text(
                 'streak ${w.streak}',
@@ -333,13 +333,13 @@ class _TodayCardState extends State<_TodayCard> {
             ),
           ),
           const SizedBox(height: 14),
-          const Text(
+          const EditableLabel('vault_screen.TodayCard',
             'SCRATCH',
             style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontSize: 12, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 8),
           if (w.scratchToday)
-            const Text(
+            const EditableLabel('vault_screen.TodayCard',
               'Today’s coupon is already open.',
               style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
             )
@@ -355,7 +355,7 @@ class _TodayCardState extends State<_TodayCard> {
                     '+${12 + DateTime.now().day % 18}',
                     style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w800),
                   ),
-                  const Text(
+                  const EditableLabel('vault_screen.TodayCard',
                     'NOWSSB COINS',
                     style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 2, fontWeight: FontWeight.w700, fontSize: 12),
                   ),
@@ -363,7 +363,7 @@ class _TodayCardState extends State<_TodayCard> {
               ),
             ),
           const SizedBox(height: 14),
-          const Text(
+          const EditableLabel('vault_screen.TodayCard',
             'GIFT',
             style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontSize: 12, fontWeight: FontWeight.w700),
           ),

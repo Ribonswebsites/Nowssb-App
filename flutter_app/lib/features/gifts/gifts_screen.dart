@@ -247,7 +247,7 @@ class _GiftsScreenState extends State<GiftsScreen> {
             children: [
               Icon(Icons.history, color: Colors.white, size: 15),
               SizedBox(width: 4),
-              Text('History', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600)),
+              EditableLabel('gifts_screen.GiftsScreen', 'History', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600)),
             ],
           ),
         ),
@@ -271,7 +271,7 @@ class _GiftsScreenState extends State<GiftsScreen> {
               const SizedBox(height: 12),
               const RandomGiftButton(),
               const SizedBox(height: 16),
-              const Text('GIFT CARDS', style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontSize: 12, fontWeight: FontWeight.w700)),
+              const EditableLabel('gifts_screen.GiftsScreen', 'GIFT CARDS', style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontSize: 12, fontWeight: FontWeight.w700)),
               const SizedBox(height: 8),
               const GiftPlanGrid(),
               const SizedBox(height: 12),

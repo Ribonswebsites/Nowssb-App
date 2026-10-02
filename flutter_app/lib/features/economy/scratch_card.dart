@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../widgets/nwsb_coin_fly.dart';
+import '../../admin/template/editable.dart';
 
 class NwsbScratchCard extends StatefulWidget {
   const NwsbScratchCard({
@@ -70,7 +71,7 @@ class _NwsbScratchCardState extends State<NwsbScratchCard> {
                     children: [
                       _Logo(),
                       SizedBox(height: 8),
-                      Text(
+                      EditableLabel('scratch_card.NwsbScratchCard',
                         'SCRATCH TO REVEAL',
                         style: TextStyle(
                           color: Color(0xFF111111),
@@ -90,7 +91,7 @@ class _NwsbScratchCardState extends State<NwsbScratchCard> {
                   child: Center(
                     child: TextButton(
                       onPressed: _finish,
-                      child: const Text(
+                      child: const EditableLabel('scratch_card.NwsbScratchCard',
                         'REVEAL FOR ME',
                         style: TextStyle(color: Color(0xFF111111), fontWeight: FontWeight.w800, letterSpacing: 1.1, fontSize: 11),
                       ),
@@ -116,15 +117,16 @@ class _Logo extends StatelessWidget {
       decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
       alignment: Alignment.center,
       child: ClipOval(
-        child: Image.asset(
+        child: EditableImage.asset(
           NwsbCoinFly.disc,
           width: 52,
           height: 52,
           fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => const Text(
+          errorBuilder: (_, __, ___) => const EditableLabel('scratch_card.Logo',
             'N',
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.w800, fontSize: 22),
           ),
+          slot: 'scratch_card.Logo',
         ),
       ),
     );

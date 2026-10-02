@@ -131,7 +131,7 @@ class _UpdateBanner extends StatelessWidget {
                         child: const NwsbIcon(NwsbMarks.update, size: 12, color: Colors.black, strokeWidth: 1.6),
                       ),
                       const SizedBox(width: 8),
-                      Text(
+                      EditableLabel('update_prompt.UpdateBanner',
                         label,
                         style: const TextStyle(color: Colors.white, fontSize: 12.5, fontWeight: FontWeight.w700),
                       ),
@@ -228,7 +228,7 @@ class _UpdateDialog extends StatelessWidget {
                       const Spacer(),
                       TextButton(
                         onPressed: () => Navigator.of(context).pop(),
-                        child: busy ? const Text('Hide') : const EditableLabel('main.NowssbApp', 'Later'),
+                        child: busy ? const EditableLabel('update_prompt.UpdateDialog', 'Hide') : const EditableLabel('main.NowssbApp', 'Later'),
                       ),
                       const _PrimaryButton(),
                     ],
@@ -275,7 +275,7 @@ class _PrimaryButton extends StatelessWidget {
     return FilledButton(
       style: FilledButton.styleFrom(backgroundColor: NwsbColors.goldLight, foregroundColor: NwsbColors.deep),
       onPressed: action,
-      child: Text(label),
+      child: EditableLabel('update_prompt.PrimaryButton', label),
     );
   }
 }
@@ -322,7 +322,7 @@ class _UpdateBody extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(text, style: const TextStyle(color: Color(0xCCFFFFFF), height: 1.45)),
+              EditableLabel('update_prompt.UpdateBody', text, style: const TextStyle(color: Color(0xCCFFFFFF), height: 1.45)),
               if (showProgress) ...[
                 const SizedBox(height: 8),
                 Text(
@@ -358,7 +358,7 @@ class _RequiredUpdateScreen extends StatelessWidget {
                 child: const Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Icon(Icons.system_update_rounded, color: NwsbColors.goldLight, size: 36),
                   SizedBox(height: 14),
-                  Text(
+                  EditableLabel('update_prompt.RequiredUpdateScreen',
                     'Update required',
                     style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800),
                   ),

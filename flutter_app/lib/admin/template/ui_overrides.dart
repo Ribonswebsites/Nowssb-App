@@ -256,6 +256,9 @@ class UiOverrides extends ChangeNotifier {
 
   Future<void> _ensure(UiOverride o) async {
     final url = o.url;
+    // `asset:` points at a file already in the app bundle (UI Editor SVG
+    // library); nothing to download.
+    if (!url.startsWith('http')) return;
     if (_files.containsKey(url) || _fetching.contains(url)) return;
     _fetching.add(url);
     try {

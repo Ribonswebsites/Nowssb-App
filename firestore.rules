@@ -17,7 +17,8 @@ service cloud.firestore {
               'role', 'roles', 'admin', 'isAdmin', 'coins', 'balance', 'wallet', 'adminGifts',
               'subscriptionOrderId', 'subscriptionSource', 'subscriptionAmount', 'subscriptionCurrency',
               'subscriptionUpdatedAt', 'subscriptionProductId', 'subscriptionTokenHash', 'subscriptionState',
-              'subscriptionAutoRenew', 'verifyTier'];
+              'subscriptionAutoRenew', 'verifyTier', 'subscriptionGrantedBy', 'restrictions', 'restrictionsUpdatedAt',
+              'unblockedAt', 'unblockedBy'];
     }
     // isPro:false and tier:null are harmless (a downgrade), so the website's
     // sign-up writes keep working.
@@ -28,6 +29,13 @@ service cloud.firestore {
         && (!('lastSeenAt' in changed) || data.lastSeenAt == request.time);
     }
     function isSelf(uid) { return signedIn() && request.auth.uid == uid; }
+    // Admin console restrictions (users/{uid}.restrictions, set only through
+    // /api/admin/restrict) and blocks. A missing profile is unrestricted.
+    function myUserDoc() { return /databases/$(database)/documents/users/$(request.auth.uid); }
+    function restricted(key) {
+      return exists(myUserDoc()) && (get(myUserDoc()).data.get('blocked', false) == true
+        || get(myUserDoc()).data.get('restrictions', {}).get(key, false) == true);
+    }
     function isParticipant(chatId) { return signedIn() && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants; }
     function isCallParty(callId) { return signedIn() && (get(/databases/$(database)/documents/calls/$(callId)).data.callerUid == request.auth.uid || get(/databases/$(database)/documents/calls/$(callId)).data.calleeUid == request.auth.uid); }
     match /admins/{uid} { allow get: if isSelf(uid) || isAdmin(); allow list, write: if false; }
@@ -56,7 +64,8 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(['kind', 'word', 'notes', 'price', 'currency', 'uid', 'email', 'name', 'status', 'at', 'source'])
         && request.resource.data.word is string && request.resource.data.word.size() > 0 && request.resource.data.word.size() <= 80
         && request.resource.data.status == 'new'
-        && (!('notes' in request.resource.data) || (request.resource.data.notes is string && request.resource.data.notes.size() <= 500));
+        && (!('notes' in request.resource.data) || (request.resource.data.notes is string && request.resource.data.notes.size() <= 500))
+        && !restricted('requests');
       allow get, list: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin());
       allow update, delete: if isAdmin();
     }
@@ -88,10 +97,10 @@ service cloud.firestore {
     match /pushSubs/{id} { allow get, list, delete: if isAdmin(); allow create, update: if signedIn(); }
     match /posts/{postId} {
       allow get, list: if resource.data.visibility == 'public' || (signedIn() && (resource.data.uid == request.auth.uid || isAdmin()));
-      allow create: if signedIn() && request.resource.data.uid == request.auth.uid && request.resource.data.visibility in ['public','followers'];
+      allow create: if signedIn() && request.resource.data.uid == request.auth.uid && request.resource.data.visibility in ['public','followers'] && !restricted('community');
       allow update, delete: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin());
       match /likes/{uid} { allow read: if signedIn(); allow create, delete: if isSelf(uid); allow update: if false; }
-      match /comments/{commentId} { allow read: if signedIn(); allow create: if signedIn() && request.resource.data.uid == request.auth.uid; allow update, delete: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin()); }
+      match /comments/{commentId} { allow read: if signedIn(); allow create: if signedIn() && request.resource.data.uid == request.auth.uid && !restricted('community'); allow update, delete: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin()); }
     }
     /* Personal Coach conversation history is private to the signed-in owner.
        This supports the optional Pages endpoint without broadening access to
@@ -103,7 +112,7 @@ service cloud.firestore {
       }
     }
 
-    match /stories/{storyId} { allow get, list: if resource.data.visibility == 'public' || (signedIn() && resource.data.uid == request.auth.uid); allow create: if signedIn() && request.resource.data.uid == request.auth.uid; allow update, delete: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin()); }
+    match /stories/{storyId} { allow get, list: if resource.data.visibility == 'public' || (signedIn() && resource.data.uid == request.auth.uid); allow create: if signedIn() && request.resource.data.uid == request.auth.uid && !restricted('community'); allow update, delete: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin()); }
     match /follows/{uid}/following/{targetUid} { allow read: if signedIn(); allow create, delete: if isSelf(uid) && targetUid != request.auth.uid; allow update: if false; }
     match /follows/{uid}/followers/{followerUid} { allow read: if signedIn(); allow create, delete: if isSelf(followerUid) && uid != request.auth.uid; allow update: if false; }
     match /chats/{chatId} {
@@ -128,12 +137,20 @@ service cloud.firestore {
     function ownsLedger() {
       return signedIn() && resource.data.uid == request.auth.uid;
     }
+    function adminWalletOk(keys) {
+      return keys.hasOnly(['coins', 'streak', 'lifetimeEarned', 'lastLoginYmd', 'updatedAt', 'streakResetAt', 'lastBrokenStreak'])
+        && request.resource.data.get('coins', 0) is int && request.resource.data.get('coins', 0) >= 0;
+    }
     match /users/{uid}/wallet/{docId} {
-      allow read: if isSelf(uid);
-      allow write: if false;
+      allow read: if isSelf(uid) || isAdmin();
+      // Admin console (when the server key is not set): coins/streak only,
+      // always paired with an append-only coinLedger row.
+      allow create: if isAdmin() && docId == 'main' && adminWalletOk(request.resource.data.keys());
+      allow update: if isAdmin() && docId == 'main' && adminWalletOk(request.resource.data.diff(resource.data).affectedKeys());
+      allow delete: if false;
     }
     match /users/{uid}/referral/{docId} {
-      allow read: if isSelf(uid);
+      allow read: if isSelf(uid) || isAdmin();
       allow write: if false;
     }
     match /users/{uid}/sellerStats/{docId} {
@@ -141,19 +158,20 @@ service cloud.firestore {
       allow write: if false;
     }
     match /users/{uid}/payout/{docId} {
-      allow read: if isSelf(uid);
-      allow write: if false;
+      allow read: if isSelf(uid) || isAdmin();
+      allow create, update: if isAdmin() && docId == 'main';
+      allow delete: if false;
     }
     match /users/{uid}/partner/{docId} {
-      allow read: if isSelf(uid);
+      allow read: if isSelf(uid) || isAdmin();
       allow write: if false;
     }
     match /users/{uid}/owned/{itemId} {
-      allow read: if isSelf(uid);
+      allow read: if isSelf(uid) || isAdmin();
       allow write: if false;
     }
     match /users/{uid}/earnCaps/{day} {
-      allow read: if isSelf(uid);
+      allow read: if isSelf(uid) || isAdmin();
       allow write: if false;
     }
     match /users/{uid}/quests/{questId} {
@@ -185,19 +203,24 @@ service cloud.firestore {
       allow delete: if false;
     }
     match /coinLedger/{entryId} {
-      allow get: if ownsLedger();
-      allow list: if signedIn() && resource.data.uid == request.auth.uid;
-      allow write: if false;
+      allow get: if ownsLedger() || isAdmin();
+      allow list: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+      // Append-only. An admin adjustment names the admin and says why.
+      allow create: if isAdmin() && request.resource.data.by == request.auth.token.email
+        && request.resource.data.delta is int && request.resource.data.reason is string
+        && request.resource.data.reason.size() > 0 && request.resource.data.reason.size() <= 200;
+      allow update, delete: if false;
     }
     match /referralLedger/{entryId} {
-      allow get: if signedIn() && (resource.data.referrerUid == request.auth.uid || resource.data.referredUid == request.auth.uid);
-      allow list: if signedIn() && (resource.data.referrerUid == request.auth.uid || resource.data.referredUid == request.auth.uid);
+      allow get: if isAdmin() || (signedIn() && (resource.data.referrerUid == request.auth.uid || resource.data.referredUid == request.auth.uid));
+      allow list: if isAdmin() || (signedIn() && (resource.data.referrerUid == request.auth.uid || resource.data.referredUid == request.auth.uid));
       allow write: if false;
     }
     match /cashLedger/{entryId} {
-      allow get: if ownsLedger();
-      allow list: if signedIn() && resource.data.uid == request.auth.uid;
-      allow write: if false;
+      allow get: if ownsLedger() || isAdmin();
+      allow list: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+      allow create: if isAdmin() && request.resource.data.delta is int;
+      allow update, delete: if false;
     }
     match /playReceipts/{receiptId} {
       allow read: if signedIn() && resource.data.uid == request.auth.uid;
@@ -224,8 +247,27 @@ service cloud.firestore {
     match /payoutRequests/{id} {
       allow get: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin());
       allow list: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
-      allow write: if false;
+      // Manual UPI queue: an admin moves a request along; amount/owner never change.
+      allow update: if isAdmin()
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.amountBase == resource.data.amountBase
+        && request.resource.data.status in ['approved', 'paid', 'rejected'];
+      allow create, delete: if false;
     }
+    // Gifts, coupons, referral network: written by the economy server; the
+    // admin console reads them and issues / voids gift codes.
+    match /gifts/{code} {
+      allow read: if isAdmin();
+      allow create: if isAdmin() && request.resource.data.source == 'admin' && request.resource.data.status == 'unredeemed';
+      allow update: if isAdmin() && resource.data.status == 'unredeemed'
+        && request.resource.data.status == 'void'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'voidedBy', 'voidedAt']);
+      allow delete: if false;
+    }
+    match /giftLedger/{id} { allow read: if isAdmin(); allow create: if isAdmin() && request.resource.data.source == 'admin'; allow update, delete: if false; }
+    match /couponLedger/{id} { allow read: if isAdmin(); allow write: if false; }
+    match /referrals/{refereeUid} { allow read: if isAdmin(); allow write: if false; }
+    match /partnerLedger/{id} { allow read: if isAdmin(); allow write: if false; }
     // Word Print. Public document holds only public fields. Money stays under
     // /users/{uid}/wallet and /users/{uid}/payout, which other accounts cannot read.
     match /profiles/{uid} {
@@ -246,13 +288,36 @@ service cloud.firestore {
       allow get, list: if isAdmin() || (signedIn() && resource.data.reporterUid == request.auth.uid);
       allow update, delete: if false;
     }
+    // config/app (force update, maintenance, feature flags, announcement)
+    // is read before sign-in too; config/economy and the rest need a sign-in.
     match /config/{docId} {
-      allow read: if signedIn();
+      allow read: if signedIn() || docId == 'app';
       allow write: if isAdmin();
+    }
+    // Every settings save from the admin console, append-only.
+    match /configHistory/{id} {
+      allow read, create: if isAdmin();
+      allow update, delete: if false;
+    }
+    // Activity feed. The app may add only its own sign-in / sign-up / open
+    // event, stamped with the server clock; the admin server writes the rest.
+    match /activity/{id} {
+      allow read: if isAdmin();
+      allow create: if signedIn()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.type in ['login', 'signup', 'open']
+        && request.resource.data.at == request.time
+        && request.resource.data.keys().hasOnly(['type', 'uid', 'at', 'platform', 'build', 'app', 'summary']);
+      allow update, delete: if false;
+    }
+    // Push broadcasts sent from the console (written by /api/admin/broadcast).
+    match /broadcasts/{id} {
+      allow read: if isAdmin();
+      allow write: if false;
     }
 
     match /ratings/{uid}/entries/{raterUid} { allow read: if signedIn(); allow create, update: if isSelf(raterUid) && uid != request.auth.uid; allow delete: if isSelf(raterUid) || isAdmin(); }
-    match /reels/{id} { allow read: if true; allow create: if signedIn() && request.resource.data.uid == request.auth.uid; allow update, delete: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin()); }
+    match /reels/{id} { allow read: if true; allow create: if signedIn() && request.resource.data.uid == request.auth.uid && !restricted('community'); allow update, delete: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin()); }
     match /{document=**} { allow read, write: if false; }
   }
 }

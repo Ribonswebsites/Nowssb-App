@@ -110,7 +110,7 @@ class LoginStage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 6),
-              const Text(
+              const EditableLabel('login_stage.LoginStage',
                 'NowssB',
                 style: TextStyle(
                   color: Colors.white,

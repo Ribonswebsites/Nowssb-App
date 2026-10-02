@@ -316,6 +316,7 @@ class EditableImage extends StatelessWidget {
 /// The provider for an override picture: the downloaded file once it is on
 /// disk, the cached network image until then.
 ImageProvider overrideImageProvider(String url, [int? cacheWidth, int? cacheHeight]) {
+  if (url.startsWith('asset:')) return ResizeImage.resizeIfNeeded(cacheWidth, cacheHeight, AssetImage(url.substring(6)));
   final path = UiOverrides.instance.fileFor(url);
   final ImageProvider base =
       path != null ? FileImage(File(path)) : CachedNetworkImageProvider(url);
@@ -407,19 +408,48 @@ class EditableSvg extends StatelessWidget {
     final o = mediaOverride(context, key, SlotType.image);
     final Widget child = o == null
         ? _default()
-        : Image(
-            image: overrideImageProvider(o.url),
-            width: width,
-            height: height,
-            fit: fit,
-            alignment: alignment,
-            gaplessPlayback: true,
-            frameBuilder: (context, img, frame, sync) =>
-                (frame == null && !sync) ? _default() : img,
-            errorBuilder: (_, __, ___) => _default(),
-          );
+        : isSvgUrl(o.url)
+            ? overrideSvg(o.url, width: width, height: height, fit: fit, alignment: alignment, colorFilter: colorFilter, fallback: _default)
+            : Image(
+                image: overrideImageProvider(o.url),
+                width: width,
+                height: height,
+                fit: fit,
+                alignment: alignment,
+                gaplessPlayback: true,
+                frameBuilder: (context, img, frame, sync) =>
+                    (frame == null && !sync) ? _default() : img,
+                errorBuilder: (_, __, ___) => _default(),
+              );
     return slotChrome(context, key, SlotType.image, source, child);
   }
+}
+
+/// True for an SVG replacement: a bundled `asset:…svg` or an uploaded .svg.
+bool isSvgUrl(String url) => Uri.tryParse(url)?.path.toLowerCase().endsWith('.svg') ?? url.toLowerCase().endsWith('.svg');
+
+/// Draws an SVG replacement — from the bundle (`asset:`), the downloaded
+/// copy, or the network — at the slot's size. Falls back to the default.
+Widget overrideSvg(
+  String url, {
+  double? width,
+  double? height,
+  BoxFit fit = BoxFit.contain,
+  AlignmentGeometry alignment = Alignment.center,
+  ColorFilter? colorFilter,
+  required Widget Function() fallback,
+}) {
+  if (url.startsWith('asset:')) {
+    return SvgPicture.asset(url.substring(6), width: width, height: height, fit: fit, alignment: alignment, colorFilter: colorFilter,
+        placeholderBuilder: (_) => fallback());
+  }
+  final path = UiOverrides.instance.fileFor(url);
+  if (path != null) {
+    return SvgPicture.file(File(path), width: width, height: height, fit: fit, alignment: alignment, colorFilter: colorFilter,
+        placeholderBuilder: (_) => fallback());
+  }
+  return SvgPicture.network(url, width: width, height: height, fit: fit, alignment: alignment, colorFilter: colorFilter,
+      placeholderBuilder: (_) => fallback());
 }
 
 /// The pencil drawn on an editable element in edit mode. Only ever built

@@ -77,7 +77,7 @@ class HomeHeader extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 10),
-                const Text(
+                const EditableLabel('header.HomeHeader',
                   'NowssB',
                   maxLines: 1,
                   softWrap: false,

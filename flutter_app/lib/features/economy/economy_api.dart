@@ -1,6 +1,7 @@
 /// Server economy. Balances change only inside Cloud Functions.
 library;
 
+import '../../data/app_control.dart';
 import 'dart:async';
 import 'dart:math';
 
@@ -105,6 +106,9 @@ class EconomyApi {
     if (FirebaseAuth.instance.currentUser == null) {
       throw EconomyException('Sign in first. Coins and payouts stay on your account.');
     }
+    // Admin console blocks, restrictions and feature flags (data/app_control.dart).
+    final stop = AppControl.instance.blockForEconomy(name);
+    if (stop != null) throw EconomyException(stop, code: 'restricted');
     try {
       final result = await _fn.httpsCallable(name).call(data ?? const {});
       final raw = result.data;

@@ -8,6 +8,7 @@ library;
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import '../admin/template/editable.dart';
 
 class RoundCarousel extends StatefulWidget {
   const RoundCarousel({
@@ -195,13 +196,14 @@ class _Face extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final photo = Image.asset(
+    final photo = EditableImage.asset(
       asset,
       width: width,
       height: height,
       fit: BoxFit.cover,
       gaplessPlayback: true,
       errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF141414)),
+      slot: 'round_carousel.Face',
     );
     return Container(
       width: width,
@@ -220,7 +222,7 @@ class _Face extends StatelessWidget {
             ? const ColoredBox(
                 color: Color(0xFF050505),
                 child: Center(
-                  child: Text(
+                  child: EditableLabel('round_carousel.Face',
                     'NowssB',
                     style: TextStyle(
                       color: Color(0xFFE4C56A),

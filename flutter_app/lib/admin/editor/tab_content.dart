@@ -7,11 +7,13 @@ library;
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../layout/app_pages.dart';
 import '../layout/template_sections.dart';
 import '../layout/ui_layouts.dart';
 import '../media_upload.dart';
+import 'svg_picker.dart';
 import '../template/editable.dart';
 import '../template/slot_keys.dart';
 import '../template/ui_overrides.dart';
@@ -214,8 +216,15 @@ class _SlotRowState extends State<SlotRow> {
                   ),
                 ),
               ] else if (s.type != SlotType.orb) ...[
-                Row(children: [
+                Wrap(spacing: 8, runSpacing: 8, children: [
                   Pill('Upload new', icon: Icons.upload_rounded, selected: true, onTap: _progress != null ? null : _upload),
+                  if (s.type == SlotType.image && s.def.toLowerCase().endsWith('.svg'))
+                    Pill('SVG library', icon: Icons.category_rounded, onTap: () async {
+                      final v = await pickSvg(context, current: o?.url ?? s.def);
+                      if (v == null || !mounted) return;
+                      c.setMedia(s.key, s.type, s.def, v, '');
+                      setState(() => _msg = 'Swapped — shown on the preview. Publish to make it live.');
+                    }),
                 ]),
               ],
               if (_progress != null) ...[
@@ -273,7 +282,11 @@ class _Thumb extends StatelessWidget {
   Widget build(BuildContext context) {
     Widget inner;
     final src = (o != null && o!.url.isNotEmpty) ? o!.url : slot.def;
-    if (slot.type == SlotType.image && !src.endsWith('.svg')) {
+    if (slot.type == SlotType.image && isSvgUrl(src)) {
+      inner = src.startsWith('http') || src.startsWith('asset:')
+          ? overrideSvg(src, width: 30, height: 30, fallback: () => Icon(slotIcon(slot.type), color: kGold, size: 18))
+          : SvgPicture.asset(src, width: 30, height: 30, placeholderBuilder: (_) => const SizedBox());
+    } else if (slot.type == SlotType.image) {
       final local = UiOverrides.instance.fileFor(src);
       inner = local != null
           ? Image.file(File(local), fit: BoxFit.cover)

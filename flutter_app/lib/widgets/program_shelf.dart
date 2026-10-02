@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import 'glass_wrap.dart';
 import 'nwsb_icon.dart';
+import '../admin/template/editable.dart';
 
 class ProgramPoster {
   const ProgramPoster(this.asset, this.title, this.line);
@@ -58,7 +59,7 @@ class GlassLine extends StatelessWidget {
           WhiteCircleOrb(size: 18, mark: mark),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(
+            child: EditableLabel('program_shelf.GlassLine',
               text,
               style: const TextStyle(
                 color: Colors.white,
@@ -100,10 +101,11 @@ class ProgramShelf extends StatelessWidget {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    Image.asset(
+                    EditableImage.asset(
                       poster.asset,
                       fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF111111)),
+                      slot: 'program_shelf.ProgramShelf',
                     ),
                     const DecoratedBox(
                       decoration: BoxDecoration(

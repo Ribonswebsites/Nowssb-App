@@ -9,6 +9,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../admin/template/editable.dart';
 
 class NwsbCoinFly {
   NwsbCoinFly._();
@@ -87,7 +88,7 @@ class _FlyStageState extends State<_FlyStage> with SingleTickerProviderStateMixi
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text(
+                      const EditableLabel('nwsb_coin_fly.FlyStage',
                         'NOWSSB COINS',
                         style: TextStyle(
                           color: Color(0xFFE4C56A),
@@ -190,7 +191,7 @@ class NwsbCoinDisc extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Image.asset(
+    return EditableImage.asset(
       NwsbCoinFly.disc,
       width: size,
       height: size,
@@ -200,11 +201,12 @@ class NwsbCoinDisc extends StatelessWidget {
         height: size,
         alignment: Alignment.center,
         decoration: const BoxDecoration(color: Color(0xFFE4C56A), shape: BoxShape.circle),
-        child: Text(
+        child: EditableLabel('nwsb_coin_fly.NwsbCoinDisc',
           'N',
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.w800, fontSize: size * 0.42),
         ),
       ),
+      slot: 'nwsb_coin_fly.NwsbCoinDisc',
     );
   }
 }

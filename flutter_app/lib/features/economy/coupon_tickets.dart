@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../widgets/nwsb_coin_fly.dart';
 import 'economy_api.dart';
+import '../../admin/template/editable.dart';
 
 class WideCouponData {
   const WideCouponData({
@@ -149,11 +150,12 @@ class CouponRails extends StatelessWidget {
                   child: SizedBox(
                     width: cardW,
                     height: cardH,
-                    child: Image.asset(
+                    child: EditableImage.asset(
                       'assets/gifts/coupon-hero.png',
                       fit: BoxFit.cover,
                       alignment: Alignment.topCenter,
                       errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black),
+                      slot: 'coupon_tickets.CouponRails',
                     ),
                   ),
                 );
@@ -434,13 +436,14 @@ class _FlipCouponState extends State<FlipCoupon> with SingleTickerProviderStateM
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
-            child: Image.asset(
+            child: EditableImage.asset(
               'assets/gifts/coupon-banner.png',
               height: 52,
               width: double.infinity,
               fit: BoxFit.cover,
               alignment: const Alignment(0, 0.2),
               errorBuilder: (_, __, ___) => const SizedBox(height: 52),
+              slot: 'coupon_tickets.FlipCoupon',
             ),
           ),
           const SizedBox(height: 6),
@@ -472,7 +475,7 @@ class _FlipCouponState extends State<FlipCoupon> with SingleTickerProviderStateM
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text('COUPON CODE:  ', style: TextStyle(color: Colors.black, fontSize: 8, fontWeight: FontWeight.w700)),
+                const EditableLabel('coupon_tickets.FlipCoupon', 'COUPON CODE:  ', style: TextStyle(color: Colors.black, fontSize: 8, fontWeight: FontWeight.w700)),
                 Flexible(
                   child: Text(shown, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: d.codeColor, fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 0.4)),
                 ),
@@ -501,9 +504,9 @@ class _FlipCouponState extends State<FlipCoupon> with SingleTickerProviderStateM
     return _shell(
       child: Column(
         children: [
-          const Text('NOWSSB', style: TextStyle(color: Colors.white, letterSpacing: 2, fontSize: 11, fontWeight: FontWeight.w800)),
+          const EditableLabel('coupon_tickets.FlipCoupon', 'NOWSSB', style: TextStyle(color: Colors.white, letterSpacing: 2, fontSize: 11, fontWeight: FontWeight.w800)),
           const Spacer(),
-          Text(title, textAlign: TextAlign.center, maxLines: 2, style: const TextStyle(color: Colors.white, fontSize: 36, fontWeight: FontWeight.w900, height: 0.95)),
+          EditableLabel('coupon_tickets.FlipCoupon', title, textAlign: TextAlign.center, maxLines: 2, style: const TextStyle(color: Colors.white, fontSize: 36, fontWeight: FontWeight.w900, height: 0.95)),
           const SizedBox(height: 8),
           Text(line, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 12, height: 1.3)),
           if (!lose)
@@ -521,7 +524,7 @@ class _FlipCouponState extends State<FlipCoupon> with SingleTickerProviderStateM
                       style: const TextStyle(color: Color(0xFFF5C518), fontWeight: FontWeight.w800, letterSpacing: 0.6),
                     ),
                     const SizedBox(height: 4),
-                    const Text('TAP CODE TO COPY', style: TextStyle(color: Colors.white, fontSize: 9, letterSpacing: 1, fontWeight: FontWeight.w700)),
+                    const EditableLabel('coupon_tickets.FlipCoupon', 'TAP CODE TO COPY', style: TextStyle(color: Colors.white, fontSize: 9, letterSpacing: 1, fontWeight: FontWeight.w700)),
                   ],
                 ),
               ),
@@ -529,7 +532,7 @@ class _FlipCouponState extends State<FlipCoupon> with SingleTickerProviderStateM
           const Spacer(),
           _BarcodePill(code: d.copy),
           const SizedBox(height: 4),
-          const Text('Flip back. Not a rank key.', style: TextStyle(color: Colors.white70, fontSize: 8)),
+          const EditableLabel('coupon_tickets.FlipCoupon', 'Flip back. Not a rank key.', style: TextStyle(color: Colors.white70, fontSize: 8)),
         ],
       ),
     );
@@ -595,7 +598,7 @@ class _Chevron extends StatelessWidget {
       painter: const _ChevronPaint(),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(12, 3, 12, 3),
-        child: Text(text, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.black, fontSize: 8, fontWeight: FontWeight.w800, letterSpacing: 0.3)),
+        child: EditableLabel('coupon_tickets.Chevron', text, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.black, fontSize: 8, fontWeight: FontWeight.w800, letterSpacing: 0.3)),
       ),
     );
   }
@@ -633,7 +636,7 @@ class _Ribbon extends StatelessWidget {
       painter: _RibbonPaint(color),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        child: Text(text, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: ink, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 0.6)),
+        child: EditableLabel('coupon_tickets.Ribbon', text, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: ink, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 0.6)),
       ),
     );
   }

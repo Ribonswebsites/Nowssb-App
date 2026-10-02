@@ -26,6 +26,7 @@ import 'admin/edit_fab.dart';
 import 'admin/layout/ui_layouts.dart';
 import 'admin/template/ui_overrides.dart';
 import 'app_update.dart';
+import 'data/app_control.dart';
 import 'data/content.dart';
 import 'data/earn_wallet.dart';
 import 'data/firebase.dart';
@@ -43,6 +44,7 @@ import 'data/settings.dart';
 import 'media/video_pool.dart';
 import 'screens/auth_gate.dart';
 import 'screens/splash.dart';
+import 'widgets/app_control_layer.dart';
 import 'widgets/motion.dart';
 import 'widgets/notification_popup.dart';
 import 'widgets/update_prompt.dart';
@@ -93,6 +95,9 @@ Future<void> main() async {
   await QuoteStore.instance.start();
   WordRequestStore.instance.startSync();
   Presence.instance.start();
+  // Admin console switches: force update, maintenance, announcement,
+  // blocked / restricted account (data/app_control.dart).
+  unawaited(AppControl.instance.start());
 
   // Nothing decodes underneath the start animation. Released by the splash
   // when it finishes, and by the eight-second ceiling if it never does.
@@ -194,9 +199,12 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
         navigatorObservers: [_popupRoutes],
         builder: (context, child) => NwsbUpdateLayer(
             navigatorKey: _navigatorKey,
-            child: AdminEditFab(
+            child: AppControlLayer(
               navigatorKey: _navigatorKey,
-              child: NotificationPopupHost(child: child ?? const SizedBox()),
+              child: AdminEditFab(
+                navigatorKey: _navigatorKey,
+                child: NotificationPopupHost(child: child ?? const SizedBox()),
+              ),
             )),
         title: 'NowssB',
         debugShowCheckedModeBanner: false,

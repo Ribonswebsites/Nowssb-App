@@ -19,6 +19,7 @@ import 'economy_api.dart';
 import 'economy_theme.dart';
 import 'scratch_card.dart';
 import 'coupon_tickets.dart';
+import '../../admin/template/editable.dart';
 
 class _Prize {
   const _Prize(this.label, this.weight, this.coins);
@@ -119,17 +120,17 @@ class _CouponScreenState extends State<CouponScreen> {
             mark: NwsbMarks.coupon,
           ),
           const SizedBox(height: 16),
-          const Text('FREE SCRATCH', style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontSize: 12, fontWeight: FontWeight.w700)),
+          const EditableLabel('coupon_screen.CouponScreen', 'FREE SCRATCH', style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontSize: 12, fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
           NwsbScratchCard(
             onCleared: _clearedNow,
             prize: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Image.asset(NwsbCoinFly.disc, width: 36, height: 36, fit: BoxFit.contain),
+                EditableImage.asset(NwsbCoinFly.disc, width: 36, height: 36, fit: BoxFit.contain, slot: 'coupon_screen.CouponScreen'),
                 const SizedBox(height: 6),
                 Text('+$_coins', style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
-                const Text('NOWSSB COINS', style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 2, fontWeight: FontWeight.w700, fontSize: 12)),
+                const EditableLabel('coupon_screen.CouponScreen', 'NOWSSB COINS', style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 2, fontWeight: FontWeight.w700, fontSize: 12)),
               ],
             ),
           ),
@@ -140,9 +141,9 @@ class _CouponScreenState extends State<CouponScreen> {
           const SizedBox(height: 18),
           const CouponRails(),
           const SizedBox(height: 18),
-          const Text('PAID CARDS', style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontSize: 12, fontWeight: FontWeight.w700)),
+          const EditableLabel('coupon_screen.CouponScreen', 'PAID CARDS', style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontSize: 12, fontWeight: FontWeight.w700)),
           const SizedBox(height: 4),
-          const Text(
+          const EditableLabel('coupon_screen.CouponScreen',
             'Odds are fixed until a published change. A Signature prize does not unlock a rank rate.',
             style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 12, height: 1.35),
           ),
@@ -169,7 +170,7 @@ class HomeCouponShelf extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
+          const EditableLabel('coupon_screen.HomeCouponShelf',
             'NOWSSB COUPONS',
             style: TextStyle(
               fontSize: 10,
@@ -179,7 +180,7 @@ class HomeCouponShelf extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 6),
-          const Text(
+          const EditableLabel('coupon_screen.HomeCouponShelf',
             'Coupons',
             style: TextStyle(
               fontSize: 26,

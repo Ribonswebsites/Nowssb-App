@@ -14,9 +14,45 @@ both check the same thing. Mark someone with
 
 Open it: App Settings → **Admin**, or the floating **Edit layout** button
 (tap = edit mode on/off, long-press = Admin home, drag to move). The Admin
-home (`admin_home.dart`, Fashion-home look) leads to the **UI Editor**,
-Content (Words / Quotes / Requests) and the later pages (People, Earn &
-Gifts, Activity, Dashboard, Settings — marked "Next update").
+home (`admin_home.dart`, Fashion-home look) is the **Admin Console hub**:
+live strip (users / online / open requests / pending payouts), the **UI
+Editor**, and cards for every section below. No placeholders.
+
+## Admin Console sections
+| Screen | File | What it does |
+|---|---|---|
+| Dashboard | `dashboard_admin.dart` | Live counts: users, signed in today/7d, online now (lastSeen < 5 min), sign-ups chart, subscribers by plan, active vs expired, payments, open requests, coins issued/spent, gifts/coupons |
+| People | `people_admin.dart`, `person_admin.dart` | Search name/email/uid/phone; filters; full profile; grant/extend/revoke plan, coins ±, block, restrictions, reset streak, message/push, helper role; referral network |
+| Word requests | `requests_admin.dart` | Status filters; open a request → create the word (text, meanings, stages, video, audio, pictures) → publish → request fulfilled + requester notified |
+| Words | `words_admin.dart` | Every field incl. `video`, `videoPoster`, `images`, `stages[{title,text,audio,video}]`, `notes`; record/pick audio & video → R2 |
+| Activity | `activity_admin.dart` | Feed of sign-ups, logins, purchases, requests, gifts, coupons, payouts, admin actions; filters; live |
+| Notifications | `broadcast_admin.dart` | FCM push to everyone / a plan / free / one user; in-app banner (`config/app.announcement`) |
+| Earn & Gifts | `earn_admin.dart` | Payout queue (manual UPI; approve / paid with UTR / reject), network, gift codes, coupon odds, `config/economy` settings |
+| Settings | `settings_admin.dart` | Server status, force update (`config/app.minBuild`), maintenance, feature flags, store products, team/helpers, audit log |
+
+Shared pieces: `admin_kit.dart` (glass, charts, orbs, tiles), `admin_api.dart`
+(server client), `admin_data.dart` (runs every action on the server; if the
+server answers 501 because `FIREBASE_SERVICE_ACCOUNT` is not set, or the route
+is not deployed, the same action runs in-app through `firestore.rules`
+`isAdmin()` and writes `adminLog` itself — push needs the server),
+`config_store.dart` (versioned saves of `config/*` with `configHistory`).
+
+App side: `data/app_control.dart` + `widgets/app_control_layer.dart` enforce
+`config/app` (force update, maintenance, banner, flags) and `users/{uid}`
+(`blocked` → blocked screen, `restrictions{community,referrals,payouts,gifting,earning,requests}`).
+`data/presence.dart` records lastSeen/lastBuild/lastOs and one `activity` row per launch.
+
+## Server routes (Cloudflare Pages Functions, admin-checked)
+`/api/admin/<action>` — `functions/api/admin/[action].js` → `_lib/admin_core.js`.
+Every call verifies the Firebase ID token and `admins/{uid}` (or `admin`
+claim); writes go to `adminLog`. GET `health` / `whoami` list missing env
+vars (no auth needed for the names only). POST actions: `stats, users, user,
+grant-sub, extend-sub, revoke-sub, adjust-coins, block, restrict,
+reset-streak, message, helper, fulfil-request, broadcast, payout-decide,
+gift-codes, gift-void, earn, network, feed, ui-assets`. Env:
+`FIREBASE_SERVICE_ACCOUNT` (Firestore + Auth Admin REST), `FCM_SERVICE_ACCOUNT`
+(push), R2 vars for `upload-url` (areas incl. `video`). Offline tests:
+`node --test tests/admin-server.test.mjs`.
 
 ## Data
 | What | Where | Who writes |
@@ -28,7 +64,15 @@ Gifts, Activity, Dashboard, Settings — marked "Next update").
 | Template overrides | `ui_overrides/{slotKey with / → ~}` `{slot, type, url, text, textSet, style, start, end, storagePath, default, updatedAt, updatedBy}` | admins |
 | Page layouts (UI Editor) | `ui_layouts/{pageId}` `{page, version, sections: [{id, src, kind, visible, deleted, props, start, end}]}` | admins (everyone reads) |
 | Editor history | `ui_history/{id}` `{page, kind: slot\|layout, target, default, before, after, at, by, note}` — append-only | admins |
-| Activity | `adminLog` (create/read by admins, never edited) | admins |
+| Admin log | `adminLog` (create/read by admins, never edited) | admins / server |
+| App events | `activity/{id}` `{type: signup\|login\|open, uid, at=server time, platform, build, app}` — append-only | users (own only), server |
+| App control | `config/app` `{minBuild, updateMessage, updateUrl, maintenance{on,blocking,title,message}, flags{}, announcement{on,title,body,until}}` (public read) | admins |
+| Economy settings | `config/economy` (payouts, coins, ranks, fastStart, topPool, scratch odds, coupons, gifts, switches) | admins |
+| Config history | `configHistory/{id}` — append-only | admins |
+| Push history | `broadcasts/{id}` | server |
+| Gift codes | `gifts/{code}`, `giftLedger` | admins (create / void only) |
+| Wallet adjust | `users/{uid}/wallet/main` coins/streak + `coinLedger` row (by = admin email, reason) | admins / server |
+| Payout queue | `payoutRequests/{id}` status approved\|paid\|rejected | admins / server |
 | Media | R2: `ui/<slot>/…`, `audio/<wordKey>/…`, `images/words/<wordKey>/…` served from the public R2 domain | via upload-url |
 
 `ContentStore` lays `words` over the shipped + `content/library` words (archived
@@ -80,6 +124,16 @@ bg, gradient[], border, borderW, glow, glowBlur, radius, padH, padV, glass`; orb
 orbCircle`. Section `props` (layout doc): `height, padTop, padBottom, padH,
 transition, autoRotate, interval, entrance`, and for template sections
 their content (`title, subtitle, body, cta, route, image, video, bg, height, cards[]`).
+
+Pickers: **SVG library** (`editor/svg_picker.dart`, Content tab on any
+`.svg` slot) — searchable grid of every bundled `assets/**.svg` (AssetManifest)
+plus R2 `ui/` uploads (`/api/admin/ui-assets`) and SVG URLs already used in
+overrides; a bundled pick is stored as `asset:<path>`. **Animation library**
+(`editor/animation_library.dart`, Animation tab) — large live previews of
+every entrance, page turn, auto-rotate (at the section's interval) and
+thinking orb; tap applies to the selected section. The app ships no
+Lottie/Rive files. **Full-screen preview** (top bar ⛶) — the whole page,
+interactive, with every draft applied, before Publish.
 
 Thinking orbs: `AppThinkingLoader(slot: …)` looks up `slot` →
 `orb.<pageId>.<sectionId>` → `orb.all`.

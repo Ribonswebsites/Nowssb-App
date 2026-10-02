@@ -26,6 +26,7 @@ import '../data/models.dart';
 import 'admin_log.dart';
 import 'admin_ui.dart';
 import 'media_upload.dart';
+import '../media/nwsb_video.dart';
 
 String wordKeyFor(String word) =>
     word.trim().toLowerCase().replaceAll(RegExp(r'\s+'), '-').replaceAll(RegExp(r'[^a-z0-9\-]'), '');
@@ -136,10 +137,20 @@ class _WordsAdminScreenState extends State<WordsAdminScreen> {
 
 /// One word, every field.
 class WordEditorScreen extends StatefulWidget {
-  const WordEditorScreen({super.key, this.wordKey});
+  const WordEditorScreen({super.key, this.wordKey, this.prefill, this.onPublished, this.requestNote});
 
   /// Null for a new word.
   final String? wordKey;
+
+  /// Starting fields for a new word (e.g. from a word request).
+  final Map<String, dynamic>? prefill;
+
+  /// Called with the key after a successful publish (Requests marks the
+  /// request fulfilled and tells the person).
+  final Future<void> Function(String key, String word)? onPublished;
+
+  /// Shown at the top: what the person asked for.
+  final String? requestNote;
 
   @override
   State<WordEditorScreen> createState() => _WordEditorScreenState();
@@ -169,6 +180,22 @@ class _PartRow {
   }
 }
 
+class _StageRow {
+  _StageRow(Map p)
+      : title = TextEditingController(text: '${p['title'] ?? ''}'),
+        text = TextEditingController(text: '${p['text'] ?? ''}'),
+        audio = '${p['audio'] ?? ''}',
+        video = '${p['video'] ?? ''}';
+  final TextEditingController title, text;
+  String audio;
+  String video;
+  Map<String, dynamic> toMap() => {'title': title.text.trim(), 'text': text.text.trim(), 'audio': audio, 'video': video};
+  void dispose() {
+    title.dispose();
+    text.dispose();
+  }
+}
+
 class _WordEditorScreenState extends State<WordEditorScreen> {
   final _db = FirebaseFirestore.instance;
   static const _textFields = <String, String>{
@@ -188,18 +215,23 @@ class _WordEditorScreenState extends State<WordEditorScreen> {
     'tip': 'Tip',
     'categories': 'Categories — comma separated',
     'price': 'Price',
-    'stage': 'Stage label (optional, not used by the app yet)',
+    'stage': 'Stage label (optional)',
+    'notes': 'Notes (shown under the meanings)',
     'img': 'Picture URL',
+    'images': 'More pictures — one URL per line',
+    'video': 'Video URL (R2)',
+    'videoPoster': 'Video poster picture URL',
     'audioMale': 'Older field: male audio URL',
     'audioFemale': 'Older field: female audio URL',
   };
-  static const _multiline = {'description', 'meanings', 'benefit', 'tip', 'mistake', 'meaning'};
+  static const _multiline = {'description', 'meanings', 'benefit', 'tip', 'mistake', 'meaning', 'notes', 'images'};
 
   final Map<String, TextEditingController> _c = {
     for (final k in _textFields.keys) k: TextEditingController(),
   };
   final _key = TextEditingController();
   final List<_PartRow> _parts = [];
+  final List<_StageRow> _stages = [];
   String _gender = 'both';
   String _time = 'any';
   String _audio = '';
@@ -245,7 +277,7 @@ class _WordEditorScreenState extends State<WordEditorScreen> {
         if (shipped.isNotEmpty) src = shipped.first.toMap();
       }
     }
-    _fill(src ?? const {});
+    _fill(src ?? widget.prefill ?? const {});
     if (mounted) setState(() => _loading = false);
   }
 
@@ -258,6 +290,16 @@ class _WordEditorScreenState extends State<WordEditorScreen> {
     _gender = const ['M', 'F', 'both'].contains(m['gender']) ? m['gender'] as String : 'both';
     _time = const ['morning', 'evening', 'night', 'any'].contains(m['time']) ? m['time'] as String : 'any';
     _audio = '${m['audio'] ?? ''}';
+    for (final st in _stages) {
+      st.dispose();
+    }
+    _stages
+      ..clear()
+      ..addAll([
+        if (m['stages'] is List)
+          for (final st in m['stages'] as List)
+            if (st is Map) _StageRow(st),
+      ]);
     for (final p in _parts) {
       p.dispose();
     }
@@ -278,6 +320,8 @@ class _WordEditorScreenState extends State<WordEditorScreen> {
     };
     out['meanings'] = lines(_c['meanings']!.text, '\n');
     out['categories'] = lines(_c['categories']!.text, ',');
+    out['images'] = lines(_c['images']!.text, '\n').where((u) => u.startsWith('http')).toList();
+    out['stages'] = [for (final st in _stages) st.toMap()].where((m) => '${m['title']}${m['text']}'.isNotEmpty).toList();
     out['price'] = num.tryParse(_c['price']!.text.trim()) ?? 0;
     out['parts'] = [for (final p in _parts) p.toMap()].where((p) => '${p['roman']}${p['deva']}'.isNotEmpty).toList();
     out['gender'] = _gender;
@@ -333,6 +377,12 @@ class _WordEditorScreenState extends State<WordEditorScreen> {
         _hasDraft = false;
         _status = 'published';
         _msg = 'Published v$_version — every app shows it now.';
+        if (widget.onPublished != null) {
+          _msg = 'Published v$_version. Marking the request done and telling them…';
+          if (mounted) setState(() {});
+          await widget.onPublished!(_k, '${m['word']}');
+          _msg = 'Published v$_version and the request is fulfilled.';
+        }
       });
 
   Future<void> _archive(bool archive) => _run(archive ? 'Archiving…' : 'Restoring…', () async {
@@ -417,8 +467,51 @@ class _WordEditorScreenState extends State<WordEditorScreen> {
     });
   }
 
+  Future<void> _uploadVideo() async {
+    final f = await pickMedia(context, PickKind.video);
+    if (f == null) return;
+    await _run('Uploading video…', () async {
+      if (_k.isEmpty) throw 'Type the word first.';
+      final up = await uploadToR2(f, 'video', _k, PickKind.video);
+      _c['video']!.text = up.url;
+      await adminLog('word.video', _k, {'url': up.url});
+      _msg = 'Video uploaded. Publish to send it to every app.';
+    });
+  }
+
+  Future<void> _addImage() async {
+    final f = await pickMedia(context, PickKind.image);
+    if (f == null) return;
+    await _run('Uploading picture…', () async {
+      if (_k.isEmpty) throw 'Type the word first.';
+      final up = await uploadToR2(f, 'image', _k, PickKind.image);
+      final t = _c['images']!.text.trim();
+      _c['images']!.text = t.isEmpty ? up.url : '$t\n${up.url}';
+      await adminLog('word.image', _k, {'url': up.url});
+      _msg = 'Picture added. Publish to send it to every app.';
+    });
+  }
+
+  Future<void> _stageMedia(_StageRow st, PickKind kind) async {
+    final f = await pickMedia(context, kind);
+    if (f == null) return;
+    await _run('Uploading…', () async {
+      if (_k.isEmpty) throw 'Type the word first.';
+      final up = await uploadToR2(f, kind == PickKind.video ? 'video' : 'audio', '$_k-stage', kind);
+      if (kind == PickKind.video) {
+        st.video = up.url;
+      } else {
+        st.audio = up.url;
+      }
+      _msg = 'Stage ${kind == PickKind.video ? 'video' : 'audio'} uploaded.';
+    });
+  }
+
   @override
   void dispose() {
+    for (final st in _stages) {
+      st.dispose();
+    }
     for (final c in _c.values) {
       c.dispose();
     }
@@ -469,6 +562,17 @@ class _WordEditorScreenState extends State<WordEditorScreen> {
             Text(_msg!, style: const TextStyle(color: kAdminDim, fontSize: 12)),
           ],
           if (_busy) const Padding(padding: EdgeInsets.only(top: 8), child: LinearProgressIndicator(minHeight: 2)),
+          if (widget.requestNote != null && widget.requestNote!.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: AdminPanel(
+                child: Row(children: [
+                  const Icon(Icons.inbox_rounded, color: kAdminGold, size: 18),
+                  const SizedBox(width: 8),
+                  Expanded(child: Text(widget.requestNote!, style: const TextStyle(color: Colors.white, fontSize: 12.5))),
+                ]),
+              ),
+            ),
           _head('Word'),
           _field('word'),
           if (_isNew)
@@ -569,11 +673,65 @@ class _WordEditorScreenState extends State<WordEditorScreen> {
                 label: const Text('Add part'),
               ),
             ),
+          _head('Video — plays on the word page'),
+          AdminPanel(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              _field('video'),
+              Wrap(spacing: 8, runSpacing: 8, children: [
+                FilledButton.icon(
+                  style: FilledButton.styleFrom(backgroundColor: kAdminGold, foregroundColor: kAdminBg),
+                  onPressed: _busy ? null : _uploadVideo,
+                  icon: const Icon(Icons.videocam_rounded),
+                  label: const Text('Record or pick video'),
+                ),
+                if (_c['video']!.text.isNotEmpty)
+                  TextButton(onPressed: () => setState(() => _c['video']!.clear()), child: const Text('Remove')),
+              ]),
+              const SizedBox(height: 10),
+              _field('videoPoster'),
+              if (_c['video']!.text.startsWith('http'))
+                SizedBox(height: 180, child: ClipRRect(borderRadius: BorderRadius.circular(14), child: NwsbVideo(asset: _c['video']!.text, fit: BoxFit.cover))),
+            ]),
+          ),
           _head('Meaning'),
           _field('meaning'),
           _field('description'),
           _field('meanings'),
           _field('benefit'),
+          _field('notes'),
+          _head('Stages (written steps, each with optional audio / video)'),
+          for (var i = 0; i < _stages.length; i++)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: AdminPanel(
+                padding: const EdgeInsets.all(10),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Row(children: [
+                    Text('${i + 1}', style: const TextStyle(color: kAdminGold, fontWeight: FontWeight.w800)),
+                    const SizedBox(width: 8),
+                    Expanded(child: TextField(controller: _stages[i].title, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Stage title'))),
+                    IconButton(onPressed: () => setState(() => _stages.removeAt(i).dispose()), icon: const Icon(Icons.close, color: Colors.white38)),
+                  ]),
+                  const SizedBox(height: 8),
+                  TextField(controller: _stages[i].text, minLines: 2, maxLines: 6, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'What to do in this stage')),
+                  const SizedBox(height: 6),
+                  Wrap(spacing: 8, runSpacing: 6, crossAxisAlignment: WrapCrossAlignment.center, children: [
+                    OutlinedButton.icon(onPressed: _busy ? null : () => _stageMedia(_stages[i], PickKind.audio), icon: const Icon(Icons.graphic_eq, size: 16), label: Text(_stages[i].audio.isEmpty ? 'Audio' : 'Replace audio')),
+                    OutlinedButton.icon(onPressed: _busy ? null : () => _stageMedia(_stages[i], PickKind.video), icon: const Icon(Icons.videocam_outlined, size: 16), label: Text(_stages[i].video.isEmpty ? 'Video' : 'Replace video')),
+                    if (_stages[i].audio.isNotEmpty) IconButton(onPressed: () => _play(_stages[i].audio), icon: const Icon(Icons.play_arrow, color: kAdminGold)),
+                    if (_stages[i].video.isNotEmpty) const AdminChip('video', color: Color(0xFF81C784)),
+                  ]),
+                ]),
+              ),
+            ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              onPressed: () => setState(() => _stages.add(_StageRow(const {}))),
+              icon: const Icon(Icons.add),
+              label: const Text('Add stage'),
+            ),
+          ),
           _head('Practice'),
           _field('organ'),
           _field('origin'),
@@ -627,6 +785,19 @@ class _WordEditorScreenState extends State<WordEditorScreen> {
             Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: SizedBox(height: 120, child: Image.network(_c['img']!.text, fit: BoxFit.contain)),
+            ),
+          _field('images'),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(onPressed: _busy ? null : _addImage, icon: const Icon(Icons.add_photo_alternate_outlined), label: const Text('Add a picture')),
+          ),
+          if (_c['images']!.text.trim().isNotEmpty)
+            SizedBox(
+              height: 84,
+              child: ListView(scrollDirection: Axis.horizontal, children: [
+                for (final u in _c['images']!.text.split('\n').map((e) => e.trim()).where((e) => e.startsWith('http')))
+                  Padding(padding: const EdgeInsets.only(right: 8), child: ClipRRect(borderRadius: BorderRadius.circular(10), child: Image.network(u, width: 84, height: 84, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const SizedBox(width: 84)))),
+              ]),
             ),
           _head('Older fields'),
           _field('audioMale'),

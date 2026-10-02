@@ -16,7 +16,7 @@
       account is needed. A custom claim `admin: true`, or the uid being in
       ADMIN_UIDS, also counts.
 
-   Request   { area: 'ui'|'audio'|'image', target: '<slot or word key>',
+   Request   { area: 'ui'|'audio'|'image'|'video', target: '<slot or word key>',
                ext: 'webp', contentType: 'image/webp' }
    Response  { uploadUrl, publicUrl, key, expiresIn }
 
@@ -135,6 +135,8 @@ const AREAS = {
   ui: { prefix: 'ui', types: /^(image|video)\// },
   audio: { prefix: 'audio', types: /^audio\// },
   image: { prefix: 'images/words', types: /^image\// },
+  // Word / request clips (admin word editor) and request voice notes.
+  video: { prefix: 'video/words', types: /^video\// },
 };
 const cleanTarget = (s) => String(s || '').replace(/[^A-Za-z0-9._~-]/g, '-').replace(/-+/g, '-').slice(0, 180);
 
@@ -164,7 +166,7 @@ export async function onRequestPost(context) {
   const target = cleanTarget(body.target);
   const ext = String(body.ext || '').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 5);
   const type = String(body.contentType || '');
-  if (!area) return json({ error: 'area must be ui, audio or image.' }, 400);
+  if (!area) return json({ error: 'area must be ui, audio, image or video.' }, 400);
   if (!target || target === '.' || target === '..') return json({ error: 'target is required.' }, 400);
   if (!ext) return json({ error: 'ext is required.' }, 400);
   if (!area.types.test(type)) return json({ error: 'That file type is not allowed here.' }, 400);

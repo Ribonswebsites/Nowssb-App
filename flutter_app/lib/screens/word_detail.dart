@@ -18,11 +18,13 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 
 import '../data/models.dart';
 import '../theme/tokens.dart';
 import '../widgets/app_backdrop.dart';
 import '../admin/template/editable.dart';
+import '../media/nwsb_video.dart';
 
 class WordDetail extends StatelessWidget {
   const WordDetail({super.key, required this.word});
@@ -57,6 +59,16 @@ class WordDetail extends StatelessWidget {
                     children: [
                       _Headline(word: word),
                       const SizedBox(height: 26),
+                      if (word.video.startsWith('http')) ...[
+                        _WordVideo(url: word.video),
+                        const SizedBox(height: 22),
+                      ],
+                      if (word.description.isNotEmpty) ...[
+                        const _SectionLabel('ABOUT THIS WORD'),
+                        const SizedBox(height: 10),
+                        Text(word.description, style: const TextStyle(color: Color(0xE6FFFFFF), fontSize: 15, height: 1.5)),
+                        const SizedBox(height: 24),
+                      ],
                       if (word.parts.isNotEmpty) ...[
                         const _SectionLabel('HOW TO SAY IT'),
                         const SizedBox(height: 12),
@@ -106,6 +118,20 @@ class WordDetail extends StatelessWidget {
                           value: word.tip,
                           icon: Icons.lightbulb_outline,
                         ),
+                      if (word.stages.isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        const _SectionLabel('STAGES'),
+                        const SizedBox(height: 12),
+                        for (var i = 0; i < word.stages.length; i++) _Stage(n: i + 1, stage: word.stages[i]),
+                      ],
+                      if (word.images.any((u) => u.startsWith('http'))) ...[
+                        const SizedBox(height: 14),
+                        _Images(urls: [for (final u in word.images) if (u.startsWith('http')) u]),
+                      ],
+                      if (word.notes.isNotEmpty) ...[
+                        const SizedBox(height: 10),
+                        _Fact(label: 'NOTES', value: word.notes, icon: Icons.sticky_note_2_outlined),
+                      ],
                       const SizedBox(height: 18),
                       if (word.categories.isNotEmpty) _Chips(word.categories),
                     ],
@@ -410,4 +436,127 @@ class _Chips extends StatelessWidget {
       ],
     );
   }
+}
+
+
+/// The word's own video (added from Admin → Words / Word requests).
+class _WordVideo extends StatelessWidget {
+  const _WordVideo({required this.url});
+  final String url;
+
+  @override
+  Widget build(BuildContext context) => ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: AspectRatio(
+          aspectRatio: 16 / 9,
+          child: NwsbVideo(asset: url, fit: BoxFit.cover, showPoster: false, slot: 'word_detail.WordVideo', id: 'video'),
+        ),
+      );
+}
+
+/// One stage of the practice, with its own recording or clip if it has one.
+class _Stage extends StatefulWidget {
+  const _Stage({required this.n, required this.stage});
+  final int n;
+  final WordStage stage;
+
+  @override
+  State<_Stage> createState() => _StageState();
+}
+
+class _StageState extends State<_Stage> {
+  AudioPlayer? _player;
+  bool _playing = false;
+
+  @override
+  void dispose() {
+    _player?.dispose();
+    super.dispose();
+  }
+
+  Future<void> _toggle() async {
+    final p = _player ??= AudioPlayer();
+    if (_playing) {
+      await p.stop();
+      if (mounted) setState(() => _playing = false);
+      return;
+    }
+    try {
+      setState(() => _playing = true);
+      await p.setUrl(widget.stage.audio);
+      await p.play();
+    } catch (_) {}
+    if (mounted) setState(() => _playing = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final st = widget.stage;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0x0FFFFFFF),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0x1FFFFFFF)),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Container(
+            width: 26,
+            height: 26,
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(color: Color(0x33E8C77E), shape: BoxShape.circle),
+            child: Text('${widget.n}', style: const TextStyle(color: Color(0xFFE8C77E), fontWeight: FontWeight.w800, fontSize: 12)),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(st.title.isEmpty ? '' : st.title,
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 15)),
+          ),
+          if (st.audio.startsWith('http'))
+            IconButton(
+              onPressed: _toggle,
+              icon: Icon(_playing ? Icons.stop_circle_outlined : Icons.play_circle_outline, color: const Color(0xFFE8C77E)),
+            ),
+        ]),
+        if (st.text.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Text(st.text, style: const TextStyle(color: Color(0xD9FFFFFF), fontSize: 14, height: 1.45)),
+        ],
+        if (st.video.startsWith('http')) ...[
+          const SizedBox(height: 10),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(14),
+            child: AspectRatio(
+              aspectRatio: 16 / 9,
+              child: NwsbVideo(asset: st.video, fit: BoxFit.cover, showPoster: false, slot: 'word_detail.Stage', id: 'stage${widget.n}'),
+            ),
+          ),
+        ],
+      ]),
+    );
+  }
+}
+
+class _Images extends StatelessWidget {
+  const _Images({required this.urls});
+  final List<String> urls;
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+        height: 150,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          itemCount: urls.length,
+          separatorBuilder: (_, __) => const SizedBox(width: 10),
+          itemBuilder: (_, i) => ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: AspectRatio(
+              aspectRatio: 1,
+              child: Image.network(urls[i], fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0x14FFFFFF))),
+            ),
+          ),
+        ),
+      );
 }

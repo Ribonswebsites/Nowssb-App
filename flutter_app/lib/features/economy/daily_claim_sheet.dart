@@ -10,6 +10,7 @@ import '../../widgets/nwsb_icon.dart';
 import 'coupon_screen.dart';
 import 'economy_api.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
+import '../../admin/template/editable.dart';
 
 class DailyClaimSheet {
   DailyClaimSheet._();
@@ -113,11 +114,11 @@ class _DailyClaimBodyState extends State<DailyClaimBody> {
                         height: 48,
                         decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
                         clipBehavior: Clip.antiAlias,
-                        child: Image.asset(NwsbCoinFly.disc, fit: BoxFit.contain),
+                        child: EditableImage.asset(NwsbCoinFly.disc, fit: BoxFit.contain, slot: 'daily_claim_sheet.DailyClaimBody'),
                       ),
                       const SizedBox(width: 10),
                       const Expanded(
-                        child: Text(
+                        child: EditableLabel('daily_claim_sheet.DailyClaimBody',
                           'Today’s coins',
                           style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800),
                         ),
@@ -153,7 +154,7 @@ class _DailyClaimBodyState extends State<DailyClaimBody> {
                       );
                     },
                     icon: const NwsbIcon(NwsbMarks.coupon, size: 16, color: Colors.white),
-                    label: const Text('Open today’s coupon'),
+                    label: const EditableLabel('daily_claim_sheet.DailyClaimBody', 'Open today’s coupon'),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.white,
                       side: const BorderSide(color: Color(0x55FFFFFF)),
