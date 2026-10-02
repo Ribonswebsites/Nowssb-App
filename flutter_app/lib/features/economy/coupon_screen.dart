@@ -198,6 +198,86 @@ class _CouponScreenState extends State<CouponScreen> {
   }
 }
 
+/// The fashion-home coupons block. Same tickets as the full page, so a
+/// code can be torn without opening the menu first.
+class HomeCouponShelf extends StatelessWidget {
+  const HomeCouponShelf({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassWrap(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Text(
+            'NOWSSB COUPONS',
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 2.2,
+              color: Color(0xFFE4C56A),
+            ),
+          ),
+          const SizedBox(height: 6),
+          const Text(
+            'Coupons',
+            style: TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.w600,
+              height: 1.05,
+              color: Color(0xFFF4F4F5),
+            ),
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            'Tear a code here. Common ₹49 · Rare ₹149 · Epic ₹399. Odds stay on the card before you draw. Nothing is cash.',
+            style: TextStyle(fontSize: 12, height: 1.35, color: Color(0xB3F4F4F5)),
+          ),
+          const SizedBox(height: 12),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              color: const Color(0xE6000000),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0x33E4C56A)),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Column(
+                children: [
+                  for (var r = 0; r < _held.length; r += 2) ...[
+                    if (r > 0) const Divider(height: 1, thickness: 1, color: Color(0x33FFFFFF)),
+                    IntrinsicHeight(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(child: _Ticket(held: _held[r])),
+                          const VerticalDivider(width: 1, thickness: 1, color: Color(0x33FFFFFF)),
+                          Expanded(child: _Ticket(held: _held[r + 1])),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          GoldButton(
+            label: 'Scratch and paid cards',
+            filled: false,
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(builder: (_) => const CouponScreen()),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
 class _Ticket extends StatefulWidget {
   const _Ticket({required this.held});
   final _Held held;

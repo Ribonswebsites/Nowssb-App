@@ -77,6 +77,7 @@ import '../widgets/nwsb_icon.dart';
 import 'app_settings.dart';
 import '../features/earn/earn_home_sections.dart';
 import '../features/earn/earn_hub_screen.dart';
+import '../features/economy/coupon_screen.dart';
 import 'store/meaning_store.dart';
 
 /// `REG.fash.items` — app/js/part062.js:107-148, key for key and in order.
@@ -136,7 +137,7 @@ const kFashionDefOff = <String>{'routines', 'shabda', 'wsearch', 'msearch'};
 const kFashionSectionTitles = <String, String>{
   'greet': 'Greeting line',
   'herorow': 'Hero row & split banner',
-  'roundring': 'Round ring',
+  'roundring': 'NowssB Coupons',
   'practice': 'Practice card',
   'routineCards': 'Routine cards, Earth Day film & colour grid',
   'mainops': 'Main options',
@@ -450,10 +451,10 @@ class _HomeFashionState extends State<HomeFashion> {
               padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
               child: BlackGlassBanner(
                 margin: EdgeInsets.zero,
-                title: 'It keeps turning',
-                subtitle: 'The ring above is this same set.',
-                mark: NwsbMarks.rewards,
-                onTap: () => _push(const EarnHubScreen()),
+                title: 'NowssB Coupons',
+                subtitle: 'The codes are in the section under the tabs.',
+                mark: NwsbMarks.coupon,
+                onTap: () => _push(const CouponScreen()),
               ),
             ),
             FashStreak(onTap: () => _go(1)),

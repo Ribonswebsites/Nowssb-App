@@ -25,6 +25,78 @@ const kGiftBoxes = <GiftBox>[
   GiftBox('assets/gifts/box-black.webp', 'Signature gift', 'Black ribbon. The high tier. Rare on the wheel.'),
 ];
 
+/// A product turntable. The photo is already a 3/4 render, so it yaws on a
+/// stand instead of flipping like a card. Shadow stays on the floor.
+class _Turntable extends StatefulWidget {
+  const _Turntable({required this.child, this.phase = 0});
+  final Widget child;
+  final double phase;
+
+  @override
+  State<_Turntable> createState() => _TurntableState();
+}
+
+class _TurntableState extends State<_Turntable> with SingleTickerProviderStateMixin {
+  late final AnimationController _c;
+
+  @override
+  void initState() {
+    super.initState();
+    _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 5200))..repeat();
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.disableAnimationsOf(context)) return widget.child;
+    return AnimatedBuilder(
+      animation: _c,
+      builder: (context, child) {
+        final t = (_c.value + widget.phase) * 2 * pi;
+        final yaw = sin(t) * 0.55;
+        final bob = sin(t) * 3;
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Transform.translate(
+              offset: Offset(0, bob),
+              child: Transform(
+                alignment: Alignment.center,
+                filterQuality: FilterQuality.medium,
+                transform: Matrix4.identity()
+                  ..setEntry(3, 2, 0.0022)
+                  ..rotateX(0.16)
+                  ..rotateY(yaw),
+                child: child,
+              ),
+            ),
+            Container(
+              height: 8,
+              width: 70,
+              margin: const EdgeInsets.only(top: 2),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                gradient: RadialGradient(
+                  colors: [
+                    Color.fromRGBO(0, 0, 0, 0.35 + 0.25 * (1 - yaw.abs())),
+                    const Color(0x00000000),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+      child: widget.child,
+    );
+  }
+}
+
 class _Slice {
   const _Slice(this.label, this.weight, this.asset, this.tier, this.mark);
   final String label;
@@ -59,7 +131,7 @@ class GiftGallery extends StatelessWidget {
           children: [
             for (var i = 0; i < kGiftBoxes.length; i++) ...[
               if (i > 0) const VerticalDivider(width: 1, thickness: 1, color: Color(0x33FFFFFF)),
-              Expanded(child: _boxCell(context, kGiftBoxes[i])),
+              Expanded(child: _boxCell(context, kGiftBoxes[i], i / kGiftBoxes.length)),
             ],
           ],
         ),
@@ -67,14 +139,17 @@ class GiftGallery extends StatelessWidget {
     );
   }
 
-  Widget _boxCell(BuildContext context, GiftBox box) {
+  Widget _boxCell(BuildContext context, GiftBox box, double phase) {
     return GestureDetector(
       onTap: () => openGiftBox(context, box: box, prize: box.line, itemId: box.title),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(8, 12, 8, 12),
         child: Column(
           children: [
-            Image.asset(box.asset, height: 108, fit: BoxFit.contain),
+            _Turntable(
+              phase: phase,
+              child: Image.asset(box.asset, height: 108, fit: BoxFit.contain),
+            ),
             const SizedBox(height: 8),
             Text(box.title, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13)),
             const SizedBox(height: 4),
@@ -96,15 +171,18 @@ class GiftWheel extends StatefulWidget {
 class _GiftWheelState extends State<GiftWheel> with TickerProviderStateMixin {
   late final AnimationController _spin;
   late final AnimationController _lamps;
+  late final AnimationController _flap;
   double _angle = 0;
   var _busy = false;
   String? _landed;
+  var _peg = 0;
 
   @override
   void initState() {
     super.initState();
-    _spin = AnimationController(vsync: this, duration: const Duration(milliseconds: 4600));
-    _lamps = AnimationController(vsync: this, duration: const Duration(milliseconds: 700))..repeat();
+    _spin = AnimationController(vsync: this, duration: const Duration(milliseconds: 5800));
+    _lamps = AnimationController(vsync: this, duration: const Duration(milliseconds: 900))..repeat();
+    _flap = AnimationController(vsync: this, duration: const Duration(milliseconds: 110));
     _load();
   }
 
@@ -112,6 +190,7 @@ class _GiftWheelState extends State<GiftWheel> with TickerProviderStateMixin {
   void dispose() {
     _spin.dispose();
     _lamps.dispose();
+    _flap.dispose();
     super.dispose();
   }
 
@@ -123,7 +202,17 @@ class _GiftWheelState extends State<GiftWheel> with TickerProviderStateMixin {
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
     final saved = prefs.getString('nwsb_wheel_$_day');
-    if (saved != null && mounted) setState(() => _landed = saved);
+    if (saved == null || !mounted) return;
+    final parts = saved.split('|');
+    final label = parts.first;
+    var index = parts.length > 1 ? int.tryParse(parts[1]) ?? -1 : -1;
+    if (index < 0) index = _wheel.indexWhere((s) => s.label == label);
+    if (index < 0) index = 0;
+    final sweep = 2 * pi / _wheel.length;
+    setState(() {
+      _landed = label;
+      _angle = -index * sweep - sweep / 2;
+    });
   }
 
   _Slice _pick() {
@@ -142,12 +231,20 @@ class _GiftWheelState extends State<GiftWheel> with TickerProviderStateMixin {
     final slice = _pick();
     final index = _wheel.indexOf(slice);
     final sweep = 2 * pi / _wheel.length;
-    final turns = 6 * 2 * pi;
+    final turns = 7 * 2 * pi;
     final land = turns - index * sweep - sweep / 2;
     final start = _angle;
-    final anim = CurvedAnimation(parent: _spin, curve: Curves.easeOutCubic);
+    _peg = (start / sweep).floor();
+    final anim = CurvedAnimation(parent: _spin, curve: const _WheelDecel());
     void tick() {
-      if (mounted) setState(() => _angle = start + (land - start) * anim.value);
+      final ang = start + (land - start) * anim.value;
+      final peg = (ang / sweep).floor();
+      if (peg != _peg) {
+        _peg = peg;
+        HapticFeedback.selectionClick();
+        _flap.forward(from: 0);
+      }
+      if (mounted) setState(() => _angle = ang);
     }
 
     anim.addListener(tick);
@@ -158,7 +255,7 @@ class _GiftWheelState extends State<GiftWheel> with TickerProviderStateMixin {
       anim.dispose();
     }
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('nwsb_wheel_$_day', slice.label);
+    await prefs.setString('nwsb_wheel_$_day', '${slice.label}|$index');
     final record = await GiftBook.instance.award(slice.tier, slice.label);
     HapticFeedback.mediumImpact();
     if (!mounted) return;
@@ -178,7 +275,6 @@ class _GiftWheelState extends State<GiftWheel> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    const wheel = 292.0;
     return GlassWrap(
       margin: EdgeInsets.zero,
       child: Column(
@@ -187,66 +283,109 @@ class _GiftWheelState extends State<GiftWheel> with TickerProviderStateMixin {
           const Text('WHEEL', style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontSize: 12, fontWeight: FontWeight.w700)),
           const SizedBox(height: 4),
           const Text(
-            'One spin. Icons only on the wheel. Premium 8%. Signature 4%.',
+            'One spin a day. It ticks, then slows into the peg. Premium 8%. Signature 4%.',
             style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 12, height: 1.35),
           ),
-          const SizedBox(height: 8),
-          SizedBox(
-            height: wheel + 28,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                AnimatedBuilder(
-                  animation: _lamps,
-                  builder: (context, _) => CustomPaint(
-                    size: Size(wheel + 18, wheel + 18),
-                    painter: _LampPainter(_lamps.value),
-                  ),
-                ),
-                Transform.rotate(
-                  angle: _angle,
-                  child: SizedBox(
-                    width: wheel,
-                    height: wheel,
-                    child: Stack(
-                      children: [
-                        CustomPaint(
-                          size: const Size(wheel, wheel),
-                          painter: _WheelPainter(_wheel),
-                        ),
-                        for (var i = 0; i < _wheel.length; i++) _mark(i, wheel),
-                      ],
-                    ),
-                  ),
-                ),
-                Container(
-                  width: 54,
-                  height: 54,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: const Color(0xFF111111),
-                    border: Border.all(color: const Color(0xFFE4C56A), width: 3),
-                  ),
+          const SizedBox(height: 4),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final frame = min(300.0, constraints.maxWidth);
+              final disc = frame - 34;
+              return SizedBox(
+                height: frame + 8,
+                width: double.infinity,
+                child: Stack(
                   alignment: Alignment.center,
-                  child: const Text('N', style: TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w800, fontSize: 20)),
+                  clipBehavior: Clip.none,
+                  children: [
+                    Positioned(
+                      bottom: 2,
+                      child: Container(
+                        width: frame * 0.58,
+                        height: 16,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(40),
+                          boxShadow: const [
+                            BoxShadow(color: Color(0xE6000000), blurRadius: 16, spreadRadius: 2),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Transform(
+                      alignment: Alignment.center,
+                      filterQuality: FilterQuality.medium,
+                      transform: Matrix4.identity()
+                        ..setEntry(3, 2, 0.0011)
+                        ..rotateX(-0.42),
+                      child: SizedBox(
+                        width: frame,
+                        height: frame,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            AnimatedBuilder(
+                              animation: _lamps,
+                              builder: (context, _) => CustomPaint(
+                                size: Size(frame, frame),
+                                painter: _LampPainter(_lamps.value, _busy),
+                              ),
+                            ),
+                            Transform.rotate(
+                              angle: _angle,
+                              child: SizedBox(
+                                width: disc,
+                                height: disc,
+                                child: Stack(
+                                  children: [
+                                    Positioned.fill(child: CustomPaint(painter: _WheelPainter(_wheel))),
+                                    for (var i = 0; i < _wheel.length; i++) _mark(i, disc),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Container(
+                              width: disc * 0.24,
+                              height: disc * 0.24,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: const Color(0xFF0A0A0A),
+                                border: Border.all(color: const Color(0xFFE4C56A), width: 3),
+                                boxShadow: const [
+                                  BoxShadow(color: Color(0x66000000), blurRadius: 8),
+                                ],
+                              ),
+                              alignment: Alignment.center,
+                              child: const Text('N', style: TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w800, fontSize: 20)),
+                            ),
+                            Positioned(
+                              top: 0,
+                              child: AnimatedBuilder(
+                                animation: _flap,
+                                builder: (context, _) => Transform.rotate(
+                                  alignment: Alignment.topCenter,
+                                  angle: -sin(_flap.value * pi) * 0.48,
+                                  child: const CustomPaint(size: Size(26, 38), painter: _Pointer()),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                const Positioned(
-                  top: 0,
-                  child: CustomPaint(size: Size(22, 28), painter: _Pointer()),
-                ),
-              ],
-            ),
+              );
+            },
           ),
           const SizedBox(height: 8),
-          for (final s in _wheel)
+          for (var i = 0; i < _wheel.length; i += 2)
             Padding(
               padding: const EdgeInsets.only(bottom: 4),
               child: Row(
                 children: [
-                  NwsbIcon(s.mark, size: 16, color: const Color(0xFFE4C56A)),
-                  const SizedBox(width: 8),
-                  Expanded(child: Text(s.label, style: const TextStyle(color: Colors.white, fontSize: 13))),
-                  Text('${s.weight}%', style: const TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w700, fontSize: 12)),
+                  Expanded(child: _odds(_wheel[i])),
+                  const SizedBox(width: 10),
+                  Expanded(child: _odds(_wheel[i + 1])),
                 ],
               ),
             ),
@@ -265,19 +404,46 @@ class _GiftWheelState extends State<GiftWheel> with TickerProviderStateMixin {
     );
   }
 
-  Widget _mark(int i, double wheel) {
+  Widget _odds(_Slice s) {
+    return Row(
+      children: [
+        NwsbIcon(s.mark, size: 14, color: const Color(0xFFE4C56A)),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text(s.label, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 12)),
+        ),
+        Text('${s.weight}%', style: const TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w700, fontSize: 12)),
+      ],
+    );
+  }
+
+  Widget _mark(int i, double size) {
     final sweep = 2 * pi / _wheel.length;
     final mid = -pi / 2 + i * sweep + sweep / 2;
-    return Positioned.fill(
+    const box = 30.0;
+    final radius = size * 0.33;
+    final cx = size / 2 + cos(mid) * radius;
+    final cy = size / 2 + sin(mid) * radius;
+    return Positioned(
+      left: cx - box / 2,
+      top: cy - box / 2,
+      width: box,
+      height: box,
       child: Transform.rotate(
-        angle: mid,
-        child: Align(
-          alignment: const Alignment(0, -0.56),
+        angle: -_angle,
+        child: Center(
           child: NwsbIcon(_wheel[i].mark, size: 22, color: const Color(0xFFF6E7B2)),
         ),
       ),
     );
   }
+}
+
+class _WheelDecel extends Curve {
+  const _WheelDecel();
+
+  @override
+  double transform(double t) => 1 - pow(1 - t, 3.2).toDouble();
 }
 
 class _WheelPainter extends CustomPainter {
@@ -287,43 +453,62 @@ class _WheelPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final c = Offset(size.width / 2, size.height / 2);
-    final r = size.width / 2 - 2;
+    final r = size.width / 2 - 1;
     final sweep = 2 * pi / slices.length;
     final rect = Rect.fromCircle(center: c, radius: r);
     for (var i = 0; i < slices.length; i++) {
       final dark = i.isEven;
+      final start = -pi / 2 + i * sweep;
       canvas.drawArc(
         rect,
-        -pi / 2 + i * sweep,
-        sweep,
-        true,
-        Paint()..color = dark ? const Color(0xFF0C0C0C) : const Color(0xFF3A2C14),
-      );
-      canvas.drawArc(
-        rect,
-        -pi / 2 + i * sweep,
+        start,
         sweep,
         true,
         Paint()
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 1.4
-          ..color = const Color(0xFFE4C56A),
+          ..shader = LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: dark
+                ? const [Color(0xFF2C2618), Color(0xFF070707)]
+                : const [Color(0xFFD4B36A), Color(0xFF3A2A10)],
+          ).createShader(rect),
+      );
+      final inner = r * 0.46;
+      canvas.drawLine(
+        c + Offset(cos(start), sin(start)) * inner,
+        c + Offset(cos(start), sin(start)) * (r - 2),
+        Paint()
+          ..color = const Color(0xFFF0D78A)
+          ..strokeWidth = 1.4,
+      );
+      canvas.drawCircle(
+        c + Offset(cos(start), sin(start)) * (r - 1),
+        4.2,
+        Paint()..color = const Color(0xFFF6E7B2),
       );
     }
     canvas.drawCircle(
       c,
-      r,
+      r * 0.44,
       Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 8
-        ..color = const Color(0xFFC6A15A),
+        ..shader = RadialGradient(
+          colors: const [Color(0xFF1A140C), Color(0xFF050505)],
+        ).createShader(Rect.fromCircle(center: c, radius: r * 0.44)),
     );
     canvas.drawCircle(
       c,
-      r - 7,
+      r * 0.44,
       Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2
+        ..color = const Color(0xFFE4C56A),
+    );
+    canvas.drawCircle(
+      c,
+      r - 0.5,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 3
         ..color = const Color(0xFFF6E7B2),
     );
   }
@@ -333,28 +518,47 @@ class _WheelPainter extends CustomPainter {
 }
 
 class _LampPainter extends CustomPainter {
-  _LampPainter(this.phase);
+  _LampPainter(this.phase, this.hot);
   final double phase;
+  final bool hot;
 
   @override
   void paint(Canvas canvas, Size size) {
     final c = Offset(size.width / 2, size.height / 2);
-    final r = size.width / 2 - 4;
-    const n = 20;
-    final on = (phase * 2).floor().isEven;
+    final r = size.width / 2 - 10;
+    final ring = Rect.fromCircle(center: c, radius: r);
+    canvas.drawCircle(
+      c,
+      r,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 14
+        ..shader = const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFFFFF3C4), Color(0xFFC6A15A), Color(0xFF5A4014)],
+        ).createShader(ring),
+    );
+    const n = 24;
+    final head = (phase * (hot ? 8 : 2) * n).floor();
     for (var i = 0; i < n; i++) {
       final a = -pi / 2 + i * 2 * pi / n;
-      final lit = on ? i.isEven : i.isOdd;
+      final dist = (i - head) % n;
+      final lit = dist == 0 || dist == 1;
+      final o = Offset(c.dx + cos(a) * r, c.dy + sin(a) * r);
+      if (lit) {
+        canvas.drawCircle(o, 7, Paint()..color = const Color(0x66F6E7B2));
+      }
       canvas.drawCircle(
-        Offset(c.dx + cos(a) * r, c.dy + sin(a) * r),
-        3.2,
-        Paint()..color = lit ? const Color(0xFFF6E7B2) : const Color(0xFF5C4A22),
+        o,
+        lit ? 3.6 : 2.6,
+        Paint()..color = lit ? const Color(0xFFFFF6D2) : const Color(0xFF3E3014),
       );
     }
   }
 
   @override
-  bool shouldRepaint(_LampPainter old) => old.phase != phase;
+  bool shouldRepaint(_LampPainter old) => old.phase != phase || old.hot != hot;
 }
 
 class _Pointer extends CustomPainter {
@@ -362,24 +566,28 @@ class _Pointer extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
     final path = Path()
-      ..moveTo(size.width / 2, size.height)
-      ..lineTo(0, 0)
-      ..lineTo(size.width, 0)
+      ..moveTo(w / 2, h)
+      ..quadraticBezierTo(w * 0.98, h * 0.42, w * 0.66, 2)
+      ..lineTo(w * 0.34, 2)
+      ..quadraticBezierTo(w * 0.02, h * 0.42, w / 2, h)
       ..close();
-    canvas.drawPath(path, Paint()..color = const Color(0xFFE4C56A));
+    canvas.drawPath(path, Paint()..color = const Color(0xFFF6E7B2));
     canvas.drawPath(
       path,
       Paint()
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 1
-        ..color = const Color(0xFF111111),
+        ..strokeWidth = 1.4
+        ..color = const Color(0xFF1A1408),
     );
   }
 
   @override
   bool shouldRepaint(_Pointer old) => false;
 }
+
 
 Future<void> openGiftBox(
   BuildContext context, {
@@ -452,7 +660,10 @@ class GiftPlanGrid extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(8, 12, 8, 12),
         child: Column(
           children: [
-            Image.asset(asset, height: 86, fit: BoxFit.contain),
+            _Turntable(
+              phase: (title.hashCode.abs() % 9) / 9,
+              child: Image.asset(asset, height: 86, fit: BoxFit.contain),
+            ),
             const SizedBox(height: 8),
             Text(title, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13)),
             const SizedBox(height: 2),
@@ -474,18 +685,24 @@ class _Reveal extends StatefulWidget {
   State<_Reveal> createState() => _RevealState();
 }
 
-class _RevealState extends State<_Reveal> with SingleTickerProviderStateMixin {
+class _RevealState extends State<_Reveal> with TickerProviderStateMixin {
   late final AnimationController _open;
+  late final AnimationController _sway;
 
   @override
   void initState() {
     super.initState();
-    _open = AnimationController(vsync: this, duration: const Duration(milliseconds: 900))..forward();
+    _open = AnimationController(vsync: this, duration: const Duration(milliseconds: 900));
+    _sway = AnimationController(vsync: this, duration: const Duration(milliseconds: 4200));
+    _open.forward().whenComplete(() {
+      if (mounted) _sway.repeat();
+    });
   }
 
   @override
   void dispose() {
     _open.dispose();
+    _sway.dispose();
     super.dispose();
   }
 
@@ -496,51 +713,68 @@ class _RevealState extends State<_Reveal> with SingleTickerProviderStateMixin {
       child: SafeArea(
         child: Center(
           child: AnimatedBuilder(
-            animation: _open,
+            animation: Listenable.merge([_open, _sway]),
             builder: (context, _) {
-              final t = Curves.easeOutBack.transform(_open.value.clamp(0.0, 1.0));
-              return Transform.scale(
-                scale: 0.86 + 0.14 * t,
-                child: Container(
-                  width: 300,
-                  margin: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(22),
-                    border: Border.all(color: const Color(0xFFE4C56A)),
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(21)),
-                        child: SizedBox(
-                          height: 220,
-                          width: double.infinity,
-                          child: Image.asset(widget.box.asset, fit: BoxFit.cover),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
-                        child: Column(
-                          children: [
-                            Text(widget.prize, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 18)),
-                            const SizedBox(height: 6),
-                            Text(widget.code, style: const TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontWeight: FontWeight.w800, fontSize: 16)),
-                            const SizedBox(height: 4),
-                            const Text('On this account. Not cash. Not a rank key.', style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 12)),
-                            const SizedBox(height: 10),
-                            TextButton(
-                              onPressed: () async {
-                                await Clipboard.setData(ClipboardData(text: widget.code));
-                                if (context.mounted) Navigator.of(context).pop();
-                              },
-                              child: const Text('Copy code', style: TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w800)),
+              final intro = Curves.easeOutCubic.transform(_open.value.clamp(0.0, 1.0));
+              final sway = sin(_sway.value * 2 * pi) * 0.4;
+              final yaw = (1 - intro) * 1.45 + intro * sway;
+              final spin = Matrix4.identity()
+                ..setEntry(3, 2, 0.0018)
+                ..rotateX(0.2)
+                ..rotateY(yaw);
+              return Opacity(
+                opacity: intro.clamp(0.0, 1.0),
+                child: Transform.scale(
+                  scale: 0.9 + 0.1 * intro,
+                  child: Container(
+                    width: 300,
+                    margin: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(22),
+                      border: Border.all(color: const Color(0xFFE4C56A)),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ClipRRect(
+                          borderRadius: const BorderRadius.vertical(top: Radius.circular(21)),
+                          child: ColoredBox(
+                            color: Colors.black,
+                            child: SizedBox(
+                              height: 240,
+                              width: double.infinity,
+                              child: Transform(
+                                alignment: Alignment.center,
+                                filterQuality: FilterQuality.medium,
+                                transform: spin,
+                                child: Image.asset(widget.box.asset, fit: BoxFit.contain),
+                              ),
                             ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ],
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+                          child: Column(
+                            children: [
+                              Text(widget.prize, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 18)),
+                              const SizedBox(height: 6),
+                              Text(widget.code, style: const TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontWeight: FontWeight.w800, fontSize: 16)),
+                              const SizedBox(height: 4),
+                              const Text('On this account. Not cash. Not a rank key.', style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 12)),
+                              const SizedBox(height: 10),
+                              TextButton(
+                                onPressed: () async {
+                                  await Clipboard.setData(ClipboardData(text: widget.code));
+                                  if (context.mounted) Navigator.of(context).pop();
+                                },
+                                child: const Text('Copy code', style: TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w800)),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               );

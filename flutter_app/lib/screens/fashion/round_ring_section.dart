@@ -1,69 +1,18 @@
-/// Fashion home — passive earning.
+/// Fashion home — NowssB Coupons.
 ///
-/// Five program posters sit on a black cylinder, the way a round carousel
-/// does: one card forward, one on each side, the rest behind and hidden.
-/// Drag turns it. There is no face chooser.
+/// This slot used to be the passive-earning cylinder. The posters were
+/// clipped ("owssB Gift"), so that ring is gone. The key on the home stays
+/// `roundring`. What shows here is the coupon book: tear a code without
+/// opening the menu.
 library;
 
 import 'package:flutter/material.dart';
 
-import '../../widgets/glass_wrap.dart';
-import '../../widgets/program_shelf.dart';
-import '../../widgets/round_carousel.dart';
+import '../../features/economy/coupon_screen.dart';
 
 class RoundRingSection extends StatelessWidget {
   const RoundRingSection({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return GlassWrap(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const Text(
-            'PASSIVE EARNING',
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 2.2,
-              color: Color(0xFFE4C56A),
-            ),
-          ),
-          const SizedBox(height: 6),
-          const Text(
-            'It keeps turning',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w500,
-              height: 1.1,
-              color: Color(0xFFF4F4F5),
-            ),
-          ),
-          const SizedBox(height: 4),
-          const Text(
-            'Earn, rewards, gifts, bonus, partner. Drag the ring.',
-            style: TextStyle(fontSize: 12, color: Color(0xB3F4F4F5)),
-          ),
-          const SizedBox(height: 8),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(18),
-            child: ColoredBox(
-              color: const Color(0xFF000000),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                child: RoundCarousel(
-                  images: [for (final p in kProgramPosters) p.asset],
-                  speed: 4,
-                  tilt: -6,
-                  perspective: 1100,
-                  cornerRadius: 16,
-                  spacing: 2,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  Widget build(BuildContext context) => const HomeCouponShelf();
 }
