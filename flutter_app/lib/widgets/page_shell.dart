@@ -27,7 +27,16 @@ class PageShell extends StatefulWidget {
     this.onBack,
     this.usePageFilm = false,
     this.onStorePicker,
+    this.background,
+    this.actions = const [],
   });
+
+  /// Extra controls at the end of the title row (e.g. Quick access Reset).
+  final List<Widget> actions;
+
+  /// Optional page-specific backdrop in place of [AppBackdrop] (same scrim
+  /// and header on top) — e.g. Widgets keeps its Fashion photo.
+  final Widget? background;
 
   final String eyebrow;
   final String title;
@@ -85,7 +94,7 @@ class _PageShellState extends State<PageShell> {
                     loop: true,
                     slot: 'page_shell.PageShell',
                   )
-                : const AppBackdrop(),
+                : (widget.background ?? const AppBackdrop()),
           ),
           // Fashion-home #fpBgVeil language so AppBackdrop / page film reads
           // clearly — never the old solid lid that hid the video.
@@ -220,6 +229,10 @@ class _PageShellState extends State<PageShell> {
                             ],
                           ),
                         ),
+                        if (widget.actions.isNotEmpty) ...[
+                          const SizedBox(width: 8),
+                          ...widget.actions,
+                        ],
                         if (widget.onStorePicker != null) ...[
                           const SizedBox(width: 8),
                           const StoreBagBar(),

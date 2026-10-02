@@ -122,11 +122,15 @@ class _PlayerIntroScreenState extends State<PlayerIntroScreen> {
       child: Stack(
         fit: StackFit.expand,
         children: [
+          // Charcoal AURA film underneath (the player family backdrop), so
+          // the page never sits on flat navy while the art loads or if a
+          // category has none.
+          const PlayerAuraBackdrop(),
           if (_art != null)
             NwsbImage(
               url: _art!,
               fit: BoxFit.cover,
-              fallback: const ColoredBox(color: Color(0xFF060C18)),
+              fallback: const SizedBox.shrink(),
               slot: 'player_intro.PlayerIntroScreen',
             ),
           const DecoratedBox(
@@ -171,8 +175,10 @@ class _PlayerIntroScreenState extends State<PlayerIntroScreen> {
                           child: Container(
                             width: 40,
                             height: 40,
+                            // Round glass, like the player pages' controls.
                             decoration: BoxDecoration(
                               color: const Color(0x6B060C18),
+                              shape: BoxShape.circle,
                               border:
                                   Border.all(color: const Color(0x2EFFFFFF)),
                             ),

@@ -15,6 +15,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../media/nwsb_image.dart';
 import '../media/onboarding_warmup.dart';
 import '../admin/template/editable.dart';
+import '../theme/player_aura.dart';
 
 const kPlayerGuideSeenKey = 'nwsb_player_guide_seen';
 
@@ -336,25 +337,12 @@ class _PlayerGuideScreenState extends State<PlayerGuideScreen> {
                         padding: EdgeInsets.fromLTRB(20, topPad, 20, 30),
                         child: Row(
                           children: [
-                            GestureDetector(
+                            // Same white round control as every player page.
+                            PlayerAuraBackButton(
                               onTap: _finish,
-                              child: Container(
-                                width: 34,
-                                height: 34,
-                                decoration: BoxDecoration(
-                                  color: const Color(0x660A0E1A),
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: Colors.white,
-                                    width: 1.5,
-                                  ),
-                                ),
-                                child: const Icon(
-                                  Icons.close,
-                                  size: 16,
-                                  color: Colors.white,
-                                ),
-                              ),
+                              icon: Icons.close,
+                              iconSize: 20,
+                              tooltip: 'Close the guide',
                             ),
                             const SizedBox(width: 14),
                             Expanded(

@@ -11,6 +11,7 @@ import '../widgets/banner_mix.dart';
 import '../widgets/glass_wrap.dart';
 import '../widgets/page_shell.dart';
 import '../admin/template/editable.dart';
+import '../admin/layout/layout_sections.dart';
 
 class NotificationsSettingsPage extends StatelessWidget {
   const NotificationsSettingsPage({super.key});
@@ -32,16 +33,17 @@ class NotificationsSettingsPage extends StatelessWidget {
                 final store = NotifStore.instance;
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _MasterCard(
+                  // Server-driven order (Admin → UI Editor); bundled order by default.
+                  children: layoutChildren(context, 'notifications', [
+                    LSection('master', 'Master switch', _MasterCard(
                       on: store.master,
                       onToggle: () {
                         store.toggleMaster();
                         HapticFeedback.lightImpact();
                       },
-                    ),
+                    )),
                     const SizedBox(height: 6),
-                    _SecHead(
+                    LSection('updates', 'Updates heading', _SecHead(
                       label: 'Updates',
                       trailing: store.feed.isEmpty
                           ? null
@@ -72,15 +74,15 @@ class NotificationsSettingsPage extends StatelessWidget {
                                 ),
                               ),
                             ),
-                    ),
+                    )),
                     const SizedBox(height: 12),
-                    const BannerMix(seed: 0),
+                    const LSection('banners', 'Banner mix', BannerMix(seed: 0)),
                     const SizedBox(height: 6),
                     if (store.feed.isEmpty)
                       const _SettingsEmpty()
                     else
                       _FeedList(store: store),
-                    const _SecHead(label: 'What you get'),
+                    const LSection('kinds', 'What you get', _SecHead(label: 'What you get')),
                     for (final g in NotifStore.groups) ...[
                       Padding(
                         padding: const EdgeInsets.only(left: 4, top: 16, bottom: 8),
@@ -109,7 +111,7 @@ class NotificationsSettingsPage extends StatelessWidget {
                       ),
                     ],
                     const SizedBox(height: 24),
-                  ],
+                  ]),
                 );
               },
             ),

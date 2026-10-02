@@ -37,6 +37,11 @@
 //      from. It has to be in the main manifest, and the main manifest is
 //      generated, so it has to be added here.
 //
+//   7. THE HOME-SCREEN WIDGET.  The streak + word-of-the-day widget
+//      (home_widget package): its AppWidgetProvider, RemoteViews layout,
+//      provider info and manifest receiver live in the generated android/
+//      tree, so they are written here too.
+//
 // Run it AFTER `flutter create` and BEFORE `flutter build`. It is idempotent:
 // running twice is a no-op, so a local android/ that is already configured is
 // left alone.
@@ -593,6 +598,349 @@ class UpdateDownloadService : Service() {
 }
 `);
 done.push('configured in-app updater (installer, ABI query, download service)');
+
+// ── home-screen widget: streak + word of the day ───────────────────────
+// lib/data/home_widget_sync.dart writes the data (home_widget package,
+// SharedPreferences "HomeWidgetPreferences"): the streak, the last day you
+// practised, and the word of the day for today and the next six days, so
+// the widget rolls over at midnight on its own (the provider re-reads every
+// hour, and the app also schedules an update just after each midnight).
+// Tap the card → the app; tap "Practise" → the player on that word. All
+// RemoteViews (TextView / ImageView / LinearLayout), no Compose.
+{
+  const res = join(android, 'app', 'src', 'main', 'res');
+  for (const d of ['layout', 'xml', 'drawable', 'values']) mkdirSync(join(res, d), { recursive: true });
+
+  writeFileSync(join(res, 'drawable', 'nowssb_widget_bg.xml'),
+    '<?xml version="1.0" encoding="utf-8"?>\n' +
+    '<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">\n' +
+    '    <gradient android:angle="315" android:startColor="#FF050A16" android:centerColor="#FF0B1730" android:endColor="#FF14213D" android:type="linear"/>\n' +
+    '    <corners android:radius="26dp"/>\n' +
+    '    <stroke android:width="1dp" android:color="#40E8D5A3"/>\n' +
+    '</shape>\n');
+  writeFileSync(join(res, 'drawable', 'nowssb_widget_glass.xml'),
+    '<?xml version="1.0" encoding="utf-8"?>\n' +
+    '<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">\n' +
+    '    <solid android:color="#1AFFFFFF"/>\n' +
+    '    <corners android:radius="18dp"/>\n' +
+    '    <stroke android:width="1dp" android:color="#26FFFFFF"/>\n' +
+    '</shape>\n');
+  writeFileSync(join(res, 'drawable', 'nowssb_widget_pill.xml'),
+    '<?xml version="1.0" encoding="utf-8"?>\n' +
+    '<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">\n' +
+    '    <solid android:color="#FFFFFFFF"/>\n' +
+    '    <corners android:radius="999dp"/>\n' +
+    '</shape>\n');
+  writeFileSync(join(res, 'drawable', 'nowssb_widget_flame.xml'),
+    '<?xml version="1.0" encoding="utf-8"?>\n' +
+    '<vector xmlns:android="http://schemas.android.com/apk/res/android"\n' +
+    '    android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">\n' +
+    '    <path android:fillColor="#FFE8D5A3"\n' +
+    '        android:pathData="M13.5,0.67s0.74,2.65 0.74,4.8c0,2.06 -1.35,3.73 -3.41,3.73 -2.07,0 -3.63,-1.67 -3.63,-3.73l0.03,-0.36C5.21,7.51 4,10.62 4,14c0,4.42 3.58,8 8,8s8,-3.58 8,-8C20,8.61 17.41,3.8 13.5,0.67zM11.71,19c-1.78,0 -3.22,-1.4 -3.22,-3.14 0,-1.62 1.05,-2.76 2.81,-3.12 1.77,-0.36 3.6,-1.21 4.62,-2.58 0.39,1.29 0.59,2.65 0.59,4.04 0,2.65 -2.15,4.8 -4.8,4.8z"/>\n' +
+    '</vector>\n');
+  writeFileSync(join(res, 'drawable', 'nowssb_widget_play.xml'),
+    '<?xml version="1.0" encoding="utf-8"?>\n' +
+    '<vector xmlns:android="http://schemas.android.com/apk/res/android"\n' +
+    '    android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">\n' +
+    '    <path android:fillColor="#FF060C18" android:pathData="M8,5.14v13.72a1,1 0,0 0,1.52 0.85l10.29,-6.86a1,1 0,0 0,0 -1.7L9.52,4.29A1,1 0,0 0,8 5.14z"/>\n' +
+    '</vector>\n');
+
+  writeFileSync(join(res, 'layout', 'nowssb_widget.xml'),
+`<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/nw_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/nowssb_widget_bg"
+    android:orientation="horizontal"
+    android:padding="14dp">
+
+    <!-- Streak -->
+    <LinearLayout
+        android:id="@+id/nw_streak_box"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:minWidth="84dp"
+        android:background="@drawable/nowssb_widget_glass"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp">
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:contentDescription="@string/nowssb_widget_streak"
+            android:src="@drawable/nowssb_widget_flame"/>
+
+        <TextView
+            android:id="@+id/nw_streak"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:includeFontPadding="false"
+            android:text="0"
+            android:textColor="#FFFFFFFF"
+            android:textSize="30sp"/>
+
+        <TextView
+            android:id="@+id/nw_streak_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:letterSpacing="0.12"
+            android:text="@string/nowssb_widget_day_streak"
+            android:textAllCaps="true"
+            android:textColor="#B3E8D5A3"
+            android:textSize="9sp"/>
+    </LinearLayout>
+
+    <!-- Word of the day -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginStart="14dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.22"
+                android:text="@string/nowssb_widget_wotd"
+                android:textColor="#FFE8D5A3"
+                android:textSize="9sp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.3"
+                android:text="NOWSSB"
+                android:textColor="#66FFFFFF"
+                android:textSize="8sp"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/nw_word"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="1"
+            android:text="NowssB"
+            android:textColor="#FFFFFFFF"
+            android:textSize="22sp"/>
+
+        <TextView
+            android:id="@+id/nw_line"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-light"
+            android:maxLines="2"
+            android:text="@string/nowssb_widget_loading"
+            android:textColor="#B3FFFFFF"
+            android:textSize="12sp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/nw_status"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@string/nowssb_widget_start"
+                android:textColor="#80FFFFFF"
+                android:textSize="10sp"/>
+
+            <LinearLayout
+                android:id="@+id/nw_practice"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:background="@drawable/nowssb_widget_pill"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="10dp"
+                android:paddingEnd="14dp">
+
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:contentDescription="@string/nowssb_widget_practise"
+                    android:src="@drawable/nowssb_widget_play"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0.08"
+                    android:text="@string/nowssb_widget_practise"
+                    android:textColor="#FF060C18"
+                    android:textSize="11sp"/>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>
+`);
+
+  writeFileSync(join(res, 'values', 'nowssb_widget_strings.xml'),
+    '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n' +
+    '    <string name="nowssb_widget_name">NowssB streak &amp; word</string>\n' +
+    '    <string name="nowssb_widget_description">Your practice streak and the word of the day</string>\n' +
+    '    <string name="nowssb_widget_streak">Streak</string>\n' +
+    '    <string name="nowssb_widget_day_streak">day streak</string>\n' +
+    '    <string name="nowssb_widget_wotd">WORD OF THE DAY</string>\n' +
+    '    <string name="nowssb_widget_loading">Open NowssB once to load today\\\'s word</string>\n' +
+    '    <string name="nowssb_widget_start">Start a streak today</string>\n' +
+    '    <string name="nowssb_widget_practise">Practise</string>\n' +
+    '</resources>\n');
+
+  writeFileSync(join(res, 'xml', 'nowssb_widget_info.xml'),
+    '<?xml version="1.0" encoding="utf-8"?>\n' +
+    '<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"\n' +
+    '    android:minWidth="250dp"\n' +
+    '    android:minHeight="110dp"\n' +
+    '    android:minResizeWidth="250dp"\n' +
+    '    android:minResizeHeight="110dp"\n' +
+    '    android:targetCellWidth="4"\n' +
+    '    android:targetCellHeight="2"\n' +
+    '    android:resizeMode="horizontal|vertical"\n' +
+    '    android:updatePeriodMillis="3600000"\n' +
+    '    android:initialLayout="@layout/nowssb_widget"\n' +
+    '    android:previewLayout="@layout/nowssb_widget"\n' +
+    '    android:previewImage="@mipmap/ic_launcher"\n' +
+    '    android:description="@string/nowssb_widget_description"\n' +
+    '    android:widgetCategory="home_screen" />\n');
+
+  writeFileSync(join(kotlinDir, 'NowssbHomeWidget.kt'), `package com.nowssb.nowssb
+
+import android.appwidget.AppWidgetManager
+import android.content.Context
+import android.content.SharedPreferences
+import android.net.Uri
+import android.widget.RemoteViews
+import es.antonborri.home_widget.HomeWidgetLaunchIntent
+import es.antonborri.home_widget.HomeWidgetProvider
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
+
+/** Home-screen widget: practice streak + word of the day (see home_widget_sync.dart). */
+class NowssbHomeWidget : HomeWidgetProvider() {
+    override fun onUpdate(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetIds: IntArray,
+        widgetData: SharedPreferences,
+    ) {
+        val fmt = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+        val cal = Calendar.getInstance()
+        val today = fmt.format(cal.time)
+        cal.add(Calendar.DAY_OF_YEAR, -1)
+        val yesterday = fmt.format(cal.time)
+
+        val last = widgetData.getString("nw_last_day", "") ?: ""
+        val saved = widgetData.getString("nw_streak", "0")?.toIntOrNull() ?: 0
+        // A streak only survives if you practised today or yesterday.
+        val streak = if (last == today || last == yesterday) saved else 0
+        val status = when {
+            last == today -> "Practised today · well done"
+            streak > 0 -> "Practise today to keep it"
+            else -> "Start a streak today"
+        }
+        val word = widgetData.getString("nw_word_" + today, null)
+            ?: widgetData.getString("nw_word_fallback", null)
+            ?: "NowssB"
+        val line = widgetData.getString("nw_line_" + today, null)
+            ?: widgetData.getString("nw_line_fallback", null)
+            ?: "Open NowssB once to load today's word"
+
+        for (id in appWidgetIds) {
+            val views = RemoteViews(context.packageName, R.layout.nowssb_widget)
+            views.setTextViewText(R.id.nw_streak, streak.toString())
+            views.setTextViewText(R.id.nw_streak_label, if (streak == 1) "day streak" else "days in a row")
+            views.setTextViewText(R.id.nw_word, word)
+            views.setTextViewText(R.id.nw_line, line)
+            views.setTextViewText(R.id.nw_status, status)
+            views.setOnClickPendingIntent(
+                R.id.nw_root,
+                HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java, Uri.parse("nowssb://widget/home")),
+            )
+            views.setOnClickPendingIntent(
+                R.id.nw_streak_box,
+                HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java, Uri.parse("nowssb://widget/streak")),
+            )
+            views.setOnClickPendingIntent(
+                R.id.nw_practice,
+                HomeWidgetLaunchIntent.getActivity(
+                    context,
+                    MainActivity::class.java,
+                    Uri.parse("nowssb://widget/practice?word=" + Uri.encode(word)),
+                ),
+            )
+            appWidgetManager.updateAppWidget(id, views)
+        }
+    }
+}
+`);
+
+  let wm = readFileSync(manifest, 'utf8');
+  if (wm.includes('.NowssbHomeWidget')) {
+    already.push('home-screen widget receiver');
+  } else {
+    // Widget taps launch MainActivity with home_widget's LAUNCH action.
+    const before = wm;
+    wm = wm.replace(
+      /(<activity[\s\S]*?android:name="\.MainActivity"[\s\S]*?)(\n\s*<\/activity>)/,
+      `$1\n            <intent-filter>\n                <action android:name="es.antonborri.home_widget.action.LAUNCH" />\n            </intent-filter>$2`,
+    );
+    if (wm === before) throw new Error('AndroidManifest.xml: MainActivity not found for the widget launch filter');
+    wm = wm.replace(
+      '</application>',
+      `    <receiver\n` +
+      `        android:name=".NowssbHomeWidget"\n` +
+      `        android:exported="true"\n` +
+      `        android:label="@string/nowssb_widget_name">\n` +
+      `        <intent-filter>\n` +
+      `            <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />\n` +
+      `        </intent-filter>\n` +
+      `        <meta-data\n` +
+      `            android:name="android.appwidget.provider"\n` +
+      `            android:resource="@xml/nowssb_widget_info" />\n` +
+      `    </receiver>\n` +
+      `    <!-- Re-arms the after-midnight widget refresh on reboot / update. -->\n` +
+      `    <receiver\n` +
+      `        android:name="es.antonborri.home_widget.HomeWidgetScheduledUpdateReceiver"\n` +
+      `        android:exported="false">\n` +
+      `        <intent-filter>\n` +
+      `            <action android:name="android.intent.action.BOOT_COMPLETED" />\n` +
+      `            <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />\n` +
+      `            <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />\n` +
+      `        </intent-filter>\n` +
+      `    </receiver>\n` +
+      `</application>`,
+    );
+    writeFileSync(manifest, wm);
+    done.push('home-screen widget (streak + word of the day): receiver, layout, provider info');
+  }
+}
 
 // ── release signing for the update channel ─────────────────────────────
 // Every GitHub runner generates a brand-new ~/.android/debug.keystore, so

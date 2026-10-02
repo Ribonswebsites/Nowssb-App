@@ -15,6 +15,7 @@ import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 import '../widgets/app_backdrop.dart';
+import '../widgets/page_shell.dart';
 import '../widgets/app_thinking_loader.dart';
 import '../widgets/banner_mix.dart';
 import '../widgets/tv_frame.dart';
@@ -138,6 +139,13 @@ class _QuickAccessScreenState extends State<QuickAccessScreen> {
           'https://media.nowssb.com/migrated-images/f82047a0e727766b_file_0000000010fc820891f9e15a38316d2b_ffffhq.png'
     },
     {
+      // Journal = account activity (the one inbox: replies, purchases,
+      // rewards, messages) — same target as the Profile Journal shortcut.
+      'id': 'journal',
+      'label': 'Journal',
+      'img': 'asset:assets/icons/qa-journal.png'
+    },
+    {
       'id': 'settings',
       'label': 'Settings',
       'img':
@@ -210,55 +218,37 @@ class _QuickAccessScreenState extends State<QuickAccessScreen> {
   @override
   Widget build(BuildContext context) {
     final bottom = MediaQuery.paddingOf(context).bottom;
-    return Scaffold(
-      backgroundColor: NwsbColors.deep,
-      body: Stack(
-        children: [
-          const Positioned.fill(child: AppBackdrop()),
-          const Positioned.fill(
-            child: IgnorePointer(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: RadialGradient(
-                    center: Alignment(0, -0.1),
-                    radius: 0.88,
-                    colors: [
-                      Color(0x00000000),
-                      Color(0x24000000),
-                      Color(0x57000000),
-                      Color(0x94000000),
-                    ],
-                    stops: [0.30, 0.58, 0.80, 1.0],
-                  ),
-                ),
-              ),
+    // Settings sub-page shell — white round back, heading and glass
+    // cards like Notifications / Fashion Plus / Settings.
+    return PageShell(
+      eyebrow: 'Your nav',
+      title: 'Quick access',
+      film: 'assets/video/hero-bg.mp4',
+      onBack: () => Navigator.of(context).maybePop(),
+      actions: [_ResetPill(onTap: _reset)],
+      // AppBackdrop + the soft looping film under the glass cards (kept).
+      background: const Stack(fit: StackFit.expand, children: [
+        AppBackdrop(),
+        IgnorePointer(
+          child: Opacity(
+            opacity: 0.35,
+            child: NwsbVideo(
+              asset: 'assets/video/hero-bg.mp4',
+              priority: ClipPriority.decoration,
+              autoplay: true,
+              loop: true,
+              showPoster: true,
+              slot: 'quick_access.QuickAccessScreen',
             ),
           ),
-          // Soft looping film under glass cards (notification-tab language).
-          const Positioned.fill(
-            child: const IgnorePointer(
-              child: const Opacity(
-                opacity: 0.35,
-                child: const NwsbVideo(
-                  asset: 'assets/video/hero-bg.mp4',
-                  priority: ClipPriority.decoration,
-                  autoplay: true,
-                  loop: true,
-                  showPoster: true,
-                  slot: 'quick_access.QuickAccessScreen',
-                ),
-              ),
-            ),
-          ),
-          SafeArea(
-            child: Column(
-              children: [
-                _TopBar(onReset: _reset),
-                Expanded(
-                  child: ListView(
-                    padding: EdgeInsets.fromLTRB(16, 8, 16, 28 + bottom),
-                    // Server-driven order (Admin → UI Editor); bundled order by default.
-      children: layoutChildren(context, 'quickaccess', [
+        ),
+      ]),
+      slivers: [
+        SliverPadding(
+          padding: EdgeInsets.fromLTRB(16, 0, 16, 28 + bottom),
+          sliver: SliverList.list(
+            // Server-driven order (Admin → UI Editor); bundled order by default.
+            children: layoutChildren(context, 'quickaccess', [
                       const LSection('intro', 'Intro', _GlassCard(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -465,51 +455,37 @@ class _QuickAccessScreenState extends State<QuickAccessScreen> {
                           ),
                         ),
                       )),
-                    ]),
-                  ),
-                ),
-              ],
-            ),
+            ]),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
 
-class _TopBar extends StatelessWidget {
-  const _TopBar({required this.onReset});
-  final VoidCallback onReset;
+/// Reset, as a glass pill in the shared header.
+class _ResetPill extends StatelessWidget {
+  const _ResetPill({required this.onTap});
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
-      child: Row(
-        children: [
-          IconButton(
-            onPressed: () => Navigator.of(context).maybePop(),
-            icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
-          ),
-          const Expanded(
-            child: EditableLabel('quick_access.TopBar',
-              'Quick access',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 17,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-          TextButton(
-            onPressed: onReset,
-            child: const EditableLabel('quick_access.TopBar',
-              'Reset',
-              style: TextStyle(color: NwsbColors.goldLight),
-            ),
-          ),
-        ],
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        height: 42,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(21),
+          color: const Color(0x33FFFFFF),
+          border: Border.all(color: const Color(0x44FFFFFF)),
+        ),
+        child: const EditableLabel('quick_access.TopBar',
+          'Reset',
+          style: TextStyle(color: NwsbColors.goldLight, fontWeight: FontWeight.w700),
+        ),
       ),
     );
   }
@@ -962,6 +938,18 @@ class _NetIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // `asset:` = a bundled icon (e.g. Journal); otherwise the R2 media URL.
+    if (url.startsWith('asset:')) {
+      return EditableImage.asset(
+        url.substring(6),
+        width: size,
+        height: size,
+        fit: BoxFit.contain,
+        errorBuilder: (_, __, ___) =>
+            Icon(Icons.circle_outlined, size: size, color: Colors.white54),
+        slot: 'quick_access.NetIcon',
+      );
+    }
     return Image.network(
       url,
       width: size,

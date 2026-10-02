@@ -40,9 +40,13 @@ void main() {
 
     final settings =
         File('lib/screens/player_settings.dart').readAsStringSync();
-    expect(settings, contains('PlayerAuraBackdrop'));
-    expect(settings, contains('PlayerAuraBackButton'));
-    expect(settings, contains('film: kPlayerPageFilm'));
+    // Settings and Saved words share the player shell (PlayerAuraPage =
+    // AURA backdrop on the page film + white round back).
+    expect(settings, contains('PlayerAuraPage('));
+    expect(aura, contains('class PlayerAuraPage'));
+    expect(aura, contains('this.film = kPlayerPageFilm'));
+    expect(aura, contains('PlayerAuraBackButton('));
+    expect(File('lib/screens/saved_words.dart').readAsStringSync(), contains('PlayerAuraPage('));
     expect(settings, isNot(contains('kPlayerBoxFilm')));
     expect(settings, contains('MUSIC PLAYER'));
     expect(settings, isNot(contains('HeavyGlassPanel')));

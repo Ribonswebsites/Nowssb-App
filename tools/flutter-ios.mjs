@@ -91,6 +91,21 @@ if (!pbx.includes('GoogleService-Info.plist')) {
   pbx = pbx.replace(resources, `$1\t\t\t\t${buildRef} /* GoogleService-Info.plist in Resources */,\n`);
 }
 pbx = pbx.replace(/PRODUCT_BUNDLE_IDENTIFIER = [^;]+;/g, `PRODUCT_BUNDLE_IDENTIFIER = ${appId};`);
+// home_widget (home-screen streak / word-of-the-day widget) ships an iOS pod
+// that needs iOS 14. CocoaPods infers the platform from the Runner target's
+// deployment target when the Podfile leaves it commented, so raise it here
+// (never lower a newer default) and pin an existing Podfile the same way.
+const minIos = 14.0;
+pbx = pbx.replace(/IPHONEOS_DEPLOYMENT_TARGET = ([0-9.]+);/g, (m, v) =>
+  parseFloat(v) < minIos ? `IPHONEOS_DEPLOYMENT_TARGET = ${minIos.toFixed(1)};` : m);
+const podfile = join(ios, 'Podfile');
+if (existsSync(podfile)) {
+  const pod = readFileSync(podfile, 'utf8').replace(
+    /^#?\s*platform :ios, '([0-9.]+)'/m,
+    (m, v) => (parseFloat(v) < minIos ? `platform :ios, '${minIos.toFixed(1)}'` : m.replace(/^#\s*/, '')),
+  );
+  writeFileSync(podfile, pod);
+}
 writeFileSync(project, pbx);
 
-console.log('configured Flutter iOS: canonical icon, NowssB, Firebase, Google callback, and Practice audio permissions');
+console.log('configured Flutter iOS: canonical icon, NowssB, Firebase, Google callback, Practice audio permissions, iOS 14+ for the home widget');

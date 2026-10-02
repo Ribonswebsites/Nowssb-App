@@ -40,6 +40,7 @@ import 'data/presence.dart';
 import 'data/quotes_remote.dart';
 import 'data/word_requests.dart';
 import 'data/cart_bag.dart';
+import 'data/home_widget_sync.dart';
 import 'data/play_subscriptions.dart';
 import 'data/settings.dart';
 import 'media/video_pool.dart';
@@ -83,6 +84,8 @@ Future<void> main() async {
   // Google Play subscriptions: listen for purchases Play delivers at launch.
   unawaited(PlaySubscriptions.instance.start());
   await ContentStore.instance.start();
+  // Android home-screen widget: streak + word of the day (no-op elsewhere).
+  unawaited(HomeWidgetSync.instance.start());
 
   // Admin mode and the live template layer (lib/admin). Overrides load from
   // the phone before the first frame, so a replaced picture or line shows

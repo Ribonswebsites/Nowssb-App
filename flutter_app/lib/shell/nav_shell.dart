@@ -8,6 +8,8 @@ import 'package:flutter/services.dart';
 import '../theme/tokens.dart';
 import '../data/settings.dart';
 import '../data/content.dart';
+import '../data/home_widget_sync.dart';
+import '../data/models.dart';
 import '../screens/home_fashion.dart';
 import '../screens/home_normal.dart';
 import '../screens/sound_library.dart';
@@ -17,10 +19,15 @@ import '../screens/profile.dart';
 import '../screens/progress/progress_screen.dart';
 import '../screens/store.dart';
 import '../screens/quick_access.dart';
+import '../screens/app_settings.dart';
+import '../screens/store/cart_pages.dart';
+import '../screens/store/meaning_store.dart';
+import '../features/notifications/inbox_screen.dart';
 import '../widgets/pool_hud.dart';
 import '../widgets/mini_player_pill.dart';
 import '../data/phone_notifications.dart';
 import '../data/playback_session.dart';
+import '../admin/template/editable.dart';
 
 class NavShell extends StatefulWidget {
   const NavShell({super.key});
@@ -62,12 +69,44 @@ class _NavShellState extends State<NavShell> {
     PlaybackSession.instance.addListener(_onSettings);
     NotificationBanner.setOnHome(_i == 0);
     unawaited(PlaybackSession.instance.ensureLoaded());
+    // Home-screen widget taps (Android): nowssb://widget/practice?word=…
+    _widgetTaps = HomeWidgetSync.instance.clicks.listen(_onWidgetTap);
+  }
+
+  StreamSubscription<Uri>? _widgetTaps;
+
+  void _onWidgetTap(Uri uri) {
+    if (!mounted || uri.host != 'widget') return;
+    final what = uri.pathSegments.isEmpty ? 'home' : uri.pathSegments.first;
+    if (what == 'practice') {
+      final name = (uri.queryParameters['word'] ?? '').toLowerCase();
+      final lib = ContentStore.instance.library;
+      Word? w;
+      for (final x in lib) {
+        if (x.word.toLowerCase() == name) {
+          w = x;
+          break;
+        }
+      }
+      w ??= HomeWidgetSync.wordFor(DateTime.now(), lib);
+      if (w == null) return;
+      _popShellOverlays();
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) => PracticePlayerScreen(words: [w!], title: 'Word of the day', showIntro: false),
+      ));
+    } else if (what == 'streak') {
+      _popShellOverlays();
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (_) => PracticeProgressScreen(words: ContentStore.instance.library),
+      ));
+    }
   }
 
   @override
   void dispose() {
     Settings.instance.removeListener(_onSettings);
     PlaybackSession.instance.removeListener(_onSettings);
+    unawaited(_widgetTaps?.cancel());
     super.dispose();
   }
 
@@ -226,6 +265,7 @@ class _NavShellState extends State<NavShell> {
       'img':
           'https://media.nowssb.com/migrated-images/f82047a0e727766b_file_0000000010fc820891f9e15a38316d2b_ffffhq.png'
     },
+    'journal': {'label': 'Journal', 'img': 'asset:assets/icons/qa-journal.png'},
     'settings': {
       'label': 'Settings',
       'img':
@@ -260,9 +300,19 @@ class _NavShellState extends State<NavShell> {
       ));
       return;
     }
+    // Shortcuts with their own page open it; the rest keep opening Quick
+    // access (the customiser) as before.
+    final Widget? page = switch (id) {
+      'journal' => const InboxScreen(),
+      'cart' => const CartPage(),
+      'wishlist' => const WishlistPage(),
+      'settings' => const AppSettingsScreen(),
+      'meaningstore' => const MeaningStoreScreen(),
+      _ => null,
+    };
     _popShellOverlays();
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (_) => const QuickAccessScreen()));
+    Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => page ?? const QuickAccessScreen()));
   }
 
   /// Keep inactive tabs mounted (IndexedStack) but off-stage so their videos
@@ -403,30 +453,57 @@ class _NavShellState extends State<NavShell> {
                               Expanded(
                                 child: GestureDetector(
                                   behavior: HitTestBehavior.opaque,
-                                  onTap: () =>
-                                      _goToSlot(settings.navSlots[i]),
+                                  onTap: () => _goToSlot(settings.navSlots[i]),
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Image.network(
-                                        _navFeatures[settings.navSlots[i]]
-                                                ?['img'] ??
-                                            '',
-                                        width: 28,
-                                        height: 28,
-                                        fit: BoxFit.contain,
-                                        errorBuilder: (_, __, ___) => Icon(
-                                          Icons.circle_outlined,
-                                          size: 22,
-                                          color: settings.navSlots[i] ==
-                                                      'connect' ||
-                                                  _primaryTab(settings
-                                                          .navSlots[i]) ==
-                                                      _i
-                                              ? NwsbColors.goldLight
-                                              : const Color(0x99FFFFFF),
-                                        ),
-                                      ),
+                                      (_navFeatures[settings.navSlots[i]]
+                                                      ?['img'] ??
+                                                  '')
+                                              .startsWith('asset:')
+                                          ? EditableImage.asset(
+                                              (_navFeatures[settings
+                                                              .navSlots[i]]
+                                                          ?['img'] ??
+                                                      '')
+                                                  .substring(6),
+                                              width: 28,
+                                              height: 28,
+                                              fit: BoxFit.contain,
+                                              errorBuilder: (_, __, ___) =>
+                                                  Icon(
+                                                Icons.circle_outlined,
+                                                size: 22,
+                                                color: settings.navSlots[i] ==
+                                                            'connect' ||
+                                                        _primaryTab(settings
+                                                                .navSlots[i]) ==
+                                                            _i
+                                                    ? NwsbColors.goldLight
+                                                    : const Color(0x99FFFFFF),
+                                              ),
+                                              slot: 'nav_shell.NavShell',
+                                            )
+                                          : Image.network(
+                                              _navFeatures[settings.navSlots[i]]
+                                                      ?['img'] ??
+                                                  '',
+                                              width: 28,
+                                              height: 28,
+                                              fit: BoxFit.contain,
+                                              errorBuilder: (_, __, ___) =>
+                                                  Icon(
+                                                Icons.circle_outlined,
+                                                size: 22,
+                                                color: settings.navSlots[i] ==
+                                                            'connect' ||
+                                                        _primaryTab(settings
+                                                                .navSlots[i]) ==
+                                                            _i
+                                                    ? NwsbColors.goldLight
+                                                    : const Color(0x99FFFFFF),
+                                              ),
+                                            ),
                                       const SizedBox(height: 3),
                                       Text(
                                         _navFeatures[settings.navSlots[i]]
@@ -436,13 +513,13 @@ class _NavShellState extends State<NavShell> {
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                           fontSize: 9,
-                                          fontWeight: _primaryTab(settings
-                                                      .navSlots[i]) ==
+                                          fontWeight: _primaryTab(
+                                                      settings.navSlots[i]) ==
                                                   _i
                                               ? FontWeight.w700
                                               : FontWeight.w400,
-                                          color: _primaryTab(settings
-                                                      .navSlots[i]) ==
+                                          color: _primaryTab(
+                                                      settings.navSlots[i]) ==
                                                   _i
                                               ? NwsbColors.goldLight
                                               : const Color(0x99FFFFFF),

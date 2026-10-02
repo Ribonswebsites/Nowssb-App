@@ -15,10 +15,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../data/content.dart';
+import '../data/practice_progress.dart';
+import '../data/home_widget_sync.dart';
 import '../data/settings.dart';
 import '../media/nwsb_video.dart';
 import '../theme/tokens.dart';
 import '../widgets/app_backdrop.dart';
+import '../widgets/page_shell.dart';
 import 'fashion_plus.dart';
 import 'healing_path.dart';
 import 'notifications_settings.dart';
@@ -64,95 +67,44 @@ class _WidgetsPageState extends State<WidgetsPage> {
   @override
   Widget build(BuildContext context) {
     final s = Settings.instance;
-    final top = MediaQuery.paddingOf(context).top;
     final bottom = MediaQuery.paddingOf(context).bottom;
     final filmOn = s.fashionPlus && s.fashionHome;
 
-    return Scaffold(
-      backgroundColor: const Color(0xFF05070E),
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          // #stBg
-          Positioned.fill(
-            child: filmOn
-                ? NwsbVideo(
-                    asset: s.fashionVideoAsset,
-                    fit: BoxFit.cover,
-                    slot: 'widgets_page.WidgetsPage',
-                  )
-                : (s.fashionImageAsset != null
-                    ? EditableImage.asset(
-                        s.fashionImageAsset!,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => const ColoredBox(
-                          color: Color(0xFF05070E),
-                        ),
-                        slot: 'widgets_page.WidgetsPage',
-                      )
-                    : EditableImage.asset(
-                        'assets/fashion/fp-intro.webp',
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => const AppBackdrop(),
-                        slot: 'widgets_page.WidgetsPage',
-                      )),
-          ),
-          // .st-page scrim
-          const Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0x9E05070E),
-                    Color(0x8005070E),
-                    Color(0xB305070E),
-                  ],
-                  stops: [0, 0.46, 1],
-                ),
-              ),
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Padding(
-                padding: EdgeInsets.fromLTRB(18, top + 12, 18, 14),
-                child: Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () => Navigator.of(context).maybePop(),
-                      behavior: HitTestBehavior.opaque,
-                      child: Container(
-                        width: 42,
-                        height: 42,
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(Icons.arrow_back,
-                            size: 19, color: NwsbColors.ink),
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    const EditableLabel('widgets_page.WidgetsPage',
-                      'Hero header',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0.2,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: ListView(
-                  padding: EdgeInsets.fromLTRB(0, 0, 0, bottom + 40),
-                  // Server-driven order (Admin → UI Editor); bundled order by default.
-      children: layoutChildren(context, 'widgets', [
+    // Settings sub-page shell — same backdrop (Fashion film / photo via
+    // AppBackdrop), white round back and heading as its sibling pages.
+    return PageShell(
+      eyebrow: 'Widgets & features',
+      title: 'Hero header',
+      film: 'assets/video/hero-bg.mp4',
+      onBack: () => Navigator.of(context).maybePop(),
+      // #stBg — the page's own Fashion film / photo, kept.
+      background: filmOn
+          ? NwsbVideo(
+              asset: s.fashionVideoAsset,
+              fit: BoxFit.cover,
+              slot: 'widgets_page.WidgetsPage',
+            )
+          : (s.fashionImageAsset != null
+              ? EditableImage.asset(
+                  s.fashionImageAsset!,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => const ColoredBox(
+                    color: Color(0xFF05070E),
+                  ),
+                  slot: 'widgets_page.WidgetsPage',
+                )
+              : EditableImage.asset(
+                  'assets/fashion/fp-intro.webp',
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => const AppBackdrop(),
+                  slot: 'widgets_page.WidgetsPage',
+                )),
+      slivers: [
+        SliverPadding(
+          padding: EdgeInsets.only(bottom: bottom + 40),
+          sliver: SliverList.list(
+            // Server-driven order (Admin → UI Editor); bundled order by default.
+            children: layoutChildren(context, 'widgets', [
                     const LSection('intro', 'Intro', Padding(
                       padding: EdgeInsets.fromLTRB(20, 4, 20, 20),
                       child: Column(
@@ -179,6 +131,11 @@ class _WidgetsPageState extends State<WidgetsPage> {
                           ),
                         ],
                       ),
+                    )),
+                    LSection('homewidget', 'Home-screen widget', _Rail(
+                      title: 'Home-screen widget',
+                      sub: 'Your streak and the word of the day, on your phone',
+                      child: const _HomeWidgetCard(),
                     )),
                     LSection('hero', 'Hero header styles', _Rail(
                       title: 'Hero header',
@@ -224,13 +181,10 @@ class _WidgetsPageState extends State<WidgetsPage> {
                         onProfile: () => _push(const ProfileScreen()),
                       ),
                     )),
-                  ]),
-                ),
-              ),
-            ],
+            ]),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -764,6 +718,167 @@ class _GoCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Live preview of the Android home-screen widget (same streak, same word
+/// of the day — HomeWidgetSync) and the button that pins it.
+class _HomeWidgetCard extends StatefulWidget {
+  const _HomeWidgetCard();
+  @override
+  State<_HomeWidgetCard> createState() => _HomeWidgetCardState();
+}
+
+class _HomeWidgetCardState extends State<_HomeWidgetCard> {
+  bool _busy = false;
+
+  @override
+  void initState() {
+    super.initState();
+    PracticeProgress.instance.addListener(_tick);
+    ContentStore.instance.addListener(_tick);
+  }
+
+  @override
+  void dispose() {
+    PracticeProgress.instance.removeListener(_tick);
+    ContentStore.instance.removeListener(_tick);
+    super.dispose();
+  }
+
+  void _tick() {
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _add() async {
+    if (!HomeWidgetSync.supported) {
+      _say('The home-screen widget is on Android. Long-press your home screen → Widgets → NowssB.');
+      return;
+    }
+    setState(() => _busy = true);
+    await HomeWidgetSync.instance.push();
+    final ok = await HomeWidgetSync.instance.requestPin();
+    if (!mounted) return;
+    setState(() => _busy = false);
+    _say(ok
+        ? 'Choose where it goes on your home screen.'
+        : 'Long-press your home screen → Widgets → NowssB to add it.');
+  }
+
+  void _say(String text) => ScaffoldMessenger.of(context)
+      .showSnackBar(SnackBar(content: EditableLabel('widgets_page.HomeWidgetCard', text), behavior: SnackBarBehavior.floating));
+
+  @override
+  Widget build(BuildContext context) {
+    final p = PracticeProgress.instance;
+    final w = HomeWidgetSync.wordFor(DateTime.now(), ContentStore.instance.library);
+    final today = HomeWidgetSync.day(DateTime.now());
+    final streak = p.streak;
+    final status = p.lastPracticed == today
+        ? 'Practised today · well done'
+        : (streak > 0 ? 'Practise today to keep it' : 'Start a streak today');
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        // Mirrors res/layout/nowssb_widget.xml.
+        Container(
+          height: 132,
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(26),
+            border: Border.all(color: const Color(0x40E8D5A3)),
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFF050A16), Color(0xFF0B1730), Color(0xFF14213D)],
+            ),
+            boxShadow: const [BoxShadow(color: Color(0x80000000), blurRadius: 24, offset: Offset(0, 10))],
+          ),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Container(
+              constraints: const BoxConstraints(minWidth: 84),
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: const Color(0x1AFFFFFF),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: const Color(0x26FFFFFF)),
+              ),
+              child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                const Icon(Icons.local_fire_department_rounded, color: Color(0xFFE8D5A3), size: 22),
+                Text('$streak', style: const TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w600, height: 1)),
+                const SizedBox(height: 2),
+                Text(streak == 1 ? 'DAY STREAK' : 'DAYS IN A ROW',
+                    style: const TextStyle(color: Color(0xB3E8D5A3), fontSize: 9, letterSpacing: 1.1)),
+              ]),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                const Row(children: [
+                  Expanded(
+                    child: EditableLabel('widgets_page.HomeWidgetCard', 'WORD OF THE DAY',
+                        style: TextStyle(color: Color(0xFFE8D5A3), fontSize: 9, letterSpacing: 2, fontWeight: FontWeight.w600)),
+                  ),
+                  EditableLabel('widgets_page.HomeWidgetCard', 'NOWSSB',
+                      style: TextStyle(color: Color(0x66FFFFFF), fontSize: 8, letterSpacing: 2.4, fontWeight: FontWeight.w600)),
+                ]),
+                const SizedBox(height: 4),
+                Text(w?.word ?? 'NowssB',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w600)),
+                Expanded(
+                  child: Text(w == null ? "Open NowssB once to load today's word" : HomeWidgetSync.lineFor(w),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12, fontWeight: FontWeight.w300)),
+                ),
+                Row(children: [
+                  Expanded(
+                    child: Text(status,
+                        maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0x80FFFFFF), fontSize: 10)),
+                  ),
+                  Container(
+                    height: 30,
+                    padding: const EdgeInsets.fromLTRB(10, 0, 14, 0),
+                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(999)),
+                    child: const Row(mainAxisSize: MainAxisSize.min, children: [
+                      Icon(Icons.play_arrow_rounded, size: 16, color: NwsbColors.ink),
+                      SizedBox(width: 3),
+                      EditableLabel('widgets_page.HomeWidgetCard', 'Practise',
+                          style: TextStyle(color: NwsbColors.ink, fontSize: 11, fontWeight: FontWeight.w600)),
+                    ]),
+                  ),
+                ]),
+              ]),
+            ),
+          ]),
+        ),
+        const SizedBox(height: 12),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: GestureDetector(
+            onTap: _busy ? null : _add,
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              height: 42,
+              padding: const EdgeInsets.symmetric(horizontal: 18),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(21),
+                color: const Color(0x33FFFFFF),
+                border: Border.all(color: const Color(0x44FFFFFF)),
+              ),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                const Icon(Icons.add_to_home_screen_rounded, size: 18, color: Colors.white),
+                const SizedBox(width: 8),
+                EditableLabel('widgets_page.HomeWidgetCard', _busy ? 'Adding…' : 'Add to home screen',
+                    style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700)),
+              ]),
+            ),
+          ),
+        ),
+      ]),
     );
   }
 }

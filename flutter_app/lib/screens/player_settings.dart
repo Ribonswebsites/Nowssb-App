@@ -77,7 +77,8 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
     s.setEq(key);
   }
 
-  Future<void> _choose(String title, List<String> options, String current, ValueChanged<String> onPick) async {
+  Future<void> _choose(String title, List<String> options, String current,
+      ValueChanged<String> onPick) async {
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: const Color(0xFF14171E),
@@ -91,11 +92,17 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(title.toUpperCase(), style: const TextStyle(color: Color(0xFF8B919A), fontSize: 12, letterSpacing: 2)),
+              Text(title.toUpperCase(),
+                  style: const TextStyle(
+                      color: Color(0xFF8B919A),
+                      fontSize: 12,
+                      letterSpacing: 2)),
               const SizedBox(height: 8),
               for (final option in options)
                 ListTile(
-                  title: Text(option, style: const TextStyle(color: Colors.white, letterSpacing: .8)),
+                  title: Text(option,
+                      style: const TextStyle(
+                          color: Colors.white, letterSpacing: .8)),
                   trailing: option.toLowerCase() == current.toLowerCase()
                       ? const Icon(Icons.check, color: Colors.white)
                       : null,
@@ -116,112 +123,126 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
     final bottomInset = MediaQuery.paddingOf(context).bottom;
     final batt = _batteryPct ?? 52;
 
-    return Scaffold(
-      backgroundColor: kPlayerAuraBg,
-      body: PlayerAuraBackdrop(
-        film: kPlayerPageFilm,
-        child: SafeArea(
-          bottom: false,
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(14, 8, 16, 4),
-                child: Row(
-                  children: [
-                    PlayerAuraBackButton(
-                      onTap: () => Navigator.maybePop(context),
-                    ),
-                    const Spacer(),
-                    EditableLabel('player_settings.PlayerSettingsScreen',
-                      'NowssB',
-                      style: playerAuraText(
-                        size: 12,
-                        letterSpacing: 4,
-                        weight: FontWeight.w500,
-                        color: kPlayerAuraFg,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 18, 24, 12),
-                  child: EditableLabel('player_settings.PlayerSettingsScreen',
-                    'MUSIC PLAYER\nSETTINGS',
-                    style: playerAuraText(
-                      size: 29,
-                      weight: FontWeight.w300,
-                      letterSpacing: 4.0,
-                      height: 1.28,
-                      color: kPlayerAuraFg,
+    // Shared player shell (Saved words / Library uses the same one).
+    return PlayerAuraPage(
+      slot: 'player_settings.PlayerSettingsScreen',
+      title: 'MUSIC PLAYER\nSETTINGS',
+      body: ListView(
+        padding: EdgeInsets.fromLTRB(22, 0, 16, 28 + bottomInset),
+        // Server-driven order (Admin → UI Editor); bundled order by default.
+        children: layoutChildren(context, 'player.settings', [
+          const SizedBox(height: 4),
+          LSection(
+              'promo',
+              'Promo banner',
+              ColoredSplitPromoBanner(
+                spec: SplitPromoExtras.at(7),
+                margin: EdgeInsets.zero,
+              )),
+          const SizedBox(height: 8),
+          LSection(
+              'eq',
+              'Equalizer',
+              _nav(Icons.tune, 'Equalizer', _eqLabel,
+                  () => _choose('Equalizer', _eqOptions, _eqLabel, _setEq))),
+          LSection(
+              'quality',
+              'Audio quality',
+              _nav(
+                  Icons.graphic_eq,
+                  'Audio Quality',
+                  s.quality,
+                  () => _choose('Audio Quality', _qualityOptions, s.quality,
+                      s.setQuality))),
+          LSection(
+              'bass',
+              'Bass boost',
+              _toggle(Icons.multitrack_audio, 'Bass Boost', s.bassBoost,
+                  s.toggleBass)),
+          LSection(
+              'crossfade',
+              'Crossfade',
+              _nav(
+                  Icons.compare_arrows,
+                  'Crossfade',
+                  s.crossfade,
+                  () => _choose('Crossfade', _crossfadeOptions, s.crossfade,
+                      s.setCrossfade))),
+          LSection(
+              'sleep',
+              'Sleep timer',
+              _nav(
+                  Icons.timer_outlined,
+                  'Sleep Timer',
+                  s.sleepTimer,
+                  () => _choose('Sleep Timer', _sleepOptions, s.sleepTimer,
+                      s.setSleepTimer))),
+          LSection(
+              'download',
+              'Download only',
+              _toggle(Icons.download_outlined, 'Download Only', s.downloadOnly,
+                  s.toggleDownloadOnly)),
+          LSection(
+              'nowview',
+              'Now playing view',
+              _nav(
+                  Icons.queue_music,
+                  'Now Playing View',
+                  s.playlist,
+                  () => _choose('Now Playing View', _viewOptions, s.playlist,
+                      s.setPlaylist))),
+          LSection(
+              'playlist',
+              'Playlist view',
+              _nav(
+                Icons.view_list_outlined,
+                'Playlist View',
+                s.playlist == 'Classic' ||
+                        s.playlist == 'Grid' ||
+                        s.playlist == 'Compact'
+                    ? s.playlist
+                    : 'Classic',
+                () => _choose('Playlist View', _playlistOptions, s.playlist,
+                    s.setPlaylist),
+              )),
+          LSection(
+              'nowplaying',
+              'Now playing',
+              _nav(
+                  Icons.notifications_none,
+                  'Now Playing',
+                  s.nowPlaying,
+                  () => _choose('Now Playing', _nowPlayingOptions, s.nowPlaying,
+                      s.setNowPlaying),
+                  last: true)),
+          const SizedBox(height: 24),
+          LSection(
+              'battery',
+              'Battery note',
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.battery_full,
+                      size: 14, color: Colors.white.withOpacity(0.55)),
+                  const SizedBox(width: 6),
+                  Text(
+                    '$batt%',
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.55),
+                      fontSize: 12,
+                      letterSpacing: 0.6,
                     ),
                   ),
-                ),
-              ),
-              Expanded(
-                child: ListView(
-                  padding: EdgeInsets.fromLTRB(22, 0, 16, 28 + bottomInset),
-                  // Server-driven order (Admin → UI Editor); bundled order by default.
-      children: layoutChildren(context, 'player.settings', [
-                    const SizedBox(height: 4),
-                    LSection('promo', 'Promo banner', ColoredSplitPromoBanner(
-                      spec: SplitPromoExtras.at(7),
-                      margin: EdgeInsets.zero,
-                    )),
-                    const SizedBox(height: 8),
-                    LSection('eq', 'Equalizer', _nav(Icons.tune, 'Equalizer', _eqLabel,
-                        () => _choose('Equalizer', _eqOptions, _eqLabel, _setEq))),
-                    LSection('quality', 'Audio quality', _nav(Icons.graphic_eq, 'Audio Quality', s.quality,
-                        () => _choose('Audio Quality', _qualityOptions, s.quality, s.setQuality))),
-                    LSection('bass', 'Bass boost', _toggle(Icons.multitrack_audio, 'Bass Boost', s.bassBoost, s.toggleBass)),
-                    LSection('crossfade', 'Crossfade', _nav(Icons.compare_arrows, 'Crossfade', s.crossfade,
-                        () => _choose('Crossfade', _crossfadeOptions, s.crossfade, s.setCrossfade))),
-                    LSection('sleep', 'Sleep timer', _nav(Icons.timer_outlined, 'Sleep Timer', s.sleepTimer,
-                        () => _choose('Sleep Timer', _sleepOptions, s.sleepTimer, s.setSleepTimer))),
-                    LSection('download', 'Download only', _toggle(Icons.download_outlined, 'Download Only', s.downloadOnly, s.toggleDownloadOnly)),
-                    LSection('nowview', 'Now playing view', _nav(Icons.queue_music, 'Now Playing View', s.playlist,
-                        () => _choose('Now Playing View', _viewOptions, s.playlist, s.setPlaylist))),
-                    LSection('playlist', 'Playlist view', _nav(
-                      Icons.view_list_outlined,
-                      'Playlist View',
-                      s.playlist == 'Classic' || s.playlist == 'Grid' || s.playlist == 'Compact'
-                          ? s.playlist
-                          : 'Classic',
-                      () => _choose('Playlist View', _playlistOptions, s.playlist, s.setPlaylist),
-                    )),
-                    LSection('nowplaying', 'Now playing', _nav(Icons.notifications_none, 'Now Playing', s.nowPlaying,
-                        () => _choose('Now Playing', _nowPlayingOptions, s.nowPlaying, s.setNowPlaying),
-                        last: true)),
-                    const SizedBox(height: 24),
-                    LSection('battery', 'Battery note', Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.battery_full, size: 14, color: Colors.white.withOpacity(0.55)),
-                        const SizedBox(width: 6),
-                        Text(
-                          '$batt%',
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.55),
-                            fontSize: 12,
-                            letterSpacing: 0.6,
-                          ),
-                        ),
-                      ],
-                    )),
-                    SizedBox(height: 12 + bottomInset),
-                  ]),
-                ),
-              ),
-            ],
-          ),
-        ),
+                ],
+              )),
+          SizedBox(height: 12 + bottomInset),
+        ]),
       ),
     );
   }
 
-  Widget _nav(IconData icon, String label, String value, VoidCallback onTap, {bool last = false}) =>
+  Widget _nav(IconData icon, String label, String value, VoidCallback onTap,
+          {bool last = false}) =>
       InkWell(
         onTap: onTap,
         child: Container(
@@ -238,16 +259,21 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
               Expanded(
                 child: Text(
                   label.toUpperCase(),
-                  style: const TextStyle(color: Colors.white, fontSize: 12, letterSpacing: 2),
+                  style: const TextStyle(
+                      color: Colors.white, fontSize: 12, letterSpacing: 2),
                 ),
               ),
               if (value.isNotEmpty)
                 Text(
                   value.toUpperCase(),
-                  style: const TextStyle(color: Color(0x99B3BDCA), fontSize: 11, letterSpacing: 1.4),
+                  style: const TextStyle(
+                      color: Color(0x99B3BDCA),
+                      fontSize: 11,
+                      letterSpacing: 1.4),
                 ),
               const SizedBox(width: 6),
-              const Icon(Icons.chevron_right, color: Color(0x73B3BDCA), size: 18),
+              const Icon(Icons.chevron_right,
+                  color: Color(0x73B3BDCA), size: 18),
             ],
           ),
         ),
@@ -268,7 +294,8 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
               Expanded(
                 child: Text(
                   label.toUpperCase(),
-                  style: const TextStyle(color: Colors.white, fontSize: 12, letterSpacing: 2),
+                  style: const TextStyle(
+                      color: Colors.white, fontSize: 12, letterSpacing: 2),
                 ),
               ),
               Switch.adaptive(

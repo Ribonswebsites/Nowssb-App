@@ -15,6 +15,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../admin/admin_home.dart';
 import '../admin/admin_state.dart';
+import '../admin/layout/layout_sections.dart';
 import '../admin/template/ui_overrides.dart';
 import '../data/account_deletion.dart';
 import '../data/device_flags.dart';
@@ -25,6 +26,7 @@ import '../media/onboarding_warmup.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 import '../widgets/black_glass_banner.dart';
+import '../widgets/page_shell.dart';
 import '../widgets/colored_split_promo_banner.dart';
 import 'fashion_plus.dart';
 import 'notifications_settings.dart';
@@ -56,7 +58,8 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
   void initState() {
     super.initState();
     Settings.instance.addListener(_onSettings);
-    _search.addListener(() => setState(() => _q = _search.text.trim().toLowerCase()));
+    _search.addListener(
+        () => setState(() => _q = _search.text.trim().toLowerCase()));
     _loadLocal();
   }
 
@@ -120,374 +123,339 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
   Widget build(BuildContext context) {
     UiScope.watch(context); // the Admin row follows the admin flag live
     final s = Settings.instance;
-    final top = MediaQuery.paddingOf(context).top;
     final bottom = MediaQuery.paddingOf(context).bottom;
 
-    return Scaffold(
-      backgroundColor: const Color(0xFF060C18),
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          const DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: RadialGradient(
-                center: Alignment(-0.6, -0.8),
-                radius: 1.1,
-                colors: [Color(0x44E8D5A3), Color(0x00060C18)],
-              ),
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(
-                padding: EdgeInsets.fromLTRB(12, top + 10, 16, 14),
-                decoration: const BoxDecoration(
-                  color: Color(0xEB060C18),
-                  border: Border(
-                    bottom: BorderSide(color: Color(0x12FFFFFF)),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Material(
-                      color: Colors.white,
-                      shape: const CircleBorder(),
-                      child: InkWell(
-                        customBorder: const CircleBorder(),
-                        onTap: () => Navigator.of(context).maybePop(),
-                        child: const SizedBox(
-                          width: 42,
-                          height: 42,
-                          child: Icon(Icons.arrow_back,
-                              size: 19, color: NwsbColors.ink),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    const EditableLabel('app_settings.AppSettingsScreen',
-                      'NOWSSB',
-                      style: TextStyle(
-                        fontSize: 10,
-                        letterSpacing: 2,
-                        fontWeight: FontWeight.w700,
-                        color: NwsbColors.goldLight,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    const EditableLabel('app_settings.AppSettingsScreen',
-                      'Settings',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: ListView(
-                  padding: EdgeInsets.fromLTRB(16, 18, 16, 40 + bottom),
-                  children: [
-                    NestedDarkWrap(
-                      onTap: () => _push(const ProfileScreen()),
-                      padding: const EdgeInsets.all(16),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 52,
-                            height: 52,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              gradient: const LinearGradient(
-                                colors: [
-                                  Color(0x22E8D5A3),
-                                  Color(0x1CC8E8F5),
-                                ],
-                              ),
-                              border: Border.all(
-                                color: const Color(0x40E8D5A3),
-                                width: 2,
-                              ),
-                            ),
-                            child: const Icon(Icons.person_outline,
-                                color: NwsbColors.gold),
-                          ),
-                          const SizedBox(width: 14),
-                          const Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                EditableLabel('app_settings.AppSettingsScreen',
-                                  'Your profile',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                                SizedBox(height: 2),
-                                EditableLabel('app_settings.AppSettingsScreen',
-                                  'Account · plan · edit',
-                                  style: TextStyle(
-                                    color: Color(0x85FFFFFF),
-                                    fontSize: 12,
-                                  ),
-                                ),
-                                SizedBox(height: 7),
-                                _Badge('STARTER'),
+    // Same shell as every settings sub-page (Notifications, Fashion Plus,
+    // Quick access, Widgets): backdrop, white round back, glass sections.
+    return PageShell(
+      eyebrow: 'NowssB',
+      title: 'Settings',
+      film: 'assets/video/hero-bg.mp4',
+      onBack: () => Navigator.of(context).maybePop(),
+      slivers: [
+        SliverPadding(
+          padding: EdgeInsets.fromLTRB(16, 0, 16, 40 + bottom),
+          sliver: SliverList.list(
+            // Server-driven order (Admin → UI Editor); bundled order by default.
+            children: layoutChildren(context, 'settings', [
+              LSection(
+                  'profile',
+                  'Profile card',
+                  NestedDarkWrap(
+                    onTap: () => _push(const ProfileScreen()),
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 52,
+                          height: 52,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: const LinearGradient(
+                              colors: [
+                                Color(0x22E8D5A3),
+                                Color(0x1CC8E8F5),
                               ],
                             ),
+                            border: Border.all(
+                              color: const Color(0x40E8D5A3),
+                              width: 2,
+                            ),
                           ),
-                          const Icon(Icons.chevron_right,
-                              color: Color(0x38FFFFFF), size: 18),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    ColoredSplitPromoBanner(
-                      spec: SplitPromoExtras.at(13),
-                      margin: EdgeInsets.zero,
-                    ),
-                    const SizedBox(height: 18),
-                    Container(
-                      height: 48,
-                      margin: const EdgeInsets.only(bottom: 22),
-                      padding: const EdgeInsets.symmetric(horizontal: 14),
-                      decoration: BoxDecoration(
-                        color: const Color(0x14FFFFFF),
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: const Color(0x24FFFFFF)),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.search,
-                              size: 18, color: Color(0x59FFFFFF)),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: TextField(
-                              controller: _search,
-                              style: const TextStyle(
-                                  color: Colors.white, fontSize: 14),
-                              decoration: const InputDecoration(
-                                hintText: 'Search settings...',
-                                hintStyle: TextStyle(color: Color(0x59FFFFFF)),
-                                border: InputBorder.none,
-                                isDense: true,
+                          child: const Icon(Icons.person_outline,
+                              color: NwsbColors.gold),
+                        ),
+                        const SizedBox(width: 14),
+                        const Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              EditableLabel(
+                                'app_settings.AppSettingsScreen',
+                                'Your profile',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
-                            ),
+                              SizedBox(height: 2),
+                              EditableLabel(
+                                'app_settings.AppSettingsScreen',
+                                'Account · plan · edit',
+                                style: TextStyle(
+                                  color: Color(0x85FFFFFF),
+                                  fontSize: 12,
+                                ),
+                              ),
+                              SizedBox(height: 7),
+                              _Badge('STARTER'),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                        const Icon(Icons.chevron_right,
+                            color: Color(0x38FFFFFF), size: 18),
+                      ],
                     ),
-                    if (_match('Player Guide') ||
-                        _match('Hero header') ||
-                        _match('Fashion Plus') ||
-                        _match('Quick Access') ||
-                        _match('Today\'s quote') ||
-                        _match('Player Settings'))
-                      _Sec(
-                        label: 'INTRO & APPEARANCE',
-                        children: [
-                          if (_match('Player Guide'))
-                            _NavRow(
-                              icon: Icons.menu_book_outlined,
-                              title: 'Player Guide',
-                              sub: 'Replay the player setup pages',
-                              onTap: () {
-                                // Decode the opening slide and orb badges
-                                // during the route transition.
-                                OnboardingWarmup.playerGuide(context,
-                                    firstOnly: true);
-                                _push(
-                                  PlayerGuideScreen(
-                                    onDone: () =>
-                                        Navigator.of(context).maybePop(),
-                                  ),
-                                );
-                              },
+                  )),
+              const SizedBox(height: 8),
+              LSection(
+                  'promo',
+                  'Promo banner',
+                  ColoredSplitPromoBanner(
+                    spec: SplitPromoExtras.at(13),
+                    margin: EdgeInsets.zero,
+                  )),
+              const SizedBox(height: 18),
+              LSection(
+                  'search',
+                  'Search settings',
+                  Container(
+                    height: 48,
+                    margin: const EdgeInsets.only(bottom: 22),
+                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                    decoration: BoxDecoration(
+                      color: const Color(0x14FFFFFF),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: const Color(0x24FFFFFF)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.search,
+                            size: 18, color: Color(0x59FFFFFF)),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: TextField(
+                            controller: _search,
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 14),
+                            decoration: const InputDecoration(
+                              hintText: 'Search settings...',
+                              hintStyle: TextStyle(color: Color(0x59FFFFFF)),
+                              border: InputBorder.none,
+                              isDense: true,
                             ),
-                          if (_match('Hero header'))
-                            _NavRow(
-                              icon: Icons.view_agenda_outlined,
-                              title: 'Hero header & widgets',
-                              sub: 'TV · full · plain · shortcuts',
-                              onTap: () => _push(const WidgetsPage()),
-                            ),
-                          if (_match('Fashion Plus'))
-                            _NavRow(
-                              icon: Icons.auto_awesome_outlined,
-                              title: 'Fashion Plus',
-                              sub: s.fashionPlus
-                                  ? 'Motion on'
-                                  : 'Still backgrounds',
-                              onTap: () => _push(const FashionPlusScreen()),
-                            ),
-                          if (_match('Quick Access'))
-                            _NavRow(
-                              icon: Icons.dashboard_customize_outlined,
-                              title: 'Quick Access',
-                              sub: 'Customize bottom navigation',
-                              onTap: () => _push(const QuickAccessScreen()),
-                            ),
-                          if (_match('Player Settings'))
-                            _NavRow(
-                              icon: Icons.tune_rounded,
-                              title: 'Player Settings',
-                              sub: 'AURA equalizer · quality · sleep',
-                              last: true,
-                              onTap: () => _push(const PlayerSettingsScreen()),
-                            ),
-                        ],
-                      ),
-                    if (_match('Screen') || _match('Nav'))
-                      _Sec(
-                        label: 'DEVICE',
-                        children: [
-                          if (_match('Screen'))
-                            _ToggleRow(
-                              icon: Icons.phone_android,
-                              title: 'Keep Screen Awake',
-                              sub: 'Stay on while NowssB is open',
-                              value: _screenWake,
-                              onChanged: (v) {
-                                setState(() => _screenWake = v);
-                                _saveBool('ss_screen_wake', v);
-                                DeviceFlags.keepAwake(v);
-                              },
-                            ),
-                          if (_match('Nav'))
-                            _PillRow(
-                              icon: Icons.space_dashboard_outlined,
-                              title: 'Nav Bar',
-                              sub: s.navColor == 'glass'
-                                  ? 'Glass'
-                                  : 'Black',
-                              pill: s.navColor == 'glass' ? 'Glass' : 'Black',
-                              last: true,
-                              onTap: _cycleNav,
-                            ),
-                        ],
-                      ),
-                    if (_match('Notification'))
-                      _Sec(
-                        label: 'NOTIFICATIONS',
-                        children: [
-                          _NavRow(
-                            icon: Icons.notifications_none,
-                            title: 'Notifications',
-                            sub: 'Daily words, streak and today’s offer',
-                            last: true,
-                            onTap: () =>
-                                _push(const NotificationsSettingsPage()),
                           ),
-                        ],
-                      ),
-                    if (_match('Appear') ||
-                        _match('Privacy') ||
-                        _match('Delete'))
-                      _Sec(
-                        label: 'PRIVACY & SOCIAL',
-                        children: [
-                          if (_match('Appear'))
-                            _ToggleRow(
-                              icon: Icons.travel_explore,
-                              title: 'Appear in Discover',
-                              sub: 'Others can find your profile',
-                              value: _appearDiscover,
-                              onChanged: _setDiscover,
-                            ),
-                          if (_match('Privacy'))
-                            _NavRow(
-                              icon: Icons.lock_outline,
-                              title: 'Privacy Policy',
-                              sub: 'What NowssB keeps and why',
-                              onTap: () => _openUrl('https://nowssb.com/privacy'),
-                            ),
-                          if (_match('Delete'))
-                            _NavRow(
-                              icon: Icons.person_remove_outlined,
-                              title: 'Delete Account',
-                              sub: 'Erase your account and its data',
-                              last: true,
-                              danger: true,
-                              onTap: _deleteAccount,
-                            ),
-                        ],
-                      ),
-                    if (_match('Cached') ||
-                        _match('Clear Practice') ||
-                        _match('About') ||
-                        _match('Terms') ||
-                        _match('Sign Out'))
-                      _Sec(
-                        label: 'APP & ABOUT',
-                        children: [
-                          if (_match('Cached'))
-                            _NavRow(
-                              icon: Icons.cleaning_services_outlined,
-                              title: 'Cached Data',
-                              sub: 'Clear temporary media cache',
-                              onTap: _clearCache,
-                            ),
-                          if (_match('Clear Practice'))
-                            _NavRow(
-                              icon: Icons.delete_outline,
-                              title: 'Clear Practice History',
-                              sub: 'Remove session logs — cannot be undone',
-                              danger: true,
-                              onTap: () => _confirmClearHistory(),
-                            ),
-                          if (_match('Request') || _match('Word'))
-                            _NavRow(
-                              icon: Icons.edit_note_outlined,
-                              title: 'Request Words',
-                              sub: 'Ask the atelier for a new word',
-                              onTap: () => openRequestWords(context),
-                            ),
-                          // Only for an account the server marks as admin
-                          // (Firestore admins/{uid}) — see lib/admin.
-                          if (AdminState.instance.isAdmin &&
-                              (_match('Admin') || _match('Template') || _match('Edit')))
-                            _NavRow(
-                              icon: Icons.admin_panel_settings_outlined,
-                              title: 'Admin',
-                              sub: 'Words · quotes · requests · template editor',
-                              onTap: () => openAdminHome(context),
-                            ),
-                          if (_match('About'))
-                            _NavRow(
-                              icon: Icons.info_outline,
-                              title: 'About NowssB',
-                              sub: 'v2.6.0 · nowssb.com',
-                              onTap: _openAbout,
-                            ),
-                          if (_match('Terms'))
-                            _NavRow(
-                              icon: Icons.description_outlined,
-                              title: 'Terms of Service',
-                              sub: 'nowssb.com/terms',
-                              onTap: () => _openUrl('https://nowssb.com/terms'),
-                            ),
-                          if (_match('Sign Out'))
-                            _NavRow(
-                              icon: Icons.logout,
-                              title: 'Sign Out',
-                              sub: 'End this session',
-                              last: true,
-                              danger: true,
-                              onTap: _signOut,
-                            ),
-                        ],
-                      ),
-                  ],
-                ),
-              ),
-            ],
+                        ),
+                      ],
+                    ),
+                  )),
+              if (_match('Player Guide') ||
+                  _match('Hero header') ||
+                  _match('Fashion Plus') ||
+                  _match('Quick Access') ||
+                  _match('Today\'s quote') ||
+                  _match('Player Settings'))
+                LSection(
+                    'intro-appearance',
+                    'Intro & Appearance',
+                    _Sec(
+                      label: 'INTRO & APPEARANCE',
+                      children: [
+                        if (_match('Player Guide'))
+                          _NavRow(
+                            icon: Icons.menu_book_outlined,
+                            title: 'Player Guide',
+                            sub: 'Replay the player setup pages',
+                            onTap: () {
+                              // Decode the opening slide and orb badges
+                              // during the route transition.
+                              OnboardingWarmup.playerGuide(context,
+                                  firstOnly: true);
+                              _push(
+                                PlayerGuideScreen(
+                                  onDone: () =>
+                                      Navigator.of(context).maybePop(),
+                                ),
+                              );
+                            },
+                          ),
+                        if (_match('Hero header'))
+                          _NavRow(
+                            icon: Icons.view_agenda_outlined,
+                            title: 'Hero header & widgets',
+                            sub: 'TV · full · plain · shortcuts',
+                            onTap: () => _push(const WidgetsPage()),
+                          ),
+                        if (_match('Fashion Plus'))
+                          _NavRow(
+                            icon: Icons.auto_awesome_outlined,
+                            title: 'Fashion Plus',
+                            sub: s.fashionPlus
+                                ? 'Motion on'
+                                : 'Still backgrounds',
+                            onTap: () => _push(const FashionPlusScreen()),
+                          ),
+                        if (_match('Quick Access'))
+                          _NavRow(
+                            icon: Icons.dashboard_customize_outlined,
+                            title: 'Quick Access',
+                            sub: 'Customize bottom navigation',
+                            onTap: () => _push(const QuickAccessScreen()),
+                          ),
+                        if (_match('Player Settings'))
+                          _NavRow(
+                            icon: Icons.tune_rounded,
+                            title: 'Player Settings',
+                            sub: 'AURA equalizer · quality · sleep',
+                            last: true,
+                            onTap: () => _push(const PlayerSettingsScreen()),
+                          ),
+                      ],
+                    )),
+              if (_match('Screen') || _match('Nav'))
+                LSection(
+                    'device',
+                    'Device',
+                    _Sec(
+                      label: 'DEVICE',
+                      children: [
+                        if (_match('Screen'))
+                          _ToggleRow(
+                            icon: Icons.phone_android,
+                            title: 'Keep Screen Awake',
+                            sub: 'Stay on while NowssB is open',
+                            value: _screenWake,
+                            onChanged: (v) {
+                              setState(() => _screenWake = v);
+                              _saveBool('ss_screen_wake', v);
+                              DeviceFlags.keepAwake(v);
+                            },
+                          ),
+                        if (_match('Nav'))
+                          _PillRow(
+                            icon: Icons.space_dashboard_outlined,
+                            title: 'Nav Bar',
+                            sub: s.navColor == 'glass' ? 'Glass' : 'Black',
+                            pill: s.navColor == 'glass' ? 'Glass' : 'Black',
+                            last: true,
+                            onTap: _cycleNav,
+                          ),
+                      ],
+                    )),
+              if (_match('Notification'))
+                LSection(
+                    'notifications',
+                    'Notifications',
+                    _Sec(
+                      label: 'NOTIFICATIONS',
+                      children: [
+                        _NavRow(
+                          icon: Icons.notifications_none,
+                          title: 'Notifications',
+                          sub: 'Daily words, streak and today’s offer',
+                          last: true,
+                          onTap: () => _push(const NotificationsSettingsPage()),
+                        ),
+                      ],
+                    )),
+              if (_match('Appear') || _match('Privacy') || _match('Delete'))
+                LSection(
+                    'privacy-social',
+                    'Privacy & Social',
+                    _Sec(
+                      label: 'PRIVACY & SOCIAL',
+                      children: [
+                        if (_match('Appear'))
+                          _ToggleRow(
+                            icon: Icons.travel_explore,
+                            title: 'Appear in Discover',
+                            sub: 'Others can find your profile',
+                            value: _appearDiscover,
+                            onChanged: _setDiscover,
+                          ),
+                        if (_match('Privacy'))
+                          _NavRow(
+                            icon: Icons.lock_outline,
+                            title: 'Privacy Policy',
+                            sub: 'What NowssB keeps and why',
+                            onTap: () => _openUrl('https://nowssb.com/privacy'),
+                          ),
+                        if (_match('Delete'))
+                          _NavRow(
+                            icon: Icons.person_remove_outlined,
+                            title: 'Delete Account',
+                            sub: 'Erase your account and its data',
+                            last: true,
+                            danger: true,
+                            onTap: _deleteAccount,
+                          ),
+                      ],
+                    )),
+              if (_match('Cached') ||
+                  _match('Clear Practice') ||
+                  _match('About') ||
+                  _match('Terms') ||
+                  _match('Sign Out'))
+                LSection(
+                    'app-about',
+                    'App & About',
+                    _Sec(
+                      label: 'APP & ABOUT',
+                      children: [
+                        if (_match('Cached'))
+                          _NavRow(
+                            icon: Icons.cleaning_services_outlined,
+                            title: 'Cached Data',
+                            sub: 'Clear temporary media cache',
+                            onTap: _clearCache,
+                          ),
+                        if (_match('Clear Practice'))
+                          _NavRow(
+                            icon: Icons.delete_outline,
+                            title: 'Clear Practice History',
+                            sub: 'Remove session logs — cannot be undone',
+                            danger: true,
+                            onTap: () => _confirmClearHistory(),
+                          ),
+                        if (_match('Request') || _match('Word'))
+                          _NavRow(
+                            icon: Icons.edit_note_outlined,
+                            title: 'Request Words',
+                            sub: 'Ask the atelier for a new word',
+                            onTap: () => openRequestWords(context),
+                          ),
+                        // Only for an account the server marks as admin
+                        // (Firestore admins/{uid}) — see lib/admin.
+                        if (AdminState.instance.isAdmin &&
+                            (_match('Admin') ||
+                                _match('Template') ||
+                                _match('Edit')))
+                          _NavRow(
+                            icon: Icons.admin_panel_settings_outlined,
+                            title: 'Admin',
+                            sub: 'Words · quotes · requests · template editor',
+                            onTap: () => openAdminHome(context),
+                          ),
+                        if (_match('About'))
+                          _NavRow(
+                            icon: Icons.info_outline,
+                            title: 'About NowssB',
+                            sub: 'v2.6.0 · nowssb.com',
+                            onTap: _openAbout,
+                          ),
+                        if (_match('Terms'))
+                          _NavRow(
+                            icon: Icons.description_outlined,
+                            title: 'Terms of Service',
+                            sub: 'nowssb.com/terms',
+                            onTap: () => _openUrl('https://nowssb.com/terms'),
+                          ),
+                        if (_match('Sign Out'))
+                          _NavRow(
+                            icon: Icons.logout,
+                            title: 'Sign Out',
+                            sub: 'End this session',
+                            last: true,
+                            danger: true,
+                            onTap: _signOut,
+                          ),
+                      ],
+                    )),
+            ]),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -503,23 +471,27 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF14171E),
-        title: const EditableLabel('app_settings.AppSettingsScreen', 'About NowssB',
+        title: const EditableLabel(
+            'app_settings.AppSettingsScreen', 'About NowssB',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
-        content: const EditableLabel('app_settings.AppSettingsScreen',
+        content: const EditableLabel(
+          'app_settings.AppSettingsScreen',
           'NowssB · Shabdapathy\nNatural Origin Word Science\nVersion 9.5.0\n\nnowssb.com',
           style: TextStyle(color: Color(0xE6FFFFFF), height: 1.45),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const EditableLabel('app_settings.AppSettingsScreen', 'Close'),
+            child:
+                const EditableLabel('app_settings.AppSettingsScreen', 'Close'),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
               _openTerms();
             },
-            child: const EditableLabel('app_settings.AppSettingsScreen', 'Website'),
+            child: const EditableLabel(
+                'app_settings.AppSettingsScreen', 'Website'),
           ),
         ],
       ),
@@ -533,7 +505,8 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
   }
 
   Future<void> _openUrl(String url) async {
-    final opened = await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    final opened =
+        await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
     if (!opened && mounted) _toast('Could not open $url');
   }
 
@@ -542,21 +515,25 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF14171E),
-        title: const EditableLabel('app_settings.DeleteAccount', 'Delete your account?',
+        title: const EditableLabel(
+            'app_settings.DeleteAccount', 'Delete your account?',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
-        content: const EditableLabel('app_settings.DeleteAccount',
+        content: const EditableLabel(
+          'app_settings.DeleteAccount',
           'Your profile, practice data, wishlist, notifications and sign-in are erased. Purchases and plans cannot be restored afterwards; cancel any Google Play subscription in the Play Store first. This cannot be undone.',
           style: TextStyle(color: Color(0xB3FFFFFF), height: 1.45),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const EditableLabel('app_settings.DeleteAccount', 'Keep my account'),
+            child: const EditableLabel(
+                'app_settings.DeleteAccount', 'Keep my account'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             child: const EditableLabel('app_settings.DeleteAccount', 'Delete',
-                style: TextStyle(color: Color(0xFFF87171), fontWeight: FontWeight.w800)),
+                style: TextStyle(
+                    color: Color(0xFFF87171), fontWeight: FontWeight.w800)),
           ),
         ],
       ),
@@ -569,7 +546,8 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
     if (!r.ok) return;
     NotificationBanner.items.value = const [];
     AuthGate.askForAccount();
-    Navigator.of(context, rootNavigator: true).popUntil((route) => route.isFirst);
+    Navigator.of(context, rootNavigator: true)
+        .popUntil((route) => route.isFirst);
   }
 
   Future<void> _signOut() async {
@@ -583,7 +561,8 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
     await prefs.setBool('nwsb.rememberMe', false);
     const webClient =
         '1024709686012-h1h9glk84uti9cbqpht5d09igdqb8pgu.apps.googleusercontent.com';
-    final google = GoogleSignIn(scopes: const ['email'], serverClientId: webClient);
+    final google =
+        GoogleSignIn(scopes: const ['email'], serverClientId: webClient);
     try {
       await google.disconnect();
     } catch (_) {}
@@ -596,7 +575,8 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
     NotificationBanner.items.value = const [];
     AuthGate.askForAccount();
     if (!mounted) return;
-    Navigator.of(context, rootNavigator: true).popUntil((route) => route.isFirst);
+    Navigator.of(context, rootNavigator: true)
+        .popUntil((route) => route.isFirst);
   }
 
   void _toast(String msg) {
@@ -610,20 +590,25 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF14171E),
-        title: const EditableLabel('app_settings.AppSettingsScreen', 'Clear practice history?',
+        title: const EditableLabel(
+            'app_settings.AppSettingsScreen', 'Clear practice history?',
             style: TextStyle(color: Colors.white)),
-        content: const EditableLabel('app_settings.AppSettingsScreen',
+        content: const EditableLabel(
+          'app_settings.AppSettingsScreen',
           'Session logs will be removed. This cannot be undone.',
           style: TextStyle(color: Color(0xB3FFFFFF)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const EditableLabel('app_settings.AppSettingsScreen', 'Cancel'),
+            child:
+                const EditableLabel('app_settings.AppSettingsScreen', 'Cancel'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const EditableLabel('app_settings.AppSettingsScreen', 'Clear', style: TextStyle(color: Color(0xFFF87171))),
+            child: const EditableLabel(
+                'app_settings.AppSettingsScreen', 'Clear',
+                style: TextStyle(color: Color(0xFFF87171))),
           ),
         ],
       ),
@@ -665,10 +650,12 @@ class _SignOutDialog extends StatelessWidget {
                         color: Colors.white,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.logout_rounded, color: Colors.black),
+                      child:
+                          const Icon(Icons.logout_rounded, color: Colors.black),
                     ),
                     const SizedBox(height: 14),
-                    const EditableLabel('app_settings.SignOutDialog',
+                    const EditableLabel(
+                      'app_settings.SignOutDialog',
                       'Sign out?',
                       style: TextStyle(
                         color: Colors.white,
@@ -677,7 +664,8 @@ class _SignOutDialog extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 6),
-                    const EditableLabel('app_settings.SignOutDialog',
+                    const EditableLabel(
+                      'app_settings.SignOutDialog',
                       'You will need to choose an account the next time you sign in.',
                       textAlign: TextAlign.center,
                       style: TextStyle(color: Color(0xB3FFFFFF), height: 1.4),
@@ -693,7 +681,8 @@ class _SignOutDialog extends StatelessWidget {
                           onTap: () => Navigator.pop(context, true),
                           child: const Padding(
                             padding: EdgeInsets.symmetric(vertical: 14),
-                            child: EditableLabel('app_settings.SignOutDialog',
+                            child: EditableLabel(
+                              'app_settings.SignOutDialog',
                               'Sign out',
                               textAlign: TextAlign.center,
                               style: TextStyle(
@@ -720,9 +709,11 @@ class _SignOutDialog extends StatelessWidget {
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(999),
-                                border: Border.all(color: const Color(0x55FFFFFF)),
+                                border:
+                                    Border.all(color: const Color(0x55FFFFFF)),
                               ),
-                              child: const EditableLabel('app_settings.SignOutDialog',
+                              child: const EditableLabel(
+                                'app_settings.SignOutDialog',
                                 'Stay signed in',
                                 style: TextStyle(
                                   color: Colors.white,
@@ -757,7 +748,8 @@ class _Badge extends StatelessWidget {
         borderRadius: BorderRadius.circular(6),
         border: Border.all(color: const Color(0x4DE8D5A3)),
       ),
-      child: EditableLabel('app_settings.Badge',
+      child: EditableLabel(
+        'app_settings.Badge',
         label,
         style: const TextStyle(
           fontSize: 9,
@@ -784,7 +776,8 @@ class _Sec extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.only(left: 4, bottom: 10),
-            child: EditableLabel('app_settings.Sec',
+            child: EditableLabel(
+              'app_settings.Sec',
               label,
               style: const TextStyle(
                 fontSize: 10,
@@ -836,7 +829,8 @@ class _NavRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                EditableLabel('app_settings.NavRow',
+                EditableLabel(
+                  'app_settings.NavRow',
                   title,
                   style: TextStyle(
                     color: danger ? const Color(0xD9F87171) : Colors.white,
@@ -900,7 +894,8 @@ class _ToggleRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                EditableLabel('app_settings.ToggleRow',
+                EditableLabel(
+                  'app_settings.ToggleRow',
                   title,
                   style: const TextStyle(
                     color: Colors.white,
@@ -909,7 +904,8 @@ class _ToggleRow extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 2),
-                EditableLabel('app_settings.ToggleRow',
+                EditableLabel(
+                  'app_settings.ToggleRow',
                   sub,
                   style: const TextStyle(
                     color: Color(0x73FFFFFF),
@@ -962,7 +958,8 @@ class _PillRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                EditableLabel('app_settings.PillRow',
+                EditableLabel(
+                  'app_settings.PillRow',
                   title,
                   style: const TextStyle(
                     color: Colors.white,
@@ -971,7 +968,8 @@ class _PillRow extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 2),
-                EditableLabel('app_settings.PillRow',
+                EditableLabel(
+                  'app_settings.PillRow',
                   sub,
                   style: const TextStyle(
                     color: Color(0x73FFFFFF),
@@ -1050,7 +1048,8 @@ class _ThemeCard extends StatelessWidget {
                           : const Color(0xBFFFFFFF),
                     ),
                   ),
-                  EditableLabel('app_settings.ThemeCard',
+                  EditableLabel(
+                    'app_settings.ThemeCard',
                     sub,
                     style: const TextStyle(
                       fontSize: 7,

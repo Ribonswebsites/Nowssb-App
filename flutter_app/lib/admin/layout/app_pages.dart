@@ -21,6 +21,7 @@ import '../../screens/healing_path.dart';
 import '../../screens/home_fashion.dart';
 import '../../screens/home_normal.dart';
 import '../../screens/library.dart';
+import '../../screens/notifications_settings.dart';
 import '../../screens/personal_coach.dart';
 import '../../screens/player_settings.dart';
 import '../../screens/practice.dart';
@@ -84,6 +85,7 @@ final List<AppPage> kAppPages = [
   AppPage('subscription', 'Subscription', 'You', Icons.workspace_premium_rounded, () => const SubscriptionScreen()),
   AppPage('quickaccess', 'Quick access', 'You', Icons.apps_rounded, () => const QuickAccessScreen()),
   AppPage('settings', 'Settings', 'You', Icons.settings_rounded, () => const AppSettingsScreen()),
+  AppPage('notifications', 'Notification settings', 'You', Icons.notifications_rounded, () => const NotificationsSettingsPage()),
   AppPage('fashionplus', 'Fashion Plus', 'Explore', Icons.checkroom_rounded, () => const FashionPlusScreen()),
   AppPage('healing', 'Healing path', 'Explore', Icons.spa_rounded, () => const HealingPathScreen()),
   AppPage('earn', 'Earn & gifts', 'Explore', Icons.toll_rounded, () => const EarnHubScreen()),

@@ -51,7 +51,7 @@ class _SelectLevelScreenState extends State<SelectLevelScreen> {
               ),
               child: Column(children: [
                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                  _CircleButton(icon: Icons.chevron_left_rounded, onTap: () => Navigator.of(context).pop()),
+                  PlayerAuraBackButton(onTap: () => Navigator.of(context).pop()),
                   // More → the player's settings (voice, speed, AURA, sleep).
                   _CircleButton(
                     icon: Icons.more_horiz_rounded,
