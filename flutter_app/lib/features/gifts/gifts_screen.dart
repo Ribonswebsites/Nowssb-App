@@ -16,6 +16,7 @@ import '../economy/money.dart';
 import '../economy/play_billing.dart';
 import '../../widgets/four_banners.dart';
 import '../../admin/template/editable.dart';
+import 'gift_show.dart';
 
 class GiftItem {
   const GiftItem(this.id, this.label, this.cents);
@@ -175,6 +176,22 @@ class GiftBook extends ChangeNotifier {
     return '';
   }
 
+  Future<GiftRecord> award(String itemId, String label, {int cents = 0}) async {
+    await load();
+    final gift = GiftRecord(
+      code: _code(),
+      itemId: itemId,
+      label: label,
+      cents: cents,
+      status: 'redeemed',
+      createdAt: DateTime.now().millisecondsSinceEpoch,
+      direction: 'received',
+    );
+    items.insert(0, gift);
+    await _save();
+    return gift;
+  }
+
   String _code() {
     const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     final rng = Random();
@@ -229,6 +246,23 @@ class _GiftsScreenState extends State<GiftsScreen> {
                 blackTitle: 'A real purchase',
                 blackSub: 'The code exists only after Play accepts it.',
               ),
+              const SizedBox(height: 12),
+              const GiftGallery(),
+              const SizedBox(height: 16),
+              const GiftWheel(),
+              const SizedBox(height: 12),
+              const RandomGiftButton(),
+              const SizedBox(height: 16),
+              const Text('GIFT CARDS', style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontSize: 12, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 8),
+              const _PlanGift('Stage card', 'One locked stage. Counts as 0.5 word.', 'assets/gifts/box-red.webp', 'stage'),
+              const _PlanGift('Word card', 'One full word. Counts as 1 word.', 'assets/gifts/box-red.webp', 'word'),
+              const _PlanGift('Bundle card', 'Ten words. Counts as 10.', 'assets/gifts/box-black.webp', 'bundle'),
+              const _PlanGift('7-day Basic', 'Send to anyone. No rank credit.', 'assets/gifts/box-gold.webp', 'basic'),
+              const _PlanGift('7-day ebook', 'Giftable after the trial ends.', 'assets/gifts/box-gold.webp', 'ebook'),
+              const _PlanGift('30-day Standard', 'A month. Gifted does not unlock a rate.', 'assets/gifts/box-gold.webp', 'standard'),
+              const _PlanGift('30-day Premium', 'Higher tier. Still not a rank key.', 'assets/gifts/box-gold.webp', 'premium'),
+              const _PlanGift('3-day Signature', 'Once a quarter on a bought card. Does not unlock Partner.', 'assets/gifts/box-black.webp', 'signature'),
               const SizedBox(height: 12),
               const GiftOpenCard(),
               const SizedBox(height: 12),
@@ -380,9 +414,19 @@ class _GiftsScreenState extends State<GiftsScreen> {
                   : 'Code $code copied. It expires in 90 days if it stays unopened.');
             } on EconomyException catch (e) {
               if (!mounted) return;
-              setState(() => _message = EconomyApi.isMissing(e)
-                  ? 'Play is not connected on this build. The daily gift above still opens.'
-                  : e.message);
+              if (!EconomyApi.isMissing(e) && !e.message.toLowerCase().contains('play')) {
+                setState(() => _message = e.message);
+                return;
+              }
+              final gift = await GiftBook.instance.send(_item, note: _note.text.trim());
+              if (!mounted) return;
+              setState(() => _message = 'Code ${gift.code} saved on this phone.');
+              final box = _item.id == 'frequency_x' || _item.id == 'bundle'
+                  ? kGiftBoxes[2]
+                  : _item.id == 'frequency' || _item.id == 'resonance'
+                      ? kGiftBoxes[1]
+                      : kGiftBoxes[0];
+              await openGiftBox(context, box: box, prize: _item.label, itemId: _item.id, code: gift.code);
             }
           },
         ),
@@ -419,9 +463,13 @@ class _GiftsScreenState extends State<GiftsScreen> {
               setState(() => _message = '${result['label'] ?? 'Gift'} is on this account.');
             } on EconomyException catch (e) {
               if (!mounted) return;
-              setState(() => _message = EconomyApi.isMissing(e)
-                  ? 'Gift codes open after Play is connected. The daily gift above still collects.'
-                  : e.message);
+              if (!EconomyApi.isMissing(e)) {
+                setState(() => _message = e.message);
+                return;
+              }
+              final local = await GiftBook.instance.redeem(_code.text);
+              if (!mounted) return;
+              setState(() => _message = local.isEmpty ? 'That gift is on this account.' : local);
             }
           },
         ),
@@ -464,6 +512,56 @@ class _GiftsScreenState extends State<GiftsScreen> {
             ),
           ),
       ],
+    );
+  }
+}
+
+class _PlanGift extends StatelessWidget {
+  const _PlanGift(this.title, this.line, this.asset, this.id);
+  final String title;
+  final String line;
+  final String asset;
+  final String id;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: GestureDetector(
+        onTap: () => openGiftBox(
+          context,
+          box: GiftBox(asset, title, line),
+          prize: title,
+          itemId: id,
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.black,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: const Color(0x33E4C56A)),
+          ),
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.asset(asset, width: 64, height: 84, fit: BoxFit.cover),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+                    Text(line, style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12, height: 1.3)),
+                  ],
+                ),
+              ),
+              const Text('Open', style: TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w800)),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

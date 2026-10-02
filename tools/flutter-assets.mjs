@@ -45,6 +45,7 @@ const FOLDERS = [
   'signature',    // the Signature's marks
   'certificates',
   'banners',      // the collection banners
+  'gifts',        // the headphone gift boxes
   'hero-curve',   // Lesmana-style 3D home gallery
 ];
 

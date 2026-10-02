@@ -85,12 +85,14 @@ class _RoundCarouselState extends State<RoundCarousel>
     return LayoutBuilder(
       builder: (context, c) {
         final stageW = c.maxWidth.isFinite ? c.maxWidth : 340.0;
-        final cardW = (stageW * 0.46).clamp(128.0, 168.0);
-        final cardH = cardW * 1.28;
         final count = images.length;
+        final cardW = (stageW * 0.34).clamp(112.0, 150.0);
+        final cardH = cardW * 1.34;
         final step = 2 * math.pi / count;
         final rot = _rot * math.pi / 180;
-        final radius = cardW * 0.42;
+        // Desandro cylinder: cards meet edge to edge, so the sides
+        // sit beside the front card instead of stacking in the middle.
+        final radius = (cardW / 2) / math.tan(math.pi / count);
 
         final order = List<int>.generate(count, (i) => i)
           ..sort((a, b) {
@@ -106,7 +108,7 @@ class _RoundCarouselState extends State<RoundCarousel>
             _vel = 0;
           },
           onHorizontalDragUpdate: (e) {
-            final k = 0.22 * widget.sensitivity;
+            final k = 0.18 * widget.sensitivity;
             setState(() {
               _rot += e.delta.dx * k;
               _vel = e.delta.dx * k * 60;
@@ -115,7 +117,7 @@ class _RoundCarouselState extends State<RoundCarousel>
           onHorizontalDragEnd: (_) => _drag = false,
           onHorizontalDragCancel: () => _drag = false,
           child: SizedBox(
-            height: 300,
+            height: cardH + 28,
             width: double.infinity,
             child: Stack(
               alignment: Alignment.center,
@@ -147,10 +149,14 @@ class _RoundCarouselState extends State<RoundCarousel>
     final depth = math.cos(angle);
     final facing = depth >= 0;
     final near = ((depth + 1) / 2).clamp(0.0, 1.0);
-    final opacity = facing ? 0.72 + 0.28 * near : 0.35 + 0.25 * near;
-    // Last call is applied first: slide out on Z, then swing around Y.
+    final opacity = facing ? 0.86 + 0.14 * near : 0.42 + 0.2 * near;
+    final tilt = widget.tilt * math.pi / 180;
+    // Applied to the card first-to-last: out on Z, around Y, back so the
+    // front face sits on the screen, then a small tilt of the whole ring.
     final m = Matrix4.identity()
-      ..setEntry(3, 2, 0.001)
+      ..setEntry(3, 2, 1 / widget.perspective)
+      ..rotateX(tilt)
+      ..translateByDouble(0, 0, -radius, 1)
       ..rotateY(angle)
       ..translateByDouble(0, 0, radius, 1);
 
@@ -211,12 +217,17 @@ class _Face extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(radius),
         child: back
-            ? ColorFiltered(
-                colorFilter: const ColorFilter.mode(Color(0xAA000000), BlendMode.darken),
-                child: Transform(
-                  alignment: Alignment.center,
-                  transform: Matrix4.diagonal3Values(-1, 1, 1),
-                  child: photo,
+            ? const ColoredBox(
+                color: Color(0xFF050505),
+                child: Center(
+                  child: Text(
+                    'NowssB',
+                    style: TextStyle(
+                      color: Color(0xFFE4C56A),
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
                 ),
               )
             : photo,

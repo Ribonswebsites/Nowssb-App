@@ -46,15 +46,17 @@ class RoundRingSection extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           ClipRRect(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(18),
             child: ColoredBox(
               color: const Color(0xFF000000),
               child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 8),
+                padding: const EdgeInsets.symmetric(vertical: 10),
                 child: RoundCarousel(
                   images: [for (final p in kProgramPosters) p.asset],
-                  speed: 2.4,
-                  tilt: -8,
+                  speed: 4,
+                  tilt: -6,
+                  perspective: 1100,
+                  cornerRadius: 16,
                   spacing: 2,
                 ),
               ),
