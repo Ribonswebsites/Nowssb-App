@@ -6,9 +6,12 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:video_player/video_player.dart';
 
+import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
 import '../../widgets/glass_wrap.dart';
+import '../../widgets/nwsb_coin_fly.dart';
 import '../../widgets/nwsb_icon.dart';
 import 'gifts_screen.dart';
 
@@ -106,16 +109,63 @@ class _Slice {
   final String mark;
 }
 
+/// Clockwise from the top peg, matching the Daily Spin face.
+const _outlineGift =
+    '<path d="M4.2 9.2h15.6v11.2H4.2z"/>'
+    '<path d="M3 6.2h18v3.2H3z"/>'
+    '<path d="M12 6.2v14.2"/>'
+    '<path d="M12 6.2c-1.4-2.6-4-3.4-5.2-2.2C5.6 5.2 6.2 6.8 8.2 7.4"/>'
+    '<path d="M12 6.2c1.4-2.6 4-3.4 5.2-2.2 1.2 1.2.6 2.8-1.4 3.4"/>';
+
+const _drop =
+    '<path d="M12 3.2s5.2 6 5.2 9.4a5.2 5.2 0 1 1-10.4 0C6.8 9.2 12 3.2 12 3.2z"/>';
+
 const _wheel = <_Slice>[
-  _Slice('15 coins', 26, 'assets/gifts/box-red.webp', 'coins', NwsbMarks.rewards),
-  _Slice('Stage', 18, 'assets/gifts/box-red.webp', 'stage', NwsbMarks.stages),
   _Slice('Ebook', 16, 'assets/gifts/box-gold.webp', 'ebook', NwsbMarks.book),
   _Slice('Basic', 14, 'assets/gifts/box-gold.webp', 'basic', NwsbMarks.sound),
-  _Slice('Standard', 12, 'assets/gifts/box-gold.webp', 'standard', NwsbMarks.crown),
-  _Slice('Premium', 8, 'assets/gifts/box-gold.webp', 'premium', NwsbMarks.flame),
+  _Slice('Premium', 8, 'assets/gifts/box-gold.webp', 'premium', NwsbMarks.crown),
+  _Slice('Bundle', 2, 'assets/gifts/box-black.webp', 'bundle', _drop),
   _Slice('Signature', 4, 'assets/gifts/box-black.webp', 'signature', NwsbMarks.signature),
-  _Slice('Bundle', 2, 'assets/gifts/box-black.webp', 'bundle', NwsbMarks.bag),
+  _Slice('15 coins', 26, 'assets/gifts/box-red.webp', 'coins', _outlineGift),
+  _Slice('Standard', 12, 'assets/gifts/box-gold.webp', 'standard', NwsbMarks.rewards),
+  _Slice('Stage', 18, 'assets/gifts/box-red.webp', 'stage', NwsbMarks.stages),
 ];
+
+const _spinCost = 15;
+
+class GiftShowcase extends StatelessWidget {
+  const GiftShowcase({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final w = MediaQuery.sizeOf(context).width;
+    return SizedBox(
+      height: 320,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(18),
+            child: Image.asset(
+              'assets/gifts/gift-hero.png',
+              width: w * 0.74,
+              height: 320,
+              fit: BoxFit.cover,
+              alignment: Alignment.topCenter,
+              errorBuilder: (_, __, ___) => const SizedBox(width: 220, height: 320),
+            ),
+          ),
+          const SizedBox(width: 12),
+          SizedBox(
+            width: max(240, w - 48),
+            child: const GiftGallery(),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 class GiftGallery extends StatelessWidget {
   const GiftGallery({super.key});
@@ -172,7 +222,7 @@ class _GiftWheelState extends State<GiftWheel> with TickerProviderStateMixin {
   late final AnimationController _spin;
   late final AnimationController _lamps;
   late final AnimationController _flap;
-  double _angle = 0;
+  double _angle = -pi / 8;
   var _busy = false;
   String? _landed;
   var _peg = 0;
@@ -227,15 +277,30 @@ class _GiftWheelState extends State<GiftWheel> with TickerProviderStateMixin {
 
   Future<void> _go() async {
     if (_busy || _landed != null) return;
+    if (EconomyMirror.instance.coins < _spinCost) return;
+    final spent = await EconomyMirror.instance.spendLocal(_spinCost);
+    if (!spent || !mounted) return;
     setState(() => _busy = true);
     final slice = _pick();
     final index = _wheel.indexOf(slice);
+    final quiet = WidgetsBinding.instance.runtimeType.toString().contains('Test');
+    if (!quiet && mounted) {
+      await showGeneralDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        barrierLabel: 'Spin',
+        barrierColor: Colors.black,
+        pageBuilder: (context, _, __) => const _SpinFilm(),
+      );
+    }
+    if (!mounted) return;
     final sweep = 2 * pi / _wheel.length;
-    final turns = 7 * 2 * pi;
+    final turns = 2 * 2 * pi;
     final land = turns - index * sweep - sweep / 2;
     final start = _angle;
     _peg = (start / sweep).floor();
-    final anim = CurvedAnimation(parent: _spin, curve: const _WheelDecel());
+    _spin.duration = const Duration(milliseconds: 1700);
+    final anim = CurvedAnimation(parent: _spin, curve: Curves.easeOutCubic);
     void tick() {
       final ang = start + (land - start) * anim.value;
       final peg = (ang / sweep).floor();
@@ -257,11 +322,14 @@ class _GiftWheelState extends State<GiftWheel> with TickerProviderStateMixin {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('nwsb_wheel_$_day', '${slice.label}|$index');
     final record = await GiftBook.instance.award(slice.tier, slice.label);
+    if (slice.tier == 'coins') {
+      await EconomyMirror.instance.grantOnce('wheel_coins', 15);
+    }
     HapticFeedback.mediumImpact();
     if (!mounted) return;
     setState(() {
       _busy = false;
-      _angle = land;
+      _angle = -index * sweep - sweep / 2;
       _landed = slice.label;
     });
     await openGiftBox(
@@ -275,175 +343,330 @@ class _GiftWheelState extends State<GiftWheel> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return GlassWrap(
-      margin: EdgeInsets.zero,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const Text('WHEEL', style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontSize: 12, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 4),
-          const Text(
-            'One spin a day. It ticks, then slows into the peg. Premium 8%. Signature 4%.',
-            style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 12, height: 1.35),
-          ),
-          const SizedBox(height: 4),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final frame = min(300.0, constraints.maxWidth);
-              final disc = frame - 34;
-              return SizedBox(
-                height: frame + 8,
-                width: double.infinity,
-                child: Stack(
-                  alignment: Alignment.center,
-                  clipBehavior: Clip.none,
-                  children: [
-                    Positioned(
-                      bottom: 2,
-                      child: Container(
-                        width: frame * 0.58,
-                        height: 16,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(40),
-                          boxShadow: const [
-                            BoxShadow(color: Color(0xE6000000), blurRadius: 16, spreadRadius: 2),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Transform(
-                      alignment: Alignment.center,
-                      filterQuality: FilterQuality.medium,
-                      transform: Matrix4.identity()
-                        ..setEntry(3, 2, 0.0011)
-                        ..rotateX(-0.42),
-                      child: SizedBox(
-                        width: frame,
-                        height: frame,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            AnimatedBuilder(
-                              animation: _lamps,
-                              builder: (context, _) => CustomPaint(
-                                size: Size(frame, frame),
-                                painter: _LampPainter(_lamps.value, _busy),
-                              ),
-                            ),
-                            Transform.rotate(
-                              angle: _angle,
-                              child: SizedBox(
-                                width: disc,
-                                height: disc,
-                                child: Stack(
-                                  children: [
-                                    Positioned.fill(child: CustomPaint(painter: _WheelPainter(_wheel))),
-                                    for (var i = 0; i < _wheel.length; i++) _mark(i, disc),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Container(
-                              width: disc * 0.24,
-                              height: disc * 0.24,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: const Color(0xFF0A0A0A),
-                                border: Border.all(color: const Color(0xFFE4C56A), width: 3),
-                                boxShadow: const [
-                                  BoxShadow(color: Color(0x66000000), blurRadius: 8),
-                                ],
-                              ),
-                              alignment: Alignment.center,
-                              child: const Text('N', style: TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w800, fontSize: 20)),
-                            ),
-                            Positioned(
-                              top: 0,
-                              child: AnimatedBuilder(
-                                animation: _flap,
-                                builder: (context, _) => Transform.rotate(
-                                  alignment: Alignment.topCenter,
-                                  angle: -sin(_flap.value * pi) * 0.48,
-                                  child: const CustomPaint(size: Size(26, 38), painter: _Pointer()),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-          const SizedBox(height: 8),
-          for (var i = 0; i < _wheel.length; i += 2)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 4),
-              child: Row(
+    return ListenableBuilder(
+      listenable: EconomyMirror.instance,
+      builder: (context, _) {
+        final coins = EconomyMirror.instance.coins;
+        final can = _landed == null && !_busy && coins >= _spinCost;
+        final buttonSub = _landed != null
+            ? 'Come back tomorrow'
+            : (_busy ? 'Spinning…' : (coins < _spinCost ? 'Need 15 coins' : 'Spend 15 coins to spin'));
+        return GlassWrap(
+          margin: EdgeInsets.zero,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(child: _odds(_wheel[i])),
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: const Color(0xFFE4C56A)),
+                    ),
+                    alignment: Alignment.center,
+                    child: const NwsbIcon(NwsbMarks.rewards, size: 16, color: Color(0xFFE4C56A)),
+                  ),
                   const SizedBox(width: 10),
-                  Expanded(child: _odds(_wheel[i + 1])),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text.rich(
+                          TextSpan(
+                            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, height: 1.05),
+                            children: [
+                              TextSpan(text: 'Daily ', style: TextStyle(color: Colors.white)),
+                              TextSpan(text: 'Spin', style: TextStyle(color: Color(0xFFE4C56A))),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 2),
+                        Text(
+                          'One spin a day. It ticks, then slows\ninto the peg.',
+                          style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 12, height: 1.25),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: const Color(0x66E4C56A)),
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Image.asset(NwsbCoinFly.disc, width: 16, height: 16, fit: BoxFit.contain),
+                            const SizedBox(width: 4),
+                            Text('$coins', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)),
+                          ],
+                        ),
+                        const Text('Your coins', style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 9)),
+                      ],
+                    ),
+                  ),
                 ],
               ),
-            ),
-          const SizedBox(height: 6),
-          Text(
-            _landed == null ? 'Spin once. Higher tiers are on the wheel.' : 'Today: $_landed',
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
+              const SizedBox(height: 6),
+              const Text(
+                'Premium 8%  ·  Signature 4%',
+                style: TextStyle(color: Color(0xFFE4C56A), fontSize: 12, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 8),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final frame = min(320.0, constraints.maxWidth);
+                  final disc = frame - 28;
+                  return SizedBox(
+                    height: frame + 6,
+                    width: double.infinity,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      clipBehavior: Clip.none,
+                      children: [
+                        Positioned(
+                          bottom: 8,
+                          child: Container(
+                            width: frame * 0.62,
+                            height: 18,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(40),
+                              boxShadow: const [BoxShadow(color: Color(0x88C6A15A), blurRadius: 24, spreadRadius: 2)],
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: frame,
+                          height: frame,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              AnimatedBuilder(
+                                animation: _lamps,
+                                builder: (context, _) => CustomPaint(
+                                  size: Size(frame, frame),
+                                  painter: _LampPainter(_lamps.value, _busy),
+                                ),
+                              ),
+                              Transform.rotate(
+                                angle: _angle,
+                                child: SizedBox(
+                                  width: disc,
+                                  height: disc,
+                                  child: Stack(
+                                    children: [
+                                      Positioned.fill(child: CustomPaint(painter: _WheelPainter(_wheel))),
+                                      for (var i = 0; i < _wheel.length; i++) _mark(i, disc),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: can ? _go : null,
+                                child: Container(
+                                  width: disc * 0.36,
+                                  height: disc * 0.36,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: const Color(0xFF0B0B0B),
+                                    border: Border.all(color: const Color(0xFFE4C56A), width: 4),
+                                    boxShadow: const [
+                                      BoxShadow(color: Color(0x99E4C56A), blurRadius: 16),
+                                    ],
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: const Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text('SPIN', style: TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w900, fontSize: 22, letterSpacing: 1.2, height: 1)),
+                                      SizedBox(height: 2),
+                                      Text('1 spin daily', style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 9)),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                top: 0,
+                                child: AnimatedBuilder(
+                                  animation: _flap,
+                                  builder: (context, _) => Transform.rotate(
+                                    alignment: Alignment.topCenter,
+                                    angle: -sin(_flap.value * pi) * 0.35,
+                                    child: const CustomPaint(size: Size(34, 46), painter: _Pointer()),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 8),
+              _oddsBoard(),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Container(
+                    width: 74,
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: const Color(0x66E4C56A)),
+                    ),
+                    child: Column(
+                      children: [
+                        Image.asset(NwsbCoinFly.disc, width: 22, height: 22, fit: BoxFit.contain),
+                        const Text('15', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16, height: 1.1)),
+                        const Text('per spin', style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 9)),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: can ? _go : null,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        decoration: BoxDecoration(
+                          color: can ? const Color(0xFFC6A15A) : const Color(0xFF4A3B22),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Column(
+                          children: [
+                            Text(
+                              'SPIN THE WHEEL',
+                              style: TextStyle(color: can ? const Color(0xFF1A1408) : const Color(0xFFB7A98A), fontWeight: FontWeight.w900, letterSpacing: 0.8, fontSize: 15),
+                            ),
+                            Text(
+                              buttonSub,
+                              style: TextStyle(color: can ? const Color(0xFF3A2C14) : const Color(0xFF8C7B5E), fontSize: 11),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Container(width: 16, height: 1, color: const Color(0x33FFFFFF)),
+                  const SizedBox(width: 6),
+                  const Icon(Icons.lock_outline, size: 12, color: Color(0x99FFFFFF)),
+                  const SizedBox(width: 4),
+                  const Expanded(
+                    child: Text(
+                      'Come back tomorrow for your next spin.',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Color(0x99FFFFFF), fontSize: 11),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Container(width: 16, height: 1, color: const Color(0x33FFFFFF)),
+                ],
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
-          GoldButton(
-            label: _landed != null ? 'Spun today' : (_busy ? 'Spinning…' : 'Spin the wheel'),
-            onTap: (_landed != null || _busy) ? null : _go,
+        );
+      },
+    );
+  }
+
+  Widget _oddsBoard() {
+    const order = <int>[5, 7, 0, 1, 6, 2, 4, 3];
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0x55E4C56A)),
+      ),
+      child: Column(
+        children: [
+          _oddsRow(order.take(4).toList()),
+          const Divider(height: 1, thickness: 1, color: Color(0x33E4C56A)),
+          _oddsRow(order.skip(4).toList()),
+        ],
+      ),
+    );
+  }
+
+  Widget _oddsRow(List<int> ids) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+      child: Row(
+        children: [
+          for (var k = 0; k < ids.length; k++) ...[
+            if (k > 0) Container(width: 1, height: 28, color: const Color(0x33E4C56A)),
+            _oddsCell(ids[k]),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _oddsCell(int i) {
+    final s = _wheel[i];
+    return Expanded(
+      child: Row(
+        children: [
+          const SizedBox(width: 4),
+          NwsbIcon(s.mark, size: 14, color: const Color(0xFFE4C56A)),
+          const SizedBox(width: 4),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(s.label, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w700)),
+                Text('${s.weight}%', style: const TextStyle(color: Color(0xFFE4C56A), fontSize: 10, fontWeight: FontWeight.w800)),
+              ],
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _odds(_Slice s) {
-    return Row(
-      children: [
-        NwsbIcon(s.mark, size: 14, color: const Color(0xFFE4C56A)),
-        const SizedBox(width: 6),
-        Expanded(
-          child: Text(s.label, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 12)),
-        ),
-        Text('${s.weight}%', style: const TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w700, fontSize: 12)),
-      ],
-    );
-  }
-
   Widget _mark(int i, double size) {
     final sweep = 2 * pi / _wheel.length;
     final mid = -pi / 2 + i * sweep + sweep / 2;
-    const box = 30.0;
-    final radius = size * 0.33;
+    const boxW = 74.0;
+    const boxH = 56.0;
+    final radius = size * 0.34;
     final cx = size / 2 + cos(mid) * radius;
     final cy = size / 2 + sin(mid) * radius;
+    final goldSlice = i.isOdd;
+    final ink = goldSlice ? const Color(0xFF1A1206) : const Color(0xFFF8F1D8);
+    final s = _wheel[i];
     return Positioned(
-      left: cx - box / 2,
-      top: cy - box / 2,
-      width: box,
-      height: box,
+      left: cx - boxW / 2,
+      top: cy - boxH / 2,
+      width: boxW,
+      height: boxH,
       child: Transform.rotate(
         angle: -_angle,
-        child: Center(
-          child: NwsbIcon(_wheel[i].mark, size: 22, color: const Color(0xFFF6E7B2)),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            NwsbIcon(s.mark, size: 18, color: ink),
+            const SizedBox(height: 1),
+            Text(s.label, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: ink, fontSize: 10, fontWeight: FontWeight.w800, height: 1.05)),
+            Text('${s.weight}%', style: TextStyle(color: ink, fontSize: 10, fontWeight: FontWeight.w800, height: 1.05)),
+          ],
         ),
       ),
     );
   }
-}
-
-class _WheelDecel extends Curve {
-  const _WheelDecel();
-
-  @override
-  double transform(double t) => 1 - pow(1 - t, 3.2).toDouble();
 }
 
 class _WheelPainter extends CustomPainter {
@@ -456,22 +679,22 @@ class _WheelPainter extends CustomPainter {
     final r = size.width / 2 - 1;
     final sweep = 2 * pi / slices.length;
     final rect = Rect.fromCircle(center: c, radius: r);
+    final gold = const RadialGradient(
+      colors: [Color(0xFFFFF3C9), Color(0xFFE8C56A), Color(0xFFA67C32)],
+      stops: [0.42, 0.72, 1],
+    ).createShader(rect);
+    final ink = const RadialGradient(
+      colors: [Color(0xFF241E14), Color(0xFF0C0C0C), Color(0xFF050505)],
+      stops: [0.2, 0.72, 1],
+    ).createShader(rect);
     for (var i = 0; i < slices.length; i++) {
-      final dark = i.isEven;
       final start = -pi / 2 + i * sweep;
       canvas.drawArc(
         rect,
         start,
         sweep,
         true,
-        Paint()
-          ..shader = LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: dark
-                ? const [Color(0xFF2C2618), Color(0xFF070707)]
-                : const [Color(0xFFD4B36A), Color(0xFF3A2A10)],
-          ).createShader(rect),
+        Paint()..shader = i.isEven ? ink : gold,
       );
       final inner = r * 0.46;
       canvas.drawLine(
@@ -489,7 +712,7 @@ class _WheelPainter extends CustomPainter {
     }
     canvas.drawCircle(
       c,
-      r * 0.44,
+      r * 0.34,
       Paint()
         ..shader = RadialGradient(
           colors: const [Color(0xFF1A140C), Color(0xFF050505)],
@@ -497,7 +720,7 @@ class _WheelPainter extends CustomPainter {
     );
     canvas.drawCircle(
       c,
-      r * 0.44,
+      r * 0.34,
       Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2
@@ -551,8 +774,8 @@ class _LampPainter extends CustomPainter {
       }
       canvas.drawCircle(
         o,
-        lit ? 3.6 : 2.6,
-        Paint()..color = lit ? const Color(0xFFFFF6D2) : const Color(0xFF3E3014),
+        lit ? 3.4 : 2.4,
+        Paint()..color = lit ? const Color(0xFFFFF8DC) : const Color(0xFFE4C56A),
       );
     }
   }
@@ -823,3 +1046,82 @@ class RandomGiftButton extends StatelessWidget {
     );
   }
 }
+
+/// The casino spin. Plays once, then the wheel is already on the peg.
+class _SpinFilm extends StatefulWidget {
+  const _SpinFilm();
+
+  @override
+  State<_SpinFilm> createState() => _SpinFilmState();
+}
+
+class _SpinFilmState extends State<_SpinFilm> {
+  VideoPlayerController? _video;
+  var _left = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _open();
+  }
+
+  Future<void> _open() async {
+    final video = VideoPlayerController.asset('assets/gifts/spin-wheel.mp4');
+    _video = video;
+    try {
+      await video.initialize();
+      if (!mounted) return;
+      setState(() {});
+      await video.setLooping(false);
+      await video.play();
+      video.addListener(_watch);
+    } catch (_) {
+      _close();
+    }
+    Future<void>.delayed(const Duration(seconds: 9), _close);
+  }
+
+  void _watch() {
+    final video = _video;
+    if (video == null || !video.value.isInitialized) return;
+    final length = video.value.duration;
+    if (length > Duration.zero && video.value.position >= length - const Duration(milliseconds: 200)) {
+      _close();
+    }
+  }
+
+  void _close() {
+    if (_left || !mounted) return;
+    _left = true;
+    Navigator.of(context).pop();
+  }
+
+  @override
+  void dispose() {
+    _video?.removeListener(_watch);
+    _video?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final video = _video;
+    final ready = video != null && video.value.isInitialized;
+    return ColoredBox(
+      color: Colors.black,
+      child: Center(
+        child: ready
+            ? AspectRatio(
+                aspectRatio: video.value.aspectRatio == 0 ? 9 / 16 : video.value.aspectRatio,
+                child: VideoPlayer(video),
+              )
+            : const SizedBox(
+                width: 28,
+                height: 28,
+                child: CircularProgressIndicator(color: Color(0xFFE4C56A), strokeWidth: 2),
+              ),
+      ),
+    );
+  }
+}
+

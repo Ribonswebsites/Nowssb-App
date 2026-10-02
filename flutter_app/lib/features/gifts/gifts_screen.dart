@@ -234,6 +234,24 @@ class _GiftsScreenState extends State<GiftsScreen> {
     return EconomyPage(
       title: 'NowssB Gifts',
       mark: NwsbMarks.gift,
+      action: GestureDetector(
+        onTap: () => setState(() => _tab = 3),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0x66FFFFFF)),
+          ),
+          child: const Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.history, color: Colors.white, size: 15),
+              SizedBox(width: 4),
+              Text('History', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600)),
+            ],
+          ),
+        ),
+      ),
       child: ListenableBuilder(
         listenable: GiftBook.instance,
         builder: (context, _) {
@@ -247,7 +265,7 @@ class _GiftsScreenState extends State<GiftsScreen> {
                 blackSub: 'The code exists only after Play accepts it.',
               ),
               const SizedBox(height: 12),
-              const GiftGallery(),
+              const GiftShowcase(),
               const SizedBox(height: 16),
               const GiftWheel(),
               const SizedBox(height: 12),

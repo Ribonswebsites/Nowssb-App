@@ -19,9 +19,8 @@ void main() {
     ));
     await tester.pump();
     expect(tester.takeException(), isNull);
-    expect(find.text('COUPONS'), findsOneWidget);
-    expect(find.text('FLIP'), findsOneWidget);
+    expect(find.byType(Image), findsWidgets);
     expect(find.text('LIMITED TIME OFFER!'), findsWidgets);
-    expect(find.text('SPECIAL OFFER!'), findsWidgets);
+    expect(find.text('COUPON CODE:  '), findsWidgets);
   });
 }

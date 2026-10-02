@@ -133,64 +133,39 @@ class CouponRails extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final maxW = constraints.maxWidth;
-        final ticketW = (maxW * 0.94).clamp(260.0, 420.0);
-        final cardW = (maxW * 0.62).clamp(176.0, 240.0);
-        final cardH = cardW * 1.62;
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Text(
-              'COUPONS',
-              style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.6, fontSize: 12, fontWeight: FontWeight.w700),
-            ),
-            const SizedBox(height: 4),
-            const Text(
-              'Words, meanings, subscriptions, Epic. Scroll sideways.',
-              style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 12, height: 1.3),
-            ),
-            const SizedBox(height: 8),
-            SizedBox(
-              height: 168,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                physics: const BouncingScrollPhysics(),
-                itemCount: kWideCoupons.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 12),
-                itemBuilder: (_, i) => WideCoupon(
-                  data: kWideCoupons[i],
-                  width: ticketW,
-                  expires: expires,
-                  scissorsLeft: i.isEven,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'FLIP',
-              style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.6, fontSize: 12, fontWeight: FontWeight.w700),
-            ),
-            const SizedBox(height: 4),
-            const Text(
-              'Flip a card. Take a chance — you can win or lose. The odds are on the card.',
-              style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 12, height: 1.3),
-            ),
-            const SizedBox(height: 8),
-            SizedBox(
-              height: cardH,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                physics: const BouncingScrollPhysics(),
-                itemCount: kFlipCoupons.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 12),
-                itemBuilder: (_, i) => FlipCoupon(
-                  data: kFlipCoupons[i],
-                  width: cardW,
-                  height: cardH,
-                  expires: expires,
-                ),
-              ),
-            ),
-          ],
+        final cardW = (maxW * 0.74).clamp(188.0, 250.0);
+        final cardH = cardW * 1.9;
+        return SizedBox(
+          height: cardH,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            itemCount: kFlipCoupons.length + 1,
+            separatorBuilder: (_, __) => const SizedBox(width: 12),
+            itemBuilder: (_, i) {
+              if (i == 0) {
+                return ClipRRect(
+                  borderRadius: BorderRadius.circular(18),
+                  child: SizedBox(
+                    width: cardW,
+                    height: cardH,
+                    child: Image.asset(
+                      'assets/gifts/coupon-hero.png',
+                      fit: BoxFit.cover,
+                      alignment: Alignment.topCenter,
+                      errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black),
+                    ),
+                  ),
+                );
+              }
+              return FlipCoupon(
+                data: kFlipCoupons[i - 1],
+                width: cardW,
+                height: cardH,
+                expires: expires,
+              );
+            },
+          ),
         );
       },
     );
@@ -457,6 +432,18 @@ class _FlipCouponState extends State<FlipCoupon> with SingleTickerProviderStateM
     return _shell(
       child: Column(
         children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Image.asset(
+              'assets/gifts/coupon-banner.png',
+              height: 52,
+              width: double.infinity,
+              fit: BoxFit.cover,
+              alignment: const Alignment(0, 0.2),
+              errorBuilder: (_, __, ___) => const SizedBox(height: 52),
+            ),
+          ),
+          const SizedBox(height: 6),
           _Ribbon(text: d.ribbon, color: d.ribbonColor, ink: d.ribbonInk),
           const Spacer(),
           SizedBox(
