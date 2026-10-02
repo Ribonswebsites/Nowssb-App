@@ -18,6 +18,7 @@ import '../../widgets/program_shelf.dart';
 import 'economy_api.dart';
 import 'economy_theme.dart';
 import 'scratch_card.dart';
+import 'coupon_tickets.dart';
 
 class _Prize {
   const _Prize(this.label, this.weight, this.coins);
@@ -65,24 +66,6 @@ const _draws = <_DrawCard>[
     _Prize('Signature word', 56, 0),
     _Prize('2-month Signature', 4, 0),
   ]),
-];
-
-class _Held {
-  const _Held(this.code, this.title, this.line);
-  final String code;
-  final String title;
-  final String line;
-}
-
-const _held = <_Held>[
-  _Held('NWSB-OPEN5', 'Open the app', '5 coins · once a day'),
-  _Held('NWSB-READ8', 'Read one meaning', '8 coins · three a day'),
-  _Held('NWSB-WORD10', '10% off a word', 'Cap ₹35 · 30 days · does not stack'),
-  _Held('NWSB-STAGE', 'Stage token', 'One locked stage of a named word'),
-  _Held('NWSB-EBOOK7', '7-day ebook pass', 'After the trial has ended'),
-  _Held('NWSB-BASIC7', '7-day Basic', 'A gifted pass does not unlock a rank'),
-  _Held('NWSB-STD30', '30-day Standard', 'Catalogue prize, not cash'),
-  _Held('NWSB-HELLO', 'Welcome set', '50 coins and one scratch on a first purchase'),
 ];
 
 class CouponScreen extends StatefulWidget {
@@ -155,32 +138,8 @@ class _CouponScreenState extends State<CouponScreen> {
             Text(_error!, style: const TextStyle(color: NwsbColors.goldLight)),
           ],
           const SizedBox(height: 18),
-          const Text('YOUR CODES', style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontSize: 12, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 8),
-          GlassWrap(
-            margin: EdgeInsets.zero,
-            padding: EdgeInsets.zero,
-            child: Column(
-              children: [
-                for (var r = 0; r < _held.length; r += 2) ...[
-                  if (r > 0) const Divider(height: 1, thickness: 1, color: Color(0x33FFFFFF)),
-                  IntrinsicHeight(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(child: _Ticket(held: _held[r])),
-                        const VerticalDivider(width: 1, thickness: 1, color: Color(0x33FFFFFF)),
-                        Expanded(
-                          child: r + 1 < _held.length ? _Ticket(held: _held[r + 1]) : const SizedBox.shrink(),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-          const SizedBox(height: 10),
+          const CouponRails(),
+          const SizedBox(height: 18),
           const Text('PAID CARDS', style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontSize: 12, fontWeight: FontWeight.w700)),
           const SizedBox(height: 4),
           const Text(
@@ -205,7 +164,8 @@ class HomeCouponShelf extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GlassWrap(
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -228,40 +188,9 @@ class HomeCouponShelf extends StatelessWidget {
               color: Color(0xFFF4F4F5),
             ),
           ),
-          const SizedBox(height: 4),
-          const Text(
-            'Tear a code here. Common ₹49 · Rare ₹149 · Epic ₹399. Odds stay on the card before you draw. Nothing is cash.',
-            style: TextStyle(fontSize: 12, height: 1.35, color: Color(0xB3F4F4F5)),
-          ),
-          const SizedBox(height: 12),
-          DecoratedBox(
-            decoration: BoxDecoration(
-              color: const Color(0xE6000000),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0x33E4C56A)),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: Column(
-                children: [
-                  for (var r = 0; r < _held.length; r += 2) ...[
-                    if (r > 0) const Divider(height: 1, thickness: 1, color: Color(0x33FFFFFF)),
-                    IntrinsicHeight(
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Expanded(child: _Ticket(held: _held[r])),
-                          const VerticalDivider(width: 1, thickness: 1, color: Color(0x33FFFFFF)),
-                          Expanded(child: _Ticket(held: _held[r + 1])),
-                        ],
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ),
           const SizedBox(height: 10),
+          const CouponRails(),
+          const SizedBox(height: 12),
           GoldButton(
             label: 'Scratch and paid cards',
             filled: false,
@@ -277,138 +206,6 @@ class HomeCouponShelf extends StatelessWidget {
   }
 }
 
-
-class _Ticket extends StatefulWidget {
-  const _Ticket({required this.held});
-  final _Held held;
-
-  @override
-  State<_Ticket> createState() => _TicketState();
-}
-
-class _TicketState extends State<_Ticket> with SingleTickerProviderStateMixin {
-  late final AnimationController _flip;
-  var _open = false;
-  var _busy = false;
-  String? _note;
-
-  @override
-  void initState() {
-    super.initState();
-    _flip = AnimationController(vsync: this, duration: const Duration(milliseconds: 700));
-  }
-
-  @override
-  void dispose() {
-    _flip.dispose();
-    super.dispose();
-  }
-
-  Future<void> _take() async {
-    if (_busy || _open) return;
-    setState(() => _busy = true);
-    await _flip.forward(from: 0);
-    final h = widget.held;
-    final coins = h.code == 'NWSB-OPEN5'
-        ? 5
-        : h.code == 'NWSB-READ8'
-            ? 8
-            : h.code == 'NWSB-HELLO'
-                ? 50
-                : 0;
-    var gained = 0;
-    if (coins > 0) {
-      final before = EconomyMirror.instance.coins;
-      gained = await EconomyMirror.instance.grantOnce('coupon_${h.code}', coins);
-      if (gained > 0 && mounted) {
-        await NwsbCoinFly.show(context, coins: gained, from: before, to: before + gained);
-      }
-    }
-    if (!mounted) return;
-    setState(() {
-      _open = true;
-      _busy = false;
-      _note = gained > 0 ? '+$gained coins' : 'Code ${h.code}';
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final h = widget.held;
-    return GestureDetector(
-      onTap: () async {
-        if (_open) {
-          await Clipboard.setData(ClipboardData(text: widget.held.code));
-          HapticFeedback.selectionClick();
-          if (mounted) setState(() => _note = 'Copied');
-          return;
-        }
-        await _take();
-      },
-      child: AnimatedBuilder(
-        animation: _flip,
-        builder: (context, _) {
-          final t = _flip.value;
-          final torn = t > 0.55 || _open;
-          return Padding(
-            padding: const EdgeInsets.fromLTRB(10, 12, 10, 12),
-            child: Column(
-              children: [
-                NwsbIcon(NwsbMarks.coupon, size: 18, color: const Color(0xFFE4C56A)),
-                const SizedBox(height: 6),
-                Text(h.title, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13)),
-                const SizedBox(height: 6),
-                SizedBox(
-                  height: 8,
-                  width: double.infinity,
-                  child: CustomPaint(painter: _Dash()),
-                ),
-                const SizedBox(height: 6),
-                ClipRect(
-                  child: Align(
-                    alignment: Alignment.topCenter,
-                    heightFactor: torn ? 1 : 0.0,
-                    child: Transform.translate(
-                      offset: Offset((1 - t) * 18, 0),
-                      child: Opacity(
-                        opacity: t,
-                        child: Text(
-                          _note ?? h.code,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w800, fontSize: 11, letterSpacing: 0.4),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                if (!torn)
-                  const Text('Tear open', style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 11)),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _Dash extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0x66E4C56A)
-      ..strokeWidth = 1;
-    const dash = 4.0;
-    var x = 0.0;
-    while (x < size.width) {
-      canvas.drawLine(Offset(x, 4), Offset(min(x + dash, size.width), 4), paint);
-      x += dash * 2;
-    }
-  }
-
-  @override
-  bool shouldRepaint(_Dash old) => false;
-}
 
 class _PaidCard extends StatefulWidget {
   const _PaidCard({required this.card});
