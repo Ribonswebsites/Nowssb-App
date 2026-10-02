@@ -15,6 +15,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../features/economy/economy_api.dart';
+import '../features/economy/play_billing.dart';
+
 import 'cart_bag.dart';
 import 'firebase.dart';
 import '../features/economy/money.dart';
@@ -152,36 +155,17 @@ class EarnWallet extends ChangeNotifier {
 
   bool get ready => _ready;
 
+  /// Rank, rate and targets come from the server (NowssB Earn). Posts and
+  /// local counters never change them.
   int get commissionPercent {
-    var base = 5;
-    if (wordsSold >= 1000) {
-      base = 20;
-    } else if (wordsSold >= 500) {
-      base = 15;
-    } else if (wordsSold >= 300) {
-      base = 12;
-    } else if (wordsSold >= 100) {
-      base = 8;
-    }
-    final postBoost = min(5, posts ~/ 20);
-    return base + postBoost;
+    final st = EconomyMirror.instance.summary['earn'];
+    final r = st is Map ? (st['ratePct'] ?? (st['standing'] is Map ? st['standing']['ratePct'] : null)) : null;
+    return (r as num?)?.round() ?? 0;
   }
 
-  String get rank {
-    if (wordsSold >= 1000) return '1,000';
-    if (wordsSold >= 500) return '500';
-    if (wordsSold >= 300) return '300';
-    if (wordsSold >= 100) return '100';
-    return 'Starter';
-  }
+  String get rank => EconomyMirror.instance.sellerTier;
 
-  int get nextTarget {
-    if (wordsSold < 100) return 100;
-    if (wordsSold < 300) return 300;
-    if (wordsSold < 500) return 500;
-    if (wordsSold < 1000) return 1000;
-    return 1000;
-  }
+  int get nextTarget => EconomyMirror.instance.nextSellerTarget;
 
   CoinQuote quote(num price) {
     final whole = price.round();
@@ -191,9 +175,20 @@ class EarnWallet extends ChangeNotifier {
     return CoinQuote(price: whole, maxCoins: cap, coins: use, cash: cash < 0 ? 0 : cash);
   }
 
+  /// Coins are the server's (EconomyMirror ← /api/economy). This legacy
+  /// wallet only mirrors them; it never adds or removes coins itself.
+  void _syncCoins() {
+    final next = EconomyMirror.instance.coins;
+    if (next != coins) {
+      coins = next;
+      notifyListeners();
+    }
+  }
+
   Future<void> start() async {
     if (_ready) return;
     _ready = true;
+    EconomyMirror.instance.addListener(_syncCoins);
     try {
       final p = await SharedPreferences.getInstance();
       final raw = p.getString(_key);
@@ -209,10 +204,19 @@ class EarnWallet extends ChangeNotifier {
     notifyListeners();
     await _persist();
     await _pullFirebaseRewards();
+    _syncCoins();
+    try {
+      final r = await EconomyApi.call('getLink', {'sku': 'any'});
+      final c = '${r['code'] ?? ''}';
+      if (c.isNotEmpty && c != code) {
+        code = c;
+        await _persist();
+      }
+    } catch (_) {}
   }
 
   void _read(Map<String, dynamic> m) {
-    coins = (m['coins'] as num?)?.toInt() ?? 0;
+    coins = EconomyMirror.instance.coins;
     code = '${m['code'] ?? ''}';
     plan = '${m['plan'] ?? 'Free'}';
     wordsSold = (m['wordsSold'] as num?)?.toInt() ?? 0;
@@ -302,7 +306,6 @@ class EarnWallet extends ChangeNotifier {
 
   Future<void> _grant(int amount, String title, String detail) async {
     if (amount == 0) return;
-    coins += amount;
     if (coins < 0) coins = 0;
     _log(title, detail, amount);
     await _persist();
@@ -311,7 +314,6 @@ class EarnWallet extends ChangeNotifier {
   Future<bool> _spend(int amount, String title, String detail) async {
     if (amount <= 0) return true;
     if (coins < amount) return false;
-    coins -= amount;
     _log(title, detail, -amount);
     await _persist();
     return true;
@@ -324,13 +326,11 @@ class EarnWallet extends ChangeNotifier {
     var changed = false;
     if (!welcomePaid) {
       welcomePaid = true;
-      coins += 25;
       _log('Login complete', 'First full sign-in', 25);
       changed = true;
     }
     if (lastLoginYmd != day) {
       lastLoginYmd = day;
-      coins += 10;
       _log('Daily sign-in', 'Opened the app signed in', 10);
       changed = true;
     }
@@ -343,13 +343,11 @@ class EarnWallet extends ChangeNotifier {
     var changed = false;
     if (streak >= 1 && streakPaidYmd != day) {
       streakPaidYmd = day;
-      coins += 10;
       _log('1-day streak', 'Streak is $streak', 10);
       changed = true;
     }
     if (streak >= 10 && !streak10Paid) {
       streak10Paid = true;
-      coins += 100;
       _log('10-day streak', 'Ten days in a row', 100);
       changed = true;
     }
@@ -362,7 +360,6 @@ class EarnWallet extends ChangeNotifier {
     if (!_ready) await start();
     if (playerOpened) return;
     playerOpened = true;
-    coins += 25;
     _log('Player opened', 'First time in the practice player', 25);
     await _persist();
   }
@@ -395,7 +392,6 @@ class EarnWallet extends ChangeNotifier {
     var bonus = words * 8 + meanings * 8 + (bundles > 0 ? 40 : 0);
     if (words >= 10) bonus += 50;
     if (bonus > 0) {
-      coins += bonus;
       _log(
         'Purchase',
         '$words word${words == 1 ? '' : 's'} · $meanings meaning${meanings == 1 ? '' : 's'}',
@@ -407,6 +403,8 @@ class EarnWallet extends ChangeNotifier {
     await _persist();
   }
 
+  /// Pays through Google Play (server checkout: friend discount → coupon →
+  /// coins within the cap → the rest on Play). Returns an error or null.
   Future<String?> pay({
     required String title,
     required num price,
@@ -416,41 +414,29 @@ class EarnWallet extends ChangeNotifier {
     String image = '',
   }) async {
     if (!_ready) await start();
-    final q = quote(price);
-    final spend = useCoins ? q.coins : 0;
-    if (spend > coins) return 'Not enough NowssB Coins.';
-    if (spend > 0) coins -= spend;
+    try {
+      if (kind == 'Subscription') return 'Plans are bought on the Subscription page through Google Play.';
+      if (kind == 'Streak') {
+        await PlayCheckout.purchase({'kind': 'product', 'productId': 'nowssb_streak_restore'});
+      } else {
+        await PlayCheckout.purchase({
+          'kind': 'cart',
+          'items': [
+            {'id': id.isEmpty ? 'buy:${title.toLowerCase()}' : id, 'kind': kind, 'title': title, 'price': price, 'qty': 1},
+          ],
+          if (!useCoins) 'coins': 0,
+        });
+      }
+    } on EconomyException catch (e) {
+      return e.message;
+    } catch (e) {
+      return 'Google Play could not complete the purchase.';
+    }
     final pieceId = id.isEmpty ? 'buy:${title.toLowerCase()}' : id;
-    final skipOwn = kind == 'Subscription' ||
-        kind == 'Streak' ||
-        kind == 'Bundle' ||
-        kind == 'Package';
-    if (!skipOwn && !owned.any((o) => o.id == pieceId)) {
-      owned.insert(0, OwnedPiece(
-        id: pieceId,
-        title: title,
-        kind: kind,
-        price: price,
-        image: image,
-      ));
+    if (kind != 'Streak' && !owned.any((o) => o.id == pieceId)) {
+      owned.insert(0, OwnedPiece(id: pieceId, title: title, kind: kind, price: price, image: image));
     }
-    if (kind == 'Subscription') {
-      plan = title;
-      await _payReferrer(price.round());
-    }
-    final cash = price.round() - spend;
-    _log(
-      title,
-      spend == 0
-          ? 'Cash ${FxBook.instance.formatRupees(price)} recorded'
-          : '${FxBook.instance.formatRupees(spend)} coins · ${FxBook.instance.formatRupees(cash < 0 ? 0 : cash)} cash recorded',
-      -spend,
-    );
-    final bonus = _purchaseBonus(kind, id, title);
-    if (bonus > 0) {
-      coins += bonus;
-      _log('Purchase bonus', title, bonus);
-    }
+    _log(title, 'Paid on Google Play', 0);
     await _persist();
     return null;
   }
@@ -478,18 +464,9 @@ class EarnWallet extends ChangeNotifier {
   }
 
   /// Spends up to 30% of [total] and returns how many coins were taken.
-  Future<int> reserveCheckoutCoins(num total, {required bool use}) async {
-    if (!_ready) await start();
-    if (!use) return 0;
-    final q = quote(total);
-    if (q.coins <= 0) return 0;
-    final ok = await _spend(
-      q.coins,
-      'Coins on checkout',
-      '30% covered · cash still ${FxBook.instance.formatRupees(q.cash)}',
-    );
-    return ok ? q.coins : 0;
-  }
+  /// Coins at checkout are applied by the server checkout (PlayCheckout,
+  /// kind 'cart'), never taken on the phone.
+  Future<int> reserveCheckoutCoins(num total, {required bool use}) async => 0;
 
   Future<String?> mintInviteCode() async {
     if (!_ready) await start();
@@ -512,7 +489,6 @@ class EarnWallet extends ChangeNotifier {
     if (err != null) return err;
     final ok = await PracticeProgress.instance.restoreBrokenStreak();
     if (!ok) {
-      coins += useCoins ? q.coins : 0;
       _log('Streak already intact', 'Yesterday is already practiced. Coins returned.', useCoins ? q.coins : 0);
       await _persist();
       return 'Yesterday is already on your streak. Nothing to restore.';
@@ -526,39 +502,11 @@ class EarnWallet extends ChangeNotifier {
     await _persist();
   }
 
-  Future<String?> listForSale(OwnedPiece piece, num price) async {
-    if (!termsAccepted) return 'Accept the resell terms first.';
-    if (price < 1) return 'Set a price.';
-    if (listings.any((l) => l.id == piece.id)) return 'Already listed.';
-    listings.insert(0, ResaleListing(
-      id: piece.id,
-      title: piece.title,
-      kind: piece.kind,
-      price: price,
-      image: piece.image,
-      at: DateTime.now().millisecondsSinceEpoch,
-    ));
-    _log('Listed ${piece.title}', 'Resell shop · ${FxBook.instance.formatRupees(price)}', 0);
-    await _persist();
-    return null;
-  }
+  /// Peer-to-peer resale is paused (both programme PDFs).
+  Future<String?> listForSale(OwnedPiece piece, num price) async => 'Resale is paused for now.';
 
-  Future<String?> confirmSale(String id) async {
-    final i = listings.indexWhere((l) => l.id == id);
-    if (i < 0) return 'That listing is gone.';
-    final listing = listings.removeAt(i);
-    owned.removeWhere((o) => o.id == id);
-    wordsSold += 1;
-    final cut = (listing.price * commissionPercent / 100).round();
-    coins += cut;
-    _log(
-      'Sold ${listing.title}',
-      '$commissionPercent% commission · rank $rank',
-      cut,
-    );
-    await _persist();
-    return null;
-  }
+  /// Resale is paused, so nothing can be sold or confirmed here.
+  Future<String?> confirmSale(String id) async => 'Resale is paused for now.';
 
   Future<void> addPost(String title, String body) async {
     final t = title.trim();
@@ -571,41 +519,30 @@ class EarnWallet extends ChangeNotifier {
     await _persist();
   }
 
+  /// Attaches a friend's code on the server (one per account, never your own).
   Future<String> redeemCode(String raw) async {
     if (!_ready) await start();
     final entered = raw.trim().toUpperCase().replaceAll(' ', '');
     if (entered.length < 6) return 'Enter the full code.';
-    if (entered == code || inviteCodes.contains(entered)) {
-      return 'You cannot use your own code.';
-    }
-    if (referredBy.isNotEmpty) return 'A referral code is already on this profile.';
-    referredBy = entered;
-    usedCodes.add(entered);
-    _log('Referral code', entered, 0);
-    await _persist();
-    if (!NwsbFirebase.ready) {
-      return 'Code saved on this phone. Subscribe to pay your friend. They are credited when Firebase connects — no new key, the NowssB project is enough.';
-    }
     try {
-      final user = FirebaseAuth.instance.currentUser;
-      final db = FirebaseFirestore.instance;
-      final snap = await db.collection('earn_codes').doc(entered).get();
-      if (!snap.exists) {
-        return 'Code saved. It is not on Firebase yet, so your friend is paid when their phone syncs and you subscribe.';
-      }
-      final uid = '${snap.data()?['uid'] ?? ''}';
-      if (uid.isEmpty || uid == user?.uid) {
-        referredBy = '';
-        await _persist();
-        return 'That code is not someone else.';
-      }
-      return 'Code applied. Subscribe and your friend gets that plan free, or coins if they already have it.';
-    } catch (e) {
-      return 'Code saved here. Firebase refused the lookup ($e).';
+      await EconomyApi.call('attachReferral', {'code': entered});
+      referredBy = entered;
+      usedCodes.add(entered);
+      _log('Referral code', entered, 0);
+      await _persist();
+      await EconomyMirror.instance.refresh();
+      return 'Code applied. Your friend is credited only when you buy for real on Google Play.';
+    } on EconomyException catch (e) {
+      return e.message;
+    } catch (_) {
+      return 'Could not reach NowssB. Try again.';
     }
   }
 
   Future<void> _payReferrer(int price) async {
+    // Referral rewards are settled by the server when Play clears a sale.
+    return;
+    // ignore: dead_code
     if (referredBy.isEmpty || !NwsbFirebase.ready) return;
     try {
       final db = FirebaseFirestore.instance;
@@ -623,6 +560,9 @@ class EarnWallet extends ChangeNotifier {
   }
 
   Future<void> _pullFirebaseRewards() async {
+    // Server-owned now (functions/_lib/economy). Nothing is pulled into a local wallet.
+    return;
+    // ignore: dead_code
     if (!NwsbFirebase.ready) return;
     try {
       final user = FirebaseAuth.instance.currentUser;
@@ -642,12 +582,10 @@ class EarnWallet extends ChangeNotifier {
           plan = bought;
           _log('Referral subscription', 'Free $bought — person $referralSubs', 0);
         } else {
-          coins += price;
           _log('Referral coins', 'You already have $plan', price);
         }
         if (referralSubs >= 5) {
           final cut = (price * 0.20).round();
-          coins += cut;
           _log('20% referral commission', 'Subscriber $referralSubs', cut);
         }
       }
@@ -661,6 +599,9 @@ class EarnWallet extends ChangeNotifier {
   }
 
   Future<void> _mirror() async {
+    // The client no longer writes earn_codes / earn_profiles (server-owned links).
+    return;
+    // ignore: dead_code
     if (!NwsbFirebase.ready) return;
     try {
       final user = FirebaseAuth.instance.currentUser;

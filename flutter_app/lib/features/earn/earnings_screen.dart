@@ -12,6 +12,8 @@ import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/program_shelf.dart';
 import '../../admin/template/editable.dart';
+import '../programs/program_kit.dart';
+import '../programs/earn_program.dart';
 
 class EarningsScreen extends StatefulWidget {
   const EarningsScreen({super.key});
@@ -22,6 +24,10 @@ class EarningsScreen extends StatefulWidget {
 
 class _EarningsScreenState extends State<EarningsScreen> {
   final _upi = TextEditingController();
+  final _legal = TextEditingController();
+  final _pan = TextEditingController();
+  final _email = TextEditingController();
+  String _method = 'wise';
   String _filter = 'all';
   String _country = 'IN';
 
@@ -45,6 +51,9 @@ class _EarningsScreenState extends State<EarningsScreen> {
   @override
   void dispose() {
     _upi.dispose();
+    _legal.dispose();
+    _pan.dispose();
+    _email.dispose();
     super.dispose();
   }
 
@@ -52,6 +61,10 @@ class _EarningsScreenState extends State<EarningsScreen> {
     final result = await EconomyApi.call('savePayoutAccount', {
       'country': _country,
       'upi': _upi.text.trim(),
+      'legalName': _legal.text.trim(),
+      'pan': _pan.text.trim(),
+      'method': _method,
+      'email': _email.text.trim(),
     });
     final url = '${result['onboardUrl'] ?? ''}';
     if (url.startsWith('http')) {
@@ -73,6 +86,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
   @override
   Widget build(BuildContext context) {
     return EconomyPage(
+      goodToKnow: kEarnDisclaimer,
       title: 'Your Earning',
       mark: NwsbMarks.bars,
       child: ListenableBuilder(
@@ -81,7 +95,8 @@ class _EarningsScreenState extends State<EarningsScreen> {
           final w = EconomyMirror.instance;
           final india = _country == 'IN';
           final unsupported = _country == 'XX';
-          final canPay = w.cash >= 500 && !unsupported && (india ? w.upi.isNotEmpty || _upi.text.trim().contains('@') : w.payoutRail == 'stripe_connect');
+          // The server checks the minimum, the hold and the saved account.
+          final canPay = !unsupported && w.payoutRail.isNotEmpty;
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
             children: [
@@ -106,6 +121,8 @@ class _EarningsScreenState extends State<EarningsScreen> {
               const SizedBox(height: 12),
               const CoinCollectCard(pageKey: 'earning', amount: 8, title: 'Earning coins'),
               const SizedBox(height: 12),
+              ProgramLink(title: 'NowssB Earn program', sub: 'Sales ledger, money lock, payouts', mark: NwsbMarks.piggy, page: () => const EarnProgramPage()),
+              const SizedBox(height: 12),
               const GlassLine(text: 'Pending for 30 days, then available. A person approves the payout.'),
               const SizedBox(height: 12),
               EconomyNote(
@@ -113,7 +130,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
                     ? 'This country is not on a payout rail yet. Earnings stay in your balance and are not sent in the wrong currency.'
                     : india
                         ? 'India settles in INR to your UPI id.'
-                        : 'Everywhere else uses Stripe Connect. You finish identity checks in Stripe, then payouts go to your local bank.',
+                        : 'Outside India payouts go to your Wise or PayPal account, sent by hand after a review.',
               ),
               const SizedBox(height: 12),
               const EditableLabel('earnings_screen.EarningsScreen', 'Lifetime', style: TextStyle(color: NwsbColors.mist, fontSize: 12)),
@@ -146,10 +163,47 @@ class _EarningsScreenState extends State<EarningsScreen> {
                     hintStyle: const TextStyle(color: NwsbColors.mist),
                   ),
                 ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _legal,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: const InputDecoration(hintText: 'Legal name (as on bank / PAN)', hintStyle: TextStyle(color: NwsbColors.mist)),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _pan,
+                  textCapitalization: TextCapitalization.characters,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: const InputDecoration(hintText: 'PAN (needed above the TDS limit)', hintStyle: TextStyle(color: NwsbColors.mist)),
+                ),
+              ],
+              if (!india && !unsupported) ...[
+                const SizedBox(height: 8),
+                Wrap(spacing: 8, children: [
+                  for (final m in const [('wise', 'Wise'), ('paypal', 'PayPal')])
+                    ChoiceChip(
+                      label: Text(m.$2),
+                      selected: _method == m.$1,
+                      onSelected: (_) => setState(() => _method = m.$1),
+                    ),
+                ]),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _email,
+                  keyboardType: TextInputType.emailAddress,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(hintText: _method == 'paypal' ? 'PayPal email' : 'Wise email', hintStyle: const TextStyle(color: NwsbColors.mist)),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _legal,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: const InputDecoration(hintText: 'Legal name on that account', hintStyle: TextStyle(color: NwsbColors.mist)),
+                ),
               ],
               const SizedBox(height: 8),
               GoldButton(
-                label: india ? 'Save India payout account' : unsupported ? 'Save country' : 'Set up Stripe payouts',
+                label: india ? 'Save India payout account' : unsupported ? 'Save country' : 'Save Wise / PayPal account',
                 filled: false,
                 onTap: () => runPrivate(context, _saveAccount),
               ),

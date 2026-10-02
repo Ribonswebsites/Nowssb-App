@@ -29,72 +29,12 @@ class BazaarScreen extends StatelessWidget {
         shrinkWrap: embedded,
         physics: embedded ? const NeverScrollableScrollPhysics() : null,
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
-        children: [
-          const FourBanners(
-            splitTitle: 'Resell',
-            splitCta: 'List a word',
-            blackTitle: 'Your words',
-            blackSub: 'Half to one and a half times the original.',
-          ),
-          const SizedBox(height: 12),
-          const CoinCollectCard(pageKey: 'resell', amount: 8, title: 'Resell coins'),
-          const SizedBox(height: 12),
-          const GlassLine(text: 'Listings stay off until Play allows them. You can still read the rules.'),
-          const SizedBox(height: 12),
-          const ColoredSplitPromoBanner(
-            margin: EdgeInsets.zero,
-            spec: SplitPromoSpec(
-              title: 'Resell',
-              cta: 'Browse listings',
-              leftColor: Color(0xFF3D2914),
-              rightColor: Color(0xFFE07A3D),
-              art: SplitPromoArts.whiteRobot,
-            ),
-          ),
-          const SizedBox(height: 12),
-          const ColoredSplitPromoBanner(
-            margin: EdgeInsets.zero,
-            spec: SplitPromoSpec(
-              title: 'List a word',
-              cta: 'Open your words',
-              leftColor: Color(0xFF24143D),
-              rightColor: Color(0xFFC8A96E),
-              art: SplitPromoArts.blondeLotus,
-            ),
-          ),
-          const SizedBox(height: 12),
-          GlassWrap(
-            margin: EdgeInsets.zero,
-            padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const EconomyNote(
-                  'Resale price stays between 50% and 150% of the original. The platform cut starts at 20% and falls toward 10% as you sell more. 3% goes to the content owner. No refunds on resold items. NowssB can delist a listing. You must own the word before you list it.',
-                ),
-                const SizedBox(height: 8),
-                GoldButton(
-                  label: 'Terms and conditions',
-                  filled: false,
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(builder: (_) => const SubscriptionTermsScreen()),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                const EditableLabel('bazaar_screen.BazaarScreen', 'WORDS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12)),
-                const SizedBox(height: 8),
-                const _SampleWords(),
-              ],
-            ),
-          ),
-          const SizedBox(height: 18),
-          const EditableLabel('bazaar_screen.BazaarScreen', 'YOUR OWNED WORDS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12)),
-          const SizedBox(height: 8),
-          const _OwnedList(),
-          const SizedBox(height: 18),
-          const EditableLabel('bazaar_screen.BazaarScreen', 'LIVE LISTINGS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12)),
-          const SizedBox(height: 8),
-          const _LiveListings(),
+        children: const [
+          // Both programme PDFs keep peer-to-peer resale paused: no listings,
+          // no boosts, no resale commission. Words you own stay in your library.
+          GlassLine(text: 'Resale is paused. You cannot list, boost or buy resold words right now — the words you own stay in your library.'),
+          SizedBox(height: 12),
+          EconomyNote('When resale opens it will run through Google Play with the price band and the resale fee shown before you list.'),
         ],
       ),
     );
@@ -103,6 +43,7 @@ class BazaarScreen extends StatelessWidget {
       which: 'bazaar',
       head: 'Before you resell',
       child: EconomyPage(
+      goodToKnow: 'Peer-to-peer resale is paused. Nothing here is charged or paid out.',
         title: 'Resell',
         mark: NwsbMarks.bag,
         child: listening,

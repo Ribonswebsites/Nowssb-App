@@ -18,7 +18,7 @@ service cloud.firestore {
               'subscriptionOrderId', 'subscriptionSource', 'subscriptionAmount', 'subscriptionCurrency',
               'subscriptionUpdatedAt', 'subscriptionProductId', 'subscriptionTokenHash', 'subscriptionState',
               'subscriptionAutoRenew', 'verifyTier', 'subscriptionGrantedBy', 'restrictions', 'restrictionsUpdatedAt',
-              'unblockedAt', 'unblockedBy'];
+              'unblockedAt', 'unblockedBy', 'ebookPassUntil', 'earlyAccessUntil', 'adultConfirmedAt'];
     }
     // isPro:false and tier:null are harmless (a downgrade), so the website's
     // sign-up writes keep working.
@@ -186,6 +186,47 @@ service cloud.firestore {
       allow read: if isSelf(uid);
       allow write: if false;
     }
+    // NowssB programs (Earn · Rewards · Coupons · Gifts · Reference · Partner).
+    // Written only by the Cloudflare Pages Functions in functions/api/economy
+    // (service account); the owner can read their own.
+    match /users/{uid}/{econ}/{docId} {
+      allow read: if isSelf(uid) && econ in ['weeks', 'months', 'scratchCards', 'coupons', 'tokens', 'boxes', 'passes',
+        'giftsSent', 'giftsReceived', 'mastery', 'friends', 'team', 'blocks'];
+      allow write: if false;
+    }
+    match /commissionLedger/{id} {
+      allow get, list: if ownsLedger() || isAdmin();
+      allow write: if false;
+    }
+    match /partnerLedger/{id} {
+      allow get, list: if ownsLedger() || isAdmin();
+      allow write: if false;
+    }
+    match /checkouts/{id} {
+      allow get, list: if ownsLedger() || isAdmin();
+      allow write: if false;
+    }
+    match /sales/{orderId} {
+      allow get, list: if isAdmin() || (signedIn() && resource.data.buyerUid == request.auth.uid);
+      allow write: if false;
+    }
+    match /giftCards/{code} {
+      allow get, list: if isAdmin() || (signedIn() && (resource.data.fromUid == request.auth.uid || resource.data.redeemedBy == request.auth.uid));
+      allow write: if false;
+    }
+    match /refLinks/{code} {
+      allow get, list: if isAdmin() || ownsLedger();
+      allow write: if false;
+    }
+    match /appointments/{id} {
+      allow get, list: if isAdmin() || (signedIn() && (resource.data.fromUid == request.auth.uid || resource.data.toUid == request.auth.uid));
+      allow write: if false;
+    }
+    match /leaderboards/{id} { allow read: if signedIn(); allow write: if false; }
+    match /leagues/{id} { allow read: if signedIn(); allow write: if false; }
+    match /echoLikes/{id} { allow get: if ownsLedger(); allow list: if ownsLedger(); allow write: if false; }
+    // devices, payoutIdentities, accountIndex, refOpens: server only (catch-all deny).
+
     match /users/{uid}/notifications/{id} {
       allow read: if isSelf(uid);
       allow update: if isSelf(uid)
@@ -267,7 +308,6 @@ service cloud.firestore {
     match /giftLedger/{id} { allow read: if isAdmin(); allow create: if isAdmin() && request.resource.data.source == 'admin'; allow update, delete: if false; }
     match /couponLedger/{id} { allow read: if isAdmin(); allow write: if false; }
     match /referrals/{refereeUid} { allow read: if isAdmin(); allow write: if false; }
-    match /partnerLedger/{id} { allow read: if isAdmin(); allow write: if false; }
     // Word Print. Public document holds only public fields. Money stays under
     // /users/{uid}/wallet and /users/{uid}/payout, which other accounts cannot read.
     match /profiles/{uid} {

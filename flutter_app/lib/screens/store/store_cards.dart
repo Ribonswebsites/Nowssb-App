@@ -21,6 +21,7 @@ import '../../widgets/app_thinking_loader.dart';
 import '../../features/economy/money.dart';
 import 'store_actions.dart';
 import '../../admin/template/editable.dart';
+import '../../features/programs/store_extras.dart';
 
 String inr(num value) {
   if (value <= 0) return 'Included';
@@ -980,6 +981,16 @@ class RmWordCard extends StatelessWidget {
                                 left: 6,
                                 child: _SignatureTag(),
                               ),
+                            Positioned(
+                              left: 6,
+                              bottom: 6,
+                              child: FriendDiscountBadge(kind: signature ? 'signature' : 'word'),
+                            ),
+                            Positioned(
+                              right: 6,
+                              bottom: 6,
+                              child: ShareChip(kind: signature ? 'signature' : 'word', id: name.toLowerCase(), title: name),
+                            ),
                           ],
                         ),
                       ),
@@ -1318,6 +1329,11 @@ class MsCard extends StatelessWidget {
               if (signature)
                 const Positioned(top: 6, left: 6, child: _SignatureTag()),
               Positioned(
+                top: signature ? 32 : 6,
+                left: 6,
+                child: const FriendDiscountBadge(kind: 'meaning'),
+              ),
+              Positioned(
                 top: 6,
                 right: 6,
                 child: Column(
@@ -1372,6 +1388,8 @@ class MsCard extends StatelessWidget {
                         storeBuyNow(context, _item);
                       },
                     ),
+                    const SizedBox(height: 5),
+                    ShareChip(kind: 'meaning', id: word.toLowerCase(), title: word),
                   ],
                 ),
               ),

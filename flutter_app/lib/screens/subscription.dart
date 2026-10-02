@@ -13,6 +13,7 @@ import '../admin/layout/layout_sections.dart';
 import '../data/billing_config.dart';
 import '../data/play_subscriptions.dart';
 import 'store/store_terms_sheet.dart';
+import '../features/programs/store_extras.dart';
 
 class SubscriptionScreen extends StatefulWidget {
   const SubscriptionScreen({super.key});
@@ -161,6 +162,21 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       padding: const EdgeInsets.fromLTRB(18, 14, 18, 0),
       child: Column(
         children: [
+          // Friend offer + share (NowssB Reference).
+          const Padding(
+            padding: EdgeInsets.only(bottom: 10),
+            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              FriendDiscountBadge(kind: 'subscription'),
+            ]),
+          ),
+          const EditableLabel('subscription.SubscriptionScreen',
+            'Share NowssB: a friend who subscribes through your link gets the friend offer on Play.',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 11.5, height: 1.4),
+          ),
+          const SizedBox(height: 8),
+          const ShareItemButtons(kind: 'plan', title: 'NowssB plans', dense: false),
+          const SizedBox(height: 10),
           if (note != null)
             Padding(
               padding: const EdgeInsets.only(bottom: 6),

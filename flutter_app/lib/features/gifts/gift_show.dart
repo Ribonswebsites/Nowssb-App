@@ -10,6 +10,7 @@ import 'package:video_player/video_player.dart';
 
 import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
+import '../economy/reward_fx.dart';
 import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_coin_fly.dart';
 import '../../widgets/nwsb_icon.dart';
@@ -193,7 +194,7 @@ class GiftGallery extends StatelessWidget {
 
   Widget _boxCell(BuildContext context, GiftBox box, double phase) {
     return GestureDetector(
-      onTap: () => openGiftBox(context, box: box, prize: box.line, itemId: box.title),
+      onTap: () => showGiftCardSheet(context, giftCardFor(box.title)),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(8, 12, 8, 12),
         child: Column(
@@ -254,8 +255,10 @@ class _GiftWheelState extends State<GiftWheel> with TickerProviderStateMixin {
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
     final saved = prefs.getString('nwsb_wheel_$_day');
-    if (saved == null || !mounted) return;
-    final parts = saved.split('|');
+    final spins = ((EconomyMirror.instance.summary['today'] as Map?)?['spins'] as num?)?.toInt() ?? 0;
+    if (saved == null && spins == 0) return;
+    if (!mounted) return;
+    final parts = (saved ?? 'Spun today|0').split('|');
     final label = parts.first;
     var index = parts.length > 1 ? int.tryParse(parts[1]) ?? -1 : -1;
     if (index < 0) index = _wheel.indexWhere((s) => s.label == label);
@@ -267,24 +270,25 @@ class _GiftWheelState extends State<GiftWheel> with TickerProviderStateMixin {
     });
   }
 
-  _Slice _pick() {
-    final total = _wheel.fold<int>(0, (s, e) => s + e.weight);
-    var roll = Random().nextInt(total);
-    for (final s in _wheel) {
-      if (roll < s.weight) return s;
-      roll -= s.weight;
-    }
-    return _wheel.first;
-  }
-
   Future<void> _go() async {
     if (_busy || _landed != null) return;
     if (EconomyMirror.instance.coins < _spinCost) return;
-    final spent = await EconomyMirror.instance.spendLocal(_spinCost);
-    if (!spent || !mounted) return;
     setState(() => _busy = true);
-    final slice = _pick();
-    final index = _wheel.indexOf(slice);
+    // The server takes the coins, draws the slice from the published
+    // weights and puts the prize on the account. The wheel only lands there.
+    Map<String, dynamic> result;
+    try {
+      result = await EconomyApi.call('spin', {'idem': '${DateTime.now().microsecondsSinceEpoch}'});
+    } on EconomyException catch (e) {
+      if (mounted) {
+        setState(() => _busy = false);
+        showEconomyError(context, e);
+      }
+      return;
+    }
+    if (!mounted) return;
+    final index = ((result['slice'] as num?)?.toInt() ?? 0).clamp(0, _wheel.length - 1);
+    final slice = _wheel[index];
     final quiet = WidgetsBinding.instance.runtimeType.toString().contains('Test');
     if (!quiet && mounted) {
       await showGeneralDialog<void>(
@@ -323,11 +327,8 @@ class _GiftWheelState extends State<GiftWheel> with TickerProviderStateMixin {
     }
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('nwsb_wheel_$_day', '${slice.label}|$index');
-    final record = await GiftBook.instance.award(slice.tier, slice.label);
-    if (slice.tier == 'coins') {
-      await EconomyMirror.instance.grantOnce('wheel_coins', 15);
-    }
     HapticFeedback.mediumImpact();
+    final granted = (result['granted'] as Map?) ?? const {};
     if (!mounted) return;
     setState(() {
       _busy = false;
@@ -337,10 +338,10 @@ class _GiftWheelState extends State<GiftWheel> with TickerProviderStateMixin {
     await openGiftBox(
       context,
       box: GiftBox(slice.asset, slice.label, 'Wheel · ${slice.weight}%'),
-      prize: slice.label,
+      prize: '${granted['label'] ?? result['label'] ?? slice.label}',
       itemId: slice.tier,
-      code: record.code,
     );
+    if (mounted) await playCoins(context, coinsIn(result), balanceAfter: balanceIn(result));
   }
 
   @override
@@ -814,6 +815,8 @@ class _Pointer extends CustomPainter {
 }
 
 
+/// Shows a gift that the server has already put on this account (or a
+/// gift card code Play has just paid for). Nothing is minted here.
 Future<void> openGiftBox(
   BuildContext context, {
   required GiftBox box,
@@ -821,17 +824,25 @@ Future<void> openGiftBox(
   required String itemId,
   String? code,
 }) async {
-  final record = code == null ? await GiftBook.instance.award(itemId, prize) : null;
-  final shown = code ?? record!.code;
   if (!context.mounted) return;
+  RewardHaptics.big();
   await showGeneralDialog<void>(
     context: context,
     barrierDismissible: true,
     barrierLabel: 'Gift',
     barrierColor: const Color(0xC0000000),
-    pageBuilder: (context, _, __) => _Reveal(box: box, prize: prize, code: shown),
+    pageBuilder: (context, _, __) => Stack(children: [
+      const Positioned.fill(child: ConfettiBurst(color: Color(0xFFE4C56A), count: 70)),
+      _Reveal(box: box, prize: prize, code: code ?? ''),
+    ]),
   );
 }
+
+GiftBox giftBoxFor(String cardId) => switch (cardId) {
+      'bundle' || 'signature3' => kGiftBoxes[2],
+      'basic7' || 'ebook7' || 'standard30' || 'premium30' || 'ebook30' => kGiftBoxes[1],
+      _ => kGiftBoxes[0],
+    };
 
 class GiftPlanGrid extends StatelessWidget {
   const GiftPlanGrid({super.key});
@@ -875,12 +886,7 @@ class GiftPlanGrid extends StatelessWidget {
   Widget _cell(BuildContext context, (String, String, String, String) item) {
     final (title, line, asset, id) = item;
     return GestureDetector(
-      onTap: () => openGiftBox(
-        context,
-        box: GiftBox(asset, title, line),
-        prize: title,
-        itemId: id,
-      ),
+      onTap: () => showGiftCardSheet(context, giftCardFor(id)),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(8, 12, 8, 12),
         child: Column(
@@ -984,16 +990,19 @@ class _RevealState extends State<_Reveal> with TickerProviderStateMixin {
                             children: [
                               Text(widget.prize, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 18)),
                               const SizedBox(height: 6),
-                              Text(widget.code, style: const TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontWeight: FontWeight.w800, fontSize: 16)),
+                              if (widget.code.isNotEmpty)
+                                Text(widget.code, style: const TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontWeight: FontWeight.w800, fontSize: 16)),
                               const SizedBox(height: 4),
                               const EditableLabel('gift_show.Reveal', 'On this account. Not cash. Not a rank key.', style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 12)),
                               const SizedBox(height: 10),
                               TextButton(
                                 onPressed: () async {
-                                  await Clipboard.setData(ClipboardData(text: widget.code));
+                                  if (widget.code.isNotEmpty) await Clipboard.setData(ClipboardData(text: widget.code));
                                   if (context.mounted) Navigator.of(context).pop();
                                 },
-                                child: const EditableLabel('gift_show.Reveal', 'Copy code', style: TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w800)),
+                                child: widget.code.isEmpty
+                                    ? const EditableLabel('gift_show.Reveal', 'Lovely', style: TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w800))
+                                    : const EditableLabel('gift_show.Reveal', 'Copy code', style: TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w800)),
                               ),
                             ],
                           ),
@@ -1015,36 +1024,15 @@ class _RevealState extends State<_Reveal> with TickerProviderStateMixin {
 class RandomGiftButton extends StatelessWidget {
   const RandomGiftButton({super.key});
 
-  static const _table = <_Slice>[
-    _Slice('Stage card', 22, 'assets/gifts/box-red.webp', 'stage', NwsbMarks.stages),
-    _Slice('Word card', 18, 'assets/gifts/box-red.webp', 'word', NwsbMarks.word),
-    _Slice('7-day Basic', 16, 'assets/gifts/box-gold.webp', 'basic', NwsbMarks.sound),
-    _Slice('7-day ebook', 14, 'assets/gifts/box-gold.webp', 'ebook', NwsbMarks.book),
-    _Slice('30-day Standard', 12, 'assets/gifts/box-gold.webp', 'standard', NwsbMarks.crown),
-    _Slice('30-day Premium', 10, 'assets/gifts/box-gold.webp', 'premium', NwsbMarks.flame),
-    _Slice('3-day Signature', 5, 'assets/gifts/box-black.webp', 'signature', NwsbMarks.signature),
-    _Slice('Bundle card', 3, 'assets/gifts/box-black.webp', 'bundle', NwsbMarks.bag),
-  ];
 
   @override
   Widget build(BuildContext context) {
     return GoldButton(
       label: 'Open a random gift',
       filled: false,
-      onTap: () {
-        final total = _table.fold<int>(0, (s, e) => s + e.weight);
-        var roll = Random().nextInt(total);
-        _Slice hit = _table.first;
-        for (final s in _table) {
-          if (roll < s.weight) {
-            hit = s;
-            break;
-          }
-          roll -= s.weight;
-        }
-        final box = GiftBox(hit.asset, hit.label, '${hit.weight}% · gifted pass does not unlock a rank');
-        openGiftBox(context, box: box, prize: hit.label, itemId: hit.tier);
-      },
+      // Today's free gift box, drawn by the server from the published
+      // contents (Gifts → Rules). One a day; minutes in the app pick the box.
+      onTap: () => runReward(context, () => EconomyApi.call('openDailyBox', {}), title: 'Today\u2019s gift'),
     );
   }
 }

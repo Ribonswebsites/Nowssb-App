@@ -1,22 +1,26 @@
-/// Server economy. Balances change only inside Cloud Functions.
+/// Server economy. Balances change only on the server: Cloudflare Pages
+/// Functions at https://nowssb.com/api/economy/<action> (Firebase stays on
+/// the free Spark plan — Auth + Firestore + rules, no Cloud Functions).
 library;
 
 import '../../data/app_control.dart';
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/firebase.dart';
 
 class EconomyException implements Exception {
-  EconomyException(this.message, {this.code});
+  EconomyException(this.message, {this.code, this.extra = const {}});
   final String message;
   final String? code;
+  final Map<String, dynamic> extra;
   @override
   String toString() => message;
 }
@@ -87,83 +91,101 @@ class CashQuote {
 class EconomyApi {
   EconomyApi._();
 
-  static FirebaseFunctions get _fn =>
-      FirebaseFunctions.instanceFor(region: 'europe-west1');
+  /// The Pages Function router (functions/api/economy/[action].js).
+  static const base = 'https://nowssb.com/api/economy/';
+
+  /// True after a 501: the server is waiting for its Firebase service
+  /// account in Cloudflare. The app shows a calm "switching on" state.
+  static final ValueNotifier<bool> switchingOn = ValueNotifier(false);
+
+  static const switchingOnMessage =
+      'Rewards are switching on. Nothing was lost — your coins and gifts start counting as soon as it is live.';
 
   static Future<String> installId() async {
     final prefs = await SharedPreferences.getInstance();
     final saved = prefs.getString('nwsb_install_id');
     if (saved != null && saved.isNotEmpty) return saved;
-    final next = '${DateTime.now().microsecondsSinceEpoch}${Random().nextInt(1 << 32)}';
+    final next = '${DateTime.now().microsecondsSinceEpoch}${Random.secure().nextInt(1 << 32)}';
     await prefs.setString('nwsb_install_id', next);
     return next;
   }
 
+  /// POST an action with the signed-in user's Firebase ID token.
   static Future<Map<String, dynamic>> call(String name, [Map<String, dynamic>? data]) async {
     if (!NwsbFirebase.ready) {
       throw EconomyException('Firebase is not connected on this build.');
     }
-    if (FirebaseAuth.instance.currentUser == null) {
-      throw EconomyException('Sign in first. Coins and payouts stay on your account.');
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw EconomyException('Sign in first. Coins and payouts stay on your account.', code: 'unauthenticated');
     }
     // Admin console blocks, restrictions and feature flags (data/app_control.dart).
     final stop = AppControl.instance.blockForEconomy(name);
     if (stop != null) throw EconomyException(stop, code: 'restricted');
+    http.Response res;
     try {
-      final result = await _fn.httpsCallable(name).call(data ?? const {});
-      final raw = result.data;
-      if (raw is Map) {
-        return raw.map((key, value) => MapEntry(key.toString(), value));
-      }
-      return {'ok': true};
-    } on FirebaseFunctionsException catch (e) {
-      throw EconomyException(_friendly(e), code: e.code);
+      final token = await user.getIdToken();
+      res = await http
+          .post(
+            Uri.parse('$base$name'),
+            headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $token'},
+            body: jsonEncode(data ?? const {}),
+          )
+          .timeout(const Duration(seconds: 30));
+    } on TimeoutException {
+      throw EconomyException('The network is slow. Nothing was lost — try again.', code: 'timeout');
     } catch (_) {
-      throw EconomyException('That did not go through. Try again.');
+      throw EconomyException('You look offline. Nothing was lost — try again.', code: 'offline');
     }
-  }
-
-  static String _friendly(FirebaseFunctionsException e) {
-    final raw = e.message ?? '';
-    if (raw.contains('Play Billing verification') || raw.contains('PLAY_SERVICE_ACCOUNT')) {
-      return 'Play purchases are not switched on yet. Nothing was credited.';
-    }
-    if (raw.contains('Exception') || raw.contains('firebase') || raw.contains('INTERNAL')) {
-      return 'That did not go through. Try again.';
-    }
-    switch (e.code) {
-      case 'unauthenticated':
-        return 'Sign in to continue.';
-      case 'permission-denied':
-        return 'That account cannot do this.';
-      case 'not-found':
-        return 'Saved on this phone.';
-      case 'already-exists':
-      case 'failed-precondition':
-      case 'resource-exhausted':
-      case 'invalid-argument':
-        return raw.isEmpty ? 'That did not go through. Try again.' : raw;
-      default:
-        return 'That did not go through. Try again.';
-    }
-  }
-
-  static bool isMissing(EconomyException e) {
-    final code = e.code ?? '';
-    final msg = e.message.toUpperCase();
-    return code == 'not-found' || msg.contains('NOT_FOUND') || msg.contains('NOT FOUND');
-  }
-
-  /// Today's coins. If the callable is not deployed, the wallet still
-  /// moves on this phone so the coin flight can play after the tap.
-  static Future<int> claimToday() async {
+    Map<String, dynamic> body = const {};
     try {
-      final result = await call('claimDailyLogin');
-      return (result['coins'] as num?)?.toInt() ?? 0;
-    } on EconomyException catch (e) {
-      if (!isMissing(e)) rethrow;
-      return EconomyMirror.instance.grantOnce('daily', 10);
+      final decoded = jsonDecode(res.body);
+      if (decoded is Map) body = decoded.map((k, v) => MapEntry(k.toString(), v));
+    } catch (_) {}
+    if (res.statusCode == 501) {
+      switchingOn.value = true;
+      throw EconomyException(switchingOnMessage, code: 'not-configured');
     }
+    if (res.statusCode >= 200 && res.statusCode < 300) {
+      if (switchingOn.value) switchingOn.value = false;
+      EconomyMirror.instance._afterAction(name, body);
+      return body;
+    }
+    final code = '${body['code'] ?? ''}';
+    final message = '${body['error'] ?? ''}';
+    if (res.statusCode == 401) throw EconomyException('Sign in again to continue.', code: 'unauthenticated');
+    if (res.statusCode >= 500 || message.isEmpty) {
+      throw EconomyException('That did not go through. Try again.', code: code.isEmpty ? 'internal' : code);
+    }
+    throw EconomyException(message, code: code.isEmpty ? 'failed-precondition' : code, extra: body);
+  }
+
+  /// The server is not switched on yet (Cloudflare is missing its key).
+  static bool isMissing(EconomyException e) => e.code == 'not-configured';
+
+  /// Today's login coins (server streak). 0 when already claimed.
+  static Future<int> claimToday() async {
+    final result = await call('claimDailyLogin');
+    return (result['coins'] as num?)?.toInt() ?? 0;
+  }
+
+  /// Everything the program pages show, in one read.
+  static Future<Map<String, dynamic>> summary() async {
+    final s = await call('summary');
+    EconomyMirror.instance.summary = s;
+    return s;
+  }
+
+  /// Published odds, ladders and caps — readable before sign-in.
+  static Future<Map<String, dynamic>> publicConfig() async {
+    try {
+      final res = await http.get(Uri.parse('${base}config')).timeout(const Duration(seconds: 20));
+      final decoded = jsonDecode(res.body);
+      if (decoded is Map && decoded['config'] is Map) {
+        return (decoded['config'] as Map).map((k, v) => MapEntry(k.toString(), v));
+      }
+    } catch (_) {}
+    return const {};
   }
 }
 
@@ -204,7 +226,13 @@ class EconomyMirror extends ChangeNotifier {
   bool live = false;
   String? uid;
   int _serverCoins = 0;
-  int _localBonus = 0;
+
+  /// Last `summary` from the server (program pages read from it).
+  Map<String, dynamic> summary = const {};
+  int partnerPending = 0;
+  int holds = 0;
+  int freezes = 0;
+  int restores = 0;
 
   StreamSubscription<User?>? _auth;
   final List<StreamSubscription<dynamic>> _docs = [];
@@ -224,7 +252,7 @@ class EconomyMirror extends ChangeNotifier {
     if (user == null) {
       coins = 0;
       _serverCoins = 0;
-      _localBonus = 0;
+      summary = const {};
       cash = 0;
       plan = 'Free';
       code = '';
@@ -234,29 +262,31 @@ class EconomyMirror extends ChangeNotifier {
       notifyListeners();
       return;
     }
+    // Local "grants" from older builds are not balances; drop them.
     final prefs = await SharedPreferences.getInstance();
-    final day = _todayKey();
-    _localBonus = prefs.getInt('nwsb_local_delta_${user.uid}') ??
-        prefs.getInt('nwsb_local_bonus_${user.uid}_$day') ??
-        (prefs.getBool('nwsb_local_daily_${user.uid}_$day') == true ? 10 : 0);
-    loginToday = prefs.getBool('nwsb_grant_${user.uid}_${day}_daily') == true ||
-        prefs.getBool('nwsb_local_daily_${user.uid}_$day') == true;
-    scratchToday = prefs.getBool('nwsb_grant_${user.uid}_${day}_scratch') == true;
-    coins = _serverCoins + _localBonus;
-    try {
-      await EconomyApi.call('ensureEconomyProfile', {
-        'installId': await EconomyApi.installId(),
-      });
-    } catch (e) {
-      debugPrint('ensureEconomyProfile: $e');
-    }
+    await prefs.remove('nwsb_local_delta_${user.uid}');
+    loginToday = false;
+    scratchToday = false;
+    unawaited(() async {
+      try {
+        summary = await EconomyApi.call('ensureEconomyProfile', {
+          'installId': await EconomyApi.installId(),
+        });
+        notifyListeners();
+      } catch (e) {
+        debugPrint('ensureEconomyProfile: $e');
+      }
+    }());
     final id = user.uid;
     _watch('users/$id/wallet/main', (data) {
       _serverCoins = (data['coins'] as num?)?.toInt() ?? 0;
-      coins = _serverCoins + _localBonus;
+      coins = _serverCoins;
+      holds = (data['holds'] as num?)?.toInt() ?? 0;
+      freezes = (data['freezes'] as num?)?.toInt() ?? 0;
+      restores = (data['restores'] as num?)?.toInt() ?? 0;
       plan = (data['plan'] as String?)?.isNotEmpty == true ? data['plan'] as String : 'Free';
       streak = (data['streak'] as num?)?.toInt() ?? 0;
-      freezesLeft = (data['freezesLeft'] as num?)?.toInt() ?? 2;
+      freezesLeft = (data['freezesLeft'] as num?)?.toInt() ?? 0;
       practice = (data['practice'] as num?)?.toInt() ?? 0;
       playerOpens = (data['playerOpens'] as num?)?.toInt() ?? 0;
       purchases = (data['purchases'] as num?)?.toInt() ?? 0;
@@ -264,7 +294,8 @@ class EconomyMirror extends ChangeNotifier {
       subUntil = (data['subUntil'] as num?)?.toInt() ?? 0;
     });
     _watch('users/$id/payout/main', (data) {
-      cash = (data['cashBalance'] as num?)?.toInt() ?? 0;
+      // cashBalance is rupees on the server; the money widgets take cents.
+      cash = (((data['cashBalance'] as num?) ?? 0) * 100).round();
       lifetimeCents = (data['lifetimeCents'] as num?)?.toInt() ?? 0;
       upi = (data['upi'] as String?) ?? '';
       country = (data['country'] as String?) ?? '';
@@ -272,12 +303,12 @@ class EconomyMirror extends ChangeNotifier {
     });
     _watch('users/$id/partner/main', (data) {
       partnerPoints = (data['points'] as num?)?.toInt() ?? 0;
+      partnerPending = (data['pending'] as num?)?.toInt() ?? 0;
       partnerPerk = (data['perk'] as String?) ?? '';
     });
     _watch('users/$id/earnCaps/${_todayKey()}', (data) {
-      final serverLogin = data['login'] == true;
-      loginToday = serverLogin || loginToday;
-      scratchToday = data['scratch'] == true || scratchToday;
+      loginToday = data['login'] == true;
+      scratchToday = data['scratch'] == true;
       capsReady = true;
     });
     _watch('users/$id/referral/main', (data) {
@@ -312,58 +343,49 @@ class EconomyMirror extends ChangeNotifier {
   bool get subscribed =>
       plan != 'Free' && subUntil > DateTime.now().millisecondsSinceEpoch && subscriptionActive;
 
+  /// The server's day: midnight IST (config dayOffsetMinutes 330).
   String _todayKey() {
-    final n = DateTime.now().toUtc();
+    final n = DateTime.now().toUtc().add(const Duration(minutes: 330));
     final m = n.month.toString().padLeft(2, '0');
     final d = n.day.toString().padLeft(2, '0');
     return '${n.year}$m$d';
   }
 
-  /// One local grant per key per day. The cloud function stays the source of
-  /// truth when it exists. This only runs when that function is not deployed.
-  Future<int> grantOnce(String key, int amount, {bool daily = true}) async {
-    final prefs = await SharedPreferences.getInstance();
-    final id = daily
-        ? 'nwsb_grant_${uid ?? 'local'}_${_todayKey()}_$key'
-        : 'nwsb_grant_${uid ?? 'local'}_once_$key';
-    if (prefs.getBool(id) == true) {
-      if (key == 'daily') loginToday = true;
-      if (key == 'scratch') scratchToday = true;
+  /// After any server action: refresh the summary in the background so
+  /// every program page shows the new state.
+  void _afterAction(String name, Map<String, dynamic> body) {
+    if (name == 'summary' || name == 'ensureEconomyProfile') {
+      summary = body;
       notifyListeners();
-      return 0;
+      return;
     }
-    await prefs.setBool(id, true);
-    _localBonus += amount;
-    coins = _serverCoins + _localBonus;
-    await prefs.setInt('nwsb_local_delta_${uid ?? 'local'}', _localBonus);
-    if (key == 'daily') {
-      loginToday = true;
-      if (streak < 1) streak = 1;
-      await prefs.setBool('nwsb_local_daily_${uid ?? 'local'}_${_todayKey()}', true);
-    }
-    if (key == 'scratch') scratchToday = true;
-    notifyListeners();
-    return amount;
+    if (name == 'claimDailyLogin') loginToday = true;
+    if (name == 'dailyScratch' || name == 'scratchCoupon') scratchToday = true;
+    _refreshSoon();
   }
 
-  /// Local coin spend when Play/server spend is not deployed.
-  Future<bool> spendLocal(int cost) async {
-    if (cost <= 0 || coins < cost) return false;
-    final prefs = await SharedPreferences.getInstance();
-    _localBonus -= cost;
-    coins = _serverCoins + _localBonus;
-    await prefs.setInt('nwsb_local_delta_${uid ?? 'local'}', _localBonus);
-    notifyListeners();
-    return true;
+  Timer? _refresh;
+  void _refreshSoon() {
+    _refresh?.cancel();
+    _refresh = Timer(const Duration(milliseconds: 600), () async {
+      try {
+        await EconomyApi.summary();
+        notifyListeners();
+      } catch (_) {}
+    });
   }
 
-  void addPartnerPoints(int add) {
-    if (add <= 0) return;
-    partnerPoints += add;
+  Future<void> refresh() async {
+    try {
+      await EconomyApi.summary();
+    } catch (_) {}
     notifyListeners();
   }
 
-  Future<int> grantLocalDaily() => grantOnce('daily', 10);
+  /// Older builds kept a local coin bonus here. Coins now come only from the
+  /// server, so this never adds anything (kept so callers compile).
+  @Deprecated('Coins are server-only.')
+  Future<int> grantOnce(String key, int amount, {bool daily = true}) async => 0;
 
   void _watch(String path, void Function(Map<String, dynamic> data) apply) {
     _docs.add(FirebaseFirestore.instance.doc(path).snapshots().listen((snap) {

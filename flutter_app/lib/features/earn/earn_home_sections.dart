@@ -27,6 +27,11 @@ import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
 import '../gifts/gifts_screen.dart';
 import '../vault/vault_screen.dart';
+import '../economy/coupon_screen.dart';
+import '../programs/coupons_program.dart';
+import '../programs/gifts_program.dart';
+import '../programs/partner_program.dart';
+import '../programs/reference_program.dart';
 import '../../admin/template/editable.dart';
 
 const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
@@ -40,33 +45,47 @@ class _EarnTier {
   final String mark;
 }
 
-const _earnTiers = <_EarnTier>[
-  _EarnTier('Starter', '0–99 units · 10% of net', '10%', [
-    'Your code on any purchase',
-    '10% of net after the store fee',
-    'Paid plan required',
-  ], NwsbMarks.piggy),
-  _EarnTier('Rising', '100 units · 15% of net', '15%', [
-    'Same code, higher rate',
-    '15% of net after the store fee',
-    'Units you already have stay',
-  ], NwsbMarks.crown),
-  _EarnTier('Pro', '300 units · 20% of net', '20%', [
-    '20% of net after the store fee',
-    'Direct recruits pay 5% of their commission',
-    'Only while both plans are active',
-  ], NwsbMarks.verified),
-  _EarnTier('Elite', '500 units · 25% of net', '25%', [
-    '25% of net after the store fee',
-    'Two levels. There is no third',
-    'An invite by itself pays nothing',
-  ], NwsbMarks.gift),
-  _EarnTier('Master', '1000 units · 30% of net', '30%', [
-    '30% of net. The cap',
-    'Never a percent of the sticker price',
-    'Payouts wait for review',
-  ], NwsbMarks.bag),
+/// NowssB Earn ranks (the 21-page plan's ranks and rates, paid from Net
+/// after tax and the Play fee). Read live from config/economy through the
+/// server summary; these defaults only show before the first answer.
+const _defaultRanks = <Map<String, Object>>[
+  {'title': 'Assistant Officer', 'minWords': 0, 'ratePct': 15, 'leg': [0, 0]},
+  {'title': 'Officer', 'minWords': 100, 'ratePct': 22, 'leg': [3, 0]},
+  {'title': 'Executive Officer I', 'minWords': 500, 'ratePct': 30, 'leg': [5, 1.5]},
+  {'title': 'Executive Officer II', 'minWords': 1000, 'ratePct': 38, 'leg': [5, 1.5]},
+  {'title': 'Diamond I', 'minWords': 2000, 'ratePct': 45, 'leg': [7, 3]},
+  {'title': 'Diamond II', 'minWords': 3000, 'ratePct': 50, 'leg': [7, 3]},
 ];
+
+const _tierMarks = [NwsbMarks.piggy, NwsbMarks.crown, NwsbMarks.verified, NwsbMarks.gift, NwsbMarks.bag, NwsbMarks.crown];
+
+List<_EarnTier> get _earnTiers {
+  final cfg = EconomyMirror.instance.summary['config'];
+  final earn = cfg is Map ? cfg['earn'] : null;
+  final raw = earn is Map && earn['ranks'] is List && (earn['ranks'] as List).isNotEmpty ? (earn['ranks'] as List) : _defaultRanks;
+  String n(Object? v) => v is num ? (v == v.roundToDouble() ? '${v.round()}' : '$v') : '${v ?? 0}';
+  final out = <_EarnTier>[];
+  for (var i = 0; i < raw.length; i++) {
+    final r = raw[i];
+    if (r is! Map) continue;
+    final rate = n(r['ratePct']);
+    final leg = r['leg'] is List ? r['leg'] as List : const [0, 0];
+    final l1 = leg.isNotEmpty ? n(leg[0]) : '0';
+    final l2 = leg.length > 1 ? n(leg[1]) : '0';
+    out.add(_EarnTier(
+      '${r['title'] ?? 'Rank ${i + 1}'}',
+      '${n(r['minWords'])}+ words · $rate% of Net',
+      '$rate%',
+      [
+        '$rate% of Net (after tax and the Play fee)',
+        if (l1 != '0') 'Team level 1: $l1%${l2 != '0' ? ' · level 2: $l2%' : ''}',
+        'Paid plan required · money lock applies',
+      ],
+      _tierMarks[i % _tierMarks.length],
+    ));
+  }
+  return out;
+}
 
 class EarnUmbrellaSection extends StatefulWidget {
   const EarnUmbrellaSection({super.key});
@@ -684,9 +703,9 @@ class YourRewardsSection extends StatelessWidget {
                   const SizedBox(height: 8),
                   SecBanner(
                     title: 'Invite a friend',
-                    sub: 'They subscribe once. You get a free month, or coins if you already have a plan.',
+                    sub: 'Share your link. Your friend gets a discount; you earn when they buy for real.',
                     mark: NwsbMarks.verified,
-                    onTap: () => EarnUmbrellaSection._open(context, const VaultScreen()),
+                    onTap: () => EarnUmbrellaSection._open(context, const ReferenceProgramPage()),
                   ),
                 ],
               );
@@ -751,10 +770,10 @@ class GiftsHomeSection extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               SecBanner(
-                title: 'Resell',
-                sub: 'List a word you already own. This is the Store, not Earn.',
+                title: 'Gift rules and history',
+                sub: 'Free boxes, gift cards, what you sent and received',
                 mark: NwsbMarks.bag,
-                onTap: () => EarnUmbrellaSection._open(context, const BazaarScreen()),
+                onTap: () => EarnUmbrellaSection._open(context, const GiftsProgramPage()),
               ),
             ],
           ),
@@ -764,7 +783,7 @@ class GiftsHomeSection extends StatelessWidget {
   }
 }
 
-enum _Dest { earn, rewards, gifts, resell }
+enum _Dest { earn, rewards, gifts, resell, reference }
 
 class _Slide {
   const _Slide({
@@ -826,6 +845,7 @@ class _OutsidePromoState extends State<_OutsidePromo> {
       _Dest.rewards => const VaultScreen(),
       _Dest.gifts => const GiftsScreen(),
       _Dest.resell => const BazaarScreen(),
+      _Dest.reference => const ReferenceProgramPage(),
     };
     Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => page));
   }
@@ -866,6 +886,115 @@ Future<void> copyFriendInvite(BuildContext context) async {
   if (context.mounted) {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: EditableLabel('earn_home_sections.shared', 'Friend invite copied.')),
+    );
+  }
+}
+
+
+/// Home door for NowssB Coupons (scratch cards, odds, your coupons).
+class CouponsHomeSection extends StatelessWidget {
+  const CouponsHomeSection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SectionPane(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const PaneHead(eyebrow: 'NowssB Coupons', title: 'Scratch, reveal, save', mark: NwsbMarks.coupon),
+              const SizedBox(height: 12),
+              SecBanner(
+                title: 'Today\'s free card',
+                sub: 'Drawn by NowssB. Odds are listed before you scratch.',
+                mark: NwsbMarks.coupon,
+                onTap: () => EarnUmbrellaSection._open(context, const CouponScreen()),
+              ),
+              const SizedBox(height: 8),
+              SecBanner(
+                title: 'Your coupons and odds',
+                sub: 'Rarity shelves, codes and what each card can hold',
+                mark: NwsbMarks.verified,
+                onTap: () => EarnUmbrellaSection._open(context, const CouponsProgramPage()),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Home door for NowssB Reference (your links, friend discount, ladder).
+class ReferenceHomeSection extends StatelessWidget {
+  const ReferenceHomeSection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const _OutsidePromo(
+          slides: [
+            _Slide(
+              title: 'NowssB Reference',
+              cta: 'Share a link',
+              left: Color(0xFF14283D),
+              right: Color(0xFF3D7AE0),
+              art: SplitPromoArts.whiteRobot,
+              dest: _Dest.reference,
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        SectionPane(
+          child: ListenableBuilder(
+            listenable: EconomyMirror.instance,
+            builder: (context, _) => Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const PaneHead(eyebrow: 'NowssB Reference', title: 'Your links', mark: NwsbMarks.reference),
+                const SizedBox(height: 12),
+                SecBanner(
+                  title: EconomyMirror.instance.code.isEmpty ? 'Get your link' : 'Your code ${EconomyMirror.instance.code}',
+                  sub: 'Friends get a discount on their first real purchase. You earn coins and rewards.',
+                  mark: NwsbMarks.reference,
+                  onTap: () => EarnUmbrellaSection._open(context, const ReferenceProgramPage()),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Home door for the NowssB Partner Program (Spark, Glow, Radiant).
+class PartnerHomeSection extends StatelessWidget {
+  const PartnerHomeSection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SectionPane(
+      child: ListenableBuilder(
+        listenable: EconomyMirror.instance,
+        builder: (context, _) => Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const PaneHead(eyebrow: 'NowssB Partner', title: 'Spark · Glow · Radiant', mark: NwsbMarks.crown),
+            const SizedBox(height: 12),
+            SecBanner(
+              title: '${EconomyMirror.instance.partnerPoints} partner points',
+              sub: 'Points come only from real purchases through your links.',
+              mark: NwsbMarks.crown,
+              onTap: () => EarnUmbrellaSection._open(context, const PartnerProgramPage()),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

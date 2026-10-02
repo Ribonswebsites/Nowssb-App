@@ -51,6 +51,7 @@ class _EchoWallScreenState extends State<EchoWallScreen> {
   @override
   Widget build(BuildContext context) {
     return EconomyPage(
+      goodToKnow: 'Posts are public to signed-in people. Be kind; reported posts are reviewed by a person and can be removed.',
       title: 'Echo Wall',
       mark: NwsbMarks.people,
       action: _admin

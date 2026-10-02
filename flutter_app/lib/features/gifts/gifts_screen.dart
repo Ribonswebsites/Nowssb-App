@@ -1,9 +1,5 @@
-import 'dart:convert';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../theme/tokens.dart';
 import '../../widgets/banner_mix.dart';
@@ -16,23 +12,58 @@ import '../economy/money.dart';
 import '../economy/play_billing.dart';
 import '../../widgets/four_banners.dart';
 import '../../admin/template/editable.dart';
+import '../economy/reward_fx.dart';
 import 'gift_show.dart';
+import '../programs/program_kit.dart';
+import '../programs/gifts_program.dart';
 
 class GiftItem {
-  const GiftItem(this.id, this.label, this.cents);
+  const GiftItem(this.id, this.label, this.cents, {this.productId = ''});
   final String id;
   final String label;
+
+  /// Price in whole rupees from the live settings doc (Play shows the
+  /// buyer's own currency at checkout).
   final int cents;
+  final String productId;
 }
 
-const kGiftCatalog = <GiftItem>[
-  GiftItem('word', 'A word', 99),
-  GiftItem('meaning', 'A meaning', 99),
-  GiftItem('bundle', '10-word bundle', 999),
-  GiftItem('resonance', 'Resonance', 499),
-  GiftItem('frequency', 'Frequency', 999),
-  GiftItem('frequency_x', 'Frequency X', 1999),
+/// Gift cards (Plan 6.3). The live list comes from config/economy
+/// (`gifts.cards`); this mirrors the defaults until the summary loads.
+const _kGiftDefaults = <GiftItem>[
+  GiftItem('stage', 'Stage card', 49, productId: 'nowssb_gift_stage'),
+  GiftItem('word', 'Word card', 99, productId: 'nowssb_gift_word'),
+  GiftItem('bundle', 'Bundle card', 499, productId: 'nowssb_gift_bundle'),
+  GiftItem('basic7', '7-day Basic', 79, productId: 'nowssb_gift_basic7'),
+  GiftItem('ebook7', '7-day ebook', 49, productId: 'nowssb_gift_ebook7'),
+  GiftItem('standard30', '30-day Standard', 499, productId: 'nowssb_gift_standard30'),
+  GiftItem('premium30', '30-day Premium', 999, productId: 'nowssb_gift_premium30'),
+  GiftItem('signature3', '3-day Signature', 199, productId: 'nowssb_gift_signature3'),
+  GiftItem('ebook30', '30-day ebook pass', 149, productId: 'nowssb_gift_ebook30'),
+  GiftItem('restore', 'Streak Restore', 99, productId: 'nowssb_gift_restore'),
 ];
+
+List<GiftItem> get kGiftCatalog {
+  final cards = (((EconomyMirror.instance.summary['config'] as Map?)?['gifts'] as Map?)?['cards'] as List?) ?? const [];
+  if (cards.isEmpty) return _kGiftDefaults;
+  return [
+    for (final c in cards.whereType<Map>())
+      GiftItem('${c['id']}', '${c['title']}', (c['priceINR'] as num?)?.toInt() ?? 0, productId: '${c['productId'] ?? ''}'),
+  ];
+}
+
+/// Maps the gift grid / gallery ids to a gift card id.
+String giftCardFor(String itemId) => switch (itemId) {
+      'basic' => 'basic7',
+      'ebook' => 'ebook7',
+      'standard' => 'standard30',
+      'premium' => 'premium30',
+      'signature' => 'signature3',
+      'Word gift' => 'word',
+      'Subscription gift' => 'standard30',
+      'Signature gift' => 'signature3',
+      _ => itemId,
+    };
 
 class GiftRecord {
   GiftRecord({
@@ -56,148 +87,170 @@ class GiftRecord {
   final String direction;
   final String note;
   final String agentCode;
-
-  Map<String, dynamic> toJson() => {
-        'code': code,
-        'itemId': itemId,
-        'label': label,
-        'cents': cents,
-        'status': status,
-        'createdAt': createdAt,
-        'direction': direction,
-        'note': note,
-        'agentCode': agentCode,
-      };
-
-  static GiftRecord fromJson(Map<String, dynamic> json) => GiftRecord(
-        code: json['code'] as String? ?? '',
-        itemId: json['itemId'] as String? ?? '',
-        label: json['label'] as String? ?? 'Gift',
-        cents: (json['cents'] as num?)?.toInt() ?? 0,
-        status: json['status'] as String? ?? 'unredeemed',
-        createdAt: (json['createdAt'] as num?)?.toInt() ?? 0,
-        direction: json['direction'] as String? ?? 'sent',
-        note: json['note'] as String? ?? '',
-        agentCode: json['agentCode'] as String? ?? '',
-      );
 }
 
+/// Gift history, straight from the server (users/{uid}/giftsSent and
+/// giftsReceived via the economy summary). Nothing is minted on the phone.
 class GiftBook extends ChangeNotifier {
-  GiftBook._();
+  GiftBook._() {
+    EconomyMirror.instance.addListener(notifyListeners);
+  }
   static final instance = GiftBook._();
 
-  static const _key = 'nwsb_gifts_v1';
-  final List<GiftRecord> items = [];
-  var ready = false;
+  bool get ready => EconomyMirror.instance.summary.isNotEmpty;
 
-  Future<void> load() async {
-    if (ready) return;
+  List<GiftRecord> get items {
+    final g = (EconomyMirror.instance.summary['gifts'] as Map?) ?? const {};
+    GiftRecord row(Map m, String dir) => GiftRecord(
+          code: '${m['code'] ?? ''}',
+          itemId: '${m['card'] ?? ''}',
+          label: '${m['title'] ?? 'Gift'}',
+          cents: 0,
+          status: '${m['status'] ?? (dir == 'received' ? 'redeemed' : 'active')}',
+          createdAt: (m['at'] as num?)?.toInt() ?? 0,
+          direction: dir,
+          note: '${m['message'] ?? m['toName'] ?? m['fromName'] ?? ''}',
+        );
+    return [
+      for (final m in ((g['sent'] as List?) ?? const []).whereType<Map>()) row(m, 'sent'),
+      for (final m in ((g['received'] as List?) ?? const []).whereType<Map>()) row(m, 'received'),
+    ];
+  }
+
+  Future<void> load() => EconomyMirror.instance.refresh();
+}
+
+/// Buy a gift card on Play and get its NWSB code (Plan 6.3).
+Future<void> showGiftCardSheet(BuildContext context, String cardId) async {
+  final cards = kGiftCatalog;
+  final card = cards.firstWhere((c) => c.id == cardId, orElse: () => cards.first);
+  await showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (context) => _GiftCardSheet(card: card),
+  );
+}
+
+class _GiftCardSheet extends StatefulWidget {
+  const _GiftCardSheet({required this.card});
+  final GiftItem card;
+  @override
+  State<_GiftCardSheet> createState() => _GiftCardSheetState();
+}
+
+class _GiftCardSheetState extends State<_GiftCardSheet> {
+  final _to = TextEditingController();
+  final _from = TextEditingController();
+  final _msg = TextEditingController();
+  var _design = 'lotus';
+  var _busy = false;
+  String? _note;
+
+  @override
+  void dispose() {
+    _to.dispose();
+    _from.dispose();
+    _msg.dispose();
+    super.dispose();
+  }
+
+  Future<void> _buy() async {
+    setState(() {
+      _busy = true;
+      _note = null;
+    });
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final raw = prefs.getString(_key);
-      if (raw != null && raw.isNotEmpty) {
-        final list = jsonDecode(raw) as List<dynamic>;
-        items
-          ..clear()
-          ..addAll(list.map((e) => GiftRecord.fromJson(Map<String, dynamic>.from(e as Map))));
-      }
-    } catch (_) {}
-    _expire();
-    ready = true;
-    notifyListeners();
-  }
-
-  void _expire() {
-    final now = DateTime.now().millisecondsSinceEpoch;
-    const window = 90 * 24 * 60 * 60 * 1000;
-    for (final gift in items) {
-      if (gift.status == 'unredeemed' && now - gift.createdAt > window) {
-        gift.status = 'expired';
-      }
+      final r = await PlayCheckout.purchase({
+        'kind': 'giftcard',
+        'cardId': widget.card.id,
+        'toName': _to.text.trim(),
+        'fromName': _from.text.trim(),
+        'message': _msg.text.trim(),
+        'design': _design,
+      });
+      final granted = (r['granted'] as List?)?.whereType<Map>().firstWhere((g) => g['type'] == 'giftcard', orElse: () => const {}) ?? const {};
+      final code = '${granted['code'] ?? ''}';
+      if (code.isNotEmpty) await Clipboard.setData(ClipboardData(text: code));
+      if (!mounted) return;
+      Navigator.of(context).pop();
+      await openGiftBox(context, box: giftBoxFor(widget.card.id), prize: widget.card.label, itemId: widget.card.id, code: code.isEmpty ? null : code);
+    } on EconomyException catch (e) {
+      if (mounted) setState(() => _note = e.message);
+    } finally {
+      if (mounted) setState(() => _busy = false);
     }
   }
 
-  Future<void> _save() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_key, jsonEncode(items.map((e) => e.toJson()).toList()));
-    notifyListeners();
-  }
-
-  Future<GiftRecord> send(GiftItem item, {String note = ''}) async {
-    await load();
-    final code = _code();
-    final agent = EconomyMirror.instance.code;
-    final gift = GiftRecord(
-      code: code,
-      itemId: item.id,
-      label: item.label,
-      cents: item.cents,
-      status: 'unredeemed',
-      createdAt: DateTime.now().millisecondsSinceEpoch,
-      direction: 'sent',
-      note: note,
-      agentCode: agent,
-    );
-    items.insert(0, gift);
-    await _save();
-    return gift;
-  }
-
-  Future<String> redeem(String raw) async {
-    await load();
-    final code = raw.trim().toUpperCase();
-    if (code.isEmpty) return 'Enter the gift code.';
-    GiftRecord? hit;
-    for (final gift in items) {
-      if (gift.code == code) {
-        hit = gift;
-        break;
-      }
-    }
-    if (hit == null) return 'That code is not on this phone yet. Ask the sender to share it again.';
-    if (hit.status == 'redeemed') return 'This gift is already open.';
-    if (hit.status == 'expired') return 'This gift expired. Unopened gifts last 90 days.';
-    hit.status = 'redeemed';
-    items.insert(
-      0,
-      GiftRecord(
-        code: hit.code,
-        itemId: hit.itemId,
-        label: hit.label,
-        cents: hit.cents,
-        status: 'redeemed',
-        createdAt: DateTime.now().millisecondsSinceEpoch,
-        direction: 'received',
-        note: hit.note,
-        agentCode: hit.agentCode,
+  @override
+  Widget build(BuildContext context) {
+    final inset = MediaQuery.viewInsetsOf(context).bottom;
+    return Padding(
+      padding: EdgeInsets.only(bottom: inset),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(18, 18, 18, 28),
+        decoration: const BoxDecoration(
+          color: Color(0xF2000000),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(26)),
+          border: Border(top: BorderSide(color: Color(0x33FFFFFF))),
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(children: [
+                EditableImage.asset(giftBoxFor(widget.card.id).asset, height: 64, errorBuilder: (_, __, ___) => const SizedBox(width: 64), slot: 'gifts_screen.GiftCardSheet'),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(widget.card.label, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
+                    FutureBuilder<String>(
+                      future: widget.card.productId.isEmpty ? Future.value('') : PlayCheckout.priceLabel(widget.card.productId),
+                      builder: (context, snap) => Text(
+                        snap.data == null || snap.data == 'Play price' || snap.data!.isEmpty ? '\u20b9${widget.card.cents} on Google Play' : '${snap.data} on Google Play',
+                        style: const TextStyle(color: NwsbColors.goldLight, fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  ]),
+                ),
+              ]),
+              const SizedBox(height: 12),
+              const EditableLabel('gifts_screen.GiftCardSheet',
+                  'The code exists only after Google Play accepts the payment. It is valid for a year. Unopened cards can be cancelled within 7 days. Coins cannot be gifted.',
+                  style: TextStyle(color: NwsbColors.mist, fontSize: 12, height: 1.4)),
+              const SizedBox(height: 12),
+              _field(_to, 'Their name (optional)'),
+              _field(_from, 'Your name (optional)'),
+              _field(_msg, 'A short message (optional)', lines: 3),
+              const SizedBox(height: 8),
+              Wrap(spacing: 8, children: [
+                for (final d in const ['lotus', 'dawn', 'gold', 'night'])
+                  ChoiceChip(
+                    label: Text(d[0].toUpperCase() + d.substring(1)),
+                    selected: _design == d,
+                    onSelected: (_) => setState(() => _design = d),
+                  ),
+              ]),
+              const SizedBox(height: 14),
+              GoldButton(label: _busy ? 'Waiting for Google Play…' : 'Pay on Play and create the code', onTap: _busy ? null : _buy),
+              if (_note != null) ...[const SizedBox(height: 10), EconomyNote(_note!)],
+            ],
+          ),
+        ),
       ),
     );
-    await _save();
-    return '';
   }
 
-  Future<GiftRecord> award(String itemId, String label, {int cents = 0}) async {
-    await load();
-    final gift = GiftRecord(
-      code: _code(),
-      itemId: itemId,
-      label: label,
-      cents: cents,
-      status: 'redeemed',
-      createdAt: DateTime.now().millisecondsSinceEpoch,
-      direction: 'received',
-    );
-    items.insert(0, gift);
-    await _save();
-    return gift;
-  }
-
-  String _code() {
-    const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    final rng = Random();
-    final body = List.generate(6, (_) => alphabet[rng.nextInt(alphabet.length)]).join();
-    return 'GFT$body';
-  }
+  Widget _field(TextEditingController c, String hint, {int lines = 1}) => Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: TextField(
+          controller: c,
+          maxLines: lines,
+          maxLength: lines > 1 ? 280 : 40,
+          style: const TextStyle(color: Colors.white),
+          decoration: InputDecoration(hintText: hint, hintStyle: const TextStyle(color: NwsbColors.mist), counterText: ''),
+        ),
+      );
 }
 
 class GiftsScreen extends StatefulWidget {
@@ -232,6 +285,7 @@ class _GiftsScreenState extends State<GiftsScreen> {
   @override
   Widget build(BuildContext context) {
     return EconomyPage(
+      goodToKnow: kGiftsDisclaimer,
       title: 'NowssB Gifts',
       mark: NwsbMarks.gift,
       action: GestureDetector(
@@ -264,6 +318,8 @@ class _GiftsScreenState extends State<GiftsScreen> {
                 blackTitle: 'A real purchase',
                 blackSub: 'The code exists only after Play accepts it.',
               ),
+              const SizedBox(height: 12),
+              ProgramLink(title: 'NowssB Gifts program', sub: 'Free boxes, gift cards, rules and history', mark: NwsbMarks.gift, page: () => const GiftsProgramPage()),
               const SizedBox(height: 12),
               const GiftShowcase(),
               const SizedBox(height: 16),
@@ -356,91 +412,45 @@ class _GiftsScreenState extends State<GiftsScreen> {
     switch (id) {
       case 'word':
         return NwsbMarks.word;
-      case 'meaning':
-        return NwsbMarks.meaning;
+      case 'stage':
+        return NwsbMarks.stages;
       case 'bundle':
         return NwsbMarks.book;
-      case 'resonance':
+      case 'basic7':
         return NwsbMarks.sound;
-      case 'frequency':
-        return NwsbMarks.stages;
+      case 'ebook7':
+      case 'ebook30':
+        return NwsbMarks.ebook;
+      case 'signature3':
+        return NwsbMarks.signature;
+      case 'restore':
+        return NwsbMarks.flame;
       default:
         return NwsbMarks.crown;
     }
   }
 
   Widget _send() {
+    final catalog = kGiftCatalog;
+    if (!catalog.any((c) => c.id == _item.id)) _item = catalog.first;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const EconomyNote(
-          'A gift is a real Play purchase sent as a code. Coins cannot be gifted. An agent code on the purchase still earns its commission, and the sale is labeled Gift purchase.',
+          'A gift is a real Play purchase sent as a code. Coins cannot be gifted. A link on the purchase still earns its commission, and the sale is labeled Gift purchase.',
         ),
         const SizedBox(height: 12),
-        for (final item in kGiftCatalog)
+        for (final item in catalog)
           BlackOffer(
             title: item.label,
             mark: _giftMark(item.id),
             selected: _item.id == item.id,
             progress: _item.id == item.id ? 1 : 0,
-            line: _item.id == item.id
-                ? '1 of 1 selected · ${FxBook.instance.formatCents(item.cents)}'
-                : '0 of 1 · ${FxBook.instance.formatCents(item.cents)}',
+            line: _item.id == item.id ? '1 of 1 selected · \u20b9${item.cents}' : '0 of 1 · \u20b9${item.cents}',
             onTap: () => setState(() => _item = item),
           ),
         const SizedBox(height: 8),
-        TextField(
-          controller: _note,
-          style: const TextStyle(color: Colors.white),
-          decoration: const InputDecoration(
-            hintText: 'A note for them (optional)',
-            hintStyle: TextStyle(color: NwsbColors.mist),
-          ),
-        ),
-        const SizedBox(height: 10),
-        GoldButton(
-          label: 'Pay on Play and create the code',
-          onTap: () async {
-            final sku = switch (_item.id) {
-              'word' => 'nwsb_word',
-              'meaning' => 'nwsb_meaning',
-              'bundle' => 'nwsb_bundle_10',
-              'resonance' => 'nwsb_sub_resonance',
-              'frequency' => 'nwsb_sub_frequency',
-              _ => 'nwsb_sub_frequency_x',
-            };
-            try {
-              final result = await PlayCheckout.buy(
-                callable: 'issueGift',
-                productId: sku,
-                payload: {'itemId': _item.id, 'note': _note.text.trim()},
-              );
-              final code = '${result['code'] ?? ''}';
-              if (code.isNotEmpty) {
-                await Clipboard.setData(ClipboardData(text: code));
-              }
-              if (!mounted) return;
-              setState(() => _message = code.isEmpty
-                  ? 'Play took the payment, but no code came back.'
-                  : 'Code $code copied. It expires in 90 days if it stays unopened.');
-            } on EconomyException catch (e) {
-              if (!mounted) return;
-              if (!EconomyApi.isMissing(e) && !e.message.toLowerCase().contains('play')) {
-                setState(() => _message = e.message);
-                return;
-              }
-              final gift = await GiftBook.instance.send(_item, note: _note.text.trim());
-              if (!mounted) return;
-              setState(() => _message = 'Code ${gift.code} saved on this phone.');
-              final box = _item.id == 'frequency_x' || _item.id == 'bundle'
-                  ? kGiftBoxes[2]
-                  : _item.id == 'frequency' || _item.id == 'resonance'
-                      ? kGiftBoxes[1]
-                      : kGiftBoxes[0];
-              await openGiftBox(context, box: box, prize: _item.label, itemId: _item.id, code: gift.code);
-            }
-          },
-        ),
+        GoldButton(label: 'Write the card and pay on Play', onTap: () => showGiftCardSheet(context, _item.id)),
         if (_message != null) ...[
           const SizedBox(height: 10),
           EconomyNote(_message!),
@@ -460,7 +470,7 @@ class _GiftsScreenState extends State<GiftsScreen> {
           textCapitalization: TextCapitalization.characters,
           style: const TextStyle(color: Colors.white, letterSpacing: 1.4),
           decoration: const InputDecoration(
-            hintText: 'GFT••••••',
+            hintText: 'NWSB-XXXX-XXXX',
             hintStyle: TextStyle(color: NwsbColors.mist),
           ),
         ),
@@ -471,16 +481,15 @@ class _GiftsScreenState extends State<GiftsScreen> {
             try {
               final result = await EconomyApi.call('redeemGift', {'code': _code.text.trim()});
               if (!mounted) return;
-              setState(() => _message = '${result['label'] ?? 'Gift'} is on this account.');
+              setState(() => _message = '${(result['granted'] as Map?)?['label'] ?? result['title'] ?? 'Gift'} is on this account.');
+              final g = result['granted'];
+              await GiftBoxOpening.show(context,
+                  box: 'gold',
+                  title: '${result['title'] ?? 'A gift for you'}${'${result['fromName'] ?? ''}'.isEmpty ? '' : ' · from ${result['fromName']}'}',
+                  items: g is Map ? [Map<String, dynamic>.from(g)] : const []);
             } on EconomyException catch (e) {
               if (!mounted) return;
-              if (!EconomyApi.isMissing(e)) {
-                setState(() => _message = e.message);
-                return;
-              }
-              final local = await GiftBook.instance.redeem(_code.text);
-              if (!mounted) return;
-              setState(() => _message = local.isEmpty ? 'That gift is on this account.' : local);
+              setState(() => _message = e.message);
             }
           },
         ),
@@ -506,24 +515,45 @@ class _GiftsScreenState extends State<GiftsScreen> {
         for (final gift in rows)
           Padding(
             padding: const EdgeInsets.only(bottom: 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
               children: [
-                Text(gift.label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
-                Text(
-                  '${gift.code} · ${gift.status} · ${FxBook.instance.formatCents(gift.cents)}',
-                  style: const TextStyle(color: NwsbColors.mist, fontSize: 12),
-                ),
-                if (gift.agentCode.isNotEmpty)
-                  Text(
-                    'Gift purchase · agent ${gift.agentCode}',
-                    style: const TextStyle(color: NwsbColors.gold, fontSize: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(gift.label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+                      Text(
+                        '${gift.code} · ${gift.status}${gift.createdAt > 0 ? ' · ${_date(gift.createdAt)}' : ''}',
+                        style: const TextStyle(color: NwsbColors.mist, fontSize: 12),
+                      ),
+                      if (gift.note.isNotEmpty) Text(gift.note, style: const TextStyle(color: NwsbColors.gold, fontSize: 12)),
+                    ],
                   ),
+                ),
+                if (direction == 'sent' && gift.status == 'active') ...[
+                  IconButton(
+                    tooltip: 'Copy code',
+                    onPressed: () => Clipboard.setData(ClipboardData(text: gift.code)),
+                    icon: const Icon(Icons.copy, color: Colors.white70, size: 18),
+                  ),
+                  TextButton(
+                    onPressed: () => runEconomy(context, () async {
+                      final r = await EconomyApi.call('cancelGift', {'code': gift.code});
+                      if (mounted) setState(() => _message = '${r['note'] ?? 'Cancelled.'}');
+                    }),
+                    child: const EditableLabel('gifts_screen.GiftsScreen', 'Cancel', style: TextStyle(color: NwsbColors.goldLight)),
+                  ),
+                ],
               ],
             ),
           ),
+        if (_message != null) EconomyNote(_message!),
       ],
     );
   }
-}
 
+  String _date(int ms) {
+    final d = DateTime.fromMillisecondsSinceEpoch(ms);
+    return '${d.day}/${d.month}/${d.year}';
+  }
+}

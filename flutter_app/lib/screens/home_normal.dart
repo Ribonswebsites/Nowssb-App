@@ -473,16 +473,16 @@ class _HomeNormalState extends State<HomeNormal> {
               ),
               const SizedBox(height: 16),
               const EarnUmbrellaSection(),
-              const SizedBox(height: 16),
-              const YourRewardsSection(),
-              const SizedBox(height: 16),
-              const GiftsHomeSection(),
             ],
           ),
         ),
         (
           'reader',
-          NmReader(onTap: () => _push(const ReaderHubScreen())),
+          Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            NmReader(onTap: () => _push(const ReaderHubScreen())),
+            const SizedBox(height: 24),
+            const YourRewardsSection(),
+          ]),
         ),
         (
           'trendwd',
@@ -490,7 +490,11 @@ class _HomeNormalState extends State<HomeNormal> {
         ),
         ('custom', null),
         ('rx', null),
-        ('routines', RoutinesSection(onTap: () => _go(1))),
+        ('routines', Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          RoutinesSection(onTap: () => _go(1)),
+          const SizedBox(height: 24),
+          const GiftsHomeSection(),
+        ])),
         (
           'condisc',
           NmPromoDisc(
@@ -499,7 +503,11 @@ class _HomeNormalState extends State<HomeNormal> {
             onTap: () => _go(0),
           )
         ),
-        ('feed', NmFeed(onTap: () => _go(0))),
+        ('feed', Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          NmFeed(onTap: () => _go(0)),
+          const SizedBox(height: 24),
+          const ReferenceHomeSection(),
+        ])),
         (
           'quickrow',
           QuickAccessSection(
@@ -508,11 +516,19 @@ class _HomeNormalState extends State<HomeNormal> {
             onOrders: () => _go(4),
           )
         ),
-        ('trendshop', NmTrendShop(onTap: () => _go(3))),
+        ('trendshop', Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          NmTrendShop(onTap: () => _go(3)),
+          const SizedBox(height: 24),
+          const CouponsHomeSection(),
+        ])),
         ('subvid', const SizedBox.shrink()),
         (
           'edition',
-          EditionSection(onTap: () => _push(const SubscriptionScreen()))
+          Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            EditionSection(onTap: () => _push(const SubscriptionScreen())),
+            const SizedBox(height: 24),
+            const PartnerHomeSection(),
+          ])
         ),
         ('ebooks', EbooksSection(onTap: () => _go(2))),
         ('connectban', ConnectBannerSection(onTap: () => _go(0))),

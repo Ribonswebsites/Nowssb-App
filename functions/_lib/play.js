@@ -198,7 +198,20 @@ export async function applyToUser(env, { uid, ev, tokenHash, source }) {
     }
     throw new Error('firestore commit ' + commit.status);
   }
-  return { status: firstTime ? 'granted' : ev.entitled ? 'already' : 'updated', ...summary(ev) };
+  let economy = null;
+  if (firstTime && env.ECONOMY_HOOKS !== 'off') {
+    // A cleared subscription order (first or renewal) feeds the economy:
+    // buyer coins / scratch card, the link holder's commission through the
+    // money lock, Partner points. Never blocks the plan grant.
+    try {
+      const { settleSubscriptionOrder } = await import('./economy/playorders.js');
+      const r = await settleSubscriptionOrder(env, { uid, ev });
+      economy = r ? { ok: true, ownerCredited: !!r.ownerCredited } : null;
+    } catch (e) {
+      economy = { ok: false };
+    }
+  }
+  return { status: firstTime ? 'granted' : ev.entitled ? 'already' : 'updated', ...summary(ev), ...(economy ? { economy } : {}) };
 }
 
 function summary(ev) {

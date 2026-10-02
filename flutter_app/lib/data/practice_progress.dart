@@ -5,12 +5,14 @@
 /// count below comes from an actual completed native playback session.
 library;
 
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'models.dart';
+import '../features/economy/economy_api.dart';
 
 class PracticeProgress extends ChangeNotifier {
   PracticeProgress._();
@@ -209,6 +211,9 @@ class PracticeProgress extends ChangeNotifier {
       // Keep the in-memory session even if storage cannot complete.
     }
     notifyListeners();
+    // Server: practice counters, starter quest and mastery practice days.
+    unawaited(EconomyApi.call('reportPractice', {'practiced': true, 'wordId': word.word})
+        .then((_) {}, onError: (_) {}));
   }
 
   /// Wipes every recorded session on this device. Used by Settings.

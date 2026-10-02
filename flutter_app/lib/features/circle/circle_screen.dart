@@ -21,6 +21,8 @@ import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
 import '../economy/money.dart';
 import '../../admin/template/editable.dart';
+import '../programs/program_kit.dart';
+import '../programs/earn_program.dart';
 
 class CircleScreen extends StatefulWidget {
   const CircleScreen({super.key});
@@ -106,6 +108,7 @@ class _CircleScreenState extends State<CircleScreen> {
   @override
   Widget build(BuildContext context) {
     return EconomyPage(
+      goodToKnow: kEarnDisclaimer,
       title: 'NowssB Earn',
       mark: NwsbMarks.piggy,
       child: ListenableBuilder(
@@ -136,6 +139,8 @@ class _CircleScreenState extends State<CircleScreen> {
               ),
               const SizedBox(height: 12),
               const CoinCollectCard(pageKey: 'earn', amount: 10, title: 'Earn coins'),
+              const SizedBox(height: 12),
+              ProgramLink(title: 'NowssB Earn program', sub: 'Team, appointments, ranks, payouts', mark: NwsbMarks.piggy, page: () => const EarnProgramPage()),
               const SizedBox(height: 12),
               const TrioRail(),
               const SizedBox(height: 14),

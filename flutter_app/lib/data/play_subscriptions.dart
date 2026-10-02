@@ -28,6 +28,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+
+import '../features/economy/economy_api.dart';
 import 'package:flutter/services.dart' show PlatformException;
 import 'package:http/http.dart' as http;
 import 'package:in_app_purchase/in_app_purchase.dart';
@@ -197,7 +199,7 @@ class PlaySubscriptions extends ChangeNotifier {
       final param = GooglePlayPurchaseParam(
         productDetails: details,
         applicationUserName: accountHash(user.uid),
-        offerToken: (offers != null && idx != null) ? offers[idx].offerIdToken : null,
+        offerToken: _offerToken(offers, idx),
         changeSubscriptionParam: old == null
             ? null
             : ChangeSubscriptionParam(oldPurchaseDetails: old, replacementMode: ReplacementMode.withTimeProration),
@@ -222,6 +224,25 @@ class PlaySubscriptions extends ChangeNotifier {
       busy = false;
       notifyListeners();
     }
+  }
+
+  /// The plan's base offer, or — while a friend's link holds this account —
+  /// the Play offer tagged 'referral' on the same base plan (friend offer,
+  /// set up in Play Console; the server's config names the tag).
+  String? _offerToken(List<SubscriptionOfferDetailsWrapper>? offers, int? idx) {
+    if (offers == null || idx == null || idx >= offers.length) return null;
+    final base = offers[idx];
+    final s = EconomyMirror.instance.summary;
+    final ref = s['referral'];
+    if (ref is Map && ref['held'] == true && ref['locked'] != true) {
+      final cfg = s['config'] is Map ? (s['config'] as Map)['reference'] : null;
+      final fd = cfg is Map ? cfg['friendDiscount'] : null;
+      final tag = fd is Map ? '${fd['subscriptionOfferTag'] ?? 'referral'}' : 'referral';
+      for (final o in offers) {
+        if (o.basePlanId == base.basePlanId && o.offerTags.contains(tag)) return o.offerIdToken;
+      }
+    }
+    return base.offerIdToken;
   }
 
   /// Re-sends every active Play subscription on this Google account to the

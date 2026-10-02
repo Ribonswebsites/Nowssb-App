@@ -48,6 +48,29 @@ export async function onRequestPost({ request, env }) {
   }
   if (msg.testNotification) return json({ ok: true, test: true }, 200);
   if (msg.packageName !== PLAY_PACKAGE_NAME) return json({ ok: true, ignored: 'other package' }, 200);
+  if (msg.voidedPurchaseNotification && env.ECONOMY_HOOKS !== 'off') {
+    // Refund / chargeback / revoke: reverse commission, coins, word credit,
+    // Partner points, items, gift cards (functions/_lib/economy/sales.js).
+    const v = msg.voidedPurchaseNotification;
+    try {
+      const { settleVoided } = await import('../../_lib/economy/playorders.js');
+      const r = await settleVoided(env, String(v.orderId || ''), v.refundType === 2 ? 'partial-refund' : 'voided');
+      return json({ ok: true, voided: true, ...r }, 200);
+    } catch (e) {
+      return json({ error: 'Try again later.' }, 503);
+    }
+  }
+  if (msg.oneTimeProductNotification && env.ECONOMY_HOOKS !== 'off') {
+    const o = msg.oneTimeProductNotification;
+    if (o.notificationType !== 1) return json({ ok: true, ignored: 'one-time product cancelled' }, 200);
+    try {
+      const { settleOneTimeFromRtdn } = await import('../../_lib/economy/playorders.js');
+      return json({ ok: true, oneTime: true, ...(await settleOneTimeFromRtdn(env, { sku: o.sku, purchaseToken: o.purchaseToken })) }, 200);
+    } catch (e) {
+      if (e.http) return json({ ok: true, ignored: 'unknown purchase' }, 200);
+      return json({ error: 'Try again later.' }, 503);
+    }
+  }
   const n = msg.subscriptionNotification;
   if (!n || !n.purchaseToken) return json({ ok: true, ignored: 'not a subscription notification' }, 200);
 

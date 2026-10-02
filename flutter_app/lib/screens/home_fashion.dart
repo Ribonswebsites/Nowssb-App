@@ -516,19 +516,27 @@ class _HomeFashionState extends State<HomeFashion> {
             StoreBannerSection(onTap: () => _go(3)),
             const SizedBox(height: 16),
             const EarnUmbrellaSection(),
-            const SizedBox(height: 16),
-            const YourRewardsSection(),
-            const SizedBox(height: 16),
-            const GiftsHomeSection(),
           ],
         )),
         ('subvid', const SizedBox.shrink()),
         (
           'edition',
-          EditionSection(onTap: () => _push(const SubscriptionScreen()))
+          Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            EditionSection(onTap: () => _push(const SubscriptionScreen())),
+            const SizedBox(height: 24),
+            const PartnerHomeSection(),
+          ])
         ),
-        ('routines', RoutinesSection(onTap: () => _go(1), fashion: true)),
-        ('offer', FashOffer(onTap: () => _go(3))),
+        ('routines', Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          RoutinesSection(onTap: () => _go(1), fashion: true),
+          const SizedBox(height: 24),
+          const YourRewardsSection(),
+        ])),
+        ('offer', Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          FashOffer(onTap: () => _go(3)),
+          const SizedBox(height: 24),
+          const GiftsHomeSection(),
+        ])),
         (
           'cube',
           QuickAccessSection(
@@ -537,7 +545,11 @@ class _HomeFashionState extends State<HomeFashion> {
             onOrders: () => _go(4),
           ),
         ),
-        ('shabda', FashShabdapathy(onTap: () => _go(2))),
+        ('shabda', Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          FashShabdapathy(onTap: () => _go(2)),
+          const SizedBox(height: 24),
+          const ReferenceHomeSection(),
+        ])),
         ('ebooks', EbooksSection(onTap: () => _go(2))),
         ('connectban', ConnectBannerSection(onTap: () => _go(0))),
         (

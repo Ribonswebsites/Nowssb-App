@@ -3,15 +3,22 @@ import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../../screens/nwsb_sign_in_sheet.dart';
 import '../../widgets/app_thinking_loader.dart';
+import '../../widgets/app_backdrop.dart';
 import '../../widgets/glass_wrap.dart';
+import '../programs/rewards_program.dart';
 import '../../widgets/nwsb_coin_fly.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/program_shelf.dart';
 import '../../theme/tokens.dart';
 import 'economy_api.dart';
 import 'money.dart';
+import 'reward_fx.dart';
 import '../../admin/template/editable.dart';
 
+/// The shell every NowssB program page shares (PDF-2 §9): the app's
+/// backdrop and brand back control, the page title, and the coin balance in
+/// the bar — tap it to open Rewards · Wallet. [goodToKnow] adds the
+/// "Good to know" line at the bottom of pages that are not tabbed programs.
 class EconomyPage extends StatelessWidget {
   const EconomyPage({
     super.key,
@@ -20,6 +27,8 @@ class EconomyPage extends StatelessWidget {
     this.mark = NwsbMarks.word,
     this.action,
     this.banner,
+    this.goodToKnow,
+    this.showBalance = true,
   });
 
   final String title;
@@ -27,40 +36,138 @@ class EconomyPage extends StatelessWidget {
   final String mark;
   final Widget? action;
   final Widget? banner;
+  final String? goodToKnow;
+  final bool showBalance;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(4, 4, 12, 0),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.of(context).maybePop(),
-                    icon: const Icon(Icons.arrow_back, color: Colors.white),
+      backgroundColor: NwsbColors.deep,
+      body: Stack(
+        children: [
+          const Positioned.fill(child: AppBackdrop()),
+          const Positioned.fill(
+            child: IgnorePointer(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Color(0x99000000), Color(0x66000000), Color(0x88000000), Color(0xCC000000)],
+                    stops: [0, 0.22, 0.72, 1.0],
                   ),
-                  _Mark(mark),
-                  const SizedBox(width: 8),
-                  const _BlackOrb(),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: EditableLabel('economy_theme.EconomyPage',
-                      title,
-                      style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700),
-                    ),
-                  ),
-                  if (action != null) action!,
-                ],
+                ),
               ),
             ),
-            if (banner != null) banner!,
-            Expanded(child: child),
-          ],
+          ),
+          SafeArea(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 10, 12, 6),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () => Navigator.of(context).maybePop(),
+                        behavior: HitTestBehavior.opaque,
+                        child: Container(
+                          width: 42,
+                          height: 42,
+                          decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                          child: const Icon(Icons.arrow_back, size: 19, color: NwsbColors.ink),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      _Mark(mark),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: EditableLabel('economy_theme.EconomyPage',
+                          title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700),
+                        ),
+                      ),
+                      if (action != null) action!,
+                      if (showBalance) const CoinBalancePill(),
+                    ],
+                  ),
+                ),
+                if (banner != null) banner!,
+                Expanded(child: child),
+                if (goodToKnow != null) _GoodToKnowBar(goodToKnow!),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Live coin balance from the server wallet. Tap → Rewards · Wallet.
+class CoinBalancePill extends StatelessWidget {
+  const CoinBalancePill({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: EconomyMirror.instance,
+      builder: (context, _) {
+        final m = EconomyMirror.instance;
+        return GestureDetector(
+          onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const RewardsProgramPage(initialTab: 6))),
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            margin: const EdgeInsets.only(left: 8),
+            padding: const EdgeInsets.fromLTRB(6, 5, 12, 5),
+            decoration: BoxDecoration(
+              color: const Color(0x26000000),
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: const Color(0x66E4C56A)),
+            ),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              EditableImage.asset(NwsbCoinFly.disc, width: 22, height: 22, fit: BoxFit.contain, slot: 'economy_theme.CoinBalancePill'),
+              const SizedBox(width: 6),
+              Text(m.uid == null ? '—' : '${m.coins}', style: const TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w800, fontSize: 14)),
+            ]),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _GoodToKnowBar extends StatelessWidget {
+  const _GoodToKnowBar(this.text);
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => showModalBottomSheet<void>(
+        context: context,
+        backgroundColor: const Color(0xFF0B0F16),
+        builder: (context) => SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
+            child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+              const EditableLabel('economy_theme.GoodToKnow', 'GOOD TO KNOW', style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.6, fontWeight: FontWeight.w800, fontSize: 12)),
+              const SizedBox(height: 10),
+              EditableLabel('economy_theme.GoodToKnowBar', text, style: const TextStyle(color: Color(0xCCFFFFFF), height: 1.5, fontSize: 13)),
+            ]),
+          ),
         ),
+      ),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(16, 9, 16, 9),
+        decoration: const BoxDecoration(color: Color(0xCC05070B), border: Border(top: BorderSide(color: Color(0x22FFFFFF)))),
+        child: Row(children: [
+          const Icon(Icons.info_outline_rounded, size: 15, color: Color(0xFFE4C56A)),
+          const SizedBox(width: 8),
+          Expanded(child: Text('Good to know · $text', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 11.5))),
+        ]),
       ),
     );
   }
@@ -353,8 +460,8 @@ Future<void> runEconomy(BuildContext context, Future<void> Function() action) as
   } on EconomyException catch (e) {
     if (context.mounted) {
       final raw = e.message.toUpperCase();
-      final text = raw.contains('NOT_FOUND') || raw.contains('NOT FOUND')
-          ? 'Saved on this phone.'
+      final text = EconomyApi.isMissing(e) || raw.contains('NOT_FOUND') || raw.contains('NOT FOUND')
+          ? EconomyApi.switchingOnMessage
           : e.message;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -391,21 +498,26 @@ class _CoinCollectCardState extends State<CoinCollectCard> {
   Future<void> _take() async {
     if (_busy) return;
     setState(() => _busy = true);
-    final before = EconomyMirror.instance.coins;
-    final gained = await EconomyMirror.instance.grantOnce(widget.pageKey, widget.amount);
-    if (!mounted) return;
-    setState(() {
-      _busy = false;
-      _note = gained > 0 ? '+$gained coins' : 'Already collected today.';
-    });
-    if (gained > 0) {
-      await NwsbCoinFly.show(
-        context,
-        coins: gained,
-        from: before,
-        to: before + gained,
-      );
+    try {
+      // Server-owned: one "visit a program page" credit per page per day.
+      final r = await EconomyApi.call('reportAction', {'action': 'explore', 'key': widget.pageKey});
+      final gained = coinsIn(r);
+      if (!mounted) return;
+      setState(() => _note = gained > 0 ? '+$gained coins' : (r['limit'] != null ? 'Today\u2019s page coins are all collected.' : 'Already collected today.'));
+      if (gained > 0) await playCoins(context, gained, balanceAfter: balanceIn(r));
+    } on EconomyException catch (e) {
+      if (mounted) setState(() => _note = EconomyApi.isMissing(e) ? 'Switching on soon' : e.message);
+    } finally {
+      if (mounted) setState(() => _busy = false);
     }
+  }
+
+  int? get _serverAmount {
+    final acts = ((EconomyMirror.instance.summary['today'] as Map?)?['actions'] as List?) ?? const [];
+    for (final a in acts) {
+      if (a is Map && a['id'] == 'explore') return (a['coins'] as num?)?.toInt();
+    }
+    return null;
   }
 
   @override
@@ -429,7 +541,7 @@ class _CoinCollectCardState extends State<CoinCollectCard> {
                 children: [
                   EditableLabel('economy_theme.CoinCollectCard', widget.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
                   Text(
-                    _note ?? '+${widget.amount} coins',
+                    _note ?? (_serverAmount == null ? 'Page coins' : '+$_serverAmount coins'),
                     style: const TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w700),
                   ),
                 ],
@@ -479,17 +591,20 @@ class _GiftOpenCardState extends State<GiftOpenCard> with SingleTickerProviderSt
   Future<void> _open() async {
     if (_busy) return;
     setState(() => _busy = true);
+    RewardHaptics.tick();
     await _lift.forward(from: 0);
     if (!mounted) return;
-    final before = EconomyMirror.instance.coins;
-    final gained = await EconomyMirror.instance.grantOnce(widget.pageKey, widget.amount);
-    if (!mounted) return;
-    setState(() {
-      _busy = false;
-      _note = gained > 0 ? '+$gained coins' : 'Already opened today.';
-    });
-    if (gained > 0) {
-      await NwsbCoinFly.show(context, coins: gained, from: before, to: before + gained);
+    try {
+      // Today's free gift box: the best box your minutes reached (server draw).
+      final r = await EconomyApi.call('openDailyBox', {});
+      if (!mounted) return;
+      setState(() => _note = 'Opened. A new box comes tomorrow.');
+      await celebrate(context, r, title: '${r['title'] ?? widget.title}');
+    } on EconomyException catch (e) {
+      if (mounted) setState(() => _note = EconomyApi.isMissing(e) ? 'Switching on soon' : e.message);
+      _lift.reverse();
+    } finally {
+      if (mounted) setState(() => _busy = false);
     }
   }
 

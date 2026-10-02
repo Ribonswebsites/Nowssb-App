@@ -30,6 +30,7 @@ import 'store.dart';
 import '../widgets/colored_split_promo_banner.dart';
 import '../admin/template/editable.dart';
 import '../admin/layout/layout_sections.dart';
+import '../features/programs/program_cards.dart';
 
 const _accent = Color(0xFFE3BD7D);
 const _text = Color(0xFFF5F5F3);
@@ -453,18 +454,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       );
 
-  String get _planName => EconomyMirror.instance.live ? EconomyMirror.instance.plan : EarnWallet.instance.plan;
+  String get _planName => EconomyMirror.instance.plan;
 
   Widget _earnHub() {
     final live = EconomyMirror.instance.live;
-    final coins = live ? EconomyMirror.instance.coins : EarnWallet.instance.coins;
+    final coins = EconomyMirror.instance.coins;
     final streak = live ? EconomyMirror.instance.streak : PracticeProgress.instance.streak;
-    final code = live && EconomyMirror.instance.subscribed ? EconomyMirror.instance.code : 'Locked';
-    final refs = live ? EconomyMirror.instance.paidReferrals : EarnWallet.instance.referralSubs;
+    final code = EconomyMirror.instance.code.isNotEmpty ? EconomyMirror.instance.code : (EarnWallet.instance.code.isNotEmpty ? EarnWallet.instance.code : '—');
+    final refs = EconomyMirror.instance.paidReferrals;
     final tier = live ? EconomyMirror.instance.circleTier : 'Member';
     final earned = live ? EconomyMirror.instance.lifetimeCents : 0;
     return Column(
       children: [
+        const SectionBlock(
+          marginBottom: 18,
+          title: 'Programs',
+          child: ProgramCardsStrip(),
+        ),
         SectionBlock(
           marginBottom: 18,
           title: 'Rewards',
@@ -585,11 +591,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               GestureDetector(
                 onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const VaultScreen())),
                 child: _TeaserStat(
-                  '${EconomyMirror.instance.live ? EconomyMirror.instance.coins : EarnWallet.instance.coins}',
+                  '${EconomyMirror.instance.coins}',
                   'Coins',
                   expanded: false,
                   figure: CoinCount(
-                    value: EconomyMirror.instance.live ? EconomyMirror.instance.coins : EarnWallet.instance.coins,
+                    value: EconomyMirror.instance.coins,
                     style: const TextStyle(fontFamily: _mono, fontSize: 22, fontWeight: FontWeight.w600, height: 1, color: _text),
                   ),
                 ),
@@ -669,8 +675,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       );
 
+  static String _coinReason(String r) {
+    final k = r.split(':').first;
+    const names = {
+      'login': 'Daily sign-in', 'quest': 'Quest', 'scratch': 'Scratch card', 'checkout': 'Coins at checkout', 'checkout-release': 'Coins returned',
+      'sale-coins': 'Sale coins', 'expired': 'Coins expired', 'gift': 'Gift', 'box': 'Gift box', 'spin': 'Spin', 'season': 'Season reward',
+      'league': 'League reward', 'mastery': 'Mastery', 'practice': 'Practice', 'explore': 'Explored a page', 'coins-back': 'Coins back on a purchase',
+    };
+    for (final e in names.entries) {
+      if (k.startsWith(e.key)) return e.value;
+    }
+    return r.isEmpty ? 'Coins' : r;
+  }
+
   Widget _recentActivity() {
-    final items = EarnWallet.instance.activity;
+    final raw = EconomyMirror.instance.summary['recentCoins'];
+    final items = <EarnActivity>[
+      for (final r in (raw is List ? raw : const []))
+        if (r is Map)
+          EarnActivity(
+            at: (r['at'] as num?)?.toInt() ?? 0,
+            title: _coinReason('${r['reason'] ?? ''}'),
+            detail: r['balance'] == null ? '' : 'Balance ${r['balance']}',
+            coins: (r['delta'] as num?)?.toInt() ?? 0,
+          ),
+    ];
     return SectionBlock(
       marginBottom: 40,
       title: 'Recent Activity',

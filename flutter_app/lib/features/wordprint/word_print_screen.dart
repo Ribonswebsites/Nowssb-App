@@ -37,6 +37,7 @@ class _WordPrintScreenState extends State<WordPrintScreen> {
     final uid = _found ?? widget.uid ?? EconomyMirror.instance.uid;
     final mine = uid != null && uid == EconomyMirror.instance.uid;
     return EconomyPage(
+      goodToKnow: 'Your Word Print shows only what you choose to make public. Money and payout details are never on it.',
       title: 'Word Print',
       mark: NwsbMarks.signature,
       child: ListView(

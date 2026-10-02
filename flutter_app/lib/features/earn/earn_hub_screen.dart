@@ -22,6 +22,13 @@ import '../economy/reference_screen.dart';
 import '../../widgets/program_shelf.dart';
 import '../../admin/template/editable.dart';
 import '../../admin/layout/layout_sections.dart';
+import '../programs/coupons_program.dart';
+import '../programs/earn_program.dart';
+import '../programs/gifts_program.dart';
+import '../programs/partner_program.dart';
+import '../programs/program_kit.dart';
+import '../programs/reference_program.dart';
+import '../programs/rewards_program.dart';
 
 class EarnHubScreen extends StatelessWidget {
   const EarnHubScreen({super.key});
@@ -29,6 +36,7 @@ class EarnHubScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return EconomyPage(
+      goodToKnow: kEarnDisclaimer,
       title: 'NowssB Earn',
       mark: NwsbMarks.piggy,
       banner: const ColoredSplitPromoBanner(
@@ -74,7 +82,7 @@ class EarnHubScreen extends StatelessWidget {
                   final page = switch (poster.title) {
                     'Rewards' => const VaultScreen(),
                     'Gift' => const GiftsScreen(),
-                    'Partner' => WordPrintScreen(uid: w.uid),
+                    'Partner' => const PartnerProgramPage(),
                     'Bonus' => const EchoWallScreen(),
                     _ => const CircleScreen(),
                   };
@@ -82,25 +90,23 @@ class EarnHubScreen extends StatelessWidget {
                 },
               ),
               const SizedBox(height: 14),
-              LSection('earn', 'NowssB Earn', GoldButton(label: 'NowssB Earn', onTap: () => _open(context, const CircleScreen()))),
-              const SizedBox(height: 8),
-              LSection('rewards', 'Rewards', GoldButton(label: 'Rewards', filled: false, onTap: () => _open(context, const VaultScreen()))),
-              const SizedBox(height: 8),
-              LSection('gifts', 'Gifts', GoldButton(label: 'Gifts', filled: false, onTap: () => _open(context, const GiftsScreen()))),
-              const SizedBox(height: 8),
-              LSection('resell', 'Resell', GoldButton(label: 'Resell', filled: false, onTap: () => _open(context, const BazaarScreen()))),
-              const SizedBox(height: 8),
-              LSection('wordprint', 'Word Print', GoldButton(label: 'Word Print', filled: false, onTap: () => _open(context, WordPrintScreen(uid: w.uid)))),
-              const SizedBox(height: 8),
-              LSection('echo', 'Echo Wall', GoldButton(label: 'Echo Wall', filled: false, onTap: () => _open(context, const EchoWallScreen()))),
-              const SizedBox(height: 14),
-              LSection('earnings', 'Earnings', GoldButton(label: 'Earnings', filled: false, onTap: () => _open(context, const EarningsScreen()))),
-              const SizedBox(height: 8),
-              LSection('coupon', 'Coupon', GoldButton(label: 'Coupon', filled: false, onTap: () => _open(context, const CouponScreen()))),
-              const SizedBox(height: 8),
-              LSection('reference', 'Reference', GoldButton(label: 'Reference', filled: false, onTap: () => _open(context, const ReferenceScreen()))),
-              const SizedBox(height: 8),
-              LSection('partner', 'Partner', GoldButton(label: 'Partner', filled: false, onTap: () => _open(context, const PartnerScreen()))),
+              // The six programs from the plan, each with its full tab set.
+              LSection.group('programs', 'Programs', [
+                const EditableLabel('earn_hub_screen.EarnHubScreen', 'THE PROGRAMS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12)),
+                const SizedBox(height: 8),
+                ProgramLink(title: 'NowssB Earn', sub: 'Ranks, team, sales, targets, payouts', mark: NwsbMarks.piggy, page: () => const EarnProgramPage()),
+                ProgramLink(title: 'NowssB Rewards', sub: 'Daily coins, streaks, quests, season, leagues', mark: NwsbMarks.rewards, page: () => const RewardsProgramPage()),
+                ProgramLink(title: 'NowssB Coupons', sub: 'Scratch cards, rarity, odds, prizes', mark: NwsbMarks.coupon, page: () => const CouponsProgramPage()),
+                ProgramLink(title: 'NowssB Gifts', sub: 'Free boxes, gift cards, send and redeem', mark: NwsbMarks.gift, page: () => const GiftsProgramPage()),
+                ProgramLink(title: 'NowssB Reference', sub: 'Your links, friends, sharer ladder', mark: NwsbMarks.reference, page: () => const ReferenceProgramPage()),
+                ProgramLink(title: 'Partner Program', sub: 'Milestones, perks, buyer discount', mark: NwsbMarks.crown, page: () => const PartnerProgramPage()),
+              ]),
+              const SizedBox(height: 12),
+              LSection.group('more', 'More', [
+                ProgramLink(title: 'Your Earning', sub: 'Balance, payout account, request a payout', mark: NwsbMarks.bars, page: () => const EarningsScreen()),
+                ProgramLink(title: 'Word Print', sub: 'Your public profile of words', mark: NwsbMarks.word, page: () => WordPrintScreen(uid: w.uid)),
+                ProgramLink(title: 'Echo Wall', sub: 'Posts from people on NowssB', mark: NwsbMarks.verified, page: () => const EchoWallScreen()),
+              ]),
               const SizedBox(height: 18),
               const LSection('coins', 'Coin ledger', EditableLabel('earn_hub_screen.EarnHubScreen', 'COIN LEDGER', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12))),
               const SizedBox(height: 8),
@@ -108,7 +114,7 @@ class EarnHubScreen extends StatelessWidget {
               const SizedBox(height: 16),
               const LSection('cash', 'Cash ledger', EditableLabel('earn_hub_screen.EarnHubScreen', 'CASH LEDGER', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12))),
               const SizedBox(height: 8),
-              _ledger('cashLedger', w.uid),
+              _ledger('commissionLedger', w.uid),
             ]),
           );
         },
@@ -134,7 +140,9 @@ class EarnHubScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(bottom: 6),
                 child: Text(
-                  '${doc.data()['reason'] ?? ''}  ${doc.data()['delta'] ?? 0}',
+                  collection == 'commissionLedger'
+                      ? '${doc.data()['note'] ?? doc.data()['type'] ?? ''}  ₹${(((doc.data()['paise'] as num?) ?? 0) / 100).toStringAsFixed(2)}'
+                      : '${doc.data()['reason'] ?? ''}  ${doc.data()['delta'] ?? 0}',
                   style: const TextStyle(color: Colors.white),
                 ),
               ),

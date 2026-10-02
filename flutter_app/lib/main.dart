@@ -32,6 +32,7 @@ import 'data/earn_wallet.dart';
 import 'data/firebase.dart';
 import 'features/economy/economy_api.dart';
 import 'features/economy/money.dart';
+import 'features/economy/play_billing.dart';
 import 'data/device_flags.dart';
 import 'data/notifications.dart';
 import 'data/phone_notifications.dart';
@@ -123,11 +124,29 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
   final _navigatorKey = GlobalKey<NavigatorState>();
   final _popupRoutes = HomePopupRouteObserver();
   bool _checkingForUpdate = false;
+  Timer? _beat;
+
+  /// Foreground time for Rewards (server counts minutes between beats and
+  /// caps them; nothing is counted on the phone).
+  void _startBeat() {
+    _beat?.cancel();
+    _beat = Timer.periodic(const Duration(seconds: 60), (_) {
+      final u = NwsbFirebase.ready ? FirebaseAuth.instance.currentUser : null;
+      if (u == null || u.isAnonymous) return;
+      unawaited(EconomyApi.call('heartbeat').then((_) {}, onError: (_) {}));
+    });
+  }
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _startBeat();
+    if (NwsbFirebase.ready) {
+      FirebaseAuth.instance.authStateChanges().listen((u) {
+        if (u != null && !u.isAnonymous) unawaited(PlayCheckout.start().catchError((_) {}));
+      });
+    }
     // Read the manifest while the splash plays, so the prompt is ready when
     // it ends; this also resumes a download a previous launch left partial.
     unawaited(NwsbUpdater.instance.check(force: true));
@@ -142,6 +161,7 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _beat?.cancel();
     super.dispose();
   }
 
@@ -153,6 +173,7 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       VideoPool.instance.resume();
+      _startBeat();
       unawaited(NwsbUpdater.instance.onResumed());
       _checkForUpdate();
       if (NwsbFirebase.ready && FirebaseAuth.instance.currentUser != null) {
@@ -163,6 +184,7 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
         state == AppLifecycleState.detached) {
       NwsbUpdater.instance.setForeground(false);
       VideoPool.instance.releaseAll();
+      _beat?.cancel();
     }
   }
 

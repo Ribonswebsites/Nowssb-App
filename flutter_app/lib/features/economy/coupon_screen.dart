@@ -16,9 +16,12 @@ import '../../widgets/nwsb_coin_fly.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/program_shelf.dart';
 import 'economy_api.dart';
+import 'reward_fx.dart';
 import 'economy_theme.dart';
 import 'scratch_card.dart';
 import 'coupon_tickets.dart';
+import '../programs/program_kit.dart';
+import '../programs/coupons_program.dart';
 import '../../admin/template/editable.dart';
 
 class _Prize {
@@ -77,32 +80,27 @@ class CouponScreen extends StatefulWidget {
 }
 
 class _CouponScreenState extends State<CouponScreen> {
-  final int _coins = 12 + DateTime.now().day % 18;
+  String? _won;
   var _cleared = false;
   String? _error;
 
   Future<void> _clearedNow() async {
     if (_cleared) return;
     setState(() => _cleared = true);
-    final from = EconomyMirror.instance.coins;
-    var gained = 0;
     try {
       final result = await EconomyApi.call('scratchCoupon');
-      gained = (result['coins'] as num?)?.toInt() ?? 0;
+      if (!mounted) return;
+      setState(() => _won = '${result['label'] ?? ''}');
+      await celebrate(context, result);
     } on EconomyException catch (e) {
-      if (!EconomyApi.isMissing(e)) {
-        if (mounted) setState(() => _error = e.message);
-        return;
-      }
-      gained = await EconomyMirror.instance.grantOnce('scratch', _coins);
+      if (mounted) setState(() => _error = EconomyApi.isMissing(e) ? EconomyApi.switchingOnMessage : e.message);
     }
-    if (!mounted || gained <= 0) return;
-    await NwsbCoinFly.show(context, coins: gained, from: from, to: from + gained);
   }
 
   @override
   Widget build(BuildContext context) {
     return EconomyPage(
+      goodToKnow: kCouponsDisclaimer,
       title: 'NowssB Coupons',
       mark: NwsbMarks.coupon,
       child: ListView(
@@ -129,8 +127,8 @@ class _CouponScreenState extends State<CouponScreen> {
               children: [
                 EditableImage.asset(NwsbCoinFly.disc, width: 36, height: 36, fit: BoxFit.contain, slot: 'coupon_screen.CouponScreen'),
                 const SizedBox(height: 6),
-                Text('+$_coins', style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
-                const EditableLabel('coupon_screen.CouponScreen', 'NOWSSB COINS', style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 2, fontWeight: FontWeight.w700, fontSize: 12)),
+                Text(_won ?? 'Today\'s prize', textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800)),
+                const EditableLabel('coupon_screen.CouponScreen', 'DRAWN BY NOWSSB', style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 2, fontWeight: FontWeight.w700, fontSize: 12)),
               ],
             ),
           ),
@@ -140,6 +138,7 @@ class _CouponScreenState extends State<CouponScreen> {
           ],
           const SizedBox(height: 18),
           const CouponRails(),
+          ProgramLink(title: 'NowssB Coupons program', sub: 'Scratch cards, rarity, odds and your coupons', mark: NwsbMarks.coupon, page: () => const CouponsProgramPage()),
           const SizedBox(height: 18),
           const EditableLabel('coupon_screen.CouponScreen', 'PAID CARDS', style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontSize: 12, fontWeight: FontWeight.w700)),
           const SizedBox(height: 4),
@@ -252,52 +251,6 @@ class _PaidCardState extends State<_PaidCard> {
     }
   }
 
-  _Prize _pick() {
-    final prizes = widget.card.prizes;
-    final total = prizes.fold<int>(0, (s, p) => s + p.weight);
-    var roll = Random().nextInt(total);
-    for (final p in prizes) {
-      if (roll < p.weight) return p;
-      roll -= p.weight;
-    }
-    return prizes.first;
-  }
-
-  Future<void> _draw() async {
-    if (_busy || _landed != null) return;
-    setState(() => _busy = true);
-    final prize = _pick();
-    final code = 'NWSB-${widget.card.tier.substring(0, 1)}${Random().nextInt(9000) + 1000}';
-    var i = 0;
-    _timer = Timer.periodic(const Duration(milliseconds: 90), (t) {
-      if (!mounted) {
-        t.cancel();
-        return;
-      }
-      setState(() => _tick = i);
-      i++;
-      if (i > 16) t.cancel();
-    });
-    await Future<void>.delayed(const Duration(milliseconds: 1600));
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('nwsb_cdraw_${widget.card.tier}_$_day', '${prize.label}|$code');
-    var gained = 0;
-    final before = EconomyMirror.instance.coins;
-    if (prize.coins > 0) {
-      gained = await EconomyMirror.instance.grantOnce('draw_${widget.card.tier}', prize.coins);
-    }
-    if (!mounted) return;
-    setState(() {
-      _busy = false;
-      _landed = prize.label;
-      _code = code;
-    });
-    HapticFeedback.mediumImpact();
-    if (gained > 0 && mounted) {
-      await NwsbCoinFly.show(context, coins: gained, from: before, to: before + gained);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final card = widget.card;
@@ -334,15 +287,15 @@ class _PaidCardState extends State<_PaidCard> {
             ),
           const SizedBox(height: 8),
           Text(
-            flashing ?? _landed ?? 'Odds stay on this card. Draw once today.',
+            flashing ?? _landed ?? 'Paid card. The odds above are fixed; NowssB draws the prize after Google Play confirms.',
             style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
           ),
           if (_code != null)
             Text(_code!, style: const TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.2, fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
           GoldButton(
-            label: _landed != null ? 'Drawn today' : (_busy ? 'Drawing…' : 'Draw ${card.tier}'),
-            onTap: (_landed != null || _busy) ? null : _draw,
+            label: 'Buy ${card.tier} on Google Play',
+            onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CouponsProgramPage(initialTab: 2))),
           ),
         ],
       ),

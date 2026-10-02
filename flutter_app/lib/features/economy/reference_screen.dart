@@ -8,6 +8,8 @@ import '../../widgets/nwsb_icon.dart';
 import '../../widgets/program_shelf.dart';
 import 'economy_api.dart';
 import 'economy_theme.dart';
+import '../programs/program_kit.dart';
+import '../programs/reference_program.dart';
 
 class ReferenceScreen extends StatefulWidget {
   const ReferenceScreen({super.key});
@@ -29,6 +31,7 @@ class _ReferenceScreenState extends State<ReferenceScreen> {
   @override
   Widget build(BuildContext context) {
     return EconomyPage(
+      goodToKnow: kReferenceDisclaimer,
       title: 'Reference',
       mark: NwsbMarks.reference,
       child: ListenableBuilder(
@@ -41,6 +44,8 @@ class _ReferenceScreenState extends State<ReferenceScreen> {
               const ProgramShelf(),
               const SizedBox(height: 12),
               const CoinCollectCard(pageKey: 'reference', amount: 8, title: 'Reference coins'),
+              const SizedBox(height: 12),
+              ProgramLink(title: 'NowssB Reference program', sub: 'Your links, friends, sharer ladder, sellers board', mark: NwsbMarks.reference, page: () => const ReferenceProgramPage()),
               const SizedBox(height: 12),
               const GlassLine(
                 text: 'Your code attributes a sale. Their parent takes a small second level. Both must hold a plan.',
@@ -88,7 +93,7 @@ class _ReferenceScreenState extends State<ReferenceScreen> {
                       if (mounted) setState(() => _note = e.message);
                       return;
                     }
-                    if (mounted) setState(() => _note = 'Saved on this phone. It cannot be changed here.');
+                    if (mounted) setState(() => _note = EconomyApi.switchingOnMessage);
                   }
                 },
               ),

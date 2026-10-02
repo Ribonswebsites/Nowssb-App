@@ -9,6 +9,12 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../data/content.dart';
 import '../../data/models.dart';
 import '../../features/earn/earn_hub_screen.dart';
+import '../../features/programs/coupons_program.dart';
+import '../../features/programs/earn_program.dart';
+import '../../features/programs/gifts_program.dart';
+import '../../features/programs/partner_program.dart';
+import '../../features/programs/reference_program.dart';
+import '../../features/programs/rewards_program.dart';
 import '../../screens/app_settings.dart';
 import '../../screens/fashion_plus.dart';
 import '../../screens/healing_path.dart';
@@ -81,6 +87,12 @@ final List<AppPage> kAppPages = [
   AppPage('fashionplus', 'Fashion Plus', 'Explore', Icons.checkroom_rounded, () => const FashionPlusScreen()),
   AppPage('healing', 'Healing path', 'Explore', Icons.spa_rounded, () => const HealingPathScreen()),
   AppPage('earn', 'Earn & gifts', 'Explore', Icons.toll_rounded, () => const EarnHubScreen()),
+  AppPage('earn.program', 'NowssB Earn (program)', 'Programs', Icons.savings_rounded, () => const EarnProgramPage()),
+  AppPage('rewards.program', 'NowssB Rewards', 'Programs', Icons.star_rounded, () => const RewardsProgramPage()),
+  AppPage('coupons.program', 'NowssB Coupons', 'Programs', Icons.confirmation_number_rounded, () => const CouponsProgramPage()),
+  AppPage('gifts.program', 'NowssB Gifts', 'Programs', Icons.card_giftcard_rounded, () => const GiftsProgramPage()),
+  AppPage('reference.program', 'NowssB Reference', 'Programs', Icons.share_rounded, () => const ReferenceProgramPage()),
+  AppPage('partner.program', 'Partner Program', 'Programs', Icons.workspace_premium_rounded, () => const PartnerProgramPage()),
   AppPage('coach', 'Personal coach', 'Explore', Icons.support_agent_rounded, () => const PersonalCoachScreen()),
   AppPage('widgets', 'Widgets & features', 'Explore', Icons.widgets_rounded, () => const WidgetsPage()),
 ];

@@ -7,6 +7,7 @@ import '../../widgets/nwsb_icon.dart';
 import '../../widgets/program_shelf.dart';
 import 'economy_api.dart';
 import 'economy_theme.dart';
+import '../programs/partner_program.dart';
 
 class PartnerScreen extends StatelessWidget {
   const PartnerScreen({super.key});
@@ -14,6 +15,7 @@ class PartnerScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return EconomyPage(
+      goodToKnow: kPartnerDisclaimer,
       title: 'Partner',
       mark: NwsbMarks.crown,
       child: ListenableBuilder(
@@ -44,16 +46,19 @@ class PartnerScreen extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(99),
                 child: LinearProgressIndicator(
-                  value: (points / 100).clamp(0, 1),
+                  value: (points / 500).clamp(0, 1),
                   minHeight: 8,
                   color: const Color(0xFFE4C56A),
                   backgroundColor: const Color(0x22FFFFFF),
                 ),
               ),
               const SizedBox(height: 16),
-              _action(context, 'Log today’s practice · 1', 'practice'),
-              _action(context, 'Log a purchase day · 5', 'purchase'),
-              _action(context, 'Log a referral day · 10', 'referral'),
+              // Points come only from cleared purchases through your links
+              // (server partnerLedger). The full program has every track.
+              _action(context, 'My progress and perks', 0),
+              _action(context, 'Word Track', 1),
+              _action(context, 'Plan Track', 2),
+              _action(context, 'Buyer discount', 4),
             ],
           );
         },
@@ -61,24 +66,13 @@ class PartnerScreen extends StatelessWidget {
     );
   }
 
-  Widget _action(BuildContext context, String label, String kind) {
+  Widget _action(BuildContext context, String label, int tab) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: GoldButton(
         label: label,
-        filled: false,
-        onTap: () async {
-          try {
-            await EconomyApi.call('logPartnerAction', {'kind': kind});
-          } on EconomyException catch (e) {
-            if (!EconomyApi.isMissing(e) || !context.mounted) return;
-            final add = int.tryParse(label.split('·').last.trim()) ?? 1;
-            EconomyMirror.instance.addPartnerPoints(add);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('+$add partner points on this phone.')),
-            );
-          }
-        },
+        filled: tab == 0,
+        onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => PartnerProgramPage(initialTab: tab))),
       ),
     );
   }

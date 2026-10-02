@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../widgets/nwsb_coin_fly.dart';
 import 'economy_api.dart';
+import 'reward_fx.dart';
 import '../../admin/template/editable.dart';
 
 class WideCouponData {
@@ -198,16 +199,17 @@ class _WideCouponState extends State<WideCoupon> {
   Future<void> _take() async {
     await Clipboard.setData(ClipboardData(text: widget.data.copy));
     HapticFeedback.selectionClick();
-    if (widget.data.coins > 0) {
-      final before = EconomyMirror.instance.coins;
-      var gained = 0;
+    // Every ticket is claimed on the server: coupons land in your account
+    // (and in the checkout coupon picker); locked ones say how to get them.
+    {
       try {
-        gained = await EconomyMirror.instance.grantOnce('coupon_${widget.data.copy}', widget.data.coins);
-      } catch (_) {
-        gained = 0;
-      }
-      if (gained > 0 && mounted) {
-        await NwsbCoinFly.show(context, coins: gained, from: before, to: before + gained);
+        final r = await EconomyApi.call('claimTicket', {'code': widget.data.copy});
+        if (mounted && r['how'] != null && r['granted'] == null) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${r['how']}')));
+        }
+        if (mounted) await celebrate(context, r);
+      } on EconomyException catch (e) {
+        if (mounted) showEconomyError(context, e);
       }
     }
     if (mounted) setState(() => _copied = true);
@@ -349,18 +351,20 @@ class _FlipCouponState extends State<FlipCoupon> with SingleTickerProviderStateM
     _touched = true;
     setState(() => _busy = true);
     final d = widget.data;
-    var fly = 0;
-    var before = 0;
+    Map<String, dynamic>? won;
     if (!_showBack && d.chance && _result == null) {
-      final win = Random().nextInt(100) < d.winPercent;
-      _result = win ? 'win' : 'lose';
+      // The server rolls the chance (once per ticket per account).
       try {
+        final r = await EconomyApi.call('claimTicket', {'code': d.copy});
+        final win = r['win'] == true || r['granted'] != null;
+        _result = win ? 'win' : 'lose';
+        if (win) won = r;
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString(_key, _result!);
-        if (win && d.winCoins > 0) {
-          before = EconomyMirror.instance.coins;
-          fly = await EconomyMirror.instance.grantOnce('coupon_${d.copy}', d.winCoins);
-        }
+      } on EconomyException catch (e) {
+        if (mounted) showEconomyError(context, e);
+        setState(() => _busy = false);
+        return;
       } catch (_) {}
     }
     if (_showBack) {
@@ -369,8 +373,8 @@ class _FlipCouponState extends State<FlipCoupon> with SingleTickerProviderStateM
     } else {
       await _turn.forward();
       if (mounted) setState(() { _showBack = true; _busy = false; });
-      if (fly > 0 && mounted) {
-        await NwsbCoinFly.show(context, coins: fly, from: before, to: before + fly);
+      if (won != null && mounted) {
+        await celebrate(context, won);
       }
     }
   }

@@ -8,6 +8,7 @@ import '../gifts/gifts_screen.dart';
 import '../vault/vault_screen.dart';
 import 'earnings_screen.dart';
 import '../../admin/template/editable.dart';
+import '../programs/earn_program.dart';
 
 /// Same shell as NowssB Earn: scrolling black banner, glass, a black card.
 class EarnTopicPage extends StatelessWidget {
@@ -31,6 +32,7 @@ class EarnTopicPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return EconomyPage(
+      goodToKnow: kEarnDisclaimer,
       title: title,
       mark: mark,
       child: ListView(
