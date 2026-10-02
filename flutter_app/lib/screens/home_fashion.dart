@@ -31,6 +31,7 @@ import '../admin/layout/layout_sections.dart';
 import '../data/content.dart';
 import '../data/notifications.dart';
 import '../data/settings.dart';
+import '../media/video_pool.dart';
 import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
 import '../widgets/app_backdrop.dart';
@@ -266,14 +267,23 @@ class _HomeFashionState extends State<HomeFashion> {
     }
   }
 
+  bool _glassMode = true;
+
   /// Quick action hero chip → HeaderActionsSheet destinations.
   void _openQuickAction() {
     showHeaderActionsSheet(
       context,
-      glassMode: true,
-      onGlassToggle: () {},
+      glassMode: _glassMode,
+      // Same switch as the classic home: lighter video budget in glass mode.
+      onGlassToggle: () => setState(() {
+        _glassMode = !_glassMode;
+        VideoPool.instance.setGlassHomeMode(_glassMode);
+      }),
       onNotifications: () => showNotificationsSheet(context),
-      onFashionHome: () {},
+      // Already on the Fashion home → its own settings (Fashion Plus).
+      onFashionHome: () => Navigator.of(context).push(
+        MaterialPageRoute<void>(builder: (_) => const FashionPlusScreen()),
+      ),
       onStore: () => _go(3),
       onPlayer: () => _go(1),
     );

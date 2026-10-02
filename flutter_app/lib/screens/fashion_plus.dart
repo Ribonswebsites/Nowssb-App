@@ -83,22 +83,29 @@ class _FashionPlusScreenState extends State<FashionPlusScreen> {
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             sliver: SliverList.list(
-      // Server-driven order (Admin → UI Editor); bundled order by default.
-      children: layoutChildren(context, 'fashionplus', [
-              LSection('switch', 'Fashion Plus switch', _Switch(
-                on: on,
-                onChanged: (v) => Settings.instance.setFashionPlus(v),
-              )),
+                // Server-driven order (Admin → UI Editor); bundled order by default.
+                children: layoutChildren(context, 'fashionplus', [
+              LSection(
+                  'switch',
+                  'Fashion Plus switch',
+                  _Switch(
+                    on: on,
+                    onChanged: (v) => Settings.instance.setFashionPlus(v),
+                  )),
               const SizedBox(height: 14),
               const LSection('banners', 'Banner mix', BannerMix(seed: 2)),
               const SizedBox(height: 14),
-              const LSection('backgrounds', 'Background chooser', _BackgroundChooser()),
+              const LSection(
+                  'backgrounds', 'Background chooser', _BackgroundChooser()),
               const SizedBox(height: 24),
-              const LSection('changes', 'What the switch touches', DarkHead(
-                eyebrow: 'What the switch touches',
-                title: 'Seven things',
-                icon: Icons.auto_awesome_motion_outlined,
-              )),
+              const LSection(
+                  'changes',
+                  'What the switch touches',
+                  DarkHead(
+                    eyebrow: 'What the switch touches',
+                    title: 'Seven things',
+                    icon: Icons.auto_awesome_motion_outlined,
+                  )),
               const SizedBox(height: 14),
               for (final (title, sub) in _changes)
                 _ChangeRow(title: title, sub: sub, on: on),
@@ -254,7 +261,7 @@ class _BackgroundChooser extends StatelessWidget {
                     ),
                     for (var i = 0; i < Settings.fashionImages.length; i++)
                       _BackgroundChoice(
-                        label: Settings.fashionImageNames[i],
+                        label: Settings.fashionImageName(i),
                         selected: settings.fashionImageIndex == i,
                         onTap: () => Settings.instance.setFashionImage(i),
                       ),
@@ -323,7 +330,8 @@ class _ChangeRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                EditableLabel('fashion_plus.ChangeRow',
+                EditableLabel(
+                  'fashion_plus.ChangeRow',
                   title,
                   style: const TextStyle(
                     fontSize: 14,
@@ -332,7 +340,8 @@ class _ChangeRow extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 2),
-                EditableLabel('fashion_plus.ChangeRow',
+                EditableLabel(
+                  'fashion_plus.ChangeRow',
                   sub,
                   style:
                       const TextStyle(fontSize: 11.5, color: Color(0x8CFFFFFF)),

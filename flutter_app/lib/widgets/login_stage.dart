@@ -2,6 +2,7 @@
 /// Every pill is glass — no fill colour, no gradient.
 library;
 
+import 'app_thinking_loader.dart';
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
@@ -202,11 +203,7 @@ class LoginStage extends StatelessWidget {
               _GlassButton(
                 onTap: busy ? null : onSubmit,
                 child: busy
-                    ? const SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                      )
+                    ? const AppThinkingLoader(size: 22)
                     : EditableLabel(
                         'login_stage.LoginStage',
                         codeSent ? 'Verify' : (createAccount ? 'Sign Up' : 'Log In'),

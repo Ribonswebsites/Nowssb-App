@@ -70,8 +70,8 @@ class WordRequestStore extends ChangeNotifier {
     });
   }
 
-  Map<String, dynamic> _row(User u, String word, String notes, int at) => {
-        'kind': 'word',
+  Map<String, dynamic> _row(User u, String word, String notes, int at, [String kind = 'word']) => {
+        'kind': kind,
         'word': word.length > 80 ? word.substring(0, 80) : word,
         'notes': notes.length > 500 ? notes.substring(0, 500) : notes,
         'uid': u.uid,
@@ -83,13 +83,13 @@ class WordRequestStore extends ChangeNotifier {
       };
 
   /// Sends one request, or parks it. Never throws.
-  Future<bool> _send(String word, String notes, int at) async {
+  Future<bool> _send(String word, String notes, int at, [String kind = 'word']) async {
     final u = NwsbFirebase.ready ? FirebaseAuth.instance.currentUser : null;
     if (u != null) {
       try {
         await FirebaseFirestore.instance
             .collection('requests')
-            .add(_row(u, word, notes, at))
+            .add(_row(u, word, notes, at, kind))
             .timeout(const Duration(seconds: 12));
         return true;
       } catch (e) {
@@ -99,7 +99,7 @@ class WordRequestStore extends ChangeNotifier {
     try {
       final p = await SharedPreferences.getInstance();
       final q = p.getStringList(_queueKey) ?? <String>[];
-      q.add(jsonEncode({'word': word, 'notes': notes, 'at': at}));
+      q.add(jsonEncode({'word': word, 'notes': notes, 'at': at, 'kind': kind}));
       await p.setStringList(_queueKey, q.length > 30 ? q.sublist(q.length - 30) : q);
     } catch (_) {}
     return false;
@@ -117,7 +117,7 @@ class WordRequestStore extends ChangeNotifier {
       try {
         final m = jsonDecode(raw) as Map;
         await FirebaseFirestore.instance.collection('requests').add(_row(
-            u, '${m['word']}', '${m['notes'] ?? ''}', (m['at'] as num).toInt()));
+            u, '${m['word']}', '${m['notes'] ?? ''}', (m['at'] as num).toInt(), '${m['kind'] ?? 'word'}'));
       } catch (_) {
         failed.add(raw);
       }
@@ -168,7 +168,9 @@ class WordRequestStore extends ChangeNotifier {
     );
   }
 
-  Future<WordRequest> submit({required String word, String notes = ''}) async {
+  /// [kind] 'word' (default), 'sentence', 'healing' or 'verify' — the admin
+  /// Requests queue shows it.
+  Future<WordRequest> submit({required String word, String notes = '', String kind = 'word'}) async {
     await ensureLoaded();
     final cleaned = word.trim();
     if (cleaned.isEmpty) {
@@ -185,7 +187,7 @@ class WordRequestStore extends ChangeNotifier {
     _items.insert(0, req);
     await _persist();
     notifyListeners();
-    unawaited(_send(req.word, req.notes, req.createdAt.millisecondsSinceEpoch));
+    unawaited(_send(req.word, req.notes, req.createdAt.millisecondsSinceEpoch, kind));
     return req;
   }
 

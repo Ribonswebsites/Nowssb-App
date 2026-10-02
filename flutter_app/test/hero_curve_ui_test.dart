@@ -31,14 +31,13 @@ void main() {
     tester.view.devicePixelRatio = 3.0;
     addTearDown(tester.view.reset);
     await tester.pumpWidget(
-      const MaterialApp(home: Scaffold(body: HeroCurveStage())),
+      const MaterialApp(home: Scaffold(body: SingleChildScrollView(child: HeroCurveStage(compact: true)))),
     );
     await tester.pump();
     expect(tester.takeException(), isNull);
     expect(find.text('NowssB.'), findsOneWidget);
-    expect(find.text('Sound that finds you'), findsOneWidget);
-    expect(find.text('Pronunciation & sound healing, wherever you are'),
-        findsOneWidget);
+    // The copy under the stage is now the Buddha line, not the old tagline.
+    expect(find.textContaining('power of words'), findsOneWidget);
     expect(find.text('Word Science'), findsNothing);
     expect(find.textContaining('she stays'), findsNothing);
     expect(find.byType(HeroCurveStage), findsOneWidget);

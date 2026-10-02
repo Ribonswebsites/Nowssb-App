@@ -16,7 +16,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../data/entitlements.dart';
 import '../../data/reader_store.dart';
+import '../../data/store_prices.dart';
+import '../../widgets/content_lock.dart';
 import '../../data/store_catalog.dart';
 import '../../media/nwsb_image.dart';
 import '../../theme/tokens.dart';
@@ -88,12 +91,24 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
     super.initState();
     _book = widget.initialBook;
     _store.addListener(_onStore);
+    Entitlements.instance.addListener(_onStore);
+    // A paid ebook opened from the Store needs a purchase, the ebook pass
+    // or Frequency X; otherwise the lock sheet offers the real ways in.
+    final b = _book;
+    if (b != null && b.price > 0) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (!mounted) return;
+        final ok = await ensureEbookOpen(context, title: b.title, sub: b.sub, img: b.cover, price: b.price);
+        if (!ok && mounted) setState(() => _book = null);
+      });
+    }
     unawaited(_store.ensureLoaded());
   }
 
   @override
   void dispose() {
     _store.removeListener(_onStore);
+    Entitlements.instance.removeListener(_onStore);
     _toastT?.cancel();
     _noteIn.dispose();
     _stage.dispose();
@@ -103,6 +118,11 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
   void _onStore() {
     if (mounted) setState(() {});
   }
+
+  bool _meaningOpen(String word) => Entitlements.instance.canOpenMeaning(
+        word,
+        price: StorePrices.instance.priceFor('meaning:${word.toLowerCase()}'),
+      );
 
   void _haptic([int ms = 15]) {
     if (ms >= 24) {
@@ -261,6 +281,12 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
         _webWait = false;
         _webBody = out ?? '';
       });
+      if (out == null) {
+        // No in-app answer — hand off to Google Translate in the browser.
+        _toastNow('Opening Google Translate…');
+        unawaited(launchUrl(ReaderLookup.webTranslateUri(t, _store.lang),
+            mode: LaunchMode.externalApplication));
+      }
     } else {
       final rows = await ReaderLookup.search(t);
       if (!mounted) return;
@@ -455,10 +481,14 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
                   title: b.title,
                   sub: b.sub,
                   meta: '${b.contents.length} chapters',
-                  onTap: () {
+                  onTap: () async {
                     OpenedEpub? opened;
                     for (final e in _store.epubs) {
                       if (e.key == b.key) opened = e;
+                    }
+                    if (opened == null && b.price > 0) {
+                      final ok = await ensureEbookOpen(context, title: b.title, sub: b.sub, img: b.cover, price: b.price);
+                      if (!ok || !mounted) return;
                     }
                     setState(() {
                       _book = b;
@@ -755,7 +785,27 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
                   ),
                 ),
               ),
-            if (pg.pending)
+            if (_isMeaning && !_meaningOpen(pg.title))
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 26, horizontal: 6),
+                child: Column(
+                  children: [
+                    Icon(Icons.lock_rounded, color: _pageFg.withValues(alpha: 0.6)),
+                    const SizedBox(height: 10),
+                    EditableLabel('reader_book.ReaderBookScreen',
+                      'This meaning is locked. Buy it once, or read every meaning with Frequency or Frequency X.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 13, height: 1.7, color: _pageFg.withValues(alpha: 0.72)),
+                    ),
+                    const SizedBox(height: 14),
+                    TextButton(
+                      onPressed: () => ensureMeaningOpen(context, word: pg.title, root: pg.root ?? '', img: kMsCardImg),
+                      child: Text('Unlock ${pg.title}', style: const TextStyle(color: NwsbColors.goldLight, fontWeight: FontWeight.w800)),
+                    ),
+                  ],
+                ),
+              )
+            else if (pg.pending)
               Padding(
                 padding:
                     const EdgeInsets.symmetric(vertical: 26, horizontal: 6),

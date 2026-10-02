@@ -8,6 +8,7 @@ import '../widgets/app_thinking_loader.dart';
 import '../widgets/colored_split_promo_banner.dart';
 import '../widgets/nwsb_icon.dart';
 import 'practice.dart';
+import 'player_settings.dart';
 import '../admin/template/editable.dart';
 
 class SelectLevelScreen extends StatefulWidget {
@@ -51,7 +52,13 @@ class _SelectLevelScreenState extends State<SelectLevelScreen> {
               child: Column(children: [
                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                   _CircleButton(icon: Icons.chevron_left_rounded, onTap: () => Navigator.of(context).pop()),
-                  _CircleButton(icon: Icons.more_horiz_rounded, onTap: () {}),
+                  // More → the player's settings (voice, speed, AURA, sleep).
+                  _CircleButton(
+                    icon: Icons.more_horiz_rounded,
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(builder: (_) => const PlayerSettingsScreen()),
+                    ),
+                  ),
                 ]),
                 const SizedBox(height: 12),
                 LayoutBuilder(

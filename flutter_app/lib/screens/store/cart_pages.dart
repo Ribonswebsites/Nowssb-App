@@ -4,13 +4,20 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../data/billing_config.dart';
 import '../../data/cart_bag.dart';
-import '../../data/earn_wallet.dart';
+import '../../data/entitlements.dart';
+import '../../data/store_prices.dart';
 import '../../theme/tokens.dart';
-import '../../widgets/app_backdrop.dart';
 import '../../widgets/cart_add_animation.dart';
+import '../../widgets/page_shell.dart';
 import '../../features/economy/money.dart';
+import '../../features/programs/store_extras.dart';
+import '../nwsb_sign_in_sheet.dart';
+import '../subscription.dart';
 import 'bag_ui.dart';
+import 'store_routes.dart';
+import 'store_select_sheet.dart';
 import '../../admin/template/editable.dart';
 
 String _inr(num value) {
@@ -27,7 +34,7 @@ class CartPage extends StatelessWidget {
       title: 'Cart',
       eyebrow: 'NowssB Store',
       child: ListenableBuilder(
-        listenable: CartBag.instance,
+        listenable: Listenable.merge([CartBag.instance, Entitlements.instance]),
         builder: (context, _) {
           final bag = CartBag.instance;
           if (bag.cart.isEmpty) {
@@ -43,28 +50,15 @@ class CartPage extends StatelessWidget {
             children: [
               for (final it in bag.cart) _CartTile(item: it),
               const SizedBox(height: 12),
-              _TotalRow(label: 'Subtotal', value: _inr(bag.cartTotal)),
+              _TotalRow(label: 'Subtotal', value: _inr(_payable(bag.cart))),
               const SizedBox(height: 16),
               _GoldBtn(
-                label: 'Checkout',
+                label: 'Checkout on Google Play',
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute<void>(builder: (_) => const CheckoutPage()),
                 ),
               ),
-              if (bag.orders.isNotEmpty) ...[
-                const SizedBox(height: 28),
-                const EditableLabel('cart_pages.CartPage',
-                  'RECENT ORDERS',
-                  style: TextStyle(
-                    fontSize: 10,
-                    letterSpacing: 2,
-                    color: NwsbColors.gold,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                for (final o in bag.orders.take(5)) _OrderTile(order: o),
-              ],
+              const _PurchasesBlock(),
             ],
           );
         },
@@ -103,141 +97,88 @@ class WishlistPage extends StatelessWidget {
   }
 }
 
+/// What the cart still costs: items not owned and not included in a plan.
+num _payable(List<BagItem> items) {
+  final e = Entitlements.instance;
+  num total = 0;
+  for (final it in items) {
+    final price = StorePrices.instance.priceFor(it.id, shown: it.price);
+    if (price <= 0 || e.ownsOrIncluded(it.id, price: price)) continue;
+    total += price;
+  }
+  return total;
+}
+
+/// Checkout for digital items: every word, meaning, Signature piece and
+/// ebook is bought on Google Play, one purchase per item (or ten words as a
+/// bundle). There is no address, no card form and no order on the phone —
+/// an item is yours when the server has confirmed the Play purchase and
+/// written it to your account (users/{uid}/owned).
 class CheckoutPage extends StatefulWidget {
-  const CheckoutPage({super.key});
+  const CheckoutPage({super.key, this.items});
+
+  /// Buy just these (an "Unlock" button); null = the whole cart.
+  final List<BagItem>? items;
 
   @override
   State<CheckoutPage> createState() => _CheckoutPageState();
 }
 
 class _CheckoutPageState extends State<CheckoutPage> {
-  late final TextEditingController _name;
-  late final TextEditingController _phone;
-  late final TextEditingController _address;
-  String _pay = 'UPI';
-  bool _useCoins = true;
-  BagOrder? _placed;
-  String? _error;
+  String? _message;
 
-  @override
-  void initState() {
-    super.initState();
-    final bag = CartBag.instance;
-    _name = TextEditingController(text: bag.shipName);
-    _phone = TextEditingController(text: bag.shipPhone);
-    _address = TextEditingController(text: bag.shipAddress);
+  List<BagItem> get _items => widget.items ?? CartBag.instance.cart;
+
+  bool _open(BagItem it) {
+    final price = StorePrices.instance.priceFor(it.id, shown: it.price);
+    return price <= 0 || Entitlements.instance.ownsOrIncluded(it.id, price: price);
   }
 
-  @override
-  void dispose() {
-    _name.dispose();
-    _phone.dispose();
-    _address.dispose();
-    super.dispose();
+  String _priceLabel(BagItem it) {
+    final price = StorePrices.instance.priceFor(it.id, shown: it.price);
+    return price <= 0 ? 'Free' : _inr(price);
   }
 
-  Future<void> _place() async {
-    final bag = CartBag.instance;
-    if (bag.cart.isEmpty) {
-      setState(() => _error = 'Your cart is empty.');
-      return;
-    }
-    if (_name.text.trim().isEmpty ||
-        _phone.text.trim().length < 8 ||
-        _address.text.trim().isEmpty) {
-      setState(() => _error = 'Add your name, phone and address.');
-      return;
-    }
-    HapticFeedback.mediumImpact();
-    final coinsUsed = await EarnWallet.instance.reserveCheckoutCoins(
-      bag.cartTotal,
-      use: _useCoins,
-    );
-    final order = await bag.checkout(
-      name: _name.text,
-      phone: _phone.text,
-      address: _address.text,
-      payMethod: _pay,
-      coinsUsed: coinsUsed,
-    );
-    if (order != null) {
-      await EarnWallet.instance.onStoreOrder(order);
+  /// Cart lines for the server checkout: {id, kind, title, price, qty}.
+  List<Map<String, dynamic>> _lines(List<BagItem> toBuy) => [
+        for (final it in toBuy)
+          {
+            'id': it.id,
+            'kind': contentKindOfItem(it.id) ?? it.kind.toLowerCase(),
+            'title': it.title,
+            'price': StorePrices.instance.priceFor(it.id, shown: it.price),
+            'qty': 1,
+          },
+      ];
+
+  void _paid(List<BagItem> bought, Map<String, dynamic> result) {
+    for (final it in bought) {
+      CartBag.instance.removeCart(it.id);
     }
     if (!mounted) return;
-    setState(() {
-      _placed = order;
-      _error = order == null ? 'Could not place the order.' : null;
-    });
+    setState(() => _message = bought.length == 1
+        ? '${bought.first.title} is yours. It opens on every phone you sign in to.'
+        : 'Your ${bought.length} items are yours. They open on every phone you sign in to.');
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_placed != null) {
-      final o = _placed!;
-      return _BagScaffold(
-        title: 'Order placed',
-        eyebrow: 'Checkout',
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
-          children: [
-            Text(
-              o.id,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              '${o.items.length} item${o.items.length == 1 ? '' : 's'} · ${_inr(o.total)} · ${o.payMethod}',
-              style: const TextStyle(fontSize: 13, color: Color(0x99FFFFFF)),
-            ),
-            const SizedBox(height: 16),
-            for (final it in o.items)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Text(
-                  '${it.title}  ×${it.qty}  ${_inr(it.lineTotal)}',
-                  style: const TextStyle(
-                    color: Color(0xCCFFFFFF),
-                    fontSize: 13,
-                  ),
-                ),
-              ),
-            const SizedBox(height: 8),
-            Text(
-              '${o.name}\n${o.phone}\n${o.address}',
-              style: const TextStyle(
-                fontSize: 13,
-                height: 1.5,
-                color: Color(0x99FFFFFF),
-              ),
-            ),
-            const SizedBox(height: 24),
-            _GoldBtn(
-              label: 'Back to Store',
-              onTap: () => Navigator.of(context).popUntil((r) => r.isFirst),
-            ),
-          ],
-        ),
-      );
-    }
-
     return _BagScaffold(
       title: 'Checkout',
       eyebrow: 'NowssB Store',
       child: ListenableBuilder(
-        listenable: Listenable.merge([CartBag.instance, EarnWallet.instance]),
+        listenable: Listenable.merge([
+          CartBag.instance,
+          Entitlements.instance,
+          StorePrices.instance,
+        ]),
         builder: (context, _) {
-          final bag = CartBag.instance;
-          final quote = EarnWallet.instance.quote(bag.cartTotal);
-          final coins = _useCoins ? quote.coins : 0;
-          final cash = bag.cartTotal - coins;
+          final items = _items;
+          final toBuy = [for (final it in items) if (!_open(it)) it];
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
             children: [
-              if (bag.cart.isEmpty)
+              if (items.isEmpty)
                 const Padding(
                   padding: EdgeInsets.only(bottom: 16),
                   child: EditableLabel('cart_pages.CheckoutPage',
@@ -245,43 +186,22 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     style: TextStyle(color: Color(0x99FFFFFF)),
                   ),
                 )
-              else ...[
-                for (final it in bag.cart)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: Row(
-                      children: [
-                        bagThumb(it.image),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            '${it.title}  ×${it.qty}',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                        Text(
-                          _inr(it.lineTotal),
-                          style: const TextStyle(color: NwsbColors.goldLight),
-                        ),
-                      ],
-                    ),
+              else
+                for (final it in items)
+                  _CheckoutRow(
+                    item: it,
+                    price: _priceLabel(it),
+                    state: _open(it)
+                        ? (StorePrices.instance.priceFor(it.id, shown: it.price) <= 0
+                            ? 'Free'
+                            : Entitlements.instance.ownsItem(it.id)
+                                ? 'Owned'
+                                : 'In your plan')
+                        : null,
                   ),
-                _TotalRow(label: 'To pay', value: _inr(cash < 0 ? 0 : cash)),
-                if (coins > 0)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 6),
-                    child: Text(
-                      '$coins coins cover up to 30%. Cash ${_inr(cash < 0 ? 0 : cash)} is recorded, not charged to a card.',
-                      style: const TextStyle(color: Color(0x99FFFFFF), fontSize: 12),
-                    ),
-                  ),
-              ],
-              const SizedBox(height: 22),
+              const SizedBox(height: 10),
               const EditableLabel('cart_pages.CheckoutPage',
-                'DELIVER TO',
+                'HOW YOU PAY',
                 style: TextStyle(
                   fontSize: 10,
                   letterSpacing: 2,
@@ -289,66 +209,47 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              const SizedBox(height: 10),
-              _Field(controller: _name, hint: 'Full name'),
-              _Field(
-                controller: _phone,
-                hint: 'Phone',
-                keyboard: TextInputType.phone,
+              const SizedBox(height: 8),
+              const EditableLabel('cart_pages.CheckoutPage',
+                'Words, meanings and ebooks are digital: nothing is shipped. You pay securely on Google Play in your own currency; coupons and coins can lower the price. Items unlock on every phone you sign in to once Google confirms the payment.',
+                style: TextStyle(color: Color(0x99FFFFFF), fontSize: 12.5, height: 1.5),
               ),
-              _Field(controller: _address, hint: 'Address', maxLines: 3),
+              const SizedBox(height: 14),
+              if (toBuy.isNotEmpty && !Entitlements.instance.signedIn)
+                _GoldBtn(
+                  label: 'Sign in to pay',
+                  onTap: () => NwsbSignInPage.open(context),
+                )
+              else if (toBuy.isNotEmpty)
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: const Color(0x52000000),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0x17FFFFFF)),
+                  ),
+                  child: CheckoutPanel(
+                    items: _lines(toBuy),
+                    onPaid: (r) => _paid(toBuy, r),
+                  ),
+                ),
+              if (_message != null) ...[
+                const SizedBox(height: 14),
+                Text(_message!, style: const TextStyle(color: Color(0xFFA5D6A7))),
+              ],
               const SizedBox(height: 18),
-              const EditableLabel('cart_pages.CheckoutPage',
-                'PAY WITH',
-                style: TextStyle(
-                  fontSize: 10,
-                  letterSpacing: 2,
-                  color: NwsbColors.gold,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Wrap(
-                spacing: 8,
-                children: [
-                  for (final p in const ['UPI', 'Card', 'Cash on delivery'])
-                    ChoiceChip(
-                      label: Text(p),
-                      selected: _pay == p,
-                      onSelected: (_) => setState(() => _pay = p),
-                      selectedColor: NwsbColors.goldLight,
-                      labelStyle: TextStyle(
-                        color: _pay == p ? NwsbColors.ink : Colors.white,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 12,
-                      ),
-                      backgroundColor: const Color(0x14FFFFFF),
-                      side: const BorderSide(color: Color(0x24FFFFFF)),
-                    ),
-                ],
-              ),
-              if (quote.maxCoins > 0) ...[
-                const SizedBox(height: 14),
-                SwitchListTile(
-                  contentPadding: EdgeInsets.zero,
-                  value: _useCoins,
-                  onChanged: (v) => setState(() => _useCoins = v),
-                  title: Text(
-                    'Use ${quote.coins} NowssB Coins',
-                    style: const TextStyle(color: Colors.white, fontSize: 14),
-                  ),
-                  subtitle: const EditableLabel('cart_pages.CheckoutPage',
-                    'At most 30% of this order',
-                    style: TextStyle(color: Color(0x99FFFFFF), fontSize: 12),
+              if (toBuy.isEmpty && items.isNotEmpty)
+                _GoldBtn(
+                  label: 'Done',
+                  onTap: () => Navigator.of(context).pop(),
+                )
+              else if (toBuy.isNotEmpty)
+                _GoldBtn(
+                  label: 'See plans that include these',
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(builder: (_) => const SubscriptionScreen()),
                   ),
                 ),
-              ],
-              if (_error != null) ...[
-                const SizedBox(height: 14),
-                Text(_error!, style: const TextStyle(color: Color(0xFFFF8A80))),
-              ],
-              const SizedBox(height: 22),
-              _GoldBtn(label: 'Place order', onTap: _place),
             ],
           );
         },
@@ -357,6 +258,137 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 }
 
+class _CheckoutRow extends StatelessWidget {
+  const _CheckoutRow({
+    required this.item,
+    required this.price,
+    required this.state,
+  });
+  final BagItem item;
+  final String price;
+
+  /// 'Free' / 'Owned' / 'In your plan', or null when it still has to be bought.
+  final String? state;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0x52000000),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0x17FFFFFF)),
+      ),
+      child: Row(
+        children: [
+          bagThumb(item.image),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(item.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+                Text('${item.kind} · $price',
+                    style: const TextStyle(fontSize: 11, color: Color(0x80FFFFFF))),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          if (state != null)
+            Text(state!, style: const TextStyle(color: Color(0xFFA5D6A7), fontWeight: FontWeight.w700, fontSize: 12)),
+        ],
+      ),
+    );
+  }
+}
+
+class _BuyOnPlayPill extends StatelessWidget {
+  const _BuyOnPlayPill({required this.onTap});
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Opacity(
+        opacity: onTap == null ? 0.5 : 1,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: NwsbColors.goldLight,
+            borderRadius: BorderRadius.circular(99),
+          ),
+          child: const Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.shop_rounded, size: 14, color: NwsbColors.ink),
+              SizedBox(width: 5),
+              EditableLabel('cart_pages.BuyOnPlayPill',
+                'Buy on Google Play',
+                style: TextStyle(color: NwsbColors.ink, fontWeight: FontWeight.w800, fontSize: 11.5),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The items this account really owns (server-confirmed), instead of the
+/// old phone-only "orders".
+class _PurchasesBlock extends StatelessWidget {
+  const _PurchasesBlock();
+
+  static String _label(String docId) {
+    final i = docId.indexOf('_');
+    if (i <= 0) return docId;
+    final kind = docId.substring(0, i);
+    final name = docId.substring(i + 1).replaceAll('_', ' ');
+    final nice = name.isEmpty ? name : name[0].toUpperCase() + name.substring(1);
+    return '$nice · ${kind[0].toUpperCase()}${kind.substring(1)}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: Entitlements.instance,
+      builder: (context, _) {
+        final owned = Entitlements.instance.owned.toList()..sort();
+        if (owned.isEmpty) return const SizedBox.shrink();
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 28),
+            const EditableLabel('cart_pages.CartPage',
+              'YOUR PURCHASES',
+              style: TextStyle(
+                fontSize: 10,
+                letterSpacing: 2,
+                color: NwsbColors.gold,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 10),
+            for (final id in owned.take(20))
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Text(_label(id), style: const TextStyle(fontSize: 12, color: Color(0x99FFFFFF))),
+              ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+/// Cart, wishlist and checkout wear the Store's own shell (PageShell: the
+/// brand back control, "NowssB Store" heading, the bag and the store picker),
+/// the same as the four departments.
 class _BagScaffold extends StatelessWidget {
   const _BagScaffold({
     required this.eyebrow,
@@ -368,82 +400,20 @@ class _BagScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: NwsbColors.deep,
-      body: Stack(
-        children: [
-          const Positioned.fill(child: AppBackdrop()),
-          const Positioned.fill(
-            child: IgnorePointer(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Color(0x88060C18), Color(0xAA060C18)],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          SafeArea(
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-                  child: Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () => Navigator.of(context).pop(),
-                        child: Container(
-                          width: 42,
-                          height: 42,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.arrow_back,
-                            size: 19,
-                            color: NwsbColors.ink,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              eyebrow.toUpperCase(),
-                              style: const TextStyle(
-                                fontSize: 10,
-                                letterSpacing: 3,
-                                fontWeight: FontWeight.w700,
-                                color: NwsbColors.gold,
-                              ),
-                            ),
-                            EditableLabel('cart_pages.BagScaffold',
-                              title,
-                              style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const StoreBagBar(),
-                    ],
-                  ),
-                ),
-                Expanded(child: child),
-              ],
-            ),
-          ),
-        ],
+    return PageShell(
+      eyebrow: '',
+      title: 'NowssB Store',
+      subtitle: title,
+      film: 'assets/video/player-bg-loop.mp4',
+      usePageFilm: true,
+      onBack: () => Navigator.of(context).pop(),
+      onStorePicker: () => showStoreSelectSheet(
+        context,
+        onSelect: (id) => openStoreFromPicker(context, id, current: ''),
       ),
+      slivers: [
+        SliverFillRemaining(hasScrollBody: true, child: child),
+      ],
     );
   }
 }
@@ -481,7 +451,7 @@ class _CartTile extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '${item.kind} · ${_inr(item.price)}',
+                  '${item.kind} · ${_inr(StorePrices.instance.priceFor(item.id, shown: item.price))}',
                   style: const TextStyle(
                     fontSize: 11,
                     color: Color(0x80FFFFFF),
@@ -490,20 +460,22 @@ class _CartTile extends StatelessWidget {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    _QtyBtn(
-                      icon: Icons.remove,
-                      onTap: () => bag.setQty(item.id, item.qty - 1),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Text(
-                        '${item.qty}',
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                    ),
-                    _QtyBtn(
-                      icon: Icons.add,
-                      onTap: () => bag.setQty(item.id, item.qty + 1),
+                    ListenableBuilder(
+                      listenable: Entitlements.instance,
+                      builder: (context, _) {
+                        final price = StorePrices.instance.priceFor(item.id, shown: item.price);
+                        if (price <= 0 || Entitlements.instance.ownsOrIncluded(item.id, price: price)) {
+                          return Text(
+                            price <= 0 ? 'Free' : Entitlements.instance.ownsItem(item.id) ? 'Owned' : 'In your plan',
+                            style: const TextStyle(color: Color(0xFFA5D6A7), fontWeight: FontWeight.w700, fontSize: 12),
+                          );
+                        }
+                        return _BuyOnPlayPill(
+                          onTap: () => Navigator.of(context).push(
+                            MaterialPageRoute<void>(builder: (_) => CheckoutPage(items: [item])),
+                          ),
+                        );
+                      },
                     ),
                     const Spacer(),
                     GestureDetector(
@@ -560,7 +532,7 @@ class _WishTile extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '${item.kind} · ${_inr(item.price)}',
+                  '${item.kind} · ${_inr(StorePrices.instance.priceFor(item.id, shown: item.price))}',
                   style: const TextStyle(
                     fontSize: 11,
                     color: Color(0x80FFFFFF),
@@ -605,46 +577,6 @@ class _WishTile extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _OrderTile extends StatelessWidget {
-  const _OrderTile({required this.order});
-  final BagOrder order;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Text(
-        '${order.id} · ${_inr(order.total)} · ${order.payMethod}',
-        style: const TextStyle(fontSize: 12, color: Color(0x80FFFFFF)),
-      ),
-    );
-  }
-}
-
-class _QtyBtn extends StatelessWidget {
-  const _QtyBtn({required this.icon, required this.onTap});
-  final IconData icon;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 28,
-        height: 28,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: const Color(0x14FFFFFF),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: const Color(0x24FFFFFF)),
-        ),
-        child: Icon(icon, size: 14, color: Colors.white),
       ),
     );
   }
@@ -698,50 +630,6 @@ class _GoldBtn extends StatelessWidget {
             fontSize: 14,
             fontWeight: FontWeight.w800,
             color: NwsbColors.ink,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _Field extends StatelessWidget {
-  const _Field({
-    required this.controller,
-    required this.hint,
-    this.maxLines = 1,
-    this.keyboard,
-  });
-  final TextEditingController controller;
-  final String hint;
-  final int maxLines;
-  final TextInputType? keyboard;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: TextField(
-        controller: controller,
-        maxLines: maxLines,
-        keyboardType: keyboard,
-        style: const TextStyle(color: Colors.white, fontSize: 14),
-        decoration: InputDecoration(
-          hintText: hint,
-          hintStyle: const TextStyle(color: Color(0x66FFFFFF)),
-          filled: true,
-          fillColor: const Color(0x14FFFFFF),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Color(0x24FFFFFF)),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Color(0x24FFFFFF)),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: NwsbColors.goldLight),
           ),
         ),
       ),

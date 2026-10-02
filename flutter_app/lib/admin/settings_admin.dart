@@ -10,6 +10,9 @@ import 'package:flutter/material.dart';
 import '../app_update.dart';
 import '../data/billing_config.dart';
 import '../data/play_subscriptions.dart';
+import '../data/store_catalog.dart';
+import '../data/store_prices.dart';
+import 'admin_log.dart';
 import 'admin_api.dart';
 import 'admin_data.dart';
 import 'admin_kit.dart';
@@ -199,6 +202,7 @@ class _SettingsAdminScreenState extends State<SettingsAdminScreen> {
               // ── store
               const SectionHead('Store', 'Products & prices'),
               const _StoreCard(),
+              const _ContentPricesCard(),
               // ── roles
               const SectionHead('Team', 'Admins and helpers'),
               Glass(
@@ -304,6 +308,161 @@ class _StoreCardState extends State<_StoreCard> {
                 } catch (_) {}
                 if (mounted) setState(() => _loading = false);
               }),
+      ]),
+    );
+  }
+}
+
+/// Word / meaning / signature / ebook prices → `config/store`
+/// `{defaults: {kind: ₹}, items: {itemId: ₹}}`. Every card, the product page
+/// and Checkout read it live (StorePrices); Checkout pays the total through
+/// a Google Play price tier, so only Play price points are offered here.
+class _ContentPricesCard extends StatefulWidget {
+  const _ContentPricesCard();
+  @override
+  State<_ContentPricesCard> createState() => _ContentPricesCardState();
+}
+
+class _ContentPricesCardState extends State<_ContentPricesCard> {
+  final _id = TextEditingController();
+  String _kind = 'word';
+  int? _price;
+  String _busy = '';
+
+  static const _kindNames = {'word': 'Words', 'meaning': 'Meanings', 'signature': 'Signature', 'ebook': 'Ebooks'};
+
+  @override
+  void initState() {
+    super.initState();
+    StorePrices.instance.addListener(_tick);
+  }
+
+  @override
+  void dispose() {
+    StorePrices.instance.removeListener(_tick);
+    _id.dispose();
+    super.dispose();
+  }
+
+  void _tick() {
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _run(String what, Future<void> Function() f, String ok) async {
+    setState(() => _busy = what);
+    try {
+      await f();
+      if (mounted) adminSnack(context, ok);
+    } catch (e) {
+      if (mounted) adminSnack(context, '$e', error: true);
+    } finally {
+      if (mounted) setState(() => _busy = '');
+    }
+  }
+
+  Future<void> _removeItems(List<String> ids, String label) async {
+    if (ids.isEmpty) return;
+    await FirebaseFirestore.instance.doc('config/store').update({
+      for (final id in ids) FieldPath(['items', id]): FieldValue.delete(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+    await adminLog('config.store', label, {'removed': ids.join(',')});
+  }
+
+  List<String> get _saleIds => [
+        for (final c in kRmCategories)
+          if (c.id == 'off50')
+            for (final w in c.words) 'word:${w.word.toLowerCase()}',
+      ];
+
+  Widget _tierPick(String kind, int value, ValueChanged<int> onPick) {
+    final tiers = kContentPriceTiers[kind] ?? const <int>[];
+    final v = tiers.contains(value) ? value : contentTierFor(kind, value);
+    return DropdownButton<int>(
+      value: tiers.contains(v) ? v : null,
+      dropdownColor: const Color(0xFF15151A),
+      underline: const SizedBox.shrink(),
+      style: const TextStyle(color: kGold, fontWeight: FontWeight.w800, fontSize: 13),
+      items: [for (final t in tiers) DropdownMenuItem(value: t, child: Text('₹$t'))],
+      onChanged: (t) => t == null ? null : onPick(t),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final sp = StorePrices.instance;
+    final items = sp.items.entries.toList()..sort((a, b) => a.key.compareTo(b.key));
+    final saleOn = _saleIds.any(sp.items.containsKey);
+    return Glass(
+      radius: 22,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const Text('Content prices (Google Play)', style: TextStyle(color: Colors.white, fontSize: 13.5, fontWeight: FontWeight.w800)),
+        const SizedBox(height: 4),
+        const Text('Default price for each kind, then per-item prices. Saved to config/store; every app updates live.', style: TextStyle(color: kFaint, fontSize: 11)),
+        const SizedBox(height: 8),
+        for (final k in _kindNames.keys)
+          Row(children: [
+            Expanded(child: Text('${_kindNames[k]} · default', style: const TextStyle(color: Colors.white, fontSize: 13))),
+            _tierPick(k, sp.defaultFor(k).toInt(), (t) => _run('d$k', () => saveConfig('store', {'defaults': {k: t}}, label: '${_kindNames[k]} default ₹$t'), 'Saved — ${_kindNames[k]} now ₹$t.')),
+          ]),
+        const Divider(color: Color(0x22FFFFFF), height: 22),
+        const Text('Per-item price', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700)),
+        const SizedBox(height: 6),
+        Row(children: [
+          DropdownButton<String>(
+            value: _kind,
+            dropdownColor: const Color(0xFF15151A),
+            underline: const SizedBox.shrink(),
+            style: const TextStyle(color: Colors.white, fontSize: 13),
+            items: [for (final k in _kindNames.keys) DropdownMenuItem(value: k, child: Text(k))],
+            onChanged: (k) => setState(() {
+              _kind = k ?? 'word';
+              _price = null;
+            }),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: TextField(
+              controller: _id,
+              style: const TextStyle(color: Colors.white, fontSize: 13),
+              decoration: const InputDecoration(isDense: true, hintText: 'word / book id, e.g. phoenix', hintStyle: TextStyle(color: kFaint, fontSize: 12)),
+            ),
+          ),
+          _tierPick(_kind, _price ?? sp.defaultFor(_kind).toInt(), (t) => setState(() => _price = t)),
+        ]),
+        const SizedBox(height: 8),
+        GoldButton('Set item price', icon: Icons.sell_rounded, busy: _busy == 'item', onTap: () {
+          final raw = _id.text.trim().toLowerCase();
+          if (raw.isEmpty) return;
+          final id = raw.contains(':') ? raw : '$_kind:$raw';
+          final t = _price ?? sp.defaultFor(_kind).toInt();
+          _run('item', () => saveConfig('store', {'items': {id: t}}, label: '$id ₹$t'), 'Saved — $id is ₹$t.');
+        }),
+        if (items.isNotEmpty) ...[
+          const SizedBox(height: 10),
+          for (final e in items)
+            Row(children: [
+              Expanded(child: Text(e.key, style: const TextStyle(color: Colors.white, fontSize: 12.5))),
+              Text('₹${e.value}', style: const TextStyle(color: kGold, fontWeight: FontWeight.w800, fontSize: 12.5)),
+              IconButton(
+                tooltip: 'Back to the default',
+                icon: const Icon(Icons.close_rounded, color: kFaint, size: 18),
+                onPressed: () => _run('rm', () => _removeItems([e.key], '${e.key} price removed'), '${e.key} uses the default again.'),
+              ),
+            ]),
+        ],
+        const Divider(color: Color(0x22FFFFFF), height: 22),
+        Text(saleOn ? '50% OFF row sale is ON' : '50% OFF row sale', style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700)),
+        const Text('Prices every word in the Atelier “50% OFF” row at half the word default (nearest Play price). Cards show the default struck through.', style: TextStyle(color: kFaint, fontSize: 11)),
+        const SizedBox(height: 8),
+        Pill(saleOn ? 'End the sale' : 'Start the sale', icon: Icons.local_offer_rounded, dense: true, onTap: _busy.isNotEmpty
+            ? null
+            : () => saleOn
+                ? _run('sale', () => _removeItems(_saleIds, '50% OFF sale ended'), 'Sale ended.')
+                : _run('sale', () {
+                    final half = contentTierFor('word', sp.defaultFor('word') / 2);
+                    return saveConfig('store', {'items': {for (final id in _saleIds) id: half}}, label: '50% OFF sale ₹$half');
+                  }, 'Sale is live.')),
       ]),
     );
   }

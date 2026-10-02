@@ -65,47 +65,62 @@ class StoriesFindYouBanner extends StatelessWidget {
         aspectRatio: 16 / 9,
         child: ClipRect(
           child: Container(
-          color: _black,
-          padding: const EdgeInsets.fromLTRB(16, 20, 8, 12),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                flex: 9,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    EditableLabel('stories_find_you_banner.StoriesFindYouBanner',
-                      'SOUND\nTHAT\nFINDS YOU',
-                      style: GoogleFonts.anton(
-                        color: _ink,
-                        fontSize: 31,
-                        height: 0.88,
-                        letterSpacing: 0.2,
+            color: _black,
+            padding: const EdgeInsets.fromLTRB(16, 20, 8, 12),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  flex: 9,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.topLeft,
+                          child: EditableLabel(
+                            'stories_find_you_banner.StoriesFindYouBanner',
+                            'SOUND\nTHAT\nFINDS YOU',
+                            style: GoogleFonts.anton(
+                              color: _ink,
+                              fontSize: 31,
+                              height: 0.88,
+                              letterSpacing: 0.2,
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-                    EditableLabel('stories_find_you_banner.StoriesFindYouBanner',
-                      'There are no limitations to the\nfrequency at NowssB.',
-                      style: GoogleFonts.libreBaskerville(
-                        color: Colors.white,
-                        fontSize: 9,
-                        height: 1.4,
-                        fontStyle: FontStyle.italic,
-                        fontWeight: FontWeight.w400,
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: EditableLabel(
+                            'stories_find_you_banner.StoriesFindYouBanner',
+                            'There are no limitations to the\nfrequency at NowssB.',
+                            style: GoogleFonts.libreBaskerville(
+                              color: Colors.white,
+                              fontSize: 9,
+                              height: 1.4,
+                              fontStyle: FontStyle.italic,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.only(bottom: 2),
-                      child: Icon(Icons.arrow_forward, size: 18, color: Colors.white),
-                    ),
-                  ],
+                      const Padding(
+                        padding: EdgeInsets.only(bottom: 2),
+                        child: Icon(Icons.arrow_forward,
+                            size: 18, color: Colors.white),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const Expanded(flex: 15, child: _StoryStack()),
-            ],
+                const Expanded(flex: 15, child: _StoryStack()),
+              ],
+            ),
           ),
-        ),
         ),
       ),
     );

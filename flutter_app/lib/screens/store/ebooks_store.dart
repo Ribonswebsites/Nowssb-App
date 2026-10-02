@@ -5,6 +5,8 @@ library;
 import 'package:flutter/material.dart';
 
 import '../../data/content.dart';
+import '../../data/entitlements.dart';
+import '../../data/store_prices.dart';
 import '../../data/store_catalog.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
@@ -32,8 +34,9 @@ class EbooksStoreScreen extends StatelessWidget {
         which: 'ebooks',
         head: 'Ebooks described by sound',
         child: PageShell(
-        eyebrow: 'NowssB Store',
-        title: 'The NowssB Ebooks',
+        eyebrow: '',
+        title: 'NowssB Store',
+        subtitle: 'The Ebooks Store',
         film: 'assets/video/player-bg-loop.mp4',
         usePageFilm: true,
         onBack: () => Navigator.of(context).pop(),
@@ -382,7 +385,9 @@ class _EbookRow extends StatelessWidget {
                         ),
                         const Spacer(),
                         Text(
-                          inr(book.price),
+                          Entitlements.instance.canOpenEbook(book.title, price: StorePrices.instance.priceFor('ebook:${book.title.toLowerCase()}', shown: book.price))
+                              ? 'Yours'
+                              : inr(StorePrices.instance.priceFor('ebook:${book.title.toLowerCase()}', shown: book.price)),
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,

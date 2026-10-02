@@ -20,6 +20,8 @@ import '../../widgets/nwsb_icon.dart';
 import '../../widgets/app_thinking_loader.dart';
 import '../../features/economy/money.dart';
 import 'store_actions.dart';
+import '../../data/entitlements.dart';
+import '../../data/store_prices.dart';
 import '../../admin/template/editable.dart';
 import '../../features/programs/store_extras.dart';
 
@@ -28,9 +30,11 @@ String inr(num value) {
   return FxBook.instance.formatRupees(value);
 }
 
-/// Full word price in rupees. 50% off is [kWordSaleInr].
-const kWordPriceInr = 92;
-const kWordSaleInr = 46;
+/// Word price in rupees: the admin's default (Products & prices →
+/// config/store), else ₹99 — a Google Play price point in the PDF band
+/// (₹70–350). A sale is real only when the admin prices a word below it.
+num get kWordPriceInr => StorePrices.instance.defaultFor('word');
+num get kWordSaleInr => kWordPriceInr;
 
 String localizedMoney(BuildContext context, num inrValue) {
   if (inrValue <= 0) return 'Included';
@@ -1023,9 +1027,19 @@ class RmWordCard extends StatelessWidget {
                             ),
                             const SizedBox(height: 6),
                             if (price != null)
-                              _CenteredPrice(
-                                price: price!,
-                                originalPrice: originalPrice,
+                              ListenableBuilder(
+                                listenable: Listenable.merge([StorePrices.instance, Entitlements.instance]),
+                                builder: (context, _) {
+                                  final id = _item.id;
+                                  final real = StorePrices.instance.priceFor(id);
+                                  if (Entitlements.instance.ownsOrIncluded(id, price: real)) {
+                                    return _CenteredPrice(price: 0, owned: Entitlements.instance.ownsItem(id) ? 'Owned' : (real <= 0 ? 'Free' : 'In your plan'));
+                                  }
+                                  return _CenteredPrice(
+                                    price: real,
+                                    originalPrice: StorePrices.instance.regularIfOnSale(id),
+                                  );
+                                },
                               ),
                             const Spacer(),
                             const SizedBox(height: 4),
@@ -1145,13 +1159,16 @@ class RmWordCard extends StatelessWidget {
 }
 
 class _CenteredPrice extends StatelessWidget {
-  const _CenteredPrice({required this.price, this.originalPrice});
+  const _CenteredPrice({required this.price, this.originalPrice, this.owned});
   final num price;
   final num? originalPrice;
 
+  /// 'Owned' / 'In your plan' / 'Free' instead of a price.
+  final String? owned;
+
   @override
   Widget build(BuildContext context) {
-    final sale = localizedMoney(context, price);
+    final sale = owned ?? localizedMoney(context, price);
     final original =
         originalPrice == null ? null : localizedMoney(context, originalPrice!);
     final showStrike = original != null && original != sale;
@@ -1432,14 +1449,22 @@ class MsCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(4),
                         border: Border.all(color: const Color(0x2EE8D5A3)),
                       ),
-                      child: Text(
-                        inr(price),
+                      child: ListenableBuilder(
+                        listenable: Listenable.merge([StorePrices.instance, Entitlements.instance]),
+                        builder: (context, _) {
+                          final id = _item.id;
+                          final real = StorePrices.instance.priceFor(id, shown: price);
+                          final open = Entitlements.instance.ownsOrIncluded(id, price: real);
+                          return Text(
+                        open ? (Entitlements.instance.ownsItem(id) ? 'OWNED' : real <= 0 ? 'FREE' : 'IN YOUR PLAN') : inr(real),
                         style: const TextStyle(
                           fontSize: 9,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 0.8,
                           color: Color(0xBFE8D5A3),
                         ),
+                          );
+                        },
                       ),
                     ),
                   ],

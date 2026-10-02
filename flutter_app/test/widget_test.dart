@@ -134,6 +134,13 @@ void main() {
       // In that layout, the supplied dashboard's primary action is the
       // visible home section that must remain wired into the shell.
       final dashboardAction = find.text('Play session');
+      // The home list is lazy: the dashboard sits below the hero and only
+      // builds once it is scrolled near.
+      final homeList = find.byType(Scrollable).first;
+      for (var i = 0; i < 30 && dashboardAction.evaluate().isEmpty; i++) {
+        await tester.drag(homeList, const Offset(0, -300));
+        await tester.pump(const Duration(milliseconds: 16));
+      }
       expect(dashboardAction, findsOneWidget,
           reason: 'the home needs a reachable primary section action');
       await tester.ensureVisible(dashboardAction);

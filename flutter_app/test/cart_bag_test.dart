@@ -26,25 +26,18 @@ void main() {
         kind: 'Word',
       );
 
-  test('adding to cart and wishlist sticks, checkout empties the bag', () async {
+  test('digital items stay one per cart; wishlist sticks; no phone-only orders', () async {
     final bag = CartBag.instance;
     await bag.addCart(item());
     await bag.addCart(item());
-    expect(bag.cartCount, 2);
-    expect(bag.cartTotal, 98);
+    expect(bag.cartCount, 1);
+    expect(bag.cartTotal, 49);
 
     await bag.addWishlist(item());
     expect(bag.wishCount, 1);
 
-    final order = await bag.checkout(
-      name: 'Healer',
-      phone: '9999999999',
-      address: 'Nagpur',
-      payMethod: 'UPI',
-    );
-    expect(order, isNotNull);
+    await bag.removeCart('word:agni');
     expect(bag.cart, isEmpty);
-    expect(bag.orders, isNotEmpty);
-    expect(bag.orders.first.total, 98);
+    expect(bag.orders, isEmpty);
   });
 }

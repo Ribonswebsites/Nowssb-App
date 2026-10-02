@@ -81,9 +81,20 @@ class Settings extends ChangeNotifier {
     'Fashion',
     'Store',
     'Word Atelier',
-    'Meanings',
-    'eBooks',
+    'Meanings Clean',
+    'Meanings Brand',
+    'Meanings Swirl',
+    'Meanings Device',
+    'eBooks Headphones',
+    'eBooks Pair',
   ];
+
+  /// Label for [fashionImages] entry [i]. Never throws: the two lists are
+  /// edited by hand and an image without a name still gets a usable chip.
+  static String fashionImageName(int i) =>
+      i >= 0 && i < fashionImageNames.length
+          ? fashionImageNames[i]
+          : 'Background ${i + 1}';
 
   // First launch is intentionally still and pale; users opt into motion and
   // the dark Fashion home from the visible controls.
@@ -153,6 +164,7 @@ class Settings extends ChangeNotifier {
   String get eq => _eq;
   List<double> get eqBands => List<double>.unmodifiable(_eqBands);
   bool get spatialAudio => _spatial;
+
   /// Optional home block. Off until someone adds it from Widgets.
   bool get showHealing => _showHealing;
   String get quality => _quality;

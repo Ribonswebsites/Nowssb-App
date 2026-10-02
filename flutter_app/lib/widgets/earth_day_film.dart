@@ -67,7 +67,8 @@ class EarthDayFilm extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const EditableLabel('earth_day_film.EarthDayFilm',
+                    const EditableLabel(
+                      'earth_day_film.EarthDayFilm',
                       'NowssB',
                       style: TextStyle(
                         color: Colors.white,
@@ -98,7 +99,9 @@ class EarthDayFilm extends StatelessWidget {
                           fontSize: 11,
                           height: 1.25,
                           fontWeight: FontWeight.w600,
-                          shadows: [Shadow(color: Colors.black87, blurRadius: 8)],
+                          shadows: [
+                            Shadow(color: Colors.black87, blurRadius: 8)
+                          ],
                         ),
                       ),
                     ),
@@ -117,24 +120,34 @@ class EarthDayFilm extends StatelessWidget {
                       state: OrbState.composing,
                       blackCircle: true,
                     ),
-                    const Spacer(),
-                    GestureDetector(
-                      onTap: () => _start(context),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 9,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(99),
-                        ),
-                        child: const EditableLabel('earth_day_film.EarthDayFilm',
-                          'Start your practice',
-                          style: TextStyle(
-                            color: Color(0xFF111111),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w800,
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerRight,
+                          child: GestureDetector(
+                            onTap: () => _start(context),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 9,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(99),
+                              ),
+                              child: const EditableLabel(
+                                'earth_day_film.EarthDayFilm',
+                                'Start your practice',
+                                style: TextStyle(
+                                  color: Color(0xFF111111),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                       ),

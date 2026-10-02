@@ -10,9 +10,9 @@ void main() {
     expect(
         aura, contains("kPlayerAuraFilm = 'assets/video/player-aura-bg.mp4'"));
     expect(aura,
-        contains("kPlayerBoxFilm = 'assets/video/player-box-liquid.mp4'"));
+        contains("kPlayerBoxFilm = 'assets/video/player-box-rings.mp4'"));
     expect(aura,
-        contains("kPlayerBoxWaveFilm = 'assets/video/player-box-wave.mp4'"));
+        contains("kPlayerBoxWaveFilm = 'assets/video/player-box-rings.mp4'"));
     expect(
         aura, contains("kPlayerPageFilm = 'assets/video/player-bg-loop.mp4'"));
     expect(aura, contains('this.film = kPlayerAuraFilm'));

@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls", "delegate_permission/common.get_login_creds"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.nowssb.app",
+      "sha256_cert_fingerprints": [
+        "CF:23:87:91:D2:98:44:98:54:DC:79:26:13:E5:7A:F5:8D:A0:B7:F1:28:B8:FC:B4:7E:1D:46:CF:6E:4E:9B:95"
+      ]
+    }
+  }
+]

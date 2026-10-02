@@ -14,6 +14,46 @@
       },
       "oauth_client": [
         {
+          "client_id": "1024709686012-2qf1s4u2d7e4ssk0jovvmqfqku04uui2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nowssb.app",
+            "certificate_hash": "e53e5cf56947d34ecb496f9e2610c1a32537659d"
+          }
+        },
+        {
+          "client_id": "1024709686012-cieauv8d6j5se8ht46ai5e0bmtjggj6v.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nowssb.app",
+            "certificate_hash": "2cb3bacba806c03a17e4fbd5254dc9933ce1c5a6"
+          }
+        },
+        {
+          "client_id": "1024709686012-h4opgpoijtto136rbfjc1j2b7o0eguph.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nowssb.app",
+            "certificate_hash": "2b7a34922902b2b358979b0fdfa2f4df94f9f367"
+          }
+        },
+        {
+          "client_id": "1024709686012-j15vj2m0i2thfeomks5kktl3m5k84fld.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nowssb.app",
+            "certificate_hash": "4aa81d0fa38c9e48776d1cddded45f726ab1195b"
+          }
+        },
+        {
+          "client_id": "1024709686012-qvufltnq7p1kdq0i5gdfeljnmos5qkje.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nowssb.app",
+            "certificate_hash": "4d50e7289351657bdedfb7be3af64784d9147bd5"
+          }
+        },
+        {
           "client_id": "1024709686012-h1h9glk84uti9cbqpht5d09igdqb8pgu.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -29,6 +69,13 @@
             {
               "client_id": "1024709686012-h1h9glk84uti9cbqpht5d09igdqb8pgu.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "1024709686012-0v0fcd2h694hep2j9ni2dqejean6e00c.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.nowssb.app"
+              }
             }
           ]
         }

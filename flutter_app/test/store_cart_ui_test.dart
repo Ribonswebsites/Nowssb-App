@@ -38,9 +38,9 @@ void main() {
 
       final atelier =
           File('lib/screens/store/word_atelier.dart').readAsStringSync();
-      expect(atelier, contains('RmBannerRail'));
+      expect(atelier, contains('StoreSubscribeBanner'));
       expect(atelier, contains('RmRowHeader'));
-      expect(atelier, contains('kWordSaleInr'));
+      expect(atelier, contains('StorePrices'));
       expect(atelier, contains('originalPrice'));
       expect(atelier, contains('cats.take(10)'));
       expect(atelier, contains('StoreViewMoreTap'));
@@ -63,11 +63,15 @@ void main() {
 
       final storeHome = File('lib/screens/store.dart').readAsStringSync();
       expect(storeHome, contains('16 / 6.4'));
-      expect(storeHome, contains('_StoreQuickMosaic'));
       expect(storeHome, contains('ClipPriority.feature'));
-      expect(storeHome, contains('assets/video/store-orb-box.mp4'));
-      expect(storeHome, contains('width: 180'));
       expect(storeHome, contains('HeavyGlassPanel'));
+      // The quick mosaic moved into the shared sections (Word Atelier).
+      final sections =
+          File('lib/screens/store/store_home_sections.dart').readAsStringSync();
+      expect(sections, contains('class StoreQuickMosaic'));
+      expect(sections, contains('assets/video/store-orb-box.mp4'));
+      expect(sections, contains('width: 180'));
+      expect(atelier, contains('StoreQuickMosaic('));
 
       final catalog = File('lib/data/store_catalog.dart').readAsStringSync();
       expect(catalog, contains("return 'assets/video/hero-word-store.mp4'"));
@@ -77,7 +81,7 @@ void main() {
           File('lib/screens/store/product_detail.dart').readAsStringSync();
       expect(detail, contains("label: 'Add to Cart'"));
       expect(detail, contains('NwsbMarks.cart'));
-      expect(detail, contains("label: 'Buy Now'"));
+      expect(detail, contains("'Buy on Google Play'"));
       expect(detail, contains('NwsbMarks.bag'));
       expect(detail, contains('NwsbMarks.wishlist'));
       expect(detail, isNot(contains('Icons.shopping_cart_outlined')));

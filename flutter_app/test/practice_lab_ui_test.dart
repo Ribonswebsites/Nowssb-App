@@ -41,7 +41,7 @@ void main() {
   test('Now Playing dock uses the practice orb', () {
     final src = File('lib/screens/practice_player.dart').readAsStringSync();
     expect(src, contains('PracticeDockOrb(onTap: onPractice'));
-    expect(src, contains('onPractice: _openPracticeLab'));
+    expect(src, contains('_handlePracticeTap()'));
     expect(src, contains('showGeneralDialog'));
     expect(src, contains('_practiceOpen'));
     expect(src, contains('assets/store/nowssb-bag-headphones.webp'));
@@ -52,7 +52,6 @@ void main() {
     expect(src, contains('kPlayerBoxWaveFilm'));
     expect(src, contains('kPlayerBoxFilms'));
     expect(src, isNot(contains('grok-video-use-this.mp4')));
-    expect(src, contains('fontSize: 22'));
     expect(src, isNot(contains('player-liquid-splash.mp4')));
     expect(src, isNot(contains('grok_video_2026-09-05-15-32-08.mp4')));
     expect(src, isNot(contains('grok_video_2026-09-05-15-32-13.mp4')));

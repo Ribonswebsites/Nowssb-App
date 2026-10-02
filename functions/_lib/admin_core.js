@@ -78,7 +78,6 @@ function logOps(deps, action, target, detail = {}, summary = '') {
 function notifyOps(db, uid, title, body, kind = 'admin', extra = {}, now = Date.now()) {
   return [
     { op: 'create', path: `users/${uid}/notifications/${db.newId()}`, data: { title, body, kind, type: kind, read: false, at: new Date(now), createdAt: null, ...extra }, serverTime: ['createdAt'] },
-    { op: 'create', path: `users/${uid}/inbox/${db.newId()}`, data: { type: kind === 'request_done' ? 'arrivals' : 'admin', title, body, at: now, read: false } },
   ];
 }
 

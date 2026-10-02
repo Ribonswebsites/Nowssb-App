@@ -44,7 +44,6 @@ class _PlayerDialState extends State<PlayerDial> with SingleTickerProviderStateM
 
   Settings get s => Settings.instance;
 
-  static const _eqOptions = ['Flat', 'Bass', 'Treble', 'Vocal', 'Electronic'];
   static const _qualityOptions = ['Low', 'Normal', 'High', 'Lossless'];
   static const _speedOptions = ['0.5x', '0.75x', 'Normal', '1.25x', '1.5x', '2x'];
   static const _crossfadeOptions = ['Off', '3 Sec', '5 Sec', '8 Sec', '12 Sec'];

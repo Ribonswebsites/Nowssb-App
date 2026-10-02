@@ -21,14 +21,11 @@ void main() {
     expect(src, contains('Try it now'));
     expect(src, contains("'Begin'"));
     expect(src, contains('NowssB Player Guide'));
-    expect(src, contains('file_00000000d7e88209a05b0cd46d3c9204_yylblf.png'));
-    expect(src, contains('file_00000000e0948207852ee99ed468fbb0_gon5be.png'));
-    expect(src, contains('file_000000007b8081fa9f8bfa346747e79f_pbkbqy.png'));
-    expect(src, contains('file_00000000bc3481fba068b600e71ed418_xt5arr.png'));
-    expect(src, contains('file_00000000cf00820b83f17dc392a0071d_hhm18g.png'));
-    expect(src, contains('file_00000000c70081faab87b58c23b3edcb_yzyrbf.png'));
-    expect(src, contains('file_0000000035ac81fa8d163588e627b067_xjpm5r.png'));
-    expect(src, contains('file_00000000b6c481fab8074cb5a1d16756_thikfl.png'));
+    // The website's remote slide art is bundled now (assets/player/guide).
+    for (final m in RegExp(r"'(assets/player/guide/[^']+)'").allMatches(src)) {
+      expect(File(m.group(1)!).existsSync(), isTrue, reason: m.group(1));
+    }
+    expect(src, contains('assets/player/guide/'));
     expect(src, contains('Alignment.topCenter'));
     expect(src, isNot(contains('kPlayerBoxFilm')));
   });

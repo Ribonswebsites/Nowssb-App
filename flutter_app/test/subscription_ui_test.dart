@@ -22,8 +22,8 @@ void main() {
   test('pricing section uses the four flip photos and keeps the 16:9 banner', () {
     final src = File('lib/screens/subscription.dart').readAsStringSync();
     expect(src, contains('aspectRatio: 16 / 9'));
-    expect(src, contains("asset: 'assets/video/subscription-banner.mp4'"));
-    expect(src, contains("asset: 'assets/video/subscription-join-nowssb.mp4'"));
+    expect(src, contains("asset: 'assets/video/subscription-b.mp4'"));
+    expect(src, contains("asset: 'assets/video/subscription-bg.mp4'"));
     expect(src, contains("What's Included"));
     expect(src, contains('Choose your frequency'));
     expect(src, contains('Start your 30-day free trial'));

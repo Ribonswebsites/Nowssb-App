@@ -75,7 +75,11 @@ void main() {
     expect(find.text('OPEN LIBRARY'), findsOneWidget);
 
     await tester.tap(find.text('OPEN LIBRARY'));
-    await tester.pumpAndSettle();
+    // The library underneath keeps its thinking orbs breathing, so the tree
+    // never settles; give the gate's own transition time to finish instead.
+    for (var i = 0; i < 30; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
 
     expect(tester.takeException(), isNull);
     expect(find.text('OPEN LIBRARY'), findsNothing);

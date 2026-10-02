@@ -7,6 +7,11 @@ import 'package:flutter/material.dart';
 import '../../data/content.dart';
 import '../../data/store_catalog.dart';
 import '../../data/cart_bag.dart';
+import '../../data/entitlements.dart';
+import '../../data/store_prices.dart';
+import '../../widgets/page_shell.dart';
+import 'store_routes.dart';
+import 'store_select_sheet.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
@@ -23,7 +28,7 @@ void openAtelierWord(
   required String root,
   required String img,
   bool signature = false,
-  num price = 49,
+  num price = 0,
 }) {
   final key = word.toLowerCase();
   final found = ContentStore.instance.library
@@ -119,7 +124,12 @@ class StoreProductPage extends StatefulWidget {
     required this.highlights,
     this.disclaimer,
     this.heroVideo,
+    this.itemId,
   });
+
+  /// Bag / ownership id (word:x, signature:x, meaning:x, ebook:x). Derived
+  /// from [kind] when not given.
+  final String? itemId;
 
   final String kind, title, root, img, about;
   final num price;
@@ -135,20 +145,31 @@ class StoreProductPage extends StatefulWidget {
 
 class _StoreProductPageState extends State<StoreProductPage> {
   final _addCartKey = GlobalKey();
-  final _cartTargetKey = GlobalKey();
 
   String get kind => widget.kind;
   String get title => widget.title;
   String get root => widget.root;
   String get img => widget.img;
-  num get price => widget.price;
+  String get _id {
+    if (widget.itemId != null) return widget.itemId!;
+    final k = kind.toLowerCase();
+    final t = title.toLowerCase();
+    if (k.contains('ebook')) return 'ebook:$t';
+    if (k.contains('meaning')) return 'meaning:$t';
+    if (k.contains('signature')) return 'signature:$t';
+    return 'word:$t';
+  }
+
+  /// What Google Play charges for this item (admin price, else default).
+  num get price => StorePrices.instance.priceFor(_id, shown: widget.price);
+  bool get _open => Entitlements.instance.ownsOrIncluded(_id, price: price);
   String get about => widget.about;
   List<String> get highlights => widget.highlights;
   String? get disclaimer => widget.disclaimer;
   String? get heroVideo => widget.heroVideo;
 
   BagItem get _bagItem => BagItem(
-    id: '${kind.toLowerCase()}:${title.toLowerCase()}',
+    id: _id,
     title: title,
     subtitle: root,
     image: img,
@@ -158,39 +179,26 @@ class _StoreProductPageState extends State<StoreProductPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: NwsbColors.deep,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  ),
-                  Expanded(
-                    child: EditableLabel('product_detail.StoreProductPage',
-                      title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  StoreBagBar(key: _cartTargetKey),
-                ],
-              ),
-            ),
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.fromLTRB(0, 8, 0, 40),
-                children: [
+    // Same Store shell as the departments, cart and checkout.
+    return ListenableBuilder(
+      listenable: Listenable.merge([StorePrices.instance, Entitlements.instance]),
+      builder: (context, _) => PageShell(
+      eyebrow: '',
+      title: 'NowssB Store',
+      subtitle: title,
+      film: 'assets/video/player-bg-loop.mp4',
+      usePageFilm: true,
+      onBack: () => Navigator.of(context).pop(),
+      onStorePicker: () => showStoreSelectSheet(
+        context,
+        onSelect: (id) => openStoreFromPicker(context, id, current: ''),
+      ),
+      slivers: [
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, 40),
+          sliver: SliverList(
+            delegate: SliverChildListDelegate(
+                [
                   if (heroVideo != null) ...[
                     AspectRatio(
                       aspectRatio: 16 / 9,
@@ -237,7 +245,7 @@ class _StoreProductPageState extends State<StoreProductPage> {
                         ),
                         const SizedBox(height: 14),
                         Text(
-                          inr(price),
+                          _open ? (price <= 0 ? 'Free' : (Entitlements.instance.ownsItem(_id) ? 'Owned' : 'Included in your plan')) : inr(price),
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.w700,
@@ -275,7 +283,6 @@ class _StoreProductPageState extends State<StoreProductPage> {
                                     context,
                                     _bagItem,
                                     origin: _addCartKey,
-                                    cartTarget: _cartTargetKey,
                                   );
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
@@ -290,15 +297,18 @@ class _StoreProductPageState extends State<StoreProductPage> {
                         ),
                         const SizedBox(height: 10),
                         _ActBtn(
-                          label: 'Buy Now',
+                          label: _open ? 'Yours — open it in the Library' : 'Buy on Google Play',
                           mark: NwsbMarks.bag,
                           filled: true,
                           onTap: () {
+                            if (_open) {
+                              Navigator.of(context).pop();
+                              return;
+                            }
                             storeBuyNow(
                               context,
                               _bagItem,
                               origin: _addCartKey,
-                              cartTarget: _cartTargetKey,
                             );
                           },
                         ),
@@ -371,10 +381,10 @@ class _StoreProductPageState extends State<StoreProductPage> {
                     ),
                   ),
                 ],
-              ),
             ),
-          ],
+          ),
         ),
+      ],
       ),
     );
   }

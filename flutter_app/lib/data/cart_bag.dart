@@ -2,10 +2,16 @@
 /// Store page is still there when you open Cart, Wishlist or Checkout.
 library;
 
+import 'dart:async';
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'billing_config.dart';
+import 'firebase.dart';
 
 class BagItem {
   BagItem({
@@ -109,9 +115,6 @@ class CartBag extends ChangeNotifier {
   final List<BagItem> _cart = [];
   final List<BagItem> _wish = [];
   final List<BagOrder> _orders = [];
-  String shipName = '';
-  String shipPhone = '';
-  String shipAddress = '';
 
   List<BagItem> get cart => List.unmodifiable(_cart);
   List<BagItem> get wishlist => List.unmodifiable(_wish);
@@ -133,26 +136,91 @@ class CartBag extends ChangeNotifier {
       _wish
         ..clear()
         ..addAll(_readItems(p.getString(_kWish)));
-      _orders
-        ..clear()
-        ..addAll(_readOrders(p.getString(_kOrders)));
-      final ship = p.getString(_kShip);
-      if (ship != null && ship.isNotEmpty) {
-        final m = jsonDecode(ship);
-        if (m is Map) {
-          shipName = '${m['name'] ?? ''}';
-          shipPhone = '${m['phone'] ?? ''}';
-          shipAddress = '${m['address'] ?? ''}';
-        }
-      }
+      // Old builds kept a shipping address and phone-only "orders" from
+      // a checkout that charged nothing; both are gone.
+      await p.remove(_kShip);
+      await p.remove(_kOrders);
+      _orders.clear();
       notifyListeners();
+    } catch (_) {}
+    _syncWishOnSignIn();
+  }
+
+  // ── Wishlist sync (users/{uid}/wishlist, owner-only in firestore.rules) ──
+  StreamSubscription<User?>? _authSub;
+
+  static CollectionReference<Map<String, dynamic>>? _wishCol() {
+    if (!NwsbFirebase.ready) return null;
+    try {
+      final u = FirebaseAuth.instance.currentUser;
+      if (u == null || u.isAnonymous) return null;
+      return FirebaseFirestore.instance.collection('users/${u.uid}/wishlist');
+    } catch (_) {
+      return null;
+    }
+  }
+
+  void _syncWishOnSignIn() {
+    if (_authSub != null || !NwsbFirebase.ready) return;
+    try {
+      _authSub = FirebaseAuth.instance.authStateChanges().listen((u) async {
+        final col = _wishCol();
+        if (col == null) return;
+        try {
+          final snap = await col.get();
+          var changed = false;
+          for (final d in snap.docs) {
+            final item = BagItem.fromJson(d.data());
+            if (item.id.isEmpty || inWish(item.id)) continue;
+            _wish.add(item);
+            changed = true;
+          }
+          // Phone-only items saved before sign-in go up once.
+          final remote = {for (final d in snap.docs) '${d.data()['id']}'};
+          for (final it in _wish) {
+            if (!remote.contains(it.id)) unawaited(_pushWish(it));
+          }
+          if (changed) {
+            notifyListeners();
+            await _persistWish();
+          }
+        } catch (e) {
+          debugPrint('NowssB wishlist sync: $e');
+        }
+      });
+    } catch (_) {}
+  }
+
+  Future<void> _pushWish(BagItem it) async {
+    final col = _wishCol();
+    if (col == null) return;
+    try {
+      await col.doc(ownedDocId(it.id)).set({
+        'id': it.id,
+        'title': it.title,
+        'subtitle': it.subtitle,
+        'image': it.image,
+        'price': it.price,
+        'kind': it.kind,
+        'addedAt': DateTime.now().millisecondsSinceEpoch,
+      });
+    } catch (_) {}
+  }
+
+  Future<void> _dropWish(String id) async {
+    final col = _wishCol();
+    if (col == null) return;
+    try {
+      await col.doc(ownedDocId(id)).delete();
     } catch (_) {}
   }
 
   Future<void> addCart(BagItem item) async {
     final i = _cart.indexWhere((e) => e.id == item.id);
+    // Digital items (words, meanings, Signature, ebooks) are bought once.
+    final digital = contentKindOfItem(item.id) != null;
     if (i >= 0) {
-      _cart[i].qty += item.qty <= 0 ? 1 : item.qty;
+      if (!digital) _cart[i].qty += item.qty <= 0 ? 1 : item.qty;
     } else {
       _cart.add(BagItem(
         id: item.id,
@@ -161,7 +229,7 @@ class CartBag extends ChangeNotifier {
         image: item.image,
         price: item.price,
         kind: item.kind,
-        qty: item.qty <= 0 ? 1 : item.qty,
+        qty: digital || item.qty <= 0 ? 1 : item.qty,
       ));
     }
     notifyListeners();
@@ -187,6 +255,7 @@ class CartBag extends ChangeNotifier {
     );
     notifyListeners();
     await _persistWish();
+    unawaited(_pushWish(_wish.first));
   }
 
   Future<void> removeCart(String id) async {
@@ -199,6 +268,7 @@ class CartBag extends ChangeNotifier {
     _wish.removeWhere((e) => e.id == id);
     notifyListeners();
     await _persistWish();
+    unawaited(_dropWish(id));
   }
 
   Future<void> setQty(String id, int qty) async {
@@ -219,70 +289,7 @@ class CartBag extends ChangeNotifier {
     final item = _wish.removeAt(i);
     await addCart(item);
     await _persistWish();
-  }
-
-  Future<void> saveShip({
-    required String name,
-    required String phone,
-    required String address,
-  }) async {
-    shipName = name.trim();
-    shipPhone = phone.trim();
-    shipAddress = address.trim();
-    notifyListeners();
-    try {
-      final p = await SharedPreferences.getInstance();
-      await p.setString(
-        _kShip,
-        jsonEncode({
-          'name': shipName,
-          'phone': shipPhone,
-          'address': shipAddress,
-        }),
-      );
-    } catch (_) {}
-  }
-
-  Future<BagOrder?> checkout({
-    required String name,
-    required String phone,
-    required String address,
-    required String payMethod,
-    int coinsUsed = 0,
-  }) async {
-    if (_cart.isEmpty) return null;
-    await saveShip(name: name, phone: phone, address: address);
-    final now = DateTime.now();
-    final cash = cartTotal - coinsUsed;
-    final method = coinsUsed > 0 ? '$payMethod + $coinsUsed coins' : payMethod;
-    final order = BagOrder(
-      id: 'NSB${now.millisecondsSinceEpoch}',
-      at: now.millisecondsSinceEpoch,
-      name: name.trim(),
-      phone: phone.trim(),
-      address: address.trim(),
-      payMethod: method,
-      items: [
-        for (final e in _cart)
-          BagItem(
-            id: e.id,
-            title: e.title,
-            subtitle: e.subtitle,
-            image: e.image,
-            price: e.price,
-            kind: e.kind,
-            qty: e.qty,
-          ),
-      ],
-      total: cash < 0 ? 0 : cash,
-      coinsUsed: coinsUsed,
-    );
-    _orders.insert(0, order);
-    _cart.clear();
-    notifyListeners();
-    await _persistCart();
-    await _persistOrders();
-    return order;
+    unawaited(_dropWish(id));
   }
 
   List<BagItem> _readItems(String? raw) {

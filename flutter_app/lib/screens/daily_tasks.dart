@@ -2,6 +2,7 @@
 /// moves the bar. The editor is where that account sets its own tasks.
 library;
 
+import '../widgets/app_thinking_loader.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -507,7 +508,7 @@ class _DailyTasksPageState extends State<DailyTasksPage> {
                   ),
                 ],
               )
-            : const Center(child: CircularProgressIndicator(color: Colors.white)),
+            : const Center(child: AppThinkingLoader(size: 64)),
       ),
     );
   }

@@ -5,6 +5,7 @@ library;
 import 'package:flutter/material.dart';
 
 import '../../data/store_catalog.dart';
+import '../../data/store_prices.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
@@ -143,15 +144,17 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
           final name = w.word.isEmpty
               ? w.word
               : '${w.word[0].toUpperCase()}${w.word.substring(1)}';
-          final sale = cat.id == 'off50';
-          final price = sale ? kWordSaleInr : kWordPriceInr;
+          // Real Play price (admin per-word price, else the default);
+          // the strike-through shows only for a real admin sale.
+          final id = 'word:${name.toLowerCase()}';
+          final price = StorePrices.instance.priceFor(id);
           const img = kRmWordImg;
           cards.add(RmWordCard(
             name: name,
             root: w.root,
             imgUrl: img,
             price: price,
-            originalPrice: sale ? kWordPriceInr : null,
+            originalPrice: StorePrices.instance.regularIfOnSale(id),
             onTap: () => openAtelierWord(context,
                 word: w.word, root: w.root, img: img, price: price),
           ));
@@ -211,6 +214,10 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
         sections.add(const StoreGlassFilmBanner(
           asset: 'assets/video/store-title-banner.mp4',
         ));
+        // Plans banner — same subscribe film as the Meaning / Signature rooms.
+        sections.add(const LSection('subscribe', 'Subscribe banner', StoreSubscribeBanner(
+          videoAsset: StoreSubscribeBanner.kSubscriptionAlternateVideo,
+        )));
       }
 
       // After the 4th rail → frequency package (grid + Limited Time Free + Browse by Goal).

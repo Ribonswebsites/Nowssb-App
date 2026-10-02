@@ -51,11 +51,24 @@ class StoreTermsHost extends StatefulWidget {
 }
 
 class _StoreTermsHostState extends State<StoreTermsHost> {
+  bool _asked = false;
+
+  /// The Store tab is kept mounted (off-stage, tickers muted) inside the nav
+  /// shell's IndexedStack from the first frame. Asking from initState put
+  /// the Store's research sheet over the HOME on every fresh launch. Ask
+  /// only once this page is really on screen: TickerMode is a dependency, so
+  /// this runs again the moment the tab is selected.
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_asked || !TickerMode.of(context)) return;
+    _asked = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
+      if (!TickerMode.of(context)) {
+        _asked = false;
+        return;
+      }
       askStoreTerms(context, which: widget.which, head: widget.head);
     });
   }

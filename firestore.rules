@@ -43,7 +43,8 @@ service cloud.firestore {
       allow read: if isSelf(uid) || isAdmin();
       allow create: if isAdmin() || (isSelf(uid) && userFieldsOk(request.resource.data, request.resource.data.keys().toSet()));
       allow update: if isAdmin() || (isSelf(uid) && userFieldsOk(request.resource.data, request.resource.data.diff(resource.data).affectedKeys()));
-      allow delete: if isAdmin();
+      // In-app account deletion (Play policy): a person may delete their own profile.
+      allow delete: if isAdmin() || isSelf(uid);
       match /inbox/{msgId} { allow read, delete: if isSelf(uid) || isAdmin(); allow update: if isSelf(uid); allow create: if isAdmin(); }
 
       // Personal Coach data is private to the signed-in owner.
@@ -168,7 +169,11 @@ service cloud.firestore {
     }
     match /users/{uid}/owned/{itemId} {
       allow read: if isSelf(uid) || isAdmin();
-      allow write: if false;
+      // Purchases are written by /api/play/verify; an admin may grant or
+      // revoke an item from the console (always marked source 'admin').
+      allow create, update: if isAdmin() && request.resource.data.source == 'admin'
+        && request.resource.data.status in ['active', 'revoked'];
+      allow delete: if false;
     }
     match /users/{uid}/earnCaps/{day} {
       allow read: if isSelf(uid) || isAdmin();
@@ -182,9 +187,12 @@ service cloud.firestore {
       allow read: if isSelf(uid);
       allow write: if false;
     }
+    // The Store wishlist, synced across phones. Owner only, small docs.
     match /users/{uid}/wishlist/{itemId} {
-      allow read: if isSelf(uid);
-      allow write: if false;
+      allow read, delete: if isSelf(uid);
+      allow create, update: if isSelf(uid)
+        && request.resource.data.keys().hasOnly(['id', 'title', 'subtitle', 'image', 'price', 'kind', 'addedAt'])
+        && request.resource.data.id is string && request.resource.data.id.size() <= 200;
     }
     // NowssB programs (Earn · Rewards · Coupons · Gifts · Reference · Partner).
     // Written only by the Cloudflare Pages Functions in functions/api/economy
@@ -233,7 +241,8 @@ service cloud.firestore {
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read'])
         && request.resource.data.read == true;
       allow create: if isAdmin();
-      allow delete: if false;
+      // "Clear all" in the inbox, and account deletion.
+      allow delete: if isSelf(uid) || isAdmin();
     }
     match /users/{uid}/prefs/{docId} {
       allow read: if isSelf(uid);
@@ -331,7 +340,7 @@ service cloud.firestore {
     // config/app (force update, maintenance, feature flags, announcement)
     // is read before sign-in too; config/economy and the rest need a sign-in.
     match /config/{docId} {
-      allow read: if signedIn() || docId == 'app';
+      allow read: if signedIn() || docId == 'app' || docId == 'store';
       allow write: if isAdmin();
     }
     // Every settings save from the admin console, append-only.
@@ -354,6 +363,26 @@ service cloud.firestore {
     match /broadcasts/{id} {
       allow read: if isAdmin();
       allow write: if false;
+    }
+
+    // Progress-page feedback. A person adds their own; admins read it.
+    match /feedback/{id} {
+      allow create: if signedIn() && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['uid', 'email', 'rating', 'tags', 'text', 'source', 'platform', 'at', 'status'])
+        && request.resource.data.text is string && request.resource.data.text.size() <= 2000
+        && request.resource.data.status == 'new'
+        && request.resource.data.at == request.time;
+      allow read, update, delete: if isAdmin();
+    }
+    // Account deletion queue (when the server cannot delete the Auth
+    // account itself). One request per person; admins process it.
+    match /accountDeletionRequests/{uid} {
+      allow create: if isSelf(uid) && request.resource.data.uid == uid
+        && request.resource.data.keys().hasOnly(['uid', 'email', 'reason', 'status', 'requestedAt', 'platform'])
+        && request.resource.data.status == 'pending'
+        && request.resource.data.requestedAt == request.time;
+      allow get: if isSelf(uid) || isAdmin();
+      allow list, update, delete: if isAdmin();
     }
 
     match /ratings/{uid}/entries/{raterUid} { allow read: if signedIn(); allow create, update: if isSelf(raterUid) && uid != request.auth.uid; allow delete: if isSelf(raterUid) || isAdmin(); }

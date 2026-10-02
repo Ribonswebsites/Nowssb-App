@@ -13,6 +13,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../data/content.dart';
+import '../data/entitlements.dart';
+import '../data/word_requests.dart';
 import '../data/store_catalog.dart';
 import '../widgets/black_glass_banner.dart';
 import '../widgets/colored_split_promo_banner.dart';
@@ -65,19 +67,24 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
   late final AnimationController _reveal;
   final _combineKey = GlobalKey();
 
-  int get _max => sentenceTierMaxWords(tier: widget.tier);
+  int get _max => sentenceTierMaxWords(
+      tier: widget.tier ??
+          (Entitlements.instance.isAdmin ? 'frequencyX' : Entitlements.instance.activeTier));
 
   static const _seedOwned = <String>[
     'Peace', 'Breath', 'Light', 'Heart', 'Flow', 'Calm', 'Truth', 'Heal',
     'Dawn', 'Grace', 'Pulse', 'Still',
   ];
 
+  /// Words this account can really open: free words, words it bought, or
+  /// every word with a plan (Entitlements — server-verified).
   List<String> get _owned {
     final lib = ContentStore.instance.library;
     if (lib.isNotEmpty) {
+      final e = Entitlements.instance;
       return lib
+          .where((w) => w.word.trim().isNotEmpty && e.canOpenWord(w))
           .map((w) => w.word)
-          .where((s) => s.trim().isNotEmpty)
           .take(48)
           .toList();
     }
@@ -88,6 +95,13 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
     final ownedLower = _owned.map((e) => e.toLowerCase()).toSet();
     final fromCatalog = <String>[];
     final seen = <String>{};
+    // Library words this account cannot open yet come first.
+    for (final w in ContentStore.instance.library) {
+      final key = w.word.trim().toLowerCase();
+      if (key.isEmpty || ownedLower.contains(key) || seen.contains(key)) continue;
+      seen.add(key);
+      fromCatalog.add(w.word);
+    }
     for (final cat in kRmCategories) {
       for (final e in cat.words) {
         final raw = e.word.trim();
@@ -114,6 +128,7 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
     super.initState();
     ContentStore.instance.start();
     ContentStore.instance.addListener(_onContent);
+    Entitlements.instance.addListener(_onContent);
     _pulse = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1600),
@@ -131,6 +146,7 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
   @override
   void dispose() {
     ContentStore.instance.removeListener(_onContent);
+    Entitlements.instance.removeListener(_onContent);
     _pulse.dispose();
     _reveal.dispose();
     super.dispose();
@@ -211,17 +227,25 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
       backgroundColor: Colors.transparent,
       builder: (_) => _RequestCustomSheet(
         initialWords: _selected.toList(),
-        onSubmitted: (text) {
+        onSubmitted: (text) async {
           Navigator.of(context).pop();
-          ScaffoldMessenger.of(this.context).showSnackBar(
-            SnackBar(
-              content: Text(
-                text.trim().isEmpty
-                    ? 'Request saved. Frequency X unlocks team-crafted words.'
-                    : 'Rewrite and Request sent.',
-              ),
-              behavior: SnackBarBehavior.floating,
-            ),
+          final messenger = ScaffoldMessenger.of(this.context);
+          // A real request (Firestore requests/{id}, the admin Requests
+          // queue). Signed out / offline it is parked and sent later.
+          final picked = _selected.toList();
+          var word = picked.isEmpty ? 'Custom sentence' : picked.join(' + ');
+          if (word.length > 80) word = word.substring(0, 80);
+          var notes = 'Sentence builder: ${text.trim()}';
+          if (notes.length > 500) notes = notes.substring(0, 500);
+          String msg;
+          try {
+            await WordRequestStore.instance.submit(word: word, notes: notes, kind: 'sentence');
+            msg = 'Request sent. The team will reply in your notifications.';
+          } catch (e) {
+            msg = e is ArgumentError ? '${e.message}' : 'The request could not be sent. Try again.';
+          }
+          messenger.showSnackBar(
+            SnackBar(content: Text(msg), behavior: SnackBarBehavior.floating),
           );
         },
       ),

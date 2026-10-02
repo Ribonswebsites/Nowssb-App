@@ -251,10 +251,26 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
                     ),
                     ColorFiltered(
                       colorFilter: const ColorFilter.matrix(<double>[
-                        1, 0, 0, 0, 0,
-                        0, 1, 0, 0, 0,
-                        0, 0, 1, 0, 0,
-                        0, 0, 0, 2.2, 0,
+                        1,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        1,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        1,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        2.2,
+                        0,
                       ]),
                       child: EditableImage.asset(
                         subject,
@@ -262,9 +278,8 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
                         alignment: Alignment.bottomCenter,
                         filterQuality: FilterQuality.high,
                         gaplessPlayback: true,
-                        errorBuilder: (_, __, ___) =>
-                            const SizedBox.shrink(),
-                            slot: 'hero_curve_stage.HeroCurveStage',
+                        errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                        slot: 'hero_curve_stage.HeroCurveStage',
                       ),
                     ),
                   ],
@@ -328,7 +343,7 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
                   filterQuality: FilterQuality.medium,
                   errorBuilder: (_, __, ___) =>
                       const ColoredBox(color: Color(0xFF111111)),
-                      slot: 'hero_curve_stage.HeroCurveStage',
+                  slot: 'hero_curve_stage.HeroCurveStage',
                 ),
               ),
             ),
@@ -429,10 +444,26 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
                         ),
                         ColorFiltered(
                           colorFilter: const ColorFilter.matrix(<double>[
-                            1, 0, 0, 0, 0,
-                            0, 1, 0, 0, 0,
-                            0, 0, 1, 0, 0,
-                            0, 0, 0, 2.2, 0,
+                            1,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            1,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            1,
+                            0,
+                            0,
+                            0,
+                            0,
+                            0,
+                            2.2,
+                            0,
                           ]),
                           child: EditableImage.asset(
                             subject,
@@ -442,7 +473,7 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
                             gaplessPlayback: true,
                             errorBuilder: (_, __, ___) =>
                                 const SizedBox.shrink(),
-                                slot: 'hero_curve_stage.HeroCurveStage',
+                            slot: 'hero_curve_stage.HeroCurveStage',
                           ),
                         ),
                       ],
@@ -497,7 +528,7 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
                 filterQuality: FilterQuality.medium,
                 errorBuilder: (_, __, ___) =>
                     const ColoredBox(color: Color(0xFF111111)),
-                    slot: 'hero_curve_stage.HeroCurveStage',
+                slot: 'hero_curve_stage.HeroCurveStage',
               ),
             ),
           ),
@@ -517,7 +548,8 @@ class _CurveCopy extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          EditableLabel('hero_curve_stage.CurveCopy',
+          EditableLabel(
+            'hero_curve_stage.CurveCopy',
             '“With no weapon in his hand, the Enlightened and Brilliant Buddha ruled the world—not by the sword, but by the power of words.”',
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -533,7 +565,6 @@ class _CurveCopy extends StatelessWidget {
     );
   }
 }
-
 
 /// Top of hero black/glass card: NowssB LEFT + Quick action RIGHT.
 /// Search below only when [showSearch] (Fashion). Normal omits search.
@@ -557,53 +588,66 @@ class _HeroChrome extends StatelessWidget {
         children: [
           Row(
             children: [
-              const EditableLabel('hero_curve_stage.HeroChrome',
-                'NowssB.',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.3,
-                  height: 1,
+              const Flexible(
+                child: EditableLabel(
+                  'hero_curve_stage.HeroChrome',
+                  'NowssB.',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.3,
+                    height: 1,
+                  ),
                 ),
               ),
+              const SizedBox(width: 10),
               const Spacer(),
-              GestureDetector(
-                onTap: onQuickAccess,
-                behavior: HitTestBehavior.opaque,
-                child: Container(
-                  height: 36,
-                  padding: const EdgeInsets.fromLTRB(10, 0, 6, 0),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: const Color(0x22FFFFFF),
-                    borderRadius: BorderRadius.circular(99),
-                    border: Border.all(color: const Color(0x44FFFFFF)),
-                  ),
-                  // Order: grid icon + label, then SMALL black-circle orb on the RIGHT.
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.apps_rounded, size: 16, color: Colors.white),
-                      SizedBox(width: 6),
-                      EditableLabel('hero_curve_stage.HeroChrome',
-                        'Quick action',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.1,
-                        ),
+              Flexible(
+                flex: 3,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerRight,
+                  child: GestureDetector(
+                    onTap: onQuickAccess,
+                    behavior: HitTestBehavior.opaque,
+                    child: Container(
+                      height: 36,
+                      padding: const EdgeInsets.fromLTRB(10, 0, 6, 0),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: const Color(0x22FFFFFF),
+                        borderRadius: BorderRadius.circular(99),
+                        border: Border.all(color: const Color(0x44FFFFFF)),
                       ),
-                      SizedBox(width: 6),
-                      AppThinkingLoader(
-                        size: 16,
-                        state: OrbState.solving,
-                        circlePad: 3,
+                      // Order: grid icon + label, then SMALL black-circle orb on the RIGHT.
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.apps_rounded,
+                              size: 16, color: Colors.white),
+                          SizedBox(width: 6),
+                          EditableLabel(
+                            'hero_curve_stage.HeroChrome',
+                            'Quick action',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.1,
+                            ),
+                          ),
+                          SizedBox(width: 6),
+                          AppThinkingLoader(
+                            size: 16,
+                            state: OrbState.solving,
+                            circlePad: 3,
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),

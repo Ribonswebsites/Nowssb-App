@@ -227,7 +227,9 @@ class ForceUpdateScreen extends StatelessWidget {
               return;
             }
           }
-          final url = c.updateUrl.startsWith('http') ? c.updateUrl : 'https://nowssb.com';
+          final url = kNwsbPlayBuild
+              ? 'https://play.google.com/store/apps/details?id=com.nowssb.app'
+              : (c.updateUrl.startsWith('http') ? c.updateUrl : 'https://nowssb.com');
           await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
         },
         child: const EditableLabel('app_control_layer.ForceUpdateScreen', 'Update now', style: TextStyle(fontWeight: FontWeight.w800)),

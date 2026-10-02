@@ -17,6 +17,7 @@ import '../../theme/tokens.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/black_glass_banner.dart';
 import '../../widgets/glass_wrap.dart';
+import '../subscription.dart';
 import 'store_actions.dart';
 import 'store_cards.dart';
 import '../../widgets/app_thinking_loader.dart';
@@ -123,7 +124,10 @@ class StoreSubscribeBanner extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: GestureDetector(
-        onTap: onTap,
+        // Default: the plans page (the banner used to do nothing).
+        onTap: onTap ??
+            () => Navigator.of(context).push(MaterialPageRoute<void>(
+                builder: (_) => const SubscriptionScreen())),
         behavior: HitTestBehavior.opaque,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(18),
@@ -179,7 +183,7 @@ class StoreRecommendedSection extends StatelessWidget {
 
   static const _wordCards = <_RecCardData>[
     _RecCardData(
-      badge: 'Free',
+      badge: 'Popular',
       badgeColor: Color(0xFF7CFF6B),
       title: 'Warrior',
       sub: 'Strength · Old French',
@@ -190,7 +194,7 @@ class StoreRecommendedSection extends StatelessWidget {
       art: kStoreProductArt,
     ),
     _RecCardData(
-      badge: 'Sale',
+      badge: 'Trending',
       badgeColor: Color(0xFFFFB74D),
       title: 'Spirit',
       sub: 'Soul · Latin',
@@ -215,7 +219,7 @@ class StoreRecommendedSection extends StatelessWidget {
 
   static const _meaningCards = <_RecCardData>[
     _RecCardData(
-      badge: 'Free',
+      badge: 'Popular',
       badgeColor: Color(0xFF7CFF6B),
       title: 'Warrior',
       sub: 'Strength · Inner courage',
@@ -226,7 +230,7 @@ class StoreRecommendedSection extends StatelessWidget {
       art: kMsMeaningIconAsset,
     ),
     _RecCardData(
-      badge: 'Sale',
+      badge: 'Trending',
       badgeColor: Color(0xFFFFB74D),
       title: 'Spirit',
       sub: 'Soul · Living essence',
@@ -2407,18 +2411,26 @@ class StoreHalfOffRail extends StatelessWidget {
                                 ),
                               ),
                               SizedBox(height: 6),
-                              EditableLabel('store_home_sections.StoreHalfOffRail',
-                                'Up To\n50% Off',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 32,
-                                  height: 0.95,
-                                  fontWeight: FontWeight.w800,
+                              Flexible(
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  alignment: Alignment.topLeft,
+                                  child: EditableLabel('store_home_sections.StoreHalfOffRail',
+                                    'Up To\n50% Off',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 32,
+                                      height: 0.95,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
                                 ),
                               ),
                               Spacer(),
                               EditableLabel('store_home_sections.StoreHalfOffRail',
                                 'Words at half price. Limited.',
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
                                 style: TextStyle(color: Color(0xD9FFFFFF), fontSize: 12),
                               ),
                             ],

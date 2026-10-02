@@ -4,10 +4,13 @@
 /// server is off) and each written to adminLog.
 library;
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../data/billing_config.dart';
 import 'admin_data.dart';
+import 'admin_log.dart';
 import 'admin_kit.dart';
 
 class PersonAdminScreen extends StatefulWidget {
@@ -141,6 +144,7 @@ class _PersonAdminScreenState extends State<PersonAdminScreen> {
         _ActionChip(Icons.workspace_premium_rounded, 'Grant plan', kViolet, () => _grant()),
         if ('${plan['tier'] ?? ''}'.isNotEmpty) _ActionChip(Icons.more_time_rounded, 'Extend', kGold, () => _extend()),
         if (plan['active'] == true) _ActionChip(Icons.remove_circle_outline_rounded, 'Revoke plan', kRose, () => _revoke(plan)),
+        _ActionChip(Icons.inventory_2_rounded, 'Grant item', kMint, () => _grantItem()),
         _ActionChip(Icons.toll_rounded, 'Adjust coins', kAmber, () => _coins(wallet)),
         _ActionChip(Icons.send_rounded, 'Message', kSky, () => _message()),
         _ActionChip(Icons.tune_rounded, 'Restrictions${restrictions.values.where((v) => v == true).isEmpty ? '' : ' (${restrictions.values.where((v) => v == true).length})'}', kAmber, () => _restrict(restrictions)),
@@ -393,6 +397,67 @@ class _PersonAdminScreenState extends State<PersonAdminScreen> {
     if (ok != true) return;
     final n = int.parse(amount.text);
     await _act('adjust-coins', {'delta': add ? n : -n, 'reason': reason.text.trim()}, add ? '+$n coins.' : '-$n coins.');
+  }
+
+  /// Give (or take back) one word / meaning / signature / ebook:
+  /// users/{uid}/owned/{cleanId} — the same doc a Play purchase writes,
+  /// marked source 'admin' (rules allow nothing else from the console).
+  Future<void> _grantItem() async {
+    final id = TextEditingController();
+    String kind = 'word';
+    bool revoke = false;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => Theme(
+        data: adminTheme(),
+        child: StatefulBuilder(
+          builder: (ctx, set) => AlertDialog(
+            title: const Text('Grant an item', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+            content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Wrap(spacing: 6, runSpacing: 6, children: [
+                for (final k in const ['word', 'meaning', 'signature', 'ebook']) Pill(k, dense: true, selected: kind == k, onTap: () => set(() => kind = k)),
+              ]),
+              TextField(controller: id, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Word or book id (e.g. phoenix)')),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                value: revoke,
+                activeThumbColor: kRose,
+                onChanged: (v) => set(() => revoke = v),
+                title: const Text('Revoke instead', style: TextStyle(color: Colors.white, fontSize: 13)),
+              ),
+            ]),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+              FilledButton(
+                  style: FilledButton.styleFrom(backgroundColor: kGold, foregroundColor: kInk),
+                  onPressed: () => id.text.trim().isEmpty ? null : Navigator.pop(ctx, true),
+                  child: Text(revoke ? 'Revoke' : 'Grant')),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (ok != true || _busy) return;
+    final raw = id.text.trim().toLowerCase();
+    final itemId = raw.contains(':') ? raw : '$kind:$raw';
+    setState(() => _busy = true);
+    try {
+      await FirebaseFirestore.instance.doc('users/${widget.uid}/owned/${ownedDocId(itemId)}').set({
+        'id': itemId,
+        'kind': itemId.split(':').first,
+        'title': raw.contains(':') ? raw.split(':').last : raw,
+        'source': 'admin',
+        'status': revoke ? 'revoked' : 'active',
+        'at': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+      await adminLog(revoke ? 'owned.revoke' : 'owned.grant', widget.uid, {'item': itemId});
+      if (mounted) adminSnack(context, revoke ? '$itemId revoked.' : '$itemId granted — it opens for them now.');
+      await _load();
+    } catch (e) {
+      if (mounted) adminSnack(context, '$e', error: true);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
   }
 
   Future<void> _message() async {

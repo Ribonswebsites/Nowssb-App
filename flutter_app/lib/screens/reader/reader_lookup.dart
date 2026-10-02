@@ -19,27 +19,59 @@ class ReaderLookup {
     ('ja', '日本語'),
   ];
 
+  /// Translate a selection. Uses the documented public MyMemory API (books
+  /// are English, so the pair is en→[to]); a single English word with
+  /// `to == 'en'` gets a dictionary definition instead. Returns null when no
+  /// service answers — the reader then offers Google Translate in the
+  /// browser ([webTranslateUri]) rather than calling an unofficial endpoint.
   static Future<String?> translate(String text, String to) async {
-    final uri = Uri.parse(
-      'https://translate.googleapis.com/translate_a/single'
-      '?client=gtx&sl=auto&tl=${Uri.encodeComponent(to)}&dt=t'
-      '&q=${Uri.encodeQueryComponent(text)}',
-    );
+    final q = text.trim();
+    if (q.isEmpty) return null;
+    if (to == 'en') return define(q);
     try {
+      final uri = Uri.https('api.mymemory.translated.net', '/get', {
+        'q': q.length > 480 ? q.substring(0, 480) : q,
+        'langpair': 'en|$to',
+      });
       final r = await http.get(uri).timeout(const Duration(seconds: 8));
       if (r.statusCode != 200) return null;
       final j = jsonDecode(r.body);
-      if (j is! List || j.isEmpty || j[0] is! List) return null;
-      final out = StringBuffer();
-      for (final p in j[0] as List) {
-        if (p is List && p.isNotEmpty && p[0] != null) out.write(p[0]);
-      }
-      final s = out.toString().trim();
-      return s.isEmpty ? null : s;
+      if (j is! Map) return null;
+      if ('${j['responseStatus']}' != '200') return null;
+      final out = '${(j['responseData'] as Map?)?['translatedText'] ?? ''}'.trim();
+      if (out.isEmpty || out.toUpperCase().contains('MYMEMORY WARNING')) return null;
+      return out;
     } catch (_) {
       return null;
     }
   }
+
+  /// English definition for one word (dictionaryapi.dev, free and public).
+  static Future<String?> define(String text) async {
+    final w = text.trim().split(RegExp(r'\s+'));
+    if (w.length != 1) return null;
+    try {
+      final r = await http
+          .get(Uri.https('api.dictionaryapi.dev', '/api/v2/entries/en/${Uri.encodeComponent(w.first.toLowerCase())}'))
+          .timeout(const Duration(seconds: 8));
+      if (r.statusCode != 200) return null;
+      final j = jsonDecode(r.body);
+      if (j is! List || j.isEmpty) return null;
+      final lines = <String>[];
+      for (final m in ((j.first as Map)['meanings'] as List? ?? const []).take(3)) {
+        final pos = '${(m as Map)['partOfSpeech'] ?? ''}';
+        final d = (m['definitions'] as List?)?.isNotEmpty == true ? '${(m['definitions'] as List).first['definition']}' : '';
+        if (d.isNotEmpty) lines.add(pos.isEmpty ? d : '($pos) $d');
+      }
+      return lines.isEmpty ? null : lines.join('\n');
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Google Translate in the browser — the graceful fallback.
+  static Uri webTranslateUri(String text, String to) => Uri.https(
+      'translate.google.com', '/', {'sl': 'auto', 'tl': to, 'text': text, 'op': 'translate'});
 
   static Future<List<(String, String)>> search(String text) async {
     final q = text.split(RegExp(r'\s+')).take(10).join(' ');

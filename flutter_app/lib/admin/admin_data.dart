@@ -215,9 +215,6 @@ void _notify(WriteBatch b, String uid, String title, String body, {String kind =
     'title': title, 'body': body, 'kind': kind, 'type': kind, 'read': false, 'at': Timestamp.fromDate(now),
     'createdAt': FieldValue.serverTimestamp(), ...extra,
   });
-  b.set(_db.collection('users').doc(uid).collection('inbox').doc(), {
-    'type': kind == 'request_done' ? 'arrivals' : 'admin', 'title': title, 'body': body, 'at': now.millisecondsSinceEpoch, 'read': false,
-  });
 }
 
 Future<Map<String, dynamic>> _userDoc(String uid) async => (await _db.collection('users').doc(uid).get()).data() ?? {};

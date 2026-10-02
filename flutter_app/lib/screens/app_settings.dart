@@ -16,6 +16,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../admin/admin_home.dart';
 import '../admin/admin_state.dart';
 import '../admin/template/ui_overrides.dart';
+import '../data/account_deletion.dart';
 import '../data/device_flags.dart';
 import '../data/phone_notifications.dart';
 import '../data/practice_progress.dart';
@@ -79,6 +80,16 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
       });
       await DeviceFlags.keepAwake(_screenWake);
     } catch (_) {}
+    // The real value lives on publicProfiles/{uid} (website Discover).
+    final pub = await ProfileVisibility.load();
+    if (pub != null && mounted) setState(() => _appearDiscover = pub);
+  }
+
+  Future<void> _setDiscover(bool v) async {
+    setState(() => _appearDiscover = v);
+    await _saveBool('ss_appear_discover', v);
+    final ok = await ProfileVisibility.set(v);
+    if (!ok && mounted) _toast('Sign in to change who can find your profile.');
   }
 
   Future<void> _saveBool(String k, bool v) async {
@@ -375,7 +386,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                       ),
                     if (_match('Appear') ||
                         _match('Privacy') ||
-                        _match('Chat'))
+                        _match('Delete'))
                       _Sec(
                         label: 'PRIVACY & SOCIAL',
                         children: [
@@ -385,25 +396,23 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                               title: 'Appear in Discover',
                               sub: 'Others can find your profile',
                               value: _appearDiscover,
-                              onChanged: (v) {
-                                setState(() => _appearDiscover = v);
-                                _saveBool('ss_appear_discover', v);
-                              },
+                              onChanged: _setDiscover,
                             ),
                           if (_match('Privacy'))
                             _NavRow(
                               icon: Icons.lock_outline,
-                              title: 'Privacy Settings',
-                              sub: 'Who can see your stats',
-                              onTap: () => _openPrivacy(),
+                              title: 'Privacy Policy',
+                              sub: 'What NowssB keeps and why',
+                              onTap: () => _openUrl('https://nowssb.com/privacy'),
                             ),
-                          if (_match('Chat'))
+                          if (_match('Delete'))
                             _NavRow(
-                              icon: Icons.chat_bubble_outline,
-                              title: 'Chat Settings',
-                              sub: 'Manage who can message you',
+                              icon: Icons.person_remove_outlined,
+                              title: 'Delete Account',
+                              sub: 'Erase your account and its data',
                               last: true,
-                              onTap: () => _openChat(),
+                              danger: true,
+                              onTap: _deleteAccount,
                             ),
                         ],
                       ),
@@ -457,9 +466,9 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                           if (_match('Terms'))
                             _NavRow(
                               icon: Icons.description_outlined,
-                              title: 'Terms & Privacy Policy',
-                              sub: 'Legal',
-                              onTap: _openTerms,
+                              title: 'Terms of Service',
+                              sub: 'nowssb.com/terms',
+                              onTap: () => _openUrl('https://nowssb.com/terms'),
                             ),
                           if (_match('Sign Out'))
                             _NavRow(
@@ -523,86 +532,44 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
     if (!opened && mounted) _toast('Could not open nowssb.com');
   }
 
-  Future<void> _openPrivacy() async {
-    final prefs = await SharedPreferences.getInstance();
-    var stats = prefs.getBool('ss_privacy_stats') ?? true;
-    var profile = prefs.getBool('ss_privacy_profile') ?? true;
-    if (!mounted) return;
-    await showDialog<void>(
-      context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setLocal) => AlertDialog(
-          backgroundColor: const Color(0xFF14171E),
-          title: const EditableLabel('app_settings.AppSettingsScreen', 'Privacy',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: const EditableLabel('app_settings.AppSettingsScreen', 'Show practice stats',
-                    style: TextStyle(color: Colors.white)),
-                value: stats,
-                onChanged: (v) async {
-                  setLocal(() => stats = v);
-                  await prefs.setBool('ss_privacy_stats', v);
-                },
-              ),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                title: const EditableLabel('app_settings.AppSettingsScreen', 'Public profile',
-                    style: TextStyle(color: Colors.white)),
-                value: profile,
-                onChanged: (v) async {
-                  setLocal(() => profile = v);
-                  await prefs.setBool('ss_privacy_profile', v);
-                },
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const EditableLabel('app_settings.AppSettingsScreen', 'Done'),
-            ),
-          ],
-        ),
-      ),
-    );
+  Future<void> _openUrl(String url) async {
+    final opened = await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    if (!opened && mounted) _toast('Could not open $url');
   }
 
-  Future<void> _openChat() async {
-    final prefs = await SharedPreferences.getInstance();
-    var messages = prefs.getBool('ss_chat_messages') ?? true;
-    if (!mounted) return;
-    await showDialog<void>(
+  Future<void> _deleteAccount() async {
+    final ok = await showDialog<bool>(
       context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setLocal) => AlertDialog(
-          backgroundColor: const Color(0xFF14171E),
-          title: const EditableLabel('app_settings.AppSettingsScreen', 'Messages',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
-          content: SwitchListTile(
-            contentPadding: EdgeInsets.zero,
-            title: const EditableLabel('app_settings.AppSettingsScreen', 'Allow messages',
-                style: TextStyle(color: Colors.white)),
-            subtitle: const EditableLabel('app_settings.AppSettingsScreen', 'Turn off to stop new messages on this phone',
-                style: TextStyle(color: Color(0x99FFFFFF))),
-            value: messages,
-            onChanged: (v) async {
-              setLocal(() => messages = v);
-              await prefs.setBool('ss_chat_messages', v);
-            },
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const EditableLabel('app_settings.AppSettingsScreen', 'Done'),
-            ),
-          ],
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF14171E),
+        title: const EditableLabel('app_settings.DeleteAccount', 'Delete your account?',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+        content: const EditableLabel('app_settings.DeleteAccount',
+          'Your profile, practice data, wishlist, notifications and sign-in are erased. Purchases and plans cannot be restored afterwards; cancel any Google Play subscription in the Play Store first. This cannot be undone.',
+          style: TextStyle(color: Color(0xB3FFFFFF), height: 1.45),
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const EditableLabel('app_settings.DeleteAccount', 'Keep my account'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const EditableLabel('app_settings.DeleteAccount', 'Delete',
+                style: TextStyle(color: Color(0xFFF87171), fontWeight: FontWeight.w800)),
+          ),
+        ],
       ),
     );
+    if (ok != true || !mounted) return;
+    _toast('Deleting your account…');
+    final r = await AccountDeletion.deleteMyAccount();
+    if (!mounted) return;
+    _toast(r.message);
+    if (!r.ok) return;
+    NotificationBanner.items.value = const [];
+    AuthGate.askForAccount();
+    Navigator.of(context, rootNavigator: true).popUntil((route) => route.isFirst);
   }
 
   Future<void> _signOut() async {

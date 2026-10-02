@@ -5,6 +5,7 @@ library;
 import 'package:flutter/material.dart';
 
 import '../../data/cart_bag.dart';
+import '../../data/store_prices.dart';
 import '../../widgets/cart_add_animation.dart';
 import 'cart_pages.dart';
 
@@ -12,15 +13,16 @@ BagItem wordBagItem({
   required String name,
   required String root,
   required String img,
-  num price = 49,
+  num price = 0,
   bool signature = false,
 }) {
+  final id = '${signature ? 'signature' : 'word'}:${name.toLowerCase()}';
   return BagItem(
-    id: '${signature ? 'signature' : 'word'}:${name.toLowerCase()}',
+    id: id,
     title: name,
     subtitle: root,
     image: img,
-    price: price,
+    price: StorePrices.instance.priceFor(id, shown: price),
     kind: signature ? 'Signature' : 'Word',
   );
 }
@@ -37,7 +39,7 @@ BagItem meaningBagItem({
     title: word,
     subtitle: root,
     image: img,
-    price: price,
+    price: StorePrices.instance.priceFor('meaning:${word.toLowerCase()}', shown: price),
     kind: signature ? 'Signature Meaning' : 'Meaning',
   );
 }
@@ -53,7 +55,7 @@ BagItem ebookBagItem({
     title: title,
     subtitle: sub,
     image: img,
-    price: price,
+    price: StorePrices.instance.priceFor('ebook:${title.toLowerCase()}', shown: price),
     kind: 'Ebook',
   );
 }
@@ -91,8 +93,9 @@ Future<void> storeBuyNow(
     openCartAfter: true,
     onComplete: () {
       if (!context.mounted) return;
+      // Buy Now = this one item on Google Play (the rest of the cart waits).
       Navigator.of(context)
-          .push(MaterialPageRoute<void>(builder: (_) => const CheckoutPage()));
+          .push(MaterialPageRoute<void>(builder: (_) => CheckoutPage(items: [item])));
     },
   );
 }

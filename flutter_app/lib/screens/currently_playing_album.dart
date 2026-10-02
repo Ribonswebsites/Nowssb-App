@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../data/models.dart';
+import '../data/word_voice.dart';
 import '../widgets/app_thinking_loader.dart';
 import '../widgets/glass_wrap.dart';
 import '../widgets/nwsb_icon.dart';
@@ -139,7 +140,7 @@ class CurrentlyPlayingAlbum extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _round(Icons.download_outlined, onTap: () {}),
+                  _round(Icons.download_outlined, onTap: () => _saveOffline(context)),
                   const SizedBox(width: 14),
                   _round(Icons.bookmark_border, onTap: () => onOpen(head)),
                   const SizedBox(width: 16),
@@ -315,6 +316,31 @@ class CurrentlyPlayingAlbum extends StatelessWidget {
               ),
             ],
     );
+  }
+
+  /// Keeps every recording in this list on the phone (WordVoice's cache),
+  /// so the session plays without a connection.
+  Future<void> _saveOffline(BuildContext context) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final withVoice = words.where(WordVoice.hasVoice).toList();
+    if (withVoice.isEmpty) {
+      messenger.showSnackBar(const SnackBar(
+        content: EditableLabel('currently_playing_album.CurrentlyPlayingAlbum', 'These words use the built-in voice, which already works offline.'),
+        behavior: SnackBarBehavior.floating,
+      ));
+      return;
+    }
+    messenger.showSnackBar(SnackBar(
+      content: Text('Saving ${withVoice.length} recordings for offline…'),
+      behavior: SnackBarBehavior.floating,
+    ));
+    for (final w in withVoice) {
+      await WordVoice.prefetch(w);
+    }
+    messenger.showSnackBar(const SnackBar(
+      content: EditableLabel('currently_playing_album.CurrentlyPlayingAlbum', 'Saved. This session now plays offline.'),
+      behavior: SnackBarBehavior.floating,
+    ));
   }
 
   Widget _round(IconData icon, {required VoidCallback onTap}) {

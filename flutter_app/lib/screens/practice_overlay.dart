@@ -264,9 +264,8 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
     await Future<void>.delayed(const Duration(milliseconds: 720));
     if (mounted) {
       setState(
-        () => _status = _matched
-            ? _PracticeStatus.complete
-            : _PracticeStatus.results,
+        () => _status =
+            _matched ? _PracticeStatus.complete : _PracticeStatus.results,
       );
     }
   }
@@ -384,10 +383,8 @@ class _WordBreakTab extends StatelessWidget {
     final title = raw.isEmpty
         ? ''
         : '${raw[0].toUpperCase()}${raw.substring(1).toLowerCase()}';
-    final syllables = word.syllables
-        .map((s) => s.trim())
-        .where((s) => s.isNotEmpty)
-        .toList();
+    final syllables =
+        word.syllables.map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
 
     final syllableRow = syllables.isEmpty
         ? const SizedBox.shrink()

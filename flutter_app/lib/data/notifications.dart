@@ -5,10 +5,15 @@
 /// turning it off stops it arriving rather than merely hiding it.
 library;
 
+import 'dart:async';
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'firebase.dart';
 
 class NotifKind {
   const NotifKind({required this.k, required this.label, required this.sub});
@@ -30,7 +35,12 @@ class NotifItem {
     required this.body,
     required this.at,
     required this.read,
+    this.remotePath,
   });
+
+  /// Set for an item that lives in Firestore users/{uid}/notifications
+  /// (admin messages, request replies, purchases) — the one inbox.
+  final String? remotePath;
 
   final String type;
   final String title;
@@ -152,9 +162,66 @@ class NotifStore extends ChangeNotifier {
   bool get loaded => _loaded;
   bool get master => _master;
   List<String> get offSet => List.unmodifiable(_off);
-  List<NotifItem> get feed => List.unmodifiable(_feed);
+  /// Local reminders + this account's Firestore notifications, newest first.
+  List<NotifItem> get feed {
+    if (_remote.isEmpty) return List.unmodifiable(_feed);
+    final all = [..._feed, ..._remote]..sort((a, b) => b.at.compareTo(a.at));
+    return List.unmodifiable(all);
+  }
 
-  int get unreadCount => _feed.where((x) => !x.read).length;
+  List<NotifItem> _remote = [];
+  StreamSubscription<User?>? _authSub;
+  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _remoteSub;
+
+  static String _remoteType(Map<String, dynamic> d) {
+    final k = '${d['kind'] ?? d['type'] ?? ''}';
+    if (k == 'request_done' || k == 'arrivals') return 'arrivals';
+    if (k.contains('sub')) return 'subscription';
+    if (k.contains('order') || k.contains('purchase')) return 'orders';
+    if (k.contains('offer')) return 'offers';
+    return 'support';
+  }
+
+  static int _ms(dynamic v) {
+    if (v is Timestamp) return v.millisecondsSinceEpoch;
+    if (v is num) return v.toInt();
+    return DateTime.tryParse('${v ?? ''}')?.millisecondsSinceEpoch ?? 0;
+  }
+
+  void _listenRemote() {
+    if (_authSub != null || !NwsbFirebase.ready) return;
+    try {
+      _authSub = FirebaseAuth.instance.authStateChanges().listen((u) {
+        _remoteSub?.cancel();
+        _remoteSub = null;
+        _remote = [];
+        notifyListeners();
+        if (u == null || u.isAnonymous) return;
+        _remoteSub = FirebaseFirestore.instance
+            .collection('users/${u.uid}/notifications')
+            .orderBy('at', descending: true)
+            .limit(40)
+            .snapshots()
+            .listen((snap) {
+          _remote = [
+            for (final d in snap.docs)
+              NotifItem(
+                type: _remoteType(d.data()),
+                title: '${d.data()['title'] ?? 'NowssB'}',
+                body: '${d.data()['body'] ?? ''}',
+                at: _ms(d.data()['at'] ?? d.data()['createdAt']),
+                read: d.data()['read'] == true,
+                remotePath: d.reference.path,
+              ),
+          ];
+          notifyListeners();
+        }, onError: (Object e) => debugPrint('NowssB inbox: $e'));
+      });
+    } catch (_) {}
+  }
+
+  int get unreadCount =>
+      _feed.where((x) => !x.read).length + _remote.where((x) => !x.read).length;
 
   /// Badge text for header bells — empty when zero, capped at 99+.
   String get badgeText {
@@ -217,6 +284,7 @@ class NotifStore extends ChangeNotifier {
       _loaded = true;
       notifyListeners();
     }
+    _listenRemote();
   }
 
   Future<void> _persistMaster() async {
@@ -300,15 +368,31 @@ class NotifStore extends ChangeNotifier {
   Future<void> clearAll() async {
     _feed = [];
     await _persistFeed();
+    final remote = _remote;
+    _remote = [];
     notifyListeners();
+    for (final n in remote) {
+      try {
+        await FirebaseFirestore.instance.doc(n.remotePath!).delete();
+      } catch (_) {}
+    }
   }
 
+  /// [index] into [feed] (the merged list).
   Future<void> markRead(int index) async {
-    if (index < 0 || index >= _feed.length) return;
-    if (_feed[index].read) return;
-    _feed[index].read = true;
-    await _persistFeed();
+    final list = feed;
+    if (index < 0 || index >= list.length) return;
+    final n = list[index];
+    if (n.read) return;
+    n.read = true;
     notifyListeners();
+    if (n.remotePath != null) {
+      try {
+        await FirebaseFirestore.instance.doc(n.remotePath!).update({'read': true});
+      } catch (_) {}
+      return;
+    }
+    await _persistFeed();
   }
 
   /// Relative time — same bands as part064 `ago()`.
@@ -327,7 +411,7 @@ class NotifStore extends ChangeNotifier {
   }
 
   String sheetSubtitle() {
-    final list = _feed;
+    final list = feed;
     final unread = unreadCount;
     if (!_master) return 'Muted — nothing is coming through';
     if (list.isEmpty) return 'Nothing new right now';

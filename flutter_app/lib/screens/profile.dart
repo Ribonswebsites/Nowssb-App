@@ -6,7 +6,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
+import '../data/cart_bag.dart';
 import '../data/content.dart';
+import '../data/entitlements.dart';
+import 'store/cart_pages.dart';
 import '../data/earn_wallet.dart';
 import '../features/bazaar/bazaar_screen.dart';
 import '../features/circle/circle_screen.dart';
@@ -21,7 +24,9 @@ import '../data/practice_progress.dart';
 import '../shell/nav_shell.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import '../widgets/app_thinking_loader.dart';
+import 'saved_words.dart';
 import 'sound_library.dart';
+import '../features/notifications/inbox_screen.dart';
 import 'player_settings.dart';
 import 'practice.dart';
 import 'progress/progress_screen.dart';
@@ -111,10 +116,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PracticeScreen()));
       case 'Saved':
       case 'Liked':
-        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SoundLibraryScreen()));
+        // The words saved with the heart in the player.
+        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SavedWordsScreen()));
       case 'Journal':
-        // Journal is account activity — not the My Progress orb screen.
-        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const QuickAccessScreen()));
+        // Journal is account activity — the one inbox (messages, request
+        // replies, purchases, rewards), not the My Progress orb screen.
+        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const InboxScreen()));
       case 'Settings':
         Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PlayerSettingsScreen()));
       default:
@@ -125,9 +132,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void _openShop(String label) {
     switch (label) {
       case 'Cart':
-      case 'Wishlist':
       case 'Orders':
-        NavScope.goTo(context, 3);
+        // The bag, with "Your purchases" (server-confirmed) under it.
+        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CartPage()));
+      case 'Wishlist':
+        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const WishlistPage()));
       default:
         Navigator.of(context).push(MaterialPageRoute(builder: (_) => const StoreScreen()));
     }
@@ -780,9 +789,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _listRow('App Version', muted: true, trailing: const EditableLabel('profile.ProfileScreen', 'v2.4.1', style: TextStyle(fontSize: 13, color: _dim))),
       ]);
 
-  Widget _shop() => _sectionList('Shop & Orders', [
-        _shopRow('Cart', '2', 26), _shopRow('Wishlist', '5', 28), _shopRow('Orders', '3', 30),
-      ]);
+  // Real counts: the bag and wishlist (CartBag) and the items this account
+  // owns (users/{uid}/owned, via Entitlements).
+  Widget _shop() => ListenableBuilder(
+        listenable: Listenable.merge([CartBag.instance, Entitlements.instance]),
+        builder: (context, _) => _sectionList('Shop & Orders', [
+          _shopRow('Cart', '${CartBag.instance.cartCount}', 26),
+          _shopRow('Wishlist', '${CartBag.instance.wishCount}', 28),
+          _shopRow('Orders', '${Entitlements.instance.owned.length}', 30),
+        ]),
+      );
+
+  String _recentFilter = 'All';
+
+  static String _ago(String iso) {
+    final t = DateTime.tryParse(iso);
+    if (t == null) return '';
+    final d = DateTime.now().difference(t);
+    if (d.inMinutes < 60) return '${d.inMinutes < 1 ? 1 : d.inMinutes}m ago';
+    if (d.inHours < 24) return '${d.inHours}h ago';
+    return '${d.inDays}d ago';
+  }
+
+  /// Practice history → cards, with each word's first library category.
+  List<({String word, String cat, String when})> get _recentSessions {
+    final lib = {for (final w in ContentStore.instance.library) w.word.toLowerCase(): w};
+    return [
+      for (final m in PracticeProgress.instance.sessionsSnapshot)
+        if ('${m['word'] ?? ''}'.isNotEmpty && !'${m['word']}'.contains('Streak restore'))
+          (
+            word: '${m['word']}',
+            cat: (lib['${m['word']}'.toLowerCase()]?.categories.isNotEmpty ?? false)
+                ? lib['${m['word']}'.toLowerCase()]!.categories.first
+                : 'Practice',
+            when: _ago('${m['completedAt'] ?? m['date'] ?? ''}'),
+          ),
+    ];
+  }
 
   Widget _account() => _sectionList('Account', [
         _listRow('Member Since', trailing: const EditableLabel('profile.ProfileScreen', 'Jan 2025', style: TextStyle(fontSize: 13, color: _dim))),
@@ -830,11 +873,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
         Align(alignment: Alignment.bottomCenter, child: SafeArea(top: false, child: Padding(padding: const EdgeInsets.all(16), child: _AnimatedSheet(child: GlassCard(radius: 28, padding: const EdgeInsets.all(20), backgroundColor: const Color(0xE60A0A0C), child: Column(mainAxisSize: MainAxisSize.min, children: [
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [const SectionLabel('Activity Library', bottom: 6), const EditableLabel('profile.ProfileScreen', 'More recent sessions', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, letterSpacing: -.4))])), _circleButton(asset: 'assets/icons/icon_32.svg', onTap: () => setState(() => _recentOpen = false))]),
           const SizedBox(height: 16),
-          SizedBox(height: 38, child: ListView(scrollDirection: Axis.horizontal, children: ['All','Meditation','Breathwork','Sleep'].map((x) => Padding(padding: const EdgeInsets.only(right: 7), child: _SheetTab(label: x))).toList())),
-          const SizedBox(height: 14),
-          GridView.count(shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), crossAxisCount: MediaQuery.sizeOf(context).width <= 360 ? 1 : 2, crossAxisSpacing: 10, mainAxisSpacing: 10, childAspectRatio: 2.55, children: const [
-            _MoreCard('Evening Reset', 'Guided Meditation · 4d ago', 'assets/profile_source/img-act1.jpeg'), _MoreCard('Box Breathing', 'Breathwork · 5d ago', 'assets/profile_source/img-act2.jpeg'), _MoreCard('Night Drift', 'Sleep Wind-Down · 6d ago', 'assets/profile_source/img-act3.jpeg'), _MoreCard('Focus Flow', 'Mindfulness · 7d ago', 'assets/profile_source/img-motto.jpeg'),
-          ]),
+          Builder(builder: (context) {
+            final all = _recentSessions;
+            final cats = <String>['All', ...{for (final r in all) r.cat}.take(4)];
+            final shown = [for (final r in all) if (_recentFilter == 'All' || r.cat == _recentFilter) r].take(8).toList();
+            const imgs = ['assets/profile_source/img-act1.jpeg', 'assets/profile_source/img-act2.jpeg', 'assets/profile_source/img-act3.jpeg', 'assets/profile_source/img-motto.jpeg'];
+            return Column(mainAxisSize: MainAxisSize.min, children: [
+              SizedBox(height: 38, child: ListView(scrollDirection: Axis.horizontal, children: cats.map((x) => Padding(padding: const EdgeInsets.only(right: 7), child: _SheetTab(label: x, active: x == _recentFilter, onTap: () => setState(() => _recentFilter = x)))).toList())),
+              const SizedBox(height: 14),
+              if (shown.isEmpty)
+                const Padding(padding: EdgeInsets.symmetric(vertical: 18), child: EditableLabel('profile.ProfileScreen', 'No sessions yet. Practise a word and it shows here.', style: TextStyle(fontSize: 13, color: _dim)))
+              else
+                GridView.count(shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), crossAxisCount: MediaQuery.sizeOf(context).width <= 360 ? 1 : 2, crossAxisSpacing: 10, mainAxisSpacing: 10, childAspectRatio: 2.55, children: [
+                  for (var i = 0; i < shown.length; i++) _MoreCard(shown[i].word, '${shown[i].cat} · ${shown[i].when}', imgs[i % imgs.length]),
+                ]),
+            ]);
+          }),
         ])))))),
       ]);
 }
@@ -934,7 +988,6 @@ class _AnimatedSheetState extends State<_AnimatedSheet> with SingleTickerProvide
   @override Widget build(BuildContext context)=>FadeTransition(opacity: CurvedAnimation(parent:c,curve:Curves.easeOut), child: SlideTransition(position: Tween(begin: const Offset(0,.04),end:Offset.zero).animate(CurvedAnimation(parent:c,curve:Curves.easeOut)), child: widget.child));
 }
 
-class _SheetTab extends StatefulWidget { final String label; const _SheetTab({required this.label}); @override State<_SheetTab> createState()=>_SheetTabState(); }
-class _SheetTabState extends State<_SheetTab> { bool active = false; @override Widget build(BuildContext context)=>InkWell(onTap:()=>setState(()=>active=!active),borderRadius:BorderRadius.circular(999),child:AnimatedContainer(duration:const Duration(milliseconds:160),padding:const EdgeInsets.symmetric(horizontal:12,vertical:8),decoration:BoxDecoration(color:active?const Color(0x26E3BD7D):const Color(0x08FFFFFF),border:Border.all(color:active?const Color(0x59E3BD7D):_borderSoft),borderRadius:BorderRadius.circular(999)),child:EditableLabel('profile.SheetTab', widget.label,style:TextStyle(fontSize:12,color:active?_accent:_dim)))); }
+class _SheetTab extends StatelessWidget { final String label; final bool active; final VoidCallback onTap; const _SheetTab({required this.label, required this.active, required this.onTap}); @override Widget build(BuildContext context)=>InkWell(onTap:onTap,borderRadius:BorderRadius.circular(999),child:AnimatedContainer(duration:const Duration(milliseconds:160),padding:const EdgeInsets.symmetric(horizontal:12,vertical:8),decoration:BoxDecoration(color:active?const Color(0x26E3BD7D):const Color(0x08FFFFFF),border:Border.all(color:active?const Color(0x59E3BD7D):_borderSoft),borderRadius:BorderRadius.circular(999)),child:EditableLabel('profile.SheetTab', label,style:TextStyle(fontSize:12,color:active?_accent:_dim)))); }
 
 class _MoreCard extends StatelessWidget { final String title,sub,image; const _MoreCard(this.title,this.sub,this.image); @override Widget build(BuildContext context)=>Container(padding:const EdgeInsets.all(8),decoration:BoxDecoration(color:const Color(0x06FFFFFF),border:Border.all(color:_borderSoft),borderRadius:BorderRadius.circular(18)),child:Row(children:[ClipRRect(borderRadius:BorderRadius.circular(13),child:EditableImage.asset(image,width:54,height:54,fit:BoxFit.cover, slot: 'profile.MoreCard')),const SizedBox(width:10),Expanded(child:Column(mainAxisAlignment:MainAxisAlignment.center,crossAxisAlignment:CrossAxisAlignment.start,children:[EditableLabel('profile.MoreCard', title,maxLines:1,overflow:TextOverflow.ellipsis,style:const TextStyle(fontSize:12.5,fontWeight:FontWeight.w600)),const SizedBox(height:4),EditableLabel('profile.MoreCard', sub,maxLines:1,overflow:TextOverflow.ellipsis,style:const TextStyle(fontSize:10.5,color:_faint))])),Container(width:24,height:24,decoration:BoxDecoration(shape:BoxShape.circle,border:Border.all(color:_borderSoft)),alignment:Alignment.center,child:const EditableLabel('profile.MoreCard', '↗',style:TextStyle(fontSize:12,color:_dim)))])); }

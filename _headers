@@ -43,3 +43,10 @@
 # The manifest decides the installed app's name, icons and start URL.
 /manifest.json
   Cache-Control: no-cache
+
+# Android App Links / Digital Asset Links (package com.nowssb.app, release
+# signing key). Must be served as JSON, never the HTML shell.
+/.well-known/assetlinks.json
+  Content-Type: application/json
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=3600

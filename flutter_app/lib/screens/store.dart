@@ -9,6 +9,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../data/app_control.dart';
+import '../data/word_requests.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
@@ -58,6 +60,22 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
   bool _resell = false;
 
   @override
+  void initState() {
+    super.initState();
+    AppControl.instance.addListener(_onControl);
+  }
+
+  @override
+  void dispose() {
+    AppControl.instance.removeListener(_onControl);
+    super.dispose();
+  }
+
+  void _onControl() {
+    if (mounted) setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
     final items = <Widget>[
       Padding(
@@ -88,6 +106,11 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
           ],
         ),
       ),
+      // Resale is paused (both programme PDFs): the Resell tab shows only
+      // when an admin turns on config/app flags.resale.
+      if (!AppControl.instance.flag('resale', fallback: false))
+        const SizedBox.shrink()
+      else
       Padding(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
         child: Row(
@@ -160,7 +183,8 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
         children: [
           _SignatureDoor(
               onTap: () => _push(context, const SignatureStoreScreen())),
-          const _StoreInfoBanner(
+          _StoreInfoBanner(
+            onTap: () => _push(context, const SignatureStoreScreen()),
             eyebrow: 'SIGNATURE STORE · LIMITED COLLECTIONS',
             title: 'Words & Meanings',
             sub: '15 Words · 5 Meanings. Owned once, never restocked.',
@@ -188,7 +212,7 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
             title: 'Get Verified',
             sub: 'Blue, Silver, Gold or Diamond — stand out on your profile.',
             icon: Icons.verified_outlined,
-            onTap: () {},
+            onTap: () => _requestVerification(context),
           ),
         ],
       ),
@@ -217,7 +241,8 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
             onTap: () => _push(context, const SubscriptionScreen()),
             tall: true,
           ),
-          const _StoreInfoBanner(
+          _StoreInfoBanner(
+            onTap: () => _push(context, const SubscriptionScreen()),
             eyebrow: 'RESONANCE · FREQUENCY · X',
             title: 'Subscription Plans',
             sub: 'More words, more features — see every tier.',
@@ -241,7 +266,7 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
         ),
       ),
     ];
-    final shown = _resell
+    final shown = _resell && AppControl.instance.flag('resale', fallback: false)
         ? <Widget>[items[0], items[1], const BazaarScreen(embedded: true)]
         // Server-driven order (Admin → UI Editor); bundled order by default.
         : layoutChildren(context, 'store.home', [
@@ -320,6 +345,24 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
 
   static void _push(BuildContext context, Widget page) {
     Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => page));
+  }
+
+  /// Verification badges are granted by the team (Admin → People → verify
+  /// tier); this files a real request in the admin Requests queue.
+  static Future<void> _requestVerification(BuildContext context) async {
+    final messenger = ScaffoldMessenger.of(context);
+    String msg;
+    try {
+      await WordRequestStore.instance.submit(
+        word: 'Verification badge',
+        notes: 'Please review my profile for a NowssB verification badge (Blue, Silver, Gold or Diamond).',
+        kind: 'verify',
+      );
+      msg = 'Verification requested. The team will reply in your notifications.';
+    } catch (e) {
+      msg = e is ArgumentError ? '${e.message}' : 'The request could not be sent. Try again.';
+    }
+    messenger.showSnackBar(SnackBar(content: Text(msg), behavior: SnackBarBehavior.floating));
   }
 }
 
@@ -455,11 +498,13 @@ class _StoreInfoBanner extends StatelessWidget {
       {required this.eyebrow,
       required this.title,
       required this.sub,
-      required this.icon});
+      required this.icon,
+      required this.onTap});
   final String eyebrow;
   final String title;
   final String sub;
   final IconData icon;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) => _MiniStoreCard(
@@ -467,7 +512,7 @@ class _StoreInfoBanner extends StatelessWidget {
         title: title,
         sub: sub,
         icon: icon,
-        onTap: () {},
+        onTap: onTap,
       );
 }
 

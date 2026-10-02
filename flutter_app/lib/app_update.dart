@@ -149,6 +149,9 @@ enum NwsbUpdatePhase { idle, downloading, retrying, verifying, ready, installing
 
 /// Owns the update check, the resumable download and the install hand-off.
 /// Widgets only listen to it; nothing here depends on a dialog being open.
+/// True in the Play Store bundle (see .github/workflows/flutter-apk.yml).
+const kNwsbPlayBuild = bool.fromEnvironment('NWSB_PLAY_BUILD');
+
 class NwsbUpdater extends ChangeNotifier {
   NwsbUpdater._();
   static final NwsbUpdater instance = NwsbUpdater._();
@@ -165,7 +168,10 @@ class NwsbUpdater extends ChangeNotifier {
   static const _maxFailuresWithoutProgress = 8;
   static const _resumePref = 'nwsb_update_resume_build';
 
-  bool get supported => !kIsWeb && Platform.isAndroid;
+  /// Google Play builds (`flutter build appbundle
+  /// --dart-define=NWSB_PLAY_BUILD=true`) never self-update: Play policy
+  /// forbids installing APKs from outside the store, and Play updates them.
+  bool get supported => !kNwsbPlayBuild && !kIsWeb && Platform.isAndroid;
 
   NwsbAppUpdate? _available;
   NwsbAppUpdate? get available => _available;

@@ -1,8 +1,13 @@
 /// Feedback chips + note — same copy as website part006 / Glass Orb.
 library;
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../data/firebase.dart';
 
 import 'progress_tokens.dart';
 import '../../admin/template/editable.dart';
@@ -70,7 +75,30 @@ class _ProgressFeedbackSectionState extends State<ProgressFeedbackSection> {
     await prefs.setString('nwsb_mp_feedback_note', _note.text.trim());
     if (markSaved) {
       await prefs.setBool('nwsb_mp_feedback_saved', true);
-      setState(() => _saved = true);
+      if (mounted) setState(() => _saved = true);
+      await _send();
+    }
+  }
+
+  /// Also file it in Firestore `feedback` so the team actually reads it
+  /// (rules: own uid, status 'new', server timestamp). Local copy stays.
+  Future<void> _send() async {
+    if (!NwsbFirebase.ready) return;
+    final u = FirebaseAuth.instance.currentUser;
+    if (u == null) return;
+    try {
+      await FirebaseFirestore.instance.collection('feedback').add({
+        'uid': u.uid,
+        'email': u.email ?? '',
+        'tags': _selected.toList(),
+        'text': _note.text.trim().length > 2000 ? _note.text.trim().substring(0, 2000) : _note.text.trim(),
+        'source': 'my_progress',
+        'platform': kIsWeb ? 'web' : defaultTargetPlatform.name,
+        'at': FieldValue.serverTimestamp(),
+        'status': 'new',
+      });
+    } catch (_) {
+      // Offline or blocked — the local copy above is kept.
     }
   }
 

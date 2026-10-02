@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:nowssb/features/earn/earn_home_sections.dart';
 import 'package:nowssb/screens/nwsb_sign_in_sheet.dart';
@@ -37,6 +38,9 @@ void main() {
   });
 
   testWidgets('Sign-in shows a real error when Firebase is not ready', (tester) async {
+    // The sheet saves "Remember me" before every attempt; without an
+    // in-memory store getInstance() never completes in a test.
+    SharedPreferences.setMockInitialValues({});
     await tester.pumpWidget(const MaterialApp(home: NwsbSignInPage()));
     await tester.pump();
 
@@ -47,6 +51,7 @@ void main() {
     );
     await tester.tap(find.text('Continue with Google'));
     await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
     await tester.pump(const Duration(milliseconds: 50));
 
     expect(find.text('Firebase is not ready in this build.'), findsOneWidget);

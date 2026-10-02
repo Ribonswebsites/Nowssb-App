@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../data/content.dart';
+import '../data/word_requests.dart';
 import '../data/models.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
@@ -282,6 +283,37 @@ class _HealingPathScreenState extends State<HealingPathScreen> {
     super.initState();
     _gender = widget.initialGender;
     _stage = _gender == null ? _HealingStage.gender : _HealingStage.categories;
+    // Words an admin publishes to Firestore `words/` appear here live.
+    ContentStore.instance.start();
+    ContentStore.instance.addListener(_onContent);
+  }
+
+  void _onContent() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void dispose() {
+    ContentStore.instance.removeListener(_onContent);
+    super.dispose();
+  }
+
+  /// No published words in this category yet: send a real request
+  /// (Firestore `requests`, the admin Requests queue) instead of faking words.
+  Future<void> _requestCategory(_HealingCategory category) async {
+    final messenger = ScaffoldMessenger.of(context);
+    String msg;
+    try {
+      await WordRequestStore.instance.submit(
+        word: 'Healing · ${category.name}',
+        notes: 'Healing path request: words for ${category.name} (${category.organ}).',
+        kind: 'healing',
+      );
+      msg = 'Requested. You will hear back in your notifications when these words are ready.';
+    } catch (e) {
+      msg = e is ArgumentError ? '${e.message}' : 'The request could not be sent. Try again.';
+    }
+    messenger.showSnackBar(SnackBar(content: Text(msg), behavior: SnackBarBehavior.floating));
   }
 
   void _choose(HealingGender gender) => setState(() {
@@ -595,7 +627,7 @@ class _HealingPathScreenState extends State<HealingPathScreen> {
           bottom: 16,
           child: FilledButton(
               onPressed: words.isEmpty
-                  ? null
+                  ? () => _requestCategory(category)
                   : () => Navigator.of(context).push(MaterialPageRoute(
                       builder: (_) => PracticePlayerScreen(
                           words: words, title: category.name))),
@@ -606,7 +638,7 @@ class _HealingPathScreenState extends State<HealingPathScreen> {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14))),
               child: Text(words.isEmpty
-                  ? 'Words Coming Soon'
+                  ? 'Request these words'
                   : 'Start Session · ${words.length} Words'))),
     ]);
   }
@@ -633,9 +665,9 @@ class _HealingPathScreenState extends State<HealingPathScreen> {
                               : FontWeight.w400))))));
   Widget _wordsTab(List<Word> words) => words.isEmpty
       ? const _EmptyState(
-          title: 'Words being crafted',
+          title: 'No words here yet',
           body:
-              'The client is personally crafting words for this category. They will appear here once ready.')
+              'Words for this category have not been published yet. Tap “Request these words” below and the team will tell you when they arrive.')
       : Column(
           children: words
               .map((word) => ListTile(

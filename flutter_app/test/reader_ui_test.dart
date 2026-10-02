@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:nowssb/data/entitlements.dart';
 import 'package:nowssb/data/reader_store.dart';
 import 'package:nowssb/data/store_catalog.dart';
 import 'package:nowssb/media/video_pool.dart';
@@ -205,6 +206,10 @@ void main() {
 
   testWidgets('eBook Reader lists the library then opens a title',
       (tester) async {
+    // The Codex is a paid title: open it as someone with the ebook pass
+    // (FrequencyX). The lock itself is covered by the entitlement tests.
+    Entitlements.instance.debugSet(uid: 'reader-test', tier: 'frequencyX', until: DateTime.now().add(const Duration(days: 30)));
+    addTearDown(() => Entitlements.instance.debugSet());
     await pumpPhone(
       tester,
       const ReaderBookScreen(kind: ReaderKind.ebook),
@@ -245,6 +250,8 @@ void main() {
     expect(ReaderStore.instance.reminders, isNotEmpty);
     expect(ReaderStore.instance.reminders.first.title, 'Earth');
     expect(find.text('Reminder set'), findsOneWidget);
+    // The store arms a one-minute reminder tick; stop it before teardown.
+    ReaderStore.instance.debugReset();
   });
 
   test('prefs round-trip and clamp', () {
