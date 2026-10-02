@@ -20,6 +20,7 @@ import '../features/earn/earnings_screen.dart';
 import '../features/notifications/inbox_screen.dart';
 import '../features/social/echo_wall_screen.dart';
 import '../features/gifts/gifts_screen.dart';
+import '../features/economy/coupon_screen.dart';
 import '../features/vault/vault_screen.dart';
 import '../features/wordprint/word_print_screen.dart';
 import '../screens/notifications_settings.dart';
@@ -361,8 +362,15 @@ class HomeMenuDrawer extends StatelessWidget {
                             light: light,
                             mark: NwsbMarks.gift,
                             label: 'NowssB Gifts',
-                            sub: 'Send or redeem a real purchase',
+                            sub: 'Boxes, the wheel, gift cards',
                             onTap: () => _push(context, const GiftsScreen()),
+                          ),
+                          _Row(
+                            light: light,
+                            mark: NwsbMarks.coupon,
+                            label: 'NowssB Coupons',
+                            sub: 'Scratch, codes, paid cards',
+                            onTap: () => _push(context, const CouponScreen()),
                           ),
                           _Row(
                             light: light,

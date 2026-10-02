@@ -11,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../theme/tokens.dart';
 import '../../widgets/four_banners.dart';
+import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_coin_fly.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/program_shelf.dart';
@@ -118,7 +119,7 @@ class _CouponScreenState extends State<CouponScreen> {
   @override
   Widget build(BuildContext context) {
     return EconomyPage(
-      title: 'Coupons',
+      title: 'NowssB Coupons',
       mark: NwsbMarks.coupon,
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
@@ -142,9 +143,9 @@ class _CouponScreenState extends State<CouponScreen> {
             prize: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Image.asset(NwsbCoinFly.disc, width: 64, height: 64, fit: BoxFit.contain),
-                const SizedBox(height: 8),
-                Text('+$_coins', style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w800)),
+                Image.asset(NwsbCoinFly.disc, width: 36, height: 36, fit: BoxFit.contain),
+                const SizedBox(height: 6),
+                Text('+$_coins', style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
                 const Text('NOWSSB COINS', style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 2, fontWeight: FontWeight.w700, fontSize: 12)),
               ],
             ),
@@ -156,10 +157,29 @@ class _CouponScreenState extends State<CouponScreen> {
           const SizedBox(height: 18),
           const Text('YOUR CODES', style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontSize: 12, fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
-          for (final c in _held) ...[
-            _Ticket(held: c),
-            const SizedBox(height: 8),
-          ],
+          GlassWrap(
+            margin: EdgeInsets.zero,
+            padding: EdgeInsets.zero,
+            child: Column(
+              children: [
+                for (var r = 0; r < _held.length; r += 2) ...[
+                  if (r > 0) const Divider(height: 1, thickness: 1, color: Color(0x33FFFFFF)),
+                  IntrinsicHeight(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(child: _Ticket(held: _held[r])),
+                        const VerticalDivider(width: 1, thickness: 1, color: Color(0x33FFFFFF)),
+                        Expanded(
+                          child: r + 1 < _held.length ? _Ticket(held: _held[r + 1]) : const SizedBox.shrink(),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
           const SizedBox(height: 10),
           const Text('PAID CARDS', style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontSize: 12, fontWeight: FontWeight.w700)),
           const SizedBox(height: 4),
@@ -235,92 +255,79 @@ class _TicketState extends State<_Ticket> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final h = widget.held;
-    return AnimatedBuilder(
-      animation: _flip,
-      builder: (context, _) {
-        final showBack = _flip.value > 0.5 || _open;
-        final angle = _flip.value * pi;
-        final face = angle > pi / 2 ? angle - pi : angle;
-        return Transform(
-          alignment: Alignment.center,
-          transform: Matrix4.identity()
-            ..setEntry(3, 2, 0.0012)
-            ..rotateY(face),
-          child: _shell(
-            child: showBack ? _back(h) : _front(h),
-          ),
-        );
+    return GestureDetector(
+      onTap: () async {
+        if (_open) {
+          await Clipboard.setData(ClipboardData(text: widget.held.code));
+          HapticFeedback.selectionClick();
+          if (mounted) setState(() => _note = 'Copied');
+          return;
+        }
+        await _take();
       },
-    );
-  }
-
-  Widget _shell({required Widget child}) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.black,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0x55E4C56A)),
+      child: AnimatedBuilder(
+        animation: _flip,
+        builder: (context, _) {
+          final t = _flip.value;
+          final torn = t > 0.55 || _open;
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(10, 12, 10, 12),
+            child: Column(
+              children: [
+                NwsbIcon(NwsbMarks.coupon, size: 18, color: const Color(0xFFE4C56A)),
+                const SizedBox(height: 6),
+                Text(h.title, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13)),
+                const SizedBox(height: 6),
+                SizedBox(
+                  height: 8,
+                  width: double.infinity,
+                  child: CustomPaint(painter: _Dash()),
+                ),
+                const SizedBox(height: 6),
+                ClipRect(
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    heightFactor: torn ? 1 : 0.0,
+                    child: Transform.translate(
+                      offset: Offset((1 - t) * 18, 0),
+                      child: Opacity(
+                        opacity: t,
+                        child: Text(
+                          _note ?? h.code,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w800, fontSize: 11, letterSpacing: 0.4),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                if (!torn)
+                  const Text('Tear open', style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 11)),
+              ],
+            ),
+          );
+        },
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(width: 10, color: const Color(0xFFE4C56A)),
-              Expanded(child: Padding(padding: const EdgeInsets.fromLTRB(12, 12, 12, 12), child: child)),
-            ],
-          ),
-        ),
-      ),
     );
+  }
+}
+
+class _Dash extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0x66E4C56A)
+      ..strokeWidth = 1;
+    const dash = 4.0;
+    var x = 0.0;
+    while (x < size.width) {
+      canvas.drawLine(Offset(x, 4), Offset(min(x + dash, size.width), 4), paint);
+      x += dash * 2;
+    }
   }
 
-  Widget _front(_Held h) {
-    return Row(
-      children: [
-        const NwsbIcon(NwsbMarks.coupon, size: 22, color: Color(0xFFE4C56A)),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(h.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
-              Text(h.line, style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12)),
-            ],
-          ),
-        ),
-        TextButton(
-          onPressed: _busy ? null : _take,
-          child: Text(_busy ? '…' : 'Open', style: const TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w800)),
-        ),
-      ],
-    );
-  }
-
-  Widget _back(_Held h) {
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(h.code, style: const TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w800, letterSpacing: 1.2, fontSize: 16)),
-              Text(_note ?? h.line, style: const TextStyle(color: Colors.white, fontSize: 12)),
-            ],
-          ),
-        ),
-        TextButton(
-          onPressed: () async {
-            await Clipboard.setData(ClipboardData(text: h.code));
-            HapticFeedback.selectionClick();
-            if (mounted) setState(() => _note = 'Copied ${h.code}');
-          },
-          child: const Text('Copy', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
-        ),
-      ],
-    );
-  }
+  @override
+  bool shouldRepaint(_Dash old) => false;
 }
 
 class _PaidCard extends StatefulWidget {

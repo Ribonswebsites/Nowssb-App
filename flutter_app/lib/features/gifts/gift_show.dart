@@ -8,6 +8,8 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../economy/economy_theme.dart';
+import '../../widgets/glass_wrap.dart';
+import '../../widgets/nwsb_icon.dart';
 import 'gifts_screen.dart';
 
 class GiftBox {
@@ -24,22 +26,23 @@ const kGiftBoxes = <GiftBox>[
 ];
 
 class _Slice {
-  const _Slice(this.label, this.weight, this.asset, this.tier);
+  const _Slice(this.label, this.weight, this.asset, this.tier, this.mark);
   final String label;
   final int weight;
   final String asset;
   final String tier;
+  final String mark;
 }
 
 const _wheel = <_Slice>[
-  _Slice('15 coins', 26, 'assets/gifts/box-red.webp', 'coins'),
-  _Slice('Stage fragment', 18, 'assets/gifts/box-red.webp', 'stage'),
-  _Slice('7-day ebook', 16, 'assets/gifts/box-gold.webp', 'ebook'),
-  _Slice('7-day Basic', 14, 'assets/gifts/box-gold.webp', 'basic'),
-  _Slice('30-day Standard', 12, 'assets/gifts/box-gold.webp', 'standard'),
-  _Slice('30-day Premium', 8, 'assets/gifts/box-gold.webp', 'premium'),
-  _Slice('3-day Signature', 4, 'assets/gifts/box-black.webp', 'signature'),
-  _Slice('10-word bundle', 2, 'assets/gifts/box-black.webp', 'bundle'),
+  _Slice('15 coins', 26, 'assets/gifts/box-red.webp', 'coins', NwsbMarks.rewards),
+  _Slice('Stage', 18, 'assets/gifts/box-red.webp', 'stage', NwsbMarks.stages),
+  _Slice('Ebook', 16, 'assets/gifts/box-gold.webp', 'ebook', NwsbMarks.book),
+  _Slice('Basic', 14, 'assets/gifts/box-gold.webp', 'basic', NwsbMarks.sound),
+  _Slice('Standard', 12, 'assets/gifts/box-gold.webp', 'standard', NwsbMarks.crown),
+  _Slice('Premium', 8, 'assets/gifts/box-gold.webp', 'premium', NwsbMarks.flame),
+  _Slice('Signature', 4, 'assets/gifts/box-black.webp', 'signature', NwsbMarks.signature),
+  _Slice('Bundle', 2, 'assets/gifts/box-black.webp', 'bundle', NwsbMarks.bag),
 ];
 
 class GiftGallery extends StatelessWidget {
@@ -47,65 +50,38 @@ class GiftGallery extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const Text('THE BOXES', style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontSize: 12, fontWeight: FontWeight.w700)),
-        const SizedBox(height: 8),
-        SizedBox(
-          height: 280,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemCount: kGiftBoxes.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 12),
-            itemBuilder: (context, i) {
-              final box = kGiftBoxes[i];
-              return GestureDetector(
-                onTap: () => openGiftBox(context, box: box, prize: box.line, itemId: box.title),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(18),
-                  child: SizedBox(
-                    width: 190,
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        Image.asset(box.asset, fit: BoxFit.cover),
-                        const DecoratedBox(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [Color(0x00000000), Color(0xE0000000)],
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Text(box.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)),
-                              Text(box.line, style: const TextStyle(color: Color(0xFFE4C56A), fontSize: 12, height: 1.3)),
-                              const SizedBox(height: 6),
-                              const Text('Tap to open', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 12)),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
+    return GlassWrap(
+      margin: EdgeInsets.zero,
+      padding: EdgeInsets.zero,
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (var i = 0; i < kGiftBoxes.length; i++) ...[
+              if (i > 0) const VerticalDivider(width: 1, thickness: 1, color: Color(0x33FFFFFF)),
+              Expanded(child: _boxCell(context, kGiftBoxes[i])),
+            ],
+          ],
         ),
-        const SizedBox(height: 8),
-        const Text(
-          'A gifted subscription does not unlock a rank. That seat has to be paid by the holder.',
-          style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 12, height: 1.35),
+      ),
+    );
+  }
+
+  Widget _boxCell(BuildContext context, GiftBox box) {
+    return GestureDetector(
+      onTap: () => openGiftBox(context, box: box, prize: box.line, itemId: box.title),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(8, 12, 8, 12),
+        child: Column(
+          children: [
+            Image.asset(box.asset, height: 108, fit: BoxFit.contain),
+            const SizedBox(height: 8),
+            Text(box.title, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13)),
+            const SizedBox(height: 4),
+            Text('Open', style: const TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w700, fontSize: 12)),
+          ],
         ),
-      ],
+      ),
     );
   }
 }
@@ -117,8 +93,9 @@ class GiftWheel extends StatefulWidget {
   State<GiftWheel> createState() => _GiftWheelState();
 }
 
-class _GiftWheelState extends State<GiftWheel> with SingleTickerProviderStateMixin {
+class _GiftWheelState extends State<GiftWheel> with TickerProviderStateMixin {
   late final AnimationController _spin;
+  late final AnimationController _lamps;
   double _angle = 0;
   var _busy = false;
   String? _landed;
@@ -126,13 +103,15 @@ class _GiftWheelState extends State<GiftWheel> with SingleTickerProviderStateMix
   @override
   void initState() {
     super.initState();
-    _spin = AnimationController(vsync: this, duration: const Duration(milliseconds: 4200));
+    _spin = AnimationController(vsync: this, duration: const Duration(milliseconds: 4600));
+    _lamps = AnimationController(vsync: this, duration: const Duration(milliseconds: 700))..repeat();
     _load();
   }
 
   @override
   void dispose() {
     _spin.dispose();
+    _lamps.dispose();
     super.dispose();
   }
 
@@ -199,55 +178,104 @@ class _GiftWheelState extends State<GiftWheel> with SingleTickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const Text('WHEEL', style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontSize: 12, fontWeight: FontWeight.w700)),
-        const SizedBox(height: 4),
-        const Text(
-          'One spin a day. Premium is 8%. Signature is 4%. The odds sit on the wheel before it moves.',
-          style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 12, height: 1.35),
-        ),
-        const SizedBox(height: 12),
-        SizedBox(
-          height: 280,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              Transform.rotate(
-                angle: _angle,
-                child: CustomPaint(
-                  size: const Size(260, 260),
-                  painter: _WheelPainter(_wheel),
-                ),
-              ),
-              const Positioned(
-                top: 0,
-                child: Icon(Icons.arrow_drop_down, color: Color(0xFFE4C56A), size: 42),
-              ),
-            ],
+    const wheel = 292.0;
+    return GlassWrap(
+      margin: EdgeInsets.zero,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Text('WHEEL', style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontSize: 12, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 4),
+          const Text(
+            'One spin. Icons only on the wheel. Premium 8%. Signature 4%.',
+            style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 12, height: 1.35),
           ),
+          const SizedBox(height: 8),
+          SizedBox(
+            height: wheel + 28,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                AnimatedBuilder(
+                  animation: _lamps,
+                  builder: (context, _) => CustomPaint(
+                    size: Size(wheel + 18, wheel + 18),
+                    painter: _LampPainter(_lamps.value),
+                  ),
+                ),
+                Transform.rotate(
+                  angle: _angle,
+                  child: SizedBox(
+                    width: wheel,
+                    height: wheel,
+                    child: Stack(
+                      children: [
+                        CustomPaint(
+                          size: const Size(wheel, wheel),
+                          painter: _WheelPainter(_wheel),
+                        ),
+                        for (var i = 0; i < _wheel.length; i++) _mark(i, wheel),
+                      ],
+                    ),
+                  ),
+                ),
+                Container(
+                  width: 54,
+                  height: 54,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: const Color(0xFF111111),
+                    border: Border.all(color: const Color(0xFFE4C56A), width: 3),
+                  ),
+                  alignment: Alignment.center,
+                  child: const Text('N', style: TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w800, fontSize: 20)),
+                ),
+                const Positioned(
+                  top: 0,
+                  child: CustomPaint(size: Size(22, 28), painter: _Pointer()),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          for (final s in _wheel)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Row(
+                children: [
+                  NwsbIcon(s.mark, size: 16, color: const Color(0xFFE4C56A)),
+                  const SizedBox(width: 8),
+                  Expanded(child: Text(s.label, style: const TextStyle(color: Colors.white, fontSize: 13))),
+                  Text('${s.weight}%', style: const TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w700, fontSize: 12)),
+                ],
+              ),
+            ),
+          const SizedBox(height: 6),
+          Text(
+            _landed == null ? 'Spin once. Higher tiers are on the wheel.' : 'Today: $_landed',
+            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
+          ),
+          const SizedBox(height: 8),
+          GoldButton(
+            label: _landed != null ? 'Spun today' : (_busy ? 'Spinning…' : 'Spin the wheel'),
+            onTap: (_landed != null || _busy) ? null : _go,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _mark(int i, double wheel) {
+    final sweep = 2 * pi / _wheel.length;
+    final mid = -pi / 2 + i * sweep + sweep / 2;
+    return Positioned.fill(
+      child: Transform.rotate(
+        angle: mid,
+        child: Align(
+          alignment: const Alignment(0, -0.56),
+          child: NwsbIcon(_wheel[i].mark, size: 22, color: const Color(0xFFF6E7B2)),
         ),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          runSpacing: 4,
-          children: [
-            for (final s in _wheel)
-              Text('${s.label} ${s.weight}%', style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 11)),
-          ],
-        ),
-        const SizedBox(height: 10),
-        Text(
-          _landed == null ? 'Spin once. Higher tiers are on the wheel.' : 'Today: $_landed',
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
-        ),
-        const SizedBox(height: 8),
-        GoldButton(
-          label: _landed != null ? 'Spun today' : (_busy ? 'Spinning…' : 'Spin the wheel'),
-          onTap: (_landed != null || _busy) ? null : _go,
-        ),
-      ],
+      ),
     );
   }
 }
@@ -256,26 +284,21 @@ class _WheelPainter extends CustomPainter {
   _WheelPainter(this.slices);
   final List<_Slice> slices;
 
-  static const _colors = <Color>[
-    Color(0xFF1A1A1A),
-    Color(0xFF3A2A12),
-    Color(0xFF111111),
-    Color(0xFF2A2416),
-    Color(0xFF0E0E0E),
-    Color(0xFF4A3818),
-    Color(0xFF000000),
-    Color(0xFF2C220E),
-  ];
-
   @override
   void paint(Canvas canvas, Size size) {
     final c = Offset(size.width / 2, size.height / 2);
-    final r = size.width / 2;
+    final r = size.width / 2 - 2;
     final sweep = 2 * pi / slices.length;
     final rect = Rect.fromCircle(center: c, radius: r);
     for (var i = 0; i < slices.length; i++) {
-      final paint = Paint()..color = _colors[i % _colors.length];
-      canvas.drawArc(rect, -pi / 2 + i * sweep, sweep, true, paint);
+      final dark = i.isEven;
+      canvas.drawArc(
+        rect,
+        -pi / 2 + i * sweep,
+        sweep,
+        true,
+        Paint()..color = dark ? const Color(0xFF0C0C0C) : const Color(0xFF3A2C14),
+      );
       canvas.drawArc(
         rect,
         -pi / 2 + i * sweep,
@@ -283,34 +306,79 @@ class _WheelPainter extends CustomPainter {
         true,
         Paint()
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 1.2
+          ..strokeWidth = 1.4
           ..color = const Color(0xFFE4C56A),
       );
-      final mid = -pi / 2 + i * sweep + sweep / 2;
-      final tp = TextPainter(
-        text: TextSpan(
-          text: slices[i].label,
-          style: const TextStyle(color: Color(0xFFF6E7B2), fontSize: 10, fontWeight: FontWeight.w700),
-        ),
-        textDirection: TextDirection.ltr,
-        maxLines: 2,
-      )..layout(maxWidth: r * 0.62);
-      canvas.save();
-      canvas.translate(c.dx + cos(mid) * r * 0.58, c.dy + sin(mid) * r * 0.58);
-      canvas.rotate(mid + pi / 2);
-      tp.paint(canvas, Offset(-tp.width / 2, -tp.height / 2));
-      canvas.restore();
     }
-    canvas.drawCircle(c, 28, Paint()..color = const Color(0xFFE4C56A));
-    final hub = TextPainter(
-      text: const TextSpan(text: 'N', style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w800)),
-      textDirection: TextDirection.ltr,
-    )..layout();
-    hub.paint(canvas, Offset(c.dx - hub.width / 2, c.dy - hub.height / 2));
+    canvas.drawCircle(
+      c,
+      r,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 8
+        ..color = const Color(0xFFC6A15A),
+    );
+    canvas.drawCircle(
+      c,
+      r - 7,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2
+        ..color = const Color(0xFFF6E7B2),
+    );
   }
 
   @override
   bool shouldRepaint(_WheelPainter old) => false;
+}
+
+class _LampPainter extends CustomPainter {
+  _LampPainter(this.phase);
+  final double phase;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final c = Offset(size.width / 2, size.height / 2);
+    final r = size.width / 2 - 4;
+    const n = 20;
+    final on = (phase * 2).floor().isEven;
+    for (var i = 0; i < n; i++) {
+      final a = -pi / 2 + i * 2 * pi / n;
+      final lit = on ? i.isEven : i.isOdd;
+      canvas.drawCircle(
+        Offset(c.dx + cos(a) * r, c.dy + sin(a) * r),
+        3.2,
+        Paint()..color = lit ? const Color(0xFFF6E7B2) : const Color(0xFF5C4A22),
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(_LampPainter old) => old.phase != phase;
+}
+
+class _Pointer extends CustomPainter {
+  const _Pointer();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final path = Path()
+      ..moveTo(size.width / 2, size.height)
+      ..lineTo(0, 0)
+      ..lineTo(size.width, 0)
+      ..close();
+    canvas.drawPath(path, Paint()..color = const Color(0xFFE4C56A));
+    canvas.drawPath(
+      path,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1
+        ..color = const Color(0xFF111111),
+    );
+  }
+
+  @override
+  bool shouldRepaint(_Pointer old) => false;
 }
 
 Future<void> openGiftBox(
@@ -330,6 +398,70 @@ Future<void> openGiftBox(
     barrierColor: const Color(0xC0000000),
     pageBuilder: (context, _, __) => _Reveal(box: box, prize: prize, code: shown),
   );
+}
+
+class GiftPlanGrid extends StatelessWidget {
+  const GiftPlanGrid({super.key});
+
+  static const _items = <(String, String, String, String)>[
+    ('Stage card', 'One locked stage.', 'assets/gifts/box-red.webp', 'stage'),
+    ('Word card', 'One full word.', 'assets/gifts/box-red.webp', 'word'),
+    ('Bundle card', 'Ten words.', 'assets/gifts/box-black.webp', 'bundle'),
+    ('7-day Basic', 'No rank credit.', 'assets/gifts/box-gold.webp', 'basic'),
+    ('7-day ebook', 'After the trial.', 'assets/gifts/box-gold.webp', 'ebook'),
+    ('30-day Standard', 'Gifted is not a rate.', 'assets/gifts/box-gold.webp', 'standard'),
+    ('30-day Premium', 'Higher tier.', 'assets/gifts/box-gold.webp', 'premium'),
+    ('3-day Signature', 'Does not unlock Partner.', 'assets/gifts/box-black.webp', 'signature'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassWrap(
+      margin: EdgeInsets.zero,
+      padding: EdgeInsets.zero,
+      child: Column(
+        children: [
+          for (var r = 0; r < _items.length; r += 2) ...[
+            if (r > 0) const Divider(height: 1, thickness: 1, color: Color(0x33FFFFFF)),
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(child: _cell(context, _items[r])),
+                  const VerticalDivider(width: 1, thickness: 1, color: Color(0x33FFFFFF)),
+                  Expanded(child: _cell(context, _items[r + 1])),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _cell(BuildContext context, (String, String, String, String) item) {
+    final (title, line, asset, id) = item;
+    return GestureDetector(
+      onTap: () => openGiftBox(
+        context,
+        box: GiftBox(asset, title, line),
+        prize: title,
+        itemId: id,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(8, 12, 8, 12),
+        child: Column(
+          children: [
+            Image.asset(asset, height: 86, fit: BoxFit.contain),
+            const SizedBox(height: 8),
+            Text(title, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13)),
+            const SizedBox(height: 2),
+            Text(line, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 11, height: 1.25)),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _Reveal extends StatefulWidget {
@@ -425,14 +557,14 @@ class RandomGiftButton extends StatelessWidget {
   const RandomGiftButton({super.key});
 
   static const _table = <_Slice>[
-    _Slice('Stage card', 22, 'assets/gifts/box-red.webp', 'stage'),
-    _Slice('Word card', 18, 'assets/gifts/box-red.webp', 'word'),
-    _Slice('7-day Basic', 16, 'assets/gifts/box-gold.webp', 'basic'),
-    _Slice('7-day ebook', 14, 'assets/gifts/box-gold.webp', 'ebook'),
-    _Slice('30-day Standard', 12, 'assets/gifts/box-gold.webp', 'standard'),
-    _Slice('30-day Premium', 10, 'assets/gifts/box-gold.webp', 'premium'),
-    _Slice('3-day Signature', 5, 'assets/gifts/box-black.webp', 'signature'),
-    _Slice('Bundle card', 3, 'assets/gifts/box-black.webp', 'bundle'),
+    _Slice('Stage card', 22, 'assets/gifts/box-red.webp', 'stage', NwsbMarks.stages),
+    _Slice('Word card', 18, 'assets/gifts/box-red.webp', 'word', NwsbMarks.word),
+    _Slice('7-day Basic', 16, 'assets/gifts/box-gold.webp', 'basic', NwsbMarks.sound),
+    _Slice('7-day ebook', 14, 'assets/gifts/box-gold.webp', 'ebook', NwsbMarks.book),
+    _Slice('30-day Standard', 12, 'assets/gifts/box-gold.webp', 'standard', NwsbMarks.crown),
+    _Slice('30-day Premium', 10, 'assets/gifts/box-gold.webp', 'premium', NwsbMarks.flame),
+    _Slice('3-day Signature', 5, 'assets/gifts/box-black.webp', 'signature', NwsbMarks.signature),
+    _Slice('Bundle card', 3, 'assets/gifts/box-black.webp', 'bundle', NwsbMarks.bag),
   ];
 
   @override

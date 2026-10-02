@@ -12,10 +12,12 @@ class NwsbScratchCard extends StatefulWidget {
     super.key,
     required this.prize,
     required this.onCleared,
+    this.height = 168,
   });
 
   final Widget prize;
   final VoidCallback onCleared;
+  final double height;
 
   @override
   State<NwsbScratchCard> createState() => _NwsbScratchCardState();
@@ -47,7 +49,7 @@ class _NwsbScratchCardState extends State<NwsbScratchCard> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(22),
         child: SizedBox(
-          height: 220,
+          height: widget.height,
           width: double.infinity,
           child: Stack(
             fit: StackFit.expand,
