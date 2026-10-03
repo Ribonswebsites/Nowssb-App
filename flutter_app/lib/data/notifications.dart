@@ -138,7 +138,7 @@ class NotifStore extends ChangeNotifier {
       NotifKind(k: 'reader', label: 'Reading', sub: 'Reminders you set in the Reader'),
     ]),
     NotifGroup(name: 'Offers', items: [
-      NotifKind(k: 'offers', label: "Today's offer", sub: 'Subscription price for your country, once a day'),
+      NotifKind(k: 'offers', label: 'Offers & news', sub: 'Announcements from NowssB, never in quiet hours'),
     ]),
     NotifGroup(name: 'Account', items: [
       NotifKind(k: 'subscription', label: 'Subscription', sub: 'Renewals, plan changes and billing'),

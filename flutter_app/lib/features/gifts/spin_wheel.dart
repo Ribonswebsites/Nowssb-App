@@ -77,35 +77,22 @@ String _pct(List<SpinSlice> all, SpinSlice s) {
   return p == p.roundToDouble() ? '${p.round()}%' : '${p.toStringAsFixed(1)}%';
 }
 
-/// What the wheel can do now: 'free', 'paid', 'coins' (needs more coins) or 'limit'.
+/// What the wheel can do now: 'free' (today's free spin is waiting) or
+/// 'limit' (used today; it comes back tomorrow). There are no paid spins.
 class SpinNow {
-  const SpinNow(this.next, this.cost, this.freeLeft, this.paidLeft);
+  const SpinNow(this.next, this.freeLeft);
   final String next;
-  final int cost;
   final int freeLeft;
-  final int paidLeft;
 
   static SpinNow read() {
     final m = EconomyMirror.instance;
     final s = m.summary;
     final cfg = s['config'] is Map ? (s['config'] as Map)['spin'] : null;
-    final cost = (cfg is Map ? (cfg['costCoins'] as num?)?.toInt() : null) ?? 15;
     final freePerDay = (cfg is Map ? (cfg['freePerDay'] as num?)?.toInt() : null) ?? 1;
-    final paidPerDay = (cfg is Map ? (cfg['paidPerDay'] as num?)?.toInt() : null) ?? 40;
     final today = s['today'] is Map ? s['today'] as Map : const {};
     final used = (today['spins'] as num?)?.toInt() ?? 0;
     final freeLeft = max(0, freePerDay - used);
-    final paidLeft = max(0, paidPerDay - max(0, used - freePerDay));
-    // The live coin balance (wallet watcher) beats the summary's copy.
-    final String next;
-    if (freeLeft > 0) {
-      next = 'free';
-    } else if (paidLeft <= 0) {
-      next = 'limit';
-    } else {
-      next = m.coins >= cost ? 'paid' : 'coins';
-    }
-    return SpinNow(next, cost, freeLeft, paidLeft.toInt());
+    return SpinNow(freeLeft > 0 ? 'free' : 'limit', freeLeft);
   }
 }
 
@@ -124,12 +111,12 @@ class _GiftWheelState extends State<GiftWheel> {
   Future<void> _go() async {
     if (_busy) return;
     final now = SpinNow.read();
-    if (now.next == 'coins' || now.next == 'limit') return;
+    if (now.next != 'free') return;
     setState(() => _busy = true);
     final slices = spinSlices();
     final nonce = '${DateTime.now().microsecondsSinceEpoch}${Random().nextInt(1 << 20)}';
     Future<Map<String, dynamic>> ask() => EconomyApi.call('spin', {'nonce': nonce});
-    // A retry with the same nonce returns the same answer and never charges twice.
+    // A retry with the same nonce returns the same answer (never a second spin).
     final result = ask().catchError((Object e) async {
       if (e is EconomyException && (e.code == 'timeout' || e.code == 'offline')) return ask();
       throw e;
@@ -160,24 +147,19 @@ class _GiftWheelState extends State<GiftWheel> {
         final coins = EconomyMirror.instance.coins;
         final now = SpinNow.read();
         final slices = spinSlices();
-        final can = !_busy && (now.next == 'free' || now.next == 'paid');
-        final buttonTitle = now.next == 'free' ? 'SPIN FREE' : 'SPIN THE WHEEL';
+        final free = now.next == 'free';
+        final can = !_busy && free;
+        final buttonTitle = free ? 'SPIN FREE' : 'SPIN THE WHEEL';
         final buttonSub = _busy
             ? 'Spinning…'
-            : switch (now.next) {
-                'free' => 'Your free spin for today',
-                'paid' => 'Spin again · ${now.cost} coins',
-                'coins' => 'Spin again · ${now.cost} coins · you have $coins',
-                _ => 'Every spin for today is used',
-              };
-        final status = switch (now.next) {
-          'free' => 'First spin each day is free. After that, ${now.cost} coins a spin.',
-          'paid' => _last == null
-              ? 'Free spin used today. Each extra spin is ${now.cost} coins.'
-              : 'Last spin: $_last. Each extra spin is ${now.cost} coins.',
-          'coins' => 'Earn ${now.cost - coins} more coins to spin again — or come back for tomorrow\u2019s free spin.',
-          _ => 'That\u2019s every spin for today. The free spin comes back at midnight.',
-        };
+            : free
+                ? 'Your free spin for today'
+                : 'Come back tomorrow';
+        final status = free
+            ? 'One free spin every day.'
+            : _last == null
+                ? 'Today\u2019s free spin is used. Come back tomorrow for the next one.'
+                : 'Last spin: $_last. Come back tomorrow for the next free spin.';
         final rare = slices.where((s) => s.weight <= 8).map((s) => '${s.label} ${_pct(slices, s)}').join('  ·  ');
         return GlassWrap(
           margin: EdgeInsets.zero,
@@ -262,9 +244,9 @@ class _GiftWheelState extends State<GiftWheel> {
                     child: Column(
                       children: [
                         EditableImage.asset(NwsbCoinFly.disc, width: 22, height: 22, fit: BoxFit.contain, slot: 'spin_wheel.GiftWheel'),
-                        Text(now.next == 'free' ? 'FREE' : '${now.cost}',
+                        Text(now.next == 'free' ? 'FREE' : 'USED',
                             style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16, height: 1.1)),
-                        EditableLabel('spin_wheel.GiftWheel', now.next == 'free' ? 'today' : 'per spin',
+                        EditableLabel('spin_wheel.GiftWheel', 'today',
                             style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 9)),
                       ],
                     ),

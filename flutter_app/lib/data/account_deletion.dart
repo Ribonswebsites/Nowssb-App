@@ -20,8 +20,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase.dart';
 
 class AccountDeletionResult {
-  const AccountDeletionResult({required this.ok, required this.queued, required this.message});
+  const AccountDeletionResult({required this.ok, required this.queued, required this.message, this.needsSignIn = false});
   final bool ok;
+
+  /// The server wants a fresh sign-in (older than 5 minutes) before deleting.
+  final bool needsSignIn;
 
   /// True when the Auth account is waiting for an admin (request filed).
   final bool queued;
@@ -57,6 +60,15 @@ class AccountDeletion {
           }, body: jsonEncode({'reason': reason}))
           .timeout(const Duration(seconds: 40));
       serverDone = r.statusCode == 200;
+      if (r.statusCode == 401 && r.body.contains('requires-recent-login')) {
+        // Nothing is deleted on a stale sign-in, not even the fallback.
+        return const AccountDeletionResult(
+          ok: false,
+          queued: false,
+          needsSignIn: true,
+          message: 'For your safety, sign out and sign in again, then delete the account. Nothing was deleted.',
+        );
+      }
       if (!serverDone) debugPrint('NowssB delete account: server ${r.statusCode}');
     } catch (e) {
       debugPrint('NowssB delete account: $e');
@@ -115,7 +127,9 @@ class AccountDeletion {
         : const AccountDeletionResult(
             ok: true,
             queued: true,
-            message: 'Your data on NowssB is deleted and your sign-in will be removed by the team within 30 days. You are signed out.',
+            // Honest about the fallback: only what the app may delete itself
+            // is gone now; the team removes the rest with the sign-in.
+            message: 'Your profile, coach chats, wishlist and notifications are deleted. Your coins, purchases, cards and the sign-in itself are removed by the team within 30 days (request filed). You are signed out.',
           );
   }
 }

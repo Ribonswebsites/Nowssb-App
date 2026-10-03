@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../data/auth_errors.dart';
 import '../data/firebase.dart';
 import '../data/phone_notifications.dart';
 import '../widgets/login_stage.dart';
@@ -45,17 +46,31 @@ class _NwsbSignInPageState extends State<NwsbSignInPage> {
   String? _error;
   String? _notice;
   String? _verificationId;
+  // The number the current code was sent to; editing the number drops it.
+  String? _codeFor;
 
   @override
   void dispose() {
+    _email.removeListener(_numberChanged);
     _email.dispose();
     _password.dispose();
     super.dispose();
   }
 
+  void _numberChanged() {
+    if (_verificationId == null || _email.text.trim() == _codeFor) return;
+    setState(() {
+      _verificationId = null;
+      _codeFor = null;
+      _notice = null;
+      _password.clear();
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    _email.addListener(_numberChanged);
     SharedPreferences.getInstance().then((prefs) {
       if (!mounted) return;
       setState(() => _remember = prefs.getBool('nwsb.rememberMe') ?? true);
@@ -95,12 +110,7 @@ class _NwsbSignInPageState extends State<NwsbSignInPage> {
 
   String _message(Object error) {
     if (error is PlatformException) {
-      final details = '${error.code} ${error.message ?? ''}'.toLowerCase();
-      if (details.contains('10') || details.contains('12500') || details.contains('developer_error') || details.contains('sign_in_failed')) {
-        return 'Google sign-in is not authorised for this Android build. '
-            'Add package com.nowssb.app and this build’s SHA-1/SHA-256 '
-            'certificates to the NowssB Firebase Android app.';
-      }
+      if (isGoogleConfigError(error)) return googleConfigMessage(error);
       return error.message ?? 'Google sign-in could not be completed.';
     }
     final code = error is FirebaseAuthException ? error.code : '';
@@ -134,7 +144,7 @@ class _NwsbSignInPageState extends State<NwsbSignInPage> {
 
   Future<void> _submit() => _run(() async {
         final raw = _email.text.trim();
-        if (!raw.contains('@') && _verificationId != null) {
+        if (!raw.contains('@') && _verificationId != null && raw == _codeFor) {
           final code = _password.text.trim();
           if (code.length < 4) throw 'Enter the verification code from SMS.';
           await FirebaseAuth.instance.signInWithCredential(
@@ -168,15 +178,16 @@ class _NwsbSignInPageState extends State<NwsbSignInPage> {
             if (mounted) setState(() => _error = _message(error));
           },
           codeSent: (verificationId, _) {
-            if (!mounted) return;
+            if (!mounted || _email.text.trim() != raw) return;
             setState(() {
               _verificationId = verificationId;
+              _codeFor = raw;
               _password.clear();
               _notice = 'Code sent. Enter it and tap Verify.';
             });
           },
           codeAutoRetrievalTimeout: (verificationId) {
-            _verificationId = verificationId;
+            if (_codeFor == raw) _verificationId = verificationId;
           },
         );
       });
@@ -216,12 +227,7 @@ class _NwsbSignInPageState extends State<NwsbSignInPage> {
             ),
           );
         } on PlatformException catch (error) {
-          final details = '${error.code} ${error.message ?? ''}'.toLowerCase();
-          final blocked = details.contains('10') ||
-              details.contains('12500') ||
-              details.contains('developer_error') ||
-              details.contains('sign_in_failed');
-          if (!blocked) rethrow;
+          if (!isGoogleConfigError(error)) rethrow;
           final provider = GoogleAuthProvider()..addScope('email');
           await FirebaseAuth.instance.signInWithProvider(provider);
         }

@@ -6,6 +6,7 @@
      · Cloudflare R2 (S3 API, SigV4): list objects under a prefix.
    Nothing here logs or returns key material. */
 import { enc, googleToken, hex } from './server.js';
+import { categoryFor, fcmMessage } from './notify/push.js';
 
 export const SCOPE_AUTH = 'https://www.googleapis.com/auth/identitytoolkit https://www.googleapis.com/auth/cloud-platform';
 export const SCOPE_FCM = 'https://www.googleapis.com/auth/firebase.messaging';
@@ -86,17 +87,19 @@ export function authAdmin(sa, project, fetchImpl = (...a) => fetch(...a)) {
 /** One FCM HTTP v1 message to a device token. */
 export async function fcmSend(sa, token, msg, fetchImpl = (...a) => fetch(...a)) {
   const access = await googleToken(sa, SCOPE_FCM);
+  // Data-only (see _lib/notify/push.js): the app draws exactly one
+  // notification on the right channel and applies the person's switches,
+  // quiet hours and de-duplication. title/body also ride in data, which is
+  // what older app builds read, so they keep working.
+  const c = categoryFor(msg.type || 'admin');
+  const route = String(msg.route || '') || c.route;
   const r = await fetchImpl('https://fcm.googleapis.com/v1/projects/' + sa.project_id + '/messages:send', {
     method: 'POST',
     headers: { Authorization: 'Bearer ' + access, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      message: {
-        token,
-        notification: { title: String(msg.title || ''), body: String(msg.body || '') },
-        data: { type: String(msg.type || 'admin'), url: String(msg.url || ''), route: String(msg.route || '') },
-        android: { priority: 'HIGH', notification: { channel_id: 'nowssb', color: '#e8d5a3' } },
-      },
-    }),
+    body: JSON.stringify(fcmMessage(token, {
+      cat: c.cat, type: String(msg.type || 'admin'), title: msg.title, body: msg.body, route, promo: c.promo,
+      nid: msg.nid || '', url: msg.url,
+    }, { legacy: Number(msg.notifFormat) !== 2 })),
   });
   const text = await r.text().catch(() => '');
   const dead = r.status === 404 || /UNREGISTERED|registration-token-not-registered/i.test(text);

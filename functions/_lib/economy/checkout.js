@@ -128,14 +128,19 @@ export async function beginCheckout(ctx, uid, data) {
       const card = s.cfg.gifts.cards.find((c) => c.id === String(data.cardId || ''));
       if (!card) fail('Unknown gift card.', 400, 'invalid-argument');
       const w = await wallet(s, uid);
-      const d = s.day;
-      w.giftSends = w.giftSends && w.giftSends.day === d ? w.giftSends : { day: d, n: 0 };
-      if (w.giftSends.n >= s.cfg.gifts.maxSendPerDay) fail(`Up to ${s.cfg.gifts.maxSendPerDay} gift cards a day.`);
+      // The daily count and the quarterly Signature lock are recorded when
+      // the payment clears (sales.js), so an abandoned checkout locks
+      // nothing. Open gift-card checkouts count toward today's limit; an
+      // earlier open checkout for the same card is replaced.
+      const live = open.length >= 3 ? [] : open;
+      const sameCard = live.filter((r) => r.data.kind === 'giftcard' && ((r.data.items || [])[0] || {}).id === 'gift:' + card.id);
+      for (const r of sameCard) await release(s, uid, r.id, r.data, 'replaced');
+      const pending = live.filter((r) => r.data.kind === 'giftcard').length - sameCard.length;
+      const sent = w.giftSends && w.giftSends.day === s.day ? w.giftSends.n || 0 : 0;
+      if (sent + pending >= s.cfg.gifts.maxSendPerDay) fail(`Up to ${s.cfg.gifts.maxSendPerDay} gift cards a day.`);
       if (card.oncePerQuarter && w.lastSig3 && s.now - w.lastSig3 < 91 * DAY) fail('The Signature day card can be sent once a quarter.');
       const deliverAt = Number(data.deliverAt) || 0;
       if (deliverAt && deliverAt > s.now + 365 * DAY) fail('Pick a delivery date within a year.');
-      w.giftSends.n += 1;
-      if (card.oncePerQuarter) w.lastSig3 = s.now;
       const meta = { toName: String(data.toName || '').slice(0, 40), fromName: String(data.fromName || '').slice(0, 40), message: String(data.message || '').slice(0, 280), design: String(data.design || 'lotus').slice(0, 30), deliverAt };
       s.create(`checkouts/${id}`, { ...base, productId: card.productId, payINR: card.priceINR, coins: 0, meta, items: [{ id: 'gift:' + card.id, kind: 'giftcard', title: card.title }] });
       return { checkoutId: id, productId: card.productId, payINR: card.priceINR };

@@ -117,7 +117,10 @@ export async function attachReferral(ctx, uid, data) {
         const dv = await s.doc(`devices/${d}`);
         if (dv && dv.welcomeAt && dv.welcomeUid !== uid) deviceUsed = true;
       }
-      if (!(R.welcome.oncePerDevice && deviceUsed)) {
+      // No registered install id = no device to dedupe against (fresh
+      // accounts calling attach directly). The welcome set needs one.
+      const noDevice = R.welcome.oncePerDevice && !(w.devices || []).length;
+      if (!(R.welcome.oncePerDevice && deviceUsed) && !noDevice) {
         r.welcomeAt = s.now;
         for (const d of w.devices || []) { const dv = await s.edit(`devices/${d}`, { uids: [] }); dv.welcomeAt = s.now; dv.welcomeUid = uid; }
         const items = [{ type: 'coins', coins: await moveCoins(s, uid, R.welcome.coins, 'welcome'), label: `${R.welcome.coins} coins` }];
@@ -141,11 +144,38 @@ export async function countOpen(db, cfg, code, ipHash, now = Date.now()) {
     const day = new Date(now + 330 * 60e3).toISOString().slice(0, 10).replace(/-/g, '');
     const rp = `refOpens/${day}_${ipHash.slice(0, 24)}`;
     const r = await t.get(rp);
+    const out = { ok: true, title: l.data.title || '', kind: l.data.kind, itemId: l.data.itemId || '' };
+    // Past the daily per-IP limit nothing is written any more (a loop of
+    // hits costs reads only, never a write per hit).
+    if (r.exists && r.data.n >= cfg.reference.openRatePerIpPerDay) return out;
     const n = (r.exists ? r.data.n : 0) + 1;
     t.set(rp, { n, at: now });
     if (n <= cfg.reference.openRatePerIpPerDay) t.set(`refLinks/${c}`, { opens: (l.data.opens || 0) + 1 }, { merge: true });
-    return { ok: true, title: l.data.title || '', kind: l.data.kind, itemId: l.data.itemId || '' };
+    return out;
   });
+}
+
+/**
+ * Edge dedupe for link opens: one Firestore count per IP + code per hour.
+ * Uses the Workers Cache API (per data centre, free), so repeated hits are
+ * answered without touching Firestore at all. Falls through when there is
+ * no cache (tests, local).
+ */
+export async function countOpenOnce(db, cfg, code, ipHash, now = Date.now()) {
+  const c = String(code || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 20);
+  if (!c) return { ok: false };
+  const cache = typeof caches !== 'undefined' && caches.default ? caches.default : null;
+  const hour = Math.floor(now / 3600e3);
+  const key = cache ? new Request(`https://ref-open.nowssb.invalid/${c}/${ipHash.slice(0, 24)}/${hour}`) : null;
+  if (cache) {
+    const hit = await cache.match(key).catch(() => null);
+    if (hit) return hit.json().catch(() => ({ ok: true }));
+  }
+  const r = await countOpen(db, cfg, c, ipHash, now);
+  if (cache && r && r.ok) {
+    await cache.put(key, new Response(JSON.stringify(r), { headers: { 'Content-Type': 'application/json', 'Cache-Control': 'max-age=3600' } })).catch(() => null);
+  }
+  return r;
 }
 
 export async function linkHub(ctx, uid) {

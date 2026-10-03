@@ -1,16 +1,24 @@
-/// Per-device practice history used by the native dashboard and player.
+/// Practice history used by the native dashboard and player, kept per
+/// account on this phone (a second account signing in starts empty) and
+/// topped up from the server's own practice days after a reinstall.
 ///
 /// A completed word is recorded once per day, matching the WebView session
 /// key convention (`YYYY-MM-DD_WORD`). No fabricated totals are shown: every
-/// count below comes from an actual completed native playback session.
+/// count below comes from an actual completed native playback session (or a
+/// practice day the server recorded for this account).
 library;
 
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show SystemSound, SystemSoundType;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'content.dart';
+import 'firebase.dart';
 import 'models.dart';
 import '../features/economy/economy_api.dart';
 import '../features/economy/reward_fx.dart';
@@ -19,36 +27,120 @@ class PracticeProgress extends ChangeNotifier {
   PracticeProgress._();
   static final PracticeProgress instance = PracticeProgress._();
 
-  static const _storageKey = 'nwsb_native_sessions';
-  static const _levelKey = 'nwsb_player_level';
+  // Signed out (guest) uses the original device-wide keys; each account gets
+  // its own `_<uid>` keys.
+  static const _guestKey = 'nwsb_native_sessions';
+  static const _guestLevelKey = 'nwsb_player_level';
+  static const _migratedKey = 'nwsb_native_sessions_migrated';
   final Map<String, Map<String, dynamic>> _sessions = {};
   bool _started = false;
   int? _levelOverride;
+  String? _uid;
+  StreamSubscription<User?>? _authSub;
+
+  String get _storageKey => _uid == null ? _guestKey : '${_guestKey}_$_uid';
+  String get _levelKey => _uid == null ? _guestLevelKey : '${_guestLevelKey}_$_uid';
+  String get _clearedKey => '${_guestKey}_cleared_${_uid ?? ''}';
 
   Future<void> start() async {
     if (_started) return;
     _started = true;
+    String? uid;
+    if (NwsbFirebase.ready) {
+      final u = FirebaseAuth.instance.currentUser;
+      uid = (u == null || u.isAnonymous) ? null : u.uid;
+      _authSub = FirebaseAuth.instance.authStateChanges().listen((u) {
+        final id = (u == null || u.isAnonymous) ? null : u.uid;
+        if (id != _uid) unawaited(_load(id));
+      });
+    }
+    await _load(uid);
+  }
+
+  /// Loads [uid]'s history (null = signed out) in place of the current one.
+  Future<void> _load(String? uid) async {
+    _uid = uid;
+    final storageKey = _storageKey, levelKey = _levelKey;
+    final sessions = <String, Map<String, dynamic>>{};
+    int? level;
     try {
       final preferences = await SharedPreferences.getInstance();
-      final raw = preferences.getString(_storageKey);
+      if (uid != null && !preferences.containsKey(storageKey) && !(preferences.getBool(_migratedKey) ?? false)) {
+        // One time: history recorded before it was kept per account belongs
+        // to the first account that signs in on this phone after the update.
+        final legacy = preferences.getString(_guestKey);
+        if (legacy != null && legacy.isNotEmpty) await preferences.setString(storageKey, legacy);
+        final legacyLevel = preferences.getInt(_guestLevelKey);
+        if (legacyLevel != null) await preferences.setInt(levelKey, legacyLevel);
+        await preferences.remove(_guestKey);
+        await preferences.remove(_guestLevelKey);
+        await preferences.setBool(_migratedKey, true);
+      }
+      final raw = preferences.getString(storageKey);
       if (raw != null && raw.isNotEmpty) {
         final decoded = jsonDecode(raw);
         if (decoded is Map) {
           for (final entry in decoded.entries) {
             if (entry.value is Map) {
-              _sessions['${entry.key}'] = Map<String, dynamic>.from(entry.value as Map);
+              sessions['${entry.key}'] = Map<String, dynamic>.from(entry.value as Map);
             }
           }
         }
       }
-      final storedLevel = preferences.getInt(_levelKey);
+      final storedLevel = preferences.getInt(levelKey);
       if (storedLevel != null && storedLevel >= 1 && storedLevel <= 10) {
-        _levelOverride = storedLevel;
+        level = storedLevel;
       }
     } catch (_) {
       // The player still works if device persistence is temporarily unavailable.
     }
+    if (_uid != uid) return; // another account signed in meanwhile
+    _sessions
+      ..clear()
+      ..addAll(sessions);
+    _levelOverride = level;
     notifyListeners();
+    if (uid != null) unawaited(_hydrate(uid));
+  }
+
+  /// Adds the practice days the server recorded for this account
+  /// (users/{uid}/mastery: last practice day per word) that this phone
+  /// doesn't have, e.g. after a reinstall or on a new phone. Days on or
+  /// before a "Clear practice history" are not brought back.
+  Future<void> _hydrate(String uid) async {
+    try {
+      final snap = await FirebaseFirestore.instance.collection('users/$uid/mastery').limit(500).get();
+      if (_uid != uid) return;
+      final preferences = await SharedPreferences.getInstance();
+      final cleared = preferences.getString(_clearedKey) ?? '';
+      final library = ContentStore.instance.library;
+      var added = false;
+      for (final doc in snap.docs) {
+        final ymd = '${doc.data()['lastPracticeDay'] ?? ''}';
+        if (!RegExp(r'^\d{8}$').hasMatch(ymd)) continue;
+        final date = '${ymd.substring(0, 4)}-${ymd.substring(4, 6)}-${ymd.substring(6, 8)}';
+        if (cleared.isNotEmpty && date.compareTo(cleared) <= 0) continue;
+        final id = '${doc.data()['word'] ?? doc.id}'.toLowerCase();
+        final known = _sessions.values.any((x) => x['date'] == date && '${x['word'] ?? ''}'.toLowerCase().replaceAll(RegExp(r'[^a-z0-9_-]'), '') == id);
+        if (known) continue;
+        final match = library.where((w) => w.key == id || w.word.toLowerCase() == id);
+        final word = match.isEmpty ? id : match.first.word;
+        _sessions['${date}_$word'] = {'date': date, 'word': word, 'completedAt': '${date}T12:00:00.000', 'source': 'server'};
+        added = true;
+      }
+      if (!added) return;
+      await _save();
+      notifyListeners();
+    } catch (e) {
+      debugPrint('NowssB practice history sync: $e');
+    }
+  }
+
+  Future<void> _save() async {
+    try {
+      final preferences = await SharedPreferences.getInstance();
+      await preferences.setString(_storageKey, jsonEncode(_sessions));
+    } catch (_) {}
   }
 
   int get totalSessions => _sessions.length;
@@ -205,13 +297,13 @@ class PracticeProgress extends ChangeNotifier {
       'source': 'native-player',
       if (durationSec > 0) 'durationSec': durationSec,
     };
+    await _save(); // the in-memory session stays even if storage fails
+    notifyListeners();
+    // Profile > Sound Feedback: a short click when a word is completed.
     try {
       final preferences = await SharedPreferences.getInstance();
-      await preferences.setString(_storageKey, jsonEncode(_sessions));
-    } catch (_) {
-      // Keep the in-memory session even if storage cannot complete.
-    }
-    notifyListeners();
+      if (preferences.getString('nowssb_sound') != 'off') unawaited(SystemSound.play(SystemSoundType.click));
+    } catch (_) {}
     // Server: practice counters, starter quest and mastery practice days.
     unawaited(EconomyApi.call('reportPractice', {'practiced': true, 'wordId': word.word})
         .then((_) {}, onError: (_) {}));
@@ -219,12 +311,14 @@ class PracticeProgress extends ChangeNotifier {
     reportEarn('ring_listen');
   }
 
-  /// Wipes every recorded session on this device. Used by Settings.
+  /// Wipes this account's recorded sessions on this phone. Used by Settings.
+  /// The server's practice days up to today are not synced back afterwards.
   Future<void> clearAll() async {
     _sessions.clear();
     try {
       final preferences = await SharedPreferences.getInstance();
       await preferences.remove(_storageKey);
+      await preferences.setString(_clearedKey, _day(DateTime.now()));
     } catch (_) {}
     notifyListeners();
   }
@@ -245,12 +339,15 @@ class PracticeProgress extends ChangeNotifier {
       'source': 'coin-restore',
       'durationSec': 60,
     };
-    try {
-      final preferences = await SharedPreferences.getInstance();
-      await preferences.setString(_storageKey, jsonEncode(_sessions));
-    } catch (_) {}
+    await _save();
     notifyListeners();
     return true;
+  }
+
+  @override
+  void dispose() {
+    _authSub?.cancel();
+    super.dispose();
   }
 
   static String _day(DateTime date) {

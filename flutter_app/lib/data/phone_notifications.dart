@@ -1,266 +1,147 @@
-/// Phone notifications + the in-app banner.
+/// Phone notifications — start-up, push wiring and the in-app banner.
 ///
-/// Alerts post through `flutter_local_notifications` only after someone is
-/// signed in. The shade uses the NowssB logo and the hands-up still as the
-/// big picture. Copy follows the phone's local time and country.
+/// The notification system itself lives in lib/features/notifications:
+///   notif_categories.dart  one category + Android channel per kind
+///   notif_prefs.dart       switches, quiet hours, reminder time, de-dup
+///   notif_center.dart      the one place a notification is drawn
+///   notif_scheduler.dart   local schedules (word of the day, streak, …)
+///   notif_router.dart      where a tap goes
+///   notif_watchers.dart    inbox + new-content watches
+///
+/// Nothing is posted at launch any more. Older builds posted two made-up
+/// notifications back to back the moment the start animation ended (a daily
+/// "words are ready"/"streak" line and a "50% off" offer no Play offer
+/// backed), and a daily periodicallyShow that Android never delivered (no
+/// ScheduledNotificationReceiver in the manifest) — so those two, together,
+/// were the only notifications anyone ever saw.
 library;
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
-import 'dart:ui' show PlatformDispatcher;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../admin/admin_state.dart';
+import '../features/notifications/notif_categories.dart';
+import '../features/notifications/notif_center.dart';
+import '../features/notifications/notif_prefs.dart';
+import '../features/notifications/notif_router.dart';
+import '../features/notifications/notif_scheduler.dart';
+import '../features/notifications/notif_watchers.dart';
 import 'firebase.dart';
 import 'notifications.dart';
 
-const _channelId = 'nowssb_alerts';
-
+/// FCM background isolate entry (main.dart registers it).
 @pragma('vm:entry-point')
-Future<void> nwsbFcmBackground(RemoteMessage message) async {
-  final plugin = FlutterLocalNotificationsPlugin();
-  const android = AndroidInitializationSettings('@drawable/ic_stat_nowssb');
-  await plugin.initialize(const InitializationSettings(android: android));
-  final n = message.notification;
-  final title = n?.title ?? message.data['title']?.toString() ?? 'NowssB';
-  final body = n?.body ?? message.data['body']?.toString() ?? '';
-  await plugin.show(
-    title.hashCode ^ DateTime.now().millisecondsSinceEpoch,
-    title,
-    body,
-    const NotificationDetails(android: _androidDetails),
-    payload: message.data['type']?.toString(),
-  );
-}
-
-const _androidDetails = AndroidNotificationDetails(
-  _channelId,
-  'NowssB',
-  channelDescription: 'Practice, offers and account updates',
-  importance: Importance.max,
-  priority: Priority.high,
-  icon: '@drawable/ic_stat_nowssb',
-  playSound: true,
-  enableVibration: true,
-);
+Future<void> nwsbFcmBackground(RemoteMessage message) => nwsbNotifBackground(message);
 
 class PhoneNotifications {
   PhoneNotifications._();
   static final PhoneNotifications instance = PhoneNotifications._();
 
-  final _plugin = FlutterLocalNotificationsPlugin();
-  bool _ready = false;
+  bool _started = false;
   bool _listening = false;
-  bool _armed = false;
-  int _seq = 1;
-  String? _picturePath;
-  String? _logoPath;
+  String? _uid;
 
   Future<void> start() async {
-    if (_ready) return;
-    try {
-      const android = AndroidInitializationSettings('@drawable/ic_stat_nowssb');
-      await _plugin.initialize(
-        const InitializationSettings(android: android),
-      );
-      final androidPlugin = _plugin.resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>();
-      await androidPlugin?.createNotificationChannel(
-        const AndroidNotificationChannel(
-          _channelId,
-          'NowssB',
-          description: 'Practice, offers and account updates',
-          importance: Importance.max,
-        ),
-      );
-      await androidPlugin?.requestNotificationsPermission();
-      await _ensureArt();
-      _ready = true;
-    } catch (e) {
-      debugPrint('NowssB notifications init: $e');
-    }
+    if (_started) return;
+    _started = true;
+    await NotifPrefs.instance.load();
+    await NotifCenter.instance.init();
 
+    // In-app events (Reader reminders, NotifStore.notify callers): the feed
+    // keeps them, the banner shows them, the phone draws them once.
     NotifStore.onDelivered = (item) {
-      unawaited(show(item));
-      if (FirebaseAuth.instance.currentUser != null) {
-        NotificationBanner.push(item);
-      }
+      if (FirebaseAuth.instance.currentUser != null) NotificationBanner.push(item);
+      unawaited(NotifCenter.instance.present(NwsbNotice(
+        category: NotifCategories.forKind(item.type),
+        title: item.title,
+        body: item.body,
+        key: 'local:${item.type}:${item.at}',
+      )));
     };
 
-    if (NwsbFirebase.ready && !_listening) {
-      _listening = true;
-      try {
-        await FirebaseMessaging.instance.requestPermission(
-          alert: true,
-          badge: true,
-          sound: true,
-        );
-        FirebaseMessaging.onMessage.listen((message) {
-          if (FirebaseAuth.instance.currentUser == null) return;
-          final n = message.notification;
-          final type = message.data['type']?.toString() ?? 'subscription';
-          unawaited(NotifStore.instance.notify(
-            type: NotifStore.allKinds.contains(type) ? type : 'subscription',
-            title: n?.title ?? message.data['title']?.toString() ?? 'NowssB',
-            body: n?.body ?? message.data['body']?.toString() ?? '',
-          ));
-        });
-        await _saveToken();
-        FirebaseAuth.instance.authStateChanges().listen((user) {
-          unawaited(_saveToken());
-          unawaited(_scheduleDaily(user != null));
-          if (user == null) {
-            NotificationBanner.items.value = const [];
-            return;
-          }
-          if (_armed) unawaited(deliverForUser(user));
-        });
-      } catch (e) {
-        debugPrint('NowssB FCM: $e');
-      }
+    if (!NwsbFirebase.ready || _listening) return;
+    _listening = true;
+    try {
+      await FirebaseMessaging.instance.requestPermission(alert: true, badge: true, sound: true);
+      FirebaseMessaging.onMessage.listen(_onForegroundPush);
+      FirebaseMessaging.instance.onTokenRefresh.listen((_) => unawaited(_saveToken()));
+      await NotifCenter.instance.bindPushTaps();
+      AdminState.instance.addListener(_syncIdentity);
+      FirebaseAuth.instance.authStateChanges().listen(_onAuth);
+    } catch (e) {
+      debugPrint('NowssB FCM: $e');
     }
   }
 
-  /// Splash calls this. Signed-out phones, and remembered-off restores, get nothing.
+  void _onForegroundPush(RemoteMessage message) {
+    if (FirebaseAuth.instance.currentUser == null) return;
+    final n = NwsbNotice.fromRemote(message);
+    if (n.category.id == NotifCategories.offers.id) {
+      // Broadcasts have no inbox document: keep one in the feed (which also
+      // draws it, through onDelivered).
+      unawaited(NotifStore.instance.notify(type: 'offers', title: n.title, body: n.body));
+      return;
+    }
+    // Everything else already has its inbox document (the feed shows it).
+    unawaited(NotifCenter.instance.present(n));
+  }
+
+  Future<void> _onAuth(User? user) async {
+    final signedIn = user != null && !user.isAnonymous;
+    final was = _uid;
+    _uid = signedIn ? user.uid : null;
+    await _syncIdentity();
+    if (signedIn) {
+      await _saveToken();
+      NotifWatchers.instance.bind(user.uid);
+    } else {
+      NotifWatchers.instance.bind(null);
+      NotificationBanner.items.value = const [];
+      await NotifScheduler.instance.cancelAll();
+      // This phone's token stays registered under the account that just
+      // signed out; retire it so that account's pushes stop coming here. A
+      // fresh token is saved at the next sign-in.
+      if (was != null) {
+        try {
+          await FirebaseMessaging.instance.deleteToken();
+        } catch (_) {}
+      }
+    }
+    NotifScheduler.instance.replanSoon();
+  }
+
+  Future<void> _syncIdentity() => NotifPrefs.instance.setIdentity(
+        uid: _uid ?? '',
+        admin: _uid != null && AdminState.instance.isAdmin,
+      );
+
+  /// Splash calls this once the start animation is done. Taps that opened
+  /// the app are routed now; local schedules are planned. Nothing is posted.
   Future<void> announceAfterLaunch() async {
     await start();
     final prefs = await SharedPreferences.getInstance();
     final remember = prefs.getBool('nwsb.rememberMe') ?? true;
-    final user = FirebaseAuth.instance.currentUser;
-    if (!remember || user == null) {
-      await _scheduleDaily(false);
+    if (!remember || FirebaseAuth.instance.currentUser == null) {
       NotificationBanner.items.value = const [];
-      return;
     }
-    _armed = true;
-    await _scheduleDaily(true);
-    await deliverForUser(user);
+    NotifRouter.instance.markReady();
+    NotifScheduler.instance.start();
+    NotifWatchers.instance.startContent();
   }
 
   /// Called after a sign-in that just succeeded in this session.
   void armSession() {
-    _armed = true;
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) unawaited(deliverForUser(user));
-  }
-
-  /// One set per local day, written for this account's clock and country.
-  Future<void> deliverForUser(User user) async {
-    await start();
-    final prefs = await SharedPreferences.getInstance();
-    final now = DateTime.now();
-    final dayKey =
-        '${user.uid}-${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
-    if (prefs.getString('nwsb_notif_day') == dayKey) return;
-    await prefs.setString('nwsb_notif_day', dayKey);
-
-    final country = _country(prefs);
-    final where = country.isEmpty ? '' : ' · $country';
-    final rawName = (user.displayName ?? '').trim();
-    final first = rawName.isEmpty ? '' : rawName.split(RegExp(r'\s+')).first;
-    final who = first.isEmpty ? 'there' : first;
-    final hour = now.hour;
-
-    if (hour < 17) {
-      final part = hour < 12 ? 'morning' : 'afternoon';
-      await NotifStore.instance.notify(
-        type: 'routine',
-        title: 'Your daily words are ready',
-        body:
-            'Good $part, $who. Sit with one word. A few minutes keeps the day$where.',
-      );
-    } else {
-      await NotifStore.instance.notify(
-        type: 'streak',
-        title: 'Streak is waiting',
-        body:
-            'Practice once before midnight, $who, so today still counts$where.',
-      );
-    }
-    await NotifStore.instance.notify(
-      type: 'offers',
-      title: 'Today’s offer · 50% off',
-      body:
-          'Subscription is half price today on this account$where. It ends at midnight, local time.',
-    );
-  }
-
-  Future<void> show(NotifItem item) async {
-    if (!_ready) return;
-    if (FirebaseAuth.instance.currentUser == null) return;
-    if (!NotifStore.instance.isKindOn(item.type)) return;
-    try {
-      await _ensureArt();
-      await _plugin.show(
-        _seq++,
-        item.title,
-        item.body,
-        NotificationDetails(android: _richDetails(item.title, item.body)),
-        payload: item.type,
-      );
-    } catch (e) {
-      debugPrint('NowssB notification show: $e');
-    }
-  }
-
-  AndroidNotificationDetails _richDetails(String title, String body) {
-    final logo = _logoPath;
-    final picture = _picturePath;
-    final logoBitmap =
-        logo == null ? null : FilePathAndroidBitmap(logo);
-    return AndroidNotificationDetails(
-      _channelId,
-      'NowssB',
-      channelDescription: 'Practice, offers and account updates',
-      importance: Importance.max,
-      priority: Priority.high,
-      icon: '@drawable/ic_stat_nowssb',
-      largeIcon: logoBitmap,
-      styleInformation: picture == null
-          ? null
-          : BigPictureStyleInformation(
-              FilePathAndroidBitmap(picture),
-              largeIcon: logoBitmap,
-              contentTitle: title,
-              summaryText: body,
-              hideExpandedLargeIcon: false,
-            ),
-      playSound: true,
-      enableVibration: true,
-    );
-  }
-
-  Future<void> _ensureArt() async {
-    if (_picturePath != null && _logoPath != null) return;
-    final dir = await getApplicationSupportDirectory();
-    final picture = File('${dir.path}/nwsb_notif_hands.png');
-    final logo = File('${dir.path}/nwsb_notif_logo.png');
-    if (!await picture.exists() || await picture.length() < 1000) {
-      final data = await rootBundle.load('assets/notifications/hands-offer.png');
-      await picture.writeAsBytes(
-        data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes),
-        flush: true,
-      );
-    }
-    if (!await logo.exists() || await logo.length() < 500) {
-      final data = await rootBundle.load('assets/notifications/logo.png');
-      await logo.writeAsBytes(
-        data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes),
-        flush: true,
-      );
-    }
-    _picturePath = picture.path;
-    _logoPath = logo.path;
+    NotifRouter.instance.markReady();
+    NotifScheduler.instance.start();
+    unawaited(NotifScheduler.instance.refreshAccount());
   }
 
   String _country(SharedPreferences prefs) {
@@ -271,29 +152,13 @@ class PhoneNotifications {
     return PlatformDispatcher.instance.locale.countryCode ?? '';
   }
 
-  Future<void> _scheduleDaily(bool signedIn) async {
-    if (!_ready) return;
-    try {
-      if (!signedIn) {
-        await _plugin.cancel(88001);
-        return;
-      }
-      await _plugin.periodicallyShow(
-        88001,
-        'NowssB',
-        'Your daily words are ready.',
-        RepeatInterval.daily,
-        const NotificationDetails(android: _androidDetails),
-        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-        payload: 'routine',
-      );
-    } catch (e) {
-      debugPrint('NowssB daily reminder: $e');
-    }
-  }
-
+  /// pushSubs/{sha(token)} — only under the signed-in account (rules
+  /// enforce it). notifFormat 2 tells the server this build reads
+  /// data-only pushes (functions/_lib/notify/push.js).
   Future<void> _saveToken() async {
     if (!NwsbFirebase.ready) return;
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
     try {
       final token = await FirebaseMessaging.instance.getToken();
       if (token == null || token.isEmpty) return;
@@ -303,7 +168,8 @@ class PhoneNotifications {
         'endpoint': 'fcm:$token',
         'fcmToken': token,
         'platform': 'android-native',
-        'uid': FirebaseAuth.instance.currentUser?.uid,
+        'notifFormat': 2,
+        'uid': uid,
         'country': _country(prefs),
         'tzOffsetMin': DateTime.now().timeZoneOffset.inMinutes,
         'updatedAt': DateTime.now().millisecondsSinceEpoch,

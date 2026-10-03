@@ -51,6 +51,8 @@
    collection and both are sent from this one call.
    ══════════════════════════════════════════════════════════════════════ */
 
+import { categoryFor, fcmMessage } from '../_lib/notify/push.js';
+
 const enc = new TextEncoder();
 
 /* ── small helpers ───────────────────────────────────────────────────── */
@@ -263,21 +265,15 @@ async function sendFcm(sa, token, msg) {
   const r = await fetch('https://fcm.googleapis.com/v1/projects/' + sa.project_id + '/messages:send', {
     method: 'POST',
     headers: { Authorization: 'Bearer ' + access, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      message: {
-        token,
-        /* The notification block is what Android draws when the app is in
-           the background or closed — which is the whole point. The data
-           block is what part072.js reads when it is open, and what a tap
-           carries either way, so both must be there. */
-        notification: { title: msg.title, body: msg.body },
-        data: { type: String(msg.type || ''), url: String(msg.url || './') },
-        android: {
-          priority: 'HIGH',
-          notification: { channel_id: 'nowssb', color: '#e8d5a3', default_vibrate_timings: true },
-        },
-      },
-    }),
+    /* Phones that registered with notifFormat 2 (the current app) get a
+       data-only message (functions/_lib/notify/push.js): the app draws one
+       notification on the category's channel, honours the person's switches
+       and quiet hours, and opens the right screen on tap. Older installs keep
+       the notification block they were built for. */
+    body: JSON.stringify(fcmMessage(token, (() => {
+      const c = categoryFor(msg.type || 'broadcast');
+      return { cat: c.cat, type: String(msg.type || 'broadcast'), title: msg.title, body: msg.body, route: c.route, promo: c.promo };
+    })(), { legacy: Number(msg.notifFormat) !== 2 })),
   });
   const text = await r.text().catch(() => '');
   /* UNREGISTERED / INVALID_ARGUMENT on the token mean the app was
@@ -337,7 +333,13 @@ export async function onRequestPost(context) {
     } catch (e) { sa = null; saError = 'FCM_SERVICE_ACCOUNT is not valid service-account JSON.'; }
   }
 
-  const results = await Promise.all(subscriptions.map(async (sub) => {
+  /* Promotional sends never reach admins (ADMIN_UIDS): an offer pushed to
+     the people who run the shop is noise, and skews what they see. */
+  const promo = body.promo === true || ['offers', 'offer', 'promo', 'broadcast'].includes(String(body.type || ''));
+  const targets = promo ? subscriptions.filter((sub) => !(sub && sub.uid && admins.includes(sub.uid))) : subscriptions;
+  const skippedAdmins = subscriptions.length - targets.length;
+
+  const results = await Promise.all(targets.map(async (sub) => {
     const endpoint = sub && sub.endpoint;
 
     /* The Android app, reached through FCM rather than a push service. */
@@ -346,7 +348,7 @@ export async function onRequestPost(context) {
     if (fcm) {
       if (!sa) return { endpoint, ok: false, error: saError || 'FCM_SERVICE_ACCOUNT is not set.' };
       try {
-        const r = await sendFcm(sa, fcm, { title, body: body.body || '', type: body.type, url: body.url });
+        const r = await sendFcm(sa, fcm, { title, body: body.body || '', type: body.type, url: body.url, notifFormat: sub.notifFormat });
         return { endpoint, ...r };
       } catch (e) {
         return { endpoint, ok: false, error: String(e && e.message || e).slice(0, 200) };
@@ -386,6 +388,7 @@ export async function onRequestPost(context) {
     sent: results.filter(r => r.ok).length,
     failed: results.filter(r => !r.ok).length,
     expired: results.filter(r => r.expired).map(r => r.endpoint),
+    skippedAdmins,
     results,
   });
 }

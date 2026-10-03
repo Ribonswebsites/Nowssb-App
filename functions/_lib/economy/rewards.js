@@ -104,6 +104,10 @@ async function referredActivation(s, uid) {
   if (!holder || holder === uid) return;
   const w = await wallet(s, uid);
   if ((w.stats.logins || 0) < A.activeDays) return;
+  // The holder is paid only for a friend on a real, different phone: a
+  // registered install id that the holder's own wallet doesn't share.
+  const holderDevices = ((await s.doc(P.wallet(holder))) || {}).devices || [];
+  if (!(w.devices || []).length || (w.devices || []).some((d) => holderDevices.includes(d))) return;
   const r = await s.edit(P.referral(uid));
   r.activationPaid = s.now;
   await moveCoins(s, holder, A.coins, 'friend-active', { ref: uid });
@@ -532,7 +536,7 @@ export async function claimSeason(ctx, uid, data) {
 /* ── leagues (weekly, by free coins earned that week) ── */
 function boardPath(week, tier) { return `leagues/${week}_${tier}`; }
 export async function leagueView(ctx, uid, name = '') {
-  return inTx(ctx, async (s) => {
+  const v = await inTx(ctx, async (s) => {
     const L = s.cfg.rewards.leagues;
     const w = await wallet(s, uid);
     const tier = L.tiers.includes(w.leagueTier) ? w.leagueTier : L.tiers[0];
@@ -543,39 +547,70 @@ export async function leagueView(ctx, uid, name = '') {
     wk.xpByDay = wk.xpByDay || {};
     wk.xpByDay[s.day] = Math.max(wk.xpByDay[s.day] || 0, (d && d.freeCoins) || 0);
     const xp = Object.values(wk.xpByDay).reduce((a, b) => a + (Number(b) || 0), 0);
-    const b = await s.edit(boardPath(s.week, tier), { week: s.week, tier, entries: {} });
-    b.entries = b.entries || {};
-    b.entries[uid] = { xp, name: String(name || '').slice(0, 40) };
-    const rows = Object.entries(b.entries).map(([id, e]) => ({ uid: id, xp: e.xp, name: e.name })).sort((x, y) => y.xp - x.xp);
-    const me = rows.findIndex((r) => r.uid === uid);
-    return { tier, title: L.titles[tier], xp, rank: me + 1, size: rows.length, top: rows.slice(0, 20).map((r, i) => ({ rank: i + 1, xp: r.xp, name: r.name || 'Listener', me: r.uid === uid })) };
+    // One small doc per entrant (no shared doc to contend on or outgrow).
+    // Only the server reads entries; players see a display alias, never a uid.
+    s.t.set(entryPath(s.week, tier, uid), { uid, xp, alias: leagueAlias(name), at: s.now });
+    return { tier, title: L.titles[tier], xp, week: s.week };
   });
+  const parent = boardPath(v.week, v.tier);
+  const [ahead, size, topRows] = await Promise.all([
+    ctx.db.count('entries', [['xp', '>', v.xp]], { parent }).catch(() => 0),
+    ctx.db.count('entries', [], { parent }).catch(() => 1),
+    ctx.db.query('entries', [], { parent, orderBy: ['xp', 'desc'], limit: 20 }).catch(() => []),
+  ]);
+  const top = topRows.map((r, i) => ({ rank: i + 1, xp: r.data.xp || 0, name: r.data.alias || 'Listener', me: r.id === uid }));
+  const { week, ...rest } = v;
+  return { ...rest, rank: ahead + 1, size: Math.max(size, 1), top };
+}
+function entryPath(week, tier, uid) { return `${boardPath(week, tier)}/entries/${uid}`; }
+/** "Ribon Patil" → "Ribon P." (a display alias; never an email or a uid). */
+export function leagueAlias(name) {
+  if (String(name || '').includes('@')) return 'Listener';
+  const parts = String(name || '').replace(/[^\p{L}\p{N} .'-]/gu, '').trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return 'Listener';
+  const first = parts[0].slice(0, 16);
+  return parts.length > 1 ? `${first} ${parts[parts.length - 1].charAt(0).toUpperCase()}.` : first;
 }
 export async function claimLeague(ctx, uid) {
+  // Last week's standing (read before the transaction; the board is closed).
+  const prev = weekKey(ctx.now - 7 * DAY, ctx.cfg);
+  const L0 = ctx.cfg.rewards.leagues;
+  const w0 = (await ctx.db.get(P.wallet(uid))).data || {};
+  const tier0 = L0.tiers.includes(w0.leagueTier) ? w0.leagueTier : L0.tiers[0];
+  const mine = (await ctx.db.get(entryPath(prev, tier0, uid))).data;
+  // Last week's XP from the account's own week record (every day counted),
+  // so a week the board missed still counts.
+  const pw = (await ctx.db.get(P.week(uid, prev))).data || {};
+  const ownXp = Object.values(pw.xpByDay || {}).reduce((a, v) => a + (Number(v) || 0), 0);
+  let standing = null;
+  if (mine || ownXp > 0) {
+    const xp = Math.max(ownXp, (mine && mine.xp) || 0);
+    // Legacy boards (written before entries moved to their own docs) still rank.
+    const legacy = mine ? null : (await ctx.db.get(boardPath(prev, tier0))).data;
+    if (legacy && legacy.entries) {
+      const entries = { ...legacy.entries, [uid]: { ...(legacy.entries[uid] || {}), xp: Math.max(xp, (legacy.entries[uid] && legacy.entries[uid].xp) || 0) } };
+      const rows = Object.entries(entries).sort((x, y) => y[1].xp - x[1].xp);
+      standing = { xp: entries[uid].xp, rank: rows.findIndex(([id]) => id === uid) + 1 };
+    } else {
+      standing = { xp, rank: (await ctx.db.count('entries', [['xp', '>', xp]], { parent: boardPath(prev, tier0) }).catch(() => 0)) + 1 };
+    }
+  }
   return inTx(ctx, async (s) => {
     const L = s.cfg.rewards.leagues;
     const w = await wallet(s, uid);
     const prevWeek = weekKey(s.now - 7 * DAY, s.cfg);
     if (w.leagueClaimed === prevWeek) fail('Last week’s league prize is claimed.', 400, 'already-exists');
     const tier = L.tiers.includes(w.leagueTier) ? w.leagueTier : L.tiers[0];
-    const b = await s.doc(boardPath(prevWeek, tier));
-    // Last week's XP from the account's own week record (every day counted).
-    const pw = (await s.doc(P.week(uid, prevWeek))) || {};
-    const ownXp = Object.values(pw.xpByDay || {}).reduce((a, v) => a + (Number(v) || 0), 0);
-    if (!b || !b.entries || !b.entries[uid]) {
-      if (ownXp <= 0) fail('You were not in a league last week.');
-    }
-    const entries = { ...((b && b.entries) || {}) };
-    entries[uid] = { ...(entries[uid] || {}), xp: Math.max(ownXp, (entries[uid] && entries[uid].xp) || 0) };
-    const rows = Object.entries(entries).sort((x, y) => y[1].xp - x[1].xp);
-    const rank = rows.findIndex(([id]) => id === uid) + 1;
+    if (prevWeek !== prev || tier !== tier0) fail('You were not in a league last week.');
+    if (!standing) fail('You were not in a league last week.');
+    const rank = standing.rank;
     w.leagueClaimed = prevWeek;
     const prize = L.prizes[rank - 1] || 0;
     const coins = prize ? await moveCoins(s, uid, prize, 'league:' + prevWeek) : 0;
     const ti = L.tiers.indexOf(tier);
     let next = tier;
     if (rank <= L.promoteTop && ti < L.tiers.length - 1) next = L.tiers[ti + 1];
-    else if (entries[uid].xp < L.demoteBelowXp && ti > 0) next = L.tiers[ti - 1];
+    else if (standing.xp < L.demoteBelowXp && ti > 0) next = L.tiers[ti - 1];
     w.leagueTier = next;
     return { rank, coins, tier: next, promoted: L.tiers.indexOf(next) > ti };
   });

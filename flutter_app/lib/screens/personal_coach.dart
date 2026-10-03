@@ -110,11 +110,20 @@ class _PersonalCoachScreenState extends State<PersonalCoachScreen> {
         },
       }, SetOptions(merge: true));
     } on _CoachException catch (error) {
-      if (mounted) setState(() => _notice = error.message);
+      if (mounted) setState(() { _notice = error.message; _restore(preset, message); });
     } catch (_) {
-      if (mounted) setState(() => _notice = 'Your coach is unavailable right now. Please try again.');
+      if (mounted) setState(() { _notice = 'Your coach is unavailable right now. Please try again.'; _restore(preset, message); });
     } finally {
       if (mounted) setState(() => _sending = false);
+    }
+  }
+
+  /// Puts a typed message back in the box after a failed send (unless the
+  /// person already started typing something new).
+  void _restore(String? preset, String message) {
+    if (preset == null && _input.text.trim().isEmpty) {
+      _input.text = message;
+      _input.selection = TextSelection.collapsed(offset: message.length);
     }
   }
 

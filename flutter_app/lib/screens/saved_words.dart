@@ -49,14 +49,17 @@ class _SavedWordsScreenState extends State<SavedWordsScreen> {
     });
   }
 
-  List<Word> _rows() {
+  /// Up to five library words the person hasn't saved, listed under a
+  /// "Suggested" header; they are not counted or played as saved words.
+  List<Word> _suggested() {
     final have = _saved.map((w) => w.word).toSet();
-    final extra = <Word>[
+    return [
       for (final word in ContentStore.instance.library)
         if (!have.contains(word.word)) word,
-    ];
-    return [..._saved, ...extra.take(5)];
+    ].take(5).toList();
   }
+
+  List<Word> _rows() => [..._saved, ..._suggested()];
 
   static const _arts = <String>[
     'assets/banners/promo/pose-01.png',
@@ -124,7 +127,7 @@ class _SavedWordsScreenState extends State<SavedWordsScreen> {
       slot: 'saved_words.SavedWordsScreen',
       title: 'LIBRARY',
       titleSize: 34,
-      subtitle: _ready ? '${_rows().length} WORDS · SAVED' : 'SAVED WORDS',
+      subtitle: _ready ? '${_saved.length} WORDS · SAVED' : 'SAVED WORDS',
       actions: [
         IconButton(
           onPressed: () => Navigator.maybePop(context),
@@ -164,16 +167,29 @@ class _SavedWordsScreenState extends State<SavedWordsScreen> {
                           ),
                         );
                       }
+                      final savedCount = _saved.length;
+                      final hasSuggested = rows.length > savedCount;
                       return ListView.separated(
                         padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                        itemCount: rows.length,
+                        itemCount: rows.length + (hasSuggested ? 1 : 0),
                         separatorBuilder: (_, __) => const SizedBox(height: 10),
-                        itemBuilder: (context, i) {
+                        itemBuilder: (context, index) {
+                          if (hasSuggested && index == savedCount) {
+                            return const Padding(
+                              padding: EdgeInsets.only(top: 10, left: 4),
+                              child: EditableLabel(
+                                'saved_words.SavedWordsScreen',
+                                'SUGGESTED',
+                                style: TextStyle(color: Color(0x88FFFFFF), fontSize: 11, letterSpacing: 1.6, fontWeight: FontWeight.w600),
+                              ),
+                            );
+                          }
+                          final i = hasSuggested && index > savedCount ? index - 1 : index;
                           final word = rows[i];
                           return Material(
                             color: Colors.transparent,
                             child: InkWell(
-                              onTap: () => _open(rows),
+                              onTap: () => _open(i < savedCount ? _saved : [word]),
                               borderRadius: BorderRadius.circular(12),
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(
@@ -228,7 +244,7 @@ class _SavedWordsScreenState extends State<SavedWordsScreen> {
                     },
                   ),
           ),
-          if (_ready && _rows().isNotEmpty)
+          if (_ready && _saved.isNotEmpty)
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
               child: ClipRRect(
@@ -242,12 +258,12 @@ class _SavedWordsScreenState extends State<SavedWordsScreen> {
                       border: Border.all(color: const Color(0x40FFFFFF)),
                     ),
                     child: InkWell(
-                      onTap: () => _open(_rows()),
+                      onTap: () => _open(_saved),
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(10, 8, 12, 8),
                         child: Row(
                           children: [
-                            _thumb(_rows().first, 0),
+                            _thumb(_saved.first, 0),
                             const SizedBox(width: 10),
                             Container(
                               width: 1,
@@ -260,7 +276,7 @@ class _SavedWordsScreenState extends State<SavedWordsScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    _rows().first.word.toUpperCase(),
+                                    _saved.first.word.toUpperCase(),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
@@ -270,9 +286,9 @@ class _SavedWordsScreenState extends State<SavedWordsScreen> {
                                     ),
                                   ),
                                   Text(
-                                    _rows().first.origin.isEmpty
+                                    _saved.first.origin.isEmpty
                                         ? 'NATURAL ORIGIN'
-                                        : _rows().first.origin.toUpperCase(),
+                                        : _saved.first.origin.toUpperCase(),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(

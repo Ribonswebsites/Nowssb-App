@@ -13,7 +13,7 @@ export function publicConfig(cfg) {
     cart: { coinCapBands: cfg.cart.coinCapBands, subscriptionCoinPct: cfg.cart.subscriptionCoinPct, maxTotalDiscountPct: cfg.cart.maxTotalDiscountPct, order: cfg.cart.order, payTiersINR: cfg.cart.payTiersINR },
     odds: oddsTable(cfg),
     coupons: { rarities: cfg.coupons.rarities, paidAdultsOnly: cfg.coupons.paidAdultsOnly, paidMonthlyLimitINR: cfg.coupons.paidMonthlyLimitINR, freeExpiryDays: cfg.coupons.freeExpiryDays, codes: Object.fromEntries(Object.entries(cfg.coupons.codes).map(([k, v]) => [k, { type: v.type, label: v.label, how: v.how || '', winPct: v.winPct || null }])) },
-    spin: { costCoins: cfg.spin.costCoins, freePerDay: spinFree(cfg), paidPerDay: spinPaid(cfg), perDay: spinFree(cfg) + spinPaid(cfg), slices: cfg.spin.slices.map((x) => ({ label: x.label, w: x.w })) },
+    spin: { costCoins: 0, freePerDay: spinFree(cfg), paidPerDay: spinPaid(cfg), perDay: spinFree(cfg) + spinPaid(cfg), slices: cfg.spin.slices.map((x) => ({ label: x.label, w: x.w })) },
     gifts: { boxes: Object.fromEntries(Object.entries(cfg.gifts.boxes).map(([k, b]) => [k, { title: b.title, minutes: b.minutes || null }])), cards: cfg.gifts.cards.map((c) => ({ id: c.id, title: c.title, productId: c.productId, priceINR: c.priceINR })), cardValidityDays: cfg.gifts.cardValidityDays, coolingOffDays: cfg.gifts.coolingOffDays, freeClaimDays: cfg.gifts.freeClaimDays },
     products: cfg.products,
     reference: { linkBase: cfg.reference.linkBase, holdDays: cfg.reference.holdDays, attribution: cfg.reference.attribution, friendDiscount: cfg.reference.friendDiscount, welcome: cfg.reference.welcome, activation: cfg.reference.activation, sharerLadder: cfg.reference.sharerLadder },
@@ -25,7 +25,7 @@ export function publicConfig(cfg) {
 }
 
 export const spinFree = (cfg) => (cfg.spin.freePerDay ?? 1);
-export const spinPaid = (cfg) => (cfg.spin.paidPerDay ?? 40);
+export const spinPaid = (cfg) => (cfg.spin.paidPerDay ?? 0);
 /** What the wheel can do right now: a free spin, a paid spin, or nothing (and why). */
 export function spinState(D, W, cfg) {
   const used = ((D && D.counts) || {}).spin || 0;

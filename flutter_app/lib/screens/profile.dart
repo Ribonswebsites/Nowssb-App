@@ -5,6 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart' hide Settings;
+import 'package:firebase_auth/firebase_auth.dart';
+import '../app_update.dart';
+import '../data/firebase.dart';
+import '../data/settings.dart';
 
 import '../data/cart_bag.dart';
 import '../data/content.dart';
@@ -84,7 +89,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _soundOn = true;
   int _duration = 15;
   TimeOfDay _reminder = const TimeOfDay(hour: 7, minute: 0);
-  final Map<int, bool> _weekDone = {};
   bool _loading = true;
   bool _recentOpen = false;
   String _toast = '';
@@ -145,9 +149,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _load() async {
     _prefs = await SharedPreferences.getInstance();
     final savedName = _prefs.getString('nowssb_name');
-    _nameController.text = savedName?.trim().isNotEmpty == true ? savedName! : 'Practitioner';
+    final accountName = NwsbFirebase.ready ? FirebaseAuth.instance.currentUser?.displayName?.trim() : null;
+    _nameController.text = savedName?.trim().isNotEmpty == true ? savedName! : (accountName?.isNotEmpty == true ? accountName! : 'Practitioner');
     _soundOn = _prefs.getString('nowssb_sound') != 'off';
-    _duration = _prefs.getInt('nowssb_duration') ?? 15;
+    // Practice duration is the player's sleep timer (Settings), so the
+    // player really stops after it. 0 = no limit.
+    _duration = math.max(0, _durationSteps.indexOf(Settings.instance.sleepTimer)) * 15;
     final savedTime = _prefs.getString('nowssb_reminder');
     if (savedTime != null && savedTime.contains(':')) {
       final parts = savedTime.split(':');
@@ -155,10 +162,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
     _bannerUrl = _prefs.getString('nwsb_local_banner');
     _avatarUrl = _prefs.getString('nwsb_local_photo');
-    for (int i = 0; i < 7; i++) {
-      final key = 'week_$i';
-      if (_prefs.containsKey(key)) _weekDone[i] = _prefs.getBool(key) ?? false;
-    }
     if (mounted) setState(() => _loading = false);
   }
 
@@ -239,6 +242,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _nameController.text = value;
     await _prefs.setString('nowssb_name', value);
     if (mounted) setState(() {});
+    await _saveAccountName(value);
+  }
+
+  /// The name is the account's: Firebase displayName, users/{uid} and the
+  /// public profile (website Discover) all get it.
+  Future<void> _saveAccountName(String value) async {
+    if (!NwsbFirebase.ready) return;
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null || user.isAnonymous) return;
+    try {
+      await user.updateDisplayName(value);
+      final db = FirebaseFirestore.instance;
+      await db.doc('users/${user.uid}').set({'displayName': value}, SetOptions(merge: true));
+      await db.doc('publicProfiles/${user.uid}').set({'uid': user.uid, 'displayName': value, 'updatedAt': FieldValue.serverTimestamp()}, SetOptions(merge: true));
+    } catch (e) {
+      debugPrint('NowssB profile name: $e');
+      if (mounted) _showToast('Saved on this phone. Your account name will update when you are online.');
+    }
+  }
+
+  static const _durationSteps = ['Off', '15 Min', '30 Min', '45 Min', '1 Hour'];
+  String get _durationText => _duration == 0 ? 'No limit' : '$_duration min';
+  Future<void> _stepDuration(int by) async {
+    final v = (_duration + by).clamp(0, 60).toInt();
+    setState(() => _duration = v);
+    await Settings.instance.setSleepTimer(_durationSteps[v ~/ 15]);
   }
 
   Future<void> _pickPhoto() async {
@@ -261,12 +290,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _onLiveProgress() { if (mounted) setState(() {}); }
 
-  void _toggleWeek(int i, int today) async {
-    if (i > today) return;
-    final value = !(_weekDone[i] ?? (i < today));
-    setState(() => _weekDone[i] = value);
-    await _prefs.setBool('week_$i', value);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -754,7 +777,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 16),
           const FractionallySizedBox(widthFactor: .66, child: Text.rich(TextSpan(children: [TextSpan(text: 'My Focus.\nBreathe.\nLet go.\n'), TextSpan(text: 'Grow.', style: TextStyle(color: _accent))]), style: TextStyle(fontSize: 25, height: 1.22, fontWeight: FontWeight.w300))),
           const SizedBox(height: 14),
-          Row(children: [Expanded(child: _compactQuick('Practice', '$_duration min', 15)), const SizedBox(width: 5), Expanded(child: _compactQuick('Reminder', _reminderText, 17)), const SizedBox(width: 5), Expanded(child: _compactQuick('Plan', _planName, 21))]),
+          Row(children: [Expanded(child: _compactQuick('Practice', _durationText, 15)), const SizedBox(width: 5), Expanded(child: _compactQuick('Reminder', _reminderText, 17)), const SizedBox(width: 5), Expanded(child: _compactQuick('Plan', _planName, 21))]),
         ]),
       );
 
@@ -764,29 +787,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Container(width: 30, height: 30, decoration: BoxDecoration(color: const Color(0x29E3BD7D), border: Border.all(color: const Color(0x59E3BD7D)), borderRadius: BorderRadius.circular(10)), child: Center(child: EditableSvg.asset('assets/icons/icon_${icon.toString().padLeft(2, '0')}.svg', width: 14, height: 14, colorFilter: const ColorFilter.mode(_accent, BlendMode.srcIn), slot: 'profile.ProfileScreen'))), EditableSvg.asset('assets/icons/icon_${(icon + 1).toString().padLeft(2, '0')}.svg', width: 12, height: 12, colorFilter: const ColorFilter.mode(_faint, BlendMode.srcIn), slot: 'profile.ProfileScreen')]), const SizedBox(height: 9), Text(label.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 7, letterSpacing: .7, color: _dim)), const SizedBox(height: 3), Text(value, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600))]),
       );
 
-  Widget _weekTracker(int today) => Container(
+  Widget _weekTracker(int today) {
+    final week = PracticeProgress.instance.thisWeekDays;
+    return Container(
         margin: const EdgeInsets.only(bottom: 44),
         child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: List.generate(7, (i) {
-          final done = _weekDone[i] ?? (i < today);
+          // Days this account actually practiced (PracticeProgress), read-only.
+          final done = week[i].done;
           final future = i > today;
-          return GestureDetector(
-            onTap: future ? null : () => _toggleWeek(i, today),
-            child: AnimatedContainer(
+          return AnimatedContainer(
               duration: const Duration(milliseconds: 150),
               width: 42,
               height: 42,
               decoration: BoxDecoration(shape: BoxShape.circle, color: done ? const Color(0xFFF2F2F0) : Colors.transparent, border: Border.all(color: future ? _borderSoft : (i == today ? const Color(0xD9FFFFFF) : _borderSoft), width: i == today ? 1.5 : 1)),
               child: Center(child: Text(const ['M','T','W','T','F','S','S'][i], style: TextStyle(fontFamily: _mono, fontSize: 13, fontWeight: i == today ? FontWeight.w600 : FontWeight.w400, color: done ? Colors.black : (future ? _dim.withOpacity(.32) : _dim)))),
-            ),
           );
         })),
       );
+  }
 
   Widget _preferences() => _sectionList('Preferences', [
         _listRow('Sound Feedback', trailing: ToggleSwitch(value: _soundOn, onChanged: (v) async { setState(() => _soundOn = v); await _prefs.setString('nowssb_sound', v ? 'on' : 'off'); })),
-        _listRow('Practice Duration', trailing: Row(mainAxisSize: MainAxisSize.min, children: [_roundAction('assets/icons/icon_24.svg', () async { final v = math.max(5, _duration - 5).toInt(); setState(() => _duration = v); await _prefs.setInt('nowssb_duration', v); }), const SizedBox(width: 14), SizedBox(width: 56, child: Text('$_duration min', textAlign: TextAlign.center, style: const TextStyle(fontFamily: _mono, fontSize: 14))), const SizedBox(width: 14), _roundAction('assets/icons/icon_25.svg', () async { final v = math.min(60, _duration + 5).toInt(); setState(() => _duration = v); await _prefs.setInt('nowssb_duration', v); })])),
+        _listRow('Practice Duration', trailing: Row(mainAxisSize: MainAxisSize.min, children: [_roundAction('assets/icons/icon_24.svg', () => _stepDuration(-15)), const SizedBox(width: 14), SizedBox(width: 64, child: Text(_durationText, textAlign: TextAlign.center, style: const TextStyle(fontFamily: _mono, fontSize: 14))), const SizedBox(width: 14), _roundAction('assets/icons/icon_25.svg', () => _stepDuration(15))])),
         _listRow('Daily Reminder', trailing: InkWell(onTap: _pickReminder, borderRadius: BorderRadius.circular(999), child: Container(padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6), decoration: BoxDecoration(color: const Color(0x08FFFFFF), border: const Border.fromBorderSide(BorderSide(color: _border)), borderRadius: BorderRadius.circular(999)), child: Text(_reminderText, style: const TextStyle(fontFamily: _mono, fontSize: 13.5))))),
-        _listRow('App Version', muted: true, trailing: const EditableLabel('profile.ProfileScreen', 'v2.4.1', style: TextStyle(fontSize: 13, color: _dim))),
+        _listRow('App Version', muted: true, trailing: const EditableLabel('profile.ProfileScreen', 'Build ${NwsbAppUpdate.currentBuild}', style: TextStyle(fontSize: 13, color: _dim))),
       ]);
 
   // Real counts: the bag and wishlist (CartBag) and the items this account

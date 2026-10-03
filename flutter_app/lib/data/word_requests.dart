@@ -82,15 +82,21 @@ class WordRequestStore extends ChangeNotifier {
         'source': 'flutter',
       };
 
+  /// One document per request (`{uid}_{at}`), so a retry or a flush of a
+  /// parked copy can never create a second request.
+  DocumentReference<Map<String, dynamic>> _doc(User u, int at) =>
+      FirebaseFirestore.instance.collection('requests').doc('${u.uid}_$at');
+
   /// Sends one request, or parks it. Never throws.
   Future<bool> _send(String word, String notes, int at, [String kind = 'word']) async {
     final u = NwsbFirebase.ready ? FirebaseAuth.instance.currentUser : null;
     if (u != null) {
       try {
-        await FirebaseFirestore.instance
-            .collection('requests')
-            .add(_row(u, word, notes, at, kind))
-            .timeout(const Duration(seconds: 12));
+        await _doc(u, at).set(_row(u, word, notes, at, kind)).timeout(const Duration(seconds: 12));
+        return true;
+      } on TimeoutException {
+        // Offline: Firestore keeps the write queued and sends it when the
+        // phone is back online. Parking a copy too would send it twice.
         return true;
       } catch (e) {
         debugPrint('NowssB request not sent: $e');
@@ -99,12 +105,15 @@ class WordRequestStore extends ChangeNotifier {
     try {
       final p = await SharedPreferences.getInstance();
       final q = p.getStringList(_queueKey) ?? <String>[];
-      q.add(jsonEncode({'word': word, 'notes': notes, 'at': at, 'kind': kind}));
+      // Parked under the account that made it ('' = signed out).
+      q.add(jsonEncode({'word': word, 'notes': notes, 'at': at, 'kind': kind, 'uid': u?.uid ?? ''}));
       await p.setStringList(_queueKey, q.length > 30 ? q.sublist(q.length - 30) : q);
     } catch (_) {}
     return false;
   }
 
+  /// Sends parked requests that belong to the signed-in account (or were made
+  /// signed out); another account's parked requests stay parked for it.
   Future<void> _flush() async {
     final u = FirebaseAuth.instance.currentUser;
     if (u == null) return;
@@ -112,19 +121,32 @@ class WordRequestStore extends ChangeNotifier {
     final q = p.getStringList(_queueKey) ?? const <String>[];
     if (q.isEmpty) return;
     await p.remove(_queueKey);
-    final failed = <String>[];
+    final keep = <String>[];
     for (final raw in q) {
       try {
         final m = jsonDecode(raw) as Map;
-        await FirebaseFirestore.instance.collection('requests').add(_row(
-            u, '${m['word']}', '${m['notes'] ?? ''}', (m['at'] as num).toInt(), '${m['kind'] ?? 'word'}'));
+        final owner = '${m['uid'] ?? ''}';
+        if (owner.isNotEmpty && owner != u.uid) {
+          keep.add(raw);
+          continue;
+        }
+        final at = (m['at'] as num).toInt();
+        final ref = _doc(u, at);
+        try {
+          await ref.set(_row(u, '${m['word']}', '${m['notes'] ?? ''}', at, '${m['kind'] ?? 'word'}'));
+        } catch (_) {
+          // Already delivered earlier (the doc exists and only admins may
+          // update it): drop the parked copy. Otherwise keep it for later.
+          final have = await ref.get().then((d) => d.exists, onError: (_) => false);
+          if (!have) keep.add(raw);
+        }
       } catch (_) {
-        failed.add(raw);
+        keep.add(raw);
       }
     }
-    if (failed.isNotEmpty) {
+    if (keep.isNotEmpty) {
       final now = p.getStringList(_queueKey) ?? <String>[];
-      await p.setStringList(_queueKey, [...failed, ...now]);
+      await p.setStringList(_queueKey, [...keep, ...now]);
     }
   }
 

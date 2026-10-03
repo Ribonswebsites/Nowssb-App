@@ -11,6 +11,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/earn_wallet.dart';
+import '../data/auth_errors.dart';
 import '../data/firebase.dart';
 import '../data/phone_notifications.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
@@ -25,6 +26,25 @@ class AuthGate extends StatefulWidget {
 
   static void askForAccount() {
     reopen.value++;
+  }
+
+  /// Cold start: a session signed in with "Remember me" unticked ends here,
+  /// before anything binds to the account. Notifications are not touched;
+  /// they have their own switches.
+  static Future<void> forgetUnremembered() async {
+    if (!NwsbFirebase.ready) return;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (prefs.getBool('nwsb.rememberMe') ?? true) return;
+      final user = await FirebaseAuth.instance
+          .authStateChanges()
+          .first
+          .timeout(const Duration(seconds: 3), onTimeout: () => FirebaseAuth.instance.currentUser);
+      if (user == null) return;
+      await FirebaseAuth.instance.signOut();
+    } catch (e) {
+      debugPrint('NowssB remember-me: $e');
+    }
   }
 
   @override
@@ -52,12 +72,28 @@ class _AuthGateState extends State<AuthGate> {
   String? _notice;
   String? _verificationId;
   int? _resendToken;
+  // The number the current code was sent to; editing the number drops it.
+  String? _codeFor;
 
   @override
   void initState() {
     super.initState();
     AuthGate.reopen.addListener(_leaveGuest);
+    _email.addListener(_numberChanged);
     _loadRemember();
+  }
+
+  /// A code is only good for the number it was sent to. Changing the number
+  /// goes back to "Send code" (and is the way to change number).
+  void _numberChanged() {
+    if (_verificationId == null || _email.text.trim() == _codeFor) return;
+    setState(() {
+      _verificationId = null;
+      _resendToken = null;
+      _codeFor = null;
+      _notice = null;
+      _password.clear();
+    });
   }
 
   Future<void> _loadRemember() async {
@@ -78,6 +114,7 @@ class _AuthGateState extends State<AuthGate> {
   @override
   void dispose() {
     AuthGate.reopen.removeListener(_leaveGuest);
+    _email.removeListener(_numberChanged);
     _email.dispose();
     _password.dispose();
     _phone.dispose();
@@ -144,12 +181,7 @@ class _AuthGateState extends State<AuthGate> {
             ),
           );
         } on PlatformException catch (error) {
-          final details = '${error.code} ${error.message ?? ''}'.toLowerCase();
-          final blocked = details.contains('10') ||
-              details.contains('12500') ||
-              details.contains('developer_error') ||
-              details.contains('sign_in_failed');
-          if (!blocked) rethrow;
+          if (!isGoogleConfigError(error)) rethrow;
           // The plugin path fails when this APK's certificate is not the one
           // Firebase has. The provider flow uses the same project and still
           // completes when that client can sign in through the browser.
@@ -210,9 +242,10 @@ class _AuthGateState extends State<AuthGate> {
             if (mounted) setState(() => _error = _friendlyAuthError(error));
           },
           codeSent: (verificationId, resendToken) {
-            if (!mounted) return;
+            if (!mounted || _email.text.trim() != phone) return;
             setState(() {
               _verificationId = verificationId;
+              _codeFor = phone;
               _resendToken = resendToken;
               _error = null;
               _password.clear();
@@ -220,7 +253,7 @@ class _AuthGateState extends State<AuthGate> {
             });
           },
           codeAutoRetrievalTimeout: (verificationId) {
-            _verificationId = verificationId;
+            if (_codeFor == phone) _verificationId = verificationId;
           },
         );
       });
@@ -248,15 +281,7 @@ class _AuthGateState extends State<AuthGate> {
       // platform error `sign_in_failed` (usually status 10/12500). It is not
       // a connectivity failure and the old generic copy sent users in the
       // wrong direction on every device.
-      final details = '${error.code} ${error.message ?? ''}'.toLowerCase();
-      if (details.contains('10') ||
-          details.contains('12500') ||
-          details.contains('developer_error') ||
-          details.contains('sign_in_failed')) {
-        return 'Google sign-in is not authorised for this Android build. '
-            'Add package com.nowssb.app and this build’s SHA-1/SHA-256 '
-            'certificates to the NowssB Firebase Android app.';
-      }
+      if (isGoogleConfigError(error)) return googleConfigMessage(error);
       return error.message ?? 'Google sign-in could not be completed.';
     }
     switch (code) {
@@ -296,7 +321,7 @@ class _AuthGateState extends State<AuthGate> {
 
   Future<void> _submit() async {
     final raw = _email.text.trim();
-    if (!raw.contains('@') && _verificationId != null) {
+    if (!raw.contains('@') && _verificationId != null && raw == _codeFor) {
       await _verifyPhoneCode();
       return;
     }

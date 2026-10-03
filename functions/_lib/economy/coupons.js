@@ -26,13 +26,14 @@ export async function dailyScratch(ctx, uid) {
 /** Reveal (scratch) a sealed card: the prize lands on the account. */
 export async function revealScratch(ctx, uid, data) {
   const id = String((data && data.id) || '');
-  return inTx(ctx, async (s) => {
+  const out = await inTx(ctx, async (s) => {
     const path = `users/${uid}/scratchCards/${id}`;
     const c = await s.doc(path);
     if (!c) fail('Card not found.', 404, 'not-found');
     if (c.status === 'revealed') return { already: true, rarity: c.rarity, label: c.label, prize: c.prize, granted: c.granted || null };
     if (c.status !== 'sealed') fail('This card can’t be scratched.', 400, 'failed-precondition');
-    if (c.expiresAt && c.expiresAt < s.now) { const e = await s.edit(path); e.status = 'expired'; fail('This card expired.'); }
+    // Commit the expiry (throwing here would roll it back), then answer with the error below.
+    if (c.expiresAt && c.expiresAt < s.now) { const x = await s.edit(path); x.status = 'expired'; return { expired: true }; }
     const e = await s.edit(path);
     e.status = 'revealed'; e.revealedAt = s.now;
     // Free cards (daily/earned) count toward the daily free-coin ceiling; bought cards don't.
@@ -50,6 +51,8 @@ export async function revealScratch(ctx, uid, data) {
     s.effect({ kind: 'reveal', rarity: c.rarity, label: granted.label });
     return { rarity: c.rarity, label: granted.label, prize: c.prize, granted };
   });
+  if (out && out.expired) fail('This card expired.', 400, 'failed-precondition');
+  return out;
 }
 
 /** Legacy `scratchCoupon`: daily card issued and revealed in one go. */
@@ -71,7 +74,13 @@ export async function buyScratchWithCoins(ctx, uid, data) {
     const card = s.cfg.coupons.paid.find((c) => c.id === cardId);
     if (!card) fail('Unknown card.', 400, 'invalid-argument');
     if (!card.coinPrice) fail('This card is not sold for coins.');
+    // Same guard as a Play-bought card (country, 18+, monthly limit); the
+    // card's rupee price counts toward the monthly limit either way.
+    await paidCardCheck(s, uid, card, data);
     await moveCoins(s, uid, -card.coinPrice, 'spend:scratch-' + card.id);
+    const pw = await wallet(s, uid);
+    if (pw.paidCardMonth !== s.month) { pw.paidCardMonth = s.month; pw.paidCardSpentINR = 0; }
+    pw.paidCardSpentINR = (pw.paidCardSpentINR || 0) + card.priceINR;
     const d = drawWeighted(card.odds);
     const prize = resolvePrize(d.item.prize);
     const floorCoins = Math.round((card.coinPrice * s.cfg.coupons.paidValueFloorPct) / 100);
@@ -142,9 +151,9 @@ export async function claimTicket(ctx, uid, data) {
 }
 
 /* ── Daily Spin ── */
-/** One free spin a day, then paid spins at costCoins each while the balance
- *  allows (up to paidPerDay). A retried request with the same `nonce`
- *  returns the first answer and is never charged twice. */
+/** Exactly one free spin a day (no paid extra spins); a second spin the same
+ *  day is rejected. A retried request with the same `nonce` returns the
+ *  first answer. */
 export async function spin(ctx, uid, data) {
   const nonce = String((data && data.nonce) || '').replace(/[^A-Za-z0-9_-]/g, '').slice(0, 40);
   return inTx(ctx, async (s) => {
@@ -152,21 +161,17 @@ export async function spin(ctx, uid, data) {
     const d = await today(s, uid);
     if (nonce && d.keys['spin:' + nonce]) return { ...d.keys['spin:' + nonce], replay: true };
     const freePerDay = S.freePerDay ?? 1;
-    const paidPerDay = S.paidPerDay ?? 40;
     const used = d.counts.spin || 0;
-    const free = used < freePerDay;
-    if (!free && used - freePerDay >= paidPerDay) fail('That’s every spin for today. The wheel resets at midnight.', 400, 'already-exists', { limit: true });
-    const cost = free ? 0 : (S.costCoins || 0);
-    if (cost) await moveCoins(s, uid, -cost, 'spend:spin');
+    if (used >= freePerDay) fail('Today’s free spin is used. Come back tomorrow.', 400, 'already-exists', { limit: true });
+    const free = true, cost = 0;
     d.counts.spin = used + 1;
     const drawn = drawWeighted(S.slices);
-    // The free spin's coins count toward the daily free-coin ceiling; paid spins don't.
-    const g = await grantPrize(s, uid, drawn.item.prize, free ? 'spin-free' : 'spin', { free });
+    // The free spin's coins count toward the daily free-coin ceiling.
+    const g = await grantPrize(s, uid, drawn.item.prize, 'spin-free', { free });
     const w = await wallet(s, uid);
     w.stats.spins = (w.stats.spins || 0) + 1;
     await checkBadges(s, uid);
-    const left = Math.max(0, paidPerDay - Math.max(0, d.counts.spin - freePerDay));
-    const out = { slice: drawn.index, label: drawn.item.label, granted: g, cost, free, freeLeft: Math.max(0, freePerDay - d.counts.spin), paidLeft: left, nextCost: S.costCoins || 0, balance: w.coins };
+    const out = { slice: drawn.index, label: drawn.item.label, granted: g, cost, free, freeLeft: Math.max(0, freePerDay - d.counts.spin), paidLeft: 0, nextCost: 0, balance: w.coins };
     if (nonce) d.keys['spin:' + nonce] = { slice: out.slice, label: out.label, granted: g, cost, free };
     return out;
   });

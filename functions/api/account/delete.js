@@ -70,6 +70,12 @@ export async function onRequestPost({ request, env }) {
   const claims = await requireUser(request, env, h);
   if (claims instanceof Response) return claims;
   const uid = claims.sub;
+  // Deleting everything needs a recent sign-in (Firebase auth_time, seconds),
+  // so a stolen or long-lived session can't wipe an account.
+  const authAge = Math.floor(Date.now() / 1000) - Number(claims.auth_time || 0);
+  if (!claims.auth_time || authAge > 5 * 60) {
+    return json({ error: 'For your safety, sign in again, then delete the account.', code: 'requires-recent-login' }, 401, h);
+  }
   const project = env.FIREBASE_PROJECT_ID || sa.project_id;
   try {
     const tok = await googleToken(sa, SCOPE);

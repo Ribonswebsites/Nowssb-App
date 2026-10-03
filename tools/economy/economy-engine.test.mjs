@@ -76,25 +76,21 @@ await t('daily scratch: server decides, reveal grants once', async () => {
   const legacy = await call('scratchCoupon', 'buyer');
   eq(legacy.already, true);
 });
-await t('spin: first free, then paid at costCoins while coins allow; nonce replay never charges twice', async () => {
+await t('spin: exactly one free spin a day, no paid spins; nonce replay returns the first answer', async () => {
+  eq([cfg.spin.freePerDay, cfg.spin.paidPerDay, cfg.spin.costCoins], [1, 0, undefined]);
   const before = await coins('buyer');
   const s1 = await call('spin', 'buyer', { nonce: 'n1' });
   ok(s1.slice >= 0 && s1.slice < cfg.spin.slices.length);
-  eq([s1.free, s1.cost], [true, 0]);
+  eq([s1.free, s1.cost, s1.freeLeft, s1.paidLeft], [true, 0, 0, 0]);
   ok((await coins('buyer')) >= before, 'free spin costs nothing');
   const replay = await call('spin', 'buyer', { nonce: 'n1' });
   eq([replay.replay, replay.slice], [true, s1.slice]);
-  await put('users/buyer/wallet/main', { ...((await db.get('users/buyer/wallet/main')).data), coins: 50 });
-  const s2 = await call('spin', 'buyer', { nonce: 'n2' });
-  eq([s2.free, s2.cost], [false, cfg.spin.costCoins]);
-  const g = s2.granted && s2.granted.type === 'coins' ? s2.granted.coins : 0;
-  eq(await coins('buyer'), 50 - cfg.spin.costCoins + g);
-  await call('spin', 'buyer', { nonce: 'n2' });
-  eq(await coins('buyer'), 50 - cfg.spin.costCoins + g, 'replay not charged');
-  await put('users/buyer/wallet/main', { ...((await db.get('users/buyer/wallet/main')).data), coins: 3 });
-  await rejects(call('spin', 'buyer', { nonce: 'n3' }), /Not enough coins/);
+  await put('users/buyer/wallet/main', { ...((await db.get('users/buyer/wallet/main')).data), coins: 500 });
+  await rejects(call('spin', 'buyer', { nonce: 'n2' }), /Come back tomorrow/);
+  eq(await coins('buyer'), 500, 'a rejected second spin charges nothing');
   const sum = await call('summary', 'buyer');
-  eq(sum.today.spin.next, 'coins');
+  eq([sum.today.spin.next, sum.today.spin.paidLeft], ['limit', 0]);
+  eq([sum.config.spin.paidPerDay, sum.config.spin.perDay], [0, 1]);
 });
 await t('per-key actions: verified on the server and capped per day', async () => {
   const a = await call('reportAction', 'quester', { action: 'close_stage', key: 'made-up-1' });

@@ -104,6 +104,20 @@ class DailyTasks {
     );
   }
 
+  /// Drops "done" lists older than a week (one key per account per day).
+  static Future<void> _pruneOld() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final n = DateTime.now().subtract(const Duration(days: 7));
+      final cutoff = '${n.year}${n.month.toString().padLeft(2, '0')}${n.day.toString().padLeft(2, '0')}';
+      final day = RegExp(r'^nwsb_task_done_.+_(\d{8})$');
+      for (final key in prefs.getKeys().toList()) {
+        final m = day.firstMatch(key);
+        if (m != null && m.group(1)!.compareTo(cutoff) < 0) await prefs.remove(key);
+      }
+    } catch (_) {}
+  }
+
   static Future<void> setDone(String id, bool on) async {
     final prefs = await SharedPreferences.getInstance();
     final next = (prefs.getStringList(_doneKey) ?? const <String>[]).toSet();
@@ -117,6 +131,7 @@ class DailyTasks {
   }
 
   static Future<void> publish() async {
+    await _pruneOld();
     final tasks = await template();
     final have = await done();
     final finished = tasks.where((t) => have.contains(t.id)).length;

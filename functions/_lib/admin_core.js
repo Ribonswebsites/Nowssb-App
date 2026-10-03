@@ -90,7 +90,7 @@ async function pushToUser(deps, uid, msg) {
     const t = s.data.fcmToken || (String(s.data.endpoint || '').startsWith('fcm:') ? String(s.data.endpoint).slice(4) : '');
     if (!t) continue;
     try {
-      const r = await deps.push(t, msg);
+      const r = await deps.push(t, { ...msg, notifFormat: s.data.notifFormat });
       if (r.ok) sent++;
       if (r.expired) dead.push(s.path);
     } catch (e) { /* one bad token never stops the rest */ }
@@ -587,14 +587,17 @@ export async function broadcast(deps, body = {}) {
   }
   let sent = 0; let failed = 0; let skipped = 0;
   const dead = [];
+  // A broadcast is promotional: it never goes to admins (admins/{uid}). A push to one chosen person still does.
+  const adminIds = audience === 'user' ? new Set() : new Set((await db.query({ collection: 'admins', limit: 500 }).catch(() => [])).map((a) => a.id));
   for (const r of rows) {
     const uid = r.data.uid || '';
+    if (adminIds.has(uid)) { skipped++; continue; }
     if (audience === 'plan' && !targets.has(uid)) { skipped++; continue; }
     if (audience === 'free' && targets.has(uid)) { skipped++; continue; }
     const t = r.data.fcmToken || (String(r.data.endpoint || '').startsWith('fcm:') ? String(r.data.endpoint).slice(4) : '');
     if (!t) { skipped++; continue; }
     try {
-      const res = await deps.push(t, { title, body: text, type: 'broadcast', route: str(body.route, 80) });
+      const res = await deps.push(t, { title, body: text, type: 'broadcast', route: str(body.route, 80), notifFormat: r.data.notifFormat });
       if (res.ok) sent++; else failed++;
       if (res.expired) dead.push(r.path);
     } catch (e) { failed++; }

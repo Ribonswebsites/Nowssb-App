@@ -217,15 +217,21 @@ List<Widget> _shop(BuildContext context, Map<String, dynamic> s) {
         Wrap(spacing: 8, runSpacing: 8, children: [
           _PaidBuy(cardId: '${c['id']}'),
           if (sInt(c['coinPrice']) > 0)
-            PClaim(label: '${sInt(c['coinPrice'])} coins', action: 'buyScratchWithCoins', data: {'cardId': c['id']}, enabled: coins >= sInt(c['coinPrice']), filled: false, title: '${c['title']}'),
+            _PaidBuy(cardId: '${c['id']}', coinPrice: sInt(c['coinPrice']), enabled: coins >= sInt(c['coinPrice']), title: '${c['title']}'),
         ]),
       ])),
   ];
 }
 
 class _PaidBuy extends StatefulWidget {
-  const _PaidBuy({required this.cardId});
+  const _PaidBuy({required this.cardId, this.coinPrice = 0, this.enabled = true, this.title});
   final String cardId;
+
+  /// > 0: buys the card with coins (same 18+ / country / monthly checks as
+  /// Google Play) instead of opening the Play sheet.
+  final int coinPrice;
+  final bool enabled;
+  final String? title;
   @override
   State<_PaidBuy> createState() => _PaidBuyState();
 }
@@ -236,6 +242,12 @@ class _PaidBuyState extends State<_PaidBuy> {
   Future<void> _buy({bool adult = false}) async {
     setState(() => _busy = true);
     try {
+      if (widget.coinPrice > 0) {
+        final r = await EconomyApi.call('buyScratchWithCoins', {'cardId': widget.cardId, if (adult) 'adult': true});
+        if (mounted) await celebrate(context, r, title: widget.title ?? 'Your card is ready in Scratch');
+        await EconomyMirror.instance.refresh();
+        return;
+      }
       final r = await PlayCheckout.purchase({'kind': 'scratch', 'cardId': widget.cardId, if (adult) 'adult': true});
       if (!mounted) return;
       unawaited(celebrate(context, r, title: 'Your card is ready in Scratch'));
@@ -270,11 +282,28 @@ class _PaidBuyState extends State<_PaidBuy> {
   }
 
   @override
-  Widget build(BuildContext context) => TextButton(
+  Widget build(BuildContext context) {
+    if (widget.coinPrice > 0) {
+      final on = widget.enabled && !_busy;
+      return TextButton(
+        onPressed: on ? _buy : null,
+        style: TextButton.styleFrom(
+          foregroundColor: NwsbColors.goldLight,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          minimumSize: const Size(0, 34),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999), side: const BorderSide(color: Color(0x66E8D5A3))),
+        ),
+        child: _busy
+            ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: NwsbColors.goldLight))
+            : Text('${widget.coinPrice} coins', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12)),
+      );
+    }
+    return TextButton(
         onPressed: _busy ? null : _buy,
         style: TextButton.styleFrom(backgroundColor: NwsbColors.goldLight, foregroundColor: Colors.black, shape: const StadiumBorder(), padding: const EdgeInsets.symmetric(horizontal: 14)),
         child: Text(_busy ? 'Waiting for Play…' : 'Buy on Play', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12)),
       );
+  }
 }
 
 final _historyStreams = <String, Stream<QuerySnapshot<Map<String, dynamic>>>>{};

@@ -31,6 +31,9 @@ dependencies:
   # already posts to FCM tokens as well as Web Push endpoints.
   firebase_messaging: ^15.1.3
   flutter_local_notifications: ^17.2.3
+  # One-shot OS alarms for the local schedules (lib/features/notifications/
+  # notif_scheduler.dart); already resolved through flutter_local_notifications.
+  timezone: ^0.9.4
   shared_preferences: ^2.3.2
   cached_network_image: ^3.4.1
   image_picker: ^1.1.2

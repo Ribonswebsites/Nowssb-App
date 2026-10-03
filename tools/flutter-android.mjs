@@ -334,12 +334,35 @@ if (!m.includes('default_notification_channel_id')) {
     '</application>',
     `    <meta-data\n` +
     `        android:name="com.google.firebase.messaging.default_notification_channel_id"\n` +
-    `        android:value="nowssb_alerts" />\n` +
+    `        android:value="nowssb" />\n` +
     `    <meta-data\n` +
     `        android:name="com.google.firebase.messaging.default_notification_icon"\n` +
     `        android:resource="@drawable/ic_stat_nowssb" />\n` +
     `</application>`,
   );
+}
+// flutter_local_notifications draws scheduled notifications (word of the
+// day, streak, daily spin, weekly summary, plan ending, Reader reminders —
+// lib/features/notifications/notif_scheduler.dart) from these receivers.
+// Without them Android fires the alarm into nothing: the older daily
+// reminder never appeared for that reason. The boot receiver re-arms them
+// after a restart or an app update.
+if (m.includes('nowssb_alerts')) m = m.replace('android:value="nowssb_alerts"', 'android:value="nowssb"');
+if (!m.includes('com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver')) {
+  m = m.replace(
+    '</application>',
+    `    <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />\n` +
+    `    <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">\n` +
+    `        <intent-filter>\n` +
+    `            <action android:name="android.intent.action.BOOT_COMPLETED" />\n` +
+    `            <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />\n` +
+    `            <action android:name="android.intent.action.QUICKBOOT_POWERON" />\n` +
+    `            <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />\n` +
+    `        </intent-filter>\n` +
+    `    </receiver>\n` +
+    `</application>`,
+  );
+  done.push('scheduled-notification receivers (flutter_local_notifications)');
 }
 if (!m.includes('android.permission.FOREGROUND_SERVICE_DATA_SYNC')) {
   m = m.replace(

@@ -100,7 +100,18 @@ service cloud.firestore {
       allow get, list: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
       allow write: if false;
     }
-    match /pushSubs/{id} { allow get, list, delete: if isAdmin(); allow create, update: if signedIn(); }
+    // A phone registers its own push token, only under its own account (or
+    // none). Re-binding an existing token is allowed for the device that holds
+    // it (same token: an account switch on one phone) — never a new token
+    // under someone else's uid, which would receive their pushes.
+    match /pushSubs/{id} {
+      allow get, list, delete: if isAdmin();
+      allow create: if signedIn() && request.resource.data.get('uid', null) in [null, request.auth.uid];
+      allow update: if signedIn() && request.resource.data.get('uid', null) in [null, request.auth.uid]
+        && (resource.data.get('uid', null) in [null, request.auth.uid]
+            || request.resource.data.get('fcmToken', '') == resource.data.get('fcmToken', '-')
+            || request.resource.data.get('endpoint', '') == resource.data.get('endpoint', '-'));
+    }
     match /posts/{postId} {
       allow get, list: if resource.data.visibility == 'public' || (signedIn() && (resource.data.uid == request.auth.uid || isAdmin()));
       allow create: if signedIn() && request.resource.data.uid == request.auth.uid && request.resource.data.visibility in ['public','followers'] && !restricted('community');
@@ -188,6 +199,12 @@ service cloud.firestore {
       allow read: if isSelf(uid);
       allow write: if false;
     }
+    // Practice days per word (written by the economy server); the app reads
+    // them to restore this account's practice history on a new install.
+    match /users/{uid}/mastery/{wordId} {
+      allow read: if isSelf(uid);
+      allow write: if false;
+    }
     match /users/{uid}/milestones/{wordId} {
       allow read: if isSelf(uid);
       allow write: if false;
@@ -236,7 +253,10 @@ service cloud.firestore {
       allow write: if false;
     }
     match /leaderboards/{id} { allow read: if signedIn(); allow write: if false; }
-    match /leagues/{id} { allow read: if signedIn(); allow write: if false; }
+    // League boards hold uids; players see ranks only through /api/economy/league
+    // (display aliases). Entries live in leagues/{week_tier}/entries/{uid}.
+    match /leagues/{id} { allow read: if isAdmin(); allow write: if false; }
+    match /leagues/{id}/entries/{uid} { allow read: if isAdmin(); allow write: if false; }
     match /echoLikes/{id} { allow get: if ownsLedger(); allow list: if ownsLedger(); allow write: if false; }
     // devices, payoutIdentities, accountIndex, refOpens: server only (catch-all deny).
 

@@ -11,7 +11,9 @@ const ALLOWED_ORIGINS = [
 ];
 export function cors(request) {
   const o = request.headers.get('Origin') || '';
-  const ok = ALLOWED_ORIGINS.includes(o) || /^http:\/\/localhost(:\d+)?$/.test(o) || /\.pages\.dev$/.test(o);
+  // Only this project's own Pages domain and its preview deployments
+  // (<hash>.nowssb-app.pages.dev), never any *.pages.dev site.
+  const ok = ALLOWED_ORIGINS.includes(o) || /^http:\/\/localhost(:\d+)?$/.test(o) || /^https:\/\/([a-z0-9-]+\.)?nowssb-app\.pages\.dev$/.test(o);
   return ok ? {
     'Access-Control-Allow-Origin': o,
     'Access-Control-Allow-Methods': 'POST, OPTIONS',

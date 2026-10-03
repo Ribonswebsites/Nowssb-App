@@ -76,12 +76,18 @@ jobs:
           NWSB_BUILD_NUMBER: ${{ github.run_number }}
         run: node tools/flutter-version.mjs
 
-      - name: Apply Practice Lab UI
+      # The Practice Lab UI is committed in lib/. This only checks that
+      # tools/apply_practice_lab.py has nothing left to apply; CI never
+      # commits or pushes to main.
+      - name: Check Practice Lab UI is applied
         working-directory: .
-        run: python3 tools/apply_practice_lab.py
-
-      - name: Format Practice Lab UI
-        run: dart format lib/screens/practice_player.dart lib/screens/practice_overlay.dart
+        run: |
+          python3 tools/apply_practice_lab.py
+          if ! git diff --quiet -- flutter_app/lib/screens/practice_player.dart flutter_app/lib/screens/practice_overlay.dart; then
+            git diff --stat -- flutter_app/lib/screens/
+            echo "::error::tools/apply_practice_lab.py still changes practice_player.dart / practice_overlay.dart. Run it locally and commit the result."
+            exit 1
+          fi
 
       # android/ and ios/ are generated. This writes them without touching lib/ or
       # pubspec.yaml, which flutter create leaves alone when they exist.
@@ -146,20 +152,6 @@ jobs:
 
       - name: Build
         run: flutter build apk --debug --target-platform android-arm,android-arm64 --dart-define=NWSB_BUILD_NUMBER=${{ github.run_number }}
-
-      - name: Commit verified Practice Lab UI
-        working-directory: .
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add flutter_app/lib/screens/practice_player.dart flutter_app/lib/screens/practice_overlay.dart tools/apply_practice_lab.py
-          if [ -f tools/practice_overlay.gz.b64 ]; then git rm tools/practice_overlay.gz.b64; fi
-          if git diff --cached --quiet; then
-            echo "No Practice Lab changes to commit."
-          else
-            git commit -m "Add glassmorphism Practice Lab"
-            git push
-          fi
 
       - uses: actions/upload-artifact@v4
         with:

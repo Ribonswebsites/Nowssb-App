@@ -91,8 +91,8 @@ await t('links: one per person per item, stable', async () => {
   eq(a, b); ok(a !== c); eq(a.length, 9);
 });
 await t('settings doc deep-merge (admin edits win, arrays replace)', () => {
-  const m = deepMerge(cfg, { lock: { payoutCapPct: 55 }, spin: { costCoins: 0 } });
-  eq([m.lock.payoutCapPct, m.lock.storeReservePct, m.spin.costCoins, m.spin.slices.length], [55, 20, 0, cfg.spin.slices.length]);
+  const m = deepMerge(cfg, { lock: { payoutCapPct: 55 }, spin: { freePerDay: 2 } });
+  eq([m.lock.payoutCapPct, m.lock.storeReservePct, m.spin.freePerDay, m.spin.slices.length], [55, 20, 2, cfg.spin.slices.length]);
 });
 await t('play products map to items', () => {
   eq(buildItems(cfg, 'nowssb_scratch_rare', null).kind, 'scratch');

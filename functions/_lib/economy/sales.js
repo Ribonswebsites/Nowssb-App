@@ -68,7 +68,15 @@ export async function applySale(ctx, order) {
     }
     for (const it of order.items || []) {
       if (it.grant) { granted.push(await grantPrize(s, buyer, it.grant, 'buy:' + order.productId)); continue; }
-      if (it.giftCard) { const g = await createGiftCard(s, buyer, it.giftCard, it.meta || {}, orderId); sale.giftCode = g.code; granted.push({ type: 'giftcard', label: g.title, code: g.code }); continue; }
+      if (it.giftCard) {
+        const g = await createGiftCard(s, buyer, it.giftCard, it.meta || {}, orderId); sale.giftCode = g.code; granted.push({ type: 'giftcard', label: g.title, code: g.code });
+        // Gift-card limits count paid cards only (checkout.js checks them).
+        const gw = await wallet(s, buyer);
+        gw.giftSends = gw.giftSends && gw.giftSends.day === s.day ? gw.giftSends : { day: s.day, n: 0 };
+        gw.giftSends.n += 1;
+        if (it.giftCard.oncePerQuarter) gw.lastSig3 = s.now;
+        continue;
+      }
       if (it.paidCard) {
         const card = it.paidCard;
         const d = drawWeighted(card.odds);

@@ -11,4 +11,4 @@ cat > firebase.json <<'JSON'
 { "firestore": { "rules": "firestore.rules" }, "emulators": { "firestore": { "port": 8089 }, "ui": { "enabled": false } } }
 JSON
 cp "$root/firestore.rules" .
-npx firebase emulators:exec --only firestore --project nowssb-34f1b "FIRESTORE_EMULATOR_HOST=127.0.0.1:8089 node '$root/tools/economy/economy-engine.test.mjs'"
+npx firebase emulators:exec --only firestore --project nowssb-34f1b "export FIRESTORE_EMULATOR_HOST=127.0.0.1:8089; node '$root/tools/economy/economy-engine.test.mjs' && node '$root/tools/economy/play-ack.test.mjs' && node '$root/tools/economy/batch1-server.test.mjs' && node '$root/tools/economy/batch1-rules.test.mjs'"

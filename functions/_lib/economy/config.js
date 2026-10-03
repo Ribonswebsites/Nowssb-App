@@ -306,13 +306,11 @@ export const DEFAULT_ECONOMY = {
   },
 
   // Daily Spin (coins in, catalogue prizes out; odds on the wheel).
-  // One free spin a day; after that each spin costs costCoins while the
-  // balance allows, up to paidPerDay extra spins (a sanity cap, not a wall).
+  // Exactly one free spin a day; no paid extra spins.
   spin: {
-    costCoins: 15,
     freePerDay: 1,
-    paidPerDay: 40,
-    perDay: 41, // legacy key read by older builds: free + paid
+    paidPerDay: 0,
+    perDay: 1, // legacy key read by older builds: free + paid
     slices: [
       { label: 'Ebook', w: 16, prize: { type: 'pass', tier: 'ebook', days: 1 } },
       { label: 'Basic', w: 14, prize: { type: 'pass', tier: 'basic', days: 1, needsNoPlan: true, elseCoins: 30 } },

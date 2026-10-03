@@ -65,7 +65,7 @@ class LoginStage extends StatelessWidget {
           child: EditableImage.asset(
             'assets/login/login-neon.png',
             fit: BoxFit.cover,
-            alignment: Alignment(0, -0.15),
+            alignment: Alignment(0, 0.2),
             slot: 'login_stage.LoginStage',
           ),
         ),
@@ -100,17 +100,6 @@ class LoginStage extends StatelessWidget {
                     icon: const Icon(Icons.close, color: Colors.white),
                   ),
                 ),
-              const EditableLabel(
-                'login_stage.LoginStage',
-                'NOWSSB',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  letterSpacing: 3.4,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: 6),
               const EditableLabel('login_stage.LoginStage',
                 'NowssB',
                 style: TextStyle(

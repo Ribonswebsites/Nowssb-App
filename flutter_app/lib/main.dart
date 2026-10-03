@@ -71,6 +71,8 @@ Future<void> main() async {
   if (NwsbFirebase.ready) {
     FirebaseMessaging.onBackgroundMessage(nwsbFcmBackground);
   }
+  // "Remember me" unticked at the last sign-in: start signed out.
+  await AuthGate.forgetUnremembered();
 
   // Stages one and two of the content contract — what ships, and the last
   // copy seen — are local, so the first screen has something real to draw

@@ -83,6 +83,20 @@ export class FsDb {
     });
   }
 
+  /** COUNT() aggregation (same where syntax as query); 1 read per 1000 matches. */
+  async count(collection, where = [], { parent = '' } = {}) {
+    const OPS = { '==': 'EQUAL', '<': 'LESS_THAN', '<=': 'LESS_THAN_OR_EQUAL', '>': 'GREATER_THAN', '>=': 'GREATER_THAN_OR_EQUAL', 'array-contains': 'ARRAY_CONTAINS', in: 'IN' };
+    const filters = where.map(([f, op, v]) => ({ fieldFilter: { field: { fieldPath: f }, op: OPS[op], value: fsValue(v) } }));
+    const structuredQuery = { from: [{ collectionId: collection }] };
+    if (filters.length === 1) structuredQuery.where = filters[0];
+    else if (filters.length > 1) structuredQuery.where = { compositeFilter: { op: 'AND', filters } };
+    const url = `${this.base}/${this.root}${parent ? '/' + parent : ''}:runAggregationQuery`;
+    const r = await this._fetch(url, { method: 'POST', body: JSON.stringify({ structuredAggregationQuery: { structuredQuery, aggregations: [{ alias: 'n', count: {} }] } }) });
+    if (!r.ok) throw new Error('firestore count ' + r.status);
+    const row = (r.data || []).find((x) => x.result);
+    return Number((row && row.result.aggregateFields && row.result.aggregateFields.n && row.result.aggregateFields.n.integerValue) || 0);
+  }
+
   /** Writes outside a transaction (still atomic as a batch). */
   async commit(writes) {
     const r = await this._fetch(`${this.base}/${this.root}:commit`, { method: 'POST', body: JSON.stringify({ writes }) });

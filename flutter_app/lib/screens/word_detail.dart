@@ -20,9 +20,11 @@ library;
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
+import '../data/entitlements.dart';
 import '../data/models.dart';
 import '../theme/tokens.dart';
 import '../widgets/app_backdrop.dart';
+import '../widgets/content_lock.dart';
 import '../admin/template/editable.dart';
 import '../media/nwsb_video.dart';
 
@@ -33,6 +35,15 @@ class WordDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Paid words: the recordings, videos and meaning open only with the
+    // same entitlement the Practice Player checks (ensureWordOpen).
+    return ListenableBuilder(
+      listenable: Entitlements.instance,
+      builder: (context, _) => _page(context, Entitlements.instance.canOpenWord(word)),
+    );
+  }
+
+  Widget _page(BuildContext context, bool open) {
     return Scaffold(
       backgroundColor: NwsbColors.deep,
       body: Stack(
@@ -59,7 +70,11 @@ class WordDetail extends StatelessWidget {
                     children: [
                       _Headline(word: word),
                       const SizedBox(height: 26),
-                      if (word.video.startsWith('http')) ...[
+                      if (!open) ...[
+                        _LockedCard(word: word),
+                        const SizedBox(height: 22),
+                      ],
+                      if (open && word.video.startsWith('http')) ...[
                         _WordVideo(url: word.video),
                         const SizedBox(height: 22),
                       ],
@@ -75,7 +90,7 @@ class WordDetail extends StatelessWidget {
                         _Parts(parts: word.parts),
                         const SizedBox(height: 26),
                       ],
-                      if (word.meaning.isNotEmpty)
+                      if (open && word.meaning.isNotEmpty)
                         _Fact(
                           label: 'MEANING',
                           value: word.meaning,
@@ -122,7 +137,7 @@ class WordDetail extends StatelessWidget {
                         const SizedBox(height: 8),
                         const _SectionLabel('STAGES'),
                         const SizedBox(height: 12),
-                        for (var i = 0; i < word.stages.length; i++) _Stage(n: i + 1, stage: word.stages[i]),
+                        for (var i = 0; i < word.stages.length; i++) _Stage(n: i + 1, stage: word.stages[i], word: word, open: open),
                       ],
                       if (word.images.any((u) => u.startsWith('http'))) ...[
                         const SizedBox(height: 14),
@@ -439,6 +454,44 @@ class _Chips extends StatelessWidget {
 }
 
 
+/// Shown instead of the paid parts (recordings, videos, meaning) of a word
+/// this account hasn't unlocked. Tapping opens the same lock sheet as the
+/// Practice Player: buy the word on Google Play or see the plans.
+class _LockedCard extends StatelessWidget {
+  const _LockedCard({required this.word});
+  final Word word;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => ensureWordOpen(context, word),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: const Color(0x1AE8C77E),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: const Color(0x55E8C77E)),
+        ),
+        child: const Row(children: [
+          Icon(Icons.lock_outline, color: Color(0xFFE8C77E), size: 22),
+          SizedBox(width: 12),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              EditableLabel('word_detail.LockedCard', 'Unlock this word',
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 15)),
+              SizedBox(height: 4),
+              EditableLabel('word_detail.LockedCard', 'Recordings, video and meaning open when you own the word or have a plan.',
+                  style: TextStyle(color: Color(0xCCFFFFFF), fontSize: 12.5, height: 1.4)),
+            ]),
+          ),
+          Icon(Icons.chevron_right, color: Color(0xFFE8C77E)),
+        ]),
+      ),
+    );
+  }
+}
+
 /// The word's own video (added from Admin → Words / Word requests).
 class _WordVideo extends StatelessWidget {
   const _WordVideo({required this.url});
@@ -456,9 +509,11 @@ class _WordVideo extends StatelessWidget {
 
 /// One stage of the practice, with its own recording or clip if it has one.
 class _Stage extends StatefulWidget {
-  const _Stage({required this.n, required this.stage});
+  const _Stage({required this.n, required this.stage, required this.word, required this.open});
   final int n;
   final WordStage stage;
+  final Word word;
+  final bool open;
 
   @override
   State<_Stage> createState() => _StageState();
@@ -475,6 +530,10 @@ class _StageState extends State<_Stage> {
   }
 
   Future<void> _toggle() async {
+    if (!widget.open && !_playing) {
+      // Locked word: the lock sheet (buy / plans) instead of the recording.
+      if (!await ensureWordOpen(context, widget.word) || !mounted) return;
+    }
     final p = _player ??= AudioPlayer();
     if (_playing) {
       await p.stop();
@@ -517,14 +576,14 @@ class _StageState extends State<_Stage> {
           if (st.audio.startsWith('http'))
             IconButton(
               onPressed: _toggle,
-              icon: Icon(_playing ? Icons.stop_circle_outlined : Icons.play_circle_outline, color: const Color(0xFFE8C77E)),
+              icon: Icon(_playing ? Icons.stop_circle_outlined : (widget.open ? Icons.play_circle_outline : Icons.lock_outline), color: const Color(0xFFE8C77E)),
             ),
         ]),
         if (st.text.isNotEmpty) ...[
           const SizedBox(height: 8),
           Text(st.text, style: const TextStyle(color: Color(0xD9FFFFFF), fontSize: 14, height: 1.45)),
         ],
-        if (st.video.startsWith('http')) ...[
+        if (widget.open && st.video.startsWith('http')) ...[
           const SizedBox(height: 10),
           ClipRRect(
             borderRadius: BorderRadius.circular(14),

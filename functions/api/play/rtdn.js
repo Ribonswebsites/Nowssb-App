@@ -21,8 +21,10 @@ import { json, parseServiceAccount, verifyGoogleOidc } from '../../_lib/server.j
 import {
   PLAY_PACKAGE_NAME, applyToUser, evaluate, getSubscriptionV2, missingPlayEnv, sha256Hex, usersForTokenHashes,
 } from '../../_lib/play.js';
+import { FsDb } from '../../_lib/economy/fsdb.js';
+import { subscriptionEvent } from '../../_lib/notify/push.js';
 
-export async function onRequestPost({ request, env }) {
+export async function onRequestPost({ request, env, waitUntil }) {
   const missing = missingPlayEnv(env);
   if (missing.length) return json({ error: 'Missing in Cloudflare Pages settings: ' + missing.join(', '), missing }, 501);
 
@@ -96,6 +98,9 @@ export async function onRequestPost({ request, env }) {
       if (ev.obfuscatedAccountId && ev.obfuscatedAccountId !== (await sha256Hex(uid))) continue;
       try {
         results.push((await applyToUser(env, { uid, ev, tokenHash, source: 'rtdn:' + n.notificationType })).status);
+        // Renewed / cancelled / on hold / expired … → inbox + phone, once per event.
+        const told = FsDb.fromEnv(env).then((db) => subscriptionEvent(env, db, uid, n.notificationType, ev, tokenHash)).catch(() => {});
+        if (typeof waitUntil === 'function') waitUntil(told); else await told;
       } catch (e) {
         if (!e.http) throw e;
         results.push('skipped');

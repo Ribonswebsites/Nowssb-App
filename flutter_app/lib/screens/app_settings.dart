@@ -557,8 +557,8 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
       builder: (ctx) => const _SignOutDialog(),
     );
     if (ok != true || !mounted) return;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('nwsb.rememberMe', false);
+    // "Remember me" keeps the person's own choice; signing out doesn't untick
+    // it (that silently turned the next session's notifications off).
     const webClient =
         '1024709686012-h1h9glk84uti9cbqpht5d09igdqb8pgu.apps.googleusercontent.com';
     final google =

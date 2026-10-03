@@ -53,13 +53,16 @@ export async function settleProduct(env, { uid, productId, purchaseToken, checko
   if (p.obfuscatedExternalAccountId && p.obfuscatedExternalAccountId !== (await sha256Hex(uid))) return { status: 403, body: { error: 'That purchase belongs to another account.' } };
   const orderId = String(p.orderId || '');
   if (!orderId) return { status: 400, body: { error: 'Play did not return an order id.' } };
-  if (p.acknowledgementState === 0) await ackProduct(env, productId, purchaseToken);
+  // Acknowledge only after the grant below succeeds (or was already made).
+  // A purchase that fails any check stays unacknowledged, so Google Play
+  // refunds it automatically after 3 days.
+  const ack = async () => { if (p.acknowledgementState === 0) await ackProduct(env, productId, purchaseToken).catch(() => false); };
   const tokenHash = await sha256Hex(purchaseToken);
   // Bind the token to this account once.
   const rec = await db.get(`playReceipts/${tokenHash.slice(0, 40)}`);
   if (rec.exists && rec.data.uid !== uid) return { status: 403, body: { error: 'That purchase belongs to another account.' } };
   const already = await db.get(`sales/${cleanId(orderId)}`);
-  if (already.exists) return { status: 200, body: { ok: true, already: true, orderId } };
+  if (already.exists) { await ack(); return { status: 200, body: { ok: true, already: true, orderId } }; }
 
   // Find the checkout (explicit id, else the newest open one for this product).
   let ck = null;
@@ -80,6 +83,7 @@ export async function settleProduct(env, { uid, productId, purchaseToken, checko
   await db.commit([db.write(`playReceipts/${tokenHash.slice(0, 40)}`, { uid, productId, orderId, kind: 'product', at: now })]).catch(() => null);
   await db.commit([db.write(`accountIndex/${(await sha256Hex(uid))}`, { uid }, {})]).catch(() => null);
   const r = await applySale({ db, cfg, now, env }, order);
+  await ack();
   return { status: 200, body: { ok: true, ...r, productId, consume: true } };
 }
 function guessPrice(cfg, productId) {

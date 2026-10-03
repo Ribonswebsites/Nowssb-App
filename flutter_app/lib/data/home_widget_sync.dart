@@ -36,11 +36,19 @@ class HomeWidgetSync {
   String _lastPayload = '';
   Timer? _debounce;
 
+  // home_widget keeps returning the launch URI for the activity's lifetime,
+  // so the cold-start tap is handed out once per process; a NavShell mounted
+  // later (sign-out → sign-in) must not replay it.
+  static bool _initialHandled = false;
+
   /// Taps on the widget (cold start included), as `nowssb://widget/<what>`.
   Stream<Uri> get clicks async* {
     if (!supported) return;
-    final first = await HomeWidget.initiallyLaunchedFromHomeWidget().catchError((_) => null);
-    if (first != null) yield first;
+    if (!_initialHandled) {
+      _initialHandled = true;
+      final first = await HomeWidget.initiallyLaunchedFromHomeWidget().catchError((_) => null);
+      if (first != null) yield first;
+    }
     await for (final u in HomeWidget.widgetClicked) {
       if (u != null) yield u;
     }

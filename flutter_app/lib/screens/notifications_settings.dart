@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../data/notifications.dart';
+import '../features/notifications/notif_preferences_screen.dart';
 import '../theme/tokens.dart';
 import '../widgets/banner_mix.dart';
 import '../widgets/glass_wrap.dart';
@@ -42,6 +43,7 @@ class NotificationsSettingsPage extends StatelessWidget {
                         HapticFeedback.lightImpact();
                       },
                     )),
+                    const LSection('preferences', 'Preferences', NotifPreferencesEntry()),
                     const SizedBox(height: 6),
                     LSection('updates', 'Updates heading', _SecHead(
                       label: 'Updates',

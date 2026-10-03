@@ -124,7 +124,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       _say('The free plan needs no purchase. Pick a paid plan to subscribe through Google Play.');
       return;
     }
-    if (PlaySubscriptions.instance.activeTier == tier) {
+    if (PlaySubscriptions.instance.isActivePlan(tier, yearly: yearly)) {
       _say('${plan.name} is already your plan. Manage it in Google Play → Subscriptions.');
       return;
     }
@@ -137,11 +137,13 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     _say(r.message);
   }
 
-  void _say(String text) {
-    if (!mounted || text.isEmpty) return;
+  // Runtime status messages are plain Text, not template copy (an
+  // EditableLabel here made every message its own editor slot).
+  void _say(String message) {
+    if (!mounted || message.isEmpty) return;
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: EditableLabel('subscription.SubscriptionScreen', text)));
+      ..showSnackBar(SnackBar(content: Text(message)));
   }
 
   /// Play's price for this card, in the buyer's currency, when Play gave one.
@@ -337,7 +339,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                   active: selected == i,
                   playPrice: _playPrice(plans[i]),
                   current: tierForPlanName(plans[i].name) != null &&
-                      PlaySubscriptions.instance.activeTier == tierForPlanName(plans[i].name),
+                      PlaySubscriptions.instance.isActivePlan(tierForPlanName(plans[i].name)!, yearly: yearly),
                   onSubscribe: () => _subscribe(plans[i]),
                 ),
               ),

@@ -25,69 +25,6 @@ class EconomyException implements Exception {
   String toString() => message;
 }
 
-class CashQuote {
-  const CashQuote({
-    required this.productId,
-    required this.cash,
-    required this.coins,
-    this.catalogId,
-  });
-
-  final String productId;
-  final int cash;
-  final int coins;
-  final String? catalogId;
-
-  static const tiers = [99, 199, 299, 399, 499, 699, 999, 1499, 1999];
-
-  static const catalogPrices = <String, int>{
-    'nwsb_sub_resonance': 499,
-    'nwsb_sub_frequency': 999,
-    'nwsb_sub_frequency_x': 1999,
-    'nwsb_word': 99,
-    'nwsb_meaning': 99,
-    'nwsb_bundle_10': 999,
-    'nwsb_package': 399,
-    'nwsb_streak_restore': 199,
-  };
-
-  /// Smallest Play cash tier that leaves at most 30% for coins.
-  static CashQuote forPrice({
-    required int price,
-    required int balance,
-    String? catalogId,
-  }) {
-    final cap = (price * 0.3).floor();
-    final maxCoins = min(cap, max(0, balance));
-    final minCash = price - maxCoins;
-    int? best;
-    for (final tier in tiers) {
-      if (tier >= minCash && tier <= price) {
-        best = tier;
-        break;
-      }
-    }
-    if (best != null && price - best > 0) {
-      return CashQuote(
-        productId: 'nwsb_cash_$best',
-        cash: best,
-        coins: price - best,
-        catalogId: catalogId,
-      );
-    }
-    if (catalogId != null && catalogPrices[catalogId] == price) {
-      return CashQuote(productId: catalogId, cash: price, coins: 0, catalogId: catalogId);
-    }
-    final tier = tiers.firstWhere((t) => t >= price, orElse: () => tiers.last);
-    return CashQuote(
-      productId: 'nwsb_cash_$tier',
-      cash: tier,
-      coins: 0,
-      catalogId: catalogId,
-    );
-  }
-}
-
 class EconomyApi {
   EconomyApi._();
 

@@ -23,6 +23,7 @@ import '../screens/app_settings.dart';
 import '../screens/store/cart_pages.dart';
 import '../screens/store/meaning_store.dart';
 import '../features/notifications/inbox_screen.dart';
+import '../features/notifications/notif_router.dart';
 import '../widgets/pool_hud.dart';
 import '../widgets/mini_player_pill.dart';
 import '../data/phone_notifications.dart';
@@ -91,6 +92,7 @@ class _NavShellState extends State<NavShell> {
     _widgetTaps = HomeWidgetSync.instance.clicks.listen(_onWidgetTap);
     // Daily 'open the app' activity (server caps it at once a day).
     reportEarn('open');
+    NotifRouter.instance.attach(context, goTab: _goToTab, popToRoot: _popShellOverlays);
   }
 
   StreamSubscription<Uri>? _widgetTaps;
@@ -132,6 +134,7 @@ class _NavShellState extends State<NavShell> {
       NavScope._global = null;
       NavScope._shellRoute = null;
     }
+    NotifRouter.instance.detach(context);
     super.dispose();
   }
 

@@ -9,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../data/content.dart';
 import '../../data/models.dart';
 import '../../features/earn/earn_hub_screen.dart';
+import '../../features/notifications/notif_preferences_screen.dart';
 import '../../features/programs/coupons_program.dart';
 import '../../features/programs/earn_program.dart';
 import '../../features/programs/gifts_program.dart';
@@ -86,6 +87,7 @@ final List<AppPage> kAppPages = [
   AppPage('quickaccess', 'Quick access', 'You', Icons.apps_rounded, () => const QuickAccessScreen()),
   AppPage('settings', 'Settings', 'You', Icons.settings_rounded, () => const AppSettingsScreen()),
   AppPage('notifications', 'Notification settings', 'You', Icons.notifications_rounded, () => const NotificationsSettingsPage()),
+  AppPage('notifications.preferences', 'Notification preferences', 'You', Icons.tune_rounded, () => const NotifPreferencesScreen()),
   AppPage('fashionplus', 'Fashion Plus', 'Explore', Icons.checkroom_rounded, () => const FashionPlusScreen()),
   AppPage('healing', 'Healing path', 'Explore', Icons.spa_rounded, () => const HealingPathScreen()),
   AppPage('earn', 'Earn & gifts', 'Explore', Icons.toll_rounded, () => const EarnHubScreen()),

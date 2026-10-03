@@ -82,6 +82,8 @@ class PlaySubscriptions extends ChangeNotifier {
   String? _tier;
   DateTime? _until;
   String _source = '';
+  String _productId = '';
+  String _billing = '';
 
   /// resonance / frequency / frequencyX while a plan is active, else null.
   String? get activeTier {
@@ -92,6 +94,17 @@ class PlaySubscriptions extends ChangeNotifier {
 
   DateTime? get activeUntil => activeTier == null ? null : _until;
   String get activeSource => _source;
+
+  /// True when [tier] billed [yearly] is exactly the active plan (same Play
+  /// product), so Monthly and Yearly of one tier are different plans.
+  /// Falls back to the billing period, then to the tier, when the server
+  /// didn't record the product.
+  bool isActivePlan(String tier, {required bool yearly}) {
+    if (activeTier != tier) return false;
+    if (_productId.isNotEmpty) return _productId == playPlanFor(tier, yearly: yearly)?.productId;
+    if (_billing == 'yearly' || _billing == 'monthly') return (_billing == 'yearly') == yearly;
+    return true;
+  }
 
   /// Play's price for a product in the buyer's currency, when known.
   String? priceFor(String productId) => _base[productId]?.price;
@@ -199,9 +212,20 @@ class PlaySubscriptions extends ChangeNotifier {
     busy = true;
     notifyListeners();
     try {
+      // _owned is only filled by this session's confirms, so after a restart
+      // it is empty. Ask Play for the account's live subscriptions first, so
+      // a tier change is an upgrade/downgrade and never a second subscription.
+      final synced = await _syncOwned(user.uid);
       GooglePlayPurchaseDetails? old;
       for (final p in _owned.values) {
         if (p.productID != plan.productId) old = p;
+      }
+      if (old == null && activeTier != null && activeSource == 'play' && (!synced || _owned.isEmpty)) {
+        // The server says a Play plan is active but Play didn't hand us its
+        // purchase (other Google account, or Play unreachable). Buying now
+        // would start a second subscription next to the old one.
+        return const PlayResult(false,
+            'Your current plan is billed on another Google Play purchase. Change it in Google Play → Subscriptions, or tap Restore purchases first.');
       }
       final offers = details is GooglePlayProductDetails ? details.productDetails.subscriptionOfferDetails : null;
       final idx = details is GooglePlayProductDetails ? details.subscriptionIndex : null;
@@ -252,6 +276,31 @@ class PlaySubscriptions extends ChangeNotifier {
       }
     }
     return base.offerIdToken;
+  }
+
+  /// Fills [_owned] with this Google account's active NowssB subscriptions
+  /// (Play's own list, no purchase flow). Returns false when Play could not
+  /// be asked.
+  Future<bool> _syncOwned(String uid) async {
+    try {
+      final android = InAppPurchase.instance.getPlatformAddition<InAppPurchaseAndroidPlatformAddition>();
+      final r = await android.queryPastPurchases(applicationUserName: accountHash(uid));
+      if (r.error != null) return false;
+      final hash = accountHash(uid);
+      _owned.removeWhere((_, p) => !r.pastPurchases.any((q) => q.purchaseID == p.purchaseID));
+      for (final p in r.pastPurchases) {
+        if (!kPlayProductIds.contains(p.productID)) continue;
+        if (p.status != PurchaseStatus.purchased && p.status != PurchaseStatus.restored) continue;
+        // Only purchases made for this NowssB account.
+        final acct = p.billingClientPurchase.obfuscatedAccountId;
+        if (acct != null && acct.isNotEmpty && acct != hash) continue;
+        _owned[p.productID] = p;
+      }
+      return true;
+    } catch (e) {
+      debugPrint('NowssB billing: queryPastPurchases failed: $e');
+      return false;
+    }
   }
 
   /// Re-sends every active Play subscription on this Google account to the
@@ -417,6 +466,8 @@ class PlaySubscriptions extends ChangeNotifier {
         final end = d['subscriptionEndDate'];
         _until = end is Timestamp ? end.toDate() : DateTime.tryParse('${end ?? ''}');
         _source = '${d['subscriptionSource'] ?? ''}';
+        _productId = '${d['subscriptionProductId'] ?? ''}';
+        _billing = '${d['subscriptionBilling'] ?? ''}'.toLowerCase();
         notifyListeners();
       }, onError: (Object e) => debugPrint('NowssB entitlement watch: $e'));
     });

@@ -34,7 +34,13 @@ void openAtelierWord(
   final found = ContentStore.instance.library
       .where((w) => w.key == key || w.word.toLowerCase() == key)
       .toList();
-  if (found.isNotEmpty) {
+  // A library word opens straight in Word Detail only when this account can
+  // already open it; otherwise the product page with its Buy button.
+  final open = found.isNotEmpty &&
+      (signature
+          ? Entitlements.instance.canOpenStoreWord(word, signature: true, price: kMsSignaturePrice)
+          : Entitlements.instance.canOpenWord(found.first));
+  if (open) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(builder: (_) => WordDetail(word: found.first)),
     );

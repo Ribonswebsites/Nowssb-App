@@ -27,6 +27,7 @@ import * as ad from '../../_lib/economy/admin.js';
 import { economySummary, publicConfig } from '../../_lib/economy/summary.js';
 import { settleProduct } from '../../_lib/economy/playorders.js';
 import { missingPlayEnv } from '../../_lib/play.js';
+import { notificationOutbox } from '../../_lib/notify/push.js';
 
 const paused = (what) => async () => { throw new EconomyError(`${what} is paused under the Play policy. Nothing was charged.`, 400, 'failed-precondition'); };
 
@@ -182,7 +183,7 @@ export async function onRequestGet(ctx) {
   }
 }
 
-export async function onRequestPost({ request, env, params }) {
+export async function onRequestPost({ request, env, params, waitUntil }) {
   const h = cors(request);
   const action = String(params.action || '');
   if (action === 'config') return onRequestGet({ request, env, params });
@@ -202,6 +203,7 @@ export async function onRequestPost({ request, env, params }) {
   try { data = (await request.json()) || {}; } catch (e) { data = {}; }
   try {
     const db = await FsDb.fromEnv(env);
+    const outbox = notificationOutbox(db); // phone push for every inbox row this action commits
     const cfg = await loadEconomy(db);
     const ctx = { db, cfg, now: Date.now(), env, claims, country: (request.cf && request.cf.country) || request.headers.get('CF-IPCountry') || '' };
     if (isAdminAction && !(await ad.isAdmin(db, uid, claims))) return json({ error: 'Admins only.', code: 'permission-denied' }, 403, h);
@@ -210,6 +212,8 @@ export async function onRequestPost({ request, env, params }) {
       if (stop) return json({ ok: false, error: stop, code: 'restricted' }, 403, h);
     }
     const out = await fn(ctx, uid, data, claims);
+    const sending = outbox.flush(env).catch(() => {});
+    if (typeof waitUntil === 'function') waitUntil(sending); else await sending;
     return json({ ok: true, ...safeOut(out, ctx) }, 200, h);
   } catch (e) {
     if (e instanceof EconomyError || (e && e.status && e.code)) {
