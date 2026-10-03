@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/content.dart';
 import '../data/models.dart';
+import '../data/word_art.dart';
 import '../theme/player_aura.dart';
 import 'player_settings.dart';
 import 'practice_player.dart';
@@ -30,7 +31,18 @@ class _SavedWordsScreenState extends State<SavedWordsScreen> {
   @override
   void initState() {
     super.initState();
+    WordArt.instance.addListener(_onArt);
     _load();
+  }
+
+  void _onArt() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void dispose() {
+    WordArt.instance.removeListener(_onArt);
+    super.dispose();
   }
 
   Future<void> _load() async {
@@ -82,8 +94,10 @@ class _SavedWordsScreenState extends State<SavedWordsScreen> {
   ];
 
   Widget _thumb(Word word, int i) {
-    final asset =
-        word.img.startsWith('assets/') ? word.img : _arts[i % _arts.length];
+    final fallback = word.img.startsWith('assets/') || word.img.startsWith('http')
+        ? word.img
+        : _arts[i % _arts.length];
+    final asset = WordArt.instance.imageFor(word.word, fallback);
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
       child: SizedBox(
@@ -97,6 +111,7 @@ class _SavedWordsScreenState extends State<SavedWordsScreen> {
               asset,
               fit: BoxFit.contain,
               alignment: Alignment.bottomCenter,
+              word: word.word,
               errorBuilder: (_, __, ___) =>
                   const ColoredBox(color: Color(0xFF1A1A1A)),
               slot: 'saved_words.SavedWordsScreen',

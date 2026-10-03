@@ -7,11 +7,11 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/foundation.dart';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../../data/cart_bag.dart';
+import '../../data/word_art.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
@@ -134,9 +134,12 @@ Color storeCardTint(String seed) {
 }
 
 class StoreNetImage extends StatelessWidget {
-  const StoreNetImage({super.key, required this.url, this.fit = BoxFit.cover});
+  const StoreNetImage({super.key, required this.url, this.fit = BoxFit.cover, this.word});
   final String url;
   final BoxFit fit;
+
+  /// When set, the shared picture for this word replaces [url].
+  final String? word;
 
   static const _composing = ColoredBox(
     color: Color(0xFF06060A),
@@ -151,11 +154,23 @@ class StoreNetImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (url.isEmpty) return _composing;
-    if (url.startsWith('assets/')) {
+    final bound = word;
+    if (bound != null && bound.isNotEmpty) {
+      return ListenableBuilder(
+        listenable: WordArt.instance,
+        builder: (_, __) => _paint(WordArt.instance.imageFor(bound, url), bound),
+      );
+    }
+    return _paint(url, null);
+  }
+
+  Widget _paint(String src, String? bound) {
+    if (src.isEmpty) return _composing;
+    if (src.startsWith('assets/')) {
       return EditableImage.asset(
-        url,
+        src,
         fit: fit,
+        word: bound,
         gaplessPlayback: true,
         filterQuality: FilterQuality.medium,
         frameBuilder: (context, child, frame, sync) {
@@ -166,14 +181,18 @@ class StoreNetImage extends StatelessWidget {
         slot: 'store_cards.StoreNetImage',
       );
     }
-    return CachedNetworkImage(
-      imageUrl: url,
-      fit: fit,
-      fadeInDuration: Duration.zero,
-      fadeOutDuration: Duration.zero,
-      placeholder: (_, __) => _composing,
-      errorWidget: (_, __, ___) => _composing,
-    );
+    if (src.startsWith('http://') || src.startsWith('https://')) {
+      return EditableImage.network(
+        src,
+        fit: fit,
+        word: bound,
+        gaplessPlayback: true,
+        filterQuality: FilterQuality.medium,
+        errorBuilder: (_, __, ___) => _composing,
+        slot: 'store_cards.StoreNetImage',
+      );
+    }
+    return _composing;
   }
 }
 
@@ -976,6 +995,7 @@ class RmWordCard extends StatelessWidget {
                                 child: StoreNetImage(
                                   url: imgUrl,
                                   fit: BoxFit.cover,
+                                  word: name,
                                 ),
                               ),
                             ),
@@ -1332,7 +1352,7 @@ class MsCard extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              StoreNetImage(url: imgUrl),
+              StoreNetImage(url: imgUrl, word: word),
               const DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(

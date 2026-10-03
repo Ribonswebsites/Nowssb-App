@@ -37,7 +37,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../admin/admin_state.dart';
-import '../admin/template/editable.dart' show mediaOverride, overrideImageProvider, slotChrome, slotSeen;
+import '../admin/template/editable.dart' show mediaOverride, overrideImageProvider, slotChrome, slotSeen, slotZoom, zoomBox;
 import '../admin/template/slot_keys.dart';
 import '../admin/template/ui_overrides.dart';
 import 'media_map.dart';
@@ -111,7 +111,7 @@ class NwsbImage extends StatelessWidget {
                 (frame == null && !sync) ? _picture() : img,
             errorBuilder: (_, __, ___) => _picture(),
           );
-    return slotChrome(context, key, SlotType.image, url, child);
+    return slotChrome(context, key, SlotType.image, url, zoomBox(child, slotZoom(key)));
   }
 
   Widget _picture() {

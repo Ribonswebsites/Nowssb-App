@@ -113,6 +113,7 @@ class CurrentlyPlayingAlbum extends StatelessWidget {
                       child: EditableImage.asset(
                         cover,
                         fit: BoxFit.cover,
+                        word: head.word,
                         errorBuilder: (_, __, ___) =>
                             const ColoredBox(color: Color(0xFF1A1A1A)),
                             slot: 'currently_playing_album.CurrentlyPlayingAlbum',
@@ -220,6 +221,7 @@ class CurrentlyPlayingAlbum extends StatelessWidget {
                                       child: EditableImage.asset(
                                         art(words[i].word),
                                         fit: BoxFit.cover,
+                                        word: words[i].word,
                                         errorBuilder: (_, __, ___) =>
                                             const ColoredBox(
                                                 color: Color(0xFF333333)),

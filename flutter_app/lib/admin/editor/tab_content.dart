@@ -15,8 +15,11 @@ import '../layout/ui_layouts.dart';
 import '../media_upload.dart';
 import 'svg_picker.dart';
 import '../template/editable.dart';
+import '../template/media_tune.dart';
 import '../template/slot_keys.dart';
+import '../template/slot_sheet.dart' show wordOfSlot;
 import '../template/ui_overrides.dart';
+import '../../data/word_art.dart';
 import 'editor_controller.dart';
 import 'glass.dart';
 import 'preview.dart';
@@ -138,6 +141,14 @@ class _SlotRowState extends State<SlotRow> {
       final up = await uploadToR2(f, 'ui', slotDocId(s.key), kind,
           onProgress: (p) => mounted ? setState(() => _progress = p) : null);
       UiOverrides.instance.primeFile(up.url, f);
+      final bound = wordOfSlot(s.key);
+      if (bound != null) {
+        await WordArt.instance.set(
+          bound,
+          image: s.type == SlotType.video ? null : up.url,
+          video: s.type == SlotType.video ? up.url : null,
+        );
+      }
       c.setMedia(s.key, s.type, s.def, up.url, up.key);
       actFeel();
       if (mounted) {
@@ -156,6 +167,16 @@ class _SlotRowState extends State<SlotRow> {
         });
       }
     }
+  }
+
+  Future<void> _zoom(String? bound, double current, double delta) async {
+    final next = (current + delta).clamp(0.5, 2.6);
+    if (bound != null) {
+      await WordArt.instance.set(bound, scale: next);
+    } else {
+      c.patchStyle(s.key, s.type, s.def, {'undoZoom': current, 'zoom': next});
+    }
+    if (mounted) setState(() {});
   }
 
   @override
@@ -216,6 +237,33 @@ class _SlotRowState extends State<SlotRow> {
                   ),
                 ),
               ] else if (s.type != SlotType.orb) ...[
+                Builder(builder: (context) {
+                  final bound = wordOfSlot(s.key);
+                  final z = bound != null
+                      ? WordArt.instance.scaleOf(bound)
+                      : ((o?.style['zoom'] as num?)?.toDouble() ?? 1);
+                  final undo = bound != null ? WordArt.instance.canUndo(bound) : o?.style['undoZoom'] != null;
+                  return MediaTuneBar(
+                    zoom: z,
+                    canUndo: undo,
+                    onUndo: _progress != null
+                        ? null
+                        : () async {
+                            if (bound != null) {
+                              await WordArt.instance.undo(bound);
+                            } else {
+                              final prev = o?.style['undoZoom'];
+                              if (prev is num) {
+                                c.patchStyle(s.key, s.type, s.def, {'zoom': prev.toDouble(), 'undoZoom': null});
+                              }
+                            }
+                            if (mounted) setState(() {});
+                          },
+                    onZoomOut: _progress != null ? null : () => _zoom(bound, z, -0.15),
+                    onZoomIn: _progress != null ? null : () => _zoom(bound, z, 0.15),
+                  );
+                }),
+                const SizedBox(height: 8),
                 Wrap(spacing: 8, runSpacing: 8, children: [
                   Pill('Upload new', icon: Icons.upload_rounded, selected: true, onTap: _progress != null ? null : _upload),
                   if (s.type == SlotType.image && s.def.toLowerCase().endsWith('.svg'))
@@ -223,6 +271,8 @@ class _SlotRowState extends State<SlotRow> {
                       final v = await pickSvg(context, current: o?.url ?? s.def);
                       if (v == null || !mounted) return;
                       c.setMedia(s.key, s.type, s.def, v, '');
+                      final bound = wordOfSlot(s.key);
+                      if (bound != null) await WordArt.instance.set(bound, image: v);
                       setState(() => _msg = 'Swapped — shown on the preview. Publish to make it live.');
                     }),
                 ]),

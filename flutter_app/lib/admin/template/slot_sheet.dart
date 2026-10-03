@@ -9,9 +9,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../data/word_art.dart';
 import '../admin_log.dart';
 import '../admin_state.dart';
 import '../media_upload.dart';
+import 'media_tune.dart';
 import 'slot_keys.dart';
 import 'ui_overrides.dart';
 
@@ -20,8 +22,10 @@ Future<void> openSlotSheet(
   required String slotKey,
   required SlotType type,
   required String defaultValue,
+  String? word,
 }) {
   if (!AdminState.instance.isAdmin) return Future.value();
+  final bound = word ?? wordOfSlot(slotKey);
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
@@ -30,8 +34,17 @@ Future<void> openSlotSheet(
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
     ),
-    builder: (_) => SlotSheet(slotKey: slotKey, type: type, defaultValue: defaultValue),
+    builder: (_) => SlotSheet(slotKey: slotKey, type: type, defaultValue: defaultValue, word: bound),
   );
+}
+
+/// `….word-aarogya` slots are the shared picture for that word.
+String? wordOfSlot(String key) {
+  const mark = '.word-';
+  final i = key.lastIndexOf(mark);
+  if (i < 0) return null;
+  final rest = key.substring(i + mark.length);
+  return rest.isEmpty ? null : rest;
 }
 
 class SlotSheet extends StatefulWidget {
@@ -40,11 +53,13 @@ class SlotSheet extends StatefulWidget {
     required this.slotKey,
     required this.type,
     required this.defaultValue,
+    this.word,
   });
 
   final String slotKey;
   final SlotType type;
   final String defaultValue;
+  final String? word;
 
   @override
   State<SlotSheet> createState() => _SlotSheetState();
@@ -55,8 +70,11 @@ class _SlotSheetState extends State<SlotSheet> {
   bool _busy = false;
   double? _progress;
   String? _msg;
+  late double _zoom;
+  var _canUndo = false;
 
   UiOverride? get _current => UiOverrides.instance.get(widget.slotKey);
+  String? get _bound => widget.word;
 
   @override
   void initState() {
@@ -64,6 +82,15 @@ class _SlotSheetState extends State<SlotSheet> {
     _text = TextEditingController(
       text: UiOverrides.instance.textFor(widget.slotKey) ?? widget.defaultValue,
     );
+    final bound = _bound;
+    if (bound != null) {
+      _zoom = WordArt.instance.scaleOf(bound);
+      _canUndo = WordArt.instance.canUndo(bound);
+    } else {
+      final z = _current?.style['zoom'];
+      _zoom = z is num ? z.toDouble().clamp(0.5, 2.6) : 1;
+      _canUndo = _current?.style['undoUrl'] != null || _current?.style['undoZoom'] != null;
+    }
   }
 
   @override
@@ -100,15 +127,35 @@ class _SlotSheetState extends State<SlotSheet> {
         onProgress: (p) => mounted ? setState(() => _progress = p) : null,
       );
       UiOverrides.instance.primeFile(up.url, file);
+      final bound = _bound;
+      if (bound != null) {
+        final kindVideo = widget.type == SlotType.video;
+        await WordArt.instance.set(
+          bound,
+          image: kindVideo ? null : up.url,
+          video: kindVideo ? up.url : null,
+        );
+      }
+      final style = Map<String, dynamic>.from(_current?.style ?? {});
+      style['undoUrl'] = _current?.url.isNotEmpty == true ? _current!.url : widget.defaultValue;
+      style['undoZoom'] = _zoom;
+      style['zoom'] = _zoom;
       await _write(
-        {'url': up.url, 'storagePath': up.key},
+        {'url': up.url, 'storagePath': up.key, 'style': style},
         UiOverride(
           slot: widget.slotKey,
           type: widget.type,
           url: up.url,
           storagePath: up.key,
+          textSet: false,
+          style: style,
         ),
       );
+      if (mounted && bound != null) {
+        setState(() => _canUndo = WordArt.instance.canUndo(bound));
+      } else if (mounted) {
+        setState(() => _canUndo = true);
+      }
     } catch (e) {
       if (mounted) {
         setState(() {
@@ -162,12 +209,96 @@ class _SlotSheetState extends State<SlotSheet> {
     }
   }
 
+  Future<void> _nudge(double delta) async {
+    final next = (_zoom + delta).clamp(0.5, 2.6);
+    if ((next - _zoom).abs() < 0.001) return;
+    final bound = _bound;
+    if (bound != null) {
+      await WordArt.instance.set(bound, scale: next);
+      if (!mounted) return;
+      setState(() {
+        _zoom = WordArt.instance.scaleOf(bound);
+        _canUndo = WordArt.instance.canUndo(bound);
+        _msg = 'Zoom saved on this word. Every place it appears uses it.';
+      });
+      return;
+    }
+    await _stashSlot(zoom: next);
+  }
+
+  Future<void> _undo() async {
+    final bound = _bound;
+    if (bound != null) {
+      final ok = await WordArt.instance.undo(bound);
+      if (!mounted) return;
+      setState(() {
+        _zoom = WordArt.instance.scaleOf(bound);
+        _canUndo = WordArt.instance.canUndo(bound);
+        _msg = ok ? 'Previous picture restored.' : 'Nothing to undo.';
+      });
+      return;
+    }
+    final cur = _current;
+    final prevUrl = cur?.style['undoUrl'];
+    final prevZoom = cur?.style['undoZoom'];
+    if (cur == null || (prevUrl == null && prevZoom == null)) return;
+    final style = Map<String, dynamic>.from(cur.style)..remove('undoUrl')..remove('undoZoom');
+    final z = prevZoom is num ? prevZoom.toDouble() : 1.0;
+    style['zoom'] = z;
+    final url = prevUrl is String ? prevUrl : cur.url;
+    await _write(
+      {'url': url == widget.defaultValue ? '' : url, 'storagePath': '', 'style': style},
+      cur.copyWith(url: url == widget.defaultValue ? '' : url, storagePath: '', style: style),
+    );
+    if (mounted) {
+      setState(() {
+        _zoom = z;
+        _canUndo = false;
+        _msg = 'Previous picture restored.';
+      });
+    }
+  }
+
+  Future<void> _stashSlot({String? url, double? zoom}) async {
+    final cur = _current;
+    final style = Map<String, dynamic>.from(cur?.style ?? {});
+    style['undoUrl'] = cur?.url.isNotEmpty == true ? cur!.url : widget.defaultValue;
+    style['undoZoom'] = _zoom;
+    if (zoom != null) style['zoom'] = zoom;
+    final nextUrl = url ?? cur?.url ?? '';
+    await _write(
+      {
+        'url': nextUrl,
+        'storagePath': cur?.storagePath ?? '',
+        'style': style,
+      },
+      UiOverride(
+        slot: widget.slotKey,
+        type: widget.type,
+        url: nextUrl,
+        storagePath: cur?.storagePath ?? '',
+        textSet: false,
+        style: style,
+      ),
+    );
+    if (mounted) {
+      setState(() {
+        if (zoom != null) _zoom = zoom;
+        _canUndo = true;
+      });
+    }
+  }
+
   Future<void> _reset() async {
     setState(() {
       _busy = true;
       _msg = 'Putting the original back…';
     });
     try {
+      final bound = _bound;
+      if (bound != null) {
+        await WordArt.instance.set(bound, image: '', video: '', scale: 1);
+      }
       await _doc.delete();
       UiOverrides.instance.removeLocal(widget.slotKey);
       await adminLog('template.reset', widget.slotKey);
@@ -176,6 +307,10 @@ class _SlotSheetState extends State<SlotSheet> {
         setState(() {
           _busy = false;
           _msg = 'Back to the original.';
+          if (bound != null) {
+            _zoom = 1;
+            _canUndo = WordArt.instance.canUndo(bound);
+          }
         });
       }
     } catch (e) {
@@ -217,7 +352,10 @@ class _SlotSheetState extends State<SlotSheet> {
                 : Image.asset(source, fit: BoxFit.contain,
                     errorBuilder: (_, __, ___) =>
                         const Icon(Icons.broken_image_outlined, color: Colors.white54));
-    return SizedBox(height: 120, child: Center(child: img));
+    final shown = (_zoom - 1).abs() < 0.02
+        ? img
+        : ClipRect(child: Transform.scale(scale: _zoom, child: img));
+    return SizedBox(height: 160, child: Center(child: shown));
   }
 
   @override
@@ -225,7 +363,7 @@ class _SlotSheetState extends State<SlotSheet> {
     final cur = _current;
     final isText = widget.type == SlotType.text;
     return AnimatedBuilder(
-      animation: UiOverrides.instance,
+      animation: Listenable.merge([UiOverrides.instance, WordArt.instance]),
       builder: (context, _) => Padding(
         padding: EdgeInsets.fromLTRB(
             18, 16, 18, 18 + MediaQuery.of(context).viewInsets.bottom),
@@ -267,7 +405,13 @@ class _SlotSheetState extends State<SlotSheet> {
               const Text('Original', style: TextStyle(color: Colors.white54, fontSize: 12)),
               const SizedBox(height: 6),
               _preview(widget.defaultValue),
-              if (!isText && cur != null) ...[
+              if (!isText && _bound != null && (WordArt.instance.imageOf(_bound!) ?? '').isNotEmpty) ...[
+                const SizedBox(height: 14),
+                Text('This word, everywhere', style: const TextStyle(color: Color(0xFFE8D5A3), fontSize: 12)),
+                const SizedBox(height: 6),
+                _preview(WordArt.instance.imageOf(_bound!)!, replaced: true),
+              ],
+              if (!isText && cur != null && cur.url.isNotEmpty) ...[
                 const SizedBox(height: 14),
                 const Text('Now showing', style: TextStyle(color: Colors.white54, fontSize: 12)),
                 const SizedBox(height: 6),
@@ -297,6 +441,16 @@ class _SlotSheetState extends State<SlotSheet> {
                 Text(_msg!, style: const TextStyle(color: Colors.white70, fontSize: 12)),
               ],
               const SizedBox(height: 16),
+              if (!isText) ...[
+                MediaTuneBar(
+                  zoom: _zoom,
+                  canUndo: _canUndo,
+                  onUndo: _busy ? null : _undo,
+                  onZoomOut: _busy ? null : () => _nudge(-0.15),
+                  onZoomIn: _busy ? null : () => _nudge(0.15),
+                ),
+                const SizedBox(height: 10),
+              ],
               Row(children: [
                 Expanded(
                   child: FilledButton.icon(
@@ -312,7 +466,7 @@ class _SlotSheetState extends State<SlotSheet> {
                 const SizedBox(width: 10),
                 OutlinedButton(
                   style: OutlinedButton.styleFrom(foregroundColor: Colors.white),
-                  onPressed: _busy || cur == null ? null : _reset,
+                  onPressed: _busy || (cur == null && _bound == null) ? null : _reset,
                   child: const Text('Reset'),
                 ),
               ]),

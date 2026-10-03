@@ -14,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'models.dart';
 import 'practice_progress.dart';
+import 'word_art.dart';
 import 'word_voice.dart';
 
 enum HearingTier { quiet, loud, danger }
@@ -61,8 +62,9 @@ class PlaybackSession extends ChangeNotifier {
   Word? get word => (_words.isEmpty) ? null : _words[_index.clamp(0, _words.length - 1)];
   String get artwork {
     final w = word;
-    if (w != null && w.img.isNotEmpty) return w.img;
-    return _artwork;
+    final fallback = (w != null && w.img.isNotEmpty) ? w.img : _artwork;
+    if (w == null) return fallback;
+    return WordArt.instance.imageFor(w.word, fallback);
   }
 
   HearingTier get tier {

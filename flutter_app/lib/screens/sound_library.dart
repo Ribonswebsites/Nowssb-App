@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 
 import '../data/content.dart';
 import '../data/models.dart';
+import '../data/word_art.dart';
 import '../data/practice_progress.dart';
 import '../data/store_catalog.dart';
 import '../media/nwsb_image.dart';
@@ -73,6 +74,8 @@ int _hash(String s) {
 }
 
 String _artForWord(String name, Map<String, RmCategory> byWord) {
+  final custom = WordArt.instance.imageFor(name, '');
+  if (custom.isNotEmpty) return custom;
   final key = name.toLowerCase();
   final hit = byWord[key];
   if (hit != null) return _colAsset(hit);
@@ -135,12 +138,14 @@ class _SoundLibraryScreenState extends State<SoundLibraryScreen> {
   void initState() {
     super.initState();
     ContentStore.instance.addListener(_onContent);
+    WordArt.instance.addListener(_onContent);
     PracticeProgress.instance.addListener(_onContent);
   }
 
   @override
   void dispose() {
     ContentStore.instance.removeListener(_onContent);
+    WordArt.instance.removeListener(_onContent);
     PracticeProgress.instance.removeListener(_onContent);
     super.dispose();
   }
@@ -878,7 +883,7 @@ class _SlmFeed extends StatelessWidget {
                       for (final w in p)
                         Builder(builder: (_) {
                           var src = art(w.word);
-                          if (used.contains(src)) {
+                          if (!src.startsWith('http') && used.contains(src)) {
                             for (var k = 1; k <= kRmCategories.length; k++) {
                               final alt = _colAsset(
                                   kRmCategories[(_hash(w.word) + k) %
@@ -926,6 +931,7 @@ class _SlmFeed extends StatelessWidget {
                               child: EditableImage.asset(
                                 src,
                                 fit: BoxFit.cover,
+                                word: w.word,
                                 errorBuilder: (_, __, ___) =>
                                     const ColoredBox(color: Color(0xFF1A1A1A)),
                                     slot: 'sound_library.SlmFeed',
@@ -992,6 +998,7 @@ class _SlmFeed extends StatelessWidget {
                 child: EditableImage.asset(
                   art(w.word),
                   fit: BoxFit.cover,
+                  word: w.word,
                   errorBuilder: (_, __, ___) =>
                       const ColoredBox(color: Color(0xFF1A1A1A)),
                       slot: 'sound_library.SlmFeed',
@@ -1175,6 +1182,7 @@ class _SlmFeed extends StatelessWidget {
                               child: EditableImage.asset(
                                 art(it.trio.first.word),
                                 fit: BoxFit.cover,
+                                word: it.trio.first.word,
                                 errorBuilder: (_, __, ___) =>
                                     const ColoredBox(color: Color(0xFF1A1A1A)),
                                     slot: 'sound_library.SlmFeed',
@@ -1319,6 +1327,7 @@ class _SlmFeed extends StatelessWidget {
                       child: EditableImage.asset(
                         art(w.word),
                         fit: BoxFit.cover,
+                        word: w.word,
                         errorBuilder: (_, __, ___) =>
                             const ColoredBox(color: Color(0xFF1A1A1A)),
                             slot: 'sound_library.SlmFeed',
@@ -1457,11 +1466,10 @@ class _SlmFeed extends StatelessWidget {
                             width: 76,
                             child: FramedSlot(
                               frame: DeviceFrame.tab6Landscape,
-                              child: m.img.isNotEmpty
-                                  ? NwsbImage(url: m.img, slot: 'sound_library.SlmFeed')
-                                  : EditableImage.asset(
-                                      art(m.name),
+                              child: EditableImage.asset(
+                                      m.img.isNotEmpty ? m.img : art(m.name),
                                       fit: BoxFit.cover,
+                                      word: m.name,
                                       errorBuilder: (_, __, ___) =>
                                           const ColoredBox(
                                               color: Color(0xFF1A1A1A)),
@@ -1853,6 +1861,7 @@ class _FeaturedMainCard extends StatelessWidget {
                     child: EditableImage.asset(
                       art,
                       fit: BoxFit.cover,
+                      word: word.word,
                       errorBuilder: (_, __, ___) =>
                           const ColoredBox(color: Color(0xFF333333)),
                           slot: 'sound_library.FeaturedMainCard',
@@ -2003,6 +2012,7 @@ class _HitsRail extends StatelessWidget {
                           child: EditableImage.asset(
                             art(w.word),
                             fit: BoxFit.cover,
+                            word: w.word,
                             errorBuilder: (_, __, ___) =>
                                 const ColoredBox(color: _kYtmCard),
                                 slot: 'sound_library.HitsRail',
@@ -2127,6 +2137,7 @@ class _YtmTrackRow extends StatelessWidget {
                   child: EditableImage.asset(
                     art,
                     fit: BoxFit.cover,
+                    word: word.word,
                     errorBuilder: (_, __, ___) =>
                         const ColoredBox(color: _kYtmCard),
                         slot: 'sound_library.YtmTrackRow',
@@ -2326,6 +2337,7 @@ class _CurrentlyPlayingRailState extends State<_CurrentlyPlayingRail>
                       child: EditableImage.asset(
                         widget.art(w.word),
                         fit: BoxFit.cover,
+                        word: w.word,
                         errorBuilder: (_, __, ___) =>
                             const ColoredBox(color: _kYtmCard),
                             slot: 'sound_library.CurrentlyPlayingRail',
@@ -2677,8 +2689,9 @@ class _AtelierWordsScreen extends StatelessWidget {
                       width: 48,
                       height: 48,
                       child: EditableImage.asset(
-                        _colAsset(category),
+                        WordArt.instance.imageFor(e.word, _colAsset(category)),
                         fit: BoxFit.cover,
+                        word: e.word,
                         errorBuilder: (_, __, ___) =>
                             const ColoredBox(color: _kYtmCard),
                             slot: 'sound_library.AtelierWordsScreen',
@@ -2734,12 +2747,14 @@ class _SoundCategoryScreenState extends State<SoundCategoryScreen> {
   void initState() {
     super.initState();
     ContentStore.instance.addListener(_onContent);
+    WordArt.instance.addListener(_onContent);
     PracticeProgress.instance.addListener(_onContent);
   }
 
   @override
   void dispose() {
     ContentStore.instance.removeListener(_onContent);
+    WordArt.instance.removeListener(_onContent);
     PracticeProgress.instance.removeListener(_onContent);
     super.dispose();
   }
@@ -3057,6 +3072,7 @@ class _SoundCategoryScreenState extends State<SoundCategoryScreen> {
                               child: EditableImage.asset(
                                 _art(w.word),
                                 fit: BoxFit.cover,
+                                word: w.word,
                                 errorBuilder: (_, __, ___) =>
                                     const ColoredBox(color: _kYtmCard),
                                     slot: 'sound_library.SoundCategoryScreen',

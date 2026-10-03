@@ -28,6 +28,7 @@ import 'admin/template/ui_overrides.dart';
 import 'app_update.dart';
 import 'data/app_control.dart';
 import 'data/content.dart';
+import 'data/word_art.dart';
 import 'data/earn_wallet.dart';
 import 'data/firebase.dart';
 import 'features/economy/economy_api.dart';
@@ -87,6 +88,7 @@ Future<void> main() async {
   // Google Play subscriptions: listen for purchases Play delivers at launch.
   unawaited(PlaySubscriptions.instance.start());
   await ContentStore.instance.start();
+  await WordArt.instance.start();
   // Android home-screen widget: streak + word of the day (no-op elsewhere).
   unawaited(HomeWidgetSync.instance.start());
 

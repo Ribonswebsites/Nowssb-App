@@ -18,6 +18,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../data/earn_wallet.dart';
 import '../features/economy/economy_api.dart';
 import '../data/models.dart';
+import '../data/word_art.dart';
 import '../data/practice_progress.dart';
 import '../media/nwsb_video.dart';
 import '../media/onboarding_warmup.dart';
@@ -140,6 +141,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     )..repeat();
     _kickBottomAuto();
     PracticeProgress.instance.addListener(_onProgress);
+    WordArt.instance.addListener(_onProgress);
     Settings.instance.addListener(_onSettings);
     _armSleep();
     unawaited(PracticeProgress.instance.start());
@@ -233,6 +235,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     _bottomPageController.dispose();
     _marqueeController.dispose();
     PracticeProgress.instance.removeListener(_onProgress);
+    WordArt.instance.removeListener(_onProgress);
     Settings.instance.removeListener(_onSettings);
     // When minimizing to the floating pill, PlaybackSession owns audio.
     if (!_handingOff) {
@@ -1684,9 +1687,10 @@ class _NextUpCard extends StatelessWidget {
     final next = words.isEmpty ? null : words[nextIndex];
     final art = next == null
         ? null
-        : (next.img.isNotEmpty
-              ? next.img
-              : themes[nextIndex % themes.length].image);
+        : WordArt.instance.imageFor(
+            next.word,
+            next.img.isNotEmpty ? next.img : themes[nextIndex % themes.length].image,
+          );
 
     return GestureDetector(
       onVerticalDragEnd: (details) {
@@ -1777,17 +1781,21 @@ class _NextUpCard extends StatelessWidget {
                                 height: 44,
                                 child: art != null && art.isNotEmpty
                                     ? (art.startsWith('http')
-                                          ? Image.network(
+                                          ? EditableImage.network(
                                               art,
                                               fit: BoxFit.cover,
+                                              word: next.word,
                                               errorBuilder: (_, __, ___) =>
                                                   const ColoredBox(
                                                     color: Color(0xFF111111),
                                                   ),
+                                              slot:
+                                                  'practice_player.NextUpCard',
                                             )
                                           : EditableImage.asset(
                                               art,
                                               fit: BoxFit.cover,
+                                              word: next.word,
                                               errorBuilder: (_, __, ___) =>
                                                   const ColoredBox(
                                                     color: Color(0xFF111111),
@@ -1914,12 +1922,18 @@ class _QueueSheetState extends State<_QueueSheet> {
     super.initState();
     _order = List<int>.generate(widget.words.length, (i) => i);
     _scrollCtrl.addListener(_onScroll);
+    WordArt.instance.addListener(_onArt);
     unawaited(_hydrate());
+  }
+
+  void _onArt() {
+    if (mounted) setState(() {});
   }
 
   @override
   void dispose() {
     _scrollCtrl.removeListener(_onScroll);
+    WordArt.instance.removeListener(_onArt);
     _scrollCtrl.dispose();
     super.dispose();
   }
@@ -2036,7 +2050,10 @@ class _QueueSheetState extends State<_QueueSheet> {
     final filtered = _filtered;
     final word = _currentWord;
     final theme = _currentTheme;
-    final art = (word?.img.isNotEmpty == true) ? word!.img : theme.image;
+    final art = WordArt.instance.imageFor(
+      word?.word ?? '',
+      (word?.img.isNotEmpty == true) ? word!.img : theme.image,
+    );
 
     final heroVideo = kPlayerBoxFilms[widget.index % kPlayerBoxFilms.length];
 
@@ -2135,6 +2152,7 @@ class _QueueSheetState extends State<_QueueSheet> {
                                   collapse: localT,
                                   maxHeight: constraints.maxHeight,
                                   art: art,
+                                  wordName: word?.word,
                                   video: heroVideo,
                                   title: word?.word ?? 'NowssB',
                                   subtitle: 'NowssB',
@@ -2263,11 +2281,12 @@ class _QueueSheetState extends State<_QueueSheet> {
                                 itemBuilder: (context, i) {
                                   final orig = filtered[i];
                                   final w = widget.words[orig];
-                                  final rowArt = w.img.isNotEmpty
-                                      ? w.img
-                                      : widget
-                                            .themes[orig % widget.themes.length]
-                                            .image;
+                                  final rowArt = WordArt.instance.imageFor(
+                                    w.word,
+                                    w.img.isNotEmpty
+                                        ? w.img
+                                        : widget.themes[orig % widget.themes.length].image,
+                                  );
                                   final isCurrent = orig == widget.index;
                                   return ReorderableDelayedDragStartListener(
                                     key: ValueKey('q-$orig-${w.word}'),
@@ -2299,9 +2318,10 @@ class _QueueSheetState extends State<_QueueSheet> {
                                                     fit: StackFit.expand,
                                                     children: [
                                                       rowArt.startsWith('http')
-                                                          ? Image.network(
+                                                          ? EditableImage.network(
                                                               rowArt,
                                                               fit: BoxFit.cover,
+                                                              word: w.word,
                                                               errorBuilder:
                                                                   (
                                                                     _,
@@ -2312,10 +2332,12 @@ class _QueueSheetState extends State<_QueueSheet> {
                                                                       0xFF111111,
                                                                     ),
                                                                   ),
+                                                              slot: 'practice_player.QueueSheet',
                                                             )
                                                           : EditableImage.asset(
                                                               rowArt,
                                                               fit: BoxFit.cover,
+                                                              word: w.word,
                                                               errorBuilder:
                                                                   (
                                                                     _,
@@ -2459,6 +2481,7 @@ class _YtmCollapsingHero extends StatelessWidget {
     required this.collapse,
     required this.maxHeight,
     required this.art,
+    this.wordName,
     required this.video,
     required this.title,
     required this.subtitle,
@@ -2482,6 +2505,7 @@ class _YtmCollapsingHero extends StatelessWidget {
   final double collapse;
   final double maxHeight;
   final String art;
+  final String? wordName;
   final String video;
   final String title;
   final String subtitle;
@@ -2566,16 +2590,19 @@ class _YtmCollapsingHero extends StatelessWidget {
                 slot: 'practice_player.YtmCollapsingHero',
               )
             else if (art.startsWith('http'))
-              Image.network(
+              EditableImage.network(
                 art,
                 fit: BoxFit.cover,
+                word: wordName,
                 errorBuilder: (_, __, ___) =>
                     const ColoredBox(color: Color(0xFF111111)),
+                slot: 'practice_player.YtmCollapsingHero',
               )
             else
               EditableImage.asset(
                 art,
                 fit: BoxFit.cover,
+                word: wordName,
                 errorBuilder: (_, __, ___) =>
                     const ColoredBox(color: Color(0xFF111111)),
                 slot: 'practice_player.YtmCollapsingHero',

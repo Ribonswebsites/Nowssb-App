@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../data/playback_session.dart';
+import '../data/word_art.dart';
 import 'app_thinking_loader.dart';
 import '../admin/template/editable.dart';
 
@@ -28,12 +29,18 @@ class MiniPlayerPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: PlaybackSession.instance,
+      listenable: Listenable.merge([
+        PlaybackSession.instance,
+        WordArt.instance,
+      ]),
       builder: (context, _) {
         final session = PlaybackSession.instance;
         if (!session.showPill) return const SizedBox.shrink();
-        final art = session.artwork;
-        final title = session.word?.word ?? session.title;
+        final playingWord = session.word?.word;
+        final art = playingWord == null
+            ? session.artwork
+            : WordArt.instance.imageFor(playingWord, session.artwork);
+        final title = playingWord ?? session.title;
         return Material(
           color: Colors.transparent,
           child: GestureDetector(
@@ -69,17 +76,20 @@ class MiniPlayerPill extends StatelessWidget {
                                 child: art.isEmpty
                                     ? const ColoredBox(color: Color(0xFF222228))
                                     : art.startsWith('http')
-                                        ? Image.network(
+                                        ? EditableImage.network(
                                             art,
                                             fit: BoxFit.cover,
+                                            word: playingWord,
                                             errorBuilder: (_, __, ___) =>
                                                 const ColoredBox(
                                               color: Color(0xFF222228),
                                             ),
+                                            slot: 'mini_player_pill.MiniPlayerPill',
                                           )
                                         : EditableImage.asset(
                                             art,
                                             fit: BoxFit.cover,
+                                            word: playingWord,
                                             errorBuilder: (_, __, ___) =>
                                                 const ColoredBox(
                                               color: Color(0xFF222228),

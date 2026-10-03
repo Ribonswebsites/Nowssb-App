@@ -23,10 +23,12 @@ import 'package:record/record.dart';
 
 import '../data/content.dart';
 import '../data/models.dart';
+import '../data/word_art.dart';
 import 'admin_log.dart';
 import 'admin_ui.dart';
 import 'media_upload.dart';
 import '../media/nwsb_video.dart';
+import 'template/media_tune.dart';
 
 String wordKeyFor(String word) =>
     word.trim().toLowerCase().replaceAll(RegExp(r'\s+'), '-').replaceAll(RegExp(r'[^a-z0-9\-]'), '');
@@ -235,6 +237,7 @@ class _WordEditorScreenState extends State<WordEditorScreen> {
   String _gender = 'both';
   String _time = 'any';
   String _audio = '';
+  double _imgZoom = 1;
   String _status = 'shipped';
   int _version = 0;
   bool _hasDraft = false;
@@ -300,6 +303,11 @@ class _WordEditorScreenState extends State<WordEditorScreen> {
           for (final st in m['stages'] as List)
             if (st is Map) _StageRow(st),
       ]);
+    final word = '${m['word'] ?? widget.wordKey ?? ''}';
+    _imgZoom = word.isEmpty ? 1 : WordArt.instance.scaleOf(word);
+    if ((m['imgScale'] is num) && _imgZoom == 1) {
+      _imgZoom = (m['imgScale'] as num).toDouble().clamp(0.5, 2.6);
+    }
     for (final p in _parts) {
       p.dispose();
     }
@@ -374,6 +382,10 @@ class _WordEditorScreenState extends State<WordEditorScreen> {
         await _db.collection('words').doc(_k).set({...m, 'status': 'published', 'version': _version, ..._stamp()});
         if (_hasDraft) await _db.collection('word_drafts').doc(_k).delete();
         await adminLog('word.publish', _k, {'version': _version});
+        final img = '${m['img'] ?? ''}';
+        if (img.isNotEmpty) {
+          await WordArt.instance.set(_k, image: img, scale: _imgZoom, pushHistory: false);
+        }
         _hasDraft = false;
         _status = 'published';
         _msg = 'Published v$_version — every app shows it now.';
@@ -455,6 +467,14 @@ class _WordEditorScreenState extends State<WordEditorScreen> {
         _msg = 'Voice uploaded. Publish to send it to every app.';
       });
 
+  Future<void> _nudgeZoom(double delta) async {
+    final next = (_imgZoom + delta).clamp(0.5, 2.6);
+    setState(() => _imgZoom = next);
+    if (_k.isEmpty) return;
+    await WordArt.instance.set(_k, scale: next, image: _c['img']!.text.trim().isEmpty ? null : _c['img']!.text.trim());
+    if (mounted) setState(() => _imgZoom = WordArt.instance.scaleOf(_k));
+  }
+
   Future<void> _uploadImage() async {
     final f = await pickMedia(context, PickKind.image);
     if (f == null) return;
@@ -462,8 +482,9 @@ class _WordEditorScreenState extends State<WordEditorScreen> {
       if (_k.isEmpty) throw 'Type the word first.';
       final up = await uploadToR2(f, 'image', _k, PickKind.image);
       _c['img']!.text = up.url;
+      await WordArt.instance.set(_k, image: up.url, scale: _imgZoom);
       await adminLog('word.image', _k, {'url': up.url});
-      _msg = 'Picture uploaded. Publish to send it to every app.';
+      _msg = 'Picture saved on this word. Library, meaning, signature and ebook use it.';
     });
   }
 
@@ -772,6 +793,25 @@ class _WordEditorScreenState extends State<WordEditorScreen> {
           _field('categories'),
           _field('price'),
           _field('stage'),
+          MediaTuneBar(
+            zoom: _imgZoom,
+            canUndo: WordArt.instance.canUndo(_k),
+            onUndo: _busy
+                ? null
+                : () async {
+                    final ok = await WordArt.instance.undo(_k);
+                    if (!mounted) return;
+                    final pic = WordArt.instance.imageOf(_k);
+                    setState(() {
+                      _imgZoom = WordArt.instance.scaleOf(_k);
+                      if (pic != null) _c['img']!.text = pic;
+                      _msg = ok ? 'Previous picture restored.' : 'Nothing to undo.';
+                    });
+                  },
+            onZoomOut: _busy ? null : () => _nudgeZoom(-0.15),
+            onZoomIn: _busy ? null : () => _nudgeZoom(0.15),
+          ),
+          const SizedBox(height: 8),
           Row(children: [
             Expanded(child: _field('img')),
             const SizedBox(width: 8),
@@ -784,7 +824,15 @@ class _WordEditorScreenState extends State<WordEditorScreen> {
           if (_c['img']!.text.startsWith('http'))
             Padding(
               padding: const EdgeInsets.only(bottom: 10),
-              child: SizedBox(height: 120, child: Image.network(_c['img']!.text, fit: BoxFit.contain)),
+              child: SizedBox(
+                height: 160,
+                child: ClipRect(
+                  child: Transform.scale(
+                    scale: _imgZoom,
+                    child: Image.network(_c['img']!.text, fit: BoxFit.contain),
+                  ),
+                ),
+              ),
             ),
           _field('images'),
           Align(

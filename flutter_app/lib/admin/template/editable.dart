@@ -24,6 +24,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../data/word_art.dart';
 import '../admin_state.dart';
 import '../layout/scopes.dart';
 import 'slot_keys.dart';
@@ -51,13 +52,31 @@ Widget slotChrome(
   String key,
   SlotType type,
   String def,
-  Widget child,
-) {
+  Widget child, {
+  String? word,
+}) {
   if (EditorPreviewScope.peek(context) != null) {
     return PreviewSlotMarker(slotKey: key, type: type, defaultValue: def, child: child);
   }
   if (!EditMode.instance.on) return child;
-  return SlotBadge(slotKey: key, type: type, defaultValue: def, child: child);
+  return SlotBadge(slotKey: key, type: type, defaultValue: def, word: word, child: child);
+}
+
+/// Zoom stored on the shared word picture, else the zoom saved on this slot.
+double slotZoom(String slotKey, {String? word}) {
+  if (word != null && word.isNotEmpty && WordArt.instance.tracked(word)) {
+    return WordArt.instance.scaleOf(word);
+  }
+  final z = UiOverrides.instance.get(slotKey)?.style['zoom'];
+  if (z is num) return z.toDouble().clamp(0.5, 2.6);
+  return 1;
+}
+
+Widget zoomBox(Widget child, double zoom) {
+  if ((zoom - 1).abs() < 0.02) return child;
+  return ClipRect(
+    child: Transform.scale(scale: zoom, alignment: Alignment.center, child: child),
+  );
 }
 
 /// Fixed copy. Named Label because Flutter already has an `EditableText`.
@@ -163,6 +182,7 @@ class EditableImage extends StatelessWidget {
     this.filterQuality = FilterQuality.medium,
     this.cacheWidth,
     this.cacheHeight,
+    this.word,
   })  : network = false,
         loadingBuilder = null,
         headers = null;
@@ -194,6 +214,7 @@ class EditableImage extends StatelessWidget {
     this.headers,
     this.cacheWidth,
     this.cacheHeight,
+    this.word,
   })  : network = true,
         bundle = null,
         package = null;
@@ -227,12 +248,40 @@ class EditableImage extends StatelessWidget {
   final int? cacheHeight;
   final Map<String, String>? headers;
 
-  String get slotKey => '$slot.${id ?? slotMediaId(source)}';
+  /// When set, this picture is the word's picture. One upload covers every
+  /// place that word is drawn (library, meaning, signature, ebook).
+  final String? word;
 
-  Widget _default() {
+  String get slotKey =>
+      '$slot.${id ?? (word != null && word!.isNotEmpty ? 'word-${WordArt.keyOf(word!)}' : slotMediaId(source))}';
+
+  Widget _picture(String src) {
+    if (src.startsWith('http')) {
+      return Image.network(
+        src,
+        frameBuilder: frameBuilder,
+        loadingBuilder: loadingBuilder,
+        errorBuilder: errorBuilder,
+        semanticLabel: semanticLabel,
+        excludeFromSemantics: excludeFromSemantics,
+        width: width,
+        height: height,
+        color: color,
+        opacity: opacity,
+        colorBlendMode: colorBlendMode,
+        fit: fit,
+        alignment: alignment,
+        repeat: repeat,
+        gaplessPlayback: true,
+        filterQuality: filterQuality,
+        isAntiAlias: isAntiAlias,
+        cacheWidth: cacheWidth,
+        cacheHeight: cacheHeight,
+      );
+    }
     if (network) {
       return Image.network(
-        source,
+        src,
         frameBuilder: frameBuilder,
         loadingBuilder: loadingBuilder,
         errorBuilder: errorBuilder,
@@ -258,7 +307,7 @@ class EditableImage extends StatelessWidget {
       );
     }
     return Image.asset(
-      source,
+      src,
       bundle: bundle,
       frameBuilder: frameBuilder,
       errorBuilder: errorBuilder,
@@ -284,31 +333,61 @@ class EditableImage extends StatelessWidget {
     );
   }
 
+  Widget _painted(String src, UiOverride? replaced) {
+    if (replaced != null) {
+      return Image(
+        image: overrideImageProvider(replaced.url, cacheWidth, cacheHeight),
+        width: width,
+        height: height,
+        fit: fit,
+        alignment: alignment,
+        repeat: repeat,
+        opacity: opacity,
+        semanticLabel: semanticLabel,
+        excludeFromSemantics: excludeFromSemantics,
+        filterQuality: filterQuality,
+        isAntiAlias: isAntiAlias,
+        gaplessPlayback: true,
+        frameBuilder: (context, img, frame, sync) => (frame == null && !sync) ? _picture(src) : img,
+        errorBuilder: (_, __, ___) => _picture(src),
+      );
+    }
+    return _picture(src);
+  }
+
   @override
   Widget build(BuildContext context) {
     UiScope.watch(context);
+    final bound = word;
+    if (bound != null && bound.isNotEmpty) {
+      return ListenableBuilder(
+        listenable: WordArt.instance,
+        builder: (context, _) {
+          final key = slotKey;
+          slotSeen(context, key, SlotType.image, source);
+          final slotPic = mediaOverride(context, key, SlotType.image);
+          final legacy = mediaOverride(context, '$slot.${slotMediaId(source)}', SlotType.image);
+          final seeded = slotPic ?? legacy;
+          final saved = WordArt.instance.imageOf(bound);
+          if ((saved == null || saved.isEmpty) && seeded != null && seeded.url.startsWith('http')) {
+            final url = seeded.url;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              WordArt.instance.set(bound, image: url, pushHistory: false);
+            });
+          }
+          final src = (saved != null && saved.isNotEmpty) ? saved : source;
+          final child = zoomBox(
+            _painted(src, saved != null && saved.isNotEmpty ? null : seeded),
+            WordArt.instance.scaleOf(bound),
+          );
+          return slotChrome(context, key, SlotType.image, source, child, word: bound);
+        },
+      );
+    }
     final key = slotKey;
     slotSeen(context, key, SlotType.image, source);
     final o = mediaOverride(context, key, SlotType.image);
-    final Widget child = o == null
-        ? _default()
-        : Image(
-            image: overrideImageProvider(o.url, cacheWidth, cacheHeight),
-            width: width,
-            height: height,
-            fit: fit,
-            alignment: alignment,
-            repeat: repeat,
-            opacity: opacity,
-            semanticLabel: semanticLabel,
-            excludeFromSemantics: excludeFromSemantics,
-            filterQuality: filterQuality,
-            isAntiAlias: isAntiAlias,
-            gaplessPlayback: true,
-            frameBuilder: (context, img, frame, sync) =>
-                (frame == null && !sync) ? _default() : img,
-            errorBuilder: (_, __, ___) => _default(),
-          );
+    final child = zoomBox(_painted(source, o), slotZoom(key));
     return slotChrome(context, key, SlotType.image, source, child);
   }
 }
@@ -461,11 +540,13 @@ class SlotBadge extends StatelessWidget {
     required this.type,
     required this.defaultValue,
     required this.child,
+    this.word,
   });
 
   final String slotKey;
   final SlotType type;
   final String defaultValue;
+  final String? word;
   final Widget child;
 
   @override
@@ -498,6 +579,7 @@ class SlotBadge extends StatelessWidget {
               slotKey: slotKey,
               type: type,
               defaultValue: defaultValue,
+              word: word,
             ),
             child: Container(
               width: 22,

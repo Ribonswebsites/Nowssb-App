@@ -350,7 +350,7 @@ class _EbookRow extends StatelessWidget {
                   child: SizedBox(
                     width: 92,
                     height: 120,
-                    child: StoreNetImage(url: book.cover),
+                    child: StoreNetImage(url: book.cover, word: book.title),
                   ),
                 ),
                 Container(

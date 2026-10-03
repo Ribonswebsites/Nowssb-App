@@ -9,6 +9,7 @@ import '../../data/store_catalog.dart';
 import '../../data/cart_bag.dart';
 import '../../data/entitlements.dart';
 import '../../data/store_prices.dart';
+import '../../data/word_art.dart';
 import '../../widgets/page_shell.dart';
 import 'store_routes.dart';
 import 'store_select_sheet.dart';
@@ -152,10 +153,26 @@ class StoreProductPage extends StatefulWidget {
 class _StoreProductPageState extends State<StoreProductPage> {
   final _addCartKey = GlobalKey();
 
+  @override
+  void initState() {
+    super.initState();
+    WordArt.instance.addListener(_onArt);
+  }
+
+  @override
+  void dispose() {
+    WordArt.instance.removeListener(_onArt);
+    super.dispose();
+  }
+
+  void _onArt() {
+    if (mounted) setState(() {});
+  }
+
   String get kind => widget.kind;
   String get title => widget.title;
   String get root => widget.root;
-  String get img => widget.img;
+  String get img => WordArt.instance.imageFor(title, widget.img);
   String get _id {
     if (widget.itemId != null) return widget.itemId!;
     final k = kind.toLowerCase();
@@ -216,7 +233,10 @@ class _StoreProductPageState extends State<StoreProductPage> {
                     ),
                     const SizedBox(height: 0),
                   ],
-                  AspectRatio(aspectRatio: 1, child: StoreNetImage(url: img)),
+                  AspectRatio(
+                    aspectRatio: 1,
+                    child: StoreNetImage(url: img, word: title),
+                  ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
                     child: Column(

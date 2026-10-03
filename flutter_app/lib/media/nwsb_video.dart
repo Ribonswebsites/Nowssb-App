@@ -17,9 +17,10 @@ library;
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import '../admin/admin_state.dart';
-import '../admin/template/editable.dart' show slotChrome, slotSeen;
+import '../admin/template/editable.dart' show slotChrome, slotSeen, slotZoom, zoomBox;
 import '../admin/template/slot_keys.dart';
 import '../admin/template/ui_overrides.dart';
+import '../data/word_art.dart';
 import 'video_pool.dart';
 
 class NwsbVideo extends StatefulWidget {
@@ -35,6 +36,7 @@ class NwsbVideo extends StatefulWidget {
     this.showPoster = true,
     this.slot,
     this.id,
+    this.word,
   });
 
   /// Live template editor: where this clip is (`<file>.<Class>` or a
@@ -45,7 +47,11 @@ class NwsbVideo extends StatefulWidget {
   /// Optional exact element name; defaults to the clip's file name.
   final String? id;
 
-  String get slotKey => '${slot ?? 'app'}.${id ?? slotMediaId(asset)}';
+  /// When set, zoom and a replacement clip are shared by this word.
+  final String? word;
+
+  String get slotKey =>
+      '${slot ?? 'app'}.${id ?? (word != null && word!.isNotEmpty ? 'word-${WordArt.keyOf(word!)}' : slotMediaId(asset))}';
 
   /// Bundled path, e.g. 'assets/video/store-section.mp4'.
   final String asset;
@@ -102,9 +108,21 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
   late String _src = _resolve();
 
   String _resolve() {
+    final w = widget.word;
+    if (w != null && w.isNotEmpty) {
+      final shared = WordArt.instance.videoOf(w);
+      if (shared != null && shared.isNotEmpty) {
+        return UiOverrides.instance.fileFor(shared) ?? shared;
+      }
+    }
     final o = UiOverrides.instance.mediaFor(widget.slotKey, SlotType.video);
     if (o == null) return widget.asset;
     return UiOverrides.instance.fileFor(o.url) ?? widget.asset;
+  }
+
+  void _onArt() {
+    _resync();
+    if (mounted) setState(() {});
   }
 
   void _resync() {
@@ -120,6 +138,9 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    if (widget.word != null && widget.word!.isNotEmpty) {
+      WordArt.instance.addListener(_onArt);
+    }
     // Every mounted video is live in the normal home. Keep the legacy flag
     // accepted for compatibility, but do not let it disable playback.
     _take();
@@ -211,9 +232,14 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
     super.didUpdateWidget(old);
     // A changed clip, or the motion switch moving under it. Both are the
     // same thing here: let go of what was held, take what is now wanted.
+    if (old.word != widget.word) {
+      if ((old.word ?? '').isNotEmpty) WordArt.instance.removeListener(_onArt);
+      if ((widget.word ?? '').isNotEmpty) WordArt.instance.addListener(_onArt);
+    }
     if (old.asset != widget.asset ||
         old.loop != widget.loop ||
-        old.slotKey != widget.slotKey) {
+        old.slotKey != widget.slotKey ||
+        old.word != widget.word) {
       _src = _resolve();
       _drop();
       _take();
@@ -235,6 +261,7 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
 
   @override
   void dispose() {
+    if ((widget.word ?? '').isNotEmpty) WordArt.instance.removeListener(_onArt);
     WidgetsBinding.instance.removeObserver(this);
     _drop();
     super.dispose();
@@ -329,7 +356,8 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     slotSeen(context, widget.slotKey, SlotType.video, widget.asset);
-    return slotChrome(context, widget.slotKey, SlotType.video, widget.asset, _clip());
+    final clip = zoomBox(_clip(), slotZoom(widget.slotKey, word: widget.word));
+    return slotChrome(context, widget.slotKey, SlotType.video, widget.asset, clip, word: widget.word);
   }
 
   Widget _clip() {
