@@ -1,27 +1,32 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../../theme/tokens.dart';
 import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
 import '../economy/coupon_screen.dart';
-import '../economy/scratch_card.dart';
 import '../economy/play_billing.dart';
 import '../economy/reward_fx.dart';
 import '../programs/program_kit.dart';
 import '../programs/rewards_program.dart';
+import '../programs/program_heroes.dart';
+import '../programs/program_router.dart';
+import '../../data/practice_progress.dart';
+import '../../shell/nwsb_links.dart';
 import '../../widgets/banner_mix.dart';
 import '../../widgets/brand_top_banner.dart';
-import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/four_banners.dart';
 import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_coin_fly.dart';
 import '../../admin/template/editable.dart';
-import '../../screens/subscription.dart';
 
 class VaultScreen extends StatelessWidget {
-  const VaultScreen({super.key});
+  const VaultScreen({super.key, this.initialTab});
+
+  /// Opens the Rewards page scrolled to one programme tab (e.g. 'wallet').
+  final String? initialTab;
 
   @override
   Widget build(BuildContext context) {
@@ -29,175 +34,204 @@ class VaultScreen extends StatelessWidget {
       goodToKnow: kRewardsDisclaimer,
       title: 'NowssB Rewards',
       mark: NwsbMarks.rewards,
-      child: ListenableBuilder(
-        listenable: EconomyMirror.instance,
-        builder: (context, _) {
-          final w = EconomyMirror.instance;
-          return ListView(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
-            children: [
-              const BrandTopBanner(
-                bare: true,
-                title: 'NowssB Rewards',
-                mark: NwsbMarks.rewards,
-              ),
-              const SizedBox(height: 12),
-              const _TodayCard(),
-              const SizedBox(height: 12),
-              ProgramLink(title: 'NowssB Rewards', sub: 'Every way to earn coins — rules, odds and history', mark: NwsbMarks.rewards, page: () => const RewardsProgramPage()),
-              const SizedBox(height: 12),
-              const FourBanners(
-                splitTitle: 'NowssB Rewards',
-                splitCta: 'Claim today’s coins',
-                blackTitle: 'Your coins',
-                blackSub: 'Earned only. At most 30% of a Play purchase.',
-              ),
-              const SizedBox(height: 12),
+      child: _VaultBody(initialTab: initialTab),
+    );
+  }
+}
+
+class _VaultBody extends StatefulWidget {
+  const _VaultBody({this.initialTab});
+  final String? initialTab;
+  @override
+  State<_VaultBody> createState() => _VaultBodyState();
+}
+
+class _VaultBodyState extends State<_VaultBody> {
+  final _go = ValueNotifier<void Function(String)?>(null);
+
+  @override
+  void dispose() {
+    _go.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
+      children: [
+        const RewardsHero(),
+        const SizedBox(height: 12),
+        BrandTopBanner(
+          bare: true,
+          title: 'NowssB Rewards',
+          mark: NwsbMarks.rewards,
+          onTap: () => _go.value?.call('today'),
+        ),
+        const SizedBox(height: 12),
+        const _TodayCard(),
+        const SizedBox(height: 12),
+        const FourBanners(
+          current: Programme.rewards,
+          splitTitle: 'NowssB Rewards',
+          splitCta: 'Claim today’s coins',
+          blackTitle: 'Your coins',
+          blackSub: 'Earned only. At most 30% of a Play purchase.',
+        ),
+        const SizedBox(height: 12),
+        ListenableBuilder(
+          listenable: EconomyMirror.instance,
+          builder: (context, _) {
+            final w = EconomyMirror.instance;
+            return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
               CoinCount(value: w.coins),
               Text('${w.plan} · streak ${w.streak} · ${w.freezesLeft} freezes left', style: const TextStyle(color: NwsbColors.mist)),
-              const SizedBox(height: 12),
-              const EconomyNote(
-                'Coins are earned. They cover at most 30% of a Play purchase. They cannot be bought, gifted, or cashed out.',
-              ),
-              const SizedBox(height: 12),
-              const EconomyNote(
-                'Invite a friend once. If they subscribe, you get one free month when you have no plan, or coins when you already do. No tiers and no ongoing percent — that lives in NowssB Earn.',
-              ),
-              const SizedBox(height: 18),
-              const EditableLabel('vault_screen.VaultScreen', 'QUESTS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.4, fontSize: 12)),
-              const SizedBox(height: 8),
-              _quest(context, 'practice5', 'Practice 5 words', w.practice, 5, 25),
-              _quest(context, 'streak3', 'Hold a 3-day streak', w.streak, 3, 30),
-              _quest(context, 'listen1', 'Open the player', w.playerOpens, 1, 15),
-              _quest(context, 'buy1', 'Complete one purchase', w.purchases, 1, 20),
-              const SizedBox(height: 18),
-              const BannerMix(seed: 4),
-              const SizedBox(height: 18),
-              const EditableLabel('vault_screen.VaultScreen', 'COIN SPENDS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.4, fontSize: 12)),
-              const SizedBox(height: 8),
-              SizedBox(
-                height: 132,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    _spend(context, 'Streak freeze · 40', 'freeze'),
-                    _spend(context, 'Practice credit · 15', 'practice'),
-                    _spend(context, 'Early access · 50', 'early'),
-                    _spend(context, 'Gold frame · 80', 'cosmetic', {'cosmeticId': 'frame_gold'}),
-                    _spend(context, 'Verified buyer badge · 30', 'badge', {'badge': 'verified-buyer'}),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 18),
-              const EditableLabel('vault_screen.VaultScreen', 'PLAY PURCHASES', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.4, fontSize: 12)),
-              const SizedBox(height: 8),
-              _buy(context, 'Word', 'nwsb_word', 99, 'word', 'Word', NwsbMarks.word),
-              _buy(context, 'Meaning', 'nwsb_meaning', 99, 'meaning', 'Meaning', NwsbMarks.meaning),
-              _buy(context, '10-word bundle', 'nwsb_bundle_10', 999, 'bundle', '10-word bundle', NwsbMarks.book),
-              _buy(context, 'Meaning package', 'nwsb_package', 399, 'package', 'Meaning package', NwsbMarks.ebook),
-              BlackOffer(
-                title: 'Plans',
-                mark: NwsbMarks.crown,
-                line: '0 of 1 · Resonance, Frequency, Frequency X',
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute<void>(builder: (_) => const SubscriptionScreen()),
-                ),
-              ),
-              _buy(context, 'Restore streak', 'nwsb_streak_restore', 99, 'streak', 'Streak restore', NwsbMarks.flame),
-              const SizedBox(height: 18),
-              const EditableLabel('vault_screen.VaultScreen', 'MILESTONE CHEST', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.4, fontSize: 12)),
-              const SizedBox(height: 8),
-              const _MilestoneForm(),
-              const SizedBox(height: 12),
-              Text('Practice credits ${w.practiceCredits}', style: const TextStyle(color: NwsbColors.mist, fontSize: 12)),
-            ],
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _quest(BuildContext context, String id, String title, int value, int goal, int reward) {
-    final frac = goal == 0 ? 0.0 : (value / goal).clamp(0, 1).toDouble();
-    final left = (goal - value).clamp(0, goal);
-    final done = value >= goal;
-    final mark = switch (id) {
-      'practice5' => NwsbMarks.stages,
-      'streak3' => NwsbMarks.flame,
-      'listen1' => NwsbMarks.sound,
-      _ => NwsbMarks.bag,
-    };
-    return BlackOffer(
-      title: title,
-      mark: mark,
-      progress: frac,
-      line: '$value of $goal done · $left left · $reward coins',
-      onTap: done
-          ? () => runReward(context, () => EconomyApi.call('claimQuest', {'kind': 'starter', 'id': id}), title: title)
-          : null,
-    );
-  }
-
-  Widget _spend(BuildContext context, String label, String purpose, [Map<String, dynamic>? extra]) {
-    final cost = int.tryParse(label.split('·').last.trim()) ?? 0;
-    final have = EconomyMirror.instance.coins;
-    return Padding(
-      padding: const EdgeInsets.only(right: 10),
-      child: GestureDetector(
-        onTap: () async {
-          final r = await runReward(context, () => EconomyApi.call('spendCoins', {'purpose': purpose, ...?extra}));
-          if (r != null && context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Spent ${r['spent'] ?? cost} coins.')));
-          }
-        },
-        child: GlassWrap(
-          margin: EdgeInsets.zero,
-          child: SizedBox(
-            width: 150,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(label.split('·').first.trim(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
-                const Spacer(),
-                Text('$cost coins', style: const TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w800)),
-                Text(
-                  have >= cost ? 'You have $have' : 'Need ${cost - have} more',
-                  style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12),
-                ),
-              ],
-            ),
-          ),
+            ]);
+          },
         ),
-      ),
+        const SizedBox(height: 12),
+        const EconomyNote(
+          'Coins are earned. They cover at most 30% of a Play purchase. They cannot be bought, gifted, or cashed out.',
+        ),
+        const SizedBox(height: 12),
+        const EconomyNote(
+          'Invite a friend once. If they subscribe, you get one free month when you have no plan, or coins when you already do. No tiers and no ongoing percent — that lives in NowssB Earn.',
+        ),
+        const SizedBox(height: 18),
+        const EditableLabel('vault_screen.VaultScreen', 'QUESTS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.4, fontSize: 12)),
+        const SizedBox(height: 8),
+        const _StarterQuests(),
+        const SizedBox(height: 18),
+        const BannerMix(seed: 4),
+        const SizedBox(height: 18),
+        const EditableLabel('vault_screen.VaultScreen', 'COIN SPENDS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.4, fontSize: 12)),
+        const SizedBox(height: 8),
+        const _SpendRail(),
+        const SizedBox(height: 18),
+        const EditableLabel('vault_screen.VaultScreen', 'PLAY PURCHASES', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.4, fontSize: 12)),
+        const SizedBox(height: 8),
+        BlackOffer(title: 'Words', mark: NwsbMarks.word, line: 'Every word, priced on Google Play', onTap: () => NwsbLinks.tab(context, 3)),
+        BlackOffer(title: 'Meanings', mark: NwsbMarks.meaning, line: 'The meaning store', onTap: () => NwsbLinks.meanings(context)),
+        BlackOffer(title: 'Ebooks', mark: NwsbMarks.ebook, line: 'The ebook store', onTap: () => NwsbLinks.ebooks(context)),
+        BlackOffer(
+          title: 'Plans',
+          mark: NwsbMarks.crown,
+          line: 'Resonance, Frequency, Frequency X',
+          onTap: () => NwsbLinks.subscription(context),
+        ),
+        const _PlayBuy(label: 'Restore streak', catalogId: 'nwsb_streak_restore', mark: NwsbMarks.flame),
+        const SizedBox(height: 18),
+        const EditableLabel('vault_screen.VaultScreen', 'MILESTONE CHEST', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.4, fontSize: 12)),
+        const SizedBox(height: 8),
+        const _MilestoneForm(),
+        const SizedBox(height: 12),
+        ListenableBuilder(
+          listenable: EconomyMirror.instance,
+          builder: (context, _) => Text('Practice credits ${EconomyMirror.instance.practiceCredits}', style: const TextStyle(color: NwsbColors.mist, fontSize: 12)),
+        ),
+        const SizedBox(height: 18),
+        ProgramTabsBlock(spec: kRewardsSpec, initialTab: widget.initialTab, scrollTo: widget.initialTab != null, goRef: _go, showDisclaimer: false),
+      ],
     );
   }
+}
 
-  Widget _buy(BuildContext context, String label, String catalogId, int price, String kind, String title, String mark) {
-    return FutureBuilder<String>(
-      future: PlayCheckout.priceLabel(catalogId),
-      builder: (context, snap) {
-        final priceLabel = snap.data ?? 'Play price';
-        return BlackOffer(
-          title: label,
-          mark: mark,
-          line: '0 of 1 · $priceLabel',
+/// Starter quests straight from the server summary (titles, goals, coins).
+class _StarterQuests extends StatelessWidget {
+  const _StarterQuests();
+
+  @override
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: EconomyMirror.instance,
+        builder: (context, _) {
+          final q = sMap(EconomyMirror.instance.summary['quests']);
+          final list = sList(q['starter']);
+          if (list.isEmpty) {
+            return const EconomyNote('Starter quests are done. Weekly and monthly quests are in the Quests tab below.');
+          }
+          return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            for (final x in list)
+              BlackOffer(
+                title: '${x['title'] ?? 'Quest'}',
+                mark: NwsbMarks.rewards,
+                progress: sNum(x['goal']) <= 0 ? 0 : (sNum(x['value']) / sNum(x['goal'])).clamp(0, 1).toDouble(),
+                line: x['claimed'] == true
+                    ? 'Claimed · +${sInt(x['coins'])} coins'
+                    : '${sInt(x['value'])} of ${sInt(x['goal'])} done · +${sInt(x['coins'])} coins',
+                onTap: x['claimed'] != true && sNum(x['value']) >= sNum(x['goal'])
+                    ? () => runReward(context, () => EconomyApi.call('claimQuest', {'kind': 'starter', 'id': x['id']}), title: '${x['title']}')
+                    : null,
+              ),
+          ]);
+        },
+      );
+}
+
+/// Coin spends priced by the server config (rewards.spend).
+class _SpendRail extends StatelessWidget {
+  const _SpendRail();
+
+  @override
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: EconomyMirror.instance,
+        builder: (context, _) {
+          final m = EconomyMirror.instance;
+          final spend = sMap(sMap(sMap(m.summary['config'])['rewards'])['spend']);
+          if (spend.isEmpty) return const EconomyNote('Coin spends load with your wallet.');
+          final have = m.coins;
+          return Wrap(spacing: 10, runSpacing: 10, children: [
+            for (final e in spend.entries)
+              Builder(builder: (context) {
+                final item = sMap(e.value);
+                final cost = sInt(item['coins']);
+                return GestureDetector(
+                  onTap: () => runReward(context, () => EconomyApi.call('spendCoins', {'item': e.key}), title: '${item['title'] ?? 'Coins spent'}'),
+                  child: GlassWrap(
+                    margin: EdgeInsets.zero,
+                    child: SizedBox(
+                      width: 140,
+                      height: 92,
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text('${item['title'] ?? e.key}', maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+                        const Spacer(),
+                        Text('$cost coins', style: const TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w800)),
+                        Text(have >= cost ? 'You have $have' : 'Need ${cost - have} more', style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12)),
+                      ]),
+                    ),
+                  ),
+                );
+              }),
+          ]);
+        },
+      );
+}
+
+/// One Play product with its real store price (future cached once).
+class _PlayBuy extends StatefulWidget {
+  const _PlayBuy({required this.label, required this.catalogId, required this.mark});
+  final String label;
+  final String catalogId;
+  final String mark;
+  @override
+  State<_PlayBuy> createState() => _PlayBuyState();
+}
+
+class _PlayBuyState extends State<_PlayBuy> {
+  late final Future<String> _price = PlayCheckout.priceLabel(widget.catalogId);
+
+  @override
+  Widget build(BuildContext context) => FutureBuilder<String>(
+        future: _price,
+        builder: (context, snap) => BlackOffer(
+          title: widget.label,
+          mark: widget.mark,
+          line: snap.data ?? 'Google Play price',
           onTap: () => runPrivate(context, () async {
-            // Server checkout: friend discount → coupon → coins (capped),
-            // the rest on Google Play. Items land only after Play clears.
-            final Map<String, dynamic> r = kind == 'streak'
-                ? await PlayCheckout.purchase({'kind': 'product', 'productId': catalogId})
-                : await PlayCheckout.purchase({
-                    'kind': 'cart',
-                    'items': [
-                      {'id': catalogId, 'kind': kind, 'title': title, 'price': price, 'qty': 1},
-                    ],
-                  });
+            final r = await PlayCheckout.purchase({'kind': 'product', 'productId': widget.catalogId});
             if (context.mounted) await celebrate(context, r, title: 'Thank you');
           }),
-        );
-      },
-    );
-  }
+        ),
+      );
 }
 
 class _TodayCard extends StatefulWidget {
@@ -211,7 +245,6 @@ class _TodayCardState extends State<_TodayCard> {
   String? _note;
 
   Future<void> _claim() async {
-    final before = EconomyMirror.instance.coins;
     try {
       final gained = await EconomyApi.claimToday();
       if (!mounted) return;
@@ -219,14 +252,7 @@ class _TodayCardState extends State<_TodayCard> {
       setState(() => _note = gained > 0
           ? '+$gained coins landed on this wallet.'
           : 'Today’s coins are already on the wallet.');
-      if (gained > 0 && mounted) {
-        await NwsbCoinFly.show(
-          context,
-          coins: gained,
-          from: before,
-          to: after,
-        );
-      }
+      if (gained > 0) unawaited(playCoins(context, gained, balanceAfter: after, title: 'Today’s coins'));
     } on EconomyException catch (e) {
       if (!mounted) return;
       final raw = e.message.toUpperCase();
@@ -236,18 +262,12 @@ class _TodayCardState extends State<_TodayCard> {
     }
   }
 
-  Future<void> _scratch() async {
-    try {
-      final result = await EconomyApi.call('scratchCoupon');
-      if (!mounted) return;
-      await celebrate(context, result);
-    } on EconomyException catch (e) {
-      if (mounted) setState(() => _note = EconomyApi.isMissing(e) ? EconomyApi.switchingOnMessage : e.message);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    return ListenableBuilder(listenable: EconomyMirror.instance, builder: (context, _) => _card(context));
+  }
+
+  Widget _card(BuildContext context) {
     final w = EconomyMirror.instance;
     final claimed = w.loginToday;
     return GlassWrap(
@@ -296,9 +316,7 @@ class _TodayCardState extends State<_TodayCard> {
           GoldButton(
             label: 'Open today’s coupon',
             filled: false,
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(builder: (_) => const CouponScreen()),
-            ),
+            onTap: () => Programmes.open(context, Programme.coupons),
           ),
           const SizedBox(height: 14),
           const EditableLabel('vault_screen.TodayCard',
@@ -306,30 +324,8 @@ class _TodayCardState extends State<_TodayCard> {
             style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontSize: 12, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 8),
-          if (w.scratchToday)
-            const EditableLabel('vault_screen.TodayCard',
-              'Today’s coupon is already open.',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
-            )
-          else
-            NwsbScratchCard(
-              onCleared: _scratch,
-              prize: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const NwsbCoinDisc(size: 64),
-                  const SizedBox(height: 8),
-                  Text(
-                    '+${12 + DateTime.now().day % 18}',
-                    style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w800),
-                  ),
-                  const EditableLabel('vault_screen.TodayCard',
-                    'NOWSSB COINS',
-                    style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 2, fontWeight: FontWeight.w700, fontSize: 12),
-                  ),
-                ],
-              ),
-            ),
+          // The one real daily card: persistent, never re-seals.
+          const DailyScratchCard(),
           const SizedBox(height: 14),
           const EditableLabel('vault_screen.TodayCard',
             'GIFT',
@@ -351,56 +347,67 @@ class _MilestoneForm extends StatefulWidget {
 }
 
 class _MilestoneFormState extends State<_MilestoneForm> {
-  final _word = TextEditingController();
+  String? _word;
   int _level = 1;
 
   @override
-  void dispose() {
-    _word.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        TextField(
-          controller: _word,
-          style: const TextStyle(color: Colors.white),
-          decoration: const InputDecoration(
-            hintText: 'Word id',
-            hintStyle: TextStyle(color: NwsbColors.mist),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Row(
+    return ListenableBuilder(
+      listenable: PracticeProgress.instance,
+      builder: (context, _) {
+        // Only words actually practised on this phone can be picked.
+        final words = <String>{
+          for (final x in PracticeProgress.instance.sessionsSnapshot)
+            if ('${x['word'] ?? ''}'.trim().isNotEmpty) '${x['word']}'.trim(),
+        }.take(24).toList();
+        if (words.isEmpty) {
+          return const EconomyNote('Practise a word in the player first. Its mastery chest opens here.');
+        }
+        final pick = _word != null && words.contains(_word) ? _word! : words.first;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Expanded(
-              child: Slider(
-                value: _level.toDouble(),
-                min: 1,
-                max: 10,
-                divisions: 9,
-                label: '$_level',
-                onChanged: (v) => setState(() => _level = v.round()),
-              ),
+            Wrap(spacing: 8, runSpacing: 8, children: [
+              for (final w in words)
+                ChoiceChip(
+                  label: Text(w),
+                  selected: w == pick,
+                  onSelected: (_) => setState(() => _word = w),
+                  labelStyle: TextStyle(color: w == pick ? Colors.black : Colors.white, fontWeight: FontWeight.w700),
+                  selectedColor: NwsbColors.goldLight,
+                  backgroundColor: const Color(0x14FFFFFF),
+                  side: const BorderSide(color: Color(0x44E4C56A)),
+                  shape: const StadiumBorder(),
+                  showCheckmark: false,
+                ),
+            ]),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: Slider(
+                    value: _level.toDouble(),
+                    min: 1,
+                    max: 10,
+                    divisions: 9,
+                    label: '$_level',
+                    onChanged: (v) => setState(() => _level = v.round()),
+                  ),
+                ),
+                Text('Lv $_level', style: const TextStyle(color: NwsbColors.goldLight)),
+              ],
             ),
-            Text('Lv $_level', style: const TextStyle(color: NwsbColors.goldLight)),
+            GoldButton(
+              label: 'Open chest · ${_level * 5} coins',
+              filled: false,
+              onTap: () => runReward(context, () => EconomyApi.call('claimMilestone', {
+                    'wordId': pick.toLowerCase(),
+                    'level': _level,
+                  }), title: 'Mastery chest'),
+            ),
           ],
-        ),
-        GoldButton(
-          label: 'Open chest · ${_level * 5} coins',
-          filled: false,
-          onTap: () async {
-            final word = _word.text.trim();
-            if (word.isEmpty) return;
-            await runReward(context, () => EconomyApi.call('claimMilestone', {
-                  'wordId': word,
-                  'level': _level,
-                }));
-          },
-        ),
-      ],
+        );
+      },
     );
   }
 }

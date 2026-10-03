@@ -78,7 +78,10 @@ import '../widgets/nwsb_icon.dart';
 import 'app_settings.dart';
 import '../features/earn/earn_home_sections.dart';
 import '../features/earn/earn_hub_screen.dart';
-import '../features/economy/coupon_screen.dart';
+import '../features/programs/program_router.dart';
+import '../shell/nwsb_links.dart';
+import 'features_page.dart';
+import '../widgets/home_keep_alive.dart';
 import 'store/meaning_store.dart';
 
 /// `REG.fash.items` — app/js/part062.js:107-148, key for key and in order.
@@ -90,7 +93,6 @@ import 'store/meaning_store.dart';
 const kFashionSectionOrder = <String>[
   'greet',
   'herorow',
-  'roundring',
   'practice',
   'routineCards',
   'coachCards',
@@ -116,6 +118,7 @@ const kFashionSectionOrder = <String>[
   'edition',
   'routines',
   'offer',
+  'roundring',
   'cube',
   'shabda',
   'ebooks',
@@ -189,17 +192,29 @@ class _HomeFashionState extends State<HomeFashion> {
   void initState() {
     super.initState();
     ContentStore.instance.addListener(_onContent);
-    Settings.instance.addListener(_onContent);
+    Settings.instance.addListener(_onSettings);
   }
 
   @override
   void dispose() {
     ContentStore.instance.removeListener(_onContent);
-    Settings.instance.removeListener(_onContent);
+    Settings.instance.removeListener(_onSettings);
     super.dispose();
   }
 
+  // Rebuild Home only when what it shows changes (the library arriving,
+  // or a home setting), not on every progress tick.
+  Object? _lib;
+  int _libLen = -1;
   void _onContent() {
+    final lib = ContentStore.instance.library;
+    if (identical(lib, _lib) && lib.length == _libLen) return;
+    _lib = lib;
+    _libLen = lib.length;
+    if (mounted) setState(() {});
+  }
+
+  void _onSettings() {
     if (mounted) setState(() {});
   }
 
@@ -326,12 +341,15 @@ class _HomeFashionState extends State<HomeFashion> {
       case 'subscribe':
         _push(const SubscriptionScreen());
       case 'word-science':
+        _push(const AboutNowssbScreen(science: true));
       case 'about':
-        _go(2);
+        _push(const AboutNowssbScreen());
+      case 'features':
+        _push(const FeaturesPage());
       case 'widgets':
         _push(const WidgetsPage());
       case 'connect':
-        _go(0);
+        NwsbLinks.connect(context);
       default:
         _go(2);
     }
@@ -340,12 +358,13 @@ class _HomeFashionState extends State<HomeFashion> {
   void _footerLink(String key) {
     switch (key) {
       case 'about':
+        _push(const AboutNowssbScreen());
       case 'word-science':
-        _go(2);
+        _push(const AboutNowssbScreen(science: true));
       case 'sound-library':
         _push(const SoundLibraryScreen());
       case 'meaning-store':
-        _go(3);
+        _push(const MeaningStoreScreen());
       case 'practice':
         _go(1);
       case 'profile':
@@ -361,11 +380,10 @@ class _HomeFashionState extends State<HomeFashion> {
           'herorow',
           FashHeroRow(
             onCustomize: () => _push(const WidgetsPage()),
-            onFeatures: () => _push(const WidgetsPage()),
+            onFeatures: () => _push(const FeaturesPage()),
             onEarn: () => _push(const EarnHubScreen()),
           ),
         ),
-        ('roundring', const RoundRingSection()),
         (
           'practice',
           Column(
@@ -461,10 +479,10 @@ class _HomeFashionState extends State<HomeFashion> {
               padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
               child: BlackGlassBanner(
                 margin: EdgeInsets.zero,
-                title: 'NowssB Coupons',
-                subtitle: 'The codes are in the section under the tabs.',
-                mark: NwsbMarks.coupon,
-                onTap: () => _push(const CouponScreen()),
+                title: 'NowssB Rewards',
+                subtitle: 'Your streak, quests and season.',
+                mark: NwsbMarks.rewards,
+                onTap: () => Programmes.open(context, Programme.rewards, tab: 'streaks'),
               ),
             ),
             FashStreak(onTap: () => _go(1)),
@@ -535,33 +553,30 @@ class _HomeFashionState extends State<HomeFashion> {
             EditionSection(onTap: () => _push(const SubscriptionScreen())),
             const SizedBox(height: 24),
             const PartnerHomeSection(),
+            const SizedBox(height: 24),
+            const YourRewardsSection(),
           ])
         ),
-        ('routines', Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          RoutinesSection(onTap: () => _go(1), fashion: true),
-          const SizedBox(height: 24),
-          const YourRewardsSection(),
-        ])),
+        ('routines', RoutinesSection(onTap: () => _go(1), fashion: true)),
         ('offer', Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           FashOffer(onTap: () => _go(3)),
           const SizedBox(height: 24),
           const GiftsHomeSection(),
         ])),
-        (
-          'cube',
+        // NowssB Coupons: below NowssB Gifts, a contained glass block.
+        ('roundring', const RoundRingSection()),
+        ('cube', Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           QuickAccessSection(
-            onCart: () => _go(3),
-            onWishlist: () => _go(3),
+            onCart: () => NwsbLinks.cart(context),
+            onWishlist: () => NwsbLinks.wishlist(context),
             onOrders: () => _go(4),
           ),
-        ),
-        ('shabda', Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          FashShabdapathy(onTap: () => _go(2)),
           const SizedBox(height: 24),
           const ReferenceHomeSection(),
         ])),
-        ('ebooks', EbooksSection(onTap: () => _go(2))),
-        ('connectban', ConnectBannerSection(onTap: () => _go(0))),
+        ('shabda', FashShabdapathy(onTap: () => _go(2))),
+        ('ebooks', EbooksSection(onTap: () => _push(const EbooksStoreScreen()))),
+        ('connectban', ConnectBannerSection(onTap: () => NwsbLinks.connect(context))),
         (
           'healing',
           HealingSection(
@@ -639,7 +654,7 @@ class _HomeFashionState extends State<HomeFashion> {
               ),
               FashionHero(
                 onExplore: () => _go(2),
-                onGuide: () => _push(const WidgetsPage()),
+                onGuide: () => _push(const FeaturesPage()),
                 onSearch: () => showDestinationSearchSheet(
                   context,
                   onSelect: _openSearchDest,
@@ -757,7 +772,7 @@ class _HomeFashionState extends State<HomeFashion> {
                   // Footer carries solid-black bottom clearance (no video bleed).
                   padding: EdgeInsets.zero,
                   itemCount: shown.length,
-                  itemBuilder: (context, i) => shown[i],
+                  itemBuilder: (context, i) => HomeKeepAlive(child: shown[i]),
                 ),
               ),
             ],

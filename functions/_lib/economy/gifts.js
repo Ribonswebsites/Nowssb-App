@@ -2,7 +2,7 @@
    cooling-off window) and the gift history. Free time gifts live in
    rewards.js (daily box, weekly/monthly gift). Coins are never giftable. */
 import { DAY, rand } from './rules.js';
-import { P, bump, fail, grantPrize, inTx, notify, wallet } from './core.js';
+import { P, bump, fail, grantPrize, inTx, notify, prizeLabel, wallet } from './core.js';
 import { checkBadges } from './rewards.js';
 
 const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -56,8 +56,12 @@ async function redeemAdminGift(ctx, uid, code) {
     const exp = typeof g.expiresAt === 'number' ? g.expiresAt : Date.parse(g.expiresAt || '') || 0;
     if (exp && exp < s.now) fail('This gift expired.');
     if (g.recipientEmail) {
-      const u = (await s.doc(P.user(uid))) || {};
-      if (String(u.email || '').toLowerCase() !== String(g.recipientEmail).toLowerCase()) fail('This gift code was made for a different account.', 403, 'permission-denied');
+      // The verified email on the sign-in token, never users/{uid}.email
+      // (that field is editable by the account itself).
+      const c = ctx.claims || {};
+      const email = c.email && c.email_verified === true ? String(c.email).toLowerCase() : '';
+      if (!email) fail('Verify your email address to open this gift.', 403, 'permission-denied');
+      if (email !== String(g.recipientEmail).trim().toLowerCase()) fail('This gift code was made for a different account.', 403, 'permission-denied');
     }
     const prize = ADMIN_GIFT_PRIZES[g.item || g.itemId];
     if (!prize) fail('This gift holds something the app does not know yet. Update NowssB.');
@@ -101,6 +105,24 @@ export async function redeemGift(ctx, uid, data) {
     await bump(s, uid, 'gifts_received');
     s.effect({ kind: 'giftopen', title: g.title, design: g.design, label: granted.label });
     return { title: g.title, message: g.message, fromName: g.fromName, design: g.design, granted };
+  });
+}
+
+/** Look inside a gift code before opening it (read-only; nothing moves). */
+export async function peekGift(ctx, uid, data) {
+  const code = String((data && data.code) || '').toUpperCase().replace(/\s+/g, '');
+  return inTx(ctx, async (s) => {
+    if (/^GFT[A-Z0-9]{4,16}$/.test(code)) {
+      const g = await s.doc(`gifts/${code}`);
+      if (!g) fail('That gift code was not found.', 404, 'not-found');
+      const prize = ADMIN_GIFT_PRIZES[g.item || g.itemId];
+      return { code, title: g.label || 'A gift from NowssB', fromName: 'NowssB', message: g.note || '', inside: prize ? prizeLabel(prize) : (g.label || 'A gift'), status: g.status === 'unredeemed' ? 'ready' : g.status, mine: g.redeemedBy === uid };
+    }
+    if (!/^NWSB-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(code)) fail('Gift codes look like NWSB-XXXX-XXXX.', 400, 'invalid-argument');
+    const g = await s.doc(`giftCards/${code}`);
+    if (!g) fail('That gift code was not found.', 404, 'not-found');
+    const status = g.status !== 'active' ? g.status : g.expiresAt < s.now ? 'expired' : g.deliverAt > s.now || g.redeemableAt > s.now ? 'later' : 'ready';
+    return { code, title: g.title, fromName: g.fromName || '', message: g.message || '', design: g.design || 'gold', inside: g.item ? prizeLabel(g.item) : g.title, status, opensAt: Math.max(g.deliverAt || 0, g.redeemableAt || 0) || null, mine: g.redeemedBy === uid, yours: g.fromUid === uid };
   });
 }
 

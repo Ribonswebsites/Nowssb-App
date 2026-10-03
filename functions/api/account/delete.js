@@ -3,7 +3,7 @@
      Authorization: Bearer <Firebase ID token of the account to delete>
 
    With FIREBASE_SERVICE_ACCOUNT set: deletes the person's Firestore data
-   (users/{uid} and every sub-collection under it, publicProfiles/{uid},
+   (users/{uid} and every sub-collection under it at any depth, profiles/{uid}, publicProfiles/{uid},
    follows/{uid}, accountDeletionRequests/{uid}) and then the Firebase Auth
    account itself (identitytoolkit accounts:delete). Purchase receipts and
    ledgers that the law or Google Play require us to keep (payments, sales,
@@ -18,20 +18,32 @@ export async function onRequestOptions({ request }) {
   return new Response(null, { status: 204, headers: cors(request) });
 }
 
-async function listDocs(tok, docPath) {
-  // Every document directly under each sub-collection of docPath (one level).
+async function listDocs(tok, docPath, depth = 0, out = []) {
+  // Every document under every sub-collection of docPath, all the way down
+  // (coach conversations → messages, etc.). showMissing finds documents that
+  // only exist as parents of deeper data.
   const base = 'https://firestore.googleapis.com/v1/';
-  const out = [];
-  const ids = await fetch(`${base}${docPath}:listCollectionIds`, {
-    method: 'POST', headers: { Authorization: 'Bearer ' + tok, 'Content-Type': 'application/json' }, body: JSON.stringify({ pageSize: 100 }),
-  }).then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
-  for (const col of ids.collectionIds || []) {
+  if (depth > 6 || out.length > 20000) return out;
+  const cols = [];
+  let cpage = '';
+  for (let i = 0; i < 10; i++) {
+    const ids = await fetch(`${base}${docPath}:listCollectionIds`, {
+      method: 'POST', headers: { Authorization: 'Bearer ' + tok, 'Content-Type': 'application/json' }, body: JSON.stringify({ pageSize: 100, ...(cpage ? { pageToken: cpage } : {}) }),
+    }).then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
+    cols.push(...(ids.collectionIds || []));
+    if (!ids.nextPageToken) break;
+    cpage = ids.nextPageToken;
+  }
+  for (const col of cols) {
     let page = '';
-    for (let i = 0; i < 20; i++) {
-      const r = await fetch(`${base}${docPath}/${col}?pageSize=300&mask.fieldPaths=__name__${page ? '&pageToken=' + page : ''}`, { headers: { Authorization: 'Bearer ' + tok } });
+    for (let i = 0; i < 40; i++) {
+      const r = await fetch(`${base}${docPath}/${col}?pageSize=300&showMissing=true&mask.fieldPaths=__name__${page ? '&pageToken=' + page : ''}`, { headers: { Authorization: 'Bearer ' + tok } });
       if (!r.ok) break;
       const d = await r.json();
-      for (const doc of d.documents || []) out.push(doc.name);
+      for (const doc of d.documents || []) {
+        await listDocs(tok, doc.name, depth + 1, out);
+        out.push(doc.name);
+      }
       if (!d.nextPageToken) break;
       page = d.nextPageToken;
     }
@@ -66,6 +78,9 @@ export async function onRequestPost({ request, env }) {
       ...(await listDocs(tok, userDoc)),
       `${userDoc}`,
       `projects/${project}/databases/(default)/documents/publicProfiles/${uid}`,
+      // Word Print's world-readable profile (social.js writes it).
+      ...(await listDocs(tok, `projects/${project}/databases/(default)/documents/profiles/${uid}`)),
+      `projects/${project}/databases/(default)/documents/profiles/${uid}`,
       `projects/${project}/databases/(default)/documents/accountDeletionRequests/${uid}`,
       ...(await listDocs(tok, `projects/${project}/databases/(default)/documents/follows/${uid}`)),
     ];

@@ -23,9 +23,14 @@ import '../economy/money.dart';
 import '../../admin/template/editable.dart';
 import '../programs/program_kit.dart';
 import '../programs/earn_program.dart';
+import '../programs/program_heroes.dart';
+import '../programs/program_router.dart';
 
 class CircleScreen extends StatefulWidget {
-  const CircleScreen({super.key});
+  const CircleScreen({super.key, this.initialTab});
+
+  /// Opens scrolled to one programme tab (e.g. 'payouts').
+  final String? initialTab;
 
   @override
   State<CircleScreen> createState() => _CircleScreenState();
@@ -33,13 +38,19 @@ class CircleScreen extends StatefulWidget {
 
 class _CircleScreenState extends State<CircleScreen> {
   final _code = TextEditingController();
+  // The welcome note shows once per app run, not on every visit.
+  static bool _welcomed = false;
+  late final Widget _tabs = ProgramTabsBlock(spec: kEarnSpec, initialTab: widget.initialTab, scrollTo: widget.initialTab != null, showDisclaimer: false);
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _welcome();
-    });
+    if (!_welcomed && widget.initialTab == null) {
+      _welcomed = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _welcome();
+      });
+    }
   }
 
   @override
@@ -129,6 +140,8 @@ class _CircleScreenState extends State<CircleScreen> {
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
             children: [
+              const EarnHero(),
+              const SizedBox(height: 12),
               BrandTopBanner(
                 bare: true,
                 title: 'NowssB Earn',
@@ -140,9 +153,7 @@ class _CircleScreenState extends State<CircleScreen> {
               const SizedBox(height: 12),
               const CoinCollectCard(pageKey: 'earn', amount: 10, title: 'Earn coins'),
               const SizedBox(height: 12),
-              ProgramLink(title: 'NowssB Earn program', sub: 'Team, appointments, ranks, payouts', mark: NwsbMarks.piggy, page: () => const EarnProgramPage()),
-              const SizedBox(height: 12),
-              const TrioRail(),
+              const TrioRail(current: Programme.earn),
               const SizedBox(height: 14),
               GlassWrap(
                 margin: EdgeInsets.zero,
@@ -357,11 +368,7 @@ class _CircleScreenState extends State<CircleScreen> {
                 const EconomyNote('Sign in to see referral payments.')
               else
                 StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                  stream: FirebaseFirestore.instance
-                      .collection('referralLedger')
-                      .where('referrerUid', isEqualTo: w.uid)
-                      .limit(20)
-                      .snapshots(),
+                  stream: _refLedger(w.uid!),
                   builder: (context, snap) {
                     final docs = snap.data?.docs ?? [];
                     if (docs.isEmpty) return const EconomyNote('No referral payments yet.');
@@ -383,6 +390,8 @@ class _CircleScreenState extends State<CircleScreen> {
               const EditableLabel('circle_screen.CircleScreen', 'AGENT TIERS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12)),
               const SizedBox(height: 8),
               const _TierRail(),
+              const SizedBox(height: 18),
+              _tabs,
             ],
           );
         },
@@ -390,6 +399,10 @@ class _CircleScreenState extends State<CircleScreen> {
     );
   }
 }
+
+final _refLedgers = <String, Stream<QuerySnapshot<Map<String, dynamic>>>>{};
+Stream<QuerySnapshot<Map<String, dynamic>>> _refLedger(String uid) => _refLedgers.putIfAbsent(
+    uid, () => FirebaseFirestore.instance.collection('referralLedger').where('referrerUid', isEqualTo: uid).limit(20).snapshots().asBroadcastStream());
 
 class _TierRail extends StatefulWidget {
   const _TierRail();

@@ -6,6 +6,7 @@
  * Provider credentials are server-only Cloudflare Pages environment variables:
  * COACH_LLM_API_URL, COACH_LLM_API_KEY, COACH_LLM_MODEL.
  */
+import { takeCoachTurn } from '../_lib/coach_quota.js';
 
 const PROJECT_ID = 'nowssb-34f1b';
 const APP_ORIGINS = new Set(['https://nowssb.com', 'https://www.nowssb.com']);
@@ -293,6 +294,12 @@ async function postCoach(request, env) {
     ...history,
     { role: 'user', content: message },
   ];
+
+  // Per-account burst limit + daily plan allowance before the paid AI call.
+  let turn;
+  try { turn = await takeCoachTurn(env, claims.sub, Date.now(), PROJECT_ID); }
+  catch (_) { return json({ error: 'The coach is temporarily unavailable. Please try again.' }, 503, request); }
+  if (!turn.ok) return json({ error: turn.error, code: 'quota' }, turn.status || 429, request);
 
   let modelContent;
   try { modelContent = await providerCompletion(env, modelMessages); }

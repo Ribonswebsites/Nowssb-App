@@ -33,6 +33,7 @@ import 'data/firebase.dart';
 import 'features/economy/economy_api.dart';
 import 'features/economy/money.dart';
 import 'features/economy/play_billing.dart';
+import 'features/economy/reward_overlay.dart';
 import 'data/device_flags.dart';
 import 'data/notifications.dart';
 import 'data/phone_notifications.dart';
@@ -124,7 +125,8 @@ class NowssbApp extends StatefulWidget {
 }
 
 class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
-  final _navigatorKey = GlobalKey<NavigatorState>();
+  // Shared with the reward overlay so wins play on the root navigator.
+  final _navigatorKey = RewardOverlay.navigatorKey;
   final _popupRoutes = HomePopupRouteObserver();
   bool _checkingForUpdate = false;
   Timer? _beat;
@@ -177,6 +179,7 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) {
       VideoPool.instance.resume();
       _startBeat();
+      EconomyMirror.instance.onForeground();
       unawaited(NwsbUpdater.instance.onResumed());
       _checkForUpdate();
       if (NwsbFirebase.ready && FirebaseAuth.instance.currentUser != null) {

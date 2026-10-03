@@ -3,6 +3,7 @@
 /// from the server response that triggered it (nothing here adds coins).
 library;
 
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -14,6 +15,7 @@ import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_coin_fly.dart';
 import '../../widgets/nwsb_icon.dart';
 import 'economy_api.dart';
+import 'reward_overlay.dart';
 
 /// Rarity palette (Common → Mythic).
 Color rarityColor(String? rarity) => switch ((rarity ?? '').toLowerCase()) {
@@ -52,12 +54,19 @@ class RewardHaptics {
   }
 }
 
-/// Coins from a server response: burst + flight + count-up into the wallet.
-Future<void> playCoins(BuildContext context, int gained, {int? balanceAfter}) async {
-  if (gained <= 0 || !context.mounted) return;
+/// Coins from a server response: "You won N coins", then the flight and
+/// count-up into the balance pill. Plays on the root overlay, so it runs
+/// even if the widget that asked has already gone (context may be stale).
+Future<void> playCoins(BuildContext? context, int gained, {int? balanceAfter, String title = 'NowssB coins', bool reveal = true}) async {
+  if (gained <= 0) return;
   final after = balanceAfter ?? EconomyMirror.instance.coins;
   final before = math.max(0, after - gained);
-  await NwsbCoinFly.show(context, coins: gained, from: before, to: after);
+  if (reveal) {
+    unawaited(RewardOverlay.reveal(title: title, items: [
+      {'type': 'coins', 'coins': gained, 'label': '$gained coins'},
+    ]));
+  }
+  await RewardOverlay.coins(gained, from: before, to: after);
 }
 
 /// Sum of coins in a server response (effects / items / coins).
@@ -83,10 +92,12 @@ int? balanceIn(Map<String, dynamic> r) {
   return null;
 }
 
-/// Plays whatever the server says happened: gift box / chest opening,
-/// prize sheet, badge toast, then the coin flight with count-up.
+/// Plays whatever the server says happened, always in this order on the
+/// root overlay: the opening (gift box / chest) or a "You won X" reveal,
+/// badge toasts, then the coin flight into the balance pill. A replayed
+/// answer (`already: true`) is never shown as a new win.
 Future<void> celebrate(BuildContext context, Map<String, dynamic> r, {String? title}) async {
-  if (!context.mounted) return;
+  if (r['already'] == true || r['replay'] == true) return;
   List<Map<String, dynamic>> asItems(Object? v) =>
       (v as List?)?.whereType<Map>().map((m) => m.map((k, v) => MapEntry('$k', v))).toList() ?? <Map<String, dynamic>>[];
   var items = asItems(r['items']);
@@ -101,22 +112,29 @@ Future<void> celebrate(BuildContext context, Map<String, dynamic> r, {String? ti
   final box = find('giftbox');
   final chest = find('chest');
   final reveal = find('reveal');
+  final gained = coinsIn(r);
+  final after = balanceIn(r) ?? EconomyMirror.instance.coins;
+  final rarity = '${r['rarity'] ?? reveal?['rarity'] ?? ''}';
   if (box != null) {
     if (items.isEmpty) items = asItems(box['items']);
     await GiftBoxOpening.show(context, box: '${box['box'] ?? r['box'] ?? 'gold'}', title: '${r['title'] ?? title ?? 'Gift box'}', items: items);
   } else if (chest != null) {
     await GiftBoxOpening.show(context, box: 'weekly', title: title ?? 'Weekly chest', items: items.isEmpty ? [{'type': 'coins', 'label': '${chest['coins'] ?? 0} coins'}] : items, chest: true);
-  } else if (items.isNotEmpty) {
-    await RewardItemsSheet.show(context, title: title ?? 'On your account', items: items);
-  } else if (reveal == null && r['granted'] is Map && (r['granted'] as Map)['type'] != 'coins') {
-    await RewardItemsSheet.show(context, title: title ?? 'On your account', items: [Map<String, dynamic>.from(r['granted'] as Map)]);
+  } else {
+    if (items.isEmpty && r['granted'] is Map) items = [Map<String, dynamic>.from(r['granted'] as Map)];
+    if (items.isEmpty && gained > 0) items = [{'type': 'coins', 'coins': gained, 'label': '$gained coins'}];
+    if (items.isEmpty && r['win'] == false) items = [{'type': 'none', 'label': 'Not this time'}];
+    if (items.isNotEmpty) {
+      await RewardOverlay.reveal(title: title ?? 'On your account', items: items, rarity: rarity.isEmpty ? null : rarity);
+    }
   }
-  if (!context.mounted) return;
+  final nav = RewardOverlay.navigatorKey.currentContext;
+  final messenger = nav == null ? null : ScaffoldMessenger.maybeOf(nav);
   for (final b in effects.where((e) => e['kind'] == 'badge')) {
     RewardHaptics.pop();
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Badge earned: ${b['title'] ?? ''}')));
+    messenger?.showSnackBar(SnackBar(content: Text('Badge earned: ${b['title'] ?? ''}')));
   }
-  await playCoins(context, coinsIn(r), balanceAfter: balanceIn(r));
+  await RewardOverlay.coins(gained, from: math.max(0, after - gained), to: after);
 }
 
 /// Shows an economy error calmly ("switching on" instead of raw errors).
@@ -130,7 +148,7 @@ void showEconomyError(BuildContext context, Object e) {
 Future<Map<String, dynamic>?> runReward(BuildContext context, Future<Map<String, dynamic>> Function() action, {String? title}) async {
   try {
     final r = await action();
-    if (context.mounted) await celebrate(context, r, title: title);
+    await celebrate(context, r, title: title);
     return r;
   } catch (e) {
     showEconomyError(context, e);
@@ -281,8 +299,7 @@ class RewardItemsSheet {
   static Future<void> show(BuildContext context, {required String title, required List<Map<String, dynamic>> items}) {
     RewardHaptics.pop();
     final party = items.any((i) => rarityParty('${i['rarity'] ?? ''}'));
-    return showGeneralDialog<void>(
-      context: context,
+    return RewardOverlay.enqueue((nav) => nav.push<void>(RawDialogRoute<void>(
       barrierDismissible: true,
       barrierLabel: 'close',
       barrierColor: const Color(0xC8000000),
@@ -315,7 +332,7 @@ class RewardItemsSheet {
           ),
         ],
       ),
-    );
+    )));
   }
 }
 
@@ -328,12 +345,11 @@ class GiftBoxOpening extends StatefulWidget {
   final bool chest;
 
   static Future<void> show(BuildContext context, {required String box, required String title, required List<Map<String, dynamic>> items, bool chest = false}) {
-    return showGeneralDialog<void>(
-      context: context,
+    return RewardOverlay.enqueue((nav) => nav.push<void>(RawDialogRoute<void>(
       barrierDismissible: false,
       barrierColor: const Color(0xE0000000),
       pageBuilder: (context, _, __) => GiftBoxOpening(box: box, title: title, items: items, chest: chest),
-    );
+    )));
   }
 
   @override
@@ -526,4 +542,18 @@ class SwitchingOnCard extends StatelessWidget {
       },
     );
   }
+}
+
+
+/// Reports a real in-app activity once per IST day per key (the server
+/// still enforces every cap); any coins play the reveal and fly.
+final _reportedToday = <String>{};
+void reportEarn(String action, {String? key}) {
+  final now = DateTime.now().toUtc().add(const Duration(minutes: 330));
+  final k = '${now.year}-${now.month}-${now.day}:$action:${key ?? ''}';
+  if (!_reportedToday.add(k)) return;
+  EconomyApi.call('reportAction', {'action': action, if (key != null && key.isNotEmpty) 'key': key}).then((r) {
+    final gained = coinsIn(r);
+    if (gained > 0) unawaited(playCoins(null, gained, balanceAfter: balanceIn(r)));
+  }, onError: (_) {});
 }

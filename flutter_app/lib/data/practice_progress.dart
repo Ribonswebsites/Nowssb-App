@@ -13,6 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'models.dart';
 import '../features/economy/economy_api.dart';
+import '../features/economy/reward_fx.dart';
 
 class PracticeProgress extends ChangeNotifier {
   PracticeProgress._();
@@ -214,6 +215,8 @@ class PracticeProgress extends ChangeNotifier {
     // Server: practice counters, starter quest and mastery practice days.
     unawaited(EconomyApi.call('reportPractice', {'practiced': true, 'wordId': word.word})
         .then((_) {}, onError: (_) {}));
+    // Practice Ring · listen: a full listen just finished.
+    reportEarn('ring_listen');
   }
 
   /// Wipes every recorded session on this device. Used by Settings.

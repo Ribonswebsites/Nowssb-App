@@ -13,6 +13,7 @@ import '../../theme/tokens.dart';
 import 'economy_api.dart';
 import 'money.dart';
 import 'reward_fx.dart';
+import 'reward_overlay.dart';
 import '../../admin/template/editable.dart';
 
 /// The shell every NowssB program page shares (PDF-2 §9): the app's
@@ -106,8 +107,31 @@ class EconomyPage extends StatelessWidget {
 }
 
 /// Live coin balance from the server wallet. Tap → Rewards · Wallet.
-class CoinBalancePill extends StatelessWidget {
-  const CoinBalancePill({super.key});
+class CoinBalancePill extends StatefulWidget {
+  const CoinBalancePill({super.key, this.onRewardsPage = false});
+
+  /// On the Rewards page itself the pill doesn't link to it again.
+  final bool onRewardsPage;
+
+  @override
+  State<CoinBalancePill> createState() => _CoinBalancePillState();
+}
+
+class _CoinBalancePillState extends State<CoinBalancePill> {
+  // Coins from a win fly into this pill (reward_overlay.dart).
+  final _anchor = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    CoinPillAnchor.add(_anchor);
+  }
+
+  @override
+  void dispose() {
+    CoinPillAnchor.remove(_anchor);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -116,9 +140,12 @@ class CoinBalancePill extends StatelessWidget {
       builder: (context, _) {
         final m = EconomyMirror.instance;
         return GestureDetector(
-          onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const RewardsProgramPage(initialTab: 6))),
+          onTap: widget.onRewardsPage
+              ? null
+              : () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const RewardsProgramPage(initialTab: 6))),
           behavior: HitTestBehavior.opaque,
           child: Container(
+            key: _anchor,
             margin: const EdgeInsets.only(left: 8),
             padding: const EdgeInsets.fromLTRB(6, 5, 12, 5),
             decoration: BoxDecoration(
@@ -129,7 +156,7 @@ class CoinBalancePill extends StatelessWidget {
             child: Row(mainAxisSize: MainAxisSize.min, children: [
               EditableImage.asset(NwsbCoinFly.disc, width: 22, height: 22, fit: BoxFit.contain, slot: 'economy_theme.CoinBalancePill'),
               const SizedBox(width: 6),
-              Text(m.uid == null ? '—' : '${m.coins}', style: const TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w800, fontSize: 14)),
+              Text(m.uid == null ? '\u2014' : '${m.coins}', style: const TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w800, fontSize: 14)),
             ]),
           ),
         );

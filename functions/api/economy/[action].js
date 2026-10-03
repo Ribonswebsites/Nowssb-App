@@ -64,6 +64,7 @@ export const ACTIONS = {
   spin: cp.spin,
   // Gifts
   redeemGift: gf.redeemGift,
+  peekGift: gf.peekGift,
   cancelGift: gf.cancelGift,
   issueGift: async () => { throw new EconomyError('To send a gift, buy a gift card in Gifts · Send a Gift. Free gifts stay with the person who earned them.', 400, 'failed-precondition'); },
   // Reference
@@ -116,7 +117,7 @@ const ADMIN = {
    program switches in config/economy (same areas as lib/data/app_control.dart). */
 const AREA = {
   requestPayout: 'payouts', savePayoutAccount: 'payouts',
-  redeemGift: 'gifting', cancelGift: 'gifting',
+  redeemGift: 'gifting', cancelGift: 'gifting', peekGift: 'gifting',
   attachReferral: 'referrals', applyReferralCode: 'referrals', claimSharerStep: 'referrals', getLink: 'referrals',
   claimDailyLogin: 'earning', claimQuest: 'earning', claimMilestone: 'earning', reportMastery: 'earning', scratchCoupon: 'earning', reportPractice: 'earning',
   reportAction: 'earning', heartbeat: 'earning', claimTimeStep: 'earning', openDailyBox: 'earning', openBox: 'earning', claimWeeklyChest: 'earning',
@@ -125,11 +126,30 @@ const AREA = {
   createEchoPost: 'community', commentOnPost: 'community', toggleEchoLike: 'community',
 };
 const COUPON_ACTIONS = new Set(['dailyScratch', 'revealScratch', 'scratchCoupon', 'buyScratchWithCoins', 'claimTicket']);
-const GIFT_ACTIONS = new Set(['redeemGift', 'cancelGift']);
+/** Own property of a plain map, or undefined (never an inherited member). */
+function own(map, key) {
+  return Object.hasOwn(map, key) ? map[key] : undefined;
+}
+
+/** Only a plain-object result is spread into a response, and never one
+ *  that is (or carries) the request context, the db or the env. */
+function safeOut(out, ctx) {
+  if (out == null) return {};
+  if (typeof out !== 'object' || Array.isArray(out)) return {};
+  const proto = Object.getPrototypeOf(out);
+  if (proto !== Object.prototype && proto !== null) return {};
+  if (out === ctx || out === ctx.env || out === ctx.db) return {};
+  for (const v of Object.values(out)) {
+    if (v === ctx || v === ctx.env || v === ctx.db) throw new Error('unsafe result');
+  }
+  return out;
+}
+
+const GIFT_ACTIONS = new Set(['redeemGift', 'cancelGift', 'peekGift']);
 export async function gateFor(db, cfg, uid, action, data) {
   const user = (await db.get(`users/${uid}`).catch(() => ({ data: null }))).data || {};
   if (user.blocked === true) return 'This account is paused.';
-  const area = AREA[action] || (action === 'beginCheckout' && data && data.kind === 'giftcard' ? 'gifting' : null);
+  const area = own(AREA, action) || (action === 'beginCheckout' && data && data.kind === 'giftcard' ? 'gifting' : null);
   if (area && user.restrictions && user.restrictions[area] === true) return 'This is switched off on this account. Write to us if you think this is a mistake.';
   const sw = cfg.switches || {};
   if (sw.coupons === false && (COUPON_ACTIONS.has(action) || (action === 'beginCheckout' && data && data.kind === 'scratch'))) return 'Coupons are switched off for now.';
@@ -166,8 +186,11 @@ export async function onRequestPost({ request, env, params }) {
   const h = cors(request);
   const action = String(params.action || '');
   if (action === 'config') return onRequestGet({ request, env, params });
-  const fn = ACTIONS[action] || ADMIN[action];
-  if (!fn) return json({ error: 'Unknown action.', code: 'not-found' }, 404, h);
+  // Own-property lookups only: 'constructor', 'toString', '__proto__' …
+  // must never resolve to Object.prototype members.
+  const isAdminAction = Object.hasOwn(ADMIN, action);
+  const fn = own(ACTIONS, action) || own(ADMIN, action);
+  if (typeof fn !== 'function') return json({ error: 'Unknown action.', code: 'not-found' }, 404, h);
   const missing = missingEconomyEnv(env);
   if (missing.length) {
     return json({ error: 'Rewards are switching on. Nothing was lost — try again soon.', code: 'not-configured', switchingOn: true, missing }, 501, h);
@@ -180,14 +203,14 @@ export async function onRequestPost({ request, env, params }) {
   try {
     const db = await FsDb.fromEnv(env);
     const cfg = await loadEconomy(db);
-    const ctx = { db, cfg, now: Date.now(), env };
-    if (ADMIN[action] && !(await ad.isAdmin(db, uid, claims))) return json({ error: 'Admins only.', code: 'permission-denied' }, 403, h);
-    if (!ADMIN[action]) {
+    const ctx = { db, cfg, now: Date.now(), env, claims, country: (request.cf && request.cf.country) || request.headers.get('CF-IPCountry') || '' };
+    if (isAdminAction && !(await ad.isAdmin(db, uid, claims))) return json({ error: 'Admins only.', code: 'permission-denied' }, 403, h);
+    if (!isAdminAction) {
       const stop = await gateFor(db, cfg, uid, action, data);
       if (stop) return json({ ok: false, error: stop, code: 'restricted' }, 403, h);
     }
     const out = await fn(ctx, uid, data, claims);
-    return json({ ok: true, ...(out || {}) }, 200, h);
+    return json({ ok: true, ...safeOut(out, ctx) }, 200, h);
   } catch (e) {
     if (e instanceof EconomyError || (e && e.status && e.code)) {
       return json({ ok: false, error: e.message, code: e.code, ...(e.extra || {}) }, e.status || 400, h);

@@ -162,7 +162,7 @@ export async function onRequestPost(context) {
 
   let body;
   try { body = await request.json(); } catch (e) { return json({ error: 'Send JSON.' }, 400); }
-  const area = AREAS[body.area];
+  const area = Object.hasOwn(AREAS, String(body.area || '')) ? AREAS[String(body.area)] : null;
   const target = cleanTarget(body.target);
   const ext = String(body.ext || '').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 5);
   const type = String(body.contentType || '');

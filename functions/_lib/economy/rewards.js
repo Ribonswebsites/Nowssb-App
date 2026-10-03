@@ -2,7 +2,8 @@
    mastery, sets, season, leagues, badges, spending. Never ending: every
    loop resets daily / weekly / monthly / per season. */
 import { DAY, dayIndex, hourOf, loginCoins, newBadges, seasonReward, seasonTier, stepStreak, weekdayOf, weekKey, monthKey, weeklyChestCoins, drawWeighted, badgeCatalog } from './rules.js';
-import { P, bump, fail, grantExtra, grantPrize, inTx, issueScratch, moveCoins, notify, planOf, today, wallet } from './core.js';
+import { BUNDLED_WORD_IDS } from './word_ids.js';
+import { P, bump, fail, pick, grantExtra, grantPass, grantPrize, inTx, issueScratch, moveCoins, notify, planOf, today, wallet } from './core.js';
 
 /* ── helpers ── */
 async function weekDoc(s, uid, key = s.week) {
@@ -38,6 +39,7 @@ export async function claimDailyLogin(ctx, uid) {
     const R = s.cfg.rewards;
     const w = await wallet(s, uid);
     const d = await today(s, uid);
+    await startBankedPass(s, uid);
     if (d.login) return { coins: 0, already: true, streak: w.streak };
     d.login = true;
     const todayIdx = dayIndex(s.now, s.cfg);
@@ -96,6 +98,8 @@ async function referredActivation(s, uid) {
   const A = s.cfg.reference.activation;
   const ref = await s.doc(P.referral(uid));
   if (!ref || ref.activationPaid) return;
+  // An old account attaching a link later doesn't pay the holder (14-day rule).
+  if (ref.newAccount === false) return;
   const holder = (ref.lockedTo && ref.lockedTo.ownerUid) || (ref.hold && ref.hold.ownerUid);
   if (!holder || holder === uid) return;
   const w = await wallet(s, uid);
@@ -125,16 +129,43 @@ export async function restoreStreak(ctx, uid, data) {
   });
 }
 
+/** Server-side proof for actions that pay more than a tap is worth. */
+async function verifyAction(s, uid, kind, key) {
+  if (kind === 'mastery') {
+    // key = "<wordId>" or "<wordId>:<stage>": the word must really be practised
+    // on this account (reportPractice writes mastery on real practice days).
+    const wordId = String(key || '').split(':')[0].toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 60);
+    if (!wordId) return false;
+    const m = await s.doc(`users/${uid}/mastery/${wordId}`);
+    return !!(m && (m.practiceDays || 0) >= 1);
+  }
+  if (kind === 'profile') {
+    const u = (await s.doc(P.user(uid))) || {};
+    const pub = (await s.doc(`publicProfiles/${uid}`)) || {};
+    const name = String(u.displayName || pub.displayName || '').trim();
+    const extra = String(u.photoURL || pub.photoURL || pub.bio || pub.username || '').trim();
+    return name.length >= 2 && extra.length > 0;
+  }
+  if (kind === 'reminders') {
+    const subs = await s.db.query('pushSubs', [['uid', '==', uid]], { limit: 1 }).catch(() => []);
+    return subs.length > 0;
+  }
+  return false;
+}
+
 /* ── standing actions (Practice Ring, word of the day, sound bath, …) ── */
 export async function reportAction(ctx, uid, data) {
   const action = String((data && data.action) || '');
   const key = String((data && data.key) || '').slice(0, 80);
   return inTx(ctx, async (s) => {
-    const A = s.cfg.rewards.actions[action];
+    const A = pick(s.cfg.rewards.actions, action);
     if (!A) fail('Unknown activity.', 400, 'invalid-argument');
     const w = await wallet(s, uid);
     const d = await today(s, uid);
     w.done = w.done || {};
+    if (A.verify && !(await verifyAction(s, uid, A.verify, key))) {
+      return { coins: 0, verified: false, action };
+    }
     if (A.per === 'once') {
       if (w.done[action]) return { coins: 0, already: true };
       w.done[action] = s.now;
@@ -143,6 +174,8 @@ export async function reportAction(ctx, uid, data) {
       const k = action + ':' + key;
       w.doneKeys = w.doneKeys || {};
       if (w.doneKeys[k]) return { coins: 0, already: true };
+      // Per-key actions are capped per day too, so new made-up keys can't mint coins.
+      if ((d.counts[action] || 0) >= (A.dayLimit || 3)) return { coins: 0, already: true, limit: A.dayLimit || 3 };
       w.doneKeys[k] = s.now;
     } else if (A.per === 'month') {
       const mo = await monthDoc(s, uid);
@@ -164,6 +197,20 @@ export async function reportAction(ctx, uid, data) {
   });
 }
 
+const PRACTICE_WORDS_PER_DAY = 20;
+
+/** A word NowssB actually has: bundled, published (words/{id}), or in a set. */
+export async function isRealWord(s, wordId) {
+  if (BUNDLED_WORD_IDS.has(wordId)) return true;
+  if ((s.cfg.rewards.sets || []).some((set) => (set.words || []).includes(wordId))) return true;
+  const pub = await s.doc(`words/${wordId}`);
+  if (pub) return pub.status !== 'archived';
+  const lib = await s.doc('content/library');
+  const items = (lib && Array.isArray(lib.items)) ? lib.items : [];
+  const norm = (v) => String(v || '').toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 60);
+  return items.some((it) => it && (norm(it.key) === wordId || norm(it.word) === wordId));
+}
+
 /** Legacy practice report from the player (opens + practice counts). */
 export async function reportPractice(ctx, uid, data) {
   return inTx(ctx, async (s) => {
@@ -173,9 +220,18 @@ export async function reportPractice(ctx, uid, data) {
     // Mastery is earned by practising a word on separate days (one level per
     // practice day by default), so a typed-in level can't mint coins.
     const wordId = String((data && data.wordId) || '').toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 60);
-    if (data && data.practiced && wordId) {
-      const m = await s.edit(`users/${uid}/mastery/${wordId}`, { word: wordId, level: 0 });
-      if (m.lastPracticeDay !== s.day) { m.lastPracticeDay = s.day; m.practiceDays = (m.practiceDays || 0) + 1; m.updatedAt = s.now; }
+    if (data && data.practiced && wordId && (await isRealWord(s, wordId))) {
+      // A practice day only counts inside a live player session (heartbeat
+      // in the last 20 minutes) and for a bounded number of words a day.
+      const d = await today(s, uid);
+      const live = d.lastBeatAt && s.now - d.lastBeatAt < 20 * 60e3;
+      const seen = d.keys['pw:' + wordId];
+      const distinct = d.counts.practiceWords || 0;
+      if (live && (seen || distinct < PRACTICE_WORDS_PER_DAY)) {
+        if (!seen) { d.keys['pw:' + wordId] = 1; d.counts.practiceWords = distinct + 1; }
+        const m = await s.edit(`users/${uid}/mastery/${wordId}`, { word: wordId, level: 0 });
+        if (m.lastPracticeDay !== s.day) { m.lastPracticeDay = s.day; m.practiceDays = (m.practiceDays || 0) + 1; m.updatedAt = s.now; }
+      }
     }
     if (data && data.score >= 80) {
       const d = await today(s, uid);
@@ -198,8 +254,17 @@ export async function heartbeat(ctx, uid) {
     const w = await wallet(s, uid);
     const last = d.lastBeatAt || 0;
     let add = 0;
-    if (last && s.now - last <= 3 * 60e3) add = Math.min((s.now - last) / 60e3, R.heartbeatMaxMinutes);
+    const gap = s.now - last;
+    // Beats closer than the minimum gap add nothing and don't move the clock,
+    // and the counted time per day is capped (scripted beats can't farm).
+    if (last && gap < (R.heartbeatMinGapSec || 45) * 1e3) {
+      return { minutes: Math.floor(d.minutes || 0), ladder: ladderState(d, s.cfg), fragment: null, early: true };
+    }
+    if (last && gap <= 3 * 60e3) add = Math.min(gap / 60e3, R.heartbeatMaxMinutes);
+    const cap = R.maxMinutesPerDay || 120;
+    add = Math.max(0, Math.min(add, cap - (d.minutes || 0)));
     d.lastBeatAt = s.now;
+    const pass = await startBankedPass(s, uid);
     if (add > 0) {
       d.minutes = Math.round(((d.minutes || 0) + add) * 100) / 100;
       const wk = await weekDoc(s, uid);
@@ -212,12 +277,29 @@ export async function heartbeat(ctx, uid) {
     let fragment = null;
     if (fr && d.minutes >= fr.minutes && !d.keys.fragment25) {
       d.keys.fragment25 = 1;
-      const pick = drawWeighted(fr.contents).item;
+      const drawn = drawWeighted(fr.contents).item;
       fragment = [];
-      for (const p of pick.prize) fragment.push(await grantPrize(s, uid, p, 'fragment25'));
+      for (const p of drawn.prize) fragment.push(await grantPrize(s, uid, p, 'fragment25'));
     }
-    return { minutes: Math.floor(d.minutes || 0), ladder: ladderState(d, s.cfg), fragment };
+    return { minutes: Math.floor(d.minutes || 0), ladder: ladderState(d, s.cfg), fragment, pass: pass ? true : undefined };
   });
+}
+/**
+ * A banked pass starts when no plan is active. Runs inside a write
+ * transaction with a fresh read of the pass and the plan, so two calls at
+ * once can never start the same pass twice (the summary stays read-only).
+ */
+export async function startBankedPass(s, uid) {
+  const user = (await s.doc(P.user(uid))) || {};
+  if (planOf(user, s.now).active) return null;
+  const rows = await s.t.query('passes', [['status', '==', 'banked']], { parent: `users/${uid}`, limit: 1 }).catch(() => []);
+  if (!rows.length) return null;
+  const path = `users/${uid}/passes/${rows[0].id}`;
+  const b = await s.doc(path); // transactional read
+  if (!b || b.status !== 'banked') return null;
+  const e = await s.edit(path);
+  e.status = 'started'; e.startedAt = s.now;
+  return grantPass(s, uid, b.tier, b.days, { source: 'banked' });
 }
 export function ladderState(d, cfg) {
   const m = (d && d.minutes) || 0;
@@ -237,11 +319,11 @@ export async function claimTimeStep(ctx, uid, data) {
   });
 }
 async function openContents(s, uid, boxId, source) {
-  const B = s.cfg.gifts.boxes[boxId];
+  const B = pick(s.cfg.gifts.boxes, boxId);
   if (!B) fail('Unknown box.', 400, 'invalid-argument');
-  const pick = drawWeighted(B.contents).item;
+  const drawn = drawWeighted(B.contents).item;
   const items = [];
-  for (const p of [].concat(pick.prize)) items.push(await grantPrize(s, uid, p, source));
+  for (const p of [].concat(drawn.prize)) items.push(await grantPrize(s, uid, p, source));
   const w = await wallet(s, uid);
   w.stats.boxes = (w.stats.boxes || 0) + 1;
   s.effect({ kind: 'giftbox', box: boxId, items });
@@ -382,6 +464,7 @@ export async function reportMastery(ctx, uid, data) {
   const level = Math.max(0, Math.min(50, Math.floor(Number(data && data.level) || 0)));
   if (!wordId) fail('Pick a word.', 400, 'invalid-argument');
   return inTx(ctx, async (s) => {
+    if (!(await isRealWord(s, wordId))) fail('That word isn\u2019t in NowssB.', 400, 'invalid-argument');
     const M = s.cfg.rewards.mastery;
     const path = `users/${uid}/mastery/${wordId}`;
     const m = await s.edit(path, { word: wordId, level: 0 });
@@ -455,11 +538,11 @@ export async function leagueView(ctx, uid, name = '') {
     const tier = L.tiers.includes(w.leagueTier) ? w.leagueTier : L.tiers[0];
     const d = await s.doc(P.day(uid, s.day));
     const wk = await weekDoc(s, uid);
-    wk.xp = Math.max(wk.xp || 0, 0) + 0;
-    // Weekly XP = free coins earned this week (recorded per day).
+    // Weekly XP = free coins earned this week; moveCoins records each day
+    // as coins land, this only fills today in for older wallets.
     wk.xpByDay = wk.xpByDay || {};
-    wk.xpByDay[s.day] = (d && d.freeCoins) || 0;
-    const xp = Object.values(wk.xpByDay).reduce((a, b) => a + b, 0);
+    wk.xpByDay[s.day] = Math.max(wk.xpByDay[s.day] || 0, (d && d.freeCoins) || 0);
+    const xp = Object.values(wk.xpByDay).reduce((a, b) => a + (Number(b) || 0), 0);
     const b = await s.edit(boardPath(s.week, tier), { week: s.week, tier, entries: {} });
     b.entries = b.entries || {};
     b.entries[uid] = { xp, name: String(name || '').slice(0, 40) };
@@ -476,8 +559,15 @@ export async function claimLeague(ctx, uid) {
     if (w.leagueClaimed === prevWeek) fail('Last week’s league prize is claimed.', 400, 'already-exists');
     const tier = L.tiers.includes(w.leagueTier) ? w.leagueTier : L.tiers[0];
     const b = await s.doc(boardPath(prevWeek, tier));
-    if (!b || !b.entries || !b.entries[uid]) fail('You were not in a league last week.');
-    const rows = Object.entries(b.entries).sort((x, y) => y[1].xp - x[1].xp);
+    // Last week's XP from the account's own week record (every day counted).
+    const pw = (await s.doc(P.week(uid, prevWeek))) || {};
+    const ownXp = Object.values(pw.xpByDay || {}).reduce((a, v) => a + (Number(v) || 0), 0);
+    if (!b || !b.entries || !b.entries[uid]) {
+      if (ownXp <= 0) fail('You were not in a league last week.');
+    }
+    const entries = { ...((b && b.entries) || {}) };
+    entries[uid] = { ...(entries[uid] || {}), xp: Math.max(ownXp, (entries[uid] && entries[uid].xp) || 0) };
+    const rows = Object.entries(entries).sort((x, y) => y[1].xp - x[1].xp);
     const rank = rows.findIndex(([id]) => id === uid) + 1;
     w.leagueClaimed = prevWeek;
     const prize = L.prizes[rank - 1] || 0;
@@ -485,7 +575,7 @@ export async function claimLeague(ctx, uid) {
     const ti = L.tiers.indexOf(tier);
     let next = tier;
     if (rank <= L.promoteTop && ti < L.tiers.length - 1) next = L.tiers[ti + 1];
-    else if (b.entries[uid].xp < L.demoteBelowXp && ti > 0) next = L.tiers[ti - 1];
+    else if (entries[uid].xp < L.demoteBelowXp && ti > 0) next = L.tiers[ti - 1];
     w.leagueTier = next;
     return { rank, coins, tier: next, promoted: L.tiers.indexOf(next) > ti };
   });
@@ -496,10 +586,10 @@ export async function spendCoins(ctx, uid, data) {
   const LEGACY = { freeze: 'streak_freeze', practice: 'practice_credit', early: 'early_access', cosmetic: null, badge: 'badge_buyer', boost: null };
   let item = String((data && (data.item || data.purpose)) || '');
   if (item === 'cosmetic') item = data.cosmeticId === 'frame_gold' ? 'frame_gold' : String(data.cosmeticId || '');
-  else if (item in LEGACY && LEGACY[item]) item = LEGACY[item];
+  else if (pick(LEGACY, item)) item = LEGACY[item];
   if (item === 'boost') fail('Resale listings are paused (Play policy). Nothing was spent.', 400, 'failed-precondition');
   return inTx(ctx, async (s) => {
-    const it = s.cfg.rewards.spend[item];
+    const it = pick(s.cfg.rewards.spend, item);
     if (!it) fail('Unknown item.', 400, 'invalid-argument');
     const w = await wallet(s, uid);
     if (it.cosmetic && w.cosmetics.includes(it.cosmetic)) fail('You already have this.', 400, 'already-exists');

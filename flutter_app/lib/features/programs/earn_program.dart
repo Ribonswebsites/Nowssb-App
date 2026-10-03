@@ -11,6 +11,8 @@ import '../../widgets/nwsb_icon.dart';
 import '../economy/economy_api.dart';
 import '../economy/reward_fx.dart';
 import 'program_kit.dart';
+import 'program_heroes.dart';
+import '../circle/circle_screen.dart';
 import 'reference_program.dart';
 import '../../admin/template/editable.dart';
 
@@ -19,26 +21,31 @@ const kEarnDisclaimer =
     'your own sales and are not guaranteed. Most people will earn little or nothing. Ranks cannot be bought. Refunded '
     'sales are reversed. Amounts are shown in your local currency and may be adjusted for exchange rates and taxes.';
 
+const kEarnSpec = ProgramSpec(
+  pageId: 'earn.program',
+  title: 'NowssB Earn',
+  mark: NwsbMarks.piggy,
+  disclaimer: kEarnDisclaimer,
+  accent: ProgramAccent.earn,
+  tabs: [
+    ProgramTab('overview', 'Overview', _overview),
+    ProgramTab('team', 'My Team', _team),
+    ProgramTab('sales', 'Sales', _sales),
+    ProgramTab('targets', 'Targets and Bonuses', _targets),
+    ProgramTab('payouts', 'Payouts', _payouts),
+    ProgramTab('academy', 'Academy', _academy),
+    ProgramTab('rules', 'Rules and Disclaimer', _rules),
+  ],
+);
+
+/// Kept for every existing entry point: opens the one Earn page.
 class EarnProgramPage extends StatelessWidget {
-  const EarnProgramPage({super.key, this.initialTab = 0});
-  final int initialTab;
+  const EarnProgramPage({super.key, this.initialTab});
+  final int? initialTab;
 
   @override
-  Widget build(BuildContext context) => ProgramPage(
-        pageId: 'earn.program',
-        title: 'NowssB Earn',
-        mark: NwsbMarks.piggy,
-        initialTab: initialTab,
-        disclaimer: kEarnDisclaimer,
-        tabs: const [
-          ProgramTab('overview', 'Overview', _overview),
-          ProgramTab('team', 'My Team', _team),
-          ProgramTab('sales', 'Sales', _sales),
-          ProgramTab('targets', 'Targets and Bonuses', _targets),
-          ProgramTab('payouts', 'Payouts', _payouts),
-          ProgramTab('academy', 'Academy', _academy),
-          ProgramTab('rules', 'Rules and Disclaimer', _rules),
-        ],
+  Widget build(BuildContext context) => CircleScreen(
+        initialTab: initialTab == null ? null : kEarnSpec.tabs[initialTab!.clamp(0, kEarnSpec.tabs.length - 1)].id,
       );
 }
 

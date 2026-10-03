@@ -39,7 +39,7 @@ export async function onRequestPost({ request, env }) {
   try { b = await request.json(); } catch (e) { return json({ error: 'Send JSON.' }, 400, h); }
   const productId = String((b && b.productId) || '');
   const purchaseToken = String((b && b.purchaseToken) || '');
-  if (!PLAY_PRODUCTS[productId]) return json({ error: 'Unknown product.' }, 400, h);
+  if (!Object.hasOwn(PLAY_PRODUCTS, productId)) return json({ error: 'Unknown product.' }, 400, h);
   if (!purchaseToken || purchaseToken.length > 4096) return json({ error: 'Missing purchase token.' }, 400, h);
 
   try {

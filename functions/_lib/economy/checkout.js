@@ -3,23 +3,63 @@
    is open and released if it is abandoned. Coins never buy cash, never pay a
    whole bill, and paid cards / gift cards take no coins or coupons. */
 import { DAY, couponFits, quoteCheckout } from './rules.js';
-import { P, fail, inTx, moveCoins, newId, wallet } from './core.js';
+import { P, fail, inTx, moveCoins, newId, pick, wallet } from './core.js';
 import { friendDiscountPct } from './reference.js';
 import { kindOfBagItem } from './sales.js';
 import { paidCardCheck } from './coupons.js';
 
-function cartFrom(cfg, items) {
+const CONTENT = ['word', 'meaning', 'signature', 'ebook'];
+const BAG_PREFIX = [...CONTENT, 'stage', 'bundle'];
+const own = (o, k) => o != null && Object.prototype.hasOwnProperty.call(o, k);
+
+function tierFor(cfg, kind, price) {
+  const tiers = (cfg.cart.contentTiersINR || {})[kind] || [];
+  if (!tiers.length) return Math.ceil(price);
+  for (const t of tiers) if (t >= price) return t;
+  return tiers[tiers.length - 1];
+}
+
+/* The server's own price for a bag line: the admin's per-item price
+   (config/store items), else the kind default; ebooks may carry their
+   catalogue price, but only as one of the ebook price points. */
+export function serverPrice(cfg, store, kind, id, clientPrice) {
+  const items = (store && store.items) || {};
+  const defs = (store && store.defaults) || {};
+  if (own(items, id) && Number.isFinite(Number(items[id]))) {
+    const v = Number(items[id]);
+    return v <= 0 ? 0 : tierFor(cfg, kind, v);
+  }
+  if (kind === 'ebook' && ((cfg.cart.contentTiersINR || {}).ebook || []).includes(clientPrice)) return clientPrice;
+  const d = own(defs, kind) && Number.isFinite(Number(defs[kind])) ? Number(defs[kind]) : (cfg.cart.contentDefaultINR || {})[kind] || 99;
+  return tierFor(cfg, kind, d);
+}
+
+export function cartFrom(cfg, items, store) {
   if (!Array.isArray(items) || !items.length) fail('Your bag is empty.', 400, 'invalid-argument');
   if (items.length > 20) fail('Up to 20 items per checkout.', 400, 'invalid-argument');
   let list = 0;
   const clean = items.map((it) => {
-    const kind = kindOfBagItem(it);
-    const price = Number(it.price);
+    const id = String((it && it.id) || '').slice(0, 120);
+    const prefix = id.includes(':') ? id.slice(0, id.indexOf(':')).toLowerCase() : '';
+    if (!BAG_PREFIX.includes(prefix) || id.length <= prefix.length + 1) fail('That item can\u2019t be bought here.', 400, 'invalid-argument');
+    // The kind comes from the item id, never from the phone.
+    const kind = prefix;
+    const said = kindOfBagItem(it);
+    if (it.kind != null && String(it.kind).trim() !== '' && said !== kind) fail('That item doesn\u2019t match its kind.', 400, 'invalid-argument');
+    const sent = Number(it.price);
+    if (!Number.isFinite(sent)) fail('Price missing.', 400, 'invalid-argument');
+    let price;
+    if (CONTENT.includes(kind)) {
+      price = serverPrice(cfg, store, kind, id, sent);
+      if (Math.abs(price - sent) > 0.5) fail('Prices changed. Open your bag again to see the new price.', 409, 'failed-precondition');
+    } else {
+      price = sent;
+      const lo = cfg.cart.priceFloorINR[kind] ?? 1; const hi = cfg.cart.priceCeilINR[kind] ?? 5000;
+      if (!(price >= lo && price <= hi)) fail(`Price for ${it.title || kind} is out of range.`, 400, 'invalid-argument');
+    }
     const qty = Math.max(1, Math.min(10, Math.floor(Number(it.qty) || 1)));
-    const lo = cfg.cart.priceFloorINR[kind] ?? 1; const hi = cfg.cart.priceCeilINR[kind] ?? 5000;
-    if (!(price >= lo && price <= hi)) fail(`Price for ${it.title || kind} is out of range.`, 400, 'invalid-argument');
     list += price * qty;
-    return { id: String(it.id || '').slice(0, 120), kind, title: String(it.title || '').slice(0, 80), price, qty };
+    return { id, kind, title: String(it.title || '').slice(0, 80), price, qty };
   });
   const kinds = [...new Set(clean.map((i) => i.kind))];
   return { items: clean, listINR: Math.round(list * 100) / 100, kind: kinds.length === 1 ? kinds[0] : 'mixed' };
@@ -45,7 +85,7 @@ export async function quote(ctx, uid, data) {
   return inTx(ctx, async (s) => buildQuote(s, uid, data));
 }
 async function buildQuote(s, uid, data) {
-  const cart = cartFrom(s.cfg, data && data.items);
+  const cart = cartFrom(s.cfg, data && data.items, (await s.doc('config/store')) || {});
   const w = await wallet(s, uid);
   const ref = (await s.doc(P.referral(uid))) || null;
   const linkPct = friendDiscountPct(ref, cart.kind, s.cfg, s.now);
@@ -102,7 +142,7 @@ export async function beginCheckout(ctx, uid, data) {
     }
     if (kind === 'product') {
       const pid = String(data.productId || '');
-      const pr = s.cfg.products[pid];
+      const pr = pick(s.cfg.products, pid);
       if (!pr) fail('Unknown product.', 400, 'invalid-argument');
       s.create(`checkouts/${id}`, { ...base, productId: pid, payINR: pr.priceINR, coins: 0, items: [{ id: 'product:' + pid, kind: pr.kind, title: pr.title }] });
       return { checkoutId: id, productId: pid, payINR: pr.priceINR };

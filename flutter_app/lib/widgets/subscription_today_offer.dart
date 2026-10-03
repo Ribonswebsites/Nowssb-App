@@ -15,6 +15,8 @@ import 'app_thinking_loader.dart';
 import 'glass_wrap.dart';
 import 'neumorphic.dart';
 import '../admin/template/editable.dart';
+import '../data/billing_config.dart';
+import '../data/play_subscriptions.dart';
 
 const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
 
@@ -42,6 +44,29 @@ class _Tier {
   final String back;
 }
 
+/// A bundled tier with today's real Google Play price (and Play's own
+/// offer, when this account is eligible). Nothing is invented: with no
+/// Play price yet the card says so.
+_Tier _live(_Tier t) {
+  final tier = tierForPlanName(t.name);
+  if (tier == null) return t;
+  final plan = playPlanFor(tier, yearly: false);
+  if (plan == null) return t;
+  final base = PlaySubscriptions.instance.priceFor(plan.productId);
+  final offer = PlaySubscriptions.instance.offerFor(plan.productId);
+  return _Tier(
+    name: t.name,
+    detail: t.detail,
+    badge: offer != null ? 'Play offer' : t.badge,
+    now: offer != null ? '$offer first' : (base != null ? '$base / month' : t.now),
+    was: offer != null && base != null ? '$base / month' : '',
+    cta: offer != null ? 'Claim the Play offer' : t.cta,
+    benefits: t.benefits,
+    front: t.front,
+    back: t.back,
+  );
+}
+
 const _tiers = <_Tier>[
   _Tier(
     name: 'Free',
@@ -62,10 +87,10 @@ const _tiers = <_Tier>[
   _Tier(
     name: 'Resonance',
     detail: 'A deeper daily practice.',
-    badge: '50% off',
-    now: r'$2.49 / month',
-    was: r'$4.99',
-    cta: 'Claim 50% off',
+    badge: 'Monthly',
+    now: 'Google Play price',
+    was: '',
+    cta: 'See the plan',
     front: 'assets/subscription/tier-sun-front.png',
     back: 'assets/subscription/tier-sun-back.png',
     benefits: [
@@ -78,10 +103,10 @@ const _tiers = <_Tier>[
   _Tier(
     name: 'Frequency',
     detail: 'Every word and frequency.',
-    badge: '50% off',
-    now: r'$4.99 / month',
-    was: r'$9.99',
-    cta: 'Claim 50% off',
+    badge: 'Monthly',
+    now: 'Google Play price',
+    was: '',
+    cta: 'See the plan',
     front: 'assets/subscription/tier-bag-front.png',
     back: 'assets/subscription/tier-bag-back.png',
     benefits: [
@@ -94,10 +119,10 @@ const _tiers = <_Tier>[
   _Tier(
     name: 'Frequency X',
     detail: 'The complete NowssB experience.',
-    badge: '50% off',
-    now: r'$9.99 / month',
-    was: r'$19.99',
-    cta: 'Claim 50% off',
+    badge: 'Monthly',
+    now: 'Google Play price',
+    was: '',
+    cta: 'See the plan',
     front: 'assets/subscription/tier-nile-front.png',
     back: 'assets/subscription/tier-nile-back.png',
     benefits: [
@@ -136,6 +161,7 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
     super.initState();
     _pager = PageController(viewportFraction: 0.92);
     if (_flutterTest) return;
+    unawaited(PlaySubscriptions.instance.start());
     _auto = Timer.periodic(const Duration(milliseconds: 4800), (_) {
       if (!mounted || _userPaging) return;
       if (!TickerMode.of(context)) return;
@@ -157,7 +183,13 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: PlaySubscriptions.instance,
+        builder: (context, _) => _build(context),
+      );
+
+  Widget _build(BuildContext context) {
+    final tiers = [for (final t in _tiers) _live(t)];
     return SizedBox(
       height: 540,
       child: NotificationListener<ScrollNotification>(
@@ -171,6 +203,7 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
         },
         child: PageView(
           controller: _pager,
+          physics: const ClampingScrollPhysics(),
           onPageChanged: (i) {
             if (_page == i) return;
             setState(() => _page = i);
@@ -184,10 +217,10 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
               child: _shell(1, _overview()),
             ),
-            for (var i = 0; i < _tiers.length; i++)
+            for (var i = 0; i < tiers.length; i++)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
-                child: _shell(i + 2, _tierCard(_tiers[i], i + 2)),
+                child: _shell(i + 2, _tierCard(tiers[i], i + 2)),
               ),
           ],
         ),
@@ -358,7 +391,7 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
         const SizedBox(height: 10),
         for (var i = 0; i < _tiers.length; i++) ...[
           if (i > 0) const SizedBox(height: 8),
-          Expanded(child: _tierBox(_tiers[i])),
+          Expanded(child: _tierBox(_live(_tiers[i]))),
         ],
       ],
     );
@@ -469,15 +502,20 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
                           ),
                           const SizedBox(height: 8),
                           Expanded(
-                            child: ListView(
+                            // Fits the card: no inner scroll to trap a thumb.
+                            child: SingleChildScrollView(
                               primary: false,
-                              physics: const ClampingScrollPhysics(),
+                              physics: const NeverScrollableScrollPhysics(),
+                              child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 for (final line in tier.benefits)
                                   Padding(
                                     padding: const EdgeInsets.symmetric(vertical: 6),
                                     child: Text(
                                       line,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(
                                         fontSize: 13.5,
                                         fontWeight: FontWeight.w600,
@@ -486,6 +524,7 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
                                     ),
                                   ),
                               ],
+                            ),
                             ),
                           ),
                           _foot(tier.cta),

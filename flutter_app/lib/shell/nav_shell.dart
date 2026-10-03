@@ -28,6 +28,7 @@ import '../widgets/mini_player_pill.dart';
 import '../data/phone_notifications.dart';
 import '../data/playback_session.dart';
 import '../admin/template/editable.dart';
+import '../features/economy/reward_fx.dart';
 
 class NavShell extends StatefulWidget {
   const NavShell({super.key});
@@ -44,9 +45,26 @@ class NavScope extends InheritedWidget {
   /// 0 Connect · 1 Practice · 2 Library · 3 Store · 4 Profile
   final void Function(int) go;
 
+  /// Switch the bottom-nav tab from anywhere — including pages pushed on
+  /// the root navigator (Progress, Settings → Profile, Library, Routines,
+  /// admin preview), where there is no NavScope above: pop back to the
+  /// shell first, then switch.
   static void goTo(BuildContext context, int i) {
-    context.dependOnInheritedWidgetOfExactType<NavScope>()?.go(i);
+    final local = context.getInheritedWidgetOfExactType<NavScope>();
+    if (local != null) {
+      local.go(i);
+      return;
+    }
+    final go = _global;
+    if (go == null) return;
+    final nav = Navigator.maybeOf(context, rootNavigator: true);
+    final route = _shellRoute;
+    if (nav != null) nav.popUntil((r) => r == route || r.isFirst);
+    go(i);
   }
+
+  static void Function(int)? _global;
+  static Route<dynamic>? _shellRoute;
 
   @override
   bool updateShouldNotify(NavScope old) => false;
@@ -71,6 +89,8 @@ class _NavShellState extends State<NavShell> {
     unawaited(PlaybackSession.instance.ensureLoaded());
     // Home-screen widget taps (Android): nowssb://widget/practice?word=…
     _widgetTaps = HomeWidgetSync.instance.clicks.listen(_onWidgetTap);
+    // Daily 'open the app' activity (server caps it at once a day).
+    reportEarn('open');
   }
 
   StreamSubscription<Uri>? _widgetTaps;
@@ -91,6 +111,7 @@ class _NavShellState extends State<NavShell> {
       w ??= HomeWidgetSync.wordFor(DateTime.now(), lib);
       if (w == null) return;
       _popShellOverlays();
+      reportEarn('word_of_day');
       Navigator.of(context).push(MaterialPageRoute(
         builder: (_) => PracticePlayerScreen(words: [w!], title: 'Word of the day', showIntro: false),
       ));
@@ -107,6 +128,10 @@ class _NavShellState extends State<NavShell> {
     Settings.instance.removeListener(_onSettings);
     PlaybackSession.instance.removeListener(_onSettings);
     unawaited(_widgetTaps?.cancel());
+    if (NavScope._global == _goToTab) {
+      NavScope._global = null;
+      NavScope._shellRoute = null;
+    }
     super.dispose();
   }
 
@@ -326,6 +351,13 @@ class _NavShellState extends State<NavShell> {
         child: child,
       ),
     );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    NavScope._global = _goToTab;
+    NavScope._shellRoute = ModalRoute.of(context);
   }
 
   @override

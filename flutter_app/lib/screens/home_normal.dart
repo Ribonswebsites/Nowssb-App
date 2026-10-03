@@ -89,6 +89,10 @@ import 'progress/progress_screen.dart';
 import 'reader/reader_hub.dart';
 import 'subscription.dart';
 import 'store/ebooks_store.dart';
+import 'store/meaning_store.dart';
+import 'features_page.dart';
+import '../shell/nwsb_links.dart';
+import '../widgets/home_keep_alive.dart';
 import '../admin/layout/layout_sections.dart';
 import '../admin/template/editable.dart';
 
@@ -195,21 +199,31 @@ class _HomeNormalState extends State<HomeNormal> {
   void initState() {
     super.initState();
     ContentStore.instance.addListener(_onContent);
-    PracticeProgress.instance.addListener(_onContent);
-    Settings.instance.addListener(_onContent);
+    // Progress-driven sections (dashboard, streak) listen on their own;
+    // the whole Home no longer rebuilds on every practice tick.
+    Settings.instance.addListener(_onSettings);
     unawaited(PracticeProgress.instance.start());
   }
 
   @override
   void dispose() {
     ContentStore.instance.removeListener(_onContent);
-    PracticeProgress.instance.removeListener(_onContent);
-    Settings.instance.removeListener(_onContent);
+    Settings.instance.removeListener(_onSettings);
     VideoPool.instance.setGlassHomeMode(false);
     super.dispose();
   }
 
+  Object? _lib;
+  int _libLen = -1;
   void _onContent() {
+    final lib = ContentStore.instance.library;
+    if (identical(lib, _lib) && lib.length == _libLen) return;
+    _lib = lib;
+    _libLen = lib.length;
+    if (mounted) setState(() {});
+  }
+
+  void _onSettings() {
     if (mounted) setState(() {});
   }
 
@@ -285,12 +299,13 @@ class _HomeNormalState extends State<HomeNormal> {
   void _footerLink(String key) {
     switch (key) {
       case 'about':
+        _push(const AboutNowssbScreen());
       case 'word-science':
-        _go(2);
+        _push(const AboutNowssbScreen(science: true));
       case 'sound-library':
         _push(const SoundLibraryScreen());
       case 'meaning-store':
-        _go(3);
+        _push(const MeaningStoreScreen());
       case 'practice':
         _go(1);
       case 'profile':
@@ -490,34 +505,33 @@ class _HomeNormalState extends State<HomeNormal> {
         ),
         ('custom', null),
         ('rx', null),
-        ('routines', Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          RoutinesSection(onTap: () => _go(1)),
-          const SizedBox(height: 24),
-          const GiftsHomeSection(),
-        ])),
+        ('routines', RoutinesSection(onTap: () => _go(1))),
         (
           'condisc',
           NmPromoDisc(
             gradient: NmPromoDisc.blue,
             slides: NmPromoDisc.connectSlides,
-            onTap: () => _go(0),
+            onTap: () => NwsbLinks.connect(context),
           )
         ),
         ('feed', Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          NmFeed(onTap: () => _go(0)),
+          NmFeed(onTap: () => NwsbLinks.connect(context)),
           const SizedBox(height: 24),
           const ReferenceHomeSection(),
         ])),
         (
           'quickrow',
           QuickAccessSection(
-            onCart: () => _go(3),
-            onWishlist: () => _go(3),
+            onCart: () => NwsbLinks.cart(context),
+            onWishlist: () => NwsbLinks.wishlist(context),
             onOrders: () => _go(4),
           )
         ),
         ('trendshop', Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           NmTrendShop(onTap: () => _go(3)),
+          const SizedBox(height: 24),
+          // NowssB Gifts, then NowssB Coupons right below it.
+          const GiftsHomeSection(),
           const SizedBox(height: 24),
           const CouponsHomeSection(),
         ])),
@@ -530,8 +544,8 @@ class _HomeNormalState extends State<HomeNormal> {
             const PartnerHomeSection(),
           ])
         ),
-        ('ebooks', EbooksSection(onTap: () => _go(2))),
-        ('connectban', ConnectBannerSection(onTap: () => _go(0))),
+        ('ebooks', EbooksSection(onTap: () => _push(const EbooksStoreScreen()))),
+        ('connectban', ConnectBannerSection(onTap: () => NwsbLinks.connect(context))),
         (
           'healing',
           HealingSection(
@@ -635,7 +649,7 @@ class _HomeNormalState extends State<HomeNormal> {
               // Footer paints solid black through nav clearance.
               padding: EdgeInsets.zero,
               itemCount: shown.length,
-              itemBuilder: (context, i) => shown[i],
+              itemBuilder: (context, i) => HomeKeepAlive(child: shown[i]),
             ),
           ),
         ],

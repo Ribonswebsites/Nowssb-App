@@ -77,18 +77,8 @@ class EarnHubScreen extends StatelessWidget {
               const SizedBox(height: 12),
               const CoinCollectCard(pageKey: 'hub', amount: 8, title: 'Earn hub coins'),
               const SizedBox(height: 12),
-              ProgramShelf(
-                onTap: (poster) {
-                  final page = switch (poster.title) {
-                    'Rewards' => const VaultScreen(),
-                    'Gift' => const GiftsScreen(),
-                    'Partner' => const PartnerProgramPage(),
-                    'Bonus' => const EchoWallScreen(),
-                    _ => const CircleScreen(),
-                  };
-                  _open(context, page);
-                },
-              ),
+              // Each poster opens its own programme (see openPoster).
+              const ProgramShelf(),
               const SizedBox(height: 14),
               // The six programs from the plan, each with its full tab set.
               LSection.group('programs', 'Programs', [

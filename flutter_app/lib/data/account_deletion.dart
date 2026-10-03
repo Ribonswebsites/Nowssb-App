@@ -85,6 +85,13 @@ class AccountDeletion {
         try {
           final snap = await db.collection('users/$uid/$sub').limit(300).get();
           for (final d in snap.docs) {
+            if (sub == 'coachConversations') {
+              // Coach messages live one level deeper.
+              final msgs = await d.reference.collection('messages').limit(500).get();
+              for (final m in msgs.docs) {
+                await m.reference.delete().catchError((_) {});
+              }
+            }
             await d.reference.delete().catchError((_) {});
           }
         } catch (_) {}

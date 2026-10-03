@@ -4,6 +4,8 @@
 /// orbs), and the disclaimer each program must show on every screen.
 library;
 
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -39,6 +41,195 @@ String shortDate(Object? ms) {
   return '${d.day} ${m[d.month - 1]} ${d.year}';
 }
 
+/// One programme's tab set (Rules · History · Odds …). Every programme
+/// has ONE page: its play area on top, these tabs below it
+/// ([ProgramTabsBlock]).
+class ProgramSpec {
+  const ProgramSpec({
+    required this.pageId,
+    required this.title,
+    required this.mark,
+    required this.tabs,
+    required this.disclaimer,
+    this.accent = NwsbColors.goldLight,
+  });
+  final String pageId;
+  final String title;
+  final String mark;
+  final List<ProgramTab> tabs;
+  final String disclaimer;
+  final Color accent;
+
+  int indexOf(String? id) {
+    if (id == null) return -1;
+    for (var i = 0; i < tabs.length; i++) {
+      if (tabs[i].id == id) return i;
+    }
+    return -1;
+  }
+}
+
+/// Lets content inside a programme page switch the tab below it
+/// (e.g. "Open them in Scratch") without opening a second page.
+class ProgramTabsScope extends InheritedWidget {
+  const ProgramTabsScope({super.key, required this.go, required super.child});
+  final void Function(String tabId) go;
+
+  static void goTo(BuildContext context, String tabId) =>
+      context.getInheritedWidgetOfExactType<ProgramTabsScope>()?.go(tabId);
+
+  @override
+  bool updateShouldNotify(ProgramTabsScope old) => false;
+}
+
+/// "Report one visit a day" for a programme page.
+final _explored = <String>{};
+void reportExploreOnce(String page) {
+  final now = DateTime.now().toUtc().add(const Duration(minutes: 330));
+  final k = '${now.year}-${now.month}-${now.day}:$page';
+  if (!_explored.add(k)) return;
+  EconomyApi.call('reportAction', {'action': 'explore', 'key': page}).then((r) {
+    final gained = coinsIn(r);
+    if (gained > 0) unawaited(playCoins(null, gained, balanceAfter: balanceIn(r), title: 'Explorer coins'));
+  }).catchError((_) {});
+}
+
+/// The tab chips + the selected tab's sections + the disclaimer, as a
+/// block inside a programme page's own scroll (no inner scrollable).
+/// Only this block listens to the economy, so the play area above it
+/// isn't rebuilt when a number changes.
+class ProgramTabsBlock extends StatefulWidget {
+  const ProgramTabsBlock({super.key, required this.spec, this.initialTab, this.scrollTo = false, this.goRef, this.showDisclaimer = true});
+  /// Off when the page already shows the same text in its Good to know bar.
+  final bool showDisclaimer;
+  final ProgramSpec spec;
+  final String? initialTab;
+
+  /// Scroll the chips into view on open (an entry point asked for a tab).
+  final bool scrollTo;
+
+  /// Filled with this block's tab switcher so a page can wrap its whole
+  /// scroll in a [ProgramTabsScope].
+  final ValueNotifier<void Function(String)?>? goRef;
+
+  @override
+  State<ProgramTabsBlock> createState() => _ProgramTabsBlockState();
+}
+
+class _ProgramTabsBlockState extends State<ProgramTabsBlock> {
+  late int _tab = widget.spec.indexOf(widget.initialTab).clamp(0, widget.spec.tabs.length - 1);
+  final _anchor = GlobalKey();
+  var _loading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (EconomyMirror.instance.summary.isEmpty) _refresh();
+    reportExploreOnce(widget.spec.pageId);
+    widget.goRef?.value = go;
+    if (widget.scrollTo) WidgetsBinding.instance.addPostFrameCallback((_) => _reveal());
+  }
+
+  void go(String id) {
+    final i = widget.spec.indexOf(id);
+    if (i < 0 || !mounted) return;
+    setState(() => _tab = i);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _reveal());
+  }
+
+  void _reveal() {
+    final c = _anchor.currentContext;
+    if (c != null) Scrollable.ensureVisible(c, duration: const Duration(milliseconds: 420), curve: Curves.easeOutCubic, alignment: 0.02);
+  }
+
+  Future<void> _refresh() async {
+    if (_loading) return;
+    setState(() => _loading = true);
+    try {
+      await EconomyMirror.instance.refresh();
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final spec = widget.spec;
+    final tab = spec.tabs[_tab];
+    return ProgramTabsScope(
+      go: go,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            key: _anchor,
+            padding: const EdgeInsets.only(top: 6, bottom: 12),
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [for (var i = 0; i < spec.tabs.length; i++) _chip(spec.tabs[i].title, i)],
+            ),
+          ),
+          ListenableBuilder(
+            listenable: EconomyMirror.instance,
+            builder: (context, _) {
+              final m = EconomyMirror.instance;
+              final s = m.summary;
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SwitchingOnCard(),
+                  if (m.uid == null)
+                    PCard(children: [
+                      const EditableLabel('program_kit.ProgramPage', 'Sign in to see your coins, cards, gifts and links. Everything is kept on your account.',
+                          style: TextStyle(color: NwsbColors.mist, height: 1.4)),
+                      const SizedBox(height: 10),
+                      GoldButton(label: 'Sign in', onTap: () => NwsbSignInPage.open(context)),
+                    ])
+                  else if (s.isEmpty && _loading)
+                    const Padding(padding: EdgeInsets.all(40), child: Center(child: AppThinkingLoader(label: 'Opening your account…')))
+                  else
+                    ...layoutChildren(context, '${spec.pageId}.${tab.id}', tab.build(context, s)),
+                ],
+              );
+            },
+          ),
+          if (widget.showDisclaimer) ...[
+            const SizedBox(height: 18),
+            PDisclaimer(spec.disclaimer, slot: 'program_kit.${spec.pageId}'),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _chip(String label, int i) {
+    final on = i == _tab;
+    final accent = widget.spec.accent;
+    return GestureDetector(
+      onTap: () {
+        RewardHaptics.tick();
+        setState(() => _tab = i);
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 220),
+        height: 38,
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: on ? accent : const Color(0x14FFFFFF),
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: on ? accent : const Color(0x33FFFFFF)),
+          boxShadow: on ? [BoxShadow(color: accent.withValues(alpha: 0.35), blurRadius: 14)] : null,
+        ),
+        child: EditableLabel('program_kit.ProgramPage', label, style: TextStyle(color: on ? Colors.black : Colors.white, fontWeight: FontWeight.w700, fontSize: 12.5)),
+      ),
+    );
+  }
+}
+
+/// A programme page: the shared shell (back button, coin pill, Good to
+/// know), the programme's own [hero] and play area ([top]), then its tabs.
 class ProgramPage extends StatefulWidget {
   const ProgramPage({
     super.key,
@@ -64,93 +255,24 @@ class ProgramPage extends StatefulWidget {
 }
 
 class _ProgramPageState extends State<ProgramPage> {
-  late int _tab = widget.initialTab.clamp(0, widget.tabs.length - 1);
-  var _loading = false;
-
-  @override
-  void initState() {
-    super.initState();
-    if (EconomyMirror.instance.summary.isEmpty) _refresh();
-    EconomyApi.call('reportAction', {'action': 'explore', 'key': widget.pageId}).catchError((_) => <String, dynamic>{});
-  }
-
-  Future<void> _refresh() async {
-    if (_loading) return;
-    setState(() => _loading = true);
-    try {
-      await EconomyMirror.instance.refresh();
-    } finally {
-      if (mounted) setState(() => _loading = false);
-    }
-  }
+  Future<void> _refresh() => EconomyMirror.instance.refresh();
 
   @override
   Widget build(BuildContext context) {
-    final tab = widget.tabs[_tab];
+    final spec = ProgramSpec(pageId: widget.pageId, title: widget.title, mark: widget.mark, tabs: widget.tabs, disclaimer: widget.disclaimer);
     return EconomyPage(
       title: widget.title,
       mark: widget.mark,
-      child: ListenableBuilder(
-        listenable: EconomyMirror.instance,
-        builder: (context, _) {
-          final m = EconomyMirror.instance;
-          final s = m.summary;
-          return RefreshIndicator(
-            color: NwsbColors.gold,
-            onRefresh: _refresh,
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(16, 4, 16, 40),
-              children: [
-                SizedBox(
-                  height: 44,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: widget.tabs.length,
-                    separatorBuilder: (_, __) => const SizedBox(width: 8),
-                    itemBuilder: (context, i) => _chip(widget.tabs[i].title, i),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                const SwitchingOnCard(),
-                if (widget.header != null) widget.header!,
-                if (m.uid == null)
-                  PCard(children: [
-                    const EditableLabel('program_kit.ProgramPage', 'Sign in to see your coins, cards, gifts and links. Everything is kept on your account.',
-                        style: TextStyle(color: NwsbColors.mist, height: 1.4)),
-                    const SizedBox(height: 10),
-                    GoldButton(label: 'Sign in', onTap: () => NwsbSignInPage.open(context)),
-                  ])
-                else if (s.isEmpty && _loading)
-                  const Padding(padding: EdgeInsets.all(40), child: Center(child: AppThinkingLoader(label: 'Opening your account…')))
-                else
-                  ...layoutChildren(context, '${widget.pageId}.${tab.id}', tab.build(context, s)),
-                const SizedBox(height: 18),
-                PDisclaimer(widget.disclaimer, slot: 'program_kit.${widget.pageId}'),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _chip(String label, int i) {
-    final on = i == _tab;
-    return GestureDetector(
-      onTap: () {
-        RewardHaptics.tick();
-        setState(() => _tab = i);
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 220),
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: on ? NwsbColors.goldLight : const Color(0x14FFFFFF),
-          borderRadius: BorderRadius.circular(999),
-          border: Border.all(color: on ? NwsbColors.goldLight : const Color(0x33FFFFFF)),
+      child: RefreshIndicator(
+        color: NwsbColors.gold,
+        onRefresh: _refresh,
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 40),
+          children: [
+            if (widget.header != null) widget.header!,
+            ProgramTabsBlock(spec: spec, initialTab: widget.tabs[widget.initialTab.clamp(0, widget.tabs.length - 1)].id),
+          ],
         ),
-        child: EditableLabel('program_kit.ProgramPage', label, style: TextStyle(color: on ? Colors.black : Colors.white, fontWeight: FontWeight.w700, fontSize: 12.5)),
       ),
     );
   }

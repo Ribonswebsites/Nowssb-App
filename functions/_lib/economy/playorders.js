@@ -6,6 +6,7 @@ import { PLAY_PACKAGE_NAME } from '../play.js';
 import { FsDb, cleanId } from './fsdb.js';
 import { loadEconomy } from './config.js';
 import { applySale, reverseSale, kindOfBagItem } from './sales.js';
+import { pick } from './core.js';
 
 const AP = 'https://androidpublisher.googleapis.com/androidpublisher/v3/applications/';
 const money = (m) => (m ? Number(m.units || 0) + Number(m.nanos || 0) / 1e9 : 0);
@@ -30,7 +31,7 @@ export async function orderAmounts(env, orderId, cfg) {
     if (!r.ok) return null;
     const o = await r.json();
     const cur = (o.total && o.total.currencyCode) || 'INR';
-    const fx = cfg.fxToINR[cur] || null;
+    const fx = pick(cfg.fxToINR, cur) || null;
     if (!fx) return null;
     const total = money(o.total);
     const tax = money(o.tax);
@@ -86,7 +87,7 @@ function guessPrice(cfg, productId) {
   if (m) return Number(m[1]);
   const pc = cfg.coupons.paid.find((c) => c.productId === productId); if (pc) return pc.priceINR;
   const gc = cfg.gifts.cards.find((c) => c.productId === productId); if (gc) return gc.priceINR;
-  const pr = cfg.products[productId]; if (pr) return pr.priceINR;
+  const pr = pick(cfg.products, productId); if (pr) return pr.priceINR;
   return 0;
 }
 export function buildItems(cfg, productId, ck) {
@@ -95,7 +96,7 @@ export function buildItems(cfg, productId, ck) {
   if (pc) return { kind: 'scratch', words: 0, items: [{ paidCard: pc, kind: 'scratch', title: pc.title }] };
   const gc = cfg.gifts.cards.find((c) => c.productId === productId);
   if (gc) return { kind: 'giftcard', words: W[gc.earnKind] || 0, items: [{ giftCard: gc, kind: gc.earnKind, title: gc.title, meta: (ck && ck.meta) || {} }] };
-  const pr = cfg.products[productId];
+  const pr = pick(cfg.products, productId);
   if (pr) return { kind: pr.kind, words: W[pr.kind] || 0, items: [{ grant: pr.grant, kind: pr.kind, title: pr.title }] };
   if (/^nowssb_tier_\d+$/.test(productId)) {
     if (!ck || ck.kind !== 'cart') return null;
@@ -115,7 +116,7 @@ export async function settleSubscriptionOrder(env, { uid, ev, now = Date.now() }
   const m = String(ev.orderId).match(/\.\.(\d+)$/);
   const renewalIndex = m ? Number(m[1]) + 1 : 0; // GPA.x..0 is the first renewal
   const amounts = await orderAmounts(env, ev.orderId, cfg);
-  const planKey = cfg.earn.planMap[ev.tier] || 'basic';
+  const planKey = pick(cfg.earn.planMap, ev.tier) || 'basic';
   const months = ev.billing === 'yearly' ? 12 * (renewalIndex + 1) : renewalIndex + 1;
   await db.commit([db.write(`accountIndex/${(await sha256Hex(uid))}`, { uid }, {})]).catch(() => null);
   return applySale({ db, cfg, now, env }, {

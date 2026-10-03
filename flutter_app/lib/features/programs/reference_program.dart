@@ -15,31 +15,38 @@ import '../../widgets/nwsb_icon.dart';
 import '../economy/economy_api.dart';
 import '../economy/reward_fx.dart';
 import 'program_kit.dart';
+import 'program_heroes.dart';
+import '../economy/reference_screen.dart';
 
 const kReferenceDisclaimer =
     'Rewards are given only after a friend completes a real purchase or 3 active days. Buying through your own link, or '
     'through accounts you control, never counts. Discounts and rewards may change with notice. Your link contains only a '
     'code, not personal details.';
 
+const kReferenceSpec = ProgramSpec(
+  pageId: 'reference.program',
+  title: 'NowssB Reference',
+  mark: NwsbMarks.reference,
+  disclaimer: kReferenceDisclaimer,
+  accent: ProgramAccent.reference,
+  tabs: [
+    ProgramTab('hub', 'Link Hub', _hub),
+    ProgramTab('friends', 'Friends', _friends),
+    ProgramTab('rewards', 'Rewards', _rewards),
+    ProgramTab('cards', 'Share Cards', _cards),
+    ProgramTab('board', 'Leaderboard', _board),
+    ProgramTab('rules', 'Rules', _rules),
+  ],
+);
+
+/// Kept for every existing entry point: opens the one Reference page.
 class ReferenceProgramPage extends StatelessWidget {
-  const ReferenceProgramPage({super.key, this.initialTab = 0});
-  final int initialTab;
+  const ReferenceProgramPage({super.key, this.initialTab});
+  final int? initialTab;
 
   @override
-  Widget build(BuildContext context) => ProgramPage(
-        pageId: 'reference.program',
-        title: 'NowssB Reference',
-        mark: NwsbMarks.reference,
-        initialTab: initialTab,
-        disclaimer: kReferenceDisclaimer,
-        tabs: const [
-          ProgramTab('hub', 'Link Hub', _hub),
-          ProgramTab('friends', 'Friends', _friends),
-          ProgramTab('rewards', 'Rewards', _rewards),
-          ProgramTab('cards', 'Share Cards', _cards),
-          ProgramTab('board', 'Leaderboard', _board),
-          ProgramTab('rules', 'Rules', _rules),
-        ],
+  Widget build(BuildContext context) => ReferenceScreen(
+        initialTab: initialTab == null ? null : kReferenceSpec.tabs[initialTab!.clamp(0, kReferenceSpec.tabs.length - 1)].id,
       );
 }
 
@@ -260,7 +267,7 @@ class SellersBoard extends StatelessWidget {
     if (!NwsbFirebase.ready) return const PEmpty('The board loads once you are online.');
     final me = EconomyMirror.instance.uid;
     return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-      stream: FirebaseFirestore.instance.doc('leaderboards/sellers_${monthKeyIst()}').snapshots(),
+      stream: _boardStream(monthKeyIst()),
       builder: (context, snap) {
         final entries = sMap(snap.data?.data()?['entries']).entries.map((e) => (e.key, sMap(e.value))).toList()
           ..sort((a, b) => sInt(b.$2[metric]).compareTo(sInt(a.$2[metric])));
@@ -292,3 +299,7 @@ List<Widget> _rules(BuildContext context, Map<String, dynamic> s) {
     ], slot: 'reference_program.rules')),
   ];
 }
+
+final _boards = <String, Stream<DocumentSnapshot<Map<String, dynamic>>>>{};
+Stream<DocumentSnapshot<Map<String, dynamic>>> _boardStream(String month) =>
+    _boards.putIfAbsent(month, () => FirebaseFirestore.instance.doc('leaderboards/sellers_$month').snapshots().asBroadcastStream());

@@ -102,9 +102,16 @@ export async function attachReferral(ctx, uid, data) {
       if (s.now - created < 2 * DAY) le.signups = (le.signups || 0) + 1;
       notify(s, link.uid, 'A friend joined with your link', 'You earn when they buy — the link holds them for 30 days.', 'reference');
     }
-    // Welcome set for the friend, once per account and device.
+    // Welcome set for the friend: new accounts only (same 14 days as the
+    // welcome ticket), once per account and device.
+    const acct = (await s.doc(P.user(uid))) || {};
+    // Oldest of the server wallet date and the profile date: editing the
+    // profile can only make an account look older, never newer.
+    const born = Math.min(w.createdAt || s.now, Date.parse(acct.createdAt || '') || Infinity);
+    const young = s.now - born <= 14 * DAY;
+    if (r.newAccount == null) r.newAccount = young;
     let welcome = null;
-    if (!r.welcomeAt) {
+    if (!r.welcomeAt && young) {
       let deviceUsed = false;
       for (const d of w.devices || []) {
         const dv = await s.doc(`devices/${d}`);

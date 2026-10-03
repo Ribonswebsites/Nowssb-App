@@ -4,6 +4,9 @@ library;
 
 import 'package:flutter/material.dart';
 
+import '../features/programs/program_router.dart';
+import '../shell/nav_shell.dart';
+
 import 'glass_wrap.dart';
 import 'nwsb_icon.dart';
 import '../admin/template/editable.dart';
@@ -77,23 +80,42 @@ class GlassLine extends StatelessWidget {
 
 /// Sideways snap shelf. Each card is a poster, not a copy of the last one.
 class ProgramShelf extends StatelessWidget {
-  const ProgramShelf({super.key, this.onTap, this.height = 168});
+  const ProgramShelf({super.key, this.onTap, this.height = 168, this.current});
 
+  /// Override; by default each poster opens its own programme.
   final ValueChanged<ProgramPoster>? onTap;
   final double height;
 
+  /// On a programme page, that programme's posters are left out.
+  final Programme? current;
+
+  static void openPoster(BuildContext context, ProgramPoster p) {
+    if (p.title == 'Practice') {
+      NavScope.goTo(context, 1);
+      return;
+    }
+    final prog = Programmes.forPoster(p.title);
+    if (prog == null) return;
+    Programmes.open(context, prog, tab: p.title == 'Bonus' ? 'targets' : (p.line == 'The white suit' ? 'season' : null));
+  }
+
   @override
   Widget build(BuildContext context) {
+    final posters = [
+      for (final p in kProgramPosters)
+        if (current == null || Programmes.forPoster(p.title) != current) p,
+    ];
     return SizedBox(
       height: height,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        itemCount: kProgramPosters.length,
+        physics: const ClampingScrollPhysics(),
+        itemCount: posters.length,
         separatorBuilder: (_, __) => const SizedBox(width: 10),
         itemBuilder: (context, i) {
-          final poster = kProgramPosters[i];
+          final poster = posters[i];
           return GestureDetector(
-            onTap: onTap == null ? null : () => onTap!(poster),
+            onTap: () => onTap != null ? onTap!(poster) : openPoster(context, poster),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16),
               child: SizedBox(

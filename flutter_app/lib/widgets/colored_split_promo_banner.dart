@@ -6,6 +6,8 @@
 library;
 
 import 'package:flutter/material.dart';
+
+import '../shell/nwsb_links.dart';
 import '../admin/template/editable.dart';
 
 /// Bundled right-side studio shots — commit as-is, never recompress.
@@ -286,7 +288,9 @@ class ColoredSplitPromoBanner extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: spec.onTap,
+          // No dead banners: without an explicit tap, the button text's
+          // own destination opens.
+          onTap: spec.onTap ?? () => NwsbLinks.cta(context, spec.cta),
           borderRadius: r,
           child: Ink(
             height: height,

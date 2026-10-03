@@ -3,6 +3,8 @@
 /// Play purchases that become NWSB codes.
 library;
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -13,31 +15,38 @@ import '../economy/economy_api.dart';
 import '../economy/reward_fx.dart';
 import '../gifts/gifts_screen.dart';
 import 'program_kit.dart';
+import 'program_heroes.dart';
+import '../economy/economy_theme.dart';
 import '../../admin/template/editable.dart';
 
 const kGiftsDisclaimer =
     'Gifts are for the item shown and have no cash value. Free gifts must be claimed before they expire. Bought gifts are '
     'valid for 12 months and can be refunded only under Google Play\u2019s rules before they are opened. Coins cannot be gifted.';
 
+const kGiftsSpec = ProgramSpec(
+  pageId: 'gifts.program',
+  title: 'NowssB Gifts',
+  mark: NwsbMarks.gift,
+  disclaimer: kGiftsDisclaimer,
+  accent: ProgramAccent.gifts,
+  tabs: [
+    ProgramTab('free', 'Free Gifts', _free),
+    ProgramTab('send', 'Send a Gift', _send),
+    ProgramTab('received', 'Received', _received),
+    ProgramTab('sent', 'Sent', _sent),
+    ProgramTab('redeem', 'Redeem', _redeem),
+    ProgramTab('rules', 'Rules', _rules),
+  ],
+);
+
+/// Kept for every existing entry point: opens the one Gifts page.
 class GiftsProgramPage extends StatelessWidget {
-  const GiftsProgramPage({super.key, this.initialTab = 0});
-  final int initialTab;
+  const GiftsProgramPage({super.key, this.initialTab});
+  final int? initialTab;
 
   @override
-  Widget build(BuildContext context) => ProgramPage(
-        pageId: 'gifts.program',
-        title: 'NowssB Gifts',
-        mark: NwsbMarks.gift,
-        initialTab: initialTab,
-        disclaimer: kGiftsDisclaimer,
-        tabs: const [
-          ProgramTab('free', 'Free Gifts', _free),
-          ProgramTab('send', 'Send a Gift', _send),
-          ProgramTab('received', 'Received', _received),
-          ProgramTab('sent', 'Sent', _sent),
-          ProgramTab('redeem', 'Redeem', _redeem),
-          ProgramTab('rules', 'Rules', _rules),
-        ],
+  Widget build(BuildContext context) => GiftsScreen(
+        initialTab: initialTab == null ? null : kGiftsSpec.tabs[initialTab!.clamp(0, kGiftsSpec.tabs.length - 1)].id,
       );
 }
 
@@ -98,23 +107,42 @@ List<Widget> _free(BuildContext context, Map<String, dynamic> s) {
   ];
 }
 
-List<Widget> _send(BuildContext context, Map<String, dynamic> s) {
-  return [
-    const LSection('intro', 'Send intro', PEmpty('Pick a card, write a note, pay on Google Play. The NWSB code is created only after Play accepts the payment. Your link still earns on gift purchases.', slot: 'gifts_program.send')),
-    LSection('cards', 'Gift cards', PCard(children: [
-      for (final c in kGiftCatalog)
-        PRow(
-          title: c.label,
-          sub: '\u20b9${c.cents} on Google Play',
-          mark: NwsbMarks.gift,
-          trailing: TextButton(
-            onPressed: () => showGiftCardSheet(context, c.id),
-            style: TextButton.styleFrom(backgroundColor: NwsbColors.goldLight, foregroundColor: Colors.black, shape: const StadiumBorder()),
-            child: const EditableLabel('gifts_program.shared', 'Send', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12)),
+List<Widget> _send(BuildContext context, Map<String, dynamic> s) => const [
+      LSection('intro', 'Send intro', PEmpty('Pick a card, write a note, pay on Google Play. The NWSB code is created only after Play accepts the payment. Your link still earns on gift purchases.', slot: 'gifts_program.send')),
+      LSection('cards', 'Gift cards', _SendPicker()),
+    ];
+
+/// Pick one gift card (real selection, no made-up progress), then write it.
+class _SendPicker extends StatefulWidget {
+  const _SendPicker();
+  @override
+  State<_SendPicker> createState() => _SendPickerState();
+}
+
+class _SendPickerState extends State<_SendPicker> {
+  String? _id;
+
+  @override
+  Widget build(BuildContext context) {
+    final cards = kGiftCatalog;
+    final id = _id ?? (cards.isEmpty ? null : cards.first.id);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (final c in cards)
+          BlackOffer(
+            title: c.label,
+            mark: NwsbMarks.gift,
+            selected: c.id == id,
+            progress: c.id == id ? 1 : 0,
+            line: c.id == id ? 'Selected · \u20b9${c.cents} on Google Play' : '\u20b9${c.cents} on Google Play',
+            onTap: () => setState(() => _id = c.id),
           ),
-        ),
-    ])),
-  ];
+        const SizedBox(height: 6),
+        if (id != null) GoldButton(label: 'Write the card and pay on Play', onTap: () => showGiftCardSheet(context, id)),
+      ],
+    );
+  }
 }
 
 List<Widget> _received(BuildContext context, Map<String, dynamic> s) {
@@ -177,18 +205,40 @@ class _RedeemState extends State<_Redeem> {
     super.dispose();
   }
 
+  Map<String, dynamic>? _peek;
+  String? _err;
+
+  /// Step 1: look inside (nothing moves). Step 2: open it.
+  Future<void> _look() async {
+    setState(() {
+      _busy = true;
+      _err = null;
+      _peek = null;
+    });
+    try {
+      final r = await EconomyApi.call('peekGift', {'code': _c.text.trim()});
+      if (mounted) setState(() => _peek = r);
+    } on EconomyException catch (e) {
+      if (mounted) setState(() => _err = e.message);
+    } catch (e) {
+      if (mounted) showEconomyError(context, e);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
   Future<void> _go() async {
     setState(() => _busy = true);
     try {
       final r = await EconomyApi.call('redeemGift', {'code': _c.text.trim()});
       if (!mounted) return;
       final g = r['granted'];
-      await GiftBoxOpening.show(context,
+      unawaited(GiftBoxOpening.show(context,
           box: 'gold',
           title: '${r['title'] ?? 'A gift for you'}${'${r['fromName'] ?? ''}'.isEmpty ? '' : ' · from ${r['fromName']}'}',
-          items: g is Map ? [Map<String, dynamic>.from(g)] : const []);
+          items: g is Map ? [Map<String, dynamic>.from(g)] : const []));
       _c.clear();
-      await EconomyMirror.instance.refresh();
+      setState(() => _peek = null);
     } catch (e) {
       if (mounted) showEconomyError(context, e);
     } finally {
@@ -206,11 +256,48 @@ class _RedeemState extends State<_Redeem> {
           decoration: const InputDecoration(hintText: 'NWSB-XXXX-XXXX', hintStyle: TextStyle(color: NwsbColors.mist)),
         ),
         const SizedBox(height: 10),
-        TextButton(
-          onPressed: _busy ? null : _go,
-          style: TextButton.styleFrom(backgroundColor: NwsbColors.goldLight, foregroundColor: Colors.black, shape: const StadiumBorder(), padding: const EdgeInsets.symmetric(vertical: 12)),
-          child: Text(_busy ? 'Opening…' : 'Open the gift', style: const TextStyle(fontWeight: FontWeight.w800)),
-        ),
+        if (_peek == null)
+          TextButton(
+            onPressed: _busy ? null : _look,
+            style: TextButton.styleFrom(backgroundColor: NwsbColors.goldLight, foregroundColor: Colors.black, shape: const StadiumBorder(), padding: const EdgeInsets.symmetric(vertical: 12)),
+            child: Text(_busy ? 'Looking…' : 'Preview the gift', style: const TextStyle(fontWeight: FontWeight.w800)),
+          )
+        else ...[
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(color: const Color(0x14FFFFFF), borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0x66E4C56A))),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('${_peek!['title'] ?? 'A gift'}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)),
+              const SizedBox(height: 4),
+              Text('Inside: ${_peek!['inside'] ?? ''}', style: const TextStyle(color: NwsbColors.goldLight, fontWeight: FontWeight.w700)),
+              if ('${_peek!['fromName'] ?? ''}'.isNotEmpty) Text('From ${_peek!['fromName']}', style: const TextStyle(color: NwsbColors.mist, fontSize: 12)),
+              if ('${_peek!['message'] ?? ''}'.isNotEmpty) Text('\u201c${_peek!['message']}\u201d', style: const TextStyle(color: Colors.white70, fontStyle: FontStyle.italic, fontSize: 12.5)),
+              if (_peek!['status'] != 'ready')
+                Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: Text(switch ('${_peek!['status']}') {
+                    'redeemed' => _peek!['mine'] == true ? 'You already opened this gift.' : 'This gift was already claimed.',
+                    'later' => 'This gift opens on ${shortDate(_peek!['opensAt'])}.',
+                    'expired' => 'This gift expired.',
+                    _ => 'This gift is no longer active.',
+                  }, style: const TextStyle(color: Color(0xFFFFA24C), fontSize: 12)),
+                ),
+            ]),
+          ),
+          const SizedBox(height: 10),
+          Row(children: [
+            Expanded(
+              child: TextButton(
+                onPressed: _busy || _peek!['status'] != 'ready' || _peek!['yours'] == true ? null : _go,
+                style: TextButton.styleFrom(backgroundColor: NwsbColors.goldLight, foregroundColor: Colors.black, shape: const StadiumBorder(), padding: const EdgeInsets.symmetric(vertical: 12)),
+                child: Text(_busy ? 'Opening…' : (_peek!['yours'] == true ? 'Send this code to your friend' : 'Redeem'), style: const TextStyle(fontWeight: FontWeight.w800)),
+              ),
+            ),
+            const SizedBox(width: 8),
+            TextButton(onPressed: () => setState(() => _peek = null), child: const EditableLabel('gifts_program.Redeem', 'Back', style: TextStyle(color: Colors.white70))),
+          ]),
+        ],
+        if (_err != null) PEmpty(_err!),
       ]);
 }
 

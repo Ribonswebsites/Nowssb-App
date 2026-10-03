@@ -562,9 +562,14 @@ class FstCard extends StatelessWidget {
             // and the longest step carries five points, so the body scrolls
             // inside the card rather than the card growing and dragging the
             // whole deck's height with it.
+            // No inner scroll (it trapped the thumb): the body scales down
+            // to fit the card instead.
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.only(right: 2),
+              child: LayoutBuilder(builder: (context, box) => FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.topLeft,
+                child: SizedBox(
+                width: box.maxWidth - 2,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
@@ -640,7 +645,8 @@ class FstCard extends StatelessWidget {
                     ],
                   ],
                 ),
-              ),
+                ),
+              )),
             ),
             const SizedBox(height: 8),
             FstNav(index: index, onClose: onClose, onStep: onStep),

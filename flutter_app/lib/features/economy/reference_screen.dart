@@ -10,9 +10,15 @@ import 'economy_api.dart';
 import 'economy_theme.dart';
 import '../programs/program_kit.dart';
 import '../programs/reference_program.dart';
+import '../programs/program_heroes.dart';
+import '../programs/program_router.dart';
+import '../../widgets/four_banners.dart';
 
 class ReferenceScreen extends StatefulWidget {
-  const ReferenceScreen({super.key});
+  const ReferenceScreen({super.key, this.initialTab});
+
+  /// Opens scrolled to one programme tab (e.g. 'board').
+  final String? initialTab;
 
   @override
   State<ReferenceScreen> createState() => _ReferenceScreenState();
@@ -34,23 +40,26 @@ class _ReferenceScreenState extends State<ReferenceScreen> {
       goodToKnow: kReferenceDisclaimer,
       title: 'Reference',
       mark: NwsbMarks.reference,
-      child: ListenableBuilder(
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+        children: [
+          const ReferenceHero(),
+          const SizedBox(height: 12),
+          const ProgramShelf(current: Programme.reference),
+          const SizedBox(height: 12),
+          const CoinCollectCard(pageKey: 'reference', amount: 8, title: 'Reference coins'),
+          const SizedBox(height: 12),
+          const GlassLine(
+            text: 'Your code attributes a sale. Their parent takes a small second level. Both must hold a plan.',
+          ),
+          const SizedBox(height: 16),
+          ListenableBuilder(
         listenable: EconomyMirror.instance,
         builder: (context, _) {
           final w = EconomyMirror.instance;
-          return ListView(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const ProgramShelf(),
-              const SizedBox(height: 12),
-              const CoinCollectCard(pageKey: 'reference', amount: 8, title: 'Reference coins'),
-              const SizedBox(height: 12),
-              ProgramLink(title: 'NowssB Reference program', sub: 'Your links, friends, sharer ladder, sellers board', mark: NwsbMarks.reference, page: () => const ReferenceProgramPage()),
-              const SizedBox(height: 12),
-              const GlassLine(
-                text: 'Your code attributes a sale. Their parent takes a small second level. Both must hold a plan.',
-              ),
-              const SizedBox(height: 16),
               Text(
                 w.code.isEmpty ? 'Your code shows on this account' : w.code,
                 style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w800),
@@ -104,6 +113,18 @@ class _ReferenceScreenState extends State<ReferenceScreen> {
             ],
           );
         },
+          ),
+          const SizedBox(height: 18),
+          const FourBanners(
+            current: Programme.reference,
+            splitTitle: 'Share a word you love',
+            splitCta: 'Share a link',
+            blackTitle: 'Your links',
+            blackSub: 'One link per word, plan and meaning.',
+          ),
+          const SizedBox(height: 18),
+          ProgramTabsBlock(spec: kReferenceSpec, initialTab: widget.initialTab, scrollTo: widget.initialTab != null, showDisclaimer: false),
+        ],
       ),
     );
   }

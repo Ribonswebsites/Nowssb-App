@@ -56,7 +56,7 @@ const cleanUid = (v) => {
 /** Plan as the app reads it (lib/data/play_subscriptions.dart). */
 export function planOf(u, now) {
   u = u || {};
-  const tier = TIERS[u.tier] ? u.tier : '';
+  const tier = Object.hasOwn(TIERS, String(u.tier || '')) ? u.tier : '';
   const until = toMs(u.subscriptionEndDate);
   const active = !!(u.isPro === true && tier && (!until || until > now));
   return {
@@ -376,7 +376,7 @@ export async function grantSub(deps, body = {}) {
   const { db, now, admin } = deps;
   const uid = cleanUid(body.uid);
   const tier = str(body.tier, 20);
-  if (!TIERS[tier]) throw bad('Pick Resonance, Frequency or Frequency X.');
+  if (!Object.hasOwn(TIERS, String(tier))) throw bad('Pick Resonance, Frequency or Frequency X.');
   const billing = BILLING.includes(body.billing) ? body.billing : 'custom';
   let end;
   if (body.until) {
@@ -412,7 +412,7 @@ export async function extendSub(deps, body = {}) {
   const u = await mustUser(db, uid);
   const p = planOf(u, now);
   const tier = p.tier || str(body.tier, 20);
-  if (!TIERS[tier]) throw bad('This person has no plan to extend. Grant one first.');
+  if (!Object.hasOwn(TIERS, String(tier))) throw bad('This person has no plan to extend. Grant one first.');
   const end = Math.max(p.until || now, now) + days * DAY;
   const fields = { isPro: true, tier, subscriptionEndDate: new Date(end).toISOString(), subscriptionUpdatedAt: null };
   if (!p.source || !p.active) fields.subscriptionSource = 'admin';
@@ -667,7 +667,7 @@ function giftCode() {
 export async function createGiftCodes(deps, body = {}) {
   const { db, now, admin } = deps;
   const item = str(body.item, 20);
-  if (!GIFT_ITEMS[item]) throw bad('Pick what the gift holds.');
+  if (!Object.hasOwn(GIFT_ITEMS, String(item))) throw bad('Pick what the gift holds.');
   const count = Math.round(num(body.count, 1));
   if (count < 1 || count > 50) throw bad('Make 1 to 50 codes at a time.');
   const days = Math.round(num(body.expiresDays, 90));

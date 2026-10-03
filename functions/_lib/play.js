@@ -81,7 +81,7 @@ export function evaluate(sub, nowMs = Date.now()) {
   const items = Array.isArray(sub && sub.lineItems) ? sub.lineItems : [];
   let best = null;
   for (const li of items) {
-    if (!PLAY_PRODUCTS[li.productId]) continue;
+    if (!Object.hasOwn(PLAY_PRODUCTS, String(li.productId))) continue;
     const exp = Date.parse(li.expiryTime || '');
     if (!best || (exp || 0) > (best.expMs || 0)) best = { ...li, expMs: exp || 0 };
   }

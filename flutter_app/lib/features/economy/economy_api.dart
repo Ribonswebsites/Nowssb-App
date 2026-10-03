@@ -171,9 +171,8 @@ class EconomyApi {
 
   /// Everything the program pages show, in one read.
   static Future<Map<String, dynamic>> summary() async {
-    final s = await call('summary');
-    EconomyMirror.instance.summary = s;
-    return s;
+    await call('summary');
+    return EconomyMirror.instance.summary;
   }
 
   /// Published odds, ladders and caps — readable before sign-in.
@@ -247,6 +246,9 @@ class EconomyMirror extends ChangeNotifier {
       await sub.cancel();
     }
     _docs.clear();
+    await _todaySub?.cancel();
+    _todaySub = null;
+    _midnight?.cancel();
     uid = user?.uid;
     live = user != null;
     if (user == null) {
@@ -306,11 +308,8 @@ class EconomyMirror extends ChangeNotifier {
       partnerPending = (data['pending'] as num?)?.toInt() ?? 0;
       partnerPerk = (data['perk'] as String?) ?? '';
     });
-    _watch('users/$id/earnCaps/${_todayKey()}', (data) {
-      loginToday = data['login'] == true;
-      scratchToday = data['scratch'] == true;
-      capsReady = true;
-    });
+    _watchToday(id);
+    _scheduleMidnight();
     _watch('users/$id/referral/main', (data) {
       code = (data['code'] as String?) ?? '';
       referredBy = (data['referredBy'] as String?) ?? '';
@@ -340,6 +339,73 @@ class EconomyMirror extends ChangeNotifier {
     );
   }
 
+  StreamSubscription<dynamic>? _todaySub;
+  String _todayBound = '';
+  Timer? _midnight;
+  int _summaryAt = 0;
+
+  /// Today's caps doc. Re-bound at the server's midnight (IST), so login and
+  /// scratch state roll over without restarting the app.
+  void _watchToday(String id) {
+    _todaySub?.cancel();
+    _todayBound = _todayKey();
+    _todaySub = FirebaseFirestore.instance.doc('users/$id/earnCaps/$_todayBound').snapshots().listen((snap) {
+      final data = snap.data() ?? {};
+      final login = data['login'] == true;
+      final scratch = data['scratch'] == true;
+      final changed = login != loginToday || scratch != scratchToday || !capsReady;
+      loginToday = login;
+      scratchToday = scratch;
+      capsReady = true;
+      if (changed) notifyListeners();
+    }, onError: (_) {});
+  }
+
+  void _scheduleMidnight() {
+    _midnight?.cancel();
+    final ist = DateTime.now().toUtc().add(const Duration(minutes: 330));
+    final next = DateTime.utc(ist.year, ist.month, ist.day).add(const Duration(days: 1, seconds: 3));
+    _midnight = Timer(next.difference(ist), _rollDay);
+  }
+
+  void _rollDay() {
+    final id = uid;
+    if (id == null) return;
+    loginToday = false;
+    scratchToday = false;
+    capsReady = false;
+    _watchToday(id);
+    _scheduleMidnight();
+    unawaited(refresh());
+  }
+
+  /// Back in the app: roll the day if midnight passed while away, and
+  /// refresh the summary only when it is old (no per-minute reloads).
+  void onForeground() {
+    if (uid == null) return;
+    if (_todayBound != _todayKey()) {
+      _rollDay();
+      return;
+    }
+    if (DateTime.now().millisecondsSinceEpoch - _summaryAt > 3 * 60 * 1000) unawaited(refresh());
+  }
+
+  /// Sets the summary and tells listeners only if something they show changed.
+  void _setSummary(Map<String, dynamic> body) {
+    _summaryAt = DateTime.now().millisecondsSinceEpoch;
+    String sig(Map<String, dynamic> m) {
+      final c = Map<String, dynamic>.from(m)..remove('now')..remove('effects');
+      try {
+        return jsonEncode(c);
+      } catch (_) {
+        return '${c.length}${DateTime.now()}';
+      }
+    }
+    final same = summary.isNotEmpty && sig(summary) == sig(body);
+    summary = body;
+    if (!same) notifyListeners();
+  }
+
   bool get subscribed =>
       plan != 'Free' && subUntil > DateTime.now().millisecondsSinceEpoch && subscriptionActive;
 
@@ -355,10 +421,26 @@ class EconomyMirror extends ChangeNotifier {
   /// every program page shows the new state.
   void _afterAction(String name, Map<String, dynamic> body) {
     if (name == 'summary' || name == 'ensureEconomyProfile') {
-      summary = body;
-      notifyListeners();
+      _setSummary(body);
       return;
     }
+    if (name == 'registerDevice') return;
+    if (name == 'heartbeat') {
+      // Minutes tick every beat; only a newly reached ladder step (or a
+      // fragment prize) is worth a reload. Everything else stays quiet.
+      final today = summary['today'];
+      if (today is Map) {
+        final before = '${today['ladder']}';
+        final t = Map<String, dynamic>.from(today);
+        t['minutes'] = body['minutes'] ?? t['minutes'];
+        if (body['ladder'] != null) t['ladder'] = body['ladder'];
+        summary = {...summary, 'today': t};
+        if (before != '${t['ladder']}') notifyListeners();
+      }
+      if (body['fragment'] != null || body['pass'] == true) _refreshSoon();
+      return;
+    }
+    if (name == 'reportAction' && ((body['coins'] as num?) ?? 0) == 0) return;
     if (name == 'claimDailyLogin') loginToday = true;
     if (name == 'dailyScratch' || name == 'scratchCoupon') scratchToday = true;
     _refreshSoon();
@@ -367,19 +449,21 @@ class EconomyMirror extends ChangeNotifier {
   Timer? _refresh;
   void _refreshSoon() {
     _refresh?.cancel();
-    _refresh = Timer(const Duration(milliseconds: 600), () async {
+    // Rewards play on the root overlay (reward_overlay.dart), so this reload
+    // can no longer cancel a reveal or a coin flight.
+    _refresh = Timer(const Duration(milliseconds: 900), () async {
       try {
-        await EconomyApi.summary();
-        notifyListeners();
+        await EconomyApi.call('summary');
       } catch (_) {}
     });
   }
 
   Future<void> refresh() async {
     try {
-      await EconomyApi.summary();
-    } catch (_) {}
-    notifyListeners();
+      await EconomyApi.call('summary');
+    } catch (_) {
+      notifyListeners();
+    }
   }
 
   /// Older builds kept a local coin bonus here. Coins now come only from the
@@ -388,8 +472,13 @@ class EconomyMirror extends ChangeNotifier {
   Future<int> grantOnce(String key, int amount, {bool daily = true}) async => 0;
 
   void _watch(String path, void Function(Map<String, dynamic> data) apply) {
+    String? last;
     _docs.add(FirebaseFirestore.instance.doc(path).snapshots().listen((snap) {
-      apply(snap.data() ?? {});
+      final data = snap.data() ?? {};
+      final sig = data.toString();
+      if (sig == last) return; // same values: nobody needs to rebuild
+      last = sig;
+      apply(data);
       notifyListeners();
     }, onError: (_) {}));
   }

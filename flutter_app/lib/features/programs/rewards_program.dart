@@ -13,36 +13,41 @@ import '../economy/economy_api.dart';
 import '../economy/play_billing.dart';
 import '../economy/reward_fx.dart';
 import 'program_kit.dart';
+import 'program_heroes.dart';
+import '../vault/vault_screen.dart';
 
 const kRewardsDisclaimer =
     'Coins have no cash value. They cannot be bought, sold, transferred or exchanged for money, and they expire after 12 '
     'months of inactivity. They can cover only part of a purchase. Rewards, limits and events may change with notice.';
 
+const kRewardsSpec = ProgramSpec(
+  pageId: 'rewards.program',
+  title: 'NowssB Rewards',
+  mark: NwsbMarks.rewards,
+  disclaimer: kRewardsDisclaimer,
+  accent: ProgramAccent.rewards,
+  tabs: [
+    ProgramTab('today', 'Today', _today),
+    ProgramTab('quests', 'Quests', _quests),
+    ProgramTab('streaks', 'Streaks', _streaks),
+    ProgramTab('mastery', 'Mastery', _mastery),
+    ProgramTab('season', 'Season', _season),
+    ProgramTab('leagues', 'Leagues', _leagues),
+    ProgramTab('wallet', 'Wallet', _wallet),
+    ProgramTab('spend', 'Spend', _spend),
+    ProgramTab('badges', 'Badges', _badges),
+  ],
+);
+
+/// Kept for every existing entry point: opens the one Rewards page.
 class RewardsProgramPage extends StatelessWidget {
-  const RewardsProgramPage({super.key, this.initialTab = 0});
-  final int initialTab;
+  const RewardsProgramPage({super.key, this.initialTab});
+  final int? initialTab;
 
   @override
-  Widget build(BuildContext context) {
-    return ProgramPage(
-      pageId: 'rewards.program',
-      title: 'NowssB Rewards',
-      mark: NwsbMarks.rewards,
-      initialTab: initialTab,
-      disclaimer: kRewardsDisclaimer,
-      tabs: const [
-        ProgramTab('today', 'Today', _today),
-        ProgramTab('quests', 'Quests', _quests),
-        ProgramTab('streaks', 'Streaks', _streaks),
-        ProgramTab('mastery', 'Mastery', _mastery),
-        ProgramTab('season', 'Season', _season),
-        ProgramTab('leagues', 'Leagues', _leagues),
-        ProgramTab('wallet', 'Wallet', _wallet),
-        ProgramTab('spend', 'Spend', _spend),
-        ProgramTab('badges', 'Badges', _badges),
-      ],
-    );
-  }
+  Widget build(BuildContext context) => VaultScreen(
+        initialTab: initialTab == null ? null : kRewardsSpec.tabs[initialTab!.clamp(0, kRewardsSpec.tabs.length - 1)].id,
+      );
 }
 
 Map<String, dynamic> _cfg(Map<String, dynamic> s) => sMap(s['config']);
@@ -309,7 +314,7 @@ List<Widget> _wallet(BuildContext context, Map<String, dynamic> s) {
         const PEmpty('Sign in to see the ledger.')
       else
         StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-          stream: FirebaseFirestore.instance.collection('coinLedger').where('uid', isEqualTo: uid).limit(200).snapshots(),
+          stream: _ledger(uid),
           builder: (context, snap) {
             final docs = [...?snap.data?.docs]..sort((a, b) => sInt(b.data()['at']).compareTo(sInt(a.data()['at'])));
             if (docs.length > 40) docs.removeRange(40, docs.length);
@@ -327,6 +332,11 @@ List<Widget> _wallet(BuildContext context, Map<String, dynamic> s) {
     ])),
   ];
 }
+
+// One ledger stream per account, not a new listener on every rebuild.
+final _ledgers = <String, Stream<QuerySnapshot<Map<String, dynamic>>>>{};
+Stream<QuerySnapshot<Map<String, dynamic>>> _ledger(String uid) => _ledgers.putIfAbsent(
+    uid, () => FirebaseFirestore.instance.collection('coinLedger').where('uid', isEqualTo: uid).limit(200).snapshots().asBroadcastStream());
 
 String _reason(String r) {
   if (r.startsWith('act:')) return 'Activity · ${r.substring(4).replaceAll('_', ' ')}';

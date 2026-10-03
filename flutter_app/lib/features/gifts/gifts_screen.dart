@@ -1,3 +1,5 @@
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -15,6 +17,8 @@ import '../../admin/template/editable.dart';
 import '../economy/reward_fx.dart';
 import 'gift_show.dart';
 import '../programs/program_kit.dart';
+import '../programs/program_heroes.dart';
+import '../programs/program_router.dart';
 import '../programs/gifts_program.dart';
 
 class GiftItem {
@@ -146,6 +150,23 @@ class _GiftCardSheetState extends State<_GiftCardSheet> {
   var _design = 'lotus';
   var _busy = false;
   String? _note;
+  // Created once, so the price never flashes a loader on rebuild.
+  late final Future<String> _price = widget.card.productId.isEmpty ? Future.value('') : PlayCheckout.priceLabel(widget.card.productId);
+
+  static const _designs = <String, List<Color>>{
+    'lotus': [Color(0xFF3B1528), Color(0xFFE07A9A)],
+    'dawn': [Color(0xFF3A2410), Color(0xFFFFB86B)],
+    'gold': [Color(0xFF1A1408), Color(0xFFE4C56A)],
+    'night': [Color(0xFF0B1230), Color(0xFF5B8FB8)],
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    for (final c in [_to, _from, _msg]) {
+      c.addListener(() => setState(() {}));
+    }
+  }
 
   @override
   void dispose() {
@@ -185,111 +206,180 @@ class _GiftCardSheetState extends State<_GiftCardSheet> {
   @override
   Widget build(BuildContext context) {
     final inset = MediaQuery.viewInsetsOf(context).bottom;
+    final colors = _designs[_design]!;
+    final to = _to.text.trim();
+    final from = _from.text.trim();
+    final msg = _msg.text.trim();
     return Padding(
       padding: EdgeInsets.only(bottom: inset),
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(18, 18, 18, 28),
-        decoration: const BoxDecoration(
-          color: Color(0xF2000000),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(26)),
-          border: Border(top: BorderSide(color: Color(0x33FFFFFF))),
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(children: [
-                EditableImage.asset(giftBoxFor(widget.card.id).asset, height: 64, errorBuilder: (_, __, ___) => const SizedBox(width: 64), slot: 'gifts_screen.GiftCardSheet'),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(widget.card.label, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
-                    FutureBuilder<String>(
-                      future: widget.card.productId.isEmpty ? Future.value('') : PlayCheckout.priceLabel(widget.card.productId),
-                      builder: (context, snap) => Text(
-                        snap.data == null || snap.data == 'Play price' || snap.data!.isEmpty ? '\u20b9${widget.card.cents} on Google Play' : '${snap.data} on Google Play',
-                        style: const TextStyle(color: NwsbColors.goldLight, fontWeight: FontWeight.w700),
-                      ),
+      child: ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(18, 10, 18, 26),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xE6101010), Color(0xF5000000)]),
+              border: Border(top: BorderSide(color: Color(0x55E4C56A))),
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Center(child: Container(width: 44, height: 4, margin: const EdgeInsets.only(bottom: 14), decoration: BoxDecoration(color: const Color(0x55FFFFFF), borderRadius: BorderRadius.circular(9)))),
+                  const EditableLabel('gifts_screen.GiftCardSheet', 'SEND A GIFT CARD', style: TextStyle(color: Color(0xFFE4C56A), fontSize: 11, letterSpacing: 2, fontWeight: FontWeight.w800)),
+                  const SizedBox(height: 10),
+                  // Live preview: what your friend will see.
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 320),
+                    height: 196,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(22),
+                      gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [colors[0], Colors.black, colors[0]]),
+                      border: Border.all(color: colors[1].withValues(alpha: 0.75), width: 1.2),
+                      boxShadow: [BoxShadow(color: colors[1].withValues(alpha: 0.28), blurRadius: 28, spreadRadius: -6)],
                     ),
-                  ]),
-                ),
-              ]),
-              const SizedBox(height: 12),
-              const EditableLabel('gifts_screen.GiftCardSheet',
-                  'The code exists only after Google Play accepts the payment. It is valid for a year. Unopened cards can be cancelled within 7 days. Coins cannot be gifted.',
-                  style: TextStyle(color: NwsbColors.mist, fontSize: 12, height: 1.4)),
-              const SizedBox(height: 12),
-              _field(_to, 'Their name (optional)'),
-              _field(_from, 'Your name (optional)'),
-              _field(_msg, 'A short message (optional)', lines: 3),
-              const SizedBox(height: 8),
-              Wrap(spacing: 8, children: [
-                for (final d in const ['lotus', 'dawn', 'gold', 'night'])
-                  ChoiceChip(
-                    label: Text(d[0].toUpperCase() + d.substring(1)),
-                    selected: _design == d,
-                    onSelected: (_) => setState(() => _design = d),
+                    child: Stack(
+                      children: [
+                        Positioned(
+                          right: -6,
+                          bottom: -6,
+                          child: Opacity(opacity: 0.9, child: EditableImage.asset(giftBoxFor(widget.card.id).asset, height: 92, errorBuilder: (_, __, ___) => const SizedBox(), slot: 'gifts_screen.GiftCardSheet')),
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(children: [
+                              EditableLabel('gifts_screen.GiftCardSheet', 'NOWSSB GIFT', style: TextStyle(color: colors[1], fontSize: 11, letterSpacing: 2.4, fontWeight: FontWeight.w800)),
+                              const Spacer(),
+                              FutureBuilder<String>(
+                                future: _price,
+                                builder: (context, snap) => Text(
+                                  snap.data == null || snap.data == 'Play price' || snap.data!.isEmpty ? '\u20b9${widget.card.cents}' : snap.data!,
+                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 15),
+                                ),
+                              ),
+                            ]),
+                            const SizedBox(height: 10),
+                            Text(widget.card.label, maxLines: 2, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800, height: 1.05)),
+                            const SizedBox(height: 6),
+                            Text(to.isEmpty ? 'For someone you choose' : 'For $to', style: const TextStyle(color: Color(0xCCFFFFFF), fontSize: 13, fontWeight: FontWeight.w600)),
+                            const Spacer(),
+                            SizedBox(
+                              width: 220,
+                              child: Text(msg.isEmpty ? 'Your message appears here.' : '\u201c$msg\u201d', maxLines: 2, overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(color: msg.isEmpty ? const Color(0x66FFFFFF) : Colors.white, fontSize: 12.5, fontStyle: FontStyle.italic, height: 1.3)),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(from.isEmpty ? '' : '\u2014 $from', style: TextStyle(color: colors[1], fontSize: 12, fontWeight: FontWeight.w700)),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-              ]),
-              const SizedBox(height: 14),
-              GoldButton(label: _busy ? 'Waiting for Google Play…' : 'Pay on Play and create the code', onTap: _busy ? null : _buy),
-              if (_note != null) ...[const SizedBox(height: 10), EconomyNote(_note!)],
-            ],
+                  const SizedBox(height: 14),
+                  Row(children: [
+                    for (final d in _designs.entries)
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => setState(() => _design = d.key),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            height: 46,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(14),
+                              gradient: LinearGradient(colors: [d.value[0], d.value[1].withValues(alpha: 0.7)]),
+                              border: Border.all(color: _design == d.key ? Colors.white : const Color(0x33FFFFFF), width: _design == d.key ? 2 : 1),
+                            ),
+                            child: Text(d.key[0].toUpperCase() + d.key.substring(1), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 12)),
+                          ),
+                        ),
+                      ),
+                  ]),
+                  const SizedBox(height: 14),
+                  _field(_to, 'Their name (optional)', Icons.person_outline),
+                  _field(_from, 'Your name (optional)', Icons.edit_outlined),
+                  _field(_msg, 'A short message (optional)', Icons.chat_bubble_outline, lines: 3),
+                  const SizedBox(height: 4),
+                  const EditableLabel('gifts_screen.GiftCardSheet',
+                      'The code exists only after Google Play accepts the payment. It is valid for a year. Unopened cards can be cancelled within 7 days. Coins cannot be gifted.',
+                      style: TextStyle(color: NwsbColors.mist, fontSize: 11.5, height: 1.4)),
+                  const SizedBox(height: 14),
+                  GoldButton(label: _busy ? 'Waiting for Google Play…' : 'Pay on Play and create the code', onTap: _busy ? null : _buy),
+                  if (_note != null) ...[const SizedBox(height: 10), EconomyNote(_note!)],
+                ],
+              ),
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _field(TextEditingController c, String hint, {int lines = 1}) => Padding(
-        padding: const EdgeInsets.only(bottom: 8),
+  Widget _field(TextEditingController c, String hint, IconData icon, {int lines = 1}) => Padding(
+        padding: const EdgeInsets.only(bottom: 10),
         child: TextField(
           controller: c,
           maxLines: lines,
           maxLength: lines > 1 ? 280 : 40,
           style: const TextStyle(color: Colors.white),
-          decoration: InputDecoration(hintText: hint, hintStyle: const TextStyle(color: NwsbColors.mist), counterText: ''),
+          decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: const TextStyle(color: NwsbColors.mist),
+            counterText: '',
+            prefixIcon: Icon(icon, color: const Color(0xFFE4C56A), size: 18),
+            filled: true,
+            fillColor: const Color(0x14FFFFFF),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0x33FFFFFF))),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0x33FFFFFF))),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0xFFE4C56A))),
+          ),
         ),
       );
 }
 
+/// The one NowssB Gifts page: the gift showcase, Daily Spin, gift cards and
+/// boxes on top; the programme tabs (Free Gifts · Send · Received · Sent ·
+/// Redeem · Rules) below.
 class GiftsScreen extends StatefulWidget {
-  const GiftsScreen({super.key, this.startOnRedeem = false});
+  const GiftsScreen({super.key, this.startOnRedeem = false, this.initialTab});
   final bool startOnRedeem;
+  final String? initialTab;
 
   @override
   State<GiftsScreen> createState() => _GiftsScreenState();
 }
 
 class _GiftsScreenState extends State<GiftsScreen> {
-  var _tab = 0;
-  GiftItem _item = kGiftCatalog.first;
-  final _note = TextEditingController();
-  final _code = TextEditingController();
-  String? _message;
+  final _go = ValueNotifier<void Function(String)?>(null);
 
   @override
   void initState() {
     super.initState();
-    if (widget.startOnRedeem) _tab = 1;
     GiftBook.instance.load();
   }
 
   @override
   void dispose() {
-    _note.dispose();
-    _code.dispose();
+    _go.dispose();
     super.dispose();
   }
 
+  void _tab(String id) => _go.value?.call(id);
+
   @override
   Widget build(BuildContext context) {
+    final start = widget.initialTab ?? (widget.startOnRedeem ? 'redeem' : null);
     return EconomyPage(
       goodToKnow: kGiftsDisclaimer,
       title: 'NowssB Gifts',
       mark: NwsbMarks.gift,
       action: GestureDetector(
-        onTap: () => setState(() => _tab = 3),
+        // History: switch to Received and scroll the tabs into view.
+        onTap: () => _tab('received'),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
           decoration: BoxDecoration(
@@ -306,254 +396,55 @@ class _GiftsScreenState extends State<GiftsScreen> {
           ),
         ),
       ),
-      child: ListenableBuilder(
-        listenable: GiftBook.instance,
-        builder: (context, _) {
-          return ListView(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
-            children: [
-              const FourBanners(
-                splitTitle: 'NowssB Gifts',
-                splitCta: 'Send a gift',
-                blackTitle: 'A real purchase',
-                blackSub: 'The code exists only after Play accepts it.',
-              ),
-              const SizedBox(height: 12),
-              ProgramLink(title: 'NowssB Gifts program', sub: 'Free boxes, gift cards, rules and history', mark: NwsbMarks.gift, page: () => const GiftsProgramPage()),
-              const SizedBox(height: 12),
-              const GiftShowcase(),
-              const SizedBox(height: 16),
-              const GiftWheel(),
-              const SizedBox(height: 12),
-              const RandomGiftButton(),
-              const SizedBox(height: 16),
-              const EditableLabel('gifts_screen.GiftsScreen', 'GIFT CARDS', style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontSize: 12, fontWeight: FontWeight.w700)),
-              const SizedBox(height: 8),
-              const GiftPlanGrid(),
-              const SizedBox(height: 12),
-              const GiftOpenCard(),
-              const SizedBox(height: 12),
-              BrandTopBanner(
-                bare: true,
-                title: 'NowssB Gifts',
-                mark: NwsbMarks.gift,
-                onTap: () => setState(() => _tab = 0),
-              ),
-              const SizedBox(height: 12),
-              ColoredSplitPromoBanner(
-                margin: EdgeInsets.zero,
-                spec: SplitPromoSpec(
-                  title: 'NowssB Gifts',
-                  cta: 'Send a gift',
-                  leftColor: const Color(0xFF3D2914),
-                  rightColor: const Color(0xFFE07A3D),
-                  art: SplitPromoArts.redLotus,
-                  onTap: () => setState(() => _tab = 0),
-                ),
-              ),
-              const SizedBox(height: 12),
-              const BannerMix(seed: 5),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  _chip('Send', 0),
-                  const SizedBox(width: 8),
-                  _chip('Redeem', 1),
-                  const SizedBox(width: 8),
-                  _chip('Sent', 2),
-                  const SizedBox(width: 8),
-                  _chip('Received', 3),
-                ],
-              ),
-              const SizedBox(height: 14),
-              if (_tab == 0) _send(),
-              if (_tab == 1) _redeem(),
-              if (_tab == 2) _history('sent'),
-              if (_tab == 3) _history('received'),
-            ],
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _chip(String label, int index) {
-    final on = _tab == index;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => setState(() {
-          _tab = index;
-          _message = null;
-        }),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: on ? NwsbColors.goldLight : Colors.transparent,
-            borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: on ? NwsbColors.goldLight : const Color(0x33FFFFFF)),
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
+        cacheExtent: 1600,
+        children: [
+          const GiftsHero(),
+          const GiftShowcase(),
+          const SizedBox(height: 16),
+          const GiftWheel(),
+          const SizedBox(height: 12),
+          const RandomGiftButton(),
+          const SizedBox(height: 16),
+          const EditableLabel('gifts_screen.GiftsScreen', 'GIFT CARDS', style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontSize: 12, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 8),
+          const GiftPlanGrid(),
+          const SizedBox(height: 12),
+          const GiftOpenCard(),
+          const SizedBox(height: 12),
+          BrandTopBanner(
+            bare: true,
+            title: 'NowssB Gifts',
+            mark: NwsbMarks.gift,
+            onTap: () => showGiftCardSheet(context, kGiftCatalog.first.id),
           ),
-          child: EditableLabel('gifts_screen.GiftsScreen',
-            label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: on ? Colors.black : Colors.white,
-              fontWeight: FontWeight.w700,
-              fontSize: 12,
+          const SizedBox(height: 12),
+          ColoredSplitPromoBanner(
+            margin: EdgeInsets.zero,
+            spec: SplitPromoSpec(
+              title: 'Got a code?',
+              cta: 'Redeem a gift',
+              leftColor: const Color(0xFF3D2914),
+              rightColor: const Color(0xFFE07A3D),
+              art: SplitPromoArts.redLotus,
+              onTap: () => _tab('redeem'),
             ),
           ),
-        ),
+          const SizedBox(height: 12),
+          const FourBanners(
+            current: Programme.gifts,
+            splitTitle: 'NowssB Gifts',
+            splitCta: 'Send a gift',
+            blackTitle: 'A real purchase',
+            blackSub: 'The code exists only after Play accepts it.',
+          ),
+          const SizedBox(height: 12),
+          const BannerMix(seed: 5),
+          const SizedBox(height: 16),
+          ProgramTabsBlock(spec: kGiftsSpec, initialTab: start, scrollTo: start != null, goRef: _go, showDisclaimer: false),
+        ],
       ),
     );
-  }
-
-  String _giftMark(String id) {
-    switch (id) {
-      case 'word':
-        return NwsbMarks.word;
-      case 'stage':
-        return NwsbMarks.stages;
-      case 'bundle':
-        return NwsbMarks.book;
-      case 'basic7':
-        return NwsbMarks.sound;
-      case 'ebook7':
-      case 'ebook30':
-        return NwsbMarks.ebook;
-      case 'signature3':
-        return NwsbMarks.signature;
-      case 'restore':
-        return NwsbMarks.flame;
-      default:
-        return NwsbMarks.crown;
-    }
-  }
-
-  Widget _send() {
-    final catalog = kGiftCatalog;
-    if (!catalog.any((c) => c.id == _item.id)) _item = catalog.first;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const EconomyNote(
-          'A gift is a real Play purchase sent as a code. Coins cannot be gifted. A link on the purchase still earns its commission, and the sale is labeled Gift purchase.',
-        ),
-        const SizedBox(height: 12),
-        for (final item in catalog)
-          BlackOffer(
-            title: item.label,
-            mark: _giftMark(item.id),
-            selected: _item.id == item.id,
-            progress: _item.id == item.id ? 1 : 0,
-            line: _item.id == item.id ? '1 of 1 selected · \u20b9${item.cents}' : '0 of 1 · \u20b9${item.cents}',
-            onTap: () => setState(() => _item = item),
-          ),
-        const SizedBox(height: 8),
-        GoldButton(label: 'Write the card and pay on Play', onTap: () => showGiftCardSheet(context, _item.id)),
-        if (_message != null) ...[
-          const SizedBox(height: 10),
-          EconomyNote(_message!),
-        ],
-      ],
-    );
-  }
-
-  Widget _redeem() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const EconomyNote('Enter the code, or open the link they sent. You will see the item before it lands on this account.'),
-        const SizedBox(height: 10),
-        TextField(
-          controller: _code,
-          textCapitalization: TextCapitalization.characters,
-          style: const TextStyle(color: Colors.white, letterSpacing: 1.4),
-          decoration: const InputDecoration(
-            hintText: 'NWSB-XXXX-XXXX',
-            hintStyle: TextStyle(color: NwsbColors.mist),
-          ),
-        ),
-        const SizedBox(height: 10),
-        GoldButton(
-          label: 'Preview and redeem',
-          onTap: () async {
-            try {
-              final result = await EconomyApi.call('redeemGift', {'code': _code.text.trim()});
-              if (!mounted) return;
-              setState(() => _message = '${(result['granted'] as Map?)?['label'] ?? result['title'] ?? 'Gift'} is on this account.');
-              final g = result['granted'];
-              await GiftBoxOpening.show(context,
-                  box: 'gold',
-                  title: '${result['title'] ?? 'A gift for you'}${'${result['fromName'] ?? ''}'.isEmpty ? '' : ' · from ${result['fromName']}'}',
-                  items: g is Map ? [Map<String, dynamic>.from(g)] : const []);
-            } on EconomyException catch (e) {
-              if (!mounted) return;
-              setState(() => _message = e.message);
-            }
-          },
-        ),
-        if (_message != null) ...[
-          const SizedBox(height: 10),
-          EconomyNote(_message!),
-        ],
-      ],
-    );
-  }
-
-  Widget _history(String direction) {
-    final rows = GiftBook.instance.items.where((g) => g.direction == direction).toList();
-    if (rows.isEmpty) {
-      return EconomyNote(
-        direction == 'sent'
-            ? 'No gifts sent yet. Create a code and it shows here with its status.'
-            : 'No gifts received yet. Redeem a code and it shows here.',
-      );
-    }
-    return Column(
-      children: [
-        for (final gift in rows)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(gift.label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
-                      Text(
-                        '${gift.code} · ${gift.status}${gift.createdAt > 0 ? ' · ${_date(gift.createdAt)}' : ''}',
-                        style: const TextStyle(color: NwsbColors.mist, fontSize: 12),
-                      ),
-                      if (gift.note.isNotEmpty) Text(gift.note, style: const TextStyle(color: NwsbColors.gold, fontSize: 12)),
-                    ],
-                  ),
-                ),
-                if (direction == 'sent' && gift.status == 'active') ...[
-                  IconButton(
-                    tooltip: 'Copy code',
-                    onPressed: () => Clipboard.setData(ClipboardData(text: gift.code)),
-                    icon: const Icon(Icons.copy, color: Colors.white70, size: 18),
-                  ),
-                  TextButton(
-                    onPressed: () => runEconomy(context, () async {
-                      final r = await EconomyApi.call('cancelGift', {'code': gift.code});
-                      if (mounted) setState(() => _message = '${r['note'] ?? 'Cancelled.'}');
-                    }),
-                    child: const EditableLabel('gifts_screen.GiftsScreen', 'Cancel', style: TextStyle(color: NwsbColors.goldLight)),
-                  ),
-                ],
-              ],
-            ),
-          ),
-        if (_message != null) EconomyNote(_message!),
-      ],
-    );
-  }
-
-  String _date(int ms) {
-    final d = DateTime.fromMillisecondsSinceEpoch(ms);
-    return '${d.day}/${d.month}/${d.year}';
   }
 }

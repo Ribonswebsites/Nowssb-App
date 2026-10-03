@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+
+import '../economy/reward_fx.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../data/firebase.dart';
@@ -211,6 +213,7 @@ class _EchoWallScreenState extends State<EchoWallScreen> {
           'imageRef': _imageRef ?? '',
         });
         _text.clear();
+        reportEarn('echo_first_post');
         if (mounted) setState(() => _imageRef = null);
       } finally {
         if (mounted) setState(() => _busy = false);

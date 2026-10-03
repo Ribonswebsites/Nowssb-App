@@ -43,8 +43,13 @@ service cloud.firestore {
       allow read: if isSelf(uid) || isAdmin();
       allow create: if isAdmin() || (isSelf(uid) && userFieldsOk(request.resource.data, request.resource.data.keys().toSet()));
       allow update: if isAdmin() || (isSelf(uid) && userFieldsOk(request.resource.data, request.resource.data.diff(resource.data).affectedKeys()));
-      // In-app account deletion (Play policy): a person may delete their own profile.
-      allow delete: if isAdmin() || isSelf(uid);
+      // In-app account deletion (Play policy): a person may delete their own
+      // profile, unless an admin has blocked or restricted it (deleting the
+      // doc would otherwise wipe the block). The server delete endpoint
+      // (service account) still removes those accounts completely.
+      allow delete: if isAdmin() || (isSelf(uid)
+        && resource.data.get('blocked', false) != true
+        && !('restrictions' in resource.data));
       match /inbox/{msgId} { allow read, delete: if isSelf(uid) || isAdmin(); allow update: if isSelf(uid); allow create: if isAdmin(); }
 
       // Personal Coach data is private to the signed-in owner.

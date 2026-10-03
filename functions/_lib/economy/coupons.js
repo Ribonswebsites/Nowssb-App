@@ -2,7 +2,7 @@
    cut-out ticket codes, Daily Spin. The server picks every prize before the
    card is shown; the phone only animates the reveal. Odds are published. */
 import { DAY, drawRarity, drawWeighted, oddsPct, rand, resolvePrize } from './rules.js';
-import { P, bump, fail, grantPass, grantPrize, inTx, issueScratch, moveCoins, newId, planOf, prizeLabel, today, wallet } from './core.js';
+import { P, bump, fail, pick, grantPass, grantPrize, inTx, issueScratch, moveCoins, newId, planOf, prizeLabel, today, wallet } from './core.js';
 import { checkBadges } from './rewards.js';
 
 /** Daily free scratch: issued and decided now; the reveal grants it. */
@@ -15,8 +15,8 @@ export async function dailyScratch(ctx, uid) {
       return { already: true, id: d.scratchId || null };
     }
     d.scratch = true;
-    const pick = drawWeighted(C.dailyScratchPool);
-    const prize = resolvePrize(pick.item.prize);
+    const drawn = drawWeighted(C.dailyScratchPool);
+    const prize = resolvePrize(drawn.item.prize);
     const card = await issueScratch(s, uid, 'common', 'daily', { prize });
     d.scratchId = card.id;
     return { id: card.id, rarity: 'common', label: prizeLabel(prize), prize };
@@ -35,7 +35,8 @@ export async function revealScratch(ctx, uid, data) {
     if (c.expiresAt && c.expiresAt < s.now) { const e = await s.edit(path); e.status = 'expired'; fail('This card expired.'); }
     const e = await s.edit(path);
     e.status = 'revealed'; e.revealedAt = s.now;
-    const granted = await grantPrize(s, uid, c.prize, 'scratch:' + c.rarity);
+    // Free cards (daily/earned) count toward the daily free-coin ceiling; bought cards don't.
+    const granted = await grantPrize(s, uid, c.prize, 'scratch:' + c.rarity, { free: !c.paid && c.source === 'daily' });
     // Paid cards: every card returns at least its price (value floor).
     if (c.paid && c.paid.floorCoins && granted.type !== 'coins') {
       // Non-coin prizes are worth more than the floor by design; nothing extra.
@@ -103,7 +104,7 @@ export function afterPurchaseRarity(cfg, payINR, isSub) {
 export async function claimTicket(ctx, uid, data) {
   const code = String((data && data.code) || '').toUpperCase().trim();
   return inTx(ctx, async (s) => {
-    const T = s.cfg.coupons.codes[code];
+    const T = pick(s.cfg.coupons.codes, code);
     if (!T) fail('That code is not active.', 404, 'not-found');
     const w = await wallet(s, uid);
     w.tickets = w.tickets || {};
@@ -141,19 +142,33 @@ export async function claimTicket(ctx, uid, data) {
 }
 
 /* ── Daily Spin ── */
-export async function spin(ctx, uid) {
+/** One free spin a day, then paid spins at costCoins each while the balance
+ *  allows (up to paidPerDay). A retried request with the same `nonce`
+ *  returns the first answer and is never charged twice. */
+export async function spin(ctx, uid, data) {
+  const nonce = String((data && data.nonce) || '').replace(/[^A-Za-z0-9_-]/g, '').slice(0, 40);
   return inTx(ctx, async (s) => {
     const S = s.cfg.spin;
     const d = await today(s, uid);
-    if ((d.counts.spin || 0) >= S.perDay) fail('One spin a day. The wheel resets at midnight.', 400, 'already-exists');
-    d.counts.spin = (d.counts.spin || 0) + 1;
-    if (S.costCoins) await moveCoins(s, uid, -S.costCoins, 'spend:spin');
-    const pick = drawWeighted(S.slices);
-    const g = await grantPrize(s, uid, pick.item.prize, 'spin');
+    if (nonce && d.keys['spin:' + nonce]) return { ...d.keys['spin:' + nonce], replay: true };
+    const freePerDay = S.freePerDay ?? 1;
+    const paidPerDay = S.paidPerDay ?? 40;
+    const used = d.counts.spin || 0;
+    const free = used < freePerDay;
+    if (!free && used - freePerDay >= paidPerDay) fail('That’s every spin for today. The wheel resets at midnight.', 400, 'already-exists', { limit: true });
+    const cost = free ? 0 : (S.costCoins || 0);
+    if (cost) await moveCoins(s, uid, -cost, 'spend:spin');
+    d.counts.spin = used + 1;
+    const drawn = drawWeighted(S.slices);
+    // The free spin's coins count toward the daily free-coin ceiling; paid spins don't.
+    const g = await grantPrize(s, uid, drawn.item.prize, free ? 'spin-free' : 'spin', { free });
     const w = await wallet(s, uid);
     w.stats.spins = (w.stats.spins || 0) + 1;
     await checkBadges(s, uid);
-    return { slice: pick.index, label: pick.item.label, granted: g, cost: S.costCoins };
+    const left = Math.max(0, paidPerDay - Math.max(0, d.counts.spin - freePerDay));
+    const out = { slice: drawn.index, label: drawn.item.label, granted: g, cost, free, freeLeft: Math.max(0, freePerDay - d.counts.spin), paidLeft: left, nextCost: S.costCoins || 0, balance: w.coins };
+    if (nonce) d.keys['spin:' + nonce] = { slice: out.slice, label: out.label, granted: g, cost, free };
+    return out;
   });
 }
 
@@ -161,8 +176,14 @@ export async function spin(ctx, uid) {
 export async function paidCardCheck(s, uid, card, data) {
   const C = s.cfg.coupons;
   const user = (await s.doc(P.user(uid))) || {};
-  const country = String((data && data.country) || user.country || 'IN').toUpperCase();
-  if (C.paidBlockedCountries.includes(country) || !s.cfg.countries.paidCouponsOpen.includes(country)) fail('Paid cards are not offered in your country. Free cards still work.');
+  // Server-side country (request IP via Cloudflare). The phone's own claim
+  // and the profile field are only used when the edge gives none (tests,
+  // 'XX' unknown); either way a blocked value from any source blocks.
+  const edge = /^[A-Z]{2}$/.test(s.country || '') && s.country !== 'XX' && s.country !== 'T1' ? s.country : '';
+  const claimed = [data && data.country, user.country].filter(Boolean).map((c) => String(c).toUpperCase());
+  const country = edge || claimed[0] || 'IN';
+  const all = [country, ...claimed];
+  if (all.some((c) => C.paidBlockedCountries.includes(c)) || !s.cfg.countries.paidCouponsOpen.includes(country)) fail('Paid cards are not offered in your country. Free cards still work.');
   if (C.paidAdultsOnly && !(data && data.adult) && !user.adultConfirmedAt) fail('Paid cards are for adults (18+). Confirm your age to continue.', 400, 'failed-precondition', { needsAdult: true });
   if (data && data.adult && !user.adultConfirmedAt) s.merge(P.user(uid), { adultConfirmedAt: new Date(s.now).toISOString() });
   const w = await wallet(s, uid);

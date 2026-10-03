@@ -145,8 +145,14 @@ class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
           }
           return false;
         },
-        child: PageView(
+        child: Listener(
+          // A finger on the card pauses the auto-slide until it lifts.
+          onPointerDown: (_) => _userPaging = true,
+          onPointerUp: (_) => _userPaging = false,
+          onPointerCancel: (_) => _userPaging = false,
+          child: PageView(
           controller: _pager,
+          physics: const ClampingScrollPhysics(),
           onPageChanged: (i) {
             if (_page == i) return;
             setState(() => _page = i);
@@ -165,6 +171,7 @@ class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
               child: _shell(neu, 2, _how()),
             ),
           ],
+        ),
         ),
       ),
     );
@@ -850,12 +857,28 @@ class _OutsidePromoState extends State<_OutsidePromo> {
     Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => page));
   }
 
+  Widget _banner(_Slide slide) => ColoredSplitPromoBanner(
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        height: 148,
+        spec: SplitPromoSpec(
+          title: slide.title,
+          cta: slide.cta,
+          leftColor: slide.left,
+          rightColor: slide.right,
+          art: slide.art,
+          onTap: () => _go(slide),
+        ),
+      );
+
   @override
   Widget build(BuildContext context) {
+    // One slide: just the banner, nothing to swipe or bounce.
+    if (widget.slides.length == 1) return _banner(widget.slides.first);
     return SizedBox(
       height: 148,
       child: PageView(
         controller: _pages,
+        physics: const ClampingScrollPhysics(),
         children: [
           for (final slide in widget.slides)
             ColoredSplitPromoBanner(

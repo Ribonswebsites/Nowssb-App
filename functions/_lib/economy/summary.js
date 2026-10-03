@@ -1,7 +1,7 @@
 /* One read for every program screen: balances, today's loops, quests,
    cards, gifts, links, Partner points and the public part of the settings. */
 import { DAY, dayIndex, monthKey, seasonTier, weekKey, loginCoins } from './rules.js';
-import { P, inTx, planOf, grantPass } from './core.js';
+import { P, planOf } from './core.js';
 import { ladderState, badgeList } from './rewards.js';
 import { oddsTable } from './coupons.js';
 
@@ -13,7 +13,7 @@ export function publicConfig(cfg) {
     cart: { coinCapBands: cfg.cart.coinCapBands, subscriptionCoinPct: cfg.cart.subscriptionCoinPct, maxTotalDiscountPct: cfg.cart.maxTotalDiscountPct, order: cfg.cart.order, payTiersINR: cfg.cart.payTiersINR },
     odds: oddsTable(cfg),
     coupons: { rarities: cfg.coupons.rarities, paidAdultsOnly: cfg.coupons.paidAdultsOnly, paidMonthlyLimitINR: cfg.coupons.paidMonthlyLimitINR, freeExpiryDays: cfg.coupons.freeExpiryDays, codes: Object.fromEntries(Object.entries(cfg.coupons.codes).map(([k, v]) => [k, { type: v.type, label: v.label, how: v.how || '', winPct: v.winPct || null }])) },
-    spin: { costCoins: cfg.spin.costCoins, perDay: cfg.spin.perDay, slices: cfg.spin.slices.map((x) => ({ label: x.label, w: x.w })) },
+    spin: { costCoins: cfg.spin.costCoins, freePerDay: spinFree(cfg), paidPerDay: spinPaid(cfg), perDay: spinFree(cfg) + spinPaid(cfg), slices: cfg.spin.slices.map((x) => ({ label: x.label, w: x.w })) },
     gifts: { boxes: Object.fromEntries(Object.entries(cfg.gifts.boxes).map(([k, b]) => [k, { title: b.title, minutes: b.minutes || null }])), cards: cfg.gifts.cards.map((c) => ({ id: c.id, title: c.title, productId: c.productId, priceINR: c.priceINR })), cardValidityDays: cfg.gifts.cardValidityDays, coolingOffDays: cfg.gifts.coolingOffDays, freeClaimDays: cfg.gifts.freeClaimDays },
     products: cfg.products,
     reference: { linkBase: cfg.reference.linkBase, holdDays: cfg.reference.holdDays, attribution: cfg.reference.attribution, friendDiscount: cfg.reference.friendDiscount, welcome: cfg.reference.welcome, activation: cfg.reference.activation, sharerLadder: cfg.reference.sharerLadder },
@@ -24,6 +24,19 @@ export function publicConfig(cfg) {
   };
 }
 
+export const spinFree = (cfg) => (cfg.spin.freePerDay ?? 1);
+export const spinPaid = (cfg) => (cfg.spin.paidPerDay ?? 40);
+/** What the wheel can do right now: a free spin, a paid spin, or nothing (and why). */
+export function spinState(D, W, cfg) {
+  const used = ((D && D.counts) || {}).spin || 0;
+  const free = Math.max(0, spinFree(cfg) - used);
+  const paidUsed = Math.max(0, used - spinFree(cfg));
+  const paidLeft = Math.max(0, spinPaid(cfg) - paidUsed);
+  const cost = cfg.spin.costCoins || 0;
+  const coins = (W && W.coins) || 0;
+  const canPay = paidLeft > 0 && coins >= cost;
+  return { used, freeLeft: free, paidLeft, cost, next: free > 0 ? 'free' : canPay ? 'paid' : paidLeft > 0 ? 'coins' : 'limit' };
+}
 const list = async (db, parent, coll, where = [], limit = 50) => (await db.query(coll, where, { parent, limit })).map((r) => ({ id: r.id, ...r.data }));
 
 export async function economySummary(ctx, uid) {
@@ -37,6 +50,8 @@ export async function economySummary(ctx, uid) {
     db.get(P.referral(uid)), db.get(P.partner(uid)), db.get(P.seller(uid)), db.get(P.user(uid)),
   ]);
   const base = `users/${uid}`;
+  const D0 = d.data || {};
+  const dailyCard = D0.scratchId ? await db.get(`${base}/scratchCards/${D0.scratchId}`).catch(() => ({ data: null })) : { data: null };
   const [cards, coupons, tokens, boxes, passes, sent, received] = await Promise.all([
     list(db, base, 'scratchCards', [['status', '==', 'sealed']], 60),
     list(db, base, 'coupons', [['status', '==', 'active']], 60),
@@ -46,7 +61,7 @@ export async function economySummary(ctx, uid) {
     list(db, base, 'giftsSent', [], 30),
     list(db, base, 'giftsReceived', [], 30),
   ]);
-  const coinRows = await db.query('coinLedger', [['uid', '==', uid]], { limit: 200 }).catch(() => []);
+  const coinRows = await db.query('coinLedger', [['uid', '==', uid]], { limit: 40 }).catch(() => []);
   const ms = (v) => (typeof v === 'number' ? v : v instanceof Date ? v.getTime() : Date.parse(v || '') || 0);
   const recentCoins = coinRows.map((r) => ({ id: r.id, ...(r.data || {}), at: ms((r.data || {}).at) })).sort((a, b) => (b.at || 0) - (a.at || 0)).slice(0, 12)
     .map((r) => ({ delta: r.delta || 0, reason: String(r.reason || ''), balance: r.balance ?? null, at: r.at || 0 }));
@@ -62,22 +77,17 @@ export async function economySummary(ctx, uid) {
   const sid = R.season.id;
   const xp = (W.seasonXp || {})[sid] || 0;
   const plan = planOf(user.data || {}, now);
-  // Banked passes start when no plan is active.
-  const banked = passes.filter((p) => p.status === 'banked');
-  if (!plan.active && banked.length) {
-    await inTx(ctx, async (s) => {
-      const b = banked[0];
-      s.t.set(`users/${uid}/passes/${b.id}`, { status: 'started', startedAt: now }, { merge: true });
-      await grantPass(s, uid, b.tier, b.days, { source: 'banked' });
-    }).catch(() => null);
-  }
+  // Banked passes start inside a write transaction (heartbeat / daily login),
+  // never here: the summary is read-only.
   const todayIdx = dayIndex(now, cfg);
   const broken = W.brokenStreak && todayIdx - W.brokenStreak.dayIdx <= R.streakRestore.maxMissedDays ? W.brokenStreak : null;
   return {
     live: true,
     now,
     wallet: { coins: W.coins || 0, lifetimeCoins: W.lifetimeCoins || 0, streak: W.streak || 0, bestStreak: W.bestStreak || 0, holds: W.holds || 0, freezes: W.freezes || 0, restores: W.restores || 0, brokenStreak: broken, practiceCredits: W.practiceCredits || 0, cosmetics: W.cosmetics || [], badges: (W.badges || []).length, earlyHours: W.earlyHours || 0, coinsBackBonusPct: W.coinsBackBonusPct || 0, leagueTier: W.leagueTier || R.leagues.tiers[0], nextLogin: loginCoins((W.streak || 0) + 1, cfg) },
-    today: { day, login: !!D.login, scratch: !!D.scratch, scratchId: D.scratchId || null, freeCoins: D.freeCoins || 0, ceiling: R.dailyCeiling, minutes: Math.floor(D.minutes || 0), ladder: ladderState(D, cfg), boxOpened: D.boxOpened || null, spins: (D.counts || {}).spin || 0, actions: Object.entries(R.actions).map(([id, a]) => ({ id, title: a.title, coins: a.coins, per: a.per || 'day', limit: a.limit || 1, done: a.per === 'once' ? ((W.done || {})[id] ? 1 : 0) : (D.counts || {})[id] || 0 })) },
+    today: { day, login: !!D.login, scratch: !!D.scratch, scratchId: D.scratchId || null, freeCoins: D.freeCoins || 0, ceiling: R.dailyCeiling, minutes: Math.floor(D.minutes || 0), ladder: ladderState(D, cfg), boxOpened: D.boxOpened || null, spins: (D.counts || {}).spin || 0,
+      spin: spinState(D, W, cfg),
+      scratchCard: dailyCard.data ? { id: D.scratchId, status: dailyCard.data.status, rarity: dailyCard.data.rarity, label: dailyCard.data.status === 'revealed' ? (dailyCard.data.label || (dailyCard.data.granted || {}).label || '') : '', granted: dailyCard.data.status === 'revealed' ? (dailyCard.data.granted || null) : null } : null, actions: Object.entries(R.actions).map(([id, a]) => ({ id, title: a.title, coins: a.coins, per: a.per || 'day', limit: a.limit || 1, done: a.per === 'once' ? ((W.done || {})[id] ? 1 : 0) : (D.counts || {})[id] || 0 })) },
     quests: {
       starter: (R.starterQuests || []).map((q) => ({ ...q, value: Number(W[q.metric]) || Number(stats[q.metric]) || 0, claimed: !!(W.done || {})['q:' + q.id] })),
       weekly: R.weeklyQuests.map((q) => ({ ...q, value: weekMetric(q.metric), claimed: claimedW.includes(q.id) })),

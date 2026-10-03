@@ -1,6 +1,8 @@
 /// Daily coins. Nothing opens by itself, and nothing flies until Claim is tapped.
 library;
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../widgets/app_thinking_loader.dart';
@@ -9,6 +11,7 @@ import '../../widgets/nwsb_coin_fly.dart';
 import '../../widgets/nwsb_icon.dart';
 import 'coupon_screen.dart';
 import 'economy_api.dart';
+import 'reward_fx.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import '../../admin/template/editable.dart';
 
@@ -56,7 +59,6 @@ class _DailyClaimBodyState extends State<DailyClaimBody> {
   Future<void> _claim() async {
     if (_busy) return;
     setState(() => _busy = true);
-    final before = EconomyMirror.instance.coins;
     try {
       final gained = await EconomyApi.claimToday();
       if (!mounted) return;
@@ -64,14 +66,9 @@ class _DailyClaimBodyState extends State<DailyClaimBody> {
       setState(() => _note = gained > 0
           ? '+$gained coins landed on this wallet.'
           : 'Today’s coins are already on the wallet.');
-      if (gained > 0 && mounted) {
-        await NwsbCoinFly.show(
-          context,
-          coins: gained,
-          from: before,
-          to: after,
-        );
-      }
+      // Reveal + coin flight run on the root overlay, so closing this
+      // sheet can no longer cut them off.
+      if (gained > 0) unawaited(playCoins(context, gained, balanceAfter: after, title: 'Today’s coins'));
     } on EconomyException catch (e) {
       if (!mounted) return;
       final raw = e.message.toUpperCase();

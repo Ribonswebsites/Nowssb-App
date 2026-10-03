@@ -11,6 +11,8 @@ import 'black_glass_banner.dart';
 import 'colored_split_promo_banner.dart';
 import 'home_parts.dart';
 import 'nwsb_icon.dart';
+import '../features/programs/program_router.dart';
+import '../shell/nwsb_links.dart';
 
 class BannerMix extends StatelessWidget {
   const BannerMix({
@@ -24,23 +26,36 @@ class BannerMix extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tap = onTap;
+    // Each banner opens what it names unless the page passes its own tap.
+    final i = seed.abs() % 4;
     final black = BlackGlassBanner(
       title: _blackTitle,
       subtitle: _blackSub,
       mark: NwsbMarks.bell,
       margin: EdgeInsets.zero,
-      onTap: tap,
+      onTap: onTap ??
+          () => switch (i) {
+                0 => NwsbLinks.subscription(context),
+                1 => NwsbLinks.tab(context, 2),
+                2 => Programmes.open(context, Programme.rewards, tab: 'streaks'),
+                _ => NwsbLinks.tab(context, 1),
+              },
     );
     final split = ColoredSplitPromoBanner(
-      spec: SplitPromoExtras.at(seed + 3, onTap: tap),
+      spec: SplitPromoExtras.at(seed + 3, onTap: onTap),
       margin: EdgeInsets.zero,
     );
     final bar = SecBanner(
       title: _barTitle,
       sub: _barSub,
       mark: NwsbMarks.gift,
-      onTap: tap,
+      onTap: onTap ??
+          () => switch (i) {
+                0 => NwsbLinks.tab(context, 3),
+                1 => Programmes.open(context, Programme.rewards),
+                2 => Programmes.open(context, Programme.gifts, tab: 'send'),
+                _ => NwsbLinks.tasks(context),
+              },
     );
     final order = <Widget>[black, split, bar];
     final start = seed.abs() % order.length;
@@ -67,7 +82,7 @@ class BannerMix extends StatelessWidget {
 
   String get _blackSub {
     const subs = [
-      'Half price on this account until midnight.',
+      'The plans, at today’s Google Play price.',
       'Saved words, meanings, and the ones you own.',
       'One sitting today keeps it.',
       'Sit with it. The recording is the whole practice.',

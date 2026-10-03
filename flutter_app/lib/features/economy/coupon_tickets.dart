@@ -2,6 +2,7 @@
 /// and a portrait card that flips. Chance cards can win or lose.
 library;
 
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -113,11 +114,27 @@ const kFlipCoupons = <FlipCouponData>[
   FlipCouponData(ribbon: 'TAKE A CHANCE', ribbonColor: _gold, ribbonInk: Colors.black, big: '20', mark: '', side: 'COIN', subtitle: 'WIN OR LOSE', code: '????', copy: 'NWSB-CHANCE-COIN', codeColor: Color(0xFFC9A227), fine: 'Coin chance. You can win or lose.', chance: true, winPercent: 25, winLabel: '20 coins', winCoins: 20),
 ];
 
-String couponExpiry() {
-  final d = DateTime.now().add(const Duration(days: 30));
-  final m = d.month.toString().padLeft(2, '0');
-  final day = d.day.toString().padLeft(2, '0');
-  return '$m/$day/${d.year}';
+/// What the server says about a ticket code (summary.config.coupons.codes):
+/// its real label, chance and "how to get it". Null when offline.
+Map<String, dynamic>? couponCodeInfo(String copy) {
+  final cfg = EconomyMirror.instance.summary['config'];
+  final codes = cfg is Map && cfg['coupons'] is Map ? (cfg['coupons'] as Map)['codes'] : null;
+  final c = codes is Map ? codes[copy] : null;
+  return c is Map ? c.map((k, v) => MapEntry('$k', v)) : null;
+}
+
+/// The real validity line for a ticket: discounts last N days from the
+/// day you claim them (server config); other tickets don't expire.
+/// Never a made-up calendar date.
+String couponExpiry([String? copy]) {
+  final info = copy == null ? null : couponCodeInfo(copy);
+  final cfg = EconomyMirror.instance.summary['config'];
+  final days = cfg is Map && cfg['coupons'] is Map ? ((cfg['coupons'] as Map)['freeExpiryDays'] as num?)?.toInt() : null;
+  final type = info?['type'];
+  if (type == 'percentOff') return days == null ? 'VALID AFTER CLAIM' : '$days DAYS AFTER CLAIM';
+  if (type == 'chance') return 'ONE TRY A DAY';
+  if (type == 'locked') return 'EARNED, NOT CLAIMED';
+  return 'NO EXPIRY';
 }
 
 String couponDigits(String code) {
@@ -125,50 +142,62 @@ String couponDigits(String code) {
   return n.substring(n.length - 12);
 }
 
-/// Both rows. The first scrolls sideways. The second flips.
-class CouponRails extends StatelessWidget {
-  const CouponRails({super.key});
+/// The coupon tickets as a contained grid (two across). No sideways
+/// strip inside the page scroll, so it never traps a swipe. Shows the
+/// first [initial] tickets and expands in place.
+class CouponRails extends StatefulWidget {
+  const CouponRails({super.key, this.initial = 4});
+  final int initial;
+
+  @override
+  State<CouponRails> createState() => _CouponRailsState();
+}
+
+class _CouponRailsState extends State<CouponRails> {
+  var _all = false;
 
   @override
   Widget build(BuildContext context) {
-    final expires = couponExpiry();
+    final list = _all ? kFlipCoupons : kFlipCoupons.take(widget.initial).toList();
     return LayoutBuilder(
       builder: (context, constraints) {
-        final maxW = constraints.maxWidth;
-        final cardW = (maxW * 0.74).clamp(188.0, 250.0);
-        final cardH = cardW * 1.9;
-        return SizedBox(
-          height: cardH,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            itemCount: kFlipCoupons.length + 1,
-            separatorBuilder: (_, __) => const SizedBox(width: 12),
-            itemBuilder: (_, i) {
-              if (i == 0) {
-                return ClipRRect(
-                  borderRadius: BorderRadius.circular(18),
-                  child: SizedBox(
-                    width: cardW,
-                    height: cardH,
-                    child: EditableImage.asset(
-                      'assets/gifts/coupon-hero.png',
-                      fit: BoxFit.cover,
-                      alignment: Alignment.topCenter,
-                      errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black),
-                      slot: 'coupon_tickets.CouponRails',
-                    ),
-                  ),
-                );
-              }
-              return FlipCoupon(
-                data: kFlipCoupons[i - 1],
-                width: cardW,
-                height: cardH,
-                expires: expires,
-              );
-            },
-          ),
+        final w = (constraints.maxWidth - 12) / 2;
+        const h = 340.0;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(18),
+              child: SizedBox(
+                height: 132,
+                child: EditableImage.asset(
+                  'assets/gifts/coupon-hero.png',
+                  fit: BoxFit.cover,
+                  alignment: const Alignment(0, -0.35),
+                  errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black),
+                  slot: 'coupon_tickets.CouponRails',
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: [
+                for (final d in list) FlipCoupon(key: ValueKey(d.copy), data: d, width: w, height: h, expires: couponExpiry(d.copy)),
+              ],
+            ),
+            if (kFlipCoupons.length > widget.initial) ...[
+              const SizedBox(height: 10),
+              Center(
+                child: TextButton(
+                  onPressed: () => setState(() => _all = !_all),
+                  style: TextButton.styleFrom(foregroundColor: const Color(0xFFE4C56A)),
+                  child: Text(_all ? 'Show fewer' : 'Show all ${kFlipCoupons.length} tickets', style: const TextStyle(fontWeight: FontWeight.w800)),
+                ),
+              ),
+            ],
+          ],
         );
       },
     );
@@ -207,7 +236,8 @@ class _WideCouponState extends State<WideCoupon> {
         if (mounted && r['how'] != null && r['granted'] == null) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${r['how']}')));
         }
-        if (mounted) await celebrate(context, r);
+        // The reveal + coin fly run on the root overlay; no mounted check.
+        if (r['how'] == null || r['granted'] != null) unawaited(celebrate(context, r));
       } on EconomyException catch (e) {
         if (mounted) showEconomyError(context, e);
       }
@@ -326,16 +356,45 @@ class _FlipCouponState extends State<FlipCoupon> with SingleTickerProviderStateM
     super.dispose();
   }
 
+  // The server's day (IST), zero-padded, so 1 Nov and 11 Jan never collide.
   String get _day {
-    final n = DateTime.now();
-    return '${n.year}${n.month}${n.day}';
+    final n = DateTime.now().toUtc().add(const Duration(minutes: 330));
+    return '${n.year}${n.month.toString().padLeft(2, '0')}${n.day.toString().padLeft(2, '0')}';
   }
 
   String get _key => widget.data.chance ? 'nwsb_cflip_${widget.data.copy}_$_day' : 'nwsb_copen_${widget.data.copy}';
+  String get _claimKey => 'nwsb_cclaim_${widget.data.copy}';
+  String? _claimed; // label of what landed on the account, or the "how" line
+  var _claiming = false;
+
+  /// Non-chance tickets: claim on the server (coupon lands in the account
+  /// and in the checkout picker; locked ones explain how to earn them).
+  Future<void> _claim() async {
+    if (_claiming || _claimed != null) return;
+    setState(() => _claiming = true);
+    try {
+      final r = await EconomyApi.call('claimTicket', {'code': widget.data.copy});
+      final line = r['how'] != null && r['granted'] == null ? '${r['how']}' : '${(r['granted'] is Map ? (r['granted'] as Map)['label'] : null) ?? r['label'] ?? 'On your account'}';
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        if (r['how'] == null) await prefs.setString(_claimKey, line);
+      } catch (_) {}
+      if (mounted) setState(() => _claimed = line);
+      if (r['how'] == null || r['granted'] != null) unawaited(celebrate(context, r));
+    } on EconomyException catch (e) {
+      if (e.code == 'already-exists' && mounted) setState(() => _claimed = 'Already on your account');
+      if (mounted && e.code != 'already-exists') showEconomyError(context, e);
+    } catch (_) {
+    } finally {
+      if (mounted) setState(() => _claiming = false);
+    }
+  }
 
   Future<void> _load() async {
     try {
       final prefs = await SharedPreferences.getInstance();
+      final claimed = prefs.getString(_claimKey);
+      if (claimed != null && mounted) setState(() => _claimed = claimed);
       final saved = prefs.getString(_key);
       if (!mounted || _touched || saved == null) return;
       setState(() {
@@ -373,8 +432,8 @@ class _FlipCouponState extends State<FlipCoupon> with SingleTickerProviderStateM
     } else {
       await _turn.forward();
       if (mounted) setState(() { _showBack = true; _busy = false; });
-      if (won != null && mounted) {
-        await celebrate(context, won);
+      if (won != null) {
+        unawaited(celebrate(context, won));
       }
     }
   }
@@ -434,7 +493,9 @@ class _FlipCouponState extends State<FlipCoupon> with SingleTickerProviderStateM
   Widget _front() {
     final d = widget.data;
     final shown = d.chance && _result == null ? '????' : (d.chance && _result == 'lose' ? 'LOSE' : d.code);
-    final fine = d.chance ? 'Win ${d.winPercent}% or lose. Odds stay on this card.' : d.fine;
+    final info = couponCodeInfo(d.copy);
+    final pct = (info?['winPct'] as num?)?.toInt() ?? d.winPercent;
+    final fine = d.chance ? 'Win $pct% or lose: ${info?['label'] ?? d.winLabel}.' : (info?['type'] == 'locked' ? '${info?['how'] ?? d.fine}' : d.fine);
     return _shell(
       child: Column(
         children: [
@@ -464,10 +525,10 @@ class _FlipCouponState extends State<FlipCoupon> with SingleTickerProviderStateM
           Row(
             children: [
               const Expanded(child: ColoredBox(color: Colors.white, child: SizedBox(height: 1))),
-              Padding(
+              Flexible(flex: 4, child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 6),
                 child: Text(d.subtitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.w700, letterSpacing: 0.6)),
-              ),
+              )),
               const Expanded(child: ColoredBox(color: Colors.white, child: SizedBox(height: 1))),
             ],
           ),
@@ -501,10 +562,11 @@ class _FlipCouponState extends State<FlipCoupon> with SingleTickerProviderStateM
     final d = widget.data;
     final lose = d.chance && _result == 'lose';
     final win = d.chance && _result == 'win';
+    final info = couponCodeInfo(d.copy);
     final title = lose ? 'LOSE' : (win ? 'WIN' : d.code);
     final line = lose
         ? 'No prize. This card can lose.'
-        : (win ? d.winLabel : 'On this account. Not cash.');
+        : (win ? '${info?['label'] ?? d.winLabel}' : (_claimed ?? '${info?['label'] ?? 'On this account'}. Not cash.'));
     return _shell(
       child: Column(
         children: [
@@ -534,6 +596,25 @@ class _FlipCouponState extends State<FlipCoupon> with SingleTickerProviderStateM
               ),
             ),
           const Spacer(),
+          if (!d.chance)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: GestureDetector(
+                onTap: _claim,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: _claimed != null ? const Color(0x22FFFFFF) : const Color(0xFFF5C518),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    _claimed != null ? 'CLAIMED' : (_claiming ? 'CLAIMING…' : (info?['type'] == 'locked' ? 'HOW TO GET IT' : 'CLAIM')),
+                    style: TextStyle(color: _claimed != null ? Colors.white : Colors.black, fontWeight: FontWeight.w900, fontSize: 11, letterSpacing: 1),
+                  ),
+                ),
+              ),
+            ),
           _BarcodePill(code: d.copy),
           const SizedBox(height: 4),
           const EditableLabel('coupon_tickets.FlipCoupon', 'Flip back. Not a rank key.', style: TextStyle(color: Colors.white70, fontSize: 8)),

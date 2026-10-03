@@ -8,6 +8,7 @@ import { applySale, reverseSale } from '../../functions/_lib/economy/sales.js';
 import { balances } from '../../functions/_lib/economy/earn.js';
 import { adminPayout, adminMonthlyPool } from '../../functions/_lib/economy/admin.js';
 import { buildItems } from '../../functions/_lib/economy/playorders.js';
+import { takeCoachTurn, COACH_LIMITS } from '../../functions/_lib/coach_quota.js';
 
 const env = { FIRESTORE_EMULATOR_HOST: process.env.FIRESTORE_EMULATOR_HOST, FIREBASE_PROJECT_ID: 'nowssb-34f1b' };
 const db = await FsDb.fromEnv(env);
@@ -30,6 +31,11 @@ await put('users/seller', { displayName: 'Sita Seller', isPro: true, tier: 'freq
 await put('users/sponsor', { displayName: 'Ravi Sponsor', isPro: true, tier: 'frequencyX', subscriptionSource: 'play', subscriptionEndDate: future });
 await put('users/buyer', { displayName: 'Bina Buyer' });
 await put('users/twin', { displayName: 'Twin' });
+await put('users/quester', { displayName: 'Q' });
+// Published words and an admin price, as Firestore would have them.
+await put('words/om', { key: 'om', word: 'OM', status: 'live' });
+await put('words/ra', { key: 'ra', word: 'RA', status: 'live' });
+await put('config/store', { defaults: { word: 99 }, items: { 'word:om': 199 } });
 await put('admins/boss', { at: 1 });
 
 await t('daily login: coins once a day, streak, ledger', async () => {
@@ -70,12 +76,51 @@ await t('daily scratch: server decides, reveal grants once', async () => {
   const legacy = await call('scratchCoupon', 'buyer');
   eq(legacy.already, true);
 });
-await t('spin costs coins, once a day', async () => {
+await t('spin: first free, then paid at costCoins while coins allow; nonce replay never charges twice', async () => {
   const before = await coins('buyer');
-  const s = await call('spin', 'buyer');
-  ok(s.slice >= 0 && s.slice < cfg.spin.slices.length);
-  ok((await coins('buyer')) >= before - cfg.spin.costCoins);
-  await rejects(call('spin', 'buyer'), /One spin/);
+  const s1 = await call('spin', 'buyer', { nonce: 'n1' });
+  ok(s1.slice >= 0 && s1.slice < cfg.spin.slices.length);
+  eq([s1.free, s1.cost], [true, 0]);
+  ok((await coins('buyer')) >= before, 'free spin costs nothing');
+  const replay = await call('spin', 'buyer', { nonce: 'n1' });
+  eq([replay.replay, replay.slice], [true, s1.slice]);
+  await put('users/buyer/wallet/main', { ...((await db.get('users/buyer/wallet/main')).data), coins: 50 });
+  const s2 = await call('spin', 'buyer', { nonce: 'n2' });
+  eq([s2.free, s2.cost], [false, cfg.spin.costCoins]);
+  const g = s2.granted && s2.granted.type === 'coins' ? s2.granted.coins : 0;
+  eq(await coins('buyer'), 50 - cfg.spin.costCoins + g);
+  await call('spin', 'buyer', { nonce: 'n2' });
+  eq(await coins('buyer'), 50 - cfg.spin.costCoins + g, 'replay not charged');
+  await put('users/buyer/wallet/main', { ...((await db.get('users/buyer/wallet/main')).data), coins: 3 });
+  await rejects(call('spin', 'buyer', { nonce: 'n3' }), /Not enough coins/);
+  const sum = await call('summary', 'buyer');
+  eq(sum.today.spin.next, 'coins');
+});
+await t('per-key actions: verified on the server and capped per day', async () => {
+  const a = await call('reportAction', 'quester', { action: 'close_stage', key: 'made-up-1' });
+  eq([a.coins, a.verified], [0, false]);
+  await call('reportPractice', 'quester', { practiced: true, wordId: 'om' });
+  eq(((await db.get('users/quester/mastery/om')).data || {}).practiceDays || 0, 0, 'no player session, no practice day');
+  await call('heartbeat', 'quester', {});
+  await call('reportPractice', 'quester', { practiced: true, wordId: 'made-up-word' });
+  eq((await db.get('users/quester/mastery/made-up-word')).exists, false, 'unknown word ignored');
+  await call('reportPractice', 'quester', { practiced: true, wordId: 'om' });
+  const b = await call('reportAction', 'quester', { action: 'close_stage', key: 'om:1' });
+  ok(b.coins > 0, 'real practised word pays');
+  for (let i = 0; i < 6; i++) await call('reportAction', 'quester', { action: 'first_share', key: 'w' + i });
+  const c = await call('reportAction', 'quester', { action: 'first_share', key: 'w99' });
+  eq(c.coins, 0);
+  const p = await call('reportAction', 'quester', { action: 'reminders_on' });
+  eq(p.coins, 0, 'no push subscription, no coins');
+});
+await t('heartbeat: beats closer than the minimum gap add nothing', async () => {
+  const a = await call('heartbeat', 'quester');
+  clock += 5e3;
+  const b = await call('heartbeat', 'quester');
+  eq(b.early, true);
+  clock += 60e3;
+  const c = await call('heartbeat', 'quester');
+  ok(c.minutes >= a.minutes);
 });
 await t('tickets: percent-off coupon once; locked explains; chance once a day', async () => {
   const a = await call('claimTicket', 'buyer', { code: 'NWSB-SAVE20' });
@@ -106,6 +151,20 @@ await t('checkout: friend 10% → coupon → coins held; Play tier product', asy
   ok(q.productId.startsWith('nowssb_tier_')); eq(q.quote.friendPct, 10);
   ok(q.quote.linkOffINR === 19.9 && q.quote.couponOffINR > 0, 'link then coupon');
   globalThis.CK = q;
+});
+await t('checkout: server prices each line; a forged kind or price is refused', async () => {
+  await rejects(call('quote', 'buyer', { items: [{ id: 'word:om', kind: 'stage', title: 'Om', price: 29 }] }), /match/);
+  await rejects(call('quote', 'buyer', { items: [{ id: 'word:om', kind: 'word', title: 'Om', price: 29 }] }), /Prices changed/);
+  await rejects(call('quote', 'buyer', { items: [{ id: 'ebook:x', kind: 'ebook', title: 'X', price: 29 }] }), /Prices changed/);
+  await rejects(call('quote', 'buyer', { items: [{ id: 'constructor', kind: 'word', price: 99 }] }), /bought here/);
+  const q = await call('quote', 'buyer', { items: [{ id: 'word:ra', kind: 'word', title: 'Ra', price: 99 }] });
+  ok(q.listINR === 99 || (q.quote && q.quote.listINR === 99) || q.payINR != null, 'default price accepted');
+});
+await t('prototype names never reach the wallet', async () => {
+  await rejects(call('reportAction', 'buyer', { action: 'toString' }), /Unknown activity/);
+  await rejects(call('spendCoins', 'buyer', { item: 'cosmetic', cosmeticId: 'constructor' }), /Unknown item/);
+  await rejects(call('openBox', 'buyer', { box: '__proto__' }), /./);
+  ok(Number.isFinite(await coins('buyer')), 'coins stay a number');
 });
 await t('cleared sale: items, coins back, first-purchase set, seller commission via money lock, partner points', async () => {
   const ck = (await db.get(`checkouts/${CK.checkoutId}`)).data;
@@ -198,7 +257,8 @@ await t('weekly quests + chest + summary', async () => {
 await t('mastery levels pay per level, capped per day; set completes', async () => {
   await rejects(call('claimMilestone', 'buyer', { wordId: 'love', level: 3 }), /Practise love/);
   const start = clock;
-  for (let i = 0; i < 3; i++) { await call('reportPractice', 'buyer', { practiced: true, wordId: 'love' }); clock += 86400e3; }
+  for (let i = 0; i < 3; i++) { await call('heartbeat', 'buyer', {}); await call('reportPractice', 'buyer', { practiced: true, wordId: 'love' }); clock += 86400e3; }
+  await call('heartbeat', 'buyer', {});
   await call('reportPractice', 'buyer', { practiced: true, wordId: 'love' }); // same day twice counts once
   const r = await call('claimMilestone', 'buyer', { wordId: 'love', level: 3 });
   clock = start;
@@ -234,6 +294,38 @@ await t('admin console gift codes redeem once; ledgers are written', async () =>
   ok((await db.query('couponLedger', [])).length >= 1, 'couponLedger');
   ok((await db.query('cashLedger', [['mirror', '==', true]])).length >= 1, 'cashLedger mirror');
   ok((await db.query('referrals', [])).length >= 1, 'referrals');
+});
+await t('gift code email lock uses the verified sign-in email, not the profile field', async () => {
+  await put('gifts/GFTMAIL2345', { code: 'GFTMAIL2345', item: 'word', itemId: 'word', label: 'A word', source: 'admin', status: 'unredeemed', recipientEmail: 'friend@example.com', createdAt: clock, expiresAt: clock + 86400e3 });
+  await put('users/twin', { displayName: 'Twin', email: 'friend@example.com' });
+  const as = (claims) => ACTIONS.redeemGift({ ...ctx(), claims }, 'twin', { code: 'GFTMAIL2345' });
+  await rejects(as({ sub: 'twin', email: 'me@example.com', email_verified: true }), /different account/);
+  await rejects(as({ sub: 'twin', email: 'friend@example.com', email_verified: false }), /Verify/);
+  const r = await as({ sub: 'twin', email: 'Friend@Example.com', email_verified: true });
+  eq(r.granted.type, 'token');
+});
+await t('welcome set: only for accounts younger than 14 days', async () => {
+  await put('users/oldie', { displayName: 'Old' });
+  await call('registerDevice', 'oldie', { installId: 'phone-oldie-789' });
+  plusDays(20);
+  const a = await call('attachReferral', 'oldie', { code: LINK });
+  plusDays(-20);
+  eq(a.attached, true); eq(a.welcome, null, 'no welcome for an old account');
+  eq(((await db.get('users/oldie/referral/main')).data || {}).newAccount, false);
+});
+await t('paid cards: a blocked edge country blocks even if the phone says IN', async () => {
+  const card = (cfg.coupons.paid || [])[0];
+  if (!card) return;
+  await rejects(ACTIONS.beginCheckout({ ...ctx(), country: 'US' }, 'buyer', { kind: 'scratch', cardId: card.id, country: 'IN', adult: true }), /country/);
+});
+await t('coach: burst limit per minute and a daily allowance by plan', async () => {
+  let n = 0;
+  for (let i = 0; i < COACH_LIMITS.perMinute; i++) { if ((await takeCoachTurn(env, 'buyer', clock + i)).ok) n++; }
+  eq(n, COACH_LIMITS.perMinute);
+  eq((await takeCoachTurn(env, 'buyer', clock + 10)).ok, false, 'burst');
+  let more = 0;
+  for (let i = 0; i < 30; i++) { if ((await takeCoachTurn(env, 'buyer', clock + 61e3 * (i + 1))).ok) more++; }
+  eq(more, COACH_LIMITS.perDay.free - COACH_LIMITS.perMinute, 'free daily allowance');
 });
 await t('payout account outside India: Wise / PayPal by hand', async () => {
   const r = await call('savePayoutAccount', 'seller', { country: 'GB', method: 'paypal', email: 'seller@example.com', legalName: 'Sam Seller' });

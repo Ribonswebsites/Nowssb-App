@@ -3,6 +3,8 @@
 /// only uncovers what the server drew.
 library;
 
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -15,6 +17,8 @@ import '../economy/play_billing.dart';
 import '../economy/reward_fx.dart';
 import '../economy/scratch_card.dart';
 import 'program_kit.dart';
+import 'program_heroes.dart';
+import '../economy/coupon_screen.dart';
 import '../../admin/template/editable.dart';
 
 const kCouponsDisclaimer =
@@ -22,24 +26,30 @@ const kCouponsDisclaimer =
     'and over, may not be available in your country, and always return at least the price paid in coins or discounts. Prizes '
     'have no cash value and cannot be transferred. Set a monthly limit any time in Settings.';
 
+const kCouponsSpec = ProgramSpec(
+  pageId: 'coupons.program',
+  title: 'NowssB Coupons',
+  mark: NwsbMarks.coupon,
+  disclaimer: kCouponsDisclaimer,
+  accent: ProgramAccent.coupons,
+  tabs: [
+    ProgramTab('mine', 'My Coupons', _mine),
+    ProgramTab('scratch', 'Scratch', _scratch),
+    ProgramTab('shop', 'Coupon Shop', _shop),
+    ProgramTab('history', 'History', _history),
+    ProgramTab('odds', 'Rules and Odds', _odds),
+  ],
+);
+
+/// Kept for every existing entry point: opens the one Coupons page
+/// (CouponScreen), at tab [initialTab] when given.
 class CouponsProgramPage extends StatelessWidget {
-  const CouponsProgramPage({super.key, this.initialTab = 0});
-  final int initialTab;
+  const CouponsProgramPage({super.key, this.initialTab});
+  final int? initialTab;
 
   @override
-  Widget build(BuildContext context) => ProgramPage(
-        pageId: 'coupons.program',
-        title: 'NowssB Coupons',
-        mark: NwsbMarks.coupon,
-        initialTab: initialTab,
-        disclaimer: kCouponsDisclaimer,
-        tabs: const [
-          ProgramTab('mine', 'My Coupons', _mine),
-          ProgramTab('scratch', 'Scratch', _scratch),
-          ProgramTab('shop', 'Coupon Shop', _shop),
-          ProgramTab('history', 'History', _history),
-          ProgramTab('odds', 'Rules and Odds', _odds),
-        ],
+  Widget build(BuildContext context) => CouponScreen(
+        initialTab: initialTab == null ? null : kCouponsSpec.tabs[initialTab!.clamp(0, kCouponsSpec.tabs.length - 1)].id,
       );
 }
 
@@ -54,7 +64,10 @@ List<Widget> _mine(BuildContext context, Map<String, dynamic> s) {
       if (cards.isEmpty) const PEmpty('No sealed cards. Earn them from streaks, quests, gift boxes and purchases, or get one in the Coupon Shop.'),
       for (final r in const ['mythic', 'legendary', 'epic', 'rare', 'common'])
         if (cards.any((c) => c['rarity'] == r))
-          PRow(title: '${rarityTitle(r)} · ${cards.where((c) => c['rarity'] == r).length}', sub: 'Open them in Scratch', mark: NwsbMarks.coupon, color: rarityColor(r)),
+          GestureDetector(
+            onTap: () => ProgramTabsScope.goTo(context, 'scratch'),
+            child: PRow(title: '${rarityTitle(r)} · ${cards.where((c) => c['rarity'] == r).length}', sub: 'Open them in Scratch', mark: NwsbMarks.coupon, color: rarityColor(r), trailing: const Icon(Icons.chevron_right, color: NwsbColors.goldLight)),
+          ),
     ])),
     LSection('coupons', 'Discounts', PCard(children: [
       const PHeading('Use at checkout', 'Discounts', slot: 'coupons_program.mine'),
@@ -76,9 +89,15 @@ List<Widget> _mine(BuildContext context, Map<String, dynamic> s) {
   ];
 }
 
+/// Cards opened this session stay on screen (the summary lists only sealed
+/// cards, so without this a just-scratched card would vanish mid-reveal).
+final _revealedThisSession = <String, Map<String, dynamic>>{};
+
 List<Widget> _scratch(BuildContext context, Map<String, dynamic> s) {
   final t = sMap(s['today']);
-  final cards = sList(s['scratchCards']);
+  final sealed = sList(s['scratchCards']);
+  final ids = {for (final c in sealed) '${c['id']}'};
+  final cards = [...sealed, for (final e in _revealedThisSession.entries) if (!ids.contains(e.key)) e.value];
   return [
     LSection('daily', 'Daily scratch', PCard(children: [
       PRow(
@@ -89,7 +108,7 @@ List<Widget> _scratch(BuildContext context, Map<String, dynamic> s) {
       ),
     ])),
     if (cards.isEmpty) const LSection('empty', 'No cards', PEmpty('No sealed cards right now.')),
-    for (final c in cards) LSection('card_${c['id']}', 'Scratch card', Padding(padding: const EdgeInsets.only(bottom: 14), child: SealedScratch(card: c))),
+    for (final c in cards) LSection('card_${c['id']}', 'Scratch card', Padding(padding: const EdgeInsets.only(bottom: 14), child: SealedScratch(key: ValueKey('scratch_${c['id']}'), card: c))),
   ];
 }
 
@@ -106,8 +125,16 @@ class _SealedScratchState extends State<SealedScratch> {
   Map<String, dynamic>? _result;
   String? _error;
 
+  @override
+  void initState() {
+    super.initState();
+    final kept = _revealedThisSession['${widget.card['id']}'];
+    if (kept != null && kept['_result'] is Map<String, dynamic>) _result = kept['_result'] as Map<String, dynamic>;
+  }
+
   void _open() {
     _reveal ??= EconomyApi.call('revealScratch', {'id': widget.card['id']}).then((r) {
+      _revealedThisSession['${widget.card['id']}'] = {...widget.card, '_result': r};
       if (mounted) setState(() => _result = r);
       return r;
     }).catchError((Object e) {
@@ -119,17 +146,22 @@ class _SealedScratchState extends State<SealedScratch> {
   Future<void> _cleared() async {
     _open();
     final r = await _reveal!;
-    if (!mounted || r.isEmpty) return;
-    await Future<void>.delayed(const Duration(milliseconds: 700));
-    if (!mounted) return;
-    await playCoins(context, coinsIn(r), balanceAfter: balanceIn(r));
-    await EconomyMirror.instance.refresh();
+    if (r.isEmpty || r['already'] == true) return;
+    // "You won X" + coin fly on the root overlay: plays even if this card
+    // scrolls away or the list reloads.
+    unawaited(celebrate(context, r, title: '${rarityTitle('${r['rarity'] ?? widget.card['rarity'] ?? ''}')} card'));
   }
 
   @override
   Widget build(BuildContext context) {
     final rarity = '${widget.card['rarity'] ?? 'common'}';
     final paid = widget.card['paid'] == true;
+    if (_result != null && _reveal == null) {
+      // Opened earlier this session: show it open, not sealed again.
+      return PCard(glow: rarityColor(rarity), children: [
+        PRow(title: '${_result!['label'] ?? 'Prize'}', sub: '${rarityTitle(rarity)} · scratched · on your account', mark: NwsbMarks.coupon, color: rarityColor(rarity)),
+      ]);
+    }
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       Row(children: [
         Text(rarityTitle(rarity).toUpperCase(), style: TextStyle(color: rarityColor(rarity), letterSpacing: 1.4, fontSize: 11, fontWeight: FontWeight.w800)),
@@ -165,6 +197,8 @@ List<Widget> _shop(BuildContext context, Map<String, dynamic> s) {
     const LSection('note', 'Shop note', PEmpty('Every paid card returns at least its price in coins or discounts. Odds are listed on each card. 18+ only.', slot: 'coupons_program.shop')),
     for (final c in paid)
       LSection('card_${c['id']}', '${c['title']}', PCard(glow: rarityColor('${c['id']}'), children: [
+        EditableLabel('coupons_program.shared', 'PAID CARD', style: TextStyle(color: rarityColor('${c['id']}').withValues(alpha: 0.8), fontSize: 10, letterSpacing: 2, fontWeight: FontWeight.w800)),
+        const SizedBox(height: 4),
         Row(children: [
           Expanded(child: Text('${c['title']}', style: TextStyle(color: rarityColor('${c['id']}'), fontSize: 18, fontWeight: FontWeight.w800))),
           Text(inr(sNum(c['priceINR'])), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
@@ -203,7 +237,9 @@ class _PaidBuyState extends State<_PaidBuy> {
     setState(() => _busy = true);
     try {
       final r = await PlayCheckout.purchase({'kind': 'scratch', 'cardId': widget.cardId, if (adult) 'adult': true});
-      if (mounted) await celebrate(context, r, title: 'Your card is ready in Scratch');
+      if (!mounted) return;
+      unawaited(celebrate(context, r, title: 'Your card is ready in Scratch'));
+      ProgramTabsScope.goTo(context, 'scratch');
       await EconomyMirror.instance.refresh();
     } on EconomyException catch (e) {
       if (e.extra['needsAdult'] == true && mounted) {
@@ -241,6 +277,8 @@ class _PaidBuyState extends State<_PaidBuy> {
       );
 }
 
+final _historyStreams = <String, Stream<QuerySnapshot<Map<String, dynamic>>>>{};
+
 List<Widget> _history(BuildContext context, Map<String, dynamic> s) {
   final uid = EconomyMirror.instance.uid;
   return [
@@ -250,7 +288,8 @@ List<Widget> _history(BuildContext context, Map<String, dynamic> s) {
         const PEmpty('Sign in to see your history.')
       else
         StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-          stream: FirebaseFirestore.instance.collection('users/$uid/scratchCards').where('status', isEqualTo: 'revealed').limit(60).snapshots(),
+          // One stream per account, so a rebuild never re-subscribes (no loader flash).
+          stream: _historyStreams.putIfAbsent(uid, () => FirebaseFirestore.instance.collection('users/$uid/scratchCards').where('status', isEqualTo: 'revealed').limit(60).snapshots()),
           builder: (context, snap) {
             final docs = [...?snap.data?.docs]..sort((a, b) => sInt(b.data()['revealedAt'] ?? b.data()['at']).compareTo(sInt(a.data()['revealedAt'] ?? a.data()['at'])));
             if (docs.isEmpty) return const PEmpty('Nothing scratched yet.');

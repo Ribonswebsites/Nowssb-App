@@ -26,8 +26,10 @@ export function newId(now = Date.now(), prefix = '') {
 }
 
 export class Session {
-  constructor(t, { db, cfg, now, env }) {
+  constructor(t, { db, cfg, now, env, country = '' }) {
     this.t = t; this.db = db; this.cfg = cfg; this.now = now; this.env = env;
+    // Where the request came from (Cloudflare's CF-IPCountry), not what the phone says.
+    this.country = String(country || '').toUpperCase();
     this.docs = new Map(); this.dirty = new Set(); this.merges = new Map();
     this.creates = []; this.effects = []; // effects: what the phone should animate
   }
@@ -121,7 +123,13 @@ export async function today(s, uid) {
  * ceiling (lower for new accounts) and event multipliers. Returns the amount
  * actually moved.
  */
+/** Own-property lookup: a client key like 'constructor' or 'toString' never resolves to Object.prototype. */
+export function pick(obj, key) {
+  return obj != null && typeof key === 'string' && Object.prototype.hasOwnProperty.call(obj, key) ? obj[key] : undefined;
+}
+
 export async function moveCoins(s, uid, delta, reason, { ref = '', free = false, multiply = free } = {}) {
+  if (typeof delta !== 'number' || !Number.isFinite(delta)) fail('Bad coin amount.', 400, 'invalid-argument');
   const w = await wallet(s, uid);
   let amt = Math.round(delta);
   if (amt > 0 && multiply) amt = Math.round(amt * eventMultiplier(s.now, s.cfg));
@@ -132,6 +140,13 @@ export async function moveCoins(s, uid, delta, reason, { ref = '', free = false,
     const ceiling = young ? R.newAccountCeiling : R.dailyCeiling;
     amt = Math.max(0, Math.min(amt, ceiling - (d.freeCoins || 0)));
     d.freeCoins = (d.freeCoins || 0) + amt;
+    // League XP = free coins per day, recorded on the day they're earned
+    // (not only on days the league screen happens to open).
+    if (amt > 0 && s.week) {
+      const wk = await s.edit(P.week(uid, s.week), { week: s.week, counts: {}, activeDays: [], minutesByDay: {}, claimed: [] });
+      wk.xpByDay = wk.xpByDay || {};
+      wk.xpByDay[s.day] = d.freeCoins;
+    }
   }
   if (amt < 0 && w.coins + amt < 0) {
     if (reason.startsWith('reverse')) amt = -w.coins; // a refund cannot push a wallet below zero
@@ -172,7 +187,7 @@ export function planOf(user, now) {
   const active = !!(user && user.isPro && user.tier && (!end || end > now));
   return { active, own: active && user.subscriptionSource === 'play', tier: active ? user.tier : null, until: end, source: user ? user.subscriptionSource || '' : '' };
 }
-export function planKeyOfTier(tier, cfg) { return cfg.earn.planMap[tier] || 'basic'; }
+export function planKeyOfTier(tier, cfg) { return pick(cfg.earn.planMap, tier) || 'basic'; }
 
 /** A gifted or won plan pass. Never satisfies a rank's own-plan rule. */
 export async function grantPass(s, uid, tierKey, days, { source = 'gift', needsNoPlan = false, elseCoins = 0, freePlanDays = false } = {}) {
@@ -201,7 +216,7 @@ export async function grantPass(s, uid, tierKey, days, { source = 'gift', needsN
     s.append(`users/${uid}/passes`, { tier: tierKey, days, status: 'banked', source });
     return { type: 'pass', tier: tierKey, days, banked: true, label: `${days}-day ${tierKey} pass (banked until your plan ends)` };
   }
-  const tier = TIER_OF[tierKey] || 'resonance';
+  const tier = (Object.hasOwn(TIER_OF, tierKey) && TIER_OF[tierKey]) || 'resonance';
   const base = plan.active ? Math.max(plan.until, s.now) : s.now;
   const until = new Date(base + days * DAY).toISOString();
   s.merge(P.user(uid), { isPro: true, tier: plan.active && plan.tier ? plan.tier : tier, subscriptionEndDate: until, subscriptionSource: 'gift' });
@@ -221,7 +236,7 @@ export function prizeLabel(p) {
   if (!p) return 'Nothing this time';
   if (p.type === 'coins') return `${p.coins} coins`;
   if (p.type === 'percentOff') return `${p.pct}% off ${p.scope === 'any' ? 'any item' : 'a ' + p.scope}${p.capINR ? `, cap ₹${p.capINR}` : ''}`;
-  if (p.type === 'token') return ITEM_LABEL[p.item] || p.item;
+  if (p.type === 'token') return (Object.hasOwn(ITEM_LABEL, p.item) && ITEM_LABEL[p.item]) || String(p.item);
   if (p.type === 'pass') return `${p.days}-day ${p.tier === 'plus' ? 'Standard' : p.tier[0].toUpperCase() + p.tier.slice(1)} pass`;
   if (p.type === 'scratch') return `${p.rarity[0].toUpperCase() + p.rarity.slice(1)} scratch card`;
   if (p.type === 'giftbox') return `${p.box[0].toUpperCase() + p.box.slice(1)} gift box`;
@@ -250,12 +265,14 @@ export async function issueScratch(s, uid, rarity, source, { paid = null, prize 
 }
 
 /** Puts any prize on the account. Returns a display row. */
-export async function grantPrize(s, uid, prize, source) {
+export async function grantPrize(s, uid, prize, source, { free = false } = {}) {
   const p = resolvePrize(prize);
   if (!p) return { type: 'none', label: 'Nothing this time' };
   switch (p.type) {
     case 'coins': {
-      const n = await moveCoins(s, uid, p.coins, source);
+      // free: counts toward the daily free-coin ceiling (no event multiplier on prizes).
+      const n = await moveCoins(s, uid, p.coins, source, { free, multiply: false });
+      if (n === 0 && p.coins > 0) return { type: 'coins', coins: 0, capped: true, label: 'Daily coin limit reached' };
       return { type: 'coins', coins: n, label: `${n} coins` };
     }
     case 'percentOff': {

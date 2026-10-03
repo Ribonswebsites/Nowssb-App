@@ -249,8 +249,8 @@ export function partnerLevel(points, cfg) {
 }
 export function partnerPointsFor(kind, planKey, cfg) {
   const P = cfg.partner.points;
-  if (kind === 'subscription') return P[planKey] || 0;
-  return P[kind] || 0;
+  if (kind === 'subscription') return (Object.hasOwn(P, planKey) && Number(P[planKey])) || 0;
+  return (Object.hasOwn(P, kind) && Number(P[kind])) || 0;
 }
 
 /* ── rewards ── */

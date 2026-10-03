@@ -50,7 +50,9 @@ class ShareItemButtons extends StatelessWidget {
     final url = await myLinkFor(context, kind: kind, id: id, title: title);
     if (url == null) return;
     final text = title.isEmpty ? 'Try NowssB with my link: $url' : '$title on NowssB — $url';
-    await SharePlus.instance.share(ShareParams(text: text, subject: title.isEmpty ? 'NowssB' : title));
+    final r = await SharePlus.instance.share(ShareParams(text: text, subject: title.isEmpty ? 'NowssB' : title));
+    // First share of this item (server pays once per item, capped per day).
+    if (r.status == ShareResultStatus.success && id.isNotEmpty) reportEarn('first_share', key: '$kind:$id');
   }
 
   @override

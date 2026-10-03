@@ -14,6 +14,8 @@ import '../../widgets/program_shelf.dart';
 import '../../admin/template/editable.dart';
 import '../programs/program_kit.dart';
 import '../programs/earn_program.dart';
+import '../programs/program_router.dart';
+import '../circle/circle_screen.dart';
 
 class EarningsScreen extends StatefulWidget {
   const EarningsScreen({super.key});
@@ -117,11 +119,11 @@ class _EarningsScreenState extends State<EarningsScreen> {
                 ),
               ),
               const SizedBox(height: 12),
-              const ProgramShelf(),
+              const ProgramShelf(current: Programme.earnings),
               const SizedBox(height: 12),
               const CoinCollectCard(pageKey: 'earning', amount: 8, title: 'Earning coins'),
               const SizedBox(height: 12),
-              ProgramLink(title: 'NowssB Earn program', sub: 'Sales ledger, money lock, payouts', mark: NwsbMarks.piggy, page: () => const EarnProgramPage()),
+              ProgramLink(title: 'NowssB Earn · Sales and payouts', sub: 'Sales ledger, money lock, payout history', mark: NwsbMarks.piggy, page: () => const CircleScreen(initialTab: 'sales')),
               const SizedBox(height: 12),
               const GlassLine(text: 'Pending for 30 days, then available. A person approves the payout.'),
               const SizedBox(height: 12),

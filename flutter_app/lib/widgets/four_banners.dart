@@ -6,9 +6,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../features/earn/earnings_screen.dart';
-import '../features/gifts/gifts_screen.dart';
-import '../features/vault/vault_screen.dart';
+import '../features/programs/program_router.dart';
+import '../screens/subscription.dart';
 import 'black_glass_banner.dart';
 import 'colored_split_promo_banner.dart';
 import 'glass_wrap.dart';
@@ -22,7 +21,12 @@ class FourBanners extends StatelessWidget {
     this.splitCta = 'Open',
     this.blackTitle = 'NowssB',
     this.blackSub = 'Words, rewards, and what you have earned.',
+    this.current,
   });
+
+  /// The programme page this sits on: its own rail tile and shelf poster
+  /// are left out (a page never links to itself).
+  final Programme? current;
 
   final String splitTitle;
   final String splitCta;
@@ -34,7 +38,7 @@ class FourBanners extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const TrioRail(),
+        TrioRail(current: current),
         const SizedBox(height: 12),
         ColoredSplitPromoBanner(
           margin: EdgeInsets.zero,
@@ -44,6 +48,8 @@ class FourBanners extends StatelessWidget {
             leftColor: const Color(0xFF3D2914),
             rightColor: const Color(0xFFE4C56A),
             art: SplitPromoArts.blondeLotus,
+            // The split promo opens the next programme (never this page).
+            onTap: () => Programmes.open(context, _next(current)),
           ),
         ),
         const SizedBox(height: 12),
@@ -52,39 +58,63 @@ class FourBanners extends StatelessWidget {
           title: blackTitle,
           subtitle: blackSub,
           mark: NwsbMarks.rewards,
+          onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SubscriptionScreen())),
         ),
         const SizedBox(height: 12),
-        const ProgramShelf(),
+        ProgramShelf(current: current),
       ],
     );
   }
 }
 
+Programme _next(Programme? p) => switch (p) {
+      Programme.coupons => Programme.gifts,
+      Programme.gifts => Programme.rewards,
+      Programme.rewards => Programme.coupons,
+      Programme.reference => Programme.partner,
+      Programme.partner => Programme.reference,
+      Programme.earn => Programme.reference,
+      _ => Programme.rewards,
+    };
+
 /// The Earn-page banner. The left photograph is full height. The cards on
 /// the right are shorter, tinted, and they keep sliding. Same row on every
 /// page that used to invent its own trio.
 class TrioRail extends StatefulWidget {
-  const TrioRail({super.key});
+  const TrioRail({super.key, this.current});
+
+  /// Leave this programme's own tiles out (on its own page).
+  final Programme? current;
 
   @override
   State<TrioRail> createState() => _TrioRailState();
 }
 
 class _RailFace {
-  const _RailFace(this.label, this.image, this.tint, this.open);
+  const _RailFace(this.label, this.image, this.tint, this.programme, [this.tab]);
   final String label;
   final String image;
   final Color tint;
-  final void Function(BuildContext) open;
+  final Programme programme;
+  final String? tab;
+  void open(BuildContext context) => Programmes.open(context, programme, tab: tab);
 }
 
 class _TrioRailState extends State<TrioRail> {
   static const _loop = 80;
-  static const _faces = <_RailFace>[
-    _RailFace('NowssB Gifts', 'assets/banners/earn/sit-dark.png', Color(0xFF6A1B4D), _openGifts),
-    _RailFace('NowssB Rewards', 'assets/banners/earn/yoga-light.png', Color(0xFF1E3A8A), _openRewards),
-    _RailFace('Your Earning', 'assets/banners/earn/man-light.png', Color(0xFF8A5A12), _openEarnings),
-    _RailFace('NowssB coins earned', 'assets/banners/earn/yoga-dark.png', Color(0xFF0F6E56), _openRewards),
+  static const _all = <_RailFace>[
+    _RailFace('NowssB Gifts', 'assets/banners/earn/sit-dark.png', Color(0xFF6A1B4D), Programme.gifts),
+    _RailFace('NowssB Rewards', 'assets/banners/earn/yoga-light.png', Color(0xFF1E3A8A), Programme.rewards),
+    _RailFace('Your Earning', 'assets/banners/earn/man-light.png', Color(0xFF8A5A12), Programme.earnings),
+    // The coin ledger (Rewards · Wallet), not the Rewards front again.
+    _RailFace('NowssB coins earned', 'assets/banners/earn/yoga-dark.png', Color(0xFF0F6E56), Programme.rewards, 'wallet'),
+    _RailFace('NowssB Coupons', 'assets/banners/earn/hands-light.png', Color(0xFF7A1F4F), Programme.coupons),
+    _RailFace('NowssB Reference', 'assets/banners/earn/sit-light.png', Color(0xFF1F4E7A), Programme.reference),
+  ];
+
+  late final List<_RailFace> _faces = [
+    for (final f in _all)
+      if (f.programme != widget.current) f,
   ];
 
   late final PageController _pages = PageController(
@@ -94,18 +124,6 @@ class _TrioRailState extends State<TrioRail> {
   Timer? _timer;
 
   bool get _quiet => WidgetsBinding.instance.runtimeType.toString().contains('Test');
-
-  static void _openGifts(BuildContext context) {
-    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const GiftsScreen()));
-  }
-
-  static void _openRewards(BuildContext context) {
-    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const VaultScreen()));
-  }
-
-  static void _openEarnings(BuildContext context) {
-    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarningsScreen()));
-  }
 
   @override
   void initState() {
@@ -158,6 +176,7 @@ class _TrioRailState extends State<TrioRail> {
                 child: PageView.builder(
                   controller: _pages,
                   padEnds: false,
+                  physics: const ClampingScrollPhysics(),
                   itemCount: _faces.length * _loop,
                   itemBuilder: (_, i) {
                     final face = _faces[i % _faces.length];

@@ -96,6 +96,15 @@ class PlaySubscriptions extends ChangeNotifier {
   /// Play's price for a product in the buyer's currency, when known.
   String? priceFor(String productId) => _base[productId]?.price;
 
+  /// The eligible Play offer's first price (e.g. a free trial or intro
+  /// price) when Play returned one that differs from the base plan.
+  String? offerFor(String productId) {
+    final buy = _buy[productId];
+    final base = _base[productId];
+    if (buy == null || base == null || identical(buy, base) || buy.price == base.price) return null;
+    return buy.price;
+  }
+
   /// Starts listening. Safe to call more than once; never throws.
   Future<void> start() async {
     if (_started) return;

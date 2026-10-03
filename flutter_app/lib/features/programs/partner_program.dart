@@ -11,6 +11,8 @@ import '../../theme/tokens.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../economy/reward_fx.dart';
 import 'program_kit.dart';
+import 'program_heroes.dart';
+import '../economy/partner_screen.dart';
 import 'reference_program.dart';
 
 const kPartnerDisclaimer =
@@ -18,26 +20,31 @@ const kPartnerDisclaimer =
     'completed, paid purchases by other people and are confirmed after the refund window. Levels and perks may change '
     'with notice.';
 
+const kPartnerSpec = ProgramSpec(
+  pageId: 'partner.program',
+  title: 'Partner Program',
+  mark: NwsbMarks.crown,
+  disclaimer: kPartnerDisclaimer,
+  accent: ProgramAccent.partner,
+  tabs: [
+    ProgramTab('progress', 'My Progress', _progress),
+    ProgramTab('word', 'Word Track', _word),
+    ProgramTab('plan', 'Plan Track', _plan),
+    ProgramTab('perks', 'Perks', _perks),
+    ProgramTab('discount', 'Buyer Discount', _discount),
+    ProgramTab('board', 'Leaderboard', _board),
+    ProgramTab('rules', 'Rules', _rules),
+  ],
+);
+
+/// Kept for every existing entry point: opens the one Partner page.
 class PartnerProgramPage extends StatelessWidget {
-  const PartnerProgramPage({super.key, this.initialTab = 0});
-  final int initialTab;
+  const PartnerProgramPage({super.key, this.initialTab});
+  final int? initialTab;
 
   @override
-  Widget build(BuildContext context) => ProgramPage(
-        pageId: 'partner.program',
-        title: 'Partner Program',
-        mark: NwsbMarks.crown,
-        initialTab: initialTab,
-        disclaimer: kPartnerDisclaimer,
-        tabs: const [
-          ProgramTab('progress', 'My Progress', _progress),
-          ProgramTab('word', 'Word Track', _word),
-          ProgramTab('plan', 'Plan Track', _plan),
-          ProgramTab('perks', 'Perks', _perks),
-          ProgramTab('discount', 'Buyer Discount', _discount),
-          ProgramTab('board', 'Leaderboard', _board),
-          ProgramTab('rules', 'Rules', _rules),
-        ],
+  Widget build(BuildContext context) => PartnerScreen(
+        initialTab: initialTab == null ? null : kPartnerSpec.tabs[initialTab!.clamp(0, kPartnerSpec.tabs.length - 1)].id,
       );
 }
 

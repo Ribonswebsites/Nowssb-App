@@ -116,10 +116,11 @@ export const DEFAULT_ECONOMY = {
       quote: { title: 'Read or share the daily quote', coins: 3, limit: 1, free: true },
       read_meaning: { title: 'Read one meaning to the end', coins: 8, limit: 3, free: true },
       explore: { title: 'Visit a program page', coins: 2, limit: 6, free: true },
-      first_share: { title: 'First share of a word', coins: 15, per: 'key', free: true },
-      close_stage: { title: 'Close a stage', coins: 40, per: 'key', free: false },
-      profile_complete: { title: 'Complete your profile', coins: 50, per: 'once', free: false },
-      reminders_on: { title: 'Turn on reminders', coins: 50, per: 'once', free: false },
+      // per:'key' actions are also capped per day (dayLimit) and checked on the server.
+      first_share: { title: 'First share of a word', coins: 15, per: 'key', dayLimit: 5, free: true },
+      close_stage: { title: 'Close a stage', coins: 40, per: 'key', dayLimit: 3, free: true, verify: 'mastery' },
+      profile_complete: { title: 'Complete your profile', coins: 50, per: 'once', free: false, verify: 'profile' },
+      reminders_on: { title: 'Turn on reminders', coins: 50, per: 'once', free: false, verify: 'reminders' },
       echo_first_post: { title: 'First Echo Wall post', coins: 10, per: 'once', free: true },
       feedback: { title: 'In-app feedback', coins: 10, per: 'month', limit: 1, free: true },
     },
@@ -130,6 +131,8 @@ export const DEFAULT_ECONOMY = {
       { minutes: 60, coins: 70, box: 'diamond' },
     ],
     heartbeatMaxMinutes: 1.5, // farming control: a beat can add at most this much time
+    heartbeatMinGapSec: 45,   // beats closer than this add nothing
+    maxMinutesPerDay: 120,    // counted app time per day (the ladder tops out at 60)
     weeklyQuests: [
       { id: 'w_practice', title: 'Practise on 4 days', metric: 'activeDays', goal: 4, coins: 30 },
       { id: 'w_minutes', title: 'Spend 60 minutes', metric: 'minutes', goal: 60, coins: 40 },
@@ -200,6 +203,16 @@ export const DEFAULT_ECONOMY = {
     // Lowest list price the server accepts per kind (protects against a forged list price).
     priceFloorINR: { word: 49, meaning: 49, stage: 29, bundle: 299, signature: 199, ebook: 49 },
     priceCeilINR: { word: 350, meaning: 350, stage: 150, bundle: 1999, signature: 999, ebook: 999 },
+    // Content price points and defaults (mirror of billing_config.dart). The
+    // server prices each bag line itself from config/store + these; the
+    // phone's price is only checked against it.
+    contentTiersINR: {
+      word: [79, 99, 149, 199, 249, 299, 349],
+      meaning: [79, 99, 149, 199, 249, 299, 349],
+      signature: [199, 249, 299, 349, 399, 499, 599, 699, 799, 999],
+      ebook: [149, 199, 249, 299, 349, 399, 499, 599, 699, 799, 999],
+    },
+    contentDefaultINR: { word: 99, meaning: 99, signature: 299, ebook: 399 },
   },
 
   // ── 5 · NowssB Coupons ──
@@ -293,9 +306,13 @@ export const DEFAULT_ECONOMY = {
   },
 
   // Daily Spin (coins in, catalogue prizes out; odds on the wheel).
+  // One free spin a day; after that each spin costs costCoins while the
+  // balance allows, up to paidPerDay extra spins (a sanity cap, not a wall).
   spin: {
     costCoins: 15,
-    perDay: 1,
+    freePerDay: 1,
+    paidPerDay: 40,
+    perDay: 41, // legacy key read by older builds: free + paid
     slices: [
       { label: 'Ebook', w: 16, prize: { type: 'pass', tier: 'ebook', days: 1 } },
       { label: 'Basic', w: 14, prize: { type: 'pass', tier: 'basic', days: 1, needsNoPlan: true, elseCoins: 30 } },

@@ -10,6 +10,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../admin/template/editable.dart';
+import '../features/economy/reward_overlay.dart' show CoinPillAnchor;
 
 class NwsbCoinFly {
   NwsbCoinFly._();
@@ -27,17 +28,20 @@ class NwsbCoinFly {
       context: context,
       useRootNavigator: true,
       barrierDismissible: false,
-      barrierColor: const Color(0xC0000000),
-      pageBuilder: (context, _, __) => _FlyStage(count: count, from: from, to: to),
+      barrierColor: const Color(0x8C000000),
+      pageBuilder: (context, _, __) => _FlyStage(count: count, from: from, to: to, target: CoinPillAnchor.target()),
     );
   }
 }
 
 class _FlyStage extends StatefulWidget {
-  const _FlyStage({required this.count, required this.from, required this.to});
+  const _FlyStage({required this.count, required this.from, required this.to, this.target});
   final int count;
   final int from;
   final int to;
+
+  /// The balance pill on screen (global), or null → top centre.
+  final Offset? target;
 
   @override
   State<_FlyStage> createState() => _FlyStageState();
@@ -74,7 +78,10 @@ class _FlyStageState extends State<_FlyStage> with SingleTickerProviderStateMixi
   Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
-      child: SafeArea(
+      child: MediaQuery.removePadding(
+        context: context,
+        removeTop: true,
+        removeBottom: true,
         child: AnimatedBuilder(
           animation: _move,
           builder: (context, _) {
@@ -83,8 +90,10 @@ class _FlyStageState extends State<_FlyStage> with SingleTickerProviderStateMixi
             final punch = t > 0.82 ? math.sin((t - 0.82) / 0.18 * math.pi) : 0.0;
             return Stack(
               children: [
-                Align(
-                  alignment: const Alignment(0, -0.78),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  top: (widget.target?.dy ?? MediaQuery.paddingOf(context).top + 60) + 34,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -151,7 +160,7 @@ class _FlyStageState extends State<_FlyStage> with SingleTickerProviderStateMixi
       size.width * (0.18 + (i % 7) * 0.1),
       size.height * (0.28 - (i % 4) * 0.04),
     );
-    final end = Offset(size.width * 0.50, size.height * 0.16);
+    final end = widget.target ?? Offset(size.width * 0.50, MediaQuery.paddingOf(context).top + 60);
     final a = Offset.lerp(start, lift, curve)!;
     final b = Offset.lerp(lift, end, curve)!;
     final p = Offset.lerp(a, b, curve)!;
