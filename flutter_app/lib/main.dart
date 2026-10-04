@@ -55,9 +55,11 @@ import 'widgets/update_prompt.dart';
 import 'shell/nav_shell.dart';
 import 'theme/theme.dart';
 import 'theme/tokens.dart';
+import 'widgets/hype_open.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  ensureHypeRoutes();
 
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(

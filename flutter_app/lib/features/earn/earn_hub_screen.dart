@@ -20,6 +20,7 @@ import '../economy/coupon_screen.dart';
 import '../economy/partner_screen.dart';
 import '../economy/reference_screen.dart';
 import '../../widgets/program_shelf.dart';
+import '../../widgets/hype_rail.dart';
 import '../../admin/template/editable.dart';
 import '../../admin/layout/layout_sections.dart';
 import '../programs/coupons_program.dart';
@@ -57,6 +58,7 @@ class EarnHubScreen extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
             // Server-driven order (Admin → UI Editor); bundled order by default.
       children: layoutChildren(context, 'earn', [
+              const LSection('hype', 'Most hyped', NowssbHypeRail()),
               if (w.uid == null)
                 GoldButton(
                   label: 'Sign in to see your balance',

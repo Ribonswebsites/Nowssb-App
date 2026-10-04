@@ -715,12 +715,11 @@ class _SignatureDoor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // IgnorePointer on the platform video so the door's onTap always fires.
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
+    final editing = editModeOn(context);
+    // Pencils on: no parent button, so a tap on the film opens the sheet.
+    final frame = AspectRatio(
+      aspectRatio: 16 / 9,
       child: Container(
-        height: 420,
         margin: EdgeInsets.zero,
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
@@ -728,9 +727,10 @@ class _SignatureDoor extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            const IgnorePointer(
+            EditMedia(
               child: NwsbVideo(
                 asset: _clip,
+                fit: BoxFit.cover,
                 priority: ClipPriority.feature,
                 autoplay: true,
                 loop: true,
@@ -738,12 +738,14 @@ class _SignatureDoor extends StatelessWidget {
                 slot: 'store.SignatureDoor',
               ),
             ),
-            const DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0x14060C18), Color(0x99060C18)],
+            const IgnorePointer(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Color(0x14060C18), Color(0x99060C18)],
+                  ),
                 ),
               ),
             ),
@@ -778,6 +780,12 @@ class _SignatureDoor extends StatelessWidget {
           ],
         ),
       ),
+    );
+    if (editing) return frame;
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: frame,
     );
   }
 }
@@ -820,35 +828,39 @@ class _StoreVideoBanner extends StatelessWidget {
   final VoidCallback? onTap;
   final bool tall;
   @override
-  Widget build(BuildContext context) => GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: HeavyGlassPanel(
-          margin: EdgeInsets.zero,
-          radius: 20,
-          padding: const EdgeInsets.all(5),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(15),
-            child: AspectRatio(
-              // Subscription film is 720×406. The old tall box cropped
-              // "NowssB Subscription" off the left edge.
-              aspectRatio: tall ? 720 / 406 : 16 / 6.4,
-              child: IgnorePointer(
-                child: NwsbVideo(
-                  asset: asset,
-                  poster: poster,
-                  fit: tall ? BoxFit.contain : BoxFit.cover,
-                  priority: ClipPriority.feature,
-                  autoplay: true,
-                  loop: true,
-                  showPoster: poster != null,
-                  slot: 'store.StoreVideoBanner',
-                ),
-              ),
+  Widget build(BuildContext context) {
+    final editing = editModeOn(context);
+    final frame = HeavyGlassPanel(
+      margin: EdgeInsets.zero,
+      radius: 20,
+      padding: const EdgeInsets.all(5),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: AspectRatio(
+          // Subscription film is 720×406, so a 16:9 box shows the whole frame.
+          aspectRatio: tall ? 16 / 9 : 16 / 6.4,
+          child: EditMedia(
+            child: NwsbVideo(
+              asset: asset,
+              poster: poster,
+              fit: BoxFit.cover,
+              priority: ClipPriority.feature,
+              autoplay: true,
+              loop: true,
+              showPoster: poster != null,
+              slot: 'store.StoreVideoBanner',
             ),
           ),
         ),
-      );
+      ),
+    );
+    if (editing || onTap == null) return frame;
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: frame,
+    );
+  }
 }
 
 class _MiniStoreCard extends StatelessWidget {

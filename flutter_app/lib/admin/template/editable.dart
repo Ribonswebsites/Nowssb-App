@@ -45,6 +45,24 @@ UiOverride? mediaOverride(BuildContext context, String key, SlotType type) {
   return o;
 }
 
+/// True while the admin pencils are on. Watches the scope so the page rebuilds.
+bool editModeOn(BuildContext context) {
+  UiScope.watch(context);
+  return EditMode.instance.on;
+}
+
+/// A film or picture sitting under a parent button. Pencils on: the slot
+/// receives the tap. Pencils off: the tap falls through to that button.
+class EditMedia extends StatelessWidget {
+  const EditMedia({super.key, required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(ignoring: !editModeOn(context), child: child);
+  }
+}
+
 /// What goes around an editable element: nothing for everyone else; the
 /// pencil in edit mode; a tappable marker in the UI Editor's preview.
 Widget slotChrome(
@@ -552,52 +570,56 @@ class SlotBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final overridden = UiOverrides.instance.get(slotKey) != null;
-    return Stack(
-      clipBehavior: Clip.none,
-      fit: StackFit.passthrough,
-      children: [
-        child,
-        Positioned.fill(
-          child: IgnorePointer(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: overridden ? const Color(0xCC34D399) : const Color(0x99E8D5A3),
-                  width: 1,
+    // The picture itself is ignored so a video view cannot eat the scroll.
+    // The detector only has a tap, so a one-finger drag still moves the page.
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => openSlotSheet(
+        context,
+        slotKey: slotKey,
+        type: type,
+        defaultValue: defaultValue,
+        word: word,
+      ),
+      child: Stack(
+        clipBehavior: Clip.none,
+        fit: StackFit.passthrough,
+        children: [
+          IgnorePointer(child: child),
+          Positioned.fill(
+            child: IgnorePointer(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: overridden ? const Color(0xCC34D399) : const Color(0x99E8D5A3),
+                    width: 1,
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-        Positioned(
-          top: 0,
-          right: 0,
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: () => openSlotSheet(
-              context,
-              slotKey: slotKey,
-              type: type,
-              defaultValue: defaultValue,
-              word: word,
-            ),
-            child: Container(
-              width: 22,
-              height: 22,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: overridden ? const Color(0xFF34D399) : const Color(0xFFE8D5A3),
-                boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 4)],
-              ),
-              child: Icon(
-                slotIcon(type),
-                size: 13,
-                color: const Color(0xFF060C18),
+          Positioned(
+            top: 0,
+            right: 0,
+            child: IgnorePointer(
+              child: Container(
+                width: 22,
+                height: 22,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: overridden ? const Color(0xFF34D399) : const Color(0xFFE8D5A3),
+                  boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 4)],
+                ),
+                child: Icon(
+                  slotIcon(type),
+                  size: 13,
+                  color: const Color(0xFF060C18),
+                ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

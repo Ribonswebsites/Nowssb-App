@@ -24,6 +24,7 @@ import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 import '../theme/player_aura.dart';
 import '../widgets/app_backdrop.dart';
+import '../widgets/hype_rail.dart';
 import '../widgets/black_glass_banner.dart';
 import '../widgets/intro_gate.dart';
 import '../widgets/tv_frame.dart';
@@ -436,6 +437,10 @@ class _SlmFeed extends StatelessWidget {
                     bottom: MediaQuery.paddingOf(context).bottom + 48,
                   ),
                   children: [
+                    const Padding(
+                      padding: EdgeInsets.fromLTRB(16, 12, 0, 4),
+                      child: NowssbHypeRail(),
+                    ),
                     if (chip == 'Currently Playing') ...[
                       CurrentlyPlayingAlbum(
                         words: _playingRail,

@@ -13,6 +13,7 @@ import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/page_shell.dart';
+import '../../widgets/hype_rail.dart';
 import '../../widgets/banner_mix.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import 'product_detail.dart';
@@ -108,12 +109,14 @@ class _EbooksBody extends StatelessWidget {
                   priority: ClipPriority.feature,
                   slot: 'ebooks_store.EbooksBody',
                 ),
-                const DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [Color(0x22060C18), Color(0xE6060C18)],
+                const IgnorePointer(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Color(0x22060C18), Color(0xE6060C18)],
+                      ),
                     ),
                   ),
                 ),
@@ -175,6 +178,7 @@ class _EbooksBody extends StatelessWidget {
             ),
           ),
         )),
+        const LSection('hype', 'Most hyped', NowssbHypeRail()),
         const LSection('intro', 'Intro line', Text(
           'Deep-dive guides on sound, phonetic origin and healing practice — '
           'yours to keep, read anywhere, forever. Not a word catalogue.',

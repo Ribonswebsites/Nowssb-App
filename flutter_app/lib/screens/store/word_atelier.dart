@@ -11,6 +11,7 @@ import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/page_shell.dart';
+import '../../widgets/hype_rail.dart';
 import 'product_detail.dart';
 import 'store_cards.dart';
 import 'store_home_sections.dart';
@@ -275,12 +276,13 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
       // Server-driven order (Admin → UI Editor); bundled order by default.
       children: layoutIndexed(context, 'store.atelier', const {
         0: ('hero', 'Hero film'),
-        2: ('promo', 'Split promo banner'),
-        4: ('search', 'Search'),
-        6: ('intro', 'Your word library intro'),
-        10: ('chips', 'Category chips'),
-        12: ('promo2', 'Meaning Store banner'),
-        13: ('rows', 'Word collections'),
+        2: ('hype', 'Most hyped'),
+        3: ('promo', 'Split promo banner'),
+        5: ('search', 'Search'),
+        7: ('intro', 'Your word library intro'),
+        11: ('chips', 'Category chips'),
+        13: ('promo2', 'Meaning Store banner'),
+        14: ('rows', 'Word collections'),
         -2: ('promo3', 'Signature Store banner'),
         -1: ('disclaimer', 'Disclaimer'),
       }, [
@@ -291,6 +293,7 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
           videoTitle: '',
         ),
         const SizedBox(height: 18),
+        const NowssbHypeRail(),
         ColoredSplitPromoBanner.forSurface(
           SplitPromoSurface.wordAtelier,
           onTap: () => Navigator.of(context).push(

@@ -17,6 +17,7 @@ import '../../data/content.dart';
 import '../../data/store_catalog.dart';
 import '../../media/nwsb_video.dart';
 import '../../widgets/page_shell.dart';
+import '../../widgets/hype_rail.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/app_thinking_loader.dart';
 import 'product_detail.dart';
@@ -219,15 +220,16 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
       children: layoutIndexed(context, 'store.meaning', const {
         0: ('hero', 'Hero film'),
         1: ('subscribe', 'Subscribe banner'),
-        2: ('search', 'Search'),
-        4: ('chips', 'Category chips'),
-        6: ('goals', 'Browse by goal'),
-        7: ('recommended', 'Recommended for you'),
-        8: ('promo', 'Signature Store banner'),
-        9: ('playlist', 'Featured playlist'),
-        10: ('collections', 'Featured collections'),
-        12: ('promo2', 'Signature promo'),
-        13: ('rows', 'Meaning collections'),
+        2: ('hype', 'Most hyped'),
+        3: ('search', 'Search'),
+        5: ('chips', 'Category chips'),
+        7: ('goals', 'Browse by goal'),
+        8: ('recommended', 'Recommended for you'),
+        9: ('promo', 'Signature Store banner'),
+        10: ('playlist', 'Featured playlist'),
+        11: ('collections', 'Featured collections'),
+        13: ('promo2', 'Signature promo'),
+        14: ('rows', 'Meaning collections'),
         -2: ('promo3', 'Request words banner'),
         -1: ('disclaimer', 'Disclaimer'),
       }, [
@@ -239,6 +241,7 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
         StoreSubscribeBanner(
           pillIconAsset: kMsMeaningProductArt,
         ),
+        const NowssbHypeRail(),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 2),
           child: StoreSearchBar(

@@ -12,6 +12,7 @@ import '../admin/template/editable.dart';
 import '../admin/layout/layout_sections.dart';
 import '../data/billing_config.dart';
 import '../data/play_subscriptions.dart';
+import '../widgets/hype_rail.dart';
 import 'store/store_terms_sheet.dart';
 import '../features/programs/store_extras.dart';
 
@@ -254,6 +255,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                 // Server-driven order (Admin → UI Editor); bundled order by default.
                 for (final w in layoutChildren(context, 'subscription', [
                   LSection('video', 'Video banner', _videoBanner()),
+                  const LSection('hype', 'Most hyped', NowssbHypeRail()),
                   LSection('billing', 'Monthly / yearly switch', _billing()),
                   LSection('plans', 'Plans', _horizontalPlans()),
                 ]))

@@ -15,6 +15,7 @@ import '../../widgets/app_thinking_loader.dart';
 import 'store_cards.dart';
 import 'store_home_sections.dart';
 import '../../admin/template/editable.dart';
+import '../../widgets/hype_rail.dart';
 
 void openRequestWords(BuildContext context) {
   Navigator.of(context).push(
@@ -99,6 +100,8 @@ class _RequestWordsScreenState extends State<RequestWordsScreen> {
                 sub: 'Tell us the word you need — we fulfill from the atelier.',
                 pillLabel: 'REQUEST',
               ),
+              const SizedBox(height: 16),
+              const NowssbHypeRail(),
               const SizedBox(height: 18),
               StoreGlassPanel(
                 child: Column(

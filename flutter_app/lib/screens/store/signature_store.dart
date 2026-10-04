@@ -10,6 +10,7 @@ import '../../theme/tokens.dart';
 import '../../widgets/banner_mix.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/page_shell.dart';
+import '../../widgets/hype_rail.dart';
 import 'product_detail.dart';
 import 'store_cards.dart';
 import 'store_home_sections.dart';
@@ -73,8 +74,8 @@ class _SignatureBody extends StatelessWidget {
         const LSection('hero', 'Hero film', StorePixelsHero(
           videoAsset: 'assets/video/signature-store-hero.mp4',
           videoTitle: '',
-          height: 320,
         )),
+        const LSection('hype', 'Most hyped', NowssbHypeRail()),
         // Subscribe banner uses #3 only — never Signature hero film.
         const LSection('subscribe', 'Subscribe banner', StoreSubscribeBanner(
           videoAsset: StoreSubscribeBanner.kSubscriptionOfferVideo,

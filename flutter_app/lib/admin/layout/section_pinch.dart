@@ -1,5 +1,9 @@
-/// Pinch a section while edit mode is on. The whole section — layout, pictures
-/// and clips — scales together, and the size is saved for every phone.
+/// Pinch a section while edit mode is on. One finger still scrolls the page.
+/// Two fingers scale the whole section — layout, pictures and clips — and
+/// the size is saved for every phone.
+///
+/// This is a [Listener], not a gesture recognizer. A scale recognizer joins
+/// the arena on the first finger and the page stops moving.
 library;
 
 import 'package:flutter/material.dart';
@@ -49,12 +53,18 @@ class _PinchSurface extends StatefulWidget {
 }
 
 class _PinchSurfaceState extends State<_PinchSurface> {
-  final Map<int, Offset> _pts = {};
-  double? _startDist;
-  double _startScale = 1;
   late double _scale = widget.scale;
-  ScrollHoldController? _hold;
+  double _startScale = 1;
+  double _startDist = 0;
   var _pinching = false;
+  final Map<int, Offset> _pts = {};
+  ScrollHoldController? _hold;
+
+  @override
+  void dispose() {
+    _hold?.cancel();
+    super.dispose();
+  }
 
   @override
   void didUpdateWidget(_PinchSurface old) {
@@ -64,50 +74,49 @@ class _PinchSurfaceState extends State<_PinchSurface> {
     }
   }
 
-  double? _dist() {
-    if (_pts.length < 2) return null;
-    final a = _pts.values.elementAt(0);
-    final b = _pts.values.elementAt(1);
-    return (a - b).distance;
-  }
-
   void _down(PointerDownEvent e) {
     _pts[e.pointer] = e.position;
-    if (_pts.length == 2) {
-      _startDist = _dist();
-      _startScale = _scale;
-      _pinching = true;
-      final scroll = Scrollable.maybeOf(context);
-      _hold ??= scroll?.position.hold(() {});
-      setState(() {});
-    }
+    if (_pts.length < 2 || _pinching) return;
+    _startDist = 0;
+    _startScale = _scale;
+    _pinching = true;
+    final scroll = Scrollable.maybeOf(context);
+    _hold ??= scroll?.position.hold(() {});
+    setState(() {});
   }
 
   void _move(PointerMoveEvent e) {
     if (!_pts.containsKey(e.pointer)) return;
     _pts[e.pointer] = e.position;
-    final start = _startDist;
-    final now = _dist();
-    if (start == null || now == null || start < 12) return;
-    final next = (_startScale * now / start).clamp(0.55, 1.85);
+    if (!_pinching || _pts.length < 2) return;
+    final d = _dist();
+    if (d < 8) return;
+    if (_startDist < 8) {
+      _startDist = d;
+      _startScale = _scale;
+      return;
+    }
+    final next = (_startScale * d / _startDist).clamp(0.55, 1.85);
     if ((next - _scale).abs() < 0.004) return;
     setState(() => _scale = next);
   }
 
   void _up(PointerEvent e) {
     _pts.remove(e.pointer);
-    if (_pts.length >= 2) return;
-    _startDist = null;
+    if (_pts.length >= 2 || !_pinching) return;
+    // Save before clearing the flag, so a rebuild does not snap back.
+    UiOverrides.instance.setSectionZoom(widget.pageId, widget.sectionId, _scale);
+    _pinching = false;
+    _startDist = 0;
     _hold?.cancel();
     _hold = null;
-    final was = _pinching;
-    if (was) {
-      // Save before clearing the pinch flag, so a rebuild from the save
-      // does not snap the scale back to the old value.
-      UiOverrides.instance.setSectionZoom(widget.pageId, widget.sectionId, _scale);
-    }
-    _pinching = false;
-    if (was && mounted) setState(() {});
+    if (mounted) setState(() {});
+  }
+
+  double _dist() {
+    final a = _pts.values.toList();
+    if (a.length < 2) return 0;
+    return (a[0] - a[1]).distance;
   }
 
   @override
@@ -118,47 +127,43 @@ class _PinchSurfaceState extends State<_PinchSurface> {
       onPointerMove: _move,
       onPointerUp: _up,
       onPointerCancel: _up,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          SectionZoom(scale: _scale, child: widget.child),
-          Positioned.fill(
-            child: IgnorePointer(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: _pinching ? const Color(0xFFE8D5A3) : const Color(0x55E8D5A3),
-                  ),
-                ),
-              ),
-            ),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: _pinching ? const Color(0xFFE8D5A3) : const Color(0x55E8D5A3),
           ),
-          if (_pinching)
-            Positioned(
-              top: 6,
-              right: 6,
-              child: IgnorePointer(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: const Color(0xE0060C18),
-                    borderRadius: BorderRadius.circular(99),
-                    border: Border.all(color: const Color(0xFFE8D5A3)),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    child: Text(
-                      '${_scale.toStringAsFixed(2)}×',
-                      style: const TextStyle(
-                        color: Color(0xFFE8D5A3),
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
+        ),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            SectionZoom(scale: _scale, child: widget.child),
+            if (_pinching)
+              Positioned(
+                top: 6,
+                right: 6,
+                child: IgnorePointer(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: const Color(0xE0060C18),
+                      borderRadius: BorderRadius.circular(99),
+                      border: Border.all(color: const Color(0xFFE8D5A3)),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      child: Text(
+                        '${_scale.toStringAsFixed(2)}×',
+                        style: const TextStyle(
+                          color: Color(0xFFE8D5A3),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -190,6 +195,14 @@ class _RenderSectionZoom extends RenderProxyBox {
     markNeedsLayout();
   }
 
+  Matrix4 get _transform {
+    final c = child;
+    final dx = c == null ? 0.0 : (size.width - c.size.width * _scale) / 2;
+    return Matrix4.identity()
+      ..translate(dx, 0.0)
+      ..scale(_scale, _scale, 1.0);
+  }
+
   @override
   void performLayout() {
     final c = child;
@@ -203,10 +216,20 @@ class _RenderSectionZoom extends RenderProxyBox {
   }
 
   @override
+  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) {
+    final c = child;
+    if (c == null) return false;
+    return result.addWithPaintTransform(
+      transform: _transform,
+      position: position,
+      hitTest: (BoxHitTestResult result, Offset position) => c.hitTest(result, position: position),
+    );
+  }
+
+  @override
   void paint(PaintingContext context, Offset offset) {
     final c = child;
     if (c == null) return;
-    final dx = (size.width - c.size.width * _scale) / 2;
     context.pushClipRect(
       needsCompositing,
       offset,
@@ -214,8 +237,8 @@ class _RenderSectionZoom extends RenderProxyBox {
       (ctx, off) {
         ctx.pushTransform(
           needsCompositing,
-          off + Offset(dx, 0),
-          Matrix4.diagonal3Values(_scale, _scale, 1),
+          off,
+          _transform,
           (c2, o2) => c2.paintChild(c, o2),
         );
       },

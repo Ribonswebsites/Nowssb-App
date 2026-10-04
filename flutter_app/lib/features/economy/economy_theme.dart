@@ -28,6 +28,7 @@ class EconomyPage extends StatelessWidget {
     this.mark = NwsbMarks.word,
     this.action,
     this.banner,
+    this.header,
     this.goodToKnow,
     this.showBalance = true,
   });
@@ -37,6 +38,9 @@ class EconomyPage extends StatelessWidget {
   final String mark;
   final Widget? action;
   final Widget? banner;
+
+  /// Replaces the default title row (coupons uses the home / title / avatar bar).
+  final Widget? header;
   final String? goodToKnow;
   final bool showBalance;
 
@@ -66,7 +70,8 @@ class EconomyPage extends StatelessWidget {
               children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(14, 10, 12, 6),
-                  child: Row(
+                  child: header ??
+                      Row(
                     children: [
                       GestureDetector(
                         onTap: () => Navigator.of(context).maybePop(),

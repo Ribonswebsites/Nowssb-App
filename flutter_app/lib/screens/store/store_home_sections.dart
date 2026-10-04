@@ -32,7 +32,6 @@ class StorePixelsHero extends StatelessWidget {
     this.onViewCart,
     this.videoAsset,
     this.videoTitle = 'The Word Atelier',
-    this.height,
   });
 
   /// Kept for call-site compatibility; branding CTAs were removed.
@@ -40,8 +39,6 @@ class StorePixelsHero extends StatelessWidget {
   final VoidCallback? onViewCart;
   final String? videoAsset;
   final String videoTitle;
-  /// When set, overrides the default 170px hero height (Signature uses taller).
-  final double? height;
 
   @override
   Widget build(BuildContext context) {
@@ -55,39 +52,48 @@ class StorePixelsHero extends StatelessWidget {
         padding: const EdgeInsets.all(6),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(14),
-          child: SizedBox(
-            height: height ?? 170,
-            width: double.infinity,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                NwsbVideo(asset: videoAsset!, priority: ClipPriority.feature, slot: 'store_home_sections.StorePixelsHero'),
-                if (videoTitle.trim().isNotEmpty) ...[
-                  const DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [Color(0x22060C18), Color(0xE6060C18)],
-                      ),
-                    ),
+          child: AspectRatio(
+            aspectRatio: 16 / 9,
+            child: ColoredBox(
+              color: Colors.black,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  NwsbVideo(
+                    asset: videoAsset!,
+                    fit: BoxFit.cover,
+                    priority: ClipPriority.feature,
+                    slot: 'store_home_sections.StorePixelsHero',
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Align(
-                      alignment: Alignment.bottomLeft,
-                      child: Text(
-                        videoTitle,
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w300,
-                          color: Colors.white,
+                  if (videoTitle.trim().isNotEmpty) ...[
+                    const IgnorePointer(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [Color(0x22060C18), Color(0xE6060C18)],
+                          ),
                         ),
                       ),
                     ),
-                  ),
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Align(
+                        alignment: Alignment.bottomLeft,
+                        child: Text(
+                          videoTitle,
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w300,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
           ),
         ),
@@ -121,49 +127,51 @@ class StoreSubscribeBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final asset = videoAsset ?? kSubscriptionOfferVideo;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: GestureDetector(
-        // Default: the plans page (the banner used to do nothing).
-        onTap: onTap ??
-            () => Navigator.of(context).push(MaterialPageRoute<void>(
-                builder: (_) => const SubscriptionScreen())),
-        behavior: HitTestBehavior.opaque,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(18),
-          child: AspectRatio(
-            // Native frame of subscription-a (720×406). A taller box with
-            // cover cropped the left of "NowssB Subscription".
-            aspectRatio: 720 / 406,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                IgnorePointer(
-                  child: NwsbVideo(
-                    asset: asset,
-                    fit: BoxFit.contain,
-                    priority: ClipPriority.feature,
-                    autoplay: true,
-                    loop: true,
-                    showPoster: false,
-                    slot: 'store_home_sections.StoreSubscribeBanner',
-                  ),
-                ),
-                // Light edge wash only — keep the clip visible.
-                const DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [Color(0x14060C18), Color(0x66060C18)],
-                    ),
-                  ),
-                ),
-              ],
+    final editing = editModeOn(context);
+    final frame = ClipRRect(
+      borderRadius: BorderRadius.circular(18),
+      child: AspectRatio(
+        aspectRatio: 16 / 9,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            EditMedia(
+              child: NwsbVideo(
+                asset: asset,
+                fit: BoxFit.cover,
+                priority: ClipPriority.feature,
+                autoplay: true,
+                loop: true,
+                showPoster: false,
+                slot: 'store_home_sections.StoreSubscribeBanner',
+              ),
             ),
-          ),
+            const IgnorePointer(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Color(0x14060C18), Color(0x66060C18)],
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
+    );
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: editing
+          ? frame
+          : GestureDetector(
+              onTap: onTap ??
+                  () => Navigator.of(context).push(MaterialPageRoute<void>(
+                      builder: (_) => const SubscriptionScreen())),
+              behavior: HitTestBehavior.opaque,
+              child: frame,
+            ),
     );
   }
 }

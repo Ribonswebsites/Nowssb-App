@@ -14,6 +14,7 @@ import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_coin_fly.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/program_shelf.dart';
+import '../../widgets/hype_rail.dart';
 import 'economy_api.dart';
 import 'reward_fx.dart';
 import 'economy_theme.dart';
@@ -37,6 +38,7 @@ class CouponScreen extends StatefulWidget {
 
 class _CouponScreenState extends State<CouponScreen> {
   final _go = ValueNotifier<void Function(String)?>(null);
+  final _scratch = GlobalKey();
 
   @override
   void dispose() {
@@ -46,12 +48,20 @@ class _CouponScreenState extends State<CouponScreen> {
 
   void _tab(String id) => _go.value?.call(id);
 
+  void _showScratch() {
+    final ctx = _scratch.currentContext;
+    if (ctx == null) return;
+    Scrollable.ensureVisible(ctx, duration: const Duration(milliseconds: 380), alignment: 0.08);
+  }
+
   @override
   Widget build(BuildContext context) {
     return EconomyPage(
       goodToKnow: kCouponsDisclaimer,
       title: 'NowssB Coupons',
       mark: NwsbMarks.coupon,
+      showBalance: false,
+      header: const CouponsPageHeader(trailing: CoinBalancePill()),
       child: RefreshIndicator(
         color: NwsbColors.gold,
         onRefresh: () => EconomyMirror.instance.refresh(),
@@ -59,6 +69,8 @@ class _CouponScreenState extends State<CouponScreen> {
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
           cacheExtent: 1600,
           children: [
+            CouponTicketPromo(onPressed: _showScratch),
+            const NowssbHypeRail(),
             const CouponsHero(),
             const GlassLine(
               text: 'A free scratch every day. Paid cards show every prize before you draw. Expected value stays under the price.',
@@ -67,7 +79,7 @@ class _CouponScreenState extends State<CouponScreen> {
             const SizedBox(height: 16),
             const EditableLabel('coupon_screen.CouponScreen', 'FREE SCRATCH', style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontSize: 12, fontWeight: FontWeight.w700)),
             const SizedBox(height: 8),
-            const DailyScratchCard(),
+            KeyedSubtree(key: _scratch, child: const DailyScratchCard()),
             const SizedBox(height: 18),
             const EditableLabel('coupon_screen.CouponScreen', 'COUPON TICKETS', style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontSize: 12, fontWeight: FontWeight.w700)),
             const SizedBox(height: 4),
