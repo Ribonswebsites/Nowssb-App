@@ -23,8 +23,10 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
+import '../admin_state.dart';
 import '../template/ui_overrides.dart';
 import 'scopes.dart';
+import 'section_pinch.dart';
 import 'template_sections.dart';
 import 'ui_layouts.dart';
 
@@ -218,15 +220,28 @@ List<Widget> layoutChildren(
     }
   }
   final laid = applyLayout(context, pageId, items, hiddenByDefault: hiddenByDefault);
-  if (identical(laid, items)) return children;
+  final editing = EditMode.instance.on;
+  bool zoomed(String id) => (UiOverrides.instance.sectionZoomOf(pageId, id) - 1).abs() > 0.015;
+  if (identical(laid, items) && !editing && !items.any((i) => zoomed(i.id))) {
+    return children;
+  }
   final iso = EditorPreviewScope.peek(context) == null
       ? null
       : context.getInheritedWidgetOfExactType<PreviewIsolateScope>();
   final isolated = iso != null && iso.pageId == pageId;
+  if (identical(laid, items)) {
+    return [
+      for (final w in children)
+        if (w is LSection && (editing || zoomed(w.id)))
+          SectionPinch(pageId: pageId, sectionId: w.id, child: w)
+        else
+          w,
+    ];
+  }
   return [
     if (!isolated) ...lead,
     for (final s in laid) ...[
-      s.widget,
+      SectionPinch(pageId: pageId, sectionId: s.id, child: s.widget),
       if (!isolated) ...?glue[s.id] ?? glue[_srcOf(s.id)],
     ],
   ];

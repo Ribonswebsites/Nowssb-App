@@ -467,14 +467,6 @@ class _WordEditorScreenState extends State<WordEditorScreen> {
         _msg = 'Voice uploaded. Publish to send it to every app.';
       });
 
-  Future<void> _nudgeZoom(double delta) async {
-    final next = (_imgZoom + delta).clamp(0.5, 2.6);
-    setState(() => _imgZoom = next);
-    if (_k.isEmpty) return;
-    await WordArt.instance.set(_k, scale: next, image: _c['img']!.text.trim().isEmpty ? null : _c['img']!.text.trim());
-    if (mounted) setState(() => _imgZoom = WordArt.instance.scaleOf(_k));
-  }
-
   Future<void> _uploadImage() async {
     final f = await pickMedia(context, PickKind.image);
     if (f == null) return;
@@ -794,7 +786,6 @@ class _WordEditorScreenState extends State<WordEditorScreen> {
           _field('price'),
           _field('stage'),
           MediaTuneBar(
-            zoom: _imgZoom,
             canUndo: WordArt.instance.canUndo(_k),
             onUndo: _busy
                 ? null
@@ -808,8 +799,6 @@ class _WordEditorScreenState extends State<WordEditorScreen> {
                       _msg = ok ? 'Previous picture restored.' : 'Nothing to undo.';
                     });
                   },
-            onZoomOut: _busy ? null : () => _nudgeZoom(-0.15),
-            onZoomIn: _busy ? null : () => _nudgeZoom(0.15),
           ),
           const SizedBox(height: 8),
           Row(children: [

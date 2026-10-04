@@ -209,23 +209,6 @@ class _SlotSheetState extends State<SlotSheet> {
     }
   }
 
-  Future<void> _nudge(double delta) async {
-    final next = (_zoom + delta).clamp(0.5, 2.6);
-    if ((next - _zoom).abs() < 0.001) return;
-    final bound = _bound;
-    if (bound != null) {
-      await WordArt.instance.set(bound, scale: next);
-      if (!mounted) return;
-      setState(() {
-        _zoom = WordArt.instance.scaleOf(bound);
-        _canUndo = WordArt.instance.canUndo(bound);
-        _msg = 'Zoom saved on this word. Every place it appears uses it.';
-      });
-      return;
-    }
-    await _stashSlot(zoom: next);
-  }
-
   Future<void> _undo() async {
     final bound = _bound;
     if (bound != null) {
@@ -255,36 +238,6 @@ class _SlotSheetState extends State<SlotSheet> {
         _zoom = z;
         _canUndo = false;
         _msg = 'Previous picture restored.';
-      });
-    }
-  }
-
-  Future<void> _stashSlot({String? url, double? zoom}) async {
-    final cur = _current;
-    final style = Map<String, dynamic>.from(cur?.style ?? {});
-    style['undoUrl'] = cur?.url.isNotEmpty == true ? cur!.url : widget.defaultValue;
-    style['undoZoom'] = _zoom;
-    if (zoom != null) style['zoom'] = zoom;
-    final nextUrl = url ?? cur?.url ?? '';
-    await _write(
-      {
-        'url': nextUrl,
-        'storagePath': cur?.storagePath ?? '',
-        'style': style,
-      },
-      UiOverride(
-        slot: widget.slotKey,
-        type: widget.type,
-        url: nextUrl,
-        storagePath: cur?.storagePath ?? '',
-        textSet: false,
-        style: style,
-      ),
-    );
-    if (mounted) {
-      setState(() {
-        if (zoom != null) _zoom = zoom;
-        _canUndo = true;
       });
     }
   }
@@ -443,11 +396,8 @@ class _SlotSheetState extends State<SlotSheet> {
               const SizedBox(height: 16),
               if (!isText) ...[
                 MediaTuneBar(
-                  zoom: _zoom,
                   canUndo: _canUndo,
                   onUndo: _busy ? null : _undo,
-                  onZoomOut: _busy ? null : () => _nudge(-0.15),
-                  onZoomIn: _busy ? null : () => _nudge(0.15),
                 ),
                 const SizedBox(height: 10),
               ],

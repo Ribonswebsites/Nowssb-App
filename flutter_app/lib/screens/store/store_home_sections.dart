@@ -132,14 +132,16 @@ class StoreSubscribeBanner extends StatelessWidget {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(18),
           child: AspectRatio(
-            // Much taller so the film reads fully (was 16/7.2 with pill).
-            aspectRatio: 16 / 11.5,
+            // Native frame of subscription-a (720×406). A taller box with
+            // cover cropped the left of "NowssB Subscription".
+            aspectRatio: 720 / 406,
             child: Stack(
               fit: StackFit.expand,
               children: [
                 IgnorePointer(
                   child: NwsbVideo(
                     asset: asset,
+                    fit: BoxFit.contain,
                     priority: ClipPriority.feature,
                     autoplay: true,
                     loop: true,

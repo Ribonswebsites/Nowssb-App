@@ -307,6 +307,53 @@ class UiOverrides extends ChangeNotifier {
     _files[url] = file.path;
   }
 
+  static String sectionZoomKey(String pageId, String sectionId) =>
+      'seczoom.$pageId.$sectionId';
+
+  /// Saved pinch scale for one section. 1 means the section ships as drawn.
+  double sectionZoomOf(String pageId, String sectionId) {
+    final z = get(sectionZoomKey(pageId, sectionId))?.style['zoom'];
+    if (z is! num) return 1;
+    return z.toDouble().clamp(0.55, 1.85);
+  }
+
+  /// Writes the pinch scale live. Near 1 clears it so the section is untouched.
+  Future<void> setSectionZoom(String pageId, String sectionId, double zoom) async {
+    final key = sectionZoomKey(pageId, sectionId);
+    final z = (zoom * 1000).round() / 1000;
+    if ((z - 1).abs() < 0.015) {
+      removeLocal(key);
+      if (!NwsbFirebase.ready) return;
+      try {
+        await FirebaseFirestore.instance.collection('ui_overrides').doc(slotDocId(key)).delete();
+      } catch (e) {
+        debugPrint('NowssB section zoom: $e');
+      }
+      return;
+    }
+    applyLocal(UiOverride(
+      slot: key,
+      type: SlotType.text,
+      text: '',
+      textSet: false,
+      style: {'zoom': z},
+    ));
+    if (!NwsbFirebase.ready) return;
+    try {
+      await FirebaseFirestore.instance.collection('ui_overrides').doc(slotDocId(key)).set({
+        'slot': key,
+        'type': 'text',
+        'url': '',
+        'text': null,
+        'storagePath': '',
+        'style': {'zoom': z},
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      debugPrint('NowssB section zoom: $e');
+    }
+  }
+
   @override
   void dispose() {
     _sub?.cancel();

@@ -169,16 +169,6 @@ class _SlotRowState extends State<SlotRow> {
     }
   }
 
-  Future<void> _zoom(String? bound, double current, double delta) async {
-    final next = (current + delta).clamp(0.5, 2.6);
-    if (bound != null) {
-      await WordArt.instance.set(bound, scale: next);
-    } else {
-      c.patchStyle(s.key, s.type, s.def, {'undoZoom': current, 'zoom': next});
-    }
-    if (mounted) setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
     final o = c.overrideOf(s.key);
@@ -239,12 +229,10 @@ class _SlotRowState extends State<SlotRow> {
               ] else if (s.type != SlotType.orb) ...[
                 Builder(builder: (context) {
                   final bound = wordOfSlot(s.key);
-                  final z = bound != null
-                      ? WordArt.instance.scaleOf(bound)
-                      : ((o?.style['zoom'] as num?)?.toDouble() ?? 1);
-                  final undo = bound != null ? WordArt.instance.canUndo(bound) : o?.style['undoZoom'] != null;
+                  final undo = bound != null
+                      ? WordArt.instance.canUndo(bound)
+                      : o?.style['undoUrl'] != null || o?.style['undoZoom'] != null;
                   return MediaTuneBar(
-                    zoom: z,
                     canUndo: undo,
                     onUndo: _progress != null
                         ? null
@@ -259,8 +247,6 @@ class _SlotRowState extends State<SlotRow> {
                             }
                             if (mounted) setState(() {});
                           },
-                    onZoomOut: _progress != null ? null : () => _zoom(bound, z, -0.15),
-                    onZoomIn: _progress != null ? null : () => _zoom(bound, z, 0.15),
                   );
                 }),
                 const SizedBox(height: 8),
