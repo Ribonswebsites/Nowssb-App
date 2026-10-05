@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 import '../admin_state.dart';
+import '../section_editor/section_editor_shell.dart';
 import '../template/ui_overrides.dart';
 
 class SectionPinch extends StatelessWidget {
@@ -137,6 +138,39 @@ class _PinchSurfaceState extends State<_PinchSurface> {
           clipBehavior: Clip.none,
           children: [
             SectionZoom(scale: _scale, child: widget.child),
+            Positioned(
+              top: 6,
+              left: 6,
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(99),
+                  onTap: () => openSectionEditor(
+                    context,
+                    pageId: widget.pageId,
+                    sectionId: widget.sectionId,
+                  ),
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: const Color(0xE0060C18),
+                      borderRadius: BorderRadius.circular(99),
+                      border: Border.all(color: const Color(0xFFE8D5A3)),
+                    ),
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      child: Text(
+                        'Edit',
+                        style: TextStyle(
+                          color: Color(0xFFE8D5A3),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
             Positioned(
               top: 6,
               right: 6,

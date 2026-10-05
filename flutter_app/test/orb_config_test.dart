@@ -11,4 +11,23 @@ void main() {
     expect(orbStateFromStyle(null), isNull);
     expect(orbStateFromStyle({'orb': 'notReal'}), isNull);
   });
+
+  test('thinkingAnimFromStyle prefers lottie kind+asset over orb', () {
+    final a = thinkingAnimFromStyle({
+      'kind': 'lottie',
+      'asset': 'assets/anim/thinking/assistant_gem_gold.json',
+      'orb': 'solving',
+    });
+    expect(a, isNotNull);
+    expect(a!.isLottie, isTrue);
+    expect(a.asset, 'assets/anim/thinking/assistant_gem_gold.json');
+    expect(a.orb, isNull);
+  });
+
+  test('thinkingAnimFromStyle falls back to OrbState', () {
+    final a = thinkingAnimFromStyle({'kind': 'orb', 'orb': 'listening'});
+    expect(a, isNotNull);
+    expect(a!.isOrb, isTrue);
+    expect(a.orb, OrbState.listening);
+  });
 }

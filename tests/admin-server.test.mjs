@@ -471,3 +471,60 @@ test('orb-set writes adminLog and ui_history kind orb', async () => {
   const log = rowsOf(db, 'adminLog/');
   assert.ok(log.some((h) => h.action === 'orb.set' && h.target === 'orb.home.hero'));
 });
+
+test('section-set saves SectionConfig with version bump, list, undo', async () => {
+  const db = memStore();
+  const d = deps(db);
+  const cfg = {
+    id: 'hero',
+    type: 'glassyCarousel',
+    version: 0,
+    enabled: true,
+    layout: { height: 180 },
+  };
+  const set1 = await A.sectionSet(d, { pageId: 'home.normal', sectionId: 'hero', config: cfg, note: 'shell' });
+  assert.equal(set1.slot, 'section.home.normal.hero');
+  assert.equal(set1.config.id, 'hero');
+  assert.equal(set1.config.type, 'glassyCarousel');
+  assert.equal(set1.config.version, 1);
+  assert.equal(set1.config.layout.height, 180);
+
+  const listed = await A.sections(d, { pageId: 'home.normal', sectionId: 'hero' });
+  assert.equal(listed.sections.length, 1);
+  assert.equal(listed.sections[0].config.version, 1);
+  assert.ok(listed.history.length >= 1);
+  assert.equal(listed.history[0].after.version, 1);
+
+  db.clock.t += 1000;
+  const d2 = { ...d, now: db.clock.t };
+  const set2 = await A.sectionSet(d2, {
+    pageId: 'home.normal',
+    sectionId: 'hero',
+    config: { ...cfg, enabled: false, layout: { height: 220 } },
+    note: 'disable',
+  });
+  assert.equal(set2.config.version, 2);
+  assert.equal(set2.config.enabled, false);
+
+  db.clock.t += 1000;
+  const undone = await A.sectionUndo({ ...d, now: db.clock.t }, { pageId: 'home.normal', sectionId: 'hero' });
+  assert.equal(undone.config.enabled, true);
+  assert.equal(undone.config.layout.height, 180);
+  // version bumps again on restore
+  assert.ok(undone.config.version >= 3);
+
+  const log = rowsOf(db, 'adminLog/');
+  assert.ok(log.some((h) => h.action === 'section.set' && h.target === 'section.home.normal.hero'));
+});
+
+test('section-set fills config.id from sectionId when omitted', async () => {
+  const db = memStore();
+  const r = await A.sectionSet(deps(db), { pageId: 'home', sectionId: 'x', config: { type: 'cardRow' } });
+  assert.equal(r.config.id, 'x');
+  assert.equal(r.config.type, 'cardRow');
+  await assert.rejects(
+    () => A.sectionSet(deps(db), { pageId: '', sectionId: '', config: { type: 'cardRow' } }),
+    (e) => e.status === 400,
+  );
+});
+

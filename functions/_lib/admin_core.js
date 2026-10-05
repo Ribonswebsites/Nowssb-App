@@ -1214,6 +1214,167 @@ export async function orbUndo(deps, body = {}) {
   return orbSet(deps, { slot, orb: parsed.orb, kind: 'orb', note: 'undo', allowUnknown: true });
 }
 
+
+/* ─── Section config (UI-0 SectionConfig) ───────────────────────────────
+   Per-section JSON lives in ui_overrides/{docId} with type "section" and
+   slot "section.<pageId>.<sectionId>". History in ui_history (kind: "section").
+   Public clients can read ui_overrides; admin writes via section-set / undo. */
+const SECTION_SLOT_RE = /^section\.[A-Za-z0-9_.-]+$/;
+function sectionSlotId(pageId, sectionId, slot) {
+  if (slot) {
+    const s = str(slot, 160);
+    if (!SECTION_SLOT_RE.test(s)) throw bad('Section slot must look like section.pageId.sectionId.');
+    return s;
+  }
+  const page = str(pageId, 80);
+  const sid = str(sectionId, 80);
+  if (!page || !sid) throw bad('pageId and sectionId are required.');
+  const s = `section.${page}.${sid}`;
+  if (!SECTION_SLOT_RE.test(s)) throw bad('Invalid section slot.');
+  return s;
+}
+function sectionDocId(slot) { return slot.replaceAll('/', '~'); }
+function parseSectionConfig(raw, fallbackId) {
+  if (!raw || typeof raw !== 'object') return null;
+  const id = str(raw.id, 80) || fallbackId || '';
+  if (!id) return null;
+  // Pass through as a plain object; Flutter SectionConfig.fromJson tolerates extras.
+  return { ...raw, id };
+}
+
+/** List section overrides, or one slot plus recent history. */
+export async function sections(deps, body = {}) {
+  const { db } = deps;
+  const want = body.slot
+    ? sectionSlotId(null, null, body.slot)
+    : (body.pageId && body.sectionId ? sectionSlotId(body.pageId, body.sectionId) : str(body.slot, 160));
+  const all = await db.query({ collection: 'ui_overrides', limit: 1000 }).catch(() => []);
+  const rows = all
+    .filter((r) => {
+      const d = r.data || {};
+      const slot = String(d.slot || r.id || '');
+      return d.type === 'section' || slot.startsWith('section.');
+    })
+    .map((r) => {
+      const d = r.data || {};
+      const slot = String(d.slot || r.id || '');
+      const config = d.config && typeof d.config === 'object' ? d.config : null;
+      return {
+        slot,
+        config,
+        updatedAt: toMs(d.updatedAt),
+        updatedBy: d.updatedBy || '',
+      };
+    })
+    .filter((r) => !want || r.slot === want);
+  let history = [];
+  if (want) {
+    const hist = (await db.query({
+      collection: 'ui_history',
+      where: [['target', '==', want]],
+      orderBy: [['at', 'desc']],
+      limit: 80,
+    }).catch(() => [])).filter((h) => h.data && h.data.kind === 'section');
+    history = hist.slice(0, 40).map((h) => ({
+      id: h.id,
+      at: toMs(h.data.at),
+      by: h.data.by || '',
+      note: h.data.note || '',
+      before: h.data.before ?? null,
+      after: h.data.after ?? null,
+    }));
+  }
+  return { ok: true, sections: rows, history };
+}
+
+/** Save a SectionConfig for one section slot. Pass config:null / {} to clear. */
+export async function sectionSet(deps, body = {}) {
+  const { db, admin, now } = deps;
+  const slot = sectionSlotId(body.pageId, body.sectionId, body.slot);
+  const parts = slot.split('.');
+  // section.<page…>.<sectionId> — page may contain dots (home.normal).
+  const sectionId = parts.length >= 3 ? parts[parts.length - 1] : '';
+  const clear = body.clear === true || body.config == null;
+  let config = null;
+  if (!clear) {
+    const incoming = body.config && typeof body.config === 'object' ? { ...body.config } : {};
+    if (!str(incoming.id, 80) && sectionId) incoming.id = sectionId;
+    config = parseSectionConfig(incoming, sectionId);
+    if (!config) throw bad('config.id is required.');
+    const prev = await db.get(`ui_overrides/${sectionDocId(slot)}`);
+    const prevCfg = prev && prev.config && typeof prev.config === 'object' ? prev.config : null;
+    const prevVer = prevCfg && Number.isFinite(Number(prevCfg.version)) ? Number(prevCfg.version) : 0;
+    config.version = prevVer + 1;
+  }
+  const before = await db.get(`ui_overrides/${sectionDocId(slot)}`);
+  const beforeCfg = before && before.config && typeof before.config === 'object' ? before.config : null;
+  const note = str(body.note, 200);
+  const ops = [];
+  if (clear) {
+    if (before) ops.push({ op: 'delete', path: `ui_overrides/${sectionDocId(slot)}` });
+  } else {
+    ops.push({
+      op: 'set',
+      path: `ui_overrides/${sectionDocId(slot)}`,
+      data: {
+        slot,
+        type: 'section',
+        url: '',
+        text: null,
+        storagePath: '',
+        style: {},
+        config,
+        default: null,
+        updatedAt: new Date(now),
+        updatedBy: admin.email || admin.uid,
+      },
+    });
+  }
+  ops.push({
+    op: 'create',
+    path: `ui_history/${db.newId()}`,
+    data: {
+      page: parts.length >= 3 ? parts.slice(1, -1).join('.') : 'all',
+      kind: 'section',
+      target: slot,
+      default: null,
+      before: beforeCfg,
+      after: clear ? null : config,
+      at: new Date(now),
+      by: admin.email || admin.uid,
+      note: note || (clear ? 'section.reset' : `section.set:${config.id}`),
+    },
+  });
+  ops.push(...logOps(
+    deps,
+    clear ? 'section.reset' : 'section.set',
+    slot,
+    { before: beforeCfg ? beforeCfg.id : null, after: config ? config.id : null, version: config ? config.version : null },
+    clear ? `Cleared section ${slot}` : `Set section ${slot} v${config.version}`,
+  ));
+  if (ops.length) await db.commit(ops);
+  return { ok: true, slot, config: clear ? null : config, before: beforeCfg };
+}
+
+/** Undo the last section change (restore previous config from ui_history). */
+export async function sectionUndo(deps, body = {}) {
+  const { db } = deps;
+  const slot = sectionSlotId(body.pageId, body.sectionId, body.slot);
+  const hist = (await db.query({
+    collection: 'ui_history',
+    where: [['target', '==', slot]],
+    orderBy: [['at', 'desc']],
+    limit: 40,
+  }).catch(() => [])).filter((h) => h.data && h.data.kind === 'section');
+  if (!hist.length) throw bad('Nothing to undo for that section.', 'nothing_to_undo');
+  const prev = hist[0].data.before;
+  if (prev == null) {
+    return sectionSet(deps, { slot, clear: true, note: 'undo' });
+  }
+  // Restore exact previous blob; sectionSet will bump version again (intentional).
+  return sectionSet(deps, { slot, config: prev, note: 'undo' });
+}
+
 export const ACTIONS = {
   stats, users: listUsers, user: userProfile,
   'grant-sub': grantSub, 'extend-sub': extendSub, 'revoke-sub': revokeSub,
@@ -1224,4 +1385,5 @@ export const ACTIONS = {
   earn: earnOverview, network, feed, 'ui-assets': uiAssets,
   today, 'grant-item': grantItem, 'send-gift': sendGift, alerts,
   orbs, 'orb-set': orbSet, 'orb-undo': orbUndo,
+  sections, 'section-set': sectionSet, 'section-undo': sectionUndo,
 };

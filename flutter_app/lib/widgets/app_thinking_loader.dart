@@ -2,15 +2,17 @@
 ///
 /// When a per-slot (or app-wide `orb.all`) choice is saved server-side in
 /// `ui_overrides`, that animation plays for every user — no random pick.
-/// Random is used only while the slot (and `orb.all`) are still unset.
-/// Every orb sits inside a **larger black circle** for consistent placement
-/// across hero chips, search fields, practice pills, and loaders.
+/// Supports package [OrbState] names (`kind: orb`) and bundled Lottie
+/// assets (`kind: lottie` + `asset`). Random is used only while unset.
+/// Every orb sits inside a **larger black circle** for consistent placement.
 library;
 
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
+import 'package:lottie/lottie.dart';
+
 import '../admin/layout/scopes.dart';
 import '../admin/template/editable.dart';
 import '../admin/template/slot_keys.dart';
@@ -26,6 +28,22 @@ const List<OrbState> kNwsbThinkingOrbStates = <OrbState>[
   OrbState.solving,
 ];
 
+/// A resolved thinking animation: package orb and/or Lottie/Rive asset.
+class ResolvedThinkingAnim {
+  const ResolvedThinkingAnim.orb(this.orb)
+      : kind = 'orb',
+        asset = null;
+  const ResolvedThinkingAnim.asset({required this.kind, required this.asset})
+      : orb = null;
+
+  final String kind;
+  final OrbState? orb;
+  final String? asset;
+
+  bool get isLottie => kind == 'lottie' && asset != null && asset!.isNotEmpty;
+  bool get isOrb => kind == 'orb' && orb != null;
+}
+
 /// Resolve a saved OrbState name from [style], or null if unset / unknown.
 OrbState? orbStateFromStyle(Map<String, dynamic>? style) {
   final pick = style == null ? null : style['orb'];
@@ -36,12 +54,36 @@ OrbState? orbStateFromStyle(Map<String, dynamic>? style) {
   return null;
 }
 
+/// Resolve the full thinking animation from a ui_overrides style map.
+ResolvedThinkingAnim? thinkingAnimFromStyle(Map<String, dynamic>? style) {
+  if (style == null || style.isEmpty) return null;
+  final kindRaw = style['kind'];
+  final kind = kindRaw is String ? kindRaw.trim().toLowerCase() : '';
+  final assetRaw = style['asset'];
+  final asset = assetRaw is String ? assetRaw.trim() : '';
+  if ((kind == 'lottie' || kind == 'rive' || asset.isNotEmpty) && asset.isNotEmpty) {
+    final k = kind.isNotEmpty
+        ? kind
+        : (asset.endsWith('.riv') ? 'rive' : 'lottie');
+    // Rive playback is pending a rive dep; fall through to orb/random if rive.
+    if (k == 'lottie') return ResolvedThinkingAnim.asset(kind: k, asset: asset);
+  }
+  final orb = orbStateFromStyle(style);
+  if (orb != null) return ResolvedThinkingAnim.orb(orb);
+  return null;
+}
+
 /// The effective server choice for a loader slot: slot → `orb.all` → null.
 OrbState? resolvedOrbChoice(String key) {
-  final local = orbStateFromStyle(UiOverrides.instance.get(key)?.style);
+  return resolvedThinkingAnim(key)?.orb;
+}
+
+/// Full resolved animation (orb or Lottie) for a loader slot.
+ResolvedThinkingAnim? resolvedThinkingAnim(String key) {
+  final local = thinkingAnimFromStyle(UiOverrides.instance.get(key)?.style);
   if (local != null) return local;
   if (key != 'orb.all') {
-    return orbStateFromStyle(UiOverrides.instance.get('orb.all')?.style);
+    return thinkingAnimFromStyle(UiOverrides.instance.get('orb.all')?.style);
   }
   return null;
 }
@@ -92,8 +134,7 @@ class AppThinkingLoader extends StatefulWidget {
 
 class _AppThinkingLoaderState extends State<AppThinkingLoader> {
   /// Random fallback kept for the lifetime of this State when no server
-  /// choice (and no [widget.state]) is set. Cleared conceptually once a
-  /// choice appears — build always prefers the server pick.
+  /// choice (and no [widget.state]) is set.
   OrbState? _randomFallback;
 
   OrbState _fallbackRandom() {
@@ -104,10 +145,9 @@ class _AppThinkingLoaderState extends State<AppThinkingLoader> {
   @override
   void initState() {
     super.initState();
-    // Prefer an already-cached server choice so the first frame is stable.
     if (widget.state == null) {
       final key = widget.slot ?? 'orb.all';
-      if (resolvedOrbChoice(key) == null) {
+      if (resolvedThinkingAnim(key) == null) {
         _randomFallback = _fallbackRandom();
       }
     }
@@ -124,34 +164,40 @@ class _AppThinkingLoaderState extends State<AppThinkingLoader> {
     UiScope.watch(context);
     final key = _slotKey(context);
     final forced = widget.state;
-    final saved = resolvedOrbChoice(key);
-    // Once a server choice exists, never use random for this mount.
-    final OrbState state;
+    final saved = forced == null ? resolvedThinkingAnim(key) : null;
+
+    late final Widget anim;
+    late final String seenName;
+
     if (forced != null) {
-      state = forced;
-    } else if (saved != null) {
-      state = saved;
       _randomFallback = null;
+      anim = ThinkingOrb(state: forced, size: _orbSize(context, key), theme: widget.theme);
+      seenName = forced.name;
+    } else if (saved != null && saved.isLottie) {
+      _randomFallback = null;
+      final size = _orbSize(context, key);
+      anim = Lottie.asset(
+        saved.asset!,
+        width: size,
+        height: size,
+        fit: BoxFit.contain,
+        repeat: true,
+      );
+      seenName = 'lottie:${saved.asset}';
+    } else if (saved != null && saved.isOrb) {
+      _randomFallback = null;
+      anim = ThinkingOrb(state: saved.orb!, size: _orbSize(context, key), theme: widget.theme);
+      seenName = saved.orb!.name;
     } else {
       _randomFallback ??= _fallbackRandom();
-      state = _randomFallback!;
+      anim = ThinkingOrb(state: _randomFallback!, size: _orbSize(context, key), theme: widget.theme);
+      seenName = _randomFallback!.name;
     }
 
-    slotSeen(context, key, SlotType.orb, state.name);
-    var look = effectiveOverride(context, key)?.style;
-    if ((look == null || look.isEmpty) && key != 'orb.all') {
-      look = effectiveOverride(context, 'orb.all')?.style;
-    }
-    look ??= const {};
-
+    slotSeen(context, key, SlotType.orb, seenName);
+    final look = _look(context, key);
     final size = look['orbSize'] is num ? (look['orbSize'] as num).toDouble() : widget.size;
     final blackCircle = look['orbCircle'] is bool ? look['orbCircle'] as bool : widget.blackCircle;
-
-    final orb = ThinkingOrb(
-      state: state,
-      size: size,
-      theme: widget.theme,
-    );
 
     final Widget orbWidget;
     if (blackCircle) {
@@ -165,10 +211,10 @@ class _AppThinkingLoaderState extends State<AppThinkingLoader> {
           shape: BoxShape.circle,
         ),
         clipBehavior: Clip.antiAlias,
-        child: orb,
+        child: anim,
       );
     } else {
-      orbWidget = orb;
+      orbWidget = anim;
     }
 
     final label = widget.label;
@@ -213,5 +259,18 @@ class _AppThinkingLoaderState extends State<AppThinkingLoader> {
         text,
       ],
     );
+  }
+
+  Map<String, dynamic> _look(BuildContext context, String key) {
+    var look = effectiveOverride(context, key)?.style;
+    if ((look == null || look.isEmpty) && key != 'orb.all') {
+      look = effectiveOverride(context, 'orb.all')?.style;
+    }
+    return look ?? const {};
+  }
+
+  double _orbSize(BuildContext context, String key) {
+    final look = _look(context, key);
+    return look['orbSize'] is num ? (look['orbSize'] as num).toDouble() : widget.size;
   }
 }

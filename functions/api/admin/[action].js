@@ -11,7 +11,7 @@
    fulfil-request, broadcast, payout-decide, gift-codes, gift-void, earn,
    network, feed, ui-assets, today (who signed in on a day), grant-item
    (free word/meaning/ebook/signature), send-gift (gift code to one person),
-   alerts (admin inbox summary), orbs / orb-set / orb-undo (thinking-orb config).
+   alerts (admin inbox summary), orbs / orb-set, section-set, section-undo, sections / orb-undo (thinking-orb config).
 
    Cloudflare Pages → Settings → Variables and secrets (Production):
      FIREBASE_SERVICE_ACCOUNT  Firebase Admin service-account JSON (required)
