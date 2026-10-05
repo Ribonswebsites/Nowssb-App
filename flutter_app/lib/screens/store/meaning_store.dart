@@ -20,9 +20,13 @@ import '../../widgets/page_shell.dart';
 import '../../widgets/hype_rail.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/app_thinking_loader.dart';
+import '../../widgets/sections/artist_cards_section.dart';
+import '../../widgets/sections/category_tiles_section.dart';
+import '../../widgets/sections/section_config.dart';
 import 'product_detail.dart';
 import 'store_cards.dart';
 import 'store_home_sections.dart';
+import 'store_section_mix.dart';
 import 'store_select_sheet.dart';
 import 'request_words.dart';
 import 'store_routes.dart';
@@ -99,6 +103,10 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
   var _allRows = false;
   var _ready = false;
 
+  /// UI-6 artist row config, built once from the catalogue (stable identity).
+  late final SectionConfig _artists =
+      MeaningMix.artists(_base, (m) => _msOnlyArt(m.key, m.img));
+
   @override
   void initState() {
     super.initState();
@@ -164,6 +172,23 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
     );
   }
 
+  void _openArtist(SectionMediaItem item) {
+    final hit = _base.where((m) => m.key == item.id).toList();
+    if (hit.isNotEmpty) {
+      openMeaningDetail(context, hit.first);
+    } else {
+      storeMixOpenLink(context, item);
+    }
+  }
+
+  void _onMixTile(SectionMediaItem item) {
+    if ((item.ctaLink ?? '').trim().isNotEmpty) {
+      storeMixOpenLink(context, item);
+      return;
+    }
+    setState(() => _chip = item.id);
+  }
+
   void _openMeaning(String word, String root, String img, num price) {
     final hit = _base
         .where((m) => m.word.toLowerCase() == word.toLowerCase())
@@ -220,16 +245,20 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
       children: layoutIndexed(context, 'store.meaning', const {
         0: ('hero', 'Hero film'),
         1: ('subscribe', 'Subscribe banner'),
-        2: ('hype', 'Most hyped'),
-        3: ('search', 'Search'),
-        5: ('chips', 'Category chips'),
-        7: ('goals', 'Browse by goal'),
-        8: ('recommended', 'Recommended for you'),
-        9: ('promo', 'Signature Store banner'),
-        10: ('playlist', 'Featured playlist'),
-        11: ('collections', 'Featured collections'),
-        13: ('promo2', 'Signature promo'),
-        14: ('rows', 'Meaning collections'),
+        // UI-6 varied mix: artists → tiles → hype → glassy (no two alike).
+        2: ('artists', 'Featured meanings'),
+        3: ('tiles', 'Category tiles'),
+        4: ('hype', 'Most hyped'),
+        5: ('glassy', 'Explore the stores'),
+        7: ('search', 'Search'),
+        9: ('chips', 'Category chips'),
+        11: ('goals', 'Browse by goal'),
+        12: ('recommended', 'Recommended for you'),
+        13: ('promo', 'Signature Store banner'),
+        14: ('playlist', 'Featured playlist'),
+        15: ('collections', 'Featured collections'),
+        17: ('promo2', 'Signature promo'),
+        18: ('rows', 'Meaning collections'),
         -2: ('promo3', 'Request words banner'),
         -1: ('disclaimer', 'Disclaimer'),
       }, [
@@ -238,10 +267,24 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
           videoAsset: nwsbVideo(kStoreMeaningDoorVidFile),
           videoTitle: '',
         ),
-        StoreSubscribeBanner(
+        const StoreSubscribeBanner(
           pillIconAsset: kMsMeaningProductArt,
         ),
+        StoreMixRow(
+          title: 'Featured meanings',
+          child: ArtistCardsSection(config: _artists, onTap: _openArtist),
+        ),
+        CategoryTilesSection(
+          config: MeaningMix.tiles,
+          onTileTap: _onMixTile,
+        ),
+        // Kept as the one hyped row (legacy cards + their admin image slots).
         const NowssbHypeRail(),
+        StoreMixRow(
+          title: 'Explore the stores',
+          child: StoreRegistrySection(config: MeaningMix.glassy),
+        ),
+        const SizedBox(height: 16),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 2),
           child: StoreSearchBar(

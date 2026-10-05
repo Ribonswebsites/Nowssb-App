@@ -15,6 +15,7 @@ import '../../widgets/hype_rail.dart';
 import 'product_detail.dart';
 import 'store_cards.dart';
 import 'store_home_sections.dart';
+import 'store_section_mix.dart';
 import 'store_select_sheet.dart';
 import 'ebooks_store.dart';
 import 'meaning_store.dart';
@@ -276,13 +277,17 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
       // Server-driven order (Admin → UI Editor); bundled order by default.
       children: layoutIndexed(context, 'store.atelier', const {
         0: ('hero', 'Hero film'),
-        2: ('hype', 'Most hyped'),
-        3: ('promo', 'Split promo banner'),
-        5: ('search', 'Search'),
-        7: ('intro', 'Your word library intro'),
-        11: ('chips', 'Category chips'),
-        13: ('promo2', 'Meaning Store banner'),
-        14: ('rows', 'Word collections'),
+        // UI-6 varied mix: coupons → hype → tiles → glassy (no two alike).
+        2: ('coupons', 'Coupon banner'),
+        3: ('hype', 'Most hyped'),
+        4: ('tiles', 'Category tiles'),
+        5: ('glassy', 'Featured collections'),
+        7: ('promo', 'Split promo banner'),
+        9: ('search', 'Search'),
+        11: ('intro', 'Your word library intro'),
+        15: ('chips', 'Category chips'),
+        17: ('promo2', 'Meaning Store banner'),
+        18: ('rows', 'Word collections'),
         -2: ('promo3', 'Signature Store banner'),
         -1: ('disclaimer', 'Disclaimer'),
       }, [
@@ -293,7 +298,15 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
           videoTitle: '',
         ),
         const SizedBox(height: 18),
+        StoreRegistrySection(config: AtelierMix.coupons),
+        // Kept as the one hyped row (legacy cards + their admin image slots).
         const NowssbHypeRail(),
+        StoreRegistrySection(config: AtelierMix.tiles),
+        StoreMixRow(
+          title: 'Featured collections',
+          child: StoreRegistrySection(config: AtelierMix.glassy),
+        ),
+        const SizedBox(height: 16),
         ColoredSplitPromoBanner.forSurface(
           SplitPromoSurface.wordAtelier,
           onTap: () => Navigator.of(context).push(
