@@ -10,7 +10,9 @@ import 'package:flutter/material.dart';
 
 import '../../admin/template/editable.dart';
 import '../../features/economy/coupon_tickets.dart';
+import '../../shell/nwsb_links.dart';
 import '../../theme/tokens.dart';
+import '../hype_rail.dart';
 import 'section_config.dart';
 
 /// One slide shown inside the ticket.
@@ -21,6 +23,7 @@ class _Slide {
     required this.offer,
     required this.subtitle,
     required this.ctaLabel,
+    this.ctaLink,
     this.badge = 'LIMITED',
   });
 
@@ -29,6 +32,7 @@ class _Slide {
   final String offer;
   final String subtitle;
   final String ctaLabel;
+  final String? ctaLink;
   final String badge;
 }
 
@@ -49,6 +53,7 @@ List<_Slide> _slidesFromConfig(SectionConfig? config) {
               ? 'Catalogue prize · not cash'
               : it.subtitle!.trim(),
           ctaLabel: (it.ctaLabel ?? '').trim().isEmpty ? 'Scratch now' : it.ctaLabel!.trim(),
+          ctaLink: (it.ctaLink ?? '').trim().isEmpty ? null : it.ctaLink!.trim(),
           badge: (it.meta['badge'] as String?)?.trim().isNotEmpty == true
               ? '${it.meta['badge']}'
               : 'LIMITED',
@@ -166,6 +171,26 @@ class _CouponBannerSectionState extends State<CouponBannerSection> {
 
   double get _radius => widget.config?.layout.radius ?? 18;
 
+  /// Hunter H-010: registry builds with no [onCta]; honour ctaLink, else coupons.
+  void _handleCta(_Slide slide) {
+    if (editModeOn(context)) return;
+    if (widget.onCta != null) {
+      widget.onCta!();
+      return;
+    }
+    final link = (slide.ctaLink ?? '').trim();
+    if (link.isNotEmpty) {
+      final opener = openHypeCard;
+      if (opener != null && kHypeCards.any((c) => c.id == link)) {
+        opener(context, link);
+        return;
+      }
+      NwsbLinks.cta(context, link);
+      return;
+    }
+    NwsbLinks.cta(context, 'coupon');
+  }
+
   @override
   Widget build(BuildContext context) {
     final slides = _slides;
@@ -212,12 +237,15 @@ class _CouponBannerSectionState extends State<CouponBannerSection> {
                   controller: _page,
                   itemCount: slides.length,
                   onPageChanged: (i) => setState(() => _index = i),
-                  itemBuilder: (context, i) => _TicketPage(
-                    slide: slides[i],
-                    sectionId: widget.config?.id ?? 'coupon_banner',
-                    accent: _accent,
-                    onCta: widget.onCta,
-                  ),
+                  itemBuilder: (context, i) {
+                    final slide = slides[i];
+                    return _TicketPage(
+                      slide: slide,
+                      sectionId: widget.config?.id ?? 'coupon_banner',
+                      accent: _accent,
+                      onCta: () => _handleCta(slide),
+                    );
+                  },
                 ),
               ),
             ),
@@ -261,13 +289,13 @@ class _TicketPage extends StatelessWidget {
     required this.slide,
     required this.sectionId,
     required this.accent,
-    this.onCta,
+    required this.onCta,
   });
 
   final _Slide slide;
   final String sectionId;
   final Color accent;
-  final VoidCallback? onCta;
+  final VoidCallback onCta;
 
   @override
   Widget build(BuildContext context) {
@@ -379,7 +407,7 @@ class _TicketPage extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           GestureDetector(
-            onTap: editModeOn(context) ? null : onCta,
+            onTap: onCta,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
               decoration: BoxDecoration(

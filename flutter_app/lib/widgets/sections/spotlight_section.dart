@@ -174,8 +174,10 @@ class _SpotlightSectionState extends State<SpotlightSection> {
     }
 
     final sectionId = widget.config?.id ?? 'spotlight';
-    // Card + title block + dots — fixed so outer home scroll stays vertical-only.
-    final pageH = _cardHeight + 88;
+    // PageView is card-only; title/subtitle sit below so text scale cannot
+    // overflow a brittle cardHeight+88 box (Hunter H-009).
+    final safeIndex = _index.clamp(0, items.length - 1);
+    final caption = items[safeIndex];
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
@@ -205,7 +207,7 @@ class _SpotlightSectionState extends State<SpotlightSection> {
               return false;
             },
             child: SizedBox(
-              height: pageH,
+              height: _cardHeight,
               child: PageView.builder(
                 controller: _page,
                 itemCount: items.length,
@@ -226,6 +228,11 @@ class _SpotlightSectionState extends State<SpotlightSection> {
                 },
               ),
             ),
+          ),
+          const SizedBox(height: 12),
+          _SpotlightCaption(
+            item: caption,
+            sectionId: sectionId,
           ),
           if (items.length > 1) ...[
             const SizedBox(height: 10),
@@ -272,9 +279,6 @@ class _SpotlightPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final slot = '$sectionId.${item.id}';
-    final title =
-        (item.title ?? '').trim().isEmpty ? 'NowssB' : item.title!.trim();
-    final subtitle = (item.subtitle ?? '').trim();
     final badge = _badgeOf(item);
     final fit = item.fit == SectionMediaFit.contain
         ? BoxFit.contain
@@ -283,95 +287,117 @@ class _SpotlightPage extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          GestureDetector(
-            onTap: onTap,
-            behavior: HitTestBehavior.opaque,
-            child: SizedBox(
-              height: cardHeight,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: const Color(0xFF141414),
-                  borderRadius: BorderRadius.circular(radius),
-                  border: Border.all(
-                    color: const Color(0x22FFFFFF),
-                    width: 1,
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: SizedBox(
+          height: cardHeight,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: const Color(0xFF141414),
+              borderRadius: BorderRadius.circular(radius),
+              border: Border.all(
+                color: const Color(0x22FFFFFF),
+                width: 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.4),
+                  blurRadius: 16,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(radius),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  _SpotlightImage(
+                    imageUrl: item.imageUrl,
+                    slot: '$slot.image',
+                    alignment: alignment,
+                    fit: fit,
+                    zoom: item.zoom,
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.4),
-                      blurRadius: 16,
-                      offset: const Offset(0, 6),
+                  // Soft bottom fade so the card edge stays dark.
+                  const Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    height: 72,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Color(0x00000000),
+                            Color(0x99000000),
+                          ],
+                        ),
+                      ),
                     ),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(radius),
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      _SpotlightImage(
-                        imageUrl: item.imageUrl,
-                        slot: '$slot.image',
-                        alignment: alignment,
-                        fit: fit,
-                        zoom: item.zoom,
-                      ),
-                      // Soft bottom fade so the card edge stays dark.
-                      const Positioned(
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        height: 72,
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                Color(0x00000000),
-                                Color(0x99000000),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      if (badge != null)
-                        Positioned(
-                          top: 12,
-                          left: 12,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 5,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xCC1A1A1A),
-                              borderRadius: BorderRadius.circular(99),
-                              border: Border.all(
-                                color: const Color(0x33FFFFFF),
-                              ),
-                            ),
-                            child: EditableLabel(
-                              '$slot.badge',
-                              badge,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 11,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
                   ),
-                ),
+                  if (badge != null)
+                    Positioned(
+                      top: 12,
+                      left: 12,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xCC1A1A1A),
+                          borderRadius: BorderRadius.circular(99),
+                          border: Border.all(
+                            color: const Color(0x33FFFFFF),
+                          ),
+                        ),
+                        child: EditableLabel(
+                          '$slot.badge',
+                          badge,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ),
           ),
-          const SizedBox(height: 12),
+        ),
+      ),
+    );
+  }
+}
+
+/// Title + subtitle under the PageView (sizes with text scale; H-009).
+class _SpotlightCaption extends StatelessWidget {
+  const _SpotlightCaption({
+    required this.item,
+    required this.sectionId,
+  });
+
+  final SectionMediaItem item;
+  final String sectionId;
+
+  @override
+  Widget build(BuildContext context) {
+    final slot = '$sectionId.${item.id}';
+    final title =
+        (item.title ?? '').trim().isEmpty ? 'NowssB' : item.title!.trim();
+    final subtitle = (item.subtitle ?? '').trim();
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 2),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
           EditableLabel(
             '$slot.title',
             title,
