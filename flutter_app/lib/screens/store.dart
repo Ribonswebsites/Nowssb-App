@@ -19,7 +19,6 @@ import '../widgets/black_glass_banner.dart';
 import '../widgets/colored_split_promo_banner.dart';
 import '../widgets/nwsb_icon.dart';
 import '../features/bazaar/bazaar_screen.dart';
-import 'sound_library.dart';
 import 'store/bag_ui.dart';
 import 'store/store_home_sections.dart';
 
@@ -38,6 +37,8 @@ import 'store/store_terms_sheet.dart';
 import '../admin/template/editable.dart';
 import '../admin/layout/layout_sections.dart';
 import '../widgets/hype_rail.dart';
+import '../widgets/home_keep_alive.dart';
+import '../shell/nwsb_links.dart';
 
 class StoreScreen extends StatelessWidget {
   const StoreScreen({super.key});
@@ -150,8 +151,10 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
       const _StoreDepartmentLabel('WORD ATELIER'),
       _StoreGlassSection(
         children: [
-          const _StoreCompactVideoBanner(
-            asset: 'assets/video/hero-word-store.mp4',
+          const HomeKeepAlive(
+            child: _StoreCompactVideoBanner(
+              asset: 'assets/video/hero-word-store.mp4',
+            ),
           ),
           _MiniStoreCard(
             eyebrow: 'THE WORD LIBRARY · PERSONAL COLLECTIONS',
@@ -166,8 +169,10 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
       const _StoreDepartmentLabel('MEANING STORE'),
       _StoreGlassSection(
         children: [
-          const _StoreCompactVideoBanner(
-            asset: 'assets/video/hero-meaning-store.mp4',
+          const HomeKeepAlive(
+            child: _StoreCompactVideoBanner(
+              asset: 'assets/video/hero-meaning-store.mp4',
+            ),
           ),
           _MiniStoreCard(
             eyebrow: 'THE MEANING LIBRARY · AI-DECODED ORIGINS',
@@ -182,8 +187,10 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
       const _StoreDepartmentLabel('SIGNATURE STORE'),
       _StoreGlassSection(
         children: [
-          _SignatureDoor(
-              onTap: () => _push(context, const SignatureStoreScreen())),
+          HomeKeepAlive(
+            child: _SignatureDoor(
+                onTap: () => _push(context, const SignatureStoreScreen())),
+          ),
           _StoreInfoBanner(
             onTap: () => _push(context, const SignatureStoreScreen()),
             eyebrow: 'SIGNATURE STORE · LIMITED COLLECTIONS',
@@ -197,16 +204,18 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
         padding: const EdgeInsets.fromLTRB(12, 6, 12, 6),
         child: ColoredSplitPromoBanner.forSurface(
           SplitPromoSurface.storeHome,
-          onTap: editModeOn(context) ? null : () => _push(context, const SoundLibraryScreen()),
+          onTap: editModeOn(context) ? null : () => NwsbLinks.subscription(context),
           margin: EdgeInsets.zero,
         ),
       ),
       const _StoreDepartmentLabel('NOWSSB CONNECT'),
       _StoreGlassSection(
         children: [
-          const _StoreVideoBanner(
-            asset: 'assets/video/store-verify-banner.mp4',
-            poster: 'assets/video/store-verify-banner-poster.webp',
+          const HomeKeepAlive(
+            child: _StoreVideoBanner(
+              asset: 'assets/video/store-verify-banner.mp4',
+              poster: 'assets/video/store-verify-banner-poster.webp',
+            ),
           ),
           _MiniStoreCard(
             eyebrow: 'Verified · Badges',
@@ -220,9 +229,11 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
       const _StoreDepartmentLabel('SHABDAPATHY · LIBRARY'),
       _StoreGlassSection(
         children: [
-          const _StoreVideoBanner(
-            asset: 'assets/video/hero-ebooks.mp4',
-            poster: 'assets/video/hero-ebooks-poster.webp',
+          const HomeKeepAlive(
+            child: _StoreVideoBanner(
+              asset: 'assets/video/hero-ebooks.mp4',
+              poster: 'assets/video/hero-ebooks-poster.webp',
+            ),
           ),
           _MiniStoreCard(
             eyebrow: 'Read · Learn · Practice',
@@ -236,11 +247,13 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
       const _StoreDepartmentLabel('SUBSCRIPTION PLANS'),
       _StoreGlassSection(
         children: [
-          _StoreVideoBanner(
-            asset: 'assets/video/subscription-a.mp4',
-            poster: null,
-            onTap: () => _push(context, const SubscriptionScreen()),
-            tall: true,
+          HomeKeepAlive(
+            child: _StoreVideoBanner(
+              asset: 'assets/video/subscription-a.mp4',
+              poster: null,
+              onTap: () => _push(context, const SubscriptionScreen()),
+              tall: true,
+            ),
           ),
           _StoreInfoBanner(
             onTap: () => _push(context, const SubscriptionScreen()),

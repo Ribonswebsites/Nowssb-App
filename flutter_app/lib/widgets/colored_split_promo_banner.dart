@@ -87,6 +87,24 @@ class SplitPromoSpec {
   final String art;
   final VoidCallback? onTap;
 
+  /// Same chrome (colours + art); only copy / destination change.
+  SplitPromoSpec copyWith({
+    String? title,
+    String? cta,
+    Color? leftColor,
+    Color? rightColor,
+    String? art,
+    VoidCallback? onTap,
+  }) =>
+      SplitPromoSpec(
+        title: title ?? this.title,
+        cta: cta ?? this.cta,
+        leftColor: leftColor ?? this.leftColor,
+        rightColor: rightColor ?? this.rightColor,
+        art: art ?? this.art,
+        onTap: onTap ?? this.onTap,
+      );
+
   static SplitPromoSpec forSurface(
     SplitPromoSurface surface, {
     VoidCallback? onTap,
@@ -150,8 +168,8 @@ class SplitPromoSpec {
         );
       case SplitPromoSurface.ebooksStore:
         return SplitPromoSpec(
-          title: 'Dig into the\nSound Library.',
-          cta: 'Open Sound Library',
+          title: 'Dig into a\nguide today.',
+          cta: 'Open ebook',
           leftColor: const Color(0xFF143028),
           rightColor: const Color(0xFF2D6A4F),
           art: SplitPromoArts.ebooksProduct,
@@ -224,8 +242,8 @@ class SplitPromoSpec {
       case SplitPromoSurface.storeHome:
         // Store hub mid-scroll — never self-referential Word Store CTA.
         return SplitPromoSpec(
-          title: 'Open today\'s\nSound Library.',
-          cta: 'Open Sound Library',
+          title: 'See every\nplan we offer.',
+          cta: 'See every plan',
           leftColor: const Color(0xFF0F2A2E),
           rightColor: const Color(0xFF16A085),
           art: SplitPromoArts.egyptianLotus,

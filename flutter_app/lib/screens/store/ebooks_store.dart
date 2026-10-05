@@ -24,7 +24,7 @@ import 'store_section_mix.dart';
 import 'store_select_sheet.dart';
 import 'store_routes.dart';
 import 'store_terms_sheet.dart';
-import '../sound_library.dart';
+import '../../shell/nwsb_links.dart';
 import '../../admin/template/editable.dart';
 import '../../admin/layout/layout_sections.dart';
 
@@ -212,37 +212,29 @@ class _EbooksBody extends StatelessWidget {
         const SizedBox(height: 12),
         LSection('promo', 'Split promo banner', ColoredSplitPromoBanner.forSurface(
           SplitPromoSurface.ebooksStore,
-          onTap: () => Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (_) => const SoundLibraryScreen(),
-            ),
-          ),
+          onTap: books.isEmpty ? null : () => openEbookDetail(context, books.first),
           margin: const EdgeInsets.only(bottom: 8),
         )),
         const SizedBox(height: 8),
         LSection.group('books', 'All books', align: CrossAxisAlignment.start, [for (final b in books) _EbookRow(book: b)]),
         const SizedBox(height: 40),
         LSection('promo2', 'Promo banner', ColoredSplitPromoBanner(
-          spec: SplitPromoExtras.at(
-            12,
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => const SoundLibraryScreen(),
-              ),
-            ),
+          spec: SplitPromoExtras.at(12).copyWith(
+            title: 'Read the science\nbehind the sound.',
+            cta: 'Read a guide',
+            onTap: books.isEmpty
+                ? null
+                : () => openEbookDetail(context, books[1 % books.length]),
           ),
           margin: const EdgeInsets.only(bottom: 48),
         )),
         const LSection('mix', 'Banner mix', BannerMix(seed: 0)),
         const SizedBox(height: 12),
         LSection('promo3', 'Promo banner 2', ColoredSplitPromoBanner(
-          spec: SplitPromoExtras.at(
-            13,
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => const SoundLibraryScreen(),
-              ),
-            ),
+          spec: SplitPromoExtras.at(13).copyWith(
+            title: 'Your ebooks,\nready to read.',
+            cta: 'Open Reader',
+            onTap: () => NwsbLinks.reader(context),
           ),
         )),
         const LSection('disclaimer', 'Disclaimer', StoreDisclaimer(text: kEbDisclaimer)),

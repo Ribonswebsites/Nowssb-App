@@ -32,6 +32,7 @@ import 'request_words.dart';
 import 'store_routes.dart';
 import 'store_terms_sheet.dart';
 import 'signature_store.dart';
+import '../../shell/nwsb_links.dart';
 import '../../admin/template/editable.dart';
 import '../../admin/layout/layout_sections.dart';
 
@@ -365,13 +366,10 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
         ),
         const SizedBox(height: 36),
         ColoredSplitPromoBanner(
-          spec: SplitPromoExtras.at(
-            8,
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => const SignatureStoreScreen(),
-              ),
-            ),
+          spec: SplitPromoExtras.at(8).copyWith(
+            title: 'Every meaning,\none plan.',
+            cta: 'See meaning plans',
+            onTap: () => NwsbLinks.subscription(context),
           ),
           margin: const EdgeInsets.only(bottom: 36),
         ),
