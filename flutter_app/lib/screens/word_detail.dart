@@ -22,28 +22,73 @@ import 'package:just_audio/just_audio.dart';
 
 import '../data/entitlements.dart';
 import '../data/models.dart';
+import '../data/word_private.dart';
 import '../theme/tokens.dart';
 import '../widgets/app_backdrop.dart';
 import '../widgets/content_lock.dart';
 import '../admin/template/editable.dart';
 import '../media/nwsb_video.dart';
 
-class WordDetail extends StatelessWidget {
+class WordDetail extends StatefulWidget {
   const WordDetail({super.key, required this.word});
 
   final Word word;
 
   @override
+  State<WordDetail> createState() => _WordDetailState();
+}
+
+class _WordDetailState extends State<WordDetail> {
+  late Word _word;
+
+  @override
+  void initState() {
+    super.initState();
+    _word = widget.word;
+    Entitlements.instance.addListener(_onEntitlements);
+    _loadPaid();
+  }
+
+  @override
+  void didUpdateWidget(covariant WordDetail oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.word.key != widget.word.key) {
+      _word = widget.word;
+      _loadPaid();
+    }
+  }
+
+  @override
+  void dispose() {
+    Entitlements.instance.removeListener(_onEntitlements);
+    super.dispose();
+  }
+
+  void _onEntitlements() => _loadPaid();
+
+  Future<void> _loadPaid() async {
+    final open = Entitlements.instance.canOpenWord(widget.word);
+    if (!open) {
+      if (mounted) setState(() => _word = widget.word);
+      return;
+    }
+    final next = await WordPrivateStore.instance.resolve(widget.word);
+    if (!mounted) return;
+    setState(() => _word = next);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // Paid words: the recordings, videos and meaning open only with the
-    // same entitlement the Practice Player checks (ensureWordOpen).
+    // Paid words: recordings, videos and meaning come from wordsPrivate via
+    // /api/content/word once entitled — never assume public docs still carry them.
     return ListenableBuilder(
       listenable: Entitlements.instance,
-      builder: (context, _) => _page(context, Entitlements.instance.canOpenWord(word)),
+      builder: (context, _) => _page(context, Entitlements.instance.canOpenWord(widget.word)),
     );
   }
 
   Widget _page(BuildContext context, bool open) {
+    final word = _word;
     return Scaffold(
       backgroundColor: NwsbColors.deep,
       body: Stack(
@@ -464,7 +509,14 @@ class _LockedCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => ensureWordOpen(context, word),
+      onTap: () async {
+        final ok = await ensureWordOpen(context, word);
+        if (ok && context.mounted) {
+          // Entitlements listener also reloads; this covers the same frame.
+          final st = context.findAncestorStateOfType<_WordDetailState>();
+          st?._loadPaid();
+        }
+      },
       behavior: HitTestBehavior.opaque,
       child: Container(
         padding: const EdgeInsets.all(16),

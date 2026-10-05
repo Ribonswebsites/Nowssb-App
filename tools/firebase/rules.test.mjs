@@ -16,6 +16,9 @@ await env.withSecurityRulesDisabled(async (c) => {
   await setDoc(doc(db, 'requests/r2'), { uid: 'bob', word: 'ra', status: 'new', at: 2 });
   await setDoc(doc(db, 'payments/pay_A'), { uid: 'alice', tier: 'frequency', amount: 999 });
   await setDoc(doc(db, 'payments/pay_B'), { uid: 'bob', tier: 'resonance', amount: 499 });
+  await setDoc(doc(db, 'wordsPrivate/om'), { meaning: 'secret', audio: 'https://media.nowssb.com/om.mp3' });
+  await setDoc(doc(db, 'users/alice/owned/word_ra'), { source: 'admin', status: 'active', itemId: 'word:ra' });
+  await setDoc(doc(db, 'wordsPrivate/ra'), { meaning: 'sun', audio: 'https://media.nowssb.com/ra.mp3' });
 });
 const alice = env.authenticatedContext('alice').firestore();
 const boss = env.authenticatedContext('boss').firestore();
@@ -300,6 +303,21 @@ await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'admi
 await t('admin reads adminAlerts ok', assertSucceeds(getDocs(collection(boss, 'adminAlerts'))));
 await t('admin marks alert seen ok', assertSucceeds(updateDoc(doc(boss, 'adminAlerts/request_z'), { seen: true })));
 await t('admin edits alert title denied', assertFails(updateDoc(doc(boss, 'adminAlerts/request_z'), { title: 'y' })));
+
+// ── BF-1 wordsPrivate ────────────────────────────────────────────────
+await t('anon read wordsPrivate denied', assertFails(getDoc(doc(anon, 'wordsPrivate/om'))));
+await t('free user read wordsPrivate denied', assertFails(getDoc(doc(alice, 'wordsPrivate/om'))));
+await t('owner read wordsPrivate ok', assertSucceeds(getDoc(doc(alice, 'wordsPrivate/ra'))));
+await t('admin read wordsPrivate ok', assertSucceeds(getDoc(doc(boss, 'wordsPrivate/om'))));
+await t('user write wordsPrivate denied', assertFails(setDoc(doc(alice, 'wordsPrivate/om'), { meaning: 'x' })));
+await t('admin write wordsPrivate ok', assertSucceeds(setDoc(doc(boss, 'wordsPrivate/om'), { meaning: 'secret', audio: 'https://media.nowssb.com/om.mp3' }, { merge: true })));
+await t('plan user read wordsPrivate ok', (async () => {
+  await env.withSecurityRulesDisabled(async (c) => {
+    await setDoc(doc(c.firestore(), 'users/pro'), { uid: 'pro', isPro: true, tier: 'resonance' }, { merge: true });
+  });
+  await assertSucceeds(getDoc(doc(pro, 'wordsPrivate/om')));
+})());
+
 console.log(`\n${pass} passed, ${fail} failed`);
 await env.cleanup();
 process.exit(fail ? 1 : 0);

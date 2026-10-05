@@ -50,6 +50,7 @@ import '../data/word_voice.dart';
 import 'store/request_words.dart';
 import '../admin/template/editable.dart';
 import '../widgets/content_lock.dart';
+import '../data/word_private.dart';
 
 String _fmtClock(num sec) {
   final s = sec.round().clamp(0, 24 * 3600);
@@ -128,7 +129,13 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
   DateTime? _startedAt;
   String? _error;
 
-  Word get _word => widget.words[_index];
+  /// Paid fields fetched from /api/content/word for the current index.
+  Word? _paidOverride;
+  Word get _word {
+    final base = widget.words[_index];
+    if (_paidOverride != null && _paidOverride!.key == base.key) return _paidOverride!;
+    return WordPrivateStore.instance.apply(base);
+  }
   _PlayerTheme get _theme => _playerThemes[_index % _playerThemes.length];
 
   @override
@@ -306,7 +313,10 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     if (_playing || widget.words.isEmpty) return;
     // Paid words need a purchase or a plan (free words and admins pass).
     if (!await ensureWordOpen(context, _word) || !mounted || _playing) return;
+    final unlocked = await WordPrivateStore.instance.resolve(_word);
+    if (!mounted || _playing) return;
     setState(() {
+      _paidOverride = unlocked;
       _playing = true;
       _completed = false;
       _error = null;
@@ -796,6 +806,9 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
   Future<void> _handlePracticeTap() async {
     if (!mounted || _practiceOpen) return;
     if (!await ensureWordOpen(context, _word) || !mounted) return;
+    final unlocked2 = await WordPrivateStore.instance.resolve(_word);
+    if (!mounted) return;
+    setState(() => _paidOverride = unlocked2);
     if (_completed) {
       await showPronunciationSurveyIfNeeded(context);
       if (!mounted) return;

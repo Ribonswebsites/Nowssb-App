@@ -154,6 +154,116 @@ class Word {
       ? audio
       : (audioMale.isNotEmpty ? audioMale : audioFemale);
 
+  /// Drop paid fields so a locked client never keeps public URLs in memory.
+  Word stripPaid() {
+    return Word(
+      key: key,
+      word: word,
+      deva: deva,
+      translit: translit,
+      phonetic: phonetic,
+      parts: [for (final p in parts) WordPart(roman: p.roman, deva: p.deva, hold: p.hold, say: p.say, audio: '')],
+      audioMale: '',
+      audioFemale: '',
+      organ: organ,
+      origin: origin,
+      benefit: benefit,
+      meaning: '',
+      mouthPos: mouthPos,
+      resonance: resonance,
+      mistake: mistake,
+      tip: tip,
+      categories: categories,
+      gender: gender,
+      time: time,
+      price: price,
+      img: img,
+      audio: '',
+      description: description,
+      meanings: const [],
+      stage: stage,
+      video: '',
+      videoPoster: '',
+      images: images,
+      stages: [for (final s in stages) WordStage(title: s.title, text: s.text)],
+      notes: notes,
+    );
+  }
+
+  /// Overlay a wordsPrivate /api/content/word payload onto this preview word.
+  Word withPaid(Map<String, dynamic> paid) {
+    String s(dynamic v) => v == null ? '' : '$v'.trim();
+    final nextParts = <WordPart>[];
+    final partsAudio = paid['partsAudio'];
+    for (var i = 0; i < parts.length; i++) {
+      final p = parts[i];
+      final a = partsAudio is List && i < partsAudio.length ? s(partsAudio[i]) : p.audio;
+      nextParts.add(WordPart(roman: p.roman, deva: p.deva, hold: p.hold, say: p.say, audio: a.isNotEmpty ? a : p.audio));
+    }
+    final nextStages = <WordStage>[];
+    final stagesMedia = paid['stagesMedia'];
+    if (paid['stages'] is List) {
+      for (final raw in paid['stages'] as List) {
+        final st = WordStage.from(raw);
+        if (st != null) nextStages.add(st);
+      }
+    } else {
+      for (var i = 0; i < stages.length; i++) {
+        final st = stages[i];
+        var audio = st.audio;
+        var video = st.video;
+        if (stagesMedia is List && i < stagesMedia.length && stagesMedia[i] is Map) {
+          final m = stagesMedia[i] as Map;
+          final a = s(m['audio']);
+          final v = s(m['video']);
+          if (a.isNotEmpty) audio = a;
+          if (v.isNotEmpty) video = v;
+        }
+        nextStages.add(WordStage(title: st.title, text: st.text, audio: audio, video: video));
+      }
+    }
+    final meaningsRaw = paid['meanings'];
+    return Word(
+      key: key,
+      word: word,
+      deva: deva,
+      translit: translit,
+      phonetic: phonetic,
+      parts: nextParts.isEmpty ? parts : nextParts,
+      audioMale: s(paid['audioMale']).isNotEmpty ? s(paid['audioMale']) : audioMale,
+      audioFemale: s(paid['audioFemale']).isNotEmpty ? s(paid['audioFemale']) : audioFemale,
+      organ: organ,
+      origin: origin,
+      benefit: benefit,
+      meaning: s(paid['meaning']).isNotEmpty ? s(paid['meaning']) : meaning,
+      mouthPos: mouthPos,
+      resonance: resonance,
+      mistake: mistake,
+      tip: tip,
+      categories: categories,
+      gender: gender,
+      time: time,
+      price: price,
+      img: img,
+      audio: s(paid['audio']).isNotEmpty ? s(paid['audio']) : audio,
+      description: description,
+      meanings: meaningsRaw is List
+          ? [for (final m in meaningsRaw) '$m'.trim()]
+          : meanings,
+      stage: stage,
+      video: () {
+        final v = s(paid['video']);
+        if (v.isNotEmpty) return v;
+        final u = s(paid['videoUrl']);
+        return u.isNotEmpty ? u : video;
+      }(),
+      videoPoster: s(paid['videoPoster']).isNotEmpty ? s(paid['videoPoster']) : videoPoster,
+      images: images,
+      stages: nextStages.isEmpty ? stages : nextStages,
+      notes: notes,
+    );
+  }
+
   /// The same shape [from] reads, for the admin editor and the cache.
   Map<String, dynamic> toMap() => {
         'key': key,

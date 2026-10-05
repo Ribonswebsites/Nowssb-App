@@ -14,6 +14,7 @@ import '../admin/template/editable.dart';
 import '../data/cart_bag.dart';
 import '../data/entitlements.dart';
 import '../data/models.dart';
+import '../data/word_private.dart';
 import '../data/store_catalog.dart';
 import '../data/store_prices.dart';
 import '../screens/nwsb_sign_in_sheet.dart';
@@ -34,11 +35,23 @@ BagItem wordItemFor(Word w) => BagItem(
 
 /// True when [w] may be practised; otherwise shows the lock sheet and
 /// answers again after it closes (true if the person bought it there).
+/// On success, prefetches paid fields from /api/content/word into
+/// [WordPrivateStore] (no-op when the API is offline or the word is free).
 Future<bool> ensureWordOpen(BuildContext context, Word w) async {
   final e = Entitlements.instance;
-  if (e.canOpenWord(w)) return true;
-  await showContentLock(context, item: wordItemFor(w), planNote: 'Every word is included in every plan.');
-  return e.canOpenWord(w);
+  if (!e.canOpenWord(w)) {
+    await showContentLock(context, item: wordItemFor(w), planNote: 'Every word is included in every plan.');
+  }
+  if (!e.canOpenWord(w)) return false;
+  await WordPrivateStore.instance.prefetch(w);
+  return true;
+}
+
+/// Like [ensureWordOpen], then returns [w] with paid fields merged from
+/// wordsPrivate (via the content API). Null when the lock sheet did not unlock.
+Future<Word?> ensureWordResolved(BuildContext context, Word w) async {
+  if (!await ensureWordOpen(context, w)) return null;
+  return WordPrivateStore.instance.resolve(w);
 }
 
 /// Ebook gate for the Reader.

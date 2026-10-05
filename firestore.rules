@@ -7,6 +7,31 @@ service cloud.firestore {
     // counts, for accounts marked that way.
     function isAdmin() { return signedIn() && (exists(/databases/$(database)/documents/admins/$(request.auth.uid)) || request.auth.token.get('admin', false) == true); }
 
+    // BF-1: paid word payloads live in wordsPrivate/{id}. A signed-in reader
+    // may open them when they own the word/meaning, have an active plan, or
+    // are an admin. isPro is server-cleared on expiry (Play RTDN / verify).
+    function ownedDoc(itemId) {
+      return /databases/$(database)/documents/users/$(request.auth.uid)/owned/$(itemId);
+    }
+    function ownsActive(itemId) {
+      return signedIn()
+        && exists(ownedDoc(itemId))
+        && get(ownedDoc(itemId)).data.status == 'active';
+    }
+    function hasActivePlan() {
+      return signedIn()
+        && exists(myUserDoc())
+        && get(myUserDoc()).data.isPro == true
+        && get(myUserDoc()).data.tier in ['resonance', 'frequency', 'frequencyX'];
+    }
+    function canReadWordsPrivate(id) {
+      return isAdmin()
+        || ownsActive('word_' + id)
+        || ownsActive('signature_' + id)
+        || ownsActive('meaning_' + id)
+        || hasActivePlan();
+    }
+
     // Fields on users/{uid} that only an admin (or, later, a verified server)
     // may set. A person can still save their profile, prefs, sessions, etc.
     function privilegedUserFields() {
@@ -63,6 +88,10 @@ service cloud.firestore {
       allow update: if isSelf(uid) && request.resource.data.uid == resource.data.uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName','username','photoURL','bannerURL','bio','category','link','profileVisibility','updatedAt']);
       allow delete: if isSelf(uid) || isAdmin();
     }
+    // Catalogue (library / books / words shelves / meanings cards / quotes).
+    // After tools/migrate-words-private.mjs strips paid fields from library
+    // items, these docs are free preview only. Paid payloads are NOT stored
+    // here — they live in wordsPrivate. Keep world-readable for the store.
     match /content/{docId} { allow read: if true; allow write: if isAdmin(); }
     match /content/{docId}/{sub=**} { allow read: if true; allow write: if isAdmin(); }
     match /requests/{id} {
@@ -76,9 +105,14 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
     }
 
-    // Admin mode (Flutter lib/admin). Published words and template overrides
-    // are read by every app, signed in or not; only admins write them.
+    // Admin mode (Flutter lib/admin). Public words/{key} is the free preview
+    // (title, cover, price, locked stubs). Paid fields (meaning, audio/video
+    // URLs, stage media) live in wordsPrivate/{key} — see BF-1.
     match /words/{key} { allow read: if true; allow write: if isAdmin(); }
+    match /wordsPrivate/{id} {
+      allow read: if signedIn() && canReadWordsPrivate(id);
+      allow write: if isAdmin();
+    }
     match /word_drafts/{key} { allow read, write: if isAdmin(); }
     match /ui_overrides/{id} { allow read: if true; allow write: if isAdmin(); }
     // UI Editor (Admin → UI Editor): page layouts are read by every app;
