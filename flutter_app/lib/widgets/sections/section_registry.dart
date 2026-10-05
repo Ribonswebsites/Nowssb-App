@@ -12,6 +12,7 @@ import 'category_tiles_section.dart';
 import 'coupon_banner_section.dart';
 import '../hype_rail.dart';
 import 'glassy_carousel_section.dart';
+import 'spotlight_section.dart';
 import 'section_config.dart';
 
 typedef SectionWidgetBuilder = Widget Function(BuildContext context, SectionConfig config);
@@ -166,8 +167,18 @@ void ensureSectionRegistry() {
     ),
     builder: (context, config) => CategoryTilesSection(config: config),
   ));
-  add(SectionTypeId.spotlight, 'Spotlight',
-      _defaults(SectionTypeId.spotlight, glass: true, height: 240, radius: 20));
+  r.register(SectionTypeEntry(
+    type: SectionTypeId.spotlight,
+    label: 'Spotlight',
+    defaultConfig: const SectionConfig(
+      id: '_default.spotlight',
+      type: SectionTypeId.spotlight,
+      layout: SectionLayout(height: 320, cardHeight: 320, radius: 20),
+      behavior: SectionBehavior(autoplay: true, autoplayMs: 4500, loop: true),
+      style: SectionStyle(glass: true, accent: 0xFFC8A96E),
+    ),
+    builder: (context, config) => SpotlightSection(config: config),
+  ));
   add(SectionTypeId.imageBanner, 'Image banner', _defaults(SectionTypeId.imageBanner, height: 220));
   add(SectionTypeId.videoBanner, 'Video banner', _defaults(SectionTypeId.videoBanner, height: 240));
   add(SectionTypeId.splitPromo, 'Split promo', _defaults(SectionTypeId.splitPromo, height: 170));

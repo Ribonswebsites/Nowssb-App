@@ -81,6 +81,8 @@ import '../widgets/earth_day_film.dart';
 import '../widgets/promo_color_grid.dart';
 import 'quotes_live.dart';
 import '../features/earn/earn_home_sections.dart';
+import '../widgets/sections/category_tiles_section.dart';
+import '../widgets/sections/spotlight_section.dart';
 import '../features/earn/earn_hub_screen.dart';
 import 'app_settings.dart';
 import 'player_settings.dart';
@@ -113,6 +115,9 @@ const kNormalSectionOrder = <String>[
   // be used without knowing where anything is — see MainOptionsSection.
   'mainops',
   'actionbar',
+  // MK-6 home mix (ref 5): category tiles + spotlight, high on the page.
+  'catTiles',
+  'spotlight',
   'tiles',
   'storiesFind',
   'buddhaGyro',
@@ -160,6 +165,8 @@ const kNormalSectionTitles = <String, String>{
   'practice': 'Practice card',
   'mainops': 'Main options',
   'actionbar': 'Support & coach bar',
+  'catTiles': 'Category tiles & filters',
+  'spotlight': 'In the spotlight',
   'tiles': 'Feature tiles',
   'storiesFind': 'Stories find you',
   'buddhaGyro': 'Buddha quotes stage',
@@ -456,6 +463,20 @@ class _HomeNormalState extends State<HomeNormal> {
           NmSuppliedActionBar(
               onSupport: () => _go(4),
               onCoach: () => _push(const PersonalCoachScreen()))
+        ),
+        (
+          'catTiles',
+          const Padding(
+            padding: EdgeInsets.fromLTRB(20, 4, 20, 0),
+            child: CategoryTilesSection(),
+          ),
+        ),
+        (
+          'spotlight',
+          const Padding(
+            padding: EdgeInsets.fromLTRB(20, 4, 20, 0),
+            child: SpotlightSection(),
+          ),
         ),
         // H-scroll: Flip glass brand showcase (card 0) + existing feature cards.
         (

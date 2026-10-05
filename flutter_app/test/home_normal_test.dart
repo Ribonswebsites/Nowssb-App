@@ -55,8 +55,8 @@ void main() {
   }
 
   test('the registry is complete', () {
-    expect(kNormalSectionOrder, hasLength(35));
-    expect(kNormalSectionOrder.toSet(), hasLength(35),
+    expect(kNormalSectionOrder, hasLength(37));
+    expect(kNormalSectionOrder.toSet(), hasLength(37),
         reason: 'two sections share a key');
     expect(kNormalSectionOrder.indexOf('herovid'),
         kNormalSectionOrder.indexOf('streak') - 1,
@@ -90,7 +90,17 @@ void main() {
         .where((k) => !kNormalNoMarkup.contains(k))
         .where((k) => !kNormalDefOff.contains(k))
         .length;
-    expect(shown, 30);
+    expect(shown, 32);
+    expect(
+      kNormalSectionOrder.indexOf('catTiles'),
+      kNormalSectionOrder.indexOf('actionbar') + 1,
+      reason: 'MK-6 category tiles sit directly below actionbar',
+    );
+    expect(
+      kNormalSectionOrder.indexOf('spotlight'),
+      kNormalSectionOrder.indexOf('catTiles') + 1,
+      reason: 'MK-6 spotlight sits directly below category tiles',
+    );
   });
 
   testWidgets('the Normal home builds at phone size without overflowing',

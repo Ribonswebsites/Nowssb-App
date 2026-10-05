@@ -77,6 +77,8 @@ import '../widgets/program_shelf.dart';
 import '../widgets/nwsb_icon.dart';
 import 'app_settings.dart';
 import '../features/earn/earn_home_sections.dart';
+import '../widgets/sections/category_tiles_section.dart';
+import '../widgets/sections/spotlight_section.dart';
 import '../features/earn/earn_hub_screen.dart';
 import '../features/programs/program_router.dart';
 import '../shell/nwsb_links.dart';
@@ -100,6 +102,9 @@ const kFashionSectionOrder = <String>[
   // be used without knowing where anything is — see MainOptionsSection.
   'mainops',
   'actionbar',
+  // MK-6 home mix (ref 5): category tiles + spotlight, high on the page.
+  'catTiles',
+  'spotlight',
   'reader',
   'herovid',
   'streak',
@@ -146,6 +151,8 @@ const kFashionSectionTitles = <String, String>{
   'routineCards': 'Routine cards, Earth Day film & colour grid',
   'mainops': 'Main options',
   'actionbar': 'Support & coach bar',
+  'catTiles': 'Category tiles & filters',
+  'spotlight': 'In the spotlight',
   'reader': 'Reader & promo banner',
   'herovid': 'Streak & store videos',
   'streak': 'Streak',
@@ -447,6 +454,20 @@ class _HomeFashionState extends State<HomeFashion> {
             glassmorphism: true,
             onSupport: () => _go(4),
             onCoach: () => _push(const PersonalCoachScreen()),
+          ),
+        ),
+        (
+          'catTiles',
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 4, 16, 0),
+            child: CategoryTilesSection(),
+          ),
+        ),
+        (
+          'spotlight',
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 4, 16, 0),
+            child: SpotlightSection(),
           ),
         ),
         (
