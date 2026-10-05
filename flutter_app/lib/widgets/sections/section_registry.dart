@@ -7,6 +7,7 @@ library;
 
 import 'package:flutter/widgets.dart';
 
+import 'coupon_banner_section.dart';
 import 'section_config.dart';
 
 typedef SectionWidgetBuilder = Widget Function(BuildContext context, SectionConfig config);
@@ -107,8 +108,18 @@ void ensureSectionRegistry() {
 
   add(SectionTypeId.glassyCarousel, 'Glassy carousel',
       _defaults(SectionTypeId.glassyCarousel, glass: true, height: 220, cardWidth: 160, cardHeight: 200, spacing: 12, radius: 20));
-  add(SectionTypeId.couponBanner, 'Coupon banner',
-      _defaults(SectionTypeId.couponBanner, height: 140, radius: 16));
+  r.register(SectionTypeEntry(
+    type: SectionTypeId.couponBanner,
+    label: 'Coupon banner',
+    defaultConfig: const SectionConfig(
+      id: '_default.couponBanner',
+      type: SectionTypeId.couponBanner,
+      layout: SectionLayout(height: 248, radius: 18),
+      behavior: SectionBehavior(autoplay: true, autoplayMs: 4000, loop: true),
+      style: SectionStyle(glowColor: 0x66E8A23A, accent: 0xFFE8A23A),
+    ),
+    builder: (context, config) => CouponBannerSection(config: config),
+  ));
   add(SectionTypeId.hypedRow, 'Hyped row',
       _defaults(SectionTypeId.hypedRow, height: 300, cardWidth: 140, cardHeight: 280, spacing: 8, radius: 12));
   add(SectionTypeId.artistCards, 'Artist cards',

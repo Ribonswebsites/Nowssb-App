@@ -15,6 +15,7 @@ import '../../widgets/nwsb_coin_fly.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/program_shelf.dart';
 import '../../widgets/hype_rail.dart';
+import '../../widgets/sections/coupon_banner_section.dart';
 import 'economy_api.dart';
 import 'reward_fx.dart';
 import 'economy_theme.dart';
@@ -69,7 +70,7 @@ class _CouponScreenState extends State<CouponScreen> {
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
           cacheExtent: 1600,
           children: [
-            CouponTicketPromo(onPressed: _showScratch),
+            CouponBannerSection(onCta: _showScratch),
             const NowssbHypeRail(),
             const CouponsHero(),
             const GlassLine(
