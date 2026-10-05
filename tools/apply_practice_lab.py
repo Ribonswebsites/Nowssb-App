@@ -77,18 +77,7 @@ elif 'showGeneralDialog<void>(' not in text.split('void _openPracticeLab()')[1][
         flags=re.S,
     )
 
-info_replacement = '''  void _openInfo() {
-    _openNotes();
-  }
-
-'''
-text = re.sub(
-    r"  void _openInfo\(\) \{.*?\n  \}\n\n(?=  void _openNotes\(\) \{)",
-    info_replacement,
-    text,
-    count=1,
-    flags=re.S,
-)
+# BF-5: _openInfo now opens the real _PlayerInfoSheet; do not rewrite it.
 
 notes = '''  void _openNotes() {
     showModalBottomSheet<void>(
