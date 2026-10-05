@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
 
@@ -7,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart' hide Settings;
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:http/http.dart' as http;
 import '../app_update.dart';
 import '../data/firebase.dart';
 import '../data/settings.dart';
@@ -268,10 +270,139 @@ class _ProfileScreenState extends State<ProfileScreen> {
     await Settings.instance.setSleepTimer(_durationSteps[v ~/ 15]);
   }
 
+  /// Cloudflare Pages function that signs a one-time R2 PUT for this user's avatar.
+  static const _kAvatarUploadUrl = 'https://nowssb.com/api/account/upload-url';
+
+  String _imageContentType(String path) {
+    final dot = path.lastIndexOf('.');
+    final e = (dot < 0 || dot < path.lastIndexOf('/')) ? '' : path.substring(dot + 1).toLowerCase();
+    switch (e) {
+      case 'png':
+        return 'image/png';
+      case 'webp':
+        return 'image/webp';
+      case 'jpg':
+      case 'jpeg':
+      default:
+        return 'image/jpeg';
+    }
+  }
+
+  String _imageExt(String path, String contentType) {
+    final dot = path.lastIndexOf('.');
+    final e = (dot < 0 || dot < path.lastIndexOf('/')) ? '' : path.substring(dot + 1).toLowerCase();
+    if (e == 'png' || e == 'webp' || e == 'jpg' || e == 'jpeg') {
+      return e == 'jpeg' ? 'jpg' : e;
+    }
+    if (contentType == 'image/png') return 'png';
+    if (contentType == 'image/webp') return 'webp';
+    return 'jpg';
+  }
+
   Future<void> _pickPhoto() async {
-    final file = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 90);
-    if (file == null || !mounted) return;
-    setState(() => _photo = File(file.path));
+    final picked = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 90);
+    if (picked == null || !mounted) return;
+    final local = File(picked.path);
+    setState(() => _photo = local);
+    await _persistPhoto(local);
+  }
+
+  /// Upload the picked file to R2, then remember the public URL locally and on the account.
+  Future<void> _persistPhoto(File file) async {
+    if (!NwsbFirebase.ready) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Sign in to save your profile photo.')),
+        );
+      }
+      return;
+    }
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null || user.isAnonymous) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Sign in to save your profile photo.')),
+        );
+      }
+      return;
+    }
+    try {
+      final bytes = await file.readAsBytes();
+      if (!mounted) return;
+      if (bytes.length > 5 * 1024 * 1024) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Photo is too large. Max size is 5 MB.')),
+        );
+        return;
+      }
+      final contentType = _imageContentType(file.path);
+      final ext = _imageExt(file.path, contentType);
+      final idToken = await user.getIdToken();
+      if (!mounted) return;
+      final res = await http
+          .post(
+            Uri.parse(_kAvatarUploadUrl),
+            headers: {
+              'Authorization': 'Bearer $idToken',
+              'Content-Type': 'application/json',
+            },
+            body: jsonEncode({
+              'contentType': contentType,
+              'ext': ext,
+              'contentLength': bytes.length,
+            }),
+          )
+          .timeout(const Duration(seconds: 20));
+      if (!mounted) return;
+      Map<String, dynamic> data = const {};
+      try {
+        data = Map<String, dynamic>.from(jsonDecode(res.body) as Map);
+      } catch (_) {}
+      if (res.statusCode != 200 || data['uploadUrl'] is! String || data['publicUrl'] is! String) {
+        throw Exception(data['error'] ?? 'Upload server said ${res.statusCode}.');
+      }
+      // Content-Type (and Content-Length from the body) were signed into uploadUrl.
+      final put = await http
+          .put(
+            Uri.parse(data['uploadUrl'] as String),
+            headers: {'Content-Type': contentType},
+            body: bytes,
+          )
+          .timeout(const Duration(minutes: 2));
+      if (!mounted) return;
+      if (put.statusCode < 200 || put.statusCode >= 300) {
+        throw Exception('Could not store the photo (${put.statusCode}).');
+      }
+      final publicUrl = data['publicUrl'] as String;
+      await _prefs.setString('nwsb_local_photo', publicUrl);
+      if (!mounted) return;
+      setState(() {
+        _avatarUrl = publicUrl;
+        // Keep the local File preview until the next load; network URL is the source of truth.
+      });
+      try {
+        await user.updatePhotoURL(publicUrl);
+        final db = FirebaseFirestore.instance;
+        await db.doc('users/${user.uid}').set({'photoURL': publicUrl}, SetOptions(merge: true));
+        await db.doc('publicProfiles/${user.uid}').set({
+          'uid': user.uid,
+          'photoURL': publicUrl,
+          'updatedAt': FieldValue.serverTimestamp(),
+        }, SetOptions(merge: true));
+      } catch (e) {
+        debugPrint('NowssB profile photo account write: $e');
+        if (mounted) {
+          _showToast('Saved on this phone. Your account photo will update when you are online.');
+        }
+      }
+    } catch (e) {
+      debugPrint('NowssB profile photo upload: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not save photo. ${e.toString().replaceFirst('Exception: ', '')}')),
+        );
+      }
+    }
   }
 
   Future<void> _pickReminder() async {

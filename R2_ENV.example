@@ -1,5 +1,7 @@
 # Cloudflare Pages → nowssb (this site) → Settings → Variables and Secrets → Production
-# Needed by functions/api/admin/upload-url.js (admin uploads to Cloudflare R2).
+# Needed by:
+#   functions/api/admin/upload-url.js   (admin media uploads to Cloudflare R2)
+#   functions/api/account/upload-url.js (signed-in user avatar uploads; same secrets)
 # Names only — never commit real values; add them as encrypted "Secret" variables.
 R2_ACCOUNT_ID=
 R2_BUCKET=
