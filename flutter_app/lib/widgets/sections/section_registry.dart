@@ -8,6 +8,7 @@ library;
 import 'package:flutter/widgets.dart';
 
 import 'coupon_banner_section.dart';
+import 'glassy_carousel_section.dart';
 import 'section_config.dart';
 
 typedef SectionWidgetBuilder = Widget Function(BuildContext context, SectionConfig config);
@@ -102,12 +103,21 @@ void ensureSectionRegistry() {
   if (_seeded) return;
   _seeded = true;
   final r = SectionRegistry.instance;
-  void add(String type, String label, SectionConfig def) {
-    r.register(SectionTypeEntry(type: type, label: label, defaultConfig: def, builder: _placeholder));
+  void add(String type, String label, SectionConfig def, {SectionWidgetBuilder? builder}) {
+    r.register(SectionTypeEntry(
+      type: type,
+      label: label,
+      defaultConfig: def,
+      builder: builder ?? _placeholder,
+    ));
   }
 
-  add(SectionTypeId.glassyCarousel, 'Glassy carousel',
-      _defaults(SectionTypeId.glassyCarousel, glass: true, height: 220, cardWidth: 160, cardHeight: 200, spacing: 12, radius: 20));
+  add(
+    SectionTypeId.glassyCarousel,
+    'Glassy carousel',
+    _defaults(SectionTypeId.glassyCarousel, glass: true, height: 220, cardWidth: 160, cardHeight: 200, spacing: 12, radius: 20),
+    builder: (context, config) => GlassyCarouselSection(config: config),
+  );
   r.register(SectionTypeEntry(
     type: SectionTypeId.couponBanner,
     label: 'Coupon banner',
