@@ -33,7 +33,6 @@ import '../theme/tokens.dart';
 import '../theme/player_aura.dart';
 import 'sound_library.dart';
 import 'aura_sound_library.dart';
-import 'store.dart';
 import 'sound_settings_sheet.dart';
 import 'player_settings.dart';
 import 'sentence_builder.dart';
@@ -1193,11 +1192,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                                   onSettings: _openSettings,
                                   onInfo: _openInfo,
                                   onLevel: _openLevel,
-                                  onStore: () => Navigator.of(context).push(
-                                    MaterialPageRoute<void>(
-                                      builder: (_) => const StoreScreen(),
-                                    ),
-                                  ),
+                                  onStore: () => NavScope.goTo(context, 3),
                                   onSyllable: (part) async {
                                     await _tts.stop();
                                     unawaited(WordVoice.instance.stop());
@@ -1313,11 +1308,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                                     onSentence: _openSentence,
                                     onPractice: () =>
                                         unawaited(_handlePracticeTap()),
-                                    onStore: () => Navigator.of(context).push(
-                                      MaterialPageRoute<void>(
-                                        builder: (_) => const StoreScreen(),
-                                      ),
-                                    ),
+                                    onStore: () => NavScope.goTo(context, 3),
                                   ),
                                   _NextUpCard(
                                     words: widget.words,
