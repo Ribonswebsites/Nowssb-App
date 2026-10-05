@@ -36,9 +36,12 @@ test('GentleMarqueeText exists; section wraps do NOT inject top black banners', 
   const parts = read('flutter_app/lib/widgets/home_parts.dart');
   assert.match(parts, /class GentleMarqueeText/);
   assert.match(parts, /class SectionMotionBanner/);
-  // SecBanner title is static; only the subtitle marquees.
-  assert.match(parts, /Text\(\s*title,/);
-  assert.match(parts, /GentleMarqueeText\(\s*sub,/);
+  // SecBanner title and subtitle are static single-line labels (fa96c144
+  // stopped the subtitle marquee to fix overflow; 321f66a0 made them editable).
+  const secBanner = parts.slice(parts.indexOf('class SecBanner '), parts.indexOf('\nclass ', parts.indexOf('class SecBanner ') + 1));
+  assert.match(secBanner, /EditableLabel\('home_parts\.SecBanner',\s*title,\s*maxLines: 1,/);
+  assert.match(secBanner, /EditableLabel\('home_parts\.SecBanner',\s*sub,\s*maxLines: 1,\s*overflow: TextOverflow\.ellipsis/);
+  assert.doesNotMatch(secBanner, /GentleMarqueeText/);
   const glass = read('flutter_app/lib/widgets/glass_wrap.dart');
   assert.doesNotMatch(glass, /SectionMotionBanner/);
   assert.doesNotMatch(glass, /GentleMarqueeText/);

@@ -51,8 +51,12 @@ assert.match(directSections, /wireActionBar/, "Direct renderer must wire the sup
 assert.match(directSections, /openPersonalCoach/, "Direct renderer must open the supplied Personal Coach page");
 assert.match(directSections, /wirePersonalCoach/, "WebView Personal Coach chat controls must be interactive");
 assert.match(directSections, /wireFashionMode/, "Direct renderer must wire the supplied Fashion Mode control");
-assert.match(directSections, /placeActionBar/, "Direct renderer must force the coach bar below Where to Begin");
-assert.match(directSections, /MutationObserver/, "Direct renderer must keep the coach bar in place after saved-layout reorders");
+// 6c78748b: there is now an action-bar host on each home, so the renderer
+// mounts every host and placement below Where to Begin is owned by the
+// layout registry (k:'actionbar' ... after:'mainops', asserted below), which
+// also survives saved-layout reorders.
+assert.match(directSections, /querySelectorAll\('\[data-direct-neomorphic="actionbar"\]'\)/, "Direct renderer must mount every action-bar host");
+assert.match(directSections, /actionBarHosts\.forEach\(function \(host\) \{[\s\S]*?wireActionBar\(mount\(host, sources\[2\]\)\)/, "Direct renderer must wire each action bar it mounts");
 assert.match(directSections, /startDashboardPractice/, "Dashboard actions must start the playable practice session");
 assert.match(index, /part094-dashboard-live\.js/, "Normal Home must load the live dashboard controller");
 assert.match(registry, /k:'dashboard'[\s\S]*sel:\['\.nmh-supplied-dashboard'\][\s\S]*after:'heroCurve'/, "Dashboard must remain anchored below the 3D curve");
@@ -61,11 +65,13 @@ assert.match(registry, /k:'actionbar'[\s\S]*sel:\['\.nmh-supplied-actionbar'\][\
 assert.ok(flutter.indexOf("'search'") < flutter.indexOf("'dashboard'"), "Flutter dashboard must follow search in Normal Home order");
 assert.ok(flutter.indexOf("'dashboard'") < flutter.indexOf("'essentials'"), "Flutter essentials must follow the dashboard");
 assert.ok(flutter.indexOf("'mainops'") < flutter.indexOf("'actionbar'"), "Flutter action bar must follow Where to Begin");
-assert.match(flutter, /NmSuppliedDashboard\(onStart: _openDashboardSession, onProgress: _openDashboardProgress\)/, "Flutter must wire the dashboard to its real player and progress screen");
-assert.match(flutter, /\('essentials', const NmSuppliedEssentials\(\)\)/, "Flutter must render essentials directly after the dashboard");
+assert.match(flutter, /NmSuppliedDashboard\(\s*onStart: _openDashboardSession,\s*onProgress: _openDashboardProgress,?\s*\)/, "Flutter must wire the dashboard to its real player and progress screen");
+assert.match(flutter, /'essentials',\s*Column\([\s\S]{0,300}?const NmSuppliedEssentials\(\)/, "Flutter must render essentials directly after the dashboard");
 assert.match(flutterDashboard, /PracticeProgress\.instance/, "Flutter dashboard must use persistent user session data");
 assert.match(flutterDashboard, /Plays aloud/, "Flutter dashboard must identify the audible session behavior");
-assert.match(flutter, /bottomNavigationClearance/, "Flutter Normal Home must reserve space above the floating navigation");
+// db31d51a: the list no longer pads for the nav; the opaque footer and its
+// black tail paint through the nav clearance instead.
+assert.match(flutter, /\/\/ Footer paints solid black through nav clearance\.\s*padding: EdgeInsets\.zero/, "Flutter Normal Home lets the black footer run under the floating navigation");
 assert.match(flutterEssentials, /See more/, "Flutter must preserve the supplied essentials expand control");
 assert.match(flutterActionBar, /How can we help today\?/, "Flutter must preserve the supplied action-bar text");
 assert.match(actionBar, /Personal Coach/, "WebView action bar must show the Personal Coach text");

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
+import { assertCacheBustAtLeast } from './helpers/source-contract.mjs';
 
 const root = new URL('..', import.meta.url);
 const read = (path) => readFileSync(new URL(path, root), 'utf8');
@@ -24,15 +25,21 @@ test('Flutter resolves every primary-page backdrop from the selected Fashion Plu
 
   for (const file of [
     'flutter_app/lib/widgets/page_shell.dart',
-    'flutter_app/lib/widgets/intro_gate.dart',
     'flutter_app/lib/screens/home_fashion.dart',
-    'flutter_app/lib/screens/home_normal.dart',
     'flutter_app/lib/screens/word_detail.dart',
-    'flutter_app/lib/screens/practice_player.dart',
     'flutter_app/lib/screens/personal_coach.dart',
+    'flutter_app/lib/screens/sound_library.dart',
+    'flutter_app/lib/screens/widgets_page.dart',
   ]) {
     assert.match(read(file), /AppBackdrop/, `${file} must use the shared backdrop`);
   }
+  // Deliberate exceptions — these surfaces own their own ground:
+  //  - intro gate: fixed near-black under the photo ring (30c664b6)
+  //  - Normal home: the pale neumorphic page, never the Fashion film (7882aeee)
+  //  - Now Playing: the black Oblivion player (16fb270a)
+  assert.match(read('flutter_app/lib/widgets/intro_gate.dart'), /const ColoredBox\(color: Color\(0xFF050506\)\)/);
+  assert.doesNotMatch(read('flutter_app/lib/screens/home_normal.dart'), /AppBackdrop\(/);
+  assert.doesNotMatch(read('flutter_app/lib/screens/practice_player.dart'), /AppBackdrop\(/);
 });
 
 test('WebView refreshes selected Fashion Plus video and image backgrounds for every opened page', () => {
@@ -70,11 +77,13 @@ test('WebView refreshes selected Fashion Plus video and image backgrounds for ev
   assert.match(css, /\.nwsb-menu-open #appBg/);
   assert.match(css, /nwsb-bg-fade-out/);
   assert.match(css, /body\.nwsb-custom-fashion-bg:not\(\.fashplus\) #appBg/);
-  assert.match(html, /nowssb-nm\.css\?v=802/);
-  assert.match(html, /part012\.js\?v=258/);
-  assert.match(html, /part076\.js\?v=121/);
-  assert.match(html, /part082\.js\?v=26/);
-  assert.match(html, /widgets\.css\?v=9/);
+  // Floors from 6eb21a8b. bec0c918 (stale base) dropped these back to
+  // 801/257/120/25/8 while keeping the new JS, so clients kept stale files.
+  assertCacheBustAtLeast(html, 'nowssb-nm.css', 802);
+  assertCacheBustAtLeast(html, 'part012.js', 258);
+  assertCacheBustAtLeast(html, 'part076.js', 121);
+  assertCacheBustAtLeast(html, 'part082.js', 26);
+  assertCacheBustAtLeast(html, 'widgets.css', 9);
   assert.match(fashion, /socialSettingsOpen/);
   assert.match(fashion, /widgetsSettingsOpen/);
   assert.match(fashion, /#sub-settings\.sub-screen\.open/);

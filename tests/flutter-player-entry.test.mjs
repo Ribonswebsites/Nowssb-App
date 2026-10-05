@@ -21,17 +21,21 @@ test('Flutter Player uses the same liquid-glass media structure as the WebView P
   const player = read('flutter_app/lib/screens/practice_player.dart');
   const video = read('flutter_app/lib/media/nwsb_video.dart');
 
-  assert.match(player, /NwsbVideo\(asset: theme\.video, poster: theme\.image/);
-  assert.match(player, /NwsbVideo\(asset: video/);
+  // Page film behind the player, and the artwork box plays its clip over
+  // the still (poster) so the box is never empty while the clip opens.
+  assert.match(player, /NwsbVideo\(\s*asset: pageBackgroundVideo,/);
+  assert.match(player, /NwsbVideo\(\s*asset: video,\s*poster: art,/);
   assert.doesNotMatch(player, /assets\/video\/word-acts\.mp4/);
   assert.match(player, /assets\/frames\/word-acts-tab\.webp/);
   assert.match(player, /_TransportTube/);
   assert.match(player, /_WordActionStrip/);
   assert.match(player, /_PlayerInfoSheet/);
   assert.match(player, /SoundLibraryScreen/);
-  assert.match(player, /StoreScreen/);
-  assert.match(player, /compact: true/);
-  assert.match(player, /Icons\.star_rounded/);
+  // BF-8: Store switches the shell to the Store tab instead of pushing a
+  // second StoreScreen over the player. (compact / star controls went with
+  // the 16fb270a and 5e93c211 player redesigns.)
+  assert.match(player, /onStore: \(\) => NavScope\.goTo\(context, 3\)/);
+  assert.doesNotMatch(player, /builder: \(_\) => const StoreScreen\(\)/);
   assert.match(player, /lgp-play\.png/);
   assert.match(player, /gwttc6\.png/);
   assert.match(video, /p\.startsWith\('http:\/\/'\)/);

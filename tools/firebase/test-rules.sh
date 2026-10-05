@@ -1,16 +1,15 @@
 #!/usr/bin/env bash
-# Run tools/firebase/rules.test.mjs against firestore.rules in the local
-# Firestore emulator (needs Java 11+). Dependencies go to a temp folder, not
-# the repo.
+# Run tools/firebase/rules.test.mjs against the repo's firestore.rules in the
+# local Firestore emulator.
+#
+# Requirements: Node 20+, Java 21+ (Firestore emulator, firebase-tools 14).
+# Dependencies (@firebase/rules-unit-testing, firebase, firebase-tools) live in
+# tools/firebase/package.json so the root web/Capacitor install stays lean.
+# The emulator jar is downloaded to ~/.cache/firebase/emulators on first run.
 set -euo pipefail
-root="$(cd "$(dirname "$0")/../.." && pwd)"
-work="${RULES_TEST_DIR:-/tmp/nowssb-rules-test}"
-mkdir -p "$work"
-cd "$work"
-[[ -f package.json ]] || npm init -y >/dev/null
-[[ -d node_modules/@firebase/rules-unit-testing ]] || npm i -s firebase-tools@14 @firebase/rules-unit-testing@4 firebase@11 >/dev/null
-cp "$root/firestore.rules" "$root/tools/firebase/rules.test.mjs" .
-cat > firebase.json <<'JSON'
-{ "firestore": { "rules": "firestore.rules" }, "emulators": { "firestore": { "port": 8089 }, "ui": { "enabled": false } } }
-JSON
-npx firebase emulators:exec --only firestore --project nowssb-34f1b "node rules.test.mjs"
+here="$(cd "$(dirname "$0")" && pwd)"
+cd "$here"
+if [[ ! -d node_modules/@firebase/rules-unit-testing ]]; then
+  if [[ -f package-lock.json ]]; then npm ci --no-audit --no-fund; else npm install --no-audit --no-fund; fi
+fi
+npm test

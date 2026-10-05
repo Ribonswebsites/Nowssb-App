@@ -85,7 +85,8 @@ test('Flutter Now Playing uses YTM continuous NestedScrollView collapse + store 
   assert.match(player, /_QueueStickyHeadDelegate/);
   assert.match(player, /_StoreGlassVideoBox/);
   assert.match(player, /nowssb-bag-headphones\.webp/);
-  assert.match(player, /Icons\.cast_rounded/);
+  // 9553d364: Cast was removed from the Flutter player everywhere.
+  assert.doesNotMatch(player, /Icons\.cast_rounded/);
   assert.doesNotMatch(player, /DraggableScrollableSheet/);
 });
 

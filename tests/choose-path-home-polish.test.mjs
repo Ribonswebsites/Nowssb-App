@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { assertCacheBustAtLeast, dartClass } from "./helpers/source-contract.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -28,8 +29,8 @@ const sub = readFileSync(join(root, "app/js/subscription-tiers.js"), "utf8");
 assert.match(sub, /block\.closest\('#home-nm'\)/);
 
 const idx = readFileSync(join(root, "index.html"), "utf8");
-assert.match(idx, /part067\.js\?v=41/);
-assert.match(idx, /subscription-tiers\.js\?v=4/);
+assertCacheBustAtLeast(idx, "part067.js", 41);
+assertCacheBustAtLeast(idx, "subscription-tiers.js", 4);
 
 for (const base of ["assets/video", "flutter_app/assets/video"]) {
   const mp4 = join(root, base, "healing-path-bg.mp4");
@@ -50,11 +51,18 @@ assert.match(fash, /KEEP\\nGOING/);
 assert.match(fash, /DeviceFrame\.tabletLandscape/);
 assert.doesNotMatch(fash, /secondCard:\s*FashStreakBody/);
 
-const footer = readFileSync(join(root, "flutter_app/lib/screens/shared_sections.dart"), "utf8");
-assert.match(footer, /Positioned\.fill/);
+// db31d51a / 9421b789: the footer is one opaque black block (no photo fill)
+// with the coverflow tabs on it, identical on both homes. Scope to the footer
+// class — the Fashion-only "Find Your Way Around" banner lives elsewhere.
+const footer = dartClass(
+  readFileSync(join(root, "flutter_app/lib/screens/shared_sections.dart"), "utf8"),
+  "_HomeFooterSectionState",
+);
+assert.match(footer, /return ColoredBox\(\s*color: const Color\(0xFF000000\)/);
 assert.match(footer, /BoxFit\.cover/);
 assert.doesNotMatch(footer, /#homeFooterNm \.footer-bg-img/);
 assert.doesNotMatch(footer, /if \(fashion\)/);
+assert.doesNotMatch(footer, /HomeSkin\.(normal|fashion)/);
 
 const flutterFash = readFileSync(join(root, "flutter_app/lib/screens/home_fashion.dart"), "utf8");
 assert.match(flutterFash, /HealingSection/);

@@ -2,16 +2,23 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { assertCacheBustAtLeast, pngPixelSha256 } from "./helpers/source-contract.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
-/* Flutter still keeps the practice-art bytes. Website / WebView no longer
-   mount a Start Today rail — that rail is what scrolled the page. */
+/* Flutter still keeps the practice-art pixels. Website / WebView no longer
+   mount a Start Today rail — that rail is what scrolled the page.
+   eae14d6c losslessly recompressed this PNG with oxipng (1933133 -> 1794157
+   bytes, identical pixels). Guard the decoded pixels, not the file size, so a
+   lossless optimiser passes and any lossy re-encode / resize / edit fails. */
 const art = "aarogya-personal-coach.png";
+const ART_PIXELS = "ff88f0568d9f0cdf623c7006c865ac771d412f0b0e29e1d74e0a5bc6e3cb37c8";
 for (const base of ["assets/coach", "flutter_app/assets/coach"]) {
   const p = join(root, base, art);
   assert.ok(existsSync(p), `missing ${base}/${art}`);
-  assert.equal(readFileSync(p).length, 1933133, `${base}/${art} must be original bytes (no recompress)`);
+  const px = pngPixelSha256(p);
+  assert.deepEqual([px.width, px.height], [1672, 941], `${base}/${art} must keep its original size`);
+  assert.equal(px.sha256, ART_PIXELS, `${base}/${art} must keep the original artwork pixels (no lossy recompress)`);
 }
 
 const fash = readFileSync(join(root, "flutter_app/lib/screens/fashion/sections_top.dart"), "utf8");
@@ -37,11 +44,11 @@ assert.match(js, /todayPracticeTitle/);
 assert.match(js, /removeProperty\('display'\)/);
 
 const idx = readFileSync(join(root, "index.html"), "utf8");
-assert.match(idx, /part096-start-today-carousel\.js\?v=3/);
+assertCacheBustAtLeast(idx, "part096-start-today-carousel.js", 3);
 assert.doesNotMatch(idx, /part096-personal-coach-carousel\.js/);
 assert.match(idx, /nwsb_sw_reset_v8/);
-assert.match(idx, /nowssb-nm\.css\?v=805/);
-assert.match(idx, /part062\.js\?v=51/);
+assertCacheBustAtLeast(idx, "nowssb-nm.css", 805);
+assertCacheBustAtLeast(idx, "part062.js", 51);
 
 const layout = readFileSync(join(root, "app/js/part062.js"), "utf8");
 const nmReg = layout.slice(layout.indexOf("nm: {"), layout.indexOf("fash: {"));

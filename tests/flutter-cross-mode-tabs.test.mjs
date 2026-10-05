@@ -11,13 +11,15 @@ test('Flutter provides all five primary tabs in both Normal and Fashion home mod
   const fashion = read('flutter_app/lib/screens/home_fashion.dart');
 
   for (const tab of ['Connect', 'Practice', 'Library', 'Store', 'Profile']) {
-    assert.match(shell, new RegExp(`\\('${tab}'`));
+    assert.match(shell, new RegExp(`'label': '${tab}'`));
   }
   assert.match(shell, /_fashion \? const HomeFashion\(\) : const HomeNormal\(\)/);
   assert.match(normal, /Settings\.instance\.setFashionHome\(true\)/);
-  assert.match(fashion, /Settings\.instance\.setFashionHome\(false\)/);
+  // Fashion -> Normal is the shared mode pill above the nav (dbc21a12).
+  assert.match(shell, /Settings\.instance\.setFashionHome\(!_fashion\)/);
   assert.match(shell, /const PracticeScreen\(\)/);
-  assert.match(shell, /const LibraryScreen\(\)/);
+  // Library tab is the media-rich Sound Library, not the old letter list.
+  assert.match(shell, /_tabAlive\(2, const SoundLibraryScreen\(embedded: true\)\)/);
   assert.match(shell, /const StoreScreen\(\)/);
   assert.match(shell, /const ProfileScreen\(\)/);
   assert.match(normal, /MainOptionsSection\(onGo: _go, onAction: _openMainOption\)/);
@@ -32,7 +34,9 @@ test('Flutter pages do not advertise unavailable tab actions and Sound Library o
   const settings = read('flutter_app/lib/screens/widgets_page.dart');
 
   assert.match(sound, /PracticePlayerScreen\(/);
-  assert.match(sound, /Start library player/);
+  // f3cff76f dropped the "Start library player" label when Sound Library was
+  // matched to the WebView; rows still open the real player.
+  assert.match(sound, /builder: \(_\) => PracticePlayerScreen\(words: \[w\]/);
   assert.doesNotMatch(sound, /Playback is not built yet/);
   assert.doesNotMatch(profile, /Not built yet/);
   assert.doesNotMatch(settings, /Not built yet/);

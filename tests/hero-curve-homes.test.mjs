@@ -12,10 +12,17 @@ const homeFashBottom = readFileSync(new URL("../flutter_app/lib/screens/fashion/
 
 assert.match(index, /nwsb-curve-nm/, "Normal home must mount the 3D curve below search");
 assert.match(index, /nwsb-curve-fash glass-wrap/, "Fashion curve sits in a glass pane");
-assert.match(index, /Sound that finds you/, "Curve uses the Sound that finds you line");
-assert.match(index, /Pronunciation & sound healing, wherever you are/, "Curve uses the pronunciation headline");
+// 5d649a4b replaced the kicker + pronunciation headline with the Buddha
+// quotation on both homes, website and Flutter alike.
+const BUDDHA = "the Enlightened and Brilliant Buddha ruled the world—not by the sword, but by the power of words.";
+assert.equal(index.split(`<div class="nwsb-curve-title">“With no weapon in his hand, ${BUDDHA}”</div>`).length - 1, 2,
+  "Both website curves use the Buddha quotation as their title");
+assert.ok(flutter.includes(BUDDHA), "Flutter curve uses the same Buddha quotation");
+assert.doesNotMatch(index, /nwsb-curve-kicker">Sound that finds you/, "Old kicker line is gone");
 assert.doesNotMatch(index, /she stays/, "Do not put the she-stays swipe line");
-assert.match(homeFash, /HeroCurveStage\(glass: true\)/, "Flutter Fashion home puts the curve under the greeting in glass");
+assert.match(homeFash, /HeroCurveStage\(\s*glass: true,/, "Flutter Fashion home puts the curve in glass");
+assert.ok((() => { const c = homeFash.indexOf("HeroCurveStage("); const g = homeFash.lastIndexOf("HeroGreeting(", c); return g >= 0 && c - g < 200; })(),
+  "Flutter Fashion curve sits under the greeting");
 assert.match(css, /width:\s*152px/, "Orbiting stills are 16:9 wide");
 assert.match(css, /height:\s*86px/, "Orbiting stills are 16:9 short");
 assert.match(css, /height:\s*72%/, "Center subject is smaller than full-bleed");
@@ -25,7 +32,9 @@ assert.match(css, /perspective:\s*980px/, "Curve stage must be a 3D scene");
 assert.match(js, /data-nwsb-curve/, "Spinner must bind every curve stage");
 assert.match(flutter, /rows = \[-118.0, 0.0, 118.0\]/, "Hero curve has three rows of stills");
 assert.match(index, /nwsb-hero-ring-c/, "Website hero curve has three rings");
-assert.match(homeNm, /HeroCurveStage\(compact: true\)/, "Flutter Normal home puts the curve under search");
+assert.match(homeNm, /'heroCurve',\s*HeroCurveStage\(\s*compact: true,/, "Flutter Normal home mounts the compact curve");
+assert.ok(homeNm.indexOf("('search'") >= 0 && homeNm.indexOf("('search'") < homeNm.indexOf("HeroCurveStage("),
+  "Flutter Normal home puts the curve under search");
 assert.match(index, /nwsb-curve-embed/, "Promo tablet mounts the embedded 3D curve");
 assert.match(index, /tab-subject\.webp/, "Promo tablet uses the blonde cutout");
 assert.match(tvFrame, /Positioned.fill\(child: overlay!\)/, "Tablet overlay sits outside the video save-layer");

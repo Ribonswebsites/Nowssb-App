@@ -1,11 +1,19 @@
-// Emulator tests for firestore.rules — run with tools/firebase/test-rules.sh
+// Emulator tests for firestore.rules.
+// Run: tools/firebase/test-rules.sh   (or: cd tools/firebase && npm ci && npm test)
+// Needs Java 21+ for the Firestore emulator (firebase-tools 14).
 import { initializeTestEnvironment, assertSucceeds, assertFails } from '@firebase/rules-unit-testing';
-import { readFileSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import { doc, getDoc, setDoc, updateDoc, addDoc, deleteDoc, collection, getDocs, query, where, serverTimestamp, increment } from 'firebase/firestore';
 
 const env = await initializeTestEnvironment({
   projectId: 'nowssb-34f1b',
-  firestore: { rules: readFileSync('firestore.rules', 'utf8'), host: '127.0.0.1', port: 8089 },
+  // The repo's firestore.rules (two levels up); a firestore.rules in the cwd
+  // wins so a copied-out run still tests exactly what it was given.
+  firestore: {
+    rules: readFileSync(existsSync('firestore.rules') ? 'firestore.rules' : new URL('../../firestore.rules', import.meta.url), 'utf8'),
+    host: '127.0.0.1',
+    port: 8089,
+  },
 });
 await env.withSecurityRulesDisabled(async (c) => {
   const db = c.firestore();
@@ -280,6 +288,13 @@ await t('user deletes own notification ok', assertSucceeds(env.withSecurityRules
 await t('anon reads config/store ok', assertSucceeds(getDoc(doc(anon, 'config/store'))));
 await t('anon reads config/economy denied', assertFails(getDoc(doc(anon, 'config/economy'))));
 await t('user deletes other profile denied', assertFails(deleteDoc(doc(alice, 'users/pro'))));
+await env.withSecurityRulesDisabled(async (c) => {
+  await setDoc(doc(c.firestore(), 'users/rx'), { uid: 'rx', restrictions: { community: true } });
+  await setDoc(doc(c.firestore(), 'users/bx'), { uid: 'bx', blocked: true, restrictions: {} });
+});
+await t('restricted user deletes own profile denied', assertFails(deleteDoc(doc(env.authenticatedContext('rx').firestore(), 'users/rx'))));
+await t('blocked user deletes own profile denied', assertFails(deleteDoc(doc(env.authenticatedContext('bx').firestore(), 'users/bx'))));
+// alice's restrictions were cleared above ({}), exactly as the admin API does.
 await t('user deletes own profile ok', assertSucceeds(deleteDoc(doc(alice, 'users/alice'))));
 // ── Admin app: daily sign-ins and the admin inbox ──
 const dayRow = (uid, day, extra = {}) => ({ uid, day, first: serverTimestamp(), last: serverTimestamp(), opens: increment(1), platform: 'android', build: '400', os: 'Android 14', ...extra });

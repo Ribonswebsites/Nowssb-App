@@ -72,9 +72,12 @@ service cloud.firestore {
       // profile, unless an admin has blocked or restricted it (deleting the
       // doc would otherwise wipe the block). The server delete endpoint
       // (service account) still removes those accounts completely.
+      // "Restricted" means some restrictions[area] == true — the same test the
+      // economy gates use. Clearing restrictions in the admin console writes
+      // restrictions: {}, which must give self-delete back.
       allow delete: if isAdmin() || (isSelf(uid)
         && resource.data.get('blocked', false) != true
-        && !('restrictions' in resource.data));
+        && !resource.data.get('restrictions', {}).values().hasAny([true]));
       match /inbox/{msgId} { allow read, delete: if isSelf(uid) || isAdmin(); allow update: if isSelf(uid); allow create: if isAdmin(); }
 
       // Personal Coach data is private to the signed-in owner.

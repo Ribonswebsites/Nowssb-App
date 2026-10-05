@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
+import { assertCacheBustAtLeast } from './helpers/source-contract.mjs';
 
 const root = new URL('..', import.meta.url).pathname;
 const read = (relative) => readFileSync(`${root}/${relative}`, 'utf8');
@@ -24,10 +25,15 @@ test('website and WebView downloads use the supplied listing and the correct lat
   assert.match(listing, /window\.goBack/);
   assert.match(listing, /role="button"/);
   assert.match(listing, /listing-hero-wrap/);
-  assert.match(listing, /padding:16px/);
-  assert.match(listing, /border-radius:24px/);
+  // 31d2001a made the banner edge to edge (bleeds through the 20px page
+  // gutter, no inset/rounding); 96f03615 replaced the still with a muted loop.
+  const heroWrap = listing.match(/\.listing-hero-wrap\{[^}]*\}/)?.[0] || '';
+  assert.match(heroWrap, /width:calc\(100% \+ 40px\)/);
+  assert.match(heroWrap, /margin-left:-20px/);
+  assert.match(heroWrap, /padding:0/);
+  assert.match(heroWrap, /border-radius:0/);
   assert.match(listing, /height:clamp\(140px, 28vw, 220px\)/);
-  assert.match(listing, /assets\/app-listing\/listing-hero-banner\.png/);
+  assert.match(listing, /<video autoplay muted loop playsinline[^>]*>\s*<source src="assets\/app-listing\/nowssb-hero-banner\.mp4"/);
   assert.match(listing, /hero-back-btn/);
   assert.match(listing, /left:12px/);
   assert.match(listing, /right:auto/);
@@ -63,14 +69,15 @@ test('Fashion Plus keeps one live film behind every page and menu', () => {
   const fashion = read('app/js/part076.js');
   const css = read('nowssb-nm.css');
 
-  assert.match(page, /part051\.js\?v=27/);
-  assert.match(page, /part076\.js\?v=119/);
-  assert.match(page, /nowssb-nm\.css\?v=797/);
+  assertCacheBustAtLeast(page, 'part051.js', 27);
+  assertCacheBustAtLeast(page, 'part076.js', 119);
+  assertCacheBustAtLeast(page, 'nowssb-nm.css', 797);
   assert.match(playback, /v\.id === 'fpBgVideo' \|\| v\.id === 'fpPageVid'/);
   assert.match(fashion, /document\.getElementById\('fpBgVideo'\)/);
   assert.match(fashion, /v\.play\(\)/);
   assert.match(fashion, /nwsb-settings-open/);
-  assert.match(fashion, /settingsOpen/);
+  // 6eb21a8b split this into Social vs Widgets Settings.
+  assert.match(fashion, /socialSettingsOpen/);
   assert.match(fashion, /isStoreScreen/);
   assert.match(fashion, /nwsb-store-open/);
   assert.match(fashion, /restoreStoreIntroArtwork/);
@@ -99,7 +106,7 @@ test('login has no transition video and Fashion Plus restores intro artwork abov
   const fashion = read('app/js/part076.js');
   const css = read('nowssb-nm.css');
 
-  assert.match(page, /firebase\.module\.js\?v=267/);
+  assertCacheBustAtLeast(page, 'firebase.module.js', 267);
   assert.doesNotMatch(page.match(/<div id="login"[\s\S]*?<\/div>\s*<\/div>\s*<\/div>/)?.[0] || '', /<video/);
   assert.match(page, /login-phone-poster\.webp/);
   assert.match(auth, /signInWithEmailAndPassword/);
@@ -125,8 +132,8 @@ test('login has no transition video and Fashion Plus restores intro artwork abov
   assert.match(backgrounds, /NWSB_DEFAULT_FASHION_BG = NWSB_FASHION_BGS\[0\]/);
   assert.match(backgrounds, /Default background restored/);
   assert.match(backgrounds, /No prior choice: apply the curated image immediately/);
-  assert.match(page, /part017\.js\?v=208/);
-  assert.match(page, /part047\.js\?v=187/);
+  assertCacheBustAtLeast(page, 'part017.js', 208);
+  assertCacheBustAtLeast(page, 'part047.js', 187);
   const pkg = JSON.parse(read('package.json'));
   assert.match(pkg.scripts.dev, /http\.server 5173/);
   assert.match(pkg.scripts.start, /http\.server 5173/);
