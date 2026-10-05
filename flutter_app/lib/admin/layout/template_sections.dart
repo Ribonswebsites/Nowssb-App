@@ -72,6 +72,7 @@ class TemplateSection extends StatelessWidget {
   Map<String, dynamic> get p => entry.props;
   String _s(String k) => '${p[k] ?? ''}';
   double _h(double def) => p['height'] is num ? (p['height'] as num).toDouble() : def;
+  BoxFit get _fit => '${p['fit']}' == 'contain' ? BoxFit.contain : BoxFit.cover;
 
   Widget _label(String id, String text, TextStyle style, {int? maxLines, TextAlign? align}) => text.isEmpty
       ? const SizedBox.shrink()
@@ -125,8 +126,8 @@ class TemplateSection extends StatelessWidget {
       case 'imageBanner':
       case 'videoBanner':
         final media = entry.kind == 'videoBanner' && _s('video').isNotEmpty
-            ? NetVideo(url: _s('video'))
-            : NetPicture(url: _s('image'));
+            ? NetVideo(url: _s('video'), fit: _fit)
+            : NetPicture(url: _s('image'), fit: _fit);
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: ClipRRect(
@@ -166,7 +167,7 @@ class TemplateSection extends StatelessWidget {
               Expanded(
                 child: Padding(padding: const EdgeInsets.all(18), child: _fitText(context)),
               ),
-              Expanded(child: NetPicture(url: _s('image'))),
+              Expanded(child: NetPicture(url: _s('image'), fit: _fit)),
             ]),
           ),
         );
@@ -304,8 +305,9 @@ class NetPicture extends StatelessWidget {
 
 /// A muted looping clip from a URL, downloaded once into the disk cache.
 class NetVideo extends StatefulWidget {
-  const NetVideo({super.key, required this.url});
+  const NetVideo({super.key, required this.url, this.fit = BoxFit.cover});
   final String url;
+  final BoxFit fit;
 
   @override
   State<NetVideo> createState() => _NetVideoState();
@@ -358,7 +360,7 @@ class _NetVideoState extends State<NetVideo> {
     final c = _c;
     if (c == null || !c.value.isInitialized) return const NetPicture(url: '');
     return FittedBox(
-      fit: BoxFit.cover,
+      fit: widget.fit,
       clipBehavior: Clip.hardEdge,
       child: SizedBox(width: c.value.size.width, height: c.value.size.height, child: VideoPlayer(c)),
     );

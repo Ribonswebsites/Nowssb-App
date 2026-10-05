@@ -154,10 +154,12 @@ class _Frame extends StatelessWidget {
               size: size,
               child: Stack(children: [
                 Positioned.fill(child: RepaintBoundary(child: screen)),
-                if (active && c.pickMode)
+                if (active && c.pickMode && !c.arrange)
                   Positioned.fill(
                     child: _Hotspots(c: c, section: sectionId == kProbe ? null : '$pageId/$sectionId'),
                   ),
+                if (active && c.arrange && sectionId != kProbe)
+                  Positioned.fill(child: _ArrangeHand(c: c, sectionId: sectionId)),
               ]),
             ),
           ),
@@ -249,6 +251,101 @@ class _HotspotsState extends State<_Hotspots> {
       }
     }
     return Stack(children: spots);
+  }
+}
+
+/// Drag the section on the phone to place it. Pinch to resize. No sliders.
+class _ArrangeHand extends StatefulWidget {
+  const _ArrangeHand({required this.c, required this.sectionId});
+  final EditorController c;
+  final String sectionId;
+
+  @override
+  State<_ArrangeHand> createState() => _ArrangeHandState();
+}
+
+class _ArrangeHandState extends State<_ArrangeHand> {
+  double _dx = 0;
+  double _dy = 0;
+  double _h = 0;
+  var _pinch = false;
+
+  Map<String, dynamic> get _props => widget.c.current?.entry.props ?? const {};
+
+  double _num(String k) {
+    final v = _props[k];
+    return v is num ? v.toDouble() : 0;
+  }
+
+  void _place(double dx, double dy) {
+    final id = widget.c.current?.id;
+    if (id == null || id != widget.sectionId) return;
+    widget.c.patchProps(id, {
+      'dx': dx.abs() < 1 ? null : dx,
+      'dy': dy.abs() < 1 ? null : dy,
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onScaleStart: (d) {
+        _dx = _num('dx');
+        _dy = _num('dy');
+        _h = _num('height');
+        _pinch = d.pointerCount >= 2;
+      },
+      onScaleUpdate: (d) {
+        final id = widget.c.current?.id;
+        if (id == null || id != widget.sectionId) return;
+        if (d.pointerCount >= 2) {
+          _pinch = true;
+          final base = _h < 1 ? 200.0 : _h;
+          final next = (base * d.scale).clamp(70.0, 720.0);
+          widget.c.patchProps(id, {'height': next.roundToDouble()});
+          return;
+        }
+        if (_pinch) return;
+        final box = context.findRenderObject() as RenderBox?;
+        var scale = 1.0;
+        if (box != null && box.hasSize) {
+          final a = box.localToGlobal(Offset.zero);
+          final b = box.localToGlobal(const Offset(100, 0));
+          final painted = (b.dx - a.dx).abs();
+          if (painted > 1) scale = painted / 100;
+        }
+        _dx = (_dx + d.focalPointDelta.dx / scale).clamp(-220.0, 220.0);
+        _dy = (_dy + d.focalPointDelta.dy / scale).clamp(-240.0, 420.0);
+        _place(_dx, _dy);
+      },
+      child: const IgnorePointer(
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            border: Border.fromBorderSide(BorderSide(color: Color(0xCCE8D5A3), width: 1.5)),
+          ),
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: EdgeInsets.only(bottom: 18),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: Color(0xE0060C18),
+                  borderRadius: BorderRadius.all(Radius.circular(99)),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  child: Text(
+                    'Drag to place  ·  pinch to resize',
+                    style: TextStyle(color: Color(0xFFE8D5A3), fontSize: 12, fontWeight: FontWeight.w700),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 

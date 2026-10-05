@@ -30,6 +30,9 @@ class EditorController extends ChangeNotifier {
   /// preview scrolls and swipes like the app.
   bool pickMode = true;
 
+  /// Layout tab: drag and pinch the phone picture. No sliders.
+  bool arrange = false;
+
   String? selectedSlot;
   SlotType? selectedType;
   String selectedDefault = '';
@@ -127,6 +130,12 @@ class EditorController extends ChangeNotifier {
 
   void setPickMode(bool v) {
     pickMode = v;
+    notifyListeners();
+  }
+
+  void setArrange(bool v) {
+    if (arrange == v) return;
+    arrange = v;
     notifyListeners();
   }
 

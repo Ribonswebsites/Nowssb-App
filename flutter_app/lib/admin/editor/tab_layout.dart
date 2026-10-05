@@ -1,7 +1,5 @@
-/// Layout tab: the page's sections in order — drag to reorder, move up or
-/// down, show/hide, duplicate, delete (with a confirm; deleted ones can be
-/// brought back), the current section's height and spacing, and Add
-/// section from ready templates.
+/// Layout tab: drag the picture on the phone to place it, pinch to resize.
+/// The list below is only for order, show, hide, and delete.
 library;
 
 import 'package:flutter/material.dart';
@@ -26,8 +24,7 @@ class LayoutTab extends StatelessWidget {
     final live = [for (var i = 0; i < secs.length; i++) if (!secs[i].entry.deleted) i];
     final deleted = [for (final s in secs) if (s.entry.deleted) s];
     final cur = c.current;
-    final p = cur?.entry.props ?? const <String, dynamic>{};
-    double n(String k, double d) => p[k] is num ? (p[k] as num).toDouble() : d;
+    final fit = '${cur?.entry.props['fit'] ?? ''}';
 
     return CustomScrollView(slivers: [
       SliverPadding(
@@ -47,37 +44,44 @@ class LayoutTab extends StatelessWidget {
             }),
           ]),
           if (cur != null) ...[
-            Eyebrow('Size & spacing — “${cur.title}”'),
-            LabeledSlider(
-              label: cur.entry.isTemplate ? 'Height' : 'Height (fits in)',
-              value: n('height', 0),
-              min: 0,
-              max: 600,
-              format: (v) => v < 1 ? 'auto' : v.toStringAsFixed(0),
-              onChanged: (v) => c.patchProps(cur.id, {'height': v < 1 ? null : v.roundToDouble()}),
-              onReset: p['height'] == null ? null : () => c.patchProps(cur.id, {'height': null}),
+            const Padding(
+              padding: EdgeInsets.fromLTRB(4, 14, 4, 10),
+              child: Text(
+                'Drag the picture on the phone to put it where you want. Pinch with two fingers to make it bigger or smaller.',
+                style: TextStyle(color: kDim, fontSize: 13, height: 1.35),
+              ),
             ),
-            LabeledSlider(
-              label: 'Space above',
-              value: n('padTop', 0),
-              min: 0,
-              max: 80,
-              onChanged: (v) => c.patchProps(cur.id, {'padTop': v < 1 ? null : v.roundToDouble()}),
-            ),
-            LabeledSlider(
-              label: 'Space below',
-              value: n('padBottom', 0),
-              min: 0,
-              max: 80,
-              onChanged: (v) => c.patchProps(cur.id, {'padBottom': v < 1 ? null : v.roundToDouble()}),
-            ),
-            LabeledSlider(
-              label: 'Side margins',
-              value: n('padH', 0),
-              min: 0,
-              max: 48,
-              onChanged: (v) => c.patchProps(cur.id, {'padH': v < 1 ? null : v.roundToDouble()}),
-            ),
+            Wrap(spacing: 8, runSpacing: 8, children: [
+              Pill('Center', icon: Icons.filter_center_focus_rounded, dense: true, onTap: () {
+                tapFeel();
+                c.patchProps(cur.id, {'dx': null, 'dy': null});
+              }),
+              Pill('Full width', icon: Icons.fullscreen_rounded, dense: true, onTap: () {
+                tapFeel();
+                c.patchProps(cur.id, {'dx': null, 'padH': null});
+              }),
+              Pill('Fill picture', icon: Icons.crop_rounded, dense: true, selected: fit != 'contain', onTap: () {
+                tapFeel();
+                c.patchProps(cur.id, {'fit': null});
+              }),
+              Pill('Whole picture', icon: Icons.fit_screen_rounded, dense: true, selected: fit == 'contain', onTap: () {
+                tapFeel();
+                c.patchProps(cur.id, {'fit': 'contain'});
+              }),
+              Pill('Reset', icon: Icons.restart_alt_rounded, dense: true, onTap: () {
+                tapFeel();
+                c.patchProps(cur.id, {
+                  'height': null,
+                  'dx': null,
+                  'dy': null,
+                  'padTop': null,
+                  'padBottom': null,
+                  'padH': null,
+                  'fit': null,
+                });
+              }),
+            ]),
+            const SizedBox(height: 8),
           ],
           Eyebrow('Order — drag ⠿ to move', trailing: Text('${live.length} sections', style: const TextStyle(color: kDim, fontSize: 11))),
         ]),

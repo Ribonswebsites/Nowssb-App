@@ -95,7 +95,10 @@ class _UiEditorScreenState extends State<UiEditorScreen> {
     super.dispose();
   }
 
-  void _openTab(int i) => setState(() => _tab = _tab == i ? null : i);
+  void _openTab(int i) {
+    setState(() => _tab = _tab == i ? null : i);
+    c.setArrange(_tab == 3);
+  }
 
   Future<bool> _confirmLeave() async {
     if (c.pendingCount == 0) return true;
