@@ -16,6 +16,7 @@ import '../../shell/nwsb_links.dart';
 import '../../theme/tokens.dart';
 import '../hype_rail.dart';
 import 'section_config.dart';
+import 'section_configs.dart';
 
 List<SectionMediaItem> _itemsFromConfig(SectionConfig? config) {
   final items = config?.items ?? const <SectionMediaItem>[];
@@ -168,6 +169,12 @@ class _SpotlightSectionState extends State<SpotlightSection> {
 
   @override
   Widget build(BuildContext context) {
+    SectionConfigs.watch(context);
+    final resolved = SectionConfigs.instance.resolveOptional(context, widget.config);
+    if (resolved != null && resolved != widget.config) {
+      return SpotlightSection(config: resolved, onTap: widget.onTap);
+    }
+
     final items = _items;
     if (items.isEmpty) return const SizedBox.shrink();
     if (widget.config != null && !widget.config!.enabled) {

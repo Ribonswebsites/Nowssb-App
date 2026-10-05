@@ -16,7 +16,9 @@ import '../../widgets/sections/section_registry.dart';
 import '../editor/glass.dart';
 import 'section_config_api.dart';
 import 'section_focal_pad.dart';
+import 'section_content_panel.dart';
 import 'section_layout_handles.dart';
+import '../../widgets/sections/section_configs.dart';
 
 Future<void> openSectionEditor(
   BuildContext context, {
@@ -161,6 +163,9 @@ class _SectionEditorShellState extends State<SectionEditorShell> {
         note: 'section.editor',
       );
       if (!mounted) return;
+      final slot = sectionSlotKey(widget.pageId, widget.sectionId);
+      SectionConfigs.instance.applyLocal(slot, saved ?? draft);
+      if (!mounted) return;
       setState(() {
         _busy = false;
         _saved = saved;
@@ -187,6 +192,9 @@ class _SectionEditorShellState extends State<SectionEditorShell> {
         pageId: widget.pageId,
         sectionId: widget.sectionId,
       );
+      if (!mounted) return;
+      final slot = sectionSlotKey(widget.pageId, widget.sectionId);
+      SectionConfigs.instance.applyLocal(slot, restored);
       if (!mounted) return;
       setState(() {
         _busy = false;
@@ -480,6 +488,13 @@ class _SectionEditorShellState extends State<SectionEditorShell> {
               ],
             ],
           ),
+        ),
+        const SizedBox(height: 14),
+
+        SectionContentPanel(
+          config: draft,
+          busy: _busy,
+          onChanged: _touch,
         ),
         const SizedBox(height: 14),
 

@@ -15,6 +15,7 @@ import '../shell/nwsb_links.dart';
 import '../theme/tokens.dart';
 import 'glass_wrap.dart';
 import 'sections/section_config.dart';
+import 'sections/section_configs.dart';
 
 /// Set from [ensureHypeRoutes] so this file does not import the screens.
 typedef HypeOpener = void Function(BuildContext context, String id);
@@ -195,6 +196,12 @@ class NowssbHypeRail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SectionConfigs.watch(context);
+    final live = SectionConfigs.instance.resolveOptional(context, config);
+    if (live != null && live != config) {
+      return NowssbHypeRail(config: live, title: title, cards: cards);
+    }
+
     if (config != null && !config!.enabled) return const SizedBox.shrink();
 
     final layout = config?.layout ?? SectionLayout.empty;

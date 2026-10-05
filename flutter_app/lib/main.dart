@@ -26,6 +26,7 @@ import 'admin/admin_state.dart';
 import 'admin/admin_pill.dart';
 import 'admin/layout/ui_layouts.dart';
 import 'admin/template/ui_overrides.dart';
+import 'widgets/sections/section_configs.dart';
 import 'app_update.dart';
 import 'data/app_control.dart';
 import 'data/content.dart';
@@ -99,6 +100,7 @@ Future<void> main() async {
   // the phone before the first frame, so a replaced picture or line shows
   // at once instead of flashing the default; the Firestore watch follows.
   await UiOverrides.instance.start();
+  await SectionConfigs.instance.start();
   await UiLayouts.instance.start();
   await dropLegacyEditPrefs();
   await SlotRegistry.instance.load();
@@ -233,40 +235,41 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return UiScope(
-      child: MaterialApp(
-        navigatorKey: _navigatorKey,
-        navigatorObservers: [_popupRoutes],
-        builder: (context, child) => NwsbUpdateLayer(
-            navigatorKey: _navigatorKey,
-            child: AppControlLayer(
+    return SectionConfigsHost(
+      child: UiScope(
+        child: MaterialApp(
+          navigatorKey: _navigatorKey,
+          navigatorObservers: [_popupRoutes],
+          builder: (context, child) => NwsbUpdateLayer(
               navigatorKey: _navigatorKey,
-              child: AdminReturnPill(
+              child: AppControlLayer(
                 navigatorKey: _navigatorKey,
-                child: NotificationPopupHost(child: child ?? const SizedBox()),
-              ),
-            )),
-        title: 'NowssB',
-        debugShowCheckedModeBanner: false,
-        theme: NwsbTheme.light,
-        darkTheme: NwsbTheme.dark,
-        themeMode: ThemeMode.light,
-        color: NwsbColors.deep,
-        scrollBehavior: const NwsbScrollBehavior(),
-        home: Stack(
-          children: [
-            const AuthGate(child: AdminAppGate(child: NavShell())),
-            if (!_splashDone)
-              Splash(onDone: () {
-                VideoPool.instance.unhold();
-                setState(() => _splashDone = true);
-                unawaited(_checkForUpdate(coldStart: true));
-                unawaited(PhoneNotifications.instance.announceAfterLaunch().then((_) => AdminPromoGuard.apply()));
-                unawaited(DeviceFlags.applySaved());
-              }),
-          ],
+                child: AdminReturnPill(
+                  navigatorKey: _navigatorKey,
+                  child: NotificationPopupHost(child: child ?? const SizedBox()),
+                ),
+              )),
+          title: 'NowssB',
+          debugShowCheckedModeBanner: false,
+          theme: NwsbTheme.light,
+          darkTheme: NwsbTheme.dark,
+          themeMode: ThemeMode.light,
+          color: NwsbColors.deep,
+          scrollBehavior: const NwsbScrollBehavior(),
+          home: Stack(
+            children: [
+              const AuthGate(child: AdminAppGate(child: NavShell())),
+              if (!_splashDone)
+                Splash(onDone: () {
+                  VideoPool.instance.unhold();
+                  setState(() => _splashDone = true);
+                  unawaited(_checkForUpdate(coldStart: true));
+                  unawaited(PhoneNotifications.instance.announceAfterLaunch().then((_) => AdminPromoGuard.apply()));
+                  unawaited(DeviceFlags.applySaved());
+                }),
+            ],
+          ),
         ),
-      ),
     );
   }
 }

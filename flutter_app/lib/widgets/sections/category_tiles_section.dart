@@ -12,6 +12,7 @@ import '../../shell/nwsb_links.dart';
 import '../../theme/tokens.dart';
 import '../nwsb_icon.dart';
 import 'section_config.dart';
+import 'section_configs.dart';
 
 // ─── Defaults ───────────────────────────────────────────────────────────────
 
@@ -209,6 +210,16 @@ class _CategoryTilesSectionState extends State<CategoryTilesSection> {
 
   @override
   Widget build(BuildContext context) {
+    SectionConfigs.watch(context);
+    final resolved = SectionConfigs.instance.resolveOptional(context, widget.config);
+    if (resolved != null && resolved != widget.config) {
+      return CategoryTilesSection(
+        config: resolved,
+        onTileTap: widget.onTileTap,
+        onChipSelected: widget.onChipSelected,
+      );
+    }
+
     final tiles = _tilesFrom(widget.config);
     final chips = _chipsFrom(widget.config);
     if (tiles.isEmpty && chips.isEmpty) return const SizedBox.shrink();

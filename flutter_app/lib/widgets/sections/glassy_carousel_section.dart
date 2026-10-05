@@ -21,6 +21,7 @@ import '../../admin/layout/app_pages.dart';
 import '../../shell/nwsb_links.dart';
 import '../../theme/tokens.dart';
 import 'section_config.dart';
+import 'section_configs.dart';
 
 /// Reusable glassy coverflow carousel driven by [SectionConfig].
 class GlassyCarouselSection extends StatefulWidget {
@@ -39,7 +40,8 @@ class _GlassyCarouselSectionState extends State<GlassyCarouselSection> {
   var _fraction = 0.58;
   var _autoplayArmed = false;
 
-  SectionConfig get _c => widget.config;
+  SectionConfig? _live;
+  SectionConfig get _c => _live ?? widget.config;
 
   List<SectionMediaItem> get _items {
     final raw = _c.items;
@@ -165,6 +167,8 @@ class _GlassyCarouselSectionState extends State<GlassyCarouselSection> {
 
   @override
   Widget build(BuildContext context) {
+    SectionConfigs.watch(context);
+    _live = SectionConfigs.instance.resolveIn(context, widget.config);
     if (!_c.enabled) return const SizedBox.shrink();
 
     final layout = _c.layout;

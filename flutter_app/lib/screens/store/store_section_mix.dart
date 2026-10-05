@@ -5,8 +5,8 @@
 /// section-config loader yet, so these are the bundled defaults: empty or
 /// NowssB-only media that the admin fills later (black/gold placeholders).
 ///
-/// TODO(CS): when the section-config loader lands, resolve each id through
-/// it first and fall back to these defaults.
+/// Live overrides resolve through [SectionConfigs] (CS-6): admin saves apply
+/// for every user without an app update; bundled defaults stay until then.
 library;
 
 import 'package:flutter/material.dart';
@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import '../../data/store_catalog.dart';
 import '../../shell/nwsb_links.dart';
 import '../../widgets/sections/section_config.dart';
+import '../../widgets/sections/section_configs.dart';
 import '../../widgets/sections/section_registry.dart';
 import 'store_cards.dart';
 
@@ -45,8 +46,10 @@ class StoreRegistrySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SectionConfigs.watch(context);
     ensureSectionRegistry();
-    return SectionRegistry.instance.build(context, config);
+    final live = SectionConfigs.instance.resolveIn(context, config);
+    return SectionRegistry.instance.build(context, live);
   }
 }
 
