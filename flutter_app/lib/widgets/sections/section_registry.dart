@@ -7,6 +7,7 @@ library;
 
 import 'package:flutter/widgets.dart';
 
+import 'artist_cards_section.dart';
 import 'coupon_banner_section.dart';
 import 'glassy_carousel_section.dart';
 import 'section_config.dart';
@@ -132,8 +133,17 @@ void ensureSectionRegistry() {
   ));
   add(SectionTypeId.hypedRow, 'Hyped row',
       _defaults(SectionTypeId.hypedRow, height: 300, cardWidth: 140, cardHeight: 280, spacing: 8, radius: 12));
-  add(SectionTypeId.artistCards, 'Artist cards',
-      _defaults(SectionTypeId.artistCards, height: 200, cardWidth: 140, cardHeight: 180, spacing: 10, radius: 16));
+  r.register(SectionTypeEntry(
+    type: SectionTypeId.artistCards,
+    label: 'Artist cards',
+    defaultConfig: const SectionConfig(
+      id: '_default.artistCards',
+      type: SectionTypeId.artistCards,
+      layout: SectionLayout(height: 220, cardWidth: 150, cardHeight: 190, spacing: 10, radius: 16),
+      style: SectionStyle(accent: 0xFFC8A96E),
+    ),
+    builder: (context, config) => ArtistCardsSection(config: config),
+  ));
   add(SectionTypeId.categoryTiles, 'Category tiles',
       _defaults(SectionTypeId.categoryTiles, height: 160, cardWidth: 100, cardHeight: 120, spacing: 10, radius: 18));
   add(SectionTypeId.spotlight, 'Spotlight',
