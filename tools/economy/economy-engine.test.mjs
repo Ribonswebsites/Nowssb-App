@@ -93,16 +93,34 @@ await t('spin: exactly one free spin a day, no paid spins; nonce replay returns 
   eq([sum.config.spin.paidPerDay, sum.config.spin.perDay], [0, 1]);
 });
 await t('per-key actions: verified on the server and capped per day', async () => {
-  const a = await call('reportAction', 'quester', { action: 'close_stage', key: 'made-up-1' });
-  eq([a.coins, a.verified], [0, false]);
+  // close_stage: key must be "<wordKey>:<stageN>" for a real practised word stage.
+  for (const bad of ['made-up-1', 'om', 'om:0', 'om:abc', 'om:99', 'nope:1', 'om:1:extra']) {
+    const r = await call('reportAction', 'quester', { action: 'close_stage', key: bad });
+    eq([r.coins, r.verified], [0, false], 'reject ' + bad);
+  }
   await call('reportPractice', 'quester', { practiced: true, wordId: 'om' });
   eq(((await db.get('users/quester/mastery/om')).data || {}).practiceDays || 0, 0, 'no player session, no practice day');
   await call('heartbeat', 'quester', {});
   await call('reportPractice', 'quester', { practiced: true, wordId: 'made-up-word' });
   eq((await db.get('users/quester/mastery/made-up-word')).exists, false, 'unknown word ignored');
   await call('reportPractice', 'quester', { practiced: true, wordId: 'om' });
+  // Word with only 2 stages: stage 3 is out of range even within maxStage.
+  await put('words/om', { key: 'om', word: 'OM', status: 'live', stages: [{ title: '1', text: 'a' }, { title: '2', text: 'b' }] });
+  const outOfRange = await call('reportAction', 'quester', { action: 'close_stage', key: 'om:3' });
+  eq([outOfRange.coins, outOfRange.verified], [0, false], 'stage beyond word.stages');
   const b = await call('reportAction', 'quester', { action: 'close_stage', key: 'om:1' });
-  ok(b.coins > 0, 'real practised word pays');
+  ok(b.coins > 0, 'real practised word stage pays');
+  const again = await call('reportAction', 'quester', { action: 'close_stage', key: 'om:1' });
+  eq([again.coins, again.already], [0, true], 'once per stage key');
+  const b2 = await call('reportAction', 'quester', { action: 'close_stage', key: 'om:2' });
+  ok(b2.coins > 0, 'second real stage pays');
+  // dayLimit 3: burn the third slot with a word that has more stages, then refuse.
+  await put('words/ra', { key: 'ra', word: 'RA', status: 'live', stages: [{ title: '1', text: 'a' }, { title: '2', text: 'b' }, { title: '3', text: 'c' }, { title: '4', text: 'd' }] });
+  await call('reportPractice', 'quester', { practiced: true, wordId: 'ra' });
+  const b3 = await call('reportAction', 'quester', { action: 'close_stage', key: 'ra:1' });
+  ok(b3.coins > 0, 'third close_stage of the day pays');
+  const over = await call('reportAction', 'quester', { action: 'close_stage', key: 'ra:2' });
+  eq([over.coins, over.already, over.limit], [0, true, 3], 'daily close_stage cap');
   for (let i = 0; i < 6; i++) await call('reportAction', 'quester', { action: 'first_share', key: 'w' + i });
   const c = await call('reportAction', 'quester', { action: 'first_share', key: 'w99' });
   eq(c.coins, 0);

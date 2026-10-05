@@ -118,7 +118,8 @@ export const DEFAULT_ECONOMY = {
       explore: { title: 'Visit a program page', coins: 2, limit: 6, free: true },
       // per:'key' actions are also capped per day (dayLimit) and checked on the server.
       first_share: { title: 'First share of a word', coins: 15, per: 'key', dayLimit: 5, free: true },
-      close_stage: { title: 'Close a stage', coins: 40, per: 'key', dayLimit: 3, free: true, verify: 'mastery' },
+      // key must be "<wordKey>:<stageN>" for a real word stage (1..maxStage); once per key + dayLimit.
+      close_stage: { title: 'Close a stage', coins: 40, per: 'key', dayLimit: 3, maxStage: 10, free: true, verify: 'close_stage' },
       profile_complete: { title: 'Complete your profile', coins: 50, per: 'once', free: false, verify: 'profile' },
       reminders_on: { title: 'Turn on reminders', coins: 50, per: 'once', free: false, verify: 'reminders' },
       echo_first_post: { title: 'First Echo Wall post', coins: 10, per: 'once', free: true },

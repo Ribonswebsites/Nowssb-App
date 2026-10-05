@@ -133,8 +133,28 @@ export async function restoreStreak(ctx, uid, data) {
   });
 }
 
+/** Parse close_stage key as "<wordKey>:<stageN>" (stage 1..99, no leading zero). */
+function parseCloseStageKey(key) {
+  const m = String(key || '').toLowerCase().match(/^([a-z0-9_-]{1,60}):([1-9]\d?)$/);
+  if (!m) return null;
+  return { wordId: m[1], stage: Number(m[2]) };
+}
+
 /** Server-side proof for actions that pay more than a tap is worth. */
 async function verifyAction(s, uid, kind, key) {
+  if (kind === 'close_stage') {
+    // Whitelist: real word + real stage index + practised on this account.
+    const parsed = parseCloseStageKey(key);
+    if (!parsed) return false;
+    const maxStage = Math.max(1, Math.min(99, Number(s.cfg.rewards.actions.close_stage?.maxStage) || 10));
+    if (parsed.stage > maxStage) return false;
+    if (!(await isRealWord(s, parsed.wordId))) return false;
+    const pub = await s.doc(`words/${parsed.wordId}`);
+    const stageCount = pub && Array.isArray(pub.stages) ? pub.stages.length : 0;
+    if (stageCount > 0 && parsed.stage > stageCount) return false;
+    const m = await s.doc(`users/${uid}/mastery/${parsed.wordId}`);
+    return !!(m && (m.practiceDays || 0) >= 1);
+  }
   if (kind === 'mastery') {
     // key = "<wordId>" or "<wordId>:<stage>": the word must really be practised
     // on this account (reportPractice writes mastery on real practice days).
@@ -160,7 +180,12 @@ async function verifyAction(s, uid, kind, key) {
 /* ── standing actions (Practice Ring, word of the day, sound bath, …) ── */
 export async function reportAction(ctx, uid, data) {
   const action = String((data && data.action) || '');
-  const key = String((data && data.key) || '').slice(0, 80);
+  let key = String((data && data.key) || '').slice(0, 80);
+  // close_stage keys are whitelisted as "<wordKey>:<stageN>" (canonical form).
+  if (action === 'close_stage') {
+    const parsed = parseCloseStageKey(key);
+    key = parsed ? `${parsed.wordId}:${parsed.stage}` : key;
+  }
   return inTx(ctx, async (s) => {
     const A = pick(s.cfg.rewards.actions, action);
     if (!A) fail('Unknown activity.', 400, 'invalid-argument');
