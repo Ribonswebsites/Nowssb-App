@@ -137,31 +137,30 @@ class _PinchSurfaceState extends State<_PinchSurface> {
           clipBehavior: Clip.none,
           children: [
             SectionZoom(scale: _scale, child: widget.child),
-            if (_pinching)
-              Positioned(
-                top: 6,
-                right: 6,
-                child: IgnorePointer(
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: const Color(0xE0060C18),
-                      borderRadius: BorderRadius.circular(99),
-                      border: Border.all(color: const Color(0xFFE8D5A3)),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      child: Text(
-                        '${_scale.toStringAsFixed(2)}×',
-                        style: const TextStyle(
-                          color: Color(0xFFE8D5A3),
-                          fontSize: 11,
-                          fontWeight: FontWeight.w800,
-                        ),
+            Positioned(
+              top: 6,
+              right: 6,
+              child: IgnorePointer(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: const Color(0xE0060C18),
+                    borderRadius: BorderRadius.circular(99),
+                    border: Border.all(color: const Color(0xFFE8D5A3)),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    child: Text(
+                      _pinching ? '${_scale.toStringAsFixed(2)}×' : 'Pinch ${_scale.toStringAsFixed(2)}×',
+                      style: const TextStyle(
+                        color: Color(0xFFE8D5A3),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
                       ),
                     ),
                   ),
                 ),
               ),
+            ),
           ],
         ),
       ),

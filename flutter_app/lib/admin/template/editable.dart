@@ -551,7 +551,11 @@ Widget overrideSvg(
 
 /// The pencil drawn on an editable element in edit mode. Only ever built
 /// when [EditMode.on], so it costs nothing for everyone else.
-class SlotBadge extends StatelessWidget {
+///
+/// A [Listener], not a [GestureDetector]. A tap recognizer joins the scroll
+/// arena, and with a pencil on every label the page stops moving. A short
+/// press opens the sheet. A drag is left for the list.
+class SlotBadge extends StatefulWidget {
   const SlotBadge({
     super.key,
     required this.slotKey,
@@ -568,24 +572,49 @@ class SlotBadge extends StatelessWidget {
   final Widget child;
 
   @override
+  State<SlotBadge> createState() => _SlotBadgeState();
+}
+
+class _SlotBadgeState extends State<SlotBadge> {
+  Offset? _down;
+  var _slid = false;
+
+  void _open() {
+    openSlotSheet(
+      context,
+      slotKey: widget.slotKey,
+      type: widget.type,
+      defaultValue: widget.defaultValue,
+      word: widget.word,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final overridden = UiOverrides.instance.get(slotKey) != null;
-    // The picture itself is ignored so a video view cannot eat the scroll.
-    // The detector only has a tap, so a one-finger drag still moves the page.
-    return GestureDetector(
+    final overridden = UiOverrides.instance.get(widget.slotKey) != null;
+    return Listener(
       behavior: HitTestBehavior.opaque,
-      onTap: () => openSlotSheet(
-        context,
-        slotKey: slotKey,
-        type: type,
-        defaultValue: defaultValue,
-        word: word,
-      ),
+      onPointerDown: (e) {
+        _down = e.position;
+        _slid = false;
+      },
+      onPointerMove: (e) {
+        final origin = _down;
+        if (origin != null && (e.position - origin).distance > 16) _slid = true;
+      },
+      onPointerUp: (_) {
+        if (!_slid) _open();
+        _down = null;
+      },
+      onPointerCancel: (_) {
+        _down = null;
+        _slid = true;
+      },
       child: Stack(
         clipBehavior: Clip.none,
         fit: StackFit.passthrough,
         children: [
-          IgnorePointer(child: child),
+          IgnorePointer(child: widget.child),
           Positioned.fill(
             child: IgnorePointer(
               child: DecoratedBox(
@@ -599,20 +628,20 @@ class SlotBadge extends StatelessWidget {
             ),
           ),
           Positioned(
-            top: 0,
-            right: 0,
+            top: -4,
+            right: -4,
             child: IgnorePointer(
               child: Container(
-                width: 22,
-                height: 22,
+                width: 28,
+                height: 28,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: overridden ? const Color(0xFF34D399) : const Color(0xFFE8D5A3),
                   boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 4)],
                 ),
                 child: Icon(
-                  slotIcon(type),
-                  size: 13,
+                  slotIcon(widget.type),
+                  size: 15,
                   color: const Color(0xFF060C18),
                 ),
               ),

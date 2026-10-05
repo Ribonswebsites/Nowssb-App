@@ -37,6 +37,7 @@ import 'subscription.dart';
 import 'store/store_terms_sheet.dart';
 import '../admin/template/editable.dart';
 import '../admin/layout/layout_sections.dart';
+import '../widgets/hype_rail.dart';
 
 class StoreScreen extends StatelessWidget {
   const StoreScreen({super.key});
@@ -196,7 +197,7 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
         padding: const EdgeInsets.fromLTRB(12, 6, 12, 6),
         child: ColoredSplitPromoBanner.forSurface(
           SplitPromoSurface.storeHome,
-          onTap: () => _push(context, const SoundLibraryScreen()),
+          onTap: editModeOn(context) ? null : () => _push(context, const SoundLibraryScreen()),
           margin: EdgeInsets.zero,
         ),
       ),
@@ -271,6 +272,10 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
         // Server-driven order (Admin → UI Editor); bundled order by default.
         : layoutChildren(context, 'store.home', [
             LSection('header', 'Title & bag', items[0]),
+            const LSection('hype', 'Most hyped', Padding(
+              padding: EdgeInsets.fromLTRB(16, 10, 0, 0),
+              child: NowssbHypeRail(),
+            )),
             LSection('tabs', 'Shop / Resell tabs', items[1]),
             LSection('rotator', 'Picture rotator', items[2]),
             LSection('halfoff', 'Half-off rail', items[3]),
@@ -749,17 +754,26 @@ class _SignatureDoor extends StatelessWidget {
                 ),
               ),
             ),
-            const Padding(
-              padding: EdgeInsets.all(20),
+            // Words sit on the film, but they do not cover it. A tap on the
+            // picture opens the video sheet. A tap on a word edits that word.
+            const Positioned(
+              left: 16,
+              right: 48,
+              top: 12,
+              child: EditableLabel('store.SignatureDoor', 'SHABDAPATHY · THE RAREST',
+                  style: TextStyle(
+                      fontSize: 10,
+                      letterSpacing: 2.2,
+                      color: NwsbColors.gold)),
+            ),
+            const Positioned(
+              left: 16,
+              right: 16,
+              bottom: 12,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  EditableLabel('store.SignatureDoor', 'SHABDAPATHY · THE RAREST',
-                      style: TextStyle(
-                          fontSize: 10,
-                          letterSpacing: 2.2,
-                          color: NwsbColors.gold)),
-                  Spacer(),
                   EditableLabel('store.SignatureDoor', 'Words & Meanings',
                       style: TextStyle(
                           fontSize: 25,
@@ -877,9 +891,8 @@ class _MiniStoreCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
+    final editing = editModeOn(context);
+    final card = Container(
         margin: const EdgeInsets.fromLTRB(0, 6, 0, 6),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
@@ -922,7 +935,9 @@ class _MiniStoreCard extends StatelessWidget {
             const Icon(Icons.arrow_forward, size: 16, color: Color(0xB3FFFFFF)),
           ],
         ),
-      ),
-    );
+      );
+    // Pencils on: the words open the editor. The card must not open the next page.
+    if (editing) return card;
+    return GestureDetector(onTap: onTap, child: card);
   }
 }
