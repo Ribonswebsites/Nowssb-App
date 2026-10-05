@@ -136,7 +136,13 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
               'promo',
               'Promo banner',
               ColoredSplitPromoBanner(
-                spec: SplitPromoExtras.at(7),
+                spec: const SplitPromoSpec(
+                  title: 'Unlock every\ntone and plan.',
+                  cta: 'View plans',
+                  leftColor: Color(0xFF1A2744),
+                  rightColor: Color(0xFFC9A227),
+                  art: SplitPromoArts.pose09,
+                ),
                 margin: EdgeInsets.zero,
               )),
           const SizedBox(height: 8),

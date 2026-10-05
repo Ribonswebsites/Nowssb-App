@@ -39,7 +39,6 @@ import 'player_settings.dart';
 import 'sentence_builder.dart';
 import 'select_level.dart';
 import 'player_dial.dart';
-import 'saved_words.dart';
 import 'player_intro.dart';
 import 'player_guide.dart';
 import 'practice_overlay.dart';
@@ -47,6 +46,7 @@ import '../widgets/pronunciation_survey.dart';
 import '../data/settings.dart';
 import '../data/playback_session.dart';
 import '../data/word_voice.dart';
+import '../shell/nav_shell.dart';
 import 'store/request_words.dart';
 import '../admin/template/editable.dart';
 import '../widgets/content_lock.dart';
@@ -117,6 +117,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
   var _repTarget = 7;
   var _shuffle = false;
   var _volume = 1.0;
+  var _fadeToken = 0;
   var _pull = 0.0;
   var _pullStamp = 0;
   var _handingOff = false;
@@ -309,7 +310,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     if (mounted) setState(() => _liked = liked.contains(_word.word));
   }
 
-  Future<void> _prepareAndPlay() async {
+  Future<void> _prepareAndPlay({int fadeInSeconds = 0}) async {
     if (_playing || widget.words.isEmpty) return;
     // Paid words need a purchase or a plan (free words and admins pass).
     if (!await ensureWordOpen(context, _word) || !mounted || _playing) return;
@@ -350,10 +351,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
         default:
           break;
       }
-      var volume = _volume;
-      if (prefs.bassBoost) volume = (volume * 1.12).clamp(0.0, 1.0);
-      if (prefs.quality == 'Low') volume *= 0.7;
-      if (prefs.quality == 'Lossless') volume = 1;
+      // Quality may soften Low; never override mute / user volume (Lossless).
+      var volume = _effectiveVolume(_volume);
       if (prefs.downloadOnly) {
         final store = await SharedPreferences.getInstance();
         final saved = store.getStringList(_likedWordsKey) ?? const <String>[];
@@ -374,11 +373,16 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       }
       await _tts.setSpeechRate(rate);
       await _tts.setPitch(pitch.clamp(0.5, 2.0));
-      await _tts.setVolume(volume.clamp(0.0, 1.0));
+      final startVol = fadeInSeconds > 0 ? 0.0 : volume;
+      await _tts.setVolume(startVol.clamp(0.0, 1.0));
       await _tts.stop();
       unawaited(WordVoice.instance.stop());
       final started = DateTime.now();
-      final ownVoice = await WordVoice.instance.play(_word, volume: volume);
+      // Ramp volume while the word plays (not after it finishes).
+      if (fadeInSeconds > 0 && volume > 0) {
+        unawaited(_fadeInVolume(volume, fadeInSeconds));
+      }
+      final ownVoice = await WordVoice.instance.play(_word, volume: startVol);
       if (!ownVoice) await _tts.speak(_word.word);
       if (prefs.spatialAudio && !ownVoice) {
         await _tts.setPitch((pitch * 1.16).clamp(0.5, 2.0));
@@ -532,7 +536,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                                 () {
                                   final v = volume > 0 ? 0.0 : 1.0;
                                   setLocal(() => volume = v);
-                                  setState(() => _volume = v);
+                                  _setVolumeLive(v);
                                 },
                               ),
                               Slider(
@@ -541,7 +545,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                                 inactiveColor: const Color(0x33FFFFFF),
                                 onChanged: (v) {
                                   setLocal(() => volume = v);
-                                  setState(() => _volume = v);
+                                  _setVolumeLive(v);
                                 },
                               ),
                               _quickBtn(
@@ -681,6 +685,45 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     );
   }
 
+
+  /// Playback volume from the user slider, with Low softening only.
+  /// Never forces full volume for Lossless (that overrode mute).
+  double _effectiveVolume(double userVol) {
+    final prefs = Settings.instance;
+    var volume = userVol;
+    if (prefs.bassBoost) volume = (volume * 1.12).clamp(0.0, 1.0);
+    if (prefs.quality == 'Low') volume *= 0.7;
+    return volume.clamp(0.0, 1.0);
+  }
+
+  void _setVolumeLive(double v) {
+    _fadeToken++; // stop crossfade ramp from fighting the slider
+    setState(() => _volume = v);
+    final effective = _effectiveVolume(v);
+    unawaited(_tts.setVolume(effective));
+    unawaited(WordVoice.instance.setVolume(effective));
+  }
+
+  Future<void> _fadeInVolume(double target, int seconds) async {
+    if (seconds <= 0 || target <= 0) return;
+    final token = ++_fadeToken;
+    const steps = 12;
+    final stepMs = ((seconds * 1000) / steps).round().clamp(16, 1000);
+    for (var i = 1; i <= steps; i++) {
+      if (!mounted || token != _fadeToken) return;
+      // Respect mute / live slider changes mid-fade.
+      if (_volume <= 0) {
+        await _tts.setVolume(0);
+        await WordVoice.instance.setVolume(0);
+        return;
+      }
+      final v = (target * (i / steps)).clamp(0.0, 1.0);
+      await _tts.setVolume(v);
+      await WordVoice.instance.setVolume(v);
+      await Future<void>.delayed(Duration(milliseconds: stepMs));
+    }
+  }
+
   Future<void> _persistQueueOrder(List<String> orderedWords) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setStringList('nwsb_saved_upnext', orderedWords);
@@ -701,6 +744,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     }
     await _tts.stop();
     unawaited(WordVoice.instance.stop());
+    _fadeToken++; // cancel any in-flight fade-in
     final fade = switch (Settings.instance.crossfade) {
       '3 Sec' => 3,
       '5 Sec' => 5,
@@ -708,7 +752,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       '12 Sec' => 12,
       _ => 0,
     };
-    if (fade > 0) await Future<void>.delayed(Duration(seconds: fade));
+    // Switch immediately (no silent wait); fade the next word in.
     if (!mounted) return;
     setState(() {
       _index = next;
@@ -717,7 +761,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       _error = null;
     });
     await _loadLiked();
-    await _prepareAndPlay();
+    await _prepareAndPlay(fadeInSeconds: fade);
   }
 
   void _openLevel() {
@@ -740,7 +784,16 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
   }
 
   void _openInfo() {
-    _openNotes();
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      barrierColor: Colors.transparent,
+      builder: (sheetContext) => _PlayerInfoSheet(
+        word: _word,
+        accent: _theme.accent,
+      ),
+    );
   }
 
   void _openNotes() {
@@ -767,9 +820,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
           onClose: () => Navigator.of(context).pop(),
           onSettings: _openSettings,
           onLibrary: () {
-            Navigator.of(context).push(
-              MaterialPageRoute<void>(builder: (_) => const SavedWordsScreen()),
-            );
+            // Aura "Library" opens the Sound Library tab, not Saved Words.
+            NavScope.goTo(context, 2);
           },
         ),
       ),
@@ -4655,6 +4707,12 @@ class _PlayerInfoSheet extends StatelessWidget {
                     style: const TextStyle(color: Colors.white60),
                   ),
                 const SizedBox(height: 20),
+                if (word.origin.isNotEmpty)
+                  _InfoFact(
+                    label: 'ORIGIN',
+                    value: word.origin,
+                    accent: accent,
+                  ),
                 _InfoFact(
                   label: "WHAT'S HAPPENING",
                   value: word.benefit.isEmpty
@@ -4662,10 +4720,10 @@ class _PlayerInfoSheet extends StatelessWidget {
                       : word.benefit,
                   accent: accent,
                 ),
-                if (word.meaning.isNotEmpty)
+                if (word.description.isNotEmpty)
                   _InfoFact(
-                    label: 'MEANING',
-                    value: word.meaning,
+                    label: 'SCIENCE',
+                    value: word.description,
                     accent: accent,
                   ),
                 if (word.organ.isNotEmpty)
@@ -4688,7 +4746,13 @@ class _PlayerInfoSheet extends StatelessWidget {
                   ),
                 const SizedBox(height: 8),
                 ColoredSplitPromoBanner(
-                  spec: SplitPromoExtras.at(11),
+                  spec: const SplitPromoSpec(
+                    title: 'Shop the word\nthat heals.',
+                    cta: 'Open Store',
+                    leftColor: Color(0xFF3A2410),
+                    rightColor: Color(0xFFC47B2B),
+                    art: SplitPromoArts.pose06,
+                  ),
                   margin: EdgeInsets.zero,
                 ),
               ],
@@ -4942,15 +5006,45 @@ class _PracticeNotesSheet extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      word.meaning,
+                      word.meaning.isEmpty
+                          ? 'Meaning notes for this word.'
+                          : word.meaning,
                       style: const TextStyle(
                         color: Colors.white54,
                         fontSize: 13,
                       ),
                     ),
+                    if (word.meanings.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        word.meanings.join(' · '),
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
+                          height: 1.4,
+                        ),
+                      ),
+                    ],
+                    if (word.notes.isNotEmpty) ...[
+                      const SizedBox(height: 10),
+                      Text(
+                        word.notes,
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 13,
+                          height: 1.45,
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 14),
                     ColoredSplitPromoBanner(
-                      spec: SplitPromoExtras.at(15),
+                      spec: const SplitPromoSpec(
+                        title: 'Unlock every\ntone and plan.',
+                        cta: 'View plans',
+                        leftColor: Color(0xFF1A2744),
+                        rightColor: Color(0xFFC9A227),
+                        art: SplitPromoArts.pose09,
+                      ),
                       margin: EdgeInsets.zero,
                     ),
                     const SizedBox(height: 14),

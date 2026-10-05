@@ -41,6 +41,7 @@ class _PlayerDialState extends State<PlayerDial> with SingleTickerProviderStateM
   DateTime _now = DateTime.now();
   late final AnimationController _spin;
   int? _batteryPct;
+  var _quickExpanded = true;
 
   Settings get s => Settings.instance;
 
@@ -325,7 +326,13 @@ class _PlayerDialState extends State<PlayerDial> with SingleTickerProviderStateM
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 4, 16, 6),
                   child: ColoredSplitPromoBanner(
-                    spec: SplitPromoExtras.at(9),
+                    spec: const SplitPromoSpec(
+                      title: 'Shop the word\nthat heals.',
+                      cta: 'Open Store',
+                      leftColor: Color(0xFF3A2410),
+                      rightColor: Color(0xFFC47B2B),
+                      art: SplitPromoArts.pose06,
+                    ),
                     margin: EdgeInsets.zero,
                   ),
                 ),
@@ -334,15 +341,31 @@ class _PlayerDialState extends State<PlayerDial> with SingleTickerProviderStateM
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: GestureDetector(
-                      onTap: _openFullSettings,
-                      child: const EditableLabel('player_dial.PlayerDial',
-                        'MUSIC PLAYER SETTINGS',
-                        style: TextStyle(
-                          color: Color(0x99B3BDCA),
-                          fontSize: 11,
-                          letterSpacing: 2.8,
-                          fontWeight: FontWeight.w400,
-                        ),
+                      onTap: () {
+                        HapticFeedback.selectionClick();
+                        setState(() => _quickExpanded = !_quickExpanded);
+                      },
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const EditableLabel('player_dial.PlayerDial',
+                            'MUSIC PLAYER SETTINGS',
+                            style: TextStyle(
+                              color: Color(0x99B3BDCA),
+                              fontSize: 11,
+                              letterSpacing: 2.8,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Icon(
+                            _quickExpanded
+                                ? Icons.expand_less
+                                : Icons.expand_more,
+                            color: const Color(0x99B3BDCA),
+                            size: 18,
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -352,6 +375,7 @@ class _PlayerDialState extends State<PlayerDial> with SingleTickerProviderStateM
                   child: ListView(
                     padding: EdgeInsets.fromLTRB(22, 0, 16, 8 + bottomInset),
                     children: [
+                      if (_quickExpanded) ...[
                       _row(
                         Icons.tune,
                         'EQUALIZER',
@@ -390,8 +414,8 @@ class _PlayerDialState extends State<PlayerDial> with SingleTickerProviderStateM
                         () => _choose('Now Playing View', _viewOptions, s.playlist, s.setPlaylist),
                       ),
                       const SizedBox(height: 10),
+                      ],
                       GestureDetector(
-                        onTap: _openFullSettings,
                         onVerticalDragEnd: (d) {
                           if ((d.primaryVelocity ?? 0) < -200) _openFullSettings();
                         },
