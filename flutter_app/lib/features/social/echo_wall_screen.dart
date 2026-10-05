@@ -31,9 +31,20 @@ class _EchoWallScreenState extends State<EchoWallScreen> {
   bool _busy = false;
   bool _admin = false;
 
+  // X1: created once, not on every build, so the wall does not flash/jump.
+  Stream<QuerySnapshot<Map<String, dynamic>>>? _posts;
+  Future<Set<String>>? _followingFuture;
+
   @override
   void initState() {
     super.initState();
+    if (NwsbFirebase.ready) {
+      _posts = FirebaseFirestore.instance
+          .collection('echoPosts')
+          .where('status', isEqualTo: 'live')
+          .limit(40)
+          .snapshots();
+    }
     _checkAdmin();
   }
 
@@ -126,24 +137,25 @@ class _EchoWallScreenState extends State<EchoWallScreen> {
       child: GoldButton(
         label: label,
         filled: on,
-        onTap: () => setState(() => _following = following),
+        onTap: () => setState(() {
+          // Refresh the follow list only when the Following tab is opened.
+          if (following && !_following) _followingFuture = _followingIds();
+          _following = following;
+        }),
       ),
     );
   }
 
   Widget _feed() {
-    if (!NwsbFirebase.ready) return const Center(child: EconomyNote('Firebase is not connected.'));
+    final posts = _posts;
+    if (!NwsbFirebase.ready || posts == null) return const Center(child: EconomyNote('Firebase is not connected.'));
     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-      stream: FirebaseFirestore.instance
-          .collection('echoPosts')
-          .where('status', isEqualTo: 'live')
-          .limit(40)
-          .snapshots(),
+      stream: posts,
       builder: (context, snap) {
         var docs = snap.data?.docs ?? [];
         if (_following) {
           return FutureBuilder<Set<String>>(
-            future: _followingIds(),
+            future: _followingFuture ??= _followingIds(),
             builder: (context, ids) {
               final allow = ids.data ?? {};
               final filtered = docs.where((d) => allow.contains(d.data()['authorUid'])).toList();
@@ -296,14 +308,29 @@ class _PostCard extends StatelessWidget {
   }
 }
 
-class _EchoImage extends StatelessWidget {
+class _EchoImage extends StatefulWidget {
   const _EchoImage({required this.path});
   final String path;
 
   @override
+  State<_EchoImage> createState() => _EchoImageState();
+}
+
+class _EchoImageState extends State<_EchoImage> {
+  late Future<String> _url = FirebaseStorage.instance.ref(widget.path).getDownloadURL();
+
+  @override
+  void didUpdateWidget(covariant _EchoImage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.path != widget.path) {
+      _url = FirebaseStorage.instance.ref(widget.path).getDownloadURL();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return FutureBuilder<String>(
-      future: FirebaseStorage.instance.ref(path).getDownloadURL(),
+      future: _url,
       builder: (context, snap) {
         if (!snap.hasData) return const SizedBox(height: 8);
         return ClipRRect(

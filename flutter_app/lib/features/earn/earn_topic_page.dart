@@ -20,6 +20,7 @@ class EarnTopicPage extends StatelessWidget {
     required this.body,
     this.actionLabel,
     this.action,
+    this.programme,
   });
 
   final String title;
@@ -28,6 +29,9 @@ class EarnTopicPage extends StatelessWidget {
   final String body;
   final String? actionLabel;
   final Widget? action;
+
+  /// The programme the banner opens. Defaults to [action], then NowssB Earn.
+  final Widget? programme;
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +42,14 @@ class EarnTopicPage extends StatelessWidget {
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
         children: [
-          BrandTopBanner(bare: true, title: title, mark: mark, onTap: () {}),
+          BrandTopBanner(
+            bare: true,
+            title: title,
+            mark: mark,
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => programme ?? action ?? const EarnProgramPage()),
+            ),
+          ),
           const SizedBox(height: 14),
           GlassWrap(
             margin: EdgeInsets.zero,
@@ -95,6 +106,8 @@ class AgentTierPage extends StatelessWidget {
       mark: NwsbMarks.piggy,
       headline: detail,
       body: note,
+      // Agent tiers are the ranks in NowssB Earn → Targets and Bonuses.
+      programme: const EarnProgramPage(initialTab: 3),
     );
   }
 }

@@ -45,9 +45,24 @@ class _PersonalCoachScreenState extends State<PersonalCoachScreen> {
   bool _signingIn = false;
   String? _notice;
 
+  // X1: streams live in State; build (which reruns on every progress tick)
+  // reuses them so the coach does not flash back to loading.
+  Stream<User?>? _auth;
+  String? _userDocUid;
+  Stream<DocumentSnapshot<Map<String, dynamic>>>? _userDoc;
+
+  Stream<DocumentSnapshot<Map<String, dynamic>>> _userDocFor(String uid) {
+    if (_userDoc == null || _userDocUid != uid) {
+      _userDocUid = uid;
+      _userDoc = FirebaseFirestore.instance.collection('users').doc(uid).snapshots();
+    }
+    return _userDoc!;
+  }
+
   @override
   void initState() {
     super.initState();
+    if (NwsbFirebase.ready) _auth = FirebaseAuth.instance.authStateChanges();
     PracticeProgress.instance.addListener(_refresh);
     PracticeProgress.instance.start();
   }
@@ -190,12 +205,12 @@ class _PersonalCoachScreenState extends State<PersonalCoachScreen> {
         const Positioned.fill(child: AppBackdrop()),
         SafeArea(
           child: StreamBuilder<User?>(
-            stream: FirebaseAuth.instance.authStateChanges(),
+            stream: _auth ??= FirebaseAuth.instance.authStateChanges(),
             builder: (_, auth) {
               final user = auth.data;
               if (user == null) return _body(_CoachData.local(), false);
               return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                stream: FirebaseFirestore.instance.collection('users').doc(user.uid).snapshots(),
+                stream: _userDocFor(user.uid),
                 builder: (_, document) => _body(_CoachData.profile(document.data?.data() ?? const {}), true),
               );
             },

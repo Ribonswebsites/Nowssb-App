@@ -8,23 +8,31 @@ import '../../screens/nwsb_sign_in_sheet.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../economy/economy_theme.dart';
+import '../earn/earn_hub_screen.dart';
 
+/// Account activity — the page form of the bell inbox (messages, request
+/// replies, orders, offers and on-phone reminders). Opened from Journal,
+/// the drawer and `inbox` links. Coins and payouts live in NowssB Earn,
+/// which the banner opens.
 class InboxScreen extends StatelessWidget {
   const InboxScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return EconomyPage(
-      title: 'NowssB Earn — Activity',
+      title: 'Activity',
       mark: NwsbMarks.bell,
-      banner: const ColoredSplitPromoBanner(
-        margin: EdgeInsets.fromLTRB(16, 0, 16, 8),
+      banner: ColoredSplitPromoBanner(
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
         spec: SplitPromoSpec(
-          title: 'NowssB Earn\nActivity',
-          cta: 'Rewards and payouts',
-          leftColor: Color(0xFF1A2438),
-          rightColor: Color(0xFFC8A96E),
+          title: 'Coins and\npayouts',
+          cta: 'Open NowssB Earn',
+          leftColor: const Color(0xFF1A2438),
+          rightColor: const Color(0xFFC8A96E),
           art: SplitPromoArts.egyptianGold,
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(builder: (_) => const EarnHubScreen()),
+          ),
         ),
       ),
       child: ListenableBuilder(
@@ -34,7 +42,7 @@ class InboxScreen extends StatelessWidget {
           if (!NwsbFirebase.ready || uid == null) {
             return EconomyMessage(
               title: 'No activity yet',
-              body: 'Sign in and your rewards will collect here.',
+              body: 'Sign in and your messages, orders and updates will collect here.',
               action: 'Sign in',
               onAction: () => NwsbSignInPage.open(context),
             );
@@ -49,7 +57,7 @@ class InboxScreen extends StatelessWidget {
               if (list.isEmpty) {
                 return const EconomyMessage(
                   title: 'You are caught up',
-                  body: 'Daily coins, payouts, and referral updates land here.',
+                  body: 'Messages, request replies, orders and reminders land here.',
                 );
               }
               return ListView.builder(

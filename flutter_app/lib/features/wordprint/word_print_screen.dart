@@ -24,6 +24,18 @@ class _WordPrintScreenState extends State<WordPrintScreen> {
   final _search = TextEditingController();
   String? _found;
 
+  // X1: keep one profile stream per uid instead of a new one every build.
+  String? _profileUid;
+  Stream<DocumentSnapshot<Map<String, dynamic>>>? _profile;
+
+  Stream<DocumentSnapshot<Map<String, dynamic>>> _profileFor(String uid) {
+    if (_profile == null || _profileUid != uid) {
+      _profileUid = uid;
+      _profile = FirebaseFirestore.instance.doc('profiles/$uid').snapshots();
+    }
+    return _profile!;
+  }
+
   @override
   void dispose() {
     _handle.dispose();
@@ -62,7 +74,7 @@ class _WordPrintScreenState extends State<WordPrintScreen> {
             const EconomyNote('Sign in, or search a handle, to open a Word Print.')
           else
             StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-              stream: FirebaseFirestore.instance.doc('profiles/$uid').snapshots(),
+              stream: _profileFor(uid),
               builder: (context, snap) {
                 final data = snap.data?.data() ?? {};
                 final stats = (data['publicStats'] as Map?) ?? {};

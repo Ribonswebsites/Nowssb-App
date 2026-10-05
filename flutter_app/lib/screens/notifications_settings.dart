@@ -13,6 +13,7 @@ import '../widgets/glass_wrap.dart';
 import '../widgets/page_shell.dart';
 import '../admin/template/editable.dart';
 import '../admin/layout/layout_sections.dart';
+import 'notifications_sheet.dart';
 
 class NotificationsSettingsPage extends StatelessWidget {
   const NotificationsSettingsPage({super.key});
@@ -277,8 +278,14 @@ class _FeedList extends StatelessWidget {
   const _FeedList({required this.store});
   final NotifStore store;
 
+  /// Settings is for switches: only a short preview of the newest updates.
+  /// The full feed lives in the bell sheet (S-4).
+  static const _preview = 3;
+
   @override
   Widget build(BuildContext context) {
+    final feed = store.feed;
+    final shown = feed.length < _preview ? feed.length : _preview;
     return Container(
       decoration: BoxDecoration(
         color: const Color(0x0AFFFFFF),
@@ -288,13 +295,37 @@ class _FeedList extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: Column(
         children: [
-          for (var i = 0; i < store.feed.length; i++) ...[
+          for (var i = 0; i < shown; i++) ...[
             if (i > 0)
               const Divider(height: 1, color: Color(0x0FFFFFFF)),
             _FeedRow(
-              item: store.feed[i],
-              label: store.labelOf(store.feed[i].type),
+              item: feed[i],
+              label: store.labelOf(feed[i].type),
               onTap: () => store.markRead(i),
+            ),
+          ],
+          if (feed.length > shown) ...[
+            const Divider(height: 1, color: Color(0x0FFFFFFF)),
+            InkWell(
+              onTap: () => showNotificationsSheet(context),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'See all ${feed.length} in the bell',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: NwsbColors.goldLight,
+                        ),
+                      ),
+                    ),
+                    const Icon(Icons.chevron_right, size: 18, color: NwsbColors.goldLight),
+                  ],
+                ),
+              ),
             ),
           ],
         ],

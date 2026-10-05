@@ -304,6 +304,15 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                             sub: 'Customize bottom navigation',
                             onTap: () => _push(const QuickAccessScreen()),
                           ),
+                        if (_match('Today\'s quote'))
+                          _NavRow(
+                            icon: Icons.format_quote_rounded,
+                            title: 'Today\'s quote',
+                            sub: s.todayQuote.trim().isEmpty
+                                ? 'Quotes to live by this week'
+                                : s.todayQuote.trim(),
+                            onTap: () => _push(const QuotesWeekScreen()),
+                          ),
                         if (_match('Player Settings'))
                           _NavRow(
                             icon: Icons.tune_rounded,
@@ -853,6 +862,8 @@ class _NavRow extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     sub!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: Color(0x73FFFFFF),
                       fontSize: 11,
