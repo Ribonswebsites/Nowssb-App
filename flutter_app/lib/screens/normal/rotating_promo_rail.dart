@@ -9,6 +9,7 @@
 /// circle. Glyphs scaled up slightly inside the same circle size.
 library;
 
+import '../../admin/admin_promo_hide.dart';
 import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
@@ -88,32 +89,33 @@ class _NormalPromoRailState extends State<NormalPromoRail>
   Widget build(BuildContext context) {
     final doors = _doors;
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const EditableLabel('rotating_promo_rail.NormalPromoRail',
-            'More ways to keep your rhythm',
-            style: TextStyle(
-              color: NwsbColors.inkSoft,
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              letterSpacing: .2,
+    return AdminPromoHide(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const EditableLabel('rotating_promo_rail.NormalPromoRail',
+              'More ways to keep your rhythm',
+              style: TextStyle(
+                color: NwsbColors.inkSoft,
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                letterSpacing: .2,
+              ),
             ),
-          ),
-          const SizedBox(height: 10),
-          SizedBox(
-            height: 132,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: doors.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 10),
-              itemBuilder: (context, i) => _PillCard(door: doors[i]),
+            const SizedBox(height: 10),
+            SizedBox(
+              height: 132,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: doors.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 10),
+                itemBuilder: (context, i) => _PillCard(door: doors[i]),
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),,
     );
   }
 }

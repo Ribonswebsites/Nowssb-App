@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'glass_wrap.dart';
 import 'nwsb_icon.dart';
+import '../admin/admin_promo_hide.dart';
 import '../admin/template/editable.dart';
 
 /// Black banner in a glass wrapper. The portrait is on the left, large,
@@ -100,10 +101,12 @@ class BrandTopBanner extends StatelessWidget {
       radius: 22,
       child: banner,
     );
-    if (bare) return glass;
-    return Padding(
-      padding: EdgeInsets.fromLTRB(16, compact ? 8 : 12, 16, 8),
-      child: glass,
-    );
+    final out = bare
+        ? glass
+        : Padding(
+            padding: EdgeInsets.fromLTRB(16, compact ? 8 : 12, 16, 8),
+            child: glass,
+          );
+    return AdminPromoHide(child: out);
   }
 }

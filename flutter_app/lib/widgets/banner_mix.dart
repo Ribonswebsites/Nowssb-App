@@ -7,6 +7,7 @@ library;
 
 import 'package:flutter/material.dart';
 
+import '../admin/admin_promo_hide.dart';
 import 'black_glass_banner.dart';
 import 'colored_split_promo_banner.dart';
 import 'home_parts.dart';
@@ -59,14 +60,16 @@ class BannerMix extends StatelessWidget {
     );
     final order = <Widget>[black, split, bar];
     final start = seed.abs() % order.length;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        for (var i = 0; i < order.length; i++) ...[
-          if (i > 0) const SizedBox(height: 12),
-          order[(start + i) % order.length],
+    return AdminPromoHide(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (var i = 0; i < order.length; i++) ...[
+            if (i > 0) const SizedBox(height: 12),
+            order[(start + i) % order.length],
+          ],
         ],
-      ],
+      ),
     );
   }
 

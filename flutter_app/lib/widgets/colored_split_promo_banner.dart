@@ -8,6 +8,7 @@ library;
 import 'package:flutter/material.dart';
 
 import '../shell/nwsb_links.dart';
+import '../admin/admin_promo_hide.dart';
 import '../admin/template/editable.dart';
 
 /// Bundled right-side studio shots — commit as-is, never recompress.
@@ -301,132 +302,133 @@ class ColoredSplitPromoBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final r = BorderRadius.circular(14);
-    return Padding(
-      padding: margin,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          // No dead banners: without an explicit tap, the button text's
-          // own destination opens.
-          onTap: spec.onTap ?? () => NwsbLinks.cta(context, spec.cta),
-          borderRadius: r,
-          child: Ink(
-            height: height,
-            decoration: BoxDecoration(
-              borderRadius: r,
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x40000000),
-                  blurRadius: 18,
-                  offset: Offset(0, 8),
-                ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: r,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Left — dark text + outlined CTA pill
-                  Expanded(
-                    flex: 48,
-                    child: ColoredBox(
-                      color: spec.leftColor,
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+    return AdminPromoHide(
+      child: Padding(
+        padding: margin,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            // No dead banners: without an explicit tap, the button text's
+            // own destination opens.
+            onTap: spec.onTap ?? () => NwsbLinks.cta(context, spec.cta),
+            borderRadius: r,
+            child: Ink(
+              height: height,
+              decoration: BoxDecoration(
+                borderRadius: r,
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x40000000),
+                    blurRadius: 18,
+                    offset: Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: r,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Left — dark text + outlined CTA pill
+                    Expanded(
+                      flex: 48,
+                      child: ColoredBox(
+                        color: spec.leftColor,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  spec.title,
+                                  maxLines: 3,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: Color.lerp(
+                                      Colors.white,
+                                      spec.rightColor,
+                                      0.35,
+                                    )!,
+                                    fontSize: 15.5,
+                                    fontWeight: FontWeight.w700,
+                                    height: 1.22,
+                                    letterSpacing: -0.2,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 7,
+                                ),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(40),
+                                  border: Border.all(
+                                    color: Color.lerp(
+                                      Colors.white,
+                                      spec.rightColor,
+                                      0.45,
+                                    )!,
+                                    width: 1.2,
+                                  ),
+                                ),
+                                child: Text(
+                                  spec.cta,
+                                  style: TextStyle(
+                                    color: Color.lerp(
+                                      Colors.white,
+                                      spec.rightColor,
+                                      0.35,
+                                    )!,
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Right — solid colour + studio graphic
+                    Expanded(
+                      flex: 52,
+                      child: ColoredBox(
+                        color: spec.rightColor,
+                        child: Stack(
+                          fit: StackFit.expand,
                           children: [
-                            Expanded(
-                              child: Text(
-                                spec.title,
-                                maxLines: 3,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: Color.lerp(
-                                    Colors.white,
-                                    spec.rightColor,
-                                    0.35,
-                                  )!,
-                                  fontSize: 15.5,
-                                  fontWeight: FontWeight.w700,
-                                  height: 1.22,
-                                  letterSpacing: -0.2,
+                            // Soft lighter blob behind subject (YTM-like)
+                            Align(
+                              alignment: const Alignment(0.35, 0.2),
+                              child: Container(
+                                width: 160,
+                                height: 160,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white.withValues(alpha: 0.12),
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 7,
-                              ),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(40),
-                                border: Border.all(
-                                  color: Color.lerp(
-                                    Colors.white,
-                                    spec.rightColor,
-                                    0.45,
-                                  )!,
-                                  width: 1.2,
-                                ),
-                              ),
-                              child: Text(
-                                spec.cta,
-                                style: TextStyle(
-                                  color: Color.lerp(
-                                    Colors.white,
-                                    spec.rightColor,
-                                    0.35,
-                                  )!,
-                                  fontSize: 11.5,
-                                  fontWeight: FontWeight.w700,
-                                ),
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(4, 4, 0, 0),
+                              child: EditableImage.asset(
+                                spec.art,
+                                fit: BoxFit.contain,
+                                alignment: Alignment.bottomCenter,
+                                filterQuality: FilterQuality.high,
+                                errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                                slot: 'colored_split_promo_banner.ColoredSplitPromoBanner',
                               ),
                             ),
                           ],
                         ),
                       ),
                     ),
-                  ),
-                  // Right — solid colour + studio graphic
-                  Expanded(
-                    flex: 52,
-                    child: ColoredBox(
-                      color: spec.rightColor,
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          // Soft lighter blob behind subject (YTM-like)
-                          Align(
-                            alignment: const Alignment(0.35, 0.2),
-                            child: Container(
-                              width: 160,
-                              height: 160,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.white.withValues(alpha: 0.12),
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(4, 4, 0, 0),
-                            child: EditableImage.asset(
-                              spec.art,
-                              fit: BoxFit.contain,
-                              alignment: Alignment.bottomCenter,
-                              filterQuality: FilterQuality.high,
-                              errorBuilder: (_, __, ___) =>
-                                  const SizedBox.shrink(),
-                                  slot: 'colored_split_promo_banner.ColoredSplitPromoBanner',
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

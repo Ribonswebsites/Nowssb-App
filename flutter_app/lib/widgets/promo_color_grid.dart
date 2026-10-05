@@ -11,6 +11,7 @@ import 'glass_wrap.dart';
 import 'home_skin.dart';
 import 'neumorphic.dart';
 import 'nwsb_icon.dart';
+import '../admin/admin_promo_hide.dart';
 import '../admin/template/editable.dart';
 
 class PromoColorGrid extends StatefulWidget {
@@ -83,7 +84,8 @@ class _PromoColorGridState extends State<PromoColorGrid> {
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 4, bottom: 10),
-          child: EditableLabel('promo_color_grid.PromoColorGrid',
+          child: EditableLabel(
+            'promo_color_grid.PromoColorGrid',
             'Open a door',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: ink),
           ),
@@ -108,22 +110,25 @@ class _PromoColorGridState extends State<PromoColorGrid> {
           ),
       ],
     );
+    final Widget out;
     if (fashion) {
-      return GlassWrap(
+      out = GlassWrap(
         margin: const EdgeInsets.fromLTRB(16, 8, 16, 6),
         padding: const EdgeInsets.fromLTRB(10, 12, 10, 8),
         child: body,
       );
+    } else {
+      out = Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 6),
+        child: NeuCard(
+          padding: const EdgeInsets.fromLTRB(10, 12, 10, 8),
+          radius: 22,
+          elevation: NwsbElevation.md,
+          child: body,
+        ),
+      );
     }
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 6),
-      child: NeuCard(
-        padding: const EdgeInsets.fromLTRB(10, 12, 10, 8),
-        radius: 22,
-        elevation: NwsbElevation.md,
-        child: body,
-      ),
-    );
+    return AdminPromoHide(child: out);
   }
 
   Widget _tile(_Cell cell, int row) {
