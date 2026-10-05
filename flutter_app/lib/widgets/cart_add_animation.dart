@@ -29,6 +29,7 @@ class CartAddAnimation {
     _busy = true;
     try {
       await CartBag.instance.addCart(item);
+      if (!context.mounted) return;
       final reduceMotion =
           MediaQuery.maybeOf(context)?.disableAnimations ?? false;
       if (reduceMotion) {
@@ -43,6 +44,7 @@ class CartAddAnimation {
         item: item,
       );
       await Future<void>.delayed(const Duration(milliseconds: 1080));
+      if (!context.mounted) return;
       onComplete?.call();
     } finally {
       _busy = false;

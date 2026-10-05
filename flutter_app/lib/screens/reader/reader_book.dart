@@ -133,6 +133,7 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
   }
 
   void _toastNow(String msg) {
+    if (!mounted) return;
     _toastT?.cancel();
     setState(() => _toast = msg);
     _toastT = Timer(const Duration(milliseconds: 1500), () {
@@ -173,6 +174,7 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
         allowedExtensions: const ['epub'],
         withData: true,
       );
+      if (!mounted) return;
       if (picked == null || picked.files.isEmpty) return;
       final f = picked.files.first;
       final bytes = f.bytes;
@@ -1615,6 +1617,7 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
               tool(Icons.bookmark_border, pm.mark ? 'Bookmarked' : 'Bookmark',
                   () async {
                 final on = await _store.toggleBookmark(_bookKey, _idx);
+                if (!mounted) return;
                 setState(() => _tools = false);
                 _toastNow(on ? 'Bookmarked' : 'Bookmark removed');
                 _haptic(28);
@@ -1779,6 +1782,7 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
                     return;
                   }
                   await _store.addNote(_bookKey, _idx, t: t, on: _noteOn);
+                  if (!mounted) return;
                   _noteIn.clear();
                   setState(() => _noteOn = '');
                   _toastNow('Note saved');
@@ -1969,6 +1973,7 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
                               key: _bookKey,
                               idx: _idx,
                             );
+                            if (!mounted) return;
                             setState(() => _remind = false);
                             _toastNow('Reminder set');
                             _haptic(30);
