@@ -4,6 +4,7 @@
 /// is parked and goes out the next time someone is signed in.
 library;
 
+import '../admin/admin_alert_client.dart';
 import 'app_control.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -92,7 +93,9 @@ class WordRequestStore extends ChangeNotifier {
     final u = NwsbFirebase.ready ? FirebaseAuth.instance.currentUser : null;
     if (u != null) {
       try {
-        await _doc(u, at).set(_row(u, word, notes, at, kind)).timeout(const Duration(seconds: 12));
+        final doc = _doc(u, at);
+        await doc.set(_row(u, word, notes, at, kind)).timeout(const Duration(seconds: 12));
+        tellAdmins('request', doc.id);
         return true;
       } on TimeoutException {
         // Offline: Firestore keeps the write queued and sends it when the
@@ -134,6 +137,7 @@ class WordRequestStore extends ChangeNotifier {
         final ref = _doc(u, at);
         try {
           await ref.set(_row(u, '${m['word']}', '${m['notes'] ?? ''}', at, '${m['kind'] ?? 'word'}'));
+          tellAdmins('request', ref.id);
         } catch (_) {
           // Already delivered earlier (the doc exists and only admins may
           // update it): drop the parked copy. Otherwise keep it for later.

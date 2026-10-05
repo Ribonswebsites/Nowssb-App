@@ -53,6 +53,18 @@ const cleanUid = (v) => {
   return s;
 };
 
+/** The product's day: India time (UTC+5:30). The app writes
+    presenceDays/{yyyy-mm-dd} with the same key, so "today" means one thing. */
+export const DAY_TZ_MIN = 330;
+export function dayKeyOf(ms, tzMin = DAY_TZ_MIN) { return new Date(ms + tzMin * 60000).toISOString().slice(0, 10); }
+export function dayStartOf(ms, tzMin = DAY_TZ_MIN) { const l = ms + tzMin * 60000; return l - (l % DAY) - tzMin * 60000; }
+
+/** Every uid on the admins list. Admins never get promo pushes. */
+export async function adminUids(db) {
+  const rows = await db.query({ collection: 'admins', limit: 300 }).catch(() => []);
+  return new Set(rows.map((r) => r.id));
+}
+
 /** Plan as the app reads it (lib/data/play_subscriptions.dart). */
 export function planOf(u, now) {
   u = u || {};
@@ -137,6 +149,12 @@ export async function stats(deps, body = {}) {
     c('payoutRequests', [['status', '==', 'paid']]),
     deps.auth ? safe(deps.auth.all(5)) : Promise.resolve({ error: 'auth not configured' }),
   ]);
+  // Daily active people for 14 days, from the app's presenceDays/{day}/people docs.
+  const dauDays = [];
+  for (let i = 13; i >= 0; i--) dauDays.push(dayKeyOf(now - i * DAY));
+  const dauCounts = await Promise.all(dauDays.map((d) => db.count({ parent: `presenceDays/${d}`, collection: 'people' }).catch(() => 0)));
+  const giftCents = await safe(db.sum({ collection: 'giftLedger', where: [['status', '==', 'issued']], field: 'cents' }));
+  const pay30 = await safe(db.query({ collection: 'payments', where: [['at', '>=', new Date(now - 30 * DAY)]], select: ['tier', 'billing', 'productId'], limit: 2000 }));
   const val = (x) => (typeof x === 'number' ? x : 0);
   const errors = {};
   const note = (k, x) => { if (x && x.error) errors[k] = x.error; };
@@ -160,7 +178,7 @@ export async function stats(deps, body = {}) {
   // Sign-ups per day for 30 days, from Firebase Auth (the real sign-up time).
   const days = [];
   for (let i = 29; i >= 0; i--) days.push({ day: new Date(dayStart - i * DAY + tz * 60000).toISOString().slice(0, 10), start: dayStart - i * DAY, n: 0 });
-  let authTotal = null; let signups7 = 0; let signupsToday = 0; let authToday = 0; let auth7 = 0;
+  let authTotal = null; let signups7 = 0; let signups30 = 0; let signupsToday = 0; let authToday = 0; let auth7 = 0;
   if (authAll && Array.isArray(authAll.users)) {
     authTotal = authAll.users.length;
     for (const u of authAll.users) {
@@ -171,6 +189,7 @@ export async function stats(deps, body = {}) {
       }
       if (t >= dayStart) signupsToday++;
       if (t >= now - 7 * DAY) signups7++;
+      if (t >= now - 30 * DAY) signups30++;
       const last = Math.max(u.lastLoginAt, u.lastRefreshAt);
       if (last >= dayStart) authToday++;
       if (last >= now - 7 * DAY) auth7++;
@@ -182,9 +201,19 @@ export async function stats(deps, body = {}) {
     users: {
       accounts: authTotal, accountsTruncated: !!(authAll && authAll.truncated), profiles: val(profiles),
       signedInToday: Math.max(val(today), authToday), signedIn7d: Math.max(val(week), auth7), online: val(online),
-      blocked: val(blocked), helpers: val(helpers), signupsToday, signups7d: signups7,
+      blocked: val(blocked), helpers: val(helpers), signupsToday, signups7d: signups7, signups30d: signups30,
+      activeToday: Math.max(val(today), dauCounts[dauCounts.length - 1] || 0),
     },
     signups: days.map((d) => ({ day: d.day, n: d.n })),
+    dau: dauDays.map((d, i) => ({ day: d, n: typeof dauCounts[i] === 'number' ? dauCounts[i] : 0 })),
+    revenue: (() => {
+      const byPlan = {};
+      for (const r of Array.isArray(pay30) ? pay30 : []) {
+        const k = `${TIERS[r.data.tier] || r.data.productId || 'Other'}${r.data.billing ? ' · ' + r.data.billing : ''}`;
+        byPlan[k] = (byPlan[k] || 0) + 1;
+      }
+      return { payments30d: Array.isArray(pay30) ? pay30.length : 0, byPlan30d: byPlan, giftCardCents: val(giftCents) };
+    })(),
     subscriptions: { active, lapsedFlagged: lapsed, expired: val(expired), plans, bySource },
     payments: { total: val(payments), last30d: val(payments30) },
     requests: { open: val(reqOpen), done: val(reqDone), total: val(reqAll) },
@@ -247,7 +276,8 @@ export async function listUsers(deps, body = {}) {
     plan: [['isPro', '==', true]],
     blocked: [['blocked', '==', true]],
     online: [['lastSeenAt', '>=', new Date(now - ONLINE_MS)]],
-    today: [['lastSeenAt', '>=', new Date(now - DAY)]],
+    today: [['lastSeenAt', '>=', new Date(dayStartOf(now, Math.max(-840, Math.min(840, num(body.tzOffsetMin, DAY_TZ_MIN)))))]],
+    seen24h: [['lastSeenAt', '>=', new Date(now - DAY)]],
     helper: [['roles', 'array-contains', 'helper']],
     expired: [['subscriptionEndDate', '<', new Date(now).toISOString()]],
   };
@@ -325,6 +355,7 @@ export async function userProfile(deps, body = {}) {
     L('activity', [['uid', '==', uid]], 60),
     L('pushSubs', [['uid', '==', uid]], 10),
   ]);
+  const days = await db.query({ parent: `users/${uid}`, collection: 'days', orderBy: [['last', 'desc']], limit: 60 }).catch(() => []);
   let auth = null;
   let authNote = '';
   if (deps.auth) {
@@ -363,6 +394,8 @@ export async function userProfile(deps, body = {}) {
     adminLog: rows(log, 'at', 100),
     activity: rows(activity, 'at', 60),
     devices: subs.map((s) => ({ platform: s.data.platform || '', country: s.data.country || '', updatedAt: toMs(s.data.updatedAt) })),
+    days: days.map((d) => ({ day: d.data.day || d.id, first: toMs(d.data.first), last: toMs(d.data.last), opens: num(d.data.opens), platform: d.data.platform || '', build: d.data.build || '', os: d.data.os || '' }))
+      .sort((a, b) => (b.day < a.day ? -1 : b.day > a.day ? 1 : 0)),
   };
 }
 
@@ -578,6 +611,8 @@ export async function broadcast(deps, body = {}) {
     const tier = str(body.tier, 20);
     targets = new Set(subs.filter((s) => { const p = planOf(s.data, now); return p.active && (!tier || p.tier === tier); }).map((s) => s.id));
   }
+  // Admins run the app; they never get promotions (a push to one named admin is still allowed).
+  const admins = audience === 'user' ? new Set() : await adminUids(db);
   const PAGE = 40;
   let rows;
   if (audience === 'user') {
@@ -585,13 +620,13 @@ export async function broadcast(deps, body = {}) {
   } else {
     rows = await db.query({ collection: 'pushSubs', orderBy: [['updatedAt', 'asc']], startAfter: body.cursor ? [num(body.cursor)] : null, limit: PAGE });
   }
-  let sent = 0; let failed = 0; let skipped = 0;
+  let sent = 0; let failed = 0; let skipped = 0; let skippedAdmins = 0;
   const dead = [];
   // A broadcast is promotional: it never goes to admins (admins/{uid}). A push to one chosen person still does.
   const adminIds = audience === 'user' ? new Set() : new Set((await db.query({ collection: 'admins', limit: 500 }).catch(() => [])).map((a) => a.id));
   for (const r of rows) {
     const uid = r.data.uid || '';
-    if (adminIds.has(uid)) { skipped++; continue; }
+    if (uid && (admins.has(uid) || adminIds.has(uid))) { skipped++; skippedAdmins++; continue; }
     if (audience === 'plan' && !targets.has(uid)) { skipped++; continue; }
     if (audience === 'free' && targets.has(uid)) { skipped++; continue; }
     const t = r.data.fcmToken || (String(r.data.endpoint || '').startsWith('fcm:') ? String(r.data.endpoint).slice(4) : '');
@@ -613,7 +648,7 @@ export async function broadcast(deps, body = {}) {
     ops.push({ op: 'merge', path: `broadcasts/${id}`, data: { sent: num(cur.sent) + sent, failed: num(cur.failed) + failed } });
   }
   await db.commit(ops);
-  return { ok: true, broadcastId: id, sent, failed, skipped, removed: dead.length, next };
+  return { ok: true, broadcastId: id, sent, failed, skipped, skippedAdmins, removed: dead.length, next };
 }
 
 /* ═════════════════ Earn & Gifts ═════════════════ */
@@ -794,6 +829,132 @@ export async function feed(deps, body = {}) {
   return { ok: true, rows: out.slice(0, n * 3) };
 }
 
+/* ═════════════════ Who signed in today ═════════════════ */
+/** Everyone who opened the app on one day (India time by default): first and
+    last time, opens, platform, OS and app build. Built from the app's
+    presenceDays/{day}/people/{uid} rows, joined with users.lastSeenAt for
+    people on an older build that does not write the daily row yet. */
+export async function today(deps, body = {}) {
+  const { db, now } = deps;
+  const tz = Math.max(-840, Math.min(840, num(body.tzOffsetMin, DAY_TZ_MIN)));
+  const day = /^\d{4}-\d{2}-\d{2}$/.test(str(body.day, 10)) ? str(body.day, 10) : dayKeyOf(now, tz);
+  const start = Date.parse(day + 'T00:00:00Z') - tz * 60000;
+  const end = start + DAY;
+  const [people, seen] = await Promise.all([
+    db.query({ parent: `presenceDays/${day}`, collection: 'people', limit: 2000 }).catch(() => []),
+    db.query({ collection: 'users', where: [['lastSeenAt', '>=', new Date(start)]], select: ['lastSeenAt', 'lastPlatform', 'lastBuild', 'lastOs', 'email', 'displayName', 'photoURL', 'isPro', 'tier', 'subscriptionEndDate', 'blocked'], limit: 2000 }).catch(() => []),
+  ]);
+  const by = new Map();
+  for (const p of people) {
+    const d = p.data;
+    by.set(p.id, { uid: p.id, first: toMs(d.first), last: toMs(d.last), opens: num(d.opens, 1), platform: d.platform || '', build: String(d.build || ''), os: d.os || '', email: d.email || '', name: d.name || '' });
+  }
+  for (const u of seen) {
+    const last = toMs(u.data.lastSeenAt);
+    if (last >= end) continue;
+    const r = by.get(u.id) || { uid: u.id, first: last, last, opens: 1, platform: '', build: '', os: '', email: '', name: '' };
+    r.last = Math.max(r.last, last);
+    if (!r.first) r.first = last;
+    r.platform = r.platform || u.data.lastPlatform || '';
+    r.build = r.build || String(u.data.lastBuild || '');
+    r.os = r.os || u.data.lastOs || '';
+    r.email = r.email || u.data.email || '';
+    r.name = r.name || u.data.displayName || '';
+    r.photo = u.data.photoURL || '';
+    r.plan = planOf(u.data, now);
+    r.blocked = u.data.blocked === true;
+    by.set(u.id, r);
+  }
+  const rows = [...by.values()].sort((a, b) => b.last - a.last);
+  const missing = rows.filter((r) => !r.email && !r.name).map((r) => r.uid).slice(0, 300);
+  if (deps.auth && missing.length) {
+    try {
+      for (const a of await deps.auth.lookup(missing)) {
+        const r = by.get(a.uid);
+        if (r) { r.email = a.email || r.email; r.name = a.name || r.name; r.photo = r.photo || a.photo || ''; }
+      }
+    } catch (e) { /* names are a nicety */ }
+  }
+  for (const r of rows) r.online = r.last > now - ONLINE_MS;
+  return { ok: true, day, tzOffsetMin: tz, total: rows.length, online: rows.filter((r) => r.online).length, rows: rows.slice(0, 1000) };
+}
+
+/* ═════════════════ Free items and gifts ═════════════════ */
+export const ITEM_KINDS = { word: 'Word', meaning: 'Meaning', ebook: 'E-book', signature: 'Signature' };
+const cleanItemId = (s) => {
+  let v = String(s).replace(/[^A-Za-z0-9_.@-]/g, '_').replace(/^\.+/, '_').slice(0, 300);
+  return v || '_';
+};
+
+/** Give (or take back) one word / meaning / e-book / signature item:
+    users/{uid}/owned/{id} — the same document a Play purchase writes, so the
+    person's app opens it at once. */
+export async function grantItem(deps, body = {}) {
+  const { db, now } = deps;
+  const uid = cleanUid(body.uid);
+  const kind = str(body.kind, 20);
+  if (!ITEM_KINDS[kind]) throw bad('Pick a word, meaning, e-book or signature item.');
+  const name = str(body.id, 200).replace(/^[a-z]+:/, '');
+  if (!name) throw bad('Pick the item to give.');
+  const itemId = `${kind}:${name}`;
+  const title = str(body.title, 120) || name;
+  const revoke = body.revoke === true;
+  const ops = [
+    { op: 'merge', path: `users/${uid}/owned/${cleanItemId(itemId)}`, data: { id: itemId, kind, title, source: 'admin', status: revoke ? 'revoked' : 'active', grantedBy: deps.admin.email || deps.admin.uid, at: new Date(now) } },
+    ...logOps(deps, revoke ? 'owned.revoke' : 'owned.grant', uid, { item: itemId, title, reason: str(body.reason, 200) }, `${revoke ? 'Took back' : 'Gave'} ${ITEM_KINDS[kind]} “${title}”`),
+  ];
+  if (!revoke && body.notify !== false) ops.push(...notifyOps(db, uid, `A free ${ITEM_KINDS[kind].toLowerCase()} for you`, `“${title}” is now yours in NowssB. Open it any time.`, 'gift', { item: itemId }, now));
+  await db.commit(ops);
+  const push = !revoke && body.notify !== false && body.push !== false
+    ? await pushToUser(deps, uid, { title: `A free ${ITEM_KINDS[kind].toLowerCase()} for you`, body: `“${title}” is now yours in NowssB.`, type: 'gift' })
+    : { sent: 0, devices: 0, skipped: true };
+  return { ok: true, item: itemId, status: revoke ? 'revoked' : 'active', push };
+}
+
+/** Send one person a gift: a one-use gift code made for their account,
+    delivered to their notifications (and phone), opened in Gifts. */
+export async function sendGift(deps, body = {}) {
+  const { db, now, admin } = deps;
+  const uid = cleanUid(body.uid);
+  const item = str(body.item, 20);
+  if (!GIFT_ITEMS[item]) throw bad('Pick what the gift holds.');
+  const u = await mustUser(db, uid);
+  let email = String(u.email || '').toLowerCase();
+  if (!email && deps.auth) { try { email = String(((await deps.auth.lookup([uid]))[0] || {}).email || '').toLowerCase(); } catch (e) { /* phone accounts have none */ } }
+  const days = Math.max(1, Math.min(730, Math.round(num(body.expiresDays, 60))));
+  const note = str(body.note, 140);
+  const code = giftCode();
+  const title = 'A gift from NowssB';
+  const text = `${GIFT_ITEMS[item].label}${note ? ' · ' + note : ''}. Open Gifts and enter ${code} to unwrap it.`;
+  await db.commit([
+    { op: 'create', path: `gifts/${code}`, data: { code, item, itemId: item, label: GIFT_ITEMS[item].label, note, senderUid: admin.uid, senderName: 'NowssB', source: 'admin', campaign: 'direct', recipientEmail: email, recipientUid: uid, status: 'unredeemed', createdAt: now, expiresAt: now + days * DAY } },
+    { op: 'create', path: `giftLedger/${db.newId()}`, data: { code, senderUid: admin.uid, itemId: item, cents: 0, status: 'issued', source: 'admin', campaign: 'direct', to: uid, at: new Date(now) } },
+    ...notifyOps(db, uid, title, text, 'gift', { code, item }, now),
+    ...logOps(deps, 'gift.send', uid, { item, code, days }, `Sent gift: ${GIFT_ITEMS[item].label}`),
+  ]);
+  const push = body.push === false ? { sent: 0, devices: 0, skipped: true } : await pushToUser(deps, uid, { title, body: text, type: 'gift' });
+  return { ok: true, code, item, expiresAt: now + days * DAY, push };
+}
+
+/* ═════════════════ Admin inbox ═════════════════ */
+/** adminAlerts (written by the server when something needs an admin) plus
+    what is waiting right now: open word requests and payouts. */
+export async function alerts(deps, body = {}) {
+  const { db } = deps;
+  const n = Math.max(10, Math.min(200, num(body.limit, 80)));
+  const [al, req, pay] = await Promise.all([
+    db.query({ collection: 'adminAlerts', orderBy: [['at', 'desc']], limit: n }).catch(() => []),
+    db.query({ collection: 'requests', where: [['status', '==', 'new']], limit: 100 }).catch(() => []),
+    db.query({ collection: 'payoutRequests', where: [['status', 'in', ['pending_review', 'queued']]], limit: 100 }).catch(() => []),
+  ]);
+  return {
+    ok: true,
+    alerts: al.map((r) => ({ id: r.id, ...r.data, at: toMs(r.data.at) })),
+    openRequests: req.length,
+    pendingPayouts: pay.length,
+  };
+}
+
 /* ═════════════════ UI assets ═════════════════ */
 export async function uiAssets(deps, body = {}) {
   const prefix = str(body.prefix, 80) || 'ui/';
@@ -814,4 +975,5 @@ export const ACTIONS = {
   'fulfil-request': fulfilRequest, broadcast,
   'payout-decide': decidePayout, 'gift-codes': createGiftCodes, 'gift-void': voidGift,
   earn: earnOverview, network, feed, 'ui-assets': uiAssets,
+  today, 'grant-item': grantItem, 'send-gift': sendGift, alerts,
 };

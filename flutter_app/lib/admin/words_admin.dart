@@ -17,9 +17,6 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:just_audio/just_audio.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:record/record.dart';
 
 import '../data/content.dart';
 import '../data/models.dart';
@@ -27,6 +24,7 @@ import '../data/word_art.dart';
 import 'admin_log.dart';
 import 'admin_ui.dart';
 import 'media_upload.dart';
+import 'voice_recorder.dart';
 import '../media/nwsb_video.dart';
 import 'template/media_tune.dart';
 
@@ -245,10 +243,6 @@ class _WordEditorScreenState extends State<WordEditorScreen> {
   bool _busy = false;
   String? _msg;
 
-  final _recorder = AudioRecorder();
-  final _player = AudioPlayer();
-  bool _recording = false;
-  File? _take;
 
   bool get _isNew => widget.wordKey == null;
   String get _k => _isNew ? wordKeyFor(_key.text.isEmpty ? _c['word']!.text : _key.text) : widget.wordKey!;
@@ -410,63 +404,6 @@ class _WordEditorScreenState extends State<WordEditorScreen> {
         _msg = archive ? 'Archived — removed from every app.' : 'Restored.';
       });
 
-  // ── Voice ────────────────────────────────────────────────────────────
-  Future<void> _toggleRecord() async {
-    if (_recording) {
-      final path = await _recorder.stop();
-      setState(() {
-        _recording = false;
-        _take = path == null ? null : File(path);
-        _msg = _take == null ? 'Nothing recorded.' : 'Recorded — play it back, then upload.';
-      });
-      return;
-    }
-    if (!await _recorder.hasPermission()) {
-      setState(() => _msg = 'Microphone permission is off.');
-      return;
-    }
-    final dir = await getTemporaryDirectory();
-    final path = '${dir.path}/nwsb-voice-${DateTime.now().millisecondsSinceEpoch}.m4a';
-    await _recorder.start(
-      const RecordConfig(encoder: AudioEncoder.aacLc, bitRate: 128000, sampleRate: 44100, numChannels: 1),
-      path: path,
-    );
-    setState(() {
-      _recording = true;
-      _msg = 'Recording… tap stop when done.';
-    });
-  }
-
-  Future<void> _pickVoice() async {
-    final f = await pickMedia(context, PickKind.audio);
-    if (f != null) setState(() => _take = f);
-  }
-
-  Future<void> _play(String src) async {
-    try {
-      await _player.stop();
-      if (src.startsWith('http')) {
-        await _player.setUrl(src);
-      } else {
-        await _player.setFilePath(src);
-      }
-      await _player.play();
-    } catch (e) {
-      setState(() => _msg = 'Could not play: $e');
-    }
-  }
-
-  Future<void> _uploadVoice() => _run('Uploading voice…', () async {
-        final f = _take;
-        if (f == null) return;
-        if (_k.isEmpty) throw 'Type the word first.';
-        final up = await uploadToR2(f, 'audio', _k, PickKind.audio);
-        _audio = up.url;
-        _take = null;
-        await adminLog('word.voice', _k, {'url': up.url});
-        _msg = 'Voice uploaded. Publish to send it to every app.';
-      });
-
   Future<void> _uploadImage() async {
     final f = await pickMedia(context, PickKind.image);
     if (f == null) return;
@@ -532,8 +469,6 @@ class _WordEditorScreenState extends State<WordEditorScreen> {
       p.dispose();
     }
     _key.dispose();
-    _recorder.dispose();
-    _player.dispose();
     super.dispose();
   }
 
@@ -603,39 +538,23 @@ class _WordEditorScreenState extends State<WordEditorScreen> {
           _field('phonetic'),
           _head('Voice — one recording, played instead of text-to-speech'),
           AdminPanel(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(_audio.isEmpty ? 'No recording — the app uses text-to-speech.' : _audio,
-                  maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: kAdminDim, fontSize: 12)),
-              const SizedBox(height: 8),
-              Wrap(spacing: 8, runSpacing: 8, children: [
-                FilledButton.icon(
-                  style: FilledButton.styleFrom(
-                      backgroundColor: _recording ? Colors.redAccent : kAdminGold, foregroundColor: kAdminBg),
-                  onPressed: _busy ? null : _toggleRecord,
-                  icon: Icon(_recording ? Icons.stop_rounded : Icons.mic_rounded),
-                  label: Text(_recording ? 'Stop' : 'Record'),
-                ),
-                OutlinedButton.icon(
-                    onPressed: _busy || _recording ? null : _pickVoice,
-                    icon: const Icon(Icons.folder_open),
-                    label: const Text('Pick file')),
-                if (_take != null)
-                  OutlinedButton.icon(
-                      onPressed: () => _play(_take!.path),
-                      icon: const Icon(Icons.play_arrow),
-                      label: const Text('Play take')),
-                if (_take != null)
-                  FilledButton.icon(
-                      onPressed: _busy ? null : _uploadVoice,
-                      icon: const Icon(Icons.cloud_upload_outlined),
-                      label: const Text('Upload take')),
-                if (_audio.isNotEmpty)
-                  OutlinedButton.icon(
-                      onPressed: () => _play(_audio), icon: const Icon(Icons.volume_up), label: const Text('Play current')),
-                if (_audio.isNotEmpty)
-                  TextButton(onPressed: () => setState(() => _audio = ''), child: const Text('Remove')),
-              ]),
-            ]),
+            child: VoiceRecorderPanel(
+              current: _audio,
+              enabled: !_busy,
+              emptyText: 'No recording — the app uses text-to-speech.',
+              upload: (f) async {
+                if (_k.isEmpty) throw 'Type the word first.';
+                final up = await uploadToR2(f, 'audio', _k, PickKind.audio);
+                await adminLog('word.voice', _k, {'url': up.url});
+                if (mounted) {
+                  setState(() {
+                    _audio = up.url;
+                    _msg = 'Voice uploaded. Publish to send it to every app.';
+                  });
+                }
+              },
+              onRemove: () => setState(() => _audio = ''),
+            ),
           ),
           _head('Parts (3–5 pronunciation boxes)'),
           for (var i = 0; i < _parts.length; i++)
@@ -728,10 +647,28 @@ class _WordEditorScreenState extends State<WordEditorScreen> {
                   const SizedBox(height: 8),
                   TextField(controller: _stages[i].text, minLines: 2, maxLines: 6, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'What to do in this stage')),
                   const SizedBox(height: 6),
+                  VoiceRecorderPanel(
+                    key: ObjectKey(_stages[i]),
+                    current: _stages[i].audio,
+                    enabled: !_busy,
+                    compact: true,
+                    emptyText: 'No stage audio.',
+                    upload: (f) async {
+                      if (_k.isEmpty) throw 'Type the word first.';
+                      final st = _stages[i];
+                      final up = await uploadToR2(f, 'audio', '$_k-stage', PickKind.audio);
+                      if (mounted) {
+                        setState(() {
+                          st.audio = up.url;
+                          _msg = 'Stage audio uploaded. Publish to send it to every app.';
+                        });
+                      }
+                    },
+                    onRemove: () => setState(() => _stages[i].audio = ''),
+                  ),
+                  const SizedBox(height: 6),
                   Wrap(spacing: 8, runSpacing: 6, crossAxisAlignment: WrapCrossAlignment.center, children: [
-                    OutlinedButton.icon(onPressed: _busy ? null : () => _stageMedia(_stages[i], PickKind.audio), icon: const Icon(Icons.graphic_eq, size: 16), label: Text(_stages[i].audio.isEmpty ? 'Audio' : 'Replace audio')),
                     OutlinedButton.icon(onPressed: _busy ? null : () => _stageMedia(_stages[i], PickKind.video), icon: const Icon(Icons.videocam_outlined, size: 16), label: Text(_stages[i].video.isEmpty ? 'Video' : 'Replace video')),
-                    if (_stages[i].audio.isNotEmpty) IconButton(onPressed: () => _play(_stages[i].audio), icon: const Icon(Icons.play_arrow, color: kAdminGold)),
                     if (_stages[i].video.isNotEmpty) const AdminChip('video', color: Color(0xFF81C784)),
                   ]),
                 ]),

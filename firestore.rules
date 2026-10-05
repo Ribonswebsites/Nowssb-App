@@ -384,6 +384,41 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(['type', 'uid', 'at', 'platform', 'build', 'app', 'summary']);
       allow update, delete: if false;
     }
+    // Daily sign-ins (Admin app: "who signed in today", a person's sign-in
+    // days). The app writes its own row for the India-time day, stamped with
+    // the server clock; only admins read the day list. Nobody deletes except
+    // the owner (account deletion) or an admin.
+    function presenceDayOk(uid, day) {
+      return isSelf(uid)
+        && request.resource.data.uid == uid
+        && request.resource.data.day == day
+        && day.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        && request.resource.data.last == request.time
+        && request.resource.data.keys().hasOnly(['uid', 'day', 'first', 'last', 'opens', 'platform', 'build', 'os', 'email', 'name'])
+        && (!('opens' in request.resource.data) || request.resource.data.opens is int)
+        && (!('os' in request.resource.data) || (request.resource.data.os is string && request.resource.data.os.size() <= 80));
+    }
+    match /presenceDays/{day} {
+      allow read: if isAdmin();
+      allow write: if false;
+      match /people/{uid} {
+        allow read: if isAdmin();
+        allow create, update: if presenceDayOk(uid, day);
+        allow delete: if isSelf(uid) || isAdmin();
+      }
+    }
+    match /users/{uid}/days/{day} {
+      allow read: if isSelf(uid) || isAdmin();
+      allow create, update: if presenceDayOk(uid, day);
+      allow delete: if isSelf(uid) || isAdmin();
+    }
+    // Admin inbox (new requests, payouts, purchases, sign-ups, feedback).
+    // Raised by the server only; admins may mark them seen.
+    match /adminAlerts/{id} {
+      allow read: if isAdmin();
+      allow update: if isAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['seen', 'seenAt', 'seenBy']);
+      allow create, delete: if false;
+    }
     // Push broadcasts sent from the console (written by /api/admin/broadcast).
     match /broadcasts/{id} {
       allow read: if isAdmin();

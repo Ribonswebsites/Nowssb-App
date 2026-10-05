@@ -295,3 +295,103 @@ test('REST encoding: server timestamps, merge masks, create preconditions, queri
   assert.deepEqual(l.items[0], { key: 'ui/a.svg', size: 12, modified: '' });
   assert.equal(authRow({ localId: 'u', createdAt: '5', providerUserInfo: [{ providerId: 'password' }] }).providers[0], 'password');
 });
+
+test('broadcast never pushes promos to admins; a named admin can still be messaged', async () => {
+  const db = memStore({
+    'admins/boss01': { email: 'boss@x.com' },
+    'pushSubs/1': { uid: 'boss01', fcmToken: 'tBoss', updatedAt: 1 },
+    'pushSubs/2': { uid: 'm1', fcmToken: 'tM1', updatedAt: 2 },
+    'pushSubs/3': { uid: 'm2', fcmToken: 'tM2', updatedAt: 3 },
+  });
+  const d = deps(db);
+  const r = await A.broadcast(d, { title: '50% off', body: 'promo', audience: 'all' });
+  assert.equal(r.sent, 2);
+  assert.equal(r.skippedAdmins, 1);
+  assert.ok(!d.sent.some(([t]) => t === 'tBoss'));
+  const d2 = deps(db);
+  const one = await A.broadcast(d2, { title: 'Hi', audience: 'user', uid: 'boss01' });
+  assert.equal(one.sent, 1);
+});
+
+test('today lists who signed in (presence rows + lastSeenAt), newest first', async () => {
+  const day = A.dayKeyOf(NOW);
+  const start = A.dayStartOf(NOW);
+  const db = memStore({
+    [`presenceDays/${day}/people/a`]: { uid: 'a', first: new Date(start + 3600e3), last: new Date(NOW - 60e3), opens: 3, platform: 'android', build: '850', os: 'Android 14', email: 'a@x.com', name: 'A' },
+    'users/b': { lastSeenAt: new Date(NOW - 2 * 3600e3), lastPlatform: 'android', lastBuild: 849, email: 'b@x.com' },
+    'users/c': { lastSeenAt: new Date(start - 3600e3) },
+  });
+  const r = await A.today(deps(db), {});
+  assert.equal(r.day, day);
+  assert.deepEqual(r.rows.map((x) => x.uid), ['a', 'b']);
+  assert.equal(r.rows[0].opens, 3);
+  assert.equal(r.rows[0].online, true);
+  assert.equal(r.rows[1].build, '849');
+});
+
+test('stats has 30-day sign-ups, daily active series and revenue', async () => {
+  const day = A.dayKeyOf(NOW);
+  const db = memStore({ [`presenceDays/${day}/people/a`]: { uid: 'a' }, [`presenceDays/${day}/people/b`]: { uid: 'b' }, 'payments/p': { uid: 'a', tier: 'frequency', billing: 'monthly', at: new Date(NOW - DAY) } });
+  const s = await A.stats(deps(db, { auth: fakeAuth([au('a', { createdAt: NOW - 20 * DAY })]) }), { tzOffsetMin: 330 });
+  assert.equal(s.users.signups30d, 1);
+  assert.equal(s.dau.length, 14);
+  assert.equal(s.dau[13].n, 2);
+  assert.equal(s.users.activeToday, 2);
+  assert.equal(s.revenue.payments30d, 1);
+});
+
+test('grant-item writes the owned doc the app reads, and tells them', async () => {
+  const db = memStore({ 'users/u1abcdef': { email: 'u@x.com' } });
+  const r = await A.grantItem(deps(db), { uid: 'u1abcdef', kind: 'word', id: 'phoenix', title: 'Phoenix' });
+  assert.equal(r.item, 'word:phoenix');
+  const owned = db.store.get('users/u1abcdef/owned/word_phoenix');
+  assert.equal(owned.source, 'admin');
+  assert.equal(owned.status, 'active');
+  assert.ok(rowsOf(db, 'users/u1abcdef/notifications/').length === 1);
+  await A.grantItem(deps(db), { uid: 'u1abcdef', kind: 'word', id: 'phoenix', revoke: true });
+  assert.equal(db.store.get('users/u1abcdef/owned/word_phoenix').status, 'revoked');
+  await assert.rejects(() => A.grantItem(deps(db), { uid: 'u1abcdef', kind: 'car', id: 'x' }));
+});
+
+test('send-gift makes a code for that account and delivers it', async () => {
+  const db = memStore({ 'users/u1abcdef': { email: 'U@x.com' } });
+  const d = deps(db);
+  await db.commit([{ op: 'set', path: 'pushSubs/z', data: { uid: 'u1abcdef', fcmToken: 'tok' } }]);
+  const r = await A.sendGift(d, { uid: 'u1abcdef', item: 'frequency', note: 'Thanks' });
+  const g = db.store.get(`gifts/${r.code}`);
+  assert.equal(g.recipientEmail, 'u@x.com');
+  assert.equal(g.recipientUid, 'u1abcdef');
+  assert.equal(g.status, 'unredeemed');
+  const n = rowsOf(db, 'users/u1abcdef/notifications/');
+  assert.ok(n[0].body.includes(r.code));
+  assert.equal(r.push.sent, 1);
+});
+
+test('admin alerts are idempotent and push only to admins', async () => {
+  const { raiseAlert } = await import('../functions/_lib/admin_alerts.js');
+  const db = memStore({ 'admins/boss': {}, 'pushSubs/1': { uid: 'boss', fcmToken: 'tBoss' }, 'pushSubs/2': { uid: 'm1', fcmToken: 'tM1' } });
+  const sent = [];
+  const push = async (t, m) => { sent.push([t, m]); return { ok: true }; };
+  const a = await raiseAlert({ db, push }, { kind: 'request', ref: 'r1', title: 'Word request: om' });
+  assert.equal(a.pushed, 1);
+  assert.deepEqual(sent.map(([t]) => t), ['tBoss']);
+  const b = await raiseAlert({ db, push }, { kind: 'request', ref: 'r1' });
+  assert.equal(b.duplicate, true);
+  assert.equal(sent.length, 1);
+  const list = await A.alerts(deps(db), {});
+  assert.equal(list.alerts.length, 1);
+});
+
+test('admin-alert endpoint checks the request belongs to the caller', async () => {
+  const { handleAlert } = await import('../functions/api/admin-alert.js');
+  const db = memStore({ 'requests/req1': { uid: 'm1', status: 'new', word: 'om' }, 'admins/boss': {} });
+  const req = (body) => new Request('https://x/api/admin-alert', { method: 'POST', body: JSON.stringify(body) });
+  const bad = await handleAlert(req({ kind: 'request', id: 'req1' }), {}, { db, claims: { sub: 'm2' }, push: null });
+  assert.equal(bad.status, 403);
+  const ok = await handleAlert(req({ kind: 'request', id: 'req1' }), {}, { db, claims: { sub: 'm1' }, push: null });
+  assert.equal(ok.status, 200);
+  assert.ok(db.store.get('adminAlerts/request_req1'));
+  const su = await handleAlert(req({ kind: 'signup' }), {}, { db, claims: { sub: 'm1' }, push: null, auth: { lookup: async () => [{ uid: 'm1', createdAt: Date.now() - 60e3, email: 'm1@x.com' }] } });
+  assert.equal(su.status, 200);
+  assert.ok(db.store.get('adminAlerts/signup_m1'));
+});

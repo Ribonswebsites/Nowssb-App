@@ -43,10 +43,24 @@ class EditorController extends ChangeNotifier {
   bool busy = false;
   String? message;
 
-  List<SectionInfo> get sections => preview.reported[pageId] ?? const [];
+  /// The layout being edited. Usually [pageId]; a page with tabs reports
+  /// each tab as '<pageId>.<tabId>' (program_kit.dart), so the tab on screen
+  /// is the one edited (and saved as its own ui_layouts doc).
+  String get layoutPage {
+    final r = preview.reported;
+    if (r.containsKey(pageId)) return pageId;
+    final last = preview.lastReported;
+    if (last != null && last.startsWith('$pageId.') && r.containsKey(last)) return last;
+    for (final k in r.keys) {
+      if (k.startsWith('$pageId.')) return k;
+    }
+    return pageId;
+  }
+
+  List<SectionInfo> get sections => preview.reported[layoutPage] ?? const [];
   SectionInfo? get current =>
       sections.isEmpty ? null : sections[index.clamp(0, sections.length - 1)];
-  String get sectionKey => '$pageId/${current?.id ?? ''}';
+  String get sectionKey => '$layoutPage/${current?.id ?? ''}';
 
   bool get sectioned => sections.isNotEmpty;
 
@@ -182,19 +196,20 @@ class EditorController extends ChangeNotifier {
 
   /// The page's full entry list as the preview shows it now.
   List<SectionEntry> get entries {
-    final d = preview.draftLayouts[pageId];
+    final d = preview.draftLayouts[layoutPage];
     if (d != null && d.version != -1) return d.sections;
     return [for (final s in sections) s.entry];
   }
 
   void _setEntries(List<SectionEntry> list) {
-    final live = UiLayouts.instance.layoutFor(pageId);
-    final l = PageLayout(page: pageId, sections: list, version: live?.version ?? 0);
+    final page = layoutPage;
+    final live = UiLayouts.instance.layoutFor(page);
+    final l = PageLayout(page: page, sections: list, version: live?.version ?? 0);
     String enc(List<SectionEntry> x) => jsonEncode([for (final e in x) e.toJson()]);
     if (live != null && enc(live.sections) == enc(list)) {
-      preview.draftLayouts.remove(pageId);
+      preview.draftLayouts.remove(page);
     } else {
-      preview.draftLayouts[pageId] = l;
+      preview.draftLayouts[page] = l;
     }
     preview.changed();
   }
@@ -280,7 +295,8 @@ class EditorController extends ChangeNotifier {
 
   /// Back to the page exactly as it ships (pending until published).
   void resetPage() {
-    preview.draftLayouts[pageId] = PageLayout(page: pageId, sections: const [], version: -1);
+    final page = layoutPage;
+    preview.draftLayouts[page] = PageLayout(page: page, sections: const [], version: -1);
     preview.changed();
   }
 

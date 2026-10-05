@@ -9,7 +9,9 @@
    Actions: whoami, stats, users, user, grant-sub, extend-sub, revoke-sub,
    adjust-coins, block, restrict, reset-streak, message, helper,
    fulfil-request, broadcast, payout-decide, gift-codes, gift-void, earn,
-   network, feed, ui-assets.
+   network, feed, ui-assets, today (who signed in on a day), grant-item
+   (free word/meaning/ebook/signature), send-gift (gift code to one person),
+   alerts (admin inbox summary).
 
    Cloudflare Pages → Settings → Variables and secrets (Production):
      FIREBASE_SERVICE_ACCOUNT  Firebase Admin service-account JSON (required)

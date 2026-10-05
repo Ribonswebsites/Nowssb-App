@@ -211,6 +211,13 @@ export async function applyToUser(env, { uid, ev, tokenHash, source }) {
       economy = { ok: false };
     }
   }
+  if (firstTime && env.ADMIN_ALERTS !== 'off') {
+    // Admin app inbox + admins' phones. Never blocks the plan grant.
+    try {
+      const { raiseAlertFromEnv } = await import('./admin_alerts.js');
+      await raiseAlertFromEnv(env, { kind: 'purchase', ref: ev.orderId, uid, title: `New ${ev.tier || 'plan'} ${ev.billing || ''} purchase`.replace(/\s+/g, ' ').trim(), body: `${user.email || user.displayName || uid} bought ${ev.productId || ev.tier || 'a plan'} on Google Play.`, route: 'person:' + uid });
+    } catch (e) { /* alerts are best effort */ }
+  }
   return { status: firstTime ? 'granted' : ev.entitled ? 'already' : 'updated', ...summary(ev), ...(economy ? { economy } : {}) };
 }
 

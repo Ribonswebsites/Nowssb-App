@@ -8,7 +8,6 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../widgets/app_backdrop.dart';
 
 const kGold = Color(0xFFE8D5A3);
 const kMint = Color(0xFF34D399);
@@ -22,7 +21,9 @@ void tapFeel() => HapticFeedback.selectionClick();
 void actFeel() => HapticFeedback.lightImpact();
 void bigFeel() => HapticFeedback.mediumImpact();
 
-/// The Fashion home's film and its two veils, behind any admin page.
+/// The Admin app's own backdrop — deep night blue with a gold and a violet
+/// glow, nothing from the member app's film — and its veil, behind every
+/// admin page. Static, so it never takes a video decoder.
 class AdminBackdrop extends StatelessWidget {
   const AdminBackdrop({super.key, required this.child, this.dim = 0.35});
   final Widget child;
@@ -33,7 +34,7 @@ class AdminBackdrop extends StatelessWidget {
     return ColoredBox(
       color: Colors.black,
       child: Stack(children: [
-        const Positioned.fill(child: AppBackdrop()),
+        const Positioned.fill(child: AdminAurora()),
         Positioned.fill(
           child: IgnorePointer(
             child: DecoratedBox(
@@ -56,6 +57,44 @@ class AdminBackdrop extends StatelessWidget {
       ]),
     );
   }
+}
+
+/// Night-blue field with soft gold (top left) and violet (bottom right) light.
+class AdminAurora extends StatelessWidget {
+  const AdminAurora({super.key});
+  @override
+  Widget build(BuildContext context) => const DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFF0B1426), Color(0xFF070B16), Color(0xFF04060C)],
+            stops: [0, 0.55, 1],
+          ),
+        ),
+        child: Stack(children: [
+          Positioned(left: -120, top: -140, child: _Glow(color: Color(0x40E8D5A3), size: 420)),
+          Positioned(right: -150, bottom: -120, child: _Glow(color: Color(0x33B79CFF), size: 460)),
+          Positioned(right: -80, top: 220, child: _Glow(color: Color(0x1A34D399), size: 260)),
+        ]),
+      );
+}
+
+class _Glow extends StatelessWidget {
+  const _Glow({required this.color, required this.size});
+  final Color color;
+  final double size;
+  @override
+  Widget build(BuildContext context) => IgnorePointer(
+        child: Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: RadialGradient(colors: [color, color.withValues(alpha: 0)]),
+          ),
+        ),
+      );
 }
 
 class Glass extends StatelessWidget {

@@ -56,7 +56,17 @@ Future<T?> pushAdmin<T>(BuildContext context, Widget page) {
   ));
 }
 
+/// Marks a subtree as a tab body of the Admin app (admin_app.dart).
+class AdminTabScope extends InheritedWidget {
+  const AdminTabScope({super.key, required super.child});
+  static bool inTab(BuildContext context) => context.dependOnInheritedWidgetOfExactType<AdminTabScope>() != null;
+  @override
+  bool updateShouldNotify(AdminTabScope oldWidget) => false;
+}
+
 /// A console page: film backdrop, back arrow, eyebrow + title, actions.
+/// Inside an Admin app tab ([AdminTabScope]) it drops the back arrow and
+/// the film, which the Admin shell already provides.
 class AdminPage extends StatelessWidget {
   const AdminPage({
     super.key,
@@ -79,6 +89,37 @@ class AdminPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (AdminTabScope.inTab(context)) {
+      // A tab of the Admin app: its shell already draws the film, the app bar
+      // and the bottom bar — this page brings its heading, actions and body.
+      return Theme(
+        data: adminTheme(),
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          floatingActionButton: fab,
+          body: Column(children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 2, 8, 2),
+              child: Row(children: [
+                Expanded(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+                    Text(eyebrow.toUpperCase(),
+                        style: const TextStyle(color: kGold, fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 1.6)),
+                    Text(title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800, letterSpacing: -0.5)),
+                  ]),
+                ),
+                ...actions,
+              ]),
+            ),
+            if (bottom != null) bottom!,
+            Expanded(child: body),
+          ]),
+        ),
+      );
+    }
     final top = MediaQuery.of(context).padding.top;
     return Theme(
       data: adminTheme(),

@@ -14,6 +14,7 @@ import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import 'app_thinking_loader.dart';
 import 'glass_wrap.dart';
 import 'neumorphic.dart';
+import '../admin/admin_state.dart';
 import '../admin/template/editable.dart';
 import '../data/billing_config.dart';
 import '../data/play_subscriptions.dart';
@@ -184,8 +185,9 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
 
   @override
   Widget build(BuildContext context) => ListenableBuilder(
-        listenable: PlaySubscriptions.instance,
-        builder: (context, _) => _build(context),
+        listenable: Listenable.merge([PlaySubscriptions.instance, AdminState.instance]),
+        // Admin accounts never see member promos (Today's offer · 50% off).
+        builder: (context, _) => AdminState.instance.isAdmin ? const SizedBox.shrink() : _build(context),
       );
 
   Widget _build(BuildContext context) {

@@ -48,10 +48,10 @@ export function adminUidsFromEnv(env) {
   return new Set(String((env && env.ADMIN_UIDS) || '').split(',').map((s) => s.trim()).filter(Boolean));
 }
 
-/** Admins: ADMIN_UIDS, or a document at admins/{uid} (same rule as the console). */
+/** Admins: a document at admins/{uid} — the one admin source for the whole
+    site (console, /api/admin, /api/push). ADMIN_UIDS is no longer read. */
 export async function isAdminUid(env, db, uid) {
   if (!uid) return false;
-  if (adminUidsFromEnv(env).has(uid)) return true;
   try {
     const a = await db.get(`admins/${uid}`);
     return !!(a && (a.exists === true || (a.exists === undefined && a)));

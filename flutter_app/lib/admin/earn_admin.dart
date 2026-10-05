@@ -15,6 +15,7 @@ import 'admin_data.dart';
 import 'admin_kit.dart';
 import 'config_store.dart';
 import 'person_admin.dart';
+import 'settings_admin.dart' show StoreProductsCard, ContentPricesCard;
 
 /// Starting values from the plan PDFs. Used only to fill an empty
 /// config/economy the first time it is saved; the doc is the source.
@@ -51,7 +52,7 @@ class EarnAdminScreen extends StatefulWidget {
 }
 
 class _EarnAdminScreenState extends State<EarnAdminScreen> with SingleTickerProviderStateMixin {
-  late final TabController _tabs = TabController(length: 5, vsync: this);
+  late final TabController _tabs = TabController(length: 6, vsync: this);
   Map<String, dynamic>? _d;
   Object? _err;
 
@@ -82,8 +83,8 @@ class _EarnAdminScreenState extends State<EarnAdminScreen> with SingleTickerProv
   @override
   Widget build(BuildContext context) {
     return AdminPage(
-      eyebrow: 'Money & rewards',
-      title: 'Earn & Gifts',
+      eyebrow: 'Payouts, gifts, odds, prices',
+      title: 'Money',
       actions: [IconButton(tooltip: 'Refresh', onPressed: _load, icon: const Icon(Icons.refresh_rounded, color: kGold))],
       bottom: TabBar(
         controller: _tabs,
@@ -94,15 +95,20 @@ class _EarnAdminScreenState extends State<EarnAdminScreen> with SingleTickerProv
         unselectedLabelColor: kDim,
         dividerColor: Colors.transparent,
         onTap: (_) => tapFeel(),
-        tabs: const [Tab(text: 'Payouts'), Tab(text: 'Network'), Tab(text: 'Gift codes'), Tab(text: 'Coupons'), Tab(text: 'Settings')],
+        tabs: const [Tab(text: 'Payouts'), Tab(text: 'Gift codes'), Tab(text: 'Prices'), Tab(text: 'Coupons & odds'), Tab(text: 'Network'), Tab(text: 'Rewards')],
       ),
       body: _d == null
           ? (_err != null ? AdminProblem(error: _err!, onRetry: _load) : const OrbLoading(label: 'Opening the books…', state: OrbState.solving))
           : TabBarView(controller: _tabs, children: [
               _Payouts(rows: _l('payouts'), onChanged: _load),
-              _Network(d: _d!),
               _GiftCodes(rows: _l('gifts'), onChanged: _load),
+              ListView(padding: const EdgeInsets.fromLTRB(16, 8, 16, 60), children: const [
+                SectionHead('Store', 'Products & prices'),
+                StoreProductsCard(),
+                ContentPricesCard(),
+              ]),
               _Coupons(rows: _l('coupons')),
+              _Network(d: _d!),
               const _EconomySettings(),
             ]),
     );
@@ -417,7 +423,7 @@ class _Coupons extends StatelessWidget {
               for (final r in scratch)
                 ShareBar(label: '${r['rarity']} · ${r['coins']} coins · ${total > 0 ? ((r['weight'] as num) / total * 100).toStringAsFixed(1) : 0}%', value: r['weight'] as num? ?? 0, total: total, color: _rarity('${r['rarity']}')),
               const SizedBox(height: 6),
-              const Text('Edit odds and prizes in Settings. The app shows these before every scratch.', style: TextStyle(color: kFaint, fontSize: 11)),
+              const Text('Edit odds and prizes in the Rewards tab. The app shows these before every scratch.', style: TextStyle(color: kFaint, fontSize: 11)),
             ]),
           );
         },

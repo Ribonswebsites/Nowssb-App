@@ -1534,12 +1534,12 @@ async function reqTellUser(uid, title, body) {
 
   try {
     const user = _auth.currentUser;
-    const subs = (await loadSubs()).filter(s => s.uid === uid);
-    if (user && subs.length) {
+    if (user) {
+      /* The server finds this person's phones itself (pushSubs by uid). */
       const res = await fetch('/api/push', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (await user.getIdToken()) },
-        body: JSON.stringify({ title, body, type: 'arrivals', subscriptions: subs }),
+        body: JSON.stringify({ title, body, type: 'arrivals', uid }),
       });
       const data = await res.json().catch(() => ({}));
       pushed = data.sent || 0;
@@ -2321,18 +2321,15 @@ window.pnSendPush = async function () {
         'Content-Type': 'application/json',
         Authorization: 'Bearer ' + (await user.getIdToken()),
       },
-      body: JSON.stringify({ title, body, type, subscriptions: subs.map(s => ({ endpoint: s.endpoint, keys: s.keys })) }),
+      /* The server works out the phones (everyone except admins). */
+      body: JSON.stringify({ title, body, type }),
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) { out.textContent = data.error || ('Send failed (' + res.status + ').'); return; }
 
-    /* Retired subscriptions are dead addresses — clear them out. */
-    let cleaned = 0;
-    for (const ep of (data.expired || [])) {
-      const hit = subs.find(s => s.endpoint === ep);
-      if (hit) { try { await deleteDoc(doc(_db, 'pushSubs', hit.id)); cleaned++; } catch (e) {} }
-    }
-    out.innerHTML = 'Sent to <b>' + data.sent + '</b> of ' + subs.length + '.' +
+    /* The server removes retired subscriptions itself. */
+    const cleaned = data.removed || 0;
+    out.innerHTML = 'Sent to <b>' + data.sent + '</b> of ' + (data.total != null ? data.total : subs.length) + '.' +
       (data.failed ? ' ' + data.failed + ' failed.' : '') +
       (cleaned ? ' Removed ' + cleaned + ' expired.' : '');
     countSubs();

@@ -29,7 +29,7 @@ void main() {
   // Settings persist through SharedPreferences, which has no platform in a
   // test — getInstance() never completes and the whole file hangs rather
   // than failing. An in-memory store is the sanctioned stand-in.
-  SharedPreferences.setMockInitialValues({});
+  SharedPreferences.setMockInitialValues({'nwsb_terms_hub': '1'});
 
   setUpAll(() {
     FakeVideoPlatform();
@@ -117,9 +117,10 @@ void main() {
 
   testWidgets('Flutter Store exposes the WebView Store departments',
       (tester) async {
+    // Store home lists departments directly (the old Enter Store hero is gone;
+    // a zero-opacity EditableLabel keeps the slot id for the template editor).
+    // Terms for the hub are pre-accepted via SharedPreferences mock above.
     await pump(tester, const StoreScreen());
-    await tester.tap(find.text('Enter Store'));
-    await tester.pumpAndSettle();
     final scrollable = find.byType(Scrollable).first;
     for (final label in [
       'WORD ATELIER',
@@ -129,7 +130,7 @@ void main() {
     ]) {
       await tester.scrollUntilVisible(find.text(label), 260,
           scrollable: scrollable);
-      expect(find.text(label), findsOneWidget);
+      expect(find.text(label), findsWidgets);
     }
     expect(tester.takeException(), isNull);
   });

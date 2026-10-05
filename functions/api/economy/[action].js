@@ -212,6 +212,13 @@ export async function onRequestPost({ request, env, params, waitUntil }) {
       if (stop) return json({ ok: false, error: stop, code: 'restricted' }, 403, h);
     }
     const out = await fn(ctx, uid, data, claims);
+    if (action === 'requestPayout' && out && out.id) {
+      // Admin app inbox + admins' phones (best effort, never blocks).
+      try {
+        const { raiseAlertFromEnv } = await import('../../_lib/admin_alerts.js');
+        await raiseAlertFromEnv(env, { kind: 'payout', ref: out.id, uid, title: `Payout request ₹${Number(out.amountINR || 0).toFixed(2)}`, body: `${claims.email || claims.name || uid} asked for a payout of ₹${Number(out.amountINR || 0).toFixed(2)}.`, route: 'payouts' });
+      } catch (e) { /* alerts are best effort */ }
+    }
     const sending = outbox.flush(env).catch(() => {});
     if (typeof waitUntil === 'function') waitUntil(sending); else await sending;
     return json({ ok: true, ...safeOut(out, ctx) }, 200, h);

@@ -14,6 +14,10 @@ import 'people_admin.dart';
 import 'requests_admin.dart';
 import 'earn_admin.dart';
 import 'activity_admin.dart';
+import 'today_admin.dart';
+import 'person_admin.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../data/firebase.dart';
 
 class DashboardAdminScreen extends StatefulWidget {
   const DashboardAdminScreen({super.key});
@@ -98,6 +102,8 @@ class _DashboardAdminScreenState extends State<DashboardAdminScreen> {
     final gifts = m('gifts');
     final po = m('payouts');
     final signups = ((s['signups'] as List?) ?? const []).cast<Map>();
+    final dau = ((s['dau'] as List?) ?? const []).cast<Map>();
+    final rev = m('revenue');
     final errors = (s['errors'] as Map?) ?? const {};
     final local = s['local'] == true;
     final accounts = u['accounts'];
@@ -114,7 +120,12 @@ class _DashboardAdminScreenState extends State<DashboardAdminScreen> {
         Text('Updated ${fmtDate(s['at'], time: true)}${local ? ' · in-app count' : ' · server count'}',
             style: const TextStyle(color: kFaint, fontSize: 11)),
         const SizedBox(height: 10),
-        _Hero(online: n(u, 'online'), today: n(u, 'signedInToday'), week: n(u, 'signedIn7d')),
+        _Hero(
+          online: n(u, 'online'),
+          today: n(u, 'signedInToday'),
+          week: n(u, 'signedIn7d'),
+          onTap: () => pushAdmin(context, const TodayAdminScreen()),
+        ),
         const SizedBox(height: 10),
         TileGrid(children: [
           StatTile(
@@ -127,7 +138,7 @@ class _DashboardAdminScreenState extends State<DashboardAdminScreen> {
           StatTile(
             label: 'New sign-ups',
             value: fmtNum(n(u, 'signupsToday')),
-            sub: 'today · ${fmtNum(n(u, 'signups7d'))} in 7 days',
+            sub: 'today · ${fmtNum(n(u, 'signups7d'))} in 7 days · ${fmtNum(n(u, 'signups30d'))} in 30',
             icon: Icons.person_add_alt_1_rounded,
             color: kMint,
           ),
@@ -148,6 +159,21 @@ class _DashboardAdminScreenState extends State<DashboardAdminScreen> {
             onTap: () => pushAdmin(context, const RequestsAdminScreen()),
           ),
         ]),
+        const TodaySection(),
+        if (dau.isNotEmpty) ...[
+          const SectionHead('Daily active', 'People who opened the app, 14 days'),
+          Glass(
+            radius: 22,
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              if (dau.every((d) => (d['n'] as num? ?? 0) == 0))
+                const EmptyNote('No daily sign-in rows yet. Phones on the new build record each day they open the app.')
+              else
+                BarChart(values: [for (final d in dau) (d['n'] as num? ?? 0)], labels: [for (final d in dau) '${d['day']}'.substring(5)]),
+              const SizedBox(height: 6),
+              Text('${fmtNum(n(u, 'activeToday'))} active today (India time)', style: const TextStyle(color: kDim, fontSize: 12)),
+            ]),
+          ),
+        ],
         const SectionHead('Growth', 'Sign-ups, last 30 days'),
         Glass(
           radius: 22,
@@ -218,7 +244,18 @@ class _DashboardAdminScreenState extends State<DashboardAdminScreen> {
               onTap: () => pushAdmin(context, const EarnAdminScreen())),
           StatTile(label: 'Coins issued', value: fmtNum(n(coins, 'issued')), sub: '${fmtNum(n(coins, 'entries'))} ledger rows', icon: Icons.toll_rounded, color: kAmber),
           StatTile(label: 'Coins spent', value: fmtNum(n(coins, 'spent')), sub: 'from coinLedger', icon: Icons.shopping_bag_rounded, color: kRose),
+          if (rev.isNotEmpty) ...[
+            StatTile(label: 'Payments, 30 days', value: fmtNum(n(rev, 'payments30d')), sub: 'Google Play orders', icon: Icons.trending_up_rounded, color: kMint),
+            StatTile(label: 'Gift cards sold', value: '₹${fmtNum((n(rev, 'giftCardCents') / 100).round())}', sub: 'from the gift ledger', icon: Icons.redeem_rounded, color: kGold),
+          ],
         ]),
+        if ((rev['byPlan30d'] as Map?)?.isNotEmpty == true)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Wrap(spacing: 6, runSpacing: 6, children: [
+              for (final e in (rev['byPlan30d'] as Map).entries) Tag('${e.key}: ${e.value}', color: kMint),
+            ]),
+          ),
         const SectionHead('Gifts', 'Gift cards and coupons'),
         TileGrid(columns: 3, children: [
           StatTile(label: 'Gift codes', value: fmtNum(n(gifts, 'codes')), icon: Icons.card_giftcard_rounded),
@@ -244,6 +281,7 @@ class _DashboardAdminScreenState extends State<DashboardAdminScreen> {
           const SizedBox(height: 8),
           Text('Some counts could not be read: ${errors.keys.join(', ')}', style: const TextStyle(color: kAmber, fontSize: 11.5)),
         ],
+        const _LiveFeed(),
         const SizedBox(height: 12),
         Center(
           child: Pill('Open the live activity feed', icon: Icons.timeline_rounded, onTap: () => pushAdmin(context, const ActivityAdminScreen())),
@@ -254,13 +292,15 @@ class _DashboardAdminScreenState extends State<DashboardAdminScreen> {
 }
 
 class _Hero extends StatelessWidget {
-  const _Hero({required this.online, required this.today, required this.week});
+  const _Hero({required this.online, required this.today, required this.week, this.onTap});
   final int online;
   final int today;
   final int week;
+  final VoidCallback? onTap;
   @override
   Widget build(BuildContext context) => Glass(
         radius: 26,
+        onTap: onTap,
         glow: kMint.withValues(alpha: 0.12),
         padding: const EdgeInsets.all(16),
         child: Row(children: [
@@ -279,6 +319,59 @@ class _Hero extends StatelessWidget {
               Text('${fmtNum(today)} signed in today · ${fmtNum(week)} in 7 days', style: const TextStyle(color: kDim, fontSize: 12)),
             ]),
           ),
+          if (onTap != null) const Icon(Icons.chevron_right_rounded, color: kFaint),
         ]),
       );
+}
+
+/// The last few things people did, live (activity collection).
+class _LiveFeed extends StatelessWidget {
+  const _LiveFeed();
+  @override
+  Widget build(BuildContext context) {
+    if (!NwsbFirebase.ready) return const SizedBox.shrink();
+    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      stream: FirebaseFirestore.instance.collection('activity').orderBy('at', descending: true).limit(12).snapshots(),
+      builder: (context, snap) {
+        final docs = snap.data?.docs ?? const [];
+        return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          const SectionHead('Live', 'What people are doing'),
+          if (snap.hasError)
+            const Text('The live feed needs admin read access to activity.', style: TextStyle(color: kAmber, fontSize: 11.5))
+          else if (docs.isEmpty)
+            const EmptyNote('Nothing yet.', icon: Icons.timeline_rounded)
+          else
+            Glass(
+              radius: 20,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              child: Column(children: [
+                for (final d in docs)
+                  InkWell(
+                    onTap: '${d.data()['uid'] ?? ''}'.isEmpty ? null : () => pushAdmin(context, PersonAdminScreen(uid: '${d.data()['uid']}')),
+                    child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 5),
+                    child: Row(children: [
+                      Container(width: 7, height: 7, decoration: const BoxDecoration(color: kGold, shape: BoxShape.circle)),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          [
+                            '${d.data()['summary'] ?? d.data()['type'] ?? ''}',
+                            '${d.data()['platform'] ?? ''}',
+                            if ('${d.data()['build'] ?? ''}'.isNotEmpty) 'build ${d.data()['build']}',
+                          ].where((e) => e.isNotEmpty).join(' · '),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(color: Colors.white, fontSize: 12),
+                        ),
+                      ),
+                      Text(fmtAgo(d.data()['at']), style: const TextStyle(color: kFaint, fontSize: 10.5)),
+                    ]),
+                  )),
+              ]),
+            ),
+        ]);
+      },
+    );
+  }
 }

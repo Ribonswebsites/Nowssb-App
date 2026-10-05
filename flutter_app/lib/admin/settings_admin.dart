@@ -1,7 +1,9 @@
-/// Settings — the switches every app reads live from `config/app`:
+/// Control — the switches every app reads live from `config/app`:
 /// force update (remote minimum build, on top of update-policy.json),
-/// maintenance (banner or blocking screen), feature flags; plus the store
-/// products, helper roles, server status and the full audit log.
+/// maintenance (banner or blocking screen), feature flags; push + banner,
+/// UI Editor, activity, helper roles, server status and the full audit log.
+/// Store products and prices (StoreProductsCard, ContentPricesCard) are shown
+/// in Money → Prices.
 library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -19,6 +21,7 @@ import 'admin_kit.dart';
 import 'admin_state.dart';
 import 'config_store.dart';
 import 'people_admin.dart';
+import 'control_admin.dart';
 
 /// Flags the app checks (AppControl.flag). Unknown = on.
 const kKnownFlags = {
@@ -103,12 +106,13 @@ class _SettingsAdminScreenState extends State<SettingsAdminScreen> {
   Widget build(BuildContext context) {
     final cfg = _cfg;
     return AdminPage(
-      eyebrow: 'Control',
-      title: 'Settings',
+      eyebrow: 'The whole app, live',
+      title: 'Control',
       body: cfg == null
           ? const OrbLoading(label: 'Reading config/app…')
           : ListView(padding: const EdgeInsets.fromLTRB(16, 4, 16, 80), children: [
               if (cfg['_error'] != null) Text('${cfg['_error']}', style: const TextStyle(color: kAmber, fontSize: 12)),
+              const ControlTools(),
               // ── server
               const SectionHead('Server', 'nowssb.com admin API'),
               _ServerCard(health: _health),
@@ -199,10 +203,16 @@ class _SettingsAdminScreenState extends State<SettingsAdminScreen> {
                   GoldButton('Save flags', icon: Icons.flag_rounded, busy: _busy == 'flags', onTap: () => _save('flags', {'flags': _flags}, 'flags')),
                 ]),
               ),
-              // ── store
-              const SectionHead('Store', 'Products & prices'),
-              const _StoreCard(),
-              const _ContentPricesCard(),
+              // Store products and content prices live in Money → Prices.
+              const Glass(
+                radius: 18,
+                padding: EdgeInsets.all(12),
+                child: Row(children: [
+                  Icon(Icons.sell_rounded, color: kGold, size: 18),
+                  SizedBox(width: 8),
+                  Expanded(child: Text('Store products and item prices are in Money → Prices.', style: TextStyle(color: kDim, fontSize: 12))),
+                ]),
+              ),
               // ── roles
               const SectionHead('Team', 'Admins and helpers'),
               Glass(
@@ -267,13 +277,13 @@ class _ServerCard extends StatelessWidget {
   }
 }
 
-class _StoreCard extends StatefulWidget {
-  const _StoreCard();
+class StoreProductsCard extends StatefulWidget {
+  const StoreProductsCard({super.key});
   @override
-  State<_StoreCard> createState() => _StoreCardState();
+  State<StoreProductsCard> createState() => StoreProductsCardState();
 }
 
-class _StoreCardState extends State<_StoreCard> {
+class StoreProductsCardState extends State<StoreProductsCard> {
   bool _loading = false;
   @override
   Widget build(BuildContext context) {
@@ -317,13 +327,13 @@ class _StoreCardState extends State<_StoreCard> {
 /// `{defaults: {kind: ₹}, items: {itemId: ₹}}`. Every card, the product page
 /// and Checkout read it live (StorePrices); Checkout pays the total through
 /// a Google Play price tier, so only Play price points are offered here.
-class _ContentPricesCard extends StatefulWidget {
-  const _ContentPricesCard();
+class ContentPricesCard extends StatefulWidget {
+  const ContentPricesCard({super.key});
   @override
-  State<_ContentPricesCard> createState() => _ContentPricesCardState();
+  State<ContentPricesCard> createState() => ContentPricesCardState();
 }
 
-class _ContentPricesCardState extends State<_ContentPricesCard> {
+class ContentPricesCardState extends State<ContentPricesCard> {
   final _id = TextEditingController();
   String _kind = 'word';
   int? _price;

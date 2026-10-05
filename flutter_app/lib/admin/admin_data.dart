@@ -92,10 +92,26 @@ class AdminData {
     'network': _network,
     'feed': _feed,
     'ui-assets': _uiAssets,
+    'today': _today,
+    'grant-item': _grantItem,
+    'send-gift': (_) async => throw AdminApiException(
+        'Sending a gift needs the admin server (FIREBASE_SERVICE_ACCOUNT in Cloudflare Production). Gift codes can still be made in Money → Gift codes.',
+        status: 501, code: 'not_configured', missing: serverMissing),
+    'alerts': _alerts,
   };
 }
 
 /* ───────────────────────── helpers ───────────────────────── */
+
+/// The product's day is India time (UTC+5:30); the app writes
+/// presenceDays/{yyyy-mm-dd} with the same key (data/presence.dart).
+const kDayTzMin = 330;
+String dayKeyOf(int ms, [int tzMin = kDayTzMin]) =>
+    DateTime.fromMillisecondsSinceEpoch(ms + tzMin * 60000, isUtc: true).toIso8601String().substring(0, 10);
+int dayStartOf(int ms, [int tzMin = kDayTzMin]) {
+  final l = ms + tzMin * 60000;
+  return l - (l % kDay) - tzMin * 60000;
+}
 
 FirebaseFirestore get _db => FirebaseFirestore.instance;
 User get _me {
@@ -327,6 +343,8 @@ Future<Map<String, dynamic>> _users(Map<String, dynamic> body) async {
     case 'online':
       base = base.where('lastSeenAt', isGreaterThanOrEqualTo: ts(now - kOnlineMs));
     case 'today':
+      base = base.where('lastSeenAt', isGreaterThanOrEqualTo: ts(dayStartOf(now)));
+    case 'seen24h':
       base = base.where('lastSeenAt', isGreaterThanOrEqualTo: ts(now - kDay));
     case 'helper':
       base = base.where('roles', arrayContains: 'helper');
@@ -388,6 +406,7 @@ Future<Map<String, dynamic>> _user(Map<String, dynamic> body) async {
     _list(_db.collection('payoutRequests').where('uid', isEqualTo: uid).limit(30)),
     _list(_db.collection('activity').where('uid', isEqualTo: uid).limit(60)),
     _list(_db.collection('pushSubs').where('uid', isEqualTo: uid).limit(10)),
+    _list(_db.collection('users').doc(uid).collection('days').orderBy(FieldPath.documentId, descending: true).limit(60)),
   ]);
   L(int i) => res[i] as List<QueryDocumentSnapshot<Map<String, dynamic>>>;
   final w = res[0] as Map<String, dynamic>?;
@@ -414,6 +433,7 @@ Future<Map<String, dynamic>> _user(Map<String, dynamic> body) async {
             'coins': _num(w['coins']), 'streak': _num(w['streak']), 'longestStreak': _num(w['longestStreak']), 'lifetimeEarned': _num(w['lifetimeEarned']),
             'freezesOwned': _num(w['freezesOwned']), 'wordCredits': _num(w['wordCredits']), 'meaningCredits': _num(w['meaningCredits']), 'lastLoginYmd': w['lastLoginYmd'] ?? '',
           },
+    'days': [for (final x in L(res.length - 1)) {'day': x.id, ..._plain(x.data())}],
     'coinLedger': pl(_rows(L(4)).take(80).toList()),
     'cashLedger': pl(_rows(L(5)).take(40).toList()),
     'referral': ref == null
@@ -849,4 +869,95 @@ Future<Map<String, dynamic>> _uiAssets(Map<String, dynamic> body) async {
   final docs = await _list(_db.collection('ui_overrides').limit(1000));
   final urls = docs.map((d) => d.data()['url']).whereType<String>().where((u) => u.startsWith('http')).toSet().toList();
   return {'ok': true, 'items': const [], 'overrides': urls, 'missing': AdminData.serverMissing};
+}
+
+/* ───────────────────────── who signed in today ───────────────────────── */
+
+Future<Map<String, dynamic>> _today(Map<String, dynamic> body) async {
+  final now = DateTime.now().millisecondsSinceEpoch;
+  final tz = _num(body['tzOffsetMin'], kDayTzMin).toInt();
+  final day = RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch('${body['day'] ?? ''}') ? '${body['day']}' : dayKeyOf(now, tz);
+  final start = DateTime.parse('${day}T00:00:00Z').millisecondsSinceEpoch - tz * 60000;
+  final end = start + kDay;
+  final res = await Future.wait([
+    _list(_db.collection('presenceDays').doc(day).collection('people').limit(2000)),
+    _list(_db.collection('users').where('lastSeenAt', isGreaterThanOrEqualTo: Timestamp.fromMillisecondsSinceEpoch(start)).limit(2000)),
+  ]);
+  final by = <String, Map<String, dynamic>>{};
+  for (final p in res[0]) {
+    final d = p.data();
+    by[p.id] = {
+      'uid': p.id, 'first': toMsAny(d['first']), 'last': toMsAny(d['last']), 'opens': _num(d['opens'], 1).toInt(),
+      'platform': d['platform'] ?? '', 'build': '${d['build'] ?? ''}', 'os': d['os'] ?? '', 'email': d['email'] ?? '', 'name': d['name'] ?? '',
+    };
+  }
+  for (final u in res[1]) {
+    final d = u.data();
+    final last = toMsAny(d['lastSeenAt']);
+    if (last >= end) continue;
+    final r = by[u.id] ?? {'uid': u.id, 'first': last, 'last': last, 'opens': 1, 'platform': '', 'build': '', 'os': '', 'email': '', 'name': ''};
+    r['last'] = math.max(r['last'] as int, last);
+    if ((r['first'] as int) == 0) r['first'] = last;
+    if ('${r['platform']}'.isEmpty) r['platform'] = d['lastPlatform'] ?? '';
+    if ('${r['build']}'.isEmpty) r['build'] = '${d['lastBuild'] ?? ''}';
+    if ('${r['os']}'.isEmpty) r['os'] = d['lastOs'] ?? '';
+    if ('${r['email']}'.isEmpty) r['email'] = d['email'] ?? '';
+    if ('${r['name']}'.isEmpty) r['name'] = d['displayName'] ?? '';
+    r['photo'] = d['photoURL'] ?? '';
+    r['plan'] = planOf(d, now);
+    r['blocked'] = d['blocked'] == true;
+    by[u.id] = r;
+  }
+  final rows = by.values.toList()..sort((a, b) => (b['last'] as int).compareTo(a['last'] as int));
+  for (final r in rows) {
+    r['online'] = (r['last'] as int) > now - kOnlineMs;
+  }
+  return {'ok': true, 'day': day, 'tzOffsetMin': tz, 'total': rows.length, 'online': rows.where((r) => r['online'] == true).length, 'rows': rows};
+}
+
+/* ───────────────────────── free items ───────────────────────── */
+
+const kItemKinds = {'word': 'Word', 'meaning': 'Meaning', 'ebook': 'E-book', 'signature': 'Signature'};
+
+Future<Map<String, dynamic>> _grantItem(Map<String, dynamic> body) async {
+  final uid = _uid(body['uid']);
+  final kind = '${body['kind'] ?? ''}';
+  if (!kItemKinds.containsKey(kind)) throw AdminApiException('Pick a word, meaning, e-book or signature item.', status: 400);
+  final name = '${body['id'] ?? ''}'.trim().replaceFirst(RegExp(r'^[a-z]+:'), '');
+  if (name.isEmpty) throw AdminApiException('Pick the item to give.', status: 400);
+  final itemId = '$kind:$name';
+  final title = '${body['title'] ?? ''}'.trim().isEmpty ? name : '${body['title']}'.trim();
+  final revoke = body['revoke'] == true;
+  var docId = itemId.replaceAll(RegExp(r'[^A-Za-z0-9_.@-]'), '_').replaceFirst(RegExp(r'^\.+'), '_');
+  if (docId.length > 300) docId = docId.substring(0, 300);
+  final b = _db.batch();
+  b.set(_db.doc('users/$uid/owned/$docId'), {
+    'id': itemId, 'kind': kind, 'title': title, 'source': 'admin', 'status': revoke ? 'revoked' : 'active',
+    'grantedBy': _by, 'at': FieldValue.serverTimestamp(),
+  }, SetOptions(merge: true));
+  _log(b, revoke ? 'owned.revoke' : 'owned.grant', uid, {'item': itemId, 'title': title}, '${revoke ? 'Took back' : 'Gave'} ${kItemKinds[kind]} “$title”');
+  if (!revoke && body['notify'] != false) {
+    b.set(_db.collection('users/$uid/notifications').doc(), {
+      'title': 'A free ${kItemKinds[kind]!.toLowerCase()} for you', 'body': '“$title” is now yours in NowssB. Open it any time.',
+      'kind': 'gift', 'type': 'gift', 'read': false, 'at': DateTime.now(), 'createdAt': FieldValue.serverTimestamp(),
+    });
+  }
+  await b.commit();
+  return {'ok': true, 'item': itemId, 'status': revoke ? 'revoked' : 'active', 'push': {'sent': 0, 'devices': 0, 'skipped': true}};
+}
+
+/* ───────────────────────── admin inbox ───────────────────────── */
+
+Future<Map<String, dynamic>> _alerts(Map<String, dynamic> body) async {
+  final res = await Future.wait<Object>([
+    _list(_db.collection('adminAlerts').orderBy('at', descending: true).limit(80)),
+    _count(_db.collection('requests').where('status', isEqualTo: 'new')),
+    _count(_db.collection('payoutRequests').where('status', whereIn: ['pending_review', 'queued'])),
+  ]);
+  return {
+    'ok': true,
+    'alerts': [for (final r in res[0] as List<QueryDocumentSnapshot<Map<String, dynamic>>>) {'id': r.id, ...r.data(), 'at': toMsAny(r.data()['at'])}],
+    'openRequests': res[1],
+    'pendingPayouts': res[2],
+  };
 }

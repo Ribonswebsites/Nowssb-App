@@ -154,6 +154,10 @@ class NotifStore extends ChangeNotifier {
   /// Fired for every item that is actually kept. Phone + banner listen here.
   static void Function(NotifItem item)? onDelivered;
 
+  /// Kinds this phone must not show (set by lib/admin: an admin's phone
+  /// never shows member promos or nudges).
+  static bool Function(String type)? mute;
+
   bool _master = true;
   List<String> _off = [];
   List<NotifItem> _feed = [];
@@ -351,6 +355,7 @@ class NotifStore extends ChangeNotifier {
   }) async {
     if (!allKinds.contains(type)) return false;
     if (!_master || _off.contains(type)) return false;
+    if (mute?.call(type) == true) return false;
     final item = NotifItem(
       type: type,
       title: title ?? labelOf(type),

@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../data/billing_config.dart';
+import '../data/content.dart';
 import 'admin_data.dart';
 import 'admin_log.dart';
 import 'admin_kit.dart';
@@ -144,7 +145,8 @@ class _PersonAdminScreenState extends State<PersonAdminScreen> {
         _ActionChip(Icons.workspace_premium_rounded, 'Grant plan', kViolet, () => _grant()),
         if ('${plan['tier'] ?? ''}'.isNotEmpty) _ActionChip(Icons.more_time_rounded, 'Extend', kGold, () => _extend()),
         if (plan['active'] == true) _ActionChip(Icons.remove_circle_outline_rounded, 'Revoke plan', kRose, () => _revoke(plan)),
-        _ActionChip(Icons.inventory_2_rounded, 'Grant item', kMint, () => _grantItem()),
+        _ActionChip(Icons.inventory_2_rounded, 'Give item', kMint, () => _grantItem()),
+        _ActionChip(Icons.card_giftcard_rounded, 'Send gift', kViolet, () => _sendGift()),
         _ActionChip(Icons.toll_rounded, 'Adjust coins', kAmber, () => _coins(wallet)),
         _ActionChip(Icons.send_rounded, 'Message', kSky, () => _message()),
         _ActionChip(Icons.tune_rounded, 'Restrictions${restrictions.values.where((v) => v == true).isEmpty ? '' : ' (${restrictions.values.where((v) => v == true).length})'}', kAmber, () => _restrict(restrictions)),
@@ -237,6 +239,21 @@ class _PersonAdminScreenState extends State<PersonAdminScreen> {
           _group('Word requests', L('requests'), (x) => _LedgerRow('${x['word'] ?? ''}', '${x['status'] ?? ''}', fmtDate(x['at']), x['status'] == 'done' ? kMint : kAmber)),
         ]),
       ),
+      const SectionHead('Sign-ins', 'Days they opened NowssB (India time)'),
+      Glass(
+        radius: 22,
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          if (L('days').isEmpty)
+            const Text('No daily sign-in rows yet — phones on the new build record each day they open the app.', style: TextStyle(color: kFaint, fontSize: 12)),
+          for (final d in L('days').take(30))
+            _LedgerRow(
+              '${d['day'] ?? d['id'] ?? ''}',
+              '${(d['opens'] as num?)?.toInt() ?? 1}x',
+              'first ${_hm(d['first'])} · last ${_hm(d['last'])}${'${d['platform'] ?? ''}'.isEmpty ? '' : ' · ${d['platform']}'}${'${d['build'] ?? ''}'.isEmpty ? '' : ' · build ${d['build']}'}',
+              kMint,
+            ),
+        ]),
+      ),
       const SectionHead('History', 'Admin changes and activity'),
       Glass(
         radius: 22,
@@ -259,6 +276,13 @@ class _PersonAdminScreenState extends State<PersonAdminScreen> {
           for (final r in rows.take(12)) one(r),
         ]),
       );
+
+  String _hm(dynamic v) {
+    final ms = msOf(v);
+    if (ms <= 0) return '—';
+    final d = DateTime.fromMillisecondsSinceEpoch(ms);
+    return '${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
+  }
 
   String _sourceName(String s) => switch (s) {
         'play' => 'Google Play',
@@ -401,57 +425,154 @@ class _PersonAdminScreenState extends State<PersonAdminScreen> {
 
   /// Give (or take back) one word / meaning / signature / ebook:
   /// users/{uid}/owned/{cleanId} — the same doc a Play purchase writes,
-  /// marked source 'admin' (rules allow nothing else from the console).
+  /// marked source 'admin'. Through the server action `grant-item`, which
+  /// also tells them (inbox + push); rules-gated Firestore when it is off.
   Future<void> _grantItem() async {
-    final id = TextEditingController();
+    final q = TextEditingController();
+    final note = TextEditingController();
     String kind = 'word';
+    String picked = '';
+    String pickedTitle = '';
     bool revoke = false;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => Theme(
+        data: adminTheme(),
+        child: StatefulBuilder(builder: (ctx, set) {
+          final needle = q.text.trim().toLowerCase();
+          final options = <(String, String)>[
+            if (kind == 'word')
+              for (final w in ContentStore.instance.library) (w.key, w.word),
+            if (kind == 'meaning')
+              for (final m in ContentStore.instance.meanings) (m.key, m.name),
+            if (kind == 'ebook')
+              for (final b in ContentStore.instance.books) (b.key, b.title),
+          ].where((o) => needle.isEmpty || o.$1.toLowerCase().contains(needle) || o.$2.toLowerCase().contains(needle)).take(40).toList();
+          return AlertDialog(
+            title: Text(revoke ? 'Take an item back' : 'Give a free item', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+            content: SizedBox(
+              width: 360,
+              child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Wrap(spacing: 6, runSpacing: 6, children: [
+                  for (final k in const ['word', 'meaning', 'signature', 'ebook'])
+                    Pill(k, dense: true, selected: kind == k, onTap: () => set(() {
+                          kind = k;
+                          picked = '';
+                          pickedTitle = '';
+                        })),
+                ]),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: q,
+                  onChanged: (_) => set(() {
+                    picked = '';
+                    pickedTitle = '';
+                  }),
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.search_rounded, color: kGold),
+                    labelText: kind == 'signature' ? 'Signature id (their name or word)' : 'Search, or type an id',
+                  ),
+                ),
+                if (options.isNotEmpty)
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxHeight: 200),
+                    child: ListView(shrinkWrap: true, children: [
+                      for (final o in options)
+                        ListTile(
+                          dense: true,
+                          contentPadding: EdgeInsets.zero,
+                          selected: picked == o.$1,
+                          selectedColor: kGold,
+                          title: Text(o.$2, style: TextStyle(color: picked == o.$1 ? kGold : Colors.white, fontSize: 13)),
+                          subtitle: Text(o.$1, style: const TextStyle(color: kFaint, fontSize: 10.5)),
+                          trailing: picked == o.$1 ? const Icon(Icons.check_circle_rounded, color: kGold, size: 18) : null,
+                          onTap: () => set(() {
+                            picked = o.$1;
+                            pickedTitle = o.$2;
+                          }),
+                        ),
+                    ]),
+                  ),
+                if (!revoke)
+                  TextField(controller: note, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Why (kept in the audit log)')),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  value: revoke,
+                  activeThumbColor: kRose,
+                  onChanged: (v) => set(() => revoke = v),
+                  title: const Text('Take it back instead', style: TextStyle(color: Colors.white, fontSize: 13)),
+                ),
+              ]),
+            ),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+              FilledButton(
+                  style: FilledButton.styleFrom(backgroundColor: revoke ? kRose : kGold, foregroundColor: kInk),
+                  onPressed: () {
+                    if (picked.isEmpty && q.text.trim().isEmpty) return;
+                    Navigator.pop(ctx, true);
+                  },
+                  child: Text(revoke ? 'Take back' : 'Give')),
+            ],
+          );
+        }),
+      ),
+    );
+    if (ok != true) return;
+    final id = picked.isNotEmpty ? picked : q.text.trim().toLowerCase();
+    final title = pickedTitle.isNotEmpty ? pickedTitle : q.text.trim();
+    await _act('grant-item', {'kind': kind, 'id': id, 'title': title, 'revoke': revoke, 'reason': note.text.trim()},
+        revoke ? '“$title” taken back.' : '“$title” given — it opens for them now, and they were told.');
+  }
+
+  /// A gift code made out to this person (gifts/{code} with their email and
+  /// uid), with a note; they get it in their inbox and as a push.
+  Future<void> _sendGift() async {
+    final note = TextEditingController();
+    String item = 'word';
+    int days = 60;
+    const items = {
+      'word': 'A word',
+      'meaning': 'A meaning',
+      'bundle': '10-word bundle',
+      'resonance': 'Resonance · 1 month',
+      'frequency': 'Frequency · 1 month',
+      'frequency_x': 'Frequency X · 1 month',
+    };
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => Theme(
         data: adminTheme(),
         child: StatefulBuilder(
           builder: (ctx, set) => AlertDialog(
-            title: const Text('Grant an item', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+            title: const Text('Send a gift', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
             content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
               Wrap(spacing: 6, runSpacing: 6, children: [
-                for (final k in const ['word', 'meaning', 'signature', 'ebook']) Pill(k, dense: true, selected: kind == k, onTap: () => set(() => kind = k)),
+                for (final e in items.entries) Pill(e.value, dense: true, selected: item == e.key, onTap: () => set(() => item = e.key)),
               ]),
-              TextField(controller: id, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Word or book id (e.g. phoenix)')),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                value: revoke,
-                activeThumbColor: kRose,
-                onChanged: (v) => set(() => revoke = v),
-                title: const Text('Revoke instead', style: TextStyle(color: Colors.white, fontSize: 13)),
-              ),
+              const SizedBox(height: 8),
+              TextField(controller: note, maxLength: 140, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Note to them (optional)')),
+              Wrap(spacing: 6, children: [
+                for (final d in const [30, 60, 180]) Pill('Expires in $d days', dense: true, selected: days == d, onTap: () => set(() => days = d)),
+              ]),
             ]),
             actions: [
               TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
-              FilledButton(
-                  style: FilledButton.styleFrom(backgroundColor: kGold, foregroundColor: kInk),
-                  onPressed: () => id.text.trim().isEmpty ? null : Navigator.pop(ctx, true),
-                  child: Text(revoke ? 'Revoke' : 'Grant')),
+              FilledButton(style: FilledButton.styleFrom(backgroundColor: kGold, foregroundColor: kInk), onPressed: () => Navigator.pop(ctx, true), child: const Text('Send')),
             ],
           ),
         ),
       ),
     );
     if (ok != true || _busy) return;
-    final raw = id.text.trim().toLowerCase();
-    final itemId = raw.contains(':') ? raw : '$kind:$raw';
     setState(() => _busy = true);
     try {
-      await FirebaseFirestore.instance.doc('users/${widget.uid}/owned/${ownedDocId(itemId)}').set({
-        'id': itemId,
-        'kind': itemId.split(':').first,
-        'title': raw.contains(':') ? raw.split(':').last : raw,
-        'source': 'admin',
-        'status': revoke ? 'revoked' : 'active',
-        'at': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
-      await adminLog(revoke ? 'owned.revoke' : 'owned.grant', widget.uid, {'item': itemId});
-      if (mounted) adminSnack(context, revoke ? '$itemId revoked.' : '$itemId granted — it opens for them now.');
+      final r = await AdminData.run('send-gift', {'uid': widget.uid, 'item': item, 'note': note.text.trim(), 'expiresDays': days});
+      if (!mounted) return;
+      final code = '${r['code'] ?? ''}';
+      await Clipboard.setData(ClipboardData(text: code));
+      if (mounted) adminSnack(context, 'Gift sent — code $code (copied). They were told in their inbox.');
       await _load();
     } catch (e) {
       if (mounted) adminSnack(context, '$e', error: true);

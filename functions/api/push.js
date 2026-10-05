@@ -17,7 +17,10 @@
    ----------------------
    1. Checks the caller is one of your admins — a real Firebase ID token,
       signature verified against Google's public certificates, then the uid
-      matched against ADMIN_UIDS. A stolen page cannot fake this.
+      looked up at Firestore admins/{uid} (or the admin claim) — the same
+      list /api/admin/* uses. A stolen page cannot fake this.
+   1b. Works out who gets it on the server (pushSubs; one uid, or everyone
+      except admins). The caller never supplies the subscription list.
    2. Encrypts the message separately for every subscription (RFC 8291:
       ECDH to the phone's key, HKDF, AES-128-GCM).
    3. Signs a VAPID token per push service (RFC 8292) and POSTs.
@@ -33,7 +36,7 @@
                          it lives here so the two can never drift apart)
      VAPID_SUBJECT       mailto:you@nowssb.com — push services want a way to
                          contact whoever is sending
-     ADMIN_UIDS          comma-separated Firebase uids allowed to send
+     FIREBASE_SERVICE_ACCOUNT  reads admins/ and pushSubs (required)
      FIREBASE_PROJECT_ID nowssb-34f1b
 
    And one more, only needed once the Android app ships (see CAPACITOR.md):
@@ -52,6 +55,8 @@
    ══════════════════════════════════════════════════════════════════════ */
 
 import { categoryFor, fcmMessage } from '../_lib/notify/push.js';
+import { googleToken, serviceAccount } from '../_lib/server.js';
+import { restStore } from '../_lib/admin_store.js';
 
 const enc = new TextEncoder();
 
@@ -289,11 +294,14 @@ const json = (obj, status = 200) => new Response(JSON.stringify(obj), {
 });
 
 export async function onRequestPost(context) {
-  const { request, env } = context;
+  const { request } = context;
+  const env = { ...(context.env || {}), FIREBASE_PROJECT_ID: (context.env && context.env.FIREBASE_PROJECT_ID) || 'nowssb-34f1b' };
 
-  for (const k of ['VAPID_PRIVATE_KEY', 'VAPID_PUBLIC_KEY', 'VAPID_SUBJECT', 'ADMIN_UIDS', 'FIREBASE_PROJECT_ID']) {
-    if (!env[k]) return json({ error: 'Server not configured: ' + k + ' is missing.' }, 500);
-  }
+  /* One list of admins for the whole site: Firestore admins/{uid} (or the
+     admin custom claim) — the same check /api/admin/* makes. Reading it, and
+     the subscriptions, needs the service account. */
+  const sa = serviceAccount(env);
+  if (!sa) return json({ error: 'Server not configured: FIREBASE_SERVICE_ACCOUNT is missing.', missing: ['FIREBASE_SERVICE_ACCOUNT'] }, 501);
 
   const auth = request.headers.get('Authorization') || '';
   if (!auth.startsWith('Bearer ')) return json({ error: 'Sign in first.' }, 401);
@@ -303,17 +311,39 @@ export async function onRequestPost(context) {
   catch (e) { return json({ error: 'Could not check the sign-in.' }, 503); }
   if (!claims) return json({ error: 'That sign-in is not valid.' }, 401);
 
-  const admins = env.ADMIN_UIDS.split(',').map(s => s.trim()).filter(Boolean);
-  if (!admins.includes(claims.sub)) return json({ error: 'Not an admin.' }, 403);
+  let db;
+  try { db = restStore(await googleToken(sa), env.FIREBASE_PROJECT_ID); }
+  catch (e) { return json({ error: 'Could not reach Firestore.' }, 502); }
+  let isAdmin = claims.admin === true;
+  if (!isAdmin) { try { isAdmin = !!(await db.get('admins/' + claims.sub)); } catch (e) { isAdmin = false; } }
+  if (!isAdmin) return json({ error: 'Not an admin.' }, 403);
 
   let body;
   try { body = await request.json(); } catch (e) { return json({ error: 'Expected JSON.' }, 400); }
-
-  const { title, subscriptions } = body;
+  const title = String((body && body.title) || '').slice(0, 120);
   if (!title) return json({ error: 'A title is required.' }, 400);
-  if (!Array.isArray(subscriptions) || !subscriptions.length) {
-    return json({ error: 'No subscriptions to send to.' }, 400);
+
+  /* Targets are worked out here, never taken from the caller: one person
+     (body.uid), or every subscribed phone except the admins' own. */
+  const uid = typeof body.uid === 'string' && /^[A-Za-z0-9_-]{6,128}$/.test(body.uid) ? body.uid : '';
+  let rows;
+  try {
+    rows = uid
+      ? await db.query({ collection: 'pushSubs', where: [['uid', '==', uid]], limit: 20 })
+      : await db.query({ collection: 'pushSubs', limit: 5000 });
+  } catch (e) { return json({ error: 'Could not read the subscriptions.' }, 502); }
+  const admins = uid ? new Set() : new Set((await db.query({ collection: 'admins', limit: 300 }).catch(() => [])).map((r) => r.id));
+  let skippedAdmins = 0;
+  const subscriptions = [];
+  for (const r of rows) {
+    const v = r.data || {};
+    if (v.uid && admins.has(v.uid)) { skippedAdmins++; continue; }
+    if (v.fcmToken) subscriptions.push({ path: r.path, endpoint: 'fcm:' + v.fcmToken, fcmToken: v.fcmToken, notifFormat: v.notifFormat });
+    else if (v.endpoint && v.keys) subscriptions.push({ path: r.path, endpoint: v.endpoint, keys: v.keys });
   }
+  if (!subscriptions.length) return json({ sent: 0, failed: 0, expired: [], skippedAdmins, total: 0, results: [] });
+
+  const vapid = !!(env.VAPID_PRIVATE_KEY && env.VAPID_PUBLIC_KEY && env.VAPID_SUBJECT);
 
   /* What the phone receives — sw.js reads exactly these fields. */
   const payload = JSON.stringify({
@@ -323,43 +353,33 @@ export async function onRequestPost(context) {
     url: body.url || './',
   });
 
-  /* Parsed once, not once per subscription. A malformed value is worth
-     saying out loud rather than silently failing every Android send. */
-  let sa = null, saError = null;
-  if (env.FCM_SERVICE_ACCOUNT) {
+  /* Parsed once, not once per subscription. */
+  let fcmSa = null, saError = null;
+  const rawFcm = env.FCM_SERVICE_ACCOUNT || env.FIREBASE_SERVICE_ACCOUNT;
+  if (rawFcm) {
     try {
-      sa = JSON.parse(env.FCM_SERVICE_ACCOUNT);
-      if (!sa.private_key || !sa.client_email || !sa.project_id) throw new Error('missing fields');
-    } catch (e) { sa = null; saError = 'FCM_SERVICE_ACCOUNT is not valid service-account JSON.'; }
+      fcmSa = JSON.parse(rawFcm);
+      if (!fcmSa.private_key || !fcmSa.client_email || !fcmSa.project_id) throw new Error('missing fields');
+    } catch (e) { fcmSa = null; saError = 'FCM_SERVICE_ACCOUNT is not valid service-account JSON.'; }
   }
 
-  /* Promotional sends never reach admins (ADMIN_UIDS): an offer pushed to
-     the people who run the shop is noise, and skews what they see. */
-  const promo = body.promo === true || ['offers', 'offer', 'promo', 'broadcast'].includes(String(body.type || ''));
-  const targets = promo ? subscriptions.filter((sub) => !(sub && sub.uid && admins.includes(sub.uid))) : subscriptions;
-  const skippedAdmins = subscriptions.length - targets.length;
-
-  const results = await Promise.all(targets.map(async (sub) => {
-    const endpoint = sub && sub.endpoint;
+  const results = await Promise.all(subscriptions.map(async (sub) => {
+    const endpoint = sub.endpoint;
 
     /* The Android app, reached through FCM rather than a push service. */
-    const fcm = (sub && sub.fcmToken) ||
-                (typeof endpoint === 'string' && endpoint.startsWith('fcm:') ? endpoint.slice(4) : null);
-    if (fcm) {
-      if (!sa) return { endpoint, ok: false, error: saError || 'FCM_SERVICE_ACCOUNT is not set.' };
+    if (sub.fcmToken) {
+      if (!fcmSa) return { endpoint, path: sub.path, ok: false, error: saError || 'FCM_SERVICE_ACCOUNT is not set.' };
       try {
-        const r = await sendFcm(sa, fcm, { title, body: body.body || '', type: body.type, url: body.url, notifFormat: sub.notifFormat });
-        return { endpoint, ...r };
+        const r = await sendFcm(fcmSa, sub.fcmToken, { title, body: body.body || '', type: body.type, url: body.url, notifFormat: sub.notifFormat });
+        return { endpoint, path: sub.path, ...r };
       } catch (e) {
-        return { endpoint, ok: false, error: String(e && e.message || e).slice(0, 200) };
+        return { endpoint, path: sub.path, ok: false, error: String(e && e.message || e).slice(0, 200) };
       }
     }
 
-    const p256dh = sub && sub.keys && sub.keys.p256dh;
-    const authKey = sub && sub.keys && sub.keys.auth;
-    if (!endpoint || !p256dh || !authKey) return { endpoint: endpoint || null, ok: false, error: 'malformed' };
+    if (!vapid) return { endpoint, path: sub.path, ok: false, error: 'VAPID keys are not set.' };
     try {
-      const cipher = await encryptPayload(payload, p256dh, authKey);
+      const cipher = await encryptPayload(payload, sub.keys.p256dh, sub.keys.auth);
       const authHeader = await vapidAuth(endpoint, env.VAPID_PUBLIC_KEY, env.VAPID_PRIVATE_KEY, env.VAPID_SUBJECT);
       const res = await fetch(endpoint, {
         method: 'POST',
@@ -372,24 +392,29 @@ export async function onRequestPost(context) {
         },
         body: cipher,
       });
-      /* 404/410 mean the push service has retired this subscription — the
-         caller should delete it rather than keep trying. */
+      /* 404/410 mean the push service has retired this subscription. */
       return {
-        endpoint, ok: res.ok, status: res.status,
+        endpoint, path: sub.path, ok: res.ok, status: res.status,
         expired: res.status === 404 || res.status === 410,
         error: res.ok ? undefined : (await res.text().catch(() => '')).slice(0, 200),
       };
     } catch (e) {
-      return { endpoint, ok: false, error: String(e && e.message || e).slice(0, 200) };
+      return { endpoint, path: sub.path, ok: false, error: String(e && e.message || e).slice(0, 200) };
     }
   }));
+
+  /* Retired subscriptions are removed here, so the list never goes stale. */
+  const dead = results.filter((r) => r.expired && r.path);
+  if (dead.length) await db.commit(dead.map((r) => ({ op: 'delete', path: r.path }))).catch(() => {});
 
   return json({
     sent: results.filter(r => r.ok).length,
     failed: results.filter(r => !r.ok).length,
-    expired: results.filter(r => r.expired).map(r => r.endpoint),
+    expired: dead.map(r => r.endpoint),
+    removed: dead.length,
     skippedAdmins,
-    results,
+    total: subscriptions.length,
+    results: results.map(({ path, ...r }) => r),
   });
 }
 

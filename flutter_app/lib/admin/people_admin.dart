@@ -36,7 +36,8 @@ class _PeopleAdminScreenState extends State<PeopleAdminScreen> {
   static const _filters = {
     'all': 'Everyone',
     'online': 'Online now',
-    'today': 'Seen 24h',
+    'today': 'Signed in today',
+    'seen24h': 'Seen 24h',
     'plan': 'Subscribers',
     'expired': 'Expired',
     'blocked': 'Blocked',

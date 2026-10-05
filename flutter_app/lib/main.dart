@@ -21,6 +21,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'admin/admin_mode.dart';
 import 'admin/admin_state.dart';
 import 'admin/edit_fab.dart';
 import 'admin/layout/ui_layouts.dart';
@@ -101,7 +102,12 @@ Future<void> main() async {
   await UiLayouts.instance.start();
   await EditMode.instance.load();
   await SlotRegistry.instance.load();
+  // Admin accounts launch into NowssB Admin (lib/admin/admin_mode.dart): the
+  // cached answer is read first so the member app never flashes for them.
+  await AdminState.instance.loadCache();
+  await AdminMode.instance.load();
   AdminState.instance.start();
+  AdminPromoGuard.start();
   QuoteStore.instance.addListener(Settings.instance.remoteChanged);
   await QuoteStore.instance.start();
   WordRequestStore.instance.startSync();
@@ -164,7 +170,7 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
     if (_splashDone) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _checkForUpdate(coldStart: true);
-        unawaited(PhoneNotifications.instance.announceAfterLaunch());
+        unawaited(PhoneNotifications.instance.announceAfterLaunch().then((_) => AdminPromoGuard.apply()));
       });
     }
   }
@@ -249,13 +255,13 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
         scrollBehavior: const NwsbScrollBehavior(),
         home: Stack(
           children: [
-            const AuthGate(child: NavShell()),
+            const AuthGate(child: AdminAppGate(child: NavShell())),
             if (!_splashDone)
               Splash(onDone: () {
                 VideoPool.instance.unhold();
                 setState(() => _splashDone = true);
                 unawaited(_checkForUpdate(coldStart: true));
-                unawaited(PhoneNotifications.instance.announceAfterLaunch());
+                unawaited(PhoneNotifications.instance.announceAfterLaunch().then((_) => AdminPromoGuard.apply()));
                 unawaited(DeviceFlags.applySaved());
               }),
           ],

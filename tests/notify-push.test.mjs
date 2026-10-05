@@ -100,15 +100,16 @@ test('outbox pushes only the attempt that committed, once per document', async (
   assert.equal((await outbox.flush({}, { fetchImpl: f, account: SA, accessToken: async () => 'a' })).sent, 0);
 });
 
-test('promotional pushes skip admins (admins/{uid} and ADMIN_UIDS)', async () => {
+test('promotional pushes skip admins (admins/{uid} only)', async () => {
   const db = fakeDb({ subs: [{ uid: 'adm', fcmToken: 't' }, { uid: 'env', fcmToken: 't3' }, { uid: 'u', fcmToken: 't2' }], admins: ['adm'] });
   const { sent, f } = fetchSpy();
   const promo = { cat: 'offers', promo: true, title: 'Sale', body: '' };
   assert.equal((await pushToUid({}, db, 'adm', promo, { fetchImpl: f, account: SA, accessToken: async () => 'a' })).skipped, 'admin');
-  assert.equal((await pushToUid({ ADMIN_UIDS: 'env' }, db, 'env', promo, { fetchImpl: f, account: SA, accessToken: async () => 'a' })).skipped, 'admin');
+  // ADMIN_UIDS is not an admin source any more: one list, admins/{uid}.
+  assert.equal((await pushToUid({ ADMIN_UIDS: 'env' }, db, 'env', promo, { fetchImpl: f, account: SA, accessToken: async () => 'a' })).sent, 1);
   assert.equal((await pushToUid({}, db, 'adm', { ...promo, promo: false, cat: 'inbox' }, { fetchImpl: f, account: SA, accessToken: async () => 'a' })).sent, 1);
   assert.equal((await pushToUid({}, db, 'u', promo, { fetchImpl: f, account: SA, accessToken: async () => 'a' })).sent, 1);
-  assert.equal(sent.length, 2);
+  assert.equal(sent.length, 3);
 });
 
 test('no FCM account: nothing pushed, nothing thrown', async () => {

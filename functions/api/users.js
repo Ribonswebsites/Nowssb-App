@@ -139,11 +139,10 @@ const json = (obj, status = 200) => new Response(JSON.stringify(obj), {
 });
 
 async function handle(context) {
-  const { request, env } = context;
+  const { request } = context;
+  let { env } = context;
 
-  for (const k of ['ADMIN_UIDS', 'FIREBASE_PROJECT_ID']) {
-    if (!env[k]) return json({ error: 'Server not configured: ' + k + ' is missing.' }, 500);
-  }
+  if (!env.FIREBASE_PROJECT_ID) env = { ...env, FIREBASE_PROJECT_ID: 'nowssb-34f1b' };
   if (!env.FCM_SERVICE_ACCOUNT) {
     return json({ error: 'FCM_SERVICE_ACCOUNT is not set. Firebase console → Project settings → Service accounts → Generate new private key, then paste the whole JSON into the Cloudflare Pages environment variables.' }, 501);
   }
@@ -156,8 +155,18 @@ async function handle(context) {
   catch (e) { return json({ error: 'Could not check the sign-in.' }, 503); }
   if (!claims) return json({ error: 'That sign-in is not valid.' }, 401);
 
-  const admins = env.ADMIN_UIDS.split(',').map(s => s.trim()).filter(Boolean);
-  if (!admins.includes(claims.sub)) return json({ error: 'Not an admin.' }, 403);
+  /* One admin list for the whole site: Firestore admins/{uid} (or the admin
+     claim), read with the caller's own token — the rules let a person read
+     only their own admins doc. */
+  let isAdmin = claims.admin === true;
+  if (!isAdmin) {
+    try {
+      const r = await fetch('https://firestore.googleapis.com/v1/projects/' + env.FIREBASE_PROJECT_ID +
+        '/databases/(default)/documents/admins/' + encodeURIComponent(claims.sub), { headers: { Authorization: auth } });
+      isAdmin = r.status === 200;
+    } catch (e) { isAdmin = false; }
+  }
+  if (!isAdmin) return json({ error: 'Not an admin.' }, 403);
 
   let sa;
   try {

@@ -13,8 +13,8 @@
    2. That uid is an admin: a document at Firestore admins/{uid}. Checked
       with the CALLER'S OWN token through the Firestore REST API — the rules
       let a signed-in user read only their own admins/{uid} — so no service
-      account is needed. A custom claim `admin: true`, or the uid being in
-      ADMIN_UIDS, also counts.
+      account is needed. A custom claim `admin: true` also counts. (One
+      admin list for the whole site — /api/admin and /api/push use it too.)
 
    Request   { area: 'ui'|'audio'|'image'|'video', target: '<slot or word key>',
                ext: 'webp', contentType: 'image/webp' }
@@ -30,7 +30,6 @@
      R2_SECRET_ACCESS_KEY  R2 API token → Secret Access Key  this bucket only)
      R2_PUBLIC_BASE_URL    the bucket's public address, e.g. https://media.nowssb.com
      FIREBASE_PROJECT_ID   nowssb-34f1b   (already set for /api/push)
-     ADMIN_UIDS            optional, comma-separated (already set for /api/push)
    ══════════════════════════════════════════════════════════════════════ */
 
 const enc = new TextEncoder();
@@ -83,8 +82,6 @@ async function verifyIdToken(token, projectId) {
 
 async function isAdmin(claims, idToken, env) {
   if (claims.admin === true) return true;
-  const list = String(env.ADMIN_UIDS || '').split(',').map((s) => s.trim()).filter(Boolean);
-  if (list.includes(claims.sub)) return true;
   const url = 'https://firestore.googleapis.com/v1/projects/' + env.FIREBASE_PROJECT_ID +
     '/databases/(default)/documents/admins/' + encodeURIComponent(claims.sub);
   const r = await fetch(url, { headers: { Authorization: 'Bearer ' + idToken } });

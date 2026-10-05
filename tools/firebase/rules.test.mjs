@@ -1,7 +1,7 @@
 // Emulator tests for firestore.rules — run with tools/firebase/test-rules.sh
 import { initializeTestEnvironment, assertSucceeds, assertFails } from '@firebase/rules-unit-testing';
 import { readFileSync } from 'fs';
-import { doc, getDoc, setDoc, updateDoc, addDoc, deleteDoc, collection, getDocs, query, where, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, addDoc, deleteDoc, collection, getDocs, query, where, serverTimestamp, increment } from 'firebase/firestore';
 
 const env = await initializeTestEnvironment({
   projectId: 'nowssb-34f1b',
@@ -278,6 +278,28 @@ await t('anon reads config/store ok', assertSucceeds(getDoc(doc(anon, 'config/st
 await t('anon reads config/economy denied', assertFails(getDoc(doc(anon, 'config/economy'))));
 await t('user deletes other profile denied', assertFails(deleteDoc(doc(alice, 'users/pro'))));
 await t('user deletes own profile ok', assertSucceeds(deleteDoc(doc(alice, 'users/alice'))));
+// ── Admin app: daily sign-ins and the admin inbox ──
+const dayRow = (uid, day, extra = {}) => ({ uid, day, first: serverTimestamp(), last: serverTimestamp(), opens: increment(1), platform: 'android', build: '400', os: 'Android 14', ...extra });
+await t('self writes presence day ok', assertSucceeds(setDoc(doc(pro, 'presenceDays/2026-10-03/people/pro'), dayRow('pro', '2026-10-03', { email: 'p@x', name: 'P' }), { merge: true })));
+await t('self updates presence day ok', assertSucceeds(setDoc(doc(pro, 'presenceDays/2026-10-03/people/pro'), dayRow('pro', '2026-10-03'), { merge: true })));
+await t('presence day for other uid denied', assertFails(setDoc(doc(pro, 'presenceDays/2026-10-03/people/bob'), dayRow('bob', '2026-10-03'))));
+await t('presence day client clock denied', assertFails(setDoc(doc(pro, 'presenceDays/2026-10-03/people/pro'), dayRow('pro', '2026-10-03', { last: 5 }))));
+await t('presence day extra field denied', assertFails(setDoc(doc(pro, 'presenceDays/2026-10-03/people/pro'), dayRow('pro', '2026-10-03', { isPro: true }))));
+await t('presence day wrong day denied', assertFails(setDoc(doc(pro, 'presenceDays/2026-10-03/people/pro'), dayRow('pro', '2026-10-04'))));
+await t('user lists presence day denied', assertFails(getDocs(collection(pro, 'presenceDays/2026-10-03/people'))));
+await t('admin lists presence day ok', assertSucceeds(getDocs(collection(boss, 'presenceDays/2026-10-03/people'))));
+await t('self writes own day ok', assertSucceeds(setDoc(doc(pro, 'users/pro/days/2026-10-03'), dayRow('pro', '2026-10-03'), { merge: true })));
+await t('self writes another day ok', assertSucceeds(setDoc(doc(pro, 'users/pro/days/2026-10-02'), dayRow('pro', '2026-10-02'), { merge: true })));
+await t('self reads own days ok', assertSucceeds(getDocs(collection(pro, 'users/pro/days'))));
+await t('other reads days denied', assertFails(getDocs(collection(newbie, 'users/pro/days'))));
+await t('admin reads days ok', assertSucceeds(getDocs(collection(boss, 'users/pro/days'))));
+await t('user writes adminAlerts denied', assertFails(setDoc(doc(pro, 'adminAlerts/request_x'), { kind: 'request', seen: false })));
+await t('user reads adminAlerts denied', assertFails(getDocs(collection(pro, 'adminAlerts'))));
+await t('admin creates adminAlerts denied', assertFails(setDoc(doc(boss, 'adminAlerts/request_y'), { kind: 'request', seen: false })));
+await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'adminAlerts/request_z'), { kind: 'request', title: 'x', seen: false }));
+await t('admin reads adminAlerts ok', assertSucceeds(getDocs(collection(boss, 'adminAlerts'))));
+await t('admin marks alert seen ok', assertSucceeds(updateDoc(doc(boss, 'adminAlerts/request_z'), { seen: true })));
+await t('admin edits alert title denied', assertFails(updateDoc(doc(boss, 'adminAlerts/request_z'), { title: 'y' })));
 console.log(`\n${pass} passed, ${fail} failed`);
 await env.cleanup();
 process.exit(fail ? 1 : 0);

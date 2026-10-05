@@ -81,7 +81,12 @@ class EditorPreviewController extends ChangeNotifier {
 
   void changed() => notifyListeners();
 
+  /// The page id that reported last — for a page with tabs
+  /// ('<pageId>.<tabId>', program_kit.dart) the tab on screen.
+  String? lastReported;
+
   void report(String pageId, List<SectionInfo> list) {
+    lastReported = pageId;
     final old = reported[pageId];
     if (old != null &&
         old.length == list.length &&
