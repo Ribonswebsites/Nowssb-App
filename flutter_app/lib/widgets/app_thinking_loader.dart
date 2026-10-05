@@ -176,12 +176,16 @@ class _AppThinkingLoaderState extends State<AppThinkingLoader> {
     } else if (saved != null && saved.isLottie) {
       _randomFallback = null;
       final size = _orbSize(context, key);
+      // Missing/bad admin asset must not crash loaders — fall back to an orb.
+      final fallback = _fallbackRandom();
       anim = Lottie.asset(
         saved.asset!,
         width: size,
         height: size,
         fit: BoxFit.contain,
         repeat: true,
+        errorBuilder: (_, __, ___) =>
+            ThinkingOrb(state: fallback, size: size, theme: widget.theme),
       );
       seenName = 'lottie:${saved.asset}';
     } else if (saved != null && saved.isOrb) {

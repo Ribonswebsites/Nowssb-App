@@ -1,9 +1,8 @@
 /// NowssB Daily Spin.
 ///
-/// One free spin a day, then each extra spin costs the server's spin price
-/// while the balance allows. The server takes the coins, draws the slice
-/// from the published weights and puts the prize on the account; the phone
-/// only animates the landing.
+/// Exactly one free spin a day. Paid extra spins are off (server paidPerDay:0).
+/// The server draws the slice from the published weights and puts the prize
+/// on the account; the phone only animates the landing.
 ///
 /// The spin itself: the first ~3 s of assets/gifts/spin-wheel.mp4 play as the
 /// intro (the button press and the spin-up), then it crossfades into a
@@ -191,7 +190,7 @@ class _GiftWheelState extends State<GiftWheel> {
                           ),
                         ),
                         SizedBox(height: 2),
-                        EditableLabel('spin_wheel.GiftWheel', 'One free spin a day. Extra spins cost coins.\nIt spins fast, then slows onto the peg.',
+                        EditableLabel('spin_wheel.GiftWheel', 'One free spin a day. Come back tomorrow after you use it.\nIt spins fast, then slows onto the peg.',
                             style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 12, height: 1.25)),
                       ],
                     ),
@@ -448,7 +447,7 @@ class SpinWheelPainter extends CustomPainter {
       ..strokeWidth = hubR * 0.12
       ..shader = const LinearGradient(colors: _gold).createShader(Rect.fromCircle(center: c, radius: hubR)));
     _text(canvas, 'SPIN', c + Offset(0, -hubR * 0.16), hubR * 0.52, const Color(0xFFE4C56A), FontWeight.w900);
-    _text(canvas, freeToday ? '1 free spin daily' : 'extra spins · coins', c + Offset(0, hubR * 0.38), hubR * 0.17, const Color(0xCCFFFFFF), FontWeight.w600);
+    _text(canvas, freeToday ? '1 free spin daily' : 'come back tomorrow', c + Offset(0, hubR * 0.38), hubR * 0.17, const Color(0xCCFFFFFF), FontWeight.w600);
 
     // Diamond pointer at 12 o'clock.
     final top = Offset(c.dx, c.dy - rOuter - pointerH * 0.35);

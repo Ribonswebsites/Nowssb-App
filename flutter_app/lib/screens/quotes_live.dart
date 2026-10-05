@@ -28,6 +28,7 @@ import 'store.dart';
 import 'subscription.dart';
 import '../admin/layout/layout_sections.dart';
 import '../admin/template/editable.dart';
+import '../features/economy/reward_fx.dart';
 
 const _days = <String>[
   'Monday',
@@ -225,6 +226,8 @@ class _QuotesWeekScreenState extends State<QuotesWeekScreen> {
   void initState() {
     super.initState();
     _loadThoughts();
+    // Daily quote reward — opening Today's quotes counts as reading it.
+    reportEarn('quote');
   }
 
   @override

@@ -254,6 +254,16 @@ class _RedeemState extends State<_Redeem> {
           textCapitalization: TextCapitalization.characters,
           style: const TextStyle(color: Colors.white, letterSpacing: 1.4),
           decoration: const InputDecoration(hintText: 'NWSB-XXXX-XXXX', hintStyle: TextStyle(color: NwsbColors.mist)),
+          // Stale peek must not stay when the code changes — Redeem would
+          // open a different gift than the one previewed (H-008).
+          onChanged: (_) {
+            if (_peek != null || _err != null) {
+              setState(() {
+                _peek = null;
+                _err = null;
+              });
+            }
+          },
         ),
         const SizedBox(height: 10),
         if (_peek == null)

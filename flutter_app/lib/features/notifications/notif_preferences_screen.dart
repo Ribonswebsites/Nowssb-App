@@ -14,6 +14,7 @@ import '../../widgets/page_shell.dart';
 import 'notif_categories.dart';
 import 'notif_prefs.dart';
 import 'notif_scheduler.dart';
+import '../economy/reward_fx.dart';
 
 const _gold = Color(0xFFE8D5A3);
 const _muted = Color(0x99FFFFFF);
@@ -245,6 +246,8 @@ class _GroupCard extends StatelessWidget {
                     onChanged: (v) {
                       HapticFeedback.lightImpact();
                       prefs.setOn(c, v);
+                      // Once-per-account: turning any reminder category on.
+                      if (v) reportEarn('reminders_on');
                     },
                   ),
                 ),

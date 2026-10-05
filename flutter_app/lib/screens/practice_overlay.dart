@@ -21,6 +21,7 @@ import '../media/video_pool.dart';
 import '../widgets/app_thinking_loader.dart';
 import '../widgets/glass_wrap.dart';
 import '../admin/template/editable.dart';
+import '../features/economy/reward_fx.dart';
 
 enum _PracticeStatus {
   ready,
@@ -282,6 +283,9 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
             ? _PracticeStatus.complete
             : _PracticeStatus.results,
       );
+      // Practice Ring · say it aloud (and 80+ when speech matched the word).
+      reportEarn('ring_say', key: widget.word.word);
+      if (_matched) reportEarn('pronounce80', key: widget.word.word);
     }
   }
 

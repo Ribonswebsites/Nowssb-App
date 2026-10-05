@@ -22,6 +22,10 @@ import '../screens/quick_access.dart';
 import '../screens/app_settings.dart';
 import '../screens/store/cart_pages.dart';
 import '../screens/store/meaning_store.dart';
+import '../screens/shared_sections.dart';
+import '../screens/fashion/header.dart';
+import '../screens/personal_coach.dart';
+import '../screens/features_page.dart';
 import '../features/notifications/inbox_screen.dart';
 import '../features/notifications/notif_router.dart';
 import '../widgets/pool_hud.dart';
@@ -320,8 +324,8 @@ class _NavShellState extends State<NavShell> {
       _goToTab(tab);
       return;
     }
-    if (id == 'progress') {
-      // Progress is NOT a tab root — push the dedicated screen only.
+    if (id == 'progress' || id == 'streak') {
+      // Progress / Streak are NOT tab roots — push the dedicated screen only.
       _popShellOverlays();
       Navigator.of(context).push(MaterialPageRoute(
         builder: (_) =>
@@ -329,14 +333,23 @@ class _NavShellState extends State<NavShell> {
       ));
       return;
     }
-    // Shortcuts with their own page open it; the rest keep opening Quick
-    // access (the customiser) as before.
+    // Shortcuts with their own page open it. "Everything" stays the Quick
+    // access customiser. Journal stays the Activity inbox (no journal page).
+    if (id == 'search') {
+      _popShellOverlays();
+      unawaited(showDestinationSearchSheet(context));
+      return;
+    }
     final Widget? page = switch (id) {
       'journal' => const InboxScreen(),
       'cart' => const CartPage(),
       'wishlist' => const WishlistPage(),
       'settings' => const AppSettingsScreen(),
       'meaningstore' => const MeaningStoreScreen(),
+      'wordscience' => const AboutNowssbScreen(science: true),
+      'routines' => const _NavRoutinesPage(),
+      'chat' || 'ai' => const PersonalCoachScreen(),
+      'everything' => const QuickAccessScreen(),
       _ => null,
     };
     _popShellOverlays();
@@ -802,3 +815,33 @@ class _TabletRail extends StatelessWidget {
     );
   }
 }
+
+/// Bottom-nav Routines slot — same destinations as the drawer Routines page.
+class _NavRoutinesPage extends StatelessWidget {
+  const _NavRoutinesPage();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF060C18),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF060C18),
+        foregroundColor: Colors.white,
+        title: const Text('My Routines'),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
+        children: [
+          RoutinesSection(
+            fashion: true,
+            onTap: () {
+              Navigator.of(context).pop();
+              NavScope.goTo(context, 1);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
