@@ -1,0 +1,214 @@
+{
+  "items": [
+    {
+      "id": "assistant_gem",
+      "kind": "lottie",
+      "asset": "assets/anim/thinking/assistant_gem_gold.json",
+      "label": "assistant gem",
+      "group": "thinking"
+    },
+    {
+      "id": "bouncing_dots",
+      "kind": "lottie",
+      "asset": "assets/anim/thinking/bouncing_dots_gold.json",
+      "label": "bouncing dots",
+      "group": "thinking"
+    },
+    {
+      "id": "brain_icon",
+      "kind": "lottie",
+      "asset": "assets/anim/thinking/brain_icon_gold.json",
+      "label": "brain icon",
+      "group": "thinking"
+    },
+    {
+      "id": "brain_outline",
+      "kind": "lottie",
+      "asset": "assets/anim/thinking/brain_outline_gold.json",
+      "label": "brain outline",
+      "group": "thinking"
+    },
+    {
+      "id": "brainstorm_head",
+      "kind": "lottie",
+      "asset": "assets/anim/thinking/brainstorm_head_gold.json",
+      "label": "brainstorm head",
+      "group": "thinking"
+    },
+    {
+      "id": "chat_typing_dots",
+      "kind": "lottie",
+      "asset": "assets/anim/thinking/chat_typing_dots_gold.json",
+      "label": "chat typing dots",
+      "group": "thinking"
+    },
+    {
+      "id": "chatbot_bubble",
+      "kind": "lottie",
+      "asset": "assets/anim/thinking/chatbot_bubble_gold.json",
+      "label": "chatbot bubble",
+      "group": "thinking"
+    },
+    {
+      "id": "glow_ring",
+      "kind": "lottie",
+      "asset": "assets/anim/thinking/glow_ring_gold.json",
+      "label": "glow ring",
+      "group": "thinking"
+    },
+    {
+      "id": "idea_bulb",
+      "kind": "lottie",
+      "asset": "assets/anim/thinking/idea_bulb_gold.json",
+      "label": "idea bulb",
+      "group": "thinking"
+    },
+    {
+      "id": "network_brain",
+      "kind": "lottie",
+      "asset": "assets/anim/thinking/network_brain_gold.json",
+      "label": "network brain",
+      "group": "thinking"
+    },
+    {
+      "id": "orbiting_dots",
+      "kind": "lottie",
+      "asset": "assets/anim/thinking/orbiting_dots_gold.json",
+      "label": "orbiting dots",
+      "group": "thinking"
+    },
+    {
+      "id": "power_orb",
+      "kind": "lottie",
+      "asset": "assets/anim/thinking/power_orb_gold.json",
+      "label": "power orb",
+      "group": "thinking"
+    },
+    {
+      "id": "ring_orb",
+      "kind": "lottie",
+      "asset": "assets/anim/thinking/ring_orb_gold.json",
+      "label": "ring orb",
+      "group": "thinking"
+    },
+    {
+      "id": "simple_dots",
+      "kind": "lottie",
+      "asset": "assets/anim/thinking/simple_dots_gold.json",
+      "label": "simple dots",
+      "group": "thinking"
+    },
+    {
+      "id": "sparkles_ai",
+      "kind": "lottie",
+      "asset": "assets/anim/thinking/sparkles_ai_gold.json",
+      "label": "sparkles ai",
+      "group": "thinking"
+    },
+    {
+      "id": "star_ai_pulse",
+      "kind": "lottie",
+      "asset": "assets/anim/thinking/star_ai_pulse_gold.json",
+      "label": "star ai pulse",
+      "group": "thinking"
+    },
+    {
+      "id": "three_dots_thinking",
+      "kind": "lottie",
+      "asset": "assets/anim/thinking/three_dots_thinking_gold.json",
+      "label": "three dots thinking",
+      "group": "thinking"
+    },
+    {
+      "id": "typing_bubble",
+      "kind": "lottie",
+      "asset": "assets/anim/thinking/typing_bubble_gold.json",
+      "label": "typing bubble",
+      "group": "thinking"
+    },
+    {
+      "id": "typing_dots",
+      "kind": "lottie",
+      "asset": "assets/anim/thinking/typing_dots_gold.json",
+      "label": "typing dots",
+      "group": "thinking"
+    },
+    {
+      "id": "arc_spinner",
+      "kind": "lottie",
+      "asset": "assets/anim/loaders/arc_spinner_gold.json",
+      "label": "arc spinner",
+      "group": "loaders"
+    },
+    {
+      "id": "basic_spinner",
+      "kind": "lottie",
+      "asset": "assets/anim/loaders/basic_spinner_gold.json",
+      "label": "basic spinner",
+      "group": "loaders"
+    },
+    {
+      "id": "book_pages",
+      "kind": "lottie",
+      "asset": "assets/anim/loaders/book_pages_gold.json",
+      "label": "book pages",
+      "group": "loaders"
+    },
+    {
+      "id": "circles",
+      "kind": "lottie",
+      "asset": "assets/anim/loaders/circles_gold.json",
+      "label": "circles",
+      "group": "loaders"
+    },
+    {
+      "id": "heart_draw",
+      "kind": "lottie",
+      "asset": "assets/anim/loaders/heart_draw_gold.json",
+      "label": "heart draw",
+      "group": "loaders"
+    },
+    {
+      "id": "infinity",
+      "kind": "lottie",
+      "asset": "assets/anim/loaders/infinity_gold.json",
+      "label": "infinity",
+      "group": "loaders"
+    },
+    {
+      "id": "ios_spinner",
+      "kind": "lottie",
+      "asset": "assets/anim/loaders/ios_spinner_gold.json",
+      "label": "ios spinner",
+      "group": "loaders"
+    },
+    {
+      "id": "liquid_dots",
+      "kind": "lottie",
+      "asset": "assets/anim/loaders/liquid_dots_gold.json",
+      "label": "liquid dots",
+      "group": "loaders"
+    },
+    {
+      "id": "sand_clock_flip",
+      "kind": "lottie",
+      "asset": "assets/anim/loaders/sand_clock_flip_gold.json",
+      "label": "sand clock flip",
+      "group": "loaders"
+    },
+    {
+      "id": "sand_clock",
+      "kind": "lottie",
+      "asset": "assets/anim/loaders/sand_clock_gold.json",
+      "label": "sand clock",
+      "group": "loaders"
+    },
+    {
+      "id": "wave_dots",
+      "kind": "lottie",
+      "asset": "assets/anim/loaders/wave_dots_gold.json",
+      "label": "wave dots",
+      "group": "loaders"
+    }
+  ]
+}

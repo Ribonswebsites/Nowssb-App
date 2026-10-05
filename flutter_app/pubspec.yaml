@@ -50,6 +50,8 @@ dependencies:
   archive: ^3.6.1
   file_picker: ^8.1.4
   flutter_thinking_orbs: ^0.1.0
+  # Admin orb picker Lottie gallery (assets/anim/{thinking,loaders}).
+  lottie: ^3.1.2
   sensors_plus: ^6.1.1
   # Admin mode (lib/admin): a word's own recording plays with just_audio and
   # is kept on the phone by flutter_cache_manager (also what caches template
@@ -122,6 +124,10 @@ flutter:
     - assets/subscription/
     - assets/hero-curve/
     - assets/flip_brand/
+    # Admin thinking-orb Lottie gallery (CS-2). Gold-only; AE-flagged skipped.
+    - assets/anim/orb_gallery.json
+    - assets/anim/thinking/
+    - assets/anim/loaders/
 
 flutter_launcher_icons:
   android: false

@@ -2,6 +2,8 @@
 /// public read via Firestore `ui_overrides` (and GET `/api/orbs`).
 ///
 /// Slot keys: `orb.all` (app-wide) or `orb.<pageId>.<sectionId>`.
+/// Choices may be a package [OrbState] name (`kind: orb`) or a bundled
+/// Lottie/Rive asset (`kind: lottie|rive` + `asset`).
 library;
 
 import 'admin_api.dart';
@@ -10,6 +12,9 @@ class OrbSlotChoice {
   OrbSlotChoice({
     required this.slot,
     this.orb,
+    this.kind,
+    this.asset,
+    this.token,
     this.orbSize,
     this.orbCircle,
     this.updatedAt = 0,
@@ -18,6 +23,9 @@ class OrbSlotChoice {
 
   final String slot;
   final String? orb;
+  final String? kind;
+  final String? asset;
+  final String? token;
   final num? orbSize;
   final bool? orbCircle;
   final int updatedAt;
@@ -26,11 +34,24 @@ class OrbSlotChoice {
   factory OrbSlotChoice.from(Map<String, dynamic> m) => OrbSlotChoice(
         slot: '${m['slot'] ?? ''}',
         orb: m['orb'] == null ? null : '${m['orb']}',
+        kind: m['kind'] == null ? null : '${m['kind']}',
+        asset: m['asset'] == null ? null : '${m['asset']}',
+        token: m['token'] == null ? null : '${m['token']}',
         orbSize: m['orbSize'] is num ? m['orbSize'] as num : null,
         orbCircle: m['orbCircle'] is bool ? m['orbCircle'] as bool : null,
         updatedAt: m['updatedAt'] is num ? (m['updatedAt'] as num).toInt() : 0,
         updatedBy: '${m['updatedBy'] ?? ''}',
       );
+
+  Map<String, dynamic> toStyle() {
+    final out = <String, dynamic>{};
+    if (kind != null && kind!.isNotEmpty) out['kind'] = kind;
+    if (asset != null && asset!.isNotEmpty) out['asset'] = asset;
+    if (orb != null && orb!.isNotEmpty) out['orb'] = orb;
+    if (orbSize != null) out['orbSize'] = orbSize;
+    if (orbCircle != null) out['orbCircle'] = orbCircle;
+    return out;
+  }
 }
 
 class OrbHistoryEntry {
@@ -82,16 +103,21 @@ class OrbConfig {
   }
 
   /// Admin: save a choice for [slot]. Pass null / empty / `random` to clear.
+  /// For Lottie/Rive pass [kind] + [asset] (and leave [orb] null).
   static Future<OrbSlotChoice> set({
     required String slot,
     String? orb,
+    String? kind,
+    String? asset,
     num? orbSize,
     bool? orbCircle,
     String note = '',
   }) async {
     final r = await AdminApi.call('orb-set', {
       'slot': slot,
-      'orb': orb ?? 'random',
+      if (kind != null && kind.isNotEmpty) 'kind': kind,
+      if (asset != null && asset.isNotEmpty) 'asset': asset,
+      'orb': (kind == 'lottie' || kind == 'rive') ? '' : (orb ?? 'random'),
       if (orbSize != null) 'orbSize': orbSize,
       if (orbCircle != null) 'orbCircle': orbCircle,
       if (note.isNotEmpty) 'note': note,
@@ -100,6 +126,9 @@ class OrbConfig {
     return OrbSlotChoice(
       slot: '${r['slot'] ?? slot}',
       orb: r['orb'] == null ? null : '${r['orb']}',
+      kind: r['kind'] == null ? null : '${r['kind']}',
+      asset: r['asset'] == null ? null : '${r['asset']}',
+      token: r['token'] == null ? null : '${r['token']}',
     );
   }
 
@@ -109,6 +138,9 @@ class OrbConfig {
     return OrbSlotChoice(
       slot: '${r['slot'] ?? slot}',
       orb: r['orb'] == null ? null : '${r['orb']}',
+      kind: r['kind'] == null ? null : '${r['kind']}',
+      asset: r['asset'] == null ? null : '${r['asset']}',
+      token: r['token'] == null ? null : '${r['token']}',
     );
   }
 }

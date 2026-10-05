@@ -987,6 +987,27 @@ function orbChoice(style) {
   const v = style && typeof style === 'object' ? style.orb : '';
   return typeof v === 'string' ? v : '';
 }
+const LOTTIE_ASSET_RE = /^assets\/anim\/(thinking|loaders)\/[a-z0-9_]+(_gold)?\.json$/i;
+/** Compact history token: "working" | "lottie:assets/..." | null. */
+function orbToken(style) {
+  if (!style || typeof style !== 'object') return null;
+  const kind = typeof style.kind === 'string' ? style.kind : '';
+  const asset = typeof style.asset === 'string' ? style.asset : '';
+  if ((kind === 'lottie' || kind === 'rive') && asset) return `${kind}:${asset}`;
+  const orb = orbChoice(style);
+  return orb || null;
+}
+function parseOrbToken(token) {
+  if (token == null || token === '' || token === 'random' || token === 'unset') {
+    return { clear: true };
+  }
+  const s = String(token);
+  if (s.startsWith('lottie:') || s.startsWith('rive:')) {
+    const i = s.indexOf(':');
+    return { kind: s.slice(0, i), asset: s.slice(i + 1), orb: '' };
+  }
+  return { kind: 'orb', orb: s, asset: '' };
+}
 
 /** List every orb override, or one slot plus its recent history. */
 export async function orbs(deps, body = {}) {
@@ -1007,6 +1028,9 @@ export async function orbs(deps, body = {}) {
       return {
         slot,
         orb: orbChoice(style) || null,
+        kind: typeof style.kind === 'string' && style.kind ? style.kind : (orbChoice(style) ? 'orb' : null),
+        asset: typeof style.asset === 'string' && style.asset ? style.asset : null,
+        token: orbToken(style),
         orbSize: style.orbSize ?? null,
         orbCircle: style.orbCircle ?? null,
         updatedAt: toMs(d.updatedAt),
@@ -1035,25 +1059,73 @@ export async function orbs(deps, body = {}) {
   return { ok: true, slots: rows, history };
 }
 
-/** Set or clear the orb for one slot. Empty / "random" clears → clients fall back to random. */
+/** Set or clear the orb/Lottie/Rive choice for one slot.
+ *  body.kind: 'orb' | 'lottie' | 'rive' (default orb when body.orb set).
+ *  body.asset: required for lottie/rive (bundled path under assets/anim/).
+ *  Empty / "random" orb with no kind/asset clears → clients fall back to random. */
 export async function orbSet(deps, body = {}) {
   const { db, admin, now } = deps;
   const slot = orbSlotId(body.slot);
-  const raw = body.orb == null ? '' : str(body.orb, 40);
-  const clear = !raw || raw === 'random' || raw === 'unset';
-  if (!clear && !ORB_NAME_RE.test(raw)) throw bad('That is not an orb animation name.');
-  if (!clear && !ORB_KNOWN.has(raw) && body.allowUnknown !== true) {
-    throw bad(`Unknown orb “${raw}”. Known: ${[...ORB_KNOWN].join(', ')}.`);
+  const kindRaw = str(body.kind, 16).toLowerCase();
+  const assetRaw = str(body.asset, 200);
+  const raw = body.orb == null ? '' : str(body.orb, 80);
+  const isLottie = kindRaw === 'lottie' || (!kindRaw && assetRaw && assetRaw.endsWith('.json'));
+  const isRive = kindRaw === 'rive' || (!kindRaw && assetRaw && assetRaw.endsWith('.riv'));
+  const clear = !isLottie && !isRive && (!raw || raw === 'random' || raw === 'unset');
+
+  if (isLottie || isRive) {
+    if (!assetRaw) throw bad('Lottie/Rive choice needs an asset path.');
+    if (!LOTTIE_ASSET_RE.test(assetRaw) && !(isRive && /^assets\/anim\/[a-z0-9_./-]+\.riv$/i.test(assetRaw))) {
+      throw bad('Asset must be under assets/anim/thinking|loaders (gold json) or a known .riv path.');
+    }
+  } else if (!clear) {
+    // Accept plain orb names, or history tokens like "lottie:assets/..."
+    if (raw.startsWith('lottie:') || raw.startsWith('rive:')) {
+      const parsed = parseOrbToken(raw);
+      return orbSet(deps, {
+        slot,
+        kind: parsed.kind,
+        asset: parsed.asset,
+        note: body.note,
+        allowUnknown: body.allowUnknown,
+        orbSize: body.orbSize,
+        orbCircle: body.orbCircle,
+      });
+    }
+    if (!ORB_NAME_RE.test(raw)) throw bad('That is not an orb animation name.');
+    if (!ORB_KNOWN.has(raw) && body.allowUnknown !== true) {
+      throw bad(`Unknown orb “${raw}”. Known: ${[...ORB_KNOWN].join(', ')}.`);
+    }
   }
+
   const before = await db.get(`ui_overrides/${orbDocId(slot)}`);
-  const beforeOrb = before ? orbChoice(before.style) || null : null;
-  const style = { ...(before && before.style && typeof before.style === 'object' ? before.style : {}) };
-  if (clear) delete style.orb;
-  else style.orb = raw;
+  const beforeStyle = before && before.style && typeof before.style === 'object' ? before.style : null;
+  const beforeToken = beforeStyle ? orbToken(beforeStyle) : null;
+  const beforeOrb = beforeStyle ? orbChoice(beforeStyle) || null : null;
+  const style = { ...(beforeStyle || {}) };
+  delete style.orb;
+  delete style.kind;
+  delete style.asset;
+  let afterKind = null;
+  let afterAsset = null;
+  let afterOrb = null;
+  if (clear) {
+    // cleared
+  } else if (isLottie || isRive) {
+    afterKind = isRive ? 'rive' : 'lottie';
+    afterAsset = assetRaw;
+    style.kind = afterKind;
+    style.asset = afterAsset;
+  } else {
+    afterKind = 'orb';
+    afterOrb = raw;
+    style.kind = 'orb';
+    style.orb = raw;
+  }
   if (body.orbSize != null && Number.isFinite(Number(body.orbSize))) style.orbSize = Number(body.orbSize);
   if (typeof body.orbCircle === 'boolean') style.orbCircle = body.orbCircle;
   const note = str(body.note, 200);
-  const afterOrb = clear ? null : raw;
+  const afterToken = clear ? null : orbToken(style);
   const ops = [];
   if (clear && Object.keys(style).length === 0) {
     if (before) ops.push({ op: 'delete', path: `ui_overrides/${orbDocId(slot)}` });
@@ -1074,6 +1146,11 @@ export async function orbSet(deps, body = {}) {
       },
     });
   }
+  const label = clear
+    ? 'orb.reset'
+    : (afterKind === 'lottie' || afterKind === 'rive'
+      ? `orb.set:${afterKind}:${afterAsset}`
+      : `orb.set:${raw}`);
   ops.push({
     op: 'create',
     path: `ui_history/${db.newId()}`,
@@ -1082,16 +1159,31 @@ export async function orbSet(deps, body = {}) {
       kind: 'orb',
       target: slot,
       default: 'random',
-      before: beforeOrb,
-      after: afterOrb,
+      before: beforeToken,
+      after: afterToken,
       at: new Date(now),
       by: admin.email || admin.uid,
-      note: note || (clear ? 'orb.reset' : `orb.set:${raw}`),
+      note: note || label,
     },
   });
-  ops.push(...logOps(deps, clear ? 'orb.reset' : 'orb.set', slot, { orb: afterOrb, before: beforeOrb }, clear ? `Cleared orb ${slot}` : `Set orb ${slot} → ${raw}`));
+  ops.push(...logOps(
+    deps,
+    clear ? 'orb.reset' : 'orb.set',
+    slot,
+    { orb: afterOrb, kind: afterKind, asset: afterAsset, before: beforeToken },
+    clear ? `Cleared orb ${slot}` : `Set orb ${slot} → ${afterToken}`,
+  ));
   if (ops.length) await db.commit(ops);
-  return { ok: true, slot, orb: afterOrb, before: beforeOrb };
+  return {
+    ok: true,
+    slot,
+    orb: afterOrb,
+    kind: afterKind,
+    asset: afterAsset,
+    token: afterToken,
+    before: beforeToken,
+    beforeOrb,
+  };
 }
 
 /** Undo the last orb change for a slot (restore previous choice from ui_history). */
@@ -1106,8 +1198,20 @@ export async function orbUndo(deps, body = {}) {
   }).catch(() => [])).filter((h) => h.data && h.data.kind === 'orb');
   if (!hist.length) throw bad('Nothing to undo for that orb slot.', 'nothing_to_undo');
   const prev = hist[0].data.before;
-  // Re-set to previous (null clears). Mark note so history shows the undo.
-  return orbSet(deps, { slot, orb: prev == null || prev === '' ? 'random' : prev, note: 'undo', allowUnknown: true });
+  const parsed = parseOrbToken(prev);
+  if (parsed.clear) {
+    return orbSet(deps, { slot, orb: 'random', note: 'undo', allowUnknown: true });
+  }
+  if (parsed.kind === 'lottie' || parsed.kind === 'rive') {
+    return orbSet(deps, {
+      slot,
+      kind: parsed.kind,
+      asset: parsed.asset,
+      note: 'undo',
+      allowUnknown: true,
+    });
+  }
+  return orbSet(deps, { slot, orb: parsed.orb, kind: 'orb', note: 'undo', allowUnknown: true });
 }
 
 export const ACTIONS = {

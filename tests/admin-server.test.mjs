@@ -433,6 +433,33 @@ test('orbs: set, list, public shape, undo restores previous', async () => {
   await assert.rejects(() => A.orbSet(d, { slot: 'orb.all', orb: 'notARealOrb' }), (e) => e.status === 400);
 });
 
+
+test('orb-set accepts lottie kind+asset and undo restores token', async () => {
+  const db = memStore();
+  const asset = 'assets/anim/thinking/assistant_gem_gold.json';
+  const d = deps(db);
+  const set1 = await A.orbSet(d, { slot: 'orb.all', kind: 'lottie', asset, note: 'lottie.pick' });
+  assert.equal(set1.kind, 'lottie');
+  assert.equal(set1.asset, asset);
+  assert.equal(set1.token, `lottie:${asset}`);
+  assert.equal(set1.orb, null);
+  const listed = await A.orbs(d, { slot: 'orb.all' });
+  assert.equal(listed.slots[0].kind, 'lottie');
+  assert.equal(listed.slots[0].asset, asset);
+  assert.equal(listed.history[0].after, `lottie:${asset}`);
+  db.clock.t += 1000;
+  const d2 = { ...d, now: db.clock.t };
+  await A.orbSet(d2, { slot: 'orb.all', orb: 'solving', note: 'switch-to-orb' });
+  db.clock.t += 1000;
+  const undone = await A.orbUndo({ ...d, now: db.clock.t }, { slot: 'orb.all' });
+  assert.equal(undone.kind, 'lottie');
+  assert.equal(undone.asset, asset);
+  await assert.rejects(
+    () => A.orbSet(d, { slot: 'orb.all', kind: 'lottie', asset: 'assets/evil.json' }),
+    (e) => e.status === 400,
+  );
+});
+
 test('orb-set writes adminLog and ui_history kind orb', async () => {
   const db = memStore();
   await A.orbSet(deps(db), { slot: 'orb.home.hero', orb: 'listening' });

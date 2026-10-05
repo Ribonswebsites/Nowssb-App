@@ -1,11 +1,15 @@
-/// Admin thinking-orb picker: every [OrbState] playing live in a grid.
+/// Admin thinking-orb picker: every [OrbState] plus the Lottie gallery
+/// (assets/anim/thinking + loaders) playing live in a grid.
 /// Tap one for a full-size preview; Set saves server-side via
-/// `/api/admin/orb-set` (and locally into ui_overrides). Undo / Reset
-/// call orb-undo / clear. Lottie gallery assets land in a later chunk.
+/// `/api/admin/orb-set` (kind/asset for Lottie, orb name for package orbs).
 library;
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
+import 'package:lottie/lottie.dart';
 
 import 'editor/glass.dart';
 import 'orb_config.dart';
@@ -31,6 +35,47 @@ String orbLabel(OrbState s) {
   }
 }
 
+/// One entry from assets/anim/orb_gallery.json.
+class OrbGalleryItem {
+  const OrbGalleryItem({
+    required this.id,
+    required this.kind,
+    required this.asset,
+    required this.label,
+    required this.group,
+  });
+
+  final String id;
+  final String kind;
+  final String asset;
+  final String label;
+  final String group;
+
+  factory OrbGalleryItem.from(Map<String, dynamic> m) => OrbGalleryItem(
+        id: '${m['id'] ?? ''}',
+        kind: '${m['kind'] ?? 'lottie'}',
+        asset: '${m['asset'] ?? ''}',
+        label: '${m['label'] ?? m['id'] ?? ''}',
+        group: '${m['group'] ?? ''}',
+      );
+}
+
+Future<List<OrbGalleryItem>> loadOrbGallery() async {
+  try {
+    final raw = await rootBundle.loadString('assets/anim/orb_gallery.json');
+    final map = jsonDecode(raw);
+    if (map is! Map) return const [];
+    final items = map['items'];
+    if (items is! List) return const [];
+    return [
+      for (final e in items)
+        if (e is Map) OrbGalleryItem.from(Map<String, dynamic>.from(e)),
+    ];
+  } catch (_) {
+    return const [];
+  }
+}
+
 Future<void> openOrbPicker(
   BuildContext context, {
   required String slot,
@@ -43,6 +88,32 @@ Future<void> openOrbPicker(
   ));
 }
 
+enum _PreviewKind { orb, lottie }
+
+class _Preview {
+  const _Preview.orb(this.state)
+      : kind = _PreviewKind.orb,
+        item = null;
+  const _Preview.lottie(this.item)
+      : kind = _PreviewKind.lottie,
+        state = null;
+
+  final _PreviewKind kind;
+  final OrbState? state;
+  final OrbGalleryItem? item;
+
+  String get title =>
+      kind == _PreviewKind.orb ? orbLabel(state!) : _titleCase(item!.label);
+}
+
+String _titleCase(String s) {
+  if (s.isEmpty) return s;
+  return s.split(RegExp(r'[\s_]+')).map((w) {
+    if (w.isEmpty) return w;
+    return '${w[0].toUpperCase()}${w.substring(1)}';
+  }).join(' ');
+}
+
 class OrbPickerScreen extends StatefulWidget {
   const OrbPickerScreen({super.key, required this.slot});
   final String slot;
@@ -51,47 +122,121 @@ class OrbPickerScreen extends StatefulWidget {
   State<OrbPickerScreen> createState() => _OrbPickerScreenState();
 }
 
-class _OrbPickerScreenState extends State<OrbPickerScreen> {
-  OrbState? _preview;
+class _OrbPickerScreenState extends State<OrbPickerScreen>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabs;
+  _Preview? _preview;
   bool _busy = false;
   String? _msg;
+  List<OrbGalleryItem> _gallery = const [];
+  bool _galleryLoaded = false;
 
   String get _slot => widget.slot.isEmpty ? 'orb.all' : widget.slot;
 
-  String get _currentName {
-    final style = UiOverrides.instance.get(_slot)?.style;
-    final v = style == null ? null : style['orb'];
-    if (v is String && v.isNotEmpty && v != 'random') return v;
-    if (_slot != 'orb.all') {
-      final all = UiOverrides.instance.get('orb.all')?.style;
-      final a = all == null ? null : all['orb'];
-      if (a is String && a.isNotEmpty && a != 'random') return a;
-    }
+  Map<String, dynamic>? get _style {
+    final local = UiOverrides.instance.get(_slot)?.style;
+    if (local != null) return local;
+    if (_slot != 'orb.all') return UiOverrides.instance.get('orb.all')?.style;
+    return null;
+  }
+
+  String get _currentOrb {
+    final v = _style?['orb'];
+    return v is String && v.isNotEmpty && v != 'random' ? v : '';
+  }
+
+  String get _currentAsset {
+    final v = _style?['asset'];
+    return v is String ? v : '';
+  }
+
+  String get _currentKind {
+    final v = _style?['kind'];
+    if (v is String && v.isNotEmpty) return v;
+    if (_currentAsset.isNotEmpty) return 'lottie';
+    if (_currentOrb.isNotEmpty) return 'orb';
     return '';
   }
 
-  Future<void> _set(OrbState state) async {
+  @override
+  void initState() {
+    super.initState();
+    _tabs = TabController(length: 3, vsync: this);
+    _loadGallery();
+  }
+
+  Future<void> _loadGallery() async {
+    final items = await loadOrbGallery();
+    if (!mounted) return;
     setState(() {
-      _busy = true;
-      _msg = 'Saving…';
+      _gallery = items;
+      _galleryLoaded = true;
     });
-    try {
-      await OrbConfig.set(slot: _slot, orb: state.name, note: 'orb.picker');
-      // Local mirror so the editor preview updates before Firestore snaps.
+  }
+
+  @override
+  void dispose() {
+    _tabs.dispose();
+    super.dispose();
+  }
+
+  Future<void> _applyChoice(OrbSlotChoice r, {required String msg}) async {
+    if (r.orb == null && (r.asset == null || r.asset!.isEmpty) &&
+        (r.kind == null || r.kind == 'orb')) {
+      UiOverrides.instance.removeLocal(_slot);
+    } else {
       UiOverrides.instance.applyLocal(UiOverride(
         slot: _slot,
         type: SlotType.orb,
         url: '',
         text: '',
         textSet: false,
-        style: {'orb': state.name},
+        style: r.toStyle(),
       ));
+    }
+    if (!mounted) return;
+    setState(() {
+      _busy = false;
+      _msg = msg;
+      _preview = null;
+    });
+  }
+
+  Future<void> _setOrb(OrbState state) async {
+    setState(() {
+      _busy = true;
+      _msg = 'Saving…';
+    });
+    try {
+      final r = await OrbConfig.set(
+        slot: _slot,
+        kind: 'orb',
+        orb: state.name,
+        note: 'orb.picker',
+      );
+      await _applyChoice(r, msg: 'Set for all users — ${orbLabel(state)}.');
+    } catch (e) {
       if (!mounted) return;
       setState(() {
         _busy = false;
-        _msg = 'Set for all users — ${orbLabel(state)}.';
-        _preview = null;
+        _msg = 'Could not save: $e';
       });
+    }
+  }
+
+  Future<void> _setLottie(OrbGalleryItem item) async {
+    setState(() {
+      _busy = true;
+      _msg = 'Saving…';
+    });
+    try {
+      final r = await OrbConfig.set(
+        slot: _slot,
+        kind: item.kind,
+        asset: item.asset,
+        note: 'orb.picker.lottie',
+      );
+      await _applyChoice(r, msg: 'Set for all users — ${_titleCase(item.label)}.');
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -108,7 +253,9 @@ class _OrbPickerScreenState extends State<OrbPickerScreen> {
     });
     try {
       final r = await OrbConfig.undo(slot: _slot);
-      if (r.orb == null || r.orb!.isEmpty) {
+      final empty = (r.orb == null || r.orb!.isEmpty) &&
+          (r.asset == null || r.asset!.isEmpty);
+      if (empty) {
         UiOverrides.instance.removeLocal(_slot);
       } else {
         UiOverrides.instance.applyLocal(UiOverride(
@@ -117,13 +264,15 @@ class _OrbPickerScreenState extends State<OrbPickerScreen> {
           url: '',
           text: '',
           textSet: false,
-          style: {'orb': r.orb},
+          style: r.toStyle(),
         ));
       }
       if (!mounted) return;
       setState(() {
         _busy = false;
-        _msg = r.orb == null ? 'Cleared — random until set again.' : 'Restored ${r.orb}.';
+        _msg = empty
+            ? 'Cleared — random until set again.'
+            : 'Restored ${r.token ?? r.orb ?? r.asset}.';
       });
     } catch (e) {
       if (!mounted) return;
@@ -157,10 +306,12 @@ class _OrbPickerScreenState extends State<OrbPickerScreen> {
     }
   }
 
+  List<OrbGalleryItem> _group(String g) =>
+      _gallery.where((e) => e.group == g).toList(growable: false);
+
   @override
   Widget build(BuildContext context) {
     final top = MediaQuery.of(context).padding.top;
-    final cur = _currentName;
     final preview = _preview;
     return Scaffold(
       backgroundColor: const Color(0xF2060C18),
@@ -172,15 +323,24 @@ class _OrbPickerScreenState extends State<OrbPickerScreen> {
             child: Row(children: [
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  const Text('THINKING ORB', style: TextStyle(color: kGold, fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 1.5)),
-                  Text(
-                    preview == null ? 'Pick an animation' : orbLabel(preview),
-                    style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800),
+                  const Text(
+                    'THINKING ORB',
+                    style: TextStyle(
+                      color: kGold,
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.5,
+                    ),
                   ),
                   Text(
-                    _slot,
-                    style: const TextStyle(color: kDim, fontSize: 11),
+                    preview == null ? 'Pick an animation' : preview.title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
+                  Text(_slot, style: const TextStyle(color: kDim, fontSize: 11)),
                 ]),
               ),
               IconButton(
@@ -202,63 +362,142 @@ class _OrbPickerScreenState extends State<OrbPickerScreen> {
           if (_msg != null)
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-              child: Text(_msg!, style: TextStyle(color: _busy ? kGold : const Color(0xFF81C784), fontSize: 12)),
+              child: Text(
+                _msg!,
+                style: TextStyle(
+                  color: _busy ? kGold : const Color(0xFF81C784),
+                  fontSize: 12,
+                ),
+              ),
             ),
           if (preview != null)
+            Expanded(child: _buildPreview(preview))
+          else ...[
+            TabBar(
+              controller: _tabs,
+              labelColor: kGold,
+              unselectedLabelColor: kDim,
+              indicatorColor: kGold,
+              tabs: const [
+                Tab(text: 'Orbs'),
+                Tab(text: 'Thinking'),
+                Tab(text: 'Loaders'),
+              ],
+            ),
             Expanded(
-              child: Column(children: [
-                Expanded(
-                  child: Center(
-                    child: Container(
-                      width: 220,
-                      height: 220,
-                      alignment: Alignment.center,
-                      decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle),
-                      child: ThinkingOrb(state: preview, size: 180, theme: OrbTheme.dark),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-                  child: Row(children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: _busy ? null : () => setState(() => _preview = null),
-                        child: const Text('Back to grid'),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: FilledButton(
-                        onPressed: _busy ? null : () => _set(preview),
-                        style: FilledButton.styleFrom(backgroundColor: kGold, foregroundColor: const Color(0xFF060C18)),
-                        child: const Text('Set'),
-                      ),
-                    ),
-                  ]),
-                ),
-              ]),
-            )
-          else
-            Expanded(
-              child: GridView.count(
-                padding: const EdgeInsets.fromLTRB(16, 4, 16, 30),
-                crossAxisCount: 2,
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
-                childAspectRatio: 1.05,
+              child: TabBarView(
+                controller: _tabs,
                 children: [
-                  for (final s in OrbState.values)
-                    _OrbTile(
-                      state: s,
-                      selected: cur == s.name,
-                      onTap: () => setState(() => _preview = s),
-                    ),
+                  _orbGrid(),
+                  _lottieGrid(_group('thinking')),
+                  _lottieGrid(_group('loaders')),
                 ],
               ),
             ),
+          ],
         ]),
       ),
+    );
+  }
+
+  Widget _buildPreview(_Preview preview) {
+    return Column(children: [
+      Expanded(
+        child: Center(
+          child: Container(
+            width: 220,
+            height: 220,
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle),
+            child: preview.kind == _PreviewKind.orb
+                ? ThinkingOrb(state: preview.state!, size: 180, theme: OrbTheme.dark)
+                : Lottie.asset(
+                    preview.item!.asset,
+                    width: 180,
+                    height: 180,
+                    fit: BoxFit.contain,
+                    repeat: true,
+                  ),
+          ),
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+        child: Row(children: [
+          Expanded(
+            child: OutlinedButton(
+              onPressed: _busy ? null : () => setState(() => _preview = null),
+              child: const Text('Back to grid'),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: FilledButton(
+              onPressed: _busy
+                  ? null
+                  : () {
+                      if (preview.kind == _PreviewKind.orb) {
+                        _setOrb(preview.state!);
+                      } else {
+                        _setLottie(preview.item!);
+                      }
+                    },
+              style: FilledButton.styleFrom(
+                backgroundColor: kGold,
+                foregroundColor: const Color(0xFF060C18),
+              ),
+              child: const Text('Set'),
+            ),
+          ),
+        ]),
+      ),
+    ]);
+  }
+
+  Widget _orbGrid() {
+    final cur = _currentOrb;
+    final isOrb = _currentKind == 'orb' || _currentKind.isEmpty;
+    return GridView.count(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 30),
+      crossAxisCount: 2,
+      mainAxisSpacing: 12,
+      crossAxisSpacing: 12,
+      childAspectRatio: 1.05,
+      children: [
+        for (final s in OrbState.values)
+          _OrbTile(
+            state: s,
+            selected: isOrb && cur == s.name,
+            onTap: () => setState(() => _preview = _Preview.orb(s)),
+          ),
+      ],
+    );
+  }
+
+  Widget _lottieGrid(List<OrbGalleryItem> items) {
+    if (!_galleryLoaded) {
+      return const Center(child: CircularProgressIndicator(color: kGold));
+    }
+    if (items.isEmpty) {
+      return const Center(
+        child: Text('No Lottie assets bundled.', style: TextStyle(color: kDim)),
+      );
+    }
+    final curAsset = _currentAsset;
+    return GridView.count(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 30),
+      crossAxisCount: 2,
+      mainAxisSpacing: 12,
+      crossAxisSpacing: 12,
+      childAspectRatio: 1.05,
+      children: [
+        for (final item in items)
+          _LottieTile(
+            item: item,
+            selected: curAsset == item.asset,
+            onTap: () => setState(() => _preview = _Preview.lottie(item)),
+          ),
+      ],
     );
   }
 }
@@ -294,6 +533,55 @@ class _OrbTile extends StatelessWidget {
           style: TextStyle(
             color: selected ? kGold : Colors.white,
             fontSize: 13,
+            fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+          ),
+        ),
+        if (selected)
+          const Text('Current', style: TextStyle(color: kGold, fontSize: 10, fontWeight: FontWeight.w700)),
+      ]),
+    );
+  }
+}
+
+class _LottieTile extends StatelessWidget {
+  const _LottieTile({required this.item, required this.selected, required this.onTap});
+  final OrbGalleryItem item;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Glass(
+      radius: 18,
+      padding: const EdgeInsets.all(10),
+      glow: selected ? kGold.withValues(alpha: 0.35) : null,
+      onTap: onTap,
+      child: Column(children: [
+        Expanded(
+          child: Center(
+            child: Container(
+              width: 96,
+              height: 96,
+              alignment: Alignment.center,
+              decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle),
+              child: Lottie.asset(
+                item.asset,
+                width: 76,
+                height: 76,
+                fit: BoxFit.contain,
+                repeat: true,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          _titleCase(item.label),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            color: selected ? kGold : Colors.white,
+            fontSize: 12,
             fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
           ),
         ),

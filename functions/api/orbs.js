@@ -12,6 +12,15 @@ function orbChoice(style) {
   const v = style && typeof style === 'object' ? style.orb : '';
   return typeof v === 'string' && v ? v : null;
 }
+function orbKind(style) {
+  if (!style || typeof style !== 'object') return null;
+  if (typeof style.kind === 'string' && style.kind) return style.kind;
+  if (orbChoice(style)) return 'orb';
+  if (typeof style.asset === 'string' && style.asset) {
+    return style.asset.endsWith('.riv') ? 'rive' : 'lottie';
+  }
+  return null;
+}
 
 export async function onRequestOptions({ request }) {
   return new Response(null, { status: 204, headers: cors(request) });
@@ -37,7 +46,14 @@ export async function onRequestGet({ request, env }) {
       .map((r) => {
         const d = r.data || {};
         const style = d.style && typeof d.style === 'object' ? d.style : {};
-        return { slot: String(d.slot || r.id || ''), orb: orbChoice(style), orbSize: style.orbSize ?? null, orbCircle: style.orbCircle ?? null };
+        return {
+          slot: String(d.slot || r.id || ''),
+          orb: orbChoice(style),
+          kind: orbKind(style),
+          asset: typeof style.asset === 'string' && style.asset ? style.asset : null,
+          orbSize: style.orbSize ?? null,
+          orbCircle: style.orbCircle ?? null,
+        };
       })
       .filter((r) => !want || r.slot === want);
     return json({ ok: true, live: true, slots }, 200, h);
