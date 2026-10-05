@@ -14,7 +14,9 @@ import '../../widgets/hype_rail.dart';
 import 'product_detail.dart';
 import 'store_cards.dart';
 import 'store_home_sections.dart';
+import 'store_section_mix.dart';
 import 'store_select_sheet.dart';
+import '../../widgets/sections/artist_cards_section.dart';
 import 'store_routes.dart';
 import 'store_terms_sheet.dart';
 import 'request_words.dart';
@@ -75,7 +77,47 @@ class _SignatureBody extends StatelessWidget {
           videoAsset: 'assets/video/signature-store-hero.mp4',
           videoTitle: '',
         )),
+        // UI-7 varied mix: artists → glassy → hype → spotlight (no two alike).
+        LSection(
+          'artists',
+          'Signature artists',
+          StoreMixRow(
+            title: 'Rarest signatures',
+            child: ArtistCardsSection(
+              config: SignatureMix.artists,
+              onTap: (item) {
+                for (final c in kRmCategories) {
+                  final s = c.signature;
+                  if (s != null && s.key == item.id) {
+                    openAtelierWord(
+                      context,
+                      word: s.name,
+                      root: 'Most Exclusive',
+                      img: s.img,
+                      signature: true,
+                    );
+                    return;
+                  }
+                }
+                storeMixOpenLink(context, item);
+              },
+            ),
+          ),
+        ),
+        LSection(
+          'glassy',
+          'Explore the stores',
+          StoreMixRow(
+            title: 'Explore the stores',
+            child: StoreRegistrySection(config: SignatureMix.glassy),
+          ),
+        ),
         const LSection('hype', 'Most hyped', NowssbHypeRail()),
+        LSection(
+          'spotlight',
+          'Signature spotlight',
+          StoreRegistrySection(config: SignatureMix.spotlight),
+        ),
         // Subscribe banner uses #3 only — never Signature hero film.
         const LSection('subscribe', 'Subscribe banner', StoreSubscribeBanner(
           videoAsset: StoreSubscribeBanner.kSubscriptionOfferVideo,

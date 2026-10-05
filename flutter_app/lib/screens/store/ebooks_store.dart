@@ -20,6 +20,7 @@ import 'product_detail.dart';
 import 'store_actions.dart';
 import 'store_cards.dart';
 import 'store_home_sections.dart';
+import 'store_section_mix.dart';
 import 'store_select_sheet.dart';
 import 'store_routes.dart';
 import 'store_terms_sheet.dart';
@@ -178,6 +179,25 @@ class _EbooksBody extends StatelessWidget {
             ),
           ),
         )),
+        // UI-7 varied mix: coupons → tiles → glassy → hype (no two alike).
+        LSection(
+          'coupons',
+          'Coupon banner',
+          StoreRegistrySection(config: EbooksMix.coupons),
+        ),
+        LSection(
+          'tiles',
+          'Category tiles',
+          StoreRegistrySection(config: EbooksMix.tiles),
+        ),
+        LSection(
+          'glassy',
+          'Explore the stores',
+          StoreMixRow(
+            title: 'Explore the stores',
+            child: StoreRegistrySection(config: EbooksMix.glassy),
+          ),
+        ),
         const LSection('hype', 'Most hyped', NowssbHypeRail()),
         const LSection('intro', 'Intro line', Text(
           'Deep-dive guides on sound, phonetic origin and healing practice — '

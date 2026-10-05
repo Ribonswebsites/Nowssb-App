@@ -1,4 +1,4 @@
-/// UI-6: varied section-type rows for the sub-store pages.
+/// UI-6 / UI-7: varied section-type rows for the sub-store pages.
 ///
 /// Each row is a [SectionConfig] with a stable id (`store.<page>.<slot>`) so
 /// Chief of Staff's section editor can target it. There is no live
@@ -89,20 +89,22 @@ List<SectionMediaItem> _storeDoors({required String skip}) => [
           ctaLabel: 'Open',
           ctaLink: 'page:store.meaning',
         ),
-      const SectionMediaItem(
-        id: 'signature',
-        title: 'Signature Store',
-        subtitle: 'The rarest words',
-        ctaLabel: 'Open',
-        ctaLink: 'page:store.signature',
-      ),
-      const SectionMediaItem(
-        id: 'ebooks',
-        title: 'eBooks',
-        subtitle: 'Read the science',
-        ctaLabel: 'Open',
-        ctaLink: 'page:store.ebooks',
-      ),
+      if (skip != 'signature')
+        const SectionMediaItem(
+          id: 'signature',
+          title: 'Signature Store',
+          subtitle: 'The rarest words',
+          ctaLabel: 'Open',
+          ctaLink: 'page:store.signature',
+        ),
+      if (skip != 'ebooks')
+        const SectionMediaItem(
+          id: 'ebooks',
+          title: 'eBooks',
+          subtitle: 'Read the science',
+          ctaLabel: 'Open',
+          ctaLink: 'page:store.ebooks',
+        ),
     ];
 
 /// Programme chips under category tiles (each opens through [NwsbLinks.cta]).
@@ -219,6 +221,100 @@ abstract final class MeaningMix {
 
   static final SectionConfig glassy =
       _seed(SectionTypeId.glassyCarousel, glassyId, _storeDoors(skip: 'meaning'));
+}
+
+// ─── Signature Store ────────────────────────────────────────────────────────
+
+/// Signature Store mix: artistCards → glassyCarousel → hypedRow (existing) →
+/// spotlight (registered; once per page).
+abstract final class SignatureMix {
+  static const artistsId = 'store.signature.artists';
+  static const glassyId = 'store.signature.glassy';
+  static const spotlightId = 'store.signature.spotlight';
+
+  /// Rarest signature words as artist cards (id = signature key).
+  static final SectionConfig artists = _seed(SectionTypeId.artistCards, artistsId, [
+        for (final c in kRmCategories.where((c) => c.signature != null).take(6))
+          SectionMediaItem(
+            id: c.signature!.key,
+            imageUrl: c.signature!.img,
+            title: c.signature!.name,
+            subtitle: 'Most Exclusive',
+            meta: {'footer': c.label},
+          ),
+      ]);
+
+  /// Other store doors; media admin-filled.
+  static final SectionConfig glassy =
+      _seed(SectionTypeId.glassyCarousel, glassyId, _storeDoors(skip: 'signature'));
+
+  /// Signature highlights — empty media → black/gold placeholders.
+  static final SectionConfig spotlight = _seed(SectionTypeId.spotlight, spotlightId, const [
+        SectionMediaItem(
+          id: 'sig.words',
+          title: 'Signature Words',
+          subtitle: 'One per collection — the rarest',
+          meta: {'badge': 'Rare'},
+        ),
+        SectionMediaItem(
+          id: 'sig.meanings',
+          title: 'Signature Meanings',
+          subtitle: 'Full decoded origin',
+          meta: {'badge': 'Exclusive'},
+        ),
+        SectionMediaItem(
+          id: 'sig.request',
+          title: 'Request a Signature',
+          subtitle: 'Crafted within 48 hours',
+          ctaLink: 'request',
+          meta: {'badge': 'Custom'},
+        ),
+      ]);
+}
+
+// ─── eBooks Store ───────────────────────────────────────────────────────────
+
+/// eBooks Store mix: couponBanner → categoryTiles → glassyCarousel →
+/// hypedRow (existing).
+abstract final class EbooksMix {
+  static const couponsId = 'store.ebooks.coupons';
+  static const tilesId = 'store.ebooks.tiles';
+  static const glassyId = 'store.ebooks.glassy';
+
+  /// Empty items → MK-1 falls back to our live wide coupons.
+  static final SectionConfig coupons =
+      _seed(SectionTypeId.couponBanner, couponsId, const []);
+
+  static final SectionConfig tiles = _seed(SectionTypeId.categoryTiles, tilesId, [
+        const SectionMediaItem(
+          id: 'atelier',
+          title: 'Words',
+          subtitle: 'Word Atelier',
+          icon: 'word',
+          ctaLink: 'store',
+          meta: {'glowColor': 0xFF5CE1FF},
+        ),
+        const SectionMediaItem(
+          id: 'meaning',
+          title: 'Meanings',
+          subtitle: 'Meaning Store',
+          icon: 'meaning',
+          ctaLink: 'meaning',
+          meta: {'glowColor': 0xFFE8A23A},
+        ),
+        const SectionMediaItem(
+          id: 'signature',
+          title: 'Signature',
+          subtitle: 'Rarest words',
+          icon: 'signature',
+          ctaLink: 'signature',
+          meta: {'glowColor': 0xFFC8A96E},
+        ),
+        ..._programmeChips('Request a word'),
+      ]);
+
+  static final SectionConfig glassy =
+      _seed(SectionTypeId.glassyCarousel, glassyId, _storeDoors(skip: 'ebooks'));
 }
 
 /// Opens a tile/chip link when the page does not handle it itself.
