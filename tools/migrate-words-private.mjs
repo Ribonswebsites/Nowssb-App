@@ -2,9 +2,10 @@
 /* One-shot: copy paid fields from words/{key} (+ content/library items) into
    wordsPrivate/{key}, then strip them from the public docs.
 
-   DO NOT run against live Firebase from a bug-fixer agent. An admin runs it
-   after deploying firestore.rules that gate wordsPrivate, and after the
-   Flutter client that fetches /api/content/word is shipping.
+   Admin (Chief of Staff) runs this after BF-1 rules + client lock are live.
+   Safe and idempotent: phase1 copy → phase2 verify → phase3 strip.
+   Already-split docs (paidStripped + wordsPrivate present) are skipped.
+   Never strips public until the private copy is verified.
 
    Usage (from repo root):
      # Dry-run (default) — prints what would change, writes nothing:
@@ -161,7 +162,7 @@ function shouldSplit(data) {
 }
 
 async function main() {
-  console.log(APPLY ? 'APPLY mode — will write to Firestore.' : 'DRY-RUN (pass --apply to write).');
+  console.log(APPLY ? 'APPLY mode — copy → verify → strip.' : 'DRY-RUN (pass --apply to write).');
   console.log('project:', PROJECT);
   const sa = loadSa();
   const token = await googleToken(sa);
@@ -169,79 +170,134 @@ async function main() {
   const words = await listCollection(token, PROJECT, 'words');
   console.log('words docs:', words.length);
 
-  const writes = [];
-  let planned = 0;
+  const toSplit = [];
   for (const { id, data } of words) {
     if (KEY_ARG && id !== KEY_ARG) continue;
     if (!shouldSplit(data)) continue;
     const paid = extractPaid(data);
     if (!paid) continue;
-    planned++;
-    const preview = stripPaid(data);
-    console.log(`  ${id}: move ${Object.keys(paid).join(',')} → wordsPrivate/${id}`);
-    if (APPLY) {
-      writes.push({
-        update: {
-          name: `${root(PROJECT)}/wordsPrivate/${id}`,
-          fields: fsFields({ ...paid, key: id, migratedAt: new Date().toISOString() }),
-        },
-      });
-      writes.push({
-        update: {
-          name: `${root(PROJECT)}/words/${id}`,
-          fields: fsFields({ ...preview, paidStripped: true }),
-        },
-      });
+    // Idempotent: already stripped and private exists → skip.
+    const existingPriv = await getDoc(token, PROJECT, `wordsPrivate/${id}`);
+    const already = data.paidStripped === true && existingPriv && extractPaid({ ...data, ...existingPriv });
+    if (data.paidStripped === true && existingPriv && Object.keys(existingPriv).length) {
+      console.log(`  ${id}: already split — skip`);
+      continue;
     }
+    toSplit.push({ id, data, paid, existingPriv });
+    console.log(`  ${id}: will move ${Object.keys(paid).join(',')} → wordsPrivate/${id}`);
   }
 
-  // content/library items — same strip for paid entries in the catalogue doc.
+  // content/library items
   const library = await getDoc(token, PROJECT, 'content/library');
+  const libraryPlan = [];
+  let libraryItems = null;
   if (library && Array.isArray(library.items)) {
-    let changed = 0;
-    const items = library.items.map((it) => {
+    libraryItems = library.items.map((it) => {
       if (!it || typeof it !== 'object') return it;
       const k = String(it.key || it.word || '').toLowerCase().replace(/\s+/g, '-');
       if (KEY_ARG && k !== KEY_ARG) return it;
       if (!shouldSplit(it)) return it;
       const paid = extractPaid(it);
       if (!paid) return it;
-      changed++;
-      console.log(`  content/library item ${k}: strip paid fields`);
-      if (APPLY && k) {
-        writes.push({
-          update: {
-            name: `${root(PROJECT)}/wordsPrivate/${k}`,
-            fields: fsFields({ ...paid, key: k, migratedAt: new Date().toISOString(), from: 'content/library' }),
-          },
-        });
-      }
-      return stripPaid(it);
+      libraryPlan.push({ k, paid, it });
+      console.log(`  content/library item ${k}: will copy paid → wordsPrivate/${k}`);
+      return it; // strip later, after verify
     });
-    if (changed && APPLY) {
-      writes.push({
-        update: {
-          name: `${root(PROJECT)}/content/library`,
-          fields: fsFields({ ...library, items }),
-        },
-      });
-    }
-    console.log('content/library paid items to strip:', changed);
+    console.log('content/library paid items to split:', libraryPlan.length);
   } else {
     console.log('content/library: missing or no items');
   }
 
-  console.log('words to split:', planned);
+  console.log('words to split:', toSplit.length);
   if (!APPLY) {
     console.log('Dry-run complete. Re-run with --apply to write.');
     return;
   }
-  for (let i = 0; i < writes.length; i += 400) {
-    await commit(token, PROJECT, writes.slice(i, i + 400));
-    console.log('committed', Math.min(i + 400, writes.length), '/', writes.length);
+
+  // ── Phase 1: COPY paid → wordsPrivate (do not touch public yet) ──
+  const copyWrites = [];
+  for (const { id, paid } of toSplit) {
+    copyWrites.push({
+      update: {
+        name: `${root(PROJECT)}/wordsPrivate/${id}`,
+        fields: fsFields({ ...paid, key: id, migratedAt: new Date().toISOString() }),
+      },
+    });
   }
-  console.log('Done.');
+  for (const { k, paid } of libraryPlan) {
+    if (!k) continue;
+    copyWrites.push({
+      update: {
+        name: `${root(PROJECT)}/wordsPrivate/${k}`,
+        fields: fsFields({ ...paid, key: k, migratedAt: new Date().toISOString(), from: 'content/library' }),
+      },
+    });
+  }
+  for (let i = 0; i < copyWrites.length; i += 400) {
+    await commit(token, PROJECT, copyWrites.slice(i, i + 400));
+    console.log('phase1 copy committed', Math.min(i + 400, copyWrites.length), '/', copyWrites.length);
+  }
+
+  // ── Phase 2: VERIFY every private doc ──
+  const verified = [];
+  for (const { id, paid } of toSplit) {
+    const priv = await getDoc(token, PROJECT, `wordsPrivate/${id}`);
+    if (!priv || !Object.keys(priv).length) {
+      throw new Error(`VERIFY FAIL: wordsPrivate/${id} missing after copy — public not stripped.`);
+    }
+    for (const k of Object.keys(paid)) {
+      if (priv[k] === undefined || priv[k] === null || priv[k] === '') {
+        // arrays/objects may be empty-ish; still require key present when paid had it
+        if (typeof paid[k] === 'string' && paid[k] && !priv[k]) {
+          throw new Error(`VERIFY FAIL: wordsPrivate/${id} missing field ${k}`);
+        }
+      }
+    }
+    verified.push(id);
+  }
+  for (const { k, paid } of libraryPlan) {
+    if (!k) continue;
+    const priv = await getDoc(token, PROJECT, `wordsPrivate/${k}`);
+    if (!priv || !Object.keys(priv).length) {
+      throw new Error(`VERIFY FAIL: wordsPrivate/${k} (from library) missing after copy.`);
+    }
+  }
+  console.log('phase2 verified:', verified.length, 'wordsPrivate docs');
+
+  // ── Phase 3: STRIP public words + library ──
+  const stripWrites = [];
+  for (const { id, data } of toSplit) {
+    const preview = stripPaid(data);
+    stripWrites.push({
+      update: {
+        name: `${root(PROJECT)}/words/${id}`,
+        fields: fsFields({ ...preview, paidStripped: true }),
+      },
+    });
+  }
+  if (library && libraryItems && libraryPlan.length) {
+    const strippedItems = library.items.map((it) => {
+      if (!it || typeof it !== 'object') return it;
+      const k = String(it.key || it.word || '').toLowerCase().replace(/\s+/g, '-');
+      if (KEY_ARG && k !== KEY_ARG) return it;
+      if (!shouldSplit(it)) return it;
+      if (!extractPaid(it)) return it;
+      return stripPaid(it);
+    });
+    stripWrites.push({
+      update: {
+        name: `${root(PROJECT)}/content/library`,
+        fields: fsFields({ ...library, items: strippedItems }),
+      },
+    });
+  }
+  for (let i = 0; i < stripWrites.length; i += 400) {
+    await commit(token, PROJECT, stripWrites.slice(i, i + 400));
+    console.log('phase3 strip committed', Math.min(i + 400, stripWrites.length), '/', stripWrites.length);
+  }
+  console.log('Done. Copied, verified, then stripped', verified.length, 'words.');
 }
+
 
 main().catch((e) => {
   console.error(e);

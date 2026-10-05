@@ -1,10 +1,12 @@
 /// Admin — Words.
 ///
-///   words/{key}        what every app shows. `status: published|archived`,
-///                      `version`, `updatedAt`, `updatedBy`, and every Word
-///                      field (lib/data/models.dart). Archived takes the word
-///                      out of every app; published replaces or adds it.
-///   word_drafts/{key}  work in progress, admins only.
+///   words/{key}          public preview every app can read (title, cover,
+///                        price, parts without audio, stage text). Paid
+///                        fields are stripped when price > 0 (BF-1).
+///   wordsPrivate/{key}   paid payload (meaning, audio/video URLs, stage
+///                        media) — same shape as /api/content/word. Entitled
+///                        clients fetch it; admins write it on publish.
+///   word_drafts/{key}    full work-in-progress, admins only (not split).
 ///
 /// ContentStore lays `words` over the shipped / content/library words, so
 /// a publish here reaches phones live, without a release. The voice is
@@ -260,12 +262,24 @@ class _WordEditorScreenState extends State<WordEditorScreen> {
       try {
         final d = await _db.collection('word_drafts').doc(k).get();
         final p = await _db.collection('words').doc(k).get();
+        final priv = await _db.collection('wordsPrivate').doc(k).get();
         if (p.exists) {
           _status = '${p.data()!['status'] ?? 'published'}';
           _version = (p.data()!['version'] as num?)?.toInt() ?? 1;
         }
         _hasDraft = d.exists;
         src = d.data() ?? p.data();
+        // Drafts already hold the full word. Published previews need the
+        // private paid fields merged back so the editor shows meaning/audio.
+        if (!_hasDraft && src != null && priv.exists && priv.data() != null) {
+          final w = Word.from(src);
+          if (w != null) {
+            final merged = w.withPaid(Map<String, dynamic>.from(priv.data()!)).toMap();
+            merged['status'] = src['status'] ?? merged['status'];
+            merged['version'] = src['version'] ?? merged['version'];
+            src = merged;
+          }
+        }
       } catch (e) {
         _msg = 'Could not read Firestore: $e';
       }
@@ -358,6 +372,45 @@ class _WordEditorScreenState extends State<WordEditorScreen> {
     if (mounted) setState(() => _busy = false);
   }
 
+  /// Writes a published/archived word: free words stay whole on `words/{id}`;
+  /// paid words (price > 0) go to wordsPrivate first, then a stripped public
+  /// preview — matching `Word.extractPaidMap` / `stripPaidMap` and
+  /// `functions/_lib/content_paid.js`. Never strip until the private copy is
+  /// verified. Drafts keep the full map (admin-only).
+  Future<void> _writeLive(Map<String, dynamic> full, {required String status, required int version}) async {
+    final stamp = _stamp();
+    final price = full['price'] is num ? full['price'] as num : num.tryParse('${full['price']}') ?? 0;
+    final paid = Word.extractPaidMap(full);
+    if (!(price > 0) || paid == null) {
+      await _db.collection('words').doc(_k).set({
+        ...full,
+        'status': status,
+        'version': version,
+        'paidStripped': false,
+        ...stamp,
+      });
+      return;
+    }
+    await _db.collection('wordsPrivate').doc(_k).set({
+      ...paid,
+      'key': _k,
+      ...stamp,
+    });
+    final check = await _db.collection('wordsPrivate').doc(_k).get();
+    if (!check.exists) {
+      throw 'Private copy of $_k did not land — public word was not stripped.';
+    }
+    final preview = Word.stripPaidMap(full);
+    await _db.collection('words').doc(_k).set({
+      ...preview,
+      'status': status,
+      'version': version,
+      'paidStripped': true,
+      'key': _k,
+      ...stamp,
+    });
+  }
+
   Future<void> _saveDraft() => _run('Saving draft…', () async {
         final m = _collect();
         final bad = _validate(m);
@@ -373,9 +426,12 @@ class _WordEditorScreenState extends State<WordEditorScreen> {
         final bad = _validate(m);
         if (bad != null) throw bad;
         _version += 1;
-        await _db.collection('words').doc(_k).set({...m, 'status': 'published', 'version': _version, ..._stamp()});
+        await _writeLive(m, status: 'published', version: _version);
         if (_hasDraft) await _db.collection('word_drafts').doc(_k).delete();
-        await adminLog('word.publish', _k, {'version': _version});
+        await adminLog('word.publish', _k, {
+          'version': _version,
+          'paidSplit': (m['price'] is num ? m['price'] as num : 0) > 0,
+        });
         final img = '${m['img'] ?? ''}';
         if (img.isNotEmpty) {
           await WordArt.instance.set(_k, image: img, scale: _imgZoom, pushHistory: false);
@@ -393,12 +449,8 @@ class _WordEditorScreenState extends State<WordEditorScreen> {
 
   Future<void> _archive(bool archive) => _run(archive ? 'Archiving…' : 'Restoring…', () async {
         final m = _collect();
-        await _db.collection('words').doc(_k).set({
-          ...m,
-          'status': archive ? 'archived' : 'published',
-          'version': _version == 0 ? 1 : _version,
-          ..._stamp(),
-        });
+        final ver = _version == 0 ? 1 : _version;
+        await _writeLive(m, status: archive ? 'archived' : 'published', version: ver);
         await adminLog(archive ? 'word.archive' : 'word.restore', _k);
         _status = archive ? 'archived' : 'published';
         _msg = archive ? 'Archived — removed from every app.' : 'Restored.';

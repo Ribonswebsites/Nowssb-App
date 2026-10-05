@@ -264,6 +264,86 @@ class Word {
     );
   }
 
+  /// Paid payload for wordsPrivate/{key}. Same keys as
+  /// `functions/_lib/content_paid.js` `extractPaid` — keep in lockstep.
+  static Map<String, dynamic>? extractPaidMap(Map<String, dynamic> raw) {
+    final out = <String, dynamic>{};
+    for (final k in const [
+      'meaning',
+      'meanings',
+      'audio',
+      'audioMale',
+      'audioFemale',
+      'video',
+      'videoUrl',
+      'videoPoster',
+    ]) {
+      final v = raw[k];
+      if (v != null && v != '') out[k] = v;
+    }
+    if (raw['meanings'] is List && (raw['meanings'] as List).isNotEmpty) {
+      out['meanings'] = List<dynamic>.from(raw['meanings'] as List);
+    }
+    if (raw['parts'] is List) {
+      final partsAudio = <String>[
+        for (final p in raw['parts'] as List)
+          p is Map ? '${p['audio'] ?? ''}' : '',
+      ];
+      if (partsAudio.any((a) => a.isNotEmpty)) out['partsAudio'] = partsAudio;
+    }
+    if (raw['stages'] is List) {
+      final stagesMedia = <Map<String, String>>[
+        for (final s in raw['stages'] as List)
+          if (s is Map)
+            {'audio': '${s['audio'] ?? ''}', 'video': '${s['video'] ?? ''}'}
+          else
+            {'audio': '', 'video': ''},
+      ];
+      if (stagesMedia.any((s) => s['audio']!.isNotEmpty || s['video']!.isNotEmpty)) {
+        out['stagesMedia'] = stagesMedia;
+      }
+    }
+    return out.isEmpty ? null : out;
+  }
+
+  /// Public preview map. Same as `functions/_lib/content_paid.js` `stripPaid`.
+  static Map<String, dynamic> stripPaidMap(Map<String, dynamic> raw) {
+    final out = Map<String, dynamic>.from(raw);
+    for (final k in const [
+      'meaning',
+      'meanings',
+      'audio',
+      'audioMale',
+      'audioFemale',
+      'video',
+      'videoUrl',
+      'videoPoster',
+    ]) {
+      out.remove(k);
+    }
+    if (out['parts'] is List) {
+      out['parts'] = [
+        for (final p in out['parts'] as List)
+          if (p is! Map)
+            p
+          else
+            Map<String, dynamic>.from(p)..remove('audio'),
+      ];
+    }
+    if (out['stages'] is List) {
+      out['stages'] = [
+        for (final s in out['stages'] as List)
+          if (s is! Map)
+            s
+          else
+            (Map<String, dynamic>.from(s)
+              ..remove('audio')
+              ..remove('video')),
+      ];
+    }
+    return out;
+  }
+
   /// The same shape [from] reads, for the admin editor and the cache.
   Map<String, dynamic> toMap() => {
         'key': key,
