@@ -12,24 +12,25 @@ import 'package:flutter/services.dart';
 
 import 'brand_top_banner.dart';
 
+import '../data/app_control.dart';
 import '../data/content.dart';
 import '../screens/app_settings.dart';
 import '../features/bazaar/bazaar_screen.dart';
-import '../features/circle/circle_screen.dart';
+import '../features/earn/earn_hub_screen.dart';
 import '../features/earn/earnings_screen.dart';
-import '../features/notifications/inbox_screen.dart';
 import '../features/social/echo_wall_screen.dart';
 import '../features/gifts/gifts_screen.dart';
 import '../features/economy/coupon_screen.dart';
 import '../features/vault/vault_screen.dart';
 import '../features/wordprint/word_print_screen.dart';
+import '../screens/features_page.dart';
 import '../screens/notifications_settings.dart';
 import '../screens/progress/progress_screen.dart';
 import '../screens/reader/reader_hub.dart';
-import '../screens/saved_words.dart';
 import '../screens/shared_sections.dart';
 import '../screens/sound_library.dart';
 import '../screens/store/meaning_store.dart';
+import '../screens/subscription.dart';
 import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
 import '../widgets/nwsb_icon.dart';
@@ -223,7 +224,10 @@ class HomeMenuDrawer extends StatelessWidget {
                       bottom + 40,
                     ),
                     children: [
-                      const BrandTopBanner(compact: true),
+                      BrandTopBanner(
+                        compact: true,
+                        onTap: () => _push(context, const SubscriptionScreen()),
+                      ),
                       _SectionLabel('Practice', light: light),
                       _Group(
                         light: light,
@@ -269,7 +273,10 @@ class HomeMenuDrawer extends StatelessWidget {
                             mark: _mark['science']!,
                             label: 'Word Science',
                             sub: 'NowssB system',
-                            onTap: () => _goTab(context, 2),
+                            onTap: () => _push(
+                              context,
+                              const AboutNowssbScreen(science: true),
+                            ),
                           ),
                           _Row(
                             light: light,
@@ -349,7 +356,7 @@ class HomeMenuDrawer extends StatelessWidget {
                             mark: NwsbMarks.piggy,
                             label: 'NowssB Earn',
                             sub: 'Agents, codes, commission',
-                            onTap: () => _push(context, const CircleScreen()),
+                            onTap: () => _push(context, const EarnHubScreen()),
                           ),
                           _Row(
                             light: light,
@@ -372,13 +379,14 @@ class HomeMenuDrawer extends StatelessWidget {
                             sub: 'Scratch, codes, paid cards',
                             onTap: () => _push(context, const CouponScreen()),
                           ),
-                          _Row(
-                            light: light,
-                            mark: NwsbMarks.bag,
-                            label: 'Resell',
-                            sub: 'Listings inside the Store',
-                            onTap: () => _push(context, const BazaarScreen()),
-                          ),
+                          if (AppControl.instance.flag('resale', fallback: false))
+                            _Row(
+                              light: light,
+                              mark: NwsbMarks.bag,
+                              label: 'Resell',
+                              sub: 'Listings inside the Store',
+                              onTap: () => _push(context, const BazaarScreen()),
+                            ),
                           _Row(
                             light: light,
                             mark: NwsbMarks.user,
@@ -404,17 +412,17 @@ class HomeMenuDrawer extends StatelessWidget {
                             light: light,
                             mark: NwsbMarks.bell,
                             label: 'Activity',
-                            sub: 'Rewards and payout updates',
-                            onTap: () => _push(context, const InboxScreen()),
+                            sub: 'Coin and cash ledger',
+                            onTap: () => _push(context, const EarnHubScreen()),
                           ),
                           _Row(
                             light: light,
                             mark: _mark['connect']!,
                             label: 'NowssB Connect',
-                            sub: 'Saved and liked words',
+                            sub: 'Echo Wall · community',
                             last: true,
                             onTap: () =>
-                                _push(context, const SavedWordsScreen()),
+                                _push(context, const EchoWallScreen()),
                           ),
                         ],
                       ),
