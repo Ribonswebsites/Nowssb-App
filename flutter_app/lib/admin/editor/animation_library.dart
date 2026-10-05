@@ -1,8 +1,8 @@
 /// Animation library: every animation the UI Editor can apply, each playing
 /// live and large — entrances, page turns, auto-rotate at the chosen speed,
-/// and the thinking orbs. Tap one to apply it to the selected section (or
-/// the whole app for orbs). The app ships no Lottie or Rive files, so those
-/// families are not listed.
+/// and the thinking orbs (every OrbState). Orbs open the full picker so
+/// Set writes server-side for all users. Lottie/Rive gallery assets are
+/// wired in a follow-up once copied into the admin bundle.
 library;
 
 import 'package:flutter/material.dart';
@@ -14,7 +14,8 @@ import '../layout/scopes.dart';
 import '../template/slot_keys.dart';
 import 'editor_controller.dart';
 import 'glass.dart';
-import 'tab_animation.dart' show kEntrances, kOrbNames;
+import 'tab_animation.dart' show kEntrances;
+import '../orb_picker.dart';
 
 Future<void> openAnimationLibrary(BuildContext context, EditorController c) {
   return Navigator.of(context).push(PageRouteBuilder<void>(
@@ -145,22 +146,43 @@ class _AnimationLibraryState extends State<AnimationLibrary> with SingleTickerPr
             const Hint('Pick a sideways (carousel) section in the page picker to auto-rotate it.'),
         ]);
       case 'orb':
-        const key = 'orb.all';
-        final pick = '${c.overrideOf(key)?.style['orb'] ?? ''}';
-        return _grid([
-          for (final e in kOrbNames.entries)
-            _BigTile(
-              label: e.value,
-              selected: pick == e.key.name,
-              onTap: () => c.patchStyle(key, SlotType.orb, 'random', {'orb': e.key.name}),
-              child: Container(
-                width: 100,
-                height: 100,
-                alignment: Alignment.center,
-                decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle),
-                child: ThinkingOrb(state: e.key, size: 80, theme: OrbTheme.dark),
-              ),
+        // Full picker: every OrbState.values, live grid, Set/Undo server-side.
+        final key = c.current == null
+            ? 'orb.all'
+            : 'orb.${c.pageId}.${c.current!.id}';
+        final pick = '${c.overrideOf(key)?.style['orb'] ?? c.overrideOf('orb.all')?.style['orb'] ?? ''}';
+        return Column(children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            child: Glass(
+              radius: 14,
+              padding: const EdgeInsets.all(12),
+              onTap: () => openOrbPicker(context, slot: key),
+              child: const Row(children: [
+                Icon(Icons.open_in_full_rounded, color: kGold, size: 18),
+                SizedBox(width: 8),
+                Expanded(child: Text('Open full orb picker — Set saves for all users, with Undo',
+                    style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600))),
+              ]),
             ),
+          ),
+          Expanded(
+            child: _grid([
+              for (final s in OrbState.values)
+                _BigTile(
+                  label: orbLabel(s),
+                  selected: pick == s.name,
+                  onTap: () => openOrbPicker(context, slot: key),
+                  child: Container(
+                    width: 100,
+                    height: 100,
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle),
+                    child: ThinkingOrb(state: s, size: 80, theme: OrbTheme.dark),
+                  ),
+                ),
+            ]),
+          ),
         ]);
       default:
         final ent = '${props['entrance'] ?? 'none'}';

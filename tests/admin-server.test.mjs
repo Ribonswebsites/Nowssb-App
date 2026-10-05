@@ -395,3 +395,52 @@ test('admin-alert endpoint checks the request belongs to the caller', async () =
   assert.equal(su.status, 200);
   assert.ok(db.store.get('adminAlerts/signup_m1'));
 });
+
+test('orbs: set, list, public shape, undo restores previous', async () => {
+  const db = memStore();
+  const d = deps(db);
+  const empty = await A.orbs(d, {});
+  assert.equal(empty.slots.length, 0);
+
+  const set1 = await A.orbSet(d, { slot: 'orb.all', orb: 'composing' });
+  assert.equal(set1.orb, 'composing');
+  assert.equal(set1.before, null);
+
+  // Advance the memstore clock so history orderBy at is stable.
+  db.clock.t += 1000;
+  const d2 = { ...d, now: db.clock.t };
+  const set2 = await A.orbSet(d2, { slot: 'orb.all', orb: 'solving', note: 'preview' });
+  assert.equal(set2.orb, 'solving');
+  assert.equal(set2.before, 'composing');
+
+  const listed = await A.orbs(d2, { slot: 'orb.all' });
+  assert.equal(listed.slots.length, 1);
+  assert.equal(listed.slots[0].orb, 'solving');
+  assert.ok(listed.history.length >= 2);
+  assert.equal(listed.history[0].after, 'solving');
+
+  const undid = await A.orbUndo(d, { slot: 'orb.all' });
+  assert.equal(undid.orb, 'composing');
+  const afterUndo = await A.orbs(d, { slot: 'orb.all' });
+  assert.equal(afterUndo.slots[0].orb, 'composing');
+
+  const cleared = await A.orbSet(d, { slot: 'orb.all', orb: 'random' });
+  assert.equal(cleared.orb, null);
+  const gone = await A.orbs(d, {});
+  assert.equal(gone.slots.length, 0);
+
+  await assert.rejects(() => A.orbSet(d, { slot: 'nope', orb: 'composing' }), (e) => e.status === 400);
+  await assert.rejects(() => A.orbSet(d, { slot: 'orb.all', orb: 'notARealOrb' }), (e) => e.status === 400);
+});
+
+test('orb-set writes adminLog and ui_history kind orb', async () => {
+  const db = memStore();
+  await A.orbSet(deps(db), { slot: 'orb.home.hero', orb: 'listening' });
+  const ov = db.store.get('ui_overrides/orb.home.hero');
+  assert.equal(ov.type, 'orb');
+  assert.equal(ov.style.orb, 'listening');
+  const hist = rowsOf(db, 'ui_history/');
+  assert.ok(hist.some((h) => h.kind === 'orb' && h.target === 'orb.home.hero' && h.after === 'listening'));
+  const log = rowsOf(db, 'adminLog/');
+  assert.ok(log.some((h) => h.action === 'orb.set' && h.target === 'orb.home.hero'));
+});

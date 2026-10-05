@@ -1,7 +1,8 @@
 /// Shared thinking-orb loader for NowssB.
 ///
-/// Picks one of [OrbState.composing], [OrbState.listening], or
-/// [OrbState.solving] once per mount so the animation does not flicker.
+/// When a per-slot (or app-wide `orb.all`) choice is saved server-side in
+/// `ui_overrides`, that animation plays for every user — no random pick.
+/// Random is used only while the slot (and `orb.all`) are still unset.
 /// Every orb sits inside a **larger black circle** for consistent placement
 /// across hero chips, search fields, practice pills, and loaders.
 library;
@@ -18,12 +19,32 @@ import '../admin/template/ui_overrides.dart';
 /// Alias kept for call sites that prefer the product name.
 typedef NwsbThinkingOrb = AppThinkingLoader;
 
-/// The only three states this app mounts for loading surfaces.
+/// Fallback pool while no server choice is set for the slot / `orb.all`.
 const List<OrbState> kNwsbThinkingOrbStates = <OrbState>[
   OrbState.composing,
   OrbState.listening,
   OrbState.solving,
 ];
+
+/// Resolve a saved OrbState name from [style], or null if unset / unknown.
+OrbState? orbStateFromStyle(Map<String, dynamic>? style) {
+  final pick = style == null ? null : style['orb'];
+  if (pick is! String || pick.isEmpty || pick == 'random') return null;
+  for (final s in OrbState.values) {
+    if (s.name == pick) return s;
+  }
+  return null;
+}
+
+/// The effective server choice for a loader slot: slot → `orb.all` → null.
+OrbState? resolvedOrbChoice(String key) {
+  final local = orbStateFromStyle(UiOverrides.instance.get(key)?.style);
+  if (local != null) return local;
+  if (key != 'orb.all') {
+    return orbStateFromStyle(UiOverrides.instance.get('orb.all')?.style);
+  }
+  return null;
+}
 
 class AppThinkingLoader extends StatefulWidget {
   const AppThinkingLoader({
@@ -50,8 +71,9 @@ class AppThinkingLoader extends StatefulWidget {
   /// Orb diameter. Prefer 28–36 inline, 72 for full-screen centers.
   final double size;
 
-  /// Force one of the three allowed states. When null, one is chosen at random
-  /// in [initState] and kept for the lifetime of this State.
+  /// Force one OrbState. When null, the server choice for [slot] / `orb.all`
+  /// is used; only if that is also unset does the loader pick at random once
+  /// per mount from [kNwsbThinkingOrbStates].
   final OrbState? state;
 
   final OrbTheme theme;
@@ -69,43 +91,59 @@ class AppThinkingLoader extends StatefulWidget {
 }
 
 class _AppThinkingLoaderState extends State<AppThinkingLoader> {
-  late final OrbState _state;
+  /// Random fallback kept for the lifetime of this State when no server
+  /// choice (and no [widget.state]) is set. Cleared conceptually once a
+  /// choice appears — build always prefers the server pick.
+  OrbState? _randomFallback;
+
+  OrbState _fallbackRandom() {
+    return kNwsbThinkingOrbStates[
+        math.Random().nextInt(kNwsbThinkingOrbStates.length)];
+  }
 
   @override
   void initState() {
     super.initState();
-    final forced = widget.state;
-    if (forced != null) {
-      assert(
-        kNwsbThinkingOrbStates.contains(forced),
-        'AppThinkingLoader only mounts composing / listening / solving',
-      );
-      _state = forced;
-    } else {
-      _state = kNwsbThinkingOrbStates[
-          math.Random().nextInt(kNwsbThinkingOrbStates.length)];
+    // Prefer an already-cached server choice so the first frame is stable.
+    if (widget.state == null) {
+      final key = widget.slot ?? 'orb.all';
+      if (resolvedOrbChoice(key) == null) {
+        _randomFallback = _fallbackRandom();
+      }
     }
+  }
+
+  String _slotKey(BuildContext context) {
+    final section = SectionScope.maybeOf(context);
+    return widget.slot ??
+        (section != null ? 'orb.${section.pageId}.${section.sectionId}' : 'orb.all');
   }
 
   @override
   Widget build(BuildContext context) {
     UiScope.watch(context);
-    final section = SectionScope.maybeOf(context);
-    final key = widget.slot ??
-        (section != null ? 'orb.${section.pageId}.${section.sectionId}' : 'orb.all');
-    slotSeen(context, key, SlotType.orb, _state.name);
+    final key = _slotKey(context);
+    final forced = widget.state;
+    final saved = resolvedOrbChoice(key);
+    // Once a server choice exists, never use random for this mount.
+    final OrbState state;
+    if (forced != null) {
+      state = forced;
+    } else if (saved != null) {
+      state = saved;
+      _randomFallback = null;
+    } else {
+      _randomFallback ??= _fallbackRandom();
+      state = _randomFallback!;
+    }
+
+    slotSeen(context, key, SlotType.orb, state.name);
     var look = effectiveOverride(context, key)?.style;
     if ((look == null || look.isEmpty) && key != 'orb.all') {
       look = effectiveOverride(context, 'orb.all')?.style;
     }
     look ??= const {};
-    var state = _state;
-    final pick = look['orb'];
-    if (pick is String) {
-      for (final s in OrbState.values) {
-        if (s.name == pick) state = s;
-      }
-    }
+
     final size = look['orbSize'] is num ? (look['orbSize'] as num).toDouble() : widget.size;
     final blackCircle = look['orbCircle'] is bool ? look['orbCircle'] as bool : widget.blackCircle;
 

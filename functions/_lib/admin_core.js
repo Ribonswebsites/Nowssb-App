@@ -967,6 +967,149 @@ export async function uiAssets(deps, body = {}) {
   return { ok: true, items: items.filter((x) => !ext || x.key.toLowerCase().endsWith('.' + ext)), overrides: [...new Set(fromOverrides)], missing: [] };
 }
 
+
+/* ═════════════════ Thinking-orb config ═════════════════
+   Per-slot choice lives in ui_overrides/{slot} with type "orb" and
+   style.orb = OrbState name. History in ui_history (kind: "orb").
+   Public clients already read ui_overrides (rules: allow read).
+   Admin GET/PUT via orbs / orb-set / orb-undo. */
+const ORB_SLOT_RE = /^orb(\.[A-Za-z0-9_.-]+)?$/;
+const ORB_NAME_RE = /^[a-zA-Z][a-zA-Z0-9_]{0,40}$/;
+const ORB_KNOWN = new Set(['working', 'searching', 'solving', 'listening', 'composing', 'shaping']);
+
+function orbSlotId(slot) {
+  const s = str(slot, 120) || 'orb.all';
+  if (!ORB_SLOT_RE.test(s)) throw bad('Orb slot must look like orb.all or orb.page.section.');
+  return s;
+}
+function orbDocId(slot) { return slot.replaceAll('/', '~'); }
+function orbChoice(style) {
+  const v = style && typeof style === 'object' ? style.orb : '';
+  return typeof v === 'string' ? v : '';
+}
+
+/** List every orb override, or one slot plus its recent history. */
+export async function orbs(deps, body = {}) {
+  const { db } = deps;
+  const want = str(body.slot, 120);
+  const all = await db.query({ collection: 'ui_overrides', limit: 1000 }).catch(() => []);
+  const rows = all
+    .filter((r) => {
+      const d = r.data || {};
+      const slot = String(d.slot || r.id || '');
+      if (d.type === 'orb') return true;
+      return slot.startsWith('orb.');
+    })
+    .map((r) => {
+      const d = r.data || {};
+      const slot = String(d.slot || r.id || '');
+      const style = d.style && typeof d.style === 'object' ? d.style : {};
+      return {
+        slot,
+        orb: orbChoice(style) || null,
+        orbSize: style.orbSize ?? null,
+        orbCircle: style.orbCircle ?? null,
+        updatedAt: toMs(d.updatedAt),
+        updatedBy: d.updatedBy || '',
+      };
+    })
+    .filter((r) => !want || r.slot === want);
+  let history = [];
+  if (want) {
+    // Filter in memory so we do not need a composite index on kind+target+at.
+    const hist = (await db.query({
+      collection: 'ui_history',
+      where: [['target', '==', want]],
+      orderBy: [['at', 'desc']],
+      limit: 80,
+    }).catch(() => [])).filter((h) => h.data && h.data.kind === 'orb');
+    history = hist.slice(0, 40).map((h) => ({
+      id: h.id,
+      at: toMs(h.data.at),
+      by: h.data.by || '',
+      note: h.data.note || '',
+      before: h.data.before ?? null,
+      after: h.data.after ?? null,
+    }));
+  }
+  return { ok: true, slots: rows, history };
+}
+
+/** Set or clear the orb for one slot. Empty / "random" clears → clients fall back to random. */
+export async function orbSet(deps, body = {}) {
+  const { db, admin, now } = deps;
+  const slot = orbSlotId(body.slot);
+  const raw = body.orb == null ? '' : str(body.orb, 40);
+  const clear = !raw || raw === 'random' || raw === 'unset';
+  if (!clear && !ORB_NAME_RE.test(raw)) throw bad('That is not an orb animation name.');
+  if (!clear && !ORB_KNOWN.has(raw) && body.allowUnknown !== true) {
+    throw bad(`Unknown orb “${raw}”. Known: ${[...ORB_KNOWN].join(', ')}.`);
+  }
+  const before = await db.get(`ui_overrides/${orbDocId(slot)}`);
+  const beforeOrb = before ? orbChoice(before.style) || null : null;
+  const style = { ...(before && before.style && typeof before.style === 'object' ? before.style : {}) };
+  if (clear) delete style.orb;
+  else style.orb = raw;
+  if (body.orbSize != null && Number.isFinite(Number(body.orbSize))) style.orbSize = Number(body.orbSize);
+  if (typeof body.orbCircle === 'boolean') style.orbCircle = body.orbCircle;
+  const note = str(body.note, 200);
+  const afterOrb = clear ? null : raw;
+  const ops = [];
+  if (clear && Object.keys(style).length === 0) {
+    if (before) ops.push({ op: 'delete', path: `ui_overrides/${orbDocId(slot)}` });
+  } else {
+    ops.push({
+      op: 'set',
+      path: `ui_overrides/${orbDocId(slot)}`,
+      data: {
+        slot,
+        type: 'orb',
+        url: '',
+        text: null,
+        storagePath: '',
+        style,
+        default: 'random',
+        updatedAt: new Date(now),
+        updatedBy: admin.email || admin.uid,
+      },
+    });
+  }
+  ops.push({
+    op: 'create',
+    path: `ui_history/${db.newId()}`,
+    data: {
+      page: slot.startsWith('orb.') ? slot.split('.')[1] || 'all' : 'all',
+      kind: 'orb',
+      target: slot,
+      default: 'random',
+      before: beforeOrb,
+      after: afterOrb,
+      at: new Date(now),
+      by: admin.email || admin.uid,
+      note: note || (clear ? 'orb.reset' : `orb.set:${raw}`),
+    },
+  });
+  ops.push(...logOps(deps, clear ? 'orb.reset' : 'orb.set', slot, { orb: afterOrb, before: beforeOrb }, clear ? `Cleared orb ${slot}` : `Set orb ${slot} → ${raw}`));
+  if (ops.length) await db.commit(ops);
+  return { ok: true, slot, orb: afterOrb, before: beforeOrb };
+}
+
+/** Undo the last orb change for a slot (restore previous choice from ui_history). */
+export async function orbUndo(deps, body = {}) {
+  const { db } = deps;
+  const slot = orbSlotId(body.slot);
+  const hist = (await db.query({
+    collection: 'ui_history',
+    where: [['target', '==', slot]],
+    orderBy: [['at', 'desc']],
+    limit: 40,
+  }).catch(() => [])).filter((h) => h.data && h.data.kind === 'orb');
+  if (!hist.length) throw bad('Nothing to undo for that orb slot.', 'nothing_to_undo');
+  const prev = hist[0].data.before;
+  // Re-set to previous (null clears). Mark note so history shows the undo.
+  return orbSet(deps, { slot, orb: prev == null || prev === '' ? 'random' : prev, note: 'undo', allowUnknown: true });
+}
+
 export const ACTIONS = {
   stats, users: listUsers, user: userProfile,
   'grant-sub': grantSub, 'extend-sub': extendSub, 'revoke-sub': revokeSub,
@@ -976,4 +1119,5 @@ export const ACTIONS = {
   'payout-decide': decidePayout, 'gift-codes': createGiftCodes, 'gift-void': voidGift,
   earn: earnOverview, network, feed, 'ui-assets': uiAssets,
   today, 'grant-item': grantItem, 'send-gift': sendGift, alerts,
+  orbs, 'orb-set': orbSet, 'orb-undo': orbUndo,
 };

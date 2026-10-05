@@ -16,6 +16,7 @@ import '../media_upload.dart';
 import 'media_tune.dart';
 import 'slot_keys.dart';
 import 'ui_overrides.dart';
+import '../orb_picker.dart';
 
 Future<void> openSlotSheet(
   BuildContext context, {
@@ -25,6 +26,9 @@ Future<void> openSlotSheet(
   String? word,
 }) {
   if (!AdminState.instance.isAdmin) return Future.value();
+  if (type == SlotType.orb) {
+    return openOrbPicker(context, slot: slotKey);
+  }
   final bound = word ?? wordOfSlot(slotKey);
   return showModalBottomSheet<void>(
     context: context,
