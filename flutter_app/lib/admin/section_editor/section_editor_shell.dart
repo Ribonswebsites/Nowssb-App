@@ -1,10 +1,10 @@
-/// CS-3 section editor shell.
+/// Section editor shell (CS-3 + CS-4).
 ///
-/// In edit mode, tapping a section opens this overlay: the section sits on a
-/// centred black panel with the rest of the screen blurred. Save / Cancel /
-/// Undo persist a [SectionConfig] via `/api/admin/section-set` (audit +
-/// ui_history). Later chunks (CS-4…CS-7) fill in pinch, handles, media, and
-/// animation controls on this same shell.
+/// Edit mode → blurred black centred panel. Save / Cancel / Undo persist a
+/// [SectionConfig] via `/api/admin/section-set`. CS-4 adds fluid per-card
+/// image pinch/drag (focalX/focalY/zoom) and layout drag handles (height,
+/// card size, spacing, radius, wrapper), all live-previewed via the UI-0
+/// [SectionRegistry].
 library;
 
 import 'dart:ui';
@@ -15,6 +15,8 @@ import '../../widgets/sections/section_config.dart';
 import '../../widgets/sections/section_registry.dart';
 import '../editor/glass.dart';
 import 'section_config_api.dart';
+import 'section_focal_pad.dart';
+import 'section_layout_handles.dart';
 
 Future<void> openSectionEditor(
   BuildContext context, {
@@ -37,6 +39,16 @@ Future<void> openSectionEditor(
     ),
     transitionsBuilder: (_, a, __, child) => FadeTransition(opacity: a, child: child),
   ));
+}
+
+/// Seed a couple of editable cards when a section has no items yet, so
+/// focal/zoom controls have something to pan.
+List<SectionMediaItem> ensureEditableItems(SectionConfig cfg) {
+  if (cfg.items.isNotEmpty) return cfg.items;
+  return [
+    SectionMediaItem(id: '${cfg.id}.a', title: 'Card A'),
+    SectionMediaItem(id: '${cfg.id}.b', title: 'Card B'),
+  ];
 }
 
 class SectionEditorShell extends StatefulWidget {
@@ -66,6 +78,7 @@ class _SectionEditorShellState extends State<SectionEditorShell> {
   bool _busy = false;
   String? _msg;
   bool _dirty = false;
+  int _itemIndex = 0;
 
   String get _slot => sectionSlotKey(widget.pageId, widget.sectionId);
 
@@ -86,24 +99,29 @@ class _SectionEditorShellState extends State<SectionEditorShell> {
         pageId: widget.pageId,
         sectionId: widget.sectionId,
       );
-      final type = remote?.type ??
-          widget.initialType ??
-          SectionTypeId.cardRow;
-      final base = remote ??
+      final type = remote?.type ?? widget.initialType ?? SectionTypeId.cardRow;
+      var base = remote ??
           SectionRegistry.instance.defaultConfigFor(type, id: widget.sectionId);
+      if (base.items.isEmpty) {
+        base = base.copyWith(items: ensureEditableItems(base));
+      }
       if (!mounted) return;
       setState(() {
         _saved = remote;
         _draft = base;
         _loading = false;
-        _dirty = false;
+        _dirty = remote == null; // seeded items count as draft until saved
+        _itemIndex = 0;
       });
     } catch (e) {
       if (!mounted) return;
       final type = widget.initialType ?? SectionTypeId.cardRow;
+      var base = SectionRegistry.instance.defaultConfigFor(type, id: widget.sectionId);
+      base = base.copyWith(items: ensureEditableItems(base));
       setState(() {
-        _draft = SectionRegistry.instance.defaultConfigFor(type, id: widget.sectionId);
+        _draft = base;
         _loading = false;
+        _dirty = true;
         _msg = 'Could not load saved config — editing defaults. ($e)';
       });
     }
@@ -114,7 +132,18 @@ class _SectionEditorShellState extends State<SectionEditorShell> {
       _draft = next;
       _dirty = true;
       _msg = null;
+      if (_itemIndex >= next.items.length) {
+        _itemIndex = next.items.isEmpty ? 0 : next.items.length - 1;
+      }
     });
+  }
+
+  void _updateItem(int i, SectionMediaItem item) {
+    final draft = _draft;
+    if (draft == null || i < 0 || i >= draft.items.length) return;
+    final items = [...draft.items];
+    items[i] = item;
+    _touch(draft.copyWith(items: items));
   }
 
   Future<void> _save() async {
@@ -162,12 +191,15 @@ class _SectionEditorShellState extends State<SectionEditorShell> {
       setState(() {
         _busy = false;
         _saved = restored;
-        _draft = restored ??
+        var next = restored ??
             SectionRegistry.instance.defaultConfigFor(
               widget.initialType ?? SectionTypeId.cardRow,
               id: widget.sectionId,
             );
+        if (next.items.isEmpty) next = next.copyWith(items: ensureEditableItems(next));
+        _draft = next;
         _dirty = false;
+        _itemIndex = 0;
         _msg = restored == null
             ? 'Cleared — section uses app defaults.'
             : 'Restored v${restored.version}.';
@@ -184,12 +216,15 @@ class _SectionEditorShellState extends State<SectionEditorShell> {
   void _cancel() {
     if (_dirty) {
       setState(() {
-        _draft = _saved ??
+        var next = _saved ??
             SectionRegistry.instance.defaultConfigFor(
               widget.initialType ?? SectionTypeId.cardRow,
               id: widget.sectionId,
             );
+        if (next.items.isEmpty) next = next.copyWith(items: ensureEditableItems(next));
+        _draft = next;
         _dirty = false;
+        _itemIndex = 0;
         _msg = 'Edits discarded.';
       });
       return;
@@ -204,7 +239,6 @@ class _SectionEditorShellState extends State<SectionEditorShell> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Stack(children: [
-        // Blurred dim backdrop.
         Positioned.fill(
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
@@ -282,9 +316,13 @@ class _SectionEditorShellState extends State<SectionEditorShell> {
   Widget _body(SectionConfig draft) {
     ensureSectionRegistry();
     final types = SectionTypeId.all.toList()..sort();
+    final items = draft.items;
+    final item = items.isEmpty ? null : items[_itemIndex.clamp(0, items.length - 1)];
+    final previewH = (draft.layout.height ?? 160).clamp(96.0, 280.0);
+
     return ListView(
       children: [
-        // Centred live preview panel.
+        // Live preview — rebuilds from draft on every handle / focal change.
         Container(
           decoration: BoxDecoration(
             color: Colors.black,
@@ -303,7 +341,7 @@ class _SectionEditorShellState extends State<SectionEditorShell> {
                 ),
               ),
               SizedBox(
-                height: (draft.layout.height ?? 160).clamp(96, 320),
+                height: previewH,
                 child: Center(
                   child: widget.preview ??
                       SectionRegistry.instance.build(context, draft),
@@ -313,6 +351,8 @@ class _SectionEditorShellState extends State<SectionEditorShell> {
           ),
         ),
         const SizedBox(height: 14),
+
+        // Type / enabled
         Glass(
           radius: 16,
           padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
@@ -350,19 +390,21 @@ class _SectionEditorShellState extends State<SectionEditorShell> {
                   ? null
                   : (v) {
                       if (v == null) return;
-                      final next = SectionRegistry.instance
+                      final seeded = SectionRegistry.instance
                           .defaultConfigFor(v, id: widget.sectionId)
                           .copyWith(
                             enabled: draft.enabled,
                             version: draft.version,
-                            items: draft.items,
+                            items: draft.items.isNotEmpty
+                                ? draft.items
+                                : ensureEditableItems(draft.copyWith(type: v)),
                             layout: draft.layout,
                             behavior: draft.behavior,
                             style: draft.style,
                             animation: draft.animation,
                             type: v,
                           );
-                      _touch(next);
+                      _touch(seeded);
                     },
             ),
             const SizedBox(height: 12),
@@ -377,18 +419,76 @@ class _SectionEditorShellState extends State<SectionEditorShell> {
               value: draft.enabled,
               onChanged: _busy ? null : (v) => _touch(draft.copyWith(enabled: v)),
             ),
-            const SizedBox(height: 4),
             Text(
               'Version ${draft.version}${_dirty ? ' (unsaved)' : (_saved != null ? ' (live)' : ' (defaults)')}',
               style: const TextStyle(color: kDim, fontSize: 11),
             ),
-            const SizedBox(height: 8),
-            Text(
-              'Pinch, layout handles, media and animations land in CS-4…CS-7 on this panel.',
-              style: TextStyle(color: kDim.withValues(alpha: 0.85), fontSize: 11),
-            ),
           ]),
         ),
+        const SizedBox(height: 14),
+
+        // Per-card focal / zoom
+        Glass(
+          radius: 16,
+          padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text(
+                'Image focal / zoom',
+                style: TextStyle(color: kGold, fontSize: 12, fontWeight: FontWeight.w800),
+              ),
+              const SizedBox(height: 8),
+              if (items.isEmpty)
+                const Text('No cards yet.', style: TextStyle(color: kDim, fontSize: 12))
+              else ...[
+                SizedBox(
+                  height: 36,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: items.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 8),
+                    itemBuilder: (_, i) {
+                      final selected = i == _itemIndex;
+                      return ChoiceChip(
+                        label: Text(items[i].title ?? items[i].id),
+                        selected: selected,
+                        onSelected: _busy
+                            ? null
+                            : (_) => setState(() => _itemIndex = i),
+                        selectedColor: kGold,
+                        labelStyle: TextStyle(
+                          color: selected ? const Color(0xFF060C18) : Colors.white,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 12,
+                        ),
+                        backgroundColor: const Color(0xFF121826),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 10),
+                if (item != null)
+                  SectionFocalPad(
+                    key: ValueKey('focal-${item.id}'),
+                    item: item,
+                    onChanged: (fx, fy, z) => _updateItem(
+                      _itemIndex,
+                      item.copyWith(focalX: fx, focalY: fy, zoom: z),
+                    ),
+                  ),
+              ],
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+
+        // Layout handles
+        SectionLayoutHandles(
+          layout: draft.layout,
+          onChanged: (layout) => _touch(draft.copyWith(layout: layout)),
+        ),
+        const SizedBox(height: 24),
       ],
     );
   }
