@@ -25,18 +25,21 @@ import '../features/economy/economy_theme.dart';
 import '../features/economy/money.dart';
 import '../features/gifts/gifts_screen.dart';
 import '../features/vault/vault_screen.dart';
+import '../data/phone_notifications.dart';
 import '../data/practice_progress.dart';
 import '../shell/nav_shell.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import '../widgets/app_thinking_loader.dart';
+import 'app_settings.dart';
+import 'auth_gate.dart';
 import 'saved_words.dart';
 import 'sound_library.dart';
 import '../features/notifications/inbox_screen.dart';
-import 'player_settings.dart';
-import 'practice.dart';
 import 'progress/progress_screen.dart';
 import 'quick_access.dart';
 import 'store.dart';
+import 'subscription.dart';
 import '../widgets/colored_split_promo_banner.dart';
 import '../admin/template/editable.dart';
 import '../admin/layout/layout_sections.dart';
@@ -98,8 +101,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     PracticeProgress.instance.addListener(_onLiveProgress);
-    EarnWallet.instance.addListener(_onEarn);
-    EconomyMirror.instance.addListener(_onEarn);
     PracticeProgress.instance.start();
     _load();
   }
@@ -117,7 +118,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void _openQuick(String name) {
     switch (name) {
       case 'Sessions':
-        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PracticeScreen()));
+        // Practice is a bottom-nav root — switch tab, don't push a copy.
+        NavScope.goTo(context, 1);
       case 'Saved':
       case 'Liked':
         // The words saved with the heart in the player.
@@ -127,7 +129,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         // replies, purchases, rewards), not the My Progress orb screen.
         Navigator.of(context).push(MaterialPageRoute(builder: (_) => const InboxScreen()));
       case 'Settings':
-        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const PlayerSettingsScreen()));
+        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AppSettingsScreen()));
       default:
         Navigator.of(context).push(MaterialPageRoute(builder: (_) => const QuickAccessScreen()));
     }
@@ -165,15 +167,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (mounted) setState(() => _loading = false);
   }
 
-  void _onEarn() {
-    if (mounted) setState(() {});
-  }
-
   @override
   void dispose() {
     PracticeProgress.instance.removeListener(_onLiveProgress);
-    EarnWallet.instance.removeListener(_onEarn);
-    EconomyMirror.instance.removeListener(_onEarn);
     _nameController.dispose();
     _toastEntry?.remove();
     super.dispose();
@@ -237,11 +233,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
-    if (result == null) return;
+    if (result == null || !mounted) return;
     final value = result.trim().isEmpty ? 'Practitioner' : result.trim();
     _nameController.text = value;
     await _prefs.setString('nowssb_name', value);
-    if (mounted) setState(() {});
+    if (!mounted) return;
+    setState(() {});
     await _saveAccountName(value);
   }
 
@@ -266,13 +263,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String get _durationText => _duration == 0 ? 'No limit' : '$_duration min';
   Future<void> _stepDuration(int by) async {
     final v = (_duration + by).clamp(0, 60).toInt();
+    if (!mounted) return;
     setState(() => _duration = v);
     await Settings.instance.setSleepTimer(_durationSteps[v ~/ 15]);
   }
 
   Future<void> _pickPhoto() async {
     final file = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 90);
-    if (file == null) return;
+    if (file == null || !mounted) return;
     setState(() => _photo = File(file.path));
   }
 
@@ -282,9 +280,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       initialTime: _reminder,
       builder: (context, child) => Theme(data: Theme.of(context).copyWith(colorScheme: const ColorScheme.dark(primary: _accent)), child: child!),
     );
-    if (value == null) return;
+    if (value == null || !mounted) return;
     _reminder = value;
     await _prefs.setString('nowssb_reminder', _reminderText);
+    if (!mounted) return;
     setState(() {});
   }
 
@@ -423,8 +422,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
-    if (chosen == null) return;
+    if (chosen == null || !mounted) return;
     await _prefs.setString('nwsb_local_banner', chosen);
+    if (!mounted) return;
     setState(() => _bannerUrl = chosen);
     _showToast('Banner updated');
   }
@@ -477,7 +477,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(height: 6),
                     const Flexible(child: EditableLabel('profile.ProfileScreen', 'Practicing daily, growing steadily.', maxLines: 2, style: TextStyle(fontSize: 12.5, height: 1.45, color: _dim))),
                     const SizedBox(height: 9),
-                    Container(padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 5), decoration: BoxDecoration(color: const Color(0x08FFFFFF), border: const Border.fromBorderSide(BorderSide(color: _border)), borderRadius: BorderRadius.circular(999)), child: Row(mainAxisSize: MainAxisSize.min, children: [Container(width: 6, height: 6, decoration: const BoxDecoration(color: _accent, shape: BoxShape.circle, boxShadow: [BoxShadow(color: _accent, blurRadius: 6)])), const SizedBox(width: 6), Text(_planName == 'Free' ? 'Free Plan' : _planName, style: const TextStyle(fontSize: 11.5, letterSpacing: .45))])),
+                    ListenableBuilder(
+                      listenable: EconomyMirror.instance,
+                      builder: (context, _) {
+                        final plan = _planName;
+                        return Container(padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 5), decoration: BoxDecoration(color: const Color(0x08FFFFFF), border: const Border.fromBorderSide(BorderSide(color: _border)), borderRadius: BorderRadius.circular(999)), child: Row(mainAxisSize: MainAxisSize.min, children: [Container(width: 6, height: 6, decoration: const BoxDecoration(color: _accent, shape: BoxShape.circle, boxShadow: [BoxShadow(color: _accent, blurRadius: 6)])), const SizedBox(width: 6), Text(plan == 'Free' ? 'Free Plan' : plan, style: const TextStyle(fontSize: 11.5, letterSpacing: .45))]));
+                      },
+                    ),
                   ]),
                 ),
               ),
@@ -489,6 +495,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String get _planName => EconomyMirror.instance.plan;
 
   Widget _earnHub() {
+    return ListenableBuilder(
+      listenable: Listenable.merge([EconomyMirror.instance, EarnWallet.instance]),
+      builder: (context, _) {
     final live = EconomyMirror.instance.live;
     final coins = EconomyMirror.instance.coins;
     final streak = live ? EconomyMirror.instance.streak : PracticeProgress.instance.streak;
@@ -583,6 +592,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ],
     );
+      },
+    );
   }
 
   Widget _earnLink(String label, Widget page) => InkWell(
@@ -600,7 +611,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
 
   Widget _progress() {
-    final p = PracticeProgress.instance;
     void openProgress() {
       Navigator.of(context).push(
         MaterialPageRoute(
@@ -609,6 +619,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
     }
 
+    return ListenableBuilder(
+      listenable: Listenable.merge([PracticeProgress.instance, EconomyMirror.instance]),
+      builder: (context, _) {
+    final p = PracticeProgress.instance;
     return SectionBlock(
       title: 'Your Progress',
       trailing: _viewAll(icon: 'assets/icons/icon_05.svg', onTap: openProgress),
@@ -663,6 +677,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
       ),
+    );
+      },
     );
   }
 
@@ -777,7 +793,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 16),
           const FractionallySizedBox(widthFactor: .66, child: Text.rich(TextSpan(children: [TextSpan(text: 'My Focus.\nBreathe.\nLet go.\n'), TextSpan(text: 'Grow.', style: TextStyle(color: _accent))]), style: TextStyle(fontSize: 25, height: 1.22, fontWeight: FontWeight.w300))),
           const SizedBox(height: 14),
-          Row(children: [Expanded(child: _compactQuick('Practice', _durationText, 15)), const SizedBox(width: 5), Expanded(child: _compactQuick('Reminder', _reminderText, 17)), const SizedBox(width: 5), Expanded(child: _compactQuick('Plan', _planName, 21))]),
+          Row(children: [Expanded(child: _compactQuick('Practice', _durationText, 15)), const SizedBox(width: 5), Expanded(child: _compactQuick('Reminder', _reminderText, 17)), const SizedBox(width: 5), Expanded(child: ListenableBuilder(listenable: EconomyMirror.instance, builder: (context, _) => _compactQuick('Plan', _planName, 21)))]),
         ]),
       );
 
@@ -851,10 +867,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
     ];
   }
 
-  Widget _account() => _sectionList('Account', [
-        _listRow('Member Since', trailing: const EditableLabel('profile.ProfileScreen', 'Jan 2025', style: TextStyle(fontSize: 13, color: _dim))),
-        _listRow('Current Plan', trailing: Row(mainAxisSize: MainAxisSize.min, children: [Text(_planName, style: const TextStyle(fontSize: 13, color: _dim)), const SizedBox(width: 10), InkWell(onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarnHubScreen())), child: const EditableLabel('profile.ProfileScreen', 'Upgrade', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, decoration: TextDecoration.underline)))])),
-      ]);
+  String get _memberSince {
+    final user = NwsbFirebase.ready ? FirebaseAuth.instance.currentUser : null;
+    final t = user?.metadata.creationTime;
+    if (t == null) return '—';
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return '${months[t.month - 1]} ${t.year}';
+  }
+
+  Widget _account() => ListenableBuilder(
+        listenable: EconomyMirror.instance,
+        builder: (context, _) => _sectionList('Account', [
+          _listRow('Member Since', trailing: Text(_memberSince, style: const TextStyle(fontSize: 13, color: _dim))),
+          _listRow('Current Plan', trailing: Row(mainAxisSize: MainAxisSize.min, children: [Text(_planName, style: const TextStyle(fontSize: 13, color: _dim)), const SizedBox(width: 10), InkWell(onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SubscriptionScreen())), child: const EditableLabel('profile.ProfileScreen', 'Upgrade', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, decoration: TextDecoration.underline)))])),
+        ]),
+      );
 
   Widget _quote() => GlassCard(
         margin: const EdgeInsets.only(bottom: 34),
@@ -865,8 +892,54 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [const EditableLabel('profile.ProfileScreen', '“', style: TextStyle(fontFamily: 'Georgia', fontSize: 38, color: _faint, height: 1)), const SizedBox(height: 8), const FractionallySizedBox(widthFactor: .70, child: EditableLabel('profile.ProfileScreen', 'Long before there was language, there was only sound.', style: TextStyle(fontSize: 17, height: 1.5))), const SizedBox(height: 16), const EditableLabel('profile.ProfileScreen', '— THE IDEA BEHIND NOWSSB', style: TextStyle(fontSize: 11, letterSpacing: 1.3, color: _dim))]),
       );
 
+  Future<void> _doSignOut() async {
+    final ok = await showDialog<bool>(
+      context: context,
+      barrierColor: const Color(0xB3000000),
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF14171E),
+        title: const EditableLabel('profile.SignOutDialog', 'Sign out?', style: TextStyle(color: _text)),
+        content: const EditableLabel(
+          'profile.SignOutDialog',
+          'You will need to choose an account the next time you sign in.',
+          style: TextStyle(color: _dim),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const EditableLabel('profile.SignOutDialog', 'Stay signed in'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const EditableLabel('profile.SignOutDialog', 'Sign out', style: TextStyle(color: Color(0xFFF87171))),
+          ),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+    // Same path as Settings: Google disconnect + Firebase signOut.
+    // EconomyMirror clears the wallet on authStateChanges (user == null).
+    const webClient =
+        '1024709686012-h1h9glk84uti9cbqpht5d09igdqb8pgu.apps.googleusercontent.com';
+    final google =
+        GoogleSignIn(scopes: const ['email'], serverClientId: webClient);
+    try {
+      await google.disconnect();
+    } catch (_) {}
+    try {
+      await google.signOut();
+    } catch (_) {}
+    try {
+      await FirebaseAuth.instance.signOut();
+    } catch (_) {}
+    NotificationBanner.items.value = const [];
+    AuthGate.askForAccount();
+    if (!mounted) return;
+    Navigator.of(context, rootNavigator: true).popUntil((route) => route.isFirst);
+  }
+
   Widget _signOut() => InkWell(
-        onTap: () { _showToast('Signed out'); _handleBack(); },
+        onTap: _doSignOut,
         borderRadius: BorderRadius.circular(22),
         child: Container(margin: const EdgeInsets.only(bottom: 30), padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: const Color(0x08FFFFFF), border: const Border.fromBorderSide(BorderSide(color: _border)), borderRadius: BorderRadius.circular(22)), alignment: Alignment.center, child: const EditableLabel('profile.ProfileScreen', 'Sign Out', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500))),
       );

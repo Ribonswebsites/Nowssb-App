@@ -21,6 +21,8 @@ import '../data/account_deletion.dart';
 import '../data/device_flags.dart';
 import '../data/phone_notifications.dart';
 import '../data/practice_progress.dart';
+import '../features/economy/economy_api.dart';
+import '../shell/nav_shell.dart';
 import '../data/settings.dart';
 import '../media/onboarding_warmup.dart';
 import '../media/video_pool.dart';
@@ -33,7 +35,6 @@ import 'notifications_settings.dart';
 import 'player_settings.dart';
 import 'player_guide.dart';
 import 'auth_gate.dart';
-import 'profile.dart';
 import 'quick_access.dart';
 import 'quotes_live.dart';
 import 'store/request_words.dart';
@@ -142,7 +143,8 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                   'profile',
                   'Profile card',
                   NestedDarkWrap(
-                    onTap: () => _push(const ProfileScreen()),
+                    // Profile is a bottom-nav root — switch tab, don't push a second Profile.
+                    onTap: () => NavScope.goTo(context, 4),
                     padding: const EdgeInsets.all(16),
                     child: Row(
                       children: [
@@ -166,11 +168,11 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                               color: NwsbColors.gold),
                         ),
                         const SizedBox(width: 14),
-                        const Expanded(
+                        Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              EditableLabel(
+                              const EditableLabel(
                                 'app_settings.AppSettingsScreen',
                                 'Your profile',
                                 style: TextStyle(
@@ -179,8 +181,8 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
-                              SizedBox(height: 2),
-                              EditableLabel(
+                              const SizedBox(height: 2),
+                              const EditableLabel(
                                 'app_settings.AppSettingsScreen',
                                 'Account · plan · edit',
                                 style: TextStyle(
@@ -188,8 +190,17 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                                   fontSize: 12,
                                 ),
                               ),
-                              SizedBox(height: 7),
-                              _Badge('STARTER'),
+                              const SizedBox(height: 7),
+                              ListenableBuilder(
+                                listenable: EconomyMirror.instance,
+                                builder: (context, _) {
+                                  final plan = EconomyMirror.instance.plan;
+                                  final label = plan.trim().isEmpty
+                                      ? 'FREE'
+                                      : plan.toUpperCase();
+                                  return _Badge(label);
+                                },
+                              ),
                             ],
                           ),
                         ),
