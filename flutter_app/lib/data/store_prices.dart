@@ -16,6 +16,7 @@ import 'package:flutter/foundation.dart';
 
 import 'billing_config.dart';
 import 'firebase.dart';
+import 'store_catalog.dart';
 
 class StorePrices extends ChangeNotifier {
   StorePrices._() {
@@ -53,17 +54,24 @@ class StorePrices extends ChangeNotifier {
   /// The Play price point for item [itemId] of [kind].
   ///
   /// Order: the admin's per-item price (Products & prices → config/store
-  /// `items`), else for ebooks the catalogue price, else the kind default
-  /// (config/store `defaults`, else [kContentDefaultPrice]). The bundled
-  /// word / meaning catalogue carries placeholder numbers (₹49, ₹24.5, 0)
-  /// that were never real prices, so [shown] is ignored for those kinds —
-  /// what a card shows is what Google Play charges. An admin price of 0
-  /// makes an item free.
+  /// `items`), else for ebooks the bundled catalogue price, else the kind
+  /// default (config/store `defaults`, else [kContentDefaultPrice]). The
+  /// bundled word / meaning catalogue carries placeholder numbers (₹49,
+  /// ₹24.5, 0) that were never real prices, so [shown] is ignored for
+  /// those kinds — what a card shows is what Google Play charges. An
+  /// admin price of 0 makes an item free. Ebooks never trust [shown]
+  /// alone (H-003) — only catalogue / store / default.
   num priceFor(String itemId, {String? kind, num? shown}) {
     final k = kind ?? contentKindOfItem(itemId) ?? 'word';
     final set = _items[itemId];
     if (set != null) return set <= 0 ? 0 : contentTierFor(k, set);
-    if (k == 'ebook' && shown != null && shown > 0) return contentTierFor(k, shown);
+    if (k == 'ebook') {
+      for (final b in kEbBooks) {
+        if ('ebook:${b.title.toLowerCase()}' == itemId) {
+          return contentTierFor(k, b.price);
+        }
+      }
+    }
     return defaultFor(k);
   }
 

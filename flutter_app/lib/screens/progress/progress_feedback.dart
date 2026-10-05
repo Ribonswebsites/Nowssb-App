@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/firebase.dart';
+import '../../features/economy/reward_fx.dart';
 
 import 'progress_tokens.dart';
 import '../../admin/template/editable.dart';
@@ -97,6 +98,8 @@ class _ProgressFeedbackSectionState extends State<ProgressFeedbackSection> {
         'at': FieldValue.serverTimestamp(),
         'status': 'new',
       });
+      // Once a month: real in-app feedback filed.
+      reportEarn('feedback');
     } catch (_) {
       // Offline or blocked — the local copy above is kept.
     }

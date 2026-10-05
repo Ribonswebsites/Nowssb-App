@@ -7,6 +7,7 @@ import { P, fail, inTx, moveCoins, newId, pick, wallet } from './core.js';
 import { friendDiscountPct } from './reference.js';
 import { kindOfBagItem } from './sales.js';
 import { paidCardCheck } from './coupons.js';
+import { BUNDLED_EBOOK_PRICES } from './ebook_prices.js';
 
 const CONTENT = ['word', 'meaning', 'signature', 'ebook'];
 const BAG_PREFIX = [...CONTENT, 'stage', 'bundle'];
@@ -20,8 +21,8 @@ function tierFor(cfg, kind, price) {
 }
 
 /* The server's own price for a bag line: the admin's per-item price
-   (config/store items), else the kind default; ebooks may carry their
-   catalogue price, but only as one of the ebook price points. */
+   (config/store items), else the bundled ebook catalogue, else the kind
+   default. Never trust the phone's number (H-003). */
 export function serverPrice(cfg, store, kind, id, clientPrice) {
   const items = (store && store.items) || {};
   const defs = (store && store.defaults) || {};
@@ -29,7 +30,9 @@ export function serverPrice(cfg, store, kind, id, clientPrice) {
     const v = Number(items[id]);
     return v <= 0 ? 0 : tierFor(cfg, kind, v);
   }
-  if (kind === 'ebook' && ((cfg.cart.contentTiersINR || {}).ebook || []).includes(clientPrice)) return clientPrice;
+  if (kind === 'ebook' && own(BUNDLED_EBOOK_PRICES, id) && Number.isFinite(Number(BUNDLED_EBOOK_PRICES[id]))) {
+    return tierFor(cfg, kind, Number(BUNDLED_EBOOK_PRICES[id]));
+  }
   const d = own(defs, kind) && Number.isFinite(Number(defs[kind])) ? Number(defs[kind]) : (cfg.cart.contentDefaultINR || {})[kind] || 99;
   return tierFor(cfg, kind, d);
 }

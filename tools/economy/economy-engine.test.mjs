@@ -170,6 +170,11 @@ await t('checkout: server prices each line; a forged kind or price is refused', 
   await rejects(call('quote', 'buyer', { items: [{ id: 'word:om', kind: 'stage', title: 'Om', price: 29 }] }), /match/);
   await rejects(call('quote', 'buyer', { items: [{ id: 'word:om', kind: 'word', title: 'Om', price: 29 }] }), /Prices changed/);
   await rejects(call('quote', 'buyer', { items: [{ id: 'ebook:x', kind: 'ebook', title: 'X', price: 29 }] }), /Prices changed/);
+  // H-003: lowest ebook tier from the phone must not buy an unknown / catalogue ebook.
+  await rejects(call('quote', 'buyer', { items: [{ id: 'ebook:x', kind: 'ebook', title: 'X', price: 149 }] }), /Prices changed/);
+  await rejects(call('quote', 'buyer', { items: [{ id: 'ebook:the sound healing atlas', kind: 'ebook', title: 'Atlas', price: 149 }] }), /Prices changed/);
+  const eb = await call('quote', 'buyer', { items: [{ id: 'ebook:the shabdapathy codex', kind: 'ebook', title: 'Codex', price: 499 }] });
+  ok((eb.listINR === 499) || (eb.quote && eb.quote.listINR === 499), 'catalogue ebook price');
   await rejects(call('quote', 'buyer', { items: [{ id: 'constructor', kind: 'word', price: 99 }] }), /bought here/);
   const q = await call('quote', 'buyer', { items: [{ id: 'word:ra', kind: 'word', title: 'Ra', price: 99 }] });
   ok(q.listINR === 99 || (q.quote && q.quote.listINR === 99) || q.payINR != null, 'default price accepted');

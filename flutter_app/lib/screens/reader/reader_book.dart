@@ -27,6 +27,7 @@ import '../../widgets/app_thinking_loader.dart';
 import 'reader_epub.dart';
 import 'reader_lookup.dart';
 import '../../admin/template/editable.dart';
+import '../../features/economy/reward_fx.dart';
 
 const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
 
@@ -145,8 +146,14 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
     final last = _pages.length - 1;
     if ((_idx <= 0 && dir < 0) || (_idx >= last && dir > 0)) {
       _haptic(8);
+      // Last meaning page: swiping past the end = read to the end.
+      if (_isMeaning && dir > 0 && _idx >= last) {
+        final title = (_page?.title ?? '').trim();
+        if (title.isNotEmpty) reportEarn('read_meaning', key: title);
+      }
       return;
     }
+    final left = _isMeaning && dir > 0 ? (_page?.title ?? '').trim() : '';
     setState(() {
       _idx += dir;
       _settings = false;
@@ -154,6 +161,8 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
     });
     if (_stage.hasClients) _stage.jumpTo(0);
     _haptic(12);
+    // Leaving a meaning page via Next = finished reading it.
+    if (left.isNotEmpty) reportEarn('read_meaning', key: left);
   }
 
   void _jump(int i) {

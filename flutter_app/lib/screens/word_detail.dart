@@ -27,6 +27,7 @@ import '../theme/tokens.dart';
 import '../widgets/app_backdrop.dart';
 import '../widgets/content_lock.dart';
 import '../admin/template/editable.dart';
+import '../features/economy/reward_fx.dart';
 import '../media/nwsb_video.dart';
 
 class WordDetail extends StatefulWidget {
@@ -601,6 +602,11 @@ class _StageState extends State<_Stage> {
       await p.stop();
       await p.setUrl(widget.stage.audio);
       await p.play();
+      // Stage audio finished — key is wordKey:stageN (server whitelist).
+      final wid = widget.word.word.trim().toLowerCase();
+      if (wid.isNotEmpty) {
+        reportEarn('close_stage', key: '$wid:${widget.n}');
+      }
     } catch (_) {}
     if (mounted) setState(() => _playing = false);
   }

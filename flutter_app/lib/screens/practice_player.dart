@@ -17,6 +17,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/earn_wallet.dart';
 import '../features/economy/economy_api.dart';
+import '../features/economy/reward_fx.dart';
 import '../data/models.dart';
 import '../data/word_art.dart';
 import '../data/practice_progress.dart';
@@ -300,6 +301,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     final prefs = await SharedPreferences.getInstance();
     final liked = (prefs.getStringList(_likedWordsKey) ?? const <String>[])
         .toSet();
+    final saving = !liked.contains(_word.word);
     if (liked.contains(_word.word)) {
       liked.remove(_word.word);
     } else {
@@ -307,6 +309,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     }
     await prefs.setStringList(_likedWordsKey, liked.toList()..sort());
     if (mounted) setState(() => _liked = liked.contains(_word.word));
+    // Practice Ring · save or reflect (once per day).
+    if (saving) reportEarn('ring_reflect', key: _word.word);
   }
 
   Future<void> _prepareAndPlay({int fadeInSeconds = 0}) async {

@@ -23,6 +23,7 @@ import '../features/circle/circle_screen.dart';
 import '../features/earn/earn_hub_screen.dart';
 import '../features/earn/earnings_screen.dart';
 import '../features/economy/economy_api.dart';
+import '../features/economy/reward_fx.dart';
 import '../features/economy/economy_theme.dart';
 import '../features/economy/money.dart';
 import '../features/gifts/gifts_screen.dart';
@@ -255,6 +256,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final db = FirebaseFirestore.instance;
       await db.doc('users/${user.uid}').set({'displayName': value}, SetOptions(merge: true));
       await db.doc('publicProfiles/${user.uid}').set({'uid': user.uid, 'displayName': value, 'updatedAt': FieldValue.serverTimestamp()}, SetOptions(merge: true));
+      // Once-per-account: server verifies name + photo/bio/username.
+      reportEarn('profile_complete');
     } catch (e) {
       debugPrint('NowssB profile name: $e');
       if (mounted) _showToast('Saved on this phone. Your account name will update when you are online.');
@@ -389,6 +392,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           'photoURL': publicUrl,
           'updatedAt': FieldValue.serverTimestamp(),
         }, SetOptions(merge: true));
+        // Once-per-account: server verifies name + photo/bio/username.
+        reportEarn('profile_complete');
       } catch (e) {
         debugPrint('NowssB profile photo account write: $e');
         if (mounted) {
