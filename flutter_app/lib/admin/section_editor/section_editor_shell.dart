@@ -16,6 +16,7 @@ import '../../widgets/sections/section_registry.dart';
 import '../editor/glass.dart';
 import 'section_config_api.dart';
 import 'section_focal_pad.dart';
+import 'section_anim_panel.dart';
 import 'section_content_panel.dart';
 import 'section_layout_handles.dart';
 import '../../widgets/sections/section_configs.dart';
@@ -492,6 +493,13 @@ class _SectionEditorShellState extends State<SectionEditorShell> {
         const SizedBox(height: 14),
 
         SectionContentPanel(
+          config: draft,
+          busy: _busy,
+          onChanged: _touch,
+        ),
+        const SizedBox(height: 14),
+
+        SectionAnimPanel(
           config: draft,
           busy: _busy,
           onChanged: _touch,

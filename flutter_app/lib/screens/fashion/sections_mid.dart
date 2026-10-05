@@ -28,6 +28,7 @@ import '../widgets_page.dart';
 import '../../admin/template/editable.dart';
 import '../../admin/layout/carousel_fx.dart';
 import '../../admin/layout/layout_sections.dart' show CarouselAutoRotate;
+import '../../widgets/sections/section_config_bridge.dart';
 
 const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
 
@@ -175,7 +176,10 @@ class _FashTilesState extends State<FashTiles> {
       ),
     );
 
-    return SizedBox(
+    // CS-7b: LSection id (e.g. home.*.tiles) → SectionConfigs layout + anim.
+    // No override ⇒ identical pixels to the previous SizedBox return.
+    return SectionConfigBridge(
+      child: SizedBox(
       height: pageH,
       child: NotificationListener<ScrollNotification>(
         onNotification: (n) {
@@ -220,6 +224,7 @@ class _FashTilesState extends State<FashTiles> {
           ]),
         )),
       ),
+    ),
     );
   }
 }

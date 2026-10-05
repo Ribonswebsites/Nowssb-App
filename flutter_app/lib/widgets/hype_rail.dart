@@ -15,6 +15,7 @@ import '../shell/nwsb_links.dart';
 import '../theme/tokens.dart';
 import 'glass_wrap.dart';
 import 'sections/section_config.dart';
+import 'sections/section_anim_layer.dart';
 import 'sections/section_configs.dart';
 
 /// Set from [ensureHypeRoutes] so this file does not import the screens.
@@ -199,7 +200,10 @@ class NowssbHypeRail extends StatelessWidget {
     SectionConfigs.watch(context);
     final live = SectionConfigs.instance.resolveOptional(context, config);
     if (live != null && live != config) {
-      return NowssbHypeRail(config: live, title: title, cards: cards);
+      return SectionAnimLayer(
+        animation: live.animation,
+        child: NowssbHypeRail(config: live, title: title, cards: cards),
+      );
     }
 
     if (config != null && !config!.enabled) return const SizedBox.shrink();

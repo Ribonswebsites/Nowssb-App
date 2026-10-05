@@ -15,6 +15,7 @@ import '../../shell/nwsb_links.dart';
 import '../../theme/tokens.dart';
 import '../hype_rail.dart';
 import 'section_config.dart';
+import 'section_anim_layer.dart';
 import 'section_configs.dart';
 
 /// One slide shown inside the ticket.
@@ -198,7 +199,10 @@ class _CouponBannerSectionState extends State<CouponBannerSection> {
     SectionConfigs.watch(context);
     final resolved = SectionConfigs.instance.resolveOptional(context, widget.config);
     if (resolved != null && resolved != widget.config) {
-      return CouponBannerSection(config: resolved, onCta: widget.onCta);
+      return SectionAnimLayer(
+        animation: resolved.animation,
+        child: CouponBannerSection(config: resolved, onCta: widget.onCta),
+      );
     }
 
     final slides = _slides;

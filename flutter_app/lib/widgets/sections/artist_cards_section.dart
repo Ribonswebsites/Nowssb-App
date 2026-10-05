@@ -12,6 +12,7 @@ import '../../shell/nwsb_links.dart';
 import '../../theme/tokens.dart';
 import '../hype_rail.dart';
 import 'section_config.dart';
+import 'section_anim_layer.dart';
 import 'section_configs.dart';
 
 /// One NowssB-flavoured meta chip (icon + count).
@@ -194,7 +195,10 @@ class ArtistCardsSection extends StatelessWidget {
     SectionConfigs.watch(context);
     final live = SectionConfigs.instance.resolveOptional(context, config);
     if (live != null && live != config) {
-      return ArtistCardsSection(config: live, onTap: onTap);
+      return SectionAnimLayer(
+        animation: live.animation,
+        child: ArtistCardsSection(config: live, onTap: onTap),
+      );
     }
 
     final items = _itemsFromConfig(config);

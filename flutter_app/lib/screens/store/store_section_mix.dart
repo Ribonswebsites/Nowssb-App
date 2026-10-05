@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import '../../data/store_catalog.dart';
 import '../../shell/nwsb_links.dart';
 import '../../widgets/sections/section_config.dart';
+import '../../widgets/sections/section_anim_layer.dart';
 import '../../widgets/sections/section_configs.dart';
 import '../../widgets/sections/section_registry.dart';
 import 'store_cards.dart';
@@ -49,7 +50,10 @@ class StoreRegistrySection extends StatelessWidget {
     SectionConfigs.watch(context);
     ensureSectionRegistry();
     final live = SectionConfigs.instance.resolveIn(context, config);
-    return SectionRegistry.instance.build(context, live);
+    return SectionAnimLayer(
+      animation: live.animation,
+      child: SectionRegistry.instance.build(context, live),
+    );
   }
 }
 

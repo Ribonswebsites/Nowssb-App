@@ -16,6 +16,7 @@ import '../../shell/nwsb_links.dart';
 import '../../theme/tokens.dart';
 import '../hype_rail.dart';
 import 'section_config.dart';
+import 'section_anim_layer.dart';
 import 'section_configs.dart';
 
 List<SectionMediaItem> _itemsFromConfig(SectionConfig? config) {
@@ -172,7 +173,10 @@ class _SpotlightSectionState extends State<SpotlightSection> {
     SectionConfigs.watch(context);
     final resolved = SectionConfigs.instance.resolveOptional(context, widget.config);
     if (resolved != null && resolved != widget.config) {
-      return SpotlightSection(config: resolved, onTap: widget.onTap);
+      return SectionAnimLayer(
+        animation: resolved.animation,
+        child: SpotlightSection(config: resolved, onTap: widget.onTap),
+      );
     }
 
     final items = _items;

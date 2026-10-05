@@ -12,6 +12,7 @@ import '../../shell/nwsb_links.dart';
 import '../../theme/tokens.dart';
 import '../nwsb_icon.dart';
 import 'section_config.dart';
+import 'section_anim_layer.dart';
 import 'section_configs.dart';
 
 // ─── Defaults ───────────────────────────────────────────────────────────────
@@ -213,10 +214,13 @@ class _CategoryTilesSectionState extends State<CategoryTilesSection> {
     SectionConfigs.watch(context);
     final resolved = SectionConfigs.instance.resolveOptional(context, widget.config);
     if (resolved != null && resolved != widget.config) {
-      return CategoryTilesSection(
-        config: resolved,
-        onTileTap: widget.onTileTap,
-        onChipSelected: widget.onChipSelected,
+      return SectionAnimLayer(
+        animation: resolved.animation,
+        child: CategoryTilesSection(
+          config: resolved,
+          onTileTap: widget.onTileTap,
+          onChipSelected: widget.onChipSelected,
+        ),
       );
     }
 
