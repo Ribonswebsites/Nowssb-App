@@ -1,6 +1,7 @@
 /// Layout tab: drag the picture on the phone up or down to reorder it (the
-/// page reflows), sideways to nudge it, pinch to resize. The list below is
-/// for order, show, hide, and delete.
+/// page reflows), sideways to nudge it, pinch to resize; space above/below
+/// and side margins in steps. The list below is for order, show, hide, and
+/// delete.
 library;
 
 import 'package:flutter/material.dart';
@@ -83,6 +84,14 @@ class LayoutTab extends StatelessWidget {
                 });
               }),
             ]),
+            // Space above/below and side margins are still drawn for every
+            // section that has them (pages published before the sliders
+            // went), so they stay visible and changeable here.
+            const SizedBox(height: 10),
+            _Spacing(
+              props: cur.entry.props,
+              onChanged: (k, v) => c.patchProps(cur.id, {k: v < 1 ? null : v}),
+            ),
             const SizedBox(height: 8),
           ],
           Eyebrow('Order — drag ⠿ to move', trailing: Text('${live.length} sections', style: const TextStyle(color: kDim, fontSize: 11))),
@@ -202,6 +211,82 @@ class LayoutTab extends StatelessWidget {
         'couponCards' => Icons.local_offer_outlined,
         _ => Icons.smart_button_rounded,
       };
+}
+
+/// Space above, space below and side margins of the section, in steps.
+class _Spacing extends StatelessWidget {
+  const _Spacing({required this.props, required this.onChanged});
+  final Map<String, dynamic> props;
+  final void Function(String key, double value) onChanged;
+
+  static const _rows = <(String, String, double)>[
+    ('padTop', 'Space above', 80),
+    ('padBottom', 'Space below', 80),
+    ('padH', 'Side margins', 48),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Glass(
+      radius: 14,
+      padding: const EdgeInsets.fromLTRB(12, 2, 4, 2),
+      child: Column(children: [
+        for (final (k, label, max) in _rows)
+          _Stepper(
+            label: label,
+            value: props[k] is num ? (props[k] as num).toDouble() : 0,
+            max: max,
+            onChanged: (v) => onChanged(k, v),
+          ),
+      ]),
+    );
+  }
+}
+
+class _Stepper extends StatelessWidget {
+  const _Stepper({required this.label, required this.value, required this.max, required this.onChanged});
+  final String label;
+  final double value;
+  final double max;
+  final ValueChanged<double> onChanged;
+
+  static const _step = 4.0;
+
+  @override
+  Widget build(BuildContext context) {
+    final v = value.clamp(0.0, max);
+    return Row(children: [
+      Expanded(child: Text(label, style: const TextStyle(color: Colors.white70, fontSize: 12.5))),
+      IconButton(
+        tooltip: 'Less space',
+        visualDensity: VisualDensity.compact,
+        onPressed: v <= 0
+            ? null
+            : () {
+                tapFeel();
+                onChanged(((v - _step) / _step).ceil() * _step);
+              },
+        icon: Icon(Icons.remove_rounded, size: 18, color: v <= 0 ? kFaint : kGold),
+      ),
+      SizedBox(
+        width: 34,
+        child: Text(v < 1 ? '0' : v.toStringAsFixed(0),
+            textAlign: TextAlign.center,
+            style: TextStyle(color: v < 1 ? kDim : Colors.white, fontWeight: FontWeight.w700, fontSize: 12.5)),
+      ),
+      IconButton(
+        tooltip: 'More space',
+        visualDensity: VisualDensity.compact,
+        onPressed: v >= max
+            ? null
+            : () {
+                tapFeel();
+                onChanged((((v + _step) / _step).floor() * _step).clamp(0.0, max));
+              },
+        icon: Icon(Icons.add_rounded, size: 18, color: v >= max ? kFaint : kGold),
+      ),
+    ]);
+  }
 }
 
 class _Row extends StatelessWidget {
