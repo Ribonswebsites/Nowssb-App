@@ -175,12 +175,15 @@ class PracticeProgress extends ChangeNotifier {
       for (final session in _sessions.values)
         if (session['date'] is String) session['date'] as String,
     };
-    var cursor = DateTime.now();
-    if (!days.contains(_day(cursor))) cursor = cursor.subtract(const Duration(days: 1));
+    // Step back by calendar day, not by 24 hours: on a DST change a day is
+    // 23 or 25 hours long and subtracting a Duration can skip or repeat one.
+    final now = DateTime.now();
+    var cursor = DateTime(now.year, now.month, now.day);
+    if (!days.contains(_day(cursor))) cursor = DateTime(cursor.year, cursor.month, cursor.day - 1);
     var value = 0;
     while (days.contains(_day(cursor)) && value < 365) {
       value += 1;
-      cursor = cursor.subtract(const Duration(days: 1));
+      cursor = DateTime(cursor.year, cursor.month, cursor.day - 1);
     }
     return value;
   }
@@ -245,14 +248,14 @@ class PracticeProgress extends ChangeNotifier {
   List<({String date, bool done, bool isToday, bool isFuture})> get thisWeekDays {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    final monday = today.subtract(Duration(days: (today.weekday + 6) % 7));
+    final monday = DateTime(today.year, today.month, today.day - (today.weekday + 6) % 7);
     final practiced = <String>{
       for (final session in _sessions.values)
         if (session['date'] is String) session['date'] as String,
     };
     final out = <({String date, bool done, bool isToday, bool isFuture})>[];
     for (var i = 0; i < 7; i++) {
-      final d = monday.add(Duration(days: i));
+      final d = DateTime(monday.year, monday.month, monday.day + i);
       final key = _day(d);
       out.add((
         date: key,
@@ -327,8 +330,7 @@ class PracticeProgress extends ChangeNotifier {
   /// yesterday is already practiced.
   Future<bool> restoreBrokenStreak() async {
     final now = DateTime.now();
-    final yesterday = DateTime(now.year, now.month, now.day)
-        .subtract(const Duration(days: 1));
+    final yesterday = DateTime(now.year, now.month, now.day - 1);
     final day = _day(yesterday);
     final already = _sessions.values.any((s) => s['date'] == day);
     if (already) return false;
