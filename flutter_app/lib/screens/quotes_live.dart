@@ -26,6 +26,7 @@ import 'reader/reader_hub.dart';
 import 'sound_library.dart';
 import 'store.dart';
 import 'subscription.dart';
+import '../admin/layout/layout_sections.dart';
 import '../admin/template/editable.dart';
 
 const _days = <String>[
@@ -301,7 +302,15 @@ class _QuotesWeekScreenState extends State<QuotesWeekScreen> {
                         Expanded(
                           child: ListView(
                             controller: _rail,
-                            children: [
+                            // Server-driven order (Admin → UI Editor); bundled order by default.
+                            children: layoutIndexed(context, 'quotes', const {
+                              0: ('promo', 'Top banner'),
+                              1: ('calendar', 'This week'),
+                              3: ('quotes', 'Quotes of the week'),
+                              5: ('promo2', 'Practice banner'),
+                              7: ('share', 'Share'),
+                              9: ('more', 'More to open'),
+                            }, [
                               ColoredSplitPromoBanner(
                                 spec: SplitPromoExtras.at(
                                   4,
@@ -375,7 +384,7 @@ class _QuotesWeekScreenState extends State<QuotesWeekScreen> {
                                 ),
                               ),
                               const SizedBox(height: 24),
-                            ],
+                            ]),
                           ),
                         ),
                       ],

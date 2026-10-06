@@ -19,6 +19,7 @@ import '../template/editable.dart';
 import '../template/slot_keys.dart';
 import 'editor_controller.dart';
 import 'glass.dart';
+import 'tab_layout.dart' show SectionDrop;
 
 /// Kept for callers that ask for "the page as a whole".
 const kProbe = '__probe__';
@@ -122,6 +123,11 @@ class _HotspotsState extends State<_Hotspots> {
   List<(PreviewSlot, Rect)> _spots = const [];
   var _watching = false;
 
+  /// The words being typed in place (a picked line tapped again).
+  PreviewSlot? _editing;
+  TextEditingController? _edit;
+  final _focus = FocusNode();
+
   @override
   void initState() {
     super.initState();
@@ -141,12 +147,92 @@ class _HotspotsState extends State<_Hotspots> {
   @override
   void dispose() {
     widget.c.removeListener(_onEdit);
+    _edit?.dispose();
+    _focus.dispose();
     super.dispose();
   }
 
   /// Picked/changed colours follow the editor at once.
   void _onEdit() {
-    if (mounted) setState(() {});
+    if (!mounted) return;
+    // Something else picked: the words typed so far stay.
+    if (_editing != null && widget.c.selectedSlot != _editing!.slotKey) _editing = null;
+    setState(() {});
+  }
+
+  static String? _textOf(RenderObject? r) {
+    if (r == null) return null;
+    if (r is RenderParagraph) return r.text.toPlainText();
+    String? found;
+    r.visitChildren((x) => found ??= _textOf(x));
+    return found;
+  }
+
+  /// A picked line tapped again: type over it right there.
+  void _startTyping(PreviewSlot s) {
+    final text = _textOf(s.box.currentContext?.findRenderObject()) ?? s.defaultValue;
+    _edit?.dispose();
+    _edit = TextEditingController(text: text)..selection = TextSelection(baseOffset: 0, extentOffset: text.length);
+    widget.c.endStep();
+    setState(() => _editing = s);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _focus.requestFocus();
+    });
+  }
+
+  void _doneTyping() {
+    if (_editing == null) return;
+    widget.c.endStep();
+    _focus.unfocus();
+    setState(() => _editing = null);
+  }
+
+  Widget _typingBox(PreviewSlot s, Rect r, Size screen) {
+    final w = (r.width + 16).clamp(180.0, screen.width - 16);
+    final left = (r.left - 8).clamp(8.0, screen.width - w - 8);
+    return Positioned(
+      key: const ValueKey('type-in-place'),
+      left: left,
+      top: (r.top - 8).clamp(8.0, screen.height - 60),
+      width: w,
+      child: Material(
+        color: const Color(0xF2111A2B),
+        elevation: 8,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: kGold, width: 2),
+          ),
+          child: Row(children: [
+            Expanded(
+              child: TextField(
+                controller: _edit,
+                focusNode: _focus,
+                minLines: 1,
+                maxLines: 4,
+                textInputAction: TextInputAction.done,
+                style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
+                cursorColor: kGold,
+                decoration: const InputDecoration(
+                  isDense: true,
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.fromLTRB(12, 10, 4, 10),
+                ),
+                onChanged: (v) => widget.c.setText(s.slotKey, s.defaultValue, v),
+                onSubmitted: (_) => _doneTyping(),
+              ),
+            ),
+            IconButton(
+              key: const ValueKey('type-done'),
+              tooltip: 'Done',
+              onPressed: _doneTyping,
+              icon: const Icon(Icons.check_rounded, color: kGold),
+            ),
+          ]),
+        ),
+      ),
+    );
   }
 
   /// Elements move (carousels, entrance animations, pictures loading).
@@ -215,6 +301,12 @@ class _HotspotsState extends State<_Hotspots> {
           behavior: HitTestBehavior.opaque,
           onTap: () {
             actFeel();
+            // Tapped again: type in place, or replace the picture.
+            if (picked && s.type == SlotType.text) return _startTyping(s);
+            if (picked && (s.type == SlotType.image || s.type == SlotType.video)) {
+              widget.c.openWords?.call();
+              return;
+            }
             final sec = s.section;
             final id = sec != null && sec.startsWith('${widget.c.layoutPage}/') ? sec.split('/').last : null;
             widget.c.selectIn(id, s.slotKey, s.type, s.defaultValue);
@@ -246,6 +338,16 @@ class _HotspotsState extends State<_Hotspots> {
           ),
         ),
       ));
+    }
+    final ed = _editing;
+    if (ed != null) {
+      for (final (s, r) in _spots) {
+        if (s.slotKey == ed.slotKey) {
+          final me = context.findRenderObject() as RenderBox?;
+          spots.add(_typingBox(s, r, me != null && me.hasSize ? me.size : MediaQuery.sizeOf(context)));
+          break;
+        }
+      }
     }
     return Stack(children: spots);
   }
@@ -380,6 +482,9 @@ class _TouchLayerState extends State<_TouchLayer> {
 
   /// While an effect or orb from the drawer hovers over the page.
   Offset? _hover;
+
+  /// While a section from the drawer is carried: the gap it would land in.
+  int? _hoverGap;
 
   @override
   void initState() {
@@ -774,9 +879,11 @@ class _TouchLayerState extends State<_TouchLayer> {
     if (me == null || !me.hasSize) return;
     final h = me.size.height;
     double speed = 0;
+    // Carried from the drawer there is no trash: the band is the bottom.
+    final bottom = _hover != null && !_carrying ? h : h - kTrashHeight;
     if (p.dy < kAutoScrollBand) {
       speed = -8;
-    } else if (p.dy > h - kTrashHeight - kAutoScrollBand && p.dy < h - kTrashHeight) {
+    } else if (p.dy > bottom - kAutoScrollBand && p.dy < bottom) {
       speed = 8;
     }
     if (speed == 0) {
@@ -787,7 +894,7 @@ class _TouchLayerState extends State<_TouchLayer> {
     _scrollPos ??= _findScroll();
     _autoScroll ??= Timer.periodic(const Duration(milliseconds: 16), (_) {
       final pos = _scrollPos;
-      if (pos == null || !_carrying) {
+      if (pos == null || (!_carrying && _hover == null)) {
         _autoScroll?.cancel();
         _autoScroll = null;
         return;
@@ -972,7 +1079,7 @@ class _TouchLayerState extends State<_TouchLayer> {
   // ── Drops from the drawer ──────────────────────────────────────────
 
   bool _accepts(Object? data) {
-    if (data is AnimDrop) return true;
+    if (data is AnimDrop || data is SectionDrop) return true;
     final fx = FxDrop.of(data);
     if (fx == null) return false;
     return true;
@@ -983,11 +1090,21 @@ class _TouchLayerState extends State<_TouchLayer> {
     if (me == null) return;
     // Drawer tiles are dragged by the point under the finger.
     final p = me.globalToLocal(d.offset);
-    setState(() => _hover = null);
-    final id = _sectionAt(p);
+    _autoScroll?.cancel();
+    _autoScroll = null;
+    setState(() {
+      _hover = null;
+      _hoverGap = null;
+    });
     final data = d.data;
+    if (data is SectionDrop) {
+      _dropSection(data, p);
+      return;
+    }
+    // Between sections, or past the last one: the nearest section takes it.
+    final id = _sectionAt(p) ?? _nearestSection(p);
     if (id == null) {
-      _say(c.sectioned ? 'Drop it on the page.' : 'This page is one block for now — effects and orbs need sections.');
+      _say('This page can’t take drops yet.');
       return;
     }
     final r = _sectionRect(id)!;
@@ -1032,6 +1149,61 @@ class _TouchLayerState extends State<_TouchLayer> {
     WidgetsBinding.instance.addPostFrameCallback((_) => c.preview.replay());
   }
 
+  /// The section closest to [p] (by height on the page).
+  String? _nearestSection(Offset p) {
+    String? best;
+    var dist = double.infinity;
+    for (final (id, r) in _sections) {
+      final d = p.dy < r.top ? r.top - p.dy : (p.dy > r.bottom ? p.dy - r.bottom : 0.0);
+      if (d < dist) {
+        dist = d;
+        best = id;
+      }
+    }
+    return best;
+  }
+
+  /// Where a section carried at [p] lands: the gap before live section
+  /// `_sections[i]` (i == length: after the last). The upper half of a
+  /// section puts it above, the lower half below.
+  int? _gapAt(Offset p) {
+    if (_sections.isEmpty) return null;
+    for (var i = 0; i < _sections.length; i++) {
+      if (p.dy < _sections[i].$2.center.dy) return i;
+    }
+    return _sections.length;
+  }
+
+  /// The height of the insertion line for gap [g].
+  double _gapY(int g) {
+    if (g <= 0) return _sections.first.$2.top;
+    if (g >= _sections.length) return _sections.last.$2.bottom;
+    return (_sections[g - 1].$2.bottom + _sections[g].$2.top) / 2;
+  }
+
+  void _dropSection(SectionDrop d, Offset p) {
+    final g = _gapAt(p);
+    if (g == null) {
+      _say('This page can’t take new sections yet.');
+      return;
+    }
+    final at = g < _sections.length
+        ? c.entryIndexBefore(_sections[g].$1)
+        : c.entryIndexBefore(_sections.last.$1) + 1;
+    bigFeel();
+    c.endStep();
+    final id = c.insertTemplate(d.kind, at);
+    c.endStep();
+    c.sectionPicked = true;
+    c.fxDropped();
+    // Picked once the page has drawn it, and its entrance plays.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      c.pickSection(id);
+      c.preview.replay();
+    });
+  }
+
   void _say(String text) {
     final m = ScaffoldMessenger.maybeOf(context);
     m?.hideCurrentSnackBar();
@@ -1046,7 +1218,8 @@ class _TouchLayerState extends State<_TouchLayer> {
     final ordering = _grab == _Grab.order && moved;
     final trash = carrying && _overTrash(_finger);
     final target = ordering && !trash ? _target() : null;
-    final hoverId = _hover == null ? null : _sectionAt(_hover!);
+    final hoverGap = _hoverGap != null && _sections.isNotEmpty ? _hoverGap : null;
+    final hoverId = _hover == null || hoverGap != null ? null : (_sectionAt(_hover!) ?? _nearestSection(_hover!));
     final hoverRect = _sectionRect(hoverId);
     final orbSel = c.selectedOrb;
     return Listener(
@@ -1056,9 +1229,20 @@ class _TouchLayerState extends State<_TouchLayer> {
         onWillAcceptWithDetails: (d) => _accepts(d.data),
         onMove: (d) {
           final me = context.findRenderObject() as RenderBox?;
-          if (me != null) setState(() => _hover = me.globalToLocal(d.offset));
+          if (me == null) return;
+          final p = me.globalToLocal(d.offset);
+          final gap = d.data is SectionDrop ? _gapAt(p) : null;
+          if (gap != _hoverGap) tapFeel();
+          setState(() {
+            _hover = p;
+            _hoverGap = gap;
+          });
+          _autoScrollFor(p);
         },
-        onLeave: (_) => setState(() => _hover = null),
+        onLeave: (_) => setState(() {
+          _hover = null;
+          _hoverGap = null;
+        }),
         onAcceptWithDetails: _onDrop,
         builder: (context, _, __) => GestureDetector(
           behavior: HitTestBehavior.opaque,
@@ -1126,6 +1310,7 @@ class _TouchLayerState extends State<_TouchLayer> {
                   ),
                 ),
               ),
+            if (hoverGap != null) InsertLine(y: _gapY(hoverGap)),
             if (carrying)
               Positioned(
                 left: 0,
@@ -1139,6 +1324,50 @@ class _TouchLayerState extends State<_TouchLayer> {
       ),
     );
   }
+}
+
+/// Where a carried section will land: a bright line across the page with
+/// a dot at each end.
+class InsertLine extends StatelessWidget {
+  const InsertLine({super.key, required this.y});
+  final double y;
+
+  @override
+  Widget build(BuildContext context) => AnimatedPositioned(
+        key: const ValueKey('insert-line'),
+        duration: const Duration(milliseconds: 140),
+        curve: Curves.easeOutCubic,
+        left: 6,
+        right: 6,
+        top: y - 9,
+        height: 18,
+        child: IgnorePointer(
+          child: Row(children: [
+            _dot(),
+            Expanded(
+              child: Container(
+                height: 6,
+                decoration: BoxDecoration(
+                  color: kGold,
+                  borderRadius: BorderRadius.circular(99),
+                  boxShadow: [BoxShadow(color: kGold.withValues(alpha: 0.7), blurRadius: 12)],
+                ),
+              ),
+            ),
+            _dot(),
+          ]),
+        ),
+      );
+
+  static Widget _dot() => Container(
+        width: 18,
+        height: 18,
+        decoration: BoxDecoration(
+          color: kGold,
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.white, width: 3),
+        ),
+      );
 }
 
 class _EdgeBar extends StatelessWidget {

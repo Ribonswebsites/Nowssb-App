@@ -24,6 +24,7 @@ import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import '../widgets/app_thinking_loader.dart';
 import 'store.dart';
 import 'store/word_atelier.dart';
+import '../admin/layout/layout_sections.dart';
 import '../admin/template/editable.dart';
 
 /// Subconscious tier → max words selectable when combining.
@@ -323,7 +324,12 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
                 Expanded(
                   child: ListView(
                     padding: EdgeInsets.fromLTRB(16, 4, 16, 28 + bottom),
-                    children: [
+                    // Server-driven order (Admin → UI Editor); bundled order by default.
+                    children: layoutIndexed(context, 'sentence', const {
+                      0: ('banner', 'Top banner'),
+                      5: ('promo', 'Split promo banner'),
+                      6: ('studio', 'Sentence studio'),
+                    }, noCopy: const {'studio'}, [
                       // 1) Black top banner — actions only, no word chips
                       CustomizeBlackBanner(
                         title: 'Build your\nsentence',
@@ -743,7 +749,7 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
                           style: TextStyle(color: Color(0xB8FFFFFF)),
                         ),
                       ),
-                    ],
+                    ]),
                   ),
                 ),
               ],

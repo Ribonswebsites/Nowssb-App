@@ -22,6 +22,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../template/editable.dart' show EditableLabel;
+
 const kCouponInk = 0xFF111111;
 const kCouponRed = 0xFFD71920;
 const kCouponYellow = 0xFFF5C518;
@@ -139,9 +141,13 @@ void _copyCode(BuildContext context, String code) {
 
 /// The coupon section itself (both kinds), on plain white.
 class CouponSection extends StatelessWidget {
-  const CouponSection({super.key, required this.kind, required this.props});
+  const CouponSection({super.key, required this.kind, required this.props, this.slot});
   final String kind;
   final Map<String, dynamic> props;
+
+  /// The section's slot prefix (`tpl.<page>.<entry>`): its words can then
+  /// be tapped in the editor (ids `c<i><field>`). Null: plain words.
+  final String? slot;
 
   @override
   Widget build(BuildContext context) {
@@ -156,9 +162,12 @@ class CouponSection extends StatelessWidget {
         rows.add(Padding(
           padding: EdgeInsets.only(top: i == 0 ? 0 : 12),
           child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Expanded(child: CouponCard(data: coupons[i], ink: ink)),
+            Expanded(child: CouponCard(data: coupons[i], ink: ink, slot: slot, index: i)),
             const SizedBox(width: 12),
-            Expanded(child: i + 1 < coupons.length ? CouponCard(data: coupons[i + 1], ink: ink) : const SizedBox()),
+            Expanded(
+                child: i + 1 < coupons.length
+                    ? CouponCard(data: coupons[i + 1], ink: ink, slot: slot, index: i + 1)
+                    : const SizedBox()),
           ]),
         ));
       }
@@ -168,7 +177,7 @@ class CouponSection extends StatelessWidget {
         for (var i = 0; i < coupons.length; i++)
           Padding(
             padding: EdgeInsets.only(top: i == 0 ? 0 : 12),
-            child: CouponTicket(data: coupons[i], ink: ink, scissorsAtEnd: i.isOdd),
+            child: CouponTicket(data: coupons[i], ink: ink, scissorsAtEnd: i.isOdd, slot: slot, index: i),
           ),
       ]);
     }
@@ -193,13 +202,39 @@ class CouponSection extends StatelessWidget {
 
 String _s(Map<String, dynamic> m, String k) => '${m[k] ?? ''}';
 
+/// One coupon's words: tappable in the editor when the section has a slot.
+class _Word extends StatelessWidget {
+  const _Word(this.slot, this.id, this.text, {this.style, this.textAlign, this.maxLines, this.overflow});
+  final String? slot;
+  final String id;
+  final String text;
+  final TextStyle? style;
+  final TextAlign? textAlign;
+  final int? maxLines;
+  final TextOverflow? overflow;
+
+  @override
+  Widget build(BuildContext context) => slot == null
+      ? Text(text, style: style, textAlign: textAlign, maxLines: maxLines, overflow: overflow)
+      : EditableLabel(slot!, text, id: id, style: style, textAlign: textAlign, maxLines: maxLines, overflow: overflow);
+}
+
 // ── Ticket ───────────────────────────────────────────────────────────
 
 class CouponTicket extends StatelessWidget {
-  const CouponTicket({super.key, required this.data, this.ink = const Color(kCouponInk), this.scissorsAtEnd = false});
+  const CouponTicket({
+    super.key,
+    required this.data,
+    this.ink = const Color(kCouponInk),
+    this.scissorsAtEnd = false,
+    this.slot,
+    this.index = 0,
+  });
   final Map<String, dynamic> data;
   final Color ink;
   final bool scissorsAtEnd;
+  final String? slot;
+  final int index;
 
   static const _w = 460.0;
   static const _h = 168.0;
@@ -235,7 +270,7 @@ class CouponTicket extends StatelessWidget {
                   _Amount(amount: _s(data, 'amount'), unit: _s(data, 'unit'), ink: ink, size: 92),
                   if (note.isNotEmpty) ...[
                     const SizedBox(height: 4),
-                    Text(note.toUpperCase(),
+                    _Word(slot, 'c${index}note', note.toUpperCase(),
                         style: TextStyle(color: ink, fontSize: 15, fontWeight: FontWeight.w700, letterSpacing: 0.3)),
                   ],
                 ]),
@@ -252,7 +287,7 @@ class CouponTicket extends StatelessWidget {
                   child: Column(mainAxisSize: MainAxisSize.min, children: [
                     FittedBox(
                       fit: BoxFit.scaleDown,
-                      child: Text(_s(data, 'headline'),
+                      child: _Word(slot, 'c${index}headline', _s(data, 'headline'),
                           textAlign: TextAlign.center,
                           maxLines: 1,
                           style: TextStyle(color: ink, fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: 0.5, height: 1.05)),
@@ -263,7 +298,7 @@ class CouponTicket extends StatelessWidget {
                     ],
                     if (body.isNotEmpty) ...[
                       const SizedBox(height: 6),
-                      Text(body,
+                      _Word(slot, 'c${index}body', body,
                           textAlign: TextAlign.center,
                           maxLines: 2,
                           style: TextStyle(color: ink.withValues(alpha: 0.85), fontSize: 10.5)),
@@ -287,7 +322,7 @@ class CouponTicket extends StatelessWidget {
                     ],
                     if (_s(data, 'expiry').isNotEmpty) ...[
                       const SizedBox(height: 6),
-                      Text(_s(data, 'expiry'), style: TextStyle(color: ink.withValues(alpha: 0.85), fontSize: 9.5, letterSpacing: 0.4)),
+                      _Word(slot, 'c${index}expiry', _s(data, 'expiry'), style: TextStyle(color: ink.withValues(alpha: 0.85), fontSize: 9.5, letterSpacing: 0.4)),
                     ],
                   ]),
                 ),
@@ -323,9 +358,11 @@ class CouponTicket extends StatelessWidget {
 // ── Card ─────────────────────────────────────────────────────────────
 
 class CouponCard extends StatelessWidget {
-  const CouponCard({super.key, required this.data, this.ink = const Color(kCouponInk)});
+  const CouponCard({super.key, required this.data, this.ink = const Color(kCouponInk), this.slot, this.index = 0});
   final Map<String, dynamic> data;
   final Color ink;
+  final String? slot;
+  final int index;
 
   static const _w = 240.0;
   static const _h = 336.0;
@@ -365,7 +402,7 @@ class CouponCard extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 6),
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
-                      child: Text(note.toUpperCase(),
+                      child: _Word(slot, 'c${index}note', note.toUpperCase(),
                           style: TextStyle(color: ink, fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 0.3)),
                     ),
                   ),
@@ -387,9 +424,9 @@ class CouponCard extends StatelessWidget {
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Row(mainAxisSize: MainAxisSize.min, children: [
-                      Text(_s(data, 'codeLabel'), style: TextStyle(color: ink, fontSize: 11, fontWeight: FontWeight.w700)),
+                      _Word(slot, 'c${index}codeLabel', _s(data, 'codeLabel'), style: TextStyle(color: ink, fontSize: 11, fontWeight: FontWeight.w700)),
                       const SizedBox(width: 10),
-                      Text(code,
+                      _Word(slot, 'c${index}code', code,
                           style: TextStyle(
                             // Yellow on white is unreadable: darken light ribbon colours for the code.
                             color: _codeInk(tagColor),
@@ -403,7 +440,7 @@ class CouponCard extends StatelessWidget {
             if (body.isNotEmpty) ...[
               const SizedBox(height: 8),
               Flexible(
-                child: Text(body,
+                child: _Word(slot, 'c${index}body', body,
                     textAlign: TextAlign.center,
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
@@ -426,7 +463,7 @@ class CouponCard extends StatelessWidget {
               ),
             if (_s(data, 'expiry').isNotEmpty) ...[
               const SizedBox(height: 6),
-              Text(_s(data, 'expiry'), style: TextStyle(color: ink, fontSize: 9.5, letterSpacing: 0.4)),
+              _Word(slot, 'c${index}expiry', _s(data, 'expiry'), style: TextStyle(color: ink, fontSize: 9.5, letterSpacing: 0.4)),
             ],
           ]),
         ),

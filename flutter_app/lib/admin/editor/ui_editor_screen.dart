@@ -69,14 +69,14 @@ const kPillOpenFor = Duration(seconds: 4);
 
 /// The tabs inside the + drawer.
 const kDrawerTabs = <(String, IconData)>[
-  ('Add', Icons.add_box_outlined),
+  ('Sections', Icons.dashboard_customize_rounded),
   ('Effects', Icons.animation_rounded),
   ('Orbs', Icons.blur_circular_rounded),
   ('Loaders', Icons.autorenew_rounded),
   ('Backgrounds', Icons.gradient_rounded),
   ('Particles', Icons.grain_rounded),
   ('Celebrate', Icons.celebration_rounded),
-  ('Sections', Icons.view_agenda_outlined),
+  ('Map', Icons.view_agenda_outlined),
 ];
 
 class _UiEditorScreenState extends State<UiEditorScreen> {
@@ -102,6 +102,7 @@ class _UiEditorScreenState extends State<UiEditorScreen> {
     _pillSig = _sig();
     c.addListener(_on);
     c.carrying.addListener(_onCarry);
+    c.openWords = _wordsSheet;
     _pillLater();
     _loadHint();
   }

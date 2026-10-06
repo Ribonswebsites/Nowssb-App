@@ -14,7 +14,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../widgets/banner_mix.dart';
+import '../../widgets/colored_split_promo_banner.dart';
+import '../../widgets/four_banners.dart';
+import '../../widgets/hype_rail.dart' show CouponTicketPromo;
+import '../../widgets/sections/section_registry.dart';
+import '../../widgets/stories_find_you_banner.dart';
 import '../template/editable.dart';
+import '../template/slot_keys.dart';
 import 'app_pages.dart';
 import 'carousel_fx.dart';
 import 'coupon_sections.dart';
@@ -31,6 +38,17 @@ const kTemplateNames = <String, String>{
   'cta': 'Button',
   'couponTicket': 'Coupon tickets (stacked)',
   'couponCards': 'Coupon cards (side by side)',
+  'couponBanner': 'Coupon banner (sliding)',
+  'couponPromo': 'Coupon ticket promo',
+  'promoBanner': 'Colour promo banner',
+  'glassyCarousel': 'Glassy carousel',
+  'spotlight': 'Spotlight',
+  'hypedRow': 'Hyped row',
+  'artistCards': 'Artist cards',
+  'categoryTiles': 'Category tiles',
+  'bannerMix': 'Banner mix',
+  'fourBanners': 'Four banners',
+  'storiesBanner': 'Stories banner',
 };
 
 const kTemplateBlurbs = <String, String>{
@@ -42,7 +60,44 @@ const kTemplateBlurbs = <String, String>{
   'cta': 'One button that goes somewhere',
   'couponTicket': 'Wide cut-out tickets: big amount, code, barcode — on white',
   'couponCards': 'Two portrait coupons with a coloured ribbon — on white',
+  'couponBanner': 'Ticket offers that slide by themselves',
+  'couponPromo': 'One gold coupon ticket that opens Coupons',
+  'promoBanner': 'A coloured banner with a figure',
+  'glassyCarousel': 'Glass cards that swipe sideways',
+  'spotlight': 'One big card at a time',
+  'hypedRow': 'Tall cards in a row',
+  'artistCards': 'Artist cards in a row',
+  'categoryTiles': 'Small tiles to browse',
+  'bannerMix': 'A mixed banner',
+  'fourBanners': 'Four banners stacked',
+  'storiesBanner': 'Stories that find you',
 };
+
+/// Sections and banners in the drawer, in the order they are shown.
+const kTemplateGallery = <String>[
+  'couponTicket',
+  'couponCards',
+  'couponBanner',
+  'couponPromo',
+  'imageBanner',
+  'videoBanner',
+  'splitPromo',
+  'promoBanner',
+  'cardRow',
+  'glassyCarousel',
+  'spotlight',
+  'hypedRow',
+  'artistCards',
+  'categoryTiles',
+  'bannerMix',
+  'fourBanners',
+  'storiesBanner',
+  'textBlock',
+  'cta',
+];
+
+/// The ready-made sections drawn by the app's section registry.
+const _registryKinds = {'couponBanner', 'glassyCarousel', 'spotlight', 'hypedRow', 'artistCards', 'categoryTiles'};
 
 String templateTitle(SectionEntry e) {
   var t = '${e.props['title'] ?? ''}'.trim();
@@ -56,18 +111,41 @@ String templateTitle(SectionEntry e) {
 
 /// Starting props for a new template section.
 Map<String, dynamic> templateStarter(String kind) => switch (kind) {
-      'imageBanner' => {'title': 'Your headline', 'subtitle': 'A line under it', 'cta': 'Explore', 'route': 'tab:3', 'height': 220},
-      'videoBanner' => {'title': 'Your headline', 'cta': 'Watch', 'route': 'tab:1', 'height': 240},
-      'splitPromo' => {'title': 'Split promo', 'subtitle': 'Say what it is', 'cta': 'Open', 'route': 'tab:3', 'bg': 0xFF1B2437, 'height': 170},
+      'imageBanner' => {
+          'title': 'Your headline',
+          'subtitle': 'A line under it',
+          'cta': 'Explore',
+          'route': 'tab:3',
+          'image': 'assets/banners/stories/aura.png',
+          'height': 220,
+        },
+      'videoBanner' => {
+          'title': 'Your headline',
+          'cta': 'Watch',
+          'route': 'tab:1',
+          'image': 'assets/banners/stories/prana.png',
+          'height': 240,
+        },
+      'splitPromo' => {
+          'title': 'Split promo',
+          'subtitle': 'Say what it is',
+          'cta': 'Open',
+          'route': 'tab:3',
+          'bg': 0xFF1B2437,
+          'image': 'assets/banners/promo/split-egyptian-gold.png',
+          'height': 170,
+        },
       'cardRow' => {
           'title': 'Picked for you',
           'cards': [
-            {'title': 'Card one', 'route': 'tab:2'},
-            {'title': 'Card two', 'route': 'tab:3'},
-            {'title': 'Card three', 'route': 'tab:1'},
+            {'title': 'Card one', 'route': 'tab:2', 'image': 'assets/store/collections/cosmos.webp'},
+            {'title': 'Card two', 'route': 'tab:3', 'image': 'assets/store/collections/nature.webp'},
+            {'title': 'Card three', 'route': 'tab:1', 'image': 'assets/store/collections/mythical.webp'},
           ],
           'height': 190,
         },
+      'promoBanner' => {'variant': 0},
+      'bannerMix' => {'variant': 0},
       'textBlock' => {'title': 'A heading', 'body': 'Write something people should read.'},
       'cta' => {'cta': 'Start now', 'route': 'tab:1'},
       'couponTicket' || 'couponCards' => couponStarter(kind),
@@ -75,9 +153,12 @@ Map<String, dynamic> templateStarter(String kind) => switch (kind) {
     };
 
 class TemplateSection extends StatelessWidget {
-  const TemplateSection({super.key, required this.entry, required this.pageId});
+  const TemplateSection({super.key, required this.entry, required this.pageId, this.thumb = false});
   final SectionEntry entry;
   final String pageId;
+
+  /// A drawer thumbnail: plain words and pictures, nothing registered.
+  final bool thumb;
 
   String get _slot => 'tpl.$pageId.${entry.id}';
   Map<String, dynamic> get p => entry.props;
@@ -87,8 +168,16 @@ class TemplateSection extends StatelessWidget {
 
   Widget _label(String id, String text, TextStyle style, {int? maxLines, TextAlign? align}) => text.isEmpty
       ? const SizedBox.shrink()
-      : EditableLabel(_slot, text, id: id, style: style, maxLines: maxLines, textAlign: align,
-          overflow: maxLines == null ? null : TextOverflow.ellipsis);
+      : thumb
+          ? Text(text, style: style, maxLines: maxLines, textAlign: align,
+              overflow: maxLines == null ? null : TextOverflow.ellipsis)
+          : EditableLabel(_slot, text, id: id, style: style, maxLines: maxLines, textAlign: align,
+              overflow: maxLines == null ? null : TextOverflow.ellipsis);
+
+  /// A picture the owner can tap in the editor to replace (prop [id]).
+  Widget _picture(BuildContext context, String id, String url) => thumb
+      ? NetPicture(url: url, fit: _fit)
+      : TemplatePicture(slot: '$_slot.$id', url: url, fit: _fit);
 
   Widget _cta(BuildContext context, {bool light = false}) {
     final label = _s('cta');
@@ -136,9 +225,9 @@ class TemplateSection extends StatelessWidget {
     switch (entry.kind) {
       case 'imageBanner':
       case 'videoBanner':
-        final media = entry.kind == 'videoBanner' && _s('video').isNotEmpty
-            ? NetVideo(url: _s('video'), fit: _fit)
-            : NetPicture(url: _s('image'), fit: _fit);
+        final media = entry.kind == 'videoBanner' && _s('video').isNotEmpty && !thumb
+            ? NetVideo(url: _s('video'), fit: _fit, poster: _s('image'))
+            : _picture(context, 'image', _s('image'));
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: ClipRRect(
@@ -178,13 +267,13 @@ class TemplateSection extends StatelessWidget {
               Expanded(
                 child: Padding(padding: const EdgeInsets.all(18), child: _fitText(context)),
               ),
-              Expanded(child: NetPicture(url: _s('image'), fit: _fit)),
+              Expanded(child: _picture(context, 'image', _s('image'))),
             ]),
           ),
         );
       case 'cardRow':
         final cards = p['cards'] is List ? (p['cards'] as List).whereType<Map>().toList() : const <Map>[];
-        return _CardRow(slot: _slot, title: _s('title'), cards: cards, height: _h(190));
+        return _CardRow(slot: _slot, title: _s('title'), cards: cards, height: _h(190), thumb: thumb);
       case 'textBlock':
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
@@ -204,22 +293,105 @@ class TemplateSection extends StatelessWidget {
         );
       case 'couponTicket':
       case 'couponCards':
-        return CouponSection(kind: entry.kind, props: p);
+        return CouponSection(kind: entry.kind, props: p, slot: thumb ? null : _slot);
+      case 'promoBanner':
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: ColoredSplitPromoBanner(
+            spec: SplitPromoExtras.at(_variant, onTap: () => openRoute(context, _s('route'))),
+            margin: EdgeInsets.zero,
+          ),
+        );
+      case 'couponPromo':
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: CouponTicketPromo(onPressed: _s('route').isEmpty ? null : () => openRoute(context, _s('route'))),
+        );
+      case 'bannerMix':
+        return BannerMix(seed: _variant);
+      case 'fourBanners':
+        return const FourBanners();
+      case 'storiesBanner':
+        return const StoriesFindYouBanner();
+    }
+    if (_registryKinds.contains(entry.kind)) {
+      ensureSectionRegistry();
+      final r = SectionRegistry.instance;
+      var config = r.defaultConfigFor(entry.kind, id: _slot);
+      // The sideways ones start at the first card and stop at the last.
+      // A little more room than where the app places them, for larger text.
+      if (entry.kind == 'glassyCarousel') {
+        config = config.copyWith(
+          behavior: config.behavior.copyWith(loop: false),
+          layout: config.layout.copyWith(height: 244, cardHeight: 224),
+        );
+      } else if (entry.kind == 'couponBanner') {
+        config = config.copyWith(layout: config.layout.copyWith(height: 264));
+      }
+      return r.build(context, config);
     }
     return const SizedBox.shrink();
   }
+
+  int get _variant => p['variant'] is num ? (p['variant'] as num).toInt() : 0;
+}
+
+/// A template's picture: tappable in the editor (its slot), replaced into
+/// the section's own props (EditorController.setMedia).
+class TemplatePicture extends StatelessWidget {
+  const TemplatePicture({super.key, required this.slot, required this.url, this.fit = BoxFit.cover});
+  final String slot;
+  final String url;
+  final BoxFit fit;
+
+  @override
+  Widget build(BuildContext context) =>
+      slotChrome(context, slot, SlotType.image, url, SizedBox.expand(child: NetPicture(url: url, fit: fit)));
+}
+
+/// A live, real-size template drawn small (the drawer's tiles).
+class TemplateThumb extends StatelessWidget {
+  const TemplateThumb({super.key, required this.kind, this.width = 412});
+  final String kind;
+
+  /// The phone width it is drawn at before it is shrunk.
+  final double width;
+
+  @override
+  Widget build(BuildContext context) => IgnorePointer(
+        child: ExcludeSemantics(
+          child: FittedBox(
+            fit: BoxFit.contain,
+            child: SizedBox(
+              width: width,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: TemplateSection(
+                  entry: SectionEntry(id: 'thumb', kind: kind, props: templateStarter(kind)),
+                  pageId: '_thumb',
+                  thumb: true,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
 }
 
 class _CardRow extends StatefulWidget {
-  const _CardRow({required this.slot, required this.title, required this.cards, required this.height});
+  const _CardRow({required this.slot, required this.title, required this.cards, required this.height, this.thumb = false});
   final String slot;
   final String title;
   final List<Map> cards;
   final double height;
+  final bool thumb;
 
   @override
   State<_CardRow> createState() => _CardRowState();
 }
+
+const _titleStyle = TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800);
+const _cardStyle = TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 15);
 
 class _CardRowState extends State<_CardRow> {
   final _c = PageController(viewportFraction: 0.72);
@@ -236,8 +408,9 @@ class _CardRowState extends State<_CardRow> {
       if (widget.title.isNotEmpty)
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-          child: EditableLabel(widget.slot, widget.title,
-              id: 'title', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
+          child: widget.thumb
+              ? Text(widget.title, style: _titleStyle)
+              : EditableLabel(widget.slot, widget.title, id: 'title', style: _titleStyle),
         ),
       SizedBox(
         height: widget.height,
@@ -261,7 +434,10 @@ class _CardRowState extends State<_CardRow> {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(18),
                       child: Stack(fit: StackFit.expand, children: [
-                        NetPicture(url: '${m['image'] ?? ''}'),
+                        if (widget.thumb)
+                          NetPicture(url: '${m['image'] ?? ''}')
+                        else
+                          TemplatePicture(slot: '${widget.slot}.card$i', url: '${m['image'] ?? ''}'),
                         const DecoratedBox(
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
@@ -275,10 +451,10 @@ class _CardRowState extends State<_CardRow> {
                           left: 14,
                           right: 14,
                           bottom: 12,
-                          child: Text('${m['title'] ?? ''}',
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 15)),
+                          child: widget.thumb || '${m['title'] ?? ''}'.isEmpty
+                              ? Text('${m['title'] ?? ''}', maxLines: 2, overflow: TextOverflow.ellipsis, style: _cardStyle)
+                              : EditableLabel(widget.slot, '${m['title'] ?? ''}',
+                                  id: 'card${i}title', maxLines: 2, overflow: TextOverflow.ellipsis, style: _cardStyle),
                         ),
                       ]),
                     ),
@@ -319,9 +495,12 @@ class NetPicture extends StatelessWidget {
 
 /// A muted looping clip from a URL, downloaded once into the disk cache.
 class NetVideo extends StatefulWidget {
-  const NetVideo({super.key, required this.url, this.fit = BoxFit.cover});
+  const NetVideo({super.key, required this.url, this.fit = BoxFit.cover, this.poster = ''});
   final String url;
   final BoxFit fit;
+
+  /// Shown until the clip plays.
+  final String poster;
 
   @override
   State<NetVideo> createState() => _NetVideoState();
@@ -376,7 +555,7 @@ class _NetVideoState extends State<NetVideo> {
   @override
   Widget build(BuildContext context) {
     final c = _c;
-    if (c == null || !c.value.isInitialized) return const NetPicture(url: '');
+    if (c == null || !c.value.isInitialized) return NetPicture(url: widget.poster, fit: widget.fit);
     return FittedBox(
       fit: widget.fit,
       clipBehavior: Clip.hardEdge,

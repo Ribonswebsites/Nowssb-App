@@ -19,6 +19,7 @@ import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/home_parts.dart';
 import '../store/ebooks_store.dart';
 import 'reader_book.dart';
+import '../../admin/layout/layout_sections.dart';
 import '../../admin/template/editable.dart';
 
 class ReaderHubScreen extends StatefulWidget {
@@ -124,7 +125,13 @@ class _ReaderHubScreenState extends State<ReaderHubScreen> {
               Expanded(
                 child: ListView(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 110),
-                  children: [
+                  // Server-driven order (Admin → UI Editor); bundled order by default.
+                  children: layoutIndexed(context, 'reader', const {
+                    0: ('film', 'Reader film'),
+                    2: ('meaning', 'Meaning Reader'),
+                    4: ('promo', 'eBooks banner'),
+                    6: ('ebook', 'eBook Reader'),
+                  }, [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(20),
                       child: const AspectRatio(
@@ -176,7 +183,7 @@ class _ReaderHubScreenState extends State<ReaderHubScreen> {
                           'Open any title from the NowssB library and read it chapter by chapter.',
                       onTap: () => _open(ReaderKind.ebook),
                     ),
-                  ],
+                  ]),
                 ),
               ),
             ],

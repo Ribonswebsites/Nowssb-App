@@ -40,6 +40,7 @@ import 'store.dart';
 import 'store/meaning_store.dart';
 import 'currently_playing_album.dart';
 import 'word_detail.dart';
+import '../admin/layout/layout_sections.dart';
 import '../admin/template/editable.dart';
 
 /// Collection banner file for each Atelier id — same table as part080 COLS.
@@ -436,7 +437,11 @@ class _SlmFeed extends StatelessWidget {
                   padding: EdgeInsets.only(
                     bottom: MediaQuery.paddingOf(context).bottom + 48,
                   ),
-                  children: [
+                  // Server-driven order (Admin → UI Editor); bundled order by default.
+                  children: layoutIndexed(context, 'sound.library', const {
+                    0: ('hype', 'Most hyped'),
+                    1: ('feed', 'Library'),
+                  }, noCopy: const {'feed'}, [
                     const Padding(
                       padding: EdgeInsets.fromLTRB(16, 12, 0, 4),
                       child: NowssbHypeRail(),
@@ -584,7 +589,7 @@ class _SlmFeed extends StatelessWidget {
                       _promoAt(2),
                       _meaningRows(),
                     ],
-                  ],
+                  ]),
                 ),
               ),
             ],

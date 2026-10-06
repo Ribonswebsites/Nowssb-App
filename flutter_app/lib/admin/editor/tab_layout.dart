@@ -1,4 +1,4 @@
-/// Sections tab (in the + drawer): the page at a glance. Everything about a
+/// Map tab (in the + drawer): the page at a glance. Everything about a
 /// section's size and place is done on the page itself (drag, pinch, edges, trash —
 /// see preview.dart); this list is a map of the page: tap to go to a
 /// section, hold and drag to reorder, swipe left to delete, eye to hide.
@@ -19,8 +19,7 @@ class LayoutTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!c.sectioned) {
-      return const Hint('This page is shown as one block for now, so its sections cannot be moved yet.\n'
-          'Tap any picture or line on the page to change it.',
+      return const Hint('This page is one block. Tap any picture or line on it to change it.',
           icon: Icons.view_agenda_outlined);
     }
     final secs = c.sections;
@@ -101,8 +100,16 @@ class LayoutTab extends StatelessWidget {
   }
 }
 
-/// Drawer tab: the ready-made sections. A tap adds one right after the
-/// picked section (or the one on screen) and closes the drawer.
+/// A section or banner (template kind) carried out of the drawer, to be
+/// dropped between two sections on the page.
+class SectionDrop {
+  const SectionDrop(this.kind);
+  final String kind;
+}
+
+/// Drawer tab: every section and banner, each drawn live and small. Hold
+/// one and drag it onto the page: a gold line shows where it lands, between
+/// two sections. A tap adds it right after the picked section.
 class AddSectionsTab extends StatelessWidget {
   const AddSectionsTab({super.key, required this.c, required this.onAdded});
   final EditorController c;
@@ -111,51 +118,98 @@ class AddSectionsTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!c.sectioned) {
-      return const Hint('This page is shown as one block for now, so sections cannot be added to it yet.',
-          icon: Icons.view_agenda_outlined);
+      return const Hint('This page can’t take new sections yet.', icon: Icons.view_agenda_outlined);
     }
-    return GridView.count(
+    return GridView.builder(
       padding: const EdgeInsets.fromLTRB(14, 0, 14, 24),
-      crossAxisCount: 2,
-      mainAxisSpacing: 10,
-      crossAxisSpacing: 10,
-      childAspectRatio: 1.35,
-      children: [
-        for (final e in kTemplateNames.entries)
-          Glass(
-            key: ValueKey('add-${e.key}'),
-            radius: 18,
-            onTap: () {
-              bigFeel();
-              c.endStep();
-              c.addTemplate(e.key);
-              c.endStep();
-              onAdded();
-            },
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Icon(_templateIcon(e.key), color: kGold),
-              const Spacer(),
-              Text(e.value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 14)),
-              const SizedBox(height: 2),
-              Text(kTemplateBlurbs[e.key] ?? '',
-                  maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: kDim, fontSize: 11)),
-            ]),
-          ),
-      ],
+      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: 220,
+        mainAxisSpacing: 10,
+        crossAxisSpacing: 10,
+        childAspectRatio: 1.05,
+      ),
+      itemCount: kTemplateGallery.length,
+      itemBuilder: (context, i) => SectionTile(c: c, kind: kTemplateGallery[i], onAdded: onAdded),
     );
   }
 }
 
-IconData _templateIcon(String k) => switch (k) {
-        'imageBanner' => Icons.image_rounded,
-        'videoBanner' => Icons.smart_display_rounded,
-        'splitPromo' => Icons.vertical_split_rounded,
-        'cardRow' => Icons.view_carousel_rounded,
-        'textBlock' => Icons.notes_rounded,
-        'couponTicket' => Icons.confirmation_number_outlined,
-        'couponCards' => Icons.local_offer_outlined,
-        _ => Icons.smart_button_rounded,
-      };
+/// White coupons are drawn on the white page they are made for.
+bool _onWhite(String kind) => kind == 'couponTicket' || kind == 'couponCards';
+
+/// One live thumbnail in the Sections tab.
+class SectionTile extends StatelessWidget {
+  const SectionTile({super.key, required this.c, required this.kind, required this.onAdded});
+  final EditorController c;
+  final String kind;
+  final VoidCallback onAdded;
+
+  Widget _art({double? width}) => Container(
+        width: width,
+        decoration: BoxDecoration(
+          color: _onWhite(kind) ? const Color(0xFFF5F2EC) : const Color(0xFF0B1120),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        clipBehavior: Clip.antiAlias,
+        padding: const EdgeInsets.all(4),
+        child: TemplateThumb(kind: kind),
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    final name = kTemplateNames[kind] ?? kind;
+    final tile = Glass(
+      radius: 16,
+      padding: const EdgeInsets.all(6),
+      onTap: () {
+        bigFeel();
+        c.endStep();
+        c.addTemplate(kind);
+        c.endStep();
+        onAdded();
+      },
+      child: Column(children: [
+        Expanded(child: SizedBox(width: double.infinity, child: _art())),
+        const SizedBox(height: 5),
+        Text(name,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: Colors.white, fontSize: 11.5, fontWeight: FontWeight.w700)),
+      ]),
+    );
+    return LongPressDraggable<Object>(
+      key: ValueKey('add-$kind'),
+      data: SectionDrop(kind),
+      delay: const Duration(milliseconds: 120),
+      hapticFeedbackOnStart: true,
+      dragAnchorStrategy: pointerDragAnchorStrategy,
+      onDragStarted: () => c.setFxDragging(true),
+      onDragEnd: (_) => c.setFxDragging(false),
+      feedback: Material(
+        color: Colors.transparent,
+        // Held by its middle, a little above the finger so the line shows.
+        child: Transform.translate(
+          offset: const Offset(-90, -150),
+          child: Opacity(
+            opacity: 0.92,
+            child: Container(
+              width: 180,
+              height: 120,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: kGold, width: 2),
+                boxShadow: const [BoxShadow(color: Color(0x99000000), blurRadius: 18, offset: Offset(0, 8))],
+              ),
+              child: _art(width: 180),
+            ),
+          ),
+        ),
+      ),
+      childWhenDragging: Opacity(opacity: 0.35, child: tile),
+      child: tile,
+    );
+  }
+}
 
 class _Row extends StatelessWidget {
   const _Row({

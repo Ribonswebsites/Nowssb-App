@@ -119,8 +119,8 @@ nothing permanent on it but a small handle at the top and a + button. The
 handle opens a floating pill (back · page picker · undo/redo · publish ·
 ⋯ for Try it, live preview, pencils, every slot); the pill also opens for a
 few seconds after each change. + opens a bottom drawer with tabs inside:
-Add (ready-made sections), Effects, Orbs, Loaders, Backgrounds, Particles,
-Celebrate, Sections (page map). Touching an
+Sections (every section and banner), Effects, Orbs, Loaders, Backgrounds,
+Particles, Celebrate, Map (page map). Touching an
 element shows a small strip that opens its own sheet (style, words,
 picture); there is no Style tab. Edits wait on the
 admin's phone (`EditorPreviewController.draftOverrides/draftLayouts`) and
@@ -137,7 +137,25 @@ orbCircle`. Element placement (any slot): `dx, dy, scale, hidden`, plus
 effects `entrance, loop`. Section `props`
 (layout doc): `height, padTop, padBottom, padH, transition, autoRotate,
 interval, entrance, loop, orbs[]`, and for template sections
-their content (`title, subtitle, body, cta, route, image, video, bg, height, cards[]`).
+their content (`title, subtitle, body, cta, route, image, video, bg, height, cards[]`,
+`coupons[]`, `variant`).
+
+**Sections drawer** (`editor/tab_layout.dart` `AddSectionsTab`): every kind
+in `kTemplateGallery` drawn live and small (`TemplateThumb`: the real
+`TemplateSection` with its starter props, shrunk, nothing registered) —
+the owner's templates (banners, card row, text, button), both white coupon
+templates and the app's ready-made sections (`kReadyKinds`: sliding coupon
+banner, coupon ticket promo, colour promo, glassy carousel, spotlight,
+hyped row, artist/category cards, banner mix, four banners, stories).
+Hold one and carry it (`SectionDrop`): a gold line (`InsertLine`) shows
+the gap it lands in — the upper half of a section puts it above, the lower
+half below — and the drop inserts it there
+(`EditorController.insertTemplate`), picks it and plays its entrance. A
+tap adds it after the picked section. Its words and pictures are slots
+`tpl.<page>.<entry>.<field>` (coupons: `c<i><field>`, cards: `card<i>` /
+`card<i>title`) that `setText`/`setMedia` write into the entry's own props
+(`setTemplateField`), so a picked line tapped again is typed in place and
+a picked picture tapped again opens Replace.
 
 Pickers: **SVG library** (`editor/svg_picker.dart`, Content tab on any
 `.svg` slot) — searchable grid of every bundled `assets/**.svg` (AssetManifest)
@@ -216,4 +234,8 @@ applyLayout(context, 'home.normal', items, hiddenByDefault: {...})
 * `LSection.group` must match the parent's crossAxisAlignment (a
   ListView/SliverList behaves like `stretch`).
 * New generic templates go in `layout/template_sections.dart`
-  (`kTemplateKinds`, `kTemplateNames`, `templateStarter`).
+  (`kTemplateKinds`, `kTemplateNames`, `kTemplateGallery`, `templateStarter`).
+* Drops that miss every section (the gaps, the page's own header) go to
+  the nearest section. `reader`, `store.request`, `quotes`, `sentence` and
+  `sound.library` were one block and now use `layoutIndexed`; `saved`,
+  `healing`, `player.session` and signed-out `practice` still are.

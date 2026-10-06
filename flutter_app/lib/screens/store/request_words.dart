@@ -14,6 +14,7 @@ import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import '../../widgets/app_thinking_loader.dart';
 import 'store_cards.dart';
 import 'store_home_sections.dart';
+import '../../admin/layout/layout_sections.dart';
 import '../../admin/template/editable.dart';
 import '../../widgets/hype_rail.dart';
 
@@ -91,7 +92,14 @@ class _RequestWordsScreenState extends State<RequestWordsScreen> {
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(20, 4, 20, 40),
           sliver: SliverList(
-            delegate: SliverChildListDelegate([
+            // Server-driven order (Admin → UI Editor); bundled order by default.
+            delegate: SliverChildListDelegate(layoutIndexed(context, 'store.request', const {
+              0: ('banner', 'Request banner'),
+              2: ('hype', 'Most hyped'),
+              4: ('form', 'Request form'),
+              6: ('promo', 'Split promo banner'),
+              8: ('recent', 'Your recent requests'),
+            }, noCopy: const {'form'}, [
               StoreNotifBanner(
                 heading: 'BUY REQUEST',
                 svgBody: NwsbMarks.word,
@@ -317,7 +325,7 @@ class _RequestWordsScreenState extends State<RequestWordsScreen> {
                   );
                 },
               ),
-            ]),
+            ])),
           ),
         ),
       ],

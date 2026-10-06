@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 
 import '../layout/anims/anim_library.dart' show AnimCategory, animById;
 import '../layout/app_pages.dart';
+import '../layout/coupon_sections.dart' show couponsOf;
 import '../layout/placed_orbs.dart';
 import '../layout/scopes.dart';
 import '../layout/template_sections.dart';
@@ -145,6 +146,10 @@ class EditorController extends ChangeNotifier {
 
   /// Tell listeners the picked thing changed (after setting it directly).
   void changedSelection() => notifyListeners();
+
+  /// Opens the words / replace sheet for the picked element (set by the
+  /// editor screen; a picked picture tapped again calls it).
+  VoidCallback? openWords;
 
   /// Something on the page is being carried by a finger (a section, an
   /// element or an orb): the screen clears the bottom for the trash.
@@ -365,12 +370,14 @@ class EditorController extends ChangeNotifier {
   UiOverride blankOverride(String key, SlotType type) => UiOverride(slot: key, type: type, textSet: false);
 
   void setText(String key, String def, String text) {
+    if (setTemplateField(key, text)) return;
     final cur = overrideOf(key) ?? blankOverride(key, SlotType.text);
     setOverride(key, SlotType.text, def,
         text == def ? cur.copyWith(textSet: false, text: '') : cur.copyWith(text: text, textSet: true));
   }
 
   void setMedia(String key, SlotType type, String def, String url, String storagePath) {
+    if (setTemplateField(key, url)) return;
     final cur = overrideOf(key) ?? blankOverride(key, type);
     setOverride(key, type, def, cur.copyWith(url: url, storagePath: storagePath));
   }
@@ -528,17 +535,72 @@ class EditorController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addTemplate(String kind) {
+  /// A template section's words and pictures live in its own props: a
+  /// slot `tpl.<page>.<entry>.<field>` writes the field (`cardN` and
+  /// `cardNtitle` are the Nth card's picture and words). False when [key]
+  /// is not a template slot on this page.
+  bool setTemplateField(String key, String value) {
+    final f = templateSlotField(key, layoutPage);
+    if (f == null) return false;
+    final (id, field) = f;
+    if (!entries.any((e) => e.id == id && e.isTemplate)) return false;
+    // A coupon's words: c<i><field> → coupons[i][field].
+    final coupon = RegExp(r'^c(\d+)([a-zA-Z]+)$').firstMatch(field);
+    if (coupon != null) {
+      final i = int.parse(coupon.group(1)!);
+      updateEntry(id, (e) {
+        final list = [for (final m in couponsOf(e.props)) Map<String, dynamic>.from(m)];
+        if (i >= list.length) return e;
+        list[i][coupon.group(2)!] = value;
+        return e.copyWith(props: {...e.props, 'coupons': list});
+      });
+      return true;
+    }
+    final card = RegExp(r'^card(\d+)(title)?$').firstMatch(field);
+    if (card == null) {
+      patchProps(id, {field: value});
+      return true;
+    }
+    final i = int.parse(card.group(1)!);
+    updateEntry(id, (e) {
+      final cards = [
+        for (final m in (e.props['cards'] is List ? e.props['cards'] as List : const []))
+          if (m is Map) Map<String, dynamic>.from(m)
+      ];
+      if (i >= cards.length) return e;
+      cards[i][card.group(2) == null ? 'image' : 'title'] = value;
+      return e.copyWith(props: {...e.props, 'cards': cards});
+    });
+    return true;
+  }
+
+  void addTemplate(String kind) => insertTemplate(kind, index + 1);
+
+  /// Adds a new [kind] section so it is the [at]th entry (clamped), picks
+  /// it, and returns its id. The page reflows around it.
+  String insertTemplate(String kind, int at) {
     final list = [...entries];
     var n = 1;
     while (list.any((x) => x.id == '$kind~$n')) {
       n++;
     }
-    final at = (index + 1).clamp(0, list.length);
-    list.insert(at, SectionEntry(id: '$kind~$n', kind: kind, props: templateStarter(kind)));
+    final id = '$kind~$n';
+    at = at.clamp(0, list.length);
+    list.insert(at, SectionEntry(id: id, kind: kind, props: templateStarter(kind)));
     _setEntries(list);
     index = at;
+    _jump = id;
     notifyListeners();
+    return id;
+  }
+
+  /// The entry index a section dropped just above live section [beforeId]
+  /// takes (the end when null).
+  int entryIndexBefore(String? beforeId) {
+    final list = entries;
+    if (beforeId == null) return list.length;
+    final i = list.indexWhere((e) => e.id == beforeId);
+    return i < 0 ? list.length : i;
   }
 
   void setSchedule(String id, int start, int end) {

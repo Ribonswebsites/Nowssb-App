@@ -29,6 +29,10 @@ import '../../data/firebase.dart';
 ///   imageBanner / videoBanner / splitPromo / cardRow / textBlock / cta /
 ///   couponTicket / couponCards
 ///             — generic template sections built from [props]
+///   glassyCarousel / couponBanner / hypedRow / artistCards /
+///   categoryTiles / spotlight / promoBanner / couponPromo /
+///   bannerMix / fourBanners / storiesBanner
+///             — the app's own ready-made sections and banners
 const kTemplateKinds = <String>[
   'imageBanner',
   'videoBanner',
@@ -38,6 +42,22 @@ const kTemplateKinds = <String>[
   'cta',
   'couponTicket',
   'couponCards',
+  ...kReadyKinds,
+];
+
+/// Ready-made sections and banners the app already ships, added whole.
+const kReadyKinds = <String>[
+  'couponBanner',
+  'couponPromo',
+  'promoBanner',
+  'glassyCarousel',
+  'spotlight',
+  'hypedRow',
+  'artistCards',
+  'categoryTiles',
+  'bannerMix',
+  'fourBanners',
+  'storiesBanner',
 ];
 
 class SectionEntry {
