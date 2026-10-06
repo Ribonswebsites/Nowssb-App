@@ -134,11 +134,22 @@ their content (`title, subtitle, body, cta, route, image, video, bg, height, car
 Pickers: **SVG library** (`editor/svg_picker.dart`, Content tab on any
 `.svg` slot) — searchable grid of every bundled `assets/**.svg` (AssetManifest)
 plus R2 `ui/` uploads (`/api/admin/ui-assets`) and SVG URLs already used in
-overrides; a bundled pick is stored as `asset:<path>`. **Animation library**
-(`editor/animation_library.dart`, Animation tab) — large live previews of
-every entrance, page turn, auto-rotate (at the section's interval) and
-thinking orb; tap applies to the selected section. The app ships no
-Lottie/Rive files. **Full-screen preview** (top bar ⛶) — the whole page,
+overrides; a bundled pick is stored as `asset:<path>`. **Effects drawer**
+(`editor/tab_animation.dart`) — live tiles for every entrance, page turn,
+auto-rotate speed and thinking orb; hold one and drag it onto the phone
+(`FxDrop` → `_FxDropZone` in `preview.dart`). The whole-app orb is a drop
+target in the drawer; pinch it to resize. The app ships no Lottie/Rive
+files.
+
+**Touch-only editing** (`editor/preview.dart`, `_TouchLayer`): on the phone,
+tap selects an element; a vertical drag moves the section (onto the trash
+strip at the bottom = delete, with Undo); dragging its top/bottom edge
+sets `padTop/padBottom`; a pinch resizes the section (`height`), or the
+selected text (`style.size`); long-press opens Put back · Duplicate ·
+Hide · Delete. There are no move/size buttons or sliders. Every draft
+change is an undo step (`EditorController.undo/redo`; edits within
+700 ms, such as one gesture, merge into one step). The canvas only needs an
+`AppPage` and its section ids, so any page in `kAppPages` works with it. **Full-screen preview** (top bar ⛶) — the whole page,
 interactive, with every draft applied, before Publish.
 
 Thinking orbs: `AppThinkingLoader(slot: …)` looks up `slot` →

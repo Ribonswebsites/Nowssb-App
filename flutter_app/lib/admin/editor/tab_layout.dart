@@ -1,7 +1,7 @@
-/// Layout tab: drag the picture on the phone up or down to reorder it (the
-/// page reflows), sideways to nudge it, pinch to resize; space above/below
-/// and side margins in steps. The list below is for order, show, hide, and
-/// delete.
+/// Layout tab: the page at a glance. Everything about a section's size and
+/// place is done on the phone picture itself (drag, pinch, edges, trash —
+/// see preview.dart); this list is a map of the page: tap to go to a
+/// section, hold and drag to reorder, swipe left to delete, eye to hide.
 library;
 
 import 'package:flutter/material.dart';
@@ -10,6 +10,7 @@ import '../layout/scopes.dart';
 import '../layout/template_sections.dart';
 import 'editor_controller.dart';
 import 'glass.dart';
+import 'preview.dart' show deleteWithUndo;
 
 class LayoutTab extends StatelessWidget {
   const LayoutTab({super.key, required this.c});
@@ -25,19 +26,17 @@ class LayoutTab extends StatelessWidget {
     final secs = c.sections;
     final live = [for (var i = 0; i < secs.length; i++) if (!secs[i].entry.deleted) i];
     final deleted = [for (final s in secs) if (s.entry.deleted) s];
-    final cur = c.current;
-    final fit = '${cur?.entry.props['fit'] ?? ''}';
 
     return CustomScrollView(slivers: [
       SliverPadding(
         padding: const EdgeInsets.fromLTRB(14, 0, 14, 0),
         sliver: SliverList.list(children: [
           Row(children: [
-            Expanded(
-              child: Pill('Add section', icon: Icons.add_rounded, selected: true, onTap: () => _addSection(context)),
+            const Expanded(
+              child: Text('Hold and drag to reorder · swipe left to delete',
+                  style: TextStyle(color: kDim, fontSize: 12.5)),
             ),
-            const SizedBox(width: 8),
-            Pill('Reset page', icon: Icons.settings_backup_restore_rounded, onTap: () async {
+            Pill('Reset page', icon: Icons.settings_backup_restore_rounded, dense: true, onTap: () async {
               if (await confirmAction(context, 'Put the whole page back?',
                   'Every section goes back to the order and look the app ships with. Nothing changes for people until you publish.',
                   yes: 'Put it back')) {
@@ -45,56 +44,7 @@ class LayoutTab extends StatelessWidget {
               }
             }),
           ]),
-          if (cur != null) ...[
-            const Padding(
-              padding: EdgeInsets.fromLTRB(4, 14, 4, 10),
-              child: Text(
-                'Drag the picture on the phone up or down to move it before or after the sections next to it — the page makes room. '
-                    'Drag sideways to nudge it. Pinch with two fingers to make it bigger or smaller.',
-                style: TextStyle(color: kDim, fontSize: 13, height: 1.35),
-              ),
-            ),
-            Wrap(spacing: 8, runSpacing: 8, children: [
-              Pill('Center', icon: Icons.filter_center_focus_rounded, dense: true, onTap: () {
-                tapFeel();
-                c.patchProps(cur.id, {'dx': null, 'dy': null});
-              }),
-              Pill('Full width', icon: Icons.fullscreen_rounded, dense: true, onTap: () {
-                tapFeel();
-                c.patchProps(cur.id, {'dx': null, 'padH': null});
-              }),
-              Pill('Fill picture', icon: Icons.crop_rounded, dense: true, selected: fit != 'contain', onTap: () {
-                tapFeel();
-                c.patchProps(cur.id, {'fit': null});
-              }),
-              Pill('Whole picture', icon: Icons.fit_screen_rounded, dense: true, selected: fit == 'contain', onTap: () {
-                tapFeel();
-                c.patchProps(cur.id, {'fit': 'contain'});
-              }),
-              Pill('Reset', icon: Icons.restart_alt_rounded, dense: true, onTap: () {
-                tapFeel();
-                c.patchProps(cur.id, {
-                  'height': null,
-                  'dx': null,
-                  'dy': null,
-                  'padTop': null,
-                  'padBottom': null,
-                  'padH': null,
-                  'fit': null,
-                });
-              }),
-            ]),
-            // Space above/below and side margins are still drawn for every
-            // section that has them (pages published before the sliders
-            // went), so they stay visible and changeable here.
-            const SizedBox(height: 10),
-            _Spacing(
-              props: cur.entry.props,
-              onChanged: (k, v) => c.patchProps(cur.id, {k: v < 1 ? null : v}),
-            ),
-            const SizedBox(height: 8),
-          ],
-          Eyebrow('Order — drag ⠿ to move', trailing: Text('${live.length} sections', style: const TextStyle(color: kDim, fontSize: 11))),
+          const SizedBox(height: 10),
         ]),
       ),
       SliverPadding(
@@ -103,7 +53,9 @@ class LayoutTab extends StatelessWidget {
           itemCount: live.length,
           onReorderItem: (a, b) {
             bigFeel();
+            c.endStep();
             c.move(live[a], live[b]);
+            c.endStep();
           },
           itemBuilder: (context, i) {
             final idx = live[i];
@@ -113,11 +65,7 @@ class LayoutTab extends StatelessWidget {
               c: c,
               s: s,
               index: i,
-              realIndex: idx,
-              first: i == 0,
-              last: i == live.length - 1,
-              onUp: () => c.move(idx, live[i - 1]),
-              onDown: () => c.move(idx, live[i + 1]),
+              realIndex: idx
             );
           },
         ),
@@ -151,8 +99,11 @@ class LayoutTab extends StatelessWidget {
         const SliverToBoxAdapter(child: SizedBox(height: 24)),
     ]);
   }
+}
 
-  Future<void> _addSection(BuildContext context) async {
+/// The + on the preview: pick a ready-made section; it goes right after the
+/// one on the preview.
+Future<void> openAddSection(BuildContext context, EditorController c) async {
     final kind = await showModalBottomSheet<String>(
       context: context,
       useRootNavigator: true,
@@ -166,7 +117,7 @@ class LayoutTab extends StatelessWidget {
         child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
           const Text('Add a section', style: TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w800)),
           const SizedBox(height: 4),
-          const Text('It goes right after the section on the preview. Fill it in from Content.',
+          const Text('It goes right after the section on the preview. Tap its words or picture to fill it in.',
               style: TextStyle(color: kDim, fontSize: 12.5)),
           const SizedBox(height: 14),
           GridView.count(
@@ -182,7 +133,7 @@ class LayoutTab extends StatelessWidget {
                   radius: 18,
                   onTap: () => Navigator.pop(ctx, e.key),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Icon(_icon(e.key), color: kGold),
+                    Icon(_templateIcon(e.key), color: kGold),
                     const Spacer(),
                     Text(e.value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 14)),
                     const SizedBox(height: 2),
@@ -197,11 +148,13 @@ class LayoutTab extends StatelessWidget {
     );
     if (kind != null) {
       bigFeel();
-      c.addTemplate(kind);
-    }
+      c.endStep();
+    c.addTemplate(kind);
+    c.endStep();
   }
+}
 
-  static IconData _icon(String k) => switch (k) {
+IconData _templateIcon(String k) => switch (k) {
         'imageBanner' => Icons.image_rounded,
         'videoBanner' => Icons.smart_display_rounded,
         'splitPromo' => Icons.vertical_split_rounded,
@@ -211,83 +164,6 @@ class LayoutTab extends StatelessWidget {
         'couponCards' => Icons.local_offer_outlined,
         _ => Icons.smart_button_rounded,
       };
-}
-
-/// Space above, space below and side margins of the section, in steps.
-class _Spacing extends StatelessWidget {
-  const _Spacing({required this.props, required this.onChanged});
-  final Map<String, dynamic> props;
-  final void Function(String key, double value) onChanged;
-
-  static const _rows = <(String, String, double)>[
-    ('padTop', 'Space above', 80),
-    ('padBottom', 'Space below', 80),
-    ('padH', 'Side margins', 48),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Glass(
-      radius: 14,
-      padding: const EdgeInsets.fromLTRB(12, 2, 4, 2),
-      child: Column(children: [
-        for (final (k, label, max) in _rows)
-          _Stepper(
-            label: label,
-            value: props[k] is num ? (props[k] as num).toDouble() : 0,
-            max: max,
-            onChanged: (v) => onChanged(k, v),
-          ),
-      ]),
-    );
-  }
-}
-
-class _Stepper extends StatelessWidget {
-  const _Stepper({required this.label, required this.value, required this.max, required this.onChanged});
-  final String label;
-  final double value;
-  final double max;
-  final ValueChanged<double> onChanged;
-
-  static const _step = 4.0;
-
-  @override
-  Widget build(BuildContext context) {
-    final v = value.clamp(0.0, max);
-    return Row(children: [
-      Expanded(child: Text(label, style: const TextStyle(color: Colors.white70, fontSize: 12.5))),
-      IconButton(
-        tooltip: 'Less space',
-        visualDensity: VisualDensity.compact,
-        onPressed: v <= 0
-            ? null
-            : () {
-                tapFeel();
-                onChanged(((v - _step) / _step).ceil() * _step);
-              },
-        icon: Icon(Icons.remove_rounded, size: 18, color: v <= 0 ? kFaint : kGold),
-      ),
-      SizedBox(
-        width: 34,
-        child: Text(v < 1 ? '0' : v.toStringAsFixed(0),
-            textAlign: TextAlign.center,
-            style: TextStyle(color: v < 1 ? kDim : Colors.white, fontWeight: FontWeight.w700, fontSize: 12.5)),
-      ),
-      IconButton(
-        tooltip: 'More space',
-        visualDensity: VisualDensity.compact,
-        onPressed: v >= max
-            ? null
-            : () {
-                tapFeel();
-                onChanged((((v + _step) / _step).floor() * _step).clamp(0.0, max));
-              },
-        icon: Icon(Icons.add_rounded, size: 18, color: v >= max ? kFaint : kGold),
-      ),
-    ]);
-  }
-}
 
 class _Row extends StatelessWidget {
   const _Row({
@@ -295,43 +171,40 @@ class _Row extends StatelessWidget {
     required this.c,
     required this.s,
     required this.index,
-    required this.realIndex,
-    required this.first,
-    required this.last,
-    required this.onUp,
-    required this.onDown,
+    required this.realIndex
   });
 
   final EditorController c;
   final SectionInfo s;
   final int index;
   final int realIndex;
-  final bool first;
-  final bool last;
-  final VoidCallback onUp;
-  final VoidCallback onDown;
 
   @override
   Widget build(BuildContext context) {
     final isCur = c.index == realIndex;
     final hidden = !s.entry.visible;
     final sched = s.entry.start != 0 || s.entry.end != 0;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
-      child: Glass(
-        radius: 14,
-        padding: const EdgeInsets.fromLTRB(4, 4, 4, 4),
+    return ReorderableDelayedDragStartListener(
+      index: index,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 6),
+        child: Dismissible(
+          key: ValueKey('del-${s.id}'),
+          direction: DismissDirection.endToStart,
+          background: Container(
+            alignment: Alignment.centerRight,
+            padding: const EdgeInsets.only(right: 20),
+            decoration: BoxDecoration(color: const Color(0xCCE5484D), borderRadius: BorderRadius.circular(14)),
+            child: const Icon(Icons.delete_rounded, color: Colors.white),
+          ),
+          onDismissed: (_) => deleteWithUndo(context, c, s.id, s.title),
+          child: Glass(
+            radius: 14,
+            padding: const EdgeInsets.fromLTRB(14, 4, 4, 4),
         edge: isCur ? kGold : kGlassEdge,
         onTap: () => c.goTo(realIndex),
         child: Row(children: [
-          ReorderableDragStartListener(
-            index: index,
-            child: const Padding(
-              padding: EdgeInsets.all(8),
-              child: Icon(Icons.drag_indicator_rounded, color: kFaint, size: 20),
-            ),
-          ),
-          Expanded(
+              Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(s.title,
                   maxLines: 1,
@@ -358,43 +231,16 @@ class _Row extends StatelessWidget {
             visualDensity: VisualDensity.compact,
             onPressed: () {
               tapFeel();
-              c.setVisible(s.id, hidden);
+              c.endStep();
+                  c.setVisible(s.id, hidden);
+                  c.endStep();
             },
             icon: Icon(hidden ? Icons.visibility_off_rounded : Icons.visibility_rounded,
                 color: hidden ? kFaint : kGold, size: 19),
+          )
+            ]),
           ),
-          PopupMenuButton<String>(
-            tooltip: 'More',
-            color: const Color(0xFF111A2B),
-            icon: const Icon(Icons.more_vert_rounded, color: kDim, size: 20),
-            onSelected: (v) async {
-              switch (v) {
-                case 'up':
-                  onUp();
-                case 'down':
-                  onDown();
-                case 'dup':
-                  actFeel();
-                  c.duplicate(s.id);
-                case 'del':
-                  if (await confirmAction(context, 'Delete “${s.title}”?',
-                      s.entry.isTemplate || s.entry.src.isNotEmpty
-                          ? 'This section you added is removed. Version history can bring it back.'
-                          : 'It stops showing for everyone once you publish. You can restore it from the Deleted list or history.',
-                      yes: 'Delete')) {
-                    bigFeel();
-                    c.delete(s.id);
-                  }
-              }
-            },
-            itemBuilder: (_) => [
-              if (!first) const PopupMenuItem(value: 'up', child: Text('Move up', style: TextStyle(color: Colors.white))),
-              if (!last) const PopupMenuItem(value: 'down', child: Text('Move down', style: TextStyle(color: Colors.white))),
-              if (s.copyable) const PopupMenuItem(value: 'dup', child: Text('Duplicate', style: TextStyle(color: Colors.white))),
-              const PopupMenuItem(value: 'del', child: Text('Delete', style: TextStyle(color: Color(0xFFFF8A8A)))),
-            ],
-          ),
-        ]),
+        ),
       ),
     );
   }

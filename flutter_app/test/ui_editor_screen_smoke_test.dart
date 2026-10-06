@@ -1,6 +1,6 @@
 /// The UI Editor screen end to end on the Normal home: the preview reports
 /// its sections (with the screen no longer rebuilding it on every change),
-/// and a drag in Layout reorders the page.
+/// and a drag on the phone reorders the page.
 library;
 
 import 'package:flutter/material.dart';
@@ -16,7 +16,8 @@ import 'fake_video_platform.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  SharedPreferences.setMockInitialValues({});
+  // The one-time touch hint has been seen (it has its own test).
+  SharedPreferences.setMockInitialValues({kTouchHintSeen: true});
 
   setUpAll(() {
     FakeVideoPlatform();
@@ -25,7 +26,7 @@ void main() {
   setUp(VideoPool.instance.debugDropAll);
   tearDown(VideoPool.instance.debugDropAll);
 
-  testWidgets('editor preview reports sections; a Layout drag reorders the page', (tester) async {
+  testWidgets('editor preview reports sections; a drag on the phone reorders the page', (tester) async {
     // Wide enough for the top bar's pending-changes pill in the test font.
     tester.view.physicalSize = const Size(640 * 3, 1000 * 3);
     tester.view.devicePixelRatio = 3.0;
@@ -41,11 +42,7 @@ void main() {
     final n = int.parse(RegExp(r'of (\d+)').firstMatch(tester.widget<Text>(first).data!)!.group(1)!);
     expect(n, greaterThan(3));
 
-    // Layout tab: drag the first section down; it moves down the page.
-    await tester.tap(find.text('Layout').last);
-    for (var i = 0; i < 6; i++) {
-      await tester.pump(const Duration(milliseconds: 100));
-    }
+    // Drag the first section down; it moves down the page.
     final pv = find.byKey(const ValueKey('pv-home.normal'));
     expect(pv, findsOneWidget);
     // The phone picture is drawn scaled down: 3.5 places' worth of phone

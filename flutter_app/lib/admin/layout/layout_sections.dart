@@ -345,8 +345,10 @@ class SectionFrame extends StatelessWidget {
     }
     final preview = EditorPreviewScope.peek(context);
     if (preview != null) {
+      final key = '$pageId/${entry.id}';
       w = _MeasureHeight(
-        onHeight: (h) => preview.sectionHeights['$pageId/${entry.id}'] = h,
+        onHeight: (h) => preview.sectionHeights[key] = h,
+        onBox: (b) => preview.sectionBoxes[key] = b,
         child: w,
       );
     }
@@ -471,24 +473,29 @@ Widget entranceTransform(String kind, double t, Widget child) {
 
 /// Reports its child's laid-out height (editor preview only).
 class _MeasureHeight extends SingleChildRenderObjectWidget {
-  const _MeasureHeight({required this.onHeight, required super.child});
+  const _MeasureHeight({required this.onHeight, required this.onBox, required super.child});
   final ValueChanged<double> onHeight;
+  final ValueChanged<RenderBox> onBox;
 
   @override
-  RenderObject createRenderObject(BuildContext context) => _RenderMeasureHeight(onHeight);
+  RenderObject createRenderObject(BuildContext context) => _RenderMeasureHeight(onHeight, onBox);
 
   @override
-  void updateRenderObject(BuildContext context, _RenderMeasureHeight r) => r.onHeight = onHeight;
+  void updateRenderObject(BuildContext context, _RenderMeasureHeight r) => r
+    ..onHeight = onHeight
+    ..onBox = onBox;
 }
 
 class _RenderMeasureHeight extends RenderProxyBox {
-  _RenderMeasureHeight(this.onHeight);
+  _RenderMeasureHeight(this.onHeight, this.onBox);
   ValueChanged<double> onHeight;
+  ValueChanged<RenderBox> onBox;
 
   @override
   void performLayout() {
     super.performLayout();
     if (size.height.isFinite && size.height > 0) onHeight(size.height);
+    onBox(this);
   }
 }
 

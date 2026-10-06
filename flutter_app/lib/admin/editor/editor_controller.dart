@@ -34,9 +34,6 @@ class EditorController extends ChangeNotifier {
   /// preview scrolls and swipes like the app.
   bool pickMode = true;
 
-  /// Layout tab: drag and pinch the phone picture. No sliders.
-  bool arrange = false;
-
   String? selectedSlot;
   SlotType? selectedType;
   String selectedDefault = '';
@@ -137,10 +134,56 @@ class EditorController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setArrange(bool v) {
-    if (arrange == v) return;
-    arrange = v;
-    notifyListeners();
+  // ── Undo / redo ────────────────────────────────────────────────────
+
+  final List<_Snapshot> _undo = [];
+  final List<_Snapshot> _redo = [];
+  DateTime _lastCheckpoint = DateTime.fromMillisecondsSinceEpoch(0);
+
+  /// Edits closer together than this are one undo step (a pinch or a drag
+  /// sends many).
+  static const kMergeWindow = Duration(milliseconds: 700);
+
+  bool get canUndo => _undo.isNotEmpty;
+  bool get canRedo => _redo.isNotEmpty;
+
+  _Snapshot _snap() => _Snapshot(Map.of(preview.draftOverrides), Map.of(preview.draftLayouts));
+
+  /// Called before every draft change: remembers the drafts as they were.
+  void _checkpoint() {
+    final now = DateTime.now();
+    if (now.difference(_lastCheckpoint) > kMergeWindow || _undo.isEmpty) {
+      _undo.add(_snap());
+      if (_undo.length > 100) _undo.removeAt(0);
+    }
+    _lastCheckpoint = now;
+    _redo.clear();
+  }
+
+  /// Starts a new undo step on the next edit (e.g. at the end of a gesture).
+  void endStep() => _lastCheckpoint = DateTime.fromMillisecondsSinceEpoch(0);
+
+  void _restore(_Snapshot s) {
+    preview.draftOverrides
+      ..clear()
+      ..addAll(s.overrides);
+    preview.draftLayouts
+      ..clear()
+      ..addAll(s.layouts);
+    endStep();
+    preview.changed();
+  }
+
+  void undo() {
+    if (_undo.isEmpty) return;
+    _redo.add(_snap());
+    _restore(_undo.removeLast());
+  }
+
+  void redo() {
+    if (_redo.isEmpty) return;
+    _undo.add(_snap());
+    _restore(_redo.removeLast());
   }
 
   // ── Overrides ──────────────────────────────────────────────────────
@@ -152,6 +195,7 @@ class EditorController extends ChangeNotifier {
   bool isPending(String key) => preview.draftOverrides.containsKey(key);
 
   void setOverride(String key, SlotType type, String def, UiOverride? o) {
+    _checkpoint();
     _defaults.putIfAbsent(key, () => def);
     final live = UiOverrides.instance.get(key);
     final next = (o == null || o.isEmpty) ? null : o;
@@ -215,6 +259,7 @@ class EditorController extends ChangeNotifier {
   }
 
   void _setEntries(List<SectionEntry> list) {
+    _checkpoint();
     final page = layoutPage;
     final live = UiLayouts.instance.layoutFor(page);
     final l = PageLayout(page: page, sections: list, version: live?.version ?? 0);
@@ -280,6 +325,22 @@ class EditorController extends ChangeNotifier {
     move(from, live[target]);
   }
 
+  /// The section's size, place and spacing as it ships (the touch
+  /// "Put back"): pinched height, offsets, spacing and picture fit.
+  void putBack(String id) {
+    endStep();
+    patchProps(id, {
+      'height': null,
+      'dx': null,
+      'dy': null,
+      'padTop': null,
+      'padBottom': null,
+      'padH': null,
+      'fit': null,
+    });
+    endStep();
+  }
+
   void setVisible(String id, bool v) => updateEntry(id, (e) => e.copyWith(visible: v));
 
   void delete(String id) {
@@ -341,6 +402,8 @@ class EditorController extends ChangeNotifier {
   /// no saved layout live, the shipped page is already what people see:
   /// this only drops the unpublished edits, so nothing counts as pending.
   void resetPage() {
+    _checkpoint();
+    endStep();
     final page = layoutPage;
     if (UiLayouts.instance.layoutFor(page) == null) {
       preview.draftLayouts.remove(page);
@@ -353,6 +416,8 @@ class EditorController extends ChangeNotifier {
   // ── Publish ────────────────────────────────────────────────────────
 
   void discard() {
+    _checkpoint();
+    endStep();
     preview.draftOverrides.clear();
     preview.draftLayouts.clear();
     preview.changed();
@@ -376,7 +441,12 @@ class EditorController extends ChangeNotifier {
         },
         note: note,
       );
-      discard();
+      preview.draftOverrides.clear();
+      preview.draftLayouts.clear();
+      // What was undoable is live now; undo starts over from here.
+      _undo.clear();
+      _redo.clear();
+      preview.changed();
       message = 'Live — every open app shows it now.';
       return null;
     } catch (e) {
@@ -394,4 +464,10 @@ class EditorController extends ChangeNotifier {
     preview.dispose();
     super.dispose();
   }
+}
+
+class _Snapshot {
+  _Snapshot(this.overrides, this.layouts);
+  final Map<String, UiOverride?> overrides;
+  final Map<String, PageLayout> layouts;
 }

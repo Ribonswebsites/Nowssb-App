@@ -1,20 +1,28 @@
 /// Admin → UI Editor.
 ///
-///   top     Normal home | Fashion home switch, and a picker for every
-///           other page and sub-page
+///   top     a strip of every page and sub-page (tap to open), and the
+///           full picker
 ///   middle  the live preview — the real page, one section at a time,
-///           swiped sideways, with the section's name and dots
+///           swiped sideways. Everything is done by touching it: tap to
+///           select, drag to move, pinch to resize, drag onto the trash to
+///           delete, long-press for the rest; + adds a section; undo/redo
+///           sit beside it; a small strip of colours shows for whatever is
+///           selected.
 ///   bottom  five pills — Content · Style · Animation · Layout · Publish —
 ///           each opening its own compact tab
+///
+/// A one-time hint explains the four touches (any touch dismisses it).
 ///
 /// Edits wait on this phone (shown on the preview) until Publish.
 library;
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../admin_state.dart';
 import '../layout/app_pages.dart';
 import '../template/all_slots_screen.dart';
+import '../template/slot_keys.dart';
 import 'editor_controller.dart';
 import 'glass.dart';
 import 'preview.dart';
@@ -40,8 +48,12 @@ void openUiEditor(BuildContext context, {String page = 'home.normal'}) {
 }
 
 class UiEditorScreen extends StatefulWidget {
-  const UiEditorScreen({super.key, this.initialPage = 'home.normal'});
+  const UiEditorScreen({super.key, this.initialPage = 'home.normal', this.controller});
   final String initialPage;
+
+  /// For tests: drive and inspect the editor. The screen disposes it.
+  @visibleForTesting
+  final EditorController? controller;
 
   @override
   State<UiEditorScreen> createState() => _UiEditorScreenState();
@@ -50,13 +62,13 @@ class UiEditorScreen extends StatefulWidget {
 const _tabs = <(String, IconData, String)>[
   ('Content', Icons.photo_library_outlined, 'Pictures, clips and words in this section'),
   ('Style', Icons.palette_outlined, 'Colours, fonts and button shapes'),
-  ('Animation', Icons.animation_rounded, 'Page turns, entrances and thinking orbs'),
-  ('Layout', Icons.view_agenda_outlined, 'Order, hide, duplicate, delete, add sections'),
+  ('Animation', Icons.animation_rounded, 'Effects to drag onto the phone'),
+  ('Layout', Icons.view_agenda_outlined, 'Every section of the page: reorder, hide, delete'),
   ('Publish', Icons.rocket_launch_outlined, 'Make it live, schedule, history'),
 ];
 
 class _UiEditorScreenState extends State<UiEditorScreen> {
-  final EditorController c = EditorController();
+  late final EditorController c = widget.controller ?? EditorController();
 
   /// One instance: rebuilding this screen (every edit does) then skips the
   /// preview, which listens to [c] itself and rebuilds only what changed.
@@ -81,11 +93,33 @@ class _UiEditorScreenState extends State<UiEditorScreen> {
     if (mounted) setState(() => _full = false);
   }
 
+  /// The one-time "tap / drag / pinch / +" hint.
+  bool _hint = false;
+
   @override
   void initState() {
     super.initState();
     c.openPage(widget.initialPage);
     c.addListener(_on);
+    _loadHint();
+  }
+
+  Future<void> _loadHint() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (prefs.getBool(kTouchHintSeen) ?? false) return;
+      if (mounted) setState(() => _hint = true);
+    } catch (_) {
+      // No preferences (tests, odd platforms): skip the hint.
+    }
+  }
+
+  Future<void> _dismissHint() async {
+    setState(() => _hint = false);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(kTouchHintSeen, true);
+    } catch (_) {}
   }
 
   void _on() {
@@ -101,7 +135,6 @@ class _UiEditorScreenState extends State<UiEditorScreen> {
 
   void _openTab(int i) {
     setState(() => _tab = _tab == i ? null : i);
-    c.setArrange(_tab == 3);
   }
 
   Future<bool> _confirmLeave() async {
@@ -110,6 +143,44 @@ class _UiEditorScreenState extends State<UiEditorScreen> {
         '${c.pendingCount} change(s) are only on this phone. They will be lost.',
         yes: 'Leave');
   }
+
+  /// The one-time hint goes over the whole editor.
+  Widget _withHint(Widget editor) => Stack(
+    children: [
+      Positioned.fill(child: editor),
+      if (_hint) Positioned.fill(child: TouchHint(onDismiss: _dismissHint)),
+    ],
+  );
+
+  /// Over the phone: undo/redo (left), + to add (right), and the small
+  /// strip for whatever is selected (middle).
+  Widget _overPreview(Widget preview) => Stack(
+    children: [
+      Positioned.fill(child: preview),
+      if (c.pickMode) ...[
+        Positioned(left: 10, bottom: 6, child: _UndoRedo(c: c)),
+        Positioned(
+          right: 10,
+          bottom: 6,
+          child: _RoundButton(
+            icon: Icons.add_rounded,
+            tooltip: 'Add',
+            big: true,
+            onTap: () => openAddSection(context, c),
+          ),
+        ),
+        if (_tab == null && c.selectedSlot != null)
+          Positioned(
+            left: 66,
+            right: 76,
+            bottom: 6,
+            child: Center(
+              child: ContextStrip(c: c, openTab: (i) => setState(() => _tab = i)),
+            ),
+          ),
+      ],
+    ],
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -129,7 +200,7 @@ class _UiEditorScreenState extends State<UiEditorScreen> {
         child: Scaffold(
           backgroundColor: Colors.black,
           resizeToAvoidBottomInset: false,
-          body: AdminBackdrop(
+          body: _withHint(AdminBackdrop(
             dim: 0.55,
             child: SafeArea(
               bottom: false,
@@ -139,7 +210,7 @@ class _UiEditorScreenState extends State<UiEditorScreen> {
                 }),
                 _PageRow(c: c),
                 _SectionHeader(c: c),
-                Expanded(child: _full ? const SizedBox.shrink() : _preview),
+                Expanded(child: _overPreview(_full ? const SizedBox.shrink() : _preview)),
                 _Dots(c: c),
                 _TabPills(index: _tab, pending: c.pendingCount, onTap: _openTab),
                 AnimatedContainer(
@@ -181,7 +252,208 @@ class _UiEditorScreenState extends State<UiEditorScreen> {
                 ),
               ]),
             ),
+          )),
+        ),
+      ),
+    );
+  }
+}
+
+/// Preferences flag: the touch hint has been seen on this phone.
+const kTouchHintSeen = 'ui_editor_touch_hint_seen';
+
+/// Shown once: the four touches. Any touch anywhere dismisses it.
+class TouchHint extends StatelessWidget {
+  const TouchHint({super.key, required this.onDismiss});
+  final VoidCallback onDismiss;
+
+  static const _rows = <(IconData, String, String)>[
+    (Icons.touch_app_rounded, 'Tap', 'to select'),
+    (Icons.open_with_rounded, 'Drag', 'to move'),
+    (Icons.pinch_rounded, 'Pinch', 'to resize'),
+    (Icons.add_circle_outline_rounded, '+', 'to add'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Listener(
+      behavior: HitTestBehavior.opaque,
+      onPointerDown: (_) => onDismiss(),
+      child: Container(
+        color: const Color(0xD9000000),
+        alignment: Alignment.center,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (final (icon, verb, rest) in _rows)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 56,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: kGold.withValues(alpha: 0.16),
+                        border: Border.all(color: kGold, width: 2),
+                      ),
+                      child: Icon(icon, color: kGold, size: 28),
+                    ),
+                    const SizedBox(width: 16),
+                    SizedBox(
+                      width: 170,
+                      child: Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(
+                              text: '$verb ',
+                              style: const TextStyle(color: kGold, fontWeight: FontWeight.w900),
+                            ),
+                            TextSpan(text: rest),
+                          ],
+                        ),
+                        style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            const SizedBox(height: 28),
+            const Text('Touch anywhere to start', style: TextStyle(color: kDim, fontSize: 13)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RoundButton extends StatelessWidget {
+  const _RoundButton({required this.icon, required this.tooltip, required this.onTap, this.big = false});
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback? onTap;
+  final bool big;
+
+  @override
+  Widget build(BuildContext context) {
+    final on = onTap != null;
+    return Tooltip(
+      message: tooltip,
+      child: GestureDetector(
+        onTap: on
+            ? () {
+                tapFeel();
+                onTap!();
+              }
+            : null,
+        child: AnimatedOpacity(
+          duration: const Duration(milliseconds: 160),
+          opacity: on ? 1 : 0.35,
+          child: Container(
+            width: big ? 56 : 44,
+            height: big ? 56 : 44,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: big ? kGold : const Color(0xCC111A2B),
+              border: Border.all(color: big ? kGold : const Color(0x33FFFFFF)),
+              boxShadow: const [BoxShadow(color: Color(0x88000000), blurRadius: 12, offset: Offset(0, 4))],
+            ),
+            child: Icon(icon, color: big ? kInk : Colors.white, size: big ? 30 : 22),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _UndoRedo extends StatelessWidget {
+  const _UndoRedo({required this.c});
+  final EditorController c;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      _RoundButton(icon: Icons.redo_rounded, tooltip: 'Redo', onTap: c.canRedo ? c.redo : null),
+      const SizedBox(height: 8),
+      _RoundButton(icon: Icons.undo_rounded, tooltip: 'Undo', onTap: c.canUndo ? c.undo : null),
+    ],
+  );
+}
+
+/// Shows over the phone while something is selected: a few colours for
+/// text, and a way into its words/picture and full style. Small on purpose
+/// — the full Style tab is one tap away.
+class ContextStrip extends StatelessWidget {
+  const ContextStrip({super.key, required this.c, required this.openTab});
+  final EditorController c;
+  final ValueChanged<int> openTab;
+
+  static const _quick = <int>[0xFFFFFFFF, 0xFF000000, 0xFFE8D5A3, 0xFF34D399, 0xFFFF4D8D, 0xFF2CB1FF];
+
+  @override
+  Widget build(BuildContext context) {
+    final key = c.selectedSlot;
+    final type = c.selectedType;
+    if (key == null || type == null) return const SizedBox.shrink();
+    final text = type == SlotType.text;
+    final st = c.overrideOf(key)?.style ?? const <String, dynamic>{};
+    Widget icon(IconData i, String tip, VoidCallback onTap, {Color color = Colors.white}) => IconButton(
+      tooltip: tip,
+      padding: EdgeInsets.zero,
+      constraints: const BoxConstraints.tightFor(width: 38, height: 40),
+      onPressed: () {
+        tapFeel();
+        onTap();
+      },
+      icon: Icon(i, color: color, size: 20),
+    );
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+      decoration: BoxDecoration(
+        color: const Color(0xEE111A2B),
+        borderRadius: BorderRadius.circular(99),
+        border: Border.all(color: const Color(0x33FFFFFF)),
+        boxShadow: const [BoxShadow(color: Color(0x88000000), blurRadius: 12, offset: Offset(0, 4))],
+      ),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (text) ...[
+              for (final col in _quick)
+                GestureDetector(
+                  onTap: () {
+                    tapFeel();
+                    c.endStep();
+                    c.patchStyle(key, type, c.selectedDefault, {'color': col, 'gradient': null});
+                    c.endStep();
+                  },
+                  child: Container(
+                    width: 22,
+                    height: 22,
+                    margin: const EdgeInsets.symmetric(horizontal: 2.5),
+                    decoration: BoxDecoration(
+                      color: Color(col),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: st['color'] == col ? kGold : const Color(0x55FFFFFF),
+                        width: st['color'] == col ? 3 : 1,
+                      ),
+                    ),
+                  ),
+                ),
+              icon(Icons.text_fields_rounded, 'Font and more', () => openTab(1), color: kGold),
+              icon(Icons.edit_rounded, 'Words', () => openTab(0)),
+            ] else if (type != SlotType.orb)
+              icon(Icons.photo_library_rounded, 'Replace', () => openTab(0), color: kGold)
+            else
+              icon(Icons.animation_rounded, 'Orb', () => openTab(2), color: kGold),
+            icon(Icons.close_rounded, 'Done', c.clearSelection, color: kDim),
+          ],
         ),
       ),
     );
@@ -206,7 +478,10 @@ class _TopBar extends StatelessWidget {
           icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 18),
         ),
         const Expanded(
-          child: Text('UI Editor', style: TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w800, letterSpacing: -0.3)),
+          child: Text('UI Editor',
+              maxLines: 1,
+              softWrap: false,
+              overflow: TextOverflow.fade, style: TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w800, letterSpacing: -0.3)),
         ),
         Pill(c.pickMode ? 'Tap to edit' : 'Try it',
             icon: c.pickMode ? Icons.touch_app_rounded : Icons.swipe_rounded,
@@ -277,53 +552,103 @@ class _TopBar extends StatelessWidget {
   }
 }
 
-class _PageRow extends StatelessWidget {
+/// Every page, one tap away: a strip of page chips (swipe it sideways)
+/// plus the full picker. Nothing here is home-page specific: any page in
+/// kAppPages opens on the same canvas.
+class _PageRow extends StatefulWidget {
   const _PageRow({required this.c});
   final EditorController c;
 
   @override
+  State<_PageRow> createState() => _PageRowState();
+}
+
+class _PageRowState extends State<_PageRow> {
+  final _scroll = ScrollController();
+  final _keys = <String, GlobalKey>{};
+  String? _shown;
+
+  EditorController get c => widget.c;
+
+  @override
+  void dispose() {
+    _scroll.dispose();
+    super.dispose();
+  }
+
+  /// Bring the open page's chip into view (e.g. after the picker).
+  void _reveal() {
+    if (_shown == c.pageId) return;
+    _shown = c.pageId;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final ctx = _keys[c.pageId]?.currentContext;
+      if (ctx != null && ctx.mounted) {
+        Scrollable.ensureVisible(ctx, alignment: 0.4, duration: const Duration(milliseconds: 300));
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final page = appPage(c.pageId);
-    final homeIndex = c.pageId == 'home.fashion' ? 1 : (c.pageId == 'home.normal' ? 0 : -1);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(14, 2, 14, 6),
-      child: Row(children: [
-        Flexible(
-          flex: 6,
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            alignment: Alignment.centerLeft,
-            child: Opacity(
-              opacity: homeIndex < 0 ? 0.55 : 1,
-              child: PillSwitch(
-                labels: const ['Normal home', 'Fashion home'],
-                index: homeIndex < 0 ? -1 : homeIndex,
-                onChanged: (i) => c.openPage(i == 0 ? 'home.normal' : 'home.fashion'),
-              ),
+    _reveal();
+    final pages = [
+      for (final p in kAppPages)
+        if (p.jumpTo == null) p,
+    ];
+    return SizedBox(
+      height: 44,
+      child: Row(
+        children: [
+          const SizedBox(width: 10),
+          IconButton(
+            tooltip: 'Every page',
+            onPressed: () => _pickPage(context),
+            icon: const Icon(Icons.grid_view_rounded, color: kGold, size: 20),
+          ),
+          Expanded(
+            child: ListView.separated(
+              controller: _scroll,
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.only(right: 14, top: 4, bottom: 6),
+              itemCount: pages.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 6),
+              itemBuilder: (_, i) {
+                final p = pages[i];
+                final on = p.id == c.pageId;
+                return GestureDetector(
+                  key: _keys.putIfAbsent(p.id, GlobalKey.new),
+                  onTap: () {
+                    tapFeel();
+                    c.openPage(p.id);
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: on ? kGold : const Color(0x1AFFFFFF),
+                      borderRadius: BorderRadius.circular(99),
+                      border: Border.all(color: on ? kGold : const Color(0x2EFFFFFF)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(p.icon, size: 15, color: on ? kInk : kGold),
+                        const SizedBox(width: 6),
+                        Text(
+                          p.title,
+                          style: TextStyle(
+                            color: on ? kInk : Colors.white,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 12.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          flex: 4,
-          child: Glass(
-            radius: 99,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-            onTap: () => _pickPage(context),
-            child: Row(children: [
-              Icon(page?.icon ?? Icons.layers_rounded, color: kGold, size: 16),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  c.isHome ? 'Other pages' : (page?.title ?? c.pageId),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 12.5),
-                ),
-              ),
-              const Icon(Icons.expand_more_rounded, color: kDim, size: 18),
-            ]),
-          ),
         ),
       ]),
     );

@@ -5,7 +5,6 @@ import 'package:nowssb/admin/editor/editor_controller.dart';
 import 'package:nowssb/admin/editor/editor_store.dart';
 import 'package:nowssb/admin/editor/preview.dart';
 import 'package:nowssb/admin/editor/tab_content.dart';
-import 'package:nowssb/admin/editor/tab_layout.dart';
 import 'package:nowssb/admin/layout/layout_sections.dart';
 import 'package:nowssb/admin/layout/scopes.dart';
 import 'package:nowssb/admin/layout/section_pinch.dart';
@@ -98,22 +97,6 @@ void main() {
       expect(m.x, 12);
       expect(m.y, 0);
     });
-  });
-
-  testWidgets('space above/below and side margins are shown and changeable in Layout', (tester) async {
-    final c = _controller('p', const [
-      SectionEntry(id: 'a', props: {'padTop': 12, 'padH': 4}),
-      SectionEntry(id: 'b'),
-    ]);
-    addTearDown(c.dispose);
-    await tester.pumpWidget(MaterialApp(home: Scaffold(body: LayoutTab(c: c))));
-    expect(find.text('Space above'), findsOneWidget);
-    expect(find.text('12'), findsOneWidget);
-    await tester.tap(find.byTooltip('More space').first);
-    expect(c.entries.first.props['padTop'], 16);
-    // Side margins 4 → 0: removed from the props, not saved as 0.
-    await tester.tap(find.byTooltip('Less space').last);
-    expect(c.entries.first.props.containsKey('padH'), isFalse);
   });
 
   group('template words have one source of truth', () {

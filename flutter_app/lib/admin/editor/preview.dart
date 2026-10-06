@@ -5,6 +5,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 import '../../theme/theme.dart';
 import '../layout/app_pages.dart';
@@ -52,7 +53,6 @@ class _EditorPreviewState extends State<EditorPreview> {
   Object _frameState() => (
         c.index,
         c.pickMode,
-        c.arrange,
         c.largeFrame,
         c.sections.map((s) => s.id).join('|'),
       );
@@ -100,9 +100,10 @@ class _EditorPreviewState extends State<EditorPreview> {
           : PageView.builder(
               key: ValueKey('pv-${page.id}'),
               controller: _pages,
-              // Layout tab ("arrange"): a sideways drag moves the section,
-              // so the pager must not steal it. Chevrons/dots still page.
-              physics: c.pickMode && !c.arrange ? const PageScrollPhysics() : const NeverScrollableScrollPhysics(),
+              // Sideways swipes turn to the next section; up/down drags and
+              // pinches belong to the section (see _TouchLayer). In "Try it"
+              // the page itself takes the touches.
+              physics: c.pickMode ? const PageScrollPhysics() : const NeverScrollableScrollPhysics(),
               itemCount: secs.length,
               onPageChanged: (i) {
                 tapFeel();
@@ -173,12 +174,21 @@ class _Frame extends StatelessWidget {
               size: size,
               child: Stack(children: [
                 Positioned.fill(child: RepaintBoundary(child: screen)),
-                if (active && c.pickMode && !c.arrange)
+                // Everything is done by touching the section itself: tap an
+                // element to select it, drag up/down to move, pinch to
+                // resize, drag its top/bottom edge for space, long-press for
+                // the few things left, drop an effect from the drawer on it.
+                if (active && c.pickMode)
                   Positioned.fill(
-                    child: _Hotspots(c: c, section: sectionId == kProbe ? null : '$pageId/$sectionId'),
+                    child: _FxDropZone(
+                      c: c,
+                      child: _TouchLayer(
+                        c: c,
+                        sectionId: sectionId == kProbe ? null : sectionId,
+                        child: _Hotspots(c: c, section: sectionId == kProbe ? null : '$pageId/$sectionId'),
+                      ),
+                    ),
                   ),
-                if (active && c.arrange && sectionId != kProbe)
-                  Positioned.fill(child: _ArrangeHand(c: c, sectionId: sectionId)),
               ]),
             ),
           ),
@@ -324,6 +334,94 @@ class _HotspotsState extends State<_Hotspots> {
   }
 }
 
+/// An effect from the Animation drawer, dragged onto a section.
+class FxDrop {
+  const FxDrop(this.label, this.patch, {this.carouselOnly = false, this.apply});
+  final String label;
+
+  /// Props it sets on the section (null = remove).
+  final Map<String, dynamic> patch;
+
+  /// Page turns and auto-rotate only mean something on a sideways section.
+  final bool carouselOnly;
+
+  /// Instead of [patch], for effects that live elsewhere (the orb).
+  final void Function(EditorController c, SectionInfo section)? apply;
+
+  /// Drawer tiles may carry extra data alongside the effect.
+  static FxDrop? of(Object? data) => switch (data) {
+        FxDrop d => d,
+        (FxDrop d, _) => d,
+        _ => null,
+      };
+}
+
+/// Deletes a section at once and offers Undo (no confirm dialog: undo is
+/// always there, in the snackbar and in the history).
+void deleteWithUndo(BuildContext context, EditorController c, String id, String title) {
+  bigFeel();
+  c.endStep();
+  c.delete(id);
+  c.endStep();
+  final m = ScaffoldMessenger.maybeOf(context);
+  m?.hideCurrentSnackBar();
+  m?.showSnackBar(SnackBar(
+    behavior: SnackBarBehavior.floating,
+    backgroundColor: const Color(0xFF111A2B),
+    duration: const Duration(seconds: 4),
+    content: Text('Deleted “$title”', style: const TextStyle(color: Colors.white)),
+    action: SnackBarAction(label: 'Undo', textColor: kGold, onPressed: c.undo),
+  ));
+}
+
+/// Takes effects dragged from the drawer and puts them on the section on
+/// the preview.
+class _FxDropZone extends StatelessWidget {
+  const _FxDropZone({required this.c, required this.child});
+  final EditorController c;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return DragTarget<Object>(
+      onWillAcceptWithDetails: (d) {
+        final fx = FxDrop.of(d.data);
+        final cur = c.current;
+        return fx != null && cur != null && (!fx.carouselOnly || cur.carousel);
+      },
+      onAcceptWithDetails: (d) {
+        final fx = FxDrop.of(d.data);
+        final cur = c.current;
+        if (fx == null || cur == null) return;
+        bigFeel();
+        c.endStep();
+        if (fx.apply != null) {
+          fx.apply!(c, cur);
+        } else {
+          c.patchProps(cur.id, fx.patch);
+        }
+        c.endStep();
+        // Play it on the phone right away.
+        c.preview.replay();
+      },
+      builder: (context, candidates, rejected) => Stack(fit: StackFit.expand, children: [
+        child,
+        if (candidates.isNotEmpty || rejected.any((r) => FxDrop.of(r) != null))
+          IgnorePointer(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: (candidates.isNotEmpty ? kGold : const Color(0xFFFF6B6B)).withValues(alpha: 0.12),
+                border: Border.all(color: candidates.isNotEmpty ? kGold : const Color(0xFFFF6B6B), width: 4),
+              ),
+            ),
+          ),
+      ]),
+    );
+  }
+}
+
+enum _Grab { none, order, padTop, padBottom, pinchSection, pinchText }
+
 /// Places one drag up or down moves a section: one place per this many
 /// points of the phone picture.
 const kShiftStep = 90.0;
@@ -333,147 +431,405 @@ const kShiftStep = 90.0;
 int shiftSteps(double dy, int up, int down) =>
     (dy / kShiftStep).truncate().clamp(-up, down);
 
-/// Drag the section on the phone up or down to move it before or after its
-/// neighbours (the page reflows; nothing is drawn over anything). A sideways
-/// drag nudges it left or right. Pinch to resize. No sliders.
-class _ArrangeHand extends StatefulWidget {
-  const _ArrangeHand({required this.c, required this.sectionId});
+/// Height of the trash zone that shows at the bottom while a section is
+/// dragged (phone points).
+const kTrashHeight = 96.0;
+
+/// How close to a section's top/bottom edge a drag must start to change the
+/// space above/below instead of moving it (phone points).
+const kEdgeGrab = 22.0;
+
+/// The touch surface over the section on the preview.
+///   drag up/down        move it (the page makes room); onto the trash = delete
+///   drag its top/bottom edge   space above / below
+///   pinch               resize the section, or the selected text
+///   long-press          Put back · Duplicate · Hide · Delete
+/// Taps go through to [child] (the element outlines) to select.
+class _TouchLayer extends StatefulWidget {
+  const _TouchLayer({required this.c, required this.sectionId, required this.child});
   final EditorController c;
-  final String sectionId;
+
+  /// Null when the page is one block (only elements can be touched).
+  final String? sectionId;
+  final Widget child;
 
   @override
-  State<_ArrangeHand> createState() => _ArrangeHandState();
+  State<_TouchLayer> createState() => _TouchLayerState();
 }
 
-enum _Axis { none, sideways, order }
+class _TouchLayerState extends State<_TouchLayer> {
+  EditorController get c => widget.c;
 
-class _ArrangeHandState extends State<_ArrangeHand> {
-  double _dx = 0;
-  double _h = 0;
-  var _pinch = false;
-  var _axis = _Axis.none;
-
-  /// Vertical drag so far (phone points) while reordering.
+  var _grab = _Grab.none;
+  double _base = 0;
+  Offset _start = Offset.zero;
+  Offset _finger = Offset.zero;
   double _drag = 0;
   (int, int) _range = (0, 0);
 
-  Map<String, dynamic> get _props => widget.c.current?.entry.props ?? const {};
+  /// The section's content on this surface, as last measured.
+  Rect? _rect;
+  var _watching = false;
 
-  double _num(String k) {
-    final v = _props[k];
-    return v is num ? v.toDouble() : 0;
+  @override
+  void initState() {
+    super.initState();
+    _watch();
+  }
+
+  /// Same as the outlines: re-measure after frames drawn anyway.
+  void _watch() {
+    if (_watching) return;
+    _watching = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _watching = false;
+      if (!mounted) return;
+      final r = _measure();
+      if (!_near(r, _rect)) setState(() => _rect = r);
+      _watch();
+    });
+  }
+
+  static bool _near(Rect? a, Rect? b) {
+    if (a == null || b == null) return a == b;
+    return (a.left - b.left).abs() < 0.5 &&
+        (a.top - b.top).abs() < 0.5 &&
+        (a.width - b.width).abs() < 0.5 &&
+        (a.height - b.height).abs() < 0.5;
+  }
+
+  Rect? _rectOf(RenderBox? box) {
+    final me = context.findRenderObject() as RenderBox?;
+    if (box == null || me == null || !box.attached || !me.attached || !box.hasSize || !me.hasSize) return null;
+    final tl = me.globalToLocal(box.localToGlobal(Offset.zero));
+    final br = me.globalToLocal(box.localToGlobal(box.size.bottomRight(Offset.zero)));
+    return Rect.fromPoints(tl, br);
+  }
+
+  Rect? _measure() {
+    final id = widget.sectionId;
+    if (id == null) return null;
+    return _rectOf(c.preview.sectionBoxes['${c.layoutPage}/$id']);
+  }
+
+  PreviewSlot? get _selected {
+    final k = c.selectedSlot;
+    if (k == null) return null;
+    for (final s in c.preview.slots.values) {
+      if (s.slotKey == k && s.box.currentContext != null) return s;
+    }
+    return null;
+  }
+
+  Map<String, dynamic> get _props => c.current?.entry.props ?? const {};
+  double _num(String k) => _props[k] is num ? (_props[k] as num).toDouble() : 0;
+  bool get _mine => widget.sectionId != null && c.current?.id == widget.sectionId;
+
+  /// Bottom strip of this surface where a dragged section is dropped to
+  /// delete it.
+  bool _overTrash(Offset p) {
+    final me = context.findRenderObject() as RenderBox?;
+    if (me == null || !me.hasSize) return false;
+    return p.dy > me.size.height - kTrashHeight;
+  }
+
+  void _startPinch(Offset focal) {
+    final sel = _selected;
+    if (sel != null && sel.type == SlotType.text) {
+      final r = _rectOf(sel.box.currentContext?.findRenderObject() as RenderBox?);
+      if (r != null && r.inflate(16).contains(focal)) {
+        final st = c.overrideOf(sel.slotKey)?.style ?? const {};
+        _base = st['size'] is num
+            ? (st['size'] as num).toDouble()
+            : (_fontSize(sel.box.currentContext?.findRenderObject()) ?? 16);
+        _grab = _Grab.pinchText;
+        return;
+      }
+    }
+    if (!_mine) {
+      _grab = _Grab.none;
+      return;
+    }
+    _base = _num('height');
+    if (_base < 1) {
+      // No saved height yet: start from the size the section has now.
+      _base = c.preview.sectionHeights['${c.layoutPage}/${widget.sectionId}'] ?? 200;
+    }
+    _grab = _Grab.pinchSection;
+  }
+
+  static double? _fontSize(RenderObject? r) {
+    if (r == null) return null;
+    if (r is RenderParagraph) return r.text.style?.fontSize;
+    double? found;
+    r.visitChildren((x) => found ??= _fontSize(x));
+    return found;
+  }
+
+  /// Where the finger first went down: a scale gesture only starts after
+  /// the finger has moved a little, so its start point is already past it.
+  Offset? _down;
+
+  void _onStart(ScaleStartDetails d) {
+    c.endStep();
+    _start = _down ?? d.localFocalPoint;
+    _finger = d.localFocalPoint;
+    // Count the movement made before the gesture was recognised.
+    _drag = d.pointerCount >= 2 ? 0 : d.localFocalPoint.dy - _start.dy;
+    if (d.pointerCount >= 2) {
+      _startPinch(d.localFocalPoint);
+      return;
+    }
+    if (!_mine) {
+      _grab = _Grab.none;
+      return;
+    }
+    final r = _rect;
+    final p = _start;
+    if (r != null && p.dx >= r.left && p.dx <= r.right && (p.dy - r.top).abs() < kEdgeGrab) {
+      _grab = _Grab.padTop;
+      _base = _num('padTop');
+    } else if (r != null && p.dx >= r.left && p.dx <= r.right && (p.dy - r.bottom).abs() < kEdgeGrab) {
+      _grab = _Grab.padBottom;
+      _base = _num('padBottom');
+    } else {
+      _grab = _Grab.order;
+      _range = c.shiftRange(widget.sectionId!);
+    }
+    setState(() {});
+  }
+
+  void _onUpdate(ScaleUpdateDetails d) {
+    if (d.pointerCount >= 2 && _grab != _Grab.pinchSection && _grab != _Grab.pinchText) {
+      _startPinch(d.localFocalPoint);
+      setState(() {});
+    }
+    final id = widget.sectionId;
+    switch (_grab) {
+      case _Grab.none:
+        return;
+      case _Grab.pinchText:
+        final sel = _selected;
+        if (sel == null) return;
+        final v = (_base * d.scale).clamp(8.0, 96.0).roundToDouble();
+        c.patchStyle(sel.slotKey, sel.type, sel.defaultValue, {'size': v});
+      case _Grab.pinchSection:
+        if (!_mine) return;
+        final next = (_base * d.scale).clamp(70.0, 720.0);
+        c.patchProps(id!, {'height': next.roundToDouble()});
+      case _Grab.padTop || _Grab.padBottom:
+        if (!_mine) return;
+        // focalPointDelta is in this surface's own (phone point) space.
+        _drag += d.focalPointDelta.dy;
+        // Dragging the top edge down, or the bottom edge down, adds space.
+        final v = (_base + _drag).clamp(0.0, 160.0).roundToDouble();
+        c.patchProps(id!, {_grab == _Grab.padTop ? 'padTop' : 'padBottom': v < 1 ? null : v});
+      case _Grab.order:
+        final before = _steps;
+        setState(() {
+          _drag += d.focalPointDelta.dy;
+          _finger = d.localFocalPoint;
+        });
+        if (_steps != before) tapFeel();
+    }
   }
 
   int get _steps => shiftSteps(_drag, _range.$1, _range.$2);
 
-  void _end() {
-    final id = widget.c.current?.id;
-    final steps = _axis == _Axis.order ? _steps : 0;
+  void _onEnd(ScaleEndDetails d) {
+    final grab = _grab;
+    final id = widget.sectionId;
+    final trash = grab == _Grab.order && (_finger - _start).distance > 12 && _overTrash(_finger);
+    final steps = grab == _Grab.order ? _steps : 0;
     setState(() {
-      _axis = _Axis.none;
+      _grab = _Grab.none;
       _drag = 0;
     });
-    if (id == null || id != widget.sectionId || steps == 0) return;
-    bigFeel();
-    widget.c.shift(id, steps);
+    c.endStep();
+    if (id == null || !_mine) return;
+    if (trash) {
+      deleteWithUndo(context, c, id, c.current?.title ?? id);
+      return;
+    }
+    if (steps != 0) {
+      bigFeel();
+      c.shift(id, steps);
+      c.endStep();
+    }
+  }
+
+  Future<void> _menu(LongPressStartDetails d) async {
+    final cur = c.current;
+    if (!_mine || cur == null) return;
+    actFeel();
+    final pictureKind =
+        cur.entry.isTemplate && const {'imageBanner', 'videoBanner', 'splitPromo'}.contains(cur.entry.kind);
+    final whole = '${cur.entry.props['fit'] ?? ''}' == 'contain';
+    final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+    final at = d.globalPosition;
+    PopupMenuItem<String> item(String v, IconData icon, String label, {Color color = Colors.white}) => PopupMenuItem(
+          value: v,
+          height: 44,
+          child: Row(children: [
+            Icon(icon, color: color, size: 19),
+            const SizedBox(width: 12),
+            Text(label, style: TextStyle(color: color, fontWeight: FontWeight.w600)),
+          ]),
+        );
+    final v = await showMenu<String>(
+      context: context,
+      color: const Color(0xFF111A2B),
+      position: RelativeRect.fromRect(at & const Size(1, 1), Offset.zero & overlay.size),
+      items: [
+        item('back', Icons.restart_alt_rounded, 'Put back'),
+        if (pictureKind)
+          item('fit', whole ? Icons.crop_rounded : Icons.fit_screen_rounded, whole ? 'Fill picture' : 'Whole picture'),
+        if (cur.copyable) item('dup', Icons.copy_rounded, 'Duplicate'),
+        item('hide', cur.entry.visible ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+            cur.entry.visible ? 'Hide' : 'Show'),
+        item('del', Icons.delete_outline_rounded, 'Delete', color: const Color(0xFFFF8A8A)),
+      ],
+    );
+    if (!mounted || v == null) return;
+    switch (v) {
+      case 'back':
+        c.putBack(cur.id);
+      case 'fit':
+        c.endStep();
+        c.patchProps(cur.id, {'fit': whole ? null : 'contain'});
+        c.endStep();
+      case 'dup':
+        c.endStep();
+        c.duplicate(cur.id);
+        c.endStep();
+      case 'hide':
+        c.endStep();
+        c.setVisible(cur.id, !cur.entry.visible);
+        c.endStep();
+      case 'del':
+        deleteWithUndo(context, c, cur.id, cur.title);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final steps = _axis == _Axis.order ? _steps : 0;
-    final label = switch (_axis) {
-      _Axis.order when steps == 0 => 'Keep dragging to move it',
-      _Axis.order => 'Let go: ${steps < 0 ? 'up' : 'down'} ${steps.abs()} place${steps.abs() == 1 ? '' : 's'}',
-      _Axis.sideways => 'Nudging sideways',
-      _Axis.none => 'Drag up/down to reorder  ·  pinch to resize',
-    };
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onScaleStart: (d) {
-        _dx = _num('dx');
-        _h = _num('height');
-        if (_h < 1) {
-          // No saved height yet: start from the size the section has now.
-          _h = widget.c.preview.sectionHeights['${widget.c.layoutPage}/${widget.sectionId}'] ?? 0;
-        }
-        _pinch = d.pointerCount >= 2;
-        _axis = _Axis.none;
-        _drag = 0;
-        _range = widget.c.shiftRange(widget.sectionId);
-      },
-      onScaleUpdate: (d) {
-        final id = widget.c.current?.id;
-        if (id == null || id != widget.sectionId) return;
-        if (d.pointerCount >= 2) {
-          _pinch = true;
-          if (_axis != _Axis.none) setState(() => _axis = _Axis.none);
-          final base = _h < 1 ? 200.0 : _h;
-          final next = (base * d.scale).clamp(70.0, 720.0);
-          widget.c.patchProps(id, {'height': next.roundToDouble()});
-          return;
-        }
-        if (_pinch) return;
-        // Already in phone points: focalPointDelta is in this widget's own
-        // coordinates, inside the scaled phone picture. (Dividing by the
-        // picture's scale again made drags ~3× too fast.)
-        final delta = d.focalPointDelta;
-        if (_axis == _Axis.none) {
-          // The first clear movement picks the axis for the whole drag.
-          _drag += delta.dy;
-          _dx += delta.dx;
-          final moved = Offset(_dx - _num('dx'), _drag);
-          if (moved.distance < 6) return;
-          setState(() => _axis = moved.dx.abs() > moved.dy.abs() ? _Axis.sideways : _Axis.order);
-          if (_axis == _Axis.sideways) _drag = 0;
-          return;
-        }
-        if (_axis == _Axis.order) {
-          final before = _steps;
-          setState(() => _drag += delta.dy);
-          if (_steps != before) tapFeel();
-          return;
-        }
-        // Sideways only: a sideways nudge stays in its own row and cannot
-        // cover the sections above or below.
-        _dx = (_dx + delta.dx).clamp(-220.0, 220.0);
-        widget.c.patchProps(id, {'dx': _dx.abs() < 1 ? null : _dx});
-      },
-      onScaleEnd: (_) => _end(),
-      child: IgnorePointer(
-        child: Transform.translate(
-          // The outline follows the finger while reordering.
-          offset: Offset(0, _axis == _Axis.order ? _drag.clamp(-kShiftStep * 3, kShiftStep * 3) : 0),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              border: Border.fromBorderSide(BorderSide(
-                color: steps != 0 ? kGold : const Color(0xCCE8D5A3),
-                width: steps != 0 ? 3 : 1.5,
-              )),
-            ),
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 18),
+    final r = _rect;
+    final ordering = _grab == _Grab.order && (_finger - _start).distance > 6;
+    final trash = ordering && _overTrash(_finger);
+    final steps = ordering && !trash ? _steps : 0;
+    final lift = ordering ? _drag.clamp(-kShiftStep * 3, kShiftStep * 3) : 0.0;
+    return Listener(
+      behavior: HitTestBehavior.translucent,
+      onPointerDown: (e) => _down = e.localPosition,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onScaleStart: _onStart,
+        onScaleUpdate: _onUpdate,
+        onScaleEnd: _onEnd,
+        onLongPressStart: widget.sectionId == null ? null : _menu,
+        child: Stack(fit: StackFit.expand, children: [
+          widget.child,
+          if (r != null && _mine) ...[
+            // The section itself: outline (following the finger while it is
+            // moved) and a grab bar on its top and bottom edge.
+            Positioned.fromRect(
+              rect: r.shift(Offset(0, lift)),
+              child: IgnorePointer(
                 child: DecoratedBox(
-                  decoration: const BoxDecoration(
-                    color: Color(0xE0060C18),
-                    borderRadius: BorderRadius.all(Radius.circular(99)),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    child: Text(
-                      label,
-                      style: const TextStyle(color: Color(0xFFE8D5A3), fontSize: 12, fontWeight: FontWeight.w700),
-                    ),
+                  decoration: BoxDecoration(
+                    color: ordering ? kGold.withValues(alpha: 0.14) : null,
+                    border: Border.all(color: ordering ? kGold : const Color(0x99E8D5A3), width: ordering ? 3 : 1.5),
                   ),
                 ),
               ),
             ),
-          ),
-        ),
+            if (!ordering) ...[
+              _EdgeBar(center: Offset(r.center.dx, r.top), active: _grab == _Grab.padTop),
+              _EdgeBar(center: Offset(r.center.dx, r.bottom), active: _grab == _Grab.padBottom),
+            ],
+          ],
+          if (steps != 0)
+            Positioned(
+              left: (_finger.dx - 34).clamp(4.0, double.infinity),
+              top: (_finger.dy - 64).clamp(4.0, double.infinity),
+              child: IgnorePointer(child: _Badge(steps)),
+            ),
+          if (ordering)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              height: kTrashHeight,
+              child: IgnorePointer(child: _Trash(hot: trash)),
+            ),
+        ]),
       ),
     );
   }
+}
+
+class _EdgeBar extends StatelessWidget {
+  const _EdgeBar({required this.center, required this.active});
+  final Offset center;
+  final bool active;
+
+  @override
+  Widget build(BuildContext context) => Positioned(
+        left: center.dx - 22,
+        top: center.dy - 4,
+        width: 44,
+        height: 8,
+        child: IgnorePointer(
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: active ? kGold : const Color(0xCCE8D5A3),
+              borderRadius: BorderRadius.circular(99),
+              boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 4)],
+            ),
+          ),
+        ),
+      );
+}
+
+/// "↑ 2" / "↓ 1": how many places the section will move.
+class _Badge extends StatelessWidget {
+  const _Badge(this.steps);
+  final int steps;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.fromLTRB(10, 8, 14, 8),
+        decoration: BoxDecoration(color: kGold, borderRadius: BorderRadius.circular(99)),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          Icon(steps < 0 ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded, color: kInk, size: 22),
+          const SizedBox(width: 4),
+          Text('${steps.abs()}', style: const TextStyle(color: kInk, fontSize: 20, fontWeight: FontWeight.w900)),
+        ]),
+      );
+}
+
+/// Shows at the bottom while a section is dragged: drop it here to delete.
+class _Trash extends StatelessWidget {
+  const _Trash({required this.hot});
+  final bool hot;
+
+  @override
+  Widget build(BuildContext context) => AnimatedContainer(
+        duration: const Duration(milliseconds: 160),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.bottomCenter,
+            end: Alignment.topCenter,
+            colors: [hot ? const Color(0xEEE5484D) : const Color(0xCC1B1F2A), const Color(0x00000000)],
+          ),
+        ),
+        alignment: Alignment.center,
+        child: AnimatedScale(
+          duration: const Duration(milliseconds: 160),
+          scale: hot ? 1.25 : 1,
+          child: Icon(Icons.delete_rounded, color: hot ? Colors.white : const Color(0xCCFFFFFF), size: 40),
+        ),
+      );
 }
 
 /// Plain-words name for a slot key, for lists.

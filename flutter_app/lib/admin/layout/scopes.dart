@@ -93,6 +93,10 @@ class EditorPreviewController extends ChangeNotifier {
   /// so a pinch starts from the size on screen instead of a guess.
   final Map<String, double> sectionHeights = {};
 
+  /// Where each section's content is drawn in the preview ('<page>/<section>'),
+  /// so the editor can outline it and put its edge handles on it.
+  final Map<String, RenderBox> sectionBoxes = {};
+
   /// The page id that reported last — for a page with tabs
   /// ('<pageId>.<tabId>', program_kit.dart) the tab on screen.
   String? lastReported;

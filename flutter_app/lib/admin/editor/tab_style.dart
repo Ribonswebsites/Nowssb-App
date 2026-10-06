@@ -1,7 +1,8 @@
-/// Style tab: the look of the picked text or button — colour, font, size,
+/// Style tab: the look of the picked text or button — colour, font,
 /// weight, spacing, italic, gradient ink, shadow/glow — plus a wrapper
 /// shape around a button/CTA/chip label (circle, pill, rounded, none) with
 /// its own fill, gradient, border, glow and glass. Ready-made looks up top.
+/// Size is not here: pinch the words on the phone.
 library;
 
 import 'package:flutter/material.dart';
@@ -103,13 +104,9 @@ class StyleTab extends StatelessWidget {
               ),
           ]),
         ),
-        LabeledSlider(
-          label: 'Size',
-          value: n('size', 16),
-          min: 8,
-          max: 64,
-          onChanged: (v) => patch({'size': v.roundToDouble()}),
-          onReset: st['size'] == null ? null : () => patch({'size': null}),
+        const Padding(
+          padding: EdgeInsets.only(top: 8),
+          child: Text('Size: pinch the words on the phone.', style: TextStyle(color: kDim, fontSize: 12)),
         ),
         LabeledSlider(
           label: 'Weight',
