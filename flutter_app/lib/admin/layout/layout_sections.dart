@@ -356,10 +356,13 @@ class SectionFrame extends StatelessWidget {
     if (pt != 0 || pb != 0 || ph != 0) {
       w = Padding(padding: EdgeInsets.fromLTRB(ph, pt, ph, pb), child: w);
     }
+    // Sideways nudge only. A vertical offset ('dy', written by drags before
+    // a drag reordered sections) painted the section over its neighbours
+    // without moving them, so it is no longer drawn; moving a section up or
+    // down is a reorder now and the page reflows.
     final dx = _d(p['dx']) ?? 0;
-    final dy = _d(p['dy']) ?? 0;
-    if (dx.abs() > 0.5 || dy.abs() > 0.5) {
-      w = Transform.translate(offset: Offset(dx, dy), child: w);
+    if (dx.abs() > 0.5) {
+      w = Transform.translate(offset: Offset(dx, 0), child: w);
     }
     final t = '${p['transition'] ?? ''}';
     final auto = p['autoRotate'] is bool ? p['autoRotate'] as bool : null;

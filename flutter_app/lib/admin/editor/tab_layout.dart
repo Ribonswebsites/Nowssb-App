@@ -1,5 +1,6 @@
-/// Layout tab: drag the picture on the phone to place it, pinch to resize.
-/// The list below is only for order, show, hide, and delete.
+/// Layout tab: drag the picture on the phone up or down to reorder it (the
+/// page reflows), sideways to nudge it, pinch to resize. The list below is
+/// for order, show, hide, and delete.
 library;
 
 import 'package:flutter/material.dart';
@@ -47,7 +48,8 @@ class LayoutTab extends StatelessWidget {
             const Padding(
               padding: EdgeInsets.fromLTRB(4, 14, 4, 10),
               child: Text(
-                'Drag the picture on the phone to put it where you want. Pinch with two fingers to make it bigger or smaller.',
+                'Drag the picture on the phone up or down to move it before or after the sections next to it — the page makes room. '
+                    'Drag sideways to nudge it. Pinch with two fingers to make it bigger or smaller.',
                 style: TextStyle(color: kDim, fontSize: 13, height: 1.35),
               ),
             ),

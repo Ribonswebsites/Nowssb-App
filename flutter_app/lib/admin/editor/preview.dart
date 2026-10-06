@@ -256,7 +256,18 @@ class _HotspotsState extends State<_Hotspots> {
   }
 }
 
-/// Drag the section on the phone to place it. Pinch to resize. No sliders.
+/// Places one drag up or down moves a section: one place per this many
+/// points of the phone picture.
+const kShiftStep = 90.0;
+
+/// How many places a vertical drag of [dy] (phone points) moves a section
+/// that can go [up] places up and [down] places down.
+int shiftSteps(double dy, int up, int down) =>
+    (dy / kShiftStep).truncate().clamp(-up, down);
+
+/// Drag the section on the phone up or down to move it before or after its
+/// neighbours (the page reflows; nothing is drawn over anything). A sideways
+/// drag nudges it left or right. Pinch to resize. No sliders.
 class _ArrangeHand extends StatefulWidget {
   const _ArrangeHand({required this.c, required this.sectionId});
   final EditorController c;
@@ -266,11 +277,17 @@ class _ArrangeHand extends StatefulWidget {
   State<_ArrangeHand> createState() => _ArrangeHandState();
 }
 
+enum _Axis { none, sideways, order }
+
 class _ArrangeHandState extends State<_ArrangeHand> {
   double _dx = 0;
-  double _dy = 0;
   double _h = 0;
   var _pinch = false;
+  var _axis = _Axis.none;
+
+  /// Vertical drag so far (phone points) while reordering.
+  double _drag = 0;
+  (int, int) _range = (0, 0);
 
   Map<String, dynamic> get _props => widget.c.current?.entry.props ?? const {};
 
@@ -279,71 +296,115 @@ class _ArrangeHandState extends State<_ArrangeHand> {
     return v is num ? v.toDouble() : 0;
   }
 
-  void _place(double dx, double dy) {
+  int get _steps => shiftSteps(_drag, _range.$1, _range.$2);
+
+  /// Phone points per screen pixel (the phone picture is scaled to fit).
+  double _paintScale() {
+    final box = context.findRenderObject() as RenderBox?;
+    if (box == null || !box.hasSize) return 1;
+    final a = box.localToGlobal(Offset.zero);
+    final b = box.localToGlobal(const Offset(100, 0));
+    final painted = (b.dx - a.dx).abs();
+    return painted > 1 ? painted / 100 : 1;
+  }
+
+  void _end() {
     final id = widget.c.current?.id;
-    if (id == null || id != widget.sectionId) return;
-    widget.c.patchProps(id, {
-      'dx': dx.abs() < 1 ? null : dx,
-      'dy': dy.abs() < 1 ? null : dy,
+    final steps = _axis == _Axis.order ? _steps : 0;
+    setState(() {
+      _axis = _Axis.none;
+      _drag = 0;
     });
+    if (id == null || id != widget.sectionId || steps == 0) return;
+    bigFeel();
+    widget.c.shift(id, steps);
   }
 
   @override
   Widget build(BuildContext context) {
+    final steps = _axis == _Axis.order ? _steps : 0;
+    final label = switch (_axis) {
+      _Axis.order when steps == 0 => 'Keep dragging to move it',
+      _Axis.order => 'Let go: ${steps < 0 ? 'up' : 'down'} ${steps.abs()} place${steps.abs() == 1 ? '' : 's'}',
+      _Axis.sideways => 'Nudging sideways',
+      _Axis.none => 'Drag up/down to reorder  ·  pinch to resize',
+    };
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onScaleStart: (d) {
         _dx = _num('dx');
-        _dy = _num('dy');
         _h = _num('height');
         if (_h < 1) {
           // No saved height yet: start from the size the section has now.
           _h = widget.c.preview.sectionHeights['${widget.c.layoutPage}/${widget.sectionId}'] ?? 0;
         }
         _pinch = d.pointerCount >= 2;
+        _axis = _Axis.none;
+        _drag = 0;
+        _range = widget.c.shiftRange(widget.sectionId);
       },
       onScaleUpdate: (d) {
         final id = widget.c.current?.id;
         if (id == null || id != widget.sectionId) return;
         if (d.pointerCount >= 2) {
           _pinch = true;
+          if (_axis != _Axis.none) setState(() => _axis = _Axis.none);
           final base = _h < 1 ? 200.0 : _h;
           final next = (base * d.scale).clamp(70.0, 720.0);
           widget.c.patchProps(id, {'height': next.roundToDouble()});
           return;
         }
         if (_pinch) return;
-        final box = context.findRenderObject() as RenderBox?;
-        var scale = 1.0;
-        if (box != null && box.hasSize) {
-          final a = box.localToGlobal(Offset.zero);
-          final b = box.localToGlobal(const Offset(100, 0));
-          final painted = (b.dx - a.dx).abs();
-          if (painted > 1) scale = painted / 100;
+        final scale = _paintScale();
+        final delta = d.focalPointDelta / scale;
+        if (_axis == _Axis.none) {
+          // The first clear movement picks the axis for the whole drag.
+          _drag += delta.dy;
+          _dx += delta.dx;
+          final moved = Offset(_dx - _num('dx'), _drag);
+          if (moved.distance < 6) return;
+          setState(() => _axis = moved.dx.abs() > moved.dy.abs() ? _Axis.sideways : _Axis.order);
+          if (_axis == _Axis.sideways) _drag = 0;
+          return;
         }
-        _dx = (_dx + d.focalPointDelta.dx / scale).clamp(-220.0, 220.0);
-        _dy = (_dy + d.focalPointDelta.dy / scale).clamp(-240.0, 420.0);
-        _place(_dx, _dy);
+        if (_axis == _Axis.order) {
+          final before = _steps;
+          setState(() => _drag += delta.dy);
+          if (_steps != before) tapFeel();
+          return;
+        }
+        // Sideways only: a sideways nudge stays in its own row and cannot
+        // cover the sections above or below.
+        _dx = (_dx + delta.dx).clamp(-220.0, 220.0);
+        widget.c.patchProps(id, {'dx': _dx.abs() < 1 ? null : _dx});
       },
-      child: const IgnorePointer(
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            border: Border.fromBorderSide(BorderSide(color: Color(0xCCE8D5A3), width: 1.5)),
-          ),
-          child: Align(
-            alignment: Alignment.bottomCenter,
-            child: Padding(
-              padding: EdgeInsets.only(bottom: 18),
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: Color(0xE0060C18),
-                  borderRadius: BorderRadius.all(Radius.circular(99)),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  child: Text(
-                    'Drag to place  ·  pinch to resize',
-                    style: TextStyle(color: Color(0xFFE8D5A3), fontSize: 12, fontWeight: FontWeight.w700),
+      onScaleEnd: (_) => _end(),
+      child: IgnorePointer(
+        child: Transform.translate(
+          // The outline follows the finger while reordering.
+          offset: Offset(0, _axis == _Axis.order ? _drag.clamp(-kShiftStep * 3, kShiftStep * 3) : 0),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              border: Border.fromBorderSide(BorderSide(
+                color: steps != 0 ? kGold : const Color(0xCCE8D5A3),
+                width: steps != 0 ? 3 : 1.5,
+              )),
+            ),
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 18),
+                child: DecoratedBox(
+                  decoration: const BoxDecoration(
+                    color: Color(0xE0060C18),
+                    borderRadius: BorderRadius.all(Radius.circular(99)),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    child: Text(
+                      label,
+                      style: const TextStyle(color: Color(0xFFE8D5A3), fontSize: 12, fontWeight: FontWeight.w700),
+                    ),
                   ),
                 ),
               ),

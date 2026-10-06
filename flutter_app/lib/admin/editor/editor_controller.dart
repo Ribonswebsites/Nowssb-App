@@ -250,6 +250,32 @@ class EditorController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// How far [id] can move among the sections still on the page (deleted
+  /// ones are skipped): (places up, places down).
+  (int, int) shiftRange(String id) {
+    final list = entries;
+    final live = [for (final e in list) if (!e.deleted) e.id];
+    final pos = live.indexOf(id);
+    if (pos < 0) return (0, 0);
+    return (pos, live.length - 1 - pos);
+  }
+
+  /// Moves [id] [steps] places among the sections still on the page
+  /// (negative = up), so the rest of the page reflows around it. This is
+  /// what a drag on the preview does.
+  void shift(String id, int steps) {
+    if (steps == 0) return;
+    final list = entries;
+    final from = list.indexWhere((e) => e.id == id);
+    if (from < 0) return;
+    final live = [for (var i = 0; i < list.length; i++) if (!list[i].deleted) i];
+    final pos = live.indexOf(from);
+    if (pos < 0) return;
+    final target = (pos + steps).clamp(0, live.length - 1);
+    if (target == pos) return;
+    move(from, live[target]);
+  }
+
   void setVisible(String id, bool v) => updateEntry(id, (e) => e.copyWith(visible: v));
 
   void delete(String id) {
