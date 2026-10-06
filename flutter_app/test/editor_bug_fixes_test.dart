@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nowssb/admin/editor/editor_controller.dart';
 import 'package:nowssb/admin/editor/editor_store.dart';
 import 'package:nowssb/admin/editor/preview.dart';
@@ -173,5 +174,31 @@ void main() {
     expect(c.pendingCount, 0, reason: 'refused, nothing pending');
     c.setSchedule('a', 100, 200);
     expect((c.entries.single.start, c.entries.single.end), (100, 200));
+  });
+
+  group('Reset page', () {
+    setUp(() => SharedPreferences.setMockInitialValues({}));
+
+    test('with nothing live it is not a pending change, and drops unpublished edits', () {
+      final c = _controller('reset.none', const [SectionEntry(id: 'a'), SectionEntry(id: 'b')]);
+      addTearDown(c.dispose);
+      c.resetPage();
+      expect(c.pendingCount, 0);
+      c.setVisible('a', false);
+      expect(c.pendingCount, 1);
+      c.resetPage();
+      expect(c.pendingCount, 0, reason: 'the shipped page is already what people see');
+    });
+
+    test('with a live layout it is one pending change', () {
+      const page = 'reset.live';
+      UiLayouts.instance.applyLocal(const PageLayout(page: page, sections: [SectionEntry(id: 'b'), SectionEntry(id: 'a')]));
+      addTearDown(() => UiLayouts.instance.removeLocal(page));
+      final c = _controller(page, const [SectionEntry(id: 'b'), SectionEntry(id: 'a')]);
+      addTearDown(c.dispose);
+      c.resetPage();
+      expect(c.pendingCount, 1);
+      expect(c.preview.draftLayouts[page]?.version, -1);
+    });
   });
 }

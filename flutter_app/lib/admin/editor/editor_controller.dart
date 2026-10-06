@@ -337,10 +337,16 @@ class EditorController extends ChangeNotifier {
     updateEntry(id, (e) => e.copyWith(start: start, end: end));
   }
 
-  /// Back to the page exactly as it ships (pending until published).
+  /// Back to the page exactly as it ships (pending until published). With
+  /// no saved layout live, the shipped page is already what people see:
+  /// this only drops the unpublished edits, so nothing counts as pending.
   void resetPage() {
     final page = layoutPage;
-    preview.draftLayouts[page] = PageLayout(page: page, sections: const [], version: -1);
+    if (UiLayouts.instance.layoutFor(page) == null) {
+      preview.draftLayouts.remove(page);
+    } else {
+      preview.draftLayouts[page] = PageLayout(page: page, sections: const [], version: -1);
+    }
     preview.changed();
   }
 
