@@ -13,14 +13,24 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../data/earn_wallet.dart';
 import '../data/auth_errors.dart';
 import '../data/firebase.dart';
+import '../data/remember_me.dart';
 import '../data/phone_notifications.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import '../widgets/app_thinking_loader.dart';
 import '../widgets/login_stage.dart';
 
 class AuthGate extends StatefulWidget {
-  const AuthGate({super.key, required this.child});
+  const AuthGate({super.key, required this.child, this.authStates, this.onSignedIn});
   final Widget child;
+
+  /// Test seam: the auth state stream to follow instead of
+  /// FirebaseAuth.instance.authStateChanges() (implies Firebase is ready).
+  @visibleForTesting
+  final Stream<User?>? authStates;
+
+  /// Test seam: what runs once per signed-in uid (default: daily login reward).
+  @visibleForTesting
+  final void Function(String uid)? onSignedIn;
 
   static final reopen = ValueNotifier<int>(0);
 
@@ -32,10 +42,11 @@ class AuthGate extends StatefulWidget {
   /// before anything binds to the account. Notifications are not touched;
   /// they have their own switches.
   static Future<void> forgetUnremembered() async {
-    if (!NwsbFirebase.ready) return;
     try {
-      final prefs = await SharedPreferences.getInstance();
-      if (prefs.getBool('nwsb.rememberMe') ?? true) return;
+      // Always read (also without Firebase): this clears the stale "off" that
+      // older builds wrote on sign-out — see lib/data/remember_me.dart.
+      if (await RememberMe.read()) return;
+      if (!NwsbFirebase.ready) return;
       final user = await FirebaseAuth.instance
           .authStateChanges()
           .first
@@ -75,6 +86,13 @@ class _AuthGateState extends State<AuthGate> {
   // The number the current code was sent to; editing the number drops it.
   String? _codeFor;
 
+  /// One subscription for the life of the gate. Building a new
+  /// authStateChanges() stream on every rebuild re-subscribed the
+  /// StreamBuilder, which dropped back to the "Preparing…" loader each time
+  /// the gate rebuilt (Remember-me load, busy flag, guest exit).
+  late final Stream<User?>? _authStates = widget.authStates ??
+      (NwsbFirebase.ready ? FirebaseAuth.instance.authStateChanges() : null);
+
   @override
   void initState() {
     super.initState();
@@ -97,15 +115,11 @@ class _AuthGateState extends State<AuthGate> {
   }
 
   Future<void> _loadRemember() async {
-    final prefs = await SharedPreferences.getInstance();
-    final remember = prefs.getBool('nwsb.rememberMe') ?? true;
+    final remember = await RememberMe.read();
     if (mounted) setState(() => _remember = remember);
   }
 
-  Future<void> _saveRemember() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('nwsb.rememberMe', _remember);
-  }
+  Future<void> _saveRemember() => RememberMe.write(_remember);
 
   void _leaveGuest() {
     if (mounted) setState(() => _guest = false);
@@ -397,14 +411,15 @@ class _AuthGateState extends State<AuthGate> {
   @override
   Widget build(BuildContext context) {
     if (_guest) return widget.child;
-    if (!NwsbFirebase.ready) {
+    final authStates = _authStates;
+    if (authStates == null) {
       return _buildAuthScreen(
         unavailable:
             'Firebase is not ready in this build. You can still explore without an account.',
       );
     }
     return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
+      stream: authStates,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
@@ -421,7 +436,12 @@ class _AuthGateState extends State<AuthGate> {
             _rewardedUid = uid;
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (!mounted) return;
-              EarnWallet.instance.onSignedIn();
+              final hook = widget.onSignedIn;
+              if (hook != null) {
+                hook(uid);
+              } else {
+                EarnWallet.instance.onSignedIn();
+              }
             });
           }
           return widget.child;

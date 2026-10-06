@@ -36,6 +36,7 @@ import '../features/notifications/notif_scheduler.dart';
 import '../features/notifications/notif_watchers.dart';
 import 'firebase.dart';
 import 'notifications.dart';
+import 'remember_me.dart';
 
 /// FCM background isolate entry (main.dart registers it).
 @pragma('vm:entry-point')
@@ -127,8 +128,7 @@ class PhoneNotifications {
   /// the app are routed now; local schedules are planned. Nothing is posted.
   Future<void> announceAfterLaunch() async {
     await start();
-    final prefs = await SharedPreferences.getInstance();
-    final remember = prefs.getBool('nwsb.rememberMe') ?? true;
+    final remember = await RememberMe.read();
     if (!remember || FirebaseAuth.instance.currentUser == null) {
       NotificationBanner.items.value = const [];
     }

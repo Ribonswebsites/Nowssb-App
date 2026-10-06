@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/auth_errors.dart';
 import '../data/firebase.dart';
+import '../data/remember_me.dart';
 import '../data/phone_notifications.dart';
 import '../widgets/login_stage.dart';
 
@@ -71,16 +72,13 @@ class _NwsbSignInPageState extends State<NwsbSignInPage> {
   void initState() {
     super.initState();
     _email.addListener(_numberChanged);
-    SharedPreferences.getInstance().then((prefs) {
+    RememberMe.read().then((remember) {
       if (!mounted) return;
-      setState(() => _remember = prefs.getBool('nwsb.rememberMe') ?? true);
+      setState(() => _remember = remember);
     });
   }
 
-  Future<void> _saveRemember() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('nwsb.rememberMe', _remember);
-  }
+  Future<void> _saveRemember() => RememberMe.write(_remember);
 
   Future<void> _run(Future<void> Function() action) async {
     if (_busy) return;
