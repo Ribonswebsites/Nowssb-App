@@ -48,7 +48,10 @@ class NotifRouter {
     _context = context;
     _goTab = goTab;
     _popToRoot = popToRoot;
-    _flush();
+    // The shell attaches from initState. A tap waiting from before sign-in
+    // would otherwise push a route / switch the tab in the middle of that
+    // build (setState during build). Route on the next frame instead.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _flush());
   }
 
   void detach(BuildContext context) {
