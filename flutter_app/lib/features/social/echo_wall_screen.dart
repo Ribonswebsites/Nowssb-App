@@ -196,7 +196,7 @@ class _EchoWallScreenState extends State<EchoWallScreen> {
     final uid = EconomyMirror.instance.uid;
     if (uid == null) return;
     final picked = await ImagePicker().pickImage(source: ImageSource.gallery, maxWidth: 1600, imageQuality: 80);
-    if (picked == null) return;
+    if (picked == null || !mounted) return;
     setState(() => _busy = true);
     try {
       final name = '${DateTime.now().millisecondsSinceEpoch}.jpg';

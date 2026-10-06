@@ -295,6 +295,7 @@ class _HeaderActionsSheetState extends State<HeaderActionsSheet>
     );
     if (chosen == null || !mounted) return;
     await Settings.instance.setQuickActions(chosen);
+    if (!mounted) return;
     final next = _buildIds(Settings.instance.quickActions);
     setState(() {
       _ids = next;

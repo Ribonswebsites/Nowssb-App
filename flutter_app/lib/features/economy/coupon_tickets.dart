@@ -421,8 +421,10 @@ class _FlipCouponState extends State<FlipCoupon> with SingleTickerProviderStateM
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString(_key, _result!);
       } on EconomyException catch (e) {
-        if (mounted) showEconomyError(context, e);
-        setState(() => _busy = false);
+        if (mounted) {
+          showEconomyError(context, e);
+          setState(() => _busy = false);
+        }
         return;
       } catch (_) {}
     }
