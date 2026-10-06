@@ -237,14 +237,22 @@ class _ScheduleRow extends StatelessWidget {
     return '${d.day} ${const ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.month - 1]} ${two(d.hour)}:${two(d.minute)}';
   }
 
-  Future<int?> _pick(BuildContext context, int ms) async {
+  /// [after]: the end's picker starts at the start's day, so days before it
+  /// cannot be picked at all.
+  Future<int?> _pick(BuildContext context, int ms, {int after = 0}) async {
     final now = DateTime.now();
-    final first = now.subtract(const Duration(days: 1));
-    final last = now.add(const Duration(days: 730));
-    final saved = ms == 0 ? now : DateTime.fromMillisecondsSinceEpoch(ms);
+    var first = now.subtract(const Duration(days: 1));
+    if (after != 0) {
+      final a = DateTime.fromMillisecondsSinceEpoch(after);
+      final day = DateTime(a.year, a.month, a.day);
+      if (day.isAfter(first)) first = day;
+    }
+    var last = now.add(const Duration(days: 730));
+    if (last.isBefore(first)) last = first.add(const Duration(days: 730));
+    final saved = ms == 0 ? (after != 0 ? DateTime.fromMillisecondsSinceEpoch(after) : now) : DateTime.fromMillisecondsSinceEpoch(ms);
     // A schedule set days ago is before firstDate: showDatePicker asserts
     // (red screen in debug) unless the initial day is inside the range.
-    final init = saved.isBefore(first) ? now : (saved.isAfter(last) ? last : saved);
+    final init = saved.isBefore(first) ? first : (saved.isAfter(last) ? last : saved);
     final day = await showDatePicker(
       context: context,
       initialDate: init,
@@ -257,16 +265,30 @@ class _ScheduleRow extends StatelessWidget {
     return DateTime(day.year, day.month, day.day, t.hour, t.minute).millisecondsSinceEpoch;
   }
 
+  void _refuse(BuildContext context, String why) {
+    ScaffoldMessenger.maybeOf(context)?.showSnackBar(SnackBar(content: Text(why)));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Wrap(spacing: 8, runSpacing: 8, crossAxisAlignment: WrapCrossAlignment.center, children: [
       Pill('Starts: ${_fmt(start)}', icon: Icons.play_arrow_rounded, dense: true, selected: start != 0, onTap: () async {
         final v = await _pick(context, start);
-        if (v != null) onChanged(v, end);
+        if (v == null || !context.mounted) return;
+        if (!scheduleOk(v, end)) {
+          _refuse(context, 'It has to start before it ends (${_fmt(end)}).');
+          return;
+        }
+        onChanged(v, end);
       }),
       Pill('Ends: ${_fmt(end)}', icon: Icons.stop_rounded, dense: true, selected: end != 0, onTap: () async {
-        final v = await _pick(context, end);
-        if (v != null) onChanged(start, v);
+        final v = await _pick(context, end, after: start);
+        if (v == null || !context.mounted) return;
+        if (!scheduleOk(start, v)) {
+          _refuse(context, 'It has to end after it starts (${_fmt(start)}).');
+          return;
+        }
+        onChanged(start, v);
       }),
       if (start != 0 || end != 0)
         Pill('No schedule', icon: Icons.close_rounded, dense: true, onTap: () => onChanged(0, 0)),

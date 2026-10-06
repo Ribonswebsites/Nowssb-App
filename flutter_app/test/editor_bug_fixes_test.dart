@@ -158,4 +158,20 @@ void main() {
     ]);
     expect([for (final h in sorted) h.id], ['b', 'c', 'a']);
   });
+
+  test('a schedule cannot end before it starts', () {
+    expect(scheduleOk(0, 0), isTrue);
+    expect(scheduleOk(100, 0), isTrue, reason: 'no end');
+    expect(scheduleOk(0, 100), isTrue, reason: 'no start');
+    expect(scheduleOk(100, 200), isTrue);
+    expect(scheduleOk(200, 100), isFalse);
+    expect(scheduleOk(100, 100), isFalse);
+
+    final c = _controller('p', const [SectionEntry(id: 'a')]);
+    addTearDown(c.dispose);
+    c.setSchedule('a', 200, 100);
+    expect(c.pendingCount, 0, reason: 'refused, nothing pending');
+    c.setSchedule('a', 100, 200);
+    expect((c.entries.single.start, c.entries.single.end), (100, 200));
+  });
 }

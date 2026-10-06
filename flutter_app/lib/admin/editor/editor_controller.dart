@@ -15,6 +15,10 @@ import '../template/slot_keys.dart';
 import '../template/ui_overrides.dart';
 import 'editor_store.dart';
 
+/// A schedule can be open on either side (0), but an end has to come after
+/// the start.
+bool scheduleOk(int start, int end) => start == 0 || end == 0 || end > start;
+
 class EditorController extends ChangeNotifier {
   EditorController() {
     preview.addListener(notifyListeners);
@@ -195,7 +199,7 @@ class EditorController extends ChangeNotifier {
 
   void setOverrideSchedule(String key, SlotType type, String def, int start, int end) {
     final cur = overrideOf(key);
-    if (cur == null) return;
+    if (cur == null || !scheduleOk(start, end)) return;
     setOverride(key, type, def, cur.copyWith(start: start, end: end));
   }
 
@@ -328,7 +332,10 @@ class EditorController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setSchedule(String id, int start, int end) => updateEntry(id, (e) => e.copyWith(start: start, end: end));
+  void setSchedule(String id, int start, int end) {
+    if (!scheduleOk(start, end)) return;
+    updateEntry(id, (e) => e.copyWith(start: start, end: end));
+  }
 
   /// Back to the page exactly as it ships (pending until published).
   void resetPage() {
