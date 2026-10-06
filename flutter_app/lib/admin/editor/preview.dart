@@ -298,16 +298,6 @@ class _ArrangeHandState extends State<_ArrangeHand> {
 
   int get _steps => shiftSteps(_drag, _range.$1, _range.$2);
 
-  /// Phone points per screen pixel (the phone picture is scaled to fit).
-  double _paintScale() {
-    final box = context.findRenderObject() as RenderBox?;
-    if (box == null || !box.hasSize) return 1;
-    final a = box.localToGlobal(Offset.zero);
-    final b = box.localToGlobal(const Offset(100, 0));
-    final painted = (b.dx - a.dx).abs();
-    return painted > 1 ? painted / 100 : 1;
-  }
-
   void _end() {
     final id = widget.c.current?.id;
     final steps = _axis == _Axis.order ? _steps : 0;
@@ -355,8 +345,10 @@ class _ArrangeHandState extends State<_ArrangeHand> {
           return;
         }
         if (_pinch) return;
-        final scale = _paintScale();
-        final delta = d.focalPointDelta / scale;
+        // Already in phone points: focalPointDelta is in this widget's own
+        // coordinates, inside the scaled phone picture. (Dividing by the
+        // picture's scale again made drags ~3× too fast.)
+        final delta = d.focalPointDelta;
         if (_axis == _Axis.none) {
           // The first clear movement picks the axis for the whole drag.
           _drag += delta.dy;
