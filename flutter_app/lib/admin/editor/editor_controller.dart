@@ -7,6 +7,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 
+import '../layout/anims/anim_library.dart' show AnimCategory, animById;
 import '../layout/app_pages.dart';
 import '../layout/placed_orbs.dart';
 import '../layout/scopes.dart';
@@ -191,13 +192,13 @@ class EditorController extends ChangeNotifier {
   }
 
   /// Drops a new orb on [sectionId] and picks it. Returns its id.
-  String addOrb(String sectionId, String orb, double x, double y, {double size = PlacedOrb.kDefaultSize}) {
+  String addOrb(String sectionId, String orb, double x, double y, {double size = PlacedOrb.kDefaultSize, String? anim}) {
     final all = [for (final e in entries) ...placedOrbsOf(e.props)];
     var n = all.length + 1;
     while (all.any((o) => o.id == 'orb$n')) {
       n++;
     }
-    final o = PlacedOrb(id: 'orb$n', orb: orb, x: x, y: y, size: size);
+    final o = PlacedOrb(id: 'orb$n', orb: orb, x: x, y: y, size: size, anim: anim);
     patchProps(sectionId, orbsPatch([...orbsIn(sectionId), o]));
     final i = sections.indexWhere((s) => s.id == sectionId);
     if (i >= 0) index = i;
@@ -206,6 +207,19 @@ class EditorController extends ChangeNotifier {
     selectedOrb = (sectionId, o.id);
     notifyListeners();
     return o.id;
+  }
+
+  /// Drops library animation [animId] (anims/anim_library.dart).
+  String addAnim(String sectionId, String animId, double x, double y, {double? size}) {
+    final f = PlacedOrb.fieldsFor(animId);
+    final big = animById(animId)?.category == AnimCategory.backgrounds;
+    return addOrb(sectionId, f.orb, x, y, size: size ?? (big ? 160 : PlacedOrb.kDefaultSize), anim: f.anim);
+  }
+
+  /// Swaps a placed animation for library id [animId], keeping its spot.
+  void setOrbAnim(String sectionId, String id, String animId) {
+    final f = PlacedOrb.fieldsFor(animId);
+    updateOrb(sectionId, id, (o) => o.copyWith(orb: f.orb, anim: f.anim ?? ''));
   }
 
   void updateOrb(String sectionId, String id, PlacedOrb Function(PlacedOrb) f) {

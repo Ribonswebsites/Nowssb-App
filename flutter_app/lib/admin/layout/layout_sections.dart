@@ -26,6 +26,7 @@ import 'package:flutter/rendering.dart';
 
 import '../admin_state.dart';
 import '../template/ui_overrides.dart';
+import 'anims/effects.dart';
 import 'placed_orbs.dart';
 import 'scopes.dart';
 import 'section_pinch.dart';
@@ -346,7 +347,9 @@ class SectionFrame extends StatelessWidget {
     }
     // Orbs the owner dropped on this section (editor and published app).
     final orbs = placedOrbsOf(p);
-    if (orbs.isNotEmpty) w = PlacedOrbLayer(orbs: orbs, child: w);
+    if (orbs.isNotEmpty) {
+      w = PlacedOrbLayer(orbs: orbs, sectionBg: p['bg'] is num ? (p['bg'] as num).toInt() : null, child: w);
+    }
     final preview = EditorPreviewScope.peek(context);
     if (preview != null) {
       final key = '$pageId/${entry.id}';
@@ -380,6 +383,8 @@ class SectionFrame extends StatelessWidget {
         child: w,
       );
     }
+    final loop = '${p['loop'] ?? ''}';
+    if (loop.isNotEmpty && loop != 'none') w = LoopFx(kind: loop, child: w);
     final ent = '${p['entrance'] ?? ''}';
     if (ent.isNotEmpty && ent != 'none') {
       w = SectionEntrance(kind: ent, child: w);
@@ -405,8 +410,9 @@ class SectionFrame extends StatelessWidget {
   }
 }
 
-/// Plays once when the section first appears.
-///   fadeUp · slide · scale · blur · fade
+/// Plays once when the section (or element) first appears. The classic
+/// fadeUp · slide · scale · blur · fade are drawn by [entranceTransform];
+/// the rest come from anims/effects.dart (flutter_animate).
 class SectionEntrance extends StatefulWidget {
   const SectionEntrance({super.key, required this.kind, required this.child});
   final String kind;
@@ -420,20 +426,26 @@ class _SectionEntranceState extends State<SectionEntrance> with SingleTickerProv
   late final AnimationController _c =
       AnimationController(vsync: this, duration: const Duration(milliseconds: 650))..forward();
   int? _tick;
+  int _plays = 0;
+
+  void _replay() {
+    _c.forward(from: 0);
+    _plays++;
+  }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     // Only inside the editor preview: replay when the Animation tab asks.
     final tick = EditorPreviewScope.of(context)?.replayTick;
-    if (_tick != null && tick != null && tick != _tick) _c.forward(from: 0);
+    if (_tick != null && tick != null && tick != _tick) _replay();
     _tick = tick;
   }
 
   @override
   void didUpdateWidget(SectionEntrance old) {
     super.didUpdateWidget(old);
-    if (old.kind != widget.kind) _c.forward(from: 0);
+    if (old.kind != widget.kind) _replay();
   }
 
   @override
@@ -444,6 +456,9 @@ class _SectionEntranceState extends State<SectionEntrance> with SingleTickerProv
 
   @override
   Widget build(BuildContext context) {
+    if (!kClassicEntrances.contains(widget.kind)) {
+      return EntranceFx(kind: widget.kind, play: _plays, child: widget.child);
+    }
     return AnimatedBuilder(
       animation: _c,
       child: widget.child,

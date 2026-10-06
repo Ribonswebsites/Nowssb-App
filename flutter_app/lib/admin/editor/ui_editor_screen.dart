@@ -23,6 +23,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../admin_state.dart';
+import '../layout/anims/anim_library.dart';
 import '../layout/app_pages.dart';
 import '../layout/placed_orbs.dart';
 import '../template/all_slots_screen.dart';
@@ -71,6 +72,10 @@ const kDrawerTabs = <(String, IconData)>[
   ('Add', Icons.add_box_outlined),
   ('Effects', Icons.animation_rounded),
   ('Orbs', Icons.blur_circular_rounded),
+  ('Loaders', Icons.autorenew_rounded),
+  ('Backgrounds', Icons.gradient_rounded),
+  ('Particles', Icons.grain_rounded),
+  ('Celebrate', Icons.celebration_rounded),
   ('Sections', Icons.view_agenda_outlined),
 ];
 
@@ -365,14 +370,18 @@ class _UiEditorScreenState extends State<UiEditorScreen> {
                   duration: const Duration(milliseconds: 280),
                   curve: Curves.easeOutCubic,
                   offset: open && !c.fxDragging ? Offset.zero : const Offset(0, 1.05),
+                  // Thumbnails stop while it is closed or slid away.
                   child: open || c.fxDragging
-                      ? EditorDrawer(
-                          key: const ValueKey('editor-drawer'),
-                          c: c,
-                          tab: _drawer ?? 1,
-                          bottom: mq.padding.bottom,
-                          onTab: (i) => setState(() => _drawer = i),
-                          onClose: () => setState(() => _drawer = null),
+                      ? TickerMode(
+                          enabled: open && !c.fxDragging,
+                          child: EditorDrawer(
+                            key: const ValueKey('editor-drawer'),
+                            c: c,
+                            tab: _drawer ?? 1,
+                            bottom: mq.padding.bottom,
+                            onTab: (i) => setState(() => _drawer = i),
+                            onClose: () => setState(() => _drawer = null),
+                          ),
                         )
                       : const SizedBox.shrink(),
                 ),
@@ -467,6 +476,10 @@ class EditorDrawer extends StatelessWidget {
                   0 => AddSectionsTab(c: c, onAdded: onClose),
                   1 => EffectsTab(c: c),
                   2 => OrbsTab(c: c),
+                  3 => AnimGridTab(c: c, category: AnimCategory.loaders),
+                  4 => AnimGridTab(c: c, category: AnimCategory.backgrounds),
+                  5 => AnimGridTab(c: c, category: AnimCategory.particles),
+                  6 => AnimGridTab(c: c, category: AnimCategory.celebrations),
                   _ => LayoutTab(c: c),
                 },
               ),
@@ -692,7 +705,8 @@ class ContextStrip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget icon(IconData i, String tip, VoidCallback onTap, {Color color = Colors.white}) => IconButton(
+    Widget icon(IconData i, String tip, VoidCallback onTap, {Color color = Colors.white, Key? key}) => IconButton(
+      key: key,
       tooltip: tip,
       padding: EdgeInsets.zero,
       constraints: const BoxConstraints.tightFor(width: 38, height: 40),
@@ -710,23 +724,38 @@ class ContextStrip extends StatelessWidget {
     if (orbSel != null) {
       final o = c.orbById(orbSel.$1, orbSel.$2);
       if (o == null) return const SizedBox.shrink();
+      final spec = animById(o.anim) ?? animById(o.animId);
+      final kin = spec == null ? <AnimSpec>[] : animsIn(spec.category);
+      // Ink: auto (from the background) → dark → light → auto.
+      const inks = <String?>[null, 'dark', 'light'];
+      final inkNext = inks[(inks.indexOf(o.ink) + 1) % inks.length];
       children.addAll([
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8),
-          child: Text('Orb', style: TextStyle(color: kGold, fontWeight: FontWeight.w800, fontSize: 13)),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Text(spec?.name ?? 'Orb', style: const TextStyle(color: kGold, fontWeight: FontWeight.w800, fontSize: 13)),
         ),
         icon(o.circle ? Icons.circle : Icons.circle_outlined, 'Black circle', () {
           c.endStep();
           c.updateOrb(orbSel.$1, o.id, (x) => x.copyWith(circle: !x.circle));
           c.endStep();
         }, color: kGold),
-        icon(Icons.shuffle_rounded, 'Another orb', () {
-          final all = kOrbNames.keys.toList();
-          final next = all[(all.indexOf(o.state) + 1) % all.length];
-          c.endStep();
-          c.updateOrb(orbSel.$1, o.id, (x) => x.copyWith(orb: next.name));
-          c.endStep();
-        }),
+        icon(
+          switch (o.ink) { 'dark' => Icons.dark_mode_rounded, 'light' => Icons.light_mode_rounded, _ => Icons.contrast_rounded },
+          switch (o.ink) { 'dark' => 'Dark ink', 'light' => 'Light ink', _ => 'Ink: auto' },
+          () {
+            c.endStep();
+            c.updateOrb(orbSel.$1, o.id, (x) => x.copyWith(ink: inkNext ?? ''));
+            c.endStep();
+          },
+          key: const ValueKey('orb-ink'),
+        ),
+        if (kin.length > 1)
+          icon(Icons.shuffle_rounded, 'Another', () {
+            final next = kin[(kin.indexWhere((k) => k.id == spec!.id) + 1) % kin.length];
+            c.endStep();
+            c.setOrbAnim(orbSel.$1, o.id, next.id);
+            c.endStep();
+          }),
         done,
       ]);
     } else if (key != null && type != null) {

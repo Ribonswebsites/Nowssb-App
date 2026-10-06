@@ -1,39 +1,30 @@
 /// Drawer tabs of things to drag onto the page, each playing live:
-///   Effects — how a section appears, how a sideways section turns its
-///             pages, and whether it turns by itself;
-///   Orbs    — thinking orbs, placed exactly where they are dropped (they
-///             become their own element on the page), or dropped on the
-///             Loaders target to set the orb every loader uses.
+///   Effects — how a section or element appears, how it moves for ever
+///             after, how a sideways section turns its pages, and whether
+///             it turns by itself;
+///   Orbs, Loaders, Backgrounds, Particles, Celebrate — the animation
+///             library (layout/anims), placed exactly where they are
+///             dropped as their own element on the page. A thinking orb
+///             can also go on the Loaders target to set the orb every
+///             loader uses.
 /// Nothing here is a switch or a slider.
 library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
+import '../layout/anims/anim_library.dart';
+import '../layout/anims/effects.dart';
 import '../layout/carousel_fx.dart';
 import '../layout/layout_sections.dart';
 import '../template/slot_keys.dart';
 import 'editor_controller.dart';
 import 'glass.dart';
-import 'preview.dart' show FxDrop, OrbDrop;
+import 'preview.dart' show AnimDrop, FxDrop;
 
-const kEntrances = <String, String>{
-  'none': 'None',
-  'fadeUp': 'Fade up',
-  'slide': 'Slide in',
-  'scale': 'Grow in',
-  'blur': 'Blur in',
-  'fade': 'Fade',
-};
+/// Entrances offered in the drawer (see anims/effects.dart).
+const kEntrances = kEntranceNames;
 
-const kOrbNames = <OrbState, String>{
-  OrbState.composing: 'Composing',
-  OrbState.listening: 'Listening',
-  OrbState.solving: 'Solving',
-  OrbState.working: 'Working',
-  OrbState.searching: 'Searching',
-  OrbState.shaping: 'Shaping',
-};
 
 /// "Turns by itself" speeds, as effects: (label, interval ms or null = off).
 const kAutoSpeeds = <(String, int?)>[
@@ -42,16 +33,6 @@ const kAutoSpeeds = <(String, int?)>[
   ('Steady', 4000),
   ('Quick', 2500),
 ];
-
-Widget _row(List<Widget> tiles) => SizedBox(
-      height: 96,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: tiles.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
-        itemBuilder: (_, i) => SizedBox(width: 88, child: tiles[i]),
-      ),
-    );
 
 const _caption = Padding(
   padding: EdgeInsets.only(top: 2, bottom: 6),
@@ -92,32 +73,43 @@ class _EffectsTabState extends State<EffectsTab> with SingleTickerProviderStateM
     final props = cur?.entry.props ?? const <String, dynamic>{};
     final fx = cur == null ? null : '${props['transition'] ?? ''}';
     final ent = cur == null ? null : '${props['entrance'] ?? 'none'}';
+    final loop = cur == null ? null : '${props['loop'] ?? 'none'}';
     final interval = cur == null
         ? -1
         : (props['autoRotate'] == true ? (props['interval'] is num ? (props['interval'] as num).toInt() : 4000) : null);
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(14, 0, 14, 24),
-      children: [
-        _caption,
-        const Eyebrow('Appear'),
-        _row([
+    // Grids, built lazily: only tiles on screen exist and play.
+    return CustomScrollView(
+      slivers: [
+        const SliverPadding(padding: EdgeInsets.fromLTRB(14, 0, 14, 0), sliver: SliverToBoxAdapter(child: _caption)),
+        _group('Appear', [
           for (final e in kEntrances.entries)
             DragTile(
               c: c,
               data: FxDrop(e.value, {'entrance': e.key == 'none' ? null : e.key}),
               label: e.value,
               selected: ent == e.key,
-              child: AnimatedBuilder(
-                animation: _loop,
-                builder: (_, __) {
-                  final t = (_loop.value * 1.6).clamp(0.0, 1.0);
-                  return entranceTransform(e.key, Curves.easeOutCubic.transform(t), const _MiniCard(color: kGold));
-                },
-              ),
+              child: kClassicEntrances.contains(e.key) || e.key == 'none'
+                  ? AnimatedBuilder(
+                      animation: _loop,
+                      builder: (_, __) {
+                        final t = (_loop.value * 1.6).clamp(0.0, 1.0);
+                        return entranceTransform(e.key, Curves.easeOutCubic.transform(t), const _MiniCard(color: kGold));
+                      },
+                    )
+                  : EntranceFx(kind: e.key, repeat: true, child: const _MiniCard(color: kGold)),
             ),
         ]),
-        const Eyebrow('Page turn — sections that slide sideways'),
-        _row([
+        _group('Keep moving', [
+          for (final e in kLoopNames.entries)
+            DragTile(
+              c: c,
+              data: FxDrop(e.value, {'loop': e.key == 'none' ? null : e.key}),
+              label: e.value,
+              selected: loop == e.key,
+              child: LoopFx(kind: e.key, child: const _MiniCard(color: kMint)),
+            ),
+        ]),
+        _group('Page turn — sections that slide sideways', [
           for (final e in kCarouselTransitions.entries)
             DragTile(
               c: c,
@@ -127,8 +119,7 @@ class _EffectsTabState extends State<EffectsTab> with SingleTickerProviderStateM
               child: AnimatedBuilder(animation: _loop, builder: (_, __) => _FxDemo(fx: e.key, t: _loop.value)),
             ),
         ]),
-        const Eyebrow('Turns by itself'),
-        _row([
+        _group('Turns by itself', [
           for (final (label, ms) in kAutoSpeeds)
             DragTile(
               c: c,
@@ -141,6 +132,68 @@ class _EffectsTabState extends State<EffectsTab> with SingleTickerProviderStateM
               ),
             ),
         ]),
+        const SliverToBoxAdapter(child: SizedBox(height: 24)),
+      ],
+    );
+  }
+
+  Widget _group(String title, List<Widget> tiles) => SliverPadding(
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        sliver: SliverMainAxisGroup(slivers: [
+          SliverToBoxAdapter(child: Eyebrow(title)),
+          SliverGrid.builder(
+            gridDelegate: _tileGrid,
+            itemCount: tiles.length,
+            itemBuilder: (_, i) => tiles[i],
+          ),
+        ]),
+      );
+}
+
+const _tileGrid = SliverGridDelegateWithMaxCrossAxisExtent(
+  maxCrossAxisExtent: 96,
+  mainAxisSpacing: 8,
+  crossAxisSpacing: 8,
+  childAspectRatio: 0.92,
+);
+
+class AnimGridTab extends StatelessWidget {
+  const AnimGridTab({super.key, required this.c, required this.category, this.footer});
+  final EditorController c;
+  final AnimCategory category;
+  final Widget? footer;
+
+  @override
+  Widget build(BuildContext context) {
+    final specs = animsIn(category);
+    final sel = c.selectedOrb;
+    final picked = sel == null ? null : c.orbById(sel.$1, sel.$2)?.animId;
+    // Carried over the page it already shows the ink the page will use.
+    final pageInk = AnimInk(onLight: Theme.of(context).brightness == Brightness.light);
+    return CustomScrollView(
+      key: PageStorageKey('anim-grid-${category.name}'),
+      slivers: [
+        const SliverPadding(padding: EdgeInsets.fromLTRB(14, 0, 14, 0), sliver: SliverToBoxAdapter(child: _caption)),
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(14, 0, 14, 12),
+          sliver: SliverGrid.builder(
+            gridDelegate: _tileGrid,
+            itemCount: specs.length,
+            itemBuilder: (context, i) {
+              final s = specs[i];
+              return DragTile(
+                key: ValueKey('anim-tile-${s.id}'),
+                c: c,
+                data: AnimDrop(s.id),
+                label: s.name,
+                selected: picked == s.id,
+                feedback: AnimView(spec: s, size: 72, ink: pageInk),
+                child: AnimView(spec: s, size: 54, ink: const AnimInk(lite: true), fps: 30),
+              );
+            },
+          ),
+        ),
+        if (footer != null) SliverPadding(padding: const EdgeInsets.fromLTRB(14, 0, 14, 24), sliver: SliverToBoxAdapter(child: footer)),
       ],
     );
   }
@@ -151,42 +204,7 @@ class OrbsTab extends StatelessWidget {
   final EditorController c;
 
   @override
-  Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(14, 0, 14, 24),
-      children: [
-        const Padding(
-          padding: EdgeInsets.only(top: 2, bottom: 6),
-          child: Row(children: [
-            Icon(Icons.pan_tool_alt_rounded, color: kGold, size: 18),
-            SizedBox(width: 8),
-            Expanded(
-              child: Text('Drag an orb to the exact spot on the page',
-                  style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
-            ),
-          ]),
-        ),
-        _row([
-          for (final e in kOrbNames.entries)
-            DragTile(
-              c: c,
-              data: OrbDrop(e.key),
-              label: e.value,
-              selected: false,
-              feedback: Container(
-                width: 72,
-                height: 72,
-                alignment: Alignment.center,
-                child: ThinkingOrb(state: e.key, size: 72, theme: OrbTheme.dark),
-              ),
-              child: ThinkingOrb(state: e.key, size: 40, theme: OrbTheme.dark),
-            ),
-        ]),
-        const SizedBox(height: 12),
-        _LoadersOrb(c: c),
-      ],
-    );
-  }
+  Widget build(BuildContext context) => AnimGridTab(c: c, category: AnimCategory.orbs, footer: _LoadersOrb(c: c));
 }
 
 /// A drawer tile: plays its effect; hold it and drag it onto the page. It
@@ -256,10 +274,11 @@ class _LoadersOrbState extends State<_LoadersOrb> {
     final size = st['orbSize'] is num ? (st['orbSize'] as num).toDouble() : 72.0;
     final circle = st['orbCircle'] is bool ? st['orbCircle'] as bool : true;
     return DragTarget<Object>(
-      onWillAcceptWithDetails: (d) => d.data is OrbDrop,
+      // Only the thinking orbs can be the loaders' orb.
+      onWillAcceptWithDetails: (d) => d.data is AnimDrop && thinkingOrbOf((d.data as AnimDrop).id) != null,
       onAcceptWithDetails: (d) {
         bigFeel();
-        _patch({'orb': (d.data as OrbDrop).state.name});
+        _patch({'orb': thinkingOrbOf((d.data as AnimDrop).id)!.name});
       },
       builder: (context, cand, _) => Glass(
         radius: 18,

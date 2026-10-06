@@ -119,7 +119,8 @@ nothing permanent on it but a small handle at the top and a + button. The
 handle opens a floating pill (back · page picker · undo/redo · publish ·
 ⋯ for Try it, live preview, pencils, every slot); the pill also opens for a
 few seconds after each change. + opens a bottom drawer with tabs inside:
-Add (ready-made sections), Effects, Orbs, Sections (page map). Touching an
+Add (ready-made sections), Effects, Orbs, Loaders, Backgrounds, Particles,
+Celebrate, Sections (page map). Touching an
 element shows a small strip that opens its own sheet (style, words,
 picture); there is no Style tab. Edits wait on the
 admin's phone (`EditorPreviewController.draftOverrides/draftLayouts`) and
@@ -132,25 +133,40 @@ Override `style` keys (all optional; see `template/style_apply.dart`):
 text `color, font, size, weight, spacing, italic, gradient[], shadow,
 shadowBlur, shadowDx, shadowDy`; box/button `shape (circle|pill|rounded|none),
 bg, gradient[], border, borderW, glow, glowBlur, radius, padH, padV, glass`; orb `orb (OrbState name), orbSize,
-orbCircle`. Element placement (any slot): `dx, dy, scale, hidden`. Section `props`
+orbCircle`. Element placement (any slot): `dx, dy, scale, hidden`, plus
+effects `entrance, loop`. Section `props`
 (layout doc): `height, padTop, padBottom, padH, transition, autoRotate,
-interval, entrance, orbs[]`, and for template sections
+interval, entrance, loop, orbs[]`, and for template sections
 their content (`title, subtitle, body, cta, route, image, video, bg, height, cards[]`).
 
 Pickers: **SVG library** (`editor/svg_picker.dart`, Content tab on any
 `.svg` slot) — searchable grid of every bundled `assets/**.svg` (AssetManifest)
 plus R2 `ui/` uploads (`/api/admin/ui-assets`) and SVG URLs already used in
 overrides; a bundled pick is stored as `asset:<path>`. **Effects drawer**
-(`editor/tab_animation.dart`) — live tiles for every entrance, page turn,
-auto-rotate speed; hold one and drag it onto a section (`FxDrop` → the
-page's `DragTarget` in `preview.dart`): it applies and plays at once.
-**Placed orbs** (`layout/placed_orbs.dart`): drag an orb from the drawer's
-Orbs tab to an exact spot; it becomes its own element, saved on the section
-under it as `props.orbs` (`[{id, orb, x (fraction of width, centre), y (pt
-from the section top, centre), size, circle}]`), so it publishes through
-`ui_layouts` and `SectionFrame` draws it for everyone at the same spot.
-The Loaders target in that tab sets `orb.all` (pinch to resize). The app ships no Lottie/Rive
-files.
+(`editor/tab_animation.dart`) — live tiles for every entrance, loop
+("Keep moving"), page turn and auto-rotate speed; hold one and drag it
+onto a section (`FxDrop` → the page's `DragTarget` in `preview.dart`): it
+applies and plays at once. Dropped on the picked element it goes on that
+element's style instead. Entrances and loops beyond the five classic ones
+are flutter_animate effects (`layout/anims/effects.dart`).
+**Animation library** (`layout/anims/`): 93 animations in `kAnimLibrary`
+(`anim_library.dart`; ids are saved, never rename): the 6 thinking orbs
+plus procedural CustomPainter ones in `anims_orbs/loaders/backgrounds/
+particles/celebrations.dart`. Each painter draws one frame in a 100 × 100
+box from (time, `AnimInk`); `AnimView` plays it from a Ticker (fps cap,
+paused off screen / with TickerMode, still with animations off). Drawer
+thumbnails are lazy grid tiles at 30 fps with fewer particles.
+**Placed animations** (`layout/placed_orbs.dart`): drag any of them from
+its drawer tab to an exact spot; it becomes its own element, saved on the
+section under it as `props.orbs` (`[{id, orb, anim?, ink?, x (fraction of
+width, centre), y (pt from the section top, centre), size, circle}]`), so
+it publishes through `ui_layouts` and `SectionFrame` draws it for everyone
+at the same spot. Thinking orbs save only `orb` (as before); others save
+`anim` with `orb` as the fallback older apps draw. Ink (`ink`: dark/light)
+defaults to the background: dark on light pages, light on a dark section
+`bg` or the black disc; the strip toggles it and "Another" cycles the
+category. The Loaders target in the Orbs tab sets `orb.all` (pinch to
+resize). Sources and licences: `flutter_app/ATTRIBUTIONS.md`.
 
 **Touch-only editing** (`editor/preview.dart`, `_TouchLayer`, over the
 whole page): with nothing picked one finger scrolls the page. Tap picks a
@@ -160,8 +176,8 @@ top/bottom edge sets `padTop/padBottom`; a pinch resizes it (`height`).
 The selected element drags anywhere (override `style.dx/dy`), pinches to
 resize (`style.size` for text, `style.scale` otherwise) and onto the trash
 is removed (`style.hidden`, faded in the editor so it can be shown again);
-see `elementPlacement` in `template/editable.dart`. Orbs drag, pinch (24 to
-420 pt) and trash the same way. Long-press opens Put back · Duplicate ·
+see `elementPlacement` in `template/editable.dart`. Placed animations drag,
+pinch (24 to 720 pt) and trash the same way. Long-press opens Put back · Duplicate ·
 Hide · Delete (or, on an orb, circle · Delete). There are no move/size
 buttons or sliders. Every draft change is an undo step
 (`EditorController.undo/redo`; edits within 700 ms, such as one gesture,

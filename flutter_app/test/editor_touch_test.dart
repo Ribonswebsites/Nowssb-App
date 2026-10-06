@@ -2,7 +2,8 @@
 /// editor screen — the page edge to edge with nothing permanent on it but a
 /// small pill and +, the + drawer, picking a section, drag onto the trash,
 /// long-press menu, the section's edges, pinch, effects dropped from the
-/// drawer (applied and played), orbs placed / moved / pinched / trashed,
+/// drawer (applied and played, on a section or the picked element), orbs
+/// and library animations placed / moved / pinched / trashed / re-inked,
 /// elements moved / resized / removed, and the one-time hint.
 library;
 
@@ -13,7 +14,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:nowssb/admin/editor/editor_controller.dart';
 import 'package:nowssb/admin/editor/preview.dart';
+import 'package:nowssb/admin/editor/tab_animation.dart' show DragTile;
 import 'package:nowssb/admin/editor/ui_editor_screen.dart';
+import 'package:nowssb/admin/layout/anims/anim_library.dart';
+import 'package:nowssb/admin/layout/anims/effects.dart';
 import 'package:nowssb/admin/layout/placed_orbs.dart';
 import 'package:nowssb/admin/layout/scopes.dart';
 import 'package:nowssb/admin/layout/ui_layouts.dart';
@@ -103,6 +107,8 @@ Future<void> _drag(WidgetTester tester, Offset from, Offset to) async {
 Future<void> _openDrawerTab(WidgetTester tester, String tab) async {
   await tester.tap(find.byKey(const ValueKey('editor-add')));
   await _settle(tester, 4);
+  await tester.ensureVisible(find.byKey(ValueKey('drawer-tab-$tab')));
+  await tester.pump();
   await tester.tap(find.byKey(ValueKey('drawer-tab-$tab')));
   await _settle(tester, 4);
 }
@@ -197,7 +203,7 @@ void main() {
       await tester.tap(find.byKey(const ValueKey('editor-add')));
       await _settle(tester, 4);
       expect(find.byKey(const ValueKey('editor-drawer')), findsOneWidget);
-      for (final t in ['Add', 'Effects', 'Orbs', 'Sections']) {
+      for (final t in ['Add', 'Effects', 'Orbs', 'Loaders', 'Backgrounds', 'Particles', 'Celebrate', 'Sections']) {
         expect(find.byKey(ValueKey('drawer-tab-$t')), findsOneWidget);
       }
       await tester.tap(find.byTooltip('Close'));
@@ -414,6 +420,94 @@ void main() {
       await tester.tap(find.text('Show'));
       await _settle(tester);
       expect(c.overrideOf(key)?.style['hidden'], isNull);
+    });
+
+    testWidgets('library: an animation carried from its tab lands in place; ink and Another', (tester) async {
+      final c = EditorController();
+      await _open(tester, c);
+      await _openDrawerTab(tester, 'Loaders');
+      final tile = find.byKey(const ValueKey('anim-tile-ld.arc'));
+      expect(tile, findsOneWidget);
+      expect(find.byType(AnimView), findsWidgets, reason: 'live thumbnails');
+      const spot = Offset(200, 300);
+      await _carry(tester, tester.getCenter(tile), spot);
+      await _settle(tester);
+      expect(find.byKey(const ValueKey('editor-drawer')), findsNothing);
+      final sel = c.selectedOrb!;
+      expect(c.orbById(sel.$1, sel.$2)!.anim, 'ld.arc');
+      final view = find.byType(PlacedOrbView);
+      expect((tester.getCenter(view) - spot).distance, lessThan(1.5), reason: 'exactly under the finger');
+      AnimInk ink() => tester.widget<AnimView>(find.descendant(of: view, matching: find.byType(AnimView))).ink;
+      expect(ink().onLight, isTrue, reason: 'auto: dark ink on the light page');
+
+      // Ink: auto → dark → light → auto.
+      for (final want in ['dark', 'light', null]) {
+        await tester.tap(find.byKey(const ValueKey('orb-ink')));
+        await _settle(tester, 2);
+        expect(c.orbById(sel.$1, sel.$2)!.ink, want);
+      }
+      for (var i = 0; i < 2; i++) {
+        await tester.tap(find.byKey(const ValueKey('orb-ink')));
+        await _settle(tester, 2);
+      }
+      expect(ink().onLight, isFalse, reason: 'light ink when picked');
+
+      // Another: the next one in the same category, same spot.
+      await tester.tap(find.byTooltip('Another'));
+      await _settle(tester, 2);
+      expect(c.orbById(sel.$1, sel.$2)!.anim, 'ld.bounce');
+      expect((tester.getCenter(find.byType(PlacedOrbView)) - spot).distance, lessThan(1.5));
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('a loop dropped on the picked element goes on it; elsewhere on the section', (tester) async {
+      final c = EditorController();
+      await _open(tester, c);
+      final words = find.textContaining('Ready for today');
+      await tester.tapAt(tester.getCenter(words));
+      await _settle(tester, 3);
+      final key = c.selectedSlot!;
+      final at = tester.getCenter(words);
+      await _openDrawerTab(tester, 'Effects');
+      final pulse = find.widgetWithText(DragTile, 'Pulse');
+      await tester.scrollUntilVisible(pulse, 120, scrollable: find.descendant(of: find.byKey(const ValueKey('editor-drawer')), matching: find.byType(Scrollable)).last);
+      await _settle(tester, 2);
+      await _carry(tester, tester.getCenter(pulse), at);
+      await _settle(tester);
+      expect(c.overrideOf(key)!.style['loop'], 'pulse');
+      expect(find.ancestor(of: words, matching: find.byType(LoopFx)), findsOneWidget, reason: 'it plays at once');
+      final sec = c.sections.firstWhere((s) => s.entry.props['loop'] != null, orElse: () => c.sections.first);
+      expect(sec.entry.props['loop'], isNull, reason: 'the section itself is untouched');
+
+      // Dropped away from the element: the section under it gets it.
+      final wordsRect = tester.getRect(words).inflate(40);
+      String? other;
+      Offset? drop;
+      for (var y = 160.0; y < 620 && other == null; y += 40) {
+        for (var x = 60.0; x < 380 && other == null; x += 80) {
+          final p = Offset(x, y);
+          if (wordsRect.contains(p)) continue;
+          for (final s in c.sections) {
+            final b = c.preview.sectionBoxes['${c.layoutPage}/${s.id}'];
+            if (b == null || !b.attached || s.entry.deleted) continue;
+            if (_sectionRect(c, s.id).deflate(8).contains(p)) {
+              other = s.id;
+              drop = p;
+              break;
+            }
+          }
+        }
+      }
+      expect(other, isNotNull);
+      await _openDrawerTab(tester, 'Effects');
+      final float = find.widgetWithText(DragTile, 'Float');
+      await tester.scrollUntilVisible(float, 120, scrollable: find.descendant(of: find.byKey(const ValueKey('editor-drawer')), matching: find.byType(Scrollable)).last);
+      await _settle(tester, 2);
+      await _carry(tester, tester.getCenter(float), drop!);
+      await _settle(tester);
+      expect(c.sections.firstWhere((s) => s.id == other).entry.props['loop'], 'float');
+      expect(c.overrideOf(key)!.style['loop'], 'pulse');
+      expect(tester.takeException(), isNull);
     });
   });
 

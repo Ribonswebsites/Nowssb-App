@@ -1,4 +1,5 @@
-/// Thinking orbs the owner dropped onto a page in the UI Editor.
+/// Orbs and other animations the owner dropped onto a page in the UI
+/// Editor (any spec from the animation library, see anims/anim_library.dart).
 ///
 /// Each one belongs to the section it was dropped on and is saved in that
 /// section's layout props (`props.orbs`), so it goes through the normal
@@ -10,6 +11,8 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
+import 'anims/anim_library.dart';
+
 class PlacedOrb {
   const PlacedOrb({
     required this.id,
@@ -18,16 +21,25 @@ class PlacedOrb {
     required this.y,
     this.size = kDefaultSize,
     this.circle = false,
+    this.anim,
+    this.ink,
   });
 
   static const kDefaultSize = 72.0;
   static const kMinSize = 24.0;
-  static const kMaxSize = 420.0;
+  static const kMaxSize = 720.0;
 
   final String id;
 
-  /// OrbState name.
+  /// OrbState name. For library animations it is only the fallback an
+  /// older app shows.
   final String orb;
+
+  /// Animation library id (null: the thinking orb [orb]).
+  final String? anim;
+
+  /// 'dark' or 'light' ink; null picks it from the background.
+  final String? ink;
   final double x;
   final double y;
   final double size;
@@ -36,6 +48,16 @@ class PlacedOrb {
   final bool circle;
 
   OrbState get state => OrbState.values.firstWhere((s) => s.name == orb, orElse: () => OrbState.composing);
+
+  /// The library id this draws: [anim], or the thinking orb's own id.
+  String get animId => anim ?? 'orb.${state.name}';
+
+  /// What a drop of library id [animId] saves: thinking orbs keep the
+  /// old `orb` field alone so older apps still draw them.
+  static ({String orb, String? anim}) fieldsFor(String animId) {
+    final s = thinkingOrbOf(animId);
+    return s != null ? (orb: s.name, anim: null) : (orb: OrbState.composing.name, anim: animId);
+  }
 
   static PlacedOrb? from(dynamic m) {
     if (m is! Map) return null;
@@ -49,6 +71,8 @@ class PlacedOrb {
       y: d(m['y'], 0),
       size: d(m['size'], kDefaultSize).clamp(kMinSize, kMaxSize),
       circle: m['circle'] == true,
+      anim: m['anim'] is String && (m['anim'] as String).isNotEmpty ? m['anim'] as String : null,
+      ink: m['ink'] == 'dark' || m['ink'] == 'light' ? m['ink'] as String : null,
     );
   }
 
@@ -59,15 +83,20 @@ class PlacedOrb {
         'y': y.roundToDouble(),
         'size': size.roundToDouble(),
         if (circle) 'circle': true,
+        if (anim != null) 'anim': anim,
+        if (ink != null) 'ink': ink,
       };
 
-  PlacedOrb copyWith({String? orb, double? x, double? y, double? size, bool? circle}) => PlacedOrb(
+  /// [anim] and [ink] take '' to clear them.
+  PlacedOrb copyWith({String? orb, double? x, double? y, double? size, bool? circle, String? anim, String? ink}) => PlacedOrb(
         id: id,
         orb: orb ?? this.orb,
         x: x ?? this.x,
         y: y ?? this.y,
         size: size ?? this.size,
         circle: circle ?? this.circle,
+        anim: anim == null ? this.anim : (anim.isEmpty ? null : anim),
+        ink: ink == null ? this.ink : (ink.isEmpty ? null : ink),
       );
 
   /// Where it is drawn inside a section of [sectionSize].
@@ -88,14 +117,30 @@ List<PlacedOrb> placedOrbsOf(Map<String, dynamic> props) {
 /// [props] patch that saves [orbs] (null removes the key when empty).
 Map<String, dynamic> orbsPatch(List<PlacedOrb> orbs) => {'orbs': orbs.isEmpty ? null : [for (final o in orbs) o.toJson()]};
 
-/// One placed orb as it is drawn.
+/// Whether a placed animation draws dark ink: its own [PlacedOrb.ink],
+/// else the section's background colour ([sectionBg]), else the theme.
+/// On the black disc it is always light ink.
+bool placedOnLight(BuildContext context, PlacedOrb o, {int? sectionBg}) {
+  if (o.circle) return false;
+  if (o.ink != null) return o.ink == 'dark';
+  if (sectionBg != null) return Color(sectionBg).computeLuminance() > 0.45;
+  return Theme.of(context).brightness == Brightness.light;
+}
+
+/// One placed animation as it is drawn.
 class PlacedOrbView extends StatelessWidget {
-  const PlacedOrbView({super.key, required this.orb});
+  const PlacedOrbView({super.key, required this.orb, this.sectionBg});
   final PlacedOrb orb;
+
+  /// The section's own background colour, when it has one.
+  final int? sectionBg;
 
   @override
   Widget build(BuildContext context) {
-    final inner = ThinkingOrb(state: orb.state, size: orb.circle ? orb.size * 0.78 : orb.size, theme: OrbTheme.dark);
+    final onLight = placedOnLight(context, orb, sectionBg: sectionBg);
+    // An id this build does not know (saved by a newer app) shows the orb.
+    final spec = animById(orb.anim) ?? animById('orb.${orb.state.name}')!;
+    final inner = AnimView(spec: spec, size: orb.circle ? orb.size * 0.78 : orb.size, ink: AnimInk(onLight: onLight));
     if (!orb.circle) return SizedBox.square(dimension: orb.size, child: Center(child: inner));
     return Container(
       width: orb.size,
@@ -109,9 +154,10 @@ class PlacedOrbView extends StatelessWidget {
 
 /// Draws a section's placed orbs over it. They may hang over its edges.
 class PlacedOrbLayer extends StatelessWidget {
-  const PlacedOrbLayer({super.key, required this.orbs, required this.child});
+  const PlacedOrbLayer({super.key, required this.orbs, required this.child, this.sectionBg});
   final List<PlacedOrb> orbs;
   final Widget child;
+  final int? sectionBg;
 
   @override
   Widget build(BuildContext context) {
@@ -123,7 +169,7 @@ class PlacedOrbLayer extends StatelessWidget {
           child: IgnorePointer(
             child: CustomSingleChildLayout(
               delegate: _OrbAt(o),
-              child: PlacedOrbView(key: ValueKey('orb-${o.id}'), orb: o),
+              child: PlacedOrbView(key: ValueKey('orb-${o.id}'), orb: o, sectionBg: sectionBg),
             ),
           ),
         ),

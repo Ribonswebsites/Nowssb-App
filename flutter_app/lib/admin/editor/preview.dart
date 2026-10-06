@@ -10,7 +10,6 @@ import 'dart:async';
 import 'package:flutter/gestures.dart' show Drag;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../../theme/theme.dart';
 import '../layout/app_pages.dart';
@@ -274,11 +273,11 @@ class FxDrop {
       };
 }
 
-/// A thinking orb dragged out of the drawer, to be placed where it is
-/// dropped.
-class OrbDrop {
-  const OrbDrop(this.state);
-  final OrbState state;
+/// An animation (anims/anim_library.dart id) dragged out of the drawer,
+/// to be placed where it is dropped.
+class AnimDrop {
+  const AnimDrop(this.id);
+  final String id;
 }
 
 /// A brief Undo just under the pill at the top, clear of the + button,
@@ -973,7 +972,7 @@ class _TouchLayerState extends State<_TouchLayer> {
   // ── Drops from the drawer ──────────────────────────────────────────
 
   bool _accepts(Object? data) {
-    if (data is OrbDrop) return true;
+    if (data is AnimDrop) return true;
     final fx = FxDrop.of(data);
     if (fx == null) return false;
     return true;
@@ -993,9 +992,9 @@ class _TouchLayerState extends State<_TouchLayer> {
     }
     final r = _sectionRect(id)!;
     c.endStep();
-    if (data is OrbDrop) {
+    if (data is AnimDrop) {
       bigFeel();
-      c.addOrb(id, data.state.name, ((p.dx - r.left) / r.width).clamp(0.0, 1.0), p.dy - r.top);
+      c.addAnim(id, data.id, ((p.dx - r.left) / r.width).clamp(0.0, 1.0), p.dy - r.top);
       c.endStep();
       c.fxDropped();
       return;
@@ -1008,6 +1007,19 @@ class _TouchLayerState extends State<_TouchLayer> {
       return;
     }
     bigFeel();
+    // Entrances and loops dropped on the picked element go on it.
+    final sel = _selectedSlot;
+    final onElement = fx.apply == null &&
+        fx.patch.keys.every(const {'entrance', 'loop'}.contains) &&
+        sel != null &&
+        (_slotRect(sel)?.inflate(12).contains(p) ?? false);
+    if (onElement) {
+      c.patchStyle(sel.slotKey, sel.type, sel.defaultValue, fx.patch);
+      c.endStep();
+      c.fxDropped();
+      WidgetsBinding.instance.addPostFrameCallback((_) => c.preview.replay());
+      return;
+    }
     c.pickSection(id);
     if (fx.apply != null) {
       fx.apply!(c, sec);
