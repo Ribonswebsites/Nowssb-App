@@ -41,6 +41,7 @@ class PlayCheckout {
   static final _waiting = <String, Completer<Map<String, dynamic>>>{};
   static StreamSubscription<List<PurchaseDetails>>? _sub;
   static bool? _available;
+  static String? _recoveredFor;
 
   /// Last settled order, so screens can refresh / celebrate.
   static final ValueNotifier<Map<String, dynamic>?> lastSettled = ValueNotifier(null);
@@ -61,12 +62,15 @@ class PlayCheckout {
 
   /// Listen for one-time purchases (also ones left over from last time).
   static Future<void> start() async {
-    if (_sub != null) return;
     if (!await available()) return;
-    _sub = InAppPurchase.instance.purchaseStream.listen(_onPurchases, onError: (Object e) => debugPrint('NowssB one-time billing: $e'));
+    _sub ??= InAppPurchase.instance.purchaseStream.listen(_onPurchases, onError: (Object e) => debugPrint('NowssB one-time billing: $e'));
     try {
       final user = FirebaseAuth.instance.currentUser;
-      if (user != null && !user.isAnonymous) {
+      // Recovery runs once per signed-in account. It used to run only on the
+      // first start(): a guest who tapped Buy before signing in never got
+      // their unconfirmed purchases re-sent until the next launch.
+      if (user != null && !user.isAnonymous && _recoveredFor != user.uid) {
+        _recoveredFor = user.uid;
         final android = InAppPurchase.instance.getPlatformAddition<InAppPurchaseAndroidPlatformAddition>();
         final past = await android.queryPastPurchases();
         for (final p in past.pastPurchases) {

@@ -180,9 +180,11 @@ class _CheckoutPanelState extends State<CheckoutPanel> {
     try {
       final r = await PlayCheckout.purchase(_req);
       unawaited(EconomyMirror.instance.refresh());
+      // Paid even if the person left Checkout while Play's sheet was open:
+      // the bought items still have to leave the cart.
+      widget.onPaid?.call(r);
       if (!mounted) return;
       await celebrate(context, r);
-      widget.onPaid?.call(r);
     } on EconomyException catch (e) {
       if (mounted) setState(() => _error = e.message);
     } catch (_) {

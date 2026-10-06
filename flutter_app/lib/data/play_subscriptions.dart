@@ -312,6 +312,9 @@ class PlaySubscriptions extends ChangeNotifier {
     if (available != true) {
       return PlayResult(false, unavailableReason ?? 'Google Play Billing is not available on this device.');
     }
+    // A second tap used to start a second restore that reset the first
+    // one's counters halfway, so it could report "nothing found".
+    if (busy) return const PlayResult(false, 'A purchase or restore is already in progress.');
     busy = true;
     notifyListeners();
     _restored = 0;
