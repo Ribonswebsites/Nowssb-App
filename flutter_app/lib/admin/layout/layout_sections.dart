@@ -26,6 +26,7 @@ import 'package:flutter/rendering.dart';
 
 import '../admin_state.dart';
 import '../template/ui_overrides.dart';
+import 'placed_orbs.dart';
 import 'scopes.dart';
 import 'section_pinch.dart';
 import 'template_sections.dart';
@@ -343,6 +344,9 @@ class SectionFrame extends StatelessWidget {
     if (h != null && h > 0 && (!entry.isTemplate || entry.kind == 'textBlock' || entry.kind == 'cta')) {
       w = SectionFitHeight(height: h, width: MediaQuery.sizeOf(context).width, child: w);
     }
+    // Orbs the owner dropped on this section (editor and published app).
+    final orbs = placedOrbsOf(p);
+    if (orbs.isNotEmpty) w = PlacedOrbLayer(orbs: orbs, child: w);
     final preview = EditorPreviewScope.peek(context);
     if (preview != null) {
       final key = '$pageId/${entry.id}';

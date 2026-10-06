@@ -1,20 +1,27 @@
-/// The big live preview: the real page, in a phone frame, drawing only one
-/// section at a time (with every pending edit), swiped sideways section by
-/// section. In "Tap to edit" mode the page takes no taps — instead every
-/// editable element on it gets a hotspot that picks it.
+/// The editor's canvas: the real page, full screen, edge to edge, with
+/// every pending edit — the whole page, not one section at a time. In
+/// "edit" mode the page takes no taps itself; [_TouchLayer] reads every
+/// touch instead (see there), so the canvas works for any page in
+/// kAppPages that lays itself out in sections.
 library;
 
+import 'dart:async';
+
+import 'package:flutter/gestures.dart' show Drag;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../../theme/theme.dart';
 import '../layout/app_pages.dart';
+import '../layout/placed_orbs.dart';
 import '../layout/scopes.dart';
 import '../template/editable.dart';
 import '../template/slot_keys.dart';
 import 'editor_controller.dart';
 import 'glass.dart';
 
+/// Kept for callers that ask for "the page as a whole".
 const kProbe = '__probe__';
 
 class EditorPreview extends StatefulWidget {
@@ -26,9 +33,10 @@ class EditorPreview extends StatefulWidget {
 }
 
 class _EditorPreviewState extends State<EditorPreview> {
-  late PageController _pages = PageController(initialPage: widget.c.index);
+  final _pageKey = GlobalKey();
   String _page = '';
-  int _count = 0;
+  String _order = '';
+  bool _pick = true;
 
   EditorController get c => widget.c;
 
@@ -36,169 +44,71 @@ class _EditorPreviewState extends State<EditorPreview> {
   void initState() {
     super.initState();
     _page = c.pageId;
+    _pick = c.pickMode;
     c.addListener(_sync);
   }
 
   @override
   void dispose() {
     c.removeListener(_sync);
-    _pages.dispose();
     super.dispose();
   }
 
-  /// What the phone frames depend on. The editor screen no longer rebuilds
-  /// the preview on every change (each keystroke used to rebuild the whole
-  /// page); drafts reach the page through EditorPreviewScope, and the frames
-  /// rebuild only when one of these changes.
-  Object _frameState() => (
-        c.index,
-        c.pickMode,
-        c.largeFrame,
-        c.sections.map((s) => s.id).join('|'),
-      );
-  Object? _shown;
-
+  /// The editor screen does not rebuild the canvas on every change: drafts
+  /// reach the page through EditorPreviewScope. It rebuilds only for a new
+  /// page or a switch between editing and trying the page.
   void _sync() {
     if (!mounted) return;
-    if (c.pageId != _page) {
-      _page = c.pageId;
-      _pages.dispose();
-      _pages = PageController(initialPage: 0);
-      _shown = _frameState();
-      setState(() {});
-      return;
-    }
-    final n = c.sections.length;
-    if (n != _count) {
-      _count = n;
+    // A new set or order of sections: the controller re-finds its section.
+    final sig = c.sections.map((s) => s.id).join('|');
+    if (sig != _order) {
+      _order = sig;
       c.onReported();
     }
-    final now = _frameState();
-    if (now != _shown) {
-      _shown = now;
+    if (c.pageId != _page || c.pickMode != _pick) {
+      _page = c.pageId;
+      _pick = c.pickMode;
       setState(() {});
-    }
-    if (_pages.hasClients) {
-      final cur = (_pages.page ?? _pages.initialPage.toDouble()).round();
-      if (cur != c.index && c.index < n) {
-        _pages.animateToPage(c.index, duration: const Duration(milliseconds: 380), curve: Curves.easeOutCubic);
-      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final page = appPage(c.pageId) ?? kAppPages.first;
-    final secs = c.sections;
-    _shown = _frameState();
+    final screen = Theme(
+      data: NwsbTheme.light,
+      child: HeroMode(
+        enabled: false,
+        child: KeyedSubtree(key: ValueKey('page-${page.id}'), child: page.build()),
+      ),
+    );
     return EditorPreviewScope(
       controller: c.preview,
-      child: secs.isEmpty
-          // First paint (and pages not split into sections yet): the page
-          // as a whole. A sectioned page reports its sections from here.
-          ? _Frame(key: ValueKey('whole-${page.id}'), c: c, page: page, sectionId: kProbe, active: true)
-          : PageView.builder(
-              key: ValueKey('pv-${page.id}'),
-              controller: _pages,
-              // Sideways swipes turn to the next section; up/down drags and
-              // pinches belong to the section (see _TouchLayer). In "Try it"
-              // the page itself takes the touches.
-              physics: c.pickMode ? const PageScrollPhysics() : const NeverScrollableScrollPhysics(),
-              itemCount: secs.length,
-              onPageChanged: (i) {
-                tapFeel();
-                c.goTo(i);
-              },
-              itemBuilder: (context, i) => _Frame(
-                key: ValueKey('f-${page.id}-${secs[i].id}'),
-                c: c,
-                page: page,
-                sectionId: secs[i].id,
-                active: i == c.index,
-              ),
+      child: Stack(children: [
+        Positioned.fill(
+          child: AbsorbPointer(
+            absorbing: c.pickMode,
+            child: RepaintBoundary(child: KeyedSubtree(key: _pageKey, child: screen)),
+          ),
+        ),
+        if (c.pickMode)
+          Positioned.fill(
+            child: _TouchLayer(
+              key: ValueKey('touch-${page.id}'),
+              c: c,
+              pageKey: _pageKey,
+              child: _Hotspots(c: c, section: null),
             ),
+          ),
+      ]),
     );
   }
 }
 
-class _Frame extends StatelessWidget {
-  const _Frame({super.key, required this.c, required this.page, required this.sectionId, required this.active});
-  final EditorController c;
-  final AppPage page;
-  final String sectionId;
-  final bool active;
-
-  @override
-  Widget build(BuildContext context) {
-    final size = c.largeFrame ? const Size(430, 932) : const Size(360, 740);
-    final pageId = page.jumpTo?.$1 ?? page.id;
-    final mq = MediaQuery.of(context);
-    Widget screen = MediaQuery(
-      data: mq.copyWith(
-        size: size,
-        padding: const EdgeInsets.only(top: 28, bottom: 18),
-        viewPadding: const EdgeInsets.only(top: 28, bottom: 18),
-        viewInsets: EdgeInsets.zero,
-      ),
-      child: Theme(
-        data: NwsbTheme.light,
-        child: HeroMode(
-          enabled: false,
-          child: PreviewIsolateScope(
-            pageId: pageId,
-            sectionId: sectionId,
-            child: page.build(),
-          ),
-        ),
-      ),
-    );
-    screen = AbsorbPointer(absorbing: c.pickMode, child: screen);
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      child: FittedBox(
-        fit: BoxFit.contain,
-        child: Container(
-          // 8 padding + 2 border on each side: the screen gets exactly [size].
-          width: size.width + 20,
-          height: size.height + 20,
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.black,
-            borderRadius: BorderRadius.circular(52),
-            border: Border.all(color: const Color(0x33FFFFFF), width: 2),
-            boxShadow: const [BoxShadow(color: Color(0x88000000), blurRadius: 40, offset: Offset(0, 18))],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(44),
-            child: SizedBox.fromSize(
-              size: size,
-              child: Stack(children: [
-                Positioned.fill(child: RepaintBoundary(child: screen)),
-                // Everything is done by touching the section itself: tap an
-                // element to select it, drag up/down to move, pinch to
-                // resize, drag its top/bottom edge for space, long-press for
-                // the few things left, drop an effect from the drawer on it.
-                if (active && c.pickMode)
-                  Positioned.fill(
-                    child: _FxDropZone(
-                      c: c,
-                      child: _TouchLayer(
-                        c: c,
-                        sectionId: sectionId == kProbe ? null : sectionId,
-                        child: _Hotspots(c: c, section: sectionId == kProbe ? null : '$pageId/$sectionId'),
-                      ),
-                    ),
-                  ),
-              ]),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Tappable outlines over every editable element of the current section.
+/// Tappable areas over every editable element on the page. Only the
+/// picked section's elements are outlined (faintly), and the selected one
+/// in gold; the rest are invisible until touched, so the page reads as it
+/// ships.
 class _Hotspots extends StatefulWidget {
   const _Hotspots({required this.c, required this.section});
   final EditorController c;
@@ -269,7 +179,8 @@ class _HotspotsState extends State<_Hotspots> {
       final tl = me.globalToLocal(box.localToGlobal(Offset.zero));
       final br = me.globalToLocal(box.localToGlobal(box.size.bottomRight(Offset.zero)));
       final r = Rect.fromPoints(tl, br).intersect(Offset.zero & me.size);
-      if (r.width < 4 || r.height < 4) continue;
+      // A box mid-resize (or scaled to nothing) can't be placed.
+      if (!r.isFinite || r.width < 4 || r.height < 4) continue;
       out.add((s, r));
     }
     return out;
@@ -293,18 +204,25 @@ class _HotspotsState extends State<_Hotspots> {
   @override
   Widget build(BuildContext context) {
     final spots = <Widget>[];
+    final c = widget.c;
+    final pickedSection = c.sectionPicked && c.current != null ? '${c.layoutPage}/${c.current!.id}' : null;
     for (final (s, r) in _spots) {
-      final picked = widget.c.selectedSlot == s.slotKey;
-      final changed = widget.c.overrideOf(s.slotKey) != null;
+      final picked = c.selectedSlot == s.slotKey;
+      final changed = c.overrideOf(s.slotKey) != null;
+      final shown = picked || (pickedSection != null && s.section == pickedSection);
       spots.add(Positioned.fromRect(
         rect: r,
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: () {
             actFeel();
-            widget.c.select(s.slotKey, s.type, s.defaultValue);
+            final sec = s.section;
+            final id = sec != null && sec.startsWith('${widget.c.layoutPage}/') ? sec.split('/').last : null;
+            widget.c.selectIn(id, s.slotKey, s.type, s.defaultValue);
           },
-          child: AnimatedContainer(
+          child: !shown
+              ? const SizedBox.expand()
+              : AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             decoration: BoxDecoration(
               color: picked ? kGold.withValues(alpha: 0.16) : Colors.transparent,
@@ -334,7 +252,7 @@ class _HotspotsState extends State<_Hotspots> {
   }
 }
 
-/// An effect from the Animation drawer, dragged onto a section.
+/// An effect from the drawer, dragged onto a section.
 class FxDrop {
   const FxDrop(this.label, this.patch, {this.carouselOnly = false, this.apply});
   final String label;
@@ -345,7 +263,7 @@ class FxDrop {
   /// Page turns and auto-rotate only mean something on a sideways section.
   final bool carouselOnly;
 
-  /// Instead of [patch], for effects that live elsewhere (the orb).
+  /// Instead of [patch], for effects that live elsewhere.
   final void Function(EditorController c, SectionInfo section)? apply;
 
   /// Drawer tiles may carry extra data alongside the effect.
@@ -356,146 +274,192 @@ class FxDrop {
       };
 }
 
+/// A thinking orb dragged out of the drawer, to be placed where it is
+/// dropped.
+class OrbDrop {
+  const OrbDrop(this.state);
+  final OrbState state;
+}
+
+/// A brief Undo just under the pill at the top, clear of the + button,
+/// the strip and the trash at the bottom.
+void _undoBar(BuildContext context, EditorController c, String text) {
+  final m = ScaffoldMessenger.maybeOf(context);
+  final mq = MediaQuery.maybeOf(context);
+  m?.hideCurrentSnackBar();
+  m?.showSnackBar(SnackBar(
+    behavior: SnackBarBehavior.floating,
+    margin: mq == null
+        ? null
+        : EdgeInsets.fromLTRB(16, 0, 16, (mq.size.height - mq.padding.top - 124).clamp(16.0, double.infinity)),
+    backgroundColor: const Color(0xFF111A2B),
+    duration: const Duration(seconds: 4),
+    content: Text(text, style: const TextStyle(color: Colors.white)),
+    action: SnackBarAction(label: 'Undo', textColor: kGold, onPressed: c.undo),
+  ));
+}
+
 /// Deletes a section at once and offers Undo (no confirm dialog: undo is
 /// always there, in the snackbar and in the history).
 void deleteWithUndo(BuildContext context, EditorController c, String id, String title) {
   bigFeel();
   c.endStep();
   c.delete(id);
+  c.unpick();
   c.endStep();
-  final m = ScaffoldMessenger.maybeOf(context);
-  m?.hideCurrentSnackBar();
-  m?.showSnackBar(SnackBar(
-    behavior: SnackBarBehavior.floating,
-    backgroundColor: const Color(0xFF111A2B),
-    duration: const Duration(seconds: 4),
-    content: Text('Deleted “$title”', style: const TextStyle(color: Colors.white)),
-    action: SnackBarAction(label: 'Undo', textColor: kGold, onPressed: c.undo),
-  ));
+  _undoBar(context, c, 'Deleted “$title”');
 }
 
-/// Takes effects dragged from the drawer and puts them on the section on
-/// the preview.
-class _FxDropZone extends StatelessWidget {
-  const _FxDropZone({required this.c, required this.child});
-  final EditorController c;
-  final Widget child;
+enum _Grab { none, scroll, order, padTop, padBottom, pinchSection, pinchElement, moveElement, moveOrb, pinchOrb }
 
-  @override
-  Widget build(BuildContext context) {
-    return DragTarget<Object>(
-      onWillAcceptWithDetails: (d) {
-        final fx = FxDrop.of(d.data);
-        final cur = c.current;
-        return fx != null && cur != null && (!fx.carouselOnly || cur.carousel);
-      },
-      onAcceptWithDetails: (d) {
-        final fx = FxDrop.of(d.data);
-        final cur = c.current;
-        if (fx == null || cur == null) return;
-        bigFeel();
-        c.endStep();
-        if (fx.apply != null) {
-          fx.apply!(c, cur);
-        } else {
-          c.patchProps(cur.id, fx.patch);
-        }
-        c.endStep();
-        // Play it on the phone right away.
-        c.preview.replay();
-      },
-      builder: (context, candidates, rejected) => Stack(fit: StackFit.expand, children: [
-        child,
-        if (candidates.isNotEmpty || rejected.any((r) => FxDrop.of(r) != null))
-          IgnorePointer(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: (candidates.isNotEmpty ? kGold : const Color(0xFFFF6B6B)).withValues(alpha: 0.12),
-                border: Border.all(color: candidates.isNotEmpty ? kGold : const Color(0xFFFF6B6B), width: 4),
-              ),
-            ),
-          ),
-      ]),
-    );
-  }
-}
-
-enum _Grab { none, order, padTop, padBottom, pinchSection, pinchText }
-
-/// Places one drag up or down moves a section: one place per this many
-/// points of the phone picture.
+/// Places one drag up or down moves a section when no other section is
+/// under the finger (kept for callers and tests of the step maths).
 const kShiftStep = 90.0;
 
-/// How many places a vertical drag of [dy] (phone points) moves a section
-/// that can go [up] places up and [down] places down.
+/// How many places a vertical drag of [dy] moves a section that can go
+/// [up] places up and [down] places down.
 int shiftSteps(double dy, int up, int down) =>
     (dy / kShiftStep).truncate().clamp(-up, down);
 
-/// Height of the trash zone that shows at the bottom while a section is
-/// dragged (phone points).
+/// Height of the trash zone that shows at the bottom while something is
+/// dragged.
 const kTrashHeight = 96.0;
 
-/// How close to a section's top/bottom edge a drag must start to change the
-/// space above/below instead of moving it (phone points).
+/// How close to a picked section's top/bottom edge a drag must start to
+/// change the space above/below instead of moving it.
 const kEdgeGrab = 22.0;
 
-/// The touch surface over the section on the preview.
-///   drag up/down        move it (the page makes room); onto the trash = delete
-///   drag its top/bottom edge   space above / below
-///   pinch               resize the section, or the selected text
-///   long-press          Put back · Duplicate · Hide · Delete
-/// Taps go through to [child] (the element outlines) to select.
-class _TouchLayer extends StatefulWidget {
-  const _TouchLayer({required this.c, required this.sectionId, required this.child});
-  final EditorController c;
+/// Where drags near the top, or just above the trash, scroll the page.
+const kAutoScrollBand = 80.0;
 
-  /// Null when the page is one block (only elements can be touched).
-  final String? sectionId;
+/// Everything on the canvas is done by touching it:
+///   tap                 pick an element, a placed orb, or a section
+///   drag (nothing picked, or outside it)   scroll the page
+///   drag the picked section    move it; the page makes room
+///   drag its top/bottom edge   space above / below
+///   drag the picked element    move it inside its section
+///   drag a placed orb          move it anywhere on the page
+///   … onto the trash at the bottom   delete (with Undo)
+///   pinch               resize the orb, element or section under it
+///   long-press          the short menu for a section or orb
+/// Effects and orbs dragged out of the drawer land where they are dropped.
+class _TouchLayer extends StatefulWidget {
+  const _TouchLayer({super.key, required this.c, required this.pageKey, required this.child});
+  final EditorController c;
+  final GlobalKey pageKey;
   final Widget child;
 
   @override
   State<_TouchLayer> createState() => _TouchLayerState();
 }
 
+typedef _OrbSpot = ({String section, PlacedOrb orb, Rect rect, Rect box});
+
 class _TouchLayerState extends State<_TouchLayer> {
   EditorController get c => widget.c;
 
   var _grab = _Grab.none;
   double _base = 0;
+  Offset _baseOffset = Offset.zero;
   Offset _start = Offset.zero;
   Offset _finger = Offset.zero;
-  double _drag = 0;
-  (int, int) _range = (0, 0);
 
-  /// The section's content on this surface, as last measured.
-  Rect? _rect;
+  /// Where the finger first went down: a scale gesture only starts after
+  /// the finger has moved a little, so its start point is already past it.
+  Offset? _down;
+  Drag? _scrollDrag;
+  ScrollPosition? _scrollPos;
+  Timer? _autoScroll;
+  (String, String)? _orb;
+  PreviewSlot? _element;
+
+  /// Live sections on screen, top to bottom, and the placed orbs.
+  List<(String, Rect)> _sections = const [];
+  List<_OrbSpot> _orbs = const [];
   var _watching = false;
+  int _lastIndex = -1;
+
+  /// While an effect or orb from the drawer hovers over the page.
+  Offset? _hover;
 
   @override
   void initState() {
     super.initState();
+    c.addListener(_onC);
     _watch();
   }
 
-  /// Same as the outlines: re-measure after frames drawn anyway.
+  @override
+  void dispose() {
+    c.removeListener(_onC);
+    _autoScroll?.cancel();
+    super.dispose();
+  }
+
+  void _onC() {
+    if (!mounted) return;
+    // A section picked from elsewhere (the Sections list): bring it into view.
+    if (c.sectionPicked && c.index != _lastIndex) {
+      _lastIndex = c.index;
+      final id = c.current?.id;
+      final box = id == null ? null : c.preview.sectionBoxes['${c.layoutPage}/$id'];
+      final me = context.findRenderObject() as RenderBox?;
+      if (box != null && box.attached && me != null && me.hasSize) {
+        final r = _rectOf(box);
+        if (r != null && (r.bottom < 0 || r.top > me.size.height)) {
+          box.showOnScreen(duration: const Duration(milliseconds: 350), curve: Curves.easeOutCubic);
+        }
+      }
+    }
+    setState(() {});
+  }
+
+  /// Re-measure after frames the app draws anyway (an idle page draws
+  /// none), and rebuild only when something moved.
   void _watch() {
     if (_watching) return;
     _watching = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _watching = false;
       if (!mounted) return;
-      final r = _measure();
-      if (!_near(r, _rect)) setState(() => _rect = r);
+      final secs = _measureSections();
+      final orbs = _measureOrbs();
+      if (!_sameSecs(secs, _sections) || !_sameOrbs(orbs, _orbs)) {
+        setState(() {
+          _sections = secs;
+          _orbs = orbs;
+        });
+      }
       _watch();
     });
   }
 
-  static bool _near(Rect? a, Rect? b) {
-    if (a == null || b == null) return a == b;
-    return (a.left - b.left).abs() < 0.5 &&
-        (a.top - b.top).abs() < 0.5 &&
-        (a.width - b.width).abs() < 0.5 &&
-        (a.height - b.height).abs() < 0.5;
+  static bool _near(Rect a, Rect b) =>
+      (a.left - b.left).abs() < 0.5 &&
+      (a.top - b.top).abs() < 0.5 &&
+      (a.width - b.width).abs() < 0.5 &&
+      (a.height - b.height).abs() < 0.5;
+
+  static bool _sameSecs(List<(String, Rect)> a, List<(String, Rect)> b) {
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i].$1 != b[i].$1 || !_near(a[i].$2, b[i].$2)) return false;
+    }
+    return true;
+  }
+
+  static bool _sameOrbs(List<_OrbSpot> a, List<_OrbSpot> b) {
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i].section != b[i].section ||
+          a[i].orb.id != b[i].orb.id ||
+          a[i].orb.orb != b[i].orb.orb ||
+          a[i].orb.circle != b[i].orb.circle ||
+          !_near(a[i].rect, b[i].rect)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   Rect? _rectOf(RenderBox? box) {
@@ -503,16 +467,74 @@ class _TouchLayerState extends State<_TouchLayer> {
     if (box == null || me == null || !box.attached || !me.attached || !box.hasSize || !me.hasSize) return null;
     final tl = me.globalToLocal(box.localToGlobal(Offset.zero));
     final br = me.globalToLocal(box.localToGlobal(box.size.bottomRight(Offset.zero)));
-    return Rect.fromPoints(tl, br);
+    final r = Rect.fromPoints(tl, br);
+    return r.isFinite ? r : null;
   }
 
-  Rect? _measure() {
-    final id = widget.sectionId;
-    if (id == null) return null;
-    return _rectOf(c.preview.sectionBoxes['${c.layoutPage}/$id']);
+  RenderBox? _boxOf(String id) {
+    final b = c.preview.sectionBoxes['${c.layoutPage}/$id'];
+    return b != null && b.attached ? b : null;
   }
 
-  PreviewSlot? get _selected {
+  List<(String, Rect)> _measureSections() {
+    final out = <(String, Rect)>[];
+    for (final s in c.sections) {
+      if (!s.entry.showsNow) continue;
+      final r = _rectOf(_boxOf(s.id));
+      if (r != null && r.height > 0) out.add((s.id, r));
+    }
+    return out;
+  }
+
+  List<_OrbSpot> _measureOrbs() {
+    final out = <_OrbSpot>[];
+    for (final e in c.entries) {
+      if (!e.showsNow) continue;
+      final orbs = placedOrbsOf(e.props);
+      if (orbs.isEmpty) continue;
+      final box = _boxOf(e.id);
+      final r = _rectOf(box);
+      if (box == null || r == null) continue;
+      for (final o in orbs) {
+        out.add((section: e.id, orb: o, rect: o.rectIn(box.size).shift(r.topLeft), box: r));
+      }
+    }
+    return out;
+  }
+
+  // ── Hit tests ──────────────────────────────────────────────────────
+
+  String? _sectionAt(Offset p) {
+    for (final (id, r) in _sections) {
+      if (r.contains(p)) return id;
+    }
+    return null;
+  }
+
+  Rect? _sectionRect(String? id) {
+    for (final (sid, r) in _sections) {
+      if (sid == id) return r;
+    }
+    return null;
+  }
+
+  _OrbSpot? _orbAt(Offset p) {
+    for (final o in _orbs.reversed) {
+      if (o.rect.inflate(8).contains(p)) return o;
+    }
+    return null;
+  }
+
+  _OrbSpot? get _pickedOrb {
+    final sel = c.selectedOrb;
+    if (sel == null) return null;
+    for (final o in _orbs) {
+      if (o.section == sel.$1 && o.orb.id == sel.$2) return o;
+    }
+    return null;
+  }
+
+  PreviewSlot? get _selectedSlot {
     final k = c.selectedSlot;
     if (k == null) return null;
     for (final s in c.preview.slots.values) {
@@ -521,40 +543,75 @@ class _TouchLayerState extends State<_TouchLayer> {
     return null;
   }
 
+  Rect? _slotRect(PreviewSlot? s) => _rectOf(s?.box.currentContext?.findRenderObject() as RenderBox?);
+
   Map<String, dynamic> get _props => c.current?.entry.props ?? const {};
   double _num(String k) => _props[k] is num ? (_props[k] as num).toDouble() : 0;
-  bool get _mine => widget.sectionId != null && c.current?.id == widget.sectionId;
 
-  /// Bottom strip of this surface where a dragged section is dropped to
-  /// delete it.
   bool _overTrash(Offset p) {
     final me = context.findRenderObject() as RenderBox?;
     if (me == null || !me.hasSize) return false;
     return p.dy > me.size.height - kTrashHeight;
   }
 
+  /// The page's own vertical scroll (the outermost one that can scroll).
+  ScrollPosition? _findScroll() {
+    ScrollableState? found;
+    void visit(Element e) {
+      if (found != null) return;
+      if (e is StatefulElement && e.state is ScrollableState) {
+        final s = e.state as ScrollableState;
+        final p = s.position;
+        if (axisDirectionToAxis(s.axisDirection) == Axis.vertical &&
+            p.hasContentDimensions &&
+            p.maxScrollExtent > p.minScrollExtent) {
+          found = s;
+          return;
+        }
+      }
+      e.visitChildren(visit);
+    }
+
+    final ctx = widget.pageKey.currentContext;
+    if (ctx is Element) ctx.visitChildren(visit);
+    return found?.position;
+  }
+
+  // ── Gestures ───────────────────────────────────────────────────────
+
   void _startPinch(Offset focal) {
-    final sel = _selected;
-    if (sel != null && sel.type == SlotType.text) {
-      final r = _rectOf(sel.box.currentContext?.findRenderObject() as RenderBox?);
-      if (r != null && r.inflate(16).contains(focal)) {
-        final st = c.overrideOf(sel.slotKey)?.style ?? const {};
+    _endScroll(0);
+    final orb = _pickedOrb ?? _orbAt(focal);
+    if (orb != null && orb.rect.inflate(48).contains(focal)) {
+      if (c.selectedOrb != (orb.section, orb.orb.id)) c.selectedOrb = (orb.section, orb.orb.id);
+      _orb = (orb.section, orb.orb.id);
+      _base = orb.orb.size;
+      _grab = _Grab.pinchOrb;
+      return;
+    }
+    final sel = _selectedSlot;
+    final sr = _slotRect(sel);
+    if (sel != null && sr != null && sr.inflate(20).contains(focal)) {
+      final st = c.overrideOf(sel.slotKey)?.style ?? const {};
+      _element = sel;
+      if (sel.type == SlotType.text) {
         _base = st['size'] is num
             ? (st['size'] as num).toDouble()
             : (_fontSize(sel.box.currentContext?.findRenderObject()) ?? 16);
-        _grab = _Grab.pinchText;
-        return;
+      } else {
+        _base = st['scale'] is num ? (st['scale'] as num).toDouble() : 1;
       }
+      _grab = _Grab.pinchElement;
+      return;
     }
-    if (!_mine) {
+    final id = _sectionAt(focal) ?? (c.sectionPicked ? c.current?.id : null);
+    if (id == null) {
       _grab = _Grab.none;
       return;
     }
+    if (!c.sectionPicked || c.current?.id != id) c.pickSection(id);
     _base = _num('height');
-    if (_base < 1) {
-      // No saved height yet: start from the size the section has now.
-      _base = c.preview.sectionHeights['${c.layoutPage}/${widget.sectionId}'] ?? 200;
-    }
+    if (_base < 1) _base = c.preview.sectionHeights['${c.layoutPage}/$id'] ?? 200;
     _grab = _Grab.pinchSection;
   }
 
@@ -566,107 +623,281 @@ class _TouchLayerState extends State<_TouchLayer> {
     return found;
   }
 
-  /// Where the finger first went down: a scale gesture only starts after
-  /// the finger has moved a little, so its start point is already past it.
-  Offset? _down;
+  void _endScroll(double velocity) {
+    final d = _scrollDrag;
+    _scrollDrag = null;
+    d?.end(DragEndDetails(velocity: Velocity(pixelsPerSecond: Offset(0, velocity)), primaryVelocity: velocity));
+  }
 
   void _onStart(ScaleStartDetails d) {
     c.endStep();
     _start = _down ?? d.localFocalPoint;
     _finger = d.localFocalPoint;
-    // Count the movement made before the gesture was recognised.
-    _drag = d.pointerCount >= 2 ? 0 : d.localFocalPoint.dy - _start.dy;
+    _orb = null;
+    _element = null;
     if (d.pointerCount >= 2) {
       _startPinch(d.localFocalPoint);
+      setState(() {});
       return;
     }
-    if (!_mine) {
-      _grab = _Grab.none;
-      return;
-    }
-    final r = _rect;
-    final p = _start;
-    if (r != null && p.dx >= r.left && p.dx <= r.right && (p.dy - r.top).abs() < kEdgeGrab) {
-      _grab = _Grab.padTop;
-      _base = _num('padTop');
-    } else if (r != null && p.dx >= r.left && p.dx <= r.right && (p.dy - r.bottom).abs() < kEdgeGrab) {
-      _grab = _Grab.padBottom;
-      _base = _num('padBottom');
+    final orb = _orbAt(_start);
+    final sel = _selectedSlot;
+    final sr = _slotRect(sel);
+    final cur = c.sectionPicked ? _sectionRect(c.current?.id) : null;
+    if (orb != null) {
+      c.selectedOrb = (orb.section, orb.orb.id);
+      c.sectionPicked = false;
+      c.clearSelection();
+      _orb = (orb.section, orb.orb.id);
+      _baseOffset = Offset(orb.orb.x * orb.box.width, orb.orb.y);
+      _grab = _Grab.moveOrb;
+    } else if (sel != null && sr != null && sr.contains(_start)) {
+      final st = c.overrideOf(sel.slotKey)?.style ?? const {};
+      double n(String k) => st[k] is num ? (st[k] as num).toDouble() : 0;
+      _element = sel;
+      _baseOffset = Offset(n('dx'), n('dy'));
+      _grab = _Grab.moveElement;
+    } else if (cur != null && cur.contains(_start)) {
+      if ((_start.dy - cur.top).abs() < kEdgeGrab) {
+        _grab = _Grab.padTop;
+        _base = _num('padTop');
+      } else if ((_start.dy - cur.bottom).abs() < kEdgeGrab) {
+        _grab = _Grab.padBottom;
+        _base = _num('padBottom');
+      } else {
+        _grab = _Grab.order;
+      }
+    } else if (cur != null && ((_start.dy - cur.top).abs() < kEdgeGrab || (_start.dy - cur.bottom).abs() < kEdgeGrab)) {
+      // Just outside the edge still grabs it (the bar sits on the edge).
+      final top = (_start.dy - cur.top).abs() < kEdgeGrab;
+      _grab = top ? _Grab.padTop : _Grab.padBottom;
+      _base = _num(top ? 'padTop' : 'padBottom');
     } else {
-      _grab = _Grab.order;
-      _range = c.shiftRange(widget.sectionId!);
+      _grab = _Grab.scroll;
+      _scrollPos = _findScroll();
+      _scrollDrag = _scrollPos?.drag(
+        DragStartDetails(globalPosition: d.focalPoint, localPosition: d.localFocalPoint),
+        () => _scrollDrag = null,
+      );
+      // The movement made before the gesture was recognised.
+      final pre = d.localFocalPoint.dy - _start.dy;
+      if (pre.abs() > 0) {
+        _scrollDrag?.update(DragUpdateDetails(
+          globalPosition: d.focalPoint,
+          delta: Offset(0, pre),
+          primaryDelta: pre,
+        ));
+      }
     }
     setState(() {});
   }
 
+  bool get _carrying => _grab == _Grab.order || _grab == _Grab.moveOrb || _grab == _Grab.moveElement;
+
+  /// Tells the screen something is being carried (it clears the bottom so
+  /// the trash is in plain sight).
+  void _syncCarry() {
+    c.carrying.value = _carrying && (_finger - _start).distance > 6;
+  }
+
   void _onUpdate(ScaleUpdateDetails d) {
-    if (d.pointerCount >= 2 && _grab != _Grab.pinchSection && _grab != _Grab.pinchText) {
+    if (d.pointerCount >= 2 &&
+        _grab != _Grab.pinchSection &&
+        _grab != _Grab.pinchElement &&
+        _grab != _Grab.pinchOrb) {
       _startPinch(d.localFocalPoint);
       setState(() {});
     }
-    final id = widget.sectionId;
+    final total = d.localFocalPoint - _start;
     switch (_grab) {
       case _Grab.none:
         return;
-      case _Grab.pinchText:
-        final sel = _selected;
+      case _Grab.scroll:
+        _scrollDrag?.update(DragUpdateDetails(
+          globalPosition: d.focalPoint,
+          delta: Offset(0, d.focalPointDelta.dy),
+          primaryDelta: d.focalPointDelta.dy,
+        ));
+      case _Grab.pinchOrb:
+        final o = _orb;
+        if (o == null) return;
+        final v = (_base * d.scale).clamp(PlacedOrb.kMinSize, PlacedOrb.kMaxSize).roundToDouble();
+        c.updateOrb(o.$1, o.$2, (x) => x.copyWith(size: v));
+      case _Grab.pinchElement:
+        final sel = _element;
         if (sel == null) return;
-        final v = (_base * d.scale).clamp(8.0, 96.0).roundToDouble();
-        c.patchStyle(sel.slotKey, sel.type, sel.defaultValue, {'size': v});
+        if (sel.type == SlotType.text) {
+          final v = (_base * d.scale).clamp(8.0, 120.0).roundToDouble();
+          c.patchStyle(sel.slotKey, sel.type, sel.defaultValue, {'size': v});
+        } else {
+          final v = double.parse((_base * d.scale).clamp(0.3, 4.0).toStringAsFixed(2));
+          c.patchStyle(sel.slotKey, sel.type, sel.defaultValue, {'scale': (v - 1).abs() < 0.02 ? null : v});
+        }
       case _Grab.pinchSection:
-        if (!_mine) return;
-        final next = (_base * d.scale).clamp(70.0, 720.0);
-        c.patchProps(id!, {'height': next.roundToDouble()});
+        final id = c.current?.id;
+        if (id == null) return;
+        c.patchProps(id, {'height': (_base * d.scale).clamp(60.0, 1400.0).roundToDouble()});
       case _Grab.padTop || _Grab.padBottom:
-        if (!_mine) return;
-        // focalPointDelta is in this surface's own (phone point) space.
-        _drag += d.focalPointDelta.dy;
-        // Dragging the top edge down, or the bottom edge down, adds space.
-        final v = (_base + _drag).clamp(0.0, 160.0).roundToDouble();
-        c.patchProps(id!, {_grab == _Grab.padTop ? 'padTop' : 'padBottom': v < 1 ? null : v});
-      case _Grab.order:
-        final before = _steps;
-        setState(() {
-          _drag += d.focalPointDelta.dy;
-          _finger = d.localFocalPoint;
+        final id = c.current?.id;
+        if (id == null) return;
+        final v = (_base + total.dy).clamp(0.0, 200.0).roundToDouble();
+        c.patchProps(id, {_grab == _Grab.padTop ? 'padTop' : 'padBottom': v < 1 ? null : v});
+      case _Grab.moveElement:
+        final sel = _element;
+        if (sel == null) return;
+        final p = _baseOffset + total;
+        setState(() => _finger = d.localFocalPoint);
+        c.patchStyle(sel.slotKey, sel.type, sel.defaultValue, {
+          'dx': p.dx.abs() < 1 ? null : p.dx.roundToDouble(),
+          'dy': p.dy.abs() < 1 ? null : p.dy.roundToDouble(),
         });
-        if (_steps != before) tapFeel();
+        _autoScrollFor(d.localFocalPoint);
+      case _Grab.moveOrb:
+        final o = _orb;
+        final spot = _pickedOrb;
+        if (o == null || spot == null) return;
+        final p = _baseOffset + total;
+        setState(() => _finger = d.localFocalPoint);
+        c.updateOrb(o.$1, o.$2, (x) => x.copyWith(x: spot.box.width <= 0 ? x.x : p.dx / spot.box.width, y: p.dy));
+        _autoScrollFor(d.localFocalPoint);
+      case _Grab.order:
+        final before = _target();
+        setState(() => _finger = d.localFocalPoint);
+        if (_target() != before) tapFeel();
+        _autoScrollFor(d.localFocalPoint);
     }
+    _syncCarry();
   }
 
-  int get _steps => shiftSteps(_drag, _range.$1, _range.$2);
+  /// Near the top, or just above the trash, a carried thing scrolls the page.
+  void _autoScrollFor(Offset p) {
+    final me = context.findRenderObject() as RenderBox?;
+    if (me == null || !me.hasSize) return;
+    final h = me.size.height;
+    double speed = 0;
+    if (p.dy < kAutoScrollBand) {
+      speed = -8;
+    } else if (p.dy > h - kTrashHeight - kAutoScrollBand && p.dy < h - kTrashHeight) {
+      speed = 8;
+    }
+    if (speed == 0) {
+      _autoScroll?.cancel();
+      _autoScroll = null;
+      return;
+    }
+    _scrollPos ??= _findScroll();
+    _autoScroll ??= Timer.periodic(const Duration(milliseconds: 16), (_) {
+      final pos = _scrollPos;
+      if (pos == null || !_carrying) {
+        _autoScroll?.cancel();
+        _autoScroll = null;
+        return;
+      }
+      final next = (pos.pixels + speed).clamp(pos.minScrollExtent, pos.maxScrollExtent);
+      if (next != pos.pixels) pos.jumpTo(next);
+    });
+  }
+
+  /// The live section the dragged one would land on (index among the
+  /// sections on screen), or null when it stays.
+  int? _target() {
+    final cur = c.current?.id;
+    final from = _sections.indexWhere((s) => s.$1 == cur);
+    if (from < 0) return null;
+    for (var i = 0; i < _sections.length; i++) {
+      final r = _sections[i].$2;
+      if (_finger.dy >= r.top && _finger.dy < r.bottom) return i == from ? null : i;
+    }
+    return null;
+  }
 
   void _onEnd(ScaleEndDetails d) {
     final grab = _grab;
-    final id = widget.sectionId;
-    final trash = grab == _Grab.order && (_finger - _start).distance > 12 && _overTrash(_finger);
-    final steps = grab == _Grab.order ? _steps : 0;
-    setState(() {
-      _grab = _Grab.none;
-      _drag = 0;
-    });
+    final moved = (_finger - _start).distance > 12;
+    final trash = (grab == _Grab.order || grab == _Grab.moveOrb || grab == _Grab.moveElement) && moved && _overTrash(_finger);
+    final target = grab == _Grab.order ? _target() : null;
+    _autoScroll?.cancel();
+    _autoScroll = null;
+    if (grab == _Grab.scroll) _endScroll(d.velocity.pixelsPerSecond.dy);
+    setState(() => _grab = _Grab.none);
+    _syncCarry();
+    switch (grab) {
+      case _Grab.order:
+        final cur = c.current;
+        if (cur == null) break;
+        if (trash) {
+          deleteWithUndo(context, c, cur.id, cur.title);
+        } else if (target != null) {
+          final from = _sections.indexWhere((s) => s.$1 == cur.id);
+          // Steps count live sections, the same ones the page shows.
+          final targetId = _sections[target].$1;
+          final live = [for (final s in c.sections) if (!s.entry.deleted) s.id];
+          final steps = live.indexOf(targetId) - live.indexOf(cur.id);
+          if (from >= 0 && steps != 0) {
+            bigFeel();
+            c.endStep();
+            c.shift(cur.id, steps);
+            c.endStep();
+            c.pickSection(cur.id);
+          }
+        }
+      case _Grab.moveOrb:
+        final o = _orb;
+        if (o == null) break;
+        if (trash) {
+          bigFeel();
+          c.endStep();
+          c.deleteOrb(o.$1, o.$2);
+          c.endStep();
+          _undoBar(context, c, 'Orb removed');
+          break;
+        }
+        // Lands in the section under it (it may have crossed into another).
+        final to = _sectionAt(_finger);
+        final spot = _pickedOrb;
+        if (to != null && to != o.$1 && spot != null) {
+          final r = _sectionRect(to)!;
+          final centre = spot.rect.center;
+          c.moveOrb(o.$1, to, o.$2, ((centre.dx - r.left) / r.width).clamp(0.0, 1.0), centre.dy - r.top);
+        }
+      case _Grab.moveElement:
+        final sel = _element;
+        if (sel == null || !trash) break;
+        bigFeel();
+        c.patchStyle(sel.slotKey, sel.type, sel.defaultValue, {'hidden': true, 'dx': null, 'dy': null});
+        c.endStep();
+        _undoBar(context, c, 'Removed “${slotFriendly(sel.slotKey, sel.type, sel.defaultValue)}”');
+      default:
+        break;
+    }
     c.endStep();
-    if (id == null || !_mine) return;
-    if (trash) {
-      deleteWithUndo(context, c, id, c.current?.title ?? id);
+  }
+
+  void _onTapUp(TapUpDetails d) {
+    final p = d.localPosition;
+    final orb = _orbAt(p);
+    if (orb != null) {
+      actFeel();
+      c.clearSelection(notify: false);
+      c.sectionPicked = false;
+      c.selectedOrb = (orb.section, orb.orb.id);
+      c.changedSelection();
       return;
     }
-    if (steps != 0) {
-      bigFeel();
-      c.shift(id, steps);
-      c.endStep();
+    final id = _sectionAt(p);
+    if (id != null) {
+      actFeel();
+      c.pickSection(id);
+    } else {
+      c.unpick();
     }
   }
 
   Future<void> _menu(LongPressStartDetails d) async {
-    final cur = c.current;
-    if (!_mine || cur == null) return;
-    actFeel();
-    final pictureKind =
-        cur.entry.isTemplate && const {'imageBanner', 'videoBanner', 'splitPromo'}.contains(cur.entry.kind);
-    final whole = '${cur.entry.props['fit'] ?? ''}' == 'contain';
+    final p = d.localPosition;
+    final orb = _orbAt(p);
     final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
-    final at = d.globalPosition;
+    final pos = RelativeRect.fromRect(d.globalPosition & const Size(1, 1), Offset.zero & overlay.size);
     PopupMenuItem<String> item(String v, IconData icon, String label, {Color color = Colors.white}) => PopupMenuItem(
           value: v,
           height: 44,
@@ -676,17 +907,43 @@ class _TouchLayerState extends State<_TouchLayer> {
             Text(label, style: TextStyle(color: color, fontWeight: FontWeight.w600)),
           ]),
         );
+    if (orb != null) {
+      actFeel();
+      c.selectedOrb = (orb.section, orb.orb.id);
+      c.changedSelection();
+      final v = await showMenu<String>(context: context, color: const Color(0xFF111A2B), position: pos, items: [
+        item('circle', Icons.circle, orb.orb.circle ? 'No circle' : 'Black circle'),
+        item('del', Icons.delete_outline_rounded, 'Delete', color: const Color(0xFFFF8A8A)),
+      ]);
+      if (!mounted || v == null) return;
+      c.endStep();
+      if (v == 'circle') {
+        c.updateOrb(orb.section, orb.orb.id, (o) => o.copyWith(circle: !o.circle));
+      } else {
+        c.deleteOrb(orb.section, orb.orb.id);
+        if (mounted) _undoBar(context, c, 'Orb removed');
+      }
+      c.endStep();
+      return;
+    }
+    final id = _sectionAt(p);
+    if (id == null) return;
+    actFeel();
+    if (!c.sectionPicked || c.current?.id != id) c.pickSection(id);
+    final cur = c.current;
+    if (cur == null) return;
+    final pictureKind = cur.entry.isTemplate && const {'imageBanner', 'videoBanner', 'splitPromo'}.contains(cur.entry.kind);
+    final whole = '${cur.entry.props['fit'] ?? ''}' == 'contain';
     final v = await showMenu<String>(
       context: context,
       color: const Color(0xFF111A2B),
-      position: RelativeRect.fromRect(at & const Size(1, 1), Offset.zero & overlay.size),
+      position: pos,
       items: [
         item('back', Icons.restart_alt_rounded, 'Put back'),
         if (pictureKind)
           item('fit', whole ? Icons.crop_rounded : Icons.fit_screen_rounded, whole ? 'Fill picture' : 'Whole picture'),
         if (cur.copyable) item('dup', Icons.copy_rounded, 'Duplicate'),
-        item('hide', cur.entry.visible ? Icons.visibility_off_rounded : Icons.visibility_rounded,
-            cur.entry.visible ? 'Hide' : 'Show'),
+        item('hide', Icons.visibility_off_rounded, 'Hide'),
         item('del', Icons.delete_outline_rounded, 'Delete', color: const Color(0xFFFF8A8A)),
       ],
     );
@@ -704,65 +961,169 @@ class _TouchLayerState extends State<_TouchLayer> {
         c.endStep();
       case 'hide':
         c.endStep();
-        c.setVisible(cur.id, !cur.entry.visible);
+        c.setVisible(cur.id, false);
+        c.unpick();
         c.endStep();
+        if (mounted) _undoBar(context, c, 'Hidden “${cur.title}”');
       case 'del':
         deleteWithUndo(context, c, cur.id, cur.title);
     }
   }
 
+  // ── Drops from the drawer ──────────────────────────────────────────
+
+  bool _accepts(Object? data) {
+    if (data is OrbDrop) return true;
+    final fx = FxDrop.of(data);
+    if (fx == null) return false;
+    return true;
+  }
+
+  void _onDrop(DragTargetDetails<Object> d) {
+    final me = context.findRenderObject() as RenderBox?;
+    if (me == null) return;
+    // Drawer tiles are dragged by the point under the finger.
+    final p = me.globalToLocal(d.offset);
+    setState(() => _hover = null);
+    final id = _sectionAt(p);
+    final data = d.data;
+    if (id == null) {
+      _say(c.sectioned ? 'Drop it on the page.' : 'This page is one block for now — effects and orbs need sections.');
+      return;
+    }
+    final r = _sectionRect(id)!;
+    c.endStep();
+    if (data is OrbDrop) {
+      bigFeel();
+      c.addOrb(id, data.state.name, ((p.dx - r.left) / r.width).clamp(0.0, 1.0), p.dy - r.top);
+      c.endStep();
+      c.fxDropped();
+      return;
+    }
+    final fx = FxDrop.of(data);
+    if (fx == null) return;
+    final sec = c.sections.firstWhere((s) => s.id == id);
+    if (fx.carouselOnly && !sec.carousel) {
+      _say('“${fx.label}” is for sections that slide sideways.');
+      return;
+    }
+    bigFeel();
+    c.pickSection(id);
+    if (fx.apply != null) {
+      fx.apply!(c, sec);
+    } else {
+      c.patchProps(id, fx.patch);
+    }
+    c.endStep();
+    c.fxDropped();
+    // Play it right away, once the page has the new props.
+    WidgetsBinding.instance.addPostFrameCallback((_) => c.preview.replay());
+  }
+
+  void _say(String text) {
+    final m = ScaffoldMessenger.maybeOf(context);
+    m?.hideCurrentSnackBar();
+    m?.showSnackBar(SnackBar(behavior: SnackBarBehavior.floating, content: Text(text)));
+  }
+
   @override
   Widget build(BuildContext context) {
-    final r = _rect;
-    final ordering = _grab == _Grab.order && (_finger - _start).distance > 6;
-    final trash = ordering && _overTrash(_finger);
-    final steps = ordering && !trash ? _steps : 0;
-    final lift = ordering ? _drag.clamp(-kShiftStep * 3, kShiftStep * 3) : 0.0;
+    final cur = c.sectionPicked ? _sectionRect(c.current?.id) : null;
+    final moved = (_finger - _start).distance > 6;
+    final carrying = _carrying && moved;
+    final ordering = _grab == _Grab.order && moved;
+    final trash = carrying && _overTrash(_finger);
+    final target = ordering && !trash ? _target() : null;
+    final hoverId = _hover == null ? null : _sectionAt(_hover!);
+    final hoverRect = _sectionRect(hoverId);
+    final orbSel = c.selectedOrb;
     return Listener(
       behavior: HitTestBehavior.translucent,
       onPointerDown: (e) => _down = e.localPosition,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onScaleStart: _onStart,
-        onScaleUpdate: _onUpdate,
-        onScaleEnd: _onEnd,
-        onLongPressStart: widget.sectionId == null ? null : _menu,
-        child: Stack(fit: StackFit.expand, children: [
-          widget.child,
-          if (r != null && _mine) ...[
-            // The section itself: outline (following the finger while it is
-            // moved) and a grab bar on its top and bottom edge.
-            Positioned.fromRect(
-              rect: r.shift(Offset(0, lift)),
-              child: IgnorePointer(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: ordering ? kGold.withValues(alpha: 0.14) : null,
-                    border: Border.all(color: ordering ? kGold : const Color(0x99E8D5A3), width: ordering ? 3 : 1.5),
+      child: DragTarget<Object>(
+        onWillAcceptWithDetails: (d) => _accepts(d.data),
+        onMove: (d) {
+          final me = context.findRenderObject() as RenderBox?;
+          if (me != null) setState(() => _hover = me.globalToLocal(d.offset));
+        },
+        onLeave: (_) => setState(() => _hover = null),
+        onAcceptWithDetails: _onDrop,
+        builder: (context, _, __) => GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTapUp: _onTapUp,
+          onScaleStart: _onStart,
+          onScaleUpdate: _onUpdate,
+          onScaleEnd: _onEnd,
+          onLongPressStart: _menu,
+          child: Stack(fit: StackFit.expand, children: [
+            widget.child,
+            // Placed orbs: a ring on the picked one.
+            for (final o in _orbs)
+              if (orbSel == (o.section, o.orb.id))
+                Positioned.fromRect(
+                  rect: o.rect.inflate(6),
+                  child: IgnorePointer(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: kGold, width: 3)),
+                    ),
+                  ),
+                ),
+            if (cur != null) ...[
+              Positioned.fromRect(
+                rect: ordering ? cur.shift(Offset(0, _finger.dy - _start.dy)) : cur,
+                child: IgnorePointer(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: ordering ? kGold.withValues(alpha: 0.14) : null,
+                      border: Border.all(color: kGold, width: ordering ? 3 : 2),
+                    ),
                   ),
                 ),
               ),
-            ),
-            if (!ordering) ...[
-              _EdgeBar(center: Offset(r.center.dx, r.top), active: _grab == _Grab.padTop),
-              _EdgeBar(center: Offset(r.center.dx, r.bottom), active: _grab == _Grab.padBottom),
+              if (!ordering) ...[
+                _EdgeBar(center: Offset(cur.center.dx, cur.top), active: _grab == _Grab.padTop),
+                _EdgeBar(center: Offset(cur.center.dx, cur.bottom), active: _grab == _Grab.padBottom),
+              ],
             ],
-          ],
-          if (steps != 0)
-            Positioned(
-              left: (_finger.dx - 34).clamp(4.0, double.infinity),
-              top: (_finger.dy - 64).clamp(4.0, double.infinity),
-              child: IgnorePointer(child: _Badge(steps)),
-            ),
-          if (ordering)
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              height: kTrashHeight,
-              child: IgnorePointer(child: _Trash(hot: trash)),
-            ),
-        ]),
+            if (target != null)
+              Builder(builder: (_) {
+                final r = _sections[target].$2;
+                final from = _sections.indexWhere((s) => s.$1 == c.current?.id);
+                final y = target > from ? r.bottom : r.top;
+                return Positioned(
+                  left: 12,
+                  right: 12,
+                  top: y - 3,
+                  height: 6,
+                  child: IgnorePointer(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(color: kGold, borderRadius: BorderRadius.circular(99)),
+                    ),
+                  ),
+                );
+              }),
+            if (hoverRect != null)
+              Positioned.fromRect(
+                rect: hoverRect,
+                child: IgnorePointer(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: kGold.withValues(alpha: 0.10),
+                      border: Border.all(color: kGold, width: 3),
+                    ),
+                  ),
+                ),
+              ),
+            if (carrying)
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                height: kTrashHeight,
+                child: IgnorePointer(child: _Trash(hot: trash)),
+              ),
+          ]),
+        ),
       ),
     );
   }
@@ -782,7 +1143,7 @@ class _EdgeBar extends StatelessWidget {
         child: IgnorePointer(
           child: DecoratedBox(
             decoration: BoxDecoration(
-              color: active ? kGold : const Color(0xCCE8D5A3),
+              color: active ? kGold : const Color(0xE6E8D5A3),
               borderRadius: BorderRadius.circular(99),
               boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 4)],
             ),
@@ -791,24 +1152,7 @@ class _EdgeBar extends StatelessWidget {
       );
 }
 
-/// "↑ 2" / "↓ 1": how many places the section will move.
-class _Badge extends StatelessWidget {
-  const _Badge(this.steps);
-  final int steps;
-
-  @override
-  Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.fromLTRB(10, 8, 14, 8),
-        decoration: BoxDecoration(color: kGold, borderRadius: BorderRadius.circular(99)),
-        child: Row(mainAxisSize: MainAxisSize.min, children: [
-          Icon(steps < 0 ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded, color: kInk, size: 22),
-          const SizedBox(width: 4),
-          Text('${steps.abs()}', style: const TextStyle(color: kInk, fontSize: 20, fontWeight: FontWeight.w900)),
-        ]),
-      );
-}
-
-/// Shows at the bottom while a section is dragged: drop it here to delete.
+/// Shows at the bottom while something is dragged: drop it here to delete.
 class _Trash extends StatelessWidget {
   const _Trash({required this.hot});
   final bool hot;

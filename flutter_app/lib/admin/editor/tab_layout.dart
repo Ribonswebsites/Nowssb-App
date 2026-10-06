@@ -1,5 +1,5 @@
-/// Layout tab: the page at a glance. Everything about a section's size and
-/// place is done on the phone picture itself (drag, pinch, edges, trash —
+/// Sections tab (in the + drawer): the page at a glance. Everything about a
+/// section's size and place is done on the page itself (drag, pinch, edges, trash —
 /// see preview.dart); this list is a map of the page: tap to go to a
 /// section, hold and drag to reorder, swipe left to delete, eye to hide.
 library;
@@ -20,7 +20,7 @@ class LayoutTab extends StatelessWidget {
   Widget build(BuildContext context) {
     if (!c.sectioned) {
       return const Hint('This page is shown as one block for now, so its sections cannot be moved yet.\n'
-          'You can still change every picture and line in Content.',
+          'Tap any picture or line on the page to change it.',
           icon: Icons.view_agenda_outlined);
     }
     final secs = c.sections;
@@ -101,56 +101,48 @@ class LayoutTab extends StatelessWidget {
   }
 }
 
-/// The + on the preview: pick a ready-made section; it goes right after the
-/// one on the preview.
-Future<void> openAddSection(BuildContext context, EditorController c) async {
-    final kind = await showModalBottomSheet<String>(
-      context: context,
-      useRootNavigator: true,
-      isScrollControlled: true,
-      backgroundColor: const Color(0xF20B1120),
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      // Scrolls: with the coupon templates the gallery is taller than a
-      // small phone's sheet.
-      builder: (ctx) => SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(16, 18, 16, 28),
-        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('Add a section', style: TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w800)),
-          const SizedBox(height: 4),
-          const Text('It goes right after the section on the preview. Tap its words or picture to fill it in.',
-              style: TextStyle(color: kDim, fontSize: 12.5)),
-          const SizedBox(height: 14),
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 10,
-            crossAxisSpacing: 10,
-            childAspectRatio: 1.35,
-            children: [
-              for (final e in kTemplateNames.entries)
-                Glass(
-                  radius: 18,
-                  onTap: () => Navigator.pop(ctx, e.key),
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Icon(_templateIcon(e.key), color: kGold),
-                    const Spacer(),
-                    Text(e.value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 14)),
-                    const SizedBox(height: 2),
-                    Text(kTemplateBlurbs[e.key] ?? '',
-                        maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: kDim, fontSize: 11)),
-                  ]),
-                ),
-            ],
+/// Drawer tab: the ready-made sections. A tap adds one right after the
+/// picked section (or the one on screen) and closes the drawer.
+class AddSectionsTab extends StatelessWidget {
+  const AddSectionsTab({super.key, required this.c, required this.onAdded});
+  final EditorController c;
+  final VoidCallback onAdded;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!c.sectioned) {
+      return const Hint('This page is shown as one block for now, so sections cannot be added to it yet.',
+          icon: Icons.view_agenda_outlined);
+    }
+    return GridView.count(
+      padding: const EdgeInsets.fromLTRB(14, 0, 14, 24),
+      crossAxisCount: 2,
+      mainAxisSpacing: 10,
+      crossAxisSpacing: 10,
+      childAspectRatio: 1.35,
+      children: [
+        for (final e in kTemplateNames.entries)
+          Glass(
+            key: ValueKey('add-${e.key}'),
+            radius: 18,
+            onTap: () {
+              bigFeel();
+              c.endStep();
+              c.addTemplate(e.key);
+              c.endStep();
+              onAdded();
+            },
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Icon(_templateIcon(e.key), color: kGold),
+              const Spacer(),
+              Text(e.value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 14)),
+              const SizedBox(height: 2),
+              Text(kTemplateBlurbs[e.key] ?? '',
+                  maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: kDim, fontSize: 11)),
+            ]),
           ),
-        ]),
-      ),
+      ],
     );
-    if (kind != null) {
-      bigFeel();
-      c.endStep();
-    c.addTemplate(kind);
-    c.endStep();
   }
 }
 

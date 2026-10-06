@@ -73,11 +73,32 @@ Widget slotChrome(
   Widget child, {
   String? word,
 }) {
-  if (EditorPreviewScope.peek(context) != null) {
-    return PreviewSlotMarker(slotKey: key, type: type, defaultValue: def, child: child);
+  final preview = EditorPreviewScope.peek(context) != null;
+  final look = effectiveOverride(context, key)?.style ?? const <String, dynamic>{};
+  if (preview) {
+    return elementPlacement(look, PreviewSlotMarker(slotKey: key, type: type, defaultValue: def, child: child),
+        preview: true);
   }
-  if (!EditMode.instance.on) return child;
-  return SlotBadge(slotKey: key, type: type, defaultValue: def, word: word, child: child);
+  if (!EditMode.instance.on) return elementPlacement(look, child);
+  return elementPlacement(look, SlotBadge(slotKey: key, type: type, defaultValue: def, word: word, child: child));
+}
+
+/// Where the owner moved, resized or removed one element in the UI Editor
+/// (override style `dx`, `dy`, `scale`, `hidden`). Painted only: the
+/// section around it keeps its size. Removed elements stay faintly visible
+/// in the editor's preview so they can be brought back.
+Widget elementPlacement(Map<String, dynamic> look, Widget child, {bool preview = false}) {
+  if (look.isEmpty) return child;
+  double n(String k, double d) => look[k] is num ? (look[k] as num).toDouble() : d;
+  if (look['hidden'] == true) {
+    if (!preview) return const SizedBox.shrink();
+    child = Opacity(opacity: 0.22, child: child);
+  }
+  final s = n('scale', 1).clamp(0.2, 6.0);
+  if ((s - 1).abs() > 0.01) child = Transform.scale(scale: s, child: child);
+  final dx = n('dx', 0), dy = n('dy', 0);
+  if (dx.abs() > 0.5 || dy.abs() > 0.5) child = Transform.translate(offset: Offset(dx, dy), child: child);
+  return child;
 }
 
 /// Zoom stored on the shared word picture, else the zoom saved on this slot.

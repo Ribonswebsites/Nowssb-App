@@ -8,6 +8,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
 import '../layout/app_pages.dart';
+import '../layout/placed_orbs.dart';
 import '../layout/scopes.dart';
 import '../layout/template_sections.dart';
 import '../layout/ui_layouts.dart';
@@ -82,6 +83,8 @@ class EditorController extends ChangeNotifier {
       _jump = null;
     }
     index = 0;
+    sectionPicked = false;
+    selectedOrb = null;
     clearSelection();
     notifyListeners();
   }
@@ -97,9 +100,137 @@ class EditorController extends ChangeNotifier {
   }
 
   void goTo(int i) {
-    if (i == index) return;
+    if (i == index && sectionPicked) return;
     index = i;
+    sectionPicked = true;
+    selectedOrb = null;
     clearSelection(notify: false);
+    notifyListeners();
+  }
+
+  // ── What is picked on the page ─────────────────────────────────────
+  //
+  // The page is shown whole. Nothing is picked at first: one-finger drags
+  // scroll it. A tap picks a section (outlined; drags then move it), an
+  // element in it (the [selectedSlot]) or a placed orb.
+
+  /// A section is picked: [current] is outlined and drags move it.
+  bool sectionPicked = false;
+
+  /// The placed orb picked on the page: (section id, orb id).
+  (String, String)? selectedOrb;
+
+  /// Picks the section with id [id] (and nothing inside it).
+  void pickSection(String id) {
+    final i = sections.indexWhere((s) => s.id == id);
+    if (i < 0) return;
+    index = i;
+    sectionPicked = true;
+    selectedOrb = null;
+    clearSelection(notify: false);
+    notifyListeners();
+  }
+
+  /// Picks the element [key] and the section it is drawn in.
+  void selectIn(String? sectionId, String key, SlotType type, String def) {
+    final i = sectionId == null ? -1 : sections.indexWhere((s) => s.id == sectionId);
+    if (i >= 0) {
+      index = i;
+      sectionPicked = true;
+    }
+    selectedOrb = null;
+    select(key, type, def);
+  }
+
+  /// Tell listeners the picked thing changed (after setting it directly).
+  void changedSelection() => notifyListeners();
+
+  /// Something on the page is being carried by a finger (a section, an
+  /// element or an orb): the screen clears the bottom for the trash.
+  final ValueNotifier<bool> carrying = ValueNotifier(false);
+
+  /// Something from the drawer is being carried: the drawer slides away.
+  bool fxDragging = false;
+
+  /// Bumped when an effect or orb from the drawer lands on the page.
+  int fxDrops = 0;
+
+  void setFxDragging(bool v) {
+    if (fxDragging == v) return;
+    fxDragging = v;
+    notifyListeners();
+  }
+
+  void fxDropped() {
+    fxDrops++;
+    notifyListeners();
+  }
+
+  /// Nothing picked: drags scroll the page again.
+  void unpick() {
+    sectionPicked = false;
+    selectedOrb = null;
+    clearSelection(notify: false);
+    notifyListeners();
+  }
+
+  // ── Placed orbs (props.orbs of a section; see placed_orbs.dart) ────
+
+  List<PlacedOrb> orbsIn(String sectionId) {
+    for (final e in entries) {
+      if (e.id == sectionId) return placedOrbsOf(e.props);
+    }
+    return const [];
+  }
+
+  PlacedOrb? orbById(String sectionId, String id) {
+    for (final o in orbsIn(sectionId)) {
+      if (o.id == id) return o;
+    }
+    return null;
+  }
+
+  /// Drops a new orb on [sectionId] and picks it. Returns its id.
+  String addOrb(String sectionId, String orb, double x, double y, {double size = PlacedOrb.kDefaultSize}) {
+    final all = [for (final e in entries) ...placedOrbsOf(e.props)];
+    var n = all.length + 1;
+    while (all.any((o) => o.id == 'orb$n')) {
+      n++;
+    }
+    final o = PlacedOrb(id: 'orb$n', orb: orb, x: x, y: y, size: size);
+    patchProps(sectionId, orbsPatch([...orbsIn(sectionId), o]));
+    final i = sections.indexWhere((s) => s.id == sectionId);
+    if (i >= 0) index = i;
+    sectionPicked = false;
+    clearSelection(notify: false);
+    selectedOrb = (sectionId, o.id);
+    notifyListeners();
+    return o.id;
+  }
+
+  void updateOrb(String sectionId, String id, PlacedOrb Function(PlacedOrb) f) {
+    final list = orbsIn(sectionId);
+    if (!list.any((o) => o.id == id)) return;
+    patchProps(sectionId, orbsPatch([for (final o in list) o.id == id ? f(o) : o]));
+  }
+
+  /// Moves an orb to [toSection] at (x, y) there.
+  void moveOrb(String fromSection, String toSection, String id, double x, double y) {
+    final o = orbById(fromSection, id);
+    if (o == null) return;
+    if (fromSection == toSection) {
+      updateOrb(fromSection, id, (o) => o.copyWith(x: x, y: y));
+      return;
+    }
+    patchProps(fromSection, orbsPatch([for (final x in orbsIn(fromSection)) if (x.id != id) x]));
+    patchProps(toSection, orbsPatch([...orbsIn(toSection), o.copyWith(x: x, y: y)]));
+    selectedOrb = (toSection, id);
+    notifyListeners();
+  }
+
+  void deleteOrb(String sectionId, String id) {
+    patchProps(sectionId, orbsPatch([for (final o in orbsIn(sectionId)) if (o.id != id) o]));
+    if (selectedOrb == (sectionId, id)) selectedOrb = null;
     notifyListeners();
   }
 
@@ -109,6 +240,7 @@ class EditorController extends ChangeNotifier {
   }
 
   void select(String key, SlotType type, String def) {
+    selectedOrb = null;
     selectedSlot = key;
     selectedType = type;
     selectedDefault = def;
@@ -295,6 +427,8 @@ class EditorController extends ChangeNotifier {
     if (curId != null) {
       final i = list.indexWhere((x) => x.id == curId);
       if (i >= 0) index = i;
+      // The page reports the new order a frame later; stay on this one.
+      _jump = curId;
     }
     notifyListeners();
   }
@@ -460,6 +594,7 @@ class EditorController extends ChangeNotifier {
 
   @override
   void dispose() {
+    carrying.dispose();
     preview.removeListener(notifyListeners);
     preview.dispose();
     super.dispose();

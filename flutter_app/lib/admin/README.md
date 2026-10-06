@@ -114,9 +114,14 @@ It is idempotent. The last run's per-file counts are in
 `template/SWEEP_REPORT.md`.
 
 ## UI Editor (`editor/`, `layout/`)
-Admin → UI Editor shows the REAL page in a phone frame, one section at a
-time (swipe sideways), with five tabs: Content (slots in the section; tap
-them on the preview), Style, Animation, Layout, Publish. Edits wait on the
+Admin → UI Editor shows the REAL page full screen, edge to edge, with
+nothing permanent on it but a small handle at the top and a + button. The
+handle opens a floating pill (back · page picker · undo/redo · publish ·
+⋯ for Try it, live preview, pencils, every slot); the pill also opens for a
+few seconds after each change. + opens a bottom drawer with tabs inside:
+Add (ready-made sections), Effects, Orbs, Sections (page map). Touching an
+element shows a small strip that opens its own sheet (style, words,
+picture); there is no Style tab. Edits wait on the
 admin's phone (`EditorPreviewController.draftOverrides/draftLayouts`) and
 `EditorStore.publish` writes them in one batch: `ui_overrides`,
 `ui_layouts` and one `ui_history` row per change. Every app listens
@@ -127,8 +132,9 @@ Override `style` keys (all optional; see `template/style_apply.dart`):
 text `color, font, size, weight, spacing, italic, gradient[], shadow,
 shadowBlur, shadowDx, shadowDy`; box/button `shape (circle|pill|rounded|none),
 bg, gradient[], border, borderW, glow, glowBlur, radius, padH, padV, glass`; orb `orb (OrbState name), orbSize,
-orbCircle`. Section `props` (layout doc): `height, padTop, padBottom, padH,
-transition, autoRotate, interval, entrance`, and for template sections
+orbCircle`. Element placement (any slot): `dx, dy, scale, hidden`. Section `props`
+(layout doc): `height, padTop, padBottom, padH, transition, autoRotate,
+interval, entrance, orbs[]`, and for template sections
 their content (`title, subtitle, body, cta, route, image, video, bg, height, cards[]`).
 
 Pickers: **SVG library** (`editor/svg_picker.dart`, Content tab on any
@@ -136,20 +142,31 @@ Pickers: **SVG library** (`editor/svg_picker.dart`, Content tab on any
 plus R2 `ui/` uploads (`/api/admin/ui-assets`) and SVG URLs already used in
 overrides; a bundled pick is stored as `asset:<path>`. **Effects drawer**
 (`editor/tab_animation.dart`) — live tiles for every entrance, page turn,
-auto-rotate speed and thinking orb; hold one and drag it onto the phone
-(`FxDrop` → `_FxDropZone` in `preview.dart`). The whole-app orb is a drop
-target in the drawer; pinch it to resize. The app ships no Lottie/Rive
+auto-rotate speed; hold one and drag it onto a section (`FxDrop` → the
+page's `DragTarget` in `preview.dart`): it applies and plays at once.
+**Placed orbs** (`layout/placed_orbs.dart`): drag an orb from the drawer's
+Orbs tab to an exact spot; it becomes its own element, saved on the section
+under it as `props.orbs` (`[{id, orb, x (fraction of width, centre), y (pt
+from the section top, centre), size, circle}]`), so it publishes through
+`ui_layouts` and `SectionFrame` draws it for everyone at the same spot.
+The Loaders target in that tab sets `orb.all` (pinch to resize). The app ships no Lottie/Rive
 files.
 
-**Touch-only editing** (`editor/preview.dart`, `_TouchLayer`): on the phone,
-tap selects an element; a vertical drag moves the section (onto the trash
-strip at the bottom = delete, with Undo); dragging its top/bottom edge
-sets `padTop/padBottom`; a pinch resizes the section (`height`), or the
-selected text (`style.size`); long-press opens Put back · Duplicate ·
-Hide · Delete. There are no move/size buttons or sliders. Every draft
-change is an undo step (`EditorController.undo/redo`; edits within
-700 ms, such as one gesture, merge into one step). The canvas only needs an
-`AppPage` and its section ids, so any page in `kAppPages` works with it. **Full-screen preview** (top bar ⛶) — the whole page,
+**Touch-only editing** (`editor/preview.dart`, `_TouchLayer`, over the
+whole page): with nothing picked one finger scrolls the page. Tap picks a
+section (or an element, or a placed orb). A picked section drags to a new
+place (onto the trash at the bottom = delete, with Undo); dragging its
+top/bottom edge sets `padTop/padBottom`; a pinch resizes it (`height`).
+The selected element drags anywhere (override `style.dx/dy`), pinches to
+resize (`style.size` for text, `style.scale` otherwise) and onto the trash
+is removed (`style.hidden`, faded in the editor so it can be shown again);
+see `elementPlacement` in `template/editable.dart`. Orbs drag, pinch (24 to
+420 pt) and trash the same way. Long-press opens Put back · Duplicate ·
+Hide · Delete (or, on an orb, circle · Delete). There are no move/size
+buttons or sliders. Every draft change is an undo step
+(`EditorController.undo/redo`; edits within 700 ms, such as one gesture,
+merge into one step). The canvas only needs an `AppPage` and its section
+ids, so any page in `kAppPages` works with it. **Live preview** (pill ⋯) — the whole page,
 interactive, with every draft applied, before Publish.
 
 Thinking orbs: `AppThinkingLoader(slot: …)` looks up `slot` →
@@ -179,7 +196,7 @@ applyLayout(context, 'home.normal', items, hiddenByDefault: {...})
 * A sideways carousel: pass `carousel: true` and use
   `carouselFxItem(context, controller, i, card)` (or `carouselFxChildren`)
   in its PageView and wrap it in `CarouselAutoRotate(...)`, so the
-  Animation tab's transitions and auto-rotate apply.
+  drawer's page-turn and auto-rotate effects apply.
 * `LSection.group` must match the parent's crossAxisAlignment (a
   ListView/SliverList behaves like `stretch`).
 * New generic templates go in `layout/template_sections.dart`

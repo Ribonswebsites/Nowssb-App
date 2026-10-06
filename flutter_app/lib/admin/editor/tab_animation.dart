@@ -1,7 +1,10 @@
-/// Animation tab: a drawer of effects, each playing live. Drag one onto the
-/// phone to put it on that section — how it appears, how a sideways section
-/// turns its pages, whether it turns by itself, and which thinking orb its
-/// loaders use. No switches or sliders: the orb is resized by pinching it.
+/// Drawer tabs of things to drag onto the page, each playing live:
+///   Effects — how a section appears, how a sideways section turns its
+///             pages, and whether it turns by itself;
+///   Orbs    — thinking orbs, placed exactly where they are dropped (they
+///             become their own element on the page), or dropped on the
+///             Loaders target to set the orb every loader uses.
+/// Nothing here is a switch or a slider.
 library;
 
 import 'package:flutter/material.dart';
@@ -12,7 +15,7 @@ import '../layout/layout_sections.dart';
 import '../template/slot_keys.dart';
 import 'editor_controller.dart';
 import 'glass.dart';
-import 'preview.dart' show FxDrop;
+import 'preview.dart' show FxDrop, OrbDrop;
 
 const kEntrances = <String, String>{
   'none': 'None',
@@ -40,17 +43,37 @@ const kAutoSpeeds = <(String, int?)>[
   ('Quick', 2500),
 ];
 
-void _setOrb(EditorController c, String key, String? orb) => c.patchStyle(key, SlotType.orb, 'random', {'orb': orb});
+Widget _row(List<Widget> tiles) => SizedBox(
+      height: 96,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: tiles.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        itemBuilder: (_, i) => SizedBox(width: 88, child: tiles[i]),
+      ),
+    );
 
-class AnimationTab extends StatefulWidget {
-  const AnimationTab({super.key, required this.c});
+const _caption = Padding(
+  padding: EdgeInsets.only(top: 2, bottom: 6),
+  child: Row(children: [
+    Icon(Icons.pan_tool_alt_rounded, color: kGold, size: 18),
+    SizedBox(width: 8),
+    Expanded(
+      child: Text('Hold one and drag it onto the page',
+          style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+    ),
+  ]),
+);
+
+class EffectsTab extends StatefulWidget {
+  const EffectsTab({super.key, required this.c});
   final EditorController c;
 
   @override
-  State<AnimationTab> createState() => _AnimationTabState();
+  State<EffectsTab> createState() => _EffectsTabState();
 }
 
-class _AnimationTabState extends State<AnimationTab> with SingleTickerProviderStateMixin {
+class _EffectsTabState extends State<EffectsTab> with SingleTickerProviderStateMixin {
   late final AnimationController _loop =
       AnimationController(vsync: this, duration: const Duration(milliseconds: 2400))..repeat();
 
@@ -62,29 +85,73 @@ class _AnimationTabState extends State<AnimationTab> with SingleTickerProviderSt
     super.dispose();
   }
 
-  Widget _row(List<Widget> tiles) => SizedBox(
-        height: 96,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          itemCount: tiles.length,
-          separatorBuilder: (_, __) => const SizedBox(width: 8),
-          itemBuilder: (_, i) => SizedBox(width: 88, child: tiles[i]),
-        ),
-      );
+  @override
+  Widget build(BuildContext context) {
+    // The picked section's current effects are ringed.
+    final cur = c.sectionPicked ? c.current : null;
+    final props = cur?.entry.props ?? const <String, dynamic>{};
+    final fx = cur == null ? null : '${props['transition'] ?? ''}';
+    final ent = cur == null ? null : '${props['entrance'] ?? 'none'}';
+    final interval = cur == null
+        ? -1
+        : (props['autoRotate'] == true ? (props['interval'] is num ? (props['interval'] as num).toInt() : 4000) : null);
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(14, 0, 14, 24),
+      children: [
+        _caption,
+        const Eyebrow('Appear'),
+        _row([
+          for (final e in kEntrances.entries)
+            DragTile(
+              c: c,
+              data: FxDrop(e.value, {'entrance': e.key == 'none' ? null : e.key}),
+              label: e.value,
+              selected: ent == e.key,
+              child: AnimatedBuilder(
+                animation: _loop,
+                builder: (_, __) {
+                  final t = (_loop.value * 1.6).clamp(0.0, 1.0);
+                  return entranceTransform(e.key, Curves.easeOutCubic.transform(t), const _MiniCard(color: kGold));
+                },
+              ),
+            ),
+        ]),
+        const Eyebrow('Page turn — sections that slide sideways'),
+        _row([
+          for (final e in kCarouselTransitions.entries)
+            DragTile(
+              c: c,
+              data: FxDrop(e.value, {'transition': e.key.isEmpty ? null : e.key}, carouselOnly: true),
+              label: e.value,
+              selected: fx == e.key,
+              child: AnimatedBuilder(animation: _loop, builder: (_, __) => _FxDemo(fx: e.key, t: _loop.value)),
+            ),
+        ]),
+        const Eyebrow('Turns by itself'),
+        _row([
+          for (final (label, ms) in kAutoSpeeds)
+            DragTile(
+              c: c,
+              data: FxDrop(label, {'autoRotate': ms == null ? null : true, 'interval': ms}, carouselOnly: true),
+              label: label,
+              selected: interval == ms,
+              child: AnimatedBuilder(
+                animation: _loop,
+                builder: (_, __) => _FxDemo(fx: '', t: ms == null ? 0 : (_loop.value * 4000 / ms) % 1),
+              ),
+            ),
+        ]),
+      ],
+    );
+  }
+}
+
+class OrbsTab extends StatelessWidget {
+  const OrbsTab({super.key, required this.c});
+  final EditorController c;
 
   @override
   Widget build(BuildContext context) {
-    final cur = c.current;
-    final props = cur?.entry.props ?? const <String, dynamic>{};
-    final fx = '${props['transition'] ?? ''}';
-    final ent = '${props['entrance'] ?? 'none'}';
-    final interval =
-        props['autoRotate'] == true ? (props['interval'] is num ? (props['interval'] as num).toInt() : 4000) : null;
-    // Same key the loaders read: SectionScope's page is the layout page
-    // ('<page>.<tab>' on pages with tabs), not the editor's page id.
-    final orbKey = cur == null ? 'orb.all' : 'orb.${c.layoutPage}.${cur.id}';
-    final orbPick = '${c.overrideOf(orbKey)?.style['orb'] ?? ''}';
-
     return ListView(
       padding: const EdgeInsets.fromLTRB(14, 0, 14, 24),
       children: [
@@ -94,105 +161,69 @@ class _AnimationTabState extends State<AnimationTab> with SingleTickerProviderSt
             Icon(Icons.pan_tool_alt_rounded, color: kGold, size: 18),
             SizedBox(width: 8),
             Expanded(
-              child: Text('Hold an effect and drag it onto the phone',
+              child: Text('Drag an orb to the exact spot on the page',
                   style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
             ),
           ]),
         ),
-        if (cur != null) ...[
-          const Eyebrow('Appear'),
-          _row([
-            for (final e in kEntrances.entries)
-              _DragFx(
-                drop: FxDrop(e.value, {'entrance': e.key == 'none' ? null : e.key}),
-                label: e.value,
-                selected: ent == e.key,
-                  child: AnimatedBuilder(
-                    animation: _loop,
-                    builder: (_, __) {
-                      final t = (_loop.value * 1.6).clamp(0.0, 1.0);
-                      return entranceTransform(e.key, Curves.easeOutCubic.transform(t), const _MiniCard(color: kGold));
-                    },
-                  ),
-                ),
-            ],
-          ),
-          // Page turns only mean something on a section that scrolls
-          // sideways; they are only offered while one is on the phone.
-          if (cur.carousel) ...[
-            const Eyebrow('Page turn'),
-            _row([
-              for (final e in kCarouselTransitions.entries)
-                _DragFx(
-                  drop: FxDrop(e.value, {'transition': e.key.isEmpty ? null : e.key}, carouselOnly: true),
-                  label: e.value,
-                  selected: fx == e.key,
-                    child: AnimatedBuilder(
-                      animation: _loop,
-                      builder: (_, __) => _FxDemo(fx: e.key, t: _loop.value),
-                    ),
-                  ),
-              ],
-            ),
-            const Eyebrow('Turns by itself'),
-            _row([
-              for (final (label, ms) in kAutoSpeeds)
-                _DragFx(
-                  drop: FxDrop(label, {'autoRotate': ms == null ? null : true, 'interval': ms}, carouselOnly: true),
-                  label: label,
-                  selected:
-                      interval == ms || (ms == 4000 && interval != null && !kAutoSpeeds.any((s) => s.$2 == interval)),
-                  child: AnimatedBuilder(
-                    animation: _loop,
-                    builder: (_, __) => _FxDemo(fx: '', t: ms == null ? 0 : (_loop.value * 4000 / ms) % 1),
-                  ),
-                ),
-            ]),
-          ],
-        ],
-        const Eyebrow('Thinking orb'),
         _row([
-          _DragFx(
-            drop: FxDrop('As designed', const {}, apply: (c, s) => _setOrb(c, 'orb.${c.layoutPage}.${s.id}', null)),
-            label: 'As designed',
-            selected: orbPick.isEmpty,
-            child: const Icon(Icons.shuffle_rounded, color: kDim, size: 28),
-          ),
           for (final e in kOrbNames.entries)
-            _DragFx(
-              drop: FxDrop(e.value, const {}, apply: (c, s) => _setOrb(c, 'orb.${c.layoutPage}.${s.id}', e.key.name)),
+            DragTile(
+              c: c,
+              data: OrbDrop(e.key),
               label: e.value,
-              selected: orbPick == e.key.name,
-              orb: e.key,
+              selected: false,
+              feedback: Container(
+                width: 72,
+                height: 72,
+                alignment: Alignment.center,
+                child: ThinkingOrb(state: e.key, size: 72, theme: OrbTheme.dark),
+              ),
               child: ThinkingOrb(state: e.key, size: 40, theme: OrbTheme.dark),
             ),
         ]),
-        const SizedBox(height: 10),
-        _WholeAppOrb(c: c),
+        const SizedBox(height: 12),
+        _LoadersOrb(c: c),
       ],
     );
   }
 }
 
-/// A drawer tile: plays its effect; hold and drag it onto the phone.
-class _DragFx extends StatelessWidget {
-  const _DragFx({required this.drop, required this.label, required this.selected, required this.child, this.orb});
-  final FxDrop drop;
+/// A drawer tile: plays its effect; hold it and drag it onto the page. It
+/// is carried by the point under the finger, so it lands exactly there.
+class DragTile extends StatelessWidget {
+  const DragTile({
+    super.key,
+    required this.c,
+    required this.data,
+    required this.label,
+    required this.selected,
+    required this.child,
+    this.feedback,
+  });
+  final EditorController c;
+  final Object data;
   final String label;
   final bool selected;
   final Widget child;
-  final OrbState? orb;
+  final Widget? feedback;
 
   @override
   Widget build(BuildContext context) {
     final tile = _FxTile(label: label, selected: selected, onTap: tapFeel, child: child);
+    final carried = feedback ?? SizedBox(width: 88, height: 88, child: Opacity(opacity: 0.9, child: tile));
+    final size = feedback == null ? 88.0 : 72.0;
     return LongPressDraggable<Object>(
-      data: orb == null ? drop : (drop, orb),
+      data: data,
       delay: const Duration(milliseconds: 120),
       hapticFeedbackOnStart: true,
+      dragAnchorStrategy: pointerDragAnchorStrategy,
+      onDragStarted: () => c.setFxDragging(true),
+      onDragEnd: (_) => c.setFxDragging(false),
       feedback: Material(
         color: Colors.transparent,
-        child: SizedBox(width: 92, height: 92, child: Opacity(opacity: 0.9, child: tile)),
+        // Centred on the finger.
+        child: Transform.translate(offset: Offset(-size / 2, -size / 2), child: carried),
       ),
       childWhenDragging: Opacity(opacity: 0.35, child: tile),
       child: tile,
@@ -200,17 +231,17 @@ class _DragFx extends StatelessWidget {
   }
 }
 
-/// Drop an orb here to use it in every loader of the app. The orb shown
-/// is the whole-app one: pinch it to resize, tap it for the black circle.
-class _WholeAppOrb extends StatefulWidget {
-  const _WholeAppOrb({required this.c});
+/// Drop an orb here to use it in every loader of the app. Pinch it to
+/// resize, tap it for the black circle.
+class _LoadersOrb extends StatefulWidget {
+  const _LoadersOrb({required this.c});
   final EditorController c;
 
   @override
-  State<_WholeAppOrb> createState() => _WholeAppOrbState();
+  State<_LoadersOrb> createState() => _LoadersOrbState();
 }
 
-class _WholeAppOrbState extends State<_WholeAppOrb> {
+class _LoadersOrbState extends State<_LoadersOrb> {
   double _base = 72;
   static const _key = 'orb.all';
 
@@ -225,12 +256,10 @@ class _WholeAppOrbState extends State<_WholeAppOrb> {
     final size = st['orbSize'] is num ? (st['orbSize'] as num).toDouble() : 72.0;
     final circle = st['orbCircle'] is bool ? st['orbCircle'] as bool : true;
     return DragTarget<Object>(
-      onWillAcceptWithDetails: (d) =>
-          d.data is (FxDrop, OrbState) || (d.data is FxDrop && (d.data as FxDrop).label == 'As designed'),
+      onWillAcceptWithDetails: (d) => d.data is OrbDrop,
       onAcceptWithDetails: (d) {
         bigFeel();
-        final o = d.data;
-        _patch({'orb': o is (FxDrop, OrbState) ? o.$2.name : null});
+        _patch({'orb': (d.data as OrbDrop).state.name});
       },
       builder: (context, cand, _) => Glass(
         radius: 18,
@@ -243,6 +272,7 @@ class _WholeAppOrbState extends State<_WholeAppOrb> {
               tapFeel();
               _patch({'orbCircle': !circle});
             },
+            onLongPress: () => _patch({'orb': null}),
             onScaleStart: (_) {
               c.endStep();
               _base = size;
@@ -269,7 +299,7 @@ class _WholeAppOrbState extends State<_WholeAppOrb> {
           ),
           const SizedBox(width: 12),
           const Expanded(
-            child: Text('Whole app — drop an orb here.\nPinch it to resize, tap for the circle.',
+            child: Text('Loaders everywhere — drop an orb here.\nPinch to resize · tap for the circle · hold to reset.',
                 style: TextStyle(color: kDim, fontSize: 12, height: 1.35)),
           ),
         ]),

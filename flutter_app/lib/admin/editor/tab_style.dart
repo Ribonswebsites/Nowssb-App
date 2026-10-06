@@ -1,8 +1,8 @@
-/// Style tab: the look of the picked text or button — colour, font,
+/// Style sheet (opened from a touched element): the look of the picked text or button — colour, font,
 /// weight, spacing, italic, gradient ink, shadow/glow — plus a wrapper
 /// shape around a button/CTA/chip label (circle, pill, rounded, none) with
 /// its own fill, gradient, border, glow and glass. Ready-made looks up top.
-/// Size is not here: pinch the words on the phone.
+/// Size is not here: pinch the words on the page.
 library;
 
 import 'package:flutter/material.dart';
@@ -22,15 +22,14 @@ class StyleTab extends StatelessWidget {
     final key = c.selectedSlot;
     final type = c.selectedType;
     if (key == null || type == null) {
-      return const Hint('Tap a heading, a line of text or a button label on the preview\n'
-          '(or pick one in Content) to style it.');
+      return const Hint('Tap a heading, a line of text or a button label on the page to style it.');
     }
     if (type == SlotType.image || type == SlotType.video) {
-      return const Hint('Pictures and clips have no text style.\nReplace them in Content.',
+      return const Hint('Pictures and clips have no text style.\nTap Replace on the strip to change one.',
           icon: Icons.image_outlined);
     }
     if (type == SlotType.orb) {
-      return const Hint('Orbs are chosen in the Animation tab.', icon: Icons.blur_circular_rounded);
+      return const Hint('Orbs come from the + drawer: drag one onto the page.', icon: Icons.blur_circular_rounded);
     }
     final def = c.selectedDefault;
     final st = c.overrideOf(key)?.style ?? const <String, dynamic>{};
@@ -106,7 +105,7 @@ class StyleTab extends StatelessWidget {
         ),
         const Padding(
           padding: EdgeInsets.only(top: 8),
-          child: Text('Size: pinch the words on the phone.', style: TextStyle(color: kDim, fontSize: 12)),
+          child: Text('Size: pinch the words on the page.', style: TextStyle(color: kDim, fontSize: 12)),
         ),
         LabeledSlider(
           label: 'Weight',

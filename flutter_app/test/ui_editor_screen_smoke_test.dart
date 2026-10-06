@@ -1,13 +1,13 @@
-/// The UI Editor screen end to end on the Normal home: the preview reports
-/// its sections (with the screen no longer rebuilding it on every change),
-/// and a drag on the phone reorders the page.
+/// The UI Editor screen end to end on the Normal home: the full-screen page
+/// reports its sections (with the screen no longer rebuilding it on every
+/// change), and a picked section dragged down the page moves down it.
 library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:nowssb/admin/editor/preview.dart';
+import 'package:nowssb/admin/editor/editor_controller.dart';
 import 'package:nowssb/admin/editor/ui_editor_screen.dart';
 import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/shell/nav_shell.dart';
@@ -26,33 +26,51 @@ void main() {
   setUp(VideoPool.instance.debugDropAll);
   tearDown(VideoPool.instance.debugDropAll);
 
-  testWidgets('editor preview reports sections; a drag on the phone reorders the page', (tester) async {
-    // Wide enough for the top bar's pending-changes pill in the test font.
-    tester.view.physicalSize = const Size(640 * 3, 1000 * 3);
+  testWidgets('editor reports sections; a picked section dragged down moves down the page', (tester) async {
+    tester.view.physicalSize = const Size(412 * 3, 915 * 3);
     tester.view.devicePixelRatio = 3.0;
     addTearDown(tester.view.reset);
 
-    await tester.pumpWidget(MaterialApp(home: NavScope(go: (_) {}, child: const UiEditorScreen())));
+    final c = EditorController();
+    await tester.pumpWidget(MaterialApp(home: NavScope(go: (_) {}, child: UiEditorScreen(controller: c))));
     for (var i = 0; i < 10; i++) {
       await tester.pump(const Duration(milliseconds: 100));
     }
     expect(tester.takeException(), isNull);
-    final first = find.textContaining(RegExp(r'^Section 1 of \d+$'));
-    expect(first, findsOneWidget, reason: 'the page reported its sections');
-    final n = int.parse(RegExp(r'of (\d+)').firstMatch(tester.widget<Text>(first).data!)!.group(1)!);
-    expect(n, greaterThan(3));
+    final n = c.sections.length;
+    expect(n, greaterThan(3), reason: 'the page reported its sections');
 
-    // Drag the first section down; it moves down the page.
-    final pv = find.byKey(const ValueKey('pv-home.normal'));
-    expect(pv, findsOneWidget);
-    // The phone picture is drawn scaled down: 3.5 places' worth of phone
-    // points on screen moves the section 3 places.
-    final scale = tester.getSize(pv).height / 952;
-    await tester.timedDrag(pv, Offset(0, kShiftStep * 3.5 * scale), const Duration(milliseconds: 600));
+    Rect? rect(String id) {
+      final b = c.preview.sectionBoxes['${c.layoutPage}/$id'];
+      if (b == null || !b.attached) return null;
+      return b.localToGlobal(Offset.zero) & b.size;
+    }
+
+    // The first two sections on screen: drag the first onto the second.
+    final onScreen = [
+      for (final s in c.sections)
+        if (rect(s.id) case final r? when r.height > 40 && r.bottom < 800) s.id,
+    ];
+    expect(onScreen.length, greaterThanOrEqualTo(2));
+    final first = onScreen[0];
+    final second = onScreen[1];
+    c.pickSection(first);
+    await tester.pump(const Duration(milliseconds: 100));
+    final from = rect(first)!.center;
+    final to = rect(second)!.center + const Offset(0, 4);
+    final g = await tester.startGesture(from);
+    for (var i = 1; i <= 12; i++) {
+      await g.moveTo(Offset.lerp(from, to, i / 12)!);
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+    await g.up();
     for (var i = 0; i < 10; i++) {
       await tester.pump(const Duration(milliseconds: 100));
     }
     expect(tester.takeException(), isNull);
-    expect(find.text('Section 4 of $n'), findsOneWidget, reason: 'moved down 3 places and the preview followed it');
+    final ids = [for (final s in c.sections) if (!s.entry.deleted) s.id];
+    expect(ids.indexOf(first), ids.indexOf(second) + 1, reason: 'it now sits after the one it was dropped on');
+    expect(c.current!.id, first, reason: 'it stays picked');
+    expect(c.sections.length, n);
   });
 }

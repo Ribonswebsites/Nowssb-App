@@ -79,7 +79,7 @@ class ContentTab extends StatelessWidget {
         Eyebrow(
           slots.isEmpty ? 'Editable things' : '${slots.length} editable things here',
           trailing: const Tooltip(
-            message: 'Tap an outlined element on the preview to jump to it',
+            message: 'Tap an outlined element on the page to jump to it',
             child: Icon(Icons.info_outline_rounded, size: 16, color: kFaint),
           ),
         ),
@@ -160,7 +160,7 @@ class _SlotRowState extends State<SlotRow> {
           _progress = null;
           _msg = s.type == SlotType.video
               ? 'Uploaded. Clips show in the app after you publish.'
-              : 'Uploaded — shown on the preview. Publish to make it live.';
+              : 'Uploaded — shown on the page. Publish to make it live.';
         });
       }
     } catch (e) {
@@ -273,7 +273,7 @@ class _SlotRowState extends State<SlotRow> {
                       c.setMedia(s.key, s.type, s.def, v, '');
                       final bound = wordOfSlot(s.key);
                       if (bound != null) await WordArt.instance.set(bound, image: v);
-                      setState(() => _msg = 'Swapped — shown on the preview. Publish to make it live.');
+                      setState(() => _msg = 'Swapped — shown on the page. Publish to make it live.');
                     }),
                 ]),
               ],
