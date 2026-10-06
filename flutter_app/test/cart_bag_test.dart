@@ -40,4 +40,31 @@ void main() {
     expect(bag.cart, isEmpty);
     expect(bag.orders, isEmpty);
   });
+
+  test('the wishlist belongs to the account: cleared on sign-out and on account switch', () async {
+    final bag = CartBag.instance;
+    await bag.onAccount('alice');
+    await bag.addWishlist(item());
+    expect(bag.wishCount, 1);
+
+    // Alice signs out: her list does not stay on the phone.
+    await bag.onAccount(null);
+    expect(bag.wishlist, isEmpty);
+    final prefs = await SharedPreferences.getInstance();
+    expect(prefs.getString('nwsb_store_wish'), '[]');
+
+    // Alice again, then Bob without a signed-out step in between.
+    await bag.onAccount('alice');
+    await bag.addWishlist(item());
+    await bag.onAccount('bob');
+    expect(bag.wishlist, isEmpty, reason: "Alice's items must not reach Bob");
+  });
+
+  test("a guest's wishlist is kept for the account that signs in", () async {
+    final bag = CartBag.instance;
+    await bag.onAccount(null);
+    await bag.addWishlist(item());
+    await bag.onAccount('carol');
+    expect(bag.wishCount, 1);
+  });
 }

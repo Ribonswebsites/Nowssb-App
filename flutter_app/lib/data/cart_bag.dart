@@ -111,6 +111,9 @@ class CartBag extends ChangeNotifier {
   static const _kWish = 'nwsb_store_wish';
   static const _kOrders = 'nwsb_store_orders';
   static const _kShip = 'nwsb_store_ship';
+  // Whose wishlist the phone holds: a uid, '' for a guest's, absent on
+  // installs from before it was recorded.
+  static const _kWishOwner = 'nwsb_store_wish_owner';
 
   final List<BagItem> _cart = [];
   final List<BagItem> _wish = [];
@@ -164,10 +167,16 @@ class CartBag extends ChangeNotifier {
     if (_authSub != null || !NwsbFirebase.ready) return;
     try {
       _authSub = FirebaseAuth.instance.authStateChanges().listen((u) async {
+        final uid = (u == null || u.isAnonymous) ? null : u.uid;
+        // The wishlist belongs to the account: signing out (or switching
+        // account) must not leave one person's list on the phone, and must
+        // never upload it into the next account.
+        await onAccount(uid);
         final col = _wishCol();
-        if (col == null) return;
+        if (col == null || uid == null) return;
         try {
           final snap = await col.get();
+          if (_wishCol()?.path != col.path) return; // account changed meanwhile
           var changed = false;
           for (final d in snap.docs) {
             final item = BagItem.fromJson(d.data());
@@ -188,6 +197,27 @@ class CartBag extends ChangeNotifier {
           debugPrint('NowssB wishlist sync: $e');
         }
       });
+    } catch (_) {}
+  }
+
+  /// Applies an account change to the local wishlist. A signed-in owner's
+  /// list is dropped when they sign out or another account signs in; a
+  /// guest's list stays and is merged into the account that signs in next.
+  @visibleForTesting
+  Future<void> onAccount(String? uid) async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      final owner = p.getString(_kWishOwner);
+      final mine = uid ?? '';
+      if (owner == mine) return;
+      // owner == null: recorded before this existed — the list stays with
+      // whoever is signed in now, as it did before.
+      if (owner != null && owner.isNotEmpty) {
+        _wish.clear();
+        notifyListeners();
+        await _persistWish();
+      }
+      await p.setString(_kWishOwner, mine);
     } catch (_) {}
   }
 
