@@ -148,7 +148,9 @@ class EditableLabel extends StatelessWidget {
     final key = slotKey;
     slotSeen(context, key, SlotType.text, data);
     final o = effectiveOverride(context, key);
-    final text = (o != null && o.type == SlotType.text && o.textSet) ? o.text : data;
+    // A template section's words come from its props only (one source of
+    // truth); its overrides still restyle it.
+    final text = (o != null && o.type == SlotType.text && o.textSet && !isTemplateSlot(key)) ? o.text : data;
     final look = o?.style ?? const <String, dynamic>{};
     Widget child = Text(
       text,

@@ -319,6 +319,9 @@ class _SlotSheetState extends State<SlotSheet> {
   Widget build(BuildContext context) {
     final cur = _current;
     final isText = widget.type == SlotType.text;
+    // A section added from the UI Editor draws its words from its own
+    // props; an override typed here would never show.
+    final tplText = isText && isTemplateSlot(widget.slotKey);
     return AnimatedBuilder(
       animation: Listenable.merge([UiOverrides.instance, WordArt.instance]),
       builder: (context, _) => Padding(
@@ -374,7 +377,13 @@ class _SlotSheetState extends State<SlotSheet> {
                 const SizedBox(height: 6),
                 _preview(cur.url, replaced: true),
               ],
-              if (isText) ...[
+              if (tplText) ...[
+                const SizedBox(height: 14),
+                const Text(
+                  'These words belong to a section added in Admin → UI Editor. Change them there, in Content.',
+                  style: TextStyle(color: Colors.white70, fontSize: 13),
+                ),
+              ] else if (isText) ...[
                 const SizedBox(height: 14),
                 TextField(
                   controller: _text,
@@ -412,7 +421,7 @@ class _SlotSheetState extends State<SlotSheet> {
                       backgroundColor: const Color(0xFFE8D5A3),
                       foregroundColor: const Color(0xFF060C18),
                     ),
-                    onPressed: _busy ? null : (isText ? _saveText : _replaceMedia),
+                    onPressed: _busy || tplText ? null : (isText ? _saveText : _replaceMedia),
                     icon: Icon(isText ? Icons.check_rounded : Icons.upload_rounded),
                     label: Text(isText ? 'Save for everyone' : 'Choose replacement'),
                   ),

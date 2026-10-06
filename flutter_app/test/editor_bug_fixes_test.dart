@@ -7,6 +7,9 @@ import 'package:nowssb/admin/layout/layout_sections.dart';
 import 'package:nowssb/admin/layout/scopes.dart';
 import 'package:nowssb/admin/layout/section_pinch.dart';
 import 'package:nowssb/admin/layout/ui_layouts.dart';
+import 'package:nowssb/admin/template/editable.dart';
+import 'package:nowssb/admin/template/slot_keys.dart';
+import 'package:nowssb/admin/template/ui_overrides.dart';
 
 Widget _frame(SectionEntry entry, Widget child) => Directionality(
       textDirection: TextDirection.ltr,
@@ -108,5 +111,36 @@ void main() {
     // Side margins 4 → 0: removed from the props, not saved as 0.
     await tester.tap(find.byTooltip('Less space').last);
     expect(c.entries.first.props.containsKey('padH'), isFalse);
+  });
+
+  group('template words have one source of truth', () {
+    test('template slots map back to their entry and field', () {
+      expect(isTemplateSlot('tpl.home.normal.textBlock~1.title'), isTrue);
+      expect(isTemplateSlot('home_normal.HomeNormal.title'), isFalse);
+      expect(templateSlotField('tpl.home.normal.textBlock~1.title', 'home.normal'), ('textBlock~1', 'title'));
+      expect(templateSlotField('tpl.program.tab2.cta~3.cta', 'program.tab2'), ('cta~3', 'cta'));
+      expect(templateSlotField('tpl.home.normal.textBlock~1.title', 'home.fashion'), isNull);
+    });
+
+    testWidgets('a text override never beats the template field', (tester) async {
+      final preview = EditorPreviewController();
+      addTearDown(preview.dispose);
+      const tpl = 'tpl.p.textBlock~1.title';
+      const plain = 'p.Hero.welcome';
+      preview.draftOverrides[tpl] = const UiOverride(slot: tpl, type: SlotType.text, text: 'Stale words');
+      preview.draftOverrides[plain] = const UiOverride(slot: 'p.Hero', type: SlotType.text, text: 'New welcome');
+      await tester.pumpWidget(MaterialApp(
+        home: EditorPreviewScope(
+          controller: preview,
+          child: const Column(children: [
+            EditableLabel('tpl.p.textBlock~1', 'From the field', id: 'title'),
+            EditableLabel('p.Hero', 'Welcome', id: 'welcome'),
+          ]),
+        ),
+      ));
+      expect(find.text('From the field'), findsOneWidget);
+      expect(find.text('Stale words'), findsNothing);
+      expect(find.text('New welcome'), findsOneWidget, reason: 'ordinary slots still take text overrides');
+    });
   });
 }

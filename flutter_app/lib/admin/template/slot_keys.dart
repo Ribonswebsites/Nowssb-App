@@ -81,6 +81,22 @@ String slotGroup(String key) {
 }
 
 /// `orb` is a thinking-orb loader (which animation, size, black circle).
+/// Slots inside a section the owner added from the UI Editor
+/// (`tpl.<page>.<entry>.<field>`, template_sections.dart). Their words live
+/// in the section's own props — the one place they are edited — so a text
+/// override on them is never drawn.
+bool isTemplateSlot(String key) => key.startsWith('tpl.');
+
+/// The template prop a template slot draws: (entry id, field), or null when
+/// [key] is not a slot of a template on [pageId].
+(String, String)? templateSlotField(String key, String pageId) {
+  final prefix = 'tpl.$pageId.';
+  if (!key.startsWith(prefix)) return null;
+  final rest = key.substring(prefix.length).split('.');
+  if (rest.length != 2 || rest[0].isEmpty || rest[1].isEmpty) return null;
+  return (rest[0], rest[1]);
+}
+
 enum SlotType { image, video, text, orb }
 
 SlotType? slotTypeFrom(String? s) {

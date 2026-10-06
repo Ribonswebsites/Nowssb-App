@@ -211,7 +211,16 @@ class _SlotRowState extends State<SlotRow> {
             ]),
             if (widget.expanded) ...[
               const SizedBox(height: 10),
-              if (s.type == SlotType.text) ...[
+              if (s.type == SlotType.text && templateSlotField(s.key, c.layoutPage) != null) ...[
+                // One source of truth: these words are the template's own
+                // field (above). A second box here wrote an override that
+                // silently beat the field.
+                Text(
+                  'These words are this section’s “${_templateFieldLabel(templateSlotField(s.key, c.layoutPage)!.$2)}” '
+                  'above — change them there. Style still changes the look.',
+                  style: const TextStyle(color: kDim, fontSize: 12),
+                ),
+              ] else if (s.type == SlotType.text) ...[
                 TextField(
                   controller: _text,
                   minLines: 1,
@@ -293,6 +302,14 @@ class _SlotRowState extends State<SlotRow> {
     );
   }
 }
+
+String _templateFieldLabel(String field) => switch (field) {
+      'title' => 'Headline',
+      'subtitle' => 'Line under it',
+      'body' => 'Paragraph',
+      'cta' => 'Button words',
+      _ => field,
+    };
 
 class _Tag extends StatelessWidget {
   const _Tag(this.text, this.color);
