@@ -57,6 +57,10 @@ const _tabs = <(String, IconData, String)>[
 
 class _UiEditorScreenState extends State<UiEditorScreen> {
   final EditorController c = EditorController();
+
+  /// One instance: rebuilding this screen (every edit does) then skips the
+  /// preview, which listens to [c] itself and rebuilds only what changed.
+  late final Widget _preview = EditorPreview(c: c);
   int? _tab;
   bool _full = false;
 
@@ -135,7 +139,7 @@ class _UiEditorScreenState extends State<UiEditorScreen> {
                 }),
                 _PageRow(c: c),
                 _SectionHeader(c: c),
-                Expanded(child: _full ? const SizedBox.shrink() : EditorPreview(c: c)),
+                Expanded(child: _full ? const SizedBox.shrink() : _preview),
                 _Dots(c: c),
                 _TabPills(index: _tab, pending: c.pendingCount, onTap: _openTab),
                 AnimatedContainer(

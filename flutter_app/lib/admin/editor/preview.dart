@@ -4,8 +4,6 @@
 /// editable element on it gets a hotspot that picks it.
 library;
 
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 
 import '../../theme/theme.dart';
@@ -47,12 +45,26 @@ class _EditorPreviewState extends State<EditorPreview> {
     super.dispose();
   }
 
+  /// What the phone frames depend on. The editor screen no longer rebuilds
+  /// the preview on every change (each keystroke used to rebuild the whole
+  /// page); drafts reach the page through EditorPreviewScope, and the frames
+  /// rebuild only when one of these changes.
+  Object _frameState() => (
+        c.index,
+        c.pickMode,
+        c.arrange,
+        c.largeFrame,
+        c.sections.map((s) => s.id).join('|'),
+      );
+  Object? _shown;
+
   void _sync() {
     if (!mounted) return;
     if (c.pageId != _page) {
       _page = c.pageId;
       _pages.dispose();
       _pages = PageController(initialPage: 0);
+      _shown = _frameState();
       setState(() {});
       return;
     }
@@ -60,6 +72,10 @@ class _EditorPreviewState extends State<EditorPreview> {
     if (n != _count) {
       _count = n;
       c.onReported();
+    }
+    final now = _frameState();
+    if (now != _shown) {
+      _shown = now;
       setState(() {});
     }
     if (_pages.hasClients) {
@@ -74,6 +90,7 @@ class _EditorPreviewState extends State<EditorPreview> {
   Widget build(BuildContext context) {
     final page = appPage(c.pageId) ?? kAppPages.first;
     final secs = c.sections;
+    _shown = _frameState();
     return EditorPreviewScope(
       controller: c.preview,
       child: secs.isEmpty
@@ -182,75 +199,126 @@ class _Hotspots extends StatefulWidget {
 }
 
 class _HotspotsState extends State<_Hotspots> {
-  Timer? _t;
+  /// Where each outline is, as last measured.
+  List<(PreviewSlot, Rect)> _spots = const [];
+  var _watching = false;
 
   @override
   void initState() {
     super.initState();
-    // Elements move (carousels, entrance animations): re-measure a few
-    // times a second while the preview is on screen.
-    _t = Timer.periodic(const Duration(milliseconds: 350), (_) {
-      if (mounted) setState(() {});
-    });
+    widget.c.addListener(_onEdit);
+    _watch();
+  }
+
+  @override
+  void didUpdateWidget(_Hotspots old) {
+    super.didUpdateWidget(old);
+    if (old.c != widget.c) {
+      old.c.removeListener(_onEdit);
+      widget.c.addListener(_onEdit);
+    }
   }
 
   @override
   void dispose() {
-    _t?.cancel();
+    widget.c.removeListener(_onEdit);
     super.dispose();
+  }
+
+  /// Picked/changed colours follow the editor at once.
+  void _onEdit() {
+    if (mounted) setState(() {});
+  }
+
+  /// Elements move (carousels, entrance animations, pictures loading).
+  /// Instead of a timer rebuilding every 350 ms, re-measure after each frame
+  /// the app draws anyway — an idle preview draws none, so this costs
+  /// nothing then — and rebuild only when an outline actually moved.
+  void _watch() {
+    if (_watching) return;
+    _watching = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _watching = false;
+      if (!mounted) return;
+      final next = _measure();
+      if (!_same(next, _spots)) setState(() => _spots = next);
+      _watch();
+    });
+  }
+
+  List<(PreviewSlot, Rect)> _measure() {
+    final me = context.findRenderObject() as RenderBox?;
+    if (me == null || !me.attached || !me.hasSize) return const [];
+    final out = <(PreviewSlot, Rect)>[];
+    final seen = <String>{};
+    for (final s in widget.c.preview.slots.values) {
+      if (widget.section != null && s.section != widget.section) continue;
+      if (!seen.add(s.slotKey)) continue;
+      final box = s.box.currentContext?.findRenderObject() as RenderBox?;
+      if (box == null || !box.attached || !box.hasSize || box.size.isEmpty) continue;
+      final tl = me.globalToLocal(box.localToGlobal(Offset.zero));
+      final br = me.globalToLocal(box.localToGlobal(box.size.bottomRight(Offset.zero)));
+      final r = Rect.fromPoints(tl, br).intersect(Offset.zero & me.size);
+      if (r.width < 4 || r.height < 4) continue;
+      out.add((s, r));
+    }
+    return out;
+  }
+
+  static bool _same(List<(PreviewSlot, Rect)> a, List<(PreviewSlot, Rect)> b) {
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (a[i].$1.slotKey != b[i].$1.slotKey) return false;
+      final x = a[i].$2, y = b[i].$2;
+      if ((x.left - y.left).abs() > 0.5 ||
+          (x.top - y.top).abs() > 0.5 ||
+          (x.width - y.width).abs() > 0.5 ||
+          (x.height - y.height).abs() > 0.5) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @override
   Widget build(BuildContext context) {
-    final me = context.findRenderObject() as RenderBox?;
     final spots = <Widget>[];
-    if (me != null && me.hasSize) {
-      final seen = <String>{};
-      for (final s in widget.c.preview.slots.values) {
-        if (widget.section != null && s.section != widget.section) continue;
-        if (!seen.add(s.slotKey)) continue;
-        final box = s.box.currentContext?.findRenderObject() as RenderBox?;
-        if (box == null || !box.attached || !box.hasSize || box.size.isEmpty) continue;
-        final tl = me.globalToLocal(box.localToGlobal(Offset.zero));
-        final br = me.globalToLocal(box.localToGlobal(box.size.bottomRight(Offset.zero)));
-        final r = Rect.fromPoints(tl, br).intersect(Offset.zero & me.size);
-        if (r.width < 4 || r.height < 4) continue;
-        final picked = widget.c.selectedSlot == s.slotKey;
-        final changed = widget.c.overrideOf(s.slotKey) != null;
-        spots.add(Positioned.fromRect(
-          rect: r,
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: () {
-              actFeel();
-              widget.c.select(s.slotKey, s.type, s.defaultValue);
-            },
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              decoration: BoxDecoration(
-                color: picked ? kGold.withValues(alpha: 0.16) : Colors.transparent,
-                border: Border.all(
-                  color: picked ? kGold : (changed ? kMint : const Color(0x66E8D5A3)),
-                  width: picked ? 3 : 1.5,
-                ),
-                borderRadius: BorderRadius.circular(6),
+    for (final (s, r) in _spots) {
+      final picked = widget.c.selectedSlot == s.slotKey;
+      final changed = widget.c.overrideOf(s.slotKey) != null;
+      spots.add(Positioned.fromRect(
+        rect: r,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () {
+            actFeel();
+            widget.c.select(s.slotKey, s.type, s.defaultValue);
+          },
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            decoration: BoxDecoration(
+              color: picked ? kGold.withValues(alpha: 0.16) : Colors.transparent,
+              border: Border.all(
+                color: picked ? kGold : (changed ? kMint : const Color(0x66E8D5A3)),
+                width: picked ? 3 : 1.5,
               ),
-              alignment: Alignment.topRight,
-              child: r.width > 30 && r.height > 22
-                  ? Container(
-                      margin: const EdgeInsets.all(3),
-                      padding: const EdgeInsets.all(3),
-                      decoration: BoxDecoration(
-                        color: picked ? kGold : (changed ? kMint : const Color(0xCCE8D5A3)),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(slotIcon(s.type), size: 12, color: kInk),
-                    )
-                  : null,
+              borderRadius: BorderRadius.circular(6),
             ),
+            alignment: Alignment.topRight,
+            child: r.width > 30 && r.height > 22
+                ? Container(
+                    margin: const EdgeInsets.all(3),
+                    padding: const EdgeInsets.all(3),
+                    decoration: BoxDecoration(
+                      color: picked ? kGold : (changed ? kMint : const Color(0xCCE8D5A3)),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(slotIcon(s.type), size: 12, color: kInk),
+                  )
+                : null,
           ),
-        ));
-      }
+        ),
+      ));
     }
     return Stack(children: spots);
   }

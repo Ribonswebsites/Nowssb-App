@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nowssb/admin/editor/editor_controller.dart';
 import 'package:nowssb/admin/editor/editor_store.dart';
 import 'package:nowssb/admin/editor/preview.dart';
+import 'package:nowssb/admin/editor/tab_content.dart';
 import 'package:nowssb/admin/editor/tab_layout.dart';
 import 'package:nowssb/admin/layout/layout_sections.dart';
 import 'package:nowssb/admin/layout/scopes.dart';
@@ -200,5 +201,31 @@ void main() {
       expect(c.pendingCount, 1);
       expect(c.preview.draftLayouts[page]?.version, -1);
     });
+  });
+
+  testWidgets('typing is applied once per pause, not once per letter', (tester) async {
+    final applied = <String>[];
+    final d = Debouncer();
+    for (final v in ['H', 'He', 'Hel', 'Hell', 'Hello']) {
+      d(() => applied.add(v));
+      await tester.pump(const Duration(milliseconds: 80));
+    }
+    expect(applied, isEmpty, reason: 'still typing');
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(applied, ['Hello']);
+
+    d(() => applied.add('Hello!'));
+    d.flush();
+    expect(applied.last, 'Hello!', reason: 'flush applies at once');
+
+    d(() => applied.add('dropped'));
+    d.cancel();
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(applied.last, 'Hello!');
+
+    d(() => applied.add('last letters'));
+    d.dispose();
+    await tester.pump();
+    expect(applied.last, 'last letters', reason: 'leaving the field keeps what was typed');
   });
 }

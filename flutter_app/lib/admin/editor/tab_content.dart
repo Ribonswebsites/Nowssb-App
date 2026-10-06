@@ -4,6 +4,7 @@
 /// headline, pictures, button and destination here too.
 library;
 
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -113,6 +114,7 @@ class SlotRow extends StatefulWidget {
 
 class _SlotRowState extends State<SlotRow> {
   TextEditingController? _t;
+  final _typing = Debouncer();
   double? _progress;
   String? _msg;
 
@@ -121,6 +123,7 @@ class _SlotRowState extends State<SlotRow> {
 
   @override
   void dispose() {
+    _typing.dispose();
     _t?.dispose();
     super.dispose();
   }
@@ -226,7 +229,8 @@ class _SlotRowState extends State<SlotRow> {
                   minLines: 1,
                   maxLines: 5,
                   style: const TextStyle(color: Colors.white, fontSize: 14),
-                  onChanged: (v) => c.setText(s.key, s.def, v),
+                  onChanged: (v) => _typing(() => c.setText(s.key, s.def, v)),
+                  onEditingComplete: _typing.flush,
                   decoration: InputDecoration(
                     hintText: 'Type what everyone should see',
                     hintStyle: const TextStyle(color: kFaint),
@@ -291,6 +295,7 @@ class _SlotRowState extends State<SlotRow> {
                     onTap: !changed
                         ? null
                         : () {
+                            _typing.cancel();
                             c.resetSlot(s.key, s.type, s.def);
                             _t?.text = s.def;
                           }),
@@ -372,16 +377,30 @@ class TemplateEditor extends StatefulWidget {
 
 class _TemplateEditorState extends State<TemplateEditor> {
   final Map<String, TextEditingController> _ctl = {};
+
+  /// One per field: the preview redraws when the owner pauses typing.
+  final Map<String, Debouncer> _typing = {};
   String? _msg;
   double? _progress;
 
   @override
   void dispose() {
+    for (final d in _typing.values) {
+      d.dispose();
+    }
     for (final t in _ctl.values) {
       t.dispose();
     }
     super.dispose();
   }
+
+  void _type(String field, VoidCallback save) => _typing.putIfAbsent(field, Debouncer.new)(save);
+
+  /// The template's cards / coupons as they are now (not as they were when
+  /// the field was built: a debounced save runs later).
+  List<Map<String, dynamic>> get _cards => e.props['cards'] is List
+      ? [for (final m in e.props['cards'] as List) if (m is Map) Map<String, dynamic>.from(m)]
+      : <Map<String, dynamic>>[];
 
   SectionEntry get e => widget.c.entries.firstWhere((x) => x.id == widget.entry.id, orElse: () => widget.entry);
 
@@ -394,7 +413,7 @@ class _TemplateEditorState extends State<TemplateEditor> {
         minLines: 1,
         maxLines: lines,
         style: const TextStyle(color: Colors.white, fontSize: 14),
-        onChanged: (v) => widget.c.patchProps(e.id, {key: v}),
+        onChanged: (v) => _type(key, () => widget.c.patchProps(e.id, {key: v})),
         decoration: InputDecoration(
           labelText: label,
           labelStyle: const TextStyle(color: kDim),
@@ -532,11 +551,12 @@ class _TemplateEditorState extends State<TemplateEditor> {
                   initialValue: '${cards[i]['title'] ?? ''}',
                   style: const TextStyle(color: Colors.white),
                   decoration: const InputDecoration(labelText: 'Card words', isDense: true),
-                  onChanged: (v) {
-                    final next = [...cards];
+                  onChanged: (v) => _type('card-$i', () {
+                    final next = _cards;
+                    if (i >= next.length) return;
                     next[i] = {...next[i], 'title': v};
                     widget.c.patchProps(e.id, {'cards': next});
-                  },
+                  }),
                 ),
                 const SizedBox(height: 8),
                 Wrap(spacing: 8, runSpacing: 8, children: [
@@ -625,12 +645,12 @@ extension on _TemplateEditorState {
                     maxLines: lines,
                     style: const TextStyle(color: Colors.white, fontSize: 14),
                     decoration: deco(label),
-                    onChanged: (v) {
+                    onChanged: (v) => _type('cp-$i-$key', () {
                       final next = [...couponsOf(e.props)];
                       if (i >= next.length) return;
                       next[i] = {...next[i], key: v};
                       save(next);
-                    },
+                    }),
                   ),
                 ),
               const Text('Ribbon colour (the code takes it too)', style: TextStyle(color: kDim, fontSize: 12)),
@@ -695,4 +715,53 @@ Future<String?> pickRoute(BuildContext context, String current) {
       ),
     ),
   );
+}
+
+/// Coalesces keystrokes: the edit is applied once typing pauses, so the
+/// preview redraws once per pause instead of once per letter.
+class Debouncer {
+  Debouncer([this.delay = const Duration(milliseconds: 300)]);
+  final Duration delay;
+  Timer? _t;
+  VoidCallback? _job;
+
+  bool get pending => _job != null;
+
+  void call(VoidCallback job) {
+    _job = job;
+    _t?.cancel();
+    _t = Timer(delay, flush);
+  }
+
+  /// Applies the waiting edit now.
+  void flush() {
+    _t?.cancel();
+    _t = null;
+    final j = _job;
+    _job = null;
+    j?.call();
+  }
+
+  /// Drops the waiting edit.
+  void cancel() {
+    _t?.cancel();
+    _t = null;
+    _job = null;
+  }
+
+  /// Keeps the last letters typed: the waiting edit is applied right after
+  /// the widget goes (not during, when the tree is locked). If the editor
+  /// itself is gone by then, there is nothing left to apply it to.
+  void dispose() {
+    _t?.cancel();
+    _t = null;
+    final j = _job;
+    _job = null;
+    if (j == null) return;
+    scheduleMicrotask(() {
+      try {
+        j();
+      } catch (_) {}
+    });
+  }
 }
