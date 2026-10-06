@@ -138,7 +138,7 @@ class _HistoryState extends State<_History> {
               style: TextStyle(color: kDim, fontSize: 12));
         }
         return Column(children: [
-          for (final h in list.take(60)) _HistoryRow(h: h),
+          for (final h in list.take(60)) _HistoryRow(h: h, page: widget.page),
         ]);
       },
     );
@@ -146,15 +146,18 @@ class _HistoryState extends State<_History> {
 }
 
 class _HistoryRow extends StatelessWidget {
-  const _HistoryRow({required this.h});
+  const _HistoryRow({required this.h, required this.page});
   final HistoryEntry h;
+  final String page;
 
   String get _what {
     if (h.kind == 'layout') {
-      if (h.after == null) return 'Page put back to original';
+      // A tab's layout ('<page>.<tab>') says which tab.
+      final tab = h.target.startsWith('$page.') ? ' · ${h.target.substring(page.length + 1)} tab' : '';
+      if (h.after == null) return 'Page put back to original$tab';
       final a = (h.after?['sections'] as List?)?.length ?? 0;
       final b = (h.before?['sections'] as List?)?.length;
-      return b == null ? 'Layout saved ($a sections)' : 'Layout changed ($b → $a sections)';
+      return b == null ? 'Layout saved ($a sections)$tab' : 'Layout changed ($b → $a sections)$tab';
     }
     final t = h.target.split('.').last;
     if (h.after == null) return 'Reset “$t”';

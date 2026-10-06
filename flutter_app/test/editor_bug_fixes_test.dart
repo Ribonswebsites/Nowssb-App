@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nowssb/admin/editor/editor_controller.dart';
+import 'package:nowssb/admin/editor/editor_store.dart';
 import 'package:nowssb/admin/editor/preview.dart';
 import 'package:nowssb/admin/editor/tab_layout.dart';
 import 'package:nowssb/admin/layout/layout_sections.dart';
@@ -142,5 +143,19 @@ void main() {
       expect(find.text('Stale words'), findsNothing);
       expect(find.text('New welcome'), findsOneWidget, reason: 'ordinary slots still take text overrides');
     });
+  });
+
+  test('a tabbed page\'s history includes its tabs\' layouts', () {
+    expect(historyBelongsTo('program', 'program'), isTrue);
+    expect(historyBelongsTo('program.week2', 'program'), isTrue, reason: 'layouts are saved per tab');
+    expect(historyBelongsTo('program-old', 'program'), isFalse);
+    expect(historyBelongsTo('programs', 'program'), isFalse);
+    expect(historyBelongsTo('home.normal', 'home.fashion'), isFalse);
+    final sorted = sortHistory([
+      HistoryEntry('a', {'page': 'program', 'at': 10}),
+      HistoryEntry('b', {'page': 'program.week2', 'at': 30}),
+      HistoryEntry('c', {'page': 'program', 'at': 20}),
+    ]);
+    expect([for (final h in sorted) h.id], ['b', 'c', 'a']);
   });
 }

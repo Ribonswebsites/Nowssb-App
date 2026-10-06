@@ -38,6 +38,14 @@ class HistoryEntry {
   }
 }
 
+/// A ui_history entry saved under [entryPage] belongs to [page]'s history:
+/// the page itself, or one of its tabs ('<page>.<tab>').
+bool historyBelongsTo(String entryPage, String page) =>
+    entryPage == page || entryPage.startsWith('$page.');
+
+/// Newest first.
+List<HistoryEntry> sortHistory(List<HistoryEntry> list) => list..sort((a, b) => b.atMs.compareTo(a.atMs));
+
 class EditorStore {
   EditorStore._();
   static final EditorStore instance = EditorStore._();
@@ -137,18 +145,21 @@ class EditorStore {
     });
   }
 
-  /// This page's history, newest first (one equality filter, sorted here,
-  /// so no composite index is needed).
+  /// This page's history, newest first, its tabs included: a page with
+  /// tabs saves each tab's layout as '<page>.<tab>' (program_kit.dart), so
+  /// an equality filter on the page name found none of them. One range
+  /// filter on `page` (no composite index), trimmed and sorted here.
   Stream<List<HistoryEntry>> history(String page) => _db
       .collection('ui_history')
-      .where('page', isEqualTo: page)
+      .where('page', isGreaterThanOrEqualTo: page)
+      .where('page', isLessThanOrEqualTo: '$page.\uf8ff')
       .limit(300)
       .snapshots()
-      .map((s) {
-        final list = [for (final d in s.docs) HistoryEntry(d.id, d.data())];
-        list.sort((a, b) => b.atMs.compareTo(a.atMs));
-        return list;
-      });
+      .map((s) => sortHistory([
+            for (final d in s.docs)
+              if (historyBelongsTo('${d.data()['page'] ?? ''}', page)) HistoryEntry(d.id, d.data()),
+          ]));
+
 
   /// Puts a history entry's `before` (undo) or `after` (restore) back live.
   Future<void> restore(HistoryEntry h, {required bool undo}) async {
