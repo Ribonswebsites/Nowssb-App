@@ -455,6 +455,8 @@ class PlaySubscriptions extends ChangeNotifier {
       _tier = null;
       _until = null;
       _source = '';
+      _productId = '';
+      _billing = '';
       _owned.clear();
       notifyListeners();
       if (u == null || u.isAnonymous) return;

@@ -29,8 +29,27 @@ class WordPrivateStore {
   final Map<String, Map<String, dynamic>> _paid = {};
   final Map<String, Future<Map<String, dynamic>?>> _inflight = {};
 
-  /// Merge any cached paid payload onto [w]. Safe when nothing is cached.
+  /// Whose paid fields [_paid] holds. The cache lived for the whole process,
+  /// so after a subscriber signed out, a free account or a guest on the same
+  /// phone was shown the paid fields the subscriber had opened.
+  String? _owner;
+
+  void _forOwner() {
+    String? uid;
+    try {
+      uid = NwsbFirebase.ready ? FirebaseAuth.instance.currentUser?.uid : null;
+    } catch (_) {}
+    if (uid == _owner) return;
+    _owner = uid;
+    _paid.clear();
+    _inflight.clear();
+  }
+
+  /// Merge any cached paid payload onto [w] while this account may open it.
+  /// Safe when nothing is cached.
   Word apply(Word w) {
+    _forOwner();
+    if (!Entitlements.instance.canOpenWord(w)) return w;
     final paid = _paid[w.key] ?? _paid[w.word.toLowerCase()];
     if (paid == null || paid.isEmpty) return w;
     return w.withPaid(paid);
@@ -50,6 +69,7 @@ class WordPrivateStore {
   }
 
   Future<Map<String, dynamic>?> prefetch(Word w) async {
+    _forOwner();
     if (!NwsbFirebase.ready) return _paid[w.key];
     if (!Entitlements.instance.canOpenWord(w)) return null;
     final key = w.key.isNotEmpty ? w.key : w.word.toLowerCase();
@@ -100,6 +120,8 @@ class WordPrivateStore {
       final paid = decoded['paid'];
       if (paid is! Map) return null;
       final map = Map<String, dynamic>.from(paid);
+      // Signed out / switched while this was in flight: not theirs to keep.
+      if (FirebaseAuth.instance.currentUser?.uid != user.uid) return null;
       _paid[key] = map;
       return map;
     } on TimeoutException {

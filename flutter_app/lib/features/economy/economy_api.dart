@@ -178,39 +178,82 @@ class EconomyMirror extends ChangeNotifier {
     _auth = FirebaseAuth.instance.authStateChanges().listen(_bind);
   }
 
+  /// Bumped on every account change; async work started for an older
+  /// account checks it and stops instead of writing into the new one.
+  int _gen = 0;
+
+  /// Everything that belongs to one account, back to a signed-out state.
+  /// Only some fields used to be reset on sign-out, so the next account (or
+  /// a guest) saw the previous person's streak, UPI id, payout country,
+  /// unread count, partner points and seller stats.
+  void _clearAccount() {
+    coins = 0;
+    _serverCoins = 0;
+    cash = 0;
+    plan = 'Free';
+    streak = 0;
+    freezesLeft = 2;
+    practice = 0;
+    playerOpens = 0;
+    purchases = 0;
+    practiceCredits = 0;
+    code = '';
+    referredBy = '';
+    circleTier = 'Member';
+    paidReferrals = 0;
+    unitsSold = 0;
+    sellerTier = 'Seller';
+    wordsSold = 0;
+    nextSellerTarget = 100;
+    subUntil = 0;
+    lifetimeCents = 0;
+    subscriptionActive = false;
+    hasSeenEarn = false;
+    unread = 0;
+    upi = '';
+    country = '';
+    payoutRail = '';
+    partnerPoints = 0;
+    partnerPerk = '';
+    partnerPending = 0;
+    holds = 0;
+    freezes = 0;
+    restores = 0;
+    loginToday = false;
+    scratchToday = false;
+    capsReady = false;
+    summary = const {};
+    _summaryAt = 0;
+  }
+
   Future<void> _bind(User? user) async {
-    for (final sub in _docs) {
-      await sub.cancel();
-    }
-    _docs.clear();
-    await _todaySub?.cancel();
-    _todaySub = null;
+    final gen = ++_gen;
+    _refresh?.cancel();
     _midnight?.cancel();
+    final old = List<StreamSubscription<dynamic>>.of(_docs);
+    _docs.clear();
+    final oldToday = _todaySub;
+    _todaySub = null;
     uid = user?.uid;
     live = user != null;
-    if (user == null) {
-      coins = 0;
-      _serverCoins = 0;
-      summary = const {};
-      cash = 0;
-      plan = 'Free';
-      code = '';
-      loginToday = false;
-      scratchToday = false;
-      capsReady = false;
-      notifyListeners();
-      return;
+    _clearAccount();
+    notifyListeners();
+    for (final sub in old) {
+      await sub.cancel();
     }
+    await oldToday?.cancel();
+    if (user == null || gen != _gen) return;
     // Local "grants" from older builds are not balances; drop them.
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('nwsb_local_delta_${user.uid}');
-    loginToday = false;
-    scratchToday = false;
+    if (gen != _gen) return;
     unawaited(() async {
       try {
-        summary = await EconomyApi.call('ensureEconomyProfile', {
+        final s = await EconomyApi.call('ensureEconomyProfile', {
           'installId': await EconomyApi.installId(),
         });
+        if (gen != _gen) return;
+        summary = s;
         notifyListeners();
       } catch (e) {
         debugPrint('ensureEconomyProfile: $e');
