@@ -594,6 +594,11 @@ class _StageState extends State<_Stage> {
     }
     try {
       setState(() => _playing = true);
+      // just_audio keeps `playing` true after a clip ends, and play() on a
+      // player that is still "playing" returns at once — so the second tap
+      // replayed the clip with the button already back on "play" and no way
+      // to stop it. Stop first so play() waits for this run again.
+      await p.stop();
       await p.setUrl(widget.stage.audio);
       await p.play();
     } catch (_) {}

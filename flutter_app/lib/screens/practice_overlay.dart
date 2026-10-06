@@ -194,7 +194,13 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
         if (mounted) setState(() => _holding = false);
         return;
       }
+      // Replay (or the 30 s end) can land while the mic prompt, the recorder
+      // or speech is still starting. Recording must not start for a take
+      // that already ended — it used to run on with the screen stuck on
+      // "Listening", the clock frozen and the mic open.
+      if (!_holding || !mounted) return;
       final dir = await getApplicationDocumentsDirectory();
+      if (!_holding || !mounted) return;
       _takePath = '${dir.path}/nwsb-practice-${widget.word.key}.m4a';
       await _recorder.start(
         const RecordConfig(
@@ -208,6 +214,10 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
         ),
         path: _takePath!,
       );
+      if (!_holding || !mounted) {
+        await _finishCapture();
+        return;
+      }
       _speechReady = await _speech.initialize(
         onStatus: (status) {
           if (!mounted || !_holding) return;
@@ -238,6 +248,10 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
         );
       }
       if (!mounted) return;
+      if (!_holding) {
+        await _finishCapture();
+        return;
+      }
       setState(() => _status = _PracticeStatus.recording);
       _clock = Timer.periodic(const Duration(seconds: 1), (_) {
         if (!mounted || !_holding) return;
