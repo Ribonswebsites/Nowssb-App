@@ -7,6 +7,7 @@ import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 import 'practice_player.dart';
+import '../admin/layout/page_block.dart';
 import '../admin/template/editable.dart';
 
 class HealingPathScreen extends StatefulWidget {
@@ -370,7 +371,7 @@ class _HealingPathScreenState extends State<HealingPathScreen> {
                             ? _maleBg
                             : _femaleBg))),
           SafeArea(
-              child: Column(children: [
+              child: PageBlock(pageId: 'healing', title: 'Healing path', child: Column(children: [
             _Header(
                 title: _stage == _HealingStage.gender
                     ? 'Healing Path'
@@ -386,7 +387,7 @@ class _HealingPathScreenState extends State<HealingPathScreen> {
                         : _stage == _HealingStage.intro
                             ? _categoryIntroPage()
                             : _categoryPage()),
-          ])),
+          ]))),
         ]));
   }
 

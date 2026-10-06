@@ -314,5 +314,38 @@ void main() {
         expect(tester.takeException(), isNull);
       });
     }
+
+    // Pages built as one block (a lazy list, a staged flow): the block is a
+    // section, so an orb lands on it and a section can go above it.
+    for (final page in ['saved', 'healing']) {
+      testWidgets('$page (no sections before) takes an orb and a section above its block', (tester) async {
+        _ignoreOverflow();
+        final c = await _open(tester, page);
+        expect(c.layoutPage, page);
+        expect(c.sections.map((s) => s.id), ['page']);
+        final r = _rectOf(c, 'page');
+
+        await _openTab(tester, 'Loaders');
+        final spot = Offset(200, (r.top + r.height / 2).clamp(150.0, 600.0));
+        await _carry(tester, tester.getCenter(find.byKey(const ValueKey('anim-tile-ld.arc'))), spot);
+        await _settle(tester);
+        final sel = c.selectedOrb;
+        expect(sel, isNotNull, reason: 'the orb landed on the page');
+        expect(sel!.$1, 'page');
+        expect(find.byType(PlacedOrbView), findsOneWidget);
+
+        await _openTab(tester, 'Sections');
+        await _carry(tester, tester.getCenter(find.byKey(const ValueKey('add-couponCards'))),
+            Offset(200, (r.top + 30).clamp(160.0, r.center.dy - 20)));
+        await _settle(tester);
+        final ids = [for (final e in c.entries) e.id];
+        expect(ids.length, 2);
+        expect(ids.first, startsWith('couponCards~'), reason: 'above the block');
+        expect(ids.last, 'page');
+        expect(find.byType(CouponSection), findsWidgets);
+        expect(find.byType(PlacedOrbView), findsOneWidget, reason: 'the orb stays on the block');
+        expect(tester.takeException(), isNull);
+      });
+    }
   });
 }

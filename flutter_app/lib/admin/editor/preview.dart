@@ -10,6 +10,7 @@ import 'dart:async';
 import 'package:flutter/gestures.dart' show Drag;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart' show HapticFeedback;
 
 import '../../theme/theme.dart';
 import '../layout/app_pages.dart';
@@ -382,6 +383,23 @@ class AnimDrop {
   final String id;
 }
 
+/// Something thrown away (the trash, a flick, off the screen).
+void trashFeel() => HapticFeedback.heavyImpact();
+
+/// Deletes the element [key] for real (not hidden: gone from the page for
+/// everyone), with Undo.
+void deleteElementWithUndo(BuildContext context, EditorController c, String key, SlotType type, String def) {
+  trashFeel();
+  c.endStep();
+  c.patchStyle(key, type, def, {'removed': true, 'hidden': null, 'dx': null, 'dy': null});
+  c.clearSelection();
+  c.endStep();
+  _undoBar(context, c, 'Deleted “${slotFriendly(key, type, def)}”');
+}
+
+/// A flick faster than this (pt/s) throws the carried thing away.
+const kFlickSpeed = 2200.0;
+
 /// A brief Undo just under the pill at the top, clear of the + button,
 /// the strip and the trash at the bottom.
 void _undoBar(BuildContext context, EditorController c, String text) {
@@ -403,7 +421,7 @@ void _undoBar(BuildContext context, EditorController c, String text) {
 /// Deletes a section at once and offers Undo (no confirm dialog: undo is
 /// always there, in the snackbar and in the history).
 void deleteWithUndo(BuildContext context, EditorController c, String id, String title) {
-  bigFeel();
+  trashFeel();
   c.endStep();
   c.delete(id);
   c.unpick();
@@ -622,6 +640,22 @@ class _TouchLayerState extends State<_TouchLayer> {
     return null;
   }
 
+  /// The smallest editable element under [p].
+  PreviewSlot? _slotAt(Offset p) {
+    PreviewSlot? best;
+    var area = double.infinity;
+    for (final s in c.preview.slots.values) {
+      final r = _slotRect(s);
+      if (r == null || !r.contains(p) || r.width < 4 || r.height < 4) continue;
+      final a = r.width * r.height;
+      if (a < area) {
+        area = a;
+        best = s;
+      }
+    }
+    return best;
+  }
+
   _OrbSpot? _orbAt(Offset p) {
     for (final o in _orbs.reversed) {
       if (o.rect.inflate(8).contains(p)) return o;
@@ -801,7 +835,10 @@ class _TouchLayerState extends State<_TouchLayer> {
   /// Tells the screen something is being carried (it clears the bottom so
   /// the trash is in plain sight).
   void _syncCarry() {
-    c.carrying.value = _carrying && (_finger - _start).distance > 6;
+    final now = _carrying && (_finger - _start).distance > 6;
+    // Picked up: a firm tick the moment it leaves its place.
+    if (now && !c.carrying.value) bigFeel();
+    c.carrying.value = now;
   }
 
   void _onUpdate(ScaleUpdateDetails d) {
@@ -917,10 +954,21 @@ class _TouchLayerState extends State<_TouchLayer> {
     return null;
   }
 
+  /// Let go while moving fast, or at (past) the side of the screen.
+  bool _thrown(ScaleEndDetails d) {
+    final me = context.findRenderObject() as RenderBox?;
+    if (me == null || !me.hasSize) return false;
+    final w = me.size.width;
+    final off = _finger.dx < 6 || _finger.dx > w - 6;
+    return off || d.velocity.pixelsPerSecond.distance > kFlickSpeed;
+  }
+
   void _onEnd(ScaleEndDetails d) {
     final grab = _grab;
     final moved = (_finger - _start).distance > 12;
-    final trash = (grab == _Grab.order || grab == _Grab.moveOrb || grab == _Grab.moveElement) && moved && _overTrash(_finger);
+    final trash = (grab == _Grab.order || grab == _Grab.moveOrb || grab == _Grab.moveElement) &&
+        moved &&
+        (_overTrash(_finger) || _thrown(d));
     final target = grab == _Grab.order ? _target() : null;
     _autoScroll?.cancel();
     _autoScroll = null;
@@ -951,7 +999,7 @@ class _TouchLayerState extends State<_TouchLayer> {
         final o = _orb;
         if (o == null) break;
         if (trash) {
-          bigFeel();
+          trashFeel();
           c.endStep();
           c.deleteOrb(o.$1, o.$2);
           c.endStep();
@@ -968,11 +1016,18 @@ class _TouchLayerState extends State<_TouchLayer> {
         }
       case _Grab.moveElement:
         final sel = _element;
-        if (sel == null || !trash) break;
-        bigFeel();
-        c.patchStyle(sel.slotKey, sel.type, sel.defaultValue, {'hidden': true, 'dx': null, 'dy': null});
+        if (sel == null) break;
+        if (!trash) {
+          if (moved) actFeel();
+          break;
+        }
+        // Undo puts it back where it was before this drag.
+        c.patchStyle(sel.slotKey, sel.type, sel.defaultValue, {
+          'dx': _baseOffset.dx.abs() < 1 ? null : _baseOffset.dx,
+          'dy': _baseOffset.dy.abs() < 1 ? null : _baseOffset.dy,
+        });
         c.endStep();
-        _undoBar(context, c, 'Removed “${slotFriendly(sel.slotKey, sel.type, sel.defaultValue)}”');
+        deleteElementWithUndo(context, c, sel.slotKey, sel.type, sel.defaultValue);
       default:
         break;
     }
@@ -1030,6 +1085,42 @@ class _TouchLayerState extends State<_TouchLayer> {
         if (mounted) _undoBar(context, c, 'Orb removed');
       }
       c.endStep();
+      return;
+    }
+    // An element (unless it fills its section and is not the picked one:
+    // then the section's menu, so a hero picture never hides it).
+    var el = _slotAt(p);
+    if (el != null && el.slotKey != c.selectedSlot) {
+      final er = _slotRect(el), sr = _sectionRect(_sectionAt(p));
+      if (er != null && sr != null && er.width * er.height > 0.6 * sr.width * sr.height) el = null;
+    }
+    if (el != null) {
+      actFeel();
+      final sec = el.section;
+      final sid = sec != null && sec.startsWith('${c.layoutPage}/') ? sec.split('/').last : null;
+      c.selectIn(sid, el.slotKey, el.type, el.defaultValue);
+      final st = c.overrideOf(el.slotKey)?.style ?? const {};
+      final hidden = st['hidden'] == true;
+      final v = await showMenu<String>(context: context, color: const Color(0xFF111A2B), position: pos, items: [
+        item('back', Icons.restart_alt_rounded, 'Put back'),
+        item('hide', hidden ? Icons.visibility_rounded : Icons.visibility_off_rounded, hidden ? 'Show' : 'Hide'),
+        item('del', Icons.delete_outline_rounded, 'Delete', color: const Color(0xFFFF8A8A)),
+      ]);
+      if (!mounted || v == null) return;
+      switch (v) {
+        case 'back':
+          c.endStep();
+          c.patchStyle(el.slotKey, el.type, el.defaultValue,
+              {'dx': null, 'dy': null, 'scale': null, 'size': null, 'hidden': null, 'cropZoom': null, 'cropX': null, 'cropY': null});
+          c.endStep();
+        case 'hide':
+          c.endStep();
+          c.patchStyle(el.slotKey, el.type, el.defaultValue, {'hidden': hidden ? null : true});
+          c.endStep();
+          if (!hidden && mounted) _undoBar(context, c, 'Hidden “${slotFriendly(el.slotKey, el.type, el.defaultValue)}”');
+        case 'del':
+          deleteElementWithUndo(context, c, el.slotKey, el.type, el.defaultValue);
+      }
       return;
     }
     final id = _sectionAt(p);
@@ -1265,7 +1356,11 @@ class _TouchLayerState extends State<_TouchLayer> {
                   ),
                 ),
             if (cur != null) ...[
-              Positioned.fromRect(
+              // Glides from section to section; follows the finger exactly.
+              AnimatedPositioned.fromRect(
+                key: const ValueKey('section-outline'),
+                duration: ordering ? Duration.zero : const Duration(milliseconds: 200),
+                curve: Curves.easeOutCubic,
                 rect: ordering ? cur.shift(Offset(0, _finger.dy - _start.dy)) : cur,
                 child: IgnorePointer(
                   child: DecoratedBox(
@@ -1286,7 +1381,10 @@ class _TouchLayerState extends State<_TouchLayer> {
                 final r = _sections[target].$2;
                 final from = _sections.indexWhere((s) => s.$1 == c.current?.id);
                 final y = target > from ? r.bottom : r.top;
-                return Positioned(
+                return AnimatedPositioned(
+                  key: const ValueKey('order-line'),
+                  duration: const Duration(milliseconds: 140),
+                  curve: Curves.easeOut,
                   left: 12,
                   right: 12,
                   top: y - 3,

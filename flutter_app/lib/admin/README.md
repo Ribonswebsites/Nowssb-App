@@ -120,9 +120,16 @@ handle opens a floating pill (back · page picker · undo/redo · publish ·
 ⋯ for Try it, live preview, pencils, every slot); the pill also opens for a
 few seconds after each change. + opens a bottom drawer with tabs inside:
 Sections (every section and banner), Effects, Orbs, Loaders, Backgrounds,
-Particles, Celebrate, Map (page map). Touching an
-element shows a small strip that opens its own sheet (style, words,
-picture); there is no Style tab. Edits wait on the
+Particles, Celebrate, Map (page map). The + and the folded handle drag
+anywhere out of the way and stay there (`editor/movable.dart`, prefs
+`ui_editor_add_spot` / `ui_editor_handle_spot`); the pill opens where the
+handle is. Touching an element or a section shows a small strip; its
+**Look** button opens `editor/tab_look.dart` `LookSheet`: chips, one
+panel of big tiles at a time — words: Colour (palette + custom, gradients),
+Font, Shadow, Shape (More = every text knob); pictures: Replace, Crop
+(pinch/drag the pad), Corners, Shadow; sections: Background (colour,
+gradient, bundled or uploaded picture, clip), Corners, Shadow. Text size
+is a pinch on the page. There is no Style tab. Edits wait on the
 admin's phone (`EditorPreviewController.draftOverrides/draftLayouts`) and
 `EditorStore.publish` writes them in one batch: `ui_overrides`,
 `ui_layouts` and one `ui_history` row per change. Every app listens
@@ -133,10 +140,13 @@ Override `style` keys (all optional; see `template/style_apply.dart`):
 text `color, font, size, weight, spacing, italic, gradient[], shadow,
 shadowBlur, shadowDx, shadowDy`; box/button `shape (circle|pill|rounded|none),
 bg, gradient[], border, borderW, glow, glowBlur, radius, padH, padV, glass`; orb `orb (OrbState name), orbSize,
-orbCircle`. Element placement (any slot): `dx, dy, scale, hidden`, plus
+orbCircle`. Element placement (any slot): `dx, dy, scale, hidden, removed`,
+picture `cropZoom, cropX, cropY`, frame `round, lift`, plus
 effects `entrance, loop`. Section `props`
 (layout doc): `height, padTop, padBottom, padH, transition, autoRotate,
-interval, entrance, loop, orbs[]`, and for template sections
+interval, entrance, loop, orbs[]`, look `fill, fill2, fillImage, fillVideo,
+corner, lift` (`sectionLook` in `layout/layout_sections.dart`; banners
+round/shadow their own card from the same `corner`/`lift`), and for template sections
 their content (`title, subtitle, body, cta, route, image, video, bg, height, cards[]`,
 `coupons[]`, `variant`).
 
@@ -191,12 +201,17 @@ whole page): with nothing picked one finger scrolls the page. Tap picks a
 section (or an element, or a placed orb). A picked section drags to a new
 place (onto the trash at the bottom = delete, with Undo); dragging its
 top/bottom edge sets `padTop/padBottom`; a pinch resizes it (`height`).
-The selected element drags anywhere (override `style.dx/dy`), pinches to
-resize (`style.size` for text, `style.scale` otherwise) and onto the trash
-is removed (`style.hidden`, faded in the editor so it can be shown again);
-see `elementPlacement` in `template/editable.dart`. Placed animations drag,
-pinch (24 to 720 pt) and trash the same way. Long-press opens Put back · Duplicate ·
-Hide · Delete (or, on an orb, circle · Delete). There are no move/size
+The selected element drags anywhere (override `style.dx/dy`) and pinches to
+resize (`style.size` for text, `style.scale` otherwise); a pinch and a
+vertical move change the room it takes, so what is under it reflows
+(`layout/element_flow.dart`). Onto the trash, flicked fast, or dragged off
+the side of the screen, it is deleted (`style.removed`: gone everywhere,
+with Undo); Hide (`style.hidden`, faded in the editor) is a separate
+long-press choice. See `elementPlacement` in `template/editable.dart`.
+Placed animations drag, pinch (24 to 720 pt) and trash or flick the same
+way. Long-press opens Put back · Duplicate · Hide · Delete on a section,
+Put back · Hide · Delete on an element (or, on an orb, circle · Delete).
+Haptics: pick-up and drop (medium), trash (heavy). There are no move/size
 buttons or sliders. Every draft change is an undo step
 (`EditorController.undo/redo`; edits within 700 ms, such as one gesture,
 merge into one step). The canvas only needs an `AppPage` and its section
@@ -237,5 +252,10 @@ applyLayout(context, 'home.normal', items, hiddenByDefault: {...})
   (`kTemplateKinds`, `kTemplateNames`, `kTemplateGallery`, `templateStarter`).
 * Drops that miss every section (the gaps, the page's own header) go to
   the nearest section. `reader`, `store.request`, `quotes`, `sentence` and
-  `sound.library` were one block and now use `layoutIndexed`; `saved`,
-  `healing`, `player.session` and signed-out `practice` still are.
+  `sound.library` were one block and now use `layoutIndexed`.
+* A page built as one block (a lazy list, a staged flow) wraps it in
+  `PageBlock(pageId: …, child: …)` (`layout/page_block.dart`): the block
+  is section `page`, so orbs and effects land on it and added sections
+  sit above/below it (`saved`, `healing`). Still one block, no drops:
+  `player.session`, signed-out `practice`, `store.meaning` until it loads,
+  the program pages.

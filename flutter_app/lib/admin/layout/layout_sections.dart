@@ -345,10 +345,13 @@ class SectionFrame extends StatelessWidget {
     if (h != null && h > 0 && (!entry.isTemplate || entry.kind == 'textBlock' || entry.kind == 'cta')) {
       w = SectionFitHeight(height: h, width: MediaQuery.sizeOf(context).width, child: w);
     }
+    // Its own background, corners and shadow, set from a touch.
+    w = sectionLook(p, w, frame: !_selfFramed.contains(entry.kind));
     // Orbs the owner dropped on this section (editor and published app).
     final orbs = placedOrbsOf(p);
     if (orbs.isNotEmpty) {
-      w = PlacedOrbLayer(orbs: orbs, sectionBg: p['bg'] is num ? (p['bg'] as num).toInt() : null, child: w);
+      final bg = p['fill'] is num ? p['fill'] : p['bg'];
+      w = PlacedOrbLayer(orbs: orbs, sectionBg: bg is num ? bg.toInt() : null, child: w);
     }
     final preview = EditorPreviewScope.peek(context);
     if (preview != null) {
@@ -408,6 +411,52 @@ class SectionFrame extends StatelessWidget {
     }
     return SectionScope(pageId: pageId, sectionId: entry.id, child: w);
   }
+}
+
+/// Templates that round and shadow their own card from the same props.
+const _selfFramed = {'imageBanner', 'videoBanner', 'splitPromo'};
+
+/// A section's look from its props (any section, built-in or added):
+///   fill (ARGB), fill2 (ARGB: a gradient to it), fillImage (url/asset),
+///   fillVideo (url) — drawn behind it;
+///   corner (pt) — rounds it; lift (pt) — a soft shadow under it.
+/// Nothing set: the section exactly as built.
+Widget sectionLook(Map<String, dynamic> p, Widget w, {bool frame = true}) {
+  final fill = p['fill'] is num ? Color((p['fill'] as num).toInt()) : null;
+  final fill2 = p['fill2'] is num ? Color((p['fill2'] as num).toInt()) : null;
+  final image = '${p['fillImage'] ?? ''}';
+  final video = '${p['fillVideo'] ?? ''}';
+  final corner = frame ? (_d(p['corner']) ?? 0) : 0.0;
+  final lift = frame ? (_d(p['lift']) ?? 0) : 0.0;
+  if (fill == null && fill2 == null && image.isEmpty && video.isEmpty && corner <= 0 && lift <= 0) return w;
+  if (fill != null || fill2 != null || image.isNotEmpty || video.isNotEmpty) {
+    final a = fill ?? fill2!;
+    Widget bg = DecoratedBox(
+      decoration: BoxDecoration(
+        color: fill2 == null ? a : null,
+        gradient: fill2 == null
+            ? null
+            : LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [a, fill2]),
+      ),
+    );
+    if (video.isNotEmpty) {
+      bg = Stack(fit: StackFit.expand, children: [bg, NetVideo(url: video, poster: image)]);
+    } else if (image.isNotEmpty) {
+      bg = Stack(fit: StackFit.expand, children: [bg, NetPicture(url: image)]);
+    }
+    w = Stack(children: [Positioned.fill(child: bg), w]);
+  }
+  if (corner > 0) w = ClipRRect(borderRadius: BorderRadius.circular(corner), child: w);
+  if (lift > 0) {
+    w = DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(corner),
+        boxShadow: [BoxShadow(color: const Color(0x55000000), blurRadius: lift * 2, offset: Offset(0, lift / 2))],
+      ),
+      child: w,
+    );
+  }
+  return w;
 }
 
 /// Plays once when the section (or element) first appears. The classic

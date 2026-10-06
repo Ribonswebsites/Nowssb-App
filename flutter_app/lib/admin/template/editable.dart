@@ -27,6 +27,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../../data/word_art.dart';
 import '../admin_state.dart';
 import '../layout/anims/effects.dart' show LoopFx;
+import '../layout/element_flow.dart';
 import '../layout/layout_sections.dart' show SectionEntrance;
 import '../layout/scopes.dart';
 import 'slot_keys.dart';
@@ -85,22 +86,39 @@ Widget slotChrome(
   return elementPlacement(look, SlotBadge(slotKey: key, type: type, defaultValue: def, word: word, child: child));
 }
 
-/// Where the owner moved, resized or removed one element in the UI Editor
-/// (override style `dx`, `dy`, `scale`, `hidden`), plus the `entrance` and
-/// `loop` effects dropped on it. Painted only: the
-/// section around it keeps its size. Removed elements stay faintly visible
-/// in the editor's preview so they can be brought back.
+/// Where the owner moved, resized, hid or deleted one element in the UI
+/// Editor (override style `dx`, `dy`, `scale`, `hidden`, `removed`), its
+/// picture crop and frame (`cropZoom`, `cropX`, `cropY`, `round`, `lift`),
+/// plus the `entrance` and `loop` effects dropped on it. A pinch (`scale`)
+/// and a vertical move (`dy`) change the room it takes, so what is under
+/// it reflows (layout/element_flow.dart); a sideways move is painted only.
+/// Deleted elements are gone everywhere (Undo brings them back); hidden
+/// ones stay faintly visible in the editor's preview.
 Widget elementPlacement(Map<String, dynamic> look, Widget child, {bool preview = false}) {
   if (look.isEmpty) return child;
   double n(String k, double d) => look[k] is num ? (look[k] as num).toDouble() : d;
+  if (look['removed'] == true) return const SizedBox.shrink();
   if (look['hidden'] == true) {
     if (!preview) return const SizedBox.shrink();
     child = Opacity(opacity: 0.22, child: child);
   }
+  final cz = n('cropZoom', 1).clamp(1.0, 4.0), cx = n('cropX', 0).clamp(-1.0, 1.0), cy = n('cropY', 0).clamp(-1.0, 1.0);
+  if (cz > 1.01) child = ClipRect(child: Transform.scale(scale: cz, alignment: Alignment(cx, cy), child: child));
+  final round = n('round', 0), lift = n('lift', 0);
+  if (round > 0.5) child = ClipRRect(borderRadius: BorderRadius.circular(round), child: child);
+  if (lift > 0.5) {
+    child = DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(round),
+        boxShadow: [BoxShadow(color: const Color(0x66000000), blurRadius: lift * 2, offset: Offset(0, lift / 2))],
+      ),
+      child: child,
+    );
+  }
   final s = n('scale', 1).clamp(0.2, 6.0);
-  if ((s - 1).abs() > 0.01) child = Transform.scale(scale: s, child: child);
   final dx = n('dx', 0), dy = n('dy', 0);
-  if (dx.abs() > 0.5 || dy.abs() > 0.5) child = Transform.translate(offset: Offset(dx, dy), child: child);
+  if ((s - 1).abs() > 0.01 || dy.abs() > 0.5) child = ElementFlow(scale: s, dy: dy, child: child);
+  if (dx.abs() > 0.5) child = Transform.translate(offset: Offset(dx, 0), child: child);
   // Effects dropped on the element (anims/effects.dart).
   final loop = look['loop'];
   if (loop is String && loop != 'none') child = LoopFx(kind: loop, child: child);

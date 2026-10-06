@@ -230,8 +230,8 @@ class TemplateSection extends StatelessWidget {
             : _picture(context, 'image', _s('image'));
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(22),
+          child: _framed(ClipRRect(
+            borderRadius: BorderRadius.circular(_corner),
             child: SizedBox(
               height: _h(220),
               child: Stack(fit: StackFit.expand, children: [
@@ -248,7 +248,7 @@ class TemplateSection extends StatelessWidget {
                 Positioned(left: 18, right: 18, bottom: 18, top: 18, child: Align(alignment: Alignment.bottomLeft, child: _fitText(context))),
               ]),
             ),
-          ),
+          )),
         );
       case 'splitPromo':
         final bg = Color(p['bg'] is num ? (p['bg'] as num).toInt() : 0xFF1B2437);
@@ -261,7 +261,8 @@ class TemplateSection extends StatelessWidget {
             decoration: BoxDecoration(
               color: bg2 == null ? bg : null,
               gradient: bg2 == null ? null : LinearGradient(colors: [bg, bg2]),
-              borderRadius: BorderRadius.circular(22),
+              borderRadius: BorderRadius.circular(_corner),
+              boxShadow: _shadow,
             ),
             child: Row(children: [
               Expanded(
@@ -334,6 +335,22 @@ class TemplateSection extends StatelessWidget {
   }
 
   int get _variant => p['variant'] is num ? (p['variant'] as num).toInt() : 0;
+
+  /// Corner and shadow of the card (props `corner`, `lift`; were fixed).
+  double get _corner => p['corner'] is num ? (p['corner'] as num).toDouble() : 22;
+  List<BoxShadow>? get _shadow {
+    final lift = p['lift'] is num ? (p['lift'] as num).toDouble() : 0.0;
+    return lift <= 0
+        ? null
+        : [BoxShadow(color: const Color(0x66000000), blurRadius: lift * 2, offset: Offset(0, lift / 2))];
+  }
+
+  Widget _framed(Widget card) => _shadow == null
+      ? card
+      : DecoratedBox(
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(_corner), boxShadow: _shadow),
+          child: card,
+        );
 }
 
 /// A template's picture: tappable in the editor (its slot), replaced into

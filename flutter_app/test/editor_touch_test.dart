@@ -389,7 +389,8 @@ void main() {
     testWidgets('elements: tap, drag to move, pinch to resize, trash to remove', (tester) async {
       final c = EditorController();
       await _open(tester, c);
-      final words = find.textContaining('Ready for today');
+      // On the page (the Deleted snackbar names it too).
+      final words = find.descendant(of: find.byType(EditorPreview), matching: find.textContaining('Ready for today'));
       expect(words, findsOneWidget);
       await tester.tapAt(tester.getCenter(words));
       await _settle(tester, 3);
@@ -413,13 +414,28 @@ void main() {
       final at = tester.getCenter(words);
       await _drag(tester, at, Offset(at.dx, _screen.height - 30));
       await _settle(tester);
-      expect(c.overrideOf(key)!.style['hidden'], isTrue);
-      expect(find.textContaining('Removed “'), findsOneWidget);
-      // Still in the editor (faded) so it can be shown again from its strip.
-      expect(find.text('Show'), findsOneWidget);
-      await tester.tap(find.text('Show'));
-      await _settle(tester);
-      expect(c.overrideOf(key)?.style['hidden'], isNull);
+      // Really gone (not just faded), and Undo brings it back where it was.
+      expect(c.overrideOf(key)!.style['removed'], isTrue);
+      expect(words, findsNothing);
+      expect(find.textContaining('Deleted “'), findsOneWidget);
+      expect(find.text('Show'), findsNothing);
+      await tester.tap(find.text('Undo'));
+      await _settle(tester, 3);
+      expect(c.overrideOf(key)?.style['removed'], isNull);
+      expect(words, findsOneWidget);
+      expect((c.overrideOf(key)!.style['dx'] as num).toDouble(), moreOrLessEquals(30, epsilon: 2));
+      ScaffoldMessenger.of(tester.element(find.byType(UiEditorScreen))).clearSnackBars();
+      await _settle(tester, 2);
+
+      // A flick throws it away too.
+      await tester.tapAt(tester.getCenter(words));
+      await _settle(tester, 3);
+      expect(c.selectedSlot, key);
+      await tester.flingFrom(tester.getCenter(words), const Offset(260, 0), 4000);
+      await _settle(tester, 3);
+      expect(c.overrideOf(key)!.style['removed'], isTrue);
+      expect(words, findsNothing);
+      expect(tester.takeException(), isNull);
     });
 
     testWidgets('library: an animation carried from its tab lands in place; ink and Another', (tester) async {
@@ -518,7 +534,7 @@ void main() {
     final c = EditorController();
     await _open(tester, c);
     expect(find.text('Touch anywhere to start'), findsOneWidget);
-    for (final t in ['to select', 'to move', 'to resize', 'to add']) {
+    for (final t in ['to select, again to type', 'to move', 'to resize', 'for more', 'to delete', 'to add']) {
       expect(find.textContaining(t, findRichText: true), findsOneWidget);
     }
     await tester.tapAt(const Offset(20, 900));

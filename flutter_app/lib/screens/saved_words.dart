@@ -14,6 +14,7 @@ import '../data/word_art.dart';
 import '../theme/player_aura.dart';
 import 'player_settings.dart';
 import 'practice_player.dart';
+import '../admin/layout/page_block.dart';
 import '../admin/template/editable.dart';
 
 class SavedWordsScreen extends StatefulWidget {
@@ -163,7 +164,10 @@ class _SavedWordsScreenState extends State<SavedWordsScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Expanded(
-            child: !_ready
+            child: PageBlock(
+              pageId: 'saved',
+              title: 'Saved words',
+              child: !_ready
                 ? const SizedBox.shrink()
                 : Builder(
                     builder: (context) {
@@ -258,6 +262,7 @@ class _SavedWordsScreenState extends State<SavedWordsScreen> {
                       );
                     },
                   ),
+            ),
           ),
           if (_ready && _saved.isNotEmpty)
             Padding(

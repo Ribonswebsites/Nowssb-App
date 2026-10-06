@@ -29,6 +29,8 @@ import '../layout/placed_orbs.dart';
 import '../template/all_slots_screen.dart';
 import '../template/slot_keys.dart';
 import 'editor_controller.dart';
+import 'movable.dart';
+import 'tab_look.dart';
 import 'glass.dart';
 import 'preview.dart';
 import 'tab_animation.dart';
@@ -105,6 +107,29 @@ class _UiEditorScreenState extends State<UiEditorScreen> {
     c.openWords = _wordsSheet;
     _pillLater();
     _loadHint();
+    _loadSpots();
+  }
+
+  /// Where the + and the folded pill were left (null: their usual place).
+  Offset? _addSpot;
+  Offset? _handleSpot;
+
+  Future<void> _loadSpots() async {
+    final add = await loadSpot(kAddSpotKey);
+    final handle = await loadSpot(kHandleSpotKey);
+    if (!mounted) return;
+    setState(() {
+      _addSpot = add;
+      _handleSpot = handle;
+    });
+  }
+
+  /// The open pill sits where its handle was left.
+  double _pillTop(MediaQueryData mq) {
+    final f = _handleSpot;
+    final top = mq.padding.top + 8;
+    if (f == null) return top;
+    return (f.dy * mq.size.height).clamp(top, (mq.size.height - 140).clamp(top, double.infinity));
   }
 
   Future<void> _loadHint() async {
@@ -208,16 +233,16 @@ class _UiEditorScreenState extends State<UiEditorScreen> {
   }
 
   /// A sheet for the touched thing; it follows the editor live.
-  Future<void> _sheet(String title, WidgetBuilder body) {
+  Future<void> _sheet(String title, WidgetBuilder body, {double size = 0.5, Color barrier = Colors.black26}) {
     final h = MediaQuery.of(context).size.height;
     return showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: const Color(0xF20B1120),
-      barrierColor: Colors.black26,
+      barrierColor: barrier,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) => SizedBox(
-        height: (h * 0.5).clamp(280.0, 560.0),
+        height: (h * size).clamp(280.0, 560.0),
         child: Material(
           type: MaterialType.transparency,
           child: Column(children: [
@@ -240,7 +265,13 @@ class _UiEditorScreenState extends State<UiEditorScreen> {
     );
   }
 
-  void _styleSheet() => _sheet('Style', (_) => StyleTab(c: c));
+  /// The look of what's touched: small chips, one panel at a time.
+  /// No dimming, a lower sheet: the change shows on the page above.
+  void _styleSheet() => _sheet('Look', (_) => LookSheet(c: c, onReplace: _wordsSheet, onMore: _moreStyle),
+      size: 0.42, barrier: Colors.transparent);
+
+  /// Every text style knob, for when the chips are not enough.
+  void _moreStyle() => _sheet('More style', (_) => StyleTab(c: c));
 
   void _wordsSheet() {
     final key = c.selectedSlot;
@@ -290,20 +321,23 @@ class _UiEditorScreenState extends State<UiEditorScreen> {
           body: Stack(children: [
             // The real page, edge to edge.
             Positioned.fill(child: _full ? const SizedBox.shrink() : _preview),
-            // The one small pill: pages, undo/redo, publish, more.
-            Positioned(
-              top: mq.padding.top + 8,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 220),
-                  transitionBuilder: (child, a) => FadeTransition(
-                    opacity: a,
-                    child: ScaleTransition(scale: Tween(begin: 0.85, end: 1.0).animate(a), child: child),
-                  ),
-                  child: _pillOpen
-                      ? EditorPill(
+            // The one small pill: pages, undo/redo, publish, more. Folded,
+            // its handle can be dragged anywhere; the pill opens there.
+            Positioned.fill(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 220),
+                transitionBuilder: (child, a) => FadeTransition(
+                  opacity: a,
+                  child: ScaleTransition(scale: Tween(begin: 0.85, end: 1.0).animate(a), child: child),
+                ),
+                child: _pillOpen
+                    ? Stack(key: const ValueKey('pill-open'), children: [
+                        Positioned(
+                          top: _pillTop(mq),
+                          left: 0,
+                          right: 0,
+                          child: Center(
+                            child: EditorPill(
                           c: c,
                           onBack: () async {
                             _pillHold();
@@ -322,9 +356,21 @@ class _UiEditorScreenState extends State<UiEditorScreen> {
                           },
                           onFull: _openFull,
                           onMenu: (open) => open ? _pillHold() : _pillLater(),
-                        )
-                      : _PillHandle(c: c, onTap: _showPill),
-                ),
+                            ),
+                          ),
+                        ),
+                      ])
+                    : DraggableSpot(
+                        key: const ValueKey('pill-folded'),
+                        frac: _handleSpot,
+                        size: const Size(58, 38),
+                        initial: (a) => Offset((a.width - 58) / 2, mq.padding.top + 8),
+                        onMoved: (f) {
+                          setState(() => _handleSpot = f);
+                          saveSpot(kHandleSpotKey, f);
+                        },
+                        child: _PillHandle(c: c, onTap: _showPill),
+                      ),
               ),
             ),
             if (c.pickMode && !open && selected && !c.carrying.value)
@@ -343,19 +389,27 @@ class _UiEditorScreenState extends State<UiEditorScreen> {
                   ),
                 ),
               ),
+            // The +: drag it anywhere out of the way; it stays there.
             if (c.pickMode && !c.carrying.value)
-              Positioned(
-                right: 16,
-                bottom: mq.padding.bottom + 16,
-                child: AnimatedScale(
-                  duration: const Duration(milliseconds: 200),
-                  scale: open ? 0 : 1,
-                  child: _RoundButton(
-                    key: const ValueKey('editor-add'),
-                    icon: Icons.add_rounded,
-                    tooltip: 'Add',
-                    big: true,
-                    onTap: open ? null : () => _openDrawer(),
+              Positioned.fill(
+                child: DraggableSpot(
+                  frac: _addSpot,
+                  size: const Size(56, 56),
+                  initial: (a) => Offset(a.width - 16 - 56, a.height - mq.padding.bottom - 16 - 56),
+                  onMoved: (f) {
+                    setState(() => _addSpot = f);
+                    saveSpot(kAddSpotKey, f);
+                  },
+                  child: AnimatedScale(
+                    duration: const Duration(milliseconds: 200),
+                    scale: open ? 0 : 1,
+                    child: _RoundButton(
+                      key: const ValueKey('editor-add'),
+                      icon: Icons.add_rounded,
+                      tooltip: 'Add',
+                      big: true,
+                      onTap: open ? null : () => _openDrawer(),
+                    ),
                   ),
                 ),
               ),
@@ -798,11 +852,12 @@ class ContextStrip extends StatelessWidget {
           ));
         }
         children.addAll([
-          icon(Icons.text_fields_rounded, 'Font and more', onStyle, color: kGold),
+          icon(Icons.palette_rounded, 'Look', onStyle, color: kGold, key: const ValueKey('strip-look')),
           icon(Icons.edit_rounded, 'Words', onWords),
         ]);
       } else if (type != SlotType.orb) {
         children.add(icon(Icons.photo_library_rounded, 'Replace', onWords, color: kGold));
+        children.add(icon(Icons.palette_rounded, 'Look', onStyle, key: const ValueKey('strip-look')));
       } else {
         children.add(icon(Icons.blur_circular_rounded, 'Orb', onEffects, color: kGold));
       }
@@ -820,6 +875,7 @@ class ContextStrip extends StatelessWidget {
           ),
         ),
         icon(Icons.edit_note_rounded, 'Everything in it', onSection),
+        icon(Icons.palette_rounded, 'Look', onStyle, color: kGold, key: const ValueKey('strip-look')),
         icon(Icons.animation_rounded, 'Effects', onEffects),
         done,
       ]);
@@ -846,15 +902,17 @@ class ContextStrip extends StatelessWidget {
 /// Preferences flag: the touch hint has been seen on this phone.
 const kTouchHintSeen = 'ui_editor_touch_hint_seen';
 
-/// Shown once: the four touches. Any touch anywhere dismisses it.
+/// Shown once: the touches, as they really work. Any touch dismisses it.
 class TouchHint extends StatelessWidget {
   const TouchHint({super.key, required this.onDismiss});
   final VoidCallback onDismiss;
 
   static const _rows = <(IconData, String, String)>[
-    (Icons.touch_app_rounded, 'Tap', 'to select'),
+    (Icons.touch_app_rounded, 'Tap', 'to select, again to type'),
     (Icons.open_with_rounded, 'Drag', 'to move'),
     (Icons.pinch_rounded, 'Pinch', 'to resize'),
+    (Icons.back_hand_rounded, 'Hold', 'for more'),
+    (Icons.swipe_rounded, 'Flick away', 'to delete'),
     (Icons.add_circle_outline_rounded, '+', 'to add'),
   ];
 
@@ -866,28 +924,31 @@ class TouchHint extends StatelessWidget {
       child: Container(
         color: const Color(0xD9000000),
         alignment: Alignment.center,
-        child: Column(
+        padding: const EdgeInsets.all(16),
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             for (final (icon, verb, rest) in _rows)
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12),
+                padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
-                      width: 56,
-                      height: 56,
+                      width: 50,
+                      height: 50,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: kGold.withValues(alpha: 0.16),
                         border: Border.all(color: kGold, width: 2),
                       ),
-                      child: Icon(icon, color: kGold, size: 28),
+                      child: Icon(icon, color: kGold, size: 26),
                     ),
                     const SizedBox(width: 16),
                     SizedBox(
-                      width: 170,
+                      width: 230,
                       child: Text.rich(
                         TextSpan(
                           children: [
@@ -898,7 +959,7 @@ class TouchHint extends StatelessWidget {
                             TextSpan(text: rest),
                           ],
                         ),
-                        style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w600),
+                        style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600),
                       ),
                     ),
                   ],
@@ -907,6 +968,7 @@ class TouchHint extends StatelessWidget {
             const SizedBox(height: 28),
             const Text('Touch anywhere to start', style: TextStyle(color: kDim, fontSize: 13)),
           ],
+          ),
         ),
       ),
     );
