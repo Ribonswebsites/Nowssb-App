@@ -13,11 +13,13 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 import '../data/content.dart';
 import '../data/firebase.dart';
+import '../data/phone_notifications.dart';
 import '../data/models.dart';
 import '../data/practice_progress.dart';
 import '../widgets/app_backdrop.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import '../widgets/app_thinking_loader.dart';
+import 'auth_gate.dart';
 import 'practice_player.dart';
 import '../widgets/colored_split_promo_banner.dart';
 import 'sound_library.dart';
@@ -99,6 +101,22 @@ class _PersonalCoachScreenState extends State<PersonalCoachScreen> {
     } finally {
       if (mounted) setState(() => _signingIn = false);
     }
+  }
+
+  /// Same as Settings › Sign out. Signing out here used to leave the coach
+  /// on screen over the login page and keep the Google account cached, so
+  /// "Sign in" went straight back into the same account.
+  Future<void> _signOut() async {
+    try {
+      await _google.signOut();
+    } catch (_) {}
+    try {
+      await FirebaseAuth.instance.signOut();
+    } catch (_) {}
+    NotificationBanner.items.value = const [];
+    AuthGate.askForAccount();
+    if (!mounted) return;
+    Navigator.of(context, rootNavigator: true).popUntil((route) => route.isFirst);
   }
 
   Future<void> _send(_CoachData data, [String? preset]) async {
@@ -231,7 +249,7 @@ class _PersonalCoachScreenState extends State<PersonalCoachScreen> {
           const Spacer(),
           const _OrbitMark(),
           const SizedBox(width: 12),
-          _topButton(signedIn ? Icons.logout_rounded : Icons.person_outline_rounded, signedIn ? 'Sign out' : 'Sign in', signedIn ? () => FirebaseAuth.instance.signOut() : _signIn),
+          _topButton(signedIn ? Icons.logout_rounded : Icons.person_outline_rounded, signedIn ? 'Sign out' : 'Sign in', signedIn ? _signOut : _signIn),
         ])),
         const SizedBox(height: 16),
         LSection('hero', 'Hero', _hero(words)),
