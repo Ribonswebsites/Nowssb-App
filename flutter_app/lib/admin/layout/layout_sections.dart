@@ -338,11 +338,10 @@ class SectionFrame extends StatelessWidget {
     Widget w = child;
     final h = _d(p['height']);
     // Builtins, and the templates that do not size themselves from props.
+    // Scaled to the height both ways: pinching bigger grows the section
+    // (a scale-down-only fit left it small on top of blank space).
     if (h != null && h > 0 && (!entry.isTemplate || entry.kind == 'textBlock' || entry.kind == 'cta')) {
-      w = SizedBox(
-        height: h,
-        child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.topCenter, child: SizedBox(width: MediaQuery.sizeOf(context).width, child: w)),
-      );
+      w = SectionFitHeight(height: h, width: MediaQuery.sizeOf(context).width, child: w);
     }
     final preview = EditorPreviewScope.peek(context);
     if (preview != null) {

@@ -278,3 +278,105 @@ class _RenderSectionZoom extends RenderProxyBox {
     );
   }
 }
+
+/// Draws [child] exactly [height] tall by scaling it uniformly, up as well
+/// as down. A section pinched bigger than its natural height grows (the
+/// sides that no longer fit are clipped, centred) instead of sitting on top
+/// of blank space; pinched smaller, it shrinks as before.
+///
+/// [width] is used only when the parent gives no width (the child is laid
+/// out at the screen width, like the page it came from).
+class SectionFitHeight extends SingleChildRenderObjectWidget {
+  const SectionFitHeight({super.key, required this.height, required this.width, required super.child});
+
+  final double height;
+  final double width;
+
+  @override
+  RenderObject createRenderObject(BuildContext context) => RenderSectionFitHeight(height, width);
+
+  @override
+  void updateRenderObject(BuildContext context, RenderSectionFitHeight renderObject) {
+    renderObject
+      ..height = height
+      ..width = width;
+  }
+}
+
+class RenderSectionFitHeight extends RenderProxyBox {
+  RenderSectionFitHeight(this._height, this._width);
+
+  double _height;
+  set height(double v) {
+    if (v == _height) return;
+    _height = v;
+    markNeedsLayout();
+  }
+
+  double _width;
+  set width(double v) {
+    if (v == _width) return;
+    _width = v;
+    markNeedsLayout();
+  }
+
+  double _scale = 1;
+
+  /// How much the child is scaled to fill [height] (1 = natural size).
+  double get scale => _scale;
+
+  double _childW = 0;
+
+  Matrix4 get _transform {
+    final dx = (size.width - _childW * _scale) / 2;
+    return Matrix4.identity()
+      ..translateByDouble(dx, 0, 0, 1)
+      ..scaleByDouble(_scale, _scale, 1, 1);
+  }
+
+  @override
+  void performLayout() {
+    final c = child;
+    final w = constraints.hasBoundedWidth ? constraints.maxWidth : _width;
+    if (c == null) {
+      size = constraints.constrain(Size(w, _height));
+      return;
+    }
+    c.layout(BoxConstraints.tightFor(width: w), parentUsesSize: true);
+    _childW = c.size.width;
+    size = constraints.constrain(Size(w, _height));
+    final ch = c.size.height;
+    _scale = ch > 0 ? size.height / ch : 1;
+  }
+
+  @override
+  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) {
+    final c = child;
+    if (c == null) return false;
+    return result.addWithPaintTransform(
+      transform: _transform,
+      position: position,
+      hitTest: (BoxHitTestResult result, Offset position) => c.hitTest(result, position: position),
+    );
+  }
+
+  @override
+  void applyPaintTransform(RenderBox child, Matrix4 transform) {
+    transform.multiply(_transform);
+  }
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    final c = child;
+    if (c == null) return;
+    void inner(PaintingContext ctx, Offset off) =>
+        ctx.pushTransform(needsCompositing, off, _transform, (c2, o2) => c2.paintChild(c, o2));
+    if (_scale > 1.0005) {
+      // Scaled up: the sides spill past the screen; keep them off the
+      // neighbours' margins.
+      context.pushClipRect(needsCompositing, offset, Offset.zero & size, inner);
+    } else {
+      inner(context, offset);
+    }
+  }
+}
