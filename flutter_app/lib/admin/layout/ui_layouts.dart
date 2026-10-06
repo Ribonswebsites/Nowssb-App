@@ -26,7 +26,8 @@ import '../../data/firebase.dart';
 
 /// What renders a section entry.
 ///   builtin   — a section the app ships (id or [src] names it)
-///   imageBanner / videoBanner / splitPromo / cardRow / textBlock / cta
+///   imageBanner / videoBanner / splitPromo / cardRow / textBlock / cta /
+///   couponTicket / couponCards
 ///             — generic template sections built from [props]
 const kTemplateKinds = <String>[
   'imageBanner',
@@ -35,6 +36,8 @@ const kTemplateKinds = <String>[
   'cardRow',
   'textBlock',
   'cta',
+  'couponTicket',
+  'couponCards',
 ];
 
 class SectionEntry {

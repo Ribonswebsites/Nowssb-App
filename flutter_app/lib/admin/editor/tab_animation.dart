@@ -60,7 +60,9 @@ class _AnimationTabState extends State<AnimationTab> with SingleTickerProviderSt
     final ent = '${props['entrance'] ?? 'none'}';
     final auto = props['autoRotate'] == true;
     final interval = props['interval'] is num ? (props['interval'] as num).toDouble() : 4000.0;
-    final orbKey = _allLoaders || cur == null ? 'orb.all' : 'orb.${c.pageId}.${cur.id}';
+    // Same key the loaders read: SectionScope's page is the layout page
+    // ('<page>.<tab>' on pages with tabs), not the editor's page id.
+    final orbKey = _allLoaders || cur == null ? 'orb.all' : 'orb.${c.layoutPage}.${cur.id}';
     final orbStyle = c.overrideOf(orbKey)?.style ?? const <String, dynamic>{};
     final orbPick = '${orbStyle['orb'] ?? ''}';
     final orbSize = orbStyle['orbSize'] is num ? (orbStyle['orbSize'] as num).toDouble() : 72.0;
@@ -94,13 +96,13 @@ class _AnimationTabState extends State<AnimationTab> with SingleTickerProviderSt
         if (cur == null)
           const Hint('This page is one block for now — only the orb choice applies.')
         else ...[
-          Eyebrow(cur.carousel ? 'Page turn — “${cur.title}”' : 'Page turn'),
-          if (!cur.carousel)
-            const Padding(
-              padding: EdgeInsets.only(bottom: 6),
-              child: Text('This section does not scroll sideways. Pick a carousel section to change how it turns.',
-                  style: TextStyle(color: kDim, fontSize: 12)),
-            ),
+          // Entrance first: it works for every section (page turns only for
+          // sideways carousels, which most sections are not).
+          Eyebrow('Entrance — how “${cur.title}” appears',
+              trailing: Pill('Play again', icon: Icons.replay_rounded, dense: true, onTap: () {
+                tapFeel();
+                c.preview.replay();
+              })),
           GridView.count(
             crossAxisCount: 3,
             shrinkWrap: true,
@@ -109,20 +111,70 @@ class _AnimationTabState extends State<AnimationTab> with SingleTickerProviderSt
             crossAxisSpacing: 8,
             childAspectRatio: 1.05,
             children: [
-              for (final e in kCarouselTransitions.entries)
+              for (final e in kEntrances.entries)
                 _FxTile(
                   label: e.value,
-                  selected: fx == e.key,
-                  enabled: cur.carousel,
-                  onTap: () => c.patchProps(cur.id, {'transition': e.key.isEmpty ? null : e.key}),
+                  selected: ent == e.key,
+                  onTap: () {
+                    tapFeel();
+                    c.patchProps(cur.id, {'entrance': e.key == 'none' ? null : e.key});
+                    // Play it on the preview right away.
+                    c.preview.replay();
+                  },
                   child: AnimatedBuilder(
                     animation: _loop,
-                    builder: (_, __) => _FxDemo(fx: e.key, t: _loop.value),
+                    builder: (_, __) {
+                      final t = (_loop.value * 1.6).clamp(0.0, 1.0);
+                      return entranceTransform(e.key, Curves.easeOutCubic.transform(t), const _MiniCard(color: kGold));
+                    },
                   ),
                 ),
             ],
           ),
-          if (cur.carousel) ...[
+          Eyebrow(cur.carousel ? 'Page turn — “${cur.title}”' : 'Page turn'),
+          if (!cur.carousel) ...[
+            const Padding(
+              padding: EdgeInsets.only(bottom: 6),
+              child: Text('Page turns are for sections that scroll sideways. Jump to one:',
+                  style: TextStyle(color: kDim, fontSize: 12)),
+            ),
+            Builder(builder: (context) {
+              final carousels = [for (final s in c.sections) if (s.carousel && !s.entry.deleted) s];
+              if (carousels.isEmpty) {
+                return const Text('This page has no sideways sections.', style: TextStyle(color: kFaint, fontSize: 12));
+              }
+              return Wrap(spacing: 8, runSpacing: 8, children: [
+                for (final s in carousels)
+                  Pill(s.title, icon: Icons.view_carousel_rounded, dense: true, onTap: () {
+                    tapFeel();
+                    c.jumpToSection(s.id);
+                  }),
+              ]);
+            }),
+          ] else ...[
+            GridView.count(
+              crossAxisCount: 3,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              mainAxisSpacing: 8,
+              crossAxisSpacing: 8,
+              childAspectRatio: 1.05,
+              children: [
+                for (final e in kCarouselTransitions.entries)
+                  _FxTile(
+                    label: e.value,
+                    selected: fx == e.key,
+                    onTap: () {
+                      tapFeel();
+                      c.patchProps(cur.id, {'transition': e.key.isEmpty ? null : e.key});
+                    },
+                    child: AnimatedBuilder(
+                      animation: _loop,
+                      builder: (_, __) => _FxDemo(fx: e.key, t: _loop.value),
+                    ),
+                  ),
+              ],
+            ),
             const SizedBox(height: 6),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
@@ -145,30 +197,6 @@ class _AnimationTabState extends State<AnimationTab> with SingleTickerProviderSt
                 onChanged: (v) => c.patchProps(cur.id, {'interval': (v * 1000).round()}),
               ),
           ],
-          Eyebrow('Entrance — how “${cur.title}” appears'),
-          GridView.count(
-            crossAxisCount: 3,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-            childAspectRatio: 1.05,
-            children: [
-              for (final e in kEntrances.entries)
-                _FxTile(
-                  label: e.value,
-                  selected: ent == e.key,
-                  onTap: () => c.patchProps(cur.id, {'entrance': e.key == 'none' ? null : e.key}),
-                  child: AnimatedBuilder(
-                    animation: _loop,
-                    builder: (_, __) {
-                      final t = (_loop.value * 1.6).clamp(0.0, 1.0);
-                      return entranceTransform(e.key, Curves.easeOutCubic.transform(t), const _MiniCard(color: kGold));
-                    },
-                  ),
-                ),
-            ],
-          ),
         ],
         Eyebrow('Thinking orb',
             trailing: PillSwitch(

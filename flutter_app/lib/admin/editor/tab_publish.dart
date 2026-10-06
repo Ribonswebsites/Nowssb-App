@@ -102,25 +102,45 @@ class PublishTab extends StatelessWidget {
           ),
         ],
         const Eyebrow('Version history — this page'),
-        StreamBuilder<List<HistoryEntry>>(
-          stream: EditorStore.instance.history(c.pageId),
-          builder: (context, snap) {
-            if (snap.hasError) {
-              return Text('History is not readable yet: ${snap.error}',
-                  style: const TextStyle(color: kDim, fontSize: 12));
-            }
-            final list = snap.data;
-            if (list == null) return const Padding(padding: EdgeInsets.all(12), child: LinearProgressIndicator(color: kGold));
-            if (list.isEmpty) {
-              return const Text('Nothing published from the editor on this page yet.',
-                  style: TextStyle(color: kDim, fontSize: 12));
-            }
-            return Column(children: [
-              for (final h in list.take(60)) _HistoryRow(h: h),
-            ]);
-          },
-        ),
+        // Its own widget: a stream created in build() was re-subscribed on
+        // every editor change (each keystroke, each slider tick), flashing
+        // the loader and re-reading Firestore.
+        _History(key: ValueKey('hist-${c.pageId}'), page: c.pageId),
       ],
+    );
+  }
+}
+
+class _History extends StatefulWidget {
+  const _History({super.key, required this.page});
+  final String page;
+
+  @override
+  State<_History> createState() => _HistoryState();
+}
+
+class _HistoryState extends State<_History> {
+  late final Stream<List<HistoryEntry>> _stream = EditorStore.instance.history(widget.page);
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<List<HistoryEntry>>(
+      stream: _stream,
+      builder: (context, snap) {
+        if (snap.hasError) {
+          return Text('History is not readable yet: ${snap.error}',
+              style: const TextStyle(color: kDim, fontSize: 12));
+        }
+        final list = snap.data;
+        if (list == null) return const Padding(padding: EdgeInsets.all(12), child: LinearProgressIndicator(color: kGold));
+        if (list.isEmpty) {
+          return const Text('Nothing published from the editor on this page yet.',
+              style: TextStyle(color: kDim, fontSize: 12));
+        }
+        return Column(children: [
+          for (final h in list.take(60)) _HistoryRow(h: h),
+        ]);
+      },
     );
   }
 }
@@ -216,12 +236,17 @@ class _ScheduleRow extends StatelessWidget {
 
   Future<int?> _pick(BuildContext context, int ms) async {
     final now = DateTime.now();
-    final init = ms == 0 ? now : DateTime.fromMillisecondsSinceEpoch(ms);
+    final first = now.subtract(const Duration(days: 1));
+    final last = now.add(const Duration(days: 730));
+    final saved = ms == 0 ? now : DateTime.fromMillisecondsSinceEpoch(ms);
+    // A schedule set days ago is before firstDate: showDatePicker asserts
+    // (red screen in debug) unless the initial day is inside the range.
+    final init = saved.isBefore(first) ? now : (saved.isAfter(last) ? last : saved);
     final day = await showDatePicker(
       context: context,
       initialDate: init,
-      firstDate: now.subtract(const Duration(days: 1)),
-      lastDate: now.add(const Duration(days: 730)),
+      firstDate: first,
+      lastDate: last,
     );
     if (day == null || !context.mounted) return null;
     final t = await showTimePicker(context: context, initialTime: TimeOfDay.fromDateTime(init));

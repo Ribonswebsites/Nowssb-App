@@ -81,6 +81,18 @@ class EditorPreviewController extends ChangeNotifier {
 
   void changed() => notifyListeners();
 
+  /// Bumped to play every section's entrance again (the Animation tab does
+  /// it on each pick, so the owner sees the animation they chose).
+  int replayTick = 0;
+  void replay() {
+    replayTick++;
+    notifyListeners();
+  }
+
+  /// Rendered height of each section in the preview ('<page>/<section>'),
+  /// so a pinch starts from the size on screen instead of a guess.
+  final Map<String, double> sectionHeights = {};
+
   /// The page id that reported last — for a page with tabs
   /// ('<pageId>.<tabId>', program_kit.dart) the tab on screen.
   String? lastReported;

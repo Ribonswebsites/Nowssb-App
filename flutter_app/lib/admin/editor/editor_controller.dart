@@ -253,7 +253,9 @@ class EditorController extends ChangeNotifier {
   void setVisible(String id, bool v) => updateEntry(id, (e) => e.copyWith(visible: v));
 
   void delete(String id) {
-    final e = entries.firstWhere((x) => x.id == id);
+    final i = entries.indexWhere((x) => x.id == id);
+    if (i < 0) return; // already gone (e.g. page reset underneath)
+    final e = entries[i];
     if (e.isTemplate || e.src.isNotEmpty) {
       // Added by the owner: removed outright (history can bring it back).
       _setEntries([for (final x in entries) if (x.id != id) x]);

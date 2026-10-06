@@ -148,7 +148,9 @@ class LayoutTab extends StatelessWidget {
       isScrollControlled: true,
       backgroundColor: const Color(0xF20B1120),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (ctx) => Padding(
+      // Scrolls: with the coupon templates the gallery is taller than a
+      // small phone's sheet.
+      builder: (ctx) => SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(16, 18, 16, 28),
         child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
           const Text('Add a section', style: TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w800)),
@@ -194,6 +196,8 @@ class LayoutTab extends StatelessWidget {
         'splitPromo' => Icons.vertical_split_rounded,
         'cardRow' => Icons.view_carousel_rounded,
         'textBlock' => Icons.notes_rounded,
+        'couponTicket' => Icons.confirmation_number_outlined,
+        'couponCards' => Icons.local_offer_outlined,
         _ => Icons.smart_button_rounded,
       };
 }

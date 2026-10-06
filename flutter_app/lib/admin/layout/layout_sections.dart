@@ -22,6 +22,7 @@ import 'dart:async';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 import '../admin_state.dart';
 import '../template/ui_overrides.dart';
@@ -159,7 +160,9 @@ List<SectionItem> applyLayout(
       if (e.src.isNotEmpty && !item.copyable) continue;
       base = item.widget;
     }
-    final plain = e.props.isEmpty && !e.isTemplate && e.src.isEmpty && isolate == null;
+    // In the editor preview every section gets its frame (it measures the
+    // section and replays entrances); users keep the bare widget.
+    final plain = e.props.isEmpty && !e.isTemplate && e.src.isEmpty && isolate == null && preview == null;
     out.add(SectionItem(
       e.id,
       byId[e.builtinId]?.title ?? e.id,
@@ -334,10 +337,18 @@ class SectionFrame extends StatelessWidget {
     final p = entry.props;
     Widget w = child;
     final h = _d(p['height']);
-    if (h != null && h > 0 && !entry.isTemplate) {
+    // Builtins, and the templates that do not size themselves from props.
+    if (h != null && h > 0 && (!entry.isTemplate || entry.kind == 'textBlock' || entry.kind == 'cta')) {
       w = SizedBox(
         height: h,
         child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.topCenter, child: SizedBox(width: MediaQuery.sizeOf(context).width, child: w)),
+      );
+    }
+    final preview = EditorPreviewScope.peek(context);
+    if (preview != null) {
+      w = _MeasureHeight(
+        onHeight: (h) => preview.sectionHeights['$pageId/${entry.id}'] = h,
+        child: w,
       );
     }
     final pt = _d(p['padTop']) ?? 0;
@@ -400,6 +411,16 @@ class SectionEntrance extends StatefulWidget {
 class _SectionEntranceState extends State<SectionEntrance> with SingleTickerProviderStateMixin {
   late final AnimationController _c =
       AnimationController(vsync: this, duration: const Duration(milliseconds: 650))..forward();
+  int? _tick;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Only inside the editor preview: replay when the Animation tab asks.
+    final tick = EditorPreviewScope.of(context)?.replayTick;
+    if (_tick != null && tick != null && tick != _tick) _c.forward(from: 0);
+    _tick = tick;
+  }
 
   @override
   void didUpdateWidget(SectionEntrance old) {
@@ -444,6 +465,29 @@ Widget entranceTransform(String kind, double t, Widget child) {
       return Opacity(opacity: t, child: child);
   }
   return child;
+}
+
+/// Reports its child's laid-out height (editor preview only).
+class _MeasureHeight extends SingleChildRenderObjectWidget {
+  const _MeasureHeight({required this.onHeight, required super.child});
+  final ValueChanged<double> onHeight;
+
+  @override
+  RenderObject createRenderObject(BuildContext context) => _RenderMeasureHeight(onHeight);
+
+  @override
+  void updateRenderObject(BuildContext context, _RenderMeasureHeight r) => r.onHeight = onHeight;
+}
+
+class _RenderMeasureHeight extends RenderProxyBox {
+  _RenderMeasureHeight(this.onHeight);
+  ValueChanged<double> onHeight;
+
+  @override
+  void performLayout() {
+    super.performLayout();
+    if (size.height.isFinite && size.height > 0) onHeight(size.height);
+  }
 }
 
 /// Turns pages on its own when the section's Animation tab says so.

@@ -83,7 +83,9 @@ class _EditorPreviewState extends State<EditorPreview> {
           : PageView.builder(
               key: ValueKey('pv-${page.id}'),
               controller: _pages,
-              physics: c.pickMode ? const PageScrollPhysics() : const NeverScrollableScrollPhysics(),
+              // Layout tab ("arrange"): a sideways drag moves the section,
+              // so the pager must not steal it. Chevrons/dots still page.
+              physics: c.pickMode && !c.arrange ? const PageScrollPhysics() : const NeverScrollableScrollPhysics(),
               itemCount: secs.length,
               onPageChanged: (i) {
                 tapFeel();
@@ -294,6 +296,10 @@ class _ArrangeHandState extends State<_ArrangeHand> {
         _dx = _num('dx');
         _dy = _num('dy');
         _h = _num('height');
+        if (_h < 1) {
+          // No saved height yet: start from the size the section has now.
+          _h = widget.c.preview.sectionHeights['${widget.c.layoutPage}/${widget.sectionId}'] ?? 0;
+        }
         _pinch = d.pointerCount >= 2;
       },
       onScaleUpdate: (d) {

@@ -4,6 +4,7 @@
 ///
 /// props: title, subtitle, body, cta, route, image, video, bg (ARGB),
 ///        bg2 (ARGB), height, cards: [{image, title, route}], align
+///        coupons: [{amount, unit, code, …}] (coupon kinds, coupon_sections.dart)
 library;
 
 import 'dart:io';
@@ -16,6 +17,7 @@ import 'package:video_player/video_player.dart';
 import '../template/editable.dart';
 import 'app_pages.dart';
 import 'carousel_fx.dart';
+import 'coupon_sections.dart';
 import 'layout_sections.dart';
 import 'ui_layouts.dart';
 
@@ -27,6 +29,8 @@ const kTemplateNames = <String, String>{
   'cardRow': 'Horizontal card row',
   'textBlock': 'Text block',
   'cta': 'Button',
+  'couponTicket': 'Coupon tickets (stacked)',
+  'couponCards': 'Coupon cards (side by side)',
 };
 
 const kTemplateBlurbs = <String, String>{
@@ -36,10 +40,16 @@ const kTemplateBlurbs = <String, String>{
   'cardRow': 'Cards people swipe sideways',
   'textBlock': 'A heading and a paragraph',
   'cta': 'One button that goes somewhere',
+  'couponTicket': 'Wide cut-out tickets: big amount, code, barcode — on white',
+  'couponCards': 'Two portrait coupons with a coloured ribbon — on white',
 };
 
 String templateTitle(SectionEntry e) {
-  final t = '${e.props['title'] ?? ''}'.trim();
+  var t = '${e.props['title'] ?? ''}'.trim();
+  if (t.isEmpty && (e.kind == 'couponTicket' || e.kind == 'couponCards')) {
+    final first = couponsOf(e.props);
+    if (first.isNotEmpty) t = '${first.first['code'] ?? ''}'.trim();
+  }
   final kind = kTemplateNames[e.kind] ?? e.kind;
   return t.isEmpty ? kind : '$kind · $t';
 }
@@ -60,6 +70,7 @@ Map<String, dynamic> templateStarter(String kind) => switch (kind) {
         },
       'textBlock' => {'title': 'A heading', 'body': 'Write something people should read.'},
       'cta' => {'cta': 'Start now', 'route': 'tab:1'},
+      'couponTicket' || 'couponCards' => couponStarter(kind),
       _ => {},
     };
 
@@ -191,6 +202,9 @@ class TemplateSection extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
           child: Center(child: _cta(context)),
         );
+      case 'couponTicket':
+      case 'couponCards':
+        return CouponSection(kind: entry.kind, props: p);
     }
     return const SizedBox.shrink();
   }
@@ -333,18 +347,22 @@ class _NetVideoState extends State<NetVideo> {
   }
 
   Future<void> _open() async {
+    final url = widget.url;
+    if (url.isEmpty) return;
     try {
-      final f = await DefaultCacheManager().getSingleFile(widget.url);
-      if (!mounted) return;
+      final f = await DefaultCacheManager().getSingleFile(url);
+      if (!mounted || url != widget.url) return;
       final c = VideoPlayerController.file(File(f.path), videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
       await c.initialize();
       await c.setVolume(0);
       await c.setLooping(true);
       await c.play();
-      if (!mounted) {
+      // Gone, or the owner swapped the clip while this one was loading.
+      if (!mounted || url != widget.url) {
         await c.dispose();
         return;
       }
+      _c?.dispose();
       setState(() => _c = c);
     } catch (_) {}
   }

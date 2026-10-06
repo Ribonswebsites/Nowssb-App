@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../layout/app_pages.dart';
+import '../layout/coupon_sections.dart';
 import '../layout/template_sections.dart';
 import '../layout/ui_layouts.dart';
 import '../media_upload.dart';
@@ -449,6 +450,8 @@ class _TemplateEditorState extends State<TemplateEditor> {
     final k = e.kind;
     final p = e.props;
     final cards = p['cards'] is List ? [for (final m in p['cards'] as List) if (m is Map) Map<String, dynamic>.from(m)] : <Map<String, dynamic>>[];
+    final coupon = k == 'couponTicket' || k == 'couponCards';
+    if (coupon) return _couponEditor(k, p);
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       if (k != 'cta') _field('title', 'Headline'),
       if (k == 'imageBanner' || k == 'videoBanner' || k == 'splitPromo') _field('subtitle', 'Line under it'),
@@ -553,6 +556,86 @@ class _TemplateEditorState extends State<TemplateEditor> {
         LinearProgressIndicator(value: _progress, color: kGold, backgroundColor: const Color(0x22FFFFFF)),
       ],
       if (_msg != null) Padding(padding: const EdgeInsets.only(top: 6), child: Text(_msg!, style: const TextStyle(color: kDim, fontSize: 11.5))),
+    ]);
+  }
+}
+
+extension on _TemplateEditorState {
+  /// Coupon templates: every word, code and colour of each coupon.
+  Widget _couponEditor(String k, Map<String, dynamic> p) {
+    final coupons = couponsOf(p);
+    void save(List<Map<String, dynamic>> next) => widget.c.patchProps(e.id, {'coupons': next});
+    InputDecoration deco(String label) => InputDecoration(
+          labelText: label,
+          labelStyle: const TextStyle(color: kDim),
+          filled: true,
+          fillColor: const Color(0x14FFFFFF),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+          isDense: true,
+        );
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      const Text('Text, borders and barcode colour', style: TextStyle(color: kDim, fontSize: 12)),
+      const SizedBox(height: 6),
+      ColorRow(
+        value: p['ink'] is num ? (p['ink'] as num).toInt() : null,
+        onPick: (v) => widget.c.patchProps(e.id, {'ink': v}),
+      ),
+      const SizedBox(height: 10),
+      for (var i = 0; i < coupons.length; i++)
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Glass(
+            radius: 14,
+            padding: const EdgeInsets.all(10),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              Row(children: [
+                Text('Coupon ${i + 1}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+                const Spacer(),
+                IconButton(
+                  tooltip: 'Remove this coupon',
+                  visualDensity: VisualDensity.compact,
+                  onPressed: () => save([...coupons]..removeAt(i)),
+                  icon: const Icon(Icons.delete_outline_rounded, color: kFaint, size: 18),
+                ),
+              ]),
+              for (final (key, label, lines) in couponFields(k))
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: TextFormField(
+                    key: ValueKey('cp-${e.id}-$i-$key-${coupons.length}'),
+                    initialValue: '${coupons[i][key] ?? ''}',
+                    minLines: 1,
+                    maxLines: lines,
+                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                    decoration: deco(label),
+                    onChanged: (v) {
+                      final next = [...couponsOf(e.props)];
+                      if (i >= next.length) return;
+                      next[i] = {...next[i], key: v};
+                      save(next);
+                    },
+                  ),
+                ),
+              const Text('Ribbon colour (the code takes it too)', style: TextStyle(color: kDim, fontSize: 12)),
+              const SizedBox(height: 6),
+              ColorRow(
+                value: coupons[i]['tagColor'] is num ? (coupons[i]['tagColor'] as num).toInt() : null,
+                onPick: (v) {
+                  final next = [...couponsOf(e.props)];
+                  if (i >= next.length) return;
+                  next[i] = {...next[i], 'tagColor': v}..removeWhere((_, x) => x == null);
+                  save(next);
+                },
+              ),
+            ]),
+          ),
+        ),
+      Align(
+        alignment: Alignment.centerLeft,
+        child: Pill('Add a coupon', icon: Icons.add_rounded, onTap: () => save([...coupons, couponBlank(k, coupons.length)])),
+      ),
+      const SizedBox(height: 6),
+      const Text('Tapping a code in the app copies it.', style: TextStyle(color: kDim, fontSize: 11.5)),
     ]);
   }
 }

@@ -91,7 +91,14 @@ class _AnimationLibraryState extends State<AnimationLibrary> with SingleTickerPr
             ]),
           ),
           const SizedBox(height: 8),
-          Expanded(child: _body(cur, props)),
+          // Rebuild on every pick: this route is not under the editor's
+          // setState, so without this the tick never moved to the new tile.
+          Expanded(
+            child: ListenableBuilder(
+              listenable: c,
+              builder: (context, _) => _body(c.current, c.current?.entry.props ?? const <String, dynamic>{}),
+            ),
+          ),
         ]),
       ),
     );
@@ -149,7 +156,7 @@ class _AnimationLibraryState extends State<AnimationLibrary> with SingleTickerPr
         // Full picker: every OrbState.values, live grid, Set/Undo server-side.
         final key = c.current == null
             ? 'orb.all'
-            : 'orb.${c.pageId}.${c.current!.id}';
+            : 'orb.${c.layoutPage}.${c.current!.id}';
         final pick = '${c.overrideOf(key)?.style['orb'] ?? c.overrideOf('orb.all')?.style['orb'] ?? ''}';
         return Column(children: [
           Padding(
@@ -192,7 +199,10 @@ class _AnimationLibraryState extends State<AnimationLibrary> with SingleTickerPr
               label: e.value,
               selected: ent == e.key,
               enabled: cur != null,
-              onTap: () => c.patchProps(cur!.id, {'entrance': e.key == 'none' ? null : e.key}),
+              onTap: () {
+                c.patchProps(cur!.id, {'entrance': e.key == 'none' ? null : e.key});
+                c.preview.replay();
+              },
               child: AnimatedBuilder(
                 animation: _loop,
                 builder: (_, __) {
