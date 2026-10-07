@@ -116,24 +116,44 @@ class _RenderSectionZoom extends RenderProxyBox {
 /// [width] is used only when the parent gives no width (the child is laid
 /// out at the screen width, like the page it came from).
 class SectionFitHeight extends SingleChildRenderObjectWidget {
-  const SectionFitHeight({super.key, required this.height, required this.width, required super.child});
+  const SectionFitHeight({super.key, required this.height, required this.width, this.align = 0, required super.child});
 
   final double height;
   final double width;
 
+  /// Made smaller, where it sits across its row: −1 left, 0 middle, 1 right.
+  final double align;
+
   @override
-  RenderObject createRenderObject(BuildContext context) => RenderSectionFitHeight(height, width);
+  RenderObject createRenderObject(BuildContext context) => RenderSectionFitHeight(height, width, align);
 
   @override
   void updateRenderObject(BuildContext context, RenderSectionFitHeight renderObject) {
     renderObject
       ..height = height
-      ..width = width;
+      ..width = width
+      ..align = align;
   }
 }
 
 class RenderSectionFitHeight extends RenderProxyBox {
-  RenderSectionFitHeight(this._height, this._width);
+  RenderSectionFitHeight(this._height, this._width, [this._align = 0]);
+
+  double _align;
+  set align(double v) {
+    if (v == _align) return;
+    _align = v;
+    markNeedsPaint();
+  }
+
+  /// Where the section itself is drawn in this row's box.
+  Rect get contentRect {
+    final c = child;
+    if (c == null || !c.hasSize) return Offset.zero & size;
+    return Rect.fromLTWH(_left, 0, _childW * _scale, c.size.height * _scale);
+  }
+
+  double get _left => (size.width - _childW * _scale) * (_scale < 1 ? (_align + 1) / 2 : 0.5);
 
   double _height;
   set height(double v) {
@@ -157,9 +177,8 @@ class RenderSectionFitHeight extends RenderProxyBox {
   double _childW = 0;
 
   Matrix4 get _transform {
-    final dx = (size.width - _childW * _scale) / 2;
     return Matrix4.identity()
-      ..translateByDouble(dx, 0, 0, 1)
+      ..translateByDouble(_left, 0, 0, 1)
       ..scaleByDouble(_scale, _scale, 1, 1);
   }
 

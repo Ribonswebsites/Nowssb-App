@@ -7,9 +7,11 @@ library;
 import 'package:flutter/material.dart';
 
 import '../layout/scopes.dart';
+import '../layout/side_row.dart';
 import '../layout/template_sections.dart';
 import 'editor_controller.dart';
 import 'glass.dart';
+import 'preview.dart' show ElementDrop;
 
 class LayoutTab extends StatelessWidget {
   const LayoutTab({super.key, required this.c});
@@ -119,7 +121,7 @@ class AddSectionsTab extends StatelessWidget {
     if (!c.sectioned) {
       return const Hint('This page can’t take new sections yet.', icon: Icons.view_agenda_outlined);
     }
-    return GridView.builder(
+    final grid = GridView.builder(
       padding: const EdgeInsets.fromLTRB(14, 0, 14, 24),
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: 220,
@@ -129,6 +131,79 @@ class AddSectionsTab extends StatelessWidget {
       ),
       itemCount: kTemplateGallery.length,
       itemBuilder: (context, i) => SectionTile(c: c, kind: kTemplateGallery[i], onAdded: onAdded),
+    );
+    return Column(children: [
+      Padding(
+        padding: const EdgeInsets.fromLTRB(14, 0, 14, 10),
+        child: Row(children: [
+          for (final k in const [BesideKind.image, BesideKind.text, BesideKind.button]) ...[
+            Expanded(child: BesideTile(c: c, kind: k, onAdded: onAdded)),
+            if (k != BesideKind.button) const SizedBox(width: 10),
+          ],
+        ]),
+      ),
+      Expanded(child: grid),
+    ]);
+  }
+}
+
+/// A picture, words or a button: hold and drag it next to a smaller
+/// section (or onto any section); a tap puts it beside the picked one.
+class BesideTile extends StatelessWidget {
+  const BesideTile({super.key, required this.c, required this.kind, required this.onAdded});
+  final EditorController c;
+  final BesideKind kind;
+  final VoidCallback onAdded;
+
+  IconData get _icon => switch (kind) {
+        BesideKind.image => Icons.image_rounded,
+        BesideKind.text => Icons.short_text_rounded,
+        BesideKind.button => Icons.smart_button_rounded,
+        BesideKind.template => Icons.dashboard_rounded,
+      };
+
+  @override
+  Widget build(BuildContext context) {
+    final label = BesideItem.label(kind);
+    final tile = Glass(
+      radius: 14,
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      onTap: () {
+        final cur = c.current;
+        if (cur == null) return;
+        bigFeel();
+        final side = sideAlignOf(cur.entry.props);
+        c.endStep();
+        c.addBeside(cur.id, kind, side < 0 ? 0.78 : (side > 0 ? 0.22 : 0.85), 0.5);
+        c.endStep();
+        onAdded();
+      },
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 48),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Icon(_icon, color: kGold, size: 24),
+          const SizedBox(height: 3),
+          Text(label, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
+        ]),
+      ),
+    );
+    return LongPressDraggable<Object>(
+      key: ValueKey('add-beside-${kind.name}'),
+      data: ElementDrop(kind),
+      delay: const Duration(milliseconds: 120),
+      hapticFeedbackOnStart: true,
+      dragAnchorStrategy: pointerDragAnchorStrategy,
+      onDragStarted: () => c.setFxDragging(true),
+      onDragEnd: (_) => c.setFxDragging(false),
+      feedback: Material(
+        color: Colors.transparent,
+        child: Transform.translate(
+          offset: const Offset(-48, -90),
+          child: SizedBox(width: 96, child: Opacity(opacity: 0.92, child: BesideView(item: BesideItem(id: '-', kind: kind)))),
+        ),
+      ),
+      childWhenDragging: Opacity(opacity: 0.35, child: tile),
+      child: tile,
     );
   }
 }

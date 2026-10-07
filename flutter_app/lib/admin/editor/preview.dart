@@ -19,6 +19,8 @@ import '../layout/app_pages.dart';
 import '../layout/image_frame.dart';
 import '../layout/placed_orbs.dart';
 import '../layout/scopes.dart';
+import '../layout/section_pinch.dart' show RenderSectionFitHeight;
+import '../layout/side_row.dart';
 import '../template/editable.dart';
 import '../template/slot_keys.dart';
 import 'bin.dart';
@@ -382,6 +384,12 @@ class FxDrop {
 
 /// An animation (anims/anim_library.dart id) dragged out of the drawer,
 /// to be placed where it is dropped.
+/// A picture, words or a button from the drawer, put beside a section.
+class ElementDrop {
+  const ElementDrop(this.kind);
+  final BesideKind kind;
+}
+
 class AnimDrop {
   const AnimDrop(this.id);
   final String id;
@@ -526,7 +534,7 @@ void deleteWithUndo(BuildContext context, EditorController c, String id, String 
   _undoBar(context, c, 'Deleted “$title” · in the Bin', item.id);
 }
 
-enum _Grab { none, scroll, order, pinchSection, pinchElement, moveElement, moveOrb, pinchOrb, panImage, zoomImage, frameEdge }
+enum _Grab { none, scroll, order, pinchSection, pinchElement, moveElement, moveOrb, pinchOrb, panImage, zoomImage, frameEdge, moveBeside }
 
 /// Places one drag up or down moves a section when no other section is
 /// under the finger (kept for callers and tests of the step maths).
@@ -770,6 +778,58 @@ class _TouchLayerState extends State<_TouchLayer> {
     return null;
   }
 
+  // ── A smaller section: its side, and what is beside it ──────────────
+
+  RenderSectionFitHeight? _fitIn(RenderObject? r) {
+    if (r == null) return null;
+    if (r is RenderSectionFitHeight) return r;
+    RenderSectionFitHeight? found;
+    r.visitChildren((x) => found ??= _fitIn(x));
+    return found;
+  }
+
+  /// Where section [id] itself is drawn when made smaller than its row
+  /// (null when it fills its row).
+  Rect? _shrunkRect(String? id) {
+    final row = _sectionRect(id);
+    final box = c.preview.sectionBoxes['${c.layoutPage}/$id'];
+    final fit = _fitIn(box);
+    if (row == null || fit == null || !fit.attached || !fit.hasSize) return null;
+    final r = _rectOf(fit);
+    if (r == null) return null;
+    final inner = fit.contentRect.shift(r.topLeft);
+    return inner.width < row.width - 40 ? inner : null;
+  }
+
+  /// The thing beside a section under [p]: (section, item, its rect).
+  (String, BesideItem, Rect)? _besideAt(Offset p) {
+    for (final (id, _) in _sections) {
+      for (final i in c.besideIn(id)) {
+        final r = _rectOf(c.preview.besideBoxes['${c.layoutPage}/$id/${i.id}']);
+        if (r != null && r.inflate(8).contains(p)) return (id, i, r);
+      }
+    }
+    return null;
+  }
+
+  (String, String)? _beside;
+  Offset _besideStart = Offset.zero;
+
+  Future<String?> _askWords(String now) {
+    final t = TextEditingController(text: now);
+    return showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Words'),
+        content: TextField(key: const ValueKey('beside-words'), controller: t, autofocus: true),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx, t.text), child: const Text('Save')),
+        ],
+      ),
+    );
+  }
+
   // ── A picked picture: pan, zoom and frame handles ───────────────────
 
   static const _frameKeys = ['imgZoom', 'imgX', 'imgY', 'frameL', 'frameT', 'frameR', 'frameB'];
@@ -981,14 +1041,25 @@ class _TouchLayerState extends State<_TouchLayer> {
     _orb = null;
     _element = null;
     final p = _start;
+    _beside = null;
     final orb = _orbAt(p);
-    if (orb != null) {
+    final side = orb == null ? _besideAt(p) : null;
+    if (side != null) {
+      final row = _sectionRect(side.$1)!;
+      _beside = (side.$1, side.$2.id);
+      _besideStart = Offset(side.$2.x * row.width, side.$2.y * row.height);
+      _grab = _Grab.moveBeside;
+    } else if (orb != null) {
       c.selectedOrb = (orb.section, orb.orb.id);
       c.sectionPicked = false;
       c.clearSelection();
       _orb = (orb.section, orb.orb.id);
       _baseOffset = Offset(orb.orb.x * orb.box.width, orb.orb.y);
       _grab = _Grab.moveOrb;
+    } else if (c.sectionPicked && c.selectedSlot == null && (_shrunkRect(c.current?.id)?.contains(p) ?? false)) {
+      // A picked smaller section is held by itself (not the words in it),
+      // so it can be carried to the left, the middle or the right.
+      _grab = _Grab.order;
     } else {
       final sel = _selectedSlot;
       var el = sel != null && (_slotRect(sel)?.contains(p) ?? false) ? sel : _slotAt(p);
@@ -1044,6 +1115,15 @@ class _TouchLayerState extends State<_TouchLayer> {
   void _carryTo(Offset local) {
     final total = local - _start;
     switch (_grab) {
+      case _Grab.moveBeside:
+        final b = _beside;
+        final row = _sectionRect(b?.$1);
+        if (b == null || row == null || row.isEmpty) return;
+        setState(() => _finger = local);
+        final at = _besideStart + total;
+        c.updateBeside(b.$1, b.$2,
+            (i) => i.copyWith(x: (at.dx / row.width).clamp(0.0, 1.0), y: (at.dy / row.height).clamp(0.0, 1.0)));
+        return;
       case _Grab.moveElement:
         final sel = _element;
         if (sel == null) return;
@@ -1072,7 +1152,8 @@ class _TouchLayerState extends State<_TouchLayer> {
     }
   }
 
-  bool get _carrying => _grab == _Grab.order || _grab == _Grab.moveOrb || _grab == _Grab.moveElement;
+  bool get _carrying =>
+      _grab == _Grab.order || _grab == _Grab.moveOrb || _grab == _Grab.moveElement || _grab == _Grab.moveBeside;
 
   /// Tells the screen something is being carried (it clears the bottom).
   void _syncCarry() {
@@ -1146,7 +1227,7 @@ class _TouchLayerState extends State<_TouchLayer> {
         final id = c.current?.id;
         if (id == null) return;
         c.patchProps(id, {'height': (_base * d.scale).clamp(60.0, 1400.0).roundToDouble()});
-      case _Grab.moveElement || _Grab.moveOrb || _Grab.order:
+      case _Grab.moveElement || _Grab.moveOrb || _Grab.order || _Grab.moveBeside:
         _carryTo(d.localFocalPoint);
     }
     _syncCarry();
@@ -1219,6 +1300,18 @@ class _TouchLayerState extends State<_TouchLayer> {
     switch (grab) {
       case _Grab.order:
         final cur = c.current;
+        // A smaller section carried sideways: it sits left, middle or right.
+        final small = _shrunkRect(cur?.id);
+        final row = _sectionRect(cur?.id);
+        final side = _finger.dx - _start.dx;
+        if (cur != null && small != null && row != null && side.abs() > 40 && side.abs() > (_finger.dy - _start.dy).abs()) {
+          final across = ((small.center.dx + side - row.left) / row.width).clamp(0.0, 1.0);
+          bigFeel();
+          c.endStep();
+          c.patchProps(cur.id, {'align': alignFor(across)});
+          c.endStep();
+          break;
+        }
         final target = _target();
         if (cur == null || target == null) break;
         // Steps count live sections, the same ones the page shows.
@@ -1272,6 +1365,39 @@ class _TouchLayerState extends State<_TouchLayer> {
   }
 
   Future<void> _menu(Offset p, Offset global) async {
+    final side = _besideAt(p);
+    if (side != null) {
+      final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+      final pos = RelativeRect.fromRect(global & const Size(1, 1), Offset.zero & overlay.size);
+      final (sec, item, _) = side;
+      final words = item.kind == BesideKind.text || item.kind == BesideKind.button;
+      final v = await showMenu<String>(context: context, color: const Color(0xFF111A2B), position: pos, items: [
+        if (words)
+          const PopupMenuItem(
+              value: 'words',
+              height: 48,
+              child: Text('Change words', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600))),
+        const PopupMenuItem(
+            value: 'delete',
+            height: 48,
+            child: Text('Delete', style: TextStyle(color: Color(0xFFFF8A80), fontWeight: FontWeight.w600))),
+      ]);
+      if (!mounted || v == null) return;
+      if (v == 'words') {
+        final t = await _askWords(item.value.isEmpty ? BesideItem.defaultValue(item.kind) : item.value);
+        if (t == null || !mounted) return;
+        c.endStep();
+        c.updateBeside(sec, item.id, (i) => i.copyWith(value: t));
+        c.endStep();
+      } else {
+        trashFeel();
+        c.endStep();
+        c.removeBeside(sec, item.id);
+        c.endStep();
+        if (mounted) _undoBar(context, c, '${BesideItem.label(item.kind)} deleted');
+      }
+      return;
+    }
     final orb = _orbAt(p);
     final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
     final pos = RelativeRect.fromRect(global & const Size(1, 1), Offset.zero & overlay.size);
@@ -1374,7 +1500,7 @@ class _TouchLayerState extends State<_TouchLayer> {
   // ── Drops from the drawer ──────────────────────────────────────────
 
   bool _accepts(Object? data) {
-    if (data is AnimDrop || data is SectionDrop) return true;
+    if (data is AnimDrop || data is SectionDrop || data is ElementDrop) return true;
     final fx = FxDrop.of(data);
     if (fx == null) return false;
     return true;
@@ -1392,6 +1518,26 @@ class _TouchLayerState extends State<_TouchLayer> {
       _hoverGap = null;
     });
     final data = d.data;
+    // Beside a smaller section (in the room next to it): a free-form row.
+    final room = _sectionAt(p);
+    final small = _shrunkRect(room);
+    final beside = data is ElementDrop || (data is SectionDrop && small != null && !small.inflate(4).contains(p));
+    if (beside && (room ?? _nearestSection(p)) != null) {
+      final id = room ?? _nearestSection(p)!;
+      final r = _sectionRect(id)!;
+      bigFeel();
+      c.endStep();
+      c.addBeside(
+        id,
+        data is ElementDrop ? data.kind : BesideKind.template,
+        (p.dx - r.left) / r.width,
+        (p.dy - r.top) / r.height,
+        value: data is SectionDrop ? data.kind : '',
+      );
+      c.endStep();
+      c.fxDropped();
+      return;
+    }
     if (data is SectionDrop) {
       _dropSection(data, p);
       return;
@@ -1566,7 +1712,9 @@ class _TouchLayerState extends State<_TouchLayer> {
                 key: const ValueKey('section-outline'),
                 duration: ordering ? Duration.zero : const Duration(milliseconds: 200),
                 curve: Curves.easeOutCubic,
-                rect: ordering ? cur.shift(Offset(0, _finger.dy - _start.dy)) : cur,
+                rect: ordering
+                    ? (_shrunkRect(c.current?.id)?.shift(_finger - _start) ?? cur.shift(Offset(0, _finger.dy - _start.dy)))
+                    : cur,
                 // A subtle highlight on the one picked section, nothing else.
                 child: IgnorePointer(
                   child: DecoratedBox(

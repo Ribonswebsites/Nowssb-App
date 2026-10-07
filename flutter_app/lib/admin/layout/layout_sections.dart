@@ -31,6 +31,7 @@ import 'placed_orbs.dart';
 import 'plain_words.dart';
 import 'scopes.dart';
 import 'section_pinch.dart';
+import 'side_row.dart';
 import 'template_sections.dart';
 import 'ui_layouts.dart';
 
@@ -343,10 +344,13 @@ class SectionFrame extends StatelessWidget {
     // Scaled to the height both ways: pinching bigger grows the section
     // (a scale-down-only fit left it small on top of blank space).
     if (h != null && h > 0 && (!entry.isTemplate || entry.kind == 'textBlock' || entry.kind == 'cta')) {
-      w = SectionFitHeight(height: h, width: MediaQuery.sizeOf(context).width, child: w);
+      w = SectionFitHeight(height: h, width: MediaQuery.sizeOf(context).width, align: sideAlignOf(p), child: w);
     }
     // Its own background, corners and shadow, set from a touch.
     w = sectionLook(p, w, frame: !_selfFramed.contains(entry.kind));
+    // Pictures, words, buttons and templates put beside it (side_row.dart).
+    final beside = besideOf(p);
+    if (beside.isNotEmpty) w = BesideCanvas(pageId: pageId, sectionId: entry.id, items: beside, child: w);
     // Orbs the owner dropped on this section (editor and published app).
     final orbs = placedOrbsOf(p);
     if (orbs.isNotEmpty) {

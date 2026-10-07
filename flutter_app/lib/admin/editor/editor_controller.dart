@@ -12,6 +12,7 @@ import '../layout/app_pages.dart';
 import '../layout/coupon_sections.dart' show couponsOf;
 import '../layout/placed_orbs.dart';
 import '../layout/scopes.dart';
+import '../layout/side_row.dart';
 import '../layout/template_sections.dart';
 import '../layout/ui_layouts.dart';
 import '../template/slot_keys.dart';
@@ -433,6 +434,30 @@ class EditorController extends ChangeNotifier {
   void updateEntry(String id, SectionEntry Function(SectionEntry) f) {
     _setEntries([for (final e in entries) e.id == id ? f(e) : e]);
   }
+
+  // ── Things put beside a smaller section (layout/side_row.dart) ──────
+
+  List<BesideItem> besideIn(String section) {
+    // The draft (not what the page last reported): two adds in a row keep both.
+    final e = entries.where((x) => x.id == section).firstOrNull;
+    return e == null ? const [] : besideOf(e.props);
+  }
+
+  /// Puts [kind] beside [section] at ([x], [y]) (fractions of its row).
+  String addBeside(String section, BesideKind kind, double x, double y, {String value = ''}) {
+    final id = 'b${DateTime.now().microsecondsSinceEpoch.toRadixString(36)}';
+    patchProps(section, besidePatch([
+      ...besideIn(section),
+      BesideItem(id: id, kind: kind, value: value, x: x.clamp(0.0, 1.0), y: y.clamp(0.0, 1.0)),
+    ]));
+    return id;
+  }
+
+  void updateBeside(String section, String id, BesideItem Function(BesideItem) f) =>
+      patchProps(section, besidePatch([for (final i in besideIn(section)) i.id == id ? f(i) : i]));
+
+  void removeBeside(String section, String id) =>
+      patchProps(section, besidePatch([for (final i in besideIn(section)) if (i.id != id) i]));
 
   void patchProps(String id, Map<String, dynamic> patch) {
     updateEntry(id, (e) {

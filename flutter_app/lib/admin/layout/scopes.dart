@@ -97,6 +97,9 @@ class EditorPreviewController extends ChangeNotifier {
   /// so the editor can outline it and put its edge handles on it.
   final Map<String, RenderBox> sectionBoxes = {};
 
+  /// Where each thing put beside a section is drawn ('<page>/<section>/<id>').
+  final Map<String, RenderBox> besideBoxes = {};
+
   /// The page id that reported last — for a page with tabs
   /// ('<pageId>.<tabId>', program_kit.dart) the tab on screen.
   String? lastReported;
