@@ -31,6 +31,11 @@ abstract final class SectionTypeId {
   static const categoryTiles = 'categoryTiles';
   static const spotlight = 'spotlight';
 
+  /// Dark media shelves (icon row + today card, collage, programs).
+  static const todayDeck = 'todayDeck';
+  static const madeForYou = 'madeForYou';
+  static const programsForYou = 'programsForYou';
+
   /// Existing template kinds (kept so the registry can wrap them later).
   static const imageBanner = 'imageBanner';
   static const videoBanner = 'videoBanner';
@@ -46,6 +51,9 @@ abstract final class SectionTypeId {
     artistCards,
     categoryTiles,
     spotlight,
+    todayDeck,
+    madeForYou,
+    programsForYou,
     imageBanner,
     videoBanner,
     splitPromo,

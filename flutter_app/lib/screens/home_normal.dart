@@ -47,7 +47,6 @@ import '../data/practice_progress.dart';
 import '../data/settings.dart';
 import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
-import '../widgets/black_glass_banner.dart';
 import '../widgets/four_banners.dart';
 import '../widgets/program_shelf.dart';
 import '../widgets/home_skin.dart';
@@ -61,7 +60,6 @@ import 'normal/header_actions_sheet.dart';
 import 'fashion/header.dart';
 import '../widgets/nwsb_icon.dart';
 import 'normal/neomorphic_essentials.dart';
-import '../widgets/colored_split_promo_banner.dart';
 import 'normal/horizontal_routine_cards.dart';
 import 'normal/sections_bottom.dart';
 import 'normal/sections_top.dart';
@@ -79,6 +77,7 @@ import '../widgets/stories_find_you_banner.dart';
 import '../widgets/subscription_today_offer.dart';
 import '../widgets/earth_day_film.dart';
 import '../widgets/promo_color_grid.dart';
+import '../widgets/sections/browse_shelves.dart';
 import 'quotes_live.dart';
 import '../features/earn/earn_home_sections.dart';
 import '../widgets/sections/category_tiles_section.dart';
@@ -118,6 +117,15 @@ const kNormalSectionOrder = <String>[
   // MK-6 home mix (ref 5): category tiles + spotlight, high on the page.
   'catTiles',
   'spotlight',
+  // Admin catalog that was not on this home. One of each, padded.
+  // Category tiles and spotlight stay the pair above — not copied again.
+  'todayDeck',
+  'glassy',
+  'couponBan',
+  'hyped',
+  'artists',
+  'madeForYou',
+  'programsYou',
   'tiles',
   'storiesFind',
   'buddhaGyro',
@@ -167,6 +175,13 @@ const kNormalSectionTitles = <String, String>{
   'actionbar': 'Support & coach bar',
   'catTiles': 'Category tiles & filters',
   'spotlight': 'In the spotlight',
+  'todayDeck': 'Today — icons and peeking card',
+  'glassy': 'Glassy carousel',
+  'couponBan': 'Coupon banner',
+  'hyped': 'Hyped posters',
+  'artists': 'Featured cards',
+  'madeForYou': 'Made for you',
+  'programsYou': 'Programs for you',
   'tiles': 'Feature tiles',
   'storiesFind': 'Stories find you',
   'buddhaGyro': 'Buddha quotes stage',
@@ -188,7 +203,18 @@ const kNormalSectionTitles = <String, String>{
 
 /// Sideways carousels wired to the Animation tab's transitions and
 /// auto-rotate (carouselFxItem / CarouselAutoRotate inside them).
-const kNormalCarousels = <String>{'herovid', 'tiles', 'healing'};
+const kNormalCarousels = <String>{
+  'herovid',
+  'tiles',
+  'healing',
+  'todayDeck',
+  'glassy',
+  'couponBan',
+  'hyped',
+  'artists',
+  'madeForYou',
+  'programsYou',
+};
 
 class HomeNormal extends StatefulWidget {
   const HomeNormal({super.key, this.name = 'Healer'});
@@ -408,14 +434,6 @@ class _HomeNormalState extends State<HomeNormal> {
         ('routineCards', Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
-              child: ColoredSplitPromoBanner.forSurface(
-                SplitPromoSurface.normalHome,
-                onTap: () => _go(2),
-                margin: EdgeInsets.zero,
-              ),
-            ),
             const NmHorizontalRoutineCards(),
             const EarthDayFilm(),
             PromoColorGrid(onOpen: _openGrid),
@@ -423,24 +441,9 @@ class _HomeNormalState extends State<HomeNormal> {
         )),
         (
           'herovid',
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
-                child: BlackGlassBanner(
-                  margin: EdgeInsets.zero,
-                  title: 'Today',
-                  subtitle: 'The line moves when a task is done.',
-                  mark: NwsbMarks.book,
-                  onTap: () => _go(1),
-                ),
-              ),
-              NmStreakVideo(
-                onTap: () => _go(1),
-                onStoreTap: () => _go(3),
-              ),
-            ],
+          NmStreakVideo(
+            onTap: () => _go(1),
+            onStoreTap: () => _go(3),
           ),
         ),
         (
@@ -478,6 +481,13 @@ class _HomeNormalState extends State<HomeNormal> {
             child: SpotlightSection(),
           ),
         ),
+        ('todayDeck', HomeShelves.today),
+        ('glassy', HomeShelves.glassy),
+        ('couponBan', HomeShelves.coupons),
+        ('hyped', HomeShelves.hyped),
+        ('artists', HomeShelves.artists),
+        ('madeForYou', HomeShelves.made),
+        ('programsYou', HomeShelves.programs),
         // H-scroll: Flip glass brand showcase (card 0) + existing feature cards.
         (
           'tiles',
@@ -496,13 +506,6 @@ class _HomeNormalState extends State<HomeNormal> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
-                child: ColoredSplitPromoBanner(
-                  spec: SplitPromoExtras.at(8, onTap: () => _go(3)),
-                  margin: EdgeInsets.zero,
-                ),
-              ),
               SubscriptionTodayOffer(
                 neumorphic: true,
                 onClaim: () => _push(const SubscriptionScreen()),

@@ -48,6 +48,9 @@ final kTemplateNames = <String, String>{
   'hypedRow': 'Hyped row',
   'artistCards': 'Artist cards',
   'categoryTiles': 'Category tiles',
+  'todayDeck': 'Today deck',
+  'madeForYou': 'Made for you',
+  'programsForYou': 'Programs for you',
   'bannerMix': 'Banner mix',
   'fourBanners': 'Four banners',
   'storiesBanner': 'Stories banner',
@@ -71,6 +74,9 @@ final kTemplateBlurbs = <String, String>{
   'hypedRow': 'Tall cards in a row',
   'artistCards': 'Artist cards in a row',
   'categoryTiles': 'Small tiles to browse',
+  'todayDeck': 'Icons, a progress line, and a big card with the next one peeking',
+  'madeForYou': 'Filter chips, collage cards, and a landscape row',
+  'programsForYou': 'An episode card, Open in, and program cards',
   'bannerMix': 'A mixed banner',
   'fourBanners': 'Four banners stacked',
   'storiesBanner': 'Stories that find you',
@@ -92,6 +98,9 @@ const kTemplateGallery = <String>[
   'hypedRow',
   'artistCards',
   'categoryTiles',
+  'todayDeck',
+  'madeForYou',
+  'programsForYou',
   'bannerMix',
   'fourBanners',
   'storiesBanner',
@@ -107,6 +116,7 @@ final List<(String, List<String>)> kTemplateCategories = () {
     'storiesBanner': 'Top banners', 'bannerMix': 'Top banners', 'fourBanners': 'Top banners',
     'cardRow': 'Cards', 'glassyCarousel': 'Cards', 'spotlight': 'Cards', 'hypedRow': 'Cards',
     'artistCards': 'Cards', 'categoryTiles': 'Cards',
+    'todayDeck': 'Cards', 'madeForYou': 'Cards', 'programsForYou': 'Cards',
     'textBlock': 'Words', 'cta': 'Buttons & banners',
     'couponTicket': 'Offers & coupons', 'couponCards': 'Offers & coupons',
     'couponBanner': 'Offers & coupons', 'couponPromo': 'Offers & coupons',
@@ -121,7 +131,17 @@ final List<(String, List<String>)> kTemplateCategories = () {
 }();
 
 /// The ready-made sections drawn by the app's section registry.
-const _registryKinds = {'couponBanner', 'glassyCarousel', 'spotlight', 'hypedRow', 'artistCards', 'categoryTiles'};
+const _registryKinds = {
+  'couponBanner',
+  'glassyCarousel',
+  'spotlight',
+  'hypedRow',
+  'artistCards',
+  'categoryTiles',
+  'todayDeck',
+  'madeForYou',
+  'programsForYou',
+};
 
 String templateTitle(SectionEntry e) {
   var t = '${e.props['title'] ?? ''}'.trim();

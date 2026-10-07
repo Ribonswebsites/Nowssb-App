@@ -44,6 +44,7 @@ import '../widgets/stories_find_you_banner.dart';
 import '../widgets/subscription_today_offer.dart';
 import '../widgets/earth_day_film.dart';
 import '../widgets/promo_color_grid.dart';
+import '../widgets/sections/browse_shelves.dart';
 import 'quotes_live.dart';
 import 'player_settings.dart';
 import 'fashion/header.dart';
@@ -54,7 +55,6 @@ import 'fashion/sections_bottom.dart';
 import 'shared_sections.dart';
 import 'fashion/sections_mid.dart';
 import 'fashion/sections_top.dart';
-import '../widgets/colored_split_promo_banner.dart';
 import 'fashion_plus.dart';
 import 'notifications_sheet.dart';
 import 'normal/header_actions_sheet.dart';
@@ -105,6 +105,14 @@ const kFashionSectionOrder = <String>[
   // MK-6 home mix (ref 5): category tiles + spotlight, high on the page.
   'catTiles',
   'spotlight',
+  // Admin catalog that was not on this home. One of each, padded.
+  'todayDeck',
+  'glassy',
+  'couponBan',
+  'hyped',
+  'artists',
+  'madeForYou',
+  'programsYou',
   'reader',
   'herovid',
   'streak',
@@ -153,6 +161,13 @@ const kFashionSectionTitles = <String, String>{
   'actionbar': 'Support & coach bar',
   'catTiles': 'Category tiles & filters',
   'spotlight': 'In the spotlight',
+  'todayDeck': 'Today — icons and peeking card',
+  'glassy': 'Glassy carousel',
+  'couponBan': 'Coupon banner',
+  'hyped': 'Hyped posters',
+  'artists': 'Featured cards',
+  'madeForYou': 'Made for you',
+  'programsYou': 'Programs for you',
   'reader': 'Reader & promo banner',
   'herovid': 'Streak & store videos',
   'streak': 'Streak',
@@ -183,7 +198,17 @@ const kFashionSectionTitles = <String, String>{
 
 /// Sideways carousels wired to the Animation tab's transitions and
 /// auto-rotate (carouselFxItem / CarouselAutoRotate inside them).
-const kFashionCarousels = <String>{'tiles', 'healing'};
+const kFashionCarousels = <String>{
+  'tiles',
+  'healing',
+  'todayDeck',
+  'glassy',
+  'couponBan',
+  'hyped',
+  'artists',
+  'madeForYou',
+  'programsYou',
+};
 
 class HomeFashion extends StatefulWidget {
   const HomeFashion({super.key, this.name = 'Healer'});
@@ -393,25 +418,12 @@ class _HomeFashionState extends State<HomeFashion> {
         ),
         (
           'practice',
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                child: ColoredSplitPromoBanner.forSurface(
-                  SplitPromoSurface.fashionHome,
-                  onTap: () => _go(1),
-                  margin: EdgeInsets.zero,
-                ),
+          FashPractice(
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => const DailyTasksPage(),
               ),
-              FashPractice(
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => const DailyTasksPage(),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
         ('routineCards', Column(
@@ -428,26 +440,7 @@ class _HomeFashionState extends State<HomeFashion> {
         )),
 
         ('coachCards', const SizedBox.shrink()),
-        ('mainops', Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-              child: ColoredSplitPromoBanner(
-                margin: EdgeInsets.zero,
-                spec: SplitPromoSpec(
-                  title: 'NowssB',
-                  cta: 'Keep going',
-                  leftColor: const Color(0xFF3D2914),
-                  rightColor: const Color(0xFFE4C56A),
-                  art: SplitPromoArts.blondeLotus,
-                  onTap: () => _go(1),
-                ),
-              ),
-            ),
-            MainOptionsSection(onGo: _go, onAction: _openMainOption),
-          ],
-        )),
+        ('mainops', MainOptionsSection(onGo: _go, onAction: _openMainOption)),
         (
           'actionbar',
           NmSuppliedActionBar(
@@ -470,21 +463,16 @@ class _HomeFashionState extends State<HomeFashion> {
             child: SpotlightSection(),
           ),
         ),
+        ('todayDeck', HomeShelves.today),
+        ('glassy', HomeShelves.glassy),
+        ('couponBan', HomeShelves.coupons),
+        ('hyped', HomeShelves.hyped),
+        ('artists', HomeShelves.artists),
+        ('madeForYou', HomeShelves.made),
+        ('programsYou', HomeShelves.programs),
         (
           'reader',
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
-                child: ColoredSplitPromoBanner(
-                  spec: SplitPromoExtras.at(1, onTap: () => _go(1)),
-                  margin: EdgeInsets.zero,
-                ),
-              ),
-              FashReader(onTap: () => _push(const ReaderHubScreen())),
-            ],
-          ),
+          FashReader(onTap: () => _push(const ReaderHubScreen())),
         ),
         (
           'herovid',
@@ -531,13 +519,6 @@ class _HomeFashionState extends State<HomeFashion> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
-                child: ColoredSplitPromoBanner(
-                  spec: SplitPromoExtras.at(6, onTap: () => _go(3)),
-                  margin: EdgeInsets.zero,
-                ),
-              ),
               SubscriptionTodayOffer(
                 onClaim: () => _push(const SubscriptionScreen()),
               ),

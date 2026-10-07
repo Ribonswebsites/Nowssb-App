@@ -13,6 +13,7 @@ import 'coupon_banner_section.dart';
 import '../hype_rail.dart';
 import 'glassy_carousel_section.dart';
 import 'spotlight_section.dart';
+import 'browse_shelves.dart';
 import 'section_config.dart';
 
 typedef SectionWidgetBuilder = Widget Function(BuildContext context, SectionConfig config);
@@ -179,6 +180,24 @@ void ensureSectionRegistry() {
     ),
     builder: (context, config) => SpotlightSection(config: config),
   ));
+  add(
+    SectionTypeId.todayDeck,
+    'Today deck',
+    _defaults(SectionTypeId.todayDeck, height: 460),
+    builder: (context, config) => TodayDeckSection(config: config),
+  );
+  add(
+    SectionTypeId.madeForYou,
+    'Made for you',
+    _defaults(SectionTypeId.madeForYou, height: 520),
+    builder: (context, config) => MadeForYouSection(config: config),
+  );
+  add(
+    SectionTypeId.programsForYou,
+    'Programs for you',
+    _defaults(SectionTypeId.programsForYou, height: 620),
+    builder: (context, config) => ProgramsForYouSection(config: config),
+  );
   add(SectionTypeId.imageBanner, 'Image banner', _defaults(SectionTypeId.imageBanner, height: 220));
   add(SectionTypeId.videoBanner, 'Video banner', _defaults(SectionTypeId.videoBanner, height: 240));
   add(SectionTypeId.splitPromo, 'Split promo', _defaults(SectionTypeId.splitPromo, height: 170));
