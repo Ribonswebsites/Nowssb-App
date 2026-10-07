@@ -576,6 +576,7 @@ class _TouchLayerState extends State<_TouchLayer> {
 
   var _grab = _Grab.none;
   double _base = 0;
+  double _shrinkBase = 1;
   Offset _baseOffset = Offset.zero;
   Offset _start = Offset.zero;
   Offset _finger = Offset.zero;
@@ -954,6 +955,8 @@ class _TouchLayerState extends State<_TouchLayer> {
       return;
     }
     if (!c.sectionPicked || c.current?.id != id) c.pickSection(id);
+    _shrinkBase = _num('shrink');
+    if (_shrinkBase <= 0) _shrinkBase = 1;
     _base = _num('height');
     if (_base < 1) _base = c.preview.sectionHeights['${c.layoutPage}/$id'] ?? 200;
     _grab = _Grab.pinchSection;
@@ -1226,7 +1229,19 @@ class _TouchLayerState extends State<_TouchLayer> {
       case _Grab.pinchSection:
         final id = c.current?.id;
         if (id == null) return;
-        c.patchProps(id, {'height': (_base * d.scale).clamp(60.0, 1400.0).roundToDouble()});
+        final cur = c.current!;
+        // Added banners and templates get narrower (and shorter) when
+        // pinched in, so they can sit side by side; out again, full width
+        // and then taller.
+        final fixed = cur.entry.isTemplate && cur.entry.kind != 'textBlock' && cur.entry.kind != 'cta';
+        final v = _shrinkBase * d.scale;
+        if (fixed && v < 0.995) {
+          c.patchProps(id, {'shrink': double.parse(v.clamp(0.3, 1.0).toStringAsFixed(3))});
+        } else if (fixed && _shrinkBase < 0.995) {
+          c.patchProps(id, {'shrink': null});
+        } else {
+          c.patchProps(id, {'height': (_base * d.scale).clamp(60.0, 1400.0).roundToDouble()});
+        }
       case _Grab.moveElement || _Grab.moveOrb || _Grab.order || _Grab.moveBeside:
         _carryTo(d.localFocalPoint);
     }

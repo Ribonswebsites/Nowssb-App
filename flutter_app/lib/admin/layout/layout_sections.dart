@@ -343,7 +343,13 @@ class SectionFrame extends StatelessWidget {
     // Builtins, and the templates that do not size themselves from props.
     // Scaled to the height both ways: pinching bigger grows the section
     // (a scale-down-only fit left it small on top of blank space).
-    if (h != null && h > 0 && (!entry.isTemplate || entry.kind == 'textBlock' || entry.kind == 'cta')) {
+    final shrink = _d(p['shrink']);
+    if (entry.isTemplate && shrink != null && shrink < 0.995) {
+      // A banner or template pinched narrower: drawn smaller, whole, so
+      // it can sit beside other things (side_row.dart).
+      w = SectionFitHeight(
+          height: 0, width: MediaQuery.sizeOf(context).width, align: sideAlignOf(p), fraction: shrink.clamp(0.25, 1.0), child: w);
+    } else if (h != null && h > 0 && (!entry.isTemplate || entry.kind == 'textBlock' || entry.kind == 'cta')) {
       w = SectionFitHeight(height: h, width: MediaQuery.sizeOf(context).width, align: sideAlignOf(p), child: w);
     }
     // Its own background, corners and shadow, set from a touch.

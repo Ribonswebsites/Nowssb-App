@@ -121,17 +121,35 @@ class AddSectionsTab extends StatelessWidget {
     if (!c.sectioned) {
       return const Hint('This page can’t take new sections yet.', icon: Icons.view_agenda_outlined);
     }
-    final grid = GridView.builder(
-      padding: const EdgeInsets.fromLTRB(14, 0, 14, 24),
-      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-        maxCrossAxisExtent: 220,
-        mainAxisSpacing: 10,
-        crossAxisSpacing: 10,
-        childAspectRatio: 1.05,
-      ),
-      itemCount: kTemplateGallery.length,
-      itemBuilder: (context, i) => SectionTile(c: c, kind: kTemplateGallery[i], onAdded: onAdded),
-    );
+    // Grouped under plain names; each tile is the real section, drawn small.
+    final grid = CustomScrollView(slivers: [
+      for (final (name, kinds) in kTemplateCategories) ...[
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(16, 6, 16, 8),
+          sliver: SliverToBoxAdapter(
+            child: Text('$name · ${kinds.length}',
+                key: ValueKey('tpl-cat-$name'),
+                style: const TextStyle(color: kGold, fontSize: 13, fontWeight: FontWeight.w800, letterSpacing: 0.3)),
+          ),
+        ),
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+          sliver: SliverGrid(
+            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: 220,
+              mainAxisSpacing: 10,
+              crossAxisSpacing: 10,
+              childAspectRatio: 1.05,
+            ),
+            delegate: SliverChildBuilderDelegate(
+              (context, i) => SectionTile(c: c, kind: kinds[i], onAdded: onAdded),
+              childCount: kinds.length,
+            ),
+          ),
+        ),
+      ],
+      const SliverToBoxAdapter(child: SizedBox(height: 24)),
+    ]);
     return Column(children: [
       Padding(
         padding: const EdgeInsets.fromLTRB(14, 0, 14, 10),

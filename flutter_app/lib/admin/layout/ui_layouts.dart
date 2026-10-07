@@ -23,6 +23,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/firebase.dart';
+import 'template_more.dart' show kMoreKinds;
 
 /// What renders a section entry.
 ///   builtin   — a section the app ships (id or [src] names it)
@@ -43,6 +44,7 @@ const kTemplateKinds = <String>[
   'couponTicket',
   'couponCards',
   ...kReadyKinds,
+  ...kMoreKinds,
 ];
 
 /// Ready-made sections and banners the app already ships, added whole.

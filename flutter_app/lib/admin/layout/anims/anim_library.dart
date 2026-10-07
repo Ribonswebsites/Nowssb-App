@@ -6,6 +6,7 @@ import 'anim_core.dart';
 import 'anims_backgrounds.dart';
 import 'anims_celebrations.dart';
 import 'anims_loaders.dart';
+import 'anims_more.dart';
 import 'anims_orbs.dart';
 import 'anims_particles.dart';
 
@@ -18,6 +19,7 @@ final List<AnimSpec> kAnimLibrary = List.unmodifiable([
   ...kBackgroundAnims,
   ...kParticleAnims,
   ...kCelebrationAnims,
+  ...kMoreAnims,
 ]);
 
 final Map<String, AnimSpec> _byId = {for (final s in kAnimLibrary) s.id: s};

@@ -72,7 +72,7 @@ void main() {
   SharedPreferences.setMockInitialValues({});
 
   test('80+ animations, unique ids and names, in every category', () {
-    expect(kAnimLibrary.length, greaterThanOrEqualTo(80));
+    expect(kAnimLibrary.length, greaterThanOrEqualTo(115), reason: '93 + the new ones');
     expect(kAnimLibrary.map((s) => s.id).toSet().length, kAnimLibrary.length, reason: 'ids are unique');
     expect(kAnimLibrary.map((s) => s.name).toSet().length, kAnimLibrary.length, reason: 'names are unique');
     final counts = {for (final c in AnimCategory.values) c: animsIn(c).length};

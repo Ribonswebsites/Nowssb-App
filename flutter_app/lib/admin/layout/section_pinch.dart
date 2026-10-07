@@ -116,7 +116,11 @@ class _RenderSectionZoom extends RenderProxyBox {
 /// [width] is used only when the parent gives no width (the child is laid
 /// out at the screen width, like the page it came from).
 class SectionFitHeight extends SingleChildRenderObjectWidget {
-  const SectionFitHeight({super.key, required this.height, required this.width, this.align = 0, required super.child});
+  const SectionFitHeight({super.key, required this.height, required this.width, this.align = 0, this.fraction, required super.child});
+
+  /// Instead of [height]: this part of its own height (and width) — a
+  /// banner or template pinched narrower than the page.
+  final double? fraction;
 
   final double height;
   final double width;
@@ -125,19 +129,27 @@ class SectionFitHeight extends SingleChildRenderObjectWidget {
   final double align;
 
   @override
-  RenderObject createRenderObject(BuildContext context) => RenderSectionFitHeight(height, width, align);
+  RenderObject createRenderObject(BuildContext context) => RenderSectionFitHeight(height, width, align, fraction);
 
   @override
   void updateRenderObject(BuildContext context, RenderSectionFitHeight renderObject) {
     renderObject
       ..height = height
       ..width = width
-      ..align = align;
+      ..align = align
+      ..fraction = fraction;
   }
 }
 
 class RenderSectionFitHeight extends RenderProxyBox {
-  RenderSectionFitHeight(this._height, this._width, [this._align = 0]);
+  RenderSectionFitHeight(this._height, this._width, [this._align = 0, this._fraction]);
+
+  double? _fraction;
+  set fraction(double? v) {
+    if (v == _fraction) return;
+    _fraction = v;
+    markNeedsLayout();
+  }
 
   double _align;
   set align(double v) {
@@ -192,7 +204,8 @@ class RenderSectionFitHeight extends RenderProxyBox {
     }
     c.layout(BoxConstraints.tightFor(width: w), parentUsesSize: true);
     _childW = c.size.width;
-    size = constraints.constrain(Size(w, _height));
+    final f = _fraction;
+    size = constraints.constrain(Size(w, f == null ? _height : c.size.height * f));
     final ch = c.size.height;
     _scale = ch > 0 ? size.height / ch : 1;
   }

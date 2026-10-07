@@ -268,3 +268,12 @@ applyLayout(context, 'home.normal', items, hiddenByDefault: {...})
   sit above/below it (`saved`, `healing`). Still one block, no drops:
   `player.session`, signed-out `practice`, `store.meaning` until it loads,
   the program pages.
+
+## More templates (item 8)
+
+`layout/template_more.dart` adds 44 sections and banners (`kMoreKinds`,
+`kMoreTemplates`: name, blurb, category) drawn from props through `TplKit`,
+so every word and picture is a template field a tap edits. The Sections tab
+groups all of them under `kTemplateCategories`. A banner or template pinched
+in gets the `shrink` prop (0.3–1): drawn whole and smaller, so it can sit
+left/right with things beside it. `anims/anims_more.dart` adds 22 animations.

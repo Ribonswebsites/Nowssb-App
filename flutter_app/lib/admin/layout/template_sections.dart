@@ -26,10 +26,12 @@ import 'app_pages.dart';
 import 'carousel_fx.dart';
 import 'coupon_sections.dart';
 import 'layout_sections.dart';
+import 'template_more.dart';
 import 'ui_layouts.dart';
 
 /// Plain-words names for the Add section gallery.
-const kTemplateNames = <String, String>{
+final kTemplateNames = <String, String>{
+  for (final e in kMoreTemplates.entries) e.key: e.value.$1,
   'imageBanner': 'Image banner',
   'videoBanner': 'Video banner',
   'splitPromo': 'Split promo banner',
@@ -51,7 +53,8 @@ const kTemplateNames = <String, String>{
   'storiesBanner': 'Stories banner',
 };
 
-const kTemplateBlurbs = <String, String>{
+final kTemplateBlurbs = <String, String>{
+  for (final e in kMoreTemplates.entries) e.key: e.value.$2,
   'imageBanner': 'A big picture with a headline and a button',
   'videoBanner': 'A looping clip with a headline and a button',
   'splitPromo': 'Words on one side, a picture on the other',
@@ -94,7 +97,28 @@ const kTemplateGallery = <String>[
   'storiesBanner',
   'textBlock',
   'cta',
+  ...kMoreKinds,
 ];
+
+/// The Sections tab's groups, in order: (plain name, kinds).
+final List<(String, List<String>)> kTemplateCategories = () {
+  const first = <String, String>{
+    'imageBanner': 'Top banners', 'videoBanner': 'Top banners', 'promoBanner': 'Top banners', //
+    'storiesBanner': 'Top banners', 'bannerMix': 'Top banners', 'fourBanners': 'Top banners',
+    'cardRow': 'Cards', 'glassyCarousel': 'Cards', 'spotlight': 'Cards', 'hypedRow': 'Cards',
+    'artistCards': 'Cards', 'categoryTiles': 'Cards',
+    'textBlock': 'Words', 'cta': 'Buttons & banners',
+    'couponTicket': 'Offers & coupons', 'couponCards': 'Offers & coupons',
+    'couponBanner': 'Offers & coupons', 'couponPromo': 'Offers & coupons',
+    'splitPromo': 'Picture + words',
+  };
+  String cat(String k) => kMoreTemplates[k]?.$3 ?? first[k] ?? 'More';
+  const order = ['Offers & coupons', 'Top banners', 'Cards', 'Features', 'Reviews', 'Buttons & banners', 'Picture + words', 'Numbers', 'Words', 'More'];
+  return [
+    for (final c in order)
+      if (kTemplateGallery.any((k) => cat(k) == c)) (c, [for (final k in kTemplateGallery) if (cat(k) == c) k]),
+  ];
+}();
 
 /// The ready-made sections drawn by the app's section registry.
 const _registryKinds = {'couponBanner', 'glassyCarousel', 'spotlight', 'hypedRow', 'artistCards', 'categoryTiles'};
@@ -149,7 +173,7 @@ Map<String, dynamic> templateStarter(String kind) => switch (kind) {
       'textBlock' => {'title': 'A heading', 'body': 'Write something people should read.'},
       'cta' => {'cta': 'Start now', 'route': 'tab:1'},
       'couponTicket' || 'couponCards' => couponStarter(kind),
-      _ => {},
+      _ => moreStarter(kind),
     };
 
 class TemplateSection extends StatelessWidget {
@@ -179,19 +203,20 @@ class TemplateSection extends StatelessWidget {
       ? NetPicture(url: url, fit: _fit)
       : TemplatePicture(slot: '$_slot.$id', url: url, fit: _fit);
 
-  Widget _cta(BuildContext context, {bool light = false}) {
+  Widget _cta(BuildContext context, {bool light = false, Color? color}) {
     final label = _s('cta');
     if (label.isEmpty) return const SizedBox.shrink();
+    final dark = color != null && color.computeLuminance() < 0.4;
     return GestureDetector(
       onTap: () => openRoute(context, _s('route')),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
         decoration: BoxDecoration(
-          color: light ? Colors.white : const Color(0xFFE8D5A3),
+          color: color ?? (light ? Colors.white : const Color(0xFFE8D5A3)),
           borderRadius: BorderRadius.circular(99),
         ),
         child: _label('cta', label,
-            const TextStyle(color: Color(0xFF060C18), fontWeight: FontWeight.w700, fontSize: 14)),
+            TextStyle(color: dark ? Colors.white : const Color(0xFF060C18), fontWeight: FontWeight.w700, fontSize: 14)),
       ),
     );
   }
@@ -314,6 +339,19 @@ class TemplateSection extends StatelessWidget {
         return const FourBanners();
       case 'storiesBanner':
         return const StoriesFindYouBanner();
+    }
+    if (kMoreTemplates.containsKey(entry.kind)) {
+      return buildMoreTemplate(
+        entry.kind,
+        TplKit(
+          props: p,
+          label: (id, style, {maxLines, align}) => _label(id, _s(id), style, maxLines: maxLines, align: align),
+          picture: (id) => _picture(context, id, _s(id)),
+          button: ({light = false, color}) => _cta(context, light: light, color: color),
+          corner: _corner,
+          shadow: _shadow,
+        ),
+      );
     }
     if (_registryKinds.contains(entry.kind)) {
       ensureSectionRegistry();

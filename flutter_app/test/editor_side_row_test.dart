@@ -215,4 +215,47 @@ void main() {
     await tester.pumpWidget(const SizedBox());
     await tester.pump(const Duration(seconds: 5));
   });
+
+  testWidgets('an added banner pinched in gets narrower (whole), and can then sit on a side', (tester) async {
+    tester.view.physicalSize = _screen * 3;
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.reset);
+    final c = EditorController();
+    await tester.pumpWidget(MaterialApp(home: NavScope(go: (_) {}, child: UiEditorScreen(controller: c))));
+    await _settle(tester, 10);
+    final id = c.insertTemplate('ctaGradient', 1);
+    await _settle(tester, 8);
+    c.pickSection(id);
+    await _settle(tester, 2);
+    final r = _rectOf(c, id);
+    expect(r.width, greaterThan(380));
+    final a = await tester.startGesture(r.center - const Offset(90, 0));
+    final b = await tester.startGesture(r.center + const Offset(90, 0));
+    await tester.pump(const Duration(milliseconds: 16));
+    for (var i = 0; i < 10; i++) {
+      await a.moveBy(const Offset(4.5, 0));
+      await b.moveBy(const Offset(-4.5, 0));
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+    await a.up();
+    await b.up();
+    await _settle(tester, 4);
+    final shrink = (c.entries.firstWhere((e) => e.id == id).props['shrink'] as num).toDouble();
+    expect(shrink, inInclusiveRange(0.4, 0.7));
+    final fit = tester.renderObjectList<RenderSectionFitHeight>(find.byType(SectionFitHeight)).firstWhere((f) {
+      final box = c.preview.sectionBoxes['${c.layoutPage}/$id']!;
+      RenderObject? x = f;
+      while (x != null && x != box) {
+        x = x.parent;
+      }
+      return x == box;
+    });
+    expect(fit.contentRect.width, closeTo(fit.size.width * shrink, 2), reason: 'whole, just smaller');
+    c.patchProps(id, {'align': 'left'});
+    await _settle(tester, 2);
+    expect(fit.contentRect.left, closeTo(0, 1));
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump(const Duration(seconds: 5));
+  });
 }
