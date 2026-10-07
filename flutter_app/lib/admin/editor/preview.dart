@@ -16,6 +16,7 @@ import 'package:flutter/services.dart' show HapticFeedback;
 import '../../theme/theme.dart';
 import '../layout/anims/anim_library.dart' show animById;
 import '../layout/app_pages.dart';
+import '../layout/image_frame.dart';
 import '../layout/placed_orbs.dart';
 import '../layout/scopes.dart';
 import '../template/editable.dart';
@@ -525,7 +526,7 @@ void deleteWithUndo(BuildContext context, EditorController c, String id, String 
   _undoBar(context, c, 'Deleted “$title” · in the Bin', item.id);
 }
 
-enum _Grab { none, scroll, order, pinchSection, pinchElement, moveElement, moveOrb, pinchOrb }
+enum _Grab { none, scroll, order, pinchSection, pinchElement, moveElement, moveOrb, pinchOrb, panImage, zoomImage, frameEdge }
 
 /// Places one drag up or down moves a section when no other section is
 /// under the finger (kept for callers and tests of the step maths).
@@ -769,6 +770,61 @@ class _TouchLayerState extends State<_TouchLayer> {
     return null;
   }
 
+  // ── A picked picture: pan, zoom and frame handles ───────────────────
+
+  static const _frameKeys = ['imgZoom', 'imgX', 'imgY', 'frameL', 'frameT', 'frameR', 'frameB'];
+
+  /// The picked element when it is a picture (image or video).
+  PreviewSlot? get _pickedPicture {
+    final s = _selectedSlot;
+    return s != null && (s.type == SlotType.image || s.type == SlotType.video) ? s : null;
+  }
+
+  ImageFraming _framingOf(PreviewSlot s) =>
+      framingOf(c.overrideOf(s.slotKey)?.style ?? const {}) ?? const ImageFraming();
+
+  /// The picture's frame on screen (its own box moved by the frame edges).
+  Rect? _pictureFrame(PreviewSlot? s) {
+    final base = _slotRect(s);
+    if (s == null || base == null) return null;
+    return _framingOf(s).frameIn(base.size).shift(base.topLeft);
+  }
+
+  /// The eight handles of a frame: (side across, side down), each −1, 0 or 1.
+  static const _handles = [(-1, -1), (0, -1), (1, -1), (1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0)];
+
+  static Offset _handlePos(Rect r, (int, int) h) =>
+      Offset(r.center.dx + h.$1 * r.width / 2, r.center.dy + h.$2 * r.height / 2);
+
+  /// A handle within finger reach (a 56dp circle) of [p].
+  (int, int)? _handleAt(Rect frame, Offset p) {
+    (int, int)? best;
+    var bd = 28.0;
+    for (final h in _handles) {
+      final d = (_handlePos(frame, h) - p).distance;
+      if (d <= bd) {
+        bd = d;
+        best = h;
+      }
+    }
+    return best;
+  }
+
+  (int, int) _edge = (0, 0);
+  Map<String, double> _frameBase = const {};
+  Size _pictureBase = Size.zero;
+
+  void _patchFrame(PreviewSlot s, Map<String, double> v) {
+    double r(double x) => double.parse(x.toStringAsFixed(3));
+    final out = <String, dynamic>{};
+    for (final k in _frameKeys) {
+      if (!v.containsKey(k)) continue;
+      final x = r(v[k]!);
+      out[k] = (k == 'imgZoom' ? (x - 1).abs() < 0.01 : x.abs() < 0.002) ? null : x;
+    }
+    c.patchStyle(s.slotKey, s.type, s.defaultValue, out);
+  }
+
   Rect? _slotRect(PreviewSlot? s) => _rectOf(s?.box.currentContext?.findRenderObject() as RenderBox?);
 
   Map<String, dynamic> get _props => c.current?.entry.props ?? const {};
@@ -807,6 +863,14 @@ class _TouchLayerState extends State<_TouchLayer> {
       _orb = (orb.section, orb.orb.id);
       _base = orb.orb.size;
       _grab = _Grab.pinchOrb;
+      return;
+    }
+    final pic = _pickedPicture;
+    final pf = _pictureFrame(pic);
+    if (pic != null && pf != null && pf.inflate(20).contains(focal)) {
+      _element = pic;
+      _base = _framingOf(pic).zoom;
+      _grab = _Grab.zoomImage;
       return;
     }
     final sel = _selectedSlot;
@@ -859,6 +923,28 @@ class _TouchLayerState extends State<_TouchLayer> {
       _startPinch(d.localFocalPoint);
       setState(() {});
       return;
+    }
+    // Inside a picked picture one finger moves the picture in its frame,
+    // and a handle moves that side or corner of the frame. (The one place
+    // where a drag does not scroll: the picture was picked on purpose.)
+    final pic = _pickedPicture;
+    final pf = _pictureFrame(pic);
+    final base = _slotRect(pic);
+    if (pic != null && pf != null && base != null) {
+      final h = _handleAt(pf, _start);
+      if (h != null || pf.contains(_start)) {
+        final f = _framingOf(pic);
+        _element = pic;
+        _pictureBase = base.size;
+        _frameBase = {
+          'imgZoom': f.zoom, 'imgX': f.x, 'imgY': f.y, //
+          'frameL': f.left, 'frameT': f.top, 'frameR': f.right, 'frameB': f.bottom,
+        };
+        _edge = h ?? (0, 0);
+        _grab = h != null ? _Grab.frameEdge : _Grab.panImage;
+        setState(() {});
+        return;
+      }
     }
     {
       // One finger scrolls, whatever is picked: carrying starts only
@@ -1000,7 +1086,8 @@ class _TouchLayerState extends State<_TouchLayer> {
     if (d.pointerCount >= 2 &&
         _grab != _Grab.pinchSection &&
         _grab != _Grab.pinchElement &&
-        _grab != _Grab.pinchOrb) {
+        _grab != _Grab.pinchOrb &&
+        _grab != _Grab.zoomImage) {
       _startPinch(d.localFocalPoint);
       setState(() {});
     }
@@ -1028,6 +1115,33 @@ class _TouchLayerState extends State<_TouchLayer> {
           final v = double.parse((_base * d.scale).clamp(0.3, 4.0).toStringAsFixed(2));
           c.patchStyle(sel.slotKey, sel.type, sel.defaultValue, {'scale': (v - 1).abs() < 0.02 ? null : v});
         }
+      case _Grab.panImage:
+        final s = _element;
+        final fr = _pictureFrame(s);
+        if (s == null || fr == null || fr.isEmpty) return;
+        final m = _moved(d.localFocalPoint);
+        _patchFrame(s, {
+          'imgX': (_frameBase['imgX']! + m.dx / fr.width).clamp(-2.0, 2.0),
+          'imgY': (_frameBase['imgY']! + m.dy / fr.height).clamp(-2.0, 2.0),
+        });
+      case _Grab.zoomImage:
+        final s = _element;
+        if (s == null) return;
+        _patchFrame(s, {'imgZoom': (_base * d.scale).clamp(ImageFraming.kMinZoom, ImageFraming.kMaxZoom)});
+      case _Grab.frameEdge:
+        final s = _element;
+        final w = _pictureBase.width, h = _pictureBase.height;
+        if (s == null || w < 1 || h < 1) return;
+        final m = _moved(d.localFocalPoint);
+        final b = _frameBase;
+        // The frame never gets smaller than 32dp across.
+        final minW = 32 / w - 1, minH = 32 / h - 1;
+        final v = <String, double>{};
+        if (_edge.$1 < 0) v['frameL'] = (b['frameL']! - m.dx / w).clamp(-0.9, 4.0).clamp(minW - b['frameR']!, 4.0);
+        if (_edge.$1 > 0) v['frameR'] = (b['frameR']! + m.dx / w).clamp(-0.9, 4.0).clamp(minW - b['frameL']!, 4.0);
+        if (_edge.$2 < 0) v['frameT'] = (b['frameT']! - m.dy / h).clamp(-0.9, 4.0).clamp(minH - b['frameB']!, 4.0);
+        if (_edge.$2 > 0) v['frameB'] = (b['frameB']! + m.dy / h).clamp(-0.9, 4.0).clamp(minH - b['frameT']!, 4.0);
+        _patchFrame(s, v);
       case _Grab.pinchSection:
         final id = c.current?.id;
         if (id == null) return;
@@ -1036,6 +1150,12 @@ class _TouchLayerState extends State<_TouchLayer> {
         _carryTo(d.localFocalPoint);
     }
     _syncCarry();
+  }
+
+  /// How far the finger went since the gesture began.
+  Offset _moved(Offset p) {
+    _finger = p;
+    return p - _start;
   }
 
   /// Near the top or the bottom, a carried thing scrolls the page.
@@ -1200,7 +1320,7 @@ class _TouchLayerState extends State<_TouchLayer> {
         case 'back':
           c.endStep();
           c.patchStyle(el.slotKey, el.type, el.defaultValue,
-              {'dx': null, 'dy': null, 'scale': null, 'size': null, 'hidden': null, 'cropZoom': null, 'cropX': null, 'cropY': null});
+              {'dx': null, 'dy': null, 'scale': null, 'size': null, 'hidden': null, 'cropZoom': null, 'cropX': null, 'cropY': null, for (final k in _frameKeys) k: null});
           c.endStep();
         case 'hide':
           c.endStep();
@@ -1458,6 +1578,36 @@ class _TouchLayerState extends State<_TouchLayer> {
                   ),
                 ),
               ),
+            ],
+            if (_pictureFrame(_pickedPicture) case final pf?) ...[
+              Positioned.fromRect(
+                key: const ValueKey('picture-frame'),
+                rect: pf,
+                child: IgnorePointer(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(border: Border.all(color: kGold, width: 2)),
+                  ),
+                ),
+              ),
+              for (final h in _handles)
+                Positioned(
+                  key: ValueKey('frame-handle-${h.$1}-${h.$2}'),
+                  left: _handlePos(pf, h).dx - 12,
+                  top: _handlePos(pf, h).dy - 12,
+                  width: 24,
+                  height: 24,
+                  child: IgnorePointer(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: h.$1 != 0 && h.$2 != 0 ? BoxShape.circle : BoxShape.rectangle,
+                        borderRadius: h.$1 != 0 && h.$2 != 0 ? null : BorderRadius.circular(6),
+                        border: Border.all(color: kGold, width: 3),
+                        boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 4)],
+                      ),
+                    ),
+                  ),
+                ),
             ],
             if (target != null)
               Builder(builder: (_) {

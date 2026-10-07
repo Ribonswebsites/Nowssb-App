@@ -488,10 +488,15 @@ class _CardRowState extends State<_CardRow> {
 
 /// A picture from a URL (the owner's upload), cached; a soft gradient
 /// while it loads or when there is none yet.
+/// Where a cropped photo keeps its middle: high up, so a person's head
+/// stays in the picture when a wide banner cuts a tall photo.
+const kPhotoAlignment = Alignment(0, -0.6);
+
 class NetPicture extends StatelessWidget {
-  const NetPicture({super.key, required this.url, this.fit = BoxFit.cover});
+  const NetPicture({super.key, required this.url, this.fit = BoxFit.cover, this.alignment = kPhotoAlignment});
   final String url;
   final BoxFit fit;
+  final Alignment alignment;
 
   static const _empty = DecoratedBox(
     decoration: BoxDecoration(
@@ -504,9 +509,9 @@ class NetPicture extends StatelessWidget {
   Widget build(BuildContext context) {
     if (url.isEmpty) return _empty;
     if (!url.startsWith('http')) {
-      return Image.asset(url, fit: fit, errorBuilder: (_, __, ___) => _empty);
+      return Image.asset(url, fit: fit, alignment: alignment, errorBuilder: (_, __, ___) => _empty);
     }
-    return CachedNetworkImage(imageUrl: url, fit: fit, placeholder: (_, __) => _empty, errorWidget: (_, __, ___) => _empty);
+    return CachedNetworkImage(imageUrl: url, fit: fit, alignment: alignment, placeholder: (_, __) => _empty, errorWidget: (_, __, ___) => _empty);
   }
 }
 
@@ -575,6 +580,7 @@ class _NetVideoState extends State<NetVideo> {
     if (c == null || !c.value.isInitialized) return NetPicture(url: widget.poster, fit: widget.fit);
     return FittedBox(
       fit: widget.fit,
+      alignment: kPhotoAlignment,
       clipBehavior: Clip.hardEdge,
       child: SizedBox(width: c.value.size.width, height: c.value.size.height, child: VideoPlayer(c)),
     );

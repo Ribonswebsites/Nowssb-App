@@ -28,6 +28,7 @@ import '../../data/word_art.dart';
 import '../admin_state.dart';
 import '../layout/anims/effects.dart' show LoopFx;
 import '../layout/element_flow.dart';
+import '../layout/image_frame.dart';
 import '../layout/layout_sections.dart' show SectionEntrance;
 import '../layout/scopes.dart';
 import 'slot_keys.dart';
@@ -79,6 +80,11 @@ Widget slotChrome(
 }) {
   final preview = EditorPreviewScope.peek(context) != null;
   final look = effectiveOverride(context, key)?.style ?? const <String, dynamic>{};
+  // A picture's own crop, zoom and frame (layout/image_frame.dart).
+  if (type == SlotType.image || type == SlotType.video) {
+    final f = framingOf(look);
+    if (f != null) child = ImageFrame(framing: f, child: child);
+  }
   if (preview) {
     return elementPlacement(look, PreviewSlotMarker(slotKey: key, type: type, defaultValue: def, child: child),
         preview: true);
