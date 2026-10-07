@@ -58,7 +58,9 @@ void main() {
     await tester.pump(const Duration(milliseconds: 100));
     final from = rect(first)!.center;
     final to = rect(second)!.center + const Offset(0, 4);
+    // Hold first: a plain drag scrolls the page.
     final g = await tester.startGesture(from);
+    await tester.pump(const Duration(milliseconds: 600));
     for (var i = 1; i <= 12; i++) {
       await g.moveTo(Offset.lerp(from, to, i / 12)!);
       await tester.pump(const Duration(milliseconds: 16));

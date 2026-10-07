@@ -296,7 +296,6 @@ class _HypeTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final editing = editModeOn(context);
     final hasCta = (item.ctaLabel?.trim().isNotEmpty ?? false) ||
         (item.ctaLink?.trim().isNotEmpty ?? false) ||
         openHypeCard != null;
@@ -372,7 +371,7 @@ class _HypeTile extends StatelessWidget {
                 ),
                 if (hasCta) ...[
                   const SizedBox(width: 6),
-                  _FlameCta(onTap: editing ? null : onOpen),
+                  _FlameCta(onTap: onOpen),
                 ],
               ],
             ),
@@ -413,7 +412,6 @@ class _HypeTile extends StatelessWidget {
       ),
     );
 
-    if (editing) return tile;
     return GestureDetector(
       onTap: onOpen,
       behavior: HitTestBehavior.opaque,

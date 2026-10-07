@@ -188,7 +188,6 @@ class _CategoryTilesSectionState extends State<CategoryTilesSection> {
   }
 
   void _handleTileTap(SectionMediaItem item) {
-    if (editModeOn(context)) return;
     if (widget.onTileTap != null) {
       widget.onTileTap!(item);
       return;
@@ -199,7 +198,6 @@ class _CategoryTilesSectionState extends State<CategoryTilesSection> {
   }
 
   void _handleChipTap(int index, SectionMediaItem item) {
-    if (editModeOn(context)) return;
     setState(() => _chipIndex = index);
     if (widget.onChipSelected != null) {
       widget.onChipSelected!(item);

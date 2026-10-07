@@ -150,7 +150,6 @@ class _SpotlightSectionState extends State<SpotlightSection> {
   }
 
   void _handleTap(SectionMediaItem item) {
-    if (editModeOn(context)) return;
     if (widget.onTap != null) {
       widget.onTap!(item);
       return;

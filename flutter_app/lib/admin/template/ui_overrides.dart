@@ -430,13 +430,12 @@ class SlotRegistry {
 }
 
 /// Put once above MaterialApp. Editable widgets depend on it, so a change
-/// to the overrides, the edit mode or admin status rebuilds exactly them.
+/// to the overrides, layouts or admin status rebuilds exactly them.
 class UiScope extends InheritedNotifier<Listenable> {
   UiScope({super.key, required super.child}) : super(notifier: _merged);
 
   static final Listenable _merged = Listenable.merge([
     UiOverrides.instance,
-    EditMode.instance,
     AdminState.instance,
     UiLayouts.instance,
   ]);

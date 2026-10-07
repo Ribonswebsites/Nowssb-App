@@ -225,9 +225,8 @@ List<Widget> layoutChildren(
     }
   }
   final laid = applyLayout(context, pageId, items, hiddenByDefault: hiddenByDefault);
-  final editing = EditMode.instance.on;
   bool zoomed(String id) => (UiOverrides.instance.sectionZoomOf(pageId, id) - 1).abs() > 0.015;
-  if (identical(laid, items) && !editing && !items.any((i) => zoomed(i.id))) {
+  if (identical(laid, items) && !items.any((i) => zoomed(i.id))) {
     return children;
   }
   final iso = EditorPreviewScope.peek(context) == null
@@ -237,7 +236,7 @@ List<Widget> layoutChildren(
   if (identical(laid, items)) {
     return [
       for (final w in children)
-        if (w is LSection && (editing || zoomed(w.id)))
+        if (w is LSection && zoomed(w.id))
           SectionPinch(pageId: pageId, sectionId: w.id, child: w)
         else
           w,

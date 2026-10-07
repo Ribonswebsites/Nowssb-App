@@ -174,7 +174,6 @@ class ArtistCardsSection extends StatelessWidget {
   }
 
   void _handleTap(BuildContext context, SectionMediaItem item) {
-    if (editModeOn(context)) return;
     if (onTap != null) {
       onTap!(item);
       return;

@@ -21,7 +21,6 @@ class ControlTools extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     UiScope.watch(context);
-    final edit = EditMode.instance;
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       TileGrid(children: [
         _Tool(Icons.campaign_rounded, 'Broadcast', 'Push to everyone, a plan, free or one person · in-app banner', kAmber,
@@ -35,26 +34,11 @@ class ControlTools extends StatelessWidget {
         _Tool(Icons.history_rounded, 'Audit log', 'Every admin action, UI edit and settings version', kSky,
             () => pushAdmin(context, const AuditLogScreen())),
       ]),
-      const SectionHead('This phone', 'Editing the user app'),
+      const SectionHead('Slots', 'Edited only in the UI Editor'),
       Glass(
         radius: 22,
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
         child: Column(children: [
-          SwitchListTile(
-            value: edit.on,
-            onChanged: edit.setOn,
-            activeThumbColor: kGold,
-            title: const Text('Pencils on the user app', style: TextStyle(color: Colors.white)),
-            subtitle: const Text('Open the user app and tap a pencil on any picture, clip or line to replace it',
-                style: TextStyle(color: kDim, fontSize: 12)),
-          ),
-          SwitchListTile(
-            value: edit.fabPreference,
-            onChanged: (v) => edit.setFab(v),
-            activeThumbColor: kGold,
-            title: const Text('Floating Edit button in the user app', style: TextStyle(color: Colors.white)),
-            subtitle: const Text('Tap = pencils on/off · hold = back to Admin', style: TextStyle(color: kDim, fontSize: 12)),
-          ),
           ListTile(
             leading: const Icon(Icons.grid_view_rounded, color: kGold),
             title: const Text('Every editable slot', style: TextStyle(color: Colors.white)),

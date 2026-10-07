@@ -59,6 +59,16 @@ Rect _sectionRect(EditorController c, [String? id]) {
   return box.localToGlobal(Offset.zero) & box.size;
 }
 
+/// The editor page's own vertical scroll.
+ScrollPosition _pageScroll(WidgetTester tester) {
+  final all = tester.stateList<ScrollableState>(
+      find.descendant(of: find.byType(EditorPreview), matching: find.byType(Scrollable)));
+  return all
+      .where((s) => axisDirectionToAxis(s.axisDirection) == Axis.vertical && s.position.maxScrollExtent > 0)
+      .first
+      .position;
+}
+
 /// Picks the first section that is on screen and tall enough to grab.
 String _pickFirst(EditorController c) {
   final s = c.sections.firstWhere((s) {
@@ -94,9 +104,11 @@ Future<void> _pinch(WidgetTester tester, Offset mid, double grow) async {
   await b.up();
 }
 
-/// A one-finger drag from [from] to [to], slowly enough to read as a carry.
+/// Hold, then carry from [from] to [to]: the only way to move anything
+/// (a plain drag scrolls the page).
 Future<void> _drag(WidgetTester tester, Offset from, Offset to) async {
   final g = await tester.startGesture(from);
+  await tester.pump(const Duration(milliseconds: 600));
   for (var i = 1; i <= 12; i++) {
     await g.moveTo(Offset.lerp(from, to, i / 12)!);
     await tester.pump(const Duration(milliseconds: 16));
@@ -227,7 +239,7 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('one finger scrolls the page until a section is picked', (tester) async {
+    testWidgets('one finger scrolls the page', (tester) async {
       final c = EditorController();
       await _open(tester, c);
       final page = find.byKey(const ValueKey('page-home.normal'));
@@ -237,7 +249,7 @@ void main() {
           .firstWhere((s) => s.axisDirection == AxisDirection.down)
           .position;
       expect(vertical().pixels, 0);
-      await _drag(tester, const Offset(200, 700), const Offset(200, 300));
+      await tester.timedDragFrom(const Offset(200, 700), const Offset(0, -400), const Duration(milliseconds: 300));
       await _settle(tester);
       expect(c.sections.map((s) => s.id).toList(), before, reason: 'nothing moved');
       expect(c.pendingCount, 0);
@@ -246,7 +258,7 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('pick a section and drag it onto the trash: deleted, with Undo', (tester) async {
+    testWidgets('a picked section is deleted only by the labelled Delete on its strip, with Undo', (tester) async {
       final c = EditorController();
       final n = await _open(tester, c);
       // Let the pill fold away first: the change has to bring it back.
@@ -256,16 +268,9 @@ void main() {
       _pickFirst(c);
       await _settle(tester, 2);
       expect(find.byKey(const ValueKey('context-strip')), findsOneWidget, reason: 'its small strip shows');
-      final from = _sectionRect(c).center;
-      final g = await tester.startGesture(from);
-      for (var i = 1; i <= 12; i++) {
-        await g.moveTo(Offset(from.dx, from.dy + (_screen.height - 30 - from.dy) * i / 12));
-        await tester.pump(const Duration(milliseconds: 16));
-      }
-      expect(find.byIcon(Icons.delete_rounded), findsOneWidget, reason: 'the trash shows while dragging');
-      expect(find.byKey(const ValueKey('context-strip')), findsNothing, reason: 'the bottom is cleared for the trash');
-      expect(find.byKey(const ValueKey('editor-add')), findsNothing);
-      await g.up();
+      final del = find.byKey(const ValueKey('strip-delete'));
+      expect(find.descendant(of: del, matching: find.text('Delete')), findsOneWidget, reason: 'labelled');
+      await tester.tap(del);
       await _settle(tester);
       expect(find.textContaining('Deleted “'), findsOneWidget);
       expect(_live(c), n - 1);
@@ -276,6 +281,65 @@ void main() {
       expect(c.canRedo, isTrue);
     });
 
+    // Regression: scrolling used to throw sections onto the trash or flick
+    // them away. Nothing a scroll does can remove, hide or move anything.
+    testWidgets('flings and scrolls over sections never remove anything, picked or not', (tester) async {
+      final c = EditorController();
+      final n = await _open(tester, c);
+      final before = [for (final s in c.sections) '${s.id}:${s.entry.visible}:${s.entry.deleted}'];
+      final scroll = _pageScroll(tester);
+      for (final picked in [false, true]) {
+        if (picked) {
+          _pickFirst(c);
+          await _settle(tester, 2);
+        }
+        final mid = picked ? _sectionRect(c).center : const Offset(200, 450);
+        // Down to the very bottom, fast flings both ways, a sideways flick
+        // and a slow drag off the side of the screen.
+        await tester.dragFrom(mid, const Offset(0, 420));
+        await _settle(tester, 3);
+        await tester.flingFrom(const Offset(200, 600), const Offset(0, -500), 5000);
+        await _settle(tester, 12);
+        expect(scroll.pixels, greaterThan(300), reason: 'the page did scroll');
+        await tester.flingFrom(const Offset(200, 300), const Offset(0, 500), 5000);
+        await _settle(tester, 12);
+        await tester.flingFrom(const Offset(200, 400), const Offset(300, 0), 5000);
+        await _settle(tester, 4);
+        await tester.timedDragFrom(const Offset(200, 500), const Offset(0, 400), const Duration(milliseconds: 600));
+        await _settle(tester, 4);
+        await tester.timedDragFrom(const Offset(200, 500), const Offset(300, 40), const Duration(milliseconds: 600));
+        await _settle(tester, 4);
+      }
+      expect(_live(c), n);
+      expect([for (final s in c.sections) '${s.id}:${s.entry.visible}:${s.entry.deleted}'], before);
+      expect(c.preview.draftLayouts, isEmpty, reason: 'nothing moved either');
+      expect(c.preview.draftOverrides, isEmpty);
+      expect(find.textContaining('Deleted'), findsNothing);
+      expect(find.byIcon(Icons.delete_rounded), findsNothing, reason: 'there is no trash');
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('a picked section still scrolls with one finger; hold to pick it up', (tester) async {
+      final c = EditorController();
+      await _open(tester, c);
+      final id = _pickFirst(c);
+      await _settle(tester, 2);
+      final scroll = _pageScroll(tester);
+      final top0 = _sectionRect(c).top;
+      final y0 = scroll.pixels;
+      await tester.timedDragFrom(_sectionRect(c).center, const Offset(0, -200), const Duration(milliseconds: 300));
+      await _settle(tester, 6);
+      expect(scroll.pixels, greaterThan(y0 + 150), reason: 'vertical scroll wins over drag');
+      expect(_sectionRect(c).top, lessThan(top0 - 150), reason: 'the page moved, the section with it');
+      expect(c.current!.id, id, reason: 'still picked');
+      expect(c.preview.draftLayouts, isEmpty, reason: 'not moved');
+      // Edge drags used to set space above/below: now they scroll too.
+      final r = _sectionRect(c);
+      await tester.timedDragFrom(Offset(r.center.dx, r.top + 2), const Offset(0, 60), const Duration(milliseconds: 300));
+      await _settle(tester, 6);
+      expect(c.current!.entry.props['padTop'], isNull);
+    });
+
     testWidgets('long-press shows the short menu; Hide works', (tester) async {
       final c = EditorController();
       await _open(tester, c);
@@ -283,9 +347,11 @@ void main() {
       await _settle(tester, 2);
       await tester.longPressAt(_sectionRect(c).center);
       await _settle(tester, 4);
-      for (final t in ['Put back', 'Hide', 'Delete']) {
+      for (final t in ['Put back', 'Hide']) {
         expect(find.text(t), findsOneWidget);
       }
+      expect(find.descendant(of: find.byType(PopupMenuItem<String>), matching: find.text('Delete')), findsNothing,
+          reason: 'delete only on the strip');
       await tester.tap(find.text('Hide'));
       await _settle(tester);
       expect(c.sections.firstWhere((s) => s.id == id).entry.visible, isFalse);
@@ -294,18 +360,11 @@ void main() {
       expect(c.sections.firstWhere((s) => s.id == id).entry.visible, isTrue);
     });
 
-    testWidgets('drag the top edge for space above; pinch to resize', (tester) async {
+    testWidgets('pinch to resize a picked section', (tester) async {
       final c = EditorController();
       await _open(tester, c);
       final id = _pickFirst(c);
       await _settle(tester, 2);
-      final r = _sectionRect(c);
-      await tester.timedDragFrom(Offset(r.center.dx, r.top + 2), const Offset(0, 60), const Duration(milliseconds: 400));
-      await _settle(tester);
-      final pad = c.current!.entry.props['padTop'];
-      expect(pad, isA<num>());
-      expect(pad as num, greaterThan(20));
-      expect(c.current!.id, id, reason: 'an edge drag does not move the section');
 
       final before = c.preview.sectionHeights['${c.layoutPage}/$id']!;
       await _pinch(tester, _sectionRect(c).center, 40);
@@ -344,7 +403,7 @@ void main() {
       expect(c.fxDragging, isFalse);
     });
 
-    testWidgets('orbs: drop at an exact spot, drag, pinch bigger, trash with undo', (tester) async {
+    testWidgets('orbs: drop at an exact spot, hold and drag, pinch bigger, Delete with undo', (tester) async {
       final c = EditorController();
       await _open(tester, c);
       await _openDrawerTab(tester, 'Orbs');
@@ -374,19 +433,18 @@ void main() {
       expect(grown, greaterThan(PlacedOrb.kDefaultSize * 2));
       expect(tester.getSize(find.byType(PlacedOrbView)).width, moreOrLessEquals(grown, epsilon: 0.5));
 
-      // Onto the trash, then Undo.
-      final at = tester.getCenter(find.byType(PlacedOrbView));
-      await _drag(tester, at, Offset(at.dx, _screen.height - 30));
+      // The strip's Delete, then Undo.
+      await tester.tap(find.byKey(const ValueKey('strip-delete')));
       await _settle(tester);
       expect(find.byType(PlacedOrbView), findsNothing);
-      expect(find.text('Orb removed'), findsOneWidget);
+      expect(find.text('Orb deleted'), findsOneWidget);
       await tester.tap(find.text('Undo'));
       await _settle(tester);
       expect(find.byType(PlacedOrbView), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('elements: tap, drag to move, pinch to resize, trash to remove', (tester) async {
+    testWidgets('elements: tap, hold and drag to move, pinch to resize, Delete to remove', (tester) async {
       final c = EditorController();
       await _open(tester, c);
       // On the page (the Deleted snackbar names it too).
@@ -411,8 +469,22 @@ void main() {
       await _settle(tester);
       expect((c.overrideOf(key)!.style['size'] as num).toDouble(), greaterThan(18), reason: 'bigger than its 12.5');
 
-      final at = tester.getCenter(words);
-      await _drag(tester, at, Offset(at.dx, _screen.height - 30));
+      // A fling over it never deletes it.
+      await tester.flingFrom(tester.getCenter(words), const Offset(260, 0), 4000);
+      await _settle(tester, 3);
+      expect(c.overrideOf(key)!.style['removed'], isNull);
+      expect(words, findsOneWidget);
+      await tester.flingFrom(tester.getCenter(words), const Offset(0, 300), 4000);
+      await _settle(tester, 12);
+      expect(c.overrideOf(key)!.style['removed'], isNull);
+      _pageScroll(tester).jumpTo(0);
+      await _settle(tester, 3);
+      if (c.selectedSlot != key) {
+        await tester.tapAt(tester.getCenter(words));
+        await _settle(tester, 3);
+      }
+
+      await tester.tap(find.byKey(const ValueKey('strip-delete')));
       await _settle(tester);
       // Really gone (not just faded), and Undo brings it back where it was.
       expect(c.overrideOf(key)!.style['removed'], isTrue);
@@ -427,14 +499,6 @@ void main() {
       ScaffoldMessenger.of(tester.element(find.byType(UiEditorScreen))).clearSnackBars();
       await _settle(tester, 2);
 
-      // A flick throws it away too.
-      await tester.tapAt(tester.getCenter(words));
-      await _settle(tester, 3);
-      expect(c.selectedSlot, key);
-      await tester.flingFrom(tester.getCenter(words), const Offset(260, 0), 4000);
-      await _settle(tester, 3);
-      expect(c.overrideOf(key)!.style['removed'], isTrue);
-      expect(words, findsNothing);
       expect(tester.takeException(), isNull);
     });
 
@@ -534,7 +598,7 @@ void main() {
     final c = EditorController();
     await _open(tester, c);
     expect(find.text('Touch anywhere to start'), findsOneWidget);
-    for (final t in ['to select, again to type', 'to move', 'to resize', 'for more', 'to delete', 'to add']) {
+    for (final t in ['to select, again to type', 'to scroll', 'to resize', 'to move, or for more', 'on its strip', 'to add']) {
       expect(find.textContaining(t, findRichText: true), findsOneWidget);
     }
     await tester.tapAt(const Offset(20, 900));

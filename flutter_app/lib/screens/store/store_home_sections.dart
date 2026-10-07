@@ -127,7 +127,6 @@ class StoreSubscribeBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final asset = videoAsset ?? kSubscriptionOfferVideo;
-    final editing = editModeOn(context);
     final frame = ClipRRect(
       borderRadius: BorderRadius.circular(18),
       child: AspectRatio(
@@ -163,15 +162,13 @@ class StoreSubscribeBanner extends StatelessWidget {
     );
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
-      child: editing
-          ? frame
-          : GestureDetector(
-              onTap: onTap ??
-                  () => Navigator.of(context).push(MaterialPageRoute<void>(
-                      builder: (_) => const SubscriptionScreen())),
-              behavior: HitTestBehavior.opaque,
-              child: frame,
-            ),
+      child: GestureDetector(
+        onTap: onTap ??
+            () => Navigator.of(context).push(MaterialPageRoute<void>(
+                builder: (_) => const SubscriptionScreen())),
+        behavior: HitTestBehavior.opaque,
+        child: frame,
+      ),
     );
   }
 }

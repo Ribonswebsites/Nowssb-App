@@ -173,7 +173,6 @@ class _CouponBannerSectionState extends State<CouponBannerSection> {
 
   /// Hunter H-010: registry builds with no [onCta]; honour ctaLink, else coupons.
   void _handleCta(_Slide slide) {
-    if (editModeOn(context)) return;
     if (widget.onCta != null) {
       widget.onCta!();
       return;

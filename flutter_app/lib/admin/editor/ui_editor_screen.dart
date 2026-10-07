@@ -661,10 +661,6 @@ class EditorPill extends StatelessWidget {
                 c.setPickMode(!c.pickMode);
               case 'full':
                 onFull();
-              case 'edit':
-                EditMode.instance.setOn(!EditMode.instance.on);
-              case 'fab':
-                EditMode.instance.setFab(!EditMode.instance.fabPreference);
               case 'all':
                 Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const AllSlotsScreen()));
             }
@@ -676,16 +672,6 @@ class EditorPill extends StatelessWidget {
               child: const Text('Try it like the app', style: TextStyle(color: Colors.white)),
             ),
             const PopupMenuItem(value: 'full', child: Text('Live preview with my drafts', style: TextStyle(color: Colors.white))),
-            CheckedPopupMenuItem(
-              value: 'edit',
-              checked: EditMode.instance.on,
-              child: const Text('Pencils on the live app', style: TextStyle(color: Colors.white)),
-            ),
-            CheckedPopupMenuItem(
-              value: 'fab',
-              checked: EditMode.instance.fabPreference,
-              child: const Text('Floating Edit button', style: TextStyle(color: Colors.white)),
-            ),
             const PopupMenuItem(value: 'all', child: Text('Every slot in the app', style: TextStyle(color: Colors.white))),
           ],
         ),
@@ -756,7 +742,7 @@ class ContextStrip extends StatelessWidget {
   final VoidCallback onSection;
   final VoidCallback onEffects;
 
-  static const _quick = <int>[0xFFFFFFFF, 0xFF000000, 0xFFE8D5A3, 0xFF34D399, 0xFFFF4D8D, 0xFF2CB1FF];
+  static const _quick = <int>[0xFFFFFFFF, 0xFF000000, 0xFFE8D5A3, 0xFFFF4D8D];
 
   @override
   Widget build(BuildContext context) {
@@ -772,6 +758,17 @@ class ContextStrip extends StatelessWidget {
       icon: Icon(i, color: color, size: 20),
     );
     final done = icon(Icons.close_rounded, 'Done', c.unpick, color: kDim);
+    // The only way to delete: a labelled button, with Undo.
+    Widget delete(VoidCallback onTap) => TextButton.icon(
+          key: const ValueKey('strip-delete'),
+          onPressed: () {
+            tapFeel();
+            onTap();
+          },
+          style: TextButton.styleFrom(minimumSize: const Size(0, 40), padding: const EdgeInsets.symmetric(horizontal: 10)),
+          icon: const Icon(Icons.delete_outline_rounded, color: Color(0xFFFF8A8A), size: 19),
+          label: const Text('Delete', style: TextStyle(color: Color(0xFFFF8A8A), fontWeight: FontWeight.w800)),
+        );
     final children = <Widget>[];
     final orbSel = c.selectedOrb;
     final key = c.selectedSlot;
@@ -779,6 +776,7 @@ class ContextStrip extends StatelessWidget {
     if (orbSel != null) {
       final o = c.orbById(orbSel.$1, orbSel.$2);
       if (o == null) return const SizedBox.shrink();
+      children.add(delete(() => deleteOrbWithUndo(context, c, orbSel.$1, o.id)));
       final spec = animById(o.anim) ?? animById(o.animId);
       final kin = spec == null ? <AnimSpec>[] : animsIn(spec.category);
       // Ink: auto (from the background) → dark → light → auto.
@@ -862,18 +860,11 @@ class ContextStrip extends StatelessWidget {
         children.add(icon(Icons.blur_circular_rounded, 'Orb', onEffects, color: kGold));
       }
       children.add(done);
+      // Delete first in the strip: always in plain sight, never scrolled off.
+      children.insert(0, delete(() => deleteElementWithUndo(context, c, key, type, c.selectedDefault)));
     } else if (c.sectionPicked && c.current != null) {
       children.addAll([
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 130),
-            child: Text(c.current!.title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(color: kGold, fontWeight: FontWeight.w800, fontSize: 13)),
-          ),
-        ),
+        delete(() => deleteWithUndo(context, c, c.current!.id, c.current!.title)),
         icon(Icons.edit_note_rounded, 'Everything in it', onSection),
         icon(Icons.palette_rounded, 'Look', onStyle, color: kGold, key: const ValueKey('strip-look')),
         icon(Icons.animation_rounded, 'Effects', onEffects),
@@ -909,10 +900,10 @@ class TouchHint extends StatelessWidget {
 
   static const _rows = <(IconData, String, String)>[
     (Icons.touch_app_rounded, 'Tap', 'to select, again to type'),
-    (Icons.open_with_rounded, 'Drag', 'to move'),
+    (Icons.swipe_vertical_rounded, 'Drag', 'to scroll'),
     (Icons.pinch_rounded, 'Pinch', 'to resize'),
-    (Icons.back_hand_rounded, 'Hold', 'for more'),
-    (Icons.swipe_rounded, 'Flick away', 'to delete'),
+    (Icons.back_hand_rounded, 'Hold', 'to move, or for more'),
+    (Icons.delete_outline_rounded, 'Delete', 'on its strip'),
     (Icons.add_circle_outline_rounded, '+', 'to add'),
   ];
 

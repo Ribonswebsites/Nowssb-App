@@ -23,7 +23,7 @@ import 'package:flutter/services.dart';
 
 import 'admin/admin_mode.dart';
 import 'admin/admin_state.dart';
-import 'admin/edit_fab.dart';
+import 'admin/admin_pill.dart';
 import 'admin/layout/ui_layouts.dart';
 import 'admin/template/ui_overrides.dart';
 import 'app_update.dart';
@@ -100,7 +100,7 @@ Future<void> main() async {
   // at once instead of flashing the default; the Firestore watch follows.
   await UiOverrides.instance.start();
   await UiLayouts.instance.start();
-  await EditMode.instance.load();
+  await dropLegacyEditPrefs();
   await SlotRegistry.instance.load();
   // Admin accounts launch into NowssB Admin (lib/admin/admin_mode.dart): the
   // cached answer is read first so the member app never flashes for them.
@@ -241,7 +241,7 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
             navigatorKey: _navigatorKey,
             child: AppControlLayer(
               navigatorKey: _navigatorKey,
-              child: AdminEditFab(
+              child: AdminReturnPill(
                 navigatorKey: _navigatorKey,
                 child: NotificationPopupHost(child: child ?? const SizedBox()),
               ),

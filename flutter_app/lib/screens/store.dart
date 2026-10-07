@@ -204,7 +204,7 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
         padding: const EdgeInsets.fromLTRB(12, 6, 12, 6),
         child: ColoredSplitPromoBanner.forSurface(
           SplitPromoSurface.storeHome,
-          onTap: editModeOn(context) ? null : () => NwsbLinks.subscription(context),
+          onTap: () => NwsbLinks.subscription(context),
           margin: EdgeInsets.zero,
         ),
       ),
@@ -733,8 +733,6 @@ class _SignatureDoor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final editing = editModeOn(context);
-    // Pencils on: no parent button, so a tap on the film opens the sheet.
     final frame = AspectRatio(
       aspectRatio: 16 / 9,
       child: Container(
@@ -808,7 +806,6 @@ class _SignatureDoor extends StatelessWidget {
         ),
       ),
     );
-    if (editing) return frame;
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -856,7 +853,6 @@ class _StoreVideoBanner extends StatelessWidget {
   final bool tall;
   @override
   Widget build(BuildContext context) {
-    final editing = editModeOn(context);
     final frame = HeavyGlassPanel(
       margin: EdgeInsets.zero,
       radius: 20,
@@ -881,7 +877,7 @@ class _StoreVideoBanner extends StatelessWidget {
         ),
       ),
     );
-    if (editing || onTap == null) return frame;
+    if (onTap == null) return frame;
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -904,7 +900,6 @@ class _MiniStoreCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final editing = editModeOn(context);
     final card = Container(
         margin: const EdgeInsets.fromLTRB(0, 6, 0, 6),
         padding: const EdgeInsets.all(14),
@@ -949,8 +944,6 @@ class _MiniStoreCard extends StatelessWidget {
           ],
         ),
       );
-    // Pencils on: the words open the editor. The card must not open the next page.
-    if (editing) return card;
     return GestureDetector(onTap: onTap, child: card);
   }
 }

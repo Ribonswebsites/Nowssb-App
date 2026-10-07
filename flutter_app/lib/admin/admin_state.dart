@@ -163,57 +163,15 @@ class AdminState extends ChangeNotifier {
     }
     _isAdmin = v;
     _how = how;
-    if (!v) EditMode.instance._reset();
     notifyListeners();
   }
 }
 
-/// The live template editor's switches. Both are meaningless unless
-/// [AdminState.isAdmin] is true, and both reset when it stops being true.
-class EditMode extends ChangeNotifier {
-  EditMode._();
-  static final EditMode instance = EditMode._();
-
-  static const _kFab = 'nwsb_admin_edit_fab';
-
-  bool _on = false;
-  bool _fab = true;
-
-  /// Pencil badges on every editable element of the live screen.
-  bool get on => _on && AdminState.instance.isAdmin;
-
-  /// The floating "Edit layout" button over the app.
-  bool get fabVisible => _fab && AdminState.instance.isAdmin;
-  bool get fabPreference => _fab;
-
-  Future<void> load() async {
-    try {
-      final p = await SharedPreferences.getInstance();
-      _fab = p.getBool(_kFab) ?? true;
-    } catch (_) {}
-  }
-
-  void toggle() => setOn(!_on);
-
-  void setOn(bool v) {
-    if (v && !AdminState.instance.isAdmin) return;
-    _on = v;
-    notifyListeners();
-  }
-
-  Future<void> setFab(bool v) async {
-    _fab = v;
-    if (!v) _on = false;
-    notifyListeners();
-    try {
-      final p = await SharedPreferences.getInstance();
-      await p.setBool(_kFab, v);
-    } catch (_) {}
-  }
-
-  void _reset() {
-    if (!_on) return;
-    _on = false;
-    notifyListeners();
-  }
+/// The old "pencils on the user app" / floating Edit button left a flag on
+/// admins' phones. Editing is only in the admin UI Editor now: drop it.
+Future<void> dropLegacyEditPrefs() async {
+  try {
+    final p = await SharedPreferences.getInstance();
+    await p.remove('nwsb_admin_edit_fab');
+  } catch (_) {}
 }

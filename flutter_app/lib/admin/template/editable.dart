@@ -48,26 +48,27 @@ UiOverride? mediaOverride(BuildContext context, String key, SlotType type) {
   return o;
 }
 
-/// True while the admin pencils are on. Watches the scope so the page rebuilds.
-bool editModeOn(BuildContext context) {
-  UiScope.watch(context);
-  return EditMode.instance.on;
-}
+IconData slotIcon(SlotType type) => switch (type) {
+      SlotType.text => Icons.edit_rounded,
+      SlotType.video => Icons.movie_edit,
+      SlotType.image => Icons.image_rounded,
+      SlotType.orb => Icons.blur_circular_rounded,
+    };
 
-/// A film or picture sitting under a parent button. Pencils on: the slot
-/// receives the tap. Pencils off: the tap falls through to that button.
+/// A film or picture sitting under a parent button: the tap falls through
+/// to that button.
 class EditMedia extends StatelessWidget {
   const EditMedia({super.key, required this.child});
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    return IgnorePointer(ignoring: !editModeOn(context), child: child);
+    return IgnorePointer(child: child);
   }
 }
 
-/// What goes around an editable element: nothing for everyone else; the
-/// pencil in edit mode; a tappable marker in the UI Editor's preview.
+/// What goes around an editable element: nothing in the user app (only its
+/// saved placement); a tappable marker in the UI Editor's preview.
 Widget slotChrome(
   BuildContext context,
   String key,
@@ -82,8 +83,7 @@ Widget slotChrome(
     return elementPlacement(look, PreviewSlotMarker(slotKey: key, type: type, defaultValue: def, child: child),
         preview: true);
   }
-  if (!EditMode.instance.on) return elementPlacement(look, child);
-  return elementPlacement(look, SlotBadge(slotKey: key, type: type, defaultValue: def, word: word, child: child));
+  return elementPlacement(look, child);
 }
 
 /// Where the owner moved, resized, hid or deleted one element in the UI
@@ -597,117 +597,6 @@ Widget overrideSvg(
   return SvgPicture.network(url, width: width, height: height, fit: fit, alignment: alignment, colorFilter: colorFilter,
       placeholderBuilder: (_) => fallback());
 }
-
-/// The pencil drawn on an editable element in edit mode. Only ever built
-/// when [EditMode.on], so it costs nothing for everyone else.
-///
-/// A [Listener], not a [GestureDetector]. A tap recognizer joins the scroll
-/// arena, and with a pencil on every label the page stops moving. A short
-/// press opens the sheet. A drag is left for the list.
-class SlotBadge extends StatefulWidget {
-  const SlotBadge({
-    super.key,
-    required this.slotKey,
-    required this.type,
-    required this.defaultValue,
-    required this.child,
-    this.word,
-  });
-
-  final String slotKey;
-  final SlotType type;
-  final String defaultValue;
-  final String? word;
-  final Widget child;
-
-  @override
-  State<SlotBadge> createState() => _SlotBadgeState();
-}
-
-class _SlotBadgeState extends State<SlotBadge> {
-  Offset? _down;
-  var _slid = false;
-
-  void _open() {
-    openSlotSheet(
-      context,
-      slotKey: widget.slotKey,
-      type: widget.type,
-      defaultValue: widget.defaultValue,
-      word: widget.word,
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final overridden = UiOverrides.instance.get(widget.slotKey) != null;
-    return Listener(
-      behavior: HitTestBehavior.opaque,
-      onPointerDown: (e) {
-        _down = e.position;
-        _slid = false;
-      },
-      onPointerMove: (e) {
-        final origin = _down;
-        if (origin != null && (e.position - origin).distance > 16) _slid = true;
-      },
-      onPointerUp: (_) {
-        if (!_slid) _open();
-        _down = null;
-      },
-      onPointerCancel: (_) {
-        _down = null;
-        _slid = true;
-      },
-      child: Stack(
-        clipBehavior: Clip.none,
-        fit: StackFit.passthrough,
-        children: [
-          IgnorePointer(child: widget.child),
-          Positioned.fill(
-            child: IgnorePointer(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: overridden ? const Color(0xCC34D399) : const Color(0x99E8D5A3),
-                    width: 1,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            top: -4,
-            right: -4,
-            child: IgnorePointer(
-              child: Container(
-                width: 28,
-                height: 28,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: overridden ? const Color(0xFF34D399) : const Color(0xFFE8D5A3),
-                  boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 4)],
-                ),
-                child: Icon(
-                  slotIcon(widget.type),
-                  size: 15,
-                  color: const Color(0xFF060C18),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-IconData slotIcon(SlotType type) => switch (type) {
-      SlotType.text => Icons.edit_rounded,
-      SlotType.video => Icons.movie_edit,
-      SlotType.image => Icons.image_rounded,
-      SlotType.orb => Icons.blur_circular_rounded,
-    };
 
 /// In the UI Editor's preview: registers where the element is so the
 /// editor can draw a tappable hotspot over it (the page itself does not

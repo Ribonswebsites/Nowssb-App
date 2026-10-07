@@ -295,7 +295,7 @@ class _HotspotsState extends State<_Hotspots> {
     for (final (s, r) in _spots) {
       final picked = c.selectedSlot == s.slotKey;
       final changed = c.overrideOf(s.slotKey) != null;
-      final shown = picked || (pickedSection != null && s.section == pickedSection);
+      final shown = picked;
       spots.add(Positioned.fromRect(
         rect: r,
         child: GestureDetector(
@@ -383,7 +383,7 @@ class AnimDrop {
   final String id;
 }
 
-/// Something thrown away (the trash, a flick, off the screen).
+/// Something deleted (from the strip's Delete).
 void trashFeel() => HapticFeedback.heavyImpact();
 
 /// Deletes the element [key] for real (not hidden: gone from the page for
@@ -397,11 +397,8 @@ void deleteElementWithUndo(BuildContext context, EditorController c, String key,
   _undoBar(context, c, 'Deleted “${slotFriendly(key, type, def)}”');
 }
 
-/// A flick faster than this (pt/s) throws the carried thing away.
-const kFlickSpeed = 2200.0;
-
-/// A brief Undo just under the pill at the top, clear of the + button,
-/// the strip and the trash at the bottom.
+/// A brief Undo just under the pill at the top, clear of the + button
+/// and the strip at the bottom.
 void _undoBar(BuildContext context, EditorController c, String text) {
   final m = ScaffoldMessenger.maybeOf(context);
   final mq = MediaQuery.maybeOf(context);
@@ -418,6 +415,15 @@ void _undoBar(BuildContext context, EditorController c, String text) {
   ));
 }
 
+/// Deletes the orb [id] in [section], with Undo.
+void deleteOrbWithUndo(BuildContext context, EditorController c, String section, String id) {
+  trashFeel();
+  c.endStep();
+  c.deleteOrb(section, id);
+  c.endStep();
+  _undoBar(context, c, 'Orb deleted');
+}
+
 /// Deletes a section at once and offers Undo (no confirm dialog: undo is
 /// always there, in the snackbar and in the history).
 void deleteWithUndo(BuildContext context, EditorController c, String id, String title) {
@@ -429,7 +435,7 @@ void deleteWithUndo(BuildContext context, EditorController c, String id, String 
   _undoBar(context, c, 'Deleted “$title”');
 }
 
-enum _Grab { none, scroll, order, padTop, padBottom, pinchSection, pinchElement, moveElement, moveOrb, pinchOrb }
+enum _Grab { none, scroll, order, pinchSection, pinchElement, moveElement, moveOrb, pinchOrb }
 
 /// Places one drag up or down moves a section when no other section is
 /// under the finger (kept for callers and tests of the step maths).
@@ -440,27 +446,19 @@ const kShiftStep = 90.0;
 int shiftSteps(double dy, int up, int down) =>
     (dy / kShiftStep).truncate().clamp(-up, down);
 
-/// Height of the trash zone that shows at the bottom while something is
-/// dragged.
-const kTrashHeight = 96.0;
-
-/// How close to a picked section's top/bottom edge a drag must start to
-/// change the space above/below instead of moving it.
-const kEdgeGrab = 22.0;
-
-/// Where drags near the top, or just above the trash, scroll the page.
+/// Where carrying something near the top or bottom scrolls the page.
 const kAutoScrollBand = 80.0;
 
 /// Everything on the canvas is done by touching it:
 ///   tap                 pick an element, a placed orb, or a section
-///   drag (nothing picked, or outside it)   scroll the page
-///   drag the picked section    move it; the page makes room
-///   drag its top/bottom edge   space above / below
-///   drag the picked element    move it inside its section
-///   drag a placed orb          move it anywhere on the page
-///   … onto the trash at the bottom   delete (with Undo)
+///   drag / fling        ALWAYS scrolls the page, picked or not: a scroll
+///                       never moves or deletes anything
+///   long-press, then drag   pick it up and carry it: a section to a new
+///                       place (the page makes room), an element inside
+///                       its section, an orb anywhere on the page
+///   long-press, let go  the short menu (Put back, Hide, Duplicate…)
 ///   pinch               resize the orb, element or section under it
-///   long-press          the short menu for a section or orb
+/// Deleting is only the strip's labelled Delete, with Undo.
 /// Effects and orbs dragged out of the drawer land where they are dropped.
 class _TouchLayer extends StatefulWidget {
   const _TouchLayer({super.key, required this.c, required this.pageKey, required this.child});
@@ -686,12 +684,6 @@ class _TouchLayerState extends State<_TouchLayer> {
   Map<String, dynamic> get _props => c.current?.entry.props ?? const {};
   double _num(String k) => _props[k] is num ? (_props[k] as num).toDouble() : 0;
 
-  bool _overTrash(Offset p) {
-    final me = context.findRenderObject() as RenderBox?;
-    if (me == null || !me.hasSize) return false;
-    return p.dy > me.size.height - kTrashHeight;
-  }
-
   /// The page's own vertical scroll (the outermost one that can scroll).
   ScrollPosition? _findScroll() {
     ScrollableState? found;
@@ -778,39 +770,9 @@ class _TouchLayerState extends State<_TouchLayer> {
       setState(() {});
       return;
     }
-    final orb = _orbAt(_start);
-    final sel = _selectedSlot;
-    final sr = _slotRect(sel);
-    final cur = c.sectionPicked ? _sectionRect(c.current?.id) : null;
-    if (orb != null) {
-      c.selectedOrb = (orb.section, orb.orb.id);
-      c.sectionPicked = false;
-      c.clearSelection();
-      _orb = (orb.section, orb.orb.id);
-      _baseOffset = Offset(orb.orb.x * orb.box.width, orb.orb.y);
-      _grab = _Grab.moveOrb;
-    } else if (sel != null && sr != null && sr.contains(_start)) {
-      final st = c.overrideOf(sel.slotKey)?.style ?? const {};
-      double n(String k) => st[k] is num ? (st[k] as num).toDouble() : 0;
-      _element = sel;
-      _baseOffset = Offset(n('dx'), n('dy'));
-      _grab = _Grab.moveElement;
-    } else if (cur != null && cur.contains(_start)) {
-      if ((_start.dy - cur.top).abs() < kEdgeGrab) {
-        _grab = _Grab.padTop;
-        _base = _num('padTop');
-      } else if ((_start.dy - cur.bottom).abs() < kEdgeGrab) {
-        _grab = _Grab.padBottom;
-        _base = _num('padBottom');
-      } else {
-        _grab = _Grab.order;
-      }
-    } else if (cur != null && ((_start.dy - cur.top).abs() < kEdgeGrab || (_start.dy - cur.bottom).abs() < kEdgeGrab)) {
-      // Just outside the edge still grabs it (the bar sits on the edge).
-      final top = (_start.dy - cur.top).abs() < kEdgeGrab;
-      _grab = top ? _Grab.padTop : _Grab.padBottom;
-      _base = _num(top ? 'padTop' : 'padBottom');
-    } else {
+    {
+      // One finger scrolls, whatever is picked: carrying starts only
+      // with a long-press (onLongPress*).
       _grab = _Grab.scroll;
       _scrollPos = _findScroll();
       _scrollDrag = _scrollPos?.drag(
@@ -830,10 +792,113 @@ class _TouchLayerState extends State<_TouchLayer> {
     setState(() {});
   }
 
+  /// Long-press: pick up what is under the finger (an orb, an element,
+  /// else its section). Let go without moving: its menu.
+  Offset _pressGlobal = Offset.zero;
+
+  void _onLongStart(LongPressStartDetails d) {
+    _endScroll(0);
+    c.endStep();
+    _start = d.localPosition;
+    _finger = _start;
+    _pressGlobal = d.globalPosition;
+    _orb = null;
+    _element = null;
+    final p = _start;
+    final orb = _orbAt(p);
+    if (orb != null) {
+      c.selectedOrb = (orb.section, orb.orb.id);
+      c.sectionPicked = false;
+      c.clearSelection();
+      _orb = (orb.section, orb.orb.id);
+      _baseOffset = Offset(orb.orb.x * orb.box.width, orb.orb.y);
+      _grab = _Grab.moveOrb;
+    } else {
+      final sel = _selectedSlot;
+      var el = sel != null && (_slotRect(sel)?.contains(p) ?? false) ? sel : _slotAt(p);
+      // An element filling its section (a hero picture) lifts the section.
+      if (el != null && el.slotKey != c.selectedSlot) {
+        final er = _slotRect(el), sr = _sectionRect(_sectionAt(p));
+        if (er != null && sr != null && er.width * er.height > 0.6 * sr.width * sr.height) el = null;
+      }
+      if (el != null) {
+        final sec = el.section;
+        final sid = sec != null && sec.startsWith('${c.layoutPage}/') ? sec.split('/').last : null;
+        if (c.selectedSlot != el.slotKey) c.selectIn(sid, el.slotKey, el.type, el.defaultValue);
+        final st = c.overrideOf(el.slotKey)?.style ?? const {};
+        double n(String k) => st[k] is num ? (st[k] as num).toDouble() : 0;
+        _element = el;
+        _baseOffset = Offset(n('dx'), n('dy'));
+        _grab = _Grab.moveElement;
+      } else {
+        final id = _sectionAt(p);
+        if (id == null) {
+          _grab = _Grab.none;
+          return;
+        }
+        if (!c.sectionPicked || c.current?.id != id) c.pickSection(id);
+        _grab = _Grab.order;
+      }
+    }
+    actFeel();
+    setState(() {});
+  }
+
+  void _onLongMove(LongPressMoveUpdateDetails d) {
+    _carryTo(d.localPosition);
+    _syncCarry();
+  }
+
+  void _onLongEnd(LongPressEndDetails d) {
+    final grab = _grab;
+    final moved = (_finger - _start).distance > 12;
+    _autoScroll?.cancel();
+    _autoScroll = null;
+    setState(() => _grab = _Grab.none);
+    _syncCarry();
+    if (!moved) {
+      _menu(_start, _pressGlobal);
+      return;
+    }
+    _finish(grab, moved);
+    c.endStep();
+  }
+
+  /// Moves what is carried to under the finger.
+  void _carryTo(Offset local) {
+    final total = local - _start;
+    switch (_grab) {
+      case _Grab.moveElement:
+        final sel = _element;
+        if (sel == null) return;
+        final p = _baseOffset + total;
+        setState(() => _finger = local);
+        c.patchStyle(sel.slotKey, sel.type, sel.defaultValue, {
+          'dx': p.dx.abs() < 1 ? null : p.dx.roundToDouble(),
+          'dy': p.dy.abs() < 1 ? null : p.dy.roundToDouble(),
+        });
+        _autoScrollFor(local);
+      case _Grab.moveOrb:
+        final o = _orb;
+        final spot = _pickedOrb;
+        if (o == null || spot == null) return;
+        final p = _baseOffset + total;
+        setState(() => _finger = local);
+        c.updateOrb(o.$1, o.$2, (x) => x.copyWith(x: spot.box.width <= 0 ? x.x : p.dx / spot.box.width, y: p.dy));
+        _autoScrollFor(local);
+      case _Grab.order:
+        final before = _target();
+        setState(() => _finger = local);
+        if (_target() != before) tapFeel();
+        _autoScrollFor(local);
+      default:
+        break;
+    }
+  }
+
   bool get _carrying => _grab == _Grab.order || _grab == _Grab.moveOrb || _grab == _Grab.moveElement;
 
-  /// Tells the screen something is being carried (it clears the bottom so
-  /// the trash is in plain sight).
+  /// Tells the screen something is being carried (it clears the bottom).
   void _syncCarry() {
     final now = _carrying && (_finger - _start).distance > 6;
     // Picked up: a firm tick the moment it leaves its place.
@@ -849,7 +914,6 @@ class _TouchLayerState extends State<_TouchLayer> {
       _startPinch(d.localFocalPoint);
       setState(() {});
     }
-    final total = d.localFocalPoint - _start;
     switch (_grab) {
       case _Grab.none:
         return;
@@ -878,46 +942,19 @@ class _TouchLayerState extends State<_TouchLayer> {
         final id = c.current?.id;
         if (id == null) return;
         c.patchProps(id, {'height': (_base * d.scale).clamp(60.0, 1400.0).roundToDouble()});
-      case _Grab.padTop || _Grab.padBottom:
-        final id = c.current?.id;
-        if (id == null) return;
-        final v = (_base + total.dy).clamp(0.0, 200.0).roundToDouble();
-        c.patchProps(id, {_grab == _Grab.padTop ? 'padTop' : 'padBottom': v < 1 ? null : v});
-      case _Grab.moveElement:
-        final sel = _element;
-        if (sel == null) return;
-        final p = _baseOffset + total;
-        setState(() => _finger = d.localFocalPoint);
-        c.patchStyle(sel.slotKey, sel.type, sel.defaultValue, {
-          'dx': p.dx.abs() < 1 ? null : p.dx.roundToDouble(),
-          'dy': p.dy.abs() < 1 ? null : p.dy.roundToDouble(),
-        });
-        _autoScrollFor(d.localFocalPoint);
-      case _Grab.moveOrb:
-        final o = _orb;
-        final spot = _pickedOrb;
-        if (o == null || spot == null) return;
-        final p = _baseOffset + total;
-        setState(() => _finger = d.localFocalPoint);
-        c.updateOrb(o.$1, o.$2, (x) => x.copyWith(x: spot.box.width <= 0 ? x.x : p.dx / spot.box.width, y: p.dy));
-        _autoScrollFor(d.localFocalPoint);
-      case _Grab.order:
-        final before = _target();
-        setState(() => _finger = d.localFocalPoint);
-        if (_target() != before) tapFeel();
-        _autoScrollFor(d.localFocalPoint);
+      case _Grab.moveElement || _Grab.moveOrb || _Grab.order:
+        _carryTo(d.localFocalPoint);
     }
     _syncCarry();
   }
 
-  /// Near the top, or just above the trash, a carried thing scrolls the page.
+  /// Near the top or the bottom, a carried thing scrolls the page.
   void _autoScrollFor(Offset p) {
     final me = context.findRenderObject() as RenderBox?;
     if (me == null || !me.hasSize) return;
     final h = me.size.height;
     double speed = 0;
-    // Carried from the drawer there is no trash: the band is the bottom.
-    final bottom = _hover != null && !_carrying ? h : h - kTrashHeight;
+    final bottom = h;
     if (p.dy < kAutoScrollBand) {
       speed = -8;
     } else if (p.dy > bottom - kAutoScrollBand && p.dy < bottom) {
@@ -954,58 +991,40 @@ class _TouchLayerState extends State<_TouchLayer> {
     return null;
   }
 
-  /// Let go while moving fast, or at (past) the side of the screen.
-  bool _thrown(ScaleEndDetails d) {
-    final me = context.findRenderObject() as RenderBox?;
-    if (me == null || !me.hasSize) return false;
-    final w = me.size.width;
-    final off = _finger.dx < 6 || _finger.dx > w - 6;
-    return off || d.velocity.pixelsPerSecond.distance > kFlickSpeed;
-  }
-
   void _onEnd(ScaleEndDetails d) {
     final grab = _grab;
     final moved = (_finger - _start).distance > 12;
-    final trash = (grab == _Grab.order || grab == _Grab.moveOrb || grab == _Grab.moveElement) &&
-        moved &&
-        (_overTrash(_finger) || _thrown(d));
-    final target = grab == _Grab.order ? _target() : null;
     _autoScroll?.cancel();
     _autoScroll = null;
     if (grab == _Grab.scroll) _endScroll(d.velocity.pixelsPerSecond.dy);
     setState(() => _grab = _Grab.none);
     _syncCarry();
+    _finish(grab, moved);
+    c.endStep();
+  }
+
+  /// A carried thing let go: a section lands in its new place, an orb in
+  /// the section under it. Nothing is ever deleted by a gesture.
+  void _finish(_Grab grab, bool moved) {
     switch (grab) {
       case _Grab.order:
         final cur = c.current;
-        if (cur == null) break;
-        if (trash) {
-          deleteWithUndo(context, c, cur.id, cur.title);
-        } else if (target != null) {
-          final from = _sections.indexWhere((s) => s.$1 == cur.id);
-          // Steps count live sections, the same ones the page shows.
-          final targetId = _sections[target].$1;
-          final live = [for (final s in c.sections) if (!s.entry.deleted) s.id];
-          final steps = live.indexOf(targetId) - live.indexOf(cur.id);
-          if (from >= 0 && steps != 0) {
-            bigFeel();
-            c.endStep();
-            c.shift(cur.id, steps);
-            c.endStep();
-            c.pickSection(cur.id);
-          }
+        final target = _target();
+        if (cur == null || target == null) break;
+        // Steps count live sections, the same ones the page shows.
+        final targetId = _sections[target].$1;
+        final live = [for (final s in c.sections) if (!s.entry.deleted) s.id];
+        final steps = live.indexOf(targetId) - live.indexOf(cur.id);
+        if (steps != 0) {
+          bigFeel();
+          c.endStep();
+          c.shift(cur.id, steps);
+          c.endStep();
+          c.pickSection(cur.id);
         }
       case _Grab.moveOrb:
         final o = _orb;
         if (o == null) break;
-        if (trash) {
-          trashFeel();
-          c.endStep();
-          c.deleteOrb(o.$1, o.$2);
-          c.endStep();
-          _undoBar(context, c, 'Orb removed');
-          break;
-        }
         // Lands in the section under it (it may have crossed into another).
         final to = _sectionAt(_finger);
         final spot = _pickedOrb;
@@ -1014,24 +1033,12 @@ class _TouchLayerState extends State<_TouchLayer> {
           final centre = spot.rect.center;
           c.moveOrb(o.$1, to, o.$2, ((centre.dx - r.left) / r.width).clamp(0.0, 1.0), centre.dy - r.top);
         }
+        bigFeel();
       case _Grab.moveElement:
-        final sel = _element;
-        if (sel == null) break;
-        if (!trash) {
-          if (moved) actFeel();
-          break;
-        }
-        // Undo puts it back where it was before this drag.
-        c.patchStyle(sel.slotKey, sel.type, sel.defaultValue, {
-          'dx': _baseOffset.dx.abs() < 1 ? null : _baseOffset.dx,
-          'dy': _baseOffset.dy.abs() < 1 ? null : _baseOffset.dy,
-        });
-        c.endStep();
-        deleteElementWithUndo(context, c, sel.slotKey, sel.type, sel.defaultValue);
+        if (moved) bigFeel();
       default:
         break;
     }
-    c.endStep();
   }
 
   void _onTapUp(TapUpDetails d) {
@@ -1054,11 +1061,10 @@ class _TouchLayerState extends State<_TouchLayer> {
     }
   }
 
-  Future<void> _menu(LongPressStartDetails d) async {
-    final p = d.localPosition;
+  Future<void> _menu(Offset p, Offset global) async {
     final orb = _orbAt(p);
     final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
-    final pos = RelativeRect.fromRect(d.globalPosition & const Size(1, 1), Offset.zero & overlay.size);
+    final pos = RelativeRect.fromRect(global & const Size(1, 1), Offset.zero & overlay.size);
     PopupMenuItem<String> item(String v, IconData icon, String label, {Color color = Colors.white}) => PopupMenuItem(
           value: v,
           height: 44,
@@ -1074,16 +1080,10 @@ class _TouchLayerState extends State<_TouchLayer> {
       c.changedSelection();
       final v = await showMenu<String>(context: context, color: const Color(0xFF111A2B), position: pos, items: [
         item('circle', Icons.circle, orb.orb.circle ? 'No circle' : 'Black circle'),
-        item('del', Icons.delete_outline_rounded, 'Delete', color: const Color(0xFFFF8A8A)),
       ]);
       if (!mounted || v == null) return;
       c.endStep();
-      if (v == 'circle') {
-        c.updateOrb(orb.section, orb.orb.id, (o) => o.copyWith(circle: !o.circle));
-      } else {
-        c.deleteOrb(orb.section, orb.orb.id);
-        if (mounted) _undoBar(context, c, 'Orb removed');
-      }
+      c.updateOrb(orb.section, orb.orb.id, (o) => o.copyWith(circle: !o.circle));
       c.endStep();
       return;
     }
@@ -1104,7 +1104,6 @@ class _TouchLayerState extends State<_TouchLayer> {
       final v = await showMenu<String>(context: context, color: const Color(0xFF111A2B), position: pos, items: [
         item('back', Icons.restart_alt_rounded, 'Put back'),
         item('hide', hidden ? Icons.visibility_rounded : Icons.visibility_off_rounded, hidden ? 'Show' : 'Hide'),
-        item('del', Icons.delete_outline_rounded, 'Delete', color: const Color(0xFFFF8A8A)),
       ]);
       if (!mounted || v == null) return;
       switch (v) {
@@ -1118,8 +1117,6 @@ class _TouchLayerState extends State<_TouchLayer> {
           c.patchStyle(el.slotKey, el.type, el.defaultValue, {'hidden': hidden ? null : true});
           c.endStep();
           if (!hidden && mounted) _undoBar(context, c, 'Hidden “${slotFriendly(el.slotKey, el.type, el.defaultValue)}”');
-        case 'del':
-          deleteElementWithUndo(context, c, el.slotKey, el.type, el.defaultValue);
       }
       return;
     }
@@ -1141,7 +1138,6 @@ class _TouchLayerState extends State<_TouchLayer> {
           item('fit', whole ? Icons.crop_rounded : Icons.fit_screen_rounded, whole ? 'Fill picture' : 'Whole picture'),
         if (cur.copyable) item('dup', Icons.copy_rounded, 'Duplicate'),
         item('hide', Icons.visibility_off_rounded, 'Hide'),
-        item('del', Icons.delete_outline_rounded, 'Delete', color: const Color(0xFFFF8A8A)),
       ],
     );
     if (!mounted || v == null) return;
@@ -1162,8 +1158,6 @@ class _TouchLayerState extends State<_TouchLayer> {
         c.unpick();
         c.endStep();
         if (mounted) _undoBar(context, c, 'Hidden “${cur.title}”');
-      case 'del':
-        deleteWithUndo(context, c, cur.id, cur.title);
     }
   }
 
@@ -1307,8 +1301,7 @@ class _TouchLayerState extends State<_TouchLayer> {
     final moved = (_finger - _start).distance > 6;
     final carrying = _carrying && moved;
     final ordering = _grab == _Grab.order && moved;
-    final trash = carrying && _overTrash(_finger);
-    final target = ordering && !trash ? _target() : null;
+    final target = ordering ? _target() : null;
     final hoverGap = _hoverGap != null && _sections.isNotEmpty ? _hoverGap : null;
     final hoverId = _hover == null || hoverGap != null ? null : (_sectionAt(_hover!) ?? _nearestSection(_hover!));
     final hoverRect = _sectionRect(hoverId);
@@ -1341,7 +1334,9 @@ class _TouchLayerState extends State<_TouchLayer> {
           onScaleStart: _onStart,
           onScaleUpdate: _onUpdate,
           onScaleEnd: _onEnd,
-          onLongPressStart: _menu,
+          onLongPressStart: _onLongStart,
+          onLongPressMoveUpdate: _onLongMove,
+          onLongPressEnd: _onLongEnd,
           child: Stack(fit: StackFit.expand, children: [
             widget.child,
             // Placed orbs: a ring on the picked one.
@@ -1362,19 +1357,17 @@ class _TouchLayerState extends State<_TouchLayer> {
                 duration: ordering ? Duration.zero : const Duration(milliseconds: 200),
                 curve: Curves.easeOutCubic,
                 rect: ordering ? cur.shift(Offset(0, _finger.dy - _start.dy)) : cur,
+                // A subtle highlight on the one picked section, nothing else.
                 child: IgnorePointer(
                   child: DecoratedBox(
                     decoration: BoxDecoration(
-                      color: ordering ? kGold.withValues(alpha: 0.14) : null,
-                      border: Border.all(color: kGold, width: ordering ? 3 : 2),
+                      color: kGold.withValues(alpha: ordering ? 0.12 : 0.05),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: kGold.withValues(alpha: ordering ? 0.9 : 0.45), width: ordering ? 2 : 1.5),
                     ),
                   ),
                 ),
               ),
-              if (!ordering) ...[
-                _EdgeBar(center: Offset(cur.center.dx, cur.top), active: _grab == _Grab.padTop),
-                _EdgeBar(center: Offset(cur.center.dx, cur.bottom), active: _grab == _Grab.padBottom),
-              ],
             ],
             if (target != null)
               Builder(builder: (_) {
@@ -1409,14 +1402,6 @@ class _TouchLayerState extends State<_TouchLayer> {
                 ),
               ),
             if (hoverGap != null) InsertLine(y: _gapY(hoverGap)),
-            if (carrying)
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                height: kTrashHeight,
-                child: IgnorePointer(child: _Trash(hot: trash)),
-              ),
           ]),
         ),
       ),
@@ -1464,53 +1449,6 @@ class InsertLine extends StatelessWidget {
           color: kGold,
           shape: BoxShape.circle,
           border: Border.all(color: Colors.white, width: 3),
-        ),
-      );
-}
-
-class _EdgeBar extends StatelessWidget {
-  const _EdgeBar({required this.center, required this.active});
-  final Offset center;
-  final bool active;
-
-  @override
-  Widget build(BuildContext context) => Positioned(
-        left: center.dx - 22,
-        top: center.dy - 4,
-        width: 44,
-        height: 8,
-        child: IgnorePointer(
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: active ? kGold : const Color(0xE6E8D5A3),
-              borderRadius: BorderRadius.circular(99),
-              boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 4)],
-            ),
-          ),
-        ),
-      );
-}
-
-/// Shows at the bottom while something is dragged: drop it here to delete.
-class _Trash extends StatelessWidget {
-  const _Trash({required this.hot});
-  final bool hot;
-
-  @override
-  Widget build(BuildContext context) => AnimatedContainer(
-        duration: const Duration(milliseconds: 160),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.bottomCenter,
-            end: Alignment.topCenter,
-            colors: [hot ? const Color(0xEEE5484D) : const Color(0xCC1B1F2A), const Color(0x00000000)],
-          ),
-        ),
-        alignment: Alignment.center,
-        child: AnimatedScale(
-          duration: const Duration(milliseconds: 160),
-          scale: hot ? 1.25 : 1,
-          child: Icon(Icons.delete_rounded, color: hot ? Colors.white : const Color(0xCCFFFFFF), size: 40),
         ),
       );
 }

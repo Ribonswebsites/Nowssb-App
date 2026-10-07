@@ -25,8 +25,10 @@ uid gets a neutral splash (max 4 s) while `admins/{uid}` is read.
   the request / person. Each alert is also an FCM push to every admin phone
   (`functions/_lib/admin_alerts.js`, channel `nowssb_alerts`).
 - **User app** pill / ⋮ menu → the member app (`AdminMode`, prefs
-  `nwsb_admin_side`). In the member app a gold **Admin** pill takes you back;
-  long-press the floating Edit button also does.
+  `nwsb_admin_side`). In the member app a gold **Admin** pill takes you back
+  (`admin_pill.dart`). The member app has no pencils, no floating Edit
+  button and no per-section chips: editing is only in the UI Editor (the
+  old `nwsb_admin_edit_fab` flag is removed at start-up).
 - Promos are off for admins: `AdminPromoGuard` mutes promo notification kinds
   (`AdminState.promoKinds`), cancels the daily repeat reminder (local id
   88001) and the server's `broadcast` skips admin uids for promo audiences.
@@ -117,7 +119,7 @@ It is idempotent. The last run's per-file counts are in
 Admin → UI Editor shows the REAL page full screen, edge to edge, with
 nothing permanent on it but a small handle at the top and a + button. The
 handle opens a floating pill (back · page picker · undo/redo · publish ·
-⋯ for Try it, live preview, pencils, every slot); the pill also opens for a
+⋯ for Try it, live preview, every slot); the pill also opens for a
 few seconds after each change. + opens a bottom drawer with tabs inside:
 Sections (every section and banner), Effects, Orbs, Loaders, Backgrounds,
 Particles, Celebrate, Map (page map). The + and the folded handle drag
@@ -197,21 +199,21 @@ category. The Loaders target in the Orbs tab sets `orb.all` (pinch to
 resize). Sources and licences: `flutter_app/ATTRIBUTIONS.md`.
 
 **Touch-only editing** (`editor/preview.dart`, `_TouchLayer`, over the
-whole page): with nothing picked one finger scrolls the page. Tap picks a
-section (or an element, or a placed orb). A picked section drags to a new
-place (onto the trash at the bottom = delete, with Undo); dragging its
-top/bottom edge sets `padTop/padBottom`; a pinch resizes it (`height`).
-The selected element drags anywhere (override `style.dx/dy`) and pinches to
-resize (`style.size` for text, `style.scale` otherwise); a pinch and a
-vertical move change the room it takes, so what is under it reflows
-(`layout/element_flow.dart`). Onto the trash, flicked fast, or dragged off
-the side of the screen, it is deleted (`style.removed`: gone everywhere,
-with Undo); Hide (`style.hidden`, faded in the editor) is a separate
-long-press choice. See `elementPlacement` in `template/editable.dart`.
-Placed animations drag, pinch (24 to 720 pt) and trash or flick the same
-way. Long-press opens Put back · Duplicate · Hide · Delete on a section,
-Put back · Hide · Delete on an element (or, on an orb, circle · Delete).
-Haptics: pick-up and drop (medium), trash (heavy). There are no move/size
+whole page): one finger ALWAYS scrolls the page, picked or not — a drag or
+fling never moves, hides or deletes anything. Nothing is drawn on the page
+until a tap; a tap picks a section (one subtle highlight), an element or a
+placed orb. **Long-press, then drag** picks it up: a section moves to a new
+place (the page makes room), an element moves inside its section
+(override `style.dx/dy`), an orb anywhere. A pinch resizes what is under
+it (section `height`; `style.size` for text, `style.scale` otherwise); a
+pinch and a vertical move change the room an element takes, so what is
+under it reflows (`layout/element_flow.dart`). Long-press and let go
+opens Put back · Duplicate · Hide on a section, Put back · Hide on an
+element (circle on an orb). **Delete** is only the labelled button at the
+front of the picked thing's strip, with Undo (`style.removed` for an
+element: gone everywhere). See `elementPlacement` in
+`template/editable.dart`. Haptics: pick-up and drop (medium), delete
+(heavy). There are no move/size
 buttons or sliders. Every draft change is an undo step
 (`EditorController.undo/redo`; edits within 700 ms, such as one gesture,
 merge into one step). The canvas only needs an `AppPage` and its section
