@@ -10,7 +10,6 @@ import '../layout/scopes.dart';
 import '../layout/template_sections.dart';
 import 'editor_controller.dart';
 import 'glass.dart';
-import 'preview.dart' show deleteWithUndo;
 
 class LayoutTab extends StatelessWidget {
   const LayoutTab({super.key, required this.c});
@@ -234,17 +233,7 @@ class _Row extends StatelessWidget {
       index: index,
       child: Padding(
         padding: const EdgeInsets.only(bottom: 6),
-        child: Dismissible(
-          key: ValueKey('del-${s.id}'),
-          direction: DismissDirection.endToStart,
-          background: Container(
-            alignment: Alignment.centerRight,
-            padding: const EdgeInsets.only(right: 20),
-            decoration: BoxDecoration(color: const Color(0xCCE5484D), borderRadius: BorderRadius.circular(14)),
-            child: const Icon(Icons.delete_rounded, color: Colors.white),
-          ),
-          onDismissed: (_) => deleteWithUndo(context, c, s.id, s.title),
-          child: Glass(
+        child: Glass(
             radius: 14,
             padding: const EdgeInsets.fromLTRB(14, 4, 4, 4),
         edge: isCur ? kGold : kGlassEdge,
@@ -286,7 +275,6 @@ class _Row extends StatelessWidget {
           )
             ]),
           ),
-        ),
       ),
     );
   }

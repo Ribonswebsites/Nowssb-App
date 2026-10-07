@@ -127,6 +127,9 @@ Future<void> _openDrawerTab(WidgetTester tester, String tab) async {
 
 int _live(EditorController c) => c.sections.where((s) => !s.entry.deleted).length;
 
+/// The Undo on the snackbar (the pill says Undo too).
+final _snackUndo = find.descendant(of: find.byType(SnackBar), matching: find.text('Undo'));
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -199,15 +202,21 @@ void main() {
       final page = tester.getRect(find.byKey(const ValueKey('page-home.normal')));
       expect(page, Offset.zero & _screen, reason: 'the real page fills the whole screen');
       // Nothing permanent but the pill and +.
-      for (final t in ['Content', 'Style', 'Animation', 'Layout', 'Publish', 'UI Editor']) {
+      for (final t in ['Content', 'Style', 'Animation', 'Layout', 'UI Editor']) {
         expect(find.text(t), findsNothing, reason: '"$t" is not on screen until asked for');
       }
       expect(find.byKey(const ValueKey('editor-drawer')), findsNothing);
       expect(find.byKey(const ValueKey('context-strip')), findsNothing, reason: 'nothing is picked yet');
       final pill = tester.getRect(find.byKey(const ValueKey('editor-pill')));
-      expect(pill.height, lessThanOrEqualTo(52));
-      expect(pill.width, lessThan(_screen.width * 0.95));
-      expect(find.byKey(const ValueKey('editor-undo')), findsNothing, reason: 'undo shows only once there is a change');
+      expect(pill.height, lessThanOrEqualTo(60));
+      expect(pill.width, lessThanOrEqualTo(_screen.width));
+      // The pill in plain words; Undo is there but does nothing yet.
+      for (final t in ['Pages', 'Undo', 'Redo', 'Bin', 'Publish']) {
+        expect(find.descendant(of: find.byKey(const ValueKey('editor-pill')), matching: find.text(t)), findsOneWidget,
+            reason: 'the pill says "$t"');
+      }
+      expect(tester.widget<StripTool>(find.byKey(const ValueKey('editor-undo'))).onTap, isNull,
+          reason: 'nothing to undo yet');
       final add = tester.getRect(find.byKey(const ValueKey('editor-add')));
       expect(add.width, lessThanOrEqualTo(56));
 
@@ -275,7 +284,7 @@ void main() {
       expect(find.textContaining('Deleted “'), findsOneWidget);
       expect(_live(c), n - 1);
       expect(find.byKey(const ValueKey('editor-undo')), findsOneWidget, reason: 'the pill opens with undo after a change');
-      await tester.tap(find.text('Undo'));
+      await tester.tap(_snackUndo);
       await _settle(tester);
       expect(_live(c), n);
       expect(c.canRedo, isTrue);
@@ -437,8 +446,8 @@ void main() {
       await tester.tap(find.byKey(const ValueKey('strip-delete')));
       await _settle(tester);
       expect(find.byType(PlacedOrbView), findsNothing);
-      expect(find.text('Orb deleted'), findsOneWidget);
-      await tester.tap(find.text('Undo'));
+      expect(find.textContaining('deleted · in the Bin'), findsOneWidget);
+      await tester.tap(_snackUndo);
       await _settle(tester);
       expect(find.byType(PlacedOrbView), findsOneWidget);
       expect(tester.takeException(), isNull);
@@ -491,7 +500,7 @@ void main() {
       expect(words, findsNothing);
       expect(find.textContaining('Deleted “'), findsOneWidget);
       expect(find.text('Show'), findsNothing);
-      await tester.tap(find.text('Undo'));
+      await tester.tap(_snackUndo);
       await _settle(tester, 3);
       expect(c.overrideOf(key)?.style['removed'], isNull);
       expect(words, findsOneWidget);
@@ -533,7 +542,7 @@ void main() {
       expect(ink().onLight, isFalse, reason: 'light ink when picked');
 
       // Another: the next one in the same category, same spot.
-      await tester.tap(find.byTooltip('Another'));
+      await tester.tap(find.byKey(const ValueKey('strip-animate')));
       await _settle(tester, 2);
       expect(c.orbById(sel.$1, sel.$2)!.anim, 'ld.bounce');
       expect((tester.getCenter(find.byType(PlacedOrbView)) - spot).distance, lessThan(1.5));

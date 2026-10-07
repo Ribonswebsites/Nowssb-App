@@ -93,6 +93,11 @@ class EditorController extends ChangeNotifier {
 
   /// Called by the preview after the page reports its sections.
   void onReported() {
+    final later = _later;
+    if (later != null && layoutPage == later.$1 && sections.isNotEmpty) {
+      _later = null;
+      Future.microtask(later.$2);
+    }
     if (_jump != null) {
       final i = sections.indexWhere((s) => s.id == _jump);
       if (i >= 0) index = i;
@@ -511,6 +516,94 @@ class EditorController extends ChangeNotifier {
   }
 
   void restore(String id) => updateEntry(id, (x) => x.copyWith(deleted: false, visible: true));
+
+  // ── The Deleted bin (bin.dart) ─────────────────────────────────────
+
+  /// Where live section [id] sits now: its place among the live sections
+  /// and its live neighbours (what the bin needs to put it back there).
+  ({int index, String? before, String? after}) placeOf(String id) {
+    final live = [for (final e in entries) if (!e.deleted) e.id];
+    final i = live.indexOf(id);
+    if (i < 0) return (index: live.length, before: null, after: null);
+    return (
+      index: i,
+      before: i > 0 ? live[i - 1] : null,
+      after: i < live.length - 1 ? live[i + 1] : null,
+    );
+  }
+
+  /// Puts deleted section [e] back where it was: in place when its entry
+  /// is still on the page (a built-in marked deleted), else just after
+  /// [before] (or just before [after]); at the end when both are gone.
+  void restoreSection(SectionEntry e, {String? before, String? after}) {
+    final list = [...entries];
+    final i = list.indexWhere((x) => x.id == e.id);
+    if (i >= 0) {
+      list[i] = list[i].copyWith(deleted: false, visible: true);
+    } else {
+      var at = list.length;
+      final b = before == null ? -1 : list.indexWhere((x) => x.id == before && !x.deleted);
+      final a = after == null ? -1 : list.indexWhere((x) => x.id == after && !x.deleted);
+      if (b >= 0) {
+        at = b + 1;
+      } else if (a >= 0) {
+        at = a;
+      }
+      list.insert(at, e.copyWith(deleted: false, visible: true));
+    }
+    endStep();
+    _setEntries(list);
+    endStep();
+    _jump = e.id;
+    notifyListeners();
+  }
+
+  /// Whether section [id] is on the page now (not deleted).
+  bool hasLiveSection(String id) => entries.any((e) => e.id == id && !e.deleted);
+
+  /// Puts a deleted orb back on [sectionId] at its spot (on the last
+  /// section when that one is gone). Returns false with no section at all.
+  bool restoreOrb(String sectionId, PlacedOrb o) {
+    var target = sectionId;
+    if (!hasLiveSection(target)) {
+      final live = [for (final e in entries) if (!e.deleted) e.id];
+      if (live.isEmpty) return false;
+      target = live.last;
+    }
+    final all = [for (final e in entries) ...placedOrbsOf(e.props)];
+    var orb = o;
+    if (all.any((x) => x.id == o.id)) {
+      var n = all.length + 1;
+      while (all.any((x) => x.id == 'orb$n')) {
+        n++;
+      }
+      orb = PlacedOrb.from({...o.toJson(), 'id': 'orb$n'})!;
+    }
+    endStep();
+    patchProps(target, orbsPatch([...orbsIn(target), orb]));
+    endStep();
+    return true;
+  }
+
+  /// Puts a deleted element back (it never left its place on the page).
+  void restoreElement(String key, SlotType type, String def) {
+    endStep();
+    patchStyle(key, type, def, {'removed': null});
+    endStep();
+  }
+
+  /// Runs [f] once [layout] is the page on screen (now, or after opening
+  /// [page] and letting it report its sections).
+  void onLayout(String page, String layout, void Function() f) {
+    if (layoutPage == layout && sections.isNotEmpty) {
+      f();
+      return;
+    }
+    _later = (layout, f);
+    openPage(page);
+  }
+
+  (String, void Function())? _later;
 
   void duplicate(String id) {
     final list = [...entries];

@@ -28,6 +28,7 @@ import '../admin_state.dart';
 import '../template/ui_overrides.dart';
 import 'anims/effects.dart';
 import 'placed_orbs.dart';
+import 'plain_words.dart';
 import 'scopes.dart';
 import 'section_pinch.dart';
 import 'template_sections.dart';
@@ -133,11 +134,11 @@ List<SectionItem> applyLayout(
       for (final e in entries)
         SectionInfo(
           e.id,
-          e.isTemplate
+          plainWords(e.isTemplate
               ? templateTitle(e)
               : (e.src.isNotEmpty
                   ? '${byId[e.src]?.title ?? e.src} (copy)'
-                  : byId[e.id]?.title ?? e.id),
+                  : byId[e.id]?.title ?? e.id)),
           e,
           carousel: e.isTemplate ? e.kind == 'cardRow' : (byId[e.builtinId]?.carousel ?? false),
           copyable: e.isTemplate || (byId[e.builtinId]?.copyable ?? true),

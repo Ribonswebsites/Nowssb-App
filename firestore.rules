@@ -119,6 +119,8 @@ service cloud.firestore {
     // only admins write them. History is admin-only and append-only so a
     // restore can never be rewritten after the fact.
     match /ui_layouts/{id} { allow read: if true; allow write: if isAdmin(); }
+    // The UI Editor's Deleted bin: admin-only, kept until restored.
+    match /ui_bin/{id} { allow read, write: if isAdmin(); }
     match /ui_history/{id} {
       allow read, create: if isAdmin();
       allow update, delete: if false;

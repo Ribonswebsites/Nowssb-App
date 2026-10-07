@@ -6,6 +6,7 @@
 library;
 
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/gestures.dart' show Drag;
 import 'package:flutter/material.dart';
@@ -13,11 +14,13 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart' show HapticFeedback;
 
 import '../../theme/theme.dart';
+import '../layout/anims/anim_library.dart' show animById;
 import '../layout/app_pages.dart';
 import '../layout/placed_orbs.dart';
 import '../layout/scopes.dart';
 import '../template/editable.dart';
 import '../template/slot_keys.dart';
+import 'bin.dart';
 import 'editor_controller.dart';
 import 'glass.dart';
 import 'tab_layout.dart' show SectionDrop;
@@ -387,19 +390,61 @@ class AnimDrop {
 void trashFeel() => HapticFeedback.heavyImpact();
 
 /// Deletes the element [key] for real (not hidden: gone from the page for
-/// everyone), with Undo.
+/// everyone), with Undo. It goes to the Deleted bin.
 void deleteElementWithUndo(BuildContext context, EditorController c, String key, SlotType type, String def) {
   trashFeel();
+  final name = slotFriendly(key, type, def);
+  final sec = c.current;
+  RenderBox? box;
+  for (final s in c.preview.slots.values) {
+    if (s.slotKey == key && s.box.currentContext != null) {
+      box = s.box.currentContext!.findRenderObject() as RenderBox?;
+      break;
+    }
+  }
+  // Taken from its section's picture (an element's own layer may be
+  // mid-animation or scaled).
+  final secBox = sec == null ? null : c.preview.sectionBoxes['${c.layoutPage}/${sec.id}'];
+  Future<Uint8List?> shot;
+  if (box != null && box.attached && box.hasSize && secBox != null && secBox.attached && secBox.hasSize) {
+    final tl = secBox.globalToLocal(box.localToGlobal(Offset.zero));
+    shot = captureBox(secBox, local: (tl & box.size).inflate(6));
+  } else {
+    shot = captureBox(box);
+  }
+  final item = BinItem(
+    id: newBinId(),
+    kind: BinKind.element,
+    page: c.pageId,
+    layout: c.layoutPage,
+    label: type == SlotType.text ? '“$name”' : (type == SlotType.video ? 'Video · $name' : 'Picture · $name'),
+    where: '${binPageTitle(c)}${sec == null ? '' : ', in “${sec.title}”'}',
+    at: DateTime.now().millisecondsSinceEpoch,
+    data: {'key': key, 'type': type.name, 'default': def, 'section': sec?.id},
+    by: binWho(),
+  );
   c.endStep();
   c.patchStyle(key, type, def, {'removed': true, 'hidden': null, 'dx': null, 'dy': null});
   c.clearSelection();
   c.endStep();
-  _undoBar(context, c, 'Deleted “${slotFriendly(key, type, def)}”');
+  _toBin(item, shot);
+  _undoBar(context, c, 'Deleted “$name” · in the Bin', item.id);
+}
+
+/// The page's name as the owner knows it.
+String binPageTitle(EditorController c) => appPage(c.pageId)?.title ?? c.pageId;
+
+void _toBin(BinItem item, Future<Uint8List?> shot) {
+  final bin = BinStore.instance;
+  unawaited(bin.add(item));
+  unawaited(shot.then((png) {
+    if (png != null) return bin.setThumb(item.id, png);
+  }));
 }
 
 /// A brief Undo just under the pill at the top, clear of the + button
-/// and the strip at the bottom.
-void _undoBar(BuildContext context, EditorController c, String text) {
+/// and the strip at the bottom. Undo also takes it out of the bin.
+void _undoBar(BuildContext context, EditorController c, String text, [String? binId]) {
   final m = ScaffoldMessenger.maybeOf(context);
   final mq = MediaQuery.maybeOf(context);
   m?.hideCurrentSnackBar();
@@ -411,28 +456,73 @@ void _undoBar(BuildContext context, EditorController c, String text) {
     backgroundColor: const Color(0xFF111A2B),
     duration: const Duration(seconds: 4),
     content: Text(text, style: const TextStyle(color: Colors.white)),
-    action: SnackBarAction(label: 'Undo', textColor: kGold, onPressed: c.undo),
+    action: SnackBarAction(
+      label: 'Undo',
+      textColor: kGold,
+      onPressed: () {
+        c.undo();
+        if (binId != null) unawaited(BinStore.instance.remove(binId));
+      },
+    ),
   ));
 }
 
-/// Deletes the orb [id] in [section], with Undo.
+/// Deletes the orb [id] in [section], with Undo. It goes to the bin.
 void deleteOrbWithUndo(BuildContext context, EditorController c, String section, String id) {
   trashFeel();
+  final o = c.orbById(section, id);
+  final box = c.preview.sectionBoxes['${c.layoutPage}/$section'];
+  final shot = o == null || box == null || !box.attached || !box.hasSize
+      ? Future<Uint8List?>.value()
+      : captureBox(box, local: o.rectIn(box.size).inflate(6));
+  final title = c.sections.where((s) => s.id == section).firstOrNull?.title;
+  final spec = o == null ? null : (animById(o.anim) ?? animById(o.animId));
+  final item = BinItem(
+    id: newBinId(),
+    kind: BinKind.orb,
+    page: c.pageId,
+    layout: c.layoutPage,
+    label: spec?.name ?? 'Animation',
+    where: '${binPageTitle(c)}${title == null ? '' : ', on “$title”'}',
+    at: DateTime.now().millisecondsSinceEpoch,
+    data: {'section': section, 'orb': o?.toJson()},
+    by: binWho(),
+  );
   c.endStep();
   c.deleteOrb(section, id);
   c.endStep();
-  _undoBar(context, c, 'Orb deleted');
+  if (o != null) _toBin(item, shot);
+  _undoBar(context, c, '${item.label} deleted · in the Bin', item.id);
 }
 
 /// Deletes a section at once and offers Undo (no confirm dialog: undo is
-/// always there, in the snackbar and in the history).
+/// always there, in the snackbar, the history and the Deleted bin).
 void deleteWithUndo(BuildContext context, EditorController c, String id, String title) {
   trashFeel();
+  final e = c.entries.where((x) => x.id == id).firstOrNull;
+  final place = c.placeOf(id);
+  String? titleOf(String? sid) => sid == null ? null : c.sections.where((s) => s.id == sid).firstOrNull?.title;
+  final before = titleOf(place.before);
+  final after = titleOf(place.after);
+  final shot = captureBox(c.preview.sectionBoxes['${c.layoutPage}/$id']);
+  final banner = e != null && RegExp('anner|oupon|romo').hasMatch(e.kind);
+  final item = BinItem(
+    id: newBinId(),
+    kind: banner ? BinKind.banner : BinKind.section,
+    page: c.pageId,
+    layout: c.layoutPage,
+    label: title,
+    where: '${binPageTitle(c)}, ${before != null ? 'after “$before”' : (after != null ? 'at the top, before “$after”' : 'section ${place.index + 1}')}',
+    at: DateTime.now().millisecondsSinceEpoch,
+    data: {'entry': e?.toJson(), 'before': place.before, 'after': place.after, 'index': place.index},
+    by: binWho(),
+  );
   c.endStep();
   c.delete(id);
   c.unpick();
   c.endStep();
-  _undoBar(context, c, 'Deleted “$title”');
+  if (e != null) _toBin(item, shot);
+  _undoBar(context, c, 'Deleted “$title” · in the Bin', item.id);
 }
 
 enum _Grab { none, scroll, order, pinchSection, pinchElement, moveElement, moveOrb, pinchOrb }

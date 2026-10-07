@@ -28,6 +28,7 @@ import '../layout/app_pages.dart';
 import '../layout/placed_orbs.dart';
 import '../template/all_slots_screen.dart';
 import '../template/slot_keys.dart';
+import 'bin_page.dart';
 import 'editor_controller.dart';
 import 'movable.dart';
 import 'tab_look.dart';
@@ -355,6 +356,7 @@ class _UiEditorScreenState extends State<UiEditorScreen> {
                             _pillLater();
                           },
                           onFull: _openFull,
+                          onBin: () => openBin(context, c),
                           onMenu: (open) => open ? _pillHold() : _pillLater(),
                             ),
                           ),
@@ -375,11 +377,12 @@ class _UiEditorScreenState extends State<UiEditorScreen> {
             ),
             if (c.pickMode && !open && selected && !c.carrying.value)
               Positioned(
-                left: 12,
-                right: 80,
-                bottom: mq.padding.bottom + 18,
+                left: 10,
+                right: 10,
+                // Above the + (bottom right), so nothing covers a tool.
+                bottom: mq.padding.bottom + 16 + 56 + 10,
                 child: Align(
-                  alignment: Alignment.centerLeft,
+                  alignment: Alignment.center,
                   child: ContextStrip(
                     c: c,
                     onStyle: _styleSheet,
@@ -557,12 +560,14 @@ class EditorPill extends StatelessWidget {
     required this.onPublish,
     required this.onFull,
     required this.onMenu,
+    required this.onBin,
   });
   final EditorController c;
   final VoidCallback onBack;
   final VoidCallback onPages;
   final VoidCallback onPublish;
   final VoidCallback onFull;
+  final VoidCallback onBin;
 
   /// The ⋯ menu opened (true) or closed (false).
   final ValueChanged<bool> onMenu;
@@ -570,112 +575,68 @@ class EditorPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final n = c.pendingCount;
-    Widget btn(IconData i, String tip, VoidCallback? onTap, {Key? key, Color color = Colors.white}) => IconButton(
-      key: key,
-      tooltip: tip,
-      padding: EdgeInsets.zero,
-      constraints: const BoxConstraints.tightFor(width: 36, height: 36),
-      onPressed: onTap == null
-          ? null
-          : () {
-              tapFeel();
-              onTap();
-            },
-      icon: Icon(i, color: color, size: 19),
-    );
-    return Container(
-      key: const ValueKey('editor-pill'),
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      decoration: BoxDecoration(
-        color: const Color(0xCC0B1120),
-        borderRadius: BorderRadius.circular(99),
-        border: Border.all(color: const Color(0x33FFFFFF)),
-        boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 12, offset: Offset(0, 3))],
-      ),
-      child: Row(mainAxisSize: MainAxisSize.min, children: [
-        btn(Icons.arrow_back_ios_new_rounded, 'Back to Admin', onBack),
-        GestureDetector(
-          key: const ValueKey('editor-pages'),
-          onTap: () {
-            tapFeel();
-            onPages();
-          },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-            child: Row(mainAxisSize: MainAxisSize.min, children: [
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 120),
-                child: Text(appPage(c.pageId)?.title ?? c.pageId,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13)),
-              ),
-              const Icon(Icons.expand_more_rounded, color: kGold, size: 18),
-            ]),
-          ),
+    Widget t(IconData i, String label, VoidCallback? onTap, {Key? key, Color color = Colors.white, String? badge}) =>
+        StripTool(key: key, icon: i, label: label, onTap: onTap, color: color, minSize: 48, badge: badge);
+    return Material(
+      type: MaterialType.transparency,
+      child: Container(
+        key: const ValueKey('editor-pill'),
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+        decoration: BoxDecoration(
+          color: const Color(0xE60B1120),
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: const Color(0x33FFFFFF)),
+          boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 12, offset: Offset(0, 3))],
         ),
-        AnimatedSize(
-          duration: const Duration(milliseconds: 220),
-          curve: Curves.easeOutCubic,
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
           child: Row(mainAxisSize: MainAxisSize.min, children: [
-            if (c.canUndo || c.canRedo) ...[
-              btn(Icons.undo_rounded, 'Undo', c.canUndo ? c.undo : null, key: const ValueKey('editor-undo')),
-              btn(Icons.redo_rounded, 'Redo', c.canRedo ? c.redo : null, key: const ValueKey('editor-redo')),
-            ],
+            t(Icons.arrow_back_rounded, 'Back', onBack, key: const ValueKey('editor-back')),
+            t(Icons.description_outlined, 'Pages', onPages, key: const ValueKey('editor-pages')),
+            t(Icons.undo_rounded, 'Undo', c.canUndo ? c.undo : null, key: const ValueKey('editor-undo')),
+            t(Icons.redo_rounded, 'Redo', c.canRedo ? c.redo : null, key: const ValueKey('editor-redo')),
+            t(Icons.delete_outline_rounded, 'Bin', onBin, key: const ValueKey('editor-bin')),
+            if (!c.pickMode) t(Icons.touch_app_rounded, 'Editing', () => c.setPickMode(true), color: kGold),
+            t(n == 0 ? Icons.cloud_done_rounded : Icons.publish_rounded, 'Publish', onPublish,
+                key: const ValueKey('editor-publish'), color: n == 0 ? kMint : kGold, badge: n == 0 ? null : '$n'),
+            PopupMenuButton<String>(
+              tooltip: 'More',
+              color: const Color(0xFF111A2B),
+              padding: EdgeInsets.zero,
+              onOpened: () => onMenu(true),
+              onCanceled: () => onMenu(false),
+              onSelected: (v) {
+                onMenu(false);
+                switch (v) {
+                  case 'try':
+                    c.setPickMode(!c.pickMode);
+                  case 'full':
+                    onFull();
+                  case 'all':
+                    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const AllSlotsScreen()));
+                }
+              },
+              itemBuilder: (_) => [
+                CheckedPopupMenuItem(
+                  value: 'try',
+                  checked: !c.pickMode,
+                  child: const Text('Try it like the app', style: TextStyle(color: Colors.white)),
+                ),
+                const PopupMenuItem(value: 'full', child: Text('Preview with my changes', style: TextStyle(color: Colors.white))),
+                const PopupMenuItem(value: 'all', child: Text('Every picture and text in the app', style: TextStyle(color: Colors.white))),
+              ],
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+                child: const Column(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.center, children: [
+                  Icon(Icons.more_horiz_rounded, color: Colors.white, size: 24),
+                  SizedBox(height: 3),
+                  Text('More', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700, height: 1.1)),
+                ]),
+              ),
+            ),
           ]),
         ),
-        if (!c.pickMode)
-          btn(Icons.touch_app_rounded, 'Back to editing', () => c.setPickMode(true), color: kGold),
-        Tooltip(
-          message: n == 0 ? 'Everything is live' : 'Publish $n change(s)',
-          child: GestureDetector(
-            key: const ValueKey('editor-publish'),
-            onTap: () {
-              tapFeel();
-              onPublish();
-            },
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
-              child: n == 0
-                  ? const Icon(Icons.cloud_done_rounded, color: kMint, size: 19)
-                  : Badge(
-                      label: Text('$n'),
-                      backgroundColor: kMint,
-                      textColor: kInk,
-                      child: const Icon(Icons.rocket_launch_rounded, color: kGold, size: 19),
-                    ),
-            ),
-          ),
-        ),
-        PopupMenuButton<String>(
-          tooltip: 'More',
-          color: const Color(0xFF111A2B),
-          padding: EdgeInsets.zero,
-          icon: const Icon(Icons.more_horiz_rounded, color: Colors.white, size: 20),
-          onOpened: () => onMenu(true),
-          onCanceled: () => onMenu(false),
-          onSelected: (v) {
-            onMenu(false);
-            switch (v) {
-              case 'try':
-                c.setPickMode(!c.pickMode);
-              case 'full':
-                onFull();
-              case 'all':
-                Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const AllSlotsScreen()));
-            }
-          },
-          itemBuilder: (_) => [
-            CheckedPopupMenuItem(
-              value: 'try',
-              checked: !c.pickMode,
-              child: const Text('Try it like the app', style: TextStyle(color: Colors.white)),
-            ),
-            const PopupMenuItem(value: 'full', child: Text('Live preview with my drafts', style: TextStyle(color: Colors.white))),
-            const PopupMenuItem(value: 'all', child: Text('Every slot in the app', style: TextStyle(color: Colors.white))),
-          ],
-        ),
-      ]),
+      ),
     );
   }
 }
@@ -742,33 +703,17 @@ class ContextStrip extends StatelessWidget {
   final VoidCallback onSection;
   final VoidCallback onEffects;
 
-  static const _quick = <int>[0xFFFFFFFF, 0xFF000000, 0xFFE8D5A3, 0xFFFF4D8D];
+  /// Every button is at least this big (a thumb, not a fingertip).
+  static const kTool = 56.0;
 
   @override
   Widget build(BuildContext context) {
-    Widget icon(IconData i, String tip, VoidCallback onTap, {Color color = Colors.white, Key? key}) => IconButton(
-      key: key,
-      tooltip: tip,
-      padding: EdgeInsets.zero,
-      constraints: const BoxConstraints.tightFor(width: 38, height: 40),
-      onPressed: () {
-        tapFeel();
-        onTap();
-      },
-      icon: Icon(i, color: color, size: 20),
-    );
-    final done = icon(Icons.close_rounded, 'Done', c.unpick, color: kDim);
-    // The only way to delete: a labelled button, with Undo.
-    Widget delete(VoidCallback onTap) => TextButton.icon(
-          key: const ValueKey('strip-delete'),
-          onPressed: () {
-            tapFeel();
-            onTap();
-          },
-          style: TextButton.styleFrom(minimumSize: const Size(0, 40), padding: const EdgeInsets.symmetric(horizontal: 10)),
-          icon: const Icon(Icons.delete_outline_rounded, color: Color(0xFFFF8A8A), size: 19),
-          label: const Text('Delete', style: TextStyle(color: Color(0xFFFF8A8A), fontWeight: FontWeight.w800)),
-        );
+    Widget tool(IconData i, String label, VoidCallback onTap, {Color color = Colors.white, Key? key}) =>
+        StripTool(key: key, icon: i, label: label, color: color, onTap: onTap);
+    final done = tool(Icons.check_rounded, 'Done', c.unpick, color: kDim, key: const ValueKey('strip-done'));
+    // The only way to delete: a labelled button, with Undo and the bin.
+    Widget delete(VoidCallback onTap) =>
+        tool(Icons.delete_outline_rounded, 'Delete', onTap, color: const Color(0xFFFF8A8A), key: const ValueKey('strip-delete'));
     final children = <Widget>[];
     final orbSel = c.selectedOrb;
     final key = c.selectedSlot;
@@ -776,25 +721,20 @@ class ContextStrip extends StatelessWidget {
     if (orbSel != null) {
       final o = c.orbById(orbSel.$1, orbSel.$2);
       if (o == null) return const SizedBox.shrink();
-      children.add(delete(() => deleteOrbWithUndo(context, c, orbSel.$1, o.id)));
       final spec = animById(o.anim) ?? animById(o.animId);
       final kin = spec == null ? <AnimSpec>[] : animsIn(spec.category);
-      // Ink: auto (from the background) → dark → light → auto.
+      // Colour: automatic (from the background) → dark → light → automatic.
       const inks = <String?>[null, 'dark', 'light'];
       final inkNext = inks[(inks.indexOf(o.ink) + 1) % inks.length];
       children.addAll([
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Text(spec?.name ?? 'Orb', style: const TextStyle(color: kGold, fontWeight: FontWeight.w800, fontSize: 13)),
-        ),
-        icon(o.circle ? Icons.circle : Icons.circle_outlined, 'Black circle', () {
+        tool(o.circle ? Icons.circle : Icons.circle_outlined, o.circle ? 'No circle' : 'Circle', () {
           c.endStep();
           c.updateOrb(orbSel.$1, o.id, (x) => x.copyWith(circle: !x.circle));
           c.endStep();
         }, color: kGold),
-        icon(
+        tool(
           switch (o.ink) { 'dark' => Icons.dark_mode_rounded, 'light' => Icons.light_mode_rounded, _ => Icons.contrast_rounded },
-          switch (o.ink) { 'dark' => 'Dark ink', 'light' => 'Light ink', _ => 'Ink: auto' },
+          switch (o.ink) { 'dark' => 'Dark', 'light' => 'Light', _ => 'Auto colour' },
           () {
             c.endStep();
             c.updateOrb(orbSel.$1, o.id, (x) => x.copyWith(ink: inkNext ?? ''));
@@ -803,71 +743,41 @@ class ContextStrip extends StatelessWidget {
           key: const ValueKey('orb-ink'),
         ),
         if (kin.length > 1)
-          icon(Icons.shuffle_rounded, 'Another', () {
+          tool(Icons.animation_rounded, 'Animate', () {
             final next = kin[(kin.indexWhere((k) => k.id == spec!.id) + 1) % kin.length];
             c.endStep();
             c.setOrbAnim(orbSel.$1, o.id, next.id);
             c.endStep();
-          }),
+          }, key: const ValueKey('strip-animate')),
+        delete(() => deleteOrbWithUndo(context, c, orbSel.$1, o.id)),
         done,
       ]);
     } else if (key != null && type != null) {
       final st = c.overrideOf(key)?.style ?? const <String, dynamic>{};
       if (st['hidden'] == true) {
-        children.add(TextButton.icon(
-          onPressed: () {
-            tapFeel();
-            c.endStep();
-            c.patchStyle(key, type, c.selectedDefault, {'hidden': null});
-            c.endStep();
-          },
-          icon: const Icon(Icons.visibility_rounded, color: kMint, size: 18),
-          label: const Text('Show', style: TextStyle(color: kMint, fontWeight: FontWeight.w800)),
-        ));
+        children.add(tool(Icons.visibility_rounded, 'Show', () {
+          c.endStep();
+          c.patchStyle(key, type, c.selectedDefault, {'hidden': null});
+          c.endStep();
+        }, color: kMint));
       }
       if (type == SlotType.text) {
-        for (final col in _quick) {
-          children.add(GestureDetector(
-            onTap: () {
-              tapFeel();
-              c.endStep();
-              c.patchStyle(key, type, c.selectedDefault, {'color': col, 'gradient': null});
-              c.endStep();
-            },
-            child: Container(
-              width: 22,
-              height: 22,
-              margin: const EdgeInsets.symmetric(horizontal: 2.5),
-              decoration: BoxDecoration(
-                color: Color(col),
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: st['color'] == col ? kGold : const Color(0x55FFFFFF),
-                  width: st['color'] == col ? 3 : 1,
-                ),
-              ),
-            ),
-          ));
-        }
-        children.addAll([
-          icon(Icons.palette_rounded, 'Look', onStyle, color: kGold, key: const ValueKey('strip-look')),
-          icon(Icons.edit_rounded, 'Words', onWords),
-        ]);
+        children.add(tool(Icons.text_fields_rounded, 'Edit text', onWords, color: kGold, key: const ValueKey('strip-text')));
       } else if (type != SlotType.orb) {
-        children.add(icon(Icons.photo_library_rounded, 'Replace', onWords, color: kGold));
-        children.add(icon(Icons.palette_rounded, 'Look', onStyle, key: const ValueKey('strip-look')));
-      } else {
-        children.add(icon(Icons.blur_circular_rounded, 'Orb', onEffects, color: kGold));
+        children.add(tool(Icons.image_rounded, 'Image', onWords, color: kGold, key: const ValueKey('strip-image')));
       }
-      children.add(done);
-      // Delete first in the strip: always in plain sight, never scrolled off.
-      children.insert(0, delete(() => deleteElementWithUndo(context, c, key, type, c.selectedDefault)));
+      children.addAll([
+        tool(Icons.palette_rounded, 'Style', onStyle, key: const ValueKey('strip-look')),
+        tool(Icons.animation_rounded, 'Animate', onEffects, key: const ValueKey('strip-animate')),
+        delete(() => deleteElementWithUndo(context, c, key, type, c.selectedDefault)),
+        done,
+      ]);
     } else if (c.sectionPicked && c.current != null) {
       children.addAll([
+        tool(Icons.text_fields_rounded, 'Edit text', onSection, color: kGold, key: const ValueKey('strip-text')),
+        tool(Icons.palette_rounded, 'Style', onStyle, key: const ValueKey('strip-look')),
+        tool(Icons.animation_rounded, 'Animate', onEffects, key: const ValueKey('strip-animate')),
         delete(() => deleteWithUndo(context, c, c.current!.id, c.current!.title)),
-        icon(Icons.edit_note_rounded, 'Everything in it', onSection),
-        icon(Icons.palette_rounded, 'Look', onStyle, color: kGold, key: const ValueKey('strip-look')),
-        icon(Icons.animation_rounded, 'Effects', onEffects),
         done,
       ]);
     } else {
@@ -875,16 +785,84 @@ class ContextStrip extends StatelessWidget {
     }
     return Container(
       key: const ValueKey('context-strip'),
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
       decoration: BoxDecoration(
-        color: const Color(0xEE111A2B),
-        borderRadius: BorderRadius.circular(99),
+        color: const Color(0xF0111A2B),
+        borderRadius: BorderRadius.circular(22),
         border: Border.all(color: const Color(0x33FFFFFF)),
         boxShadow: const [BoxShadow(color: Color(0x88000000), blurRadius: 12, offset: Offset(0, 4))],
       ),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(mainAxisSize: MainAxisSize.min, children: children),
+      // Every tool in plain sight: shared out across the width, scrolling
+      // only on a phone too narrow for all of them.
+      child: LayoutBuilder(builder: (context, box) {
+        if (children.length * kTool <= box.maxWidth) {
+          return Row(children: [for (final w in children) Expanded(child: w)]);
+        }
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(mainAxisSize: MainAxisSize.min, children: children),
+        );
+      }),
+    );
+  }
+}
+
+/// One button of the strip or the pill: an icon over a plain word, and a
+/// touch target of at least [minSize] square.
+class StripTool extends StatelessWidget {
+  const StripTool({
+    super.key,
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.color = Colors.white,
+    this.minSize = ContextStrip.kTool,
+    this.badge,
+  });
+  final IconData icon;
+  final String label;
+  final VoidCallback? onTap;
+  final Color color;
+  final double minSize;
+  final String? badge;
+
+  @override
+  Widget build(BuildContext context) {
+    final on = onTap != null;
+    Widget ic = Icon(icon, color: color, size: 24);
+    if (badge != null) {
+      ic = Badge(label: Text(badge!), backgroundColor: kMint, textColor: kInk, child: ic);
+    }
+    return Semantics(
+      button: true,
+      label: label,
+      excludeSemantics: true,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: on
+            ? () {
+                tapFeel();
+                onTap!();
+              }
+            : null,
+        child: Opacity(
+          opacity: on ? 1 : 0.35,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minWidth: minSize, minHeight: minSize),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+              child: Column(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.center, children: [
+                ic,
+                const SizedBox(height: 3),
+                Text(label,
+                    maxLines: 1,
+                    softWrap: false,
+                    overflow: TextOverflow.fade,
+                    style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w700, height: 1.1)),
+              ]),
+            ),
+          ),
+        ),
       ),
     );
   }

@@ -118,8 +118,8 @@ It is idempotent. The last run's per-file counts are in
 ## UI Editor (`editor/`, `layout/`)
 Admin → UI Editor shows the REAL page full screen, edge to edge, with
 nothing permanent on it but a small handle at the top and a + button. The
-handle opens a floating pill (back · page picker · undo/redo · publish ·
-⋯ for Try it, live preview, every slot); the pill also opens for a
+handle opens a floating pill in plain words (Back · Pages · Undo · Redo ·
+Bin · Publish · More for Try it, preview, every slot); the pill also opens for a
 few seconds after each change. + opens a bottom drawer with tabs inside:
 Sections (every section and banner), Effects, Orbs, Loaders, Backgrounds,
 Particles, Celebrate, Map (page map). The + and the folded handle drag
@@ -209,9 +209,16 @@ it (section `height`; `style.size` for text, `style.scale` otherwise); a
 pinch and a vertical move change the room an element takes, so what is
 under it reflows (`layout/element_flow.dart`). Long-press and let go
 opens Put back · Duplicate · Hide on a section, Put back · Hide on an
-element (circle on an orb). **Delete** is only the labelled button at the
-front of the picked thing's strip, with Undo (`style.removed` for an
-element: gone everywhere). See `elementPlacement` in
+element (circle on an orb). The picked thing has ONE strip of labelled,
+56dp tools: Edit text / Image, Style, Animate, Delete, Done. **Delete** is
+only that labelled button, with Undo (`style.removed` for an element: gone
+everywhere). Everything deleted also goes to the **Deleted bin**
+(`editor/bin.dart`, `bin_page.dart`; pill → Bin): a picture of it, what it
+was, where, when, and a big Restore that puts it back in its place (after
+its old neighbour, else at the end). Kept until restored, in Firestore
+`ui_bin/{id}` (admin-only rules) and mirrored on the phone
+(`ui_bin_local_v1`) while offline. Section names shown in the editor go
+through `layout/plain_words.dart` (no "Hero" / "curve"). See `elementPlacement` in
 `template/editable.dart`. Haptics: pick-up and drop (medium), delete
 (heavy). There are no move/size
 buttons or sliders. Every draft change is an undo step

@@ -128,7 +128,7 @@ class StyleTab extends StatelessWidget {
         Wrap(spacing: 8, runSpacing: 8, children: [
           Pill('Italic', icon: Icons.format_italic_rounded, dense: true, selected: st['italic'] == true,
               onTap: () => patch({'italic': st['italic'] == true ? null : true})),
-          Pill('Gradient ink', icon: Icons.gradient_rounded, dense: true, selected: grad.length >= 2,
+          Pill('Two-colour fill', icon: Icons.gradient_rounded, dense: true, selected: grad.length >= 2,
               onTap: () => patch({'gradient': grad.length >= 2 ? null : [0xFFF6E7B0, 0xFFB8904A]})),
           Pill('Shadow / glow', icon: Icons.blur_on_rounded, dense: true, selected: st['shadow'] != null,
               onTap: () => patch({'shadow': st['shadow'] != null ? null : 0xAAE8D5A3, 'shadowBlur': st['shadow'] != null ? null : 14})),
