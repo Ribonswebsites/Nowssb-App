@@ -763,6 +763,23 @@ class ContextStrip extends StatelessWidget {
       }
       if (type == SlotType.text) {
         children.add(tool(Icons.text_fields_rounded, 'Edit text', onWords, color: kGold, key: const ValueKey('strip-text')));
+      } else if (type == SlotType.image || type == SlotType.video) {
+        children.add(tool(
+          type == SlotType.video ? Icons.play_circle_outline : Icons.image_rounded,
+          type == SlotType.video ? 'Video on' : 'Image on',
+          onWords,
+          color: kGold,
+          key: const ValueKey('mode-media'),
+        ));
+        children.add(tool(Icons.crop_free_rounded, 'Section', () {
+          final id = c.current?.id;
+          c.clearSelection(notify: false);
+          if (id != null) {
+            c.pickSection(id);
+          } else {
+            c.changedSelection();
+          }
+        }, key: const ValueKey('mode-section')));
       } else if (type != SlotType.orb) {
         children.add(tool(Icons.image_rounded, 'Image', onWords, color: kGold, key: const ValueKey('strip-image')));
       }
@@ -774,6 +791,7 @@ class ContextStrip extends StatelessWidget {
       ]);
     } else if (c.sectionPicked && c.current != null) {
       children.addAll([
+        tool(Icons.crop_free_rounded, 'Section on', () {}, color: kGold, key: const ValueKey('mode-section')),
         tool(Icons.text_fields_rounded, 'Edit text', onSection, color: kGold, key: const ValueKey('strip-text')),
         tool(Icons.palette_rounded, 'Style', onStyle, key: const ValueKey('strip-look')),
         tool(Icons.animation_rounded, 'Animate', onEffects, key: const ValueKey('strip-animate')),

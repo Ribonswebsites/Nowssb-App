@@ -10,6 +10,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import 'template_more.dart';
+import 'template_rails.dart';
 
 const _earn = 'assets/banners/programs/earn.png';
 const _rewards = 'assets/banners/programs/rewards.png';
@@ -39,6 +40,7 @@ const kMotionTemplates = <String, (String, String, String)>{
   'shineLine': ('Moving offer line', 'One line of an offer that travels', 'Top banners'),
   'pulseCta': ('Pulsing button', 'A banner whose button breathes', 'Buttons & banners'),
   'litSteps': ('Lit steps', 'Steps that light up one after another', 'Features'),
+  ...kRailTemplates,
 };
 
 const kMotionKinds = <String>[
@@ -46,9 +48,13 @@ const kMotionKinds = <String>[
   'giftOpen', 'stayCard', 'threeDeals', 'savingLine', 'bagItem',
   'coinPicks', 'metalPass', 'rankTrack', 'benefitSplit', 'dropShelf',
   'peekShelf', 'lovedRow', 'shineLine', 'pulseCta', 'litSteps',
+  ...kRailKinds,
 ];
 
-Map<String, dynamic> motionStarter(String kind) => switch (kind) {
+Map<String, dynamic> motionStarter(String kind) {
+  final rail = railStarter(kind);
+  if (rail.isNotEmpty) return rail;
+  return switch (kind) {
       'offerTwins' => {'title': 'NowssB picks', 't1': 'Signature', 'off1': 'Rare words', 't2': 'Sounds', 'off2': 'Hear a word', 'image': _store, 'image2': _library},
       'savedShelf' => {'title': 'Saved for you', 'c1': 'Your list', 'c2': 'Opened', 'c3': 'Still here', 't1': 'Meaning pack', 'p1': '₹499', 's1': 'Was ₹899', 'image': _library, 't2': 'Sound week', 'p2': '₹299', 's2': 'Was ₹599', 'image2': _earn},
       'goldRibbon' => {'title': 'NowssB nights', 'subtitle': 'Words, sounds and the store', 'd1': 'Words', 'd2': 'Sounds', 'd3': 'Store', 'd4': 'Gifts', 'd5': 'Earn'},
@@ -71,6 +77,7 @@ Map<String, dynamic> motionStarter(String kind) => switch (kind) {
       'litSteps' => {'title': 'How a rank moves', 's1': 'Someone buys', 's2': 'The sale clears', 's3': 'Words count', 's4': 'The rate can rise'},
       _ => const {},
     };
+}
 
 class MotionLoop extends StatefulWidget {
   const MotionLoop({super.key, required this.builder, this.milliseconds = 2800});
@@ -101,6 +108,7 @@ class _MotionLoopState extends State<MotionLoop> with SingleTickerProviderStateM
 }
 
 Widget buildMotionBanner(String kind, TplKit k) {
+  if (isRailKind(kind)) return buildRailBanner(kind, k);
   final l = k.label;
   switch (kind) {
     case 'offerTwins':

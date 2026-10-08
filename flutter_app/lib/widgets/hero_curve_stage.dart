@@ -588,25 +588,22 @@ class _HeroChrome extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Flexible(
-                child: EditableLabel(
-                  'hero_curve_stage.HeroChrome',
-                  'NowssB.',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.3,
-                    height: 1,
-                  ),
+              const EditableLabel(
+                'hero_curve_stage.HeroChrome',
+                'NowssB',
+                maxLines: 1,
+                softWrap: false,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.3,
+                  height: 1,
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 8),
               const Spacer(),
               Flexible(
-                flex: 3,
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   alignment: Alignment.centerRight,
@@ -622,12 +619,10 @@ class _HeroChrome extends StatelessWidget {
                         borderRadius: BorderRadius.circular(99),
                         border: Border.all(color: const Color(0x44FFFFFF)),
                       ),
-                      // Order: grid icon + label, then SMALL black-circle orb on the RIGHT.
                       child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.apps_rounded,
-                              size: 16, color: Colors.white),
+                          Icon(Icons.apps_rounded, size: 16, color: Colors.white),
                           SizedBox(width: 6),
                           EditableLabel(
                             'hero_curve_stage.HeroChrome',

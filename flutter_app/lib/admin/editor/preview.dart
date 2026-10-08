@@ -844,32 +844,9 @@ class _TouchLayerState extends State<_TouchLayer> {
   ImageFraming _framingOf(PreviewSlot s) =>
       framingOf(c.overrideOf(s.slotKey)?.style ?? const {}) ?? const ImageFraming();
 
-  /// The picture's frame on screen (its own box moved by the frame edges).
-  Rect? _pictureFrame(PreviewSlot? s) {
-    final base = _slotRect(s);
-    if (s == null || base == null) return null;
-    return _framingOf(s).frameIn(base.size).shift(base.topLeft);
-  }
-
-  /// The eight handles of a frame: (side across, side down), each −1, 0 or 1.
-  static const _handles = [(-1, -1), (0, -1), (1, -1), (1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0)];
-
-  static Offset _handlePos(Rect r, (int, int) h) =>
-      Offset(r.center.dx + h.$1 * r.width / 2, r.center.dy + h.$2 * r.height / 2);
-
-  /// A handle within finger reach (a 56dp circle) of [p].
-  (int, int)? _handleAt(Rect frame, Offset p) {
-    (int, int)? best;
-    var bd = 28.0;
-    for (final h in _handles) {
-      final d = (_handlePos(frame, h) - p).distance;
-      if (d <= bd) {
-        bd = d;
-        best = h;
-      }
-    }
-    return best;
-  }
+  /// The picture's own box on screen. Dragging stays inside this, never a
+  /// frame that can grow over the rest of the page.
+  Rect? _pictureFrame(PreviewSlot? s) => _slotRect(s);
 
   (int, int) _edge = (0, 0);
   Map<String, double> _frameBase = const {};
@@ -927,8 +904,9 @@ class _TouchLayerState extends State<_TouchLayer> {
       return;
     }
     final pic = _pickedPicture;
-    final pf = _pictureFrame(pic);
-    if (pic != null && pf != null && pf.inflate(20).contains(focal)) {
+    if (pic != null) {
+      // Image or video is selected: a pinch only moves that picture.
+      // It must not shrink the section around it.
       _element = pic;
       _base = _framingOf(pic).zoom;
       _grab = _Grab.zoomImage;
@@ -987,27 +965,23 @@ class _TouchLayerState extends State<_TouchLayer> {
       setState(() {});
       return;
     }
-    // Inside a picked picture one finger moves the picture in its frame,
-    // and a handle moves that side or corner of the frame. (The one place
-    // where a drag does not scroll: the picture was picked on purpose.)
+    // A picked picture: one finger slides the picture inside its box.
+    // There are no corner handles — those were growing the frame over
+    // the whole screen and cutting off heads.
     final pic = _pickedPicture;
-    final pf = _pictureFrame(pic);
     final base = _slotRect(pic);
-    if (pic != null && pf != null && base != null) {
-      final h = _handleAt(pf, _start);
-      if (h != null || pf.contains(_start)) {
-        final f = _framingOf(pic);
-        _element = pic;
-        _pictureBase = base.size;
-        _frameBase = {
-          'imgZoom': f.zoom, 'imgX': f.x, 'imgY': f.y, //
-          'frameL': f.left, 'frameT': f.top, 'frameR': f.right, 'frameB': f.bottom,
-        };
-        _edge = h ?? (0, 0);
-        _grab = h != null ? _Grab.frameEdge : _Grab.panImage;
-        setState(() {});
-        return;
-      }
+    if (pic != null && base != null && base.inflate(12).contains(_start)) {
+      final f = _framingOf(pic);
+      _element = pic;
+      _pictureBase = base.size;
+      _frameBase = {
+        'imgZoom': f.zoom, 'imgX': f.x, 'imgY': f.y,
+        'frameL': f.left, 'frameT': f.top, 'frameR': f.right, 'frameB': f.bottom,
+      };
+      _edge = (0, 0);
+      _grab = _Grab.panImage;
+      setState(() {});
+      return;
     }
     {
       // One finger scrolls, whatever is picked: carrying starts only
@@ -1533,10 +1507,38 @@ class _TouchLayerState extends State<_TouchLayer> {
       _hoverGap = null;
     });
     final data = d.data;
-    // Beside a smaller section (in the room next to it): a free-form row.
+    // A section dropped in the empty side of a smaller one becomes a real
+    // neighbour, not a thumbnail. The two then share one row.
     final room = _sectionAt(p);
     final small = _shrunkRect(room);
-    final beside = data is ElementDrop || (data is SectionDrop && small != null && !small.inflate(4).contains(p));
+    if (data is SectionDrop && room != null && small != null && !small.inflate(8).contains(p)) {
+      final row = _sectionRect(room);
+      if (row != null && row.width > 1) {
+        final onRight = p.dx >= small.center.dx;
+        final used = (small.width / row.width).clamp(0.32, 0.68);
+        final rest = (1 - used).clamp(0.28, 0.68);
+        final sum = used + rest;
+        bigFeel();
+        c.endStep();
+        c.patchProps(room, {
+          'shrink': double.parse((used / sum).toStringAsFixed(3)),
+          'align': onRight ? 'left' : 'right',
+          'height': null,
+        });
+        final at = onRight ? c.entryIndexBefore(room) + 1 : c.entryIndexBefore(room);
+        final id = c.insertTemplate(data.kind, at);
+        c.patchProps(id, {
+          'shrink': double.parse((rest / sum).toStringAsFixed(3)),
+          'align': onRight ? 'right' : 'left',
+        });
+        c.endStep();
+        c.pickSection(id);
+        c.fxDropped();
+        return;
+      }
+    }
+    // Pictures, words and buttons still sit in the free room.
+    final beside = data is ElementDrop;
     if (beside && (room ?? _nearestSection(p)) != null) {
       final id = room ?? _nearestSection(p)!;
       final r = _sectionRect(id)!;
@@ -1544,10 +1546,9 @@ class _TouchLayerState extends State<_TouchLayer> {
       c.endStep();
       c.addBeside(
         id,
-        data is ElementDrop ? data.kind : BesideKind.template,
+        data.kind,
         (p.dx - r.left) / r.width,
         (p.dy - r.top) / r.height,
-        value: data is SectionDrop ? data.kind : '',
       );
       c.endStep();
       c.fxDropped();
@@ -1742,36 +1743,20 @@ class _TouchLayerState extends State<_TouchLayer> {
                 ),
               ),
             ],
-            if (_pictureFrame(_pickedPicture) case final pf?) ...[
-              Positioned.fromRect(
-                key: const ValueKey('picture-frame'),
-                rect: pf,
-                child: IgnorePointer(
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(border: Border.all(color: kGold, width: 2)),
-                  ),
-                ),
-              ),
-              for (final h in _handles)
-                Positioned(
-                  key: ValueKey('frame-handle-${h.$1}-${h.$2}'),
-                  left: _handlePos(pf, h).dx - 12,
-                  top: _handlePos(pf, h).dy - 12,
-                  width: 24,
-                  height: 24,
+            if (_pickedPicture case final pic?)
+              if (_slotRect(pic) case final r?)
+                Positioned.fromRect(
+                  key: const ValueKey('picture-frame'),
+                  rect: r,
                   child: IgnorePointer(
                     child: DecoratedBox(
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: h.$1 != 0 && h.$2 != 0 ? BoxShape.circle : BoxShape.rectangle,
-                        borderRadius: h.$1 != 0 && h.$2 != 0 ? null : BorderRadius.circular(6),
-                        border: Border.all(color: kGold, width: 3),
-                        boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 4)],
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: kGold, width: 2),
                       ),
                     ),
                   ),
                 ),
-            ],
             if (target != null)
               Builder(builder: (_) {
                 final r = _sections[target].$2;

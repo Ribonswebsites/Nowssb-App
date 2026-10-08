@@ -87,6 +87,7 @@ class _RequestWordsScreenState extends State<RequestWordsScreen> {
       subtitle: 'Request Words',
       film: 'assets/video/player-bg-loop.mp4',
       usePageFilm: true,
+      plain: true,
       onBack: () => Navigator.of(context).pop(),
       slivers: [
         SliverPadding(

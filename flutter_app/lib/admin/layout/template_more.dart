@@ -8,6 +8,7 @@ library;
 import 'package:flutter/material.dart';
 
 import 'template_motion.dart';
+import 'template_rails.dart';
 
 /// The helpers a template draws with (from TemplateSection), so words and
 /// pictures here are editable exactly like in the first templates.
@@ -236,6 +237,36 @@ const kMoreTemplates = <String, (String, String, String)>{
   'shineLine': ('Moving offer line', 'One line of an offer that travels', 'Top banners'),
   'pulseCta': ('Pulsing button', 'A banner whose button breathes', 'Buttons & banners'),
   'litSteps': ('Lit steps', 'Steps that light up one after another', 'Features'),
+  'sideShelf': ('Side shelf', 'Posters you can swipe', 'Cards'),
+  'wordLane': ('Word lane', 'Words in a sideways row', 'Words'),
+  'priceLane': ('Price lane', 'Prices you swipe', 'Numbers'),
+  'soundLane': ('Sound lane', 'Sounds in a sideways row', 'Cards'),
+  'couponLane': ('Coupon lane', 'Coupons you swipe', 'Offers & coupons'),
+  'rankLane': ('Rank lane', 'Ranks in a sideways row', 'Numbers'),
+  'posterLane': ('Poster lane', 'Tall posters you swipe', 'Top banners'),
+  'dealLane': ('Deal lane', 'Deals you swipe', 'Offers & coupons'),
+  'storyStack': ('Story stack', 'Stories you scroll down', 'Cards'),
+  'stepStack': ('Step stack', 'Steps you scroll down', 'Features'),
+  'noteStack': ('Note stack', 'Notes you scroll down', 'Words'),
+  'offerStack': ('Offer stack', 'Offers you scroll down', 'Offers & coupons'),
+  'wordStack': ('Word stack', 'A tall list of words', 'Words'),
+  'priceStack': ('Price stack', 'Prices you scroll down', 'Numbers'),
+  'nightStack': ('Night stack', 'Night cards you scroll down', 'Top banners'),
+  'sidePills': ('Side pills', 'Black pills down the side', 'Buttons & banners'),
+  'doorPills': ('Door pills', 'Doors as black pills', 'Buttons & banners'),
+  'shopPills': ('Shop pills', 'Store, player and earn as pills', 'Buttons & banners'),
+  'soundPills': ('Sound pills', 'Sound actions as pills', 'Buttons & banners'),
+  'earnPills': ('Earn pills', 'Rank actions as pills', 'Buttons & banners'),
+  'giftPills': ('Gift pills', 'Gift actions as pills', 'Offers & coupons'),
+  'wordPills': ('Word pills', 'Word actions as pills', 'Words'),
+  'nightPills': ('Night pills', 'Night actions as pills', 'Buttons & banners'),
+  'calmPills': ('Calm pills', 'Calm actions as pills', 'Features'),
+  'storePills': ('Store pills', 'Departments as pills', 'Cards'),
+  'markPills': ('Mark pills', 'Marks you can tap', 'Features'),
+  'goldPills': ('Gold pills', 'Gold-edged black pills', 'Buttons & banners'),
+  'coinPills': ('Coin pills', 'Coin actions as pills', 'Offers & coupons'),
+  'bookPills': ('Book pills', 'Reading actions as pills', 'Words'),
+  'pathPills': ('Path pills', 'A path of black pills', 'Features'),
 };
 
 const kMoreKinds = <String>[
@@ -252,6 +283,12 @@ const kMoreKinds = <String>[
   'giftOpen', 'stayCard', 'threeDeals', 'savingLine', 'bagItem',
   'coinPicks', 'metalPass', 'rankTrack', 'benefitSplit', 'dropShelf',
   'peekShelf', 'lovedRow', 'shineLine', 'pulseCta', 'litSteps',
+  'sideShelf', 'wordLane', 'priceLane', 'soundLane', 'couponLane',
+  'rankLane', 'posterLane', 'dealLane', 'storyStack', 'stepStack',
+  'noteStack', 'offerStack', 'wordStack', 'priceStack', 'nightStack',
+  'sidePills', 'doorPills', 'shopPills', 'soundPills', 'earnPills',
+  'giftPills', 'wordPills', 'nightPills', 'calmPills', 'storePills',
+  'markPills', 'goldPills', 'coinPills', 'bookPills', 'pathPills',
 ];
 
 const _a = 'assets/banners/stories/aura.png';
@@ -263,7 +300,10 @@ const _f = 'assets/store/collections/nature.webp';
 const _g = 'assets/store/collections/peace.webp';
 const _h = 'assets/store/collections/sacred.webp';
 
-Map<String, dynamic> moreStarter(String kind) => switch (kind) {
+Map<String, dynamic> moreStarter(String kind) {
+  final rail = railStarter(kind);
+  if (rail.isNotEmpty) return rail;
+  return switch (kind) {
       'heroCentered' => {'eyebrow': 'NEW TODAY', 'title': 'Find your calm in five minutes', 'subtitle': 'Short practices for busy days', 'cta': 'Start now', 'route': 'tab:1', 'image': _b},
       'heroSideImage' => {'eyebrow': 'FOR YOU', 'title': 'Breathe. Listen. Heal.', 'subtitle': 'A new path every morning', 'cta': 'Begin', 'route': 'tab:1', 'image': _a},
       'heroGlow' => {'title': 'Words that heal', 'subtitle': 'Over 1,000 healing words, read aloud for you', 'cta': 'Explore words', 'route': 'tab:3'},
@@ -310,8 +350,10 @@ Map<String, dynamic> moreStarter(String kind) => switch (kind) {
       'statsBig' => {'title': '1,000,000', 'subtitle': 'minutes of calm, together', 'cta': 'Add yours', 'route': 'tab:1'},
       _ => motionStarter(kind),
     };
+}
 
 Widget buildMoreTemplate(String kind, TplKit k) {
+  if (isRailKind(kind)) return buildRailBanner(kind, k);
   if (kMotionKinds.contains(kind)) return buildMotionBanner(kind, k);
   final L = k.label;
   switch (kind) {

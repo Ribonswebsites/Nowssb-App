@@ -11,6 +11,7 @@ library;
 
 import 'dart:async';
 import 'dart:math' as math;
+import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 
@@ -74,10 +75,6 @@ class _NormalPromoRailState extends State<NormalPromoRail>
   @override
   void initState() {
     super.initState();
-    _cycle = Timer.periodic(const Duration(milliseconds: 3800), (_) {
-      if (!mounted || !TickerMode.of(context)) return;
-      setState(() => _page = (_page + 1) % _pageCount);
-    });
   }
 
   @override
@@ -106,60 +103,14 @@ class _NormalPromoRailState extends State<NormalPromoRail>
             ),
           ),
           const SizedBox(height: 10),
-          AnimatedBuilder(
-            animation: _motion,
-            builder: (context, _) {
-              return Container(
-                height: kRhythmCardHeight,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(24),
-                  // Neutral / transparent matching home grid — no colored fills.
-                  color: NwsbColors.surface,
-                  boxShadow: NwsbShadows.raised,
-                ),
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 420),
-                  switchInCurve: Curves.easeOutCubic,
-                  switchOutCurve: Curves.easeInCubic,
-                  child: _page == 0
-                      ? KeyedSubtree(
-                          key: const ValueKey('grid'),
-                          child: _GridRow(doors: doors, motion: _motion),
-                        )
-                      : KeyedSubtree(
-                          key: ValueKey('exp-$_page'),
-                          child: _ExpandedRow(
-                            door: doors[_page - 1],
-                            phase: (_page - 1) / doors.length,
-                            motion: _motion,
-                          ),
-                        ),
-                ),
-              );
-            },
-          ),
-          const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              for (var i = 0; i < _pageCount; i++)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 3),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 220),
-                    width: i == _page ? 16 : 6,
-                    height: 6,
-                    decoration: BoxDecoration(
-                      color: i == _page
-                          ? NwsbColors.gold
-                          : const Color(0x332B2D33),
-                      borderRadius: BorderRadius.circular(3),
-                    ),
-                  ),
-                ),
-            ],
+          SizedBox(
+            height: 132,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: doors.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 10),
+              itemBuilder: (context, i) => _PillCard(door: doors[i]),
+            ),
           ),
         ],
       ),
@@ -493,6 +444,63 @@ class _NeutralRippleDiscPainter extends CustomPainter {
 }
 
 /// Small semantic hooks for focused widget tests.
+class _PillCard extends StatelessWidget {
+  const _PillCard({required this.door});
+  final _PromoDoorData door;
+
+  String get _mark => switch (door.title) {
+        'Store' => NwsbMarks.bag,
+        'Player' => NwsbMarks.sound,
+        _ => NwsbMarks.earn,
+      };
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: door.onTap,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(22),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+          child: Container(
+            width: 210,
+            padding: const EdgeInsets.all(7),
+            decoration: BoxDecoration(
+              color: const Color(0x99FFFFFF),
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: const Color(0x66FFFFFF)),
+            ),
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF12141A),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Row(children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  alignment: Alignment.center,
+                  decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                  child: NwsbIcon(_mark, size: 22, color: const Color(0xFF12141A), strokeWidth: 1.7),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
+                    Text(door.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w800)),
+                    const SizedBox(height: 2),
+                    Text(door.subtitle, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xCCFFFFFF), fontSize: 12, height: 1.25)),
+                  ]),
+                ),
+              ]),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class NormalPromoRailLabels {
   static const store = 'Store';
   static const player = 'Player';

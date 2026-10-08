@@ -41,6 +41,7 @@ class EbooksStoreScreen extends StatelessWidget {
         subtitle: 'The Ebooks Store',
         film: 'assets/video/player-bg-loop.mp4',
         usePageFilm: true,
+        plain: true,
         onBack: () => Navigator.of(context).pop(),
         onStorePicker: () => showStoreSelectSheet(
           context,

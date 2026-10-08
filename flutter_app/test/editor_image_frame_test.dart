@@ -1,7 +1,5 @@
-/// Full control of a picture: drag inside a picked picture moves it in its
-/// frame, pinch zooms in and out freely, eight big handles move each side
-/// and corner of the frame; saved as data and drawn the same outside the
-/// editor. And photos keep the top (a person's head) when a banner crops.
+/// Full control of a picture: drag inside a picked picture moves it,
+/// pinch zooms in and out. No corner handles — those grew over the page.
 library;
 
 import 'dart:convert';
@@ -104,7 +102,7 @@ void main() {
     expect(img.alignment, kPhotoAlignment);
   });
 
-  testWidgets('in the editor: drag pans, pinch zooms out and in, handles resize the frame', (tester) async {
+  testWidgets('in the editor: drag pans, pinch zooms, and there are no frame handles', (tester) async {
     tester.view.physicalSize = _screen * 3;
     tester.view.devicePixelRatio = 3.0;
     addTearDown(tester.view.reset);
@@ -132,8 +130,8 @@ void main() {
     c.selectIn(null, pic!.slotKey, pic.type, pic.defaultValue);
     await _settle(tester, 3);
     expect(find.byKey(const ValueKey('picture-frame')), findsOneWidget);
-    expect(find.byKey(const ValueKey('frame-handle-1-1')), findsOneWidget);
-    expect(tester.getSize(find.byKey(const ValueKey('frame-handle-1-1'))).width, greaterThanOrEqualTo(24));
+    expect(find.byKey(const ValueKey('frame-handle-1-1')), findsNothing);
+    expect(find.text('Image on'), findsWidgets);
     Map<String, dynamic> st() => c.overrideOf(pic!.slotKey)?.style ?? const {};
 
     // Drag inside: the picture moves, the page does not scroll.
@@ -168,31 +166,6 @@ void main() {
     expect(out, lessThan(0.75), reason: 'zoomed out below its own size');
     await pinch(20, 60);
     expect((st()['imgZoom'] as num).toDouble(), greaterThan(out));
-
-    // The bottom-right handle: the frame grows right and down.
-    final h = tester.getCenter(find.byKey(const ValueKey('frame-handle-1-1')));
-    final hg = await tester.startGesture(h + const Offset(-6, -6));
-    for (var i = 0; i < 10; i++) {
-      await hg.moveBy(const Offset(3, 4));
-      await tester.pump(const Duration(milliseconds: 16));
-    }
-    await hg.up();
-    await _settle(tester, 2);
-    expect((st()['frameR'] as num).toDouble(), greaterThan(0.05));
-    expect((st()['frameB'] as num).toDouble(), greaterThan(0.05));
-    expect(st()['frameL'], isNull);
-    final frame = tester.getRect(find.byKey(const ValueKey('picture-frame')));
-    expect(frame.right, greaterThan(at.right + 15));
-    // The left side handle: in (smaller).
-    final l = tester.getCenter(find.byKey(const ValueKey('frame-handle--1-0')));
-    final lg = await tester.startGesture(l);
-    for (var i = 0; i < 10; i++) {
-      await lg.moveBy(const Offset(3, 0));
-      await tester.pump(const Duration(milliseconds: 16));
-    }
-    await lg.up();
-    await _settle(tester, 2);
-    expect((st()['frameL'] as num).toDouble(), lessThan(0));
     expect(tester.takeException(), isNull);
 
     await tester.pumpWidget(const SizedBox());

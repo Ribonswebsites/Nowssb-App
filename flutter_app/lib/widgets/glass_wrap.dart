@@ -81,9 +81,9 @@ class GlassWrap extends StatelessWidget {
             child: Container(
               padding: padding,
               decoration: BoxDecoration(
-                color: fill,
+                color: glassFill(context),
                 borderRadius: r,
-                border: Border.all(color: line),
+                border: Border.all(color: glassLine(context)),
               ),
               child: child,
             ),
@@ -176,3 +176,22 @@ class SectionHead extends StatelessWidget {
     );
   }
 }
+
+/// Store and its rooms sit on white. Cards ask for a dark glass so the
+/// words already on them stay readable.
+class StoreSurface extends InheritedWidget {
+  const StoreSurface({super.key, required this.light, required super.child});
+  final bool light;
+
+  static bool lightOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<StoreSurface>()?.light ?? false;
+
+  @override
+  bool updateShouldNotify(StoreSurface oldWidget) => oldWidget.light != light;
+}
+
+Color glassFill(BuildContext context) =>
+    StoreSurface.lightOf(context) ? const Color(0xF216181E) : GlassWrap.fill;
+
+Color glassLine(BuildContext context) =>
+    StoreSurface.lightOf(context) ? const Color(0x66E8D5A3) : GlassWrap.line;

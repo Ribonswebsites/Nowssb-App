@@ -35,7 +35,7 @@ void main() {
     );
     await tester.pump();
     expect(tester.takeException(), isNull);
-    expect(find.text('NowssB.'), findsOneWidget);
+    expect(find.text('NowssB'), findsOneWidget);
     // The copy under the stage is now the Buddha line, not the old tagline.
     expect(find.textContaining('power of words'), findsOneWidget);
     expect(find.text('Word Science'), findsNothing);
@@ -64,7 +64,7 @@ void main() {
     );
     await tester.pump();
     expect(tester.takeException(), isNull);
-    expect(find.text('NowssB.'), findsNothing);
+    expect(find.text('NowssB'), findsNothing);
     final images = tester.widgetList<Image>(find.byType(Image));
     expect(
       images.any((i) {

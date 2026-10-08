@@ -13,6 +13,7 @@ import '../admin/layout/app_pages.dart';
 import '../admin/template/editable.dart';
 import '../shell/nwsb_links.dart';
 import '../theme/tokens.dart';
+import 'glass_wrap.dart';
 import 'sections/section_config.dart';
 
 /// Set from [ensureHypeRoutes] so this file does not import the screens.
@@ -256,8 +257,8 @@ class NowssbHypeRail extends StatelessWidget {
               padding: const EdgeInsets.only(left: 2, bottom: 12),
               child: Text(
                 title,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: StoreSurface.lightOf(context) ? const Color(0xFF16181E) : Colors.white,
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
                   letterSpacing: -0.3,
@@ -361,8 +362,8 @@ class _HypeTile extends StatelessWidget {
                     item.title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: StoreSurface.lightOf(context) ? const Color(0xFF16181E) : Colors.white,
                       fontSize: 15,
                       fontWeight: FontWeight.w800,
                       height: 1.15,

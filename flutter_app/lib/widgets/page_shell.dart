@@ -15,6 +15,7 @@ import '../media/video_pool.dart';
 import 'app_backdrop.dart';
 import '../screens/store/bag_ui.dart';
 import '../admin/template/editable.dart';
+import 'glass_wrap.dart';
 
 class PageShell extends StatefulWidget {
   const PageShell({
@@ -29,6 +30,7 @@ class PageShell extends StatefulWidget {
     this.onStorePicker,
     this.background,
     this.actions = const [],
+    this.plain = false,
   });
 
   /// Extra controls at the end of the title row (e.g. Quick access Reset).
@@ -58,6 +60,9 @@ class PageShell extends StatefulWidget {
   /// Top button — opens AJIO-style “Please select the store” sheet.
   final VoidCallback? onStorePicker;
 
+  /// White page, no film. Store uses this. Cards stay dark glass.
+  final bool plain;
+
   @override
   State<PageShell> createState() => _PageShellState();
 }
@@ -81,10 +86,16 @@ class _PageShellState extends State<PageShell> {
 
   @override
   Widget build(BuildContext context) {
+    final plain = widget.plain;
+    final titleColor = plain ? NwsbColors.ink : Colors.white;
+    final subColor = plain ? const Color(0xFF5C564E) : const Color(0xCCFFFFFF);
     return Scaffold(
-      backgroundColor: NwsbColors.deep,
-      body: Stack(
+      backgroundColor: plain ? const Color(0xFFF6F4EF) : NwsbColors.deep,
+      body: StoreSurface(
+        light: plain,
+        child: Stack(
         children: [
+          if (!plain)
           Positioned.fill(
             child: widget.usePageFilm && widget.film.isNotEmpty
                 ? NwsbVideo(
@@ -96,9 +107,7 @@ class _PageShellState extends State<PageShell> {
                   )
                 : (widget.background ?? const AppBackdrop()),
           ),
-          // Fashion-home #fpBgVeil language so AppBackdrop / page film reads
-          // clearly — never the old solid lid that hid the video.
-          if (widget.usePageFilm)
+          if (!plain && widget.usePageFilm)
             const Positioned.fill(
               child: IgnorePointer(
                 child: DecoratedBox(
@@ -116,7 +125,7 @@ class _PageShellState extends State<PageShell> {
                 ),
               ),
             )
-          else ...[
+          else if (!plain) ...[
             const Positioned.fill(
               child: IgnorePointer(
                 child: DecoratedBox(
@@ -203,10 +212,10 @@ class _PageShellState extends State<PageShell> {
                               ],
                               EditableLabel('page_shell.PageShell',
                                 widget.title,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 28,
                                   fontWeight: FontWeight.w800,
-                                  color: Colors.white,
+                                  color: titleColor,
                                   height: 1.1,
                                 ),
                               ),
@@ -218,10 +227,10 @@ class _PageShellState extends State<PageShell> {
                                   maxLines: 1,
                                   softWrap: false,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,
-                                    color: Color(0xCCFFFFFF),
+                                    color: subColor,
                                     height: 1.2,
                                   ),
                                 ),
@@ -245,8 +254,8 @@ class _PageShellState extends State<PageShell> {
                               padding: const EdgeInsets.symmetric(horizontal: 12),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(21),
-                                color: const Color(0x33FFFFFF),
-                                border: Border.all(color: const Color(0x44FFFFFF)),
+                                color: plain ? const Color(0xF216181E) : const Color(0x33FFFFFF),
+                                border: Border.all(color: plain ? const Color(0x66E8D5A3) : const Color(0x44FFFFFF)),
                               ),
                               child: const Row(
                                 mainAxisSize: MainAxisSize.min,
@@ -271,14 +280,14 @@ class _PageShellState extends State<PageShell> {
                   ),
                 ),
                 ...widget.slivers,
-                // Clear of the bottom nav.
-                  const SliverToBoxAdapter(child: SizedBox(height: 108)),
+                const SliverToBoxAdapter(child: SizedBox(height: 108)),
                 ],
               ),
             ),
           ),
           ),
         ],
+      ),
       ),
     );
   }

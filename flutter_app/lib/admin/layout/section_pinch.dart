@@ -205,6 +205,20 @@ class RenderSectionFitHeight extends RenderProxyBox {
     c.layout(BoxConstraints.tightFor(width: w), parentUsesSize: true);
     _childW = c.size.width;
     final f = _fraction;
+    final screen = _width > 1 ? _width : w;
+    final cell = f == null ? w : screen * f;
+    // Already given its share of the row: scale from the full page width
+    // into that share, instead of scaling a second time.
+    final packed = f != null && (w - cell).abs() < 28;
+    if (packed) {
+      if ((c.size.width - screen).abs() > 2) {
+        c.layout(BoxConstraints.tightFor(width: screen), parentUsesSize: true);
+        _childW = c.size.width;
+      }
+      _scale = screen > 0 ? w / screen : 1;
+      size = constraints.constrain(Size(w, c.size.height * _scale));
+      return;
+    }
     size = constraints.constrain(Size(w, f == null ? _height : c.size.height * f));
     final ch = c.size.height;
     _scale = ch > 0 ? size.height / ch : 1;

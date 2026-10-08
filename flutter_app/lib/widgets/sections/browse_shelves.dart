@@ -10,6 +10,8 @@
 /// Black, gold, white, and the app's own posters. No third-party brands.
 library;
 
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/material.dart';
 
 import '../../admin/layout/app_pages.dart';
@@ -711,31 +713,46 @@ class _ProgramsForYouSectionState extends State<ProgramsForYouSection> {
           ),
         ),
         const SizedBox(height: 14),
-        DecoratedBox(
-          decoration: BoxDecoration(
-            color: _card,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: const Color(0x22FFFFFF)),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Row(children: [
-              const Text('Open in', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 15)),
-              const Spacer(),
-              for (var i = 0; i < _openIn.length; i++) ...[
-                if (i > 0) const SizedBox(width: 10),
-                GestureDetector(
-                  onTap: () => _open(context, _openIn[i].$2),
-                  child: Container(
-                    width: 42,
-                    height: 42,
-                    decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                    alignment: Alignment.center,
-                    child: NwsbIcon(_openIn[i].$1, size: 20, color: _inkDark, strokeWidth: 1.7),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: const Color(0x33FFFFFF),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: const Color(0x55FFFFFF)),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(6),
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: const Color(0xF012141A),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    child: Row(children: [
+                      const Text('Open in', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 15)),
+                      const Spacer(),
+                      for (var i = 0; i < _openIn.length; i++) ...[
+                        if (i > 0) const SizedBox(width: 10),
+                        GestureDetector(
+                          onTap: () => _open(context, _openIn[i].$2),
+                          child: Container(
+                            width: 42,
+                            height: 42,
+                            decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                            alignment: Alignment.center,
+                            child: NwsbIcon(_openIn[i].$1, size: 20, color: _inkDark, strokeWidth: 1.7),
+                          ),
+                        ),
+                      ],
+                    ]),
                   ),
                 ),
-              ],
-            ]),
+              ),
+            ),
           ),
         ),
         const SizedBox(height: 22),

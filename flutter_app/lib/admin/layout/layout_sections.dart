@@ -244,13 +244,84 @@ List<Widget> layoutChildren(
           w,
     ];
   }
-  return [
+  return _packSides(context, pageId, [
     if (!isolated) ...lead,
     for (final s in laid) ...[
       SectionPinch(pageId: pageId, sectionId: s.id, child: s.widget),
       if (!isolated) ...?glue[s.id] ?? glue[_srcOf(s.id)],
     ],
-  ];
+  ]);
+}
+
+/// Consecutive sections that were made narrower share one row, so the
+/// empty side of one is where the next one actually sits.
+List<Widget> _packSides(BuildContext context, String pageId, List<Widget> items) {
+  double? shrinkOf(String id) {
+    final layout = effectiveLayout(context, pageId);
+    if (layout == null) return null;
+    for (final e in layout.sections) {
+      if (e.id != id) continue;
+      final v = e.props['shrink'];
+      if (v is num) {
+        final s = v.toDouble();
+        if (s > 0.2 && s < 0.995) return s;
+      }
+    }
+    return null;
+  }
+
+  final out = <Widget>[];
+  var i = 0;
+  while (i < items.length) {
+    final w = items[i];
+    if (w is! SectionPinch) {
+      out.add(w);
+      i++;
+      continue;
+    }
+    final s = shrinkOf(w.sectionId);
+    if (s == null) {
+      out.add(w);
+      i++;
+      continue;
+    }
+    final group = <(SectionPinch, double)>[(w, s)];
+    var used = s;
+    var j = i + 1;
+    while (j < items.length && items[j] is SectionPinch) {
+      final n = items[j] as SectionPinch;
+      final ns = shrinkOf(n.sectionId);
+      if (ns == null || used + ns > 1.04) break;
+      group.add((n, ns));
+      used += ns;
+      j++;
+    }
+    if (group.length < 2) {
+      out.add(w);
+      i++;
+    } else {
+      out.add(_SidePack(spans: group));
+      i = j;
+    }
+  }
+  return out;
+}
+
+class _SidePack extends StatelessWidget {
+  const _SidePack({required this.spans});
+  final List<(SectionPinch, double)> spans;
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final (child, fraction) in spans)
+          SizedBox(width: width * fraction, child: child),
+      ],
+    );
+  }
 }
 
 /// [layoutChildren] for an existing `children:` list without touching the
@@ -344,9 +415,9 @@ class SectionFrame extends StatelessWidget {
     // Scaled to the height both ways: pinching bigger grows the section
     // (a scale-down-only fit left it small on top of blank space).
     final shrink = _d(p['shrink']);
-    if (entry.isTemplate && shrink != null && shrink < 0.995) {
-      // A banner or template pinched narrower: drawn smaller, whole, so
-      // it can sit beside other things (side_row.dart).
+    if (shrink != null && shrink < 0.995) {
+      // Narrower than the page, built-in or added, so a neighbour can sit
+      // in the room beside it (see _packSides).
       w = SectionFitHeight(
           height: 0, width: MediaQuery.sizeOf(context).width, align: sideAlignOf(p), fraction: shrink.clamp(0.25, 1.0), child: w);
     } else if (h != null && h > 0 && (!entry.isTemplate || entry.kind == 'textBlock' || entry.kind == 'cta')) {

@@ -187,7 +187,8 @@ void main() {
     expect(items.single.x, closeTo(0.25, 0.05));
     expect(find.byKey(ValueKey('beside-${items.single.id}')), findsOneWidget, reason: 'drawn on the page');
 
-    // A template dropped in the room goes beside it too (not a new row).
+    // A template dropped in the empty side becomes a real neighbour,
+    // sharing the row, not a thumbnail under the section.
     final before = c.entries.length;
     await tester.tap(find.byKey(const ValueKey('editor-add')));
     await _settle(tester, 4);
@@ -196,9 +197,12 @@ void main() {
     await _carry(tester, tester.getCenter(find.byKey(ValueKey('add-${kTemplateGallery.first}'))),
         Offset(row.left + 20, row.top + 12));
     await _settle(tester);
-    expect(c.entries.length, before);
-    items = c.besideIn(id);
-    expect(items.map((i) => i.kind), [BesideKind.image, BesideKind.template]);
+    expect(c.entries.length, before + 1);
+    final host = c.entries.firstWhere((e) => e.id == id);
+    expect(host.props['shrink'], isNotNull);
+    expect(host.props['align'], 'right');
+    final added = c.entries.where((e) => e.id != id && e.props['shrink'] != null);
+    expect(added, isNotEmpty);
 
     // Long-press the picture and move it down a little.
     final pic = items.first;

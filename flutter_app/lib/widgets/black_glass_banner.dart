@@ -13,6 +13,7 @@ import 'package:flutter/services.dart';
 
 import 'home_parts.dart';
 import 'nwsb_icon.dart';
+import 'glass_wrap.dart';
 import '../admin/template/editable.dart';
 
 /// Notifications-sheet blur (CSS blur(26px) → sigma ≈ 13).
@@ -223,9 +224,9 @@ class HeavyGlassPanel extends StatelessWidget {
           ),
           child: DecoratedBox(
             decoration: BoxDecoration(
-              color: const Color(0x12FFFFFF),
+              color: StoreSurface.lightOf(context) ? const Color(0xF216181E) : const Color(0x12FFFFFF),
               borderRadius: r,
-              border: Border.all(color: const Color(0x2EFFFFFF)),
+              border: Border.all(color: StoreSurface.lightOf(context) ? const Color(0x66E8D5A3) : const Color(0x2EFFFFFF)),
               boxShadow: const [
                 BoxShadow(
                   color: Color(0xA6000000),

@@ -276,8 +276,8 @@ class RmCatBanner extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
               decoration: BoxDecoration(
                 borderRadius: r,
-                color: GlassWrap.fill,
-                border: Border.all(color: GlassWrap.line),
+                color: glassFill(context),
+                border: Border.all(color: glassLine(context)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -690,6 +690,7 @@ class RmRowHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final light = StoreSurface.lightOf(context);
     return Padding(
       padding: const EdgeInsets.only(top: 18, bottom: 10),
       child: Row(
@@ -699,10 +700,10 @@ class RmRowHeader extends StatelessWidget {
               title,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
-                color: Colors.white,
+                color: light ? const Color(0xFF16181E) : Colors.white,
                 letterSpacing: -0.3,
               ),
             ),
@@ -876,6 +877,7 @@ class RmWordCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bg = tint ?? storeCardTint(name);
+    final light = StoreSurface.lightOf(context);
     return GestureDetector(
       onTap: onTap,
       child: ClipRRect(
@@ -887,22 +889,24 @@ class RmWordCard extends StatelessWidget {
             height: cardHeight,
             padding: const EdgeInsets.fromLTRB(10, 10, 12, 10),
             decoration: BoxDecoration(
-              color: bg.withOpacity(0.13),
+              color: light ? const Color(0xF216181E) : bg.withOpacity(0.13),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
                 color: signature
                     ? const Color(0x66E8D5A3)
                     : const Color(0x38FFFFFF),
               ),
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  bg.withOpacity(0.22),
-                  const Color(0x1AFFFFFF),
-                  const Color(0x12000000),
-                ],
-              ),
+              gradient: light
+                  ? null
+                  : LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        bg.withOpacity(0.22),
+                        const Color(0x1AFFFFFF),
+                        const Color(0x12000000),
+                      ],
+                    ),
               boxShadow: [
                 BoxShadow(
                   color: bg.withOpacity(0.18),
