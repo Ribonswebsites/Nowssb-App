@@ -415,6 +415,7 @@ class SectionFrame extends StatelessWidget {
     // Scaled to the height both ways: pinching bigger grows the section
     // (a scale-down-only fit left it small on top of blank space).
     final shrink = _d(p['shrink']);
+    final boxH = _d(p['boxH']);
     if (shrink != null && shrink < 0.995) {
       // Narrower than the page, built-in or added, so a neighbour can sit
       // in the room beside it (see _packSides).
@@ -422,6 +423,9 @@ class SectionFrame extends StatelessWidget {
           height: 0, width: MediaQuery.sizeOf(context).width, align: sideAlignOf(p), fraction: shrink.clamp(0.25, 1.0), child: w);
     } else if (h != null && h > 0 && (!entry.isTemplate || entry.kind == 'textBlock' || entry.kind == 'cta')) {
       w = SectionFitHeight(height: h, width: MediaQuery.sizeOf(context).width, align: sideAlignOf(p), child: w);
+    } else if (boxH != null && boxH > 20) {
+      // A window on the section. The picture keeps its own size.
+      w = SectionWindow(height: boxH, child: w);
     }
     // Its own background, corners and shadow, set from a touch.
     w = sectionLook(p, w, frame: !_selfFramed.contains(entry.kind));

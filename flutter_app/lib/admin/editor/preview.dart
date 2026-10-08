@@ -534,7 +534,7 @@ void deleteWithUndo(BuildContext context, EditorController c, String id, String 
   _undoBar(context, c, 'Deleted “$title” · in the Bin', item.id);
 }
 
-enum _Grab { none, scroll, order, pinchSection, pinchElement, moveElement, moveOrb, pinchOrb, panImage, zoomImage, frameEdge, moveBeside }
+enum _Grab { none, scroll, order, pinchSection, pinchElement, moveElement, moveOrb, pinchOrb, panImage, zoomImage, frameEdge, moveBeside, boxEdge, mediaEdge }
 
 /// Places one drag up or down moves a section when no other section is
 /// under the finger (kept for callers and tests of the step maths).
@@ -601,6 +601,8 @@ class _TouchLayerState extends State<_TouchLayer> {
 
   /// While a section from the drawer is carried: the gap it would land in.
   int? _hoverGap;
+  /// (section id, on the right) while a new section is over a side, not a row gap.
+  (String, bool)? _hoverSide;
 
   @override
   void initState() {
@@ -935,7 +937,8 @@ class _TouchLayerState extends State<_TouchLayer> {
     if (!c.sectionPicked || c.current?.id != id) c.pickSection(id);
     _shrinkBase = _num('shrink');
     if (_shrinkBase <= 0) _shrinkBase = 1;
-    _base = _num('height');
+    _base = _num('boxH');
+    if (_base < 1) _base = _num('height');
     if (_base < 1) _base = c.preview.sectionHeights['${c.layoutPage}/$id'] ?? 200;
     _grab = _Grab.pinchSection;
   }
@@ -965,11 +968,17 @@ class _TouchLayerState extends State<_TouchLayer> {
       setState(() {});
       return;
     }
-    // A picked picture: one finger slides the picture inside its box.
-    // There are no corner handles — those were growing the frame over
-    // the whole screen and cutting off heads.
+    // A picked picture: the bottom edge changes how tall the picture is.
+    // The section around it stays the size it already is.
     final pic = _pickedPicture;
     final base = _slotRect(pic);
+    if (pic != null && base != null && (_start.dy - base.bottom).abs() < 28 && _start.dx >= base.left - 12 && _start.dx <= base.right + 12) {
+      _element = pic;
+      _base = _framingOf(pic).bottom;
+      _grab = _Grab.mediaEdge;
+      setState(() {});
+      return;
+    }
     if (pic != null && base != null && base.inflate(12).contains(_start)) {
       final f = _framingOf(pic);
       _element = pic;
@@ -980,6 +989,17 @@ class _TouchLayerState extends State<_TouchLayer> {
       };
       _edge = (0, 0);
       _grab = _Grab.panImage;
+      setState(() {});
+      return;
+    }
+    // Section picked: the bottom edge changes the section window only.
+    // It does not zoom the video.
+    final secId = c.sectionPicked ? c.current?.id : null;
+    final secR = _shrunkRect(secId) ?? _sectionRect(secId);
+    if (secId != null && secR != null && c.selectedSlot == null && (_start.dy - secR.bottom).abs() < 32 && _start.dx >= secR.left && _start.dx <= secR.right) {
+      _base = _num('boxH');
+      if (_base < 1) _base = secR.height;
+      _grab = _Grab.boxEdge;
       setState(() {});
       return;
     }
@@ -1186,6 +1206,16 @@ class _TouchLayerState extends State<_TouchLayer> {
         final s = _element;
         if (s == null) return;
         _patchFrame(s, {'imgZoom': (_base * d.scale).clamp(ImageFraming.kMinZoom, ImageFraming.kMaxZoom)});
+      case _Grab.mediaEdge:
+        final s = _element;
+        if (s == null) return;
+        final next = (_base + (d.localFocalPoint.dy - _start.dy) / 220).clamp(-0.2, 0.9);
+        _patchFrame(s, {'frameB': next});
+      case _Grab.boxEdge:
+        final id = c.current?.id;
+        if (id == null) return;
+        final next = (_base + (d.localFocalPoint.dy - _start.dy)).clamp(72.0, 1400.0).roundToDouble();
+        c.patchProps(id, {'boxH': next, 'height': null});
       case _Grab.frameEdge:
         final s = _element;
         final w = _pictureBase.width, h = _pictureBase.height;
@@ -1214,7 +1244,8 @@ class _TouchLayerState extends State<_TouchLayer> {
         } else if (fixed && _shrinkBase < 0.995) {
           c.patchProps(id, {'shrink': null});
         } else {
-          c.patchProps(id, {'height': (_base * d.scale).clamp(60.0, 1400.0).roundToDouble()});
+          // Section window, not a zoom. The video keeps its size.
+          c.patchProps(id, {'boxH': (_base * d.scale).clamp(72.0, 1400.0).roundToDouble(), 'height': null});
         }
       case _Grab.moveElement || _Grab.moveOrb || _Grab.order || _Grab.moveBeside:
         _carryTo(d.localFocalPoint);
@@ -1289,15 +1320,26 @@ class _TouchLayerState extends State<_TouchLayer> {
     switch (grab) {
       case _Grab.order:
         final cur = c.current;
-        // A smaller section carried sideways: it sits left, middle or right.
+        final beside = _sideOfOther();
+        if (cur != null && beside != null) {
+          _sitBeside(cur.id, beside.$1, beside.$2);
+          break;
+        }
+        // A smaller section carried sideways: it sits left, middle or right
+        // and leaves the other side open.
         final small = _shrunkRect(cur?.id);
         final row = _sectionRect(cur?.id);
         final side = _finger.dx - _start.dx;
-        if (cur != null && small != null && row != null && side.abs() > 40 && side.abs() > (_finger.dy - _start.dy).abs()) {
-          final across = ((small.center.dx + side - row.left) / row.width).clamp(0.0, 1.0);
+        final rise = _finger.dy - _start.dy;
+        if (cur != null && row != null && side.abs() > 48 && side.abs() > rise.abs()) {
+          final across = ((_finger.dx - row.left) / row.width).clamp(0.0, 1.0);
           bigFeel();
           c.endStep();
-          c.patchProps(cur.id, {'align': alignFor(across)});
+          c.patchProps(cur.id, {
+            if (small == null) 'shrink': 0.62,
+            'align': alignFor(across),
+            'height': null,
+          });
           c.endStep();
           break;
         }
@@ -1505,40 +1547,31 @@ class _TouchLayerState extends State<_TouchLayer> {
     setState(() {
       _hover = null;
       _hoverGap = null;
+      _hoverSide = null;
     });
     final data = d.data;
-    // A section dropped in the empty side of a smaller one becomes a real
-    // neighbour, not a thumbnail. The two then share one row.
-    final room = _sectionAt(p);
-    final small = _shrunkRect(room);
-    if (data is SectionDrop && room != null && small != null && !small.inflate(8).contains(p)) {
-      final row = _sectionRect(room);
-      if (row != null && row.width > 1) {
-        final onRight = p.dx >= small.center.dx;
-        final used = (small.width / row.width).clamp(0.32, 0.68);
-        final rest = (1 - used).clamp(0.28, 0.68);
-        final sum = used + rest;
-        bigFeel();
-        c.endStep();
-        c.patchProps(room, {
-          'shrink': double.parse((used / sum).toStringAsFixed(3)),
-          'align': onRight ? 'left' : 'right',
-          'height': null,
-        });
-        final at = onRight ? c.entryIndexBefore(room) + 1 : c.entryIndexBefore(room);
-        final id = c.insertTemplate(data.kind, at);
-        c.patchProps(id, {
-          'shrink': double.parse((rest / sum).toStringAsFixed(3)),
-          'align': onRight ? 'right' : 'left',
-        });
-        c.endStep();
-        c.pickSection(id);
-        c.fxDropped();
-        return;
-      }
+    final side = data is SectionDrop ? _dropSide(p) : null;
+    if (data is SectionDrop && side != null) {
+      final room = side.$1;
+      final onRight = side.$2;
+      bigFeel();
+      c.endStep();
+      c.patchProps(room, {
+        'shrink': 0.58,
+        'align': onRight ? 'left' : 'right',
+        'height': null,
+      });
+      final at = onRight ? c.entryIndexBefore(room) + 1 : c.entryIndexBefore(room);
+      final id = c.insertTemplate(data.kind, at);
+      c.patchProps(id, {'shrink': 0.42, 'align': onRight ? 'right' : 'left'});
+      c.endStep();
+      c.pickSection(id);
+      c.fxDropped();
+      return;
     }
     // Pictures, words and buttons still sit in the free room.
     final beside = data is ElementDrop;
+    final room = _sectionAt(p);
     if (beside && (room ?? _nearestSection(p)) != null) {
       final id = room ?? _nearestSection(p)!;
       final r = _sectionRect(id)!;
@@ -1620,6 +1653,55 @@ class _TouchLayerState extends State<_TouchLayer> {
     return best;
   }
 
+  /// Another section's left or right side under the finger, while a section
+  /// is being carried. The middle of a section stays an up/down move.
+  (String, bool)? _sideOfOther() {
+    final cur = c.current?.id;
+    if ((_finger - _start).distance < 24) return null;
+    for (final (id, r) in _sections) {
+      if (id == cur || r.width < 1) continue;
+      if (_finger.dy < r.top + 6 || _finger.dy > r.bottom - 6) continue;
+      final x = (_finger.dx - r.left) / r.width;
+      if (x >= 0.56) return (id, true);
+      if (x <= 0.44) return (id, false);
+    }
+    return null;
+  }
+
+  /// Puts [moving] on the left or right of [host]. Both get narrower so
+  /// they share the row. Neither one is zoomed to do it.
+  void _sitBeside(String moving, String host, bool onRight) {
+    final live = [for (final s in c.sections) if (!s.entry.deleted) s.id];
+    final hi = live.indexOf(host);
+    final mi = live.indexOf(moving);
+    if (hi < 0 || mi < 0 || hi == mi) return;
+    final want = (onRight ? (mi < hi ? hi : hi + 1) : (mi < hi ? hi - 1 : hi)).clamp(0, live.length - 1);
+    bigFeel();
+    c.endStep();
+    final steps = want - mi;
+    if (steps != 0) c.shift(moving, steps);
+    c.patchProps(host, {'shrink': 0.58, 'align': onRight ? 'left' : 'right', 'height': null});
+    c.patchProps(moving, {'shrink': 0.42, 'align': onRight ? 'right' : 'left', 'height': null});
+    c.endStep();
+    c.pickSection(moving);
+  }
+
+  /// A drawer section over the side of a row, not between rows.
+  (String, bool)? _dropSide(Offset p) {
+    final room = _sectionAt(p);
+    final row = _sectionRect(room);
+    if (room == null || row == null || row.width < 1) return null;
+    if (p.dy < row.top || p.dy > row.bottom) return null;
+    final small = _shrunkRect(room);
+    if (small != null && !small.inflate(8).contains(p)) {
+      return (room, p.dx >= small.center.dx);
+    }
+    final x = (p.dx - row.left) / row.width;
+    if (x <= 0.30) return (room, false);
+    if (x >= 0.70) return (room, true);
+    return null;
+  }
+
   /// Where a section carried at [p] lands: the gap before live section
   /// `_sections[i]` (i == length: after the last). The upper half of a
   /// section puts it above, the lower half below.
@@ -1669,11 +1751,12 @@ class _TouchLayerState extends State<_TouchLayer> {
 
   @override
   Widget build(BuildContext context) {
-    final cur = c.sectionPicked ? _sectionRect(c.current?.id) : null;
+    final cur = c.sectionPicked ? (_shrunkRect(c.current?.id) ?? _sectionRect(c.current?.id)) : null;
     final moved = (_finger - _start).distance > 6;
     final carrying = _carrying && moved;
     final ordering = _grab == _Grab.order && moved;
-    final target = ordering ? _target() : null;
+    final sideNow = ordering ? _sideOfOther() : null;
+    final target = ordering && sideNow == null ? _target() : null;
     final hoverGap = _hoverGap != null && _sections.isNotEmpty ? _hoverGap : null;
     final hoverId = _hover == null || hoverGap != null ? null : (_sectionAt(_hover!) ?? _nearestSection(_hover!));
     final hoverRect = _sectionRect(hoverId);
@@ -1687,17 +1770,20 @@ class _TouchLayerState extends State<_TouchLayer> {
           final me = context.findRenderObject() as RenderBox?;
           if (me == null) return;
           final p = me.globalToLocal(d.offset);
-          final gap = d.data is SectionDrop ? _gapAt(p) : null;
+          final side = d.data is SectionDrop ? _dropSide(p) : null;
+          final gap = d.data is SectionDrop && side == null ? _gapAt(p) : null;
           if (gap != _hoverGap) tapFeel();
           setState(() {
             _hover = p;
             _hoverGap = gap;
+            _hoverSide = side;
           });
           _autoScrollFor(p);
         },
         onLeave: (_) => setState(() {
           _hover = null;
           _hoverGap = null;
+          _hoverSide = null;
         }),
         onAcceptWithDetails: _onDrop,
         builder: (context, _, __) => GestureDetector(
@@ -1735,9 +1821,8 @@ class _TouchLayerState extends State<_TouchLayer> {
                 child: IgnorePointer(
                   child: DecoratedBox(
                     decoration: BoxDecoration(
-                      color: kGold.withValues(alpha: ordering ? 0.12 : 0.05),
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: kGold.withValues(alpha: ordering ? 0.9 : 0.45), width: ordering ? 2 : 1.5),
+                      border: Border.all(color: kGold.withValues(alpha: 0.35), width: 1),
                     ),
                   ),
                 ),
@@ -1777,7 +1862,42 @@ class _TouchLayerState extends State<_TouchLayer> {
                   ),
                 );
               }),
-            if (hoverRect != null)
+            if (sideNow != null)
+              Builder(builder: (_) {
+                final r = _sectionRect(sideNow.$1);
+                if (r == null) return const SizedBox.shrink();
+                return Positioned(
+                  key: const ValueKey('side-line'),
+                  left: sideNow.$2 ? r.right - 10 : r.left + 4,
+                  top: r.top + 10,
+                  width: 6,
+                  height: (r.height - 20).clamp(24, 2000),
+                  child: IgnorePointer(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(color: kGold, borderRadius: BorderRadius.circular(99)),
+                    ),
+                  ),
+                );
+              }),
+            if (_hoverSide != null)
+              Builder(builder: (_) {
+                final r = _sectionRect(_hoverSide!.$1);
+                if (r == null) return const SizedBox.shrink();
+                final onRight = _hoverSide!.$2;
+                return Positioned(
+                  key: const ValueKey('side-line'),
+                  left: onRight ? r.right - 10 : r.left + 4,
+                  top: r.top + 10,
+                  width: 6,
+                  height: (r.height - 20).clamp(24, 2000),
+                  child: IgnorePointer(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(color: kGold, borderRadius: BorderRadius.circular(99)),
+                    ),
+                  ),
+                );
+              })
+            else if (hoverRect != null)
               Positioned.fromRect(
                 rect: hoverRect,
                 child: IgnorePointer(
@@ -1789,7 +1909,7 @@ class _TouchLayerState extends State<_TouchLayer> {
                   ),
                 ),
               ),
-            if (hoverGap != null) InsertLine(y: _gapY(hoverGap)),
+            if (hoverGap != null && _hoverSide == null) InsertLine(y: _gapY(hoverGap)),
           ]),
         ),
       ),

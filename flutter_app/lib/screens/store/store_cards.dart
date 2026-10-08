@@ -19,6 +19,7 @@ import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/app_thinking_loader.dart';
 import '../../features/economy/money.dart';
+import 'atelier_look.dart';
 import 'store_actions.dart';
 import '../../data/entitlements.dart';
 import '../../data/store_prices.dart';
@@ -276,8 +277,8 @@ class RmCatBanner extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
               decoration: BoxDecoration(
                 borderRadius: r,
-                color: glassFill(context),
-                border: Border.all(color: glassLine(context)),
+                color: AtelierScope.of(context) ? const Color(0xF2FFFFFF) : glassFill(context),
+                border: Border.all(color: AtelierScope.of(context) ? const Color(0x22000000) : glassLine(context)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -335,9 +336,9 @@ class RmCatBanner extends StatelessWidget {
                     const SizedBox(height: 3),
                     EditableLabel('store_cards.RmCatBanner',
                       sub,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
-                        color: Color(0x88FFFFFF),
+                        color: AtelierScope.of(context) ? const Color(0xFF5C564E) : const Color(0x88FFFFFF),
                       ),
                     ),
                   ],
@@ -877,7 +878,10 @@ class RmWordCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bg = tint ?? storeCardTint(name);
+    final paper = AtelierScope.of(context);
     final light = StoreSurface.lightOf(context);
+    final fg = paper ? const Color(0xFF16181E) : Colors.white;
+    final mute = paper ? const Color(0xFF5C564E) : const Color(0xB8FFFFFF);
     return GestureDetector(
       onTap: onTap,
       child: ClipRRect(
@@ -889,14 +893,14 @@ class RmWordCard extends StatelessWidget {
             height: cardHeight,
             padding: const EdgeInsets.fromLTRB(10, 10, 12, 10),
             decoration: BoxDecoration(
-              color: light ? const Color(0xF216181E) : bg.withOpacity(0.13),
+              color: paper ? const Color(0xF2FFFFFF) : (light ? const Color(0xF216181E) : bg.withOpacity(0.13)),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
                 color: signature
                     ? const Color(0x66E8D5A3)
                     : const Color(0x38FFFFFF),
               ),
-              gradient: light
+              gradient: paper || light
                   ? null
                   : LinearGradient(
                       begin: Alignment.topLeft,
@@ -942,10 +946,10 @@ class RmWordCard extends StatelessWidget {
                         name,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w800,
-                          color: Colors.white,
+                          color: fg,
                           height: 1.05,
                         ),
                       ),
@@ -1043,10 +1047,10 @@ class RmWordCard extends StatelessWidget {
                               wordVibrationTag(name),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 11,
                                 height: 1.25,
-                                color: Color(0xB8FFFFFF),
+                                color: mute,
                               ),
                             ),
                             const SizedBox(height: 6),
@@ -1196,6 +1200,9 @@ class _CenteredPrice extends StatelessWidget {
     final original =
         originalPrice == null ? null : localizedMoney(context, originalPrice!);
     final showStrike = original != null && original != sale;
+    final paper = AtelierScope.of(context);
+    final fg = paper ? const Color(0xFF16181E) : Colors.white;
+    final strike = paper ? const Color(0xFF8A8175) : const Color(0x88FFFFFF);
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1203,20 +1210,20 @@ class _CenteredPrice extends StatelessWidget {
         if (showStrike)
           Text(
             original,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
-              color: Color(0x88FFFFFF),
+              color: strike,
               decoration: TextDecoration.lineThrough,
-              decorationColor: Color(0x88FFFFFF),
+              decorationColor: strike,
             ),
           ),
         Text(
           sale,
           textAlign: TextAlign.left,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.w900,
-            color: Colors.white,
+            color: fg,
             height: 1.0,
             letterSpacing: -0.6,
           ),

@@ -211,12 +211,12 @@ class RenderSectionFitHeight extends RenderProxyBox {
     // into that share, instead of scaling a second time.
     final packed = f != null && (w - cell).abs() < 28;
     if (packed) {
-      if ((c.size.width - screen).abs() > 2) {
-        c.layout(BoxConstraints.tightFor(width: screen), parentUsesSize: true);
-        _childW = c.size.width;
-      }
-      _scale = screen > 0 ? w / screen : 1;
-      size = constraints.constrain(Size(w, c.size.height * _scale));
+      // Share the row at this width. Reflow into the cell — do not scale,
+      // or the picture zooms just because something sits beside it.
+      c.layout(BoxConstraints.tightFor(width: w), parentUsesSize: true);
+      _childW = c.size.width;
+      _scale = 1;
+      size = constraints.constrain(Size(w, c.size.height));
       return;
     }
     size = constraints.constrain(Size(w, f == null ? _height : c.size.height * f));
@@ -253,5 +253,52 @@ class RenderSectionFitHeight extends RenderProxyBox {
     } else {
       inner(context, offset);
     }
+  }
+}
+
+/// Shows the top [height] of [child] and clips the rest. The child is not
+/// scaled, so a taller window reveals more of the video and a shorter one
+/// crops it. The video's own size stays put.
+class SectionWindow extends SingleChildRenderObjectWidget {
+  const SectionWindow({super.key, required this.height, required super.child});
+  final double height;
+
+  @override
+  RenderObject createRenderObject(BuildContext context) => RenderSectionWindow(height);
+
+  @override
+  void updateRenderObject(BuildContext context, RenderSectionWindow renderObject) {
+    renderObject.height = height;
+  }
+}
+
+class RenderSectionWindow extends RenderProxyBox {
+  RenderSectionWindow(this._height);
+  double _height;
+  set height(double v) {
+    if (v == _height) return;
+    _height = v;
+    markNeedsLayout();
+  }
+
+  @override
+  void performLayout() {
+    final c = child;
+    final w = constraints.hasBoundedWidth ? constraints.maxWidth : 0.0;
+    if (c == null) {
+      size = constraints.constrain(Size(w, _height));
+      return;
+    }
+    c.layout(BoxConstraints(minWidth: w, maxWidth: w), parentUsesSize: true);
+    size = constraints.constrain(Size(w, _height));
+  }
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    final c = child;
+    if (c == null) return;
+    context.pushClipRect(needsCompositing, offset, Offset.zero & size, (ctx, off) {
+      ctx.paintChild(c, off);
+    });
   }
 }

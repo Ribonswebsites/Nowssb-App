@@ -31,6 +31,7 @@ class PageShell extends StatefulWidget {
     this.background,
     this.actions = const [],
     this.plain = false,
+    this.canvas,
   });
 
   /// Extra controls at the end of the title row (e.g. Quick access Reset).
@@ -63,6 +64,9 @@ class PageShell extends StatefulWidget {
   /// White page, no film. Store uses this. Cards stay dark glass.
   final bool plain;
 
+  /// Flat page colour, no film. Word Atelier's black look uses this.
+  final Color? canvas;
+
   @override
   State<PageShell> createState() => _PageShellState();
 }
@@ -86,16 +90,17 @@ class _PageShellState extends State<PageShell> {
 
   @override
   Widget build(BuildContext context) {
-    final plain = widget.plain;
+    final bare = widget.canvas != null;
+    final plain = widget.plain && !bare;
     final titleColor = plain ? NwsbColors.ink : Colors.white;
     final subColor = plain ? const Color(0xFF5C564E) : const Color(0xCCFFFFFF);
     return Scaffold(
-      backgroundColor: plain ? const Color(0xFFF6F4EF) : NwsbColors.deep,
+      backgroundColor: widget.canvas ?? (plain ? const Color(0xFFF6F4EF) : NwsbColors.deep),
       body: StoreSurface(
         light: plain,
         child: Stack(
         children: [
-          if (!plain)
+          if (!plain && !bare)
           Positioned.fill(
             child: widget.usePageFilm && widget.film.isNotEmpty
                 ? NwsbVideo(
@@ -107,7 +112,7 @@ class _PageShellState extends State<PageShell> {
                   )
                 : (widget.background ?? const AppBackdrop()),
           ),
-          if (!plain && widget.usePageFilm)
+          if (!plain && !bare && widget.usePageFilm)
             const Positioned.fill(
               child: IgnorePointer(
                 child: DecoratedBox(
@@ -125,7 +130,7 @@ class _PageShellState extends State<PageShell> {
                 ),
               ),
             )
-          else if (!plain) ...[
+          else if (!plain && !bare) ...[
             const Positioned.fill(
               child: IgnorePointer(
                 child: DecoratedBox(

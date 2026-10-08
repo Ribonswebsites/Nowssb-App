@@ -114,12 +114,10 @@ Map<String, dynamic> railStarter(String kind) => switch (kind) {
 bool isRailKind(String kind) => kRailKinds.contains(kind);
 
 Widget buildRailBanner(String kind, TplKit k) {
-  if (kind.endsWith('Pills')) return _pills(k, _pillIndex(kind));
-  if (kind.endsWith('Stack')) return _stack(k);
+  if (kind.endsWith('Pills')) return _pills(k, kind);
+  if (kind.endsWith('Stack')) return _stack(k, kind);
   return _lane(k, kind);
 }
-
-int _pillIndex(String kind) => kRailKinds.indexOf(kind).clamp(0, 14);
 
 Widget _pad(Widget child) => Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: child);
 
@@ -130,12 +128,29 @@ TextStyle _d(double s) => TextStyle(color: const Color(0xB3FFFFFF), fontSize: s,
 Widget _lane(TplKit k, String kind) {
   final cards = switch (kind) {
     'wordLane' => [
-        for (final id in ['w1', 'w2', 'w3', 'w4', 'w5']) _chipCard(k, id),
+        for (final id in ['w1', 'w2', 'w3', 'w4', 'w5'])
+          Padding(
+            padding: const EdgeInsets.only(right: 18),
+            child: Column(mainAxisAlignment: MainAxisAlignment.end, crossAxisAlignment: CrossAxisAlignment.start, children: [
+              k.label(id, _w(28)),
+              const SizedBox(height: 6),
+              Container(width: 36, height: 2, color: const Color(0xFFE8D5A3)),
+            ]),
+          ),
       ],
     'priceLane' => [
-        _priceCard(k, 'n1', 'l1'),
-        _priceCard(k, 'n2', 'l2'),
-        _priceCard(k, 'n3', 'l3'),
+        for (final pair in [('n1', 'l1'), ('n2', 'l2'), ('n3', 'l3')])
+          Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: Container(
+              width: 120, height: 120, alignment: Alignment.center,
+              decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: const Color(0xFFE8D5A3), width: 1.4)),
+              child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                k.label(pair.$1, _g(16)),
+                k.label(pair.$2, _d(11), maxLines: 2, align: TextAlign.center),
+              ]),
+            ),
+          ),
       ],
     'couponLane' => [
         _couponCard(k, 'c1', 'a1'),
@@ -182,20 +197,103 @@ Widget _lane(TplKit k, String kind) {
   ]));
 }
 
-Widget _stack(TplKit k) {
+Widget _stack(TplKit k, String kind) {
+  final rows = [('h1', 's1'), ('h2', 's2'), ('h3', 's3')];
+  Widget row(int i) {
+    final (h, s) = rows[i];
+    switch (kind) {
+      case 'stepStack':
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Column(children: [
+              Container(
+                width: 28, height: 28, alignment: Alignment.center,
+                decoration: const BoxDecoration(color: Color(0xFFE8D5A3), shape: BoxShape.circle),
+                child: Text('${i + 1}', style: const TextStyle(color: Color(0xFF16181E), fontWeight: FontWeight.w900)),
+              ),
+              if (i < 2) Container(width: 2, height: 28, color: const Color(0x55E8D5A3)),
+            ]),
+            const SizedBox(width: 12),
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              k.label(h, _w(16)),
+              k.label(s, _d(12), maxLines: 2),
+            ])),
+          ]),
+        );
+      case 'noteStack':
+        return Padding(
+          padding: EdgeInsets.only(bottom: 8, left: i * 8),
+          child: Transform.rotate(
+            angle: (i - 1) * 0.03,
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              color: const Color(0xFFF4EFE4),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                k.label(h, const TextStyle(color: Color(0xFF1A140C), fontSize: 15, fontWeight: FontWeight.w800)),
+                k.label(s, const TextStyle(color: Color(0xFF5C5348), fontSize: 12)),
+              ]),
+            ),
+          ),
+        );
+      case 'offerStack':
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Row(children: [
+            SizedBox(width: 92, child: k.label(h, _g(18), maxLines: 2)),
+            Expanded(child: k.label(s, _w(14), maxLines: 2)),
+          ]),
+        );
+      case 'wordStack':
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 6),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [
+            Expanded(child: k.label(h, _w(26), maxLines: 1)),
+            k.label(s, _d(13), maxLines: 1),
+          ]),
+        );
+      case 'priceStack':
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Row(children: [
+            k.label(h, _w(14)),
+            const Expanded(child: Text('  · · · · · · · · ', maxLines: 1, style: TextStyle(color: Color(0x44FFFFFF), letterSpacing: 2))),
+            k.label(s, _g(14)),
+          ]),
+        );
+      case 'nightStack':
+        return Container(
+          margin: const EdgeInsets.only(bottom: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(color: const Color(0xFF0C0C10), borderRadius: BorderRadius.circular(8)),
+          child: Row(children: [
+            Expanded(child: k.label(h, _w(16))),
+            k.label(s, _g(12)),
+          ]),
+        );
+      default:
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+            decoration: BoxDecoration(
+              border: Border(left: BorderSide(color: const Color(0xFFE8D5A3), width: 3)),
+              color: const Color(0xFF14161C),
+            ),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              k.label(h, _w(15)),
+              k.label(s, _d(12)),
+            ]),
+          ),
+        );
+    }
+  }
+
   return _pad(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
     k.label('title', _w(18)),
     const SizedBox(height: 8),
-    SizedBox(
-      height: 220,
-      child: SingleChildScrollView(
-        child: Column(children: [
-          _row(k, 'h1', 's1'),
-          _row(k, 'h2', 's2'),
-          _row(k, 'h3', 's3'),
-        ]),
-      ),
-    ),
+    SizedBox(height: 240, child: SingleChildScrollView(child: Column(children: [for (var i = 0; i < 3; i++) row(i)]))),
   ]));
 }
 
@@ -294,41 +392,165 @@ Widget _poster(TplKit k, String image, String title, double width, double height
       ),
     );
 
-Widget _pills(TplKit k, int seed) {
+Widget _pills(TplKit k, String kind) {
   const ids = ['a', 'b', 'c', 'd'];
+  final seed = kind.hashCode.abs();
+  Widget one(int i, double t) {
+    final id = ids[i];
+    final mark = _marks[(seed + i) % _marks.length];
+    final on = (t * 4).floor() % 4 == i;
+    switch (kind) {
+      case 'doorPills':
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Container(
+            height: 64,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: const Color(0xFF101114),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
+              border: Border.all(color: on ? const Color(0xFFE8D5A3) : const Color(0x33FFFFFF)),
+            ),
+            child: k.label(id, _w(15)),
+          ),
+        );
+      case 'shopPills':
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Container(
+            height: 72,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              NwsbIcon(mark, size: 18, color: const Color(0xFF16181E)),
+              const SizedBox(height: 4),
+              k.label(id, const TextStyle(color: Color(0xFF16181E), fontWeight: FontWeight.w800, fontSize: 13)),
+            ]),
+          ),
+        );
+      case 'soundPills':
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Row(children: [
+            Container(width: 44, height: 44, alignment: Alignment.center, decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFF16181E), border: Border.fromBorderSide(BorderSide(color: Color(0xFFE8D5A3)))), child: NwsbIcon(mark, size: 16, color: Colors.white)),
+            const SizedBox(width: 8),
+            Expanded(child: k.label(id, _w(16))),
+          ]),
+        );
+      case 'earnPills':
+        return Container(
+          margin: const EdgeInsets.only(bottom: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          decoration: BoxDecoration(border: Border.all(color: const Color(0xFFE8D5A3)), borderRadius: BorderRadius.circular(6)),
+          child: k.label(id, _g(14)),
+        );
+      case 'giftPills':
+        return Container(
+          margin: const EdgeInsets.only(bottom: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(color: const Color(0xFF1A140C), borderRadius: BorderRadius.circular(4)),
+          child: Row(children: [
+            Expanded(child: k.label(id, _w(14))),
+            const Text('····', style: TextStyle(color: Color(0xFFE8D5A3))),
+          ]),
+        );
+      case 'nightPills':
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 2),
+          child: ColoredBox(
+            color: const Color(0xFF07080C),
+            child: Padding(padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8), child: k.label(id, _w(22))),
+          ),
+        );
+      case 'calmPills':
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(99), border: Border.all(color: Colors.white)),
+            child: k.label(id, _w(13)),
+          ),
+        );
+      case 'storePills':
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: Column(children: [
+            Container(width: 48, height: 48, alignment: Alignment.center, decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle), child: NwsbIcon(mark, size: 20, color: const Color(0xFF16181E))),
+            const SizedBox(height: 4),
+            k.label(id, _d(12), align: TextAlign.center),
+          ]),
+        );
+      case 'markPills':
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Row(children: [
+            Container(width: 36, height: 36, alignment: Alignment.center, decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle), child: NwsbIcon(mark, size: 16, color: const Color(0xFF16181E))),
+            const SizedBox(width: 8),
+            k.label(id, _w(13)),
+          ]),
+        );
+      case 'goldPills':
+        return Container(
+          margin: const EdgeInsets.only(bottom: 8),
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(color: on ? const Color(0xFFE8D5A3) : const Color(0xFF3A3018), borderRadius: BorderRadius.circular(20)),
+          child: k.label(id, TextStyle(color: on ? const Color(0xFF16181E) : const Color(0xFFE8D5A3), fontWeight: FontWeight.w800, fontSize: 14)),
+        );
+      case 'coinPills':
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Container(
+            width: 72, height: 72, alignment: Alignment.center,
+            decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: const Color(0xFFE8D5A3), width: 2), color: const Color(0xFF1A140C)),
+            child: k.label(id, _g(16)),
+          ),
+        );
+      case 'bookPills':
+        return Container(
+          margin: const EdgeInsets.only(bottom: 4),
+          padding: const EdgeInsets.fromLTRB(10, 14, 10, 14),
+          decoration: const BoxDecoration(color: Color(0xFFF6F1E6), border: Border(left: BorderSide(color: Color(0xFF8A6A32), width: 6))),
+          child: k.label(id, const TextStyle(color: Color(0xFF1A140C), fontWeight: FontWeight.w800, fontSize: 15)),
+        );
+      case 'pathPills':
+        return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Column(children: [
+            Container(width: 14, height: 14, decoration: BoxDecoration(shape: BoxShape.circle, color: on ? const Color(0xFFE8D5A3) : const Color(0xFF2A2A2A), border: Border.all(color: const Color(0xFFE8D5A3)))),
+            if (i < 3) Container(width: 2, height: 36, color: const Color(0x55E8D5A3)),
+          ]),
+          const SizedBox(width: 10),
+          Expanded(child: Padding(padding: const EdgeInsets.only(bottom: 8), child: k.label(id, _w(15)))),
+        ]);
+      case 'wordPills':
+        return Container(
+          margin: const EdgeInsets.only(bottom: 6),
+          padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+          decoration: const BoxDecoration(
+            color: Color(0xFF12141A),
+            border: Border(left: BorderSide(color: Color(0xFFE8D5A3), width: 4)),
+          ),
+          child: k.label(id, _w(16)),
+        );
+      default:
+        return _pill(k, id, mark, on, 0.8);
+    }
+  }
+
   return _pad(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
     k.label('title', _w(16)),
     const SizedBox(height: 8),
     Align(
       alignment: Alignment.centerLeft,
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 210),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(22),
-          child: BackdropFilter(
-            filter: ui.ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: const Color(0x33FFFFFF),
-                borderRadius: BorderRadius.circular(22),
-                border: Border.all(color: const Color(0x66E8D5A3)),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(8, 8, 8, 2),
-                child: MotionLoop(
-                  milliseconds: 2400,
-                  builder: (t) {
-                    final on = (t * ids.length).floor() % ids.length;
-                    final pulse = 0.55 + 0.45 * math.sin(t * math.pi * 2);
-                    return Column(children: [
-                      for (var i = 0; i < ids.length; i++)
-                        _pill(k, ids[i], _marks[(seed + i) % _marks.length], i == on, pulse),
-                    ]);
-                  },
-                ),
-              ),
-            ),
-          ),
+        constraints: const BoxConstraints(maxWidth: 220),
+        child: MotionLoop(
+          milliseconds: 2800,
+          builder: (t) => Column(children: [for (var i = 0; i < 4; i++) one(i, t)]),
         ),
       ),
     ),
