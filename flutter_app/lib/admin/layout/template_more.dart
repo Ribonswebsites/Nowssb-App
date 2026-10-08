@@ -7,6 +7,8 @@ library;
 
 import 'package:flutter/material.dart';
 
+import 'template_motion.dart';
+
 /// The helpers a template draws with (from TemplateSection), so words and
 /// pictures here are editable exactly like in the first templates.
 class TplKit {
@@ -214,6 +216,26 @@ const kMoreTemplates = <String, (String, String, String)>{
   'statsCards': ('Number cards', 'Four numbers in cards', 'Numbers'),
   'statsProgress': ('Progress bars', 'Three bars that show how far', 'Numbers'),
   'statsBig': ('One big number', 'A huge number and a line', 'Numbers'),
+  'offerTwins': ('Twin offer cards', 'Two gold-edged offer cards, side by side', 'Top banners'),
+  'savedShelf': ('Saved for you', 'Chips and cards of things you saved', 'Cards'),
+  'goldRibbon': ('Gold ribbon', 'A shining gold ribbon with doors under it', 'Top banners'),
+  'doorChips': ('Door chips', 'A row of doors you can tap', 'Cards'),
+  'codeBand': ('Code band', 'A slim band with an offer code', 'Offers & coupons'),
+  'giftOpen': ('Opening gift', 'A gift card whose flap lifts', 'Offers & coupons'),
+  'stayCard': ('Stay card', 'A curved card that asks you to stay', 'Buttons & banners'),
+  'threeDeals': ('Three deals', 'Three steps, then the deals they unlock', 'Offers & coupons'),
+  'savingLine': ('Saving line', 'A bar that fills with what you saved', 'Numbers'),
+  'bagItem': ('Bag item', 'One item in the bag, with its price', 'Cards'),
+  'coinPicks': ('Coin amounts', 'Five coin amounts in a row', 'Offers & coupons'),
+  'metalPass': ('Metal membership', 'A metal card with a slow shine', 'Cards'),
+  'rankTrack': ('Rank track', 'Dots for each rank and how far you are', 'Numbers'),
+  'benefitSplit': ('This rank, next rank', 'What you have, and what the next rank adds', 'Features'),
+  'dropShelf': ('Dropped prices', 'Cards with the old price and the new one', 'Cards'),
+  'peekShelf': ('Peeking posters', 'Posters in a row, the next one peeking in', 'Top banners'),
+  'lovedRow': ('Loved row', 'Cards you marked, with a heart', 'Cards'),
+  'shineLine': ('Moving offer line', 'One line of an offer that travels', 'Top banners'),
+  'pulseCta': ('Pulsing button', 'A banner whose button breathes', 'Buttons & banners'),
+  'litSteps': ('Lit steps', 'Steps that light up one after another', 'Features'),
 };
 
 const kMoreKinds = <String>[
@@ -226,6 +248,10 @@ const kMoreKinds = <String>[
   'offerFlash', 'offerBundle', 'offerPrice',
   'splitLeft', 'splitRight', 'splitOverlap', 'splitLight',
   'statsRow', 'statsCards', 'statsProgress', 'statsBig',
+  'offerTwins', 'savedShelf', 'goldRibbon', 'doorChips', 'codeBand',
+  'giftOpen', 'stayCard', 'threeDeals', 'savingLine', 'bagItem',
+  'coinPicks', 'metalPass', 'rankTrack', 'benefitSplit', 'dropShelf',
+  'peekShelf', 'lovedRow', 'shineLine', 'pulseCta', 'litSteps',
 ];
 
 const _a = 'assets/banners/stories/aura.png';
@@ -282,10 +308,11 @@ Map<String, dynamic> moreStarter(String kind) => switch (kind) {
       'statsCards' => {'title': 'Your month', 'n1': '18', 'l1': 'days', 'n2': '214', 'l2': 'minutes', 'n3': '36', 'l3': 'words', 'n4': '7', 'l4': 'streak'},
       'statsProgress' => {'title': 'This week', 't1': 'Breath', 'v1': 0.8, 't2': 'Reading', 'v2': 0.55, 't3': 'Sleep', 'v3': 0.35},
       'statsBig' => {'title': '1,000,000', 'subtitle': 'minutes of calm, together', 'cta': 'Add yours', 'route': 'tab:1'},
-      _ => const {},
+      _ => motionStarter(kind),
     };
 
 Widget buildMoreTemplate(String kind, TplKit k) {
+  if (kMotionKinds.contains(kind)) return buildMotionBanner(kind, k);
   final L = k.label;
   switch (kind) {
     // ── Top banners ──

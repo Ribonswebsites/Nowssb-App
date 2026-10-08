@@ -31,6 +31,7 @@ class EconomyPage extends StatelessWidget {
     this.header,
     this.goodToKnow,
     this.showBalance = true,
+    this.film = true,
   });
 
   final String title;
@@ -44,23 +45,33 @@ class EconomyPage extends StatelessWidget {
   final String? goodToKnow;
   final bool showBalance;
 
+  /// When false the page is a flat metal wash. NowssB Earn uses this so
+  /// the rank card is readable and no film plays behind it.
+  final bool film;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: NwsbColors.deep,
       body: Stack(
         children: [
-          const Positioned.fill(child: AppBackdrop()),
-          const Positioned.fill(
+          if (film) const Positioned.fill(child: AppBackdrop()),
+          Positioned.fill(
             child: IgnorePointer(
               child: DecoratedBox(
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Color(0x99000000), Color(0x66000000), Color(0x88000000), Color(0xCC000000)],
-                    stops: [0, 0.22, 0.72, 1.0],
-                  ),
+                  gradient: film
+                      ? const LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [Color(0x99000000), Color(0x66000000), Color(0x88000000), Color(0xCC000000)],
+                          stops: [0, 0.22, 0.72, 1.0],
+                        )
+                      : const LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [Color(0xFF3A3E46), Color(0xFF12141A)],
+                        ),
                 ),
               ),
             ),
