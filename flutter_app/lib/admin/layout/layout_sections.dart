@@ -34,6 +34,7 @@ import 'section_pinch.dart';
 import 'side_row.dart';
 import 'template_sections.dart';
 import 'ui_layouts.dart';
+import '../../widgets/tablet_section_rail.dart';
 
 /// One section of a page's list.
 class LSection extends StatelessWidget {
@@ -205,6 +206,7 @@ List<Widget> layoutChildren(
   String pageId,
   List<Widget> children, {
   Set<String> hiddenByDefault = const {},
+  bool tabletRail = true,
 }) {
   final lead = <Widget>[];
   final items = <SectionItem>[];
@@ -228,29 +230,45 @@ List<Widget> layoutChildren(
   }
   final laid = applyLayout(context, pageId, items, hiddenByDefault: hiddenByDefault);
   bool zoomed(String id) => (UiOverrides.instance.sectionZoomOf(pageId, id) - 1).abs() > 0.015;
+  List<Widget> finish(List<Widget> items) =>
+      tabletRail ? _tabletRails(context, items) : items;
   if (identical(laid, items) && !items.any((i) => zoomed(i.id))) {
-    return children;
+    return finish(children);
   }
   final iso = EditorPreviewScope.peek(context) == null
       ? null
       : context.getInheritedWidgetOfExactType<PreviewIsolateScope>();
   final isolated = iso != null && iso.pageId == pageId;
   if (identical(laid, items)) {
-    return [
+    return finish([
       for (final w in children)
         if (w is LSection && zoomed(w.id))
           SectionPinch(pageId: pageId, sectionId: w.id, child: w)
         else
           w,
-    ];
+    ]);
   }
-  return _packSides(context, pageId, [
+  return finish(_packSides(context, pageId, [
     if (!isolated) ...lead,
     for (final s in laid) ...[
       SectionPinch(pageId: pageId, sectionId: s.id, child: s.widget),
       if (!isolated) ...?glue[s.id] ?? glue[_srcOf(s.id)],
     ],
-  ]);
+  ]));
+}
+
+/// Tablet: keep each section near phone width and hang a vertical 3D
+/// motion on its right. Phone width is unchanged.
+List<Widget> _tabletRails(BuildContext context, List<Widget> items) {
+  if (!nwsbTablet(context)) return items;
+  return [for (final w in items) _railOf(w)];
+}
+
+Widget _railOf(Widget w) {
+  if (w is SectionPinch) return TabletSectionRow(seed: w.sectionId, child: w);
+  if (w is LSection) return TabletSectionRow(seed: w.id, child: w);
+  if (w is _SidePack) return TabletSectionRow(seed: 'row', child: w);
+  return w;
 }
 
 /// Consecutive sections that were made narrower share one row, so the
@@ -313,14 +331,15 @@ class _SidePack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.sizeOf(context).width;
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        for (final (child, fraction) in spans)
-          SizedBox(width: width * fraction, child: child),
-      ],
-    );
+    return LayoutBuilder(builder: (context, box) {
+      final width = box.maxWidth.isFinite && box.maxWidth > 0 ? box.maxWidth : MediaQuery.sizeOf(context).width;
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final (child, fraction) in spans) SizedBox(width: width * fraction, child: child),
+        ],
+      );
+    });
   }
 }
 

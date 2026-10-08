@@ -17,6 +17,7 @@ import 'store_cards.dart';
 import 'store_home_sections.dart';
 import 'store_section_mix.dart';
 import 'store_coupon_banner.dart';
+import 'shop_page.dart';
 import 'store_select_sheet.dart';
 import 'ebooks_store.dart';
 import 'meaning_store.dart';
@@ -34,24 +35,11 @@ class WordAtelierScreen extends StatelessWidget {
   Widget build(BuildContext context) => StoreTermsHost(
         which: 'word',
         head: 'Words described by sound',
-        child: PageShell(
-        eyebrow: '',
-        title: 'NowssB Store',
-        subtitle: 'The Word Atelier',
-        film: 'assets/video/player-bg-loop.mp4',
-        usePageFilm: true,
-        onBack: () => Navigator.of(context).pop(),
-        onStorePicker: () => showStoreSelectSheet(
-          context,
-          current: 'word',
-          onSelect: (id) => openStoreFromPicker(context, id, current: 'word'),
-        ),
-        slivers: [
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 40),
-            sliver: SliverList.list(children: const [_WordAtelierBody()]),
-          ),
-        ],
+        child: NwsbShopPage(
+          pageId: 'store.atelier',
+          which: 'word',
+          title: 'The Word Atelier',
+          groups: wordShopGroups(),
         ),
       );
 }

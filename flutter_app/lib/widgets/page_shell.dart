@@ -32,6 +32,7 @@ class PageShell extends StatefulWidget {
     this.actions = const [],
     this.plain = false,
     this.canvas,
+    this.bodyMax = 860,
   });
 
   /// Extra controls at the end of the title row (e.g. Quick access Reset).
@@ -66,6 +67,9 @@ class PageShell extends StatefulWidget {
 
   /// Flat page colour, no film. Word Atelier's black look uses this.
   final Color? canvas;
+
+  /// Cap on the scrolling column. Phone width is unaffected.
+  final double bodyMax;
 
   @override
   State<PageShell> createState() => _PageShellState();
@@ -173,7 +177,7 @@ class _PageShellState extends State<PageShell> {
           SafeArea(
             child: Center(
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 860),
+                constraints: BoxConstraints(maxWidth: widget.bodyMax),
                 child: CustomScrollView(
                   slivers: [
                 SliverToBoxAdapter(
