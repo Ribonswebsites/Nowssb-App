@@ -7,6 +7,7 @@ library;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../../admin/layout/scopes.dart';
 import '../../widgets/neumorphic.dart';
 
 import '../../widgets/enter_curve_stage.dart';
@@ -916,6 +917,7 @@ class _CustomizeCardPagerState extends State<_CustomizeCardPager> {
     super.initState();
     if (_flutterTest) return;
     _auto = Timer.periodic(const Duration(milliseconds: 4200), (_) {
+      if (editorHoldsStill(context)) return;
       if (!mounted || _userPaging) return;
       if (!TickerMode.of(context)) return;
       if (!_pager.hasClients) return;

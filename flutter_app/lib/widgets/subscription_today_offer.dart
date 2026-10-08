@@ -9,6 +9,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import '../admin/layout/scopes.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import 'app_thinking_loader.dart';
@@ -164,6 +165,7 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
     if (_flutterTest) return;
     unawaited(PlaySubscriptions.instance.start());
     _auto = Timer.periodic(const Duration(milliseconds: 4800), (_) {
+      if (editorHoldsStill(context)) return;
       if (!mounted || _userPaging) return;
       if (!TickerMode.of(context)) return;
       if (!_pager.hasClients) return;

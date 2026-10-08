@@ -8,13 +8,13 @@ library;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../admin/layout/scopes.dart';
 
 import '../data/app_control.dart';
 import '../data/word_requests.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
-import '../widgets/glass_wrap.dart';
 import '../widgets/banner_mix.dart';
 import '../widgets/black_glass_banner.dart';
 import '../widgets/colored_split_promo_banner.dart';
@@ -92,7 +92,7 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
                 children: [
                   EditableLabel('store.StoreHomeContent', 'NowssB Store',
                       style: TextStyle(
-                          color: Color(0xFF16181E),
+                          color: Colors.white,
                           fontSize: 34,
                           height: 1.0,
                           fontWeight: FontWeight.w800,
@@ -100,7 +100,7 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
                   SizedBox(height: 8),
                   EditableLabel('store.StoreHomeContent', 'Own the words. Unlock the meanings.',
                       style: TextStyle(
-                          color: Color(0xFF5C564E), fontSize: 13, height: 1.3)),
+                          color: Color(0xAFFFFFFF), fontSize: 13, height: 1.3)),
                 ],
               ),
             ),
@@ -269,7 +269,7 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
         padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
         child: EditableLabel('store.StoreHomeContent',
           'Disclaimer & Confidentiality\n\nWords, meanings, ebooks and verification badges shared or sold here are for educational and wellness purposes only — nothing here is medical advice. Purchases are final once unlocked. Any information you share with us is kept strictly confidential and never sold or shared with third parties.',
-          style: TextStyle(fontSize: 11, height: 1.5, color: Color(0xFF5C564E)),
+          style: TextStyle(fontSize: 11, height: 1.5, color: Color(0x73FFFFFF)),
         ),
       ),
       const Padding(
@@ -277,7 +277,7 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
         child: EditableLabel('store.StoreHomeContent',
           'NowssB\n© 2026 Adv. Sanjaykumar Gadge · Shabdapathy',
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 11, height: 1.6, color: Color(0xFF5C564E)),
+          style: TextStyle(fontSize: 11, height: 1.6, color: Color(0x73FFFFFF)),
         ),
       ),
     ];
@@ -305,10 +305,59 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
             LSection('credits', 'Credits', items[19]),
           ]);
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F4EF),
-      body: StoreSurface(
-        light: true,
-        child: SafeArea(child: ListView(children: shown)),
+      backgroundColor: NwsbColors.deep,
+      body: Stack(
+        children: [
+          const Positioned.fill(
+            child: NwsbVideo(
+              asset: 'assets/video/player-bg-loop.mp4',
+              priority: ClipPriority.decoration,
+              autoplay: true,
+              loop: true,
+              fit: BoxFit.cover,
+              slot: 'store.StoreHomeContent',
+            ),
+          ),
+          const Positioned.fill(
+            child: IgnorePointer(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: RadialGradient(
+                    center: Alignment(0, -0.1),
+                    radius: 0.88,
+                    colors: [
+                      Color(0x00000000),
+                      Color(0x24000000),
+                      Color(0x57000000),
+                      Color(0x94000000),
+                    ],
+                    stops: [0.30, 0.58, 0.80, 1.0],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const Positioned.fill(
+            child: IgnorePointer(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Color(0x42000000),
+                      Color(0x00000000),
+                      Color(0x00000000),
+                      Color(0x57000000),
+                    ],
+                    stops: [0, 0.20, 0.76, 1.0],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          SafeArea(child: ListView(children: shown)),
+        ],
       ),
     );
   }
@@ -391,6 +440,7 @@ class _StoreImageRotatorState extends State<_StoreImageRotator> {
     super.initState();
     if (!_flutterTest) {
       _timer = Timer.periodic(const Duration(seconds: 4), (_) {
+        if (editorHoldsStill(context)) return;
         if (mounted) setState(() => _index = (_index + 1) % _images.length);
       });
     }

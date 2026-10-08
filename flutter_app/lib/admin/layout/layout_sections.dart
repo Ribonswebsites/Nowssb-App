@@ -416,16 +416,18 @@ class SectionFrame extends StatelessWidget {
     // (a scale-down-only fit left it small on top of blank space).
     final shrink = _d(p['shrink']);
     final boxH = _d(p['boxH']);
-    if (shrink != null && shrink < 0.995) {
-      // Narrower than the page, built-in or added, so a neighbour can sit
-      // in the room beside it (see _packSides).
+    // A saved crop window is drawn as a real height now. Cropping the
+    // picture and calling it "taller" is not a size.
+    final tall = (h != null && h > 0) ? h : (boxH != null && boxH > 20 ? boxH : null);
+    final narrow = shrink != null && shrink < 0.995;
+    if (narrow || tall != null) {
       w = SectionFitHeight(
-          height: 0, width: MediaQuery.sizeOf(context).width, align: sideAlignOf(p), fraction: shrink.clamp(0.25, 1.0), child: w);
-    } else if (h != null && h > 0 && (!entry.isTemplate || entry.kind == 'textBlock' || entry.kind == 'cta')) {
-      w = SectionFitHeight(height: h, width: MediaQuery.sizeOf(context).width, align: sideAlignOf(p), child: w);
-    } else if (boxH != null && boxH > 20) {
-      // A window on the section. The picture keeps its own size.
-      w = SectionWindow(height: boxH, child: w);
+        height: tall ?? 0,
+        width: MediaQuery.sizeOf(context).width,
+        align: sideAlignOf(p),
+        fraction: narrow ? shrink.clamp(0.25, 1.0) : null,
+        child: w,
+      );
     }
     // Its own background, corners and shadow, set from a touch.
     w = sectionLook(p, w, frame: !_selfFramed.contains(entry.kind));
@@ -687,7 +689,7 @@ class _CarouselAutoRotateState extends State<CarouselAutoRotate> {
     if (iv > 0) {
       _t = Timer.periodic(Duration(milliseconds: iv), (_) {
         final c = widget.controller;
-        if (!mounted || !c.hasClients || widget.count < 2) return;
+        if (!mounted || editorHoldsStill(context) || !c.hasClients || widget.count < 2) return;
         final cur = (c.page ?? c.initialPage.toDouble()).round();
         final next = (cur + 1) % widget.count;
         if (next == 0) {

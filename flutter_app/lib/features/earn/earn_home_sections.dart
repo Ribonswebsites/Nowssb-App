@@ -8,6 +8,7 @@ library;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../../admin/layout/scopes.dart';
 import 'package:flutter/services.dart';
 
 import '../../data/firebase.dart';
@@ -110,6 +111,7 @@ class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
     _pager = PageController(viewportFraction: 0.92);
     if (_flutterTest) return;
     _auto = Timer.periodic(const Duration(milliseconds: 4800), (_) {
+      if (editorHoldsStill(context)) return;
       if (!mounted || _userPaging) return;
       if (!TickerMode.of(context)) return;
       if (!_pager.hasClients) return;
@@ -828,6 +830,7 @@ class _OutsidePromoState extends State<_OutsidePromo> {
     super.initState();
     if (widget.slides.length > 1) {
       _timer = Timer.periodic(const Duration(milliseconds: 3400), (_) {
+        if (editorHoldsStill(context)) return;
         if (!mounted || !_pages.hasClients) return;
         _index = (_index + 1) % widget.slides.length;
         _pages.animateToPage(

@@ -10,6 +10,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import '../admin/layout/scopes.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 
@@ -63,6 +64,7 @@ class _BuddhaGyroStageState extends State<BuddhaGyroStage> {
       }, onError: (_) {});
     } catch (_) {}
     _pageAuto = Timer.periodic(const Duration(milliseconds: 5200), (_) {
+      if (editorHoldsStill(context)) return;
       if (!mounted || _userPaging) return;
       if (!TickerMode.of(context)) return;
       if (!_pager.hasClients) return;

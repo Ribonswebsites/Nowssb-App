@@ -305,8 +305,12 @@ class _HotspotsState extends State<_Hotspots> {
       spots.add(Positioned.fromRect(
         rect: r,
         child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () {
+          behavior: (s.type == SlotType.image || s.type == SlotType.video) && !picked
+              ? HitTestBehavior.deferToChild
+              : HitTestBehavior.opaque,
+          onTap: (s.type == SlotType.image || s.type == SlotType.video) && !picked
+              ? null
+              : () {
             actFeel();
             // Tapped again: type in place, or replace the picture.
             if (picked && s.type == SlotType.text) return _startTyping(s);
@@ -534,7 +538,7 @@ void deleteWithUndo(BuildContext context, EditorController c, String id, String 
   _undoBar(context, c, 'Deleted “$title” · in the Bin', item.id);
 }
 
-enum _Grab { none, scroll, order, pinchSection, pinchElement, moveElement, moveOrb, pinchOrb, panImage, zoomImage, frameEdge, moveBeside, boxEdge, mediaEdge }
+enum _Grab { none, scroll, order, pinchSection, pinchElement, moveElement, moveOrb, pinchOrb, panImage, zoomImage, frameEdge, moveBeside, boxEdge, mediaEdge, lengthEdge }
 
 /// Places one drag up or down moves a section when no other section is
 /// under the finger (kept for callers and tests of the step maths).
@@ -549,9 +553,14 @@ int shiftSteps(double dy, int up, int down) =>
 const kAutoScrollBand = 80.0;
 
 /// Everything on the canvas is done by touching it:
-///   tap                 pick an element, a placed orb, or a section
+///   tap on a picture     asks Image/Video or Section — only that is edited
+///   tap on a plain part  picks the section
 ///   drag / fling        ALWAYS scrolls the page, picked or not: a scroll
 ///                       never moves or deletes anything
+///   section picked      bottom edge = height, right edge = width.
+///                       Pinch grows or shrinks that section. Not a crop.
+///   image or video      pinch zooms it, one finger slides it. The section
+///                       stays the size it already is.
 ///   long-press, then drag   pick it up and carry it: a section to a new
 ///                       place (the page makes room), an element inside
 ///                       its section, an orb anywhere on the page
@@ -580,6 +589,10 @@ class _TouchLayerState extends State<_TouchLayer> {
   Offset _baseOffset = Offset.zero;
   Offset _start = Offset.zero;
   Offset _finger = Offset.zero;
+
+  /// Tap on a picture asked Image/Video or Section, and is waiting.
+  String? _askId;
+  PreviewSlot? _askSlot;
 
   /// Where the finger first went down: a scale gesture only starts after
   /// the finger has moved a little, so its start point is already past it.
@@ -870,6 +883,102 @@ class _TouchLayerState extends State<_TouchLayer> {
   Map<String, dynamic> get _props => c.current?.entry.props ?? const {};
   double _num(String k) => _props[k] is num ? (_props[k] as num).toDouble() : 0;
 
+  /// Section size is being edited, not a picture inside it.
+  bool get _sectionMode =>
+      _askId == null && c.sectionPicked && c.selectedSlot == null && c.selectedOrb == null;
+
+  bool _chooserContains(Offset p) {
+    if (_askId == null) return false;
+    final box = context.findRenderObject() as RenderBox?;
+    if (box == null || !box.hasSize) return false;
+    return p.dy >= box.size.height - 112;
+  }
+
+  bool _slotIn(PreviewSlot s, String id) {
+    final sec = s.section;
+    if (sec == null) return false;
+    return sec == id || sec == '${c.layoutPage}/$id';
+  }
+
+  /// The picture or video in [id], preferring the one under the finger.
+  PreviewSlot? _mediaIn(String id, Offset p) {
+    PreviewSlot? hit;
+    var hitArea = double.infinity;
+    PreviewSlot? biggest;
+    var area = 0.0;
+    for (final s in c.preview.slots.values) {
+      if (s.type != SlotType.image && s.type != SlotType.video) continue;
+      if (!_slotIn(s, id)) continue;
+      final r = _slotRect(s);
+      if (r == null) continue;
+      final a = r.width * r.height;
+      if (r.contains(p) && a < hitArea) {
+        hit = s;
+        hitArea = a;
+      }
+      if (a > area) {
+        area = a;
+        biggest = s;
+      }
+    }
+    return hit ?? biggest;
+  }
+
+  void _chooseMedia() {
+    final s = _askSlot;
+    final id = _askId;
+    if (s == null || id == null) {
+      _say('No picture here. Choose Section to change height and width.');
+      return;
+    }
+    c.selectIn(id, s.slotKey, s.type, s.defaultValue);
+    setState(() {
+      _askId = null;
+      _askSlot = null;
+    });
+  }
+
+  void _chooseSection() {
+    final id = _askId;
+    if (id == null) return;
+    c.pickSection(id);
+    setState(() {
+      _askId = null;
+      _askSlot = null;
+    });
+  }
+
+  Widget _askButton({
+    required Key key,
+    required IconData icon,
+    required String title,
+    required String sub,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: const Color(0xFF1C2433),
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        key: key,
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+          child: Row(children: [
+            Icon(icon, color: Colors.white, size: 22),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 15)),
+                Text(sub, style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 11)),
+              ]),
+            ),
+          ]),
+        ),
+      ),
+    );
+  }
+
   /// The page's own vertical scroll (the outermost one that can scroll).
   ScrollPosition? _findScroll() {
     ScrollableState? found;
@@ -929,18 +1038,19 @@ class _TouchLayerState extends State<_TouchLayer> {
       _grab = _Grab.pinchElement;
       return;
     }
-    final id = _sectionAt(focal) ?? (c.sectionPicked ? c.current?.id : null);
-    if (id == null) {
-      _grab = _Grab.none;
+    // Section is the thing being edited: pinch changes its real size.
+    // It does not crop, and it does not zoom a picture that was not chosen.
+    if (_sectionMode && c.current != null) {
+      final id = c.current!.id;
+      _shrinkBase = _num('shrink');
+      if (_shrinkBase <= 0) _shrinkBase = 1;
+      _base = _num('height');
+      if (_base < 1) _base = _num('boxH');
+      if (_base < 1) _base = c.preview.sectionHeights['${c.layoutPage}/$id'] ?? 200;
+      _grab = _Grab.pinchSection;
       return;
     }
-    if (!c.sectionPicked || c.current?.id != id) c.pickSection(id);
-    _shrinkBase = _num('shrink');
-    if (_shrinkBase <= 0) _shrinkBase = 1;
-    _base = _num('boxH');
-    if (_base < 1) _base = _num('height');
-    if (_base < 1) _base = c.preview.sectionHeights['${c.layoutPage}/$id'] ?? 200;
-    _grab = _Grab.pinchSection;
+    _grab = _Grab.none;
   }
 
   static double? _fontSize(RenderObject? r) {
@@ -968,17 +1078,15 @@ class _TouchLayerState extends State<_TouchLayer> {
       setState(() {});
       return;
     }
-    // A picked picture: the bottom edge changes how tall the picture is.
-    // The section around it stays the size it already is.
-    final pic = _pickedPicture;
-    final base = _slotRect(pic);
-    if (pic != null && base != null && (_start.dy - base.bottom).abs() < 28 && _start.dx >= base.left - 12 && _start.dx <= base.right + 12) {
-      _element = pic;
-      _base = _framingOf(pic).bottom;
-      _grab = _Grab.mediaEdge;
+    if (_askId != null && _chooserContains(_start)) {
+      _grab = _Grab.none;
       setState(() {});
       return;
     }
+    // Image or video is chosen: one finger only slides that picture.
+    // It does not crop it and it does not resize the section.
+    final pic = _pickedPicture;
+    final base = _slotRect(pic);
     if (pic != null && base != null && base.inflate(12).contains(_start)) {
       final f = _framingOf(pic);
       _element = pic;
@@ -992,16 +1100,32 @@ class _TouchLayerState extends State<_TouchLayer> {
       setState(() {});
       return;
     }
-    // Section picked: the bottom edge changes the section window only.
-    // It does not zoom the video.
-    final secId = c.sectionPicked ? c.current?.id : null;
-    final secR = _shrunkRect(secId) ?? _sectionRect(secId);
-    if (secId != null && secR != null && c.selectedSlot == null && (_start.dy - secR.bottom).abs() < 32 && _start.dx >= secR.left && _start.dx <= secR.right) {
-      _base = _num('boxH');
-      if (_base < 1) _base = secR.height;
-      _grab = _Grab.boxEdge;
-      setState(() {});
-      return;
+    // Section is chosen: the bottom edge is its height, the right edge
+    // its width. Neither one crops the picture.
+    if (_sectionMode) {
+      final secId = c.current?.id;
+      final secR = _shrunkRect(secId) ?? _sectionRect(secId);
+      if (secId != null && secR != null) {
+        final fromBottom = (_start.dy - secR.bottom).abs();
+        final fromRight = (_start.dx - secR.right).abs();
+        final onBottom = fromBottom < 36 && _start.dx >= secR.left - 12 && _start.dx <= secR.right + 24;
+        final onRight = fromRight < 36 && _start.dy >= secR.top - 8 && _start.dy <= secR.bottom + 16;
+        if (onRight && (!onBottom || fromRight <= fromBottom)) {
+          _base = _num('shrink');
+          if (_base < 0.05) _base = 1;
+          _grab = _Grab.lengthEdge;
+          setState(() {});
+          return;
+        }
+        if (onBottom) {
+          _base = _num('height');
+          if (_base < 1) _base = _num('boxH');
+          if (_base < 1) _base = secR.height;
+          _grab = _Grab.boxEdge;
+          setState(() {});
+          return;
+        }
+      }
     }
     {
       // One finger scrolls, whatever is picked: carrying starts only
@@ -1207,15 +1331,21 @@ class _TouchLayerState extends State<_TouchLayer> {
         if (s == null) return;
         _patchFrame(s, {'imgZoom': (_base * d.scale).clamp(ImageFraming.kMinZoom, ImageFraming.kMaxZoom)});
       case _Grab.mediaEdge:
-        final s = _element;
-        if (s == null) return;
-        final next = (_base + (d.localFocalPoint.dy - _start.dy) / 220).clamp(-0.2, 0.9);
-        _patchFrame(s, {'frameB': next});
+        return;
+      case _Grab.lengthEdge:
+        final id = c.current?.id;
+        final row = _sectionRect(id);
+        if (id == null || row == null || row.width < 1) return;
+        final next = (_base + (d.localFocalPoint.dx - _start.dx) / row.width).clamp(0.32, 1.0);
+        c.patchProps(id, {
+          'shrink': next >= 0.97 ? null : double.parse(next.toStringAsFixed(3)),
+          'boxH': null,
+        });
       case _Grab.boxEdge:
         final id = c.current?.id;
         if (id == null) return;
-        final next = (_base + (d.localFocalPoint.dy - _start.dy)).clamp(72.0, 1400.0).roundToDouble();
-        c.patchProps(id, {'boxH': next, 'height': null});
+        final next = (_base + (d.localFocalPoint.dy - _start.dy)).clamp(48.0, 1600.0).roundToDouble();
+        c.patchProps(id, {'height': next, 'boxH': null});
       case _Grab.frameEdge:
         final s = _element;
         final w = _pictureBase.width, h = _pictureBase.height;
@@ -1240,12 +1370,12 @@ class _TouchLayerState extends State<_TouchLayer> {
         final fixed = cur.entry.isTemplate && cur.entry.kind != 'textBlock' && cur.entry.kind != 'cta';
         final v = _shrinkBase * d.scale;
         if (fixed && v < 0.995) {
-          c.patchProps(id, {'shrink': double.parse(v.clamp(0.3, 1.0).toStringAsFixed(3))});
+          c.patchProps(id, {'shrink': double.parse(v.clamp(0.3, 1.0).toStringAsFixed(3)), 'boxH': null});
         } else if (fixed && _shrinkBase < 0.995) {
-          c.patchProps(id, {'shrink': null});
+          c.patchProps(id, {'shrink': null, 'boxH': null});
         } else {
-          // Section window, not a zoom. The video keeps its size.
-          c.patchProps(id, {'boxH': (_base * d.scale).clamp(72.0, 1400.0).roundToDouble(), 'height': null});
+          // Real height of the section. The picture's own zoom is separate.
+          c.patchProps(id, {'height': (_base * d.scale).clamp(48.0, 1600.0).roundToDouble(), 'boxH': null});
         }
       case _Grab.moveElement || _Grab.moveOrb || _Grab.order || _Grab.moveBeside:
         _carryTo(d.localFocalPoint);
@@ -1377,6 +1507,7 @@ class _TouchLayerState extends State<_TouchLayer> {
 
   void _onTapUp(TapUpDetails d) {
     final p = d.localPosition;
+    if (_chooserContains(p)) return;
     final orb = _orbAt(p);
     if (orb != null) {
       actFeel();
@@ -1384,15 +1515,36 @@ class _TouchLayerState extends State<_TouchLayer> {
       c.sectionPicked = false;
       c.selectedOrb = (orb.section, orb.orb.id);
       c.changedSelection();
+      setState(() {
+        _askId = null;
+        _askSlot = null;
+      });
       return;
     }
     final id = _sectionAt(p);
-    if (id != null) {
-      actFeel();
-      c.pickSection(id);
-    } else {
+    if (id == null) {
       c.unpick();
+      setState(() {
+        _askId = null;
+        _askSlot = null;
+      });
+      return;
     }
+    final media = _mediaIn(id, p);
+    if (media != null) {
+      actFeel();
+      setState(() {
+        _askId = id;
+        _askSlot = media;
+      });
+      return;
+    }
+    actFeel();
+    c.pickSection(id);
+    setState(() {
+      _askId = null;
+      _askSlot = null;
+    });
   }
 
   Future<void> _menu(Offset p, Offset global) async {
@@ -1910,6 +2062,40 @@ class _TouchLayerState extends State<_TouchLayer> {
                 ),
               ),
             if (hoverGap != null && _hoverSide == null) InsertLine(y: _gapY(hoverGap)),
+            if (_askId != null)
+              Positioned(
+                left: 12,
+                right: 12,
+                bottom: 16,
+                child: GestureDetector(
+                  onTap: () {},
+                  child: Material(
+                    color: const Color(0xF0141824),
+                    elevation: 8,
+                    borderRadius: BorderRadius.circular(18),
+                    child: Padding(
+                      padding: const EdgeInsets.all(6),
+                      child: Row(children: [
+                        Expanded(child: _askButton(
+                          key: const ValueKey('choose-media'),
+                          icon: _askSlot?.type == SlotType.video ? Icons.play_circle_outline : Icons.image_outlined,
+                          title: _askSlot?.type == SlotType.video ? 'Video' : 'Image',
+                          sub: 'Zoom in and out',
+                          onTap: _chooseMedia,
+                        )),
+                        const SizedBox(width: 6),
+                        Expanded(child: _askButton(
+                          key: const ValueKey('choose-section'),
+                          icon: Icons.crop_free_rounded,
+                          title: 'Section',
+                          sub: 'Height and width',
+                          onTap: _chooseSection,
+                        )),
+                      ]),
+                    ),
+                  ),
+                ),
+              ),
           ]),
         ),
       ),

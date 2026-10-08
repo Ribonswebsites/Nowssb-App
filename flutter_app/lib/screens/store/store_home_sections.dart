@@ -688,8 +688,8 @@ class StoreGlassPanel extends StatelessWidget {
             padding: padding,
             decoration: BoxDecoration(
               borderRadius: r,
-              color: glassFill(context),
-              border: Border.all(color: glassLine(context)),
+              color: GlassWrap.fill,
+              border: Border.all(color: GlassWrap.line),
             ),
             child: child,
           ),

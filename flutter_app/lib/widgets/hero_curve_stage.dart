@@ -10,6 +10,7 @@ import 'dart:ui' as ui;
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import '../admin/layout/scopes.dart';
 
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
@@ -90,6 +91,7 @@ class _HeroCurveStageState extends State<HeroCurveStage> {
     super.initState();
     if (!_flutterTest) {
       _tick = Timer.periodic(const Duration(milliseconds: 32), (_) {
+        if (editorHoldsStill(context)) return;
         if (!mounted) return;
         // Same orbit path as before, only calmer and slower.
         setState(() => _auto += 0.0055);

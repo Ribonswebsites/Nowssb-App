@@ -11,7 +11,6 @@ import '../../data/store_prices.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/cart_add_animation.dart';
 import '../../widgets/page_shell.dart';
-import '../../widgets/glass_wrap.dart';
 import '../../features/economy/money.dart';
 import '../../features/programs/store_extras.dart';
 import '../nwsb_sign_in_sheet.dart';
@@ -277,9 +276,9 @@ class _CheckoutRow extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: StoreSurface.lightOf(context) ? const Color(0xF216181E) : const Color(0x52000000),
+        color: const Color(0x52000000),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: StoreSurface.lightOf(context) ? const Color(0x66E8D5A3) : const Color(0x17FFFFFF)),
+        border: Border.all(color: const Color(0x17FFFFFF)),
       ),
       child: Row(
         children: [
@@ -407,7 +406,6 @@ class _BagScaffold extends StatelessWidget {
       subtitle: title,
       film: 'assets/video/player-bg-loop.mp4',
       usePageFilm: true,
-      plain: true,
       onBack: () => Navigator.of(context).pop(),
       onStorePicker: () => showStoreSelectSheet(
         context,
@@ -431,9 +429,9 @@ class _CartTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: StoreSurface.lightOf(context) ? const Color(0xF216181E) : const Color(0x52000000),
+        color: const Color(0x52000000),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: StoreSurface.lightOf(context) ? const Color(0x66E8D5A3) : const Color(0x17FFFFFF)),
+        border: Border.all(color: const Color(0x17FFFFFF)),
       ),
       child: Row(
         children: [
@@ -512,9 +510,9 @@ class _WishTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: StoreSurface.lightOf(context) ? const Color(0xF216181E) : const Color(0x52000000),
+        color: const Color(0x52000000),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: StoreSurface.lightOf(context) ? const Color(0x66E8D5A3) : const Color(0x17FFFFFF)),
+        border: Border.all(color: const Color(0x17FFFFFF)),
       ),
       child: Row(
         children: [

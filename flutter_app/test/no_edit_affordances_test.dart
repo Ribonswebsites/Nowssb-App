@@ -112,6 +112,11 @@ void main() {
       final r = box.localToGlobal(Offset.zero) & box.size;
       await tester.tapAt(Offset(r.right - 6, r.center.dy));
       await _settle(tester, 4);
+      final choose = find.byKey(const ValueKey('choose-section'));
+      if (choose.evaluate().isNotEmpty) {
+        await tester.tap(choose);
+        await _settle(tester, 4);
+      }
       expect(c.sectionPicked, isTrue);
       final outline = find.byKey(const ValueKey('section-outline'));
       expect(outline, findsOneWidget);

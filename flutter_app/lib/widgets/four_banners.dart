@@ -5,6 +5,7 @@ library;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../admin/layout/scopes.dart';
 
 import '../features/programs/program_router.dart';
 import '../screens/subscription.dart';
@@ -130,6 +131,7 @@ class _TrioRailState extends State<TrioRail> {
     super.initState();
     if (_quiet) return;
     _timer = Timer.periodic(const Duration(milliseconds: 2400), (_) {
+      if (editorHoldsStill(context)) return;
       if (!mounted || !_pages.hasClients) return;
       final current = _pages.page?.round() ?? _faces.length * (_loop ~/ 2);
       _pages.animateToPage(

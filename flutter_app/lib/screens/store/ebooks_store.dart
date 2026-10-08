@@ -21,6 +21,7 @@ import 'store_actions.dart';
 import 'store_cards.dart';
 import 'store_home_sections.dart';
 import 'store_section_mix.dart';
+import 'store_coupon_banner.dart';
 import 'store_select_sheet.dart';
 import 'store_routes.dart';
 import 'store_terms_sheet.dart';
@@ -41,7 +42,6 @@ class EbooksStoreScreen extends StatelessWidget {
         subtitle: 'The Ebooks Store',
         film: 'assets/video/player-bg-loop.mp4',
         usePageFilm: true,
-        plain: true,
         onBack: () => Navigator.of(context).pop(),
         onStorePicker: () => showStoreSelectSheet(
           context,
@@ -184,7 +184,7 @@ class _EbooksBody extends StatelessWidget {
         LSection(
           'coupons',
           'Coupon banner',
-          StoreRegistrySection(config: EbooksMix.coupons),
+          const StoreCouponBanner(),
         ),
         LSection(
           'tiles',

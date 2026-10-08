@@ -13,6 +13,7 @@ import 'dart:ui' as ui;
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import '../../admin/layout/scopes.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:video_player/video_player.dart';
 
@@ -139,6 +140,7 @@ class _GlassyCarouselSectionState extends State<GlassyCarouselSection> {
     if (_reduceMotion(context)) return;
     final ms = _c.behavior.autoplayMs.clamp(1200, 60000);
     _autoplay = Timer.periodic(Duration(milliseconds: ms), (_) {
+      if (editorHoldsStill(context)) return;
       if (!mounted || !_page.hasClients) return;
       if (!TickerMode.valuesOf(context).enabled) return;
       final next = (_page.page ?? _page.initialPage.toDouble()).round() + 1;

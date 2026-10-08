@@ -24,6 +24,7 @@ import 'dart:async';
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
+import '../admin/layout/scopes.dart';
 
 import '../media/nwsb_image.dart';
 import '../theme/tokens.dart';
@@ -76,6 +77,7 @@ class _AnimatedHeadingState extends State<AnimatedHeading>
     _motionTimer = Timer.periodic(
       Duration(milliseconds: 3600 + (widget.text.length % 5) * 180),
       (_) {
+        if (editorHoldsStill(context)) return;
         if (mounted) setState(() => _phase = _phase == 0 ? 1 : 0);
       },
     );
@@ -437,6 +439,7 @@ class _NcbCarouselState extends State<NcbCarousel> {
     if (_flutterTest) return;
     if (widget.slides.length > 1) {
       _t = Timer.periodic(const Duration(milliseconds: 3200), (_) {
+        if (editorHoldsStill(context)) return;
         // `if (document.hidden) return` — a bar nobody is looking at does
         // not need to be rebuilt every three seconds.
         if (!mounted || !TickerMode.of(context)) return;

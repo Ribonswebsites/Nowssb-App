@@ -9,6 +9,7 @@ library;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../../admin/layout/scopes.dart';
 
 import '../../admin/template/editable.dart';
 import '../../shell/nwsb_links.dart';
@@ -119,6 +120,7 @@ class _SpotlightSectionState extends State<SpotlightSection> {
     _timer = null;
     if (!_autoplay) return;
     _timer = Timer.periodic(Duration(milliseconds: _autoplayMs), (_) {
+      if (editorHoldsStill(context)) return;
       if (!mounted || _userPaging) return;
       if (!TickerMode.valuesOf(context).enabled) return;
       if (!_page.hasClients) return;

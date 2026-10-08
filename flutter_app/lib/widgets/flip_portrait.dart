@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import '../admin/layout/scopes.dart';
 
 import 'nwsb_icon.dart';
 import '../admin/template/editable.dart';
@@ -46,6 +47,7 @@ class _FlipPortraitState extends State<FlipPortrait> with SingleTickerProviderSt
     _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 720));
     if (_flutterTest) return;
     _auto = Timer.periodic(const Duration(milliseconds: 2800), (_) {
+      if (editorHoldsStill(context)) return;
       if (!mounted) return;
       if (_showBack) {
         _c.reverse();

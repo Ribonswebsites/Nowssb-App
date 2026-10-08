@@ -578,7 +578,6 @@ class CouponTicketPromo extends StatelessWidget {
           decoration: const BoxDecoration(color: Color(0xFF071018)),
           child: Stack(
             children: [
-              const Positioned.fill(child: CustomPaint(painter: _WavePainter())),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
                 child: Column(
@@ -670,29 +669,6 @@ class _TicketClip extends CustomClipper<Path> {
 
   @override
   bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
-}
-
-class _WavePainter extends CustomPainter {
-  const _WavePainter();
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.2
-      ..color = const Color(0x33E8D5A3);
-    for (var i = 0; i < 5; i++) {
-      final path = Path();
-      final y = size.height * (0.15 + i * 0.16);
-      path.moveTo(0, y);
-      path.quadraticBezierTo(size.width * 0.25, y - 28, size.width * 0.5, y);
-      path.quadraticBezierTo(size.width * 0.75, y + 28, size.width, y);
-      canvas.drawPath(path, paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 /// Coupon page bar: home circle, title, subtitle, optional coins, avatar.

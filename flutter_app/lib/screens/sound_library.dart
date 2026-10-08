@@ -12,6 +12,7 @@ library;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../admin/layout/scopes.dart';
 
 import '../data/content.dart';
 import '../data/models.dart';
@@ -1548,6 +1549,7 @@ class _StoreFilmReelState extends State<_StoreFilmReel> {
   void initState() {
     super.initState();
     _timer = Timer.periodic(const Duration(milliseconds: 3400), (_) {
+      if (editorHoldsStill(context)) return;
       if (!mounted || widget.items.isEmpty || !_pages.hasClients) return;
       _index = (_index + 1) % widget.items.length;
       _pages.animateToPage(

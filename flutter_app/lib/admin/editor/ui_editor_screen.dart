@@ -791,7 +791,7 @@ class ContextStrip extends StatelessWidget {
       ]);
     } else if (c.sectionPicked && c.current != null) {
       children.addAll([
-        tool(Icons.crop_free_rounded, 'Section on', () {}, color: kGold, key: const ValueKey('mode-section')),
+        tool(Icons.crop_free_rounded, 'Height · width', () {}, color: kGold, key: const ValueKey('mode-section')),
         tool(Icons.text_fields_rounded, 'Edit text', onSection, color: kGold, key: const ValueKey('strip-text')),
         tool(Icons.palette_rounded, 'Style', onStyle, key: const ValueKey('strip-look')),
         tool(Icons.animation_rounded, 'Animate', onEffects, key: const ValueKey('strip-animate')),

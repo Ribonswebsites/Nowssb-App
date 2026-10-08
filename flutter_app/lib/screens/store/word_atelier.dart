@@ -16,12 +16,12 @@ import 'product_detail.dart';
 import 'store_cards.dart';
 import 'store_home_sections.dart';
 import 'store_section_mix.dart';
+import 'store_coupon_banner.dart';
 import 'store_select_sheet.dart';
 import 'ebooks_store.dart';
 import 'meaning_store.dart';
 import 'request_words.dart';
 import 'signature_store.dart';
-import 'atelier_look.dart';
 import 'store_routes.dart';
 import 'store_terms_sheet.dart';
 import '../../admin/template/editable.dart';
@@ -34,52 +34,24 @@ class WordAtelierScreen extends StatelessWidget {
   Widget build(BuildContext context) => StoreTermsHost(
         which: 'word',
         head: 'Words described by sound',
-        child: ListenableBuilder(
-          listenable: AtelierLooks.instance,
-          builder: (context, _) {
-            AtelierLooks.instance.load();
-            final ink = AtelierLooks.instance.current == AtelierLook.ink;
-            return AtelierScope(
-              whiteCards: ink,
-              child: PageShell(
-                eyebrow: '',
-                title: 'NowssB Store',
-                subtitle: 'The Word Atelier',
-                film: 'assets/video/player-bg-loop.mp4',
-                usePageFilm: !ink,
-                plain: !ink,
-                canvas: ink ? const Color(0xFF07080C) : null,
-                onBack: () => Navigator.of(context).pop(),
-                actions: [
-                  GestureDetector(
-                    onTap: () => showAtelierLooks(context),
-                    child: Container(
-                      height: 42,
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: ink ? const Color(0xFF16181E) : Colors.white,
-                        borderRadius: BorderRadius.circular(21),
-                        border: Border.all(color: const Color(0x66E8D5A3)),
-                      ),
-                      child: Text('Looks', style: TextStyle(color: ink ? Colors.white : const Color(0xFF16181E), fontWeight: FontWeight.w800, fontSize: 13)),
-                    ),
-                  ),
-                ],
-                onStorePicker: () => showStoreSelectSheet(
-                  context,
-                  current: 'word',
-                  onSelect: (id) => openStoreFromPicker(context, id, current: 'word'),
-                ),
-                slivers: [
-                  SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 40),
-                    sliver: SliverList.list(children: const [_WordAtelierBody()]),
-                  ),
-                ],
-              ),
-            );
-          },
+        child: PageShell(
+        eyebrow: '',
+        title: 'NowssB Store',
+        subtitle: 'The Word Atelier',
+        film: 'assets/video/player-bg-loop.mp4',
+        usePageFilm: true,
+        onBack: () => Navigator.of(context).pop(),
+        onStorePicker: () => showStoreSelectSheet(
+          context,
+          current: 'word',
+          onSelect: (id) => openStoreFromPicker(context, id, current: 'word'),
+        ),
+        slivers: [
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 40),
+            sliver: SliverList.list(children: const [_WordAtelierBody()]),
+          ),
+        ],
         ),
       );
 }
@@ -327,7 +299,7 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
           videoTitle: '',
         ),
         const SizedBox(height: 18),
-        StoreRegistrySection(config: AtelierMix.coupons),
+        const StoreCouponBanner(),
         // Kept as the one hyped row (legacy cards + their admin image slots).
         const NowssbHypeRail(),
         StoreRegistrySection(config: AtelierMix.tiles),

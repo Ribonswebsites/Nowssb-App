@@ -169,6 +169,11 @@ class EditorPreviewScope extends InheritedNotifier<EditorPreviewController> {
       context.getInheritedWidgetOfExactType<EditorPreviewScope>()?.notifier;
 }
 
+/// True inside the UI Editor, including Try the page. Carousels must not
+/// turn by themselves there — a moving banner cannot be placed.
+bool editorHoldsStill(BuildContext context) =>
+    EditorPreviewScope.peek(context) != null;
+
 /// The override a slot should draw right now: a pending edit in the
 /// preview, else the live one (inside its schedule).
 UiOverride? effectiveOverride(BuildContext context, String key) {

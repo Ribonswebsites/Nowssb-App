@@ -18,6 +18,7 @@ library;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../admin/layout/scopes.dart';
 
 import '../widgets/nwsb_icon.dart';
 
@@ -1072,6 +1073,7 @@ class _HealingSectionState extends State<HealingSection> {
     super.initState();
     _page = PageController(viewportFraction: 0.92);
     _timer = Timer.periodic(const Duration(milliseconds: _autoMs), (_) {
+      if (editorHoldsStill(context)) return;
       if (!mounted || !TickerMode.of(context)) return;
       if (_paused) return;
       if (_resumeAfter != null && DateTime.now().isBefore(_resumeAfter!)) {

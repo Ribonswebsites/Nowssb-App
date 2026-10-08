@@ -10,6 +10,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import '../admin/layout/scopes.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import 'app_thinking_loader.dart';
@@ -150,11 +151,13 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
     _wordsScroll = ScrollController();
     if (!_flutterTest) {
       _tick = Timer.periodic(const Duration(milliseconds: 32), (_) {
+        if (editorHoldsStill(context)) return;
         if (!mounted) return;
         setState(() => _auto += 0.0055);
       });
       // Auto-rotate remaining enter-curve cards when more than one.
       _pageAuto = Timer.periodic(const Duration(milliseconds: 4800), (_) {
+        if (editorHoldsStill(context)) return;
         if (!mounted || _userPaging || widget.embedded) return;
         if (!TickerMode.of(context)) return;
         if (!_pager.hasClients) return;

@@ -14,6 +14,7 @@ library;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../../admin/layout/scopes.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import '../../widgets/app_thinking_loader.dart';
 
@@ -424,6 +425,7 @@ class _NmPromoDiscState extends State<NmPromoDisc>
     if (_flutterTest) return;
     _spin.repeat();
     _t = Timer.periodic(const Duration(milliseconds: 1900), (_) {
+      if (editorHoldsStill(context)) return;
       if (!mounted || !TickerMode.of(context)) return;
       setState(() {
         final lines = widget.slides[_slide].$2;

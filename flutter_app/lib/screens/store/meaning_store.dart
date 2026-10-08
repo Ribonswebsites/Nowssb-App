@@ -74,7 +74,6 @@ class MeaningStoreScreen extends StatelessWidget {
         subtitle: 'The Meaning Store',
         film: 'assets/video/player-bg-loop.mp4',
         usePageFilm: true,
-        plain: true,
         onBack: () => Navigator.of(context).pop(),
         onStorePicker: () => showStoreSelectSheet(
           context,

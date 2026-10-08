@@ -162,10 +162,10 @@ class RenderSectionFitHeight extends RenderProxyBox {
   Rect get contentRect {
     final c = child;
     if (c == null || !c.hasSize) return Offset.zero & size;
-    return Rect.fromLTWH(_left, 0, _childW * _scale, c.size.height * _scale);
+    return Rect.fromLTWH(_left, 0, _childW * _sx, c.size.height * _sy);
   }
 
-  double get _left => (size.width - _childW * _scale) * (_scale < 1 ? (_align + 1) / 2 : 0.5);
+  double get _left => (size.width - _childW * _sx) * (_sx < 1 ? (_align + 1) / 2 : 0.5);
 
   double _height;
   set height(double v) {
@@ -182,16 +182,21 @@ class RenderSectionFitHeight extends RenderProxyBox {
   }
 
   double _scale = 1;
+  double _scaleX = 1;
 
-  /// How much the child is scaled to fill [height] (1 = natural size).
+  /// How much the child is scaled on Y to fill [height] (1 = natural size).
+  /// Width-only shrink uses the same number, so older callers stay uniform.
   double get scale => _scale;
+
+  double get _sx => _scaleX;
+  double get _sy => _scale;
 
   double _childW = 0;
 
   Matrix4 get _transform {
     return Matrix4.identity()
       ..translateByDouble(_left, 0, 0, 1)
-      ..scaleByDouble(_scale, _scale, 1, 1);
+      ..scaleByDouble(_sx, _sy, 1, 1);
   }
 
   @override
@@ -210,18 +215,37 @@ class RenderSectionFitHeight extends RenderProxyBox {
     // Already given its share of the row: scale from the full page width
     // into that share, instead of scaling a second time.
     final packed = f != null && (w - cell).abs() < 28;
+    final ch = c.size.height;
     if (packed) {
-      // Share the row at this width. Reflow into the cell — do not scale,
-      // or the picture zooms just because something sits beside it.
+      // Share the row at this width. Reflow into the cell — do not scale
+      // the width, or the picture zooms just because something sits beside it.
+      // A saved height still changes how tall the cell is.
       c.layout(BoxConstraints.tightFor(width: w), parentUsesSize: true);
       _childW = c.size.width;
-      _scale = 1;
-      size = constraints.constrain(Size(w, c.size.height));
+      final natural = c.size.height;
+      if (_height > 1 && natural > 0) {
+        _scaleX = 1;
+        _scale = _height / natural;
+        size = constraints.constrain(Size(w, _height));
+      } else {
+        _scaleX = 1;
+        _scale = 1;
+        size = constraints.constrain(Size(w, natural));
+      }
       return;
     }
-    size = constraints.constrain(Size(w, f == null ? _height : c.size.height * f));
-    final ch = c.size.height;
-    _scale = ch > 0 ? size.height / ch : 1;
+    if (f == null) {
+      size = constraints.constrain(Size(w, _height));
+      _scale = ch > 0 ? size.height / ch : 1;
+      _scaleX = _scale;
+      return;
+    }
+    // Length (width) is the fraction of the page. Height, when set, is its
+    // own size — not a crop of the picture and not a second zoom.
+    final targetH = _height > 1 ? _height : ch * f;
+    size = constraints.constrain(Size(w, targetH));
+    _scaleX = f;
+    _scale = ch > 0 ? size.height / ch : f;
   }
 
   @override
@@ -246,7 +270,7 @@ class RenderSectionFitHeight extends RenderProxyBox {
     if (c == null) return;
     void inner(PaintingContext ctx, Offset off) =>
         ctx.pushTransform(needsCompositing, off, _transform, (c2, o2) => c2.paintChild(c, o2));
-    if (_scale > 1.0005) {
+    if (_sy > 1.0005 || _sx > 1.0005) {
       // Scaled up: the sides spill past the screen; keep them off the
       // neighbours' margins.
       context.pushClipRect(needsCompositing, offset, Offset.zero & size, inner);

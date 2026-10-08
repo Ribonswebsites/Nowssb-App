@@ -6,6 +6,7 @@ library;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../admin/layout/scopes.dart';
 
 import '../widgets/nwsb_icon.dart';
 import '../admin/template/editable.dart';
@@ -61,6 +62,7 @@ class _PracticeCarouselState extends State<PracticeCarousel> {
     super.initState();
     _page = PageController();
     _timer = Timer.periodic(const Duration(milliseconds: 4200), (_) {
+      if (editorHoldsStill(context)) return;
       if (!mounted || !TickerMode.of(context)) return;
       final next = (_index + 1) % _cardCount;
       _page.animateToPage(

@@ -7,6 +7,7 @@ library;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../../admin/layout/scopes.dart';
 
 import '../../admin/template/editable.dart';
 import '../../features/economy/coupon_tickets.dart';
@@ -135,6 +136,7 @@ class _CouponBannerSectionState extends State<CouponBannerSection> {
     _timer = null;
     if (!_autoplay) return;
     _timer = Timer.periodic(Duration(milliseconds: _autoplayMs), (_) {
+      if (editorHoldsStill(context)) return;
       if (!mounted || _userPaging) return;
       if (!TickerMode.valuesOf(context).enabled) return;
       if (!_page.hasClients) return;
@@ -201,7 +203,6 @@ class _CouponBannerSectionState extends State<CouponBannerSection> {
         color: const Color(0xFF071018),
         child: Stack(
           children: [
-            const Positioned.fill(child: CustomPaint(painter: _WavePainter())),
             // Soft gold glow behind the ticket area.
             Positioned.fill(
               child: IgnorePointer(
@@ -451,27 +452,4 @@ class _TicketClip extends CustomClipper<Path> {
 
   @override
   bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
-}
-
-class _WavePainter extends CustomPainter {
-  const _WavePainter();
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.2
-      ..color = const Color(0x33E8D5A3);
-    for (var i = 0; i < 5; i++) {
-      final path = Path();
-      final y = size.height * (0.15 + i * 0.16);
-      path.moveTo(0, y);
-      path.quadraticBezierTo(size.width * 0.25, y - 28, size.width * 0.5, y);
-      path.quadraticBezierTo(size.width * 0.75, y + 28, size.width, y);
-      canvas.drawPath(path, paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
