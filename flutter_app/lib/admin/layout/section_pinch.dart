@@ -209,35 +209,39 @@ class RenderSectionFitHeight extends RenderProxyBox {
     }
     c.layout(BoxConstraints.tightFor(width: w), parentUsesSize: true);
     _childW = c.size.width;
+    final ch = c.size.height;
     final f = _fraction;
     final screen = _width > 1 ? _width : w;
     final cell = f == null ? w : screen * f;
     // Already given its share of the row: scale from the full page width
     // into that share, instead of scaling a second time.
-    final packed = f != null && (w - cell).abs() < 28;
-    final ch = c.size.height;
-    if (packed) {
-      // Share the row at this width. Reflow into the cell — do not scale
-      // the width, or the picture zooms just because something sits beside it.
-      // A saved height still changes how tall the cell is.
+    final packed = f != null && (w - cell).abs() < 48;
+    // Already in a narrow column. Reflow at that width and keep the
+    // natural height — scaling the full section into the column stretches it.
+    final narrowBox = f != null && screen > 0 && w < screen * 0.8;
+    if (packed || narrowBox) {
       c.layout(BoxConstraints.tightFor(width: w), parentUsesSize: true);
       _childW = c.size.width;
-      final natural = c.size.height;
-      if (_height > 1 && natural > 0) {
-        _scaleX = 1;
-        _scale = _height / natural;
-        size = constraints.constrain(Size(w, _height));
-      } else {
-        _scaleX = 1;
-        _scale = 1;
-        size = constraints.constrain(Size(w, natural));
-      }
+      _scaleX = 1;
+      _scale = 1;
+      size = constraints.constrain(Size(w, c.size.height));
       return;
     }
     if (f == null) {
-      size = constraints.constrain(Size(w, _height));
-      _scale = ch > 0 ? size.height / ch : 1;
-      _scaleX = _scale;
+      _childW = c.size.width;
+      _scaleX = 1;
+      _scale = 1;
+      // Taller is empty room the film can grow into. Shorter crops the box.
+      // A few pixels over the asked height is the card under a film, not a zoom.
+      if (!(_height > 1)) {
+        size = constraints.constrain(Size(w, ch));
+        return;
+      }
+      if (_height + 16 < ch) {
+        size = constraints.constrain(Size(w, _height));
+        return;
+      }
+      size = constraints.constrain(Size(w, _height > ch ? _height : ch));
       return;
     }
     // Length (width) is the fraction of the page. Height, when set, is its
@@ -270,7 +274,7 @@ class RenderSectionFitHeight extends RenderProxyBox {
     if (c == null) return;
     void inner(PaintingContext ctx, Offset off) =>
         ctx.pushTransform(needsCompositing, off, _transform, (c2, o2) => c2.paintChild(c, o2));
-    if (_sy > 1.0005 || _sx > 1.0005) {
+    if (_sy > 1.0005 || _sx > 1.0005 || (c.size.height > size.height + 0.5)) {
       // Scaled up: the sides spill past the screen; keep them off the
       // neighbours' margins.
       context.pushClipRect(needsCompositing, offset, Offset.zero & size, inner);

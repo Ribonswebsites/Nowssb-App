@@ -372,7 +372,7 @@ class _NwsbShopPageState extends State<NwsbShopPage> {
                 crossAxisCount: cols,
                 mainAxisSpacing: 10,
                 crossAxisSpacing: 10,
-                childAspectRatio: _cardRatio(w, cols),
+                childAspectRatio: widget.which == 'word' ? 0.72 : _cardRatio(w, cols),
               ),
               itemBuilder: (_, i) => _card(g.products[i]),
             );
@@ -389,6 +389,18 @@ class _NwsbShopPageState extends State<NwsbShopPage> {
 
   Widget _card(ShopProduct p) {
     final price = StorePrices.instance.priceFor(p.itemId, kind: p.kind.toLowerCase().contains('ebook') ? 'ebook' : null, shown: p.shown);
+    if (widget.which == 'word') {
+      return GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => p.open(context),
+        child: WordSpecimen(
+          word: p.title,
+          root: p.line,
+          priceLabel: price <= 0 ? 'Free' : inr(price),
+          onAdd: () => storeAddToCart(context, p.bag),
+        ),
+      );
+    }
     return Material(
       color: Colors.white,
       shape: RoundedRectangleBorder(

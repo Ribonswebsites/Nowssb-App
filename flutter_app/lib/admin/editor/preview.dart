@@ -1712,10 +1712,11 @@ class _TouchLayerState extends State<_TouchLayer> {
         'shrink': 0.58,
         'align': onRight ? 'left' : 'right',
         'height': null,
+        'boxH': null,
       });
       final at = onRight ? c.entryIndexBefore(room) + 1 : c.entryIndexBefore(room);
       final id = c.insertTemplate(data.kind, at);
-      c.patchProps(id, {'shrink': 0.42, 'align': onRight ? 'right' : 'left'});
+      c.patchProps(id, {'shrink': 0.42, 'align': onRight ? 'right' : 'left', 'height': null, 'boxH': null});
       c.endStep();
       c.pickSection(id);
       c.fxDropped();
@@ -1832,8 +1833,8 @@ class _TouchLayerState extends State<_TouchLayer> {
     c.endStep();
     final steps = want - mi;
     if (steps != 0) c.shift(moving, steps);
-    c.patchProps(host, {'shrink': 0.58, 'align': onRight ? 'left' : 'right', 'height': null});
-    c.patchProps(moving, {'shrink': 0.42, 'align': onRight ? 'right' : 'left', 'height': null});
+    c.patchProps(host, {'shrink': 0.58, 'align': onRight ? 'left' : 'right', 'height': null, 'boxH': null});
+    c.patchProps(moving, {'shrink': 0.42, 'align': onRight ? 'right' : 'left', 'height': null, 'boxH': null});
     c.endStep();
     c.pickSection(moving);
   }

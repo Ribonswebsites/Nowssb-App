@@ -30,27 +30,26 @@ EditorController _controller(String page, List<SectionEntry> entries) {
 List<String> _order(EditorController c) => [for (final e in c.entries) e.id];
 
 void main() {
-  group('pinch height scales built-in sections both ways', () {
+  group('pinch height sizes the section without zooming it', () {
     const key = ValueKey('content');
     const content = SizedBox(key: key, width: 300, height: 100);
 
-    testWidgets('bigger: the section grows instead of adding blank space', (tester) async {
+    testWidgets('bigger: the box grows and the content stays its own size', (tester) async {
       await tester.pumpWidget(_frame(const SectionEntry(id: 'hero', props: {'height': 200}), content));
       final fit = tester.renderObject<RenderSectionFitHeight>(find.byType(SectionFitHeight));
       expect(fit.size.height, 200);
-      expect(fit.scale, closeTo(2, 0.001));
-      // The content is painted twice as tall as it is laid out.
+      expect(fit.scale, closeTo(1, 0.001));
       final box = tester.renderObject<RenderBox>(find.byKey(key));
       final top = box.localToGlobal(Offset.zero);
       final bottom = box.localToGlobal(box.size.bottomLeft(Offset.zero));
-      expect(bottom.dy - top.dy, closeTo(200, 0.01));
+      expect(bottom.dy - top.dy, closeTo(100, 0.01), reason: 'taller is not a zoom');
     });
 
-    testWidgets('smaller: the section still shrinks to fit', (tester) async {
+    testWidgets('smaller: the box shortens without scaling the content', (tester) async {
       await tester.pumpWidget(_frame(const SectionEntry(id: 'hero', props: {'height': 50}), content));
       final fit = tester.renderObject<RenderSectionFitHeight>(find.byType(SectionFitHeight));
       expect(fit.size.height, 50);
-      expect(fit.scale, closeTo(0.5, 0.001));
+      expect(fit.scale, closeTo(1, 0.001));
     });
 
     testWidgets('no height: untouched', (tester) async {

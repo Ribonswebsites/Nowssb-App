@@ -407,6 +407,19 @@ class SectionCarouselScope extends InheritedWidget {
 
 double? _d(dynamic v) => v is num ? v.toDouble() : null;
 
+/// The height the owner set for this section. A video reads it and grows
+/// its own frame. Everything else stays its own size — nothing is zoomed.
+class SectionExtent extends InheritedWidget {
+  const SectionExtent({super.key, required this.height, required super.child});
+  final double height;
+
+  static double? of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<SectionExtent>()?.height;
+
+  @override
+  bool updateShouldNotify(SectionExtent oldWidget) => oldWidget.height != height;
+}
+
 /// Height, spacing, entrance animation, carousel settings and the section
 /// scope around one section.
 class SectionFrame extends StatelessWidget {
@@ -439,6 +452,9 @@ class SectionFrame extends StatelessWidget {
     // picture and calling it "taller" is not a size.
     final tall = (h != null && h > 0) ? h : (boxH != null && boxH > 20 ? boxH : null);
     final narrow = shrink != null && shrink < 0.995;
+    if (tall != null) {
+      w = SectionExtent(height: tall, child: w);
+    }
     if (narrow || tall != null) {
       w = SectionFitHeight(
         height: tall ?? 0,

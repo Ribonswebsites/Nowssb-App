@@ -7,6 +7,7 @@ library;
 
 import 'package:flutter/material.dart';
 
+import 'template_fresh.dart';
 import 'template_motion.dart';
 import 'template_rails.dart';
 
@@ -267,6 +268,7 @@ const kMoreTemplates = <String, (String, String, String)>{
   'coinPills': ('Coin pills', 'Coin actions as pills', 'Offers & coupons'),
   'bookPills': ('Book pills', 'Reading actions as pills', 'Words'),
   'pathPills': ('Path pills', 'A path of black pills', 'Features'),
+  ...kFreshTemplates,
 };
 
 const kMoreKinds = <String>[
@@ -289,6 +291,7 @@ const kMoreKinds = <String>[
   'sidePills', 'doorPills', 'shopPills', 'soundPills', 'earnPills',
   'giftPills', 'wordPills', 'nightPills', 'calmPills', 'storePills',
   'markPills', 'goldPills', 'coinPills', 'bookPills', 'pathPills',
+  ...kFreshKinds,
 ];
 
 const _a = 'assets/banners/stories/aura.png';
@@ -301,6 +304,8 @@ const _g = 'assets/store/collections/peace.webp';
 const _h = 'assets/store/collections/sacred.webp';
 
 Map<String, dynamic> moreStarter(String kind) {
+  final fresh = freshStarter(kind);
+  if (fresh.isNotEmpty) return fresh;
   final rail = railStarter(kind);
   if (rail.isNotEmpty) return rail;
   return switch (kind) {
@@ -353,6 +358,7 @@ Map<String, dynamic> moreStarter(String kind) {
 }
 
 Widget buildMoreTemplate(String kind, TplKit k) {
+  if (isFreshKind(kind)) return buildFreshTemplate(kind, k);
   if (isRailKind(kind)) return buildRailBanner(kind, k);
   if (kMotionKinds.contains(kind)) return buildMotionBanner(kind, k);
   final L = k.label;

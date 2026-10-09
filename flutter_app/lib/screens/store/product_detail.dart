@@ -53,12 +53,12 @@ void openAtelierWord(
         img: img,
         price: signature ? kMsSignaturePrice : price,
         about: signature
-            ? 'The rarest word in its collection. One signature exists per collection, it is never discounted on its own, and it is never restocked.'
-            : 'Every word carries a vibrational signature that predates its dictionary definition. Unlock the phonetic origin of ${_titleCase(word)} — what the sound does inside your body, and where it existed before anyone wrote it down.',
+            ? 'One signature word in this collection. It is not discounted on its own, and it is not restocked.'
+            : '${_titleCase(word)} · $root. A word in the NowssB catalogue. Unlock it once and it stays on this account.',
         highlights: const [
-          'Native pronunciation audio, generated on demand',
-          'Full phonetic root breakdown and origin story',
-          'Permanent access — owned words never expire',
+          'Spoken once you own it',
+          'Root and origin on the card',
+          'Stays on this account',
         ],
       ),
     ),
@@ -249,7 +249,16 @@ class _StoreProductPageState extends State<StoreProductPage> {
                         height: wide ? 320 : 260,
                         child: ColoredBox(
                           color: const Color(0xFFF3F1EC),
-                          child: StoreNetImage(url: img, word: title),
+                          child: ListenableBuilder(
+                            listenable: WordArt.instance,
+                            builder: (_, __) {
+                              final src = WordArt.instance.imageFor(title, img);
+                              if (src.isEmpty || src == kRmWordImg) {
+                                return WordSpecimen(word: title, root: root);
+                              }
+                              return StoreNetImage(url: src, word: title);
+                            },
+                          ),
                         ),
                       ),
                     );

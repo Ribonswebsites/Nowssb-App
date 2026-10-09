@@ -1773,3 +1773,116 @@ class StoreViewMoreTap extends StatelessWidget {
     );
   }
 }
+
+/// A word as type, not a photograph. Cream paper, or black every so often,
+/// so the atelier is a specimen sheet instead of one face repeated.
+class WordSpecimen extends StatelessWidget {
+  const WordSpecimen({
+    super.key,
+    required this.word,
+    required this.root,
+    this.priceLabel,
+    this.onAdd,
+  });
+
+  final String word;
+  final String root;
+  final String? priceLabel;
+  final VoidCallback? onAdd;
+
+  int get _hash {
+    var h = 0;
+    for (final c in word.toLowerCase().codeUnits) {
+      h = (h * 33 + c) & 0x7fffffff;
+    }
+    return h;
+  }
+
+  bool get _black => _hash % 9 == 0;
+
+  String get _no => ((_hash % 90) + 10).toString();
+
+  @override
+  Widget build(BuildContext context) {
+    final black = _black;
+    final ink = black ? const Color(0xFFF6F1E6) : const Color(0xFF14120E);
+    final paper = black ? const Color(0xFF14120E) : const Color(0xFFF7F4EE);
+    final n = word.length;
+    final size = n <= 4 ? 34.0 : n <= 7 ? 26.0 : n <= 12 ? 20.0 : 16.0;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: paper,
+        border: Border.all(color: const Color(0xFF14120E)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(10, 10, 10, 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              _no,
+              style: const TextStyle(
+                color: Color(0xFF8A6A32),
+                fontSize: 10,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.4,
+              ),
+            ),
+            const Spacer(),
+            Text(
+              word,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: ink,
+                fontSize: size,
+                height: 0.95,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.4,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Container(width: 28, height: 2, color: const Color(0xFF8A6A32)),
+            const SizedBox(height: 6),
+            Text(
+              root,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: ink.withValues(alpha: 0.62), fontSize: 11, height: 1.25),
+            ),
+            const Spacer(),
+            if (priceLabel != null)
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      priceLabel!,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: ink, fontSize: 13, fontWeight: FontWeight.w800),
+                    ),
+                  ),
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: onAdd,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      color: black ? const Color(0xFFF6F1E6) : const Color(0xFF14120E),
+                      child: Text(
+                        'ADD',
+                        style: TextStyle(
+                          color: black ? const Color(0xFF14120E) : const Color(0xFFF6F1E6),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}

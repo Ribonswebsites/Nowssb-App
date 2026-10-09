@@ -541,20 +541,36 @@ Widget _pills(TplKit k, String kind) {
     }
   }
 
-  return _pad(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-    k.label('title', _w(16)),
-    const SizedBox(height: 8),
-    Align(
-      alignment: Alignment.centerLeft,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 220),
-        child: MotionLoop(
-          milliseconds: 2800,
-          builder: (t) => Column(children: [for (var i = 0; i < 4; i++) one(i, t)]),
-        ),
+  return LayoutBuilder(builder: (context, box) {
+    final narrow = box.maxWidth < 280;
+    final pills = MotionLoop(
+      milliseconds: 2800,
+      builder: (t) => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [for (var i = 0; i < 4; i++) one(i, t)],
       ),
-    ),
-  ]));
+    );
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: narrow ? 8 : 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          k.label('title', _w(narrow ? 13 : 16)),
+          const SizedBox(height: 8),
+          if (narrow)
+            pills
+          else
+            Align(
+              alignment: Alignment.centerLeft,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 220),
+                child: pills,
+              ),
+            ),
+        ],
+      ),
+    );
+  });
 }
 
 Widget _pill(TplKit k, String id, String mark, bool on, double pulse) {

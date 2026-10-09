@@ -8,6 +8,7 @@ library;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import '../admin/layout/scopes.dart';
 
 import '../data/app_control.dart';
@@ -497,20 +498,117 @@ class _StoreGlassSection extends StatelessWidget {
   final EdgeInsets margin;
 
   @override
-  Widget build(BuildContext context) => HeavyGlassPanel(
-        margin: margin,
-        radius: 24,
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            for (var i = 0; i < children.length; i++) ...[
-              children[i],
-              if (i != children.length - 1) const SizedBox(height: 10),
+  Widget build(BuildContext context) {
+    final body = children.length < 2
+        ? Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (var i = 0; i < children.length; i++) ...[
+                children[i],
+                if (i != children.length - 1) const SizedBox(height: 10),
+              ],
             ],
-          ],
-        ),
-      );
+          )
+        : _FilmPair(
+            // Label above the glass, this panel's margin, and its padding.
+            // The film takes whatever height is left. The card is [rest].
+            chrome: 36 + margin.vertical + 20,
+            film: children.first,
+            rest: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (var i = 1; i < children.length; i++) ...[
+                  const SizedBox(height: 10),
+                  children[i],
+                ],
+              ],
+            ),
+          );
+    return HeavyGlassPanel(
+      margin: margin,
+      radius: 24,
+      padding: const EdgeInsets.all(10),
+      child: body,
+    );
+  }
+}
+
+/// Lays the film out at the height the owner asked for, after the card
+/// under it has taken its own size. The card is not scaled.
+class _FilmPair extends MultiChildRenderObjectWidget {
+  _FilmPair({required this.chrome, required Widget film, required Widget rest})
+      : super(children: [film, rest]);
+
+  final double chrome;
+
+  @override
+  RenderObject createRenderObject(BuildContext context) =>
+      _RenderFilmPair(SectionExtent.of(context), chrome);
+
+  @override
+  void updateRenderObject(BuildContext context, _RenderFilmPair renderObject) {
+    renderObject
+      ..extent = SectionExtent.of(context)
+      ..chrome = chrome;
+  }
+}
+
+class _FilmParentData extends ContainerBoxParentData<RenderBox> {}
+
+class _RenderFilmPair extends RenderBox
+    with ContainerRenderObjectMixin<RenderBox, _FilmParentData>,
+        RenderBoxContainerDefaultsMixin<RenderBox, _FilmParentData> {
+  _RenderFilmPair(this._extent, this._chrome);
+
+  double? _extent;
+  set extent(double? v) {
+    if (v == _extent) return;
+    _extent = v;
+    markNeedsLayout();
+  }
+
+  double _chrome;
+  set chrome(double v) {
+    if (v == _chrome) return;
+    _chrome = v;
+    markNeedsLayout();
+  }
+
+  @override
+  void setupParentData(RenderBox child) {
+    if (child.parentData is! _FilmParentData) {
+      child.parentData = _FilmParentData();
+    }
+  }
+
+  @override
+  void performLayout() {
+    final film = firstChild;
+    final rest = film == null ? null : childAfter(film);
+    final w = constraints.hasBoundedWidth ? constraints.maxWidth : 0.0;
+    if (film == null || rest == null) {
+      size = constraints.constrain(Size(w, 0));
+      return;
+    }
+    rest.layout(BoxConstraints.tightFor(width: w), parentUsesSize: true);
+    final asked = _extent;
+    if (asked != null && asked > 48) {
+      final room = asked - _chrome - rest.size.height;
+      film.layout(BoxConstraints.tightFor(width: w, height: room.clamp(72.0, 960.0)), parentUsesSize: true);
+    } else {
+      film.layout(BoxConstraints.tightFor(width: w), parentUsesSize: true);
+    }
+    (film.parentData! as _FilmParentData).offset = Offset.zero;
+    (rest.parentData! as _FilmParentData).offset = Offset(0, film.size.height);
+    size = constraints.constrain(Size(w, film.size.height + rest.size.height));
+  }
+
+  @override
+  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) =>
+      defaultHitTestChildren(result, position: position);
+
+  @override
+  void paint(PaintingContext context, Offset offset) => defaultPaint(context, offset);
 }
 
 class _StoreInfoBanner extends StatelessWidget {
