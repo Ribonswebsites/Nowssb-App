@@ -1775,7 +1775,7 @@ class StoreViewMoreTap extends StatelessWidget {
   }
 }
 
-/// A word as type. White card or black glass, no photograph.
+/// A word on a soft card. No photo, no catalogue number.
 class WordSpecimen extends StatelessWidget {
   const WordSpecimen({
     super.key,
@@ -1790,70 +1790,44 @@ class WordSpecimen extends StatelessWidget {
   final String? priceLabel;
   final VoidCallback? onAdd;
 
-  int get _hash {
-    var h = 0;
-    for (final c in word.toLowerCase().codeUnits) {
-      h = (h * 33 + c) & 0x7fffffff;
-    }
-    return h;
-  }
-
-  bool get _black => _hash % 5 == 0;
-
-  String get _no => ((_hash % 90) + 10).toString();
-
   @override
   Widget build(BuildContext context) {
-    final black = _black;
-    final ink = black ? Colors.white : const Color(0xFF101010);
     final n = word.length;
-    final size = n <= 4 ? 34.0 : n <= 7 ? 26.0 : n <= 12 ? 20.0 : 16.0;
+    final size = n <= 4 ? 32.0 : n <= 8 ? 26.0 : n <= 12 ? 20.0 : 16.0;
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: black ? const Color(0x14FFFFFF) : const Color(0xFFF7F7F5),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: black ? const Color(0x33FFFFFF) : const Color(0xFF101010)),
-        boxShadow: black
-            ? null
-            : const [
-                BoxShadow(color: Color(0x66000000), offset: Offset(4, 5), blurRadius: 0),
-              ],
+        color: const Color(0xFFF7F4EE),
+        borderRadius: BorderRadius.circular(22),
+        boxShadow: const [
+          BoxShadow(color: Color(0xFFD4CFC4), offset: Offset(5, 6), blurRadius: 12),
+          BoxShadow(color: Color(0xFFFFFFFF), offset: Offset(-4, -4), blurRadius: 10),
+        ],
       ),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
+        padding: const EdgeInsets.fromLTRB(14, 14, 12, 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              _no,
-              style: TextStyle(
-                color: ink.withValues(alpha: 0.45),
-                fontSize: 10,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1.6,
-              ),
-            ),
-            const Spacer(),
             Text(
               word,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                color: ink,
+                color: const Color(0xFF16181E),
                 fontSize: size,
                 height: 0.95,
                 fontWeight: FontWeight.w800,
-                letterSpacing: -0.6,
+                letterSpacing: -0.5,
               ),
             ),
             const SizedBox(height: 8),
-            Container(width: 22, height: 1.5, color: ink),
+            Container(width: 28, height: 2, color: const Color(0xFF16181E)),
             const SizedBox(height: 6),
             Text(
               root,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: ink.withValues(alpha: 0.55), fontSize: 11, height: 1.25),
+              style: const TextStyle(color: Color(0xFF6A6258), fontSize: 12, height: 1.25),
             ),
             const Spacer(),
             if (priceLabel != null)
@@ -1864,27 +1838,24 @@ class WordSpecimen extends StatelessWidget {
                       priceLabel!,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(color: ink, fontSize: 13, fontWeight: FontWeight.w800),
+                      style: const TextStyle(color: Color(0xFF16181E), fontSize: 15, fontWeight: FontWeight.w800),
                     ),
                   ),
                   GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTap: onAdd,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
                       decoration: BoxDecoration(
-                        color: black ? Colors.white : const Color(0xFF101010),
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: const [BoxShadow(color: Color(0x55000000), offset: Offset(2, 2), blurRadius: 0)],
+                        color: const Color(0xFF16181E),
+                        borderRadius: BorderRadius.circular(18),
+                        boxShadow: const [
+                          BoxShadow(color: Color(0x33000000), blurRadius: 8, offset: Offset(0, 3)),
+                        ],
                       ),
-                      child: Text(
+                      child: const Text(
                         'ADD',
-                        style: TextStyle(
-                          color: black ? const Color(0xFF101010) : Colors.white,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.6,
-                        ),
+                        style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 0.4),
                       ),
                     ),
                   ),

@@ -942,7 +942,7 @@ class _StoreCompactVideoBanner extends StatelessWidget {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(15),
           child: AspectRatio(
-            aspectRatio: 16 / 6.4,
+            aspectRatio: 16 / 9,
             child: NwsbVideo(
               asset: asset,
               priority: ClipPriority.feature,
@@ -977,7 +977,7 @@ class _StoreVideoBanner extends StatelessWidget {
         borderRadius: BorderRadius.circular(15),
         child: AspectRatio(
           // Subscription film is 720×406, so a 16:9 box shows the whole frame.
-          aspectRatio: tall ? 16 / 9 : 16 / 6.4,
+          aspectRatio: 16 / 9,
           child: EditMedia(
             child: NwsbVideo(
               asset: asset,
@@ -1020,11 +1020,10 @@ class _MiniStoreCard extends StatelessWidget {
         margin: const EdgeInsets.fromLTRB(0, 6, 0, 6),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: const Color(0x14FFFFFF),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: const Color(0x33FFFFFF)),
+          color: const Color(0xFFF4F1EA),
+          borderRadius: BorderRadius.circular(18),
           boxShadow: const [
-            BoxShadow(color: Color(0xFF000000), offset: Offset(3, 4), blurRadius: 0),
+            BoxShadow(color: Color(0x66000000), blurRadius: 18, offset: Offset(0, 8)),
           ],
         ),
         child: Row(
@@ -1034,13 +1033,9 @@ class _MiniStoreCard extends StatelessWidget {
               height: 44,
               decoration: const BoxDecoration(
                 shape: BoxShape.circle,
-                color: Color(0xFF0A0A0A),
-                boxShadow: [
-                  BoxShadow(color: Color(0xFF000000), offset: Offset(2, 2), blurRadius: 0),
-                  BoxShadow(color: Color(0x22FFFFFF), offset: Offset(-1, -1), blurRadius: 0),
-                ],
+                color: Color(0xFF16181E),
               ),
-              child: Icon(icon, color: Colors.white, size: 21),
+              child: Icon(icon, color: Colors.white, size: 20),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -1051,21 +1046,21 @@ class _MiniStoreCard extends StatelessWidget {
                       style: const TextStyle(
                           fontSize: 9,
                           letterSpacing: 1.2,
-                          color: Color(0x99FFFFFF))),
+                          color: Color(0xFF8A847A))),
                   const SizedBox(height: 3),
                   EditableLabel('store.MiniStoreCard', title,
                       style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
-                          color: Colors.white)),
+                          color: Color(0xFF16181E))),
                   const SizedBox(height: 3),
                   EditableLabel('store.MiniStoreCard', sub,
                       style: const TextStyle(
-                          fontSize: 11, height: 1.3, color: Color(0x8CFFFFFF))),
+                          fontSize: 11, height: 1.3, color: Color(0xFF5C564E))),
                 ],
               ),
             ),
-            const Icon(Icons.arrow_forward, size: 16, color: Color(0xB3FFFFFF)),
+            const Icon(Icons.arrow_forward, size: 16, color: Color(0xFF16181E)),
           ],
         ),
       );

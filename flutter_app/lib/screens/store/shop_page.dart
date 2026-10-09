@@ -9,7 +9,6 @@ import '../../data/cart_bag.dart';
 import '../../data/store_catalog.dart';
 import '../../data/store_prices.dart';
 import '../../widgets/page_shell.dart';
-import 'cart_pages.dart';
 import 'product_detail.dart';
 import 'store_actions.dart';
 import 'store_cards.dart';
@@ -233,8 +232,7 @@ class _NwsbShopPageState extends State<NwsbShopPage> {
       title: 'NowssB Store',
       subtitle: widget.title,
       film: '',
-      plain: false,
-      canvas: const Color(0xFF101010),
+      plain: true,
       usePageFilm: false,
       bodyMax: 1120,
       onBack: () => Navigator.of(context).pop(),
@@ -243,25 +241,6 @@ class _NwsbShopPageState extends State<NwsbShopPage> {
         current: widget.which,
         onSelect: (id) => openStoreFromPicker(context, id, current: widget.which),
       ),
-      actions: [
-        IconButton(
-          tooltip: 'Cart',
-          onPressed: () => Navigator.of(context).push(
-            MaterialPageRoute<void>(builder: (_) => const CartPage()),
-          ),
-          icon: ListenableBuilder(
-            listenable: CartBag.instance,
-            builder: (_, __) {
-              final n = CartBag.instance.cartCount;
-              return Badge(
-                isLabelVisible: n > 0,
-                label: Text('$n'),
-                child: const Icon(Icons.shopping_bag_outlined, color: Colors.white),
-              );
-            },
-          ),
-        ),
-      ],
       slivers: [
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(12, 8, 12, 28),
@@ -280,7 +259,7 @@ class _NwsbShopPageState extends State<NwsbShopPage> {
                       'No matches',
                       Padding(
                         padding: EdgeInsets.all(24),
-                        child: Text('Nothing matches that search.', style: TextStyle(color: Color(0xFFBDBDBD))),
+                        child: Text('Nothing matches that search.', style: TextStyle(color: Color(0xFF6A6258))),
                       ),
                     ),
                 ], tabletRail: false),
@@ -292,61 +271,39 @@ class _NwsbShopPageState extends State<NwsbShopPage> {
     );
   }
 
-  String get _mast => switch (widget.which) {
-        'word' => 'WORDS',
-        'meaning' => 'MEANINGS',
-        'signature' => 'RARE',
-        'ebooks' => 'BOOKS',
-        _ => 'STORE',
-      };
-
   Widget _searchBox() {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          BwKineticLine(
-            text: _mast,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 42,
-              height: 0.9,
-              fontWeight: FontWeight.w800,
-              letterSpacing: -1.2,
-            ),
-          ),
-          const SizedBox(height: 14),
-          DecoratedBox(
-            decoration: BoxDecoration(
-              color: const Color(0xFF0A0A0A),
+      padding: const EdgeInsets.only(bottom: 12),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: const Color(0xFFF7F4EE),
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: const [
+            BoxShadow(color: Color(0xFFD5D0C6), offset: Offset(4, 4), blurRadius: 10),
+            BoxShadow(color: Color(0xFFFFFFFF), offset: Offset(-4, -4), blurRadius: 10),
+          ],
+        ),
+        child: TextField(
+          controller: _search,
+          onChanged: (v) => setState(() => _q = v),
+          style: const TextStyle(color: Color(0xFF16181E), fontSize: 15),
+          cursorColor: const Color(0xFF16181E),
+          decoration: InputDecoration(
+            hintText: 'Search ${widget.title}',
+            hintStyle: const TextStyle(color: Color(0xFF8A847A), fontSize: 15),
+            prefixIcon: const Icon(Icons.search, color: Color(0xFF16181E), size: 20),
+            isDense: true,
+            filled: true,
+            fillColor: Colors.transparent,
+            contentPadding: const EdgeInsets.symmetric(vertical: 14),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(18), borderSide: BorderSide.none),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(18), borderSide: BorderSide.none),
+            focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: const Color(0x22FFFFFF)),
-              boxShadow: const [
-                BoxShadow(color: Color(0xFF000000), offset: Offset(3, 3), blurRadius: 0),
-                BoxShadow(color: Color(0x18FFFFFF), offset: Offset(-2, -2), blurRadius: 0),
-              ],
-            ),
-            child: TextField(
-              controller: _search,
-              onChanged: (v) => setState(() => _q = v),
-              style: const TextStyle(color: Colors.white, fontSize: 14),
-              cursorColor: Colors.white,
-              decoration: InputDecoration(
-                hintText: 'Search ${widget.title}',
-                hintStyle: const TextStyle(color: Color(0xFF8A8A8A), fontSize: 14),
-                prefixIcon: const Icon(Icons.search, color: Colors.white, size: 20),
-                isDense: true,
-                filled: true,
-                fillColor: Colors.transparent,
-                contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(18), borderSide: BorderSide.none),
-                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(18), borderSide: BorderSide.none),
-                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(18), borderSide: const BorderSide(color: Colors.white)),
-              ),
+              borderSide: const BorderSide(color: Color(0xFF16181E), width: 1.2),
             ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -369,23 +326,19 @@ class _NwsbShopPageState extends State<NwsbShopPage> {
               padding: const EdgeInsets.symmetric(horizontal: 14),
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: on ? Colors.white : const Color(0xFF161616),
+                color: on ? const Color(0xFF16181E) : const Color(0xFFF7F4EE),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: on ? Colors.white : const Color(0x33FFFFFF)),
-                boxShadow: on
-                    ? const [BoxShadow(color: Color(0xFF000000), offset: Offset(2, 2), blurRadius: 0)]
-                    : const [
-                        BoxShadow(color: Color(0xFF000000), offset: Offset(2, 2), blurRadius: 0),
-                        BoxShadow(color: Color(0x14FFFFFF), offset: Offset(-1, -1), blurRadius: 0),
-                      ],
+                boxShadow: const [
+                  BoxShadow(color: Color(0xFFD5D0C6), offset: Offset(3, 3), blurRadius: 8),
+                  BoxShadow(color: Color(0xFFFFFFFF), offset: Offset(-3, -3), blurRadius: 8),
+                ],
               ),
               child: Text(
                 labels[id] ?? id,
                 style: TextStyle(
-                  color: on ? const Color(0xFF101010) : Colors.white,
+                  color: on ? Colors.white : const Color(0xFF16181E),
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  letterSpacing: 0.3,
                 ),
               ),
             ),
@@ -401,9 +354,9 @@ class _NwsbShopPageState extends State<NwsbShopPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(g.label, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w800, letterSpacing: 1.4)),
+          Text(g.label, style: const TextStyle(color: Color(0xFF16181E), fontSize: 15, fontWeight: FontWeight.w800)),
           const SizedBox(height: 2),
-          Text(g.products.length == 1 ? '1 item' : '${g.products.length} items', style: const TextStyle(color: Color(0xFF9A9A9A), fontSize: 11, fontWeight: FontWeight.w600)),
+          Text(g.products.length == 1 ? '1 item' : '${g.products.length} items', style: const TextStyle(color: Color(0xFF8A847A), fontSize: 11, fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
           LayoutBuilder(builder: (context, box) {
             final w = box.maxWidth;
@@ -416,7 +369,7 @@ class _NwsbShopPageState extends State<NwsbShopPage> {
                 crossAxisCount: cols,
                 mainAxisSpacing: 10,
                 crossAxisSpacing: 10,
-                childAspectRatio: widget.which == 'word' ? 0.72 : _cardRatio(w, cols),
+                childAspectRatio: widget.which == 'word' ? 0.86 : _cardRatio(w, cols),
               ),
               itemBuilder: (_, i) => _card(g.products[i]),
             );
@@ -440,72 +393,81 @@ class _NwsbShopPageState extends State<NwsbShopPage> {
         child: WordSpecimen(
           word: p.title,
           root: p.line,
-          priceLabel: price <= 0 ? 'Free' : inr(price),
+          priceLabel: _ask(price),
           onAdd: () => storeAddToCart(context, p.bag),
         ),
       );
     }
     return Material(
-      color: const Color(0x14FFFFFF),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-        side: const BorderSide(color: Color(0x33FFFFFF)),
-      ),
+      color: const Color(0xFFF7F4EE),
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-            onTap: () => p.open(context),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  flex: 5,
-                  child: ColoredBox(
-                    color: const Color(0xFF0A0A0A),
-                    child: StoreNetImage(url: p.image, word: p.title),
-                  ),
-                ),
-                Expanded(
-                  flex: 4,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+        onTap: () => p.open(context),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              flex: 5,
+              child: ColoredBox(
+                color: const Color(0xFFE7E1D6),
+                child: StoreNetImage(url: p.image, word: p.title),
+              ),
+            ),
+            Expanded(
+              flex: 4,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(p.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xFF16181E), fontSize: 14, fontWeight: FontWeight.w800)),
+                    Text(p.line, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xFF6A6258), fontSize: 11)),
+                    const Spacer(),
+                    Row(
                       children: [
-                        Text(p.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w800)),
-                        Text(p.line, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xFFB0B0B0), fontSize: 10)),
-                        const Spacer(),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                price <= 0 ? 'Free' : inr(price),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w800),
-                              ),
+                        Expanded(
+                          child: Text(
+                            _ask(price),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(color: Color(0xFF16181E), fontSize: 14, fontWeight: FontWeight.w800),
+                          ),
+                        ),
+                        GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () => storeAddToCart(context, p.bag),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF16181E),
+                              borderRadius: BorderRadius.circular(16),
                             ),
-                            GestureDetector(
-                              behavior: HitTestBehavior.opaque,
-                              onTap: () => storeAddToCart(context, p.bag),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(14),
-                                  boxShadow: const [BoxShadow(color: Color(0x55000000), offset: Offset(2, 2), blurRadius: 0)],
-                                ),
-                                child: const Text('ADD', style: TextStyle(color: Color(0xFF101010), fontSize: 11, fontWeight: FontWeight.w800)),
-                              ),
-                            ),
-                          ],
+                            child: const Text('ADD', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w800)),
+                          ),
                         ),
                       ],
                     ),
-                  ),
+                  ],
                 ),
-              ],
+              ),
             ),
+          ],
+        ),
       ),
     );
+  }
+
+  String _ask(num price) {
+    if (price <= 0) return 'Free';
+    final n = price.round();
+    final s = n.abs().toString();
+    final buf = StringBuffer();
+    for (var i = 0; i < s.length; i++) {
+      if (i > 0 && (s.length - i) % 3 == 0) buf.write(',');
+      buf.write(s[i]);
+    }
+    return '₹$buf';
   }
 }

@@ -56,9 +56,12 @@ class StoreBagBar extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.fromLTRB(8, 6, 8, 6),
               decoration: BoxDecoration(
-                color: const Color(0x0FFFFFFF),
+                color: const Color(0xCCFFFFFF),
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: const Color(0x24FFFFFF)),
+                border: Border.all(color: const Color(0x14000000)),
+                boxShadow: const [
+                  BoxShadow(color: Color(0x22000000), blurRadius: 10, offset: Offset(0, 3)),
+                ],
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
