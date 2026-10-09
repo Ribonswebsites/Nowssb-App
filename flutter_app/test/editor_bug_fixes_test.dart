@@ -45,11 +45,15 @@ void main() {
       expect(bottom.dy - top.dy, closeTo(100, 0.01), reason: 'taller is not a zoom');
     });
 
-    testWidgets('smaller: the box shortens without scaling the content', (tester) async {
+    testWidgets('smaller: the whole section shrinks and nothing is cut', (tester) async {
       await tester.pumpWidget(_frame(const SectionEntry(id: 'hero', props: {'height': 50}), content));
       final fit = tester.renderObject<RenderSectionFitHeight>(find.byType(SectionFitHeight));
-      expect(fit.size.height, 50);
-      expect(fit.scale, closeTo(1, 0.001));
+      expect(fit.size.height, closeTo(50, 0.5));
+      expect(fit.scale, closeTo(0.5, 0.02));
+      final box = tester.renderObject<RenderBox>(find.byKey(key));
+      final top = box.localToGlobal(Offset.zero);
+      final bottom = box.localToGlobal(box.size.bottomLeft(Offset.zero));
+      expect(bottom.dy - top.dy, closeTo(50, 1), reason: 'the whole block is still there, just smaller');
     });
 
     testWidgets('no height: untouched', (tester) async {

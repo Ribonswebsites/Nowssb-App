@@ -10,6 +10,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
+import '../scopes.dart';
+
 const kClassicEntrances = {'fadeUp', 'slide', 'scale', 'blur', 'fade'};
 
 /// Every entrance, id → drawer label.
@@ -186,7 +188,9 @@ class LoopFx extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fx = loopEffects(kind);
+    final preview = EditorPreviewScope.of(context);
     if (fx == null || (MediaQuery.maybeDisableAnimationsOf(context) ?? false)) return child;
+    if (preview != null && !preview.motionPreview) return child;
     return Animate(
       key: ValueKey('loop-$kind'),
       effects: fx.$1,

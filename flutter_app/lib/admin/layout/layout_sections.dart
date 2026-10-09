@@ -597,7 +597,7 @@ class SectionFrame extends StatelessWidget {
     if (t.isNotEmpty || auto != null) {
       w = SectionCarouselScope(
         transition: t,
-        autoRotate: auto,
+        autoRotate: preview != null ? false : auto,
         interval: (p['interval'] is num) ? (p['interval'] as num).toInt() : 4000,
         child: w,
       );

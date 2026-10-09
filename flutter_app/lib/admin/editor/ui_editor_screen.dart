@@ -25,6 +25,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../admin_state.dart';
 import '../layout/anims/anim_library.dart';
+import '../layout/anims/effects.dart';
 import '../layout/app_pages.dart';
 import '../layout/placed_orbs.dart';
 import '../template/all_slots_screen.dart';
@@ -774,6 +775,203 @@ void _placeFull(EditorController c) {
   c.endStep();
 }
 
+/// The tab for the section you just picked. Move it, size it, and choose
+/// a motion. Nothing turns by itself while this is open.
+class _SectionBoard extends StatelessWidget {
+  const _SectionBoard({required this.c, required this.onStyle, required this.onWords, required this.onEffects});
+  final EditorController c;
+  final VoidCallback onStyle;
+  final VoidCallback onWords;
+  final VoidCallback onEffects;
+
+  void _step(void Function() fn) {
+    c.endStep();
+    fn();
+    c.endStep();
+  }
+
+  void _watch(bool on) {
+    c.preview.setMotionPreview(on);
+    if (on) c.preview.replay();
+    c.changedSelection();
+  }
+
+  void _size(double factor) {
+    final cur = c.current;
+    if (cur == null) return;
+    final stored = cur.entry.props['height'];
+    final measured = c.preview.sectionHeights['${c.layoutPage}/${cur.id}'];
+    final base = stored is num && stored > 1 ? stored.toDouble() : (measured ?? 220);
+    final next = (base * factor).clamp(64.0, 1400.0).roundToDouble();
+    _step(() => c.patchProps(cur.id, {'height': next, 'boxH': null}));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final cur = c.current!;
+    final p = cur.entry.props;
+    final scrolling = p['hScroll'] == true;
+    final entrance = '${p['entrance'] ?? 'none'}';
+    final loop = '${p['loop'] ?? 'none'}';
+    final liveTurn = p['autoRotate'] == true;
+    final cards = <String, String>{};
+    for (final k in const ['a', 'b', 'c', 'd', 't1', 't2', 't3', 'word']) {
+      final v = p[k];
+      if (v is String && v.trim().isNotEmpty) cards[k] = v.trim();
+    }
+    Widget chip(String label, bool on, VoidCallback tap, {Key? key}) => Padding(
+          padding: const EdgeInsets.only(right: 6, bottom: 6),
+          child: ChoiceChip(
+            key: key,
+            label: Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+            selected: on,
+            onSelected: (_) => tap(),
+            visualDensity: VisualDensity.compact,
+            selectedColor: const Color(0xFFE8D5A3),
+            labelStyle: TextStyle(color: on ? const Color(0xFF14120E) : Colors.white, fontSize: 12, fontWeight: FontWeight.w700),
+          ),
+        );
+    return Material(
+      key: const ValueKey('context-strip'),
+      color: const Color(0xF0111A2B),
+      elevation: 10,
+      borderRadius: BorderRadius.circular(22),
+      clipBehavior: Clip.antiAlias,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxHeight: 320),
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(12, 8, 12, 10),
+          shrinkWrap: true,
+          children: [
+            Row(children: [
+              const Icon(Icons.dashboard_customize_rounded, color: Color(0xFFE8D5A3), size: 18),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(cur.title, maxLines: 1, overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w800)),
+              ),
+              TextButton(
+                key: const ValueKey('section-default'),
+                onPressed: () {
+                  c.preview.setMotionPreview(false);
+                  c.resetSection(cur.id);
+                },
+                child: const Text('Default'),
+              ),
+              IconButton(
+                key: const ValueKey('strip-done'),
+                onPressed: c.unpick,
+                icon: const Icon(Icons.check_rounded, color: Colors.white),
+              ),
+            ]),
+            const Text(
+              'Bottom edge shortens the whole section — nothing is cut. Hold it and drag up or down to move it. Cards stay put: swipe to the next one.',
+              style: TextStyle(color: Color(0xFFB7C0D0), fontSize: 12, height: 1.3),
+            ),
+            const SizedBox(height: 8),
+            Wrap(children: [
+              chip('Up', false, () {
+                final id = cur.id;
+                _step(() => c.shift(id, -1));
+                c.pickSection(id);
+              }, key: const ValueKey('move-up')),
+              chip('Down', false, () {
+                final id = cur.id;
+                _step(() => c.shift(id, 1));
+                c.pickSection(id);
+              }, key: const ValueKey('move-down')),
+              chip('Smaller', false, () => _size(0.85), key: const ValueKey('size-smaller')),
+              chip('Bigger', false, () => _size(1.18), key: const ValueKey('size-bigger')),
+              chip('Left', false, () => _placeBeside(c, onRight: false), key: const ValueKey('side-left')),
+              chip('Right', false, () => _placeBeside(c, onRight: true), key: const ValueKey('side-right')),
+              chip('Full width', false, () => _placeFull(c), key: const ValueKey('side-full')),
+              chip(scrolling ? 'No scroll' : 'Scroll row', scrolling, () {
+                _step(() => c.patchProps(cur.id, {'hScroll': scrolling ? null : true}));
+              }, key: const ValueKey('side-scroll')),
+            ]),
+            const Text('Appear', style: TextStyle(color: Color(0xFFE8D5A3), fontSize: 11, fontWeight: FontWeight.w800)),
+            Wrap(children: [
+              for (final e in kEntranceNames.entries)
+                chip(e.value, entrance == e.key, () {
+                  _step(() => c.patchProps(cur.id, {'entrance': e.key == 'none' ? null : e.key}));
+                  c.preview.replay();
+                }),
+            ]),
+            const Text('Keep moving', style: TextStyle(color: Color(0xFFE8D5A3), fontSize: 11, fontWeight: FontWeight.w800)),
+            Wrap(children: [
+              for (final e in kLoopNames.entries)
+                chip(e.value, loop == e.key, () {
+                  final still = e.key == 'none';
+                  _step(() => c.patchProps(cur.id, {'loop': still ? null : e.key}));
+                  _watch(!still);
+                }),
+            ]),
+            Wrap(children: [
+              chip('Preview', c.preview.motionPreview, () => _watch(true), key: const ValueKey('section-preview')),
+              chip('Stop', !c.preview.motionPreview, () => _watch(false)),
+              chip(liveTurn ? 'Auto on (after publish)' : 'Auto off', liveTurn, () {
+                _step(() => c.patchProps(cur.id, {'autoRotate': liveTurn ? null : true, 'interval': liveTurn ? null : 4000}));
+              }),
+              chip('Edit text', false, onWords, key: const ValueKey('strip-text')),
+              chip('Style', false, onStyle, key: const ValueKey('strip-look')),
+              chip('More', false, onEffects, key: const ValueKey('strip-animate')),
+              chip('Delete', false, () => deleteWithUndo(context, c, cur.id, cur.title), key: const ValueKey('strip-delete')),
+              chip('Height · length', false, () {}, key: const ValueKey('mode-section')),
+            ]),
+            if (cards.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              const Text('Each card', style: TextStyle(color: Color(0xFFE8D5A3), fontSize: 11, fontWeight: FontWeight.w800)),
+              for (final e in cards.entries)
+                _CardAnimRow(c: c, sectionId: cur.id, field: e.key, label: e.value, fx: '${p['fx_${e.key}'] ?? 'none'}'),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CardAnimRow extends StatelessWidget {
+  const _CardAnimRow({required this.c, required this.sectionId, required this.field, required this.label, required this.fx});
+  final EditorController c;
+  final String sectionId;
+  final String field;
+  final String label;
+  final String fx;
+
+  static const _fx = ['none', 'pulse', 'float', 'breathe', 'bounce', 'shimmer'];
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(children: [
+        Expanded(
+          child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700)),
+        ),
+        DropdownButton<String>(
+          value: _fx.contains(fx) ? fx : 'none',
+          dropdownColor: const Color(0xFF111A2B),
+          style: const TextStyle(color: Colors.white, fontSize: 12),
+          underline: const SizedBox.shrink(),
+          items: [
+            for (final id in _fx)
+              DropdownMenuItem(value: id, child: Text(id == 'none' ? 'Still' : id)),
+          ],
+          onChanged: (v) {
+            if (v == null) return;
+            c.endStep();
+            c.patchProps(sectionId, {'fx_$field': v == 'none' ? null : v});
+            c.endStep();
+            c.preview.setMotionPreview(v != 'none');
+            c.changedSelection();
+          },
+        ),
+      ]),
+    );
+  }
+}
+
 /// Shows while something is touched: a few colours for text and a way into
 /// its own sheet (style, words, picture); for an orb its circle; for a
 /// section its content and effects. Small on purpose.
@@ -879,25 +1077,7 @@ class ContextStrip extends StatelessWidget {
         done,
       ]);
     } else if (c.sectionPicked && c.current != null) {
-      final scrolling = c.current!.entry.props['hScroll'] == true;
-      children.addAll([
-        tool(Icons.crop_free_rounded, 'Height · length', () {}, color: kGold, key: const ValueKey('mode-section')),
-        tool(Icons.align_horizontal_left_rounded, 'Left side', () => _placeBeside(c, onRight: false), key: const ValueKey('side-left')),
-        tool(Icons.align_horizontal_right_rounded, 'Right side', () => _placeBeside(c, onRight: true), key: const ValueKey('side-right')),
-        tool(Icons.open_in_full_rounded, 'Full width', () => _placeFull(c), key: const ValueKey('side-full')),
-        tool(Icons.swipe_rounded, scrolling ? 'No scroll' : 'Scroll row', () {
-          final id = c.current?.id;
-          if (id == null) return;
-          c.endStep();
-          c.patchProps(id, {'hScroll': scrolling ? null : true});
-          c.endStep();
-        }, key: const ValueKey('side-scroll')),
-        tool(Icons.text_fields_rounded, 'Edit text', onSection, color: kGold, key: const ValueKey('strip-text')),
-        tool(Icons.palette_rounded, 'Style', onStyle, key: const ValueKey('strip-look')),
-        tool(Icons.animation_rounded, 'Animate', onEffects, key: const ValueKey('strip-animate')),
-        delete(() => deleteWithUndo(context, c, c.current!.id, c.current!.title)),
-        done,
-      ]);
+      return _SectionBoard(c: c, onStyle: onStyle, onWords: onSection, onEffects: onEffects);
     } else {
       return const SizedBox.shrink();
     }

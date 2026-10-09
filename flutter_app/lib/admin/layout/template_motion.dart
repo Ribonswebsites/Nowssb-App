@@ -9,6 +9,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import 'scopes.dart';
 import 'template_more.dart';
 import 'template_rails.dart';
 
@@ -101,10 +102,14 @@ class _MotionLoopState extends State<MotionLoop> with SingleTickerProviderStateM
   }
 
   @override
-  Widget build(BuildContext context) => AnimatedBuilder(
-        animation: _c,
-        builder: (_, __) => widget.builder(_c.value),
-      );
+  Widget build(BuildContext context) {
+    final preview = EditorPreviewScope.of(context);
+    if (preview != null && !preview.motionPreview) return widget.builder(0.35);
+    return AnimatedBuilder(
+      animation: _c,
+      builder: (_, __) => widget.builder(_c.value),
+    );
+  }
 }
 
 Widget buildMotionBanner(String kind, TplKit k) {

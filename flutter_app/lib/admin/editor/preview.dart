@@ -1450,41 +1450,44 @@ class _TouchLayerState extends State<_TouchLayer> {
     switch (grab) {
       case _Grab.order:
         final cur = c.current;
+        final side = _finger.dx - _start.dx;
+        final rise = _finger.dy - _start.dy;
+        // Up or down moves the section. A sideways nudge must not steal that.
+        if (cur != null && rise.abs() >= 28 && rise.abs() >= side.abs() * 0.7) {
+          final target = _target();
+          if (target != null) {
+            final targetId = _sections[target].$1;
+            final live = [for (final s in c.sections) if (!s.entry.deleted) s.id];
+            final steps = live.indexOf(targetId) - live.indexOf(cur.id);
+            if (steps != 0) {
+              bigFeel();
+              c.endStep();
+              c.shift(cur.id, steps);
+              c.endStep();
+              c.pickSection(cur.id);
+            }
+          }
+          break;
+        }
         final beside = _sideOfOther();
-        if (cur != null && beside != null) {
+        if (cur != null && beside != null && side.abs() > rise.abs()) {
           _sitBeside(cur.id, beside.$1, beside.$2);
           break;
         }
-        // A smaller section carried sideways: it sits left, middle or right
-        // and leaves the other side open.
+        // A clearly sideways drag sits it on the left, middle or right.
+        // Its height stays — sitting beside is not a crop.
         final small = _shrunkRect(cur?.id);
         final row = _sectionRect(cur?.id);
-        final side = _finger.dx - _start.dx;
-        final rise = _finger.dy - _start.dy;
-        if (cur != null && row != null && side.abs() > 48 && side.abs() > rise.abs()) {
+        if (cur != null && row != null && side.abs() > 56 && side.abs() > rise.abs() * 1.4) {
           final across = ((_finger.dx - row.left) / row.width).clamp(0.0, 1.0);
           bigFeel();
           c.endStep();
           c.patchProps(cur.id, {
             if (small == null) 'shrink': 0.62,
             'align': alignFor(across),
-            'height': null,
           });
           c.endStep();
           break;
-        }
-        final target = _target();
-        if (cur == null || target == null) break;
-        // Steps count live sections, the same ones the page shows.
-        final targetId = _sections[target].$1;
-        final live = [for (final s in c.sections) if (!s.entry.deleted) s.id];
-        final steps = live.indexOf(targetId) - live.indexOf(cur.id);
-        if (steps != 0) {
-          bigFeel();
-          c.endStep();
-          c.shift(cur.id, steps);
-          c.endStep();
-          c.pickSection(cur.id);
         }
       case _Grab.moveOrb:
         final o = _orb;

@@ -108,10 +108,9 @@ class _RenderSectionZoom extends RenderProxyBox {
   }
 }
 
-/// Draws [child] exactly [height] tall by scaling it uniformly, up as well
-/// as down. A section pinched bigger than its natural height grows (the
-/// sides that no longer fit are clipped, centred) instead of sitting on top
-/// of blank space; pinched smaller, it shrinks as before.
+/// Draws [child] at [height]. Taller than the content: extra room, the
+/// content stays its own size. Shorter: the whole section scales down so
+/// nothing is cut off, and it gets narrower by the same amount.
 ///
 /// [width] is used only when the parent gives no width (the child is laid
 /// out at the screen width, like the page it came from).
@@ -218,6 +217,14 @@ class RenderSectionFitHeight extends RenderProxyBox {
     final f = _fraction;
     final screen = _width > 1 ? _width : w;
     final cell = f == null ? w : screen * f;
+    // Shorter than the content: scale the whole thing down. Cutting it
+    // off is not a size.
+    void shorter(double natural) {
+      final s = (_height / natural).clamp(0.22, 1.0);
+      _scaleX = s;
+      _scale = s;
+      size = constraints.constrain(Size(w, natural * s));
+    }
     // Already given its share of the row: scale from the full page width
     // into that share, instead of scaling a second time.
     final packed = f != null && (w - cell).abs() < 48;
@@ -235,7 +242,7 @@ class RenderSectionFitHeight extends RenderProxyBox {
         return;
       }
       if (_height + 16 < natural) {
-        size = constraints.constrain(Size(w, _height));
+        shorter(natural);
         return;
       }
       size = constraints.constrain(Size(w, _height > natural ? _height : natural));
@@ -245,16 +252,17 @@ class RenderSectionFitHeight extends RenderProxyBox {
       _childW = c.size.width;
       _scaleX = 1;
       _scale = 1;
-      // Taller is empty room the film can grow into. Shorter crops the box.
-      // A few pixels over the asked height is the card under a film, not a zoom.
+      // Taller is empty room. Shorter scales the whole section down.
       if (!(_height > 1)) {
         size = constraints.constrain(Size(w, ch));
         return;
       }
       if (_height + 16 < ch) {
-        size = constraints.constrain(Size(w, _height));
+        shorter(ch);
         return;
       }
+      _scaleX = 1;
+      _scale = 1;
       size = constraints.constrain(Size(w, _height > ch ? _height : ch));
       return;
     }
@@ -271,7 +279,7 @@ class RenderSectionFitHeight extends RenderProxyBox {
       return;
     }
     if (_height + 16 < natural) {
-      size = constraints.constrain(Size(w, _height));
+      shorter(natural);
       return;
     }
     size = constraints.constrain(Size(w, _height > natural ? _height : natural));

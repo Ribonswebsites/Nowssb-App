@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'template_fresh.dart';
 import 'template_motion.dart';
 import 'template_rails.dart';
+import 'template_wild.dart';
 
 /// The helpers a template draws with (from TemplateSection), so words and
 /// pictures here are editable exactly like in the first templates.
@@ -269,6 +270,7 @@ const kMoreTemplates = <String, (String, String, String)>{
   'bookPills': ('Book pills', 'Reading actions as pills', 'Words'),
   'pathPills': ('Path pills', 'A path of black pills', 'Features'),
   ...kFreshTemplates,
+  ...kWildTemplates,
 };
 
 const kMoreKinds = <String>[
@@ -292,6 +294,7 @@ const kMoreKinds = <String>[
   'giftPills', 'wordPills', 'nightPills', 'calmPills', 'storePills',
   'markPills', 'goldPills', 'coinPills', 'bookPills', 'pathPills',
   ...kFreshKinds,
+  ...kWildKinds,
 ];
 
 const _a = 'assets/banners/stories/aura.png';
@@ -304,6 +307,8 @@ const _g = 'assets/store/collections/peace.webp';
 const _h = 'assets/store/collections/sacred.webp';
 
 Map<String, dynamic> moreStarter(String kind) {
+  final wild = wildStarter(kind);
+  if (wild.isNotEmpty) return wild;
   final fresh = freshStarter(kind);
   if (fresh.isNotEmpty) return fresh;
   final rail = railStarter(kind);
@@ -358,6 +363,7 @@ Map<String, dynamic> moreStarter(String kind) {
 }
 
 Widget buildMoreTemplate(String kind, TplKit k) {
+  if (isWildKind(kind)) return buildWildTemplate(kind, k);
   if (isFreshKind(kind)) return buildFreshTemplate(kind, k);
   if (isRailKind(kind)) return buildRailBanner(kind, k);
   if (kMotionKinds.contains(kind)) return buildMotionBanner(kind, k);

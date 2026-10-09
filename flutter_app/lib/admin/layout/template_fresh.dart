@@ -10,7 +10,6 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
-import 'scopes.dart';
 import 'template_more.dart';
 import 'template_motion.dart';
 
@@ -128,12 +127,8 @@ TextStyle _inkS(double s, {FontWeight w = FontWeight.w700, double tracking = 0})
 TextStyle _goldS(double s, {FontWeight w = FontWeight.w800, double tracking = 1.2}) =>
     TextStyle(color: _gold, fontSize: s, fontWeight: w, letterSpacing: tracking, height: 1.1);
 
-Widget _loop(Widget Function(double t) builder, {int ms = 2800}) {
-  return Builder(builder: (context) {
-    if (editorHoldsStill(context)) return builder(0.35);
-    return MotionLoop(milliseconds: ms, builder: builder);
-  });
-}
+Widget _loop(Widget Function(double t) builder, {int ms = 2800}) =>
+    MotionLoop(milliseconds: ms, builder: builder);
 
 enum _Kin { pop, drop, type, flap, wave, scatter }
 

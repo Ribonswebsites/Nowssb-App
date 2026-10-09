@@ -512,6 +512,30 @@ class EditorController extends ChangeNotifier {
 
   /// The section's size, place and spacing as it ships (the touch
   /// "Put back"): pinched height, offsets, spacing and picture fit.
+  /// Size, place and motion back to how the section shipped. Words stay.
+  void resetSection(String id) {
+    endStep();
+    patchProps(id, {
+      'height': null,
+      'dx': null,
+      'dy': null,
+      'padTop': null,
+      'padBottom': null,
+      'padH': null,
+      'fit': null,
+      'shrink': null,
+      'align': null,
+      'boxH': null,
+      'hScroll': null,
+      'entrance': null,
+      'loop': null,
+      'transition': null,
+      'autoRotate': null,
+      'interval': null,
+    });
+    endStep();
+  }
+
   void putBack(String id) {
     endStep();
     patchProps(id, {

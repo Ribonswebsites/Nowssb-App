@@ -89,6 +89,14 @@ class EditorPreviewController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// While editing, motion stays still until the section tab asks to watch it.
+  bool motionPreview = false;
+  void setMotionPreview(bool on) {
+    if (motionPreview == on) return;
+    motionPreview = on;
+    notifyListeners();
+  }
+
   /// Rendered height of each section in the preview ('<page>/<section>'),
   /// so a pinch starts from the size on screen instead of a guess.
   final Map<String, double> sectionHeights = {};
