@@ -723,6 +723,57 @@ class _PillHandle extends StatelessWidget {
   }
 }
 
+/// Puts the picked section on the left or the right of its neighbour.
+/// Both keep their height. They share the row at their own size — not zoomed.
+void _placeBeside(EditorController c, {required bool onRight}) {
+  final id = c.current?.id;
+  if (id == null) return;
+  final live = [for (final e in c.entries) if (!e.deleted) e];
+  final i = live.indexWhere((e) => e.id == id);
+  if (i < 0) return;
+  c.endStep();
+  if (onRight) {
+    // Room on the right of this one: the section under it sits there.
+    if (i + 1 < live.length) {
+      c.patchProps(id, {'shrink': 0.58, 'align': 'left', 'boxH': null});
+      c.patchProps(live[i + 1].id, {'shrink': 0.42, 'align': 'right', 'boxH': null});
+    } else {
+      c.patchProps(id, {'shrink': 0.58, 'align': 'left', 'boxH': null});
+    }
+  } else if (i > 0) {
+    c.patchProps(live[i - 1].id, {'shrink': 0.58, 'align': 'left', 'boxH': null});
+    c.patchProps(id, {'shrink': 0.42, 'align': 'right', 'boxH': null});
+  } else {
+    c.patchProps(id, {'shrink': 0.42, 'align': 'right', 'boxH': null});
+  }
+  c.endStep();
+}
+
+/// Back to one full row. A neighbour that was sharing this row comes back too.
+void _placeFull(EditorController c) {
+  final id = c.current?.id;
+  if (id == null) return;
+  final live = [for (final e in c.entries) if (!e.deleted) e];
+  final i = live.indexWhere((e) => e.id == id);
+  bool pair(Map<String, dynamic> props) {
+    final a = c.current?.entry.props['shrink'];
+    final b = props['shrink'];
+    if (a is! num || b is! num) return false;
+    final s = a.toDouble() + b.toDouble();
+    return s > 0.9 && s < 1.08;
+  }
+
+  c.endStep();
+  if (i > 0 && pair(live[i - 1].props)) {
+    c.patchProps(live[i - 1].id, {'shrink': null, 'align': null, 'boxH': null});
+  }
+  if (i >= 0 && i + 1 < live.length && pair(live[i + 1].props)) {
+    c.patchProps(live[i + 1].id, {'shrink': null, 'align': null, 'boxH': null});
+  }
+  c.patchProps(id, {'shrink': null, 'align': null, 'boxH': null});
+  c.endStep();
+}
+
 /// Shows while something is touched: a few colours for text and a way into
 /// its own sheet (style, words, picture); for an orb its circle; for a
 /// section its content and effects. Small on purpose.
@@ -828,8 +879,19 @@ class ContextStrip extends StatelessWidget {
         done,
       ]);
     } else if (c.sectionPicked && c.current != null) {
+      final scrolling = c.current!.entry.props['hScroll'] == true;
       children.addAll([
-        tool(Icons.crop_free_rounded, 'Height · width', () {}, color: kGold, key: const ValueKey('mode-section')),
+        tool(Icons.crop_free_rounded, 'Height · length', () {}, color: kGold, key: const ValueKey('mode-section')),
+        tool(Icons.align_horizontal_left_rounded, 'Left side', () => _placeBeside(c, onRight: false), key: const ValueKey('side-left')),
+        tool(Icons.align_horizontal_right_rounded, 'Right side', () => _placeBeside(c, onRight: true), key: const ValueKey('side-right')),
+        tool(Icons.open_in_full_rounded, 'Full width', () => _placeFull(c), key: const ValueKey('side-full')),
+        tool(Icons.swipe_rounded, scrolling ? 'No scroll' : 'Scroll row', () {
+          final id = c.current?.id;
+          if (id == null) return;
+          c.endStep();
+          c.patchProps(id, {'hScroll': scrolling ? null : true});
+          c.endStep();
+        }, key: const ValueKey('side-scroll')),
         tool(Icons.text_fields_rounded, 'Edit text', onSection, color: kGold, key: const ValueKey('strip-text')),
         tool(Icons.palette_rounded, 'Style', onStyle, key: const ValueKey('strip-look')),
         tool(Icons.animation_rounded, 'Animate', onEffects, key: const ValueKey('strip-animate')),

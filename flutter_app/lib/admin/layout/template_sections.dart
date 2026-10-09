@@ -17,7 +17,7 @@ import 'package:video_player/video_player.dart';
 import '../../widgets/banner_mix.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/four_banners.dart';
-import '../../widgets/hype_rail.dart' show CouponTicketPromo;
+import '../../widgets/hype_rail.dart' show CouponTicketPromo, NowssbHypeRail;
 import '../../widgets/sections/section_registry.dart';
 import '../../widgets/stories_find_you_banner.dart';
 import '../template/editable.dart';
@@ -27,11 +27,14 @@ import 'carousel_fx.dart';
 import 'coupon_sections.dart';
 import 'layout_sections.dart';
 import 'template_more.dart';
+import 'template_real.dart';
 import 'ui_layouts.dart';
+import '../../screens/store/store_home_sections.dart';
 
 /// Plain-words names for the Add section gallery.
 final kTemplateNames = <String, String>{
   for (final e in kMoreTemplates.entries) e.key: e.value.$1,
+  ...kAppPieceNames,
   'imageBanner': 'Image banner',
   'videoBanner': 'Video banner',
   'splitPromo': 'Split promo banner',
@@ -58,6 +61,7 @@ final kTemplateNames = <String, String>{
 
 final kTemplateBlurbs = <String, String>{
   for (final e in kMoreTemplates.entries) e.key: e.value.$2,
+  ...kAppPieceBlurbs,
   'imageBanner': 'A big picture with a headline and a button',
   'videoBanner': 'A looping clip with a headline and a button',
   'splitPromo': 'Words on one side, a picture on the other',
@@ -84,6 +88,7 @@ final kTemplateBlurbs = <String, String>{
 
 /// Sections and banners in the drawer, in the order they are shown.
 const kTemplateGallery = <String>[
+  ...kAppPieceKinds,
   'couponTicket',
   'couponCards',
   'couponBanner',
@@ -122,8 +127,11 @@ final List<(String, List<String>)> kTemplateCategories = () {
     'couponBanner': 'Offers & coupons', 'couponPromo': 'Offers & coupons',
     'splitPromo': 'Picture + words',
   };
-  String cat(String k) => kMoreTemplates[k]?.$3 ?? first[k] ?? 'More';
-  const order = ['Offers & coupons', 'Top banners', 'Cards', 'Features', 'Reviews', 'Buttons & banners', 'Picture + words', 'Numbers', 'Words', 'More'];
+  String cat(String k) {
+    if (kAppPieceKinds.contains(k)) return 'App pieces';
+    return kMoreTemplates[k]?.$3 ?? first[k] ?? 'More';
+  }
+  const order = ['App pieces', 'Offers & coupons', 'Top banners', 'Cards', 'Features', 'Reviews', 'Buttons & banners', 'Picture + words', 'Numbers', 'Words', 'More'];
   return [
     for (final c in order)
       if (kTemplateGallery.any((k) => cat(k) == c)) (c, [for (final k in kTemplateGallery) if (cat(k) == c) k]),
@@ -154,7 +162,9 @@ String templateTitle(SectionEntry e) {
 }
 
 /// Starting props for a new template section.
-Map<String, dynamic> templateStarter(String kind) => switch (kind) {
+Map<String, dynamic> templateStarter(String kind) {
+  if (kAppPieceKinds.contains(kind)) return appPieceStarter(kind);
+  return switch (kind) {
       'imageBanner' => {
           'title': 'Your headline',
           'subtitle': 'A line under it',
@@ -195,6 +205,7 @@ Map<String, dynamic> templateStarter(String kind) => switch (kind) {
       'couponTicket' || 'couponCards' => couponStarter(kind),
       _ => moreStarter(kind),
     };
+}
 
 class TemplateSection extends StatelessWidget {
   const TemplateSection({super.key, required this.entry, required this.pageId, this.thumb = false});
@@ -359,6 +370,24 @@ class TemplateSection extends StatelessWidget {
         return const FourBanners();
       case 'storiesBanner':
         return const StoriesFindYouBanner();
+    }
+    if (entry.kind == 'pieceHalf') {
+      return const Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: StoreHalfOffRail());
+    }
+    if (entry.kind == 'pieceHype') {
+      return const NowssbHypeRail();
+    }
+    if (entry.kind == 'pieceSplit') {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: ColoredSplitPromoBanner.forSurface(
+          SplitPromoSurface.storeHome,
+          onTap: () => openRoute(context, _s('route')),
+        ),
+      );
+    }
+    if (kAppPieceKinds.contains(entry.kind)) {
+      return buildAppPiece(entry.kind, onTap: () => openRoute(context, _s('route')));
     }
     if (kMoreTemplates.containsKey(entry.kind)) {
       return buildMoreTemplate(

@@ -165,7 +165,12 @@ class RenderSectionFitHeight extends RenderProxyBox {
     return Rect.fromLTWH(_left, 0, _childW * _sx, c.size.height * _sy);
   }
 
-  double get _left => (size.width - _childW * _sx) * (_sx < 1 ? (_align + 1) / 2 : 0.5);
+  double get _left {
+    final contentW = _childW * _sx;
+    final spare = size.width - contentW;
+    if (spare.abs() < 1) return 0;
+    return spare * ((_align + 1) / 2);
+  }
 
   double _height;
   set height(double v) {
@@ -224,7 +229,16 @@ class RenderSectionFitHeight extends RenderProxyBox {
       _childW = c.size.width;
       _scaleX = 1;
       _scale = 1;
-      size = constraints.constrain(Size(w, c.size.height));
+      final natural = c.size.height;
+      if (!(_height > 1)) {
+        size = constraints.constrain(Size(w, natural));
+        return;
+      }
+      if (_height + 16 < natural) {
+        size = constraints.constrain(Size(w, _height));
+        return;
+      }
+      size = constraints.constrain(Size(w, _height > natural ? _height : natural));
       return;
     }
     if (f == null) {
@@ -244,12 +258,23 @@ class RenderSectionFitHeight extends RenderProxyBox {
       size = constraints.constrain(Size(w, _height > ch ? _height : ch));
       return;
     }
-    // Length (width) is the fraction of the page. Height, when set, is its
-    // own size — not a crop of the picture and not a second zoom.
-    final targetH = _height > 1 ? _height : ch * f;
-    size = constraints.constrain(Size(w, targetH));
-    _scaleX = f;
-    _scale = ch > 0 ? size.height / ch : f;
+    // A share of the row, laid out at that width and sat on the side.
+    // Never scaled — scaling is what made a side section look zoomed out.
+    final cellW = (w * f).clamp(48.0, w);
+    c.layout(BoxConstraints.tightFor(width: cellW), parentUsesSize: true);
+    _childW = c.size.width;
+    _scaleX = 1;
+    _scale = 1;
+    final natural = c.size.height;
+    if (!(_height > 1)) {
+      size = constraints.constrain(Size(w, natural));
+      return;
+    }
+    if (_height + 16 < natural) {
+      size = constraints.constrain(Size(w, _height));
+      return;
+    }
+    size = constraints.constrain(Size(w, _height > natural ? _height : natural));
   }
 
   @override

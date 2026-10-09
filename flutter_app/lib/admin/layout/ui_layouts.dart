@@ -34,6 +34,29 @@ import 'template_more.dart' show kMoreKinds;
 ///   categoryTiles / spotlight / promoBanner / couponPromo /
 ///   bannerMix / fourBanners / storiesBanner
 ///             — the app's own ready-made sections and banners
+///
+/// [kAppPieceKinds] — the real store cards, films and Word Atelier cards.
+const kAppPieceKinds = <String>[
+  'pieceWord',
+  'pieceWords',
+  'pieceLibrary',
+  'pieceMeaning',
+  'pieceSignature',
+  'pieceBooks',
+  'piecePlans',
+  'pieceVerify',
+  'pieceFilmWord',
+  'pieceFilmMean',
+  'pieceFilmSign',
+  'pieceFilmBook',
+  'pieceFilmPlan',
+  'pieceFilmCheck',
+  'pieceCoupon',
+  'pieceHalf',
+  'pieceHype',
+  'pieceSplit',
+];
+
 const kTemplateKinds = <String>[
   'imageBanner',
   'videoBanner',
@@ -44,6 +67,7 @@ const kTemplateKinds = <String>[
   'couponTicket',
   'couponCards',
   ...kReadyKinds,
+  ...kAppPieceKinds,
   ...kMoreKinds,
 ];
 

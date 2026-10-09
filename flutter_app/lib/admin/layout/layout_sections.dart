@@ -420,6 +420,97 @@ class SectionExtent extends InheritedWidget {
   bool updateShouldNotify(SectionExtent oldWidget) => oldWidget.height != height;
 }
 
+/// Lays [child] out wider than the row and lets a finger drag it sideways.
+/// The section keeps its own height. Nothing is scaled.
+class SectionSideScroll extends StatefulWidget {
+  const SectionSideScroll({super.key, required this.child});
+  final Widget child;
+
+  @override
+  State<SectionSideScroll> createState() => _SectionSideScrollState();
+}
+
+class _SectionSideScrollState extends State<SectionSideScroll> {
+  final _key = GlobalKey();
+  double _off = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onHorizontalDragUpdate: (d) {
+        final box = _key.currentContext?.findRenderObject();
+        final max = box is RenderSectionSideScroll ? box.maxOff : 0.0;
+        setState(() => _off = (_off - d.delta.dx).clamp(0.0, max));
+      },
+      child: _SideViewport(key: _key, offset: _off, child: widget.child),
+    );
+  }
+}
+
+class _SideViewport extends SingleChildRenderObjectWidget {
+  const _SideViewport({super.key, required this.offset, required super.child});
+  final double offset;
+
+  @override
+  RenderObject createRenderObject(BuildContext context) => RenderSectionSideScroll(offset);
+
+  @override
+  void updateRenderObject(BuildContext context, RenderSectionSideScroll renderObject) {
+    renderObject.offset = offset;
+  }
+}
+
+class RenderSectionSideScroll extends RenderProxyBox {
+  RenderSectionSideScroll(this._off);
+
+  double _off;
+  set offset(double v) {
+    if (v == _off) return;
+    _off = v;
+    markNeedsPaint();
+  }
+
+  /// How far the finger can drag. Set during layout.
+  double maxOff = 0;
+
+  @override
+  void performLayout() {
+    final c = child;
+    final view = constraints.hasBoundedWidth ? constraints.maxWidth : 360.0;
+    if (c == null) {
+      size = constraints.constrain(Size(view, 0));
+      return;
+    }
+    final wide = view * 1.8;
+    c.layout(BoxConstraints(minWidth: wide, maxWidth: wide), parentUsesSize: true);
+    maxOff = (c.size.width - view).clamp(0.0, 100000.0);
+    if (_off > maxOff) _off = maxOff;
+    final h = c.size.height.isFinite ? c.size.height : 0.0;
+    size = constraints.constrain(Size(view, h));
+  }
+
+  @override
+  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) {
+    final c = child;
+    if (c == null) return false;
+    return result.addWithPaintOffset(
+      offset: Offset(-_off, 0),
+      position: position,
+      hitTest: (BoxHitTestResult result, Offset position) => c.hitTest(result, position: position),
+    );
+  }
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    final c = child;
+    if (c == null) return;
+    context.pushClipRect(needsCompositing, offset, Offset.zero & size, (ctx, off) {
+      ctx.paintChild(c, off + Offset(-_off, 0));
+    });
+  }
+}
+
 /// Height, spacing, entrance animation, carousel settings and the section
 /// scope around one section.
 class SectionFrame extends StatelessWidget {
@@ -442,6 +533,9 @@ class SectionFrame extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = entry.props;
     Widget w = child;
+    if (p['hScroll'] == true) {
+      w = SectionSideScroll(child: w);
+    }
     final h = _d(p['height']);
     // Builtins, and the templates that do not size themselves from props.
     // Scaled to the height both ways: pinching bigger grows the section

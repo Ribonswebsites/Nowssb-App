@@ -1711,12 +1711,11 @@ class _TouchLayerState extends State<_TouchLayer> {
       c.patchProps(room, {
         'shrink': 0.58,
         'align': onRight ? 'left' : 'right',
-        'height': null,
         'boxH': null,
       });
       final at = onRight ? c.entryIndexBefore(room) + 1 : c.entryIndexBefore(room);
       final id = c.insertTemplate(data.kind, at);
-      c.patchProps(id, {'shrink': 0.42, 'align': onRight ? 'right' : 'left', 'height': null, 'boxH': null});
+      c.patchProps(id, {'shrink': 0.42, 'align': onRight ? 'right' : 'left', 'boxH': null});
       c.endStep();
       c.pickSection(id);
       c.fxDropped();
@@ -1833,8 +1832,8 @@ class _TouchLayerState extends State<_TouchLayer> {
     c.endStep();
     final steps = want - mi;
     if (steps != 0) c.shift(moving, steps);
-    c.patchProps(host, {'shrink': 0.58, 'align': onRight ? 'left' : 'right', 'height': null, 'boxH': null});
-    c.patchProps(moving, {'shrink': 0.42, 'align': onRight ? 'right' : 'left', 'height': null, 'boxH': null});
+    c.patchProps(host, {'shrink': 0.58, 'align': onRight ? 'left' : 'right', 'boxH': null});
+    c.patchProps(moving, {'shrink': 0.42, 'align': onRight ? 'right' : 'left', 'boxH': null});
     c.endStep();
     c.pickSection(moving);
   }
@@ -2081,7 +2080,7 @@ class _TouchLayerState extends State<_TouchLayer> {
                           key: const ValueKey('choose-media'),
                           icon: _askSlot?.type == SlotType.video ? Icons.play_circle_outline : Icons.image_outlined,
                           title: _askSlot?.type == SlotType.video ? 'Video' : 'Image',
-                          sub: 'Zoom in and out',
+                          sub: 'The picture only',
                           onTap: _chooseMedia,
                         )),
                         const SizedBox(width: 6),
@@ -2089,7 +2088,7 @@ class _TouchLayerState extends State<_TouchLayer> {
                           key: const ValueKey('choose-section'),
                           icon: Icons.crop_free_rounded,
                           title: 'Section',
-                          sub: 'Height and width',
+                          sub: 'Height and length',
                           onTap: _chooseSection,
                         )),
                       ]),
