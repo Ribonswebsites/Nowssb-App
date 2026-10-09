@@ -121,8 +121,51 @@ class AddSectionsTab extends StatelessWidget {
     if (!c.sectioned) {
       return const Hint('This page can’t take new sections yet.', icon: Icons.view_agenda_outlined);
     }
-    // Grouped under plain names; each tile is the real section, drawn small.
+    // Deleted sections of this page stay listed, so Put back is always here.
+    // The full set (header through the last section, and every banner) lives
+    // on Admin → Templates and does not shrink when something is deleted.
+    final gone = [for (final s in c.sections) if (s.entry.deleted) s];
     final grid = CustomScrollView(slivers: [
+      if (gone.isNotEmpty) ...[
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(16, 6, 16, 8),
+          sliver: SliverToBoxAdapter(
+            child: Text('Deleted on this page · ${gone.length}',
+                key: const ValueKey('tpl-cat-This page'),
+                style: const TextStyle(color: kGold, fontSize: 13, fontWeight: FontWeight.w800, letterSpacing: 0.3)),
+          ),
+        ),
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+          sliver: SliverList.separated(
+            itemCount: gone.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 6),
+            itemBuilder: (context, i) {
+              final s = gone[i];
+              return Glass(
+                key: ValueKey('tpl-page-${s.id}'),
+                radius: 14,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                onTap: () {
+                  actFeel();
+                  c.endStep();
+                  c.restore(s.id);
+                  c.endStep();
+                  onAdded();
+                },
+                child: Row(children: [
+                  const Icon(Icons.restore_rounded, color: kMint, size: 18),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(s.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+                  ),
+                  const Text('Put back', style: TextStyle(color: kMint, fontWeight: FontWeight.w700, fontSize: 12)),
+                ]),
+              );
+            },
+          ),
+        ),
+      ],
       for (final (name, kinds) in kTemplateCategories) ...[
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(16, 6, 16, 8),

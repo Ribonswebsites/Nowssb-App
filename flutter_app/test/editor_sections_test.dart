@@ -227,7 +227,7 @@ void main() {
       final (above, below) = _neighbours(c);
       final b = _rectOf(c, below);
       final a = _rectOf(c, above);
-      await _openTab(tester, 'Sections');
+      await _openTab(tester, 'Templates');
       expect(find.byType(TemplateThumb), findsWidgets, reason: 'live thumbnails');
       final tile = find.byKey(const ValueKey('add-couponTicket'));
       expect(tile, findsOneWidget);
@@ -294,7 +294,7 @@ void main() {
         final r = _rectOf(c, first);
 
         // A section between its built-in parts…
-        await _openTab(tester, 'Sections');
+        await _openTab(tester, 'Templates');
         await _carry(tester, tester.getCenter(find.byKey(const ValueKey('add-couponCards'))),
             Offset(200, r.bottom - 4));
         await _settle(tester);
@@ -334,7 +334,7 @@ void main() {
         expect(sel!.$1, 'page');
         expect(find.byType(PlacedOrbView), findsOneWidget);
 
-        await _openTab(tester, 'Sections');
+        await _openTab(tester, 'Templates');
         await _carry(tester, tester.getCenter(find.byKey(const ValueKey('add-couponCards'))),
             Offset(200, (r.top + 30).clamp(160.0, r.center.dy - 20)));
         await _settle(tester);

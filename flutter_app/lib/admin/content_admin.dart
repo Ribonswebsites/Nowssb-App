@@ -12,6 +12,7 @@ import 'editor/ui_editor_screen.dart';
 import 'quotes_admin.dart';
 import 'requests_admin.dart';
 import 'template/all_slots_screen.dart';
+import 'templates_admin.dart';
 import 'words_admin.dart';
 
 class ContentAdminScreen extends StatefulWidget {
@@ -155,6 +156,25 @@ class _ContentAdminScreenState extends State<ContentAdminScreen> {
             },
           ),
           const SectionHead('Screens', 'Pictures, copy and layout of every page'),
+          Glass(
+            radius: 22,
+            padding: const EdgeInsets.all(14),
+            onTap: () => pushAdmin(context, const TemplatesAdminScreen()),
+            child: const Row(children: [
+              Icon(Icons.dashboard_customize_rounded, color: kGold, size: 22),
+              SizedBox(width: 12),
+              Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text('Templates', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)),
+                  SizedBox(height: 2),
+                  Text('Header through every section, and every banner. Deleting one never removes it from here.',
+                      style: TextStyle(color: kDim, fontSize: 12, height: 1.3)),
+                ]),
+              ),
+              Icon(Icons.chevron_right_rounded, color: kFaint),
+            ]),
+          ),
+          const SizedBox(height: 10),
           TileGrid(children: [
             _Card(Icons.auto_awesome_mosaic_rounded, 'UI Editor', 'The real page in a phone frame — change, preview, publish', kGold, () {
               bigFeel();

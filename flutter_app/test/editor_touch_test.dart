@@ -224,7 +224,7 @@ void main() {
       await tester.tap(find.byKey(const ValueKey('editor-add')));
       await _settle(tester, 4);
       expect(find.byKey(const ValueKey('editor-drawer')), findsOneWidget);
-      for (final t in ['Sections', 'Effects', 'Orbs', 'Loaders', 'Backgrounds', 'Particles', 'Celebrate', 'Map']) {
+      for (final t in ['Templates', 'Effects', 'Orbs', 'Loaders', 'Backgrounds', 'Particles', 'Celebrate', 'Map']) {
         expect(find.byKey(ValueKey('drawer-tab-$t')), findsOneWidget);
       }
       await tester.tap(find.byTooltip('Close'));

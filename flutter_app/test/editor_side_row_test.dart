@@ -173,7 +173,7 @@ void main() {
     // A picture from the drawer into the room on the left.
     await tester.tap(find.byKey(const ValueKey('editor-add')));
     await _settle(tester, 4);
-    await tester.tap(find.byKey(const ValueKey('drawer-tab-Sections')));
+    await tester.tap(find.byKey(const ValueKey('drawer-tab-Templates')));
     await _settle(tester, 4);
     final tile = find.byKey(const ValueKey('add-beside-image'));
     expect(tile, findsOneWidget);
@@ -192,7 +192,7 @@ void main() {
     final before = c.entries.length;
     await tester.tap(find.byKey(const ValueKey('editor-add')));
     await _settle(tester, 4);
-    await tester.tap(find.byKey(const ValueKey('drawer-tab-Sections')));
+    await tester.tap(find.byKey(const ValueKey('drawer-tab-Templates')));
     await _settle(tester, 4);
     await _carry(tester, tester.getCenter(find.byKey(ValueKey('add-${kTemplateGallery.first}'))),
         Offset(row.left + 20, row.top + 12));

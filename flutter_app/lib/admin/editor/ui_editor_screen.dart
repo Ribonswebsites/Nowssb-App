@@ -4,9 +4,10 @@
 /// and the + button. The handle opens a floating pill (back · page ·
 /// undo/redo · publish · more); the pill also opens for a few seconds
 /// after each change, so undo is right there, then folds away again. Everything else appears only when needed:
-///   +            opens a drawer from the bottom with tabs inside it — Add
-///                (ready-made sections), Effects and Orbs (drag them onto
-///                the page) and Sections (a map of the page);
+///   +            opens a drawer from the bottom with tabs inside it — Templates
+///                (every shipped section and every banner; deleting one never
+///                removes it from here), Effects and Orbs (drag them onto
+///                the page) and Map (the page);
 ///   touch        tap to select, drag to move, pinch to resize, drag onto
 ///                the trash to delete, long-press for the rest (preview.dart);
 ///   selection    a small strip for whatever is touched, which opens its
@@ -40,11 +41,11 @@ import 'tab_layout.dart';
 import 'tab_publish.dart';
 import 'tab_style.dart';
 
-void openUiEditor(BuildContext context, {String page = 'home.normal'}) {
+void openUiEditor(BuildContext context, {String page = 'home.normal', bool openTemplates = false, String? putBack, String? addKind}) {
   if (!AdminState.instance.isAdmin) return;
   Navigator.of(context).push(PageRouteBuilder<void>(
     transitionDuration: const Duration(milliseconds: 420),
-    pageBuilder: (_, __, ___) => UiEditorScreen(initialPage: page),
+    pageBuilder: (_, __, ___) => UiEditorScreen(initialPage: page, openTemplates: openTemplates, putBack: putBack, addKind: addKind),
     transitionsBuilder: (_, a, __, child) => FadeTransition(
       opacity: CurvedAnimation(parent: a, curve: Curves.easeOut),
       child: ScaleTransition(
@@ -56,8 +57,17 @@ void openUiEditor(BuildContext context, {String page = 'home.normal'}) {
 }
 
 class UiEditorScreen extends StatefulWidget {
-  const UiEditorScreen({super.key, this.initialPage = 'home.normal', this.controller});
+  const UiEditorScreen({super.key, this.initialPage = 'home.normal', this.openTemplates = false, this.putBack, this.addKind, this.controller});
   final String initialPage;
+
+  /// Open straight onto the Templates drawer.
+  final bool openTemplates;
+
+  /// When the page reports this section deleted, put it back once.
+  final String? putBack;
+
+  /// When the page can take sections, add this template once.
+  final String? addKind;
 
   /// For tests: drive and inspect the editor. The screen disposes it.
   @visibleForTesting
@@ -72,7 +82,7 @@ const kPillOpenFor = Duration(seconds: 4);
 
 /// The tabs inside the + drawer.
 const kDrawerTabs = <(String, IconData)>[
-  ('Sections', Icons.dashboard_customize_rounded),
+  ('Templates', Icons.dashboard_customize_rounded),
   ('Effects', Icons.animation_rounded),
   ('Orbs', Icons.blur_circular_rounded),
   ('Loaders', Icons.autorenew_rounded),
@@ -93,6 +103,8 @@ class _UiEditorScreenState extends State<UiEditorScreen> {
   /// The + drawer: null = closed, else the tab showing.
   int? _drawer;
   int _drops = 0;
+  String? _putBack;
+  String? _addKind;
 
   /// The one-time "tap / drag / pinch / +" hint.
   bool _hint = false;
@@ -101,6 +113,9 @@ class _UiEditorScreenState extends State<UiEditorScreen> {
   void initState() {
     super.initState();
     c.openPage(widget.initialPage);
+    _putBack = widget.putBack;
+    _addKind = widget.addKind;
+    if (widget.openTemplates) _drawer = 0;
     _drops = c.fxDrops;
     _pillSig = _sig();
     c.addListener(_on);
@@ -181,6 +196,29 @@ class _UiEditorScreenState extends State<UiEditorScreen> {
 
   void _on() {
     if (!mounted) return;
+    final put = _putBack;
+    if (put != null && c.sectioned) {
+      _putBack = null;
+      final s = c.sections.where((x) => x.id == put).firstOrNull;
+      if (s != null && s.entry.deleted) {
+        Future.microtask(() {
+          if (!mounted) return;
+          c.endStep();
+          c.restore(put);
+          c.endStep();
+        });
+      }
+    }
+    final kind = _addKind;
+    if (kind != null && c.sectioned) {
+      _addKind = null;
+      Future.microtask(() {
+        if (!mounted) return;
+        c.endStep();
+        c.addTemplate(kind);
+        c.endStep();
+      });
+    }
     final sig = _sig();
     if (sig != _pillSig) {
       _pillSig = sig;
