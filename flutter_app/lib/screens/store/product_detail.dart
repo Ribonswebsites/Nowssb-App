@@ -207,7 +207,8 @@ class _StoreProductPageState extends State<StoreProductPage> {
       title: 'NowssB Store',
       subtitle: title,
       film: '',
-      plain: true,
+      plain: false,
+      canvas: const Color(0xFF101010),
       usePageFilm: false,
       bodyMax: 980,
       onBack: () => Navigator.of(context).pop(),
@@ -228,7 +229,7 @@ class _StoreProductPageState extends State<StoreProductPage> {
               return Badge(
                 isLabelVisible: n > 0,
                 label: Text('$n'),
-                child: const Icon(Icons.shopping_bag_outlined, color: Color(0xFF16181E)),
+                child: const Icon(Icons.shopping_bag_outlined, color: Colors.white),
               );
             },
           ),
@@ -243,12 +244,18 @@ class _StoreProductPageState extends State<StoreProductPage> {
                   LayoutBuilder(builder: (context, box) {
                     final wide = box.maxWidth >= 680;
                     final image = ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: SizedBox(
+                      borderRadius: BorderRadius.circular(22),
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(22),
+                          border: Border.all(color: const Color(0x33FFFFFF)),
+                          boxShadow: const [BoxShadow(color: Color(0xFF000000), offset: Offset(5, 6), blurRadius: 0)],
+                        ),
+                        child: SizedBox(
                         width: wide ? 320 : 260,
                         height: wide ? 320 : 260,
                         child: ColoredBox(
-                          color: const Color(0xFFF3F1EC),
+                          color: const Color(0xFF0A0A0A),
                           child: ListenableBuilder(
                             listenable: WordArt.instance,
                             builder: (_, __) {
@@ -261,6 +268,7 @@ class _StoreProductPageState extends State<StoreProductPage> {
                           ),
                         ),
                       ),
+                    ),
                     );
                     final info = _details();
                     if (!wide) {
@@ -301,7 +309,7 @@ class _StoreProductPageState extends State<StoreProductPage> {
             style: const TextStyle(
               fontSize: 11,
               letterSpacing: 0.6,
-              color: Color(0xFF6A6258),
+              color: Color(0xFF9A9A9A),
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -312,14 +320,14 @@ class _StoreProductPageState extends State<StoreProductPage> {
             style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w800,
-              color: Color(0xFF16181E),
+              color: Colors.white,
               height: 1.15,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             root,
-            style: const TextStyle(fontSize: 13, color: Color(0xFF6A6258)),
+            style: const TextStyle(fontSize: 13, color: Color(0xFFB0B0B0)),
           ),
           const SizedBox(height: 10),
           Text(
@@ -331,7 +339,7 @@ class _StoreProductPageState extends State<StoreProductPage> {
             style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w800,
-              color: Color(0xFF16181E),
+              color: Colors.white,
             ),
           ),
           const SizedBox(height: 16),
@@ -390,13 +398,13 @@ class _StoreProductPageState extends State<StoreProductPage> {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w800,
-              color: Color(0xFF16181E),
+              color: Colors.white,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             about,
-            style: const TextStyle(fontSize: 13, height: 1.5, color: Color(0xFF3A3834)),
+            style: const TextStyle(fontSize: 13, height: 1.5, color: Color(0xFFD6D6D6)),
           ),
           const SizedBox(height: 18),
           const EditableLabel(
@@ -405,7 +413,7 @@ class _StoreProductPageState extends State<StoreProductPage> {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w800,
-              color: Color(0xFF16181E),
+              color: Colors.white,
             ),
           ),
           const SizedBox(height: 10),
@@ -415,12 +423,12 @@ class _StoreProductPageState extends State<StoreProductPage> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.check, size: 15, color: Color(0xFF16181E)),
+                  const Icon(Icons.check, size: 15, color: Colors.white),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       h,
-                      style: const TextStyle(fontSize: 13, color: Color(0xFF16181E)),
+                      style: const TextStyle(fontSize: 13, color: Color(0xFFE8E8E8)),
                     ),
                   ),
                 ],
@@ -430,7 +438,7 @@ class _StoreProductPageState extends State<StoreProductPage> {
             const SizedBox(height: 16),
             Text(
               disclaimer!,
-              style: const TextStyle(fontSize: 12, height: 1.5, color: Color(0xFF6A6258)),
+              style: const TextStyle(fontSize: 12, height: 1.5, color: Color(0xFF9A9A9A)),
             ),
           ],
         ],
@@ -458,9 +466,10 @@ class _ActBtn extends StatelessWidget {
         alignment: Alignment.center,
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(4),
-          color: filled ? const Color(0xFF16181E) : Colors.white,
-          border: Border.all(color: const Color(0xFF16181E)),
+          borderRadius: BorderRadius.circular(16),
+          color: filled ? Colors.white : const Color(0xFF161616),
+          border: Border.all(color: filled ? Colors.white : const Color(0x44FFFFFF)),
+          boxShadow: const [BoxShadow(color: Color(0xFF000000), offset: Offset(3, 3), blurRadius: 0)],
         ),
         child: EditableLabel(
           'product_detail.ActBtn',
@@ -468,7 +477,7 @@ class _ActBtn extends StatelessWidget {
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w700,
-            color: filled ? Colors.white : const Color(0xFF16181E),
+            color: filled ? const Color(0xFF101010) : Colors.white,
           ),
         ),
       ),

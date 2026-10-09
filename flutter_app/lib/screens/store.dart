@@ -22,6 +22,7 @@ import '../widgets/colored_split_promo_banner.dart';
 import '../widgets/nwsb_icon.dart';
 import '../features/bazaar/bazaar_screen.dart';
 import 'store/bag_ui.dart';
+import 'store/store_cards.dart';
 import 'store/store_home_sections.dart';
 
 export 'store/ebooks_store.dart';
@@ -84,29 +85,44 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
     final items = <Widget>[
       Padding(
         padding: const EdgeInsets.fromLTRB(20, 22, 12, 2),
-        child: Row(
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  EditableLabel('store.StoreHomeContent', 'NowssB Store',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 34,
-                          height: 1.0,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: -1.0)),
-                  SizedBox(height: 8),
-                  EditableLabel('store.StoreHomeContent', 'Own the words. Unlock the meanings.',
-                      style: TextStyle(
-                          color: Color(0xAFFFFFFF), fontSize: 13, height: 1.3)),
-                ],
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      EditableLabel('store.StoreHomeContent', 'NowssB Store',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 34,
+                              height: 1.0,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: -1.0)),
+                      SizedBox(height: 8),
+                      EditableLabel('store.StoreHomeContent', 'Own the words. Unlock the meanings.',
+                          style: TextStyle(
+                              color: Color(0xAFFFFFFF), fontSize: 13, height: 1.3)),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                const StoreBagBar(),
+              ],
+            ),
+            const SizedBox(height: 14),
+            const BwKineticLine(
+              text: 'WORDS   MEANINGS   BOOKS',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 15,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.2,
               ),
             ),
-            const SizedBox(width: 8),
-            const StoreBagBar(),
           ],
         ),
       ),
@@ -643,7 +659,7 @@ class _StoreDepartmentLabel extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
         child: EditableLabel('store.StoreDepartmentLabel', label,
             style: const TextStyle(
-                fontSize: 10, letterSpacing: 2.2, color: NwsbColors.gold)),
+                fontSize: 10, letterSpacing: 2.2, color: Colors.white)),
       );
 }
 
@@ -1004,9 +1020,12 @@ class _MiniStoreCard extends StatelessWidget {
         margin: const EdgeInsets.fromLTRB(0, 6, 0, 6),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: const Color(0xFF000000),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0x24FFFFFF)),
+          color: const Color(0x14FFFFFF),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: const Color(0x33FFFFFF)),
+          boxShadow: const [
+            BoxShadow(color: Color(0xFF000000), offset: Offset(3, 4), blurRadius: 0),
+          ],
         ),
         child: Row(
           children: [
@@ -1014,8 +1033,14 @@ class _MiniStoreCard extends StatelessWidget {
               width: 44,
               height: 44,
               decoration: const BoxDecoration(
-                  shape: BoxShape.circle, color: Color(0x14FFFFFF)),
-              child: Icon(icon, color: NwsbColors.gold, size: 21),
+                shape: BoxShape.circle,
+                color: Color(0xFF0A0A0A),
+                boxShadow: [
+                  BoxShadow(color: Color(0xFF000000), offset: Offset(2, 2), blurRadius: 0),
+                  BoxShadow(color: Color(0x22FFFFFF), offset: Offset(-1, -1), blurRadius: 0),
+                ],
+              ),
+              child: Icon(icon, color: Colors.white, size: 21),
             ),
             const SizedBox(width: 14),
             Expanded(

@@ -3,6 +3,7 @@
 library;
 
 import 'dart:async';
+import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/foundation.dart';
@@ -1774,8 +1775,7 @@ class StoreViewMoreTap extends StatelessWidget {
   }
 }
 
-/// A word as type, not a photograph. Cream paper, or black every so often,
-/// so the atelier is a specimen sheet instead of one face repeated.
+/// A word as type. White card or black glass, no photograph.
 class WordSpecimen extends StatelessWidget {
   const WordSpecimen({
     super.key,
@@ -1798,34 +1798,39 @@ class WordSpecimen extends StatelessWidget {
     return h;
   }
 
-  bool get _black => _hash % 9 == 0;
+  bool get _black => _hash % 5 == 0;
 
   String get _no => ((_hash % 90) + 10).toString();
 
   @override
   Widget build(BuildContext context) {
     final black = _black;
-    final ink = black ? const Color(0xFFF6F1E6) : const Color(0xFF14120E);
-    final paper = black ? const Color(0xFF14120E) : const Color(0xFFF7F4EE);
+    final ink = black ? Colors.white : const Color(0xFF101010);
     final n = word.length;
     final size = n <= 4 ? 34.0 : n <= 7 ? 26.0 : n <= 12 ? 20.0 : 16.0;
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: paper,
-        border: Border.all(color: const Color(0xFF14120E)),
+        color: black ? const Color(0x14FFFFFF) : const Color(0xFFF7F7F5),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: black ? const Color(0x33FFFFFF) : const Color(0xFF101010)),
+        boxShadow: black
+            ? null
+            : const [
+                BoxShadow(color: Color(0x66000000), offset: Offset(4, 5), blurRadius: 0),
+              ],
       ),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(10, 10, 10, 8),
+        padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               _no,
-              style: const TextStyle(
-                color: Color(0xFF8A6A32),
+              style: TextStyle(
+                color: ink.withValues(alpha: 0.45),
                 fontSize: 10,
                 fontWeight: FontWeight.w800,
-                letterSpacing: 1.4,
+                letterSpacing: 1.6,
               ),
             ),
             const Spacer(),
@@ -1838,17 +1843,17 @@ class WordSpecimen extends StatelessWidget {
                 fontSize: size,
                 height: 0.95,
                 fontWeight: FontWeight.w800,
-                letterSpacing: -0.4,
+                letterSpacing: -0.6,
               ),
             ),
             const SizedBox(height: 8),
-            Container(width: 28, height: 2, color: const Color(0xFF8A6A32)),
+            Container(width: 22, height: 1.5, color: ink),
             const SizedBox(height: 6),
             Text(
               root,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: ink.withValues(alpha: 0.62), fontSize: 11, height: 1.25),
+              style: TextStyle(color: ink.withValues(alpha: 0.55), fontSize: 11, height: 1.25),
             ),
             const Spacer(),
             if (priceLabel != null)
@@ -1866,14 +1871,19 @@ class WordSpecimen extends StatelessWidget {
                     behavior: HitTestBehavior.opaque,
                     onTap: onAdd,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      color: black ? const Color(0xFFF6F1E6) : const Color(0xFF14120E),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: black ? Colors.white : const Color(0xFF101010),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: const [BoxShadow(color: Color(0x55000000), offset: Offset(2, 2), blurRadius: 0)],
+                      ),
                       child: Text(
                         'ADD',
                         style: TextStyle(
-                          color: black ? const Color(0xFF14120E) : const Color(0xFFF6F1E6),
+                          color: black ? const Color(0xFF101010) : Colors.white,
                           fontSize: 11,
                           fontWeight: FontWeight.w800,
+                          letterSpacing: 0.6,
                         ),
                       ),
                     ),
@@ -1882,6 +1892,56 @@ class WordSpecimen extends StatelessWidget {
               ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Black-and-white kinetic type. Letters move; the whole word stays readable.
+class BwKineticLine extends StatefulWidget {
+  const BwKineticLine({super.key, required this.text, required this.style});
+
+  final String text;
+  final TextStyle style;
+
+  @override
+  State<BwKineticLine> createState() => _BwKineticLineState();
+}
+
+class _BwKineticLineState extends State<BwKineticLine> with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 2600),
+  )..repeat();
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (editorHoldsStill(context)) return _paint(0.25);
+    return AnimatedBuilder(animation: _c, builder: (_, __) => _paint(_c.value));
+  }
+
+  Widget _paint(double t) {
+    final text = widget.text;
+    final style = widget.style;
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      alignment: Alignment.centerLeft,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          for (var i = 0; i < text.length; i++)
+            Transform.translate(
+              offset: Offset(0, text[i] == ' ' ? 0 : math.sin((t * math.pi * 2) + i * 0.45) * 3.5),
+              child: Text(text[i], style: style),
+            ),
+        ],
       ),
     );
   }

@@ -233,7 +233,8 @@ class _NwsbShopPageState extends State<NwsbShopPage> {
       title: 'NowssB Store',
       subtitle: widget.title,
       film: '',
-      plain: true,
+      plain: false,
+      canvas: const Color(0xFF101010),
       usePageFilm: false,
       bodyMax: 1120,
       onBack: () => Navigator.of(context).pop(),
@@ -255,7 +256,7 @@ class _NwsbShopPageState extends State<NwsbShopPage> {
               return Badge(
                 isLabelVisible: n > 0,
                 label: Text('$n'),
-                child: const Icon(Icons.shopping_bag_outlined, color: Color(0xFF16181E)),
+                child: const Icon(Icons.shopping_bag_outlined, color: Colors.white),
               );
             },
           ),
@@ -279,7 +280,7 @@ class _NwsbShopPageState extends State<NwsbShopPage> {
                       'No matches',
                       Padding(
                         padding: EdgeInsets.all(24),
-                        child: Text('Nothing matches that search.', style: TextStyle(color: Color(0xFF6A6258))),
+                        child: Text('Nothing matches that search.', style: TextStyle(color: Color(0xFFBDBDBD))),
                       ),
                     ),
                 ], tabletRail: false),
@@ -291,25 +292,61 @@ class _NwsbShopPageState extends State<NwsbShopPage> {
     );
   }
 
+  String get _mast => switch (widget.which) {
+        'word' => 'WORDS',
+        'meaning' => 'MEANINGS',
+        'signature' => 'RARE',
+        'ebooks' => 'BOOKS',
+        _ => 'STORE',
+      };
+
   Widget _searchBox() {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: TextField(
-        controller: _search,
-        onChanged: (v) => setState(() => _q = v),
-        style: const TextStyle(color: Color(0xFF16181E), fontSize: 14),
-        decoration: InputDecoration(
-          hintText: 'Search ${widget.title}',
-          hintStyle: const TextStyle(color: Color(0xFF8A847A), fontSize: 14),
-          prefixIcon: const Icon(Icons.search, color: Color(0xFF16181E), size: 20),
-          isDense: true,
-          filled: true,
-          fillColor: Colors.white,
-          contentPadding: const EdgeInsets.symmetric(vertical: 10),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE4E4E4))),
-          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE4E4E4))),
-          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFF16181E))),
-        ),
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          BwKineticLine(
+            text: _mast,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 42,
+              height: 0.9,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -1.2,
+            ),
+          ),
+          const SizedBox(height: 14),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              color: const Color(0xFF0A0A0A),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: const Color(0x22FFFFFF)),
+              boxShadow: const [
+                BoxShadow(color: Color(0xFF000000), offset: Offset(3, 3), blurRadius: 0),
+                BoxShadow(color: Color(0x18FFFFFF), offset: Offset(-2, -2), blurRadius: 0),
+              ],
+            ),
+            child: TextField(
+              controller: _search,
+              onChanged: (v) => setState(() => _q = v),
+              style: const TextStyle(color: Colors.white, fontSize: 14),
+              cursorColor: Colors.white,
+              decoration: InputDecoration(
+                hintText: 'Search ${widget.title}',
+                hintStyle: const TextStyle(color: Color(0xFF8A8A8A), fontSize: 14),
+                prefixIcon: const Icon(Icons.search, color: Colors.white, size: 20),
+                isDense: true,
+                filled: true,
+                fillColor: Colors.transparent,
+                contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(18), borderSide: BorderSide.none),
+                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(18), borderSide: BorderSide.none),
+                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(18), borderSide: const BorderSide(color: Colors.white)),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -318,7 +355,7 @@ class _NwsbShopPageState extends State<NwsbShopPage> {
     final chips = ['ALL', for (final g in widget.groups) g.id];
     final labels = {'ALL': 'All', for (final g in widget.groups) g.id: g.label};
     return SizedBox(
-      height: 36,
+      height: 40,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: chips.length,
@@ -329,19 +366,26 @@ class _NwsbShopPageState extends State<NwsbShopPage> {
           return GestureDetector(
             onTap: () => setState(() => _chip = id),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 14),
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: on ? const Color(0xFF16181E) : Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: const Color(0xFF16181E)),
+                color: on ? Colors.white : const Color(0xFF161616),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: on ? Colors.white : const Color(0x33FFFFFF)),
+                boxShadow: on
+                    ? const [BoxShadow(color: Color(0xFF000000), offset: Offset(2, 2), blurRadius: 0)]
+                    : const [
+                        BoxShadow(color: Color(0xFF000000), offset: Offset(2, 2), blurRadius: 0),
+                        BoxShadow(color: Color(0x14FFFFFF), offset: Offset(-1, -1), blurRadius: 0),
+                      ],
               ),
               child: Text(
                 labels[id] ?? id,
                 style: TextStyle(
-                  color: on ? Colors.white : const Color(0xFF16181E),
+                  color: on ? const Color(0xFF101010) : Colors.white,
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
+                  letterSpacing: 0.3,
                 ),
               ),
             ),
@@ -357,9 +401,9 @@ class _NwsbShopPageState extends State<NwsbShopPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(g.label, style: const TextStyle(color: Color(0xFF16181E), fontSize: 15, fontWeight: FontWeight.w800)),
+          Text(g.label, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w800, letterSpacing: 1.4)),
           const SizedBox(height: 2),
-          Text(g.products.length == 1 ? '1 item' : '${g.products.length} items', style: const TextStyle(color: Color(0xFF8A847A), fontSize: 11, fontWeight: FontWeight.w600)),
+          Text(g.products.length == 1 ? '1 item' : '${g.products.length} items', style: const TextStyle(color: Color(0xFF9A9A9A), fontSize: 11, fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
           LayoutBuilder(builder: (context, box) {
             final w = box.maxWidth;
@@ -402,63 +446,65 @@ class _NwsbShopPageState extends State<NwsbShopPage> {
       );
     }
     return Material(
-      color: Colors.white,
+      color: const Color(0x14FFFFFF),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(4),
-        side: const BorderSide(color: Color(0xFFE4E4E4)),
+        borderRadius: BorderRadius.circular(18),
+        side: const BorderSide(color: Color(0x33FFFFFF)),
       ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () => p.open(context),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            AspectRatio(
-              aspectRatio: 1,
-              child: ColoredBox(
-                color: const Color(0xFFF3F1EC),
-                child: StoreNetImage(url: p.image, word: p.title),
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(8, 6, 8, 4),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(p.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xFF16181E), fontSize: 13, fontWeight: FontWeight.w800)),
-                    Text(p.line, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xFF6A6258), fontSize: 10)),
-                    const Spacer(),
-                    Row(
+            onTap: () => p.open(context),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  flex: 5,
+                  child: ColoredBox(
+                    color: const Color(0xFF0A0A0A),
+                    child: StoreNetImage(url: p.image, word: p.title),
+                  ),
+                ),
+                Expanded(
+                  flex: 4,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: Text(
-                            price <= 0 ? 'Free' : inr(price),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(color: Color(0xFF16181E), fontSize: 13, fontWeight: FontWeight.w800),
-                          ),
-                        ),
-                        GestureDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onTap: () => storeAddToCart(context, p.bag),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF16181E),
-                              borderRadius: BorderRadius.circular(4),
+                        Text(p.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w800)),
+                        Text(p.line, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xFFB0B0B0), fontSize: 10)),
+                        const Spacer(),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                price <= 0 ? 'Free' : inr(price),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w800),
+                              ),
                             ),
-                            child: const Text('ADD', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w800)),
-                          ),
+                            GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onTap: () => storeAddToCart(context, p.bag),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(14),
+                                  boxShadow: const [BoxShadow(color: Color(0x55000000), offset: Offset(2, 2), blurRadius: 0)],
+                                ),
+                                child: const Text('ADD', style: TextStyle(color: Color(0xFF101010), fontSize: 11, fontWeight: FontWeight.w800)),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
       ),
     );
   }

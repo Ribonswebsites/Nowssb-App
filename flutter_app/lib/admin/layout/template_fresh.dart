@@ -6,6 +6,7 @@
 library;
 
 import 'dart:math' as math;
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
@@ -44,6 +45,16 @@ const kFreshTemplates = <String, (String, String, String)>{
   'squareBadges': ('Four badges', 'Four small badges, one outlined', 'Features'),
   'slashPrice': ('Slashed price', 'The old figure crossed, the new one plain', 'Offers & coupons'),
   'crossMark': ('You are here', 'Two lines crossing on a word', 'Buttons & banners'),
+  'letterPop': ('Letters pop', 'Each letter springs up and settles', 'Words'),
+  'letterDrop': ('Letters fall', 'Letters drop in and land', 'Top banners'),
+  'maskWipe': ('Mask wipe', 'A line uncovers from the left', 'Top banners'),
+  'typeOn': ('Type on', 'Letters appear one after another', 'Words'),
+  'flapWord': ('Flap word', 'Letters swing in like a board', 'Buttons & banners'),
+  'waveType': ('Wave type', 'A wave travels along the line', 'Top banners'),
+  'trackOpen': ('Open tracking', 'The letters step apart, then close', 'Words'),
+  'spinColumn': ('Spin column', 'Three words turn like a drum', 'Cards'),
+  'glassLine': ('Glass line', 'White type on a glass panel', 'Picture + words'),
+  'scatterSet': ('Scatter set', 'Letters fly in and find their place', 'Features'),
 };
 
 const kFreshKinds = <String>[
@@ -53,6 +64,8 @@ const kFreshKinds = <String>[
   'ribbonSlash', 'typeSteps', 'dashedCode', 'arcFill', 'whisperBand',
   'blockFour', 'verticalType', 'discStack', 'cornerNote', 'ruleQuote',
   'statSplit', 'beadPath', 'squareBadges', 'slashPrice', 'crossMark',
+  'letterPop', 'letterDrop', 'maskWipe', 'typeOn', 'flapWord',
+  'waveType', 'trackOpen', 'spinColumn', 'glassLine', 'scatterSet',
 ];
 
 bool isFreshKind(String kind) => kFreshKinds.contains(kind);
@@ -88,6 +101,16 @@ Map<String, dynamic> freshStarter(String kind) => switch (kind) {
       'squareBadges' => {'a': 'Daily', 'b': 'Offline', 'c': 'Private', 'd': 'Spoken'},
       'slashPrice' => {'title': 'Year plan', 'old': '₹2399', 'price': '₹1499', 'line': 'Same shelf, lower figure'},
       'crossMark' => {'title': 'You are here', 'line': 'The practice is open'},
+      'letterPop' => {'word': 'OWN IT', 'line': 'One word at a time'},
+      'letterDrop' => {'title': 'Drop in', 'line': 'Then it settles'},
+      'maskWipe' => {'title': 'Read this slowly', 'line': 'The line uncovers'},
+      'typeOn' => {'title': 'Type on', 'line': 'Letter after letter'},
+      'flapWord' => {'word': 'STILL', 'line': 'It turns into place'},
+      'waveType' => {'title': 'Wave', 'line': 'A wave along the line'},
+      'trackOpen' => {'word': 'QUIET', 'line': 'The letters step apart'},
+      'spinColumn' => {'title': 'Turn', 'a': 'Read', 'b': 'Hear', 'c': 'Keep'},
+      'glassLine' => {'title': 'Glass type', 'line': 'Black on white'},
+      'scatterSet' => {'word': 'FOCUS', 'line': 'They find their place'},
       _ => const {},
     };
 
@@ -110,6 +133,63 @@ Widget _loop(Widget Function(double t) builder, {int ms = 2800}) {
     if (editorHoldsStill(context)) return builder(0.35);
     return MotionLoop(milliseconds: ms, builder: builder);
   });
+}
+
+enum _Kin { pop, drop, type, flap, wave, scatter }
+
+/// Per-letter motion. The full string stays in [TplKit.label] so a tap
+/// still edits it and the registry can see the words.
+Widget _kin(TplKit k, String id, TextStyle style, double t, _Kin mode) {
+  final text = k.s(id);
+  if (text.isEmpty) return k.label(id, style);
+  return ClipRect(
+    child: Stack(
+      alignment: Alignment.centerLeft,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (var i = 0; i < text.length; i++) _glyph(text[i], style, i, text.length, t, mode),
+          ],
+        ),
+        k.label(id, style.copyWith(color: const Color(0x00000000))),
+      ],
+    ),
+  );
+}
+
+Widget _glyph(String ch, TextStyle style, int i, int n, double t, _Kin mode) {
+  if (ch == ' ') return const SizedBox(width: 8);
+  final stagger = i / math.max(1, n);
+  final local = ((t * 1.2) - stagger * 0.55).clamp(0.0, 1.0);
+  final wave = math.sin((t * math.pi * 2) + i * 0.6);
+  Widget child = Text(ch, style: style);
+  switch (mode) {
+    case _Kin.pop:
+      child = Transform.scale(scale: Curves.easeOutBack.transform(local), alignment: Alignment.bottomCenter, child: child);
+    case _Kin.drop:
+      final y = (1 - Curves.bounceOut.transform(local)) * -26;
+      child = Transform.translate(offset: Offset(0, y), child: child);
+    case _Kin.type:
+      child = Opacity(opacity: local > 0.12 ? 1 : 0, child: child);
+    case _Kin.flap:
+      final a = (1 - Curves.easeOutCubic.transform(local)) * -1.35;
+      child = Transform(
+        alignment: Alignment.topCenter,
+        transform: Matrix4.identity()..setEntry(3, 2, 0.006)..rotateX(a),
+        child: child,
+      );
+    case _Kin.wave:
+      child = Transform.translate(offset: Offset(0, wave * 6), child: child);
+    case _Kin.scatter:
+      final left = 1 - Curves.easeOutCubic.transform(local);
+      final dir = i.isEven ? 1.0 : -1.0;
+      child = Opacity(
+        opacity: local.clamp(0.0, 1.0),
+        child: Transform.translate(offset: Offset(dir * 16 * left, -20 * left), child: child),
+      );
+  }
+  return child;
 }
 
 Widget _pad(Widget child) => Padding(
@@ -756,6 +836,147 @@ Widget buildFreshTemplate(String kind, TplKit k) {
             ),
           ]);
         }),
+      ));
+    case 'letterPop':
+      return _pad(_panel(
+        child: _loop((t) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          _kin(k, 'word', _creamS(36, w: FontWeight.w900), t, _Kin.pop),
+          const SizedBox(height: 8),
+          L('line', _goldS(12, tracking: 0.6, w: FontWeight.w600)),
+        ])),
+      ));
+    case 'letterDrop':
+      return _pad(_panel(
+        bg: _cream,
+        border: _ink,
+        child: _loop((t) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          _kin(k, 'title', _inkS(34, w: FontWeight.w900), t, _Kin.drop),
+          const SizedBox(height: 8),
+          L('line', _inkS(13, w: FontWeight.w500)),
+        ])),
+      ));
+    case 'maskWipe':
+      return _pad(_panel(
+        bg: Colors.white,
+        border: _ink,
+        child: _loop((t) {
+          final reveal = t < 0.62 ? (t / 0.62) : 1.0;
+          return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            ClipRect(
+              child: Align(
+                alignment: Alignment.centerLeft,
+                widthFactor: reveal.clamp(0.04, 1.0),
+                child: L('title', _inkS(26, w: FontWeight.w800)),
+              ),
+            ),
+            const SizedBox(height: 8),
+            L('line', _inkS(13, w: FontWeight.w500)),
+          ]);
+        }),
+      ));
+    case 'typeOn':
+      return _pad(_panel(
+        child: _loop((t) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          _kin(k, 'title', _creamS(32, w: FontWeight.w800), t, _Kin.type),
+          const SizedBox(height: 8),
+          L('line', _creamS(13, w: FontWeight.w500)),
+        ]), ms: 2200),
+      ));
+    case 'flapWord':
+      return _pad(_panel(
+        child: _loop((t) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          _kin(k, 'word', _creamS(36, w: FontWeight.w900, tracking: 2), t, _Kin.flap),
+          const SizedBox(height: 8),
+          L('line', _goldS(12, tracking: 0.4, w: FontWeight.w600)),
+        ])),
+      ));
+    case 'waveType':
+      return _pad(_panel(
+        bg: Colors.white,
+        border: _ink,
+        child: _loop((t) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          L('title', _inkS(11, tracking: 2.2)),
+          const SizedBox(height: 6),
+          _kin(k, 'line', _inkS(22, w: FontWeight.w800), t, _Kin.wave),
+        ])),
+      ));
+    case 'trackOpen':
+      return _pad(_panel(
+        child: _loop((t) {
+          final open = 1 + 10 * (0.5 + 0.5 * math.sin(t * math.pi * 2));
+          return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: L('word', _creamS(34, w: FontWeight.w900, tracking: open)),
+            ),
+            const SizedBox(height: 8),
+            L('line', _goldS(12, tracking: 0.4, w: FontWeight.w600)),
+          ]);
+        }),
+      ));
+    case 'spinColumn':
+      return _pad(_panel(
+        child: _loop((t) {
+          const row = 42.0;
+          final shift = (t * 3) * row;
+          return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            L('title', _goldS(11)),
+            const SizedBox(height: 8),
+            ClipRect(
+              child: SizedBox(
+                height: row,
+                width: double.infinity,
+                child: OverflowBox(
+                  alignment: Alignment.topLeft,
+                  minHeight: row * 4,
+                  maxHeight: row * 4,
+                  child: Transform.translate(
+                    offset: Offset(0, -shift),
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      for (final id in ['a', 'b', 'c', 'a'])
+                        SizedBox(height: row, child: Align(alignment: Alignment.centerLeft, child: L(id, _creamS(28, w: FontWeight.w900)))),
+                    ]),
+                  ),
+                ),
+              ),
+            ),
+          ]);
+        }, ms: 3200),
+      ));
+    case 'glassLine':
+      return _pad(ClipRRect(
+        borderRadius: BorderRadius.circular(22),
+        child: BackdropFilter(
+          filter: ui.ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(18, 22, 18, 20),
+            decoration: BoxDecoration(
+              color: const Color(0xE8FFFFFF),
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: const Color(0xFF14120E)),
+            ),
+            child: _loop((t) {
+              final y = math.sin(t * math.pi * 2) * 3;
+              return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Transform.translate(offset: Offset(0, y), child: L('title', _inkS(30, w: FontWeight.w800))),
+                const SizedBox(height: 6),
+                L('line', _inkS(14, w: FontWeight.w700)),
+              ]);
+            }),
+          ),
+        ),
+      ));
+    case 'scatterSet':
+      return _pad(_panel(
+        bg: Colors.white,
+        border: _ink,
+        child: _loop((t) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          _kin(k, 'word', _inkS(34, w: FontWeight.w900), t, _Kin.scatter),
+          const SizedBox(height: 10),
+          L('line', _inkS(13, w: FontWeight.w500)),
+        ])),
       ));
     default:
       return const SizedBox.shrink();
