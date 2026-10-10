@@ -158,6 +158,7 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
             name: name,
             root: w.root,
             imgUrl: img,
+            categoryId: cat.id,
             price: price,
             originalPrice: StorePrices.instance.regularIfOnSale(id),
             onTap: () => openAtelierWord(context,
@@ -170,6 +171,7 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
             name: sig.name,
             root: 'Most Exclusive',
             imgUrl: sig.img,
+            categoryId: cat.id,
             signature: true,
             price: kMsSignaturePrice,
             onTap: () => openAtelierWord(

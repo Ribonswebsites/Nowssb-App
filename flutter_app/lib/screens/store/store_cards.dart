@@ -830,6 +830,39 @@ class RmWordRow extends StatelessWidget {
   }
 }
 
+/// Vertical NowssB ribbon for one collection. Width is not the same on
+/// every card — each category wears a different banner.
+class _CatRibbon {
+  const _CatRibbon(this.asset, this.width);
+  final String asset;
+  final double width;
+}
+
+_CatRibbon? ribbonForCategory(String? id) {
+  switch (id) {
+    case 'off50':
+    case 'identity':
+    case 'family':
+    case 'ancient':
+    case 'white':
+      return const _CatRibbon('assets/banners/ribbon-plain.png', 64);
+    case 'elements':
+    case 'cosmos':
+    case 'elite':
+    case 'mythical':
+    case 'black':
+      return const _CatRibbon('assets/banners/ribbon-metal.png', 96);
+    case 'sacred':
+    case 'nature':
+    case 'premium':
+    case 'warriors':
+    case 'peace':
+      return const _CatRibbon('assets/banners/ribbon-silk.png', 78);
+    default:
+      return null;
+  }
+}
+
 class RmWordCard extends StatelessWidget {
   const RmWordCard({
     super.key,
@@ -844,6 +877,7 @@ class RmWordCard extends StatelessWidget {
     this.onWishlist,
     this.onAddCart,
     this.tint,
+    this.categoryId,
   });
 
   final String name;
@@ -857,6 +891,9 @@ class RmWordCard extends StatelessWidget {
   final VoidCallback? onWishlist;
   final VoidCallback? onAddCart;
   final Color? tint;
+
+  /// Which collection this card belongs to. Picks the vertical ribbon.
+  final String? categoryId;
 
   /// Taller card: glass outside, black card inside, picture on a white tile.
   static const double cardHeight = 308;
@@ -876,6 +913,26 @@ class RmWordCard extends StatelessWidget {
         content: Text(msg),
         behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  _CatRibbon? get _ribbon => ribbonForCategory(categoryId);
+
+  /// Picture tile. Smaller when the category ribbon is taking the left side.
+  double get _tile => _ribbon == null ? 158 : (_ribbon!.width > 80 ? 104 : 120);
+
+  Widget _ribbonStrip(_CatRibbon ribbon) {
+    return ClipRRect(
+      borderRadius: const BorderRadius.horizontal(left: Radius.circular(20)),
+      child: SizedBox(
+        width: ribbon.width,
+        child: Image.asset(
+          ribbon.asset,
+          fit: BoxFit.cover,
+          alignment: Alignment.center,
+          filterQuality: FilterQuality.high,
+        ),
       ),
     );
   }
@@ -911,8 +968,15 @@ class RmWordCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(10, 10, 12, 10),
-                child: Column(
+                padding: EdgeInsets.zero,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (_ribbon != null) _ribbonStrip(_ribbon!),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(10, 10, 12, 10),
+                        child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
@@ -974,8 +1038,8 @@ class RmWordCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       SizedBox(
-                        width: 158,
-                        height: 158,
+                        width: _tile,
+                        height: _tile,
                         child: Stack(
                           fit: StackFit.expand,
                           children: [
@@ -1168,6 +1232,10 @@ class RmWordCard extends StatelessWidget {
                 ),
               ],
             ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
