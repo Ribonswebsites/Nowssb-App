@@ -11,7 +11,6 @@ import '../../data/entitlements.dart';
 import '../../data/store_prices.dart';
 import '../../data/word_art.dart';
 import '../../widgets/page_shell.dart';
-import '../../widgets/glass_wrap.dart';
 import 'store_routes.dart';
 import 'store_select_sheet.dart';
 import '../../media/nwsb_video.dart';
@@ -212,7 +211,6 @@ class _StoreProductPageState extends State<StoreProductPage> {
       subtitle: title,
       film: 'assets/video/player-bg-loop.mp4',
       usePageFilm: true,
-      plain: true,
       onBack: () => Navigator.of(context).pop(),
       onStorePicker: () => showStoreSelectSheet(
         context,
@@ -249,26 +247,26 @@ class _StoreProductPageState extends State<StoreProductPage> {
                           style: const TextStyle(
                             fontSize: 10,
                             letterSpacing: 2.2,
-                            color: NwsbColors.gold,
+                            color: Color(0x8CC8E8F5),
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                         const SizedBox(height: 6),
                         EditableLabel('product_detail.StoreProductPage',
                           title,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 30,
                             fontWeight: FontWeight.w700,
-                            color: StoreSurface.lightOf(context) ? const Color(0xFF16181E) : Colors.white,
+                            color: Colors.white,
                             height: 1.1,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           root,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 12,
-                            color: StoreSurface.lightOf(context) ? const Color(0xFF6A6258) : const Color(0x61FFFFFF),
+                            color: Color(0x61FFFFFF),
                           ),
                         ),
                         const SizedBox(height: 14),
