@@ -7,7 +7,11 @@ import 'package:flutter/material.dart';
 
 import '../../data/store_catalog.dart';
 import '../../media/nwsb_video.dart';
+import '../../screens/fashion/sections_bottom.dart';
+import '../../screens/fashion/sections_top.dart';
 import '../../screens/store/store_cards.dart';
+import '../../widgets/buddha_gyro_stage.dart';
+import '../../widgets/home_skin.dart';
 
 const kAppPieceNames = <String, String>{
   'pieceWord': 'Word type card',
@@ -28,6 +32,12 @@ const kAppPieceNames = <String, String>{
   'pieceHalf': 'Half-off row',
   'pieceHype': 'Hype posters',
   'pieceSplit': 'Store offer',
+  'cardPractice': 'Today\'s practice',
+  'cardReader': 'Reader block',
+  'cardStreak': 'Streak block',
+  'cardOffer': 'Offer card',
+  'cardQuote': 'Quotes stage',
+  'cardQuoteSoft': 'Quotes stage, raised',
 };
 
 const kAppPieceBlurbs = <String, String>{
@@ -49,6 +59,12 @@ const kAppPieceBlurbs = <String, String>{
   'pieceHalf': 'The store half-off row',
   'pieceHype': 'The hyped-words posters',
   'pieceSplit': 'The store offer banner',
+  'cardPractice': 'The practice card, black inside glass',
+  'cardReader': 'The reader card, black inside glass',
+  'cardStreak': 'The streak card, black inside glass',
+  'cardOffer': 'The offer card, black inside glass',
+  'cardQuote': 'The quotes stage, black inside glass. The Buddha stays. The pictures change.',
+  'cardQuoteSoft': 'The same quotes stage, raised, for the normal home',
 };
 
 /// Where a piece opens. Only a route string — the words on the card are fixed.
@@ -172,9 +188,31 @@ Widget buildAppPiece(String kind, {VoidCallback? onTap}) {
           ),
         ),
       );
+    case 'cardPractice':
+      return _home(const FashPractice(), fashion: true);
+    case 'cardReader':
+      return _home(const FashReader(), fashion: true);
+    case 'cardStreak':
+      return _home(const FashStreak(), fashion: true);
+    case 'cardOffer':
+      return _home(const FashOffer(), fashion: true);
+    case 'cardQuote':
+      return _home(const BuddhaGyroStage(), fashion: true);
+    case 'cardQuoteSoft':
+      return _home(const BuddhaGyroStage(neumorphic: true), fashion: false);
     default:
       return const SizedBox.shrink();
   }
+}
+
+Widget _home(Widget child, {required bool fashion}) {
+  return ColoredBox(
+    color: fashion ? const Color(0xFF07080C) : const Color(0xFFF0F2F7),
+    child: HomeSkinScope(
+      skin: fashion ? HomeSkin.fashion : HomeSkin.normal,
+      child: child,
+    ),
+  );
 }
 
 Widget _wordPad(Widget child) => Padding(

@@ -55,6 +55,12 @@ const kAppPieceKinds = <String>[
   'pieceHalf',
   'pieceHype',
   'pieceSplit',
+  'cardPractice',
+  'cardReader',
+  'cardStreak',
+  'cardOffer',
+  'cardQuote',
+  'cardQuoteSoft',
 ];
 
 const kTemplateKinds = <String>[

@@ -1,18 +1,14 @@
-/// Today's Quotes — two auto-rotating cards.
+/// Today's Quotes.
 ///
-/// The type plate fills the card in black. Dragging it left and right
-/// reveals the other side of the poster; anything past the plate stays
-/// black, never the home's glass or neu colour. The Buddha is smaller and
-/// sits on the bottom edge so the words stay readable around it.
+/// The Buddha stays put. The pictures behind it change one by one.
+/// There is no tilt and no drag — that parallax is gone.
 library;
 
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import '../admin/layout/scopes.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
-import 'package:sensors_plus/sensors_plus.dart';
 
 import 'app_thinking_loader.dart';
 import 'glass_wrap.dart';
@@ -20,6 +16,15 @@ import 'neumorphic.dart';
 import '../admin/template/editable.dart';
 
 const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
+
+/// Pictures behind the Buddha, in order. The first is the quote plate.
+const _quoteBacks = <String>[
+  'assets/banners/gyro/words-bg.png',
+  'assets/banners/stories/prana.png',
+  'assets/banners/stories/soma.png',
+  'assets/banners/stories/aura.png',
+  'assets/banners/stories/pitta.png',
+];
 
 class BuddhaGyroStage extends StatefulWidget {
   const BuddhaGyroStage({
@@ -37,13 +42,9 @@ class BuddhaGyroStage extends StatefulWidget {
 }
 
 class _BuddhaGyroStageState extends State<BuddhaGyroStage> {
-  StreamSubscription<AccelerometerEvent>? _sub;
   Timer? _pageAuto;
   late final PageController _pager;
-  double _pitch = 0;
-  double _pan = 0;
   var _page = 0;
-  var _userPaging = false;
 
   static const _stageH = 680.0;
 
@@ -52,26 +53,15 @@ class _BuddhaGyroStageState extends State<BuddhaGyroStage> {
     super.initState();
     _pager = PageController();
     if (_flutterTest) return;
-    try {
-      _sub = accelerometerEventStream(
-        samplingPeriod: SensorInterval.uiInterval,
-      ).listen((e) {
-        if (!mounted) return;
-        final pitch = math.atan2(e.z, e.y);
-        final next = (pitch / 0.55).clamp(-1.0, 1.0);
-        if ((next - _pitch).abs() < 0.02) return;
-        setState(() => _pitch = next);
-      }, onError: (_) {});
-    } catch (_) {}
-    _pageAuto = Timer.periodic(const Duration(milliseconds: 5200), (_) {
+    _pageAuto = Timer.periodic(const Duration(milliseconds: 4200), (_) {
       if (editorHoldsStill(context)) return;
-      if (!mounted || _userPaging) return;
+      if (!mounted) return;
       if (!TickerMode.of(context)) return;
       if (!_pager.hasClients) return;
-      final next = (_page + 1) % 2;
+      final next = (_page + 1) % _quoteBacks.length;
       _pager.animateToPage(
         next,
-        duration: const Duration(milliseconds: 560),
+        duration: const Duration(milliseconds: 700),
         curve: Curves.easeOutCubic,
       );
     });
@@ -79,18 +69,9 @@ class _BuddhaGyroStageState extends State<BuddhaGyroStage> {
 
   @override
   void dispose() {
-    _sub?.cancel();
     _pageAuto?.cancel();
     _pager.dispose();
     super.dispose();
-  }
-
-  void _drag(double dx) {
-    final box = context.findRenderObject();
-    final w = box is RenderBox && box.hasSize ? box.size.width : 340.0;
-    // Travel far enough to reveal the other side of the poster, then black.
-    final limit = (w * 0.92).clamp(160.0, 520.0);
-    setState(() => _pan = (_pan + dx).clamp(-limit, limit));
   }
 
   @override
@@ -114,135 +95,81 @@ class _BuddhaGyroStageState extends State<BuddhaGyroStage> {
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
           child: _enterBar(),
         ),
-        SizedBox(
-          height: _stageH,
-          child: PageView(
-            controller: _pager,
-            physics: const NeverScrollableScrollPhysics(),
-            onPageChanged: (i) => _page = i,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: _shell(0, _stage('assets/banners/gyro/buddha.png')),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: _shell(
-                  1,
-                  _stage('assets/banners/gyro/buddha-hand.png', orb: true),
-                ),
-              ),
-            ],
-          ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: _shell(child: _stage()),
         ),
       ],
     );
   }
 
-  Widget _shell(int index, Widget child) {
+  Widget _shell({required Widget child}) {
     if (widget.neumorphic) {
       return NeuCard(
         padding: const EdgeInsets.all(8),
-        radius: index == 0 ? 18 : 26,
-        elevation: index == 0 ? NwsbElevation.md : NwsbElevation.sm,
+        radius: 22,
+        elevation: NwsbElevation.md,
         child: child,
       );
     }
     return GlassWrap(
       margin: EdgeInsets.zero,
-      radius: index == 0 ? 18 : 26,
+      radius: 22,
       padding: const EdgeInsets.all(8),
       child: child,
     );
   }
 
-  Widget _stage(String figure, {bool orb = false}) {
-    return GestureDetector(
-      onHorizontalDragUpdate: (d) => _drag(d.delta.dx),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(14),
-        child: ColoredBox(
-          color: Colors.black,
-          child: LayoutBuilder(
-            builder: (context, c) {
-              final w = c.maxWidth;
-              final h = c.maxHeight;
-              // The plate is the poster’s own shape, contained in the card,
-              // so the whole line reads. Dragging it still lands on black.
-              const posterAspect = 844 / 1500;
-              final plateH = h * 0.92;
-              final plateW = plateH * posterAspect;
-              final plateTilt = Matrix4.identity()
-                ..setEntry(3, 2, 0.0011)
-                ..rotateX(_pitch * 0.22)
-                ..rotateY((_pan / w).clamp(-1.0, 1.0) * 0.08);
-              final tilt = Matrix4.identity()
-                ..setEntry(3, 2, 0.0012)
-                ..rotateX(_pitch * 0.28)
-                ..translateByDouble(0, _pitch * 8, 0, 1);
-              const aspect = 844 / 1500;
-              final imgH = h * 0.42;
-              final imgW = imgH * aspect;
-              final left = (w - imgW) / 2;
-              final top = h - imgH;
-              const orbSize = 46.0;
-              return Stack(
-                fit: StackFit.expand,
-                clipBehavior: Clip.hardEdge,
-                children: [
-                  Positioned(
-                    left: (w - plateW) / 2 + _pan,
-                    top: (h - plateH) / 2 + _pitch * -18,
-                    width: plateW,
-                    height: plateH,
-                    child: Transform(
-                      alignment: Alignment.center,
-                      transform: plateTilt,
-                      child: EditableImage.asset(
-                        'assets/banners/gyro/words-bg.png',
-                        fit: BoxFit.contain,
-                        filterQuality: FilterQuality.high,
-                        slot: 'buddha_gyro_stage.BuddhaGyroStage',
-                      ),
+  Widget _stage() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: ColoredBox(
+        color: Colors.black,
+        child: SizedBox(
+          height: _stageH,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              PageView.builder(
+                controller: _pager,
+                itemCount: _quoteBacks.length,
+                onPageChanged: (i) => _page = i,
+                itemBuilder: (_, i) {
+                  final words = i == 0;
+                  return EditableImage.asset(
+                    _quoteBacks[i],
+                    fit: words ? BoxFit.contain : BoxFit.cover,
+                    filterQuality: FilterQuality.high,
+                    slot: 'buddha_gyro_stage.BuddhaGyroStage',
+                  );
+                },
+              ),
+              const IgnorePointer(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Color(0x22000000), Color(0x00000000), Color(0xCC000000)],
+                      stops: [0, 0.45, 1],
                     ),
                   ),
-                  Positioned(
-                    left: left,
-                    top: top,
-                    width: imgW,
-                    height: imgH,
-                    child: Transform(
-                      alignment: Alignment.bottomCenter,
-                      transform: tilt,
-                      child: Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          Positioned.fill(
-                            child: EditableImage.asset(
-                              figure,
-                              fit: BoxFit.fill,
-                              filterQuality: FilterQuality.high,
-                              slot: 'buddha_gyro_stage.BuddhaGyroStage',
-                            ),
-                          ),
-                          if (orb)
-                            Positioned(
-                              // Fingertips of the raised hand, not the type.
-                              left: imgW * 0.90 - orbSize * 0.5,
-                              top: imgH * 0.47 - orbSize * 0.45,
-                              child: const AppThinkingLoader(
-                                size: orbSize,
-                                state: OrbState.composing,
-                                blackCircle: true,
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
+                ),
+              ),
+              // The Buddha does not move and does not change.
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: FractionallySizedBox(
+                  heightFactor: 0.42,
+                  child: EditableImage.asset(
+                    'assets/banners/gyro/buddha.png',
+                    fit: BoxFit.contain,
+                    filterQuality: FilterQuality.high,
+                    slot: 'buddha_gyro_stage.BuddhaGyroStage',
                   ),
-                ],
-              );
-            },
+                ),
+              ),
+            ],
           ),
         ),
       ),

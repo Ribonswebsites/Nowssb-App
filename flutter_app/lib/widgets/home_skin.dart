@@ -48,7 +48,7 @@ class HomeSkinScope extends InheritedWidget {
 /// Takes the same `child` [GlassWrap] does, so a section written for one
 /// home becomes a section on both by changing this one word.
 class SectionPane extends StatelessWidget {
-  const SectionPane({super.key, required this.child, this.padding});
+  const SectionPane({super.key, required this.child, this.padding, this.white = false});
 
   final Widget child;
 
@@ -56,12 +56,24 @@ class SectionPane extends StatelessWidget {
   /// edge of the pane, which on the web is what `padding: 0` does.
   final EdgeInsets? padding;
 
+  /// Fashion only: a white card inside the glass. Otherwise the card is black.
+  final bool white;
+
   @override
   Widget build(BuildContext context) {
     return switch (HomeSkinScope.of(context)) {
       HomeSkin.fashion => GlassWrap(
-          padding: padding ?? const EdgeInsets.all(12),
-          child: child,
+          padding: const EdgeInsets.all(8),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: white ? Colors.white : const Color(0xFF0B0B12),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Padding(
+              padding: padding ?? const EdgeInsets.all(10),
+              child: child,
+            ),
+          ),
         ),
       HomeSkin.normal => SecWrap(
           padding: padding ?? const EdgeInsets.all(14),
