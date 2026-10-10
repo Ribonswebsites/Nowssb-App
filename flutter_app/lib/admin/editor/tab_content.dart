@@ -510,7 +510,7 @@ class _TemplateEditorState extends State<TemplateEditor> {
           onPick: (v) => widget.c.patchProps(e.id, {'bg2': v}),
         ),
       ],
-      if (k == 'cardRow') ...[
+      if (k == 'cardRow' || cards.isNotEmpty) ...[
         for (var i = 0; i < cards.length; i++)
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
@@ -566,10 +566,24 @@ class _TemplateEditorState extends State<TemplateEditor> {
           ),
         Align(
           alignment: Alignment.centerLeft,
-          child: Pill('Add a card', icon: Icons.add_rounded, onTap: () {
-            widget.c.patchProps(e.id, {
-              'cards': [...cards, {'title': 'New card', 'route': 'tab:2'}],
-            });
+          child: Pill('Add a card', icon: Icons.add_rounded, onTap: () async {
+            final route = await pickRoute(context, '${p['route'] ?? 'tab:1'}');
+            if (route == null) return;
+            final had = cards;
+            final next = had.isEmpty
+                ? [
+                    {
+                      'title': '${p['title'] ?? ''}',
+                      'image': '${p['image'] ?? ''}',
+                      'route': '${p['route'] ?? ''}',
+                    },
+                    {'title': 'Next card', 'route': route, 'image': '${p['image'] ?? ''}'},
+                  ]
+                : [
+                    ...had,
+                    {'title': 'New card', 'route': route, 'image': '${had.last['image'] ?? ''}'},
+                  ];
+            widget.c.patchProps(e.id, {'cards': next});
           }),
         ),
       ],

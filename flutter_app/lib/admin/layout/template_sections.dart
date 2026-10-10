@@ -26,6 +26,7 @@ import 'app_pages.dart';
 import 'carousel_fx.dart';
 import 'coupon_sections.dart';
 import 'layout_sections.dart';
+import 'scopes.dart';
 import 'template_more.dart';
 import 'template_real.dart';
 import 'ui_layouts.dart';
@@ -208,16 +209,49 @@ Map<String, dynamic> templateStarter(String kind) {
 }
 
 class TemplateSection extends StatelessWidget {
-  const TemplateSection({super.key, required this.entry, required this.pageId, this.thumb = false});
+  const TemplateSection({super.key, required this.entry, required this.pageId, this.thumb = false, this.cardIndex});
   final SectionEntry entry;
   final String pageId;
 
   /// A drawer thumbnail: plain words and pictures, nothing registered.
   final bool thumb;
 
+  /// When set, this draws one card of a sideways row (its own words, picture and page).
+  final int? cardIndex;
+
   String get _slot => 'tpl.$pageId.${entry.id}';
   Map<String, dynamic> get p => entry.props;
-  String _s(String k) => '${p[k] ?? ''}';
+  List<Map<String, dynamic>> get _cards => [
+        for (final m in (p['cards'] is List ? p['cards'] as List : const []))
+          if (m is Map) Map<String, dynamic>.from(m),
+      ];
+
+  /// The one card this copy is drawing, when it is part of a sideways row.
+  Map<String, dynamic>? get _one {
+    final i = cardIndex;
+    final cards = _cards;
+    if (i == null || i < 0 || i >= cards.length) return null;
+    return cards[i];
+  }
+
+  String _s(String k) {
+    final one = _one;
+    if (one != null && one[k] != null && '${one[k]}'.isNotEmpty) return '${one[k]}';
+    return '${p[k] ?? ''}';
+  }
+
+  /// Slot field. A card in a row writes `cardN…` so it does not overwrite the others.
+  String _fid(String id) {
+    final i = cardIndex;
+    if (i == null) return id;
+    return switch (id) {
+      'title' => 'card${i}title',
+      'image' => 'card$i',
+      'subtitle' => 'card${i}subtitle',
+      'cta' => 'card${i}cta',
+      _ => id,
+    };
+  }
   double _h(double def) => p['height'] is num ? (p['height'] as num).toDouble() : def;
   BoxFit get _fit => '${p['fit']}' == 'contain' ? BoxFit.contain : BoxFit.cover;
 
@@ -226,13 +260,13 @@ class TemplateSection extends StatelessWidget {
       : thumb
           ? Text(text, style: style, maxLines: maxLines, textAlign: align,
               overflow: maxLines == null ? null : TextOverflow.ellipsis)
-          : EditableLabel(_slot, text, id: id, style: style, maxLines: maxLines, textAlign: align,
+          : EditableLabel(_slot, text, id: _fid(id), style: style, maxLines: maxLines, textAlign: align,
               overflow: maxLines == null ? null : TextOverflow.ellipsis);
 
   /// A picture the owner can tap in the editor to replace (prop [id]).
   Widget _picture(BuildContext context, String id, String url) => thumb
       ? NetPicture(url: url, fit: _fit)
-      : TemplatePicture(slot: '$_slot.$id', url: url, fit: _fit);
+      : TemplatePicture(slot: '$_slot.${_fid(id)}', url: url, fit: _fit);
 
   Widget _cta(BuildContext context, {bool light = false, Color? color}) {
     final label = _s('cta');
@@ -278,6 +312,11 @@ class TemplateSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Two or more cards: the card they designed, repeated sideways.
+    // Each one keeps the look and opens its own page.
+    if (cardIndex == null && entry.kind != 'cardRow' && _cards.length >= 2) {
+      return _SameCardRow(entry: entry, pageId: pageId, thumb: thumb, cards: _cards);
+    }
     switch (entry.kind) {
       case 'imageBanner':
       case 'videoBanner':
@@ -480,6 +519,48 @@ class TemplateThumb extends StatelessWidget {
           ),
         ),
       );
+}
+
+class _SameCardRow extends StatelessWidget {
+  const _SameCardRow({required this.entry, required this.pageId, required this.cards, this.thumb = false});
+  final SectionEntry entry;
+  final String pageId;
+  final List<Map<String, dynamic>> cards;
+  final bool thumb;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(builder: (context, box) {
+      final w = box.maxWidth.isFinite && box.maxWidth > 0 ? box.maxWidth : 360.0;
+      final cardW = (w * 0.86).clamp(240.0, 460.0);
+      return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (var i = 0; i < cards.length; i++)
+              SizedBox(
+                width: cardW,
+                child: GestureDetector(
+                  onTap: thumb
+                      ? null
+                      : () {
+                          if (editorHoldsStill(context)) return;
+                          openRoute(context, '${cards[i]['route'] ?? ''}');
+                        },
+                  child: TemplateSection(
+                    entry: entry,
+                    pageId: pageId,
+                    thumb: thumb,
+                    cardIndex: i,
+                  ),
+                ),
+              ),
+          ],
+        ),
+      );
+    });
+  }
 }
 
 class _CardRow extends StatefulWidget {

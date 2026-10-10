@@ -698,19 +698,21 @@ class EditorController extends ChangeNotifier {
       });
       return true;
     }
-    final card = RegExp(r'^card(\d+)(title)?$').firstMatch(field);
+    final card = RegExp(r'^card(\d+)([a-zA-Z]*)$').firstMatch(field);
     if (card == null) {
       patchProps(id, {field: value});
       return true;
     }
     final i = int.parse(card.group(1)!);
+    final suffix = card.group(2)!;
+    final fieldKey = suffix.isEmpty ? 'image' : suffix;
     updateEntry(id, (e) {
       final cards = [
         for (final m in (e.props['cards'] is List ? e.props['cards'] as List : const []))
           if (m is Map) Map<String, dynamic>.from(m)
       ];
       if (i >= cards.length) return e;
-      cards[i][card.group(2) == null ? 'image' : 'title'] = value;
+      cards[i][fieldKey] = value;
       return e.copyWith(props: {...e.props, 'cards': cards});
     });
     return true;

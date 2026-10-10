@@ -799,6 +799,62 @@ class _SectionBoard extends StatelessWidget {
     _step(() => c.patchProps(cur.id, {'height': next, 'boxH': null}));
   }
 
+  List<Map<String, dynamic>> _cardMaps(Map<String, dynamic> p) => [
+        for (final m in (p['cards'] is List ? p['cards'] as List : const []))
+          if (m is Map) Map<String, dynamic>.from(m),
+      ];
+
+  /// The card they already finished stays card one. The new card sits beside
+  /// it, the row scrolls sideways, and each card opens the page they pick.
+  Future<void> _addNextCard(BuildContext context) async {
+    final cur = c.current;
+    if (cur == null || !cur.entry.isTemplate) return;
+    final p = cur.entry.props;
+    final route = await pickRoute(context, '${p['route'] ?? 'tab:1'}');
+    if (route == null) return;
+    final had = _cardMaps(p);
+    final next = had.isEmpty
+        ? [
+            {
+              'title': '${p['title'] ?? cur.title}',
+              'subtitle': '${p['subtitle'] ?? ''}',
+              'image': '${p['image'] ?? ''}',
+              'route': '${p['route'] ?? ''}',
+              'cta': '${p['cta'] ?? ''}',
+            },
+            {
+              'title': 'Next card',
+              'subtitle': '',
+              'image': '${p['image'] ?? ''}',
+              'route': route,
+              'cta': '${p['cta'] ?? ''}',
+            },
+          ]
+        : [
+            ...had,
+            {
+              'title': 'Next card',
+              'subtitle': '',
+              'image': '${had.last['image'] ?? p['image'] ?? ''}',
+              'route': route,
+              'cta': '${p['cta'] ?? ''}',
+            },
+          ];
+    _step(() => c.patchProps(cur.id, {'cards': next}));
+  }
+
+  Future<void> _cardPage(BuildContext context, int i) async {
+    final cur = c.current;
+    if (cur == null) return;
+    final cards = _cardMaps(cur.entry.props);
+    if (i < 0 || i >= cards.length) return;
+    final route = await pickRoute(context, '${cards[i]['route'] ?? ''}');
+    if (route == null) return;
+    final next = [...cards];
+    next[i] = {...next[i], 'route': route};
+    _step(() => c.patchProps(cur.id, {'cards': next}));
+  }
+
   @override
   Widget build(BuildContext context) {
     final cur = c.current!;
@@ -876,8 +932,27 @@ class _SectionBoard extends StatelessWidget {
               chip('Edit text', false, onWords, key: const ValueKey('strip-text')),
               chip('Style', false, onStyle, key: const ValueKey('strip-look')),
               chip('Animate', false, onEffects, key: const ValueKey('strip-animate')),
+              if (cur.entry.isTemplate)
+                chip('Add next card', false, () => _addNextCard(context), key: const ValueKey('add-next-card')),
               chip('Delete', false, () => deleteWithUndo(context, c, cur.id, cur.title), key: const ValueKey('strip-delete')),
             ]),
+            if (cur.entry.isTemplate && _cardMaps(p).isNotEmpty) ...[
+              const SizedBox(height: 4),
+              const Text(
+                'Swipe the row. Each card opens its own page.',
+                style: TextStyle(color: Color(0xFFB7C0D0), fontSize: 12),
+              ),
+              const SizedBox(height: 6),
+              Wrap(children: [
+                for (var i = 0; i < _cardMaps(p).length; i++)
+                  chip(
+                    'Card ${i + 1} · ${routeLabel('${_cardMaps(p)[i]['route'] ?? ''}')}',
+                    false,
+                    () => _cardPage(context, i),
+                    key: ValueKey('card-page-$i'),
+                  ),
+              ]),
+            ],
           ],
         ),
       ),
