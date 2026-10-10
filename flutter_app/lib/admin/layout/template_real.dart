@@ -5,6 +5,7 @@ library;
 
 import 'package:flutter/material.dart';
 
+import '../../data/store_catalog.dart';
 import '../../media/nwsb_video.dart';
 import '../../screens/store/store_cards.dart';
 
@@ -72,14 +73,14 @@ Widget buildAppPiece(String kind, {VoidCallback? onTap}) {
     case 'pieceWord':
       return _wordPad(SizedBox(
         height: 220,
-        child: WordSpecimen(word: 'Aarogya', root: 'Immune system', priceLabel: '₹199', onAdd: onTap),
+        child: RmWordCard(name: 'Aarogya', root: 'Immune system', imgUrl: kRmWordImg, price: 199, onTap: onTap, onAddCart: onTap),
       ));
     case 'pieceWords':
       return _wordPad(SizedBox(
         height: 220,
         child: Row(children: [
           for (final (w, r) in [('Aarogya', 'Immune system'), ('Prana', 'Lungs · Heart'), ('Soma', 'Body · Mind')]) ...[
-            Expanded(child: WordSpecimen(word: w, root: r, priceLabel: '₹199', onAdd: onTap)),
+            Expanded(child: RmWordCard(name: w, root: r, imgUrl: kRmWordImg, price: 199, onTap: onTap, onAddCart: onTap)),
             if (w != 'Soma') const SizedBox(width: 8),
           ],
         ]),

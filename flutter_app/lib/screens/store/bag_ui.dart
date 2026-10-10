@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import '../../data/cart_bag.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/nwsb_icon.dart';
+import '../../widgets/glass_wrap.dart';
 import 'cart_pages.dart';
 import 'store_cards.dart';
 import '../../admin/template/editable.dart';
@@ -49,6 +50,7 @@ class StoreBagBar extends StatelessWidget {
       listenable: CartBag.instance,
       builder: (_, __) {
         final bag = CartBag.instance;
+        final light = StoreSurface.lightOf(context);
         return ClipRRect(
           borderRadius: BorderRadius.circular(24),
           child: BackdropFilter(
@@ -56,12 +58,9 @@ class StoreBagBar extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.fromLTRB(8, 6, 8, 6),
               decoration: BoxDecoration(
-                color: const Color(0xCCFFFFFF),
+                color: light ? const Color(0xF216181E) : const Color(0x0FFFFFFF),
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: const Color(0x14000000)),
-                boxShadow: const [
-                  BoxShadow(color: Color(0x22000000), blurRadius: 10, offset: Offset(0, 3)),
-                ],
+                border: Border.all(color: light ? const Color(0x66E8D5A3) : const Color(0x24FFFFFF)),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,

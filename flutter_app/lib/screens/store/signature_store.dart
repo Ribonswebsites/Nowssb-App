@@ -15,7 +15,6 @@ import 'product_detail.dart';
 import 'store_cards.dart';
 import 'store_home_sections.dart';
 import 'store_section_mix.dart';
-import 'shop_page.dart';
 import 'store_select_sheet.dart';
 import '../../widgets/sections/artist_cards_section.dart';
 import 'store_routes.dart';
@@ -31,11 +30,26 @@ class SignatureStoreScreen extends StatelessWidget {
   Widget build(BuildContext context) => StoreTermsHost(
         which: 'signature',
         head: 'Signatures described by sound',
-        child: NwsbShopPage(
-          pageId: 'store.signature',
-          which: 'signature',
-          title: 'The Signature Store',
-          groups: signatureShopGroups(),
+        child: PageShell(
+        eyebrow: '',
+        title: 'NowssB Store',
+        subtitle: 'The Signature Store',
+        film: 'assets/video/player-bg-loop.mp4',
+        usePageFilm: true,
+        plain: true,
+        onBack: () => Navigator.of(context).pop(),
+        onStorePicker: () => showStoreSelectSheet(
+          context,
+          current: 'signature',
+          onSelect: (id) =>
+              openStoreFromPicker(context, id, current: 'signature'),
+        ),
+        slivers: [
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 40),
+            sliver: SliverList.list(children: const [_SignatureBody()]),
+          ),
+        ],
         ),
       );
 }

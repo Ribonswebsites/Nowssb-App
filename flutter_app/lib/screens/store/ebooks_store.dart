@@ -21,8 +21,6 @@ import 'store_actions.dart';
 import 'store_cards.dart';
 import 'store_home_sections.dart';
 import 'store_section_mix.dart';
-import 'store_coupon_banner.dart';
-import 'shop_page.dart';
 import 'store_select_sheet.dart';
 import 'store_routes.dart';
 import 'store_terms_sheet.dart';
@@ -37,11 +35,26 @@ class EbooksStoreScreen extends StatelessWidget {
   Widget build(BuildContext context) => StoreTermsHost(
         which: 'ebooks',
         head: 'Ebooks described by sound',
-        child: NwsbShopPage(
-          pageId: 'store.ebooks',
-          which: 'ebooks',
-          title: 'The Ebooks Store',
-          groups: ebookShopGroups(),
+        child: PageShell(
+        eyebrow: '',
+        title: 'NowssB Store',
+        subtitle: 'The Ebooks Store',
+        film: 'assets/video/player-bg-loop.mp4',
+        usePageFilm: true,
+        plain: true,
+        onBack: () => Navigator.of(context).pop(),
+        onStorePicker: () => showStoreSelectSheet(
+          context,
+          current: 'ebooks',
+          onSelect: (id) =>
+              openStoreFromPicker(context, id, current: 'ebooks'),
+        ),
+        slivers: [
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
+            sliver: SliverList.list(children: const [_EbooksBody()]),
+          ),
+        ],
         ),
       );
 }
@@ -171,7 +184,7 @@ class _EbooksBody extends StatelessWidget {
         LSection(
           'coupons',
           'Coupon banner',
-          const StoreCouponBanner(),
+          StoreRegistrySection(config: EbooksMix.coupons),
         ),
         LSection(
           'tiles',

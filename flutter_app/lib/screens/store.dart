@@ -8,21 +8,19 @@ library;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import '../admin/layout/scopes.dart';
 
 import '../data/app_control.dart';
 import '../data/word_requests.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
+import '../widgets/glass_wrap.dart';
 import '../widgets/banner_mix.dart';
 import '../widgets/black_glass_banner.dart';
 import '../widgets/colored_split_promo_banner.dart';
 import '../widgets/nwsb_icon.dart';
 import '../features/bazaar/bazaar_screen.dart';
 import 'store/bag_ui.dart';
-import 'store/store_cards.dart';
 import 'store/store_home_sections.dart';
 
 export 'store/ebooks_store.dart';
@@ -85,44 +83,29 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
     final items = <Widget>[
       Padding(
         padding: const EdgeInsets.fromLTRB(20, 22, 12, 2),
-        child: Column(
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      EditableLabel('store.StoreHomeContent', 'NowssB Store',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 34,
-                              height: 1.0,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: -1.0)),
-                      SizedBox(height: 8),
-                      EditableLabel('store.StoreHomeContent', 'Own the words. Unlock the meanings.',
-                          style: TextStyle(
-                              color: Color(0xAFFFFFFF), fontSize: 13, height: 1.3)),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 8),
-                const StoreBagBar(),
-              ],
-            ),
-            const SizedBox(height: 14),
-            const BwKineticLine(
-              text: 'WORDS   MEANINGS   BOOKS',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 15,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1.2,
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  EditableLabel('store.StoreHomeContent', 'NowssB Store',
+                      style: TextStyle(
+                          color: Color(0xFF16181E),
+                          fontSize: 34,
+                          height: 1.0,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -1.0)),
+                  SizedBox(height: 8),
+                  EditableLabel('store.StoreHomeContent', 'Own the words. Unlock the meanings.',
+                      style: TextStyle(
+                          color: Color(0xFF5C564E), fontSize: 13, height: 1.3)),
+                ],
               ),
             ),
+            const SizedBox(width: 8),
+            const StoreBagBar(),
           ],
         ),
       ),
@@ -286,7 +269,7 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
         padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
         child: EditableLabel('store.StoreHomeContent',
           'Disclaimer & Confidentiality\n\nWords, meanings, ebooks and verification badges shared or sold here are for educational and wellness purposes only — nothing here is medical advice. Purchases are final once unlocked. Any information you share with us is kept strictly confidential and never sold or shared with third parties.',
-          style: TextStyle(fontSize: 11, height: 1.5, color: Color(0x73FFFFFF)),
+          style: TextStyle(fontSize: 11, height: 1.5, color: Color(0xFF5C564E)),
         ),
       ),
       const Padding(
@@ -294,7 +277,7 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
         child: EditableLabel('store.StoreHomeContent',
           'NowssB\n© 2026 Adv. Sanjaykumar Gadge · Shabdapathy',
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 11, height: 1.6, color: Color(0x73FFFFFF)),
+          style: TextStyle(fontSize: 11, height: 1.6, color: Color(0xFF5C564E)),
         ),
       ),
     ];
@@ -322,59 +305,10 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
             LSection('credits', 'Credits', items[19]),
           ]);
     return Scaffold(
-      backgroundColor: NwsbColors.deep,
-      body: Stack(
-        children: [
-          const Positioned.fill(
-            child: NwsbVideo(
-              asset: 'assets/video/player-bg-loop.mp4',
-              priority: ClipPriority.decoration,
-              autoplay: true,
-              loop: true,
-              fit: BoxFit.cover,
-              slot: 'store.StoreHomeContent',
-            ),
-          ),
-          const Positioned.fill(
-            child: IgnorePointer(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: RadialGradient(
-                    center: Alignment(0, -0.1),
-                    radius: 0.88,
-                    colors: [
-                      Color(0x00000000),
-                      Color(0x24000000),
-                      Color(0x57000000),
-                      Color(0x94000000),
-                    ],
-                    stops: [0.30, 0.58, 0.80, 1.0],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          const Positioned.fill(
-            child: IgnorePointer(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color(0x42000000),
-                      Color(0x00000000),
-                      Color(0x00000000),
-                      Color(0x57000000),
-                    ],
-                    stops: [0, 0.20, 0.76, 1.0],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          SafeArea(child: ListView(children: shown)),
-        ],
+      backgroundColor: const Color(0xFFF6F4EF),
+      body: StoreSurface(
+        light: true,
+        child: SafeArea(child: ListView(children: shown)),
       ),
     );
   }
@@ -457,7 +391,6 @@ class _StoreImageRotatorState extends State<_StoreImageRotator> {
     super.initState();
     if (!_flutterTest) {
       _timer = Timer.periodic(const Duration(seconds: 4), (_) {
-        if (editorHoldsStill(context)) return;
         if (mounted) setState(() => _index = (_index + 1) % _images.length);
       });
     }
@@ -514,117 +447,20 @@ class _StoreGlassSection extends StatelessWidget {
   final EdgeInsets margin;
 
   @override
-  Widget build(BuildContext context) {
-    final body = children.length < 2
-        ? Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              for (var i = 0; i < children.length; i++) ...[
-                children[i],
-                if (i != children.length - 1) const SizedBox(height: 10),
-              ],
+  Widget build(BuildContext context) => HeavyGlassPanel(
+        margin: margin,
+        radius: 24,
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (var i = 0; i < children.length; i++) ...[
+              children[i],
+              if (i != children.length - 1) const SizedBox(height: 10),
             ],
-          )
-        : _FilmPair(
-            // Label above the glass, this panel's margin, and its padding.
-            // The film takes whatever height is left. The card is [rest].
-            chrome: 36 + margin.vertical + 20,
-            film: children.first,
-            rest: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                for (var i = 1; i < children.length; i++) ...[
-                  const SizedBox(height: 10),
-                  children[i],
-                ],
-              ],
-            ),
-          );
-    return HeavyGlassPanel(
-      margin: margin,
-      radius: 24,
-      padding: const EdgeInsets.all(10),
-      child: body,
-    );
-  }
-}
-
-/// Lays the film out at the height the owner asked for, after the card
-/// under it has taken its own size. The card is not scaled.
-class _FilmPair extends MultiChildRenderObjectWidget {
-  _FilmPair({required this.chrome, required Widget film, required Widget rest})
-      : super(children: [film, rest]);
-
-  final double chrome;
-
-  @override
-  RenderObject createRenderObject(BuildContext context) =>
-      _RenderFilmPair(SectionExtent.of(context), chrome);
-
-  @override
-  void updateRenderObject(BuildContext context, _RenderFilmPair renderObject) {
-    renderObject
-      ..extent = SectionExtent.of(context)
-      ..chrome = chrome;
-  }
-}
-
-class _FilmParentData extends ContainerBoxParentData<RenderBox> {}
-
-class _RenderFilmPair extends RenderBox
-    with ContainerRenderObjectMixin<RenderBox, _FilmParentData>,
-        RenderBoxContainerDefaultsMixin<RenderBox, _FilmParentData> {
-  _RenderFilmPair(this._extent, this._chrome);
-
-  double? _extent;
-  set extent(double? v) {
-    if (v == _extent) return;
-    _extent = v;
-    markNeedsLayout();
-  }
-
-  double _chrome;
-  set chrome(double v) {
-    if (v == _chrome) return;
-    _chrome = v;
-    markNeedsLayout();
-  }
-
-  @override
-  void setupParentData(RenderBox child) {
-    if (child.parentData is! _FilmParentData) {
-      child.parentData = _FilmParentData();
-    }
-  }
-
-  @override
-  void performLayout() {
-    final film = firstChild;
-    final rest = film == null ? null : childAfter(film);
-    final w = constraints.hasBoundedWidth ? constraints.maxWidth : 0.0;
-    if (film == null || rest == null) {
-      size = constraints.constrain(Size(w, 0));
-      return;
-    }
-    rest.layout(BoxConstraints.tightFor(width: w), parentUsesSize: true);
-    final asked = _extent;
-    if (asked != null && asked > 48) {
-      final room = asked - _chrome - rest.size.height;
-      film.layout(BoxConstraints.tightFor(width: w, height: room.clamp(72.0, 960.0)), parentUsesSize: true);
-    } else {
-      film.layout(BoxConstraints.tightFor(width: w), parentUsesSize: true);
-    }
-    (film.parentData! as _FilmParentData).offset = Offset.zero;
-    (rest.parentData! as _FilmParentData).offset = Offset(0, film.size.height);
-    size = constraints.constrain(Size(w, film.size.height + rest.size.height));
-  }
-
-  @override
-  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) =>
-      defaultHitTestChildren(result, position: position);
-
-  @override
-  void paint(PaintingContext context, Offset offset) => defaultPaint(context, offset);
+          ],
+        ),
+      );
 }
 
 class _StoreInfoBanner extends StatelessWidget {
@@ -659,7 +495,7 @@ class _StoreDepartmentLabel extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
         child: EditableLabel('store.StoreDepartmentLabel', label,
             style: const TextStyle(
-                fontSize: 10, letterSpacing: 2.2, color: Colors.white)),
+                fontSize: 10, letterSpacing: 2.2, color: NwsbColors.gold)),
       );
 }
 
@@ -942,7 +778,7 @@ class _StoreCompactVideoBanner extends StatelessWidget {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(15),
           child: AspectRatio(
-            aspectRatio: 16 / 9,
+            aspectRatio: 16 / 6.4,
             child: NwsbVideo(
               asset: asset,
               priority: ClipPriority.feature,
@@ -977,7 +813,7 @@ class _StoreVideoBanner extends StatelessWidget {
         borderRadius: BorderRadius.circular(15),
         child: AspectRatio(
           // Subscription film is 720×406, so a 16:9 box shows the whole frame.
-          aspectRatio: 16 / 9,
+          aspectRatio: tall ? 16 / 9 : 16 / 6.4,
           child: EditMedia(
             child: NwsbVideo(
               asset: asset,
@@ -1020,11 +856,9 @@ class _MiniStoreCard extends StatelessWidget {
         margin: const EdgeInsets.fromLTRB(0, 6, 0, 6),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: const Color(0xFFF4F1EA),
-          borderRadius: BorderRadius.circular(18),
-          boxShadow: const [
-            BoxShadow(color: Color(0x66000000), blurRadius: 18, offset: Offset(0, 8)),
-          ],
+          color: const Color(0xFF000000),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0x24FFFFFF)),
         ),
         child: Row(
           children: [
@@ -1032,10 +866,8 @@ class _MiniStoreCard extends StatelessWidget {
               width: 44,
               height: 44,
               decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Color(0xFF16181E),
-              ),
-              child: Icon(icon, color: Colors.white, size: 20),
+                  shape: BoxShape.circle, color: Color(0x14FFFFFF)),
+              child: Icon(icon, color: NwsbColors.gold, size: 21),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -1046,21 +878,21 @@ class _MiniStoreCard extends StatelessWidget {
                       style: const TextStyle(
                           fontSize: 9,
                           letterSpacing: 1.2,
-                          color: Color(0xFF8A847A))),
+                          color: Color(0x99FFFFFF))),
                   const SizedBox(height: 3),
                   EditableLabel('store.MiniStoreCard', title,
                       style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
-                          color: Color(0xFF16181E))),
+                          color: Colors.white)),
                   const SizedBox(height: 3),
                   EditableLabel('store.MiniStoreCard', sub,
                       style: const TextStyle(
-                          fontSize: 11, height: 1.3, color: Color(0xFF5C564E))),
+                          fontSize: 11, height: 1.3, color: Color(0x8CFFFFFF))),
                 ],
               ),
             ),
-            const Icon(Icons.arrow_forward, size: 16, color: Color(0xFF16181E)),
+            const Icon(Icons.arrow_forward, size: 16, color: Color(0xB3FFFFFF)),
           ],
         ),
       );

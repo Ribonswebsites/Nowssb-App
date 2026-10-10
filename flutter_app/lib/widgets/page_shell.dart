@@ -32,7 +32,6 @@ class PageShell extends StatefulWidget {
     this.actions = const [],
     this.plain = false,
     this.canvas,
-    this.bodyMax = 860,
   });
 
   /// Extra controls at the end of the title row (e.g. Quick access Reset).
@@ -67,9 +66,6 @@ class PageShell extends StatefulWidget {
 
   /// Flat page colour, no film. Word Atelier's black look uses this.
   final Color? canvas;
-
-  /// Cap on the scrolling column. Phone width is unaffected.
-  final double bodyMax;
 
   @override
   State<PageShell> createState() => _PageShellState();
@@ -177,10 +173,117 @@ class _PageShellState extends State<PageShell> {
           SafeArea(
             child: Center(
               child: ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: widget.bodyMax),
+                constraints: const BoxConstraints(maxWidth: 860),
                 child: CustomScrollView(
                   slivers: [
-                SliverToBoxAdapter(child: _header(plain, titleColor, subColor)),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
+                    child: Row(
+                      children: [
+                        if (widget.onBack != null) ...[
+                          GestureDetector(
+                            onTap: widget.onBack,
+                            behavior: HitTestBehavior.opaque,
+                            child: Container(
+                              width: 42,
+                              height: 42,
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.arrow_back,
+                                  size: 19, color: NwsbColors.ink),
+                            ),
+                          ),
+                          const SizedBox(width: 14),
+                        ],
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (widget.eyebrow.trim().isNotEmpty) ...[
+                                Text(
+                                  widget.eyebrow.toUpperCase(),
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    letterSpacing: 3,
+                                    fontWeight: FontWeight.w700,
+                                    color: NwsbColors.gold,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                              ],
+                              EditableLabel('page_shell.PageShell',
+                                widget.title,
+                                style: TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.w800,
+                                  color: titleColor,
+                                  height: 1.1,
+                                ),
+                              ),
+                              if (widget.subtitle != null &&
+                                  widget.subtitle!.trim().isNotEmpty) ...[
+                                const SizedBox(height: 4),
+                                Text(
+                                  widget.subtitle!,
+                                  maxLines: 1,
+                                  softWrap: false,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: subColor,
+                                    height: 1.2,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                        if (widget.actions.isNotEmpty) ...[
+                          const SizedBox(width: 8),
+                          ...widget.actions,
+                        ],
+                        if (widget.onStorePicker != null) ...[
+                          const SizedBox(width: 8),
+                          const StoreBagBar(),
+                          const SizedBox(width: 8),
+                          GestureDetector(
+                            onTap: widget.onStorePicker,
+                            behavior: HitTestBehavior.opaque,
+                            child: Container(
+                              height: 42,
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(21),
+                                color: plain ? const Color(0xF216181E) : const Color(0x33FFFFFF),
+                                border: Border.all(color: plain ? const Color(0x66E8D5A3) : const Color(0x44FFFFFF)),
+                              ),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.storefront_outlined, size: 18, color: Colors.white),
+                                  SizedBox(width: 6),
+                                  EditableLabel('page_shell.PageShell',
+                                    'Stores',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
                 ...widget.slivers,
                 const SliverToBoxAdapter(child: SizedBox(height: 108)),
                 ],
@@ -190,120 +293,6 @@ class _PageShellState extends State<PageShell> {
           ),
         ],
       ),
-      ),
-    );
-  }
-
-  /// Controls on one row. The name on the next, full width — a title beside
-  /// the bag and Stores was being crushed into a column of syllables.
-  Widget _header(bool plain, Color titleColor, Color subColor) {
-    final back = widget.onBack == null
-        ? null
-        : GestureDetector(
-            onTap: widget.onBack,
-            behavior: HitTestBehavior.opaque,
-            child: Container(
-              width: 42,
-              height: 42,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                boxShadow: const [
-                  BoxShadow(color: Color(0x33000000), blurRadius: 10, offset: Offset(0, 3)),
-                ],
-              ),
-              child: const Icon(Icons.arrow_back, size: 19, color: NwsbColors.ink),
-            ),
-          );
-    final stores = widget.onStorePicker == null
-        ? null
-        : GestureDetector(
-            onTap: widget.onStorePicker,
-            behavior: HitTestBehavior.opaque,
-            child: Container(
-              height: 42,
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(21),
-                color: plain ? const Color(0xFF16181E) : const Color(0xE616181E),
-                boxShadow: const [
-                  BoxShadow(color: Color(0x33000000), blurRadius: 10, offset: Offset(0, 3)),
-                ],
-              ),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.storefront_outlined, size: 16, color: Colors.white),
-                  SizedBox(width: 6),
-                  Text(
-                    'Stores',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white),
-                  ),
-                ],
-              ),
-            ),
-          );
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 10, 16, 6),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            children: [
-              if (back != null) back,
-              const Spacer(),
-              if (widget.actions.isNotEmpty) ...widget.actions,
-              if (widget.onStorePicker != null) ...[
-                if (widget.actions.isNotEmpty) const SizedBox(width: 8),
-                const StoreBagBar(),
-                const SizedBox(width: 8),
-                stores!,
-              ],
-            ],
-          ),
-          const SizedBox(height: 14),
-          if (widget.eyebrow.trim().isNotEmpty) ...[
-            Text(
-              widget.eyebrow.toUpperCase(),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 10,
-                letterSpacing: 2.4,
-                fontWeight: FontWeight.w700,
-                color: NwsbColors.gold,
-              ),
-            ),
-            const SizedBox(height: 4),
-          ],
-          EditableLabel(
-            'page_shell.PageShell',
-            widget.title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 26,
-              fontWeight: FontWeight.w800,
-              color: titleColor,
-              height: 1.05,
-              letterSpacing: -0.4,
-            ),
-          ),
-          if (widget.subtitle != null && widget.subtitle!.trim().isNotEmpty) ...[
-            const SizedBox(height: 3),
-            Text(
-              widget.subtitle!,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: subColor,
-                height: 1.2,
-              ),
-            ),
-          ],
-        ],
       ),
     );
   }

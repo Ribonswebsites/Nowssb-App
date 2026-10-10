@@ -3,13 +3,11 @@
 library;
 
 import 'dart:async';
-import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
-import '../../admin/layout/scopes.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../../data/cart_bag.dart';
@@ -21,6 +19,7 @@ import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/app_thinking_loader.dart';
 import '../../features/economy/money.dart';
+import 'atelier_look.dart';
 import 'store_actions.dart';
 import '../../data/entitlements.dart';
 import '../../data/store_prices.dart';
@@ -278,8 +277,8 @@ class RmCatBanner extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
               decoration: BoxDecoration(
                 borderRadius: r,
-                color: GlassWrap.fill,
-                border: Border.all(color: GlassWrap.line),
+                color: AtelierScope.of(context) ? const Color(0xF2FFFFFF) : glassFill(context),
+                border: Border.all(color: AtelierScope.of(context) ? const Color(0x22000000) : glassLine(context)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -337,9 +336,9 @@ class RmCatBanner extends StatelessWidget {
                     const SizedBox(height: 3),
                     EditableLabel('store_cards.RmCatBanner',
                       sub,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
-                        color: Color(0x88FFFFFF),
+                        color: AtelierScope.of(context) ? const Color(0xFF5C564E) : const Color(0x88FFFFFF),
                       ),
                     ),
                   ],
@@ -692,6 +691,7 @@ class RmRowHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final light = StoreSurface.lightOf(context);
     return Padding(
       padding: const EdgeInsets.only(top: 18, bottom: 10),
       child: Row(
@@ -701,10 +701,10 @@ class RmRowHeader extends StatelessWidget {
               title,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
-                color: Colors.white,
+                color: light ? const Color(0xFF16181E) : Colors.white,
                 letterSpacing: -0.3,
               ),
             ),
@@ -737,7 +737,6 @@ class _RmBannerRailState extends State<RmBannerRail> {
     _pc = PageController(viewportFraction: 0.92);
     if (widget.banners.length > 1) {
       _timer = Timer.periodic(const Duration(milliseconds: 3800), (_) {
-        if (editorHoldsStill(context)) return;
         if (!mounted || !_pc.hasClients) return;
         final next = (_page + 1) % widget.banners.length;
         _pc.animateToPage(
@@ -879,6 +878,10 @@ class RmWordCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bg = tint ?? storeCardTint(name);
+    final paper = AtelierScope.of(context);
+    final light = StoreSurface.lightOf(context);
+    final fg = paper ? const Color(0xFF16181E) : Colors.white;
+    final mute = paper ? const Color(0xFF5C564E) : const Color(0xB8FFFFFF);
     return GestureDetector(
       onTap: onTap,
       child: ClipRRect(
@@ -890,22 +893,24 @@ class RmWordCard extends StatelessWidget {
             height: cardHeight,
             padding: const EdgeInsets.fromLTRB(10, 10, 12, 10),
             decoration: BoxDecoration(
-              color: bg.withOpacity(0.13),
+              color: paper ? const Color(0xF2FFFFFF) : (light ? const Color(0xF216181E) : bg.withOpacity(0.13)),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
                 color: signature
                     ? const Color(0x66E8D5A3)
                     : const Color(0x38FFFFFF),
               ),
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  bg.withOpacity(0.22),
-                  const Color(0x1AFFFFFF),
-                  const Color(0x12000000),
-                ],
-              ),
+              gradient: paper || light
+                  ? null
+                  : LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        bg.withOpacity(0.22),
+                        const Color(0x1AFFFFFF),
+                        const Color(0x12000000),
+                      ],
+                    ),
               boxShadow: [
                 BoxShadow(
                   color: bg.withOpacity(0.18),
@@ -941,10 +946,10 @@ class RmWordCard extends StatelessWidget {
                         name,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w800,
-                          color: Colors.white,
+                          color: fg,
                           height: 1.05,
                         ),
                       ),
@@ -1042,10 +1047,10 @@ class RmWordCard extends StatelessWidget {
                               wordVibrationTag(name),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 11,
                                 height: 1.25,
-                                color: Color(0xB8FFFFFF),
+                                color: mute,
                               ),
                             ),
                             const SizedBox(height: 6),
@@ -1195,6 +1200,9 @@ class _CenteredPrice extends StatelessWidget {
     final original =
         originalPrice == null ? null : localizedMoney(context, originalPrice!);
     final showStrike = original != null && original != sale;
+    final paper = AtelierScope.of(context);
+    final fg = paper ? const Color(0xFF16181E) : Colors.white;
+    final strike = paper ? const Color(0xFF8A8175) : const Color(0x88FFFFFF);
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1202,20 +1210,20 @@ class _CenteredPrice extends StatelessWidget {
         if (showStrike)
           Text(
             original,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
-              color: Color(0x88FFFFFF),
+              color: strike,
               decoration: TextDecoration.lineThrough,
-              decorationColor: Color(0x88FFFFFF),
+              decorationColor: strike,
             ),
           ),
         Text(
           sale,
           textAlign: TextAlign.left,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.w900,
-            color: Colors.white,
+            color: fg,
             height: 1.0,
             letterSpacing: -0.6,
           ),
@@ -1770,149 +1778,6 @@ class StoreViewMoreTap extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-/// A word on a soft card. No photo, no catalogue number.
-class WordSpecimen extends StatelessWidget {
-  const WordSpecimen({
-    super.key,
-    required this.word,
-    required this.root,
-    this.priceLabel,
-    this.onAdd,
-  });
-
-  final String word;
-  final String root;
-  final String? priceLabel;
-  final VoidCallback? onAdd;
-
-  @override
-  Widget build(BuildContext context) {
-    final n = word.length;
-    final size = n <= 4 ? 32.0 : n <= 8 ? 26.0 : n <= 12 ? 20.0 : 16.0;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: const Color(0xFFF7F4EE),
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: const [
-          BoxShadow(color: Color(0xFFD4CFC4), offset: Offset(5, 6), blurRadius: 12),
-          BoxShadow(color: Color(0xFFFFFFFF), offset: Offset(-4, -4), blurRadius: 10),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(14, 14, 12, 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              word,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: const Color(0xFF16181E),
-                fontSize: size,
-                height: 0.95,
-                fontWeight: FontWeight.w800,
-                letterSpacing: -0.5,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Container(width: 28, height: 2, color: const Color(0xFF16181E)),
-            const SizedBox(height: 6),
-            Text(
-              root,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(color: Color(0xFF6A6258), fontSize: 12, height: 1.25),
-            ),
-            const Spacer(),
-            if (priceLabel != null)
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      priceLabel!,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: Color(0xFF16181E), fontSize: 15, fontWeight: FontWeight.w800),
-                    ),
-                  ),
-                  GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: onAdd,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF16181E),
-                        borderRadius: BorderRadius.circular(18),
-                        boxShadow: const [
-                          BoxShadow(color: Color(0x33000000), blurRadius: 8, offset: Offset(0, 3)),
-                        ],
-                      ),
-                      child: const Text(
-                        'ADD',
-                        style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 0.4),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Black-and-white kinetic type. Letters move; the whole word stays readable.
-class BwKineticLine extends StatefulWidget {
-  const BwKineticLine({super.key, required this.text, required this.style});
-
-  final String text;
-  final TextStyle style;
-
-  @override
-  State<BwKineticLine> createState() => _BwKineticLineState();
-}
-
-class _BwKineticLineState extends State<BwKineticLine> with SingleTickerProviderStateMixin {
-  late final AnimationController _c = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 2600),
-  )..repeat();
-
-  @override
-  void dispose() {
-    _c.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (editorHoldsStill(context)) return _paint(0.25);
-    return AnimatedBuilder(animation: _c, builder: (_, __) => _paint(_c.value));
-  }
-
-  Widget _paint(double t) {
-    final text = widget.text;
-    final style = widget.style;
-    return FittedBox(
-      fit: BoxFit.scaleDown,
-      alignment: Alignment.centerLeft,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          for (var i = 0; i < text.length; i++)
-            Transform.translate(
-              offset: Offset(0, text[i] == ' ' ? 0 : math.sin((t * math.pi * 2) + i * 0.45) * 3.5),
-              child: Text(text[i], style: style),
-            ),
-        ],
       ),
     );
   }

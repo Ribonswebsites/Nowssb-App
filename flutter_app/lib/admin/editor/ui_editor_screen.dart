@@ -25,7 +25,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../admin_state.dart';
 import '../layout/anims/anim_library.dart';
-import '../layout/anims/effects.dart';
 import '../layout/app_pages.dart';
 import '../layout/placed_orbs.dart';
 import '../template/all_slots_screen.dart';
@@ -790,12 +789,6 @@ class _SectionBoard extends StatelessWidget {
     c.endStep();
   }
 
-  void _watch(bool on) {
-    c.preview.setMotionPreview(on);
-    if (on) c.preview.replay();
-    c.changedSelection();
-  }
-
   void _size(double factor) {
     final cur = c.current;
     if (cur == null) return;
@@ -811,14 +804,6 @@ class _SectionBoard extends StatelessWidget {
     final cur = c.current!;
     final p = cur.entry.props;
     final scrolling = p['hScroll'] == true;
-    final entrance = '${p['entrance'] ?? 'none'}';
-    final loop = '${p['loop'] ?? 'none'}';
-    final liveTurn = p['autoRotate'] == true;
-    final cards = <String, String>{};
-    for (final k in const ['a', 'b', 'c', 'd', 't1', 't2', 't3', 'word']) {
-      final v = p[k];
-      if (v is String && v.trim().isNotEmpty) cards[k] = v.trim();
-    }
     Widget chip(String label, bool on, VoidCallback tap, {Key? key}) => Padding(
           padding: const EdgeInsets.only(right: 6, bottom: 6),
           child: ChoiceChip(
@@ -865,7 +850,7 @@ class _SectionBoard extends StatelessWidget {
               ),
             ]),
             const Text(
-              'Bottom edge shortens the whole section — nothing is cut. Hold it and drag up or down to move it. Cards stay put: swipe to the next one.',
+              'Drag the bottom edge to resize. Hold and drag up or down to move.',
               style: TextStyle(color: Color(0xFFB7C0D0), fontSize: 12, height: 1.3),
             ),
             const SizedBox(height: 8),
@@ -888,86 +873,14 @@ class _SectionBoard extends StatelessWidget {
               chip(scrolling ? 'No scroll' : 'Scroll row', scrolling, () {
                 _step(() => c.patchProps(cur.id, {'hScroll': scrolling ? null : true}));
               }, key: const ValueKey('side-scroll')),
-            ]),
-            const Text('Appear', style: TextStyle(color: Color(0xFFE8D5A3), fontSize: 11, fontWeight: FontWeight.w800)),
-            Wrap(children: [
-              for (final e in kEntranceNames.entries)
-                chip(e.value, entrance == e.key, () {
-                  _step(() => c.patchProps(cur.id, {'entrance': e.key == 'none' ? null : e.key}));
-                  c.preview.replay();
-                }),
-            ]),
-            const Text('Keep moving', style: TextStyle(color: Color(0xFFE8D5A3), fontSize: 11, fontWeight: FontWeight.w800)),
-            Wrap(children: [
-              for (final e in kLoopNames.entries)
-                chip(e.value, loop == e.key, () {
-                  final still = e.key == 'none';
-                  _step(() => c.patchProps(cur.id, {'loop': still ? null : e.key}));
-                  _watch(!still);
-                }),
-            ]),
-            Wrap(children: [
-              chip('Preview', c.preview.motionPreview, () => _watch(true), key: const ValueKey('section-preview')),
-              chip('Stop', !c.preview.motionPreview, () => _watch(false)),
-              chip(liveTurn ? 'Auto on (after publish)' : 'Auto off', liveTurn, () {
-                _step(() => c.patchProps(cur.id, {'autoRotate': liveTurn ? null : true, 'interval': liveTurn ? null : 4000}));
-              }),
               chip('Edit text', false, onWords, key: const ValueKey('strip-text')),
               chip('Style', false, onStyle, key: const ValueKey('strip-look')),
-              chip('More', false, onEffects, key: const ValueKey('strip-animate')),
+              chip('Animate', false, onEffects, key: const ValueKey('strip-animate')),
               chip('Delete', false, () => deleteWithUndo(context, c, cur.id, cur.title), key: const ValueKey('strip-delete')),
-              chip('Height · length', false, () {}, key: const ValueKey('mode-section')),
             ]),
-            if (cards.isNotEmpty) ...[
-              const SizedBox(height: 4),
-              const Text('Each card', style: TextStyle(color: Color(0xFFE8D5A3), fontSize: 11, fontWeight: FontWeight.w800)),
-              for (final e in cards.entries)
-                _CardAnimRow(c: c, sectionId: cur.id, field: e.key, label: e.value, fx: '${p['fx_${e.key}'] ?? 'none'}'),
-            ],
           ],
         ),
       ),
-    );
-  }
-}
-
-class _CardAnimRow extends StatelessWidget {
-  const _CardAnimRow({required this.c, required this.sectionId, required this.field, required this.label, required this.fx});
-  final EditorController c;
-  final String sectionId;
-  final String field;
-  final String label;
-  final String fx;
-
-  static const _fx = ['none', 'pulse', 'float', 'breathe', 'bounce', 'shimmer'];
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
-      child: Row(children: [
-        Expanded(
-          child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700)),
-        ),
-        DropdownButton<String>(
-          value: _fx.contains(fx) ? fx : 'none',
-          dropdownColor: const Color(0xFF111A2B),
-          style: const TextStyle(color: Colors.white, fontSize: 12),
-          underline: const SizedBox.shrink(),
-          items: [
-            for (final id in _fx)
-              DropdownMenuItem(value: id, child: Text(id == 'none' ? 'Still' : id)),
-          ],
-          onChanged: (v) {
-            if (v == null) return;
-            c.endStep();
-            c.patchProps(sectionId, {'fx_$field': v == 'none' ? null : v});
-            c.endStep();
-            c.preview.setMotionPreview(v != 'none');
-            c.changedSelection();
-          },
-        ),
-      ]),
     );
   }
 }

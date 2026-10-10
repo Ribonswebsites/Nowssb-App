@@ -27,7 +27,6 @@ import 'product_detail.dart';
 import 'store_cards.dart';
 import 'store_home_sections.dart';
 import 'store_section_mix.dart';
-import 'shop_page.dart';
 import 'store_select_sheet.dart';
 import 'request_words.dart';
 import 'store_routes.dart';
@@ -69,11 +68,26 @@ class MeaningStoreScreen extends StatelessWidget {
   Widget build(BuildContext context) => StoreTermsHost(
         which: 'meaning',
         head: 'Meanings described by sound',
-        child: NwsbShopPage(
-          pageId: 'store.meaning',
-          which: 'meaning',
-          title: 'The Meaning Store',
-          groups: meaningShopGroups(),
+        child: PageShell(
+        eyebrow: '',
+        title: 'NowssB Store',
+        subtitle: 'The Meaning Store',
+        film: 'assets/video/player-bg-loop.mp4',
+        usePageFilm: true,
+        plain: true,
+        onBack: () => Navigator.of(context).pop(),
+        onStorePicker: () => showStoreSelectSheet(
+          context,
+          current: 'meaning',
+          onSelect: (id) =>
+              openStoreFromPicker(context, id, current: 'meaning'),
+        ),
+        slivers: [
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
+            sliver: SliverList.list(children: const [_MeaningStoreBody()]),
+          ),
+        ],
         ),
       );
 }
