@@ -120,11 +120,12 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
         ? cats.take(10).toList()
         : cats;
     final sections = <Widget>[];
+    final banners = <Widget>[];
     // Count product rails actually emitted (search may empty some).
     var productRailIndex = 0;
     for (var i = 0; i < rowCats.length; i++) {
       final cat = rowCats[i];
-      sections.add(RmCatBanner(
+      banners.add(RmCatBanner(
         title: cat.label,
         sub: cat.sub,
         badge: cat.badge,
@@ -133,6 +134,8 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
         categoryId: cat.id,
         artAsset: storeCollectionArt(cat.id),
         pillLabel: cat.badge ?? cat.label,
+        inRail: true,
+        showPill: false,
         onViewAll: () => _openViewAll(cat.label),
       ));
       sections.add(RmRowHeader(
@@ -263,6 +266,10 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
           sections.add(RmRowVid(url: nwsbVideo(kRmRowVids[vidIdx])));
         }
       }
+    }
+
+    if (banners.isNotEmpty) {
+      sections.insert(0, RmBannerRail(banners: banners, height: 112));
     }
 
     if (_chip == 'ALL' && !_allRows && cats.length > 10) {

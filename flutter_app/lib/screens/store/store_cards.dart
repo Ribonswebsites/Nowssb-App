@@ -214,6 +214,7 @@ class RmCatBanner extends StatelessWidget {
     this.onViewAll,
     this.pillLabel,
     this.inRail = false,
+    this.showPill = true,
   });
 
   final String title;
@@ -245,12 +246,13 @@ class RmCatBanner extends StatelessWidget {
   /// When true the banner sits in the top horizontal rail (no extra margin).
   final bool inRail;
 
+  /// The circular product shot. Off in the one top rail — that shot was
+  /// already on the word cards, and repeating it on every banner looked fake.
+  final bool showPill;
+
   @override
   Widget build(BuildContext context) {
     final titleColor = labelColor ?? NwsbColors.goldLight;
-    final art = artAsset ?? storePillProductArt(categoryId);
-    final mark = svgBody ?? NwsbMarks.bag;
-    final leftLabel = (pillLabel ?? badge ?? title).trim();
     final r = BorderRadius.circular(kGlassRadius);
     return Padding(
       padding: EdgeInsets.only(top: inRail ? 0 : 18, bottom: inRail ? 0 : 10),
@@ -341,15 +343,19 @@ class RmCatBanner extends StatelessWidget {
                       ),
                     ),
                   ],
-                  const SizedBox(height: 10),
-                  StoreBlackPill(
-                    label: leftLabel.isEmpty ? title : leftLabel,
-                    artAsset: art,
-                    accent: titleColor,
-                    svgBody: mark,
-                    fallbackLogoUrl: logoUrl,
-                    fallbackLogoAsset: logoAsset,
-                  ),
+                  if (showPill) ...[
+                    const SizedBox(height: 10),
+                    StoreBlackPill(
+                      label: (pillLabel ?? badge ?? title).trim().isEmpty
+                          ? title
+                          : (pillLabel ?? badge ?? title).trim(),
+                      artAsset: artAsset ?? storePillProductArt(categoryId),
+                      accent: titleColor,
+                      svgBody: svgBody ?? NwsbMarks.bag,
+                      fallbackLogoUrl: logoUrl,
+                      fallbackLogoAsset: logoAsset,
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -716,9 +722,10 @@ class RmRowHeader extends StatelessWidget {
 
 /// Auto-moving horizontal strip of category banners (one place, not per row).
 class RmBannerRail extends StatefulWidget {
-  const RmBannerRail({super.key, required this.banners});
+  const RmBannerRail({super.key, required this.banners, this.height = 188});
 
   final List<Widget> banners;
+  final double height;
 
   @override
   State<RmBannerRail> createState() => _RmBannerRailState();
@@ -759,7 +766,7 @@ class _RmBannerRailState extends State<RmBannerRail> {
     return Padding(
       padding: const EdgeInsets.only(top: 10, bottom: 4),
       child: SizedBox(
-        height: 188,
+        height: widget.height,
         child: PageView.builder(
           controller: _pc,
           padEnds: false,
@@ -851,8 +858,8 @@ class RmWordCard extends StatelessWidget {
   final VoidCallback? onAddCart;
   final Color? tint;
 
-  /// Taller horizontal card so the UFC-style price can sit large and clear.
-  static const double cardHeight = 228;
+  /// Taller card: glass outside, black card inside, picture on a white tile.
+  static const double cardHeight = 308;
   static const double cardWidth = 338;
 
   BagItem get _item => wordBagItem(
@@ -879,44 +886,33 @@ class RmWordCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(26),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+          filter: ImageFilter.blur(sigmaX: GlassWrap.blurSigma, sigmaY: GlassWrap.blurSigma),
           child: Container(
             width: cardWidth,
             height: cardHeight,
-            padding: const EdgeInsets.fromLTRB(10, 10, 12, 10),
+            padding: const EdgeInsets.all(7),
             decoration: BoxDecoration(
-              color: bg.withOpacity(0.13),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: signature
-                    ? const Color(0x66E8D5A3)
-                    : const Color(0x38FFFFFF),
-              ),
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  bg.withOpacity(0.22),
-                  const Color(0x1AFFFFFF),
-                  const Color(0x12000000),
-                ],
-              ),
+              color: GlassWrap.fill,
+              borderRadius: BorderRadius.circular(26),
+              border: Border.all(color: GlassWrap.line),
               boxShadow: [
                 BoxShadow(
-                  color: bg.withOpacity(0.18),
-                  blurRadius: 24,
-                  spreadRadius: 1,
-                ),
-                const BoxShadow(
-                  color: Color(0x80000000),
-                  blurRadius: 18,
-                  offset: Offset(0, 7),
+                  color: bg.withOpacity(0.16),
+                  blurRadius: 22,
+                  offset: const Offset(0, 10),
                 ),
               ],
             ),
-            child: Column(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: const Color(0xFF0B0B12),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(10, 10, 12, 10),
+                child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
@@ -978,24 +974,25 @@ class RmWordCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       SizedBox(
-                        width: 132,
-                        height: 132,
+                        width: 158,
+                        height: 158,
                         child: Stack(
                           fit: StackFit.expand,
                           children: [
                             DecoratedBox(
                               decoration: BoxDecoration(
-                                color: const Color(0xD9060C18),
-                                borderRadius: BorderRadius.circular(15),
-                                border:
-                                    Border.all(color: const Color(0x28FFFFFF)),
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
                               ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(15),
-                                child: StoreNetImage(
-                                  url: imgUrl,
-                                  fit: BoxFit.cover,
-                                  word: name,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: StoreNetImage(
+                                    url: imgUrl,
+                                    fit: BoxFit.contain,
+                                    word: name,
+                                  ),
                                 ),
                               ),
                             ),
@@ -1170,6 +1167,8 @@ class RmWordCard extends StatelessWidget {
                   ),
                 ),
               ],
+            ),
+              ),
             ),
           ),
         ),

@@ -22,9 +22,9 @@ void main() {
       expect(cards, contains('storeBuyNow'));
       expect(cards, isNot(contains('Icons.shopping_cart_outlined')));
       expect(cards, isNot(contains('Icons.graphic_eq')));
-      expect(cards, contains('height: 132'));
+      expect(cards, contains('height: 158'));
       expect(cards, contains('_CenteredPrice'));
-      expect(cards, contains('static const double cardHeight = 228'));
+      expect(cards, contains('static const double cardHeight = 308'));
       expect(cards, contains('kWordPriceInr'));
       expect(cards, contains('kWordSaleInr'));
       expect(cards, contains('RmBannerRail'));
