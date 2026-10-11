@@ -26,6 +26,7 @@ import '../features/notifications/inbox_screen.dart';
 import '../features/notifications/notif_router.dart';
 import '../widgets/pool_hud.dart';
 import '../widgets/mini_player_pill.dart';
+import '../widgets/tablet_section_rail.dart';
 import '../data/phone_notifications.dart';
 import '../data/playback_session.dart';
 import '../admin/template/editable.dart';
@@ -372,6 +373,7 @@ class _NavShellState extends State<NavShell> {
   }
 
   Widget _build(BuildContext context) {
+    if (nwsbTablet(context)) return _buildTablet(context);
     final lightHome = _i == 0 && !_fashion;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
@@ -392,23 +394,7 @@ class _NavShellState extends State<NavShell> {
             // IndexedStack rather than swapping the child: it keeps each tab's
             // scroll position and state alive, which is what the website does
             // (its screens are all in the DOM at once, one of them .active).
-            IndexedStack(
-              index: _i,
-              children: [
-                // Offstage + TickerMode: inactive IndexedStack tabs still layout,
-                // so without this their NwsbVideos keep claiming VideoPool seats
-                // and the visible tab (and player overlays) starve — "playing 1".
-                _tabAlive(
-                    0, _fashion ? const HomeFashion() : const HomeNormal()),
-                _tabAlive(1, const PracticeScreen()),
-                // Bottom-nav Library must be the media-rich Sound Library (website
-                // SLM), NOT the old plain letter list in library.dart.
-                _tabAlive(2, const SoundLibraryScreen(embedded: true)),
-                _tabAlive(3, const StoreScreen()),
-                // Tab 4 is always account Profile — never PracticeProgressScreen.
-                _tabAlive(4, const ProfileScreen()),
-              ],
-            ),
+            _tabs(),
             // Fashion-home switch + mini player share one row above the nav.
             if (_i == 0 || PlaybackSession.instance.showPill)
               Positioned(
@@ -573,6 +559,243 @@ class _NavShellState extends State<NavShell> {
                 ),
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// IndexedStack rather than swapping the child: it keeps each tab's
+  /// scroll position and state alive. Inactive tabs stay off-stage so their
+  /// videos do not claim VideoPool seats.
+  Widget _tabs() {
+    return IndexedStack(
+      index: _i,
+      children: [
+        _tabAlive(0, _fashion ? const HomeFashion() : const HomeNormal()),
+        _tabAlive(1, const PracticeScreen()),
+        _tabAlive(2, const SoundLibraryScreen(embedded: true)),
+        _tabAlive(3, const StoreScreen()),
+        _tabAlive(4, const ProfileScreen()),
+      ],
+    );
+  }
+
+  Widget _buildTablet(BuildContext context) {
+    final lightHome = _i == 0 && !_fashion;
+    final rail = lightHome ? NwsbColors.surface : const Color(0xFF07090E);
+    final ink = lightHome ? const Color(0xFF16181E) : Colors.white;
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: lightHome ? Brightness.dark : Brightness.light,
+        systemNavigationBarColor: rail,
+        systemNavigationBarIconBrightness:
+            lightHome ? Brightness.dark : Brightness.light,
+        systemNavigationBarDividerColor: Colors.transparent,
+      ),
+      child: Scaffold(
+        backgroundColor: lightHome ? NwsbColors.surface : NwsbColors.deep,
+        body: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _TabletRail(
+              light: lightHome,
+              background: rail,
+              ink: ink,
+              index: _i,
+              fashion: _fashion,
+              homeTab: _i == 0,
+              slots: Settings.instance.navSlots,
+              features: _navFeatures,
+              showPlayer: PlaybackSession.instance.showPill,
+              primaryTab: _primaryTab,
+              onSlot: _goToSlot,
+              onToggleHome: () => Settings.instance.setFashionHome(!_fashion),
+              onOpenPlayer: _openMiniPlayer,
+            ),
+            Expanded(
+              child: Stack(
+                children: [
+                  _tabs(),
+                  const Positioned(
+                    top: 4,
+                    right: 8,
+                    child: SafeArea(child: PoolHud()),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Side navigation for a tablet. The phone keeps the bottom bar.
+class _TabletRail extends StatelessWidget {
+  const _TabletRail({
+    required this.light,
+    required this.background,
+    required this.ink,
+    required this.index,
+    required this.fashion,
+    required this.homeTab,
+    required this.slots,
+    required this.features,
+    required this.showPlayer,
+    required this.primaryTab,
+    required this.onSlot,
+    required this.onToggleHome,
+    required this.onOpenPlayer,
+  });
+
+  final bool light;
+  final Color background;
+  final Color ink;
+  final int index;
+  final bool fashion;
+  final bool homeTab;
+  final List<String> slots;
+  final Map<String, Map<String, String>> features;
+  final bool showPlayer;
+  final int? Function(String id) primaryTab;
+  final void Function(String id) onSlot;
+  final VoidCallback onToggleHome;
+  final VoidCallback onOpenPlayer;
+
+  @override
+  Widget build(BuildContext context) {
+    final line = light ? const Color(0x14000000) : const Color(0x22FFFFFF);
+    return Container(
+      width: 84,
+      decoration: BoxDecoration(
+        color: background,
+        border: Border(right: BorderSide(color: line)),
+      ),
+      child: SafeArea(
+        child: Column(
+          children: [
+            const SizedBox(height: 8),
+            Text(
+              'N',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: ink,
+                letterSpacing: 1,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Container(width: 28, height: 1, color: line),
+            const SizedBox(height: 8),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                children: [
+                  for (final id in slots) _item(id),
+                ],
+              ),
+            ),
+            if (homeTab)
+              _iconButton(
+                icon: fashion ? Icons.light_mode : Icons.dark_mode,
+                label: fashion ? 'Normal' : 'Fashion',
+                onTap: onToggleHome,
+              ),
+            if (showPlayer)
+              _iconButton(
+                icon: Icons.play_arrow_rounded,
+                label: 'Playing',
+                onTap: onOpenPlayer,
+              ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _item(String id) {
+    final active = primaryTab(id) == index;
+    final label = features[id]?['label'] ?? id;
+    final img = features[id]?['img'] ?? '';
+    final tile = active
+        ? (light ? const Color(0xFF16181E) : Colors.white)
+        : Colors.transparent;
+    final fg = active ? (light ? Colors.white : const Color(0xFF16181E)) : ink;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => onSlot(id),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 160),
+          width: 68,
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          decoration: BoxDecoration(
+            color: tile,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            children: [
+              _mark(img, fg),
+              const SizedBox(height: 3),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 9,
+                  fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+                  color: fg,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _mark(String img, Color fallback) {
+    if (img.startsWith('asset:')) {
+      return EditableImage.asset(
+        img.substring(6),
+        width: 26,
+        height: 26,
+        fit: BoxFit.contain,
+        errorBuilder: (_, __, ___) => Icon(Icons.circle_outlined, size: 22, color: fallback),
+        slot: 'nav_shell.TabletRail',
+      );
+    }
+    if (img.isEmpty) {
+      return Icon(Icons.circle_outlined, size: 22, color: fallback);
+    }
+    return Image.network(
+      img,
+      width: 26,
+      height: 26,
+      fit: BoxFit.contain,
+      errorBuilder: (_, __, ___) => Icon(Icons.circle_outlined, size: 22, color: fallback),
+    );
+  }
+
+  Widget _iconButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: GestureDetector(
+        onTap: onTap,
+        child: Column(
+          children: [
+            Icon(icon, size: 20, color: ink),
+            const SizedBox(height: 2),
+            Text(label, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w600, color: ink)),
           ],
         ),
       ),

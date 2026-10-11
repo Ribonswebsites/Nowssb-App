@@ -257,18 +257,18 @@ List<Widget> layoutChildren(
   ]));
 }
 
-/// Tablet: keep each section near phone width and hang a vertical 3D
-/// motion on its right. Phone width is unchanged.
+/// Tablet: the real sections sit in columns at phone width. They are not
+/// stretched, and nothing fake is painted beside them.
 List<Widget> _tabletRails(BuildContext context, List<Widget> items) {
   if (!nwsbTablet(context)) return items;
-  return [for (final w in items) _railOf(w)];
-}
-
-Widget _railOf(Widget w) {
-  if (w is SectionPinch) return TabletSectionRow(seed: w.sectionId, child: w);
-  if (w is LSection) return TabletSectionRow(seed: w.id, child: w);
-  if (w is _SidePack) return TabletSectionRow(seed: 'row', child: w);
-  return w;
+  return [
+    TabletBoard(
+      children: [
+        for (final w in items)
+          TabletPiece(child: w),
+      ],
+    ),
+  ];
 }
 
 /// Consecutive sections that were made narrower share one row, so the
