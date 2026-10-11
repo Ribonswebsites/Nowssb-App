@@ -48,11 +48,7 @@ final _store = <_Feature>[
 ];
 
 final _programmes = <_Feature>[
-  _Feature('rewards', 'NowssB Rewards', 'Daily coins, streaks, quests, season and leagues.', NwsbMarks.rewards, (c) => Programmes.open(c, Programme.rewards)),
-  _Feature('coupons', 'NowssB Coupons', 'Your daily scratch card and coupon tickets.', NwsbMarks.coupon, (c) => Programmes.open(c, Programme.coupons)),
-  _Feature('gifts', 'NowssB Gifts', 'Free gift boxes, gift cards, send and redeem.', NwsbMarks.gift, (c) => Programmes.open(c, Programme.gifts)),
-  _Feature('reference', 'NowssB Reference', 'Your links: friends get a discount, you get rewards.', NwsbMarks.reference, (c) => Programmes.open(c, Programme.reference)),
-  _Feature('earn', 'NowssB Earn', 'Ranks, team, sales and payouts.', NwsbMarks.piggy, (c) => Programmes.open(c, Programme.earn)),
+  _Feature('nowssb', 'NowssB', 'Ranks, coupons, gifts and your link. One page.', NwsbMarks.piggy, (c) => Programmes.open(c, Programme.earn)),
   _Feature('partner', 'Partner Program', 'Milestones and perks. Never cash.', NwsbMarks.crown, (c) => Programmes.open(c, Programme.partner)),
 ];
 

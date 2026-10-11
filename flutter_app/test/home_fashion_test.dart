@@ -59,9 +59,9 @@ void main() {
     // fresh install shows twenty-six — plus `mainops`, which is this app's
     // own: six doors on one panel, so the app can be used without knowing
     // where anything is.
-    expect(kFashionSectionOrder, hasLength(48));
+    expect(kFashionSectionOrder, hasLength(45));
     expect(kFashionDefOff, hasLength(4));
-    expect(kFashionSectionOrder.toSet(), hasLength(48),
+    expect(kFashionSectionOrder.toSet(), hasLength(45),
         reason: 'two sections share a key');
     for (final k in kFashionDefOff) {
       expect(kFashionSectionOrder, contains(k),
@@ -69,7 +69,7 @@ void main() {
     }
     expect(
       kFashionSectionOrder.where((k) => !kFashionDefOff.contains(k)).length,
-      44,
+      41,
     );
     expect(
       kFashionSectionOrder.indexOf('catTiles'),
@@ -80,11 +80,6 @@ void main() {
       kFashionSectionOrder.indexOf('spotlight'),
       kFashionSectionOrder.indexOf('catTiles') + 1,
       reason: 'MK-6 spotlight sits directly below category tiles',
-    );
-    expect(
-      kFashionSectionOrder.indexOf('roundring'),
-      kFashionSectionOrder.indexOf('offer') + 1,
-      reason: 'Coupons (roundring) stay directly below Gifts (offer)',
     );
     expect(
       kFashionSectionOrder.indexOf('buddhaGyro'),

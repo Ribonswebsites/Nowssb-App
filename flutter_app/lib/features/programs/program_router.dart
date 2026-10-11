@@ -5,23 +5,19 @@ library;
 
 import 'package:flutter/material.dart';
 
-import '../circle/circle_screen.dart';
-import '../economy/coupon_screen.dart';
 import '../economy/partner_screen.dart';
-import '../economy/reference_screen.dart';
 import '../earn/earnings_screen.dart';
-import '../gifts/gifts_screen.dart';
-import '../vault/vault_screen.dart';
+import '../earn/nowssb_one.dart';
 
 enum Programme { earn, rewards, coupons, gifts, reference, partner, earnings }
 
 abstract final class Programmes {
   static Widget page(Programme p, {String? tab}) => switch (p) {
-        Programme.earn => CircleScreen(initialTab: tab),
-        Programme.rewards => VaultScreen(initialTab: tab),
-        Programme.coupons => CouponScreen(initialTab: tab),
-        Programme.gifts => GiftsScreen(initialTab: tab),
-        Programme.reference => ReferenceScreen(initialTab: tab),
+        Programme.earn => NowssbOnePage(focus: tab ?? 'ranks'),
+        Programme.rewards => const NowssbOnePage(focus: 'ranks'),
+        Programme.coupons => const NowssbOnePage(focus: 'coupons'),
+        Programme.gifts => const NowssbOnePage(focus: 'gifts'),
+        Programme.reference => const NowssbOnePage(focus: 'links'),
         Programme.partner => PartnerScreen(initialTab: tab),
         Programme.earnings => const EarningsScreen(),
       };

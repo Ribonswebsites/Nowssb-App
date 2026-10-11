@@ -82,7 +82,7 @@ import 'quotes_live.dart';
 import '../features/earn/earn_home_sections.dart';
 import '../widgets/sections/category_tiles_section.dart';
 import '../widgets/sections/spotlight_section.dart';
-import '../features/earn/earn_hub_screen.dart';
+import '../features/programs/program_router.dart';
 import 'app_settings.dart';
 import 'player_settings.dart';
 import 'practice_player.dart';
@@ -121,11 +121,9 @@ const kNormalSectionOrder = <String>[
   // Category tiles and spotlight stay the pair above — not copied again.
   'todayDeck',
   'glassy',
-  'couponBan',
   'hyped',
   'artists',
   'madeForYou',
-  'programsYou',
   'tiles',
   'storiesFind',
   'buddhaGyro',
@@ -177,15 +175,13 @@ const kNormalSectionTitles = <String, String>{
   'spotlight': 'In the spotlight',
   'todayDeck': 'Today — icons and peeking card',
   'glassy': 'Glassy carousel',
-  'couponBan': 'Coupon banner',
   'hyped': 'Hyped posters',
   'artists': 'Featured cards',
   'madeForYou': 'Made for you',
-  'programsYou': 'Programs for you',
   'tiles': 'Feature tiles',
   'storiesFind': 'Stories find you',
   'buddhaGyro': 'Buddha quotes stage',
-  'store': 'Offer, earn, rewards & gifts',
+  'store': "Today's offer",
   'reader': 'Reader',
   'trendwd': 'Trending words',
   'routines': 'Routines (off by default)',
@@ -209,11 +205,9 @@ const kNormalCarousels = <String>{
   'healing',
   'todayDeck',
   'glassy',
-  'couponBan',
   'hyped',
   'artists',
   'madeForYou',
-  'programsYou',
 };
 
 class HomeNormal extends StatefulWidget {
@@ -403,7 +397,7 @@ class _HomeNormalState extends State<HomeNormal> {
           NormalPromoRail(
             onStore: () => _go(3),
             onPlayer: () => _go(1),
-            onEarn: () => _push(const EarnHubScreen()),
+            onEarn: () => Programmes.open(context, Programme.earn),
           ),
         ),
         (
@@ -483,11 +477,9 @@ class _HomeNormalState extends State<HomeNormal> {
         ),
         ('todayDeck', HomeShelves.today),
         ('glassy', HomeShelves.glassy),
-        ('couponBan', HomeShelves.coupons),
         ('hyped', HomeShelves.hyped),
         ('artists', HomeShelves.artists),
         ('madeForYou', HomeShelves.made),
-        ('programsYou', HomeShelves.programs),
         // H-scroll: Flip glass brand showcase (card 0) + existing feature cards.
         (
           'tiles',
@@ -503,25 +495,14 @@ class _HomeNormalState extends State<HomeNormal> {
         )),
         (
           'store',
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SubscriptionTodayOffer(
-                neumorphic: true,
-                onClaim: () => _push(const SubscriptionScreen()),
-              ),
-              const SizedBox(height: 16),
-              const EarnUmbrellaSection(),
-            ],
+          SubscriptionTodayOffer(
+            neumorphic: true,
+            onClaim: () => _push(const SubscriptionScreen()),
           ),
         ),
         (
           'reader',
-          Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            NmReader(onTap: () => _push(const ReaderHubScreen())),
-            const SizedBox(height: 24),
-            const YourRewardsSection(),
-          ]),
+          NmReader(onTap: () => _push(const ReaderHubScreen())),
         ),
         (
           'trendwd',
@@ -538,11 +519,7 @@ class _HomeNormalState extends State<HomeNormal> {
             onTap: () => NwsbLinks.connect(context),
           )
         ),
-        ('feed', Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          NmFeed(onTap: () => NwsbLinks.connect(context)),
-          const SizedBox(height: 24),
-          const ReferenceHomeSection(),
-        ])),
+        ('feed', NmFeed(onTap: () => NwsbLinks.connect(context))),
         (
           'quickrow',
           QuickAccessSection(
@@ -551,14 +528,7 @@ class _HomeNormalState extends State<HomeNormal> {
             onOrders: () => _go(4),
           )
         ),
-        ('trendshop', Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          NmTrendShop(onTap: () => _go(3)),
-          const SizedBox(height: 24),
-          // NowssB Gifts, then NowssB Coupons right below it.
-          const GiftsHomeSection(),
-          const SizedBox(height: 24),
-          const CouponsHomeSection(),
-        ])),
+        ('trendshop', NmTrendShop(onTap: () => _go(3))),
         ('subvid', const SizedBox.shrink()),
         (
           'edition',

@@ -15,7 +15,7 @@ import '../../theme/tokens.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
-import '../programs/rewards_program.dart';
+import '../programs/program_router.dart';
 
 class EarnStep {
   const EarnStep(this.title, this.shortName, this.minWords, this.rate, this.leg1, this.leg2);
@@ -242,7 +242,7 @@ class _BoardState extends State<_Board> {
   }
 
   Widget _redeem(BuildContext context) => GestureDetector(
-        onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const RewardsProgramPage())),
+        onTap: () => Programmes.open(context, Programme.earn),
         child: Container(
           height: 52,
           alignment: Alignment.center,

@@ -73,13 +73,11 @@ import 'store/ebooks_store.dart';
 import 'reader/reader_hub.dart';
 import 'store/request_words.dart';
 import 'sentence_builder.dart';
-import '../widgets/program_shelf.dart';
 import '../widgets/nwsb_icon.dart';
 import 'app_settings.dart';
 import '../features/earn/earn_home_sections.dart';
 import '../widgets/sections/category_tiles_section.dart';
 import '../widgets/sections/spotlight_section.dart';
-import '../features/earn/earn_hub_screen.dart';
 import '../features/programs/program_router.dart';
 import '../shell/nwsb_links.dart';
 import 'features_page.dart';
@@ -108,11 +106,9 @@ const kFashionSectionOrder = <String>[
   // Admin catalog that was not on this home. One of each, padded.
   'todayDeck',
   'glassy',
-  'couponBan',
   'hyped',
   'artists',
   'madeForYou',
-  'programsYou',
   'reader',
   'herovid',
   'streak',
@@ -131,7 +127,6 @@ const kFashionSectionOrder = <String>[
   'edition',
   'routines',
   'offer',
-  'roundring',
   'cube',
   'shabda',
   'ebooks',
@@ -154,7 +149,6 @@ const kFashionDefOff = <String>{'routines', 'shabda', 'wsearch', 'msearch'};
 const kFashionSectionTitles = <String, String>{
   'greet': 'Greeting line',
   'herorow': 'Hero row & split banner',
-  'roundring': 'NowssB Coupons',
   'practice': 'Practice card',
   'routineCards': 'Routine cards, Earth Day film & colour grid',
   'mainops': 'Main options',
@@ -163,11 +157,9 @@ const kFashionSectionTitles = <String, String>{
   'spotlight': 'In the spotlight',
   'todayDeck': 'Today — icons and peeking card',
   'glassy': 'Glassy carousel',
-  'couponBan': 'Coupon banner',
   'hyped': 'Hyped posters',
   'artists': 'Featured cards',
   'madeForYou': 'Made for you',
-  'programsYou': 'Programs for you',
   'reader': 'Reader & promo banner',
   'herovid': 'Streak & store videos',
   'streak': 'Streak',
@@ -181,7 +173,7 @@ const kFashionSectionTitles = <String, String>{
   'enterCurve': 'Enter curve',
   'rx': 'Word prescription',
   'trendvid': 'Shop now video',
-  'storeban': 'Store banner, earn, rewards & gifts',
+  'storeban': 'Store banner',
   'edition': 'Edition',
   'routines': 'Routines (off by default)',
   'offer': 'Offer',
@@ -203,11 +195,9 @@ const kFashionCarousels = <String>{
   'healing',
   'todayDeck',
   'glassy',
-  'couponBan',
   'hyped',
   'artists',
   'madeForYou',
-  'programsYou',
 };
 
 class HomeFashion extends StatefulWidget {
@@ -413,7 +403,7 @@ class _HomeFashionState extends State<HomeFashion> {
           FashHeroRow(
             onCustomize: () => _push(const WidgetsPage()),
             onFeatures: () => _push(const FeaturesPage()),
-            onEarn: () => _push(const EarnHubScreen()),
+            onEarn: () => Programmes.open(context, Programme.earn),
           ),
         ),
         (
@@ -465,11 +455,9 @@ class _HomeFashionState extends State<HomeFashion> {
         ),
         ('todayDeck', HomeShelves.today),
         ('glassy', HomeShelves.glassy),
-        ('couponBan', HomeShelves.coupons),
         ('hyped', HomeShelves.hyped),
         ('artists', HomeShelves.artists),
         ('madeForYou', HomeShelves.made),
-        ('programsYou', HomeShelves.programs),
         (
           'reader',
           FashReader(onTap: () => _push(const ReaderHubScreen())),
@@ -481,32 +469,8 @@ class _HomeFashionState extends State<HomeFashion> {
             onStoreTap: () => _go(3),
           ),
         ),
-        ('streak', Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
-              child: BlackGlassBanner(
-                margin: EdgeInsets.zero,
-                title: 'NowssB Rewards',
-                subtitle: 'Your streak, quests and season.',
-                mark: NwsbMarks.rewards,
-                onTap: () => Programmes.open(context, Programme.rewards, tab: 'streaks'),
-              ),
-            ),
-            FashStreak(onTap: () => _go(1)),
-          ],
-        )),
-        ('tiles', Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
-              child: ProgramShelf(),
-            ),
-            FashTiles(onTile: _go, onOpen: _openEnter),
-          ],
-        )),
+        ('streak', FashStreak(onTap: () => _go(1))),
+        ('tiles', FashTiles(onTile: _go, onOpen: _openEnter)),
         (
           'storiesFind',
           StoriesFindYouBanner(onTap: () => _go(2)),
@@ -540,14 +504,7 @@ class _HomeFashionState extends State<HomeFashion> {
         ),
         ('rx', FashPrescription(onTap: () => _go(1), onWord: _openWord)),
         ('trendvid', FashShopNow(onTap: () => _go(3))),
-        ('storeban', Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            StoreBannerSection(onTap: () => _go(3)),
-            const SizedBox(height: 16),
-            const EarnUmbrellaSection(),
-          ],
-        )),
+        ('storeban', StoreBannerSection(onTap: () => _go(3))),
         ('subvid', const SizedBox.shrink()),
         (
           'edition',
@@ -555,27 +512,15 @@ class _HomeFashionState extends State<HomeFashion> {
             EditionSection(onTap: () => _push(const SubscriptionScreen())),
             const SizedBox(height: 24),
             const PartnerHomeSection(),
-            const SizedBox(height: 24),
-            const YourRewardsSection(),
           ])
         ),
         ('routines', RoutinesSection(onTap: () => _go(1), fashion: true)),
-        ('offer', Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          FashOffer(onTap: () => _go(3)),
-          const SizedBox(height: 24),
-          const GiftsHomeSection(),
-        ])),
-        // NowssB Coupons: below NowssB Gifts, a contained glass block.
-        ('roundring', const RoundRingSection()),
-        ('cube', Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          QuickAccessSection(
+        ('offer', FashOffer(onTap: () => _go(3))),
+        ('cube', QuickAccessSection(
             onCart: () => NwsbLinks.cart(context),
             onWishlist: () => NwsbLinks.wishlist(context),
             onOrders: () => _go(4),
-          ),
-          const SizedBox(height: 24),
-          const ReferenceHomeSection(),
-        ])),
+          )),
         ('shabda', FashShabdapathy(onTap: () => _go(2))),
         ('ebooks', EbooksSection(onTap: () => _push(const EbooksStoreScreen()))),
         ('connectban', ConnectBannerSection(onTap: () => NwsbLinks.connect(context))),
