@@ -13,6 +13,7 @@ import '../../theme/tokens.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../economy/economy_api.dart';
 import '../economy/reward_fx.dart';
+import '../gifts/gift_unwrap.dart';
 import '../gifts/gifts_screen.dart';
 import 'program_kit.dart';
 import 'program_heroes.dart';
@@ -30,8 +31,8 @@ const kGiftsSpec = ProgramSpec(
   disclaimer: kGiftsDisclaimer,
   accent: ProgramAccent.gifts,
   tabs: [
-    ProgramTab('free', 'Free Gifts', _free),
-    ProgramTab('send', 'Send a Gift', _send),
+    ProgramTab('free', 'Free', _free),
+    ProgramTab('send', 'Send', _send),
     ProgramTab('received', 'Received', _received),
     ProgramTab('sent', 'Sent', _sent),
     ProgramTab('redeem', 'Redeem', _redeem),
@@ -61,26 +62,23 @@ List<Widget> _free(BuildContext context, Map<String, dynamic> s) {
   return [
     LSection('today', 'Today\u2019s box', PCard(glow: NwsbColors.gold, children: [
       PRow(
-        title: t['boxOpened'] != null ? 'Today\u2019s box is open' : 'Today\u2019s free gift box',
-        sub: '${sInt(t['minutes'])} minutes today. More minutes, a better box.',
+        title: t['boxOpened'] != null ? 'Box opened' : 'Today\u2019s box',
         mark: NwsbMarks.gift,
         trailing: PClaim(label: 'Open', action: 'openDailyBox', enabled: t['boxOpened'] == null, title: 'Today\u2019s gift'),
       ),
       for (final st in ladder)
         PRow(
           title: '${sInt(st['minutes'])} min · ${st['box'] ?? ''} box',
-          sub: '+${sInt(st['coins'])} coins',
           mark: NwsbMarks.hourglass,
           trailing: st['claimed'] == true ? const PPill('Claimed', color: NwsbColors.goldLight) : PClaim(label: 'Claim', action: 'claimTimeStep', data: {'minutes': sInt(st['minutes'])}, enabled: st['reached'] == true, title: 'Time ladder'),
         ),
     ])),
     LSection('boxes', 'Unopened boxes', PCard(children: [
-      const PHeading('Waiting for you', 'Unopened boxes', slot: 'gifts_program.free'),
-      if (boxes.isEmpty) const PEmpty('No unopened boxes. Boxes come from quests, streaks, the season and the Partner Program.'),
+      const PHeading('', 'Unopened boxes', slot: 'gifts_program.free'),
+      if (boxes.isEmpty) const PEmpty('No boxes yet'),
       for (final b in boxes)
         PRow(
           title: '${b['box'] ?? 'Gift'} box'.replaceFirstMapped(RegExp('^.'), (m) => m[0]!.toUpperCase()),
-          sub: 'From ${b['source'] ?? 'a reward'}${sInt(b['expiresAt']) > 0 ? ' · open by ${shortDate(b['expiresAt'])}' : ''}',
           mark: NwsbMarks.gift,
           trailing: PClaim(label: 'Open', action: 'openBox', data: {'id': b['id']}, title: 'Gift box'),
         ),
@@ -88,27 +86,24 @@ List<Widget> _free(BuildContext context, Map<String, dynamic> s) {
     LSection('weekly', 'Weekly and monthly', PCard(children: [
       PRow(
         title: 'Weekly gift',
-        sub: '${sInt(wg['daysAt20'])} days with 20+ minutes this week',
         mark: NwsbMarks.gift,
         trailing: wg['claimed'] == true ? const PPill('Claimed', color: NwsbColors.goldLight) : PClaim(label: 'Claim', action: 'claimWeeklyGift', enabled: wg['ready'] == true, title: 'Weekly gift'),
       ),
       PRow(
         title: 'Monthly gift',
-        sub: '${sInt(mg['activeDays'])} of ${sInt(mg['goal'])} active days',
         mark: NwsbMarks.gift,
         trailing: mg['claimed'] == true ? const PPill('Claimed', color: NwsbColors.goldLight) : PClaim(label: 'Claim', action: 'claimMonthlyGift', enabled: sInt(mg['goal']) > 0 && sInt(mg['activeDays']) >= sInt(mg['goal']), title: 'Monthly gift'),
       ),
     ])),
     if (passes.isNotEmpty)
       LSection('passes', 'Banked passes', PCard(children: [
-        const PHeading('Banked', 'Passes waiting for your plan to end', slot: 'gifts_program.free'),
-        for (final p in passes) PRow(title: '${sInt(p['days'])}-day ${p['tier']} pass', sub: 'Starts on its own when your current plan ends.', mark: NwsbMarks.crown),
+        const PHeading('', 'Banked passes', slot: 'gifts_program.free'),
+        for (final p in passes) PRow(title: '${sInt(p['days'])}-day ${p['tier']} pass', mark: NwsbMarks.crown),
       ])),
   ];
 }
 
 List<Widget> _send(BuildContext context, Map<String, dynamic> s) => const [
-      LSection('intro', 'Send intro', PEmpty('Pick a card, write a note, pay on Google Play. The NWSB code is created only after Play accepts the payment. Your link still earns on gift purchases.', slot: 'gifts_program.send')),
       LSection('cards', 'Gift cards', _SendPicker()),
     ];
 
@@ -135,11 +130,11 @@ class _SendPickerState extends State<_SendPicker> {
             mark: NwsbMarks.gift,
             selected: c.id == id,
             progress: c.id == id ? 1 : 0,
-            line: c.id == id ? 'Selected · \u20b9${c.cents} on Google Play' : '\u20b9${c.cents} on Google Play',
+            line: '\u20b9${c.cents}',
             onTap: () => setState(() => _id = c.id),
           ),
         const SizedBox(height: 6),
-        if (id != null) GoldButton(label: 'Write the card and pay on Play', onTap: () => showGiftCardSheet(context, id)),
+        if (id != null) GoldButton(label: 'Send this gift', onTap: () => showGiftCardSheet(context, id)),
       ],
     );
   }
@@ -149,11 +144,10 @@ List<Widget> _received(BuildContext context, Map<String, dynamic> s) {
   final rows = sList(sMap(s['gifts'])['received']);
   return [
     LSection('inbox', 'Inbox', PCard(children: [
-      if (rows.isEmpty) const PEmpty('No gifts received yet. Redeem a code and it shows here.'),
+      if (rows.isEmpty) const PEmpty('Nothing received yet'),
       for (final g in rows)
         PRow(
           title: '${g['title'] ?? 'Gift'}${'${g['fromName'] ?? ''}'.isEmpty ? '' : ' · from ${g['fromName']}'}',
-          sub: '${g['granted'] ?? ''}${'${g['message'] ?? ''}'.isEmpty ? '' : ' · “${g['message']}”'} · ${shortDate(g['at'])}',
           mark: NwsbMarks.gift,
         ),
     ])),
@@ -164,11 +158,10 @@ List<Widget> _sent(BuildContext context, Map<String, dynamic> s) {
   final rows = sList(sMap(s['gifts'])['sent']);
   return [
     LSection('sent', 'Sent', PCard(children: [
-      if (rows.isEmpty) const PEmpty('No gifts sent yet.'),
+      if (rows.isEmpty) const PEmpty('Nothing sent yet'),
       for (final g in rows)
         PRow(
           title: '${g['title'] ?? 'Gift'}${'${g['toName'] ?? ''}'.isEmpty ? '' : ' · to ${g['toName']}'}',
-          sub: '${g['code']} · ${g['status']} · ${shortDate(g['at'])}',
           mark: NwsbMarks.gift,
           trailing: g['status'] == 'active'
               ? Row(mainAxisSize: MainAxisSize.min, children: [
@@ -233,8 +226,7 @@ class _RedeemState extends State<_Redeem> {
       final r = await EconomyApi.call('redeemGift', {'code': _c.text.trim()});
       if (!mounted) return;
       final g = r['granted'];
-      unawaited(GiftBoxOpening.show(context,
-          box: 'gold',
+      unawaited(GiftUnwrapMoment.show(context,
           title: '${r['title'] ?? 'A gift for you'}${'${r['fromName'] ?? ''}'.isEmpty ? '' : ' · from ${r['fromName']}'}',
           items: g is Map ? [Map<String, dynamic>.from(g)] : const []));
       _c.clear();
@@ -248,7 +240,7 @@ class _RedeemState extends State<_Redeem> {
 
   @override
   Widget build(BuildContext context) => PCard(children: [
-        const PHeading('Got a code?', 'Redeem a gift', slot: 'gifts_program.redeem'),
+        const PHeading('', 'Redeem a code', slot: 'gifts_program.redeem'),
         TextField(
           controller: _c,
           textCapitalization: TextCapitalization.characters,
@@ -270,7 +262,7 @@ class _RedeemState extends State<_Redeem> {
           TextButton(
             onPressed: _busy ? null : _look,
             style: TextButton.styleFrom(backgroundColor: NwsbColors.goldLight, foregroundColor: Colors.black, shape: const StadiumBorder(), padding: const EdgeInsets.symmetric(vertical: 12)),
-            child: Text(_busy ? 'Looking…' : 'Preview the gift', style: const TextStyle(fontWeight: FontWeight.w800)),
+            child: Text(_busy ? 'Looking…' : 'Preview', style: const TextStyle(fontWeight: FontWeight.w800)),
           )
         else ...[
           Container(
@@ -300,7 +292,7 @@ class _RedeemState extends State<_Redeem> {
               child: TextButton(
                 onPressed: _busy || _peek!['status'] != 'ready' || _peek!['yours'] == true ? null : _go,
                 style: TextButton.styleFrom(backgroundColor: NwsbColors.goldLight, foregroundColor: Colors.black, shape: const StadiumBorder(), padding: const EdgeInsets.symmetric(vertical: 12)),
-                child: Text(_busy ? 'Opening…' : (_peek!['yours'] == true ? 'Send this code to your friend' : 'Redeem'), style: const TextStyle(fontWeight: FontWeight.w800)),
+                child: Text(_busy ? 'Opening…' : (_peek!['yours'] == true ? 'Share code' : 'Redeem'), style: const TextStyle(fontWeight: FontWeight.w800)),
               ),
             ),
             const SizedBox(width: 8),
@@ -311,12 +303,14 @@ class _RedeemState extends State<_Redeem> {
       ]);
 }
 
-List<Widget> _rules(BuildContext context, Map<String, dynamic> s) => const [
-      LSection('rules', 'Gift rules', PRules([
+const kGiftsRules = [
         'Free gifts come from time spent: 10, 20, 40 and 60 minutes a day open better boxes. One free box a day.',
         'Weekly gift: 5 days with 20+ minutes. Monthly gift: 20 active days. Claim within 30 days.',
         'Gift cards are real Google Play purchases. The code is valid for 12 months; unopened cards can be cancelled within 7 days.',
         'A gifted plan pass does not count toward Earn ranks or the Partner Program. Coins cannot be gifted.',
         'If a gift card purchase is refunded, the unopened code stops working.',
-      ], slot: 'gifts_program.rules')),
+];
+
+List<Widget> _rules(BuildContext context, Map<String, dynamic> s) => const [
+      LSection('rules', 'Gift rules', PRules(kGiftsRules, slot: 'gifts_program.rules')),
     ];
