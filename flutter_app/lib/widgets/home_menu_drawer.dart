@@ -12,7 +12,10 @@ import 'package:flutter/services.dart';
 
 import 'brand_top_banner.dart';
 
+import 'package:firebase_auth/firebase_auth.dart';
+
 import '../data/app_control.dart';
+import '../data/firebase.dart';
 import '../data/content.dart';
 import '../screens/app_settings.dart';
 import '../features/bazaar/bazaar_screen.dart';
@@ -165,10 +168,10 @@ class HomeMenuDrawer extends StatelessWidget {
               children: [
                 Container(
                   padding: EdgeInsets.fromLTRB(
-                    light ? 20 : 12,
-                    top + (light ? 14 : 10),
-                    light ? 20 : 16,
-                    light ? 16 : 14,
+                    20,
+                    top + 14,
+                    20,
+                    14,
                   ),
                   decoration: BoxDecoration(
                     color: headerBg,
@@ -189,20 +192,11 @@ class HomeMenuDrawer extends StatelessWidget {
                           TextSpan(
                             children: [
                               TextSpan(
-                                text: 'NOWSSB',
+                                text: 'Menu',
                                 style: TextStyle(
-                                  fontSize: 10,
-                                  letterSpacing: 1.2,
-                                  fontWeight: FontWeight.w700,
-                                  color: NwsbColors.goldLight,
-                                ),
-                              ),
-                              const TextSpan(text: '  '),
-                              TextSpan(
-                                text: 'Your Menu',
-                                style: TextStyle(
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w800,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w500,
+                                  letterSpacing: 0.4,
                                   color: titleColor,
                                 ),
                               ),
@@ -218,16 +212,19 @@ class HomeMenuDrawer extends StatelessWidget {
                 Expanded(
                   child: ListView(
                     padding: EdgeInsets.fromLTRB(
-                      light ? 0 : 16,
-                      light ? 0 : 18,
-                      light ? 0 : 16,
+                      light ? 0 : 20,
+                      light ? 0 : 20,
+                      light ? 0 : 20,
                       bottom + 40,
                     ),
                     children: [
+                      if (!light)
+                        _ProfileHeader(onTap: () => _goTab(context, 4)),
                       BrandTopBanner(
                         compact: true,
                         onTap: () => _push(context, const SubscriptionScreen()),
                       ),
+                      const SizedBox(height: 8),
                       _SectionLabel('Practice', light: light),
                       _Group(
                         light: light,
@@ -252,6 +249,7 @@ class HomeMenuDrawer extends StatelessWidget {
                             mark: _mark['routines']!,
                             label: 'My Routines',
                             sub: '5 routine slots',
+                            last: true,
                             onTap: () => _push(context, const _RoutinesPage()),
                           ),
                         ],
@@ -283,6 +281,7 @@ class HomeMenuDrawer extends StatelessWidget {
                             mark: _mark['shabda']!,
                             label: 'Shabdapathy',
                             sub: 'Foundations',
+                            last: true,
                             onTap: () =>
                                 _push(context, const ReaderHubScreen()),
                           ),
@@ -317,6 +316,7 @@ class HomeMenuDrawer extends StatelessWidget {
                             mark: _mark['meaning']!,
                             label: 'Meaning Store',
                             sub: 'True hidden meanings',
+                            last: true,
                             onTap: () =>
                                 _push(context, const MeaningStoreScreen()),
                           ),
@@ -346,11 +346,18 @@ class HomeMenuDrawer extends StatelessWidget {
                             mark: NwsbMarks.bell,
                             label: 'Notifications',
                             sub: 'Turn them on for this phone',
+                            last: true,
                             onTap: () => _push(
                               context,
                               const NotificationsSettingsPage(),
                             ),
                           ),
+                        ],
+                      ),
+                      _SectionLabel('Rewards', light: light),
+                      _Group(
+                        light: light,
+                        children: [
                           _Row(
                             light: light,
                             mark: NwsbMarks.piggy,
@@ -389,6 +396,27 @@ class HomeMenuDrawer extends StatelessWidget {
                             ),
                           _Row(
                             light: light,
+                            mark: NwsbMarks.bars,
+                            label: 'Earnings',
+                            sub: 'Payouts and commissions',
+                            onTap: () => _push(context, const EarningsScreen()),
+                          ),
+                          _Row(
+                            light: light,
+                            mark: NwsbMarks.bell,
+                            label: 'Activity',
+                            sub: 'Coin and cash ledger',
+                            last: true,
+                            onTap: () => _push(context, const EarnHubScreen()),
+                          ),
+                        ],
+                      ),
+                      _SectionLabel('Community', light: light),
+                      _Group(
+                        light: light,
+                        children: [
+                          _Row(
+                            light: light,
                             mark: NwsbMarks.user,
                             label: 'Word Print',
                             sub: 'Public profile',
@@ -400,20 +428,6 @@ class HomeMenuDrawer extends StatelessWidget {
                             label: 'Echo Wall',
                             sub: 'Reflections',
                             onTap: () => _push(context, const EchoWallScreen()),
-                          ),
-                          _Row(
-                            light: light,
-                            mark: NwsbMarks.bars,
-                            label: 'Earnings',
-                            sub: 'Payouts and commissions',
-                            onTap: () => _push(context, const EarningsScreen()),
-                          ),
-                          _Row(
-                            light: light,
-                            mark: NwsbMarks.bell,
-                            label: 'Activity',
-                            sub: 'Coin and cash ledger',
-                            onTap: () => _push(context, const EarnHubScreen()),
                           ),
                           _Row(
                             light: light,
@@ -464,8 +478,9 @@ class _BackBtn extends StatelessWidget {
         width: 42,
         height: 42,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: light ? Colors.white : const Color(0x12FFFFFF),
           shape: BoxShape.circle,
+          border: light ? null : Border.all(color: const Color(0x2EFFFFFF)),
           boxShadow: light
               ? const [
                   BoxShadow(
@@ -478,8 +493,8 @@ class _BackBtn extends StatelessWidget {
         ),
         child: Icon(
           light ? Icons.arrow_back_ios_new_rounded : Icons.arrow_back,
-          size: light ? 16 : 19,
-          color: NwsbColors.ink,
+          size: light ? 16 : 18,
+          color: light ? NwsbColors.ink : Colors.white70,
         ),
       ),
     );
@@ -497,14 +512,14 @@ class _SectionLabel extends StatelessWidget {
     return Padding(
       padding: light
           ? const EdgeInsets.fromLTRB(32, 20, 20, 8)
-          : const EdgeInsets.only(left: 4, bottom: 10, top: 4),
+          : const EdgeInsets.only(left: 6, bottom: 12, top: 10),
       child: Text(
         text.toUpperCase(),
         style: TextStyle(
           fontSize: light ? 9 : 10,
-          letterSpacing: light ? 2.5 : 1.6,
-          fontWeight: light ? FontWeight.w700 : FontWeight.w800,
-          color: light ? NwsbColors.gold : const Color(0x73FFFFFF),
+          letterSpacing: light ? 2.5 : 2.4,
+          fontWeight: light ? FontWeight.w700 : FontWeight.w600,
+          color: light ? NwsbColors.gold : const Color(0x8CE8D5A3),
         ),
       ),
     );
@@ -521,10 +536,10 @@ class _Group extends StatelessWidget {
     if (!light) {
       // Match AppSettingsScreen _Sec → HeavyGlassPanel.
       return Padding(
-        padding: const EdgeInsets.only(bottom: 22),
+        padding: const EdgeInsets.only(bottom: 26),
         child: HeavyGlassPanel(
-          padding: const EdgeInsets.fromLTRB(8, 10, 8, 10),
-          radius: 22,
+          padding: const EdgeInsets.all(10),
+          radius: 24,
           child: Column(children: children),
         ),
       );
@@ -588,14 +603,26 @@ class _Row extends StatelessWidget {
   Widget build(BuildContext context) {
     if (!light) {
       // Match AppSettingsScreen _NavRow → NestedDarkWrap.
-      final leading = _glyph(NwsbColors.gold);
+      final leading = SizedBox(
+        width: 36,
+        height: 36,
+        child: Center(
+          child: NwsbIcon(
+            mark ?? NwsbMarks.arrow,
+            size: 20,
+            color: NwsbColors.goldLight,
+            viewBox: viewBox,
+          ),
+        ),
+      );
       return NestedDarkWrap(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
         margin: EdgeInsets.only(bottom: last ? 0 : 8),
         onTap: onTap,
         child: Row(
           children: [
             leading,
-            const SizedBox(width: 12),
+            const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -603,17 +630,18 @@ class _Row extends StatelessWidget {
                   EditableLabel('home_menu_drawer.Row',
                     label,
                     style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
+                      color: Color(0xEBFFFFFF),
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 0.2,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 3),
                   EditableLabel('home_menu_drawer.Row',
                     sub,
                     style: const TextStyle(
-                      color: Color(0x73FFFFFF),
-                      fontSize: 11,
+                      color: Color(0x66FFFFFF),
+                      fontSize: 11.5,
                     ),
                   ),
                 ],
@@ -622,7 +650,7 @@ class _Row extends StatelessWidget {
             const Icon(
               Icons.chevron_right,
               size: 16,
-              color: Color(0x55FFFFFF),
+              color: Color(0x33FFFFFF),
             ),
           ],
         ),
@@ -693,6 +721,86 @@ class _Row extends StatelessWidget {
               Icon(Icons.chevron_right_rounded, size: 18, color: chevColor),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Small, quiet profile line at the top of the menu (opens Profile tab).
+class _ProfileHeader extends StatelessWidget {
+  const _ProfileHeader({required this.onTap});
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    User? u;
+    try {
+      u = NwsbFirebase.ready ? FirebaseAuth.instance.currentUser : null;
+    } catch (_) {
+      u = null;
+    }
+    final name = (u?.displayName?.trim().isNotEmpty ?? false)
+        ? u!.displayName!.trim()
+        : 'Welcome';
+    final sub = u?.email ?? 'Breathe. Practice. Return.';
+    final initial = name.characters.first.toUpperCase();
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 18),
+      child: NestedDarkWrap(
+        margin: EdgeInsets.zero,
+        radius: 20,
+        padding: const EdgeInsets.fromLTRB(16, 16, 14, 16),
+        onTap: onTap,
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: const Color(0x66E8D5A3)),
+              ),
+              child: Text(
+                initial,
+                style: const TextStyle(
+                  color: NwsbColors.goldLight,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Color(0xEBFFFFFF),
+                      fontSize: 15.5,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    sub,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Color(0x66FFFFFF),
+                      fontSize: 11.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right, size: 16, color: Color(0x33FFFFFF)),
+          ],
         ),
       ),
     );
