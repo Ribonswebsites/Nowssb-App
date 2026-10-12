@@ -2,6 +2,7 @@
 /// NowssB secure Worker. Provider credentials are never bundled in Flutter.
 library;
 
+import '../widgets/glass_black_card.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
@@ -251,18 +252,18 @@ class _PersonalCoachScreenState extends State<PersonalCoachScreen> {
           const SizedBox(width: 12),
           _topButton(signedIn ? Icons.logout_rounded : Icons.person_outline_rounded, signedIn ? 'Sign out' : 'Sign in', signedIn ? _signOut : _signIn),
         ])),
-        const SizedBox(height: 16),
+        const SizedBox(height: UiSpace.xl),
         LSection('hero', 'Hero', _hero(words)),
-        const SizedBox(height: 16),
+        const SizedBox(height: UiSpace.xxl),
         LSection('metrics', 'Metrics', _metrics(data)),
-        const SizedBox(height: 16),
+        const SizedBox(height: UiSpace.xxl),
         LSection('promo', 'Split promo banner', ColoredSplitPromoBanner.forSurface(
           SplitPromoSurface.coach,
           onTap: () => Navigator.of(context).push(
             MaterialPageRoute<void>(builder: (_) => const SoundLibraryScreen()),
           ),
         )),
-        const SizedBox(height: 16),
+        const SizedBox(height: UiSpace.xxl),
         const LSection('quote', 'Quote card', _QuoteCard()),
         const SizedBox(height: 22),
         const LSection('chat', 'Chat with your coach', EditableLabel('personal_coach.PersonalCoachScreen', 'Chat with your coach', style: TextStyle(color: Color(0xFFB5B5BA), fontSize: 17, fontWeight: FontWeight.w600))),
@@ -275,7 +276,9 @@ class _PersonalCoachScreenState extends State<PersonalCoachScreen> {
         ],
         const SizedBox(height: 12),
         LSection('note', 'Streak note', Text(data.streak > 0 ? 'Your ${data.streak}-day streak informs your coach context.' : 'Complete a practice to begin your coach progress history.', style: const TextStyle(color: Color(0xFF7F7F85), fontSize: 13))),
-      ]),
+        // UD-2b: the coloured split promo ships off (calm pass); admin can
+        // re-enable it from the UI Editor.
+      ], hiddenByDefault: const {'promo'}),
     );
   }
 
@@ -395,7 +398,7 @@ class _ProgressCard extends StatelessWidget {
   final int percent;
   final int target;
   @override
-  Widget build(BuildContext context) => _Panel(height: 286, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+  Widget build(BuildContext context) => _Panel(height: 318, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         const _Label('Progress'), const Spacer(), Center(child: _Ring(percent)), const Spacer(),
         Text(target == 0 ? 'Choose a practice.\nYour progress will appear here.' : 'Keep showing up.\nYou’re building momentum.', style: const TextStyle(color: Color(0xFFA1A1A7), height: 1.42)),
       ]));
@@ -426,8 +429,8 @@ class _MetricCard extends StatelessWidget {
   final String label, title, detail;
   final double? progress;
   @override
-  Widget build(BuildContext context) => _Panel(height: progress == null ? 142 : 132, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        _Label(label), const SizedBox(height: 9), EditableLabel('personal_coach.MetricCard', title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 21, height: 1.14, fontWeight: FontWeight.w500)), const Spacer(),
+  Widget build(BuildContext context) => _Panel(height: progress == null ? 158 : 148, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        _Label(label), const SizedBox(height: 9), EditableLabel('personal_coach.MetricCard', title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 17, height: 1.2, fontWeight: FontWeight.w500)), const Spacer(),
         if (progress != null) ...[LinearProgressIndicator(value: progress, minHeight: 2, color: Colors.white, backgroundColor: Colors.white12), const SizedBox(height: 8)],
         EditableLabel('personal_coach.MetricCard', detail, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xFF94949A), fontSize: 12)),
       ]));
@@ -437,7 +440,12 @@ class _Panel extends StatelessWidget {
   const _Panel({required this.child, required this.height});
   final Widget child; final double height;
   @override
-  Widget build(BuildContext context) => Container(height: height, padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: const Color(0xFF101013), borderRadius: BorderRadius.circular(24), border: Border.all(color: Colors.white.withOpacity(.09))), child: child);
+  // UD-2b: soft glass frame around the black card (shared GlassBlackCard).
+  Widget build(BuildContext context) {
+    // Grow with large text so labels never clip (UD-2b, 320px @ 1.3).
+    final k = MediaQuery.textScalerOf(context).scale(1);
+    return SizedBox(height: k <= 1 ? height : height * k + 16, child: GlassBlackCard(radius: UiRadii.lg, frame: 5, padding: const EdgeInsets.all(UiSpace.lg), child: child));
+  }
 }
 
 class _QuoteCard extends StatelessWidget {

@@ -11,6 +11,7 @@ import '../features/economy/economy_theme.dart';
 import '../features/programs/program_router.dart';
 import '../shell/nwsb_links.dart';
 import '../theme/tokens.dart';
+import '../widgets/glass_black_card.dart';
 import '../widgets/glass_wrap.dart';
 import '../widgets/nwsb_icon.dart';
 import 'healing_path.dart';
@@ -69,7 +70,7 @@ class FeaturesPage extends StatelessWidget {
       mark: NwsbMarks.features,
       showBalance: false,
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
+        padding: const EdgeInsets.fromLTRB(UiSpace.lg, UiSpace.sm, UiSpace.lg, 48),
         children: layoutChildren(context, 'features', [
           const LSection('intro', 'Intro', _Intro()),
           LSection('practice', 'Practice', _Group(eyebrow: 'PRACTICE', title: 'Listen, say, sit', items: _practice)),
@@ -82,28 +83,24 @@ class FeaturesPage extends StatelessWidget {
   }
 }
 
+/// UD-2b: calm intro — type and whitespace only, no glow card.
 class _Intro extends StatelessWidget {
   const _Intro();
   @override
-  Widget build(BuildContext context) => Container(
-        margin: const EdgeInsets.only(bottom: 14),
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(22),
-          gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF1B1408), Color(0xFF000000)]),
-          border: Border.all(color: const Color(0x66E4C56A)),
-          boxShadow: const [BoxShadow(color: Color(0x33E4C56A), blurRadius: 24, offset: Offset(0, 10))],
-        ),
-        child: const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          EditableLabel('features_page.Intro', 'EVERYTHING IN NOWSSB', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.6, fontSize: 11, fontWeight: FontWeight.w800)),
-          SizedBox(height: 6),
-          EditableLabel('features_page.Intro', 'One tap to every part of the app', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
-          SizedBox(height: 6),
-          EditableLabel('features_page.Intro', 'Each tile opens its own page. Customize how Home looks from the Customize tile.', style: TextStyle(color: NwsbColors.mist, height: 1.35)),
+  Widget build(BuildContext context) => const Padding(
+        padding: EdgeInsets.fromLTRB(UiSpace.sm, UiSpace.xl, UiSpace.sm, UiSpace.xxl),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          EditableLabel('features_page.Intro', 'EVERYTHING IN NOWSSB', style: TextStyle(color: NwsbColors.gold, letterSpacing: 2.4, fontSize: 11, fontWeight: FontWeight.w600)),
+          SizedBox(height: UiSpace.md),
+          EditableLabel('features_page.Intro', 'One tap to every part of the app', style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w600, height: 1.2)),
+          SizedBox(height: UiSpace.md),
+          EditableLabel('features_page.Intro', 'Each tile opens its own page. Customize how Home looks from the Customize tile.', style: UiType.body),
         ]),
       );
 }
 
+/// UD-2b: one quiet glass-framed black card per group, rows with hairline
+/// dividers instead of a grid of identical tiles.
 class _Group extends StatelessWidget {
   const _Group({required this.eyebrow, required this.title, required this.items});
   final String eyebrow;
@@ -111,65 +108,55 @@ class _Group extends StatelessWidget {
   final List<_Feature> items;
 
   @override
-  Widget build(BuildContext context) => GlassWrap(
-        margin: const EdgeInsets.only(bottom: 14),
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.only(bottom: UiSpace.xxl),
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          EditableLabel('features_page.Group', eyebrow, style: const TextStyle(color: NwsbColors.gold, letterSpacing: 1.4, fontSize: 11, fontWeight: FontWeight.w800)),
-          const SizedBox(height: 2),
-          EditableLabel('features_page.Group', title, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
-          const SizedBox(height: 10),
-          LayoutBuilder(builder: (context, c) {
-            final w = (c.maxWidth - 10) / 2;
-            return Wrap(spacing: 10, runSpacing: 10, children: [for (final f in items) SizedBox(width: w, child: _Tile(f))]);
-          }),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(UiSpace.sm, 0, UiSpace.sm, UiSpace.md),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              EditableLabel('features_page.Group', eyebrow, style: const TextStyle(color: NwsbColors.gold, letterSpacing: 2.2, fontSize: 11, fontWeight: FontWeight.w600)),
+              const SizedBox(height: UiSpace.xs),
+              EditableLabel('features_page.Group', title, style: const TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w600)),
+            ]),
+          ),
+          GlassBlackCard(
+            radius: UiRadii.lg,
+            padding: const EdgeInsets.symmetric(vertical: UiSpace.xs),
+            child: Column(children: [
+              for (var i = 0; i < items.length; i++) ...[
+                if (i > 0)
+                  const Divider(height: 1, thickness: 1, indent: 64, endIndent: UiSpace.lg, color: Color(0x14FFFFFF)),
+                _Tile(items[i]),
+              ],
+            ]),
+          ),
         ]),
       );
 }
 
-class _Tile extends StatefulWidget {
+class _Tile extends StatelessWidget {
   const _Tile(this.f);
   final _Feature f;
-  @override
-  State<_Tile> createState() => _TileState();
-}
 
-class _TileState extends State<_Tile> {
-  bool _down = false;
   @override
   Widget build(BuildContext context) {
-    final f = widget.f;
-    return GestureDetector(
-      onTapDown: (_) => setState(() => _down = true),
-      onTapCancel: () => setState(() => _down = false),
-      onTapUp: (_) => setState(() => _down = false),
+    return InkWell(
       onTap: () => f.open(context),
-      child: AnimatedScale(
-        scale: _down ? 0.96 : 1,
-        duration: const Duration(milliseconds: 120),
-        child: Container(
-          height: 132,
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Colors.black,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: _down ? const Color(0xAAE4C56A) : const Color(0x29FFFFFF)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: UiSpace.lg, vertical: UiSpace.lg),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+          NwsbIcon(f.mark, size: 20, color: NwsbColors.goldLight),
+          const SizedBox(width: UiSpace.xl),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              EditableLabel('features_page.${f.id}', f.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 15)),
+              const SizedBox(height: UiSpace.xs),
+              EditableLabel('features_page.${f.id}', f.line, maxLines: 2, overflow: TextOverflow.ellipsis, style: UiType.caption.copyWith(fontSize: 12, fontWeight: FontWeight.w400, letterSpacing: 0)),
+            ]),
           ),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Container(
-              width: 34,
-              height: 34,
-              decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0x1FE4C56A)),
-              alignment: Alignment.center,
-              child: NwsbIcon(f.mark, size: 18, color: NwsbColors.goldLight),
-            ),
-            const SizedBox(height: 8),
-            EditableLabel('features_page.${f.id}', f.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13.5)),
-            const SizedBox(height: 3),
-            Expanded(
-              child: EditableLabel('features_page.${f.id}', f.line, maxLines: 3, overflow: TextOverflow.ellipsis, style: const TextStyle(color: NwsbColors.mist, fontSize: 11.5, height: 1.3)),
-            ),
-          ]),
-        ),
+          const SizedBox(width: UiSpace.md),
+          const Icon(Icons.chevron_right_rounded, size: 20, color: Color(0x66FFFFFF)),
+        ]),
       ),
     );
   }
