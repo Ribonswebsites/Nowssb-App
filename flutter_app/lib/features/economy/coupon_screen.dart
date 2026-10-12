@@ -9,13 +9,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../theme/tokens.dart';
-import '../../widgets/four_banners.dart';
 import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_coin_fly.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/program_shelf.dart';
+import '../../widgets/coupon_ticket_shape.dart';
 import '../../widgets/hype_rail.dart';
-import '../../widgets/sections/coupon_banner_section.dart';
 import 'economy_api.dart';
 import 'reward_fx.dart';
 import 'economy_theme.dart';
@@ -49,12 +48,6 @@ class _CouponScreenState extends State<CouponScreen> {
 
   void _tab(String id) => _go.value?.call(id);
 
-  void _showScratch() {
-    final ctx = _scratch.currentContext;
-    if (ctx == null) return;
-    Scrollable.ensureVisible(ctx, duration: const Duration(milliseconds: 380), alignment: 0.08);
-  }
-
   @override
   Widget build(BuildContext context) {
     return EconomyPage(
@@ -70,7 +63,6 @@ class _CouponScreenState extends State<CouponScreen> {
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
           cacheExtent: 1600,
           children: [
-            CouponBannerSection(onCta: _showScratch),
             const CouponsHero(),
             const GlassLine(
               text: 'A free scratch every day. Paid cards show every prize before you draw. Expected value stays under the price.',
@@ -96,14 +88,6 @@ class _CouponScreenState extends State<CouponScreen> {
             ),
             const SizedBox(height: 8),
             _PaidPeek(onOpen: () => _tab('shop')),
-            const SizedBox(height: 18),
-            const FourBanners(
-              current: Programme.coupons,
-              splitTitle: 'Coupons',
-              splitCta: 'Scratch',
-              blackTitle: 'Odds on the card',
-              blackSub: 'A free scratch, and three paid cards. Nothing is cash.',
-            ),
             const SizedBox(height: 18),
             ProgramTabsBlock(spec: kCouponsSpec, initialTab: widget.initialTab, scrollTo: widget.initialTab != null, goRef: _go, showDisclaimer: false),
           ],
@@ -209,27 +193,19 @@ class _OpenedCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 168,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(18),
-        gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF1A1408), Colors.black, Color(0xFF14100A)]),
-        border: Border.all(color: const Color(0x99E4C56A)),
-        boxShadow: const [BoxShadow(color: Color(0x33E4C56A), blurRadius: 22, spreadRadius: -6)],
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
+    return CouponTicket(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          EditableImage.asset(NwsbCoinFly.disc, width: 34, height: 34, fit: BoxFit.contain, slot: 'coupon_screen.OpenedCard'),
-          const SizedBox(height: 6),
           const EditableLabel('coupon_screen.OpenedCard', 'ALREADY SCRATCHED TODAY', style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.6, fontSize: 11, fontWeight: FontWeight.w800)),
-          const SizedBox(height: 4),
-          Text('You won $label', textAlign: TextAlign.center, maxLines: 2, style: const TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w800)),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
+          Text('You won $label', maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w800)),
+          const SizedBox(height: 6),
           const EditableLabel('coupon_screen.OpenedCard', 'Next free card at midnight · it\u2019s on your account', style: TextStyle(color: Color(0x99FFFFFF), fontSize: 11.5)),
         ],
       ),
+      stub: EditableImage.asset(NwsbCoinFly.disc, width: 40, height: 40, fit: BoxFit.contain, slot: 'coupon_screen.OpenedCard'),
     );
   }
 }
