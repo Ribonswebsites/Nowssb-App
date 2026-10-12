@@ -392,32 +392,40 @@ class _CategoryTile extends StatelessWidget {
                           ),
                         ),
                       ),
-                      EditableLabel(
-                        '$slot.title',
-                        title,
-                        textAlign: TextAlign.center,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w800,
-                          height: 1.15,
+                      // Scale down (never "…") so short labels like
+                      // "Meanings" stay whole at large text scales on 320px.
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: EditableLabel(
+                          '$slot.title',
+                          title,
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          softWrap: false,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800,
+                            height: 1.15,
+                          ),
                         ),
                       ),
                       if (subtitle.isNotEmpty) ...[
                         const SizedBox(height: 2),
-                        EditableLabel(
-                          '$slot.subtitle',
-                          subtitle,
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.55),
-                            fontSize: 10.5,
-                            fontWeight: FontWeight.w500,
-                            height: 1.15,
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: EditableLabel(
+                            '$slot.subtitle',
+                            subtitle,
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
+                            softWrap: false,
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.55),
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.w500,
+                              height: 1.15,
+                            ),
                           ),
                         ),
                       ],
