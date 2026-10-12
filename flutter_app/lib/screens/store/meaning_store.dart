@@ -262,7 +262,11 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
         18: ('rows', 'Meaning collections'),
         -2: ('promo3', 'Request words banner'),
         -1: ('disclaimer', 'Disclaimer'),
-      }, [
+      },
+          // Brief B (calm): hype row retired; the second Signature promo is
+          // folded (promo + promo3 keep the page's promo slots).
+          hiddenByDefault: const {'hype', 'promo2'},
+          [
         // Single hero/video area — no back-to-back promo banners.
         StorePixelsHero(
           videoAsset: nwsbVideo(kStoreMeaningDoorVidFile),
@@ -285,7 +289,7 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
           title: 'Explore the stores',
           child: StoreRegistrySection(config: MeaningMix.glassy),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 28),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 2),
           child: StoreSearchBar(
@@ -294,7 +298,7 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
             onChanged: (v) => setState(() => _query = v),
           ),
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 24),
         SizedBox(
           height: 36,
           child: ListView(
@@ -321,7 +325,7 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
             ],
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 20),
         StoreFrequencyPackage(
           meanings: true,
           onSelectCategory: (id) {

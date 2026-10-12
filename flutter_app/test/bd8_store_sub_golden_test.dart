@@ -88,6 +88,7 @@ void main() {
 
   final pages = <String, Widget Function()>{
     'atelier': () => const WordAtelierScreen(),
+    'meanings': () => const MeaningStoreScreen(),
   };
   for (final w in [320.0, 390.0]) {
     for (final k in [1.0, 1.3, 2.0]) {
@@ -130,6 +131,24 @@ void main() {
   pages.forEach((name, build) {
     testWidgets('store sub $name golden 390x844', (tester) async {
       await pump(tester, build(), const Size(390, 844), 1.0);
+      // Meaning Store pre-caches its art (real async I/O) first.
+      for (var i = 0;
+          i < 40 &&
+              find
+                  .textContaining('Loading', findRichText: true)
+                  .evaluate()
+                  .isNotEmpty;
+          i++) {
+        await tester.runAsync(
+            () => Future<void>.delayed(const Duration(milliseconds: 150)));
+        await tester.pump(const Duration(milliseconds: 100));
+      }
+      await tester.runAsync(() async {
+        for (final e in find.byType(Image).evaluate()) {
+          await precacheImage((e.widget as Image).image, e);
+        }
+      });
+      await tester.pump(const Duration(milliseconds: 200));
       restore();
       await expectLater(find.byType(MaterialApp),
           matchesGoldenFile('goldens/store-sub-$name.png'));
