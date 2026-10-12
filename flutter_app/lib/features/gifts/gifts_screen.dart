@@ -401,7 +401,6 @@ class _GiftsScreenState extends State<GiftsScreen> {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
         cacheExtent: 1600,
         children: [
-          const NowssbHypeRail(),
           const GiftsHero(),
           const GiftShowcase(),
           const SizedBox(height: 16),

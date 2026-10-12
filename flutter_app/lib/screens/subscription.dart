@@ -255,7 +255,6 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                 // Server-driven order (Admin → UI Editor); bundled order by default.
                 for (final w in layoutChildren(context, 'subscription', [
                   LSection('video', 'Video banner', _videoBanner()),
-                  const LSection('hype', 'Most hyped', NowssbHypeRail()),
                   LSection('billing', 'Monthly / yearly switch', _billing()),
                   LSection('plans', 'Plans', _horizontalPlans()),
                 ],

@@ -109,7 +109,6 @@ class _RequestWordsScreenState extends State<RequestWordsScreen> {
                 pillLabel: 'REQUEST',
               ),
               const SizedBox(height: 16),
-              const NowssbHypeRail(),
               const SizedBox(height: 18),
               StoreGlassPanel(
                 child: Column(
