@@ -1353,7 +1353,18 @@ export async function sectionSet(deps, body = {}) {
     clear ? `Cleared section ${slot}` : `Set section ${slot} v${config.version}`,
   ));
   if (ops.length) await db.commit(ops);
-  return { ok: true, slot, config: clear ? null : config, before: beforeCfg };
+  // CA-2: after the admin confirmed, delete media the old config used that the
+  // new one does not (server re-checks every other reference first).
+  let media = [];
+  if (body.purgeMedia === true && beforeCfg) {
+    const keep = urlsIn(clear ? null : config);
+    const gone = [...urlsIn(beforeCfg)].filter((u) => !keep.has(u));
+    if (gone.length) {
+      media = await gcUrls(deps, gone, { targets: [slot] });
+      await db.commit(logOps(deps, 'media.gc', slot, { results: media.map(({ key, url, status }) => ({ key: key || url, status })) }, `Old media for ${slot}`));
+    }
+  }
+  return { ok: true, slot, config: clear ? null : config, before: beforeCfg, media };
 }
 
 /** Undo the last section change (restore previous config from ui_history). */
@@ -1375,6 +1386,8 @@ export async function sectionUndo(deps, body = {}) {
   return sectionSet(deps, { slot, config: prev, note: 'undo' });
 }
 
+import { gcUrls, mediaGc, mediaOrphans, pagePurge, sectionPurge, urlsIn } from './admin_media.js';
+
 export const ACTIONS = {
   stats, users: listUsers, user: userProfile,
   'grant-sub': grantSub, 'extend-sub': extendSub, 'revoke-sub': revokeSub,
@@ -1386,4 +1399,5 @@ export const ACTIONS = {
   today, 'grant-item': grantItem, 'send-gift': sendGift, alerts,
   orbs, 'orb-set': orbSet, 'orb-undo': orbUndo,
   sections, 'section-set': sectionSet, 'section-undo': sectionUndo,
+  'media-gc': mediaGc, 'media-orphans': mediaOrphans, 'section-purge': sectionPurge, 'page-purge': pagePurge,
 };

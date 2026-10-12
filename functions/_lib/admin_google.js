@@ -172,3 +172,11 @@ export async function r2List(env, prefix, { maxPages = 5, fetchImpl = (...a) => 
   }
   return out;
 }
+
+/** Deletes one R2 object (S3 DeleteObject). 204/200 ok; 404 counts as gone. */
+export async function r2Delete(env, key, { fetchImpl = (...a) => fetch(...a) } = {}) {
+  const url = await presign({ method: 'DELETE', accountId: env.R2_ACCOUNT_ID, bucket: env.R2_BUCKET, accessKeyId: env.R2_ACCESS_KEY_ID, secret: env.R2_SECRET_ACCESS_KEY, key });
+  const r = await fetchImpl(url, { method: 'DELETE' });
+  if (!(r.ok || r.status === 404)) throw new Error('r2 delete ' + r.status);
+  return true;
+}

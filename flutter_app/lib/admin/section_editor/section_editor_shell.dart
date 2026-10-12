@@ -17,6 +17,7 @@ import '../editor/glass.dart';
 import 'section_config_api.dart';
 import 'section_focal_pad.dart';
 import 'section_anim_panel.dart';
+import '../editor/media_cleanup.dart';
 import 'section_content_panel.dart';
 import 'section_layout_handles.dart';
 import '../../widgets/sections/section_configs.dart';
@@ -152,6 +153,16 @@ class _SectionEditorShellState extends State<SectionEditorShell> {
   Future<void> _save() async {
     final draft = _draft;
     if (draft == null) return;
+    // CA-2: media the saved config used that this draft drops.
+    final live = SectionConfigs.instance.forSlot(sectionSlotKey(widget.pageId, widget.sectionId));
+    final keep = adminMediaIn(draft.toJson());
+    final gone = live == null ? <String>{} : adminMediaIn(live.toJson()).difference(keep);
+    var purge = false;
+    if (gone.isNotEmpty) {
+      final choice = await confirmMediaDelete(context, MediaPlan(oldUrls: gone));
+      if (choice == MediaChoice.cancel || !mounted) return;
+      purge = choice == MediaChoice.delete;
+    }
     setState(() {
       _busy = true;
       _msg = 'Saving…';
@@ -162,6 +173,7 @@ class _SectionEditorShellState extends State<SectionEditorShell> {
         sectionId: widget.sectionId,
         config: draft,
         note: 'section.editor',
+        purgeMedia: purge,
       );
       if (!mounted) return;
       final slot = sectionSlotKey(widget.pageId, widget.sectionId);

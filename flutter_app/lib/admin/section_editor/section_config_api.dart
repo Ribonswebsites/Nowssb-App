@@ -75,11 +75,13 @@ class SectionConfigApi {
     required String sectionId,
     required SectionConfig config,
     String note = '',
+    bool purgeMedia = false,
   }) async {
     final r = await AdminApi.call('section-set', {
       'pageId': pageId,
       'sectionId': sectionId,
       'config': config.toJson(),
+      if (purgeMedia) 'purgeMedia': true,
       if (note.isNotEmpty) 'note': note,
     });
     return SectionConfig.fromJson(r['config']);

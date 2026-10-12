@@ -3,6 +3,7 @@
 /// Nothing reaches users until [publish].
 library;
 
+import 'media_cleanup.dart';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -777,7 +778,21 @@ class EditorController extends ChangeNotifier {
     preview.changed();
   }
 
-  Future<String?> publish({String note = ''}) async {
+  /// CA-2: old media / deleted sections / reset pages this publish leaves.
+  MediaPlan mediaPlan() {
+    final layouts = <String, PageLayout?>{
+      for (final e in preview.draftLayouts.entries)
+        e.key: e.value.sections.isEmpty && e.value.version == -1 ? null : e.value,
+    };
+    return planMedia(
+      liveOverrides: {for (final k in preview.draftOverrides.keys) k: UiOverrides.instance.get(k)},
+      draftOverrides: Map.of(preview.draftOverrides),
+      liveLayouts: {for (final k in layouts.keys) k: UiLayouts.instance.layoutFor(k)},
+      draftLayouts: layouts,
+    );
+  }
+
+  Future<String?> publish({String note = '', MediaPlan? plan, bool deleteMedia = false}) async {
     if (pendingCount == 0) return null;
     busy = true;
     message = 'Publishing…';
@@ -802,6 +817,11 @@ class EditorController extends ChangeNotifier {
       _redo.clear();
       preview.changed();
       message = 'Live — every open app shows it now.';
+      if (plan != null && !plan.isEmpty) {
+        notifyListeners();
+        final s = await runMediaCleanup(plan, deleteMedia: deleteMedia);
+        if (s.isNotEmpty) message = 'Live — every open app shows it now. $s.';
+      }
       return null;
     } catch (e) {
       message = 'Could not publish: $e';

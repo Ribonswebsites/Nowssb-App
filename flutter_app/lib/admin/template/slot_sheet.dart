@@ -17,6 +17,7 @@ import 'media_tune.dart';
 import 'slot_keys.dart';
 import 'ui_overrides.dart';
 import '../orb_picker.dart';
+import '../editor/media_cleanup.dart';
 
 Future<void> openSlotSheet(
   BuildContext context, {
@@ -117,6 +118,16 @@ class _SlotSheetState extends State<SlotSheet> {
     final kind = widget.type == SlotType.video ? PickKind.video : PickKind.image;
     final file = await pickMedia(context, kind);
     if (file == null || !mounted) return;
+    // CA-2: the file being replaced (and the one undo would bring back).
+    final oldUrls = <String>{
+      if (_current != null && isAdminMedia(_current!.url)) _current!.url,
+    };
+    var purge = false;
+    if (oldUrls.isNotEmpty && _bound == null) {
+      final choice = await confirmMediaDelete(context, MediaPlan(oldUrls: oldUrls, targets: {widget.slotKey}));
+      if (choice == MediaChoice.cancel || !mounted) return;
+      purge = choice == MediaChoice.delete;
+    }
     setState(() {
       _busy = true;
       _progress = 0;
@@ -141,7 +152,8 @@ class _SlotSheetState extends State<SlotSheet> {
         );
       }
       final style = Map<String, dynamic>.from(_current?.style ?? {});
-      style['undoUrl'] = _current?.url.isNotEmpty == true ? _current!.url : widget.defaultValue;
+      // Purged old file cannot be undone to: undo goes back to the original.
+      style['undoUrl'] = !purge && _current?.url.isNotEmpty == true ? _current!.url : widget.defaultValue;
       style['undoZoom'] = _zoom;
       style['zoom'] = _zoom;
       await _write(
@@ -155,6 +167,10 @@ class _SlotSheetState extends State<SlotSheet> {
           style: style,
         ),
       );
+      if (purge) {
+        final s = await runMediaCleanup(MediaPlan(oldUrls: oldUrls, targets: {widget.slotKey}), deleteMedia: true);
+        if (mounted && s.isNotEmpty) setState(() => _msg = 'Saved. $s.');
+      }
       if (mounted && bound != null) {
         setState(() => _canUndo = WordArt.instance.canUndo(bound));
       } else if (mounted) {
@@ -247,6 +263,18 @@ class _SlotSheetState extends State<SlotSheet> {
   }
 
   Future<void> _reset() async {
+    final cur = _current;
+    final oldUrls = <String>{
+      if (cur != null && isAdminMedia(cur.url)) cur.url,
+      if (cur != null && cur.style['undoUrl'] is String && isAdminMedia(cur.style['undoUrl'] as String))
+        cur.style['undoUrl'] as String,
+    };
+    var purge = false;
+    if (oldUrls.isNotEmpty && _bound == null) {
+      final choice = await confirmMediaDelete(context, MediaPlan(oldUrls: oldUrls, targets: {widget.slotKey}));
+      if (choice == MediaChoice.cancel || !mounted) return;
+      purge = choice == MediaChoice.delete;
+    }
     setState(() {
       _busy = true;
       _msg = 'Putting the original back…';
@@ -259,6 +287,7 @@ class _SlotSheetState extends State<SlotSheet> {
       await _doc.delete();
       UiOverrides.instance.removeLocal(widget.slotKey);
       await adminLog('template.reset', widget.slotKey);
+      if (purge) await runMediaCleanup(MediaPlan(oldUrls: oldUrls, targets: {widget.slotKey}), deleteMedia: true);
       if (widget.type == SlotType.text) _text.text = widget.defaultValue;
       if (mounted) {
         setState(() {

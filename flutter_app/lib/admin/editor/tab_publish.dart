@@ -4,6 +4,7 @@
 /// restore (deleted sections included).
 library;
 
+import 'media_cleanup.dart';
 import 'package:flutter/material.dart';
 
 import '../admin_ui.dart' show adminAgo;
@@ -59,7 +60,10 @@ class PublishTab extends StatelessWidget {
                       ? null
                       : () async {
                           bigFeel();
-                          await c.publish();
+                          final plan = c.mediaPlan();
+                          final choice = await confirmMediaDelete(context, plan);
+                          if (choice == MediaChoice.cancel) return;
+                          await c.publish(plan: plan, deleteMedia: choice == MediaChoice.delete);
                         },
                   icon: c.busy
                       ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: kInk))

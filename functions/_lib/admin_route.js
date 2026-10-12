@@ -6,7 +6,7 @@
    (custom claim admin:true, or a document at admins/{uid}). */
 import { cors, googleToken, json, parseServiceAccount, requireUser, serviceAccount } from './server.js';
 import { restStore } from './admin_store.js';
-import { R2_VARS, authAdmin, fcmSend, r2List } from './admin_google.js';
+import { R2_VARS, authAdmin, fcmSend, r2Delete, r2List } from './admin_google.js';
 import { ACTIONS, AdminError } from './admin_core.js';
 
 export const DEFAULT_PROJECT = 'nowssb-34f1b';
@@ -69,6 +69,8 @@ export async function handleAdmin({ request, env, params }, deps = {}) {
     auth: deps.auth !== undefined ? deps.auth : (sa ? authAdmin(sa, e.FIREBASE_PROJECT_ID) : null),
     push: deps.push !== undefined ? deps.push : (pushSa ? (token, msg) => fcmSend(pushSa, token, msg) : null),
     r2: deps.r2 !== undefined ? deps.r2 : (cfg.r2 ? (prefix) => r2List(e, prefix) : null),
+    r2Del: deps.r2Del !== undefined ? deps.r2Del : (cfg.r2 ? (key) => r2Delete(e, key) : null),
+    mediaBase: deps.mediaBase !== undefined ? deps.mediaBase : String(e.R2_PUBLIC_BASE_URL || '').replace(/\/+$/, ''),
     r2Missing: cfg.r2Missing,
     admin: { uid: claims.sub, email: claims.email || '' },
     now: deps.now || Date.now(),
