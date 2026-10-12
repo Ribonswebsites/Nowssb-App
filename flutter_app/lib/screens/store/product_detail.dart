@@ -18,6 +18,8 @@ import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../word_detail.dart';
+import '../../widgets/glass_black_card.dart';
+import '../../theme/ui_tokens.dart';
 import 'bag_ui.dart';
 import 'store_actions.dart';
 import 'store_cards.dart';
@@ -39,7 +41,8 @@ void openAtelierWord(
   // already open it; otherwise the product page with its Buy button.
   final open = found.isNotEmpty &&
       (signature
-          ? Entitlements.instance.canOpenStoreWord(word, signature: true, price: kMsSignaturePrice)
+          ? Entitlements.instance
+              .canOpenStoreWord(word, signature: true, price: kMsSignaturePrice)
           : Entitlements.instance.canOpenWord(found.first));
   if (open) {
     Navigator.of(context).push(
@@ -73,8 +76,7 @@ void openMeaningDetail(
   MsMeaning m, {
   bool signature = false,
 }) {
-  final blurb =
-      kMsWordBlurb[m.key] ??
+  final blurb = kMsWordBlurb[m.key] ??
       'Every word carries a vibration that predates its dictionary definition. Unlock the true phonetic origin of ${m.word}.';
   Navigator.of(context).push(
     MaterialPageRoute<void>(
@@ -192,226 +194,173 @@ class _StoreProductPageState extends State<StoreProductPage> {
   String? get heroVideo => widget.heroVideo;
 
   BagItem get _bagItem => BagItem(
-    id: _id,
-    title: title,
-    subtitle: root,
-    image: img,
-    price: price,
-    kind: kind,
-  );
+        id: _id,
+        title: title,
+        subtitle: root,
+        image: img,
+        price: price,
+        kind: kind,
+      );
 
-  @override
-  Widget build(BuildContext context) {
-    // Same Store shell as the departments, cart and checkout.
-    return ListenableBuilder(
-      listenable: Listenable.merge([StorePrices.instance, Entitlements.instance]),
-      builder: (context, _) => PageShell(
-      eyebrow: '',
-      title: 'NowssB Store',
-      subtitle: title,
-      film: 'assets/video/player-bg-loop.mp4',
-      usePageFilm: true,
-      onBack: () => Navigator.of(context).pop(),
-      onStorePicker: () => showStoreSelectSheet(
-        context,
-        onSelect: (id) => openStoreFromPicker(context, id, current: ''),
-      ),
-      slivers: [
-        SliverPadding(
-          padding: const EdgeInsets.fromLTRB(0, 0, 0, 40),
-          sliver: SliverList(
-            delegate: SliverChildListDelegate(
-                [
-                  if (heroVideo != null) ...[
-                    AspectRatio(
-                      aspectRatio: 16 / 9,
-                      child: NwsbVideo(
-                        asset: heroVideo!,
-                        priority: ClipPriority.feature,
-                        slot: 'product_detail.StoreProductPage',
-                      ),
-                    ),
-                    const SizedBox(height: 0),
-                  ],
-                  AspectRatio(
-                    aspectRatio: 1,
-                    child: StoreNetImage(url: img, word: title),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          kind.toUpperCase(),
-                          style: const TextStyle(
-                            fontSize: 10,
-                            letterSpacing: 2.2,
-                            color: Color(0x8CC8E8F5),
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        EditableLabel('product_detail.StoreProductPage',
-                          title,
-                          style: const TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                            height: 1.1,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          root,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Color(0x61FFFFFF),
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-                        Text(
-                          _open ? (price <= 0 ? 'Free' : (Entitlements.instance.ownsItem(_id) ? 'Owned' : 'Included in your plan')) : inr(price),
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w700,
-                            color: NwsbColors.goldLight,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _ActBtn(
-                                label: 'Wishlist',
-                                mark: NwsbMarks.wishlist,
-                                filled: false,
-                                onTap: () {
-                                  CartBag.instance.addWishlist(_bagItem);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('Saved $title to wishlist'),
-                                      behavior: SnackBarBehavior.floating,
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: _ActBtn(
-                                key: _addCartKey,
-                                label: 'Add to Cart',
-                                mark: NwsbMarks.cart,
-                                filled: false,
-                                onTap: () {
-                                  storeAddToCart(
-                                    context,
-                                    _bagItem,
-                                    origin: _addCartKey,
-                                  );
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('Added $title to cart'),
-                                      behavior: SnackBarBehavior.floating,
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        _ActBtn(
-                          label: _open ? 'Yours — open it in the Library' : 'Buy on Google Play',
-                          mark: NwsbMarks.bag,
-                          filled: true,
-                          onTap: () {
-                            if (_open) {
-                              Navigator.of(context).pop();
-                              return;
-                            }
-                            storeBuyNow(
-                              context,
-                              _bagItem,
-                              origin: _addCartKey,
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 22),
-                        const EditableLabel('product_detail.StoreProductPage',
-                          'ABOUT',
-                          style: TextStyle(
-                            fontSize: 9,
-                            letterSpacing: 1.6,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0x66FFFFFF),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          about,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            height: 1.7,
-                            color: Color(0xA6FFFFFF),
-                          ),
-                        ),
-                        const SizedBox(height: 22),
-                        const EditableLabel('product_detail.StoreProductPage',
-                          "WHAT'S INCLUDED",
-                          style: TextStyle(
-                            fontSize: 9,
-                            letterSpacing: 1.6,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0x66FFFFFF),
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        for (final h in highlights)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Icon(
-                                  Icons.check,
-                                  size: 15,
-                                  color: NwsbColors.goldLight,
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: Text(
-                                    h,
-                                    style: const TextStyle(
-                                      fontSize: 12.5,
-                                      color: Color(0x9EFFFFFF),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        if (disclaimer != null) ...[
-                          const SizedBox(height: 16),
-                          Text(
-                            disclaimer!,
-                            style: const TextStyle(
-                              fontSize: 11,
-                              height: 1.5,
-                              color: Color(0x66FFFFFF),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                ],
+  void _wish() {
+    CartBag.instance.addWishlist(_bagItem);
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Saved to wishlist'),
+        behavior: SnackBarBehavior.floating));
+  }
+
+  void _buy() {
+    if (_open) {
+      Navigator.of(context).pop();
+      return;
+    }
+    storeBuyNow(context, _bagItem);
+  }
+
+  void _about() => showModalBottomSheet<void>(
+        context: context,
+        backgroundColor: Colors.transparent,
+        builder: (_) => SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(UiSpace.md),
+            child: GlassBlackCard(
+              child: Text(disclaimer == null ? about : '$about\n\n$disclaimer',
+                  style: const TextStyle(
+                      color: Color(0xB3FFFFFF), fontSize: 13, height: 1.5)),
             ),
           ),
         ),
-      ],
-      ),
+      );
+
+  /// Rebuild C (Ribon 8:26): Myntra item layout on the original NowssB
+  /// colours, glass and media — hero art, name, price, Wishlist + Add to Bag
+  /// side by side, one full-width Buy. Nothing else.
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable:
+          Listenable.merge([StorePrices.instance, Entitlements.instance]),
+      builder: (context, _) {
+        final priceText = _open
+            ? (price <= 0
+                ? 'Free'
+                : (Entitlements.instance.ownsItem(_id)
+                    ? 'Owned'
+                    : 'In your plan'))
+            : inr(price);
+        return PageShell(
+          eyebrow: '',
+          title: 'NowssB Store',
+          subtitle: title,
+          film: 'assets/video/player-bg-loop.mp4',
+          usePageFilm: false,
+          background: const ColoredBox(color: NwsbColors.deep),
+          onBack: () => Navigator.of(context).pop(),
+          onStorePicker: () => showStoreSelectSheet(
+            context,
+            onSelect: (id) => openStoreFromPicker(context, id, current: ''),
+          ),
+          slivers: [
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 48),
+              sliver: SliverList.list(children: [
+                GlassBlackCard(
+                  padding: const EdgeInsets.all(UiSpace.sm),
+                  child: ClipRRect(
+                    borderRadius:
+                        BorderRadius.circular(UiRadii.card - UiSpace.sm),
+                    child: AspectRatio(
+                      aspectRatio: heroVideo != null ? 16 / 9 : 1,
+                      child: heroVideo != null
+                          ? NwsbVideo(
+                              asset: heroVideo!,
+                              priority: ClipPriority.feature,
+                              slot: 'product_detail.StoreProductPage',
+                            )
+                          : StoreNetImage(url: img, word: title),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 28),
+                Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Expanded(
+                    child: EditableLabel(
+                        'product_detail.StoreProductPage', title,
+                        style: const TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                            height: 1.1)),
+                  ),
+                  IconButton(
+                    tooltip: 'About',
+                    onPressed: _about,
+                    icon: const Icon(Icons.info_outline,
+                        color: Color(0x80FFFFFF)),
+                  ),
+                ]),
+                const SizedBox(height: 10),
+                Text(priceText,
+                    style: const TextStyle(
+                        color: NwsbColors.gold,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w600)),
+                const SizedBox(height: 32),
+                Row(children: [
+                  Expanded(
+                    child: SizedBox(
+                      height: 52,
+                      child: OutlinedButton.icon(
+                        onPressed: _wish,
+                        icon: const Icon(Icons.favorite_border, size: 18),
+                        label: const Text('Wishlist'),
+                        style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            side: const BorderSide(color: Color(0x40FFFFFF)),
+                            shape: const StadiumBorder()),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: SizedBox(
+                      height: 52,
+                      child: FilledButton.icon(
+                        key: _addCartKey,
+                        onPressed: _open
+                            ? null
+                            : () => storeAddToCart(context, _bagItem,
+                                origin: _addCartKey),
+                        icon: const Icon(Icons.shopping_bag_outlined, size: 18),
+                        label: const Text('Add to Bag'),
+                        style: FilledButton.styleFrom(
+                            backgroundColor: NwsbColors.gold,
+                            foregroundColor: Colors.black,
+                            disabledBackgroundColor: const Color(0x22FFFFFF),
+                            shape: const StadiumBorder()),
+                      ),
+                    ),
+                  ),
+                ]),
+                const SizedBox(height: 12),
+                SizedBox(
+                  height: 52,
+                  child: FilledButton(
+                    onPressed: _buy,
+                    style: FilledButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.black,
+                        shape: const StadiumBorder()),
+                    child: Text(_open ? 'Open in Library' : 'Buy Now',
+                        style: const TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.w600)),
+                  ),
+                ),
+              ]),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -457,7 +406,8 @@ class _ActBtn extends StatelessWidget {
             if (filled) const SizedBox(width: 8),
             if (!filled) NwsbIcon(mark, size: 16, color: ink),
             if (!filled) const SizedBox(width: 8),
-            EditableLabel('product_detail.ActBtn',
+            EditableLabel(
+              'product_detail.ActBtn',
               label,
               style: TextStyle(
                 fontSize: 13,

@@ -14,6 +14,8 @@ import '../../widgets/page_shell.dart';
 import '../../widgets/hype_rail.dart';
 import 'product_detail.dart';
 import 'store_cards.dart';
+import '../../theme/ui_tokens.dart';
+import 'store_actions.dart';
 import 'store_home_sections.dart';
 import 'store_section_mix.dart';
 import 'store_select_sheet.dart';
@@ -25,6 +27,7 @@ import 'store_routes.dart';
 import 'store_terms_sheet.dart';
 import '../../admin/template/editable.dart';
 import '../../admin/layout/layout_sections.dart';
+import '../../widgets/glass_black_card.dart';
 import '../../data/app_control.dart';
 
 class WordAtelierScreen extends StatelessWidget {
@@ -35,23 +38,25 @@ class WordAtelierScreen extends StatelessWidget {
         which: 'word',
         head: 'Words described by sound',
         child: PageShell(
-        eyebrow: '',
-        title: 'NowssB Store',
-        subtitle: 'The Word Atelier',
-        film: 'assets/video/player-bg-loop.mp4',
-        usePageFilm: true,
-        onBack: () => Navigator.of(context).pop(),
-        onStorePicker: () => showStoreSelectSheet(
-          context,
-          current: 'word',
-          onSelect: (id) => openStoreFromPicker(context, id, current: 'word'),
-        ),
-        slivers: [
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 40),
-            sliver: SliverList.list(children: const [_WordAtelierBody()]),
+          eyebrow: '',
+          title: 'NowssB Store',
+          subtitle: 'The Word Atelier',
+          film: 'assets/video/player-bg-loop.mp4',
+          usePageFilm: false,
+          // Calm: plain NowssB deep base, no film or swirl behind content.
+          background: const ColoredBox(color: NwsbColors.deep),
+          onBack: () => Navigator.of(context).pop(),
+          onStorePicker: () => showStoreSelectSheet(
+            context,
+            current: 'word',
+            onSelect: (id) => openStoreFromPicker(context, id, current: 'word'),
           ),
-        ],
+          slivers: [
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 40),
+              sliver: SliverList.list(children: const [_WordAtelierBody()]),
+            ),
+          ],
         ),
       );
 }
@@ -74,9 +79,14 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
     super.dispose();
   }
 
+  /// The "50% OFF · Limited time" collection is left out: no real sale
+  /// backs that title (Task Master, Oct 12).
+  static final _all =
+      kRmCategories.where((c) => c.id != 'off50').toList(growable: false);
+
   List<RmCategory> get _cats {
-    if (_chip == 'ALL') return kRmCategories;
-    return kRmCategories.where((c) => c.id == _chip).toList();
+    if (_chip == 'ALL') return _all;
+    return _all.where((c) => c.id == _chip).toList();
   }
 
   bool _match(String word, String root) {
@@ -94,7 +104,8 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
   void _viewCart() {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: EditableLabel('word_atelier.WordAtelierBody', 'Your cart is waiting in Profile → Cart'),
+        content: EditableLabel('word_atelier.WordAtelierBody',
+            'Your cart is waiting in Profile → Cart'),
         behavior: SnackBarBehavior.floating,
         duration: Duration(seconds: 2),
       ),
@@ -116,276 +127,107 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
 
   @override
   Widget build(BuildContext context) {
-    final cats = _cats;
-    final rowCats = (_chip == 'ALL' && !_allRows && cats.length > 10)
-        ? cats.take(10).toList()
-        : cats;
-    final sections = <Widget>[];
-    final banners = <Widget>[];
-    // Count product rails actually emitted (search may empty some).
-    var productRailIndex = 0;
-    for (var i = 0; i < rowCats.length; i++) {
-      final cat = rowCats[i];
-      banners.add(RmCatBanner(
-        title: cat.label,
-        sub: cat.sub,
-        badge: cat.badge,
-        labelColor: cat.labelColor != null ? Color(cat.labelColor!) : null,
-        logoAsset: kRmCatLogoAsset,
-        categoryId: cat.id,
-        artAsset: storeCollectionArt(cat.id),
-        pillLabel: cat.badge ?? cat.label,
-        inRail: true,
-        showPill: false,
-        onViewAll: () => _openViewAll(cat.label),
+    // Calm: 4 collections on ALL; a chip shows any one of them.
+    final cats = _chip == 'ALL' ? _cats.take(4).toList() : _cats;
+    final k = MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 2.0);
+    final rows = <Widget>[];
+    for (final cat in cats) {
+      final items = [
+        for (final w in cat.words)
+          if (_match(w.word, w.root)) w,
+      ];
+      if (items.isEmpty) continue;
+      rows.add(Padding(
+        padding: const EdgeInsets.fromLTRB(4, 40, 4, 16),
+        child: Text(cat.label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+                color: Colors.white,
+                fontSize: 22,
+                fontWeight: FontWeight.w600,
+                letterSpacing: -0.3)),
       ));
-      sections.add(RmRowHeader(
-        title: cat.label,
-        onViewAll: () => _openViewAll(cat.label),
-      ));
-      sections.add(Builder(builder: (context) {
-        final cards = <Widget>[];
-        for (final w in cat.words) {
-          if (!_match(w.word, w.root)) continue;
-          final name = w.word.isEmpty
-              ? w.word
-              : '${w.word[0].toUpperCase()}${w.word.substring(1)}';
-          // Real Play price (admin per-word price, else the default);
-          // the strike-through shows only for a real admin sale.
-          final id = 'word:${name.toLowerCase()}';
-          final price = StorePrices.instance.priceFor(id);
-          const img = kRmWordImg;
-          cards.add(RmWordCard(
-            name: name,
-            root: w.root,
-            imgUrl: img,
-            categoryId: cat.id,
-            price: price,
-            originalPrice: StorePrices.instance.regularIfOnSale(id),
-            onTap: () => openAtelierWord(context,
-                word: w.word, root: w.root, img: img, price: price),
-          ));
-        }
-        final sig = cat.signature;
-        if (sig != null && _match(sig.name, 'Most Exclusive')) {
-          cards.add(RmWordCard(
-            name: sig.name,
-            root: 'Most Exclusive',
-            imgUrl: sig.img,
-            categoryId: cat.id,
-            signature: true,
-            price: kMsSignaturePrice,
-            onTap: () => openAtelierWord(
-              context,
-              word: sig.name,
-              root: 'Most Exclusive',
-              img: sig.img,
-              signature: true,
-            ),
-          ));
-        }
-        if (cards.isEmpty) {
-          return const Padding(
-            padding: EdgeInsets.symmetric(vertical: 18),
-            child: EditableLabel('word_atelier.WordAtelierBody',
-              'No words match this search in this collection.',
-              style: TextStyle(color: Color(0x8CFFFFFF), fontSize: 12),
-            ),
-          );
-        }
-        return RmWordRow(children: cards);
-      }));
-      productRailIndex++;
-
-      if (_chip == 'ALL' && productRailIndex == 1) {
-        // Moved from Store home: Words / Request / Meanings + atelier pills
-        // sit below the first 50% OFF row.
-        sections.add(StoreQuickMosaic(
-          onWords: () {}, // already on Word Atelier
-          onMeanings: () => Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (_) => const MeaningStoreScreen(),
-            ),
-          ),
-          onSignature: () => Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (_) => const SignatureStoreScreen(),
-            ),
-          ),
-          onEbooks: () => Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (_) => const EbooksStoreScreen(),
-            ),
-          ),
-          onRequest: () => openRequestWords(context),
-        ));
-        // Brief B (calm): the decorative title film ships off; admin flag
-        // store_atelier_title_film turns it back on.
-        if (AppControl.instance
-            .flag('store_atelier_title_film', fallback: false)) {
-          sections.add(const StoreGlassFilmBanner(
-            asset: 'assets/video/store-title-banner.mp4',
-          ));
-        }
-        // Plans banner — same subscribe film as the Meaning / Signature rooms.
-        sections.add(const LSection('subscribe', 'Subscribe banner', StoreSubscribeBanner(
-          videoAsset: StoreSubscribeBanner.kSubscriptionAlternateVideo,
-        )));
-      }
-
-      // After the 4th rail → frequency package (grid + Limited Time Free + Browse by Goal).
-      if (_chip == 'ALL' && productRailIndex == 4) {
-        sections.add(StoreFrequencyPackage(
-          onSelectCategory: (id) => setState(() => _chip = id),
-          onSeeAll: () => _openViewAll('Browse by Goal'),
-          onOpenWord: _openWord,
-          onRequestWords: () => openRequestWords(context),
-        ));
-      }
-
-      // After the 6th rail → Recommended + Featured Playlist glass (image-4).
-      if (_chip == 'ALL' && productRailIndex == 6) {
-        sections.add(StoreRecommendedSection(
-          onSeeAll: () => _openViewAll('Recommended for You'),
-          onOpenWord: _openWord,
-        ));
-        sections.add(StoreFeaturedPlaylistSection(
-          onSeeAll: () => _openViewAll('Featured Playlist'),
-          onOpenWord: _openWord,
-        ));
-      }
-
-      // After the 7th rail → Featured Bundle glass + tall 3-card carousel (image-5).
-      if (_chip == 'ALL' && productRailIndex == 7) {
-        sections.add(StoreFeaturedBundleSection(
-          onSeeAll: () => _openViewAll('Featured Bundle'),
-          onOpenWord: _openWord,
-        ));
-        sections.add(StoreGlassPlaylistCarousel(
-          onSeeAll: () => _openViewAll('Playlists'),
-          onOpenWord: _openWord,
-        ));
-      }
-
-      // Every fifth category row — same as part010 ROW_VIDS.
-      // Brief B (calm): row films ship off (flag store_atelier_row_vids).
-      if (_chip == 'ALL' &&
-          (i + 1) % 5 == 0 &&
-          AppControl.instance.flag('store_atelier_row_vids', fallback: false)) {
-        final vidIdx = (i + 1) ~/ 5 - 1;
-        if (vidIdx >= 0 && vidIdx < kRmRowVids.length) {
-          sections.add(RmRowVid(url: nwsbVideo(kRmRowVids[vidIdx])));
-        }
-      }
-    }
-
-    if (banners.isNotEmpty) {
-      // UI-9: rail banners are fixed-height; cap their text and grow the
-      // rail a little with enlarged text so titles never clip.
-      final k = MediaQuery.textScalerOf(context)
-          .scale(100)
-          .clamp(100, kStoreCardMaxTextScale * 100) / 100;
-      sections.insert(
-        0,
-        StoreTextCap(
-          child: RmBannerRail(banners: banners, height: 112 + (k - 1) * 60),
+      rows.add(SizedBox(
+        height: 236 + (k - 1) * 56,
+        child: ListView.separated(
+          clipBehavior: Clip.none,
+          scrollDirection: Axis.horizontal,
+          itemCount: items.length,
+          separatorBuilder: (_, __) => const SizedBox(width: 14),
+          itemBuilder: (_, i) {
+            final w = items[i];
+            final name = w.word.isEmpty
+                ? w.word
+                : '${w.word[0].toUpperCase()}${w.word.substring(1)}';
+            final id = 'word:${name.toLowerCase()}';
+            final price = StorePrices.instance.priceFor(id);
+            return _WordTile(
+              name: name,
+              art: storeCollectionArt(cat.id),
+              price: price,
+              originalPrice: StorePrices.instance.regularIfOnSale(id),
+              onOpen: () => openAtelierWord(context,
+                  word: w.word, root: w.root, img: kRmWordImg, price: price),
+              onBag: () => storeAddToCart(
+                  context,
+                  wordBagItem(
+                      name: name, root: w.root, img: kRmWordImg, price: price)),
+            );
+          },
         ),
-      );
+      ));
     }
-
-    if (_chip == 'ALL' && !_allRows && cats.length > 10) {
-      sections.add(StoreViewMoreTap(
-        leftover: cats.length - 10,
-        onTap: () => setState(() => _allRows = true),
+    if (rows.isEmpty) {
+      rows.add(Padding(
+        padding: const EdgeInsets.symmetric(vertical: 48),
+        child: Center(
+          child: TextButton(
+            onPressed: () => openRequestWords(context),
+            child: const Text('Request this word',
+                style: TextStyle(color: NwsbColors.gold)),
+          ),
+        ),
       ));
     }
 
+    // Rebuild C (Ribon, 8:26): one hero film, one search, chips, 3-4 rows.
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      // Server-driven order (Admin → UI Editor); bundled order by default.
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: layoutIndexed(context, 'store.atelier', const {
         0: ('hero', 'Hero film'),
-        // UI-6 varied mix: coupons → hype → tiles → glassy (no two alike).
-        2: ('coupons', 'Coupon banner'),
-        3: ('hype', 'Most hyped'),
-        4: ('tiles', 'Category tiles'),
-        5: ('glassy', 'Featured collections'),
-        7: ('promo', 'Split promo banner'),
-        9: ('search', 'Search'),
-        11: ('intro', 'Your word library intro'),
-        15: ('chips', 'Category chips'),
-        17: ('promo2', 'Meaning Store banner'),
-        18: ('rows', 'Word collections'),
-        -2: ('promo3', 'Signature Store banner'),
+        1: ('search', 'Search'),
+        2: ('chips', 'Category chips'),
+        3: ('rows', 'Word collections'),
         -1: ('disclaimer', 'Disclaimer'),
-      },
-          // Brief B (calm): the hype row is being retired and the third split
-          // promo is folded; promo + promo2 keep the page's promo slots.
-          hiddenByDefault: const {'hype', 'coupons', 'glassy', 'promo2', 'promo3'},
-          [
+      }, [
         StorePixelsHero(
           onBrowseAll: _browseAll,
           onViewCart: _viewCart,
           videoAsset: nwsbVideo(kRmHeroVidFile),
           videoTitle: '',
         ),
-        const SizedBox(height: 28),
-        // Declutter: coupon carousel + hype rail removed (slots kept).
-        const SizedBox.shrink(),
-        const SizedBox.shrink(),
-        StoreRegistrySection(config: AtelierMix.tiles),
-        StoreMixRow(
-          title: 'Featured collections',
-          child: StoreRegistrySection(config: AtelierMix.glassy),
-        ),
-        const SizedBox(height: 28),
-        StoreTextCap(child: ColoredSplitPromoBanner.forSurface(
-          SplitPromoSurface.wordAtelier,
-          onTap: () => Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (_) => const MeaningStoreScreen(),
+        Padding(
+          padding: const EdgeInsets.only(top: 28),
+          child: GlassBlackCard(
+            padding: const EdgeInsets.all(5),
+            child: StoreSearchBar(
+              controller: _search,
+              onChanged: (v) => setState(() => _query = v),
+              onGo: () {
+                if (_query.trim().isEmpty) {
+                  openRequestWords(context);
+                  return;
+                }
+                final any =
+                    _all.any((c) => c.words.any((w) => _match(w.word, w.root)));
+                if (!any) openRequestWords(context);
+              },
             ),
           ),
-          margin: const EdgeInsets.only(bottom: 8),
-        )),
-        const SizedBox(height: 20),
-        StoreGlassPanel(
-          radius: 32,
-          padding: const EdgeInsets.all(5),
-          child: StoreSearchBar(
-            controller: _search,
-            onChanged: (v) => setState(() => _query = v),
-            onGo: () {
-              if (_query.trim().isEmpty) {
-                openRequestWords(context);
-                return;
-              }
-              // If nothing matches, offer request-word flow.
-              final any = kRmCategories.any((c) => c.words.any(
-                    (w) => _match(w.word, w.root),
-                  ));
-              if (!any) openRequestWords(context);
-            },
-          ),
         ),
-        const SizedBox(height: 32),
-        const EditableLabel('word_atelier.WordAtelierBody',
-          'YOUR WORD LIBRARY',
-          style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 2.2,
-              color: NwsbColors.gold),
-        ),
-        const SizedBox(height: 6),
-        const EditableLabel('word_atelier.WordAtelierBody',
-          'Every word carries a vibrational signature.',
-          style: TextStyle(fontSize: 13, color: Color(0x99FFFFFF)),
-        ),
-        const SizedBox(height: 12),
-        StoreGlassPanel(
-          radius: 28,
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
+        Padding(
+          padding: const EdgeInsets.only(top: 16),
           child: SizedBox(
             height: 36,
             child: ListView(
@@ -396,37 +238,149 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
                     selected: _chip == 'ALL',
                     black: true,
                     onTap: () => setState(() => _chip = 'ALL')),
-                const SizedBox(width: 7),
-                for (final c in kRmCategories) ...[
+                const SizedBox(width: 8),
+                for (final c in _all) ...[
                   StoreFilterChip(
                     label: c.label.toUpperCase(),
                     selected: _chip == c.id,
                     black: true,
                     onTap: () => setState(() => _chip = c.id),
                   ),
-                  const SizedBox(width: 7),
+                  const SizedBox(width: 8),
                 ],
               ],
             ),
           ),
         ),
-        const SizedBox(height: 20),
-        ...sections,
-        StoreTextCap(child: ColoredSplitPromoBanner(
-          spec: SplitPromoExtras.at(
-            7,
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => const SignatureStoreScreen(),
-              ),
-            ),
+        Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: rows),
+        const Padding(
+          padding: EdgeInsets.only(top: 32),
+          child: _InfoDisclaimer(
+            text:
+                'Words shared or sold here are for educational and wellness purposes only — nothing here is medical advice. Purchases are final once unlocked. Any information you share with us is kept strictly confidential and never sold or shared with third parties.',
           ),
-        )),
-        const StoreDisclaimer(
-          text:
-              'Words shared or sold here are for educational and wellness purposes only — nothing here is medical advice. Purchases are final once unlocked. Any information you share with us is kept strictly confidential and never sold or shared with third parties.',
         ),
       ]),
     );
   }
+}
+
+/// A calm word tile: art, name, price, one bag button.
+class _WordTile extends StatelessWidget {
+  const _WordTile({
+    required this.name,
+    required this.art,
+    required this.price,
+    required this.originalPrice,
+    required this.onOpen,
+    required this.onBag,
+  });
+  final String name, art;
+  final num price;
+  final num? originalPrice;
+  final VoidCallback onOpen, onBag;
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+        width: 150,
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          GestureDetector(
+            onTap: onOpen,
+            child: GlassBlackCard(
+              padding: const EdgeInsets.all(6),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(UiRadii.md),
+                child: SizedBox(
+                  height: 150,
+                  width: double.infinity,
+                  child: ColoredBox(
+                    color: Colors.black,
+                    child: Image.asset(art,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => const SizedBox()),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Expanded(
+              child: GestureDetector(
+                onTap: onOpen,
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600)),
+                      const SizedBox(height: 3),
+                      Text.rich(
+                        TextSpan(children: [
+                          if (originalPrice != null)
+                            TextSpan(
+                                text:
+                                    '${localizedMoney(context, originalPrice!)}  ',
+                                style: const TextStyle(
+                                    color: Color(0x66FFFFFF),
+                                    decoration: TextDecoration.lineThrough)),
+                          TextSpan(text: localizedMoney(context, price)),
+                        ]),
+                        maxLines: 1,
+                        style: const TextStyle(
+                            color: Color(0x99FFFFFF), fontSize: 13),
+                      ),
+                    ]),
+              ),
+            ),
+            Semantics(
+              button: true,
+              label: 'Add $name to bag',
+              child: GestureDetector(
+                onTap: onBag,
+                child: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: const BoxDecoration(
+                      shape: BoxShape.circle, color: NwsbColors.gold),
+                  child: const Icon(Icons.shopping_bag_outlined,
+                      size: 17, color: Colors.black),
+                ),
+              ),
+            ),
+          ]),
+        ]),
+      );
+}
+
+/// The disclaimer sits behind a small (i) icon (compliance, Oct 12).
+class _InfoDisclaimer extends StatelessWidget {
+  const _InfoDisclaimer({required this.text});
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Center(
+        child: IconButton(
+          tooltip: 'About these words',
+          icon: const Icon(Icons.info_outline, color: Color(0x80FFFFFF)),
+          onPressed: () => showModalBottomSheet<void>(
+            context: context,
+            backgroundColor: Colors.transparent,
+            builder: (_) => SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(UiSpace.md),
+                child: GlassBlackCard(
+                  child: Text(text,
+                      style: const TextStyle(
+                          color: Color(0xB3FFFFFF), fontSize: 12, height: 1.5)),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
 }

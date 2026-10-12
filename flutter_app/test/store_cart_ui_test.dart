@@ -40,14 +40,13 @@ void main() {
 
       final atelier =
           File('lib/screens/store/word_atelier.dart').readAsStringSync();
-      expect(atelier, contains('StoreSubscribeBanner'));
-      expect(atelier, contains('RmRowHeader'));
+      // Rebuild C (8:22 PM): original media + glass, Myntra layout; real
+      // prices with a sale strike only when real, no fake 50% OFF row.
       expect(atelier, contains('StorePrices'));
       expect(atelier, contains('originalPrice'));
-      expect(atelier, contains('cats.take(10)'));
-      expect(atelier, contains('StoreViewMoreTap'));
-      expect(atelier, contains('StoreGlassFilmBanner'));
-      expect(atelier, contains('store-title-banner.mp4'));
+      expect(atelier, contains('storeAddToCart'));
+      expect(atelier, contains('kRmHeroVidFile'));
+      expect(atelier, contains("c.id != 'off50'"));
       expect(atelier, isNot(contains('storeMidRailBannerAt')));
       expect(atelier, isNot(contains('IntroGate')));
       expect(atelier, isNot(contains('Enter The Word Atelier')));
@@ -60,7 +59,10 @@ void main() {
       ]) {
         final src = File(path).readAsStringSync();
         expect(src, isNot(contains('IntroGate')), reason: path);
-        expect(src, contains('PageShell('), reason: path);
+        // Rebuild C: the Meaning Store has its own light CLiQ-style shell.
+        if (true) {
+          expect(src, contains('PageShell('), reason: path);
+        }
       }
 
       final storeHome = File('lib/screens/store.dart').readAsStringSync();
@@ -73,7 +75,8 @@ void main() {
       expect(sections, contains('class StoreQuickMosaic'));
       expect(sections, contains('assets/video/store-orb-box.mp4'));
       expect(sections, contains('clamp(120.0, 180.0)'));
-      expect(atelier, contains('StoreQuickMosaic('));
+      // Rebuild C: the mosaic (links to other stores) left Word Atelier.
+      expect(atelier, isNot(contains('StoreQuickMosaic(')));
 
       final catalog = File('lib/data/store_catalog.dart').readAsStringSync();
       expect(catalog, contains("return 'assets/video/hero-word-store.mp4'"));
@@ -81,11 +84,12 @@ void main() {
 
       final detail =
           File('lib/screens/store/product_detail.dart').readAsStringSync();
-      expect(detail, contains("label: 'Add to Cart'"));
-      expect(detail, contains('NwsbMarks.cart'));
-      expect(detail, contains("'Buy on Google Play'"));
-      expect(detail, contains('NwsbMarks.bag'));
-      expect(detail, contains('NwsbMarks.wishlist'));
+      // Rebuild C (Myntra item ref): Add to Bag + Buy Now via the real
+      // cart / Play checkout actions, wishlist via CartBag.
+      expect(detail, contains("Text('Add to Bag')"));
+      expect(detail, contains('storeAddToCart('));
+      expect(detail, contains('storeBuyNow('));
+      expect(detail, contains('addWishlist('));
       expect(detail, isNot(contains('Icons.shopping_cart_outlined')));
       expect(detail, isNot(contains('Icons.flash_on_outlined')));
 
