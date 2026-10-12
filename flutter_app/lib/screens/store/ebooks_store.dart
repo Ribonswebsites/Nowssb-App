@@ -1,32 +1,35 @@
-/// NowssB Ebooks store — ebooks-only (not a Word Atelier / Meaning paste).
-/// One hero/video max; no word mid-rail banner stacks; ebook icons only.
+/// RB-ebooks (Oct 12 rebuild): the eBooks Store, rebuilt from scratch.
+///
+/// One hero moment: a single book floats in deep glass, slowly turning in
+/// 3D with a soft gold glow beneath it. Real book chips pick the book in
+/// focus; below it sits only what that book needs: its contents and
+/// outlined Buy / filled Add pills. Then a quiet shelf of the other books
+/// and the Reader. No carousels, coupon banners, hype rows or store-explore
+/// sections. Research: /workspace/team-plan/research/ebooks/NOTES.md
 library;
+
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../admin/layout/layout_sections.dart';
+import '../../admin/template/editable.dart';
 import '../../data/content.dart';
 import '../../data/entitlements.dart';
+import '../../data/store_catalog.dart';
 import '../../data/store_prices.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../shell/nwsb_links.dart';
 import '../../theme/tokens.dart';
-import '../../widgets/nwsb_icon.dart';
+import '../../widgets/glass_black_card.dart';
 import '../../widgets/page_shell.dart';
-import '../../widgets/hype_rail.dart';
-import '../../widgets/banner_mix.dart';
-import '../../widgets/colored_split_promo_banner.dart';
 import 'product_detail.dart';
 import 'store_actions.dart';
 import 'store_cards.dart';
-import 'store_home_sections.dart';
-import 'store_section_mix.dart';
-import 'store_select_sheet.dart';
 import 'store_routes.dart';
+import 'store_select_sheet.dart';
 import 'store_terms_sheet.dart';
-import '../../shell/nwsb_links.dart';
-import '../../admin/template/editable.dart';
-import '../../admin/layout/layout_sections.dart';
 
 const _slot = 'ebooks_store.Reading';
 
@@ -54,8 +57,26 @@ class EbooksStoreScreen extends StatelessWidget {
       );
 }
 
-class _EbooksBody extends StatelessWidget {
-  const _EbooksBody();
+/// Bundled books plus any the studio published live.
+List<EbBook> _allBooks() {
+  final live = ContentStore.instance.books;
+  if (live.isEmpty) return kEbBooks;
+  final keys = {for (final b in kEbBooks) b.key};
+  return [
+    ...kEbBooks,
+    for (final b in live)
+      if (!keys.contains(b.key))
+        EbBook(
+          key: b.key,
+          title: b.title,
+          sub: b.sub,
+          price: b.price,
+          cover: b.cover.isNotEmpty ? b.cover : kEbBooks.first.cover,
+          about: b.sub,
+          contents: const ['Published from the NowssB studio'],
+        ),
+  ];
+}
 
 num _price(EbBook b) => StorePrices.instance
     .priceFor('ebook:${b.title.toLowerCase()}', shown: b.price);
@@ -139,461 +160,95 @@ class _FloatingBookState extends State<_FloatingBook>
     } else if (!_t.isAnimating) {
       _t.repeat();
     }
-    return merged;
+  }
+
+  @override
+  void dispose() {
+    _t.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final books = _books;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      // Server-driven order (Admin → UI Editor); bundled order by default.
-      children: layoutChildren(context, 'store.ebooks', [
-        // Single hero/video — no back-to-back promo / word-banner stacks.
-        LSection('hero', 'Hero film', Container(
-          margin: const EdgeInsets.only(bottom: 16),
-          clipBehavior: Clip.antiAlias,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            color: Colors.black,
-          ),
-          child: AspectRatio(
-            aspectRatio: 16 / 9,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                const NwsbVideo(
-                  asset: 'assets/video/hero-ebooks.mp4',
-                  poster: 'assets/video/hero-ebooks-poster.webp',
-                  priority: ClipPriority.feature,
-                  slot: 'ebooks_store.EbooksBody',
-                ),
-                const IgnorePointer(
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [Color(0x22060C18), Color(0xE6060C18)],
-                      ),
-                    ),
-                  ),
-                ),
+    return GlassBlackCard(
+      radius: 32,
+      intensity: 0.9,
+      padding: const EdgeInsets.fromLTRB(UiSpace.xl, 56, UiSpace.xl, 40),
+      child: Column(children: [
+        SizedBox(
+          height: 400,
+          child: AnimatedBuilder(
+            animation: _t,
+            builder: (context, child) {
+              final a = _t.value * math.pi * 2;
+              final lift = math.sin(a) * 8;
+              final turn = -0.32 + math.sin(a) * 0.14;
+              return Stack(alignment: Alignment.center, children: [
+                // Gold glow pooled under the book.
                 Positioned(
-                  left: 18,
-                  right: 18,
-                  bottom: 16,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      const Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            EditableLabel('ebooks_store.EbooksBody',
-                              'READ · LEARN · PRACTICE',
-                              style: TextStyle(
-                                fontSize: 10,
-                                letterSpacing: 3,
-                                fontWeight: FontWeight.w700,
-                                color: NwsbColors.goldLight,
-                              ),
-                            ),
-                            SizedBox(height: 6),
-                            EditableLabel('ebooks_store.EbooksBody',
-                              'The NowssB Ebooks',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(14),
-                        child: EditableImage.asset(
-                          kEbProductArt,
-                          width: 56,
-                          height: 56,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => EditableImage.asset(
-                            kEbIntroArt,
-                            width: 56,
-                            height: 56,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) =>
-                                const SizedBox(width: 56, height: 56),
-                                slot: 'ebooks_store.EbooksBody',
-                          ),
-                          slot: 'ebooks_store.EbooksBody',
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        )),
-        // UI-7 varied mix: coupons → tiles → glassy → hype (no two alike).
-        LSection(
-          'tiles',
-          'Category tiles',
-          StoreRegistrySection(config: EbooksMix.tiles),
-        ),
-        const LSection('intro', 'Intro line', Text(
-          'Deep-dive guides on sound, phonetic origin and healing practice — '
-          'yours to keep, read anywhere, forever. Not a word catalogue.',
-          style: TextStyle(fontSize: 13, height: 1.6, color: Color(0x80FFFFFF)),
-        )),
-        const SizedBox(height: 28),
-        LSection('browse', 'Browse strip', _EbookBrowseStrip(
-          onOpen: (b) => openEbookDetail(context, b),
-          books: books,
-        )),
-        const SizedBox(height: 24),
-        LSection('promo', 'Split promo banner', StoreTextCap(child: ColoredSplitPromoBanner.forSurface(
-          SplitPromoSurface.ebooksStore,
-          onTap: books.isEmpty ? null : () => openEbookDetail(context, books.first),
-          margin: const EdgeInsets.only(bottom: 8),
-        ))),
-        const SizedBox(height: 20),
-        LSection.group('books', 'All books', align: CrossAxisAlignment.start, [for (final b in books) _EbookRow(book: b)]),
-        const SizedBox(height: 40),
-        LSection('promo2', 'Promo banner', StoreTextCap(child: ColoredSplitPromoBanner(
-          spec: SplitPromoExtras.at(12).copyWith(
-            title: 'Read the science\nbehind the sound.',
-            cta: 'Read a guide',
-            onTap: books.isEmpty
-                ? null
-                : () => openEbookDetail(context, books[1 % books.length]),
-          ),
-          margin: const EdgeInsets.only(bottom: 48),
-        ))),
-        const LSection('mix', 'Banner mix', StoreTextCap(child: BannerMix(seed: 0))),
-        const SizedBox(height: 12),
-        LSection('promo3', 'Promo banner 2', StoreTextCap(child: ColoredSplitPromoBanner(
-          spec: SplitPromoExtras.at(13).copyWith(
-            title: 'Your ebooks,\nready to read.',
-            cta: 'Open Reader',
-            onTap: () => NwsbLinks.reader(context),
-          ),
-        ))),
-        const LSection('disclaimer', 'Disclaimer', StoreDisclaimer(text: kEbDisclaimer)),
-      ],
-          // Brief B (calm): the hype row is retired; ships off, admin can
-          // re-enable it.
-          hiddenByDefault: const {'hype'}),
-    );
-  }
-}
-
-/// Unique ebook goal/browse strip — ebook picker art only, no word bag.
-class _EbookBrowseStrip extends StatelessWidget {
-  const _EbookBrowseStrip({required this.books, required this.onOpen});
-
-  final List<EbBook> books;
-  final void Function(EbBook book) onOpen;
-
-  static const _goals = <(String, String, Color)>[
-    ('Guides', kEbProductArt, Color(0xFF5CE1FF)),
-    ('Origins', kEbIntroArt, Color(0xFFFFB74D)),
-    ('Atlas', kEbProductArt, Color(0xFF81C784)),
-    ('Practice', kEbIntroArt, Color(0xFFB388FF)),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 18),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const EditableLabel('ebooks_store.EbookBrowseStrip',
-            'Browse ebooks',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w800,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 108,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: _goals.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 12),
-              itemBuilder: (context, i) {
-                final g = _goals[i];
-                return GestureDetector(
-                  onTap: books.isEmpty ? null : () => onOpen(books[i % books.length]),
-                  child: SizedBox(
-                    width: 86,
-                    child: Column(
-                      children: [
-                        Container(
-                          width: 72,
-                          height: 72,
-                          padding: const EdgeInsets.all(3),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: g.$3,
-                            border: Border.all(color: g.$3, width: 2.5),
-                            boxShadow: [
-                              BoxShadow(
-                                color: g.$3.withValues(alpha: 0.35),
-                                blurRadius: 12,
-                              ),
-                            ],
-                          ),
-                          child: ClipOval(
-                            child: ColoredBox(
-                              color: g.$3,
-                              child: EditableImage.asset(
-                                g.$2,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) =>
-                                    const ColoredBox(color: Color(0xFF0A0F1C)),
-                                    slot: 'ebooks_store.EbookBrowseStrip',
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        // UI-9: one line that shrinks under large text.
-                        Flexible(
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Text(
-                              g.$1,
-                              maxLines: 1,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xCCFFFFFF),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                  bottom: 6,
+                  child: Container(
+                    width: 170 - lift * 3,
+                    height: 26,
+                    decoration: BoxDecoration(
+                      gradient: RadialGradient(colors: [
+                        NwsbColors.gold.withValues(alpha: 0.30),
+                        NwsbColors.gold.withValues(alpha: 0),
+                      ]),
                     ),
                   ),
-                );
-              },
-            ),
+                ),
+                Transform.translate(
+                  offset: Offset(0, -lift - 10),
+                  child: Transform(
+                    alignment: Alignment.center,
+                    transform: Matrix4.identity()
+                      ..setEntry(3, 2, 0.0014)
+                      ..rotateY(turn)
+                      ..rotateX(0.06),
+                    child: child,
+                  ),
+                ),
+              ]);
+            },
+            child: _Cover(book: widget.book),
           ),
-        ],
-      ),
+        ),
+        const SizedBox(height: UiSpace.xl),
+        Text(widget.book.title,
+            textAlign: TextAlign.center,
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+                fontSize: 26,
+                height: 1.15,
+                fontWeight: FontWeight.w800,
+                color: Colors.white)),
+        const SizedBox(height: UiSpace.sm),
+        Text(widget.book.sub,
+            textAlign: TextAlign.center,
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+            style: UiType.body),
+      ]),
     );
   }
 }
 
-class _EbookRow extends StatelessWidget {
-  const _EbookRow({required this.book});
+class _Cover extends StatelessWidget {
+  const _Cover({required this.book});
   final EbBook book;
-
   @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => openEbookDetail(context, book),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 16),
-        padding: const EdgeInsets.all(14),
+  Widget build(BuildContext context) => Container(
+        width: 180,
+        height: 252,
         decoration: BoxDecoration(
-          color: const Color(0x0AFFFFFF),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0x1FFFFFFF)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: SizedBox(
-                    width: 92,
-                    height: 120,
-                    child: StoreNetImage(url: book.cover, word: book.title),
-                  ),
-                ),
-                Container(
-                  width: 1,
-                  height: 120,
-                  margin: const EdgeInsets.symmetric(horizontal: 14),
-                  color: const Color(0x26FFFFFF),
-                ),
-                // UI-9: was a fixed 120px column — at 1.3×/2× text on a
-                // ~320px phone the title + sub ran far past it. Now at least
-                // the cover height, growing with the text; price stays last.
-                Expanded(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(minHeight: 120),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              book.title,
-                              // UI-9: room for long titles at 2× text.
-                              maxLines: 6,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.white,
-                                height: 1.15,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              book.sub,
-                              maxLines: 3,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                height: 1.4,
-                                color: Color(0x8CFFFFFF),
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                          ],
-                        ),
-                        Text(
-                          Entitlements.instance.canOpenEbook(book.title, price: StorePrices.instance.priceFor('ebook:${book.title.toLowerCase()}', shown: book.price))
-                              ? 'Yours'
-                              : inr(StorePrices.instance.priceFor('ebook:${book.title.toLowerCase()}', shown: book.price)),
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: NwsbColors.goldLight,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Text(
-              book.about,
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 12,
-                height: 1.55,
-                color: Color(0x73FFFFFF),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Semantics(
-                  button: true,
-                  label: 'Add to Cart',
-                  child: GestureDetector(
-                    onTap: () {
-                      storeAddToCart(
-                        context,
-                        ebookBagItem(
-                          title: book.title,
-                          sub: book.sub,
-                          img: book.cover,
-                          price: book.price,
-                        ),
-                      );
-                    },
-                    child: Container(
-                      width: 42,
-                      height: 42,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: const Color(0xE60A101C),
-                        shape: BoxShape.circle,
-                        border: Border.all(color: const Color(0x66E8D5A3)),
-                      ),
-                      child: const NwsbIcon(
-                        NwsbMarks.cart,
-                        size: 18,
-                        color: Color(0xFFE8D5A3),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Semantics(
-                    button: true,
-                    label: 'Buy Now',
-                    child: GestureDetector(
-                      onTap: () {
-                        storeBuyNow(
-                          context,
-                          ebookBagItem(
-                            title: book.title,
-                            sub: book.sub,
-                            img: book.cover,
-                            price: book.price,
-                          ),
-                        );
-                      },
-                      child: Container(
-                        height: 42,
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFFF3E4B7), Color(0xFFC8A96E)],
-                          ),
-                        ),
-                        // UI-9: label + art scale down inside the 42px button.
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const EditableLabel('ebooks_store.EbookRow',
-                              'Buy Now',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w800,
-                                color: NwsbColors.ink,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(4),
-                              child: EditableImage.asset(
-                                kEbProductArt,
-                                width: 18,
-                                height: 18,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => const NwsbIcon(
-                                  NwsbMarks.bag,
-                                  size: 16,
-                                  color: NwsbColors.ink,
-                                ),
-                                slot: 'ebooks_store.EbookRow',
-                              ),
-                            ),
-                          ],
-                        ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: const [
+            BoxShadow(
+                color: Color(0xCC000000),
+                blurRadius: 30,
+                offset: Offset(14, 18)),
           ],
         ),
         child: ClipRRect(

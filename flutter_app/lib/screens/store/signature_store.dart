@@ -9,23 +9,19 @@ library;
 
 import 'package:flutter/material.dart';
 
+import '../../admin/layout/layout_sections.dart';
+import '../../admin/template/editable.dart';
 import '../../data/store_catalog.dart';
 import '../../theme/tokens.dart';
-import '../../widgets/banner_mix.dart';
-import '../../widgets/colored_split_promo_banner.dart';
+import '../../widgets/glass_black_card.dart';
 import '../../widgets/page_shell.dart';
-import '../../widgets/hype_rail.dart';
 import 'product_detail.dart';
+import 'request_words.dart';
 import 'store_cards.dart';
 import 'store_home_sections.dart';
 import 'store_routes.dart';
 import 'store_select_sheet.dart';
-import '../../widgets/sections/artist_cards_section.dart';
-import 'store_routes.dart';
 import 'store_terms_sheet.dart';
-import 'request_words.dart';
-import '../../admin/template/editable.dart';
-import '../../admin/layout/layout_sections.dart';
 
 const _slot = 'signature_store.SignatureBody';
 
@@ -73,16 +69,10 @@ class _SignatureBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final words =
-        kRmCategories.where((c) => c.signature != null).map((c) => c.signature!).toList();
-    final half = (words.length / 2).ceil();
-    final w1 = words.take(half).toList();
-    final w2 = words.skip(half).toList();
-    final meanings = kMsSignature.entries.toList();
-    final mh = (meanings.length / 2).ceil();
-    final m1 = meanings.take(mh).toList();
-    final m2 = meanings.skip(mh).toList();
-
+    final words = [
+      for (final c in kRmCategories)
+        if (c.signature != null) c.signature!,
+    ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       // rb2.* ids: saved layouts of the old mix match nothing.
