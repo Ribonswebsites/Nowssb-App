@@ -64,7 +64,7 @@ test('section-purge removes override docs + template entry, then GCs media', asy
     'ui_overrides/section.home.normalX.t1': { slot: 'section.home.normalX.t1', config: { id: 't1' } },
   });
   const d = deps(db);
-  const r = await M.sectionPurge(d, { pageId: 'home.normal', sectionId: 't1', confirm: true });
+  const r = await M.sectionPurge(d, { pageId: 'home.normal', sectionId: 't1', confirm: true, deleteMedia: true });
   assert.deepEqual(r.removedDocs.sort(), ['section.home.normal.t1', 'tpl.home.normal.t1.title']);
   assert.equal(await db.get('ui_overrides/section.home.normal.t1'), null);
   assert.ok(await db.get('ui_overrides/section.home.normal.t10'));
@@ -74,10 +74,12 @@ test('section-purge removes override docs + template entry, then GCs media', asy
   assert.deepEqual(d.deleted.sort(), ['ui/sec/t1.webp', 'ui/tpl/t1.webp']);
 });
 
-test('section-purge without confirm removes docs but keeps media', async () => {
+test('section-purge needs confirm; without deleteMedia keeps media', async () => {
   const db = memStore({ 'ui_overrides/section.p.s': { slot: 'section.p.s', config: { id: 's', items: [{ imageUrl: U('ui/a.webp') }] } } });
   const d = deps(db);
-  const r = await M.sectionPurge(d, { pageId: 'p', sectionId: 's' });
+  await assert.rejects(() => M.sectionPurge(d, { pageId: 'p', sectionId: 's' }), /Confirm/);
+  assert.ok(await db.get('ui_overrides/section.p.s'));
+  const r = await M.sectionPurge(d, { pageId: 'p', sectionId: 's', confirm: true });
   assert.deepEqual(r.removedDocs, ['section.p.s']);
   assert.equal(d.deleted.length, 0);
 });
@@ -90,7 +92,9 @@ test('page-purge removes layout + only this page\'s slots', async () => {
     'ui_overrides/section.home.normal.cat': { slot: 'section.home.normal.cat', config: { id: 'cat' } },
   });
   const d = deps(db);
-  const r = await M.pagePurge(d, { pageId: 'home', confirm: true });
+  await assert.rejects(() => M.pagePurge(d, { pageId: 'home', deleteMedia: true }), /Confirm/);
+  assert.ok(await db.get('ui_layouts/home'));
+  const r = await M.pagePurge(d, { pageId: 'home', confirm: true, deleteMedia: true });
   assert.deepEqual(r.removedDocs.sort(), ['section.home.cat', 'tpl.home.b1.title']);
   assert.equal(await db.get('ui_layouts/home'), null);
   assert.ok(await db.get('ui_overrides/section.home.normal.cat'));

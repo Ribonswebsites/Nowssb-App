@@ -165,18 +165,23 @@ async function purge(deps, { page, sid, removeLayout, layoutEntryId }) {
 }
 const body_confirm = (deps) => deps._confirmMedia === true;
 
-/** section-purge { pageId, sectionId, confirm } — section deleted in the editor. */
+/** section-purge { pageId, sectionId, confirm:true, deleteMedia? } — section
+    deleted in the editor. confirm:true is required to remove the override
+    docs at all; deleteMedia:true additionally deletes unreferenced R2 files. */
 export async function sectionPurge(deps, body = {}) {
   const page = str(body.pageId, 120); const sid = str(body.sectionId, 120);
   if (!SAFE_ID.test(page) || !SAFE_ID.test(sid)) throw bad('pageId and sectionId are required.');
-  return purge({ ...deps, _confirmMedia: body.confirm === true }, { page, sid, layoutEntryId: sid });
+  if (body.confirm !== true) throw bad('Confirm removing this section\'s saved settings first.', 'confirm_required');
+  return purge({ ...deps, _confirmMedia: body.deleteMedia === true }, { page, sid, layoutEntryId: sid });
 }
 
-/** page-purge { pageId, confirm } — page reset/deleted: layout + all its overrides. */
+/** page-purge { pageId, confirm:true, deleteMedia? } — page reset/deleted:
+    layout + all its overrides. Same confirm rules as section-purge. */
 export async function pagePurge(deps, body = {}) {
   const page = str(body.pageId, 120);
   if (!SAFE_ID.test(page)) throw bad('pageId is required.');
-  return purge({ ...deps, _confirmMedia: body.confirm === true }, { page, removeLayout: true });
+  if (body.confirm !== true) throw bad('Confirm removing this page\'s saved settings first.', 'confirm_required');
+  return purge({ ...deps, _confirmMedia: body.deleteMedia === true }, { page, removeLayout: true });
 }
 
 /** media-orphans — DRY RUN only. Lists R2 objects nobody references and

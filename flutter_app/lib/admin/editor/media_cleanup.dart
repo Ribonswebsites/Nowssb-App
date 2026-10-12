@@ -125,12 +125,15 @@ MediaPlan planMedia({
   return plan;
 }
 
-enum MediaChoice { delete, keep, cancel }
+/// delete: purge settings + old files · keep: purge settings, keep files ·
+/// publishOnly: publish, delete nothing · cancel: do not publish.
+enum MediaChoice { delete, keep, publishOnly, cancel }
 
 /// Confirm before anything is permanently removed.
 Future<MediaChoice> confirmMediaDelete(BuildContext context, MediaPlan plan) async {
   if (plan.isEmpty) return MediaChoice.keep;
   final what = plan.hasVideo ? 'video' : 'picture';
+  final purges = plan.deletedSections.isNotEmpty || plan.resetPages.isNotEmpty;
   final lines = <String>[
     if (plan.hasMedia)
       '${plan.oldUrls.length} old $what${plan.oldUrls.length == 1 ? '' : 's'} will be permanently deleted from the server. Undo cannot bring ${plan.oldUrls.length == 1 ? 'it' : 'them'} back.',
@@ -143,16 +146,23 @@ Future<MediaChoice> confirmMediaDelete(BuildContext context, MediaPlan plan) asy
     context: context,
     builder: (ctx) => AlertDialog(
       backgroundColor: const Color(0xFF121826),
-      title: Text('Old $what will be permanently deleted', style: const TextStyle(color: Colors.white)),
+      title: Text(
+        plan.hasMedia ? 'Old $what will be permanently deleted' : 'Saved settings will be permanently deleted',
+        style: const TextStyle(color: Colors.white),
+      ),
       content: Text(lines.join('\n\n'), style: const TextStyle(color: kDim)),
       actions: [
         TextButton(onPressed: () => Navigator.pop(ctx, MediaChoice.cancel), child: const Text('Cancel')),
-        if (plan.hasMedia)
-          TextButton(onPressed: () => Navigator.pop(ctx, MediaChoice.keep), child: const Text('Publish, keep old file')),
+        TextButton(
+          onPressed: () => Navigator.pop(ctx, MediaChoice.publishOnly),
+          child: const Text('Publish, delete nothing'),
+        ),
+        if (plan.hasMedia && purges)
+          TextButton(onPressed: () => Navigator.pop(ctx, MediaChoice.keep), child: const Text('Delete settings, keep old file')),
         FilledButton(
           style: FilledButton.styleFrom(backgroundColor: kGold, foregroundColor: kInk),
           onPressed: () => Navigator.pop(ctx, MediaChoice.delete),
-          child: Text(plan.hasMedia ? 'Publish and delete' : 'Publish'),
+          child: Text(plan.hasMedia ? 'Publish and delete' : 'Publish and remove settings'),
         ),
       ],
     ),
@@ -162,7 +172,7 @@ Future<MediaChoice> confirmMediaDelete(BuildContext context, MediaPlan plan) asy
 
 /// After the publish committed: ask the server to clean up. Returns a short
 /// summary line; never throws (the publish itself already succeeded).
-Future<String> runMediaCleanup(MediaPlan plan, {required bool deleteMedia}) async {
+Future<String> runMediaCleanup(MediaPlan plan, {required bool deleteMedia, bool purgeDocs = true}) async {
   var deleted = 0, kept = 0, docs = 0;
   final errors = <String>[];
   void count(Map<String, dynamic> r) {
@@ -183,11 +193,15 @@ Future<String> runMediaCleanup(MediaPlan plan, {required bool deleteMedia}) asyn
     }
   }
 
-  for (final (page, sid) in plan.deletedSections) {
-    await guard(() => AdminApi.call('section-purge', {'pageId': page, 'sectionId': sid, 'confirm': deleteMedia}));
-  }
-  for (final page in plan.resetPages) {
-    await guard(() => AdminApi.call('page-purge', {'pageId': page, 'confirm': deleteMedia}));
+  // Only reached after the admin confirmed in [confirmMediaDelete].
+  if (purgeDocs) {
+    for (final (page, sid) in plan.deletedSections) {
+      await guard(() => AdminApi.call('section-purge',
+          {'pageId': page, 'sectionId': sid, 'confirm': true, 'deleteMedia': deleteMedia}));
+    }
+    for (final page in plan.resetPages) {
+      await guard(() => AdminApi.call('page-purge', {'pageId': page, 'confirm': true, 'deleteMedia': deleteMedia}));
+    }
   }
   if (deleteMedia && plan.oldUrls.isNotEmpty) {
     await guard(() => AdminApi.call('media-gc', {

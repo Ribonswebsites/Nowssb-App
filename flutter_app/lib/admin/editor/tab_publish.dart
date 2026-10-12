@@ -63,7 +63,10 @@ class PublishTab extends StatelessWidget {
                           final plan = c.mediaPlan();
                           final choice = await confirmMediaDelete(context, plan);
                           if (choice == MediaChoice.cancel) return;
-                          await c.publish(plan: plan, deleteMedia: choice == MediaChoice.delete);
+                          await c.publish(
+                            plan: choice == MediaChoice.publishOnly ? null : plan,
+                            deleteMedia: choice == MediaChoice.delete,
+                          );
                         },
                   icon: c.busy
                       ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: kInk))
