@@ -155,6 +155,7 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
       ),
       const _StoreDepartmentLabel('WORD ATELIER'),
       _StoreGlassSection(
+        onTap: () => _push(context, const WordAtelierScreen()),
         children: [
           const HomeKeepAlive(
             child: _StoreCompactVideoBanner(
@@ -173,6 +174,7 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
       ),
       const _StoreDepartmentLabel('MEANING STORE'),
       _StoreGlassSection(
+        onTap: () => _push(context, const MeaningStoreScreen()),
         children: [
           const HomeKeepAlive(
             child: _StoreCompactVideoBanner(
@@ -215,6 +217,7 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
       ),
       const _StoreDepartmentLabel('NOWSSB CONNECT'),
       _StoreGlassSection(
+        onTap: () => _confirmVerification(context),
         children: [
           const HomeKeepAlive(
             child: _StoreVideoBanner(
@@ -227,12 +230,13 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
             title: 'Get Verified',
             sub: 'Blue, Silver, Gold or Diamond — stand out on your profile.',
             icon: Icons.verified_outlined,
-            onTap: () => _requestVerification(context),
+            onTap: () => _confirmVerification(context),
           ),
         ],
       ),
       const _StoreDepartmentLabel('SHABDAPATHY · LIBRARY'),
       _StoreGlassSection(
+        onTap: () => _push(context, const EbooksStoreScreen()),
         children: [
           const HomeKeepAlive(
             child: _StoreVideoBanner(
@@ -251,6 +255,7 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
       ),
       const _StoreDepartmentLabel('SUBSCRIPTION PLANS'),
       _StoreGlassSection(
+        onTap: () => _push(context, const SubscriptionScreen()),
         children: [
           HomeKeepAlive(
             child: _StoreVideoBanner(
@@ -419,6 +424,60 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
 
   /// Verification badges are granted by the team (Admin → People → verify
   /// tier); this files a real request in the admin Requests queue.
+  /// Get Verified (NowssB Connect): a confirmation sheet, then the real
+  /// verification request, so the tap always visibly does something.
+  static Future<void> _confirmVerification(BuildContext context) async {
+    final ok = await showModalBottomSheet<bool>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (sheet) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(UiSpace.md),
+          child: GlassBlackCard(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(8, 12, 8, 4),
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                const Icon(Icons.verified_outlined,
+                    color: NwsbColors.gold, size: 30),
+                const SizedBox(height: 12),
+                const Text('Get Verified',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700)),
+                const SizedBox(height: 8),
+                const Text(
+                    'Ask the NowssB team to review your profile for a Blue, Silver, Gold or Diamond badge. We reply in your notifications.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: Color(0xB3FFFFFF), fontSize: 13, height: 1.4)),
+                const SizedBox(height: 18),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    key: const ValueKey('verify-request'),
+                    style: FilledButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.black,
+                        shape: const StadiumBorder()),
+                    onPressed: () => Navigator.of(sheet).pop(true),
+                    child: const Text('Request verification'),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(sheet).pop(false),
+                  child: const Text('Not now',
+                      style: TextStyle(color: Color(0x99FFFFFF))),
+                ),
+              ]),
+            ),
+          ),
+        ),
+      ),
+    );
+    if (ok == true && context.mounted) await _requestVerification(context);
+  }
+
   static Future<void> _requestVerification(BuildContext context) async {
     final messenger = ScaffoldMessenger.of(context);
     String msg;
@@ -549,12 +608,19 @@ class _StoreImageRotatorState extends State<_StoreImageRotator> {
 class _StoreGlassSection extends StatelessWidget {
   const _StoreGlassSection(
       {required this.children,
-      this.margin = const EdgeInsets.fromLTRB(12, 4, 12, 10)});
+      this.margin = const EdgeInsets.fromLTRB(12, 4, 12, 10),
+      this.onTap});
   final List<Widget> children;
   final EdgeInsets margin;
 
+  /// Tile fix: a tap anywhere on the card (banner too) opens the page.
+  final VoidCallback? onTap;
+
   @override
-  Widget build(BuildContext context) => HeavyGlassPanel(
+  Widget build(BuildContext context) => GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: HeavyGlassPanel(
         margin: margin,
         radius: 24,
         padding: const EdgeInsets.all(10),
@@ -567,7 +633,7 @@ class _StoreGlassSection extends StatelessWidget {
             ],
           ],
         ),
-      );
+      ));
 }
 
 class _StoreInfoBanner extends StatelessWidget {
@@ -1011,7 +1077,13 @@ class _MiniStoreCard extends StatelessWidget {
         ],
       ),
     );
-    return GestureDetector(onTap: onTap, child: card);
+    // Tile fix: the whole black tile is one opaque button.
+    return Semantics(
+      button: true,
+      label: title,
+      child: GestureDetector(
+          behavior: HitTestBehavior.opaque, onTap: onTap, child: card),
+    );
   }
 }
 
