@@ -32,7 +32,6 @@ import '../widgets/tv_frame.dart';
 import '../widgets/app_thinking_loader.dart';
 import '../widgets/nwsb_icon.dart';
 import '../widgets/colored_split_promo_banner.dart';
-import '../widgets/glass_black_card.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import 'notifications_sheet.dart';
 import 'practice.dart';
@@ -124,27 +123,11 @@ String _artistLine(Word w, Map<String, int> counts) {
 }
 
 
-/// BD-1: which signature banner the feed opens with (page-matrix #14/#15).
-enum SoundLibraryVariant {
-  /// Sound Library: breathing aura orb hero (B5).
-  orbHero,
-
-  /// Aura Sound Library: plain black title band (B3).
-  titleBand,
-}
-
 class SoundLibraryScreen extends StatefulWidget {
-  const SoundLibraryScreen({
-    super.key,
-    this.embedded = false,
-    this.variant = SoundLibraryVariant.orbHero,
-  });
+  const SoundLibraryScreen({super.key, this.embedded = false});
 
   /// True when opened as the player sheet — skip the intro gate.
   final bool embedded;
-
-  /// Banner + top-of-feed order. Same sections either way; nothing removed.
-  final SoundLibraryVariant variant;
 
   @override
   State<SoundLibraryScreen> createState() => _SoundLibraryScreenState();
@@ -318,7 +301,6 @@ class _SoundLibraryScreenState extends State<SoundLibraryScreen> {
       onPractice: _goPractice,
       onOpenCategory: _openCategory,
       embedded: widget.embedded,
-      variant: widget.variant,
       onBack: () => Navigator.of(context).maybePop(),
     );
 
@@ -377,10 +359,7 @@ class _SlmFeed extends StatelessWidget {
     required this.onOpenCategory,
     required this.embedded,
     required this.onBack,
-    this.variant = SoundLibraryVariant.orbHero,
   });
-
-  final SoundLibraryVariant variant;
 
   final String chip;
   final List<String> chips;
@@ -557,23 +536,21 @@ class _SlmFeed extends StatelessWidget {
                       _promoAt(1),
                       _buyRequest(),
                     ] else ...[
-                      if (variant == SoundLibraryVariant.titleBand) ...[
-                        // #15: title band → mood grid → hits → now playing.
-                        _titleBand(),
-                        _speedDial(),
-                        if (hits.isNotEmpty) _globalHits(hits),
-                        _currentlyPlaying(),
-                        if (featured != null) _featuredMain(featured),
-                      ] else ...[
-                        // #14: orb hero → featured → hits → mood rail.
-                        _orbHero(featured),
-                        if (featured != null) _featuredMain(featured),
-                        if (hits.isNotEmpty) _globalHits(hits),
-                        _speedDial(),
-                        _currentlyPlaying(),
-                      ],
-                      // Promo slot kept on both variants (UD review note 1).
+                      _currentlyPlaying(),
                       _promoAt(0),
+                      if (featured != null) _featuredMain(featured),
+                      _speedDial(),
+                      if (hits.isNotEmpty)
+                        _ytmPlainSection(
+                          "Today's Global Hits",
+                          eyebrow: 'THE BIGGEST & BEST TONES INTERNATIONALLY!',
+                          child: _HitsRail(
+                            words: hits,
+                            art: art,
+                            counts: counts,
+                            onTap: onPlayWord,
+                          ),
+                        ),
                       _section(
                         'Quick picks',
                         trailing: words.isEmpty
@@ -640,9 +617,9 @@ class _SlmFeed extends StatelessWidget {
     // never kisses the outer HeavyGlassPanel edges (L/R/T/B).
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 14, 12, 6),
-      child: GlassBlackCard(
-        radius: UiRadii.lg,
-        padding: const EdgeInsets.all(UiSpace.sm),
+      child: HeavyGlassPanel(
+        radius: 24,
+        padding: const EdgeInsets.all(14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -688,81 +665,6 @@ class _SlmFeed extends StatelessWidget {
   }
 
   Widget _buyRequest() => _BuyRequestCta(onTap: onStore);
-
-  Widget _globalHits(List<Word> hits) => _ytmPlainSection(
-        "Today's Global Hits",
-        eyebrow: 'THE BIGGEST & BEST TONES INTERNATIONALLY!',
-        child: _HitsRail(
-          words: hits,
-          art: art,
-          counts: counts,
-          onTap: onPlayWord,
-        ),
-      );
-
-  /// B5 — breathing aura orb hero for the Sound Library (#14).
-  Widget _orbHero(Word? now) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(UiSpace.md, UiSpace.lg, UiSpace.md, UiSpace.sm),
-      child: GlassBlackCard(
-        radius: UiRadii.lg,
-        intensity: 0.7,
-        padding: const EdgeInsets.fromLTRB(UiSpace.lg, UiSpace.xl, UiSpace.lg, UiSpace.xl),
-        onTap: now == null ? null : () => onPlayWord(now),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const AppThinkingLoader(
-              size: 112,
-              state: OrbState.composing,
-              circlePad: 10,
-            ),
-            const SizedBox(height: UiSpace.lg),
-            const EditableLabel('sound_library.OrbHero',
-              'NOW PLAYING',
-              textAlign: TextAlign.center,
-              style: UiType.caption,
-            ),
-            const SizedBox(height: UiSpace.xs),
-            Text(
-              now?.word ?? 'Breathe, then press play',
-              textAlign: TextAlign.center,
-              softWrap: true,
-              style: UiType.title.copyWith(fontSize: 24, height: 1.15),
-            ),
-            if (now != null) ...[
-              const SizedBox(height: UiSpace.md),
-              _pill('Play', () => onPlayWord(now)),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// B3 — quiet black title band for the Aura Sound Library (#15).
-  Widget _titleBand() {
-    return Container(
-      width: double.infinity,
-      color: Colors.black,
-      padding: const EdgeInsets.fromLTRB(UiSpace.xl, UiSpace.xl, UiSpace.xl, UiSpace.lg),
-      child: const Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          EditableLabel('sound_library.TitleBand',
-            'Aura Sound Library',
-            style: UiType.title,
-          ),
-          SizedBox(height: UiSpace.xs),
-          EditableLabel('sound_library.TitleBand',
-            'Quiet tones for your aura. Choose a mood and let it play.',
-            style: UiType.body,
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _featuredMain(Word w) => _FeaturedMainCard(
         word: w,
@@ -846,9 +748,9 @@ class _SlmFeed extends StatelessWidget {
   Widget _section(String title, {Widget? trailing, required Widget child}) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 14, 12, 6),
-      child: GlassBlackCard(
-        radius: UiRadii.lg,
-        padding: const EdgeInsets.fromLTRB(UiSpace.xs, UiSpace.sm, UiSpace.xs, UiSpace.sm),
+      child: HeavyGlassPanel(
+        radius: 24,
+        padding: const EdgeInsets.fromLTRB(10, 12, 10, 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

@@ -7,7 +7,6 @@ import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import '../data/models.dart';
 import '../data/word_voice.dart';
 import '../widgets/app_thinking_loader.dart';
-import '../widgets/glass_black_card.dart';
 import '../widgets/glass_wrap.dart';
 import '../widgets/nwsb_icon.dart';
 import '../admin/template/editable.dart';
@@ -102,8 +101,7 @@ class CurrentlyPlayingAlbum extends StatelessWidget {
               ),
               const SizedBox(height: 18),
               Center(
-                child: _CollapsingAlbumHero(
-                  child: GlassWrap(
+                child: GlassWrap(
                   margin: EdgeInsets.zero,
                   padding: const EdgeInsets.all(8),
                   radius: 18,
@@ -122,7 +120,6 @@ class CurrentlyPlayingAlbum extends StatelessWidget {
                       ),
                     ),
                   ),
-                ),
                 ),
               ),
               const SizedBox(height: 22),
@@ -174,9 +171,12 @@ class CurrentlyPlayingAlbum extends StatelessWidget {
               const SizedBox(height: 18),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: GlassBlackCard(
-                  radius: UiRadii.card,
-                  padding: const EdgeInsets.fromLTRB(UiSpace.md, UiSpace.md, UiSpace.sm, UiSpace.md),
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1C1C1C),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                   child: Row(
                     children: [
                       const Expanded(
@@ -251,10 +251,12 @@ class CurrentlyPlayingAlbum extends StatelessWidget {
               const SizedBox(height: 12),
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
-                child: GlassBlackCard(
-                  radius: UiRadii.md,
-                  frame: UiSpace.xs,
-                  padding: const EdgeInsets.fromLTRB(UiSpace.sm, UiSpace.xs, UiSpace.xs, UiSpace.xs),
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1A1A1A),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                   child: Row(
                     children: [
                       ClipRRect(
@@ -416,62 +418,6 @@ class CurrentlyPlayingAlbum extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-
-/// B7 — YTM-style collapsing album hero. The cover shrinks and fades as it
-/// scrolls up under the page top. Paint-only (Transform/Opacity), so list
-/// layout never changes while scrolling.
-class _CollapsingAlbumHero extends StatefulWidget {
-  const _CollapsingAlbumHero({required this.child});
-
-  final Widget child;
-
-  @override
-  State<_CollapsingAlbumHero> createState() => _CollapsingAlbumHeroState();
-}
-
-class _CollapsingAlbumHeroState extends State<_CollapsingAlbumHero> {
-  ScrollPosition? _pos;
-  double _t = 0; // 0 = full, 1 = collapsed
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final next = Scrollable.maybeOf(context)?.position;
-    if (next != _pos) {
-      _pos?.removeListener(_onScroll);
-      _pos = next?..addListener(_onScroll);
-    }
-  }
-
-  @override
-  void dispose() {
-    _pos?.removeListener(_onScroll);
-    super.dispose();
-  }
-
-  void _onScroll() {
-    final box = context.findRenderObject() as RenderBox?;
-    final view = _pos?.context.notificationContext?.findRenderObject() as RenderBox?;
-    if (box == null || view == null || !box.attached || !view.attached) return;
-    final top = box.localToGlobal(Offset.zero, ancestor: view).dy;
-    final h = box.size.height;
-    final t = h <= 0 ? 0.0 : (-top / h).clamp(0.0, 1.0);
-    if ((t - _t).abs() > 0.01) setState(() => _t = t);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Opacity(
-      opacity: 1 - 0.6 * _t,
-      child: Transform.scale(
-        scale: 1 - 0.35 * _t,
-        alignment: Alignment.bottomCenter,
-        child: widget.child,
       ),
     );
   }
