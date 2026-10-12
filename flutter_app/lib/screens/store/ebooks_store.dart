@@ -204,18 +204,18 @@ class _EbooksBody extends StatelessWidget {
           'yours to keep, read anywhere, forever. Not a word catalogue.',
           style: TextStyle(fontSize: 13, height: 1.6, color: Color(0x80FFFFFF)),
         )),
-        const SizedBox(height: 18),
+        const SizedBox(height: 28),
         LSection('browse', 'Browse strip', _EbookBrowseStrip(
           onOpen: (b) => openEbookDetail(context, b),
           books: books,
         )),
-        const SizedBox(height: 12),
+        const SizedBox(height: 24),
         LSection('promo', 'Split promo banner', StoreTextCap(child: ColoredSplitPromoBanner.forSurface(
           SplitPromoSurface.ebooksStore,
           onTap: books.isEmpty ? null : () => openEbookDetail(context, books.first),
           margin: const EdgeInsets.only(bottom: 8),
         ))),
-        const SizedBox(height: 8),
+        const SizedBox(height: 20),
         LSection.group('books', 'All books', align: CrossAxisAlignment.start, [for (final b in books) _EbookRow(book: b)]),
         const SizedBox(height: 40),
         LSection('promo2', 'Promo banner', StoreTextCap(child: ColoredSplitPromoBanner(
@@ -238,7 +238,10 @@ class _EbooksBody extends StatelessWidget {
           ),
         ))),
         const LSection('disclaimer', 'Disclaimer', StoreDisclaimer(text: kEbDisclaimer)),
-      ]),
+      ],
+          // Brief B (calm): the hype row is retired; ships off, admin can
+          // re-enable it.
+          hiddenByDefault: const {'hype'}),
     );
   }
 }
