@@ -258,7 +258,10 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                   const LSection('hype', 'Most hyped', NowssbHypeRail()),
                   LSection('billing', 'Monthly / yearly switch', _billing()),
                   LSection('plans', 'Plans', _horizontalPlans()),
-                ]))
+                ],
+          // Brief B (calm): the hype row is retired; ships off, admin can
+          // re-enable it.
+          hiddenByDefault: const {'hype'}))
                   SliverToBoxAdapter(child: w),
               ]),
             ),
