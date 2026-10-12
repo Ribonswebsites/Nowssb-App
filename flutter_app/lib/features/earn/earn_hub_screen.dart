@@ -39,16 +39,6 @@ class EarnHubScreen extends StatelessWidget {
       goodToKnow: kEarnDisclaimer,
       title: 'NowssB Earn',
       mark: NwsbMarks.piggy,
-      banner: const ColoredSplitPromoBanner(
-        margin: EdgeInsets.fromLTRB(16, 0, 16, 8),
-        spec: SplitPromoSpec(
-          title: 'NowssB Earn',
-          cta: 'Agents, rewards, gifts',
-          leftColor: Color(0xFF0B0D0C),
-          rightColor: Color(0xFF8FA89A),
-          art: SplitPromoArts.egyptianGold,
-        ),
-      ),
       child: ListenableBuilder(
         listenable: EconomyMirror.instance,
         builder: (context, _) {
@@ -154,11 +144,7 @@ class _CalmBalanceCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(children: [
-            Container(
-              width: 8,
-              height: 8,
-              decoration: const BoxDecoration(color: _kCalmAccent, shape: BoxShape.circle),
-            ),
+            const _BreathDot(),
             const SizedBox(width: 10),
             const Flexible(
               child: Text('YOUR REWARDS', style: TextStyle(color: _kCalmAccent, letterSpacing: 2.4, fontSize: 11, fontWeight: FontWeight.w500)),
@@ -188,6 +174,49 @@ class _CalmBalanceCard extends StatelessWidget {
             Text('${w.plan} · ${w.circleTier} · ${w.code.isEmpty ? 'code paused' : w.code}', style: soft),
           ],
         ],
+      ),
+    );
+  }
+}
+
+/// A slow 'breathe in, breathe out' dot (4 s cycle) — the page's one motion.
+class _BreathDot extends StatefulWidget {
+  const _BreathDot();
+  @override
+  State<_BreathDot> createState() => _BreathDotState();
+}
+
+class _BreathDotState extends State<_BreathDot> with SingleTickerProviderStateMixin {
+  // Three calm breaths, then rest (no endless ticker).
+  late final AnimationController _c =
+      AnimationController(vsync: this, duration: const Duration(seconds: 4))..repeat(reverse: true, count: 6);
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 18,
+      height: 18,
+      child: AnimatedBuilder(
+        animation: _c,
+        builder: (_, __) {
+          final t = Curves.easeInOut.transform(_c.value);
+          return Center(
+            child: Container(
+              width: 8 + 8 * t,
+              height: 8 + 8 * t,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: _kCalmAccent.withValues(alpha: 0.35 + 0.65 * (1 - t)),
+                border: Border.all(color: _kCalmAccent.withValues(alpha: 0.6)),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
