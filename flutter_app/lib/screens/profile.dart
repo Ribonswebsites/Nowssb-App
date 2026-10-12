@@ -44,6 +44,7 @@ import 'quick_access.dart';
 import 'store.dart';
 import 'subscription.dart';
 import '../widgets/colored_split_promo_banner.dart';
+import '../widgets/glass_black_card.dart';
 import '../admin/template/editable.dart';
 import '../admin/layout/layout_sections.dart';
 import '../features/programs/program_cards.dart';
@@ -460,7 +461,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   // Server-driven order (Admin → UI Editor); bundled order by default.
       children: layoutChildren(context, 'profile', [
                     LSection('banner', 'Banner', _banner()),
-                    LSection('card', 'Profile card', _profileCard()),
+                    LSection('card', 'Profile card', Column(crossAxisAlignment: CrossAxisAlignment.start, children: [_profileCard(), _balancePill()])),
                     LSection('earn', 'Earn hub', _earnHub()),
                     LSection('progress', 'Progress', _progress()),
                     LSection('about', 'About', _about()),
@@ -566,8 +567,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _profileCard() => GlassCard(
-        margin: const EdgeInsets.only(bottom: 34),
-        radius: 22,
+        margin: const EdgeInsets.only(bottom: 14),
+        radius: 26,
+        // CLiQ-style member card: one subtle diagonal sheen, no neon.
+        overlay: const LinearGradient(begin: Alignment(-1, -1), end: Alignment(1, 1), colors: [Color(0x00FFFFFF), Color(0x0FFFFFFF), Color(0x00FFFFFF)], stops: [.25, .5, .75]),
         padding: EdgeInsets.zero,
         child: SizedBox(
           height: 138,
@@ -617,7 +620,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       listenable: EconomyMirror.instance,
                       builder: (context, _) {
                         final plan = _planName;
-                        return Container(padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 5), decoration: BoxDecoration(color: const Color(0x08FFFFFF), border: const Border.fromBorderSide(BorderSide(color: _border)), borderRadius: BorderRadius.circular(999)), child: Row(mainAxisSize: MainAxisSize.min, children: [Container(width: 6, height: 6, decoration: const BoxDecoration(color: _accent, shape: BoxShape.circle, boxShadow: [BoxShadow(color: _accent, blurRadius: 6)])), const SizedBox(width: 6), Text(plan == 'Free' ? 'Free Plan' : plan, style: const TextStyle(fontSize: 11.5, letterSpacing: .45))]));
+                        return Container(padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 5), decoration: BoxDecoration(color: const Color(0x08FFFFFF), border: const Border.fromBorderSide(BorderSide(color: _border)), borderRadius: BorderRadius.circular(999)), child: Row(mainAxisSize: MainAxisSize.min, children: [Container(width: 6, height: 6, decoration: const BoxDecoration(color: _accent, shape: BoxShape.circle)), const SizedBox(width: 6), Text(plan == 'Free' ? 'Free Plan' : plan, style: const TextStyle(fontSize: 11.5, letterSpacing: .45))]));
                       },
                     ),
                   ]),
@@ -629,6 +632,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
 
   String get _planName => EconomyMirror.instance.plan;
+
+  /// Small glass pill with the signed-in user's existing coin balance
+  /// (EconomyMirror). Hidden when there is no signed-in wallet.
+  Widget _balancePill() => ListenableBuilder(
+        listenable: EconomyMirror.instance,
+        builder: (context, _) {
+          final signedIn = NwsbFirebase.ready && FirebaseAuth.instance.currentUser != null;
+          if (!signedIn) return const SizedBox(height: 24);
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 34),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(999),
+              onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarnHubScreen())),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+                decoration: BoxDecoration(color: const Color(0x0DFFFFFF), border: Border.all(color: _border), borderRadius: BorderRadius.circular(999)),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  const Icon(Icons.toll_outlined, size: 16, color: _accent),
+                  const SizedBox(width: 8),
+                  Text('${EconomyMirror.instance.coins}', style: const TextStyle(fontFamily: _mono, fontSize: 14, fontWeight: FontWeight.w600, color: _text)),
+                  const SizedBox(width: 6),
+                  const Text('coins', style: TextStyle(fontSize: 12.5, color: _dim)),
+                ]),
+              ),
+            ),
+          );
+        },
+      );
 
   Widget _earnHub() {
     return ListenableBuilder(
@@ -648,89 +679,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
           title: 'Programs',
           child: ProgramCardsStrip(),
         ),
-        SectionBlock(
-          marginBottom: 18,
-          title: 'Rewards',
-          child: GlassCard(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
-            child: InkWell(
-              onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const VaultScreen())),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CoinCount(
-                    value: coins,
-                    style: const TextStyle(fontFamily: _mono, fontSize: 32, fontWeight: FontWeight.w600, color: _accent, height: 1),
-                  ),
-                  const SizedBox(height: 6),
-                  Text('Streak $streak · open Vault', style: const TextStyle(fontSize: 12.5, color: _dim)),
-                ],
-              ),
-            ),
-          ),
-        ),
-        SectionBlock(
-          marginBottom: 18,
-          title: 'NowssB Earn',
-          child: GlassCard(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
-            child: InkWell(
-              onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CircleScreen())),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(tier, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: _accent)),
-                  const SizedBox(height: 6),
-                  Text('$code · $refs paid referrals', style: const TextStyle(fontSize: 12.5, color: _dim)),
-                ],
-              ),
-            ),
-          ),
-        ),
-        SectionBlock(
-          marginBottom: 18,
-          title: 'Gifts',
-          child: GlassCard(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
-            child: InkWell(
-              onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const GiftsScreen())),
-              child: const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  EditableLabel('profile.ProfileScreen', 'Send or redeem', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: _accent)),
-                  SizedBox(height: 6),
-                  EditableLabel('profile.ProfileScreen', 'A real purchase, shared as a code', style: TextStyle(fontSize: 12.5, color: _dim)),
-                ],
-              ),
-            ),
-          ),
-        ),
-        SectionBlock(
-          marginBottom: 34,
-          title: 'Earnings',
-          child: GlassCard(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
-            child: InkWell(
-              onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarningsScreen())),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    live ? FxBook.instance.formatCents(earned) : 'Sign in',
-                    style: const TextStyle(fontFamily: _mono, fontSize: 22, fontWeight: FontWeight.w600, color: _accent),
-                  ),
-                  const SizedBox(height: 6),
-                  const EditableLabel('profile.ProfileScreen', 'Sales and referrals · payout history', style: TextStyle(fontSize: 12.5, color: _dim)),
-                ],
-              ),
-            ),
-          ),
-        ),
+        _sectionList('Rewards & Earn', [
+          _linkRow(Icons.savings_outlined, 'Rewards', '$coins coins · streak $streak · open Vault', () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const VaultScreen()))),
+          _linkRow(Icons.workspace_premium_outlined, 'NowssB Earn · $tier', '$code · $refs paid referrals', () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CircleScreen()))),
+          _linkRow(Icons.card_giftcard_outlined, 'Gifts', 'Send or redeem · a real purchase, shared as a code', () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const GiftsScreen()))),
+          _linkRow(Icons.account_balance_wallet_outlined, 'Earnings', '${live ? FxBook.instance.formatCents(earned) : 'Sign in'} · sales, referrals, payouts', () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarningsScreen()))),
+        ]),
       ],
     );
       },
     );
   }
+
+  Widget _linkRow(IconData icon, String title, String sub, VoidCallback onTap) => InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Row(children: [
+            Container(width: 38, height: 38, decoration: BoxDecoration(color: const Color(0x14E3BD7D), borderRadius: BorderRadius.circular(19)), child: Icon(icon, size: 18, color: _accent)),
+            const SizedBox(width: 16),
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
+              const SizedBox(height: 3),
+              Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12, color: _dim)),
+            ])),
+            const Icon(Icons.chevron_right_rounded, size: 20, color: _faint),
+          ]),
+        ),
+      );
 
   Widget _earnLink(String label, Widget page) => InkWell(
         onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => page)),
@@ -970,9 +946,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _shop() => ListenableBuilder(
         listenable: Listenable.merge([CartBag.instance, Entitlements.instance]),
         builder: (context, _) => _sectionList('Shop & Orders', [
-          _shopRow('Cart', '${CartBag.instance.cartCount}', 26),
-          _shopRow('Wishlist', '${CartBag.instance.wishCount}', 28),
-          _shopRow('Orders', '${Entitlements.instance.owned.length}', 30),
+          _shopRow('Cart', '${CartBag.instance.cartCount}', 26, sub: '${CartBag.instance.cartCount} in your cart'),
+          _shopRow('Wishlist', '${CartBag.instance.wishCount}', 28, sub: '${CartBag.instance.wishCount} saved for later'),
+          _shopRow('Orders', '${Entitlements.instance.owned.length}', 30, sub: '${Entitlements.instance.owned.length} owned'),
         ]),
       );
 
@@ -1080,11 +1056,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Container(margin: const EdgeInsets.only(bottom: 30), padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: const Color(0x08FFFFFF), border: const Border.fromBorderSide(BorderSide(color: _border)), borderRadius: BorderRadius.circular(22)), alignment: Alignment.center, child: const EditableLabel('profile.ProfileScreen', 'Sign Out', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500))),
       );
 
-  Widget _sectionList(String title, List<Widget> rows) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [SectionLabel(title), GlassCard(margin: const EdgeInsets.only(bottom: 40), padding: const EdgeInsets.all(4), child: Column(children: rows))]);
+  // Calm list: one glass-wrapped black card, rows with thin inset dividers.
+  Widget _sectionList(String title, List<Widget> rows) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        SectionLabel(title),
+        GlassCard(margin: const EdgeInsets.only(bottom: 40), padding: const EdgeInsets.symmetric(vertical: 6), child: Column(children: [
+          for (var i = 0; i < rows.length; i++) ...[
+            if (i > 0) const Divider(height: 1, thickness: .5, indent: 20, endIndent: 20, color: _borderSoft),
+            rows[i],
+          ],
+        ])),
+      ]);
 
-  Widget _listRow(String label, {required Widget trailing, bool muted = false}) => Container(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16), decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: _borderSoft))), child: Row(children: [Expanded(child: EditableLabel('profile.ProfileScreen', label, style: TextStyle(fontSize: 14.5, color: muted ? _faint : _text))), const SizedBox(width: 12), trailing]));
+  Widget _listRow(String label, {required Widget trailing, bool muted = false}) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+        child: Row(children: [Expanded(child: EditableLabel('profile.ProfileScreen', label, style: TextStyle(fontSize: 15, color: muted ? _faint : _text))), const SizedBox(width: 12), trailing]),
+      );
 
-  Widget _shopRow(String label, String count, int icon) => InkWell(onTap: () => _openShop(label), child: Container(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: _borderSoft))), child: Row(children: [Container(width: 34, height: 34, decoration: BoxDecoration(border: Border.all(color: _borderSoft), borderRadius: BorderRadius.circular(11)), child: Center(child: EditableSvg.asset('assets/icons/icon_${icon.toString().padLeft(2, '0')}.svg', width: 16, height: 16, colorFilter: const ColorFilter.mode(_text, BlendMode.srcIn), slot: 'profile.ProfileScreen'))), const SizedBox(width: 13), Expanded(child: EditableLabel('profile.ProfileScreen', label, style: const TextStyle(fontSize: 14.5))), Text(count, style: const TextStyle(fontFamily: _mono, fontSize: 12.5, color: _faint)), const SizedBox(width: 6), EditableSvg.asset('assets/icons/icon_16.svg', width: 14, height: 14, colorFilter: const ColorFilter.mode(_faint, BlendMode.srcIn), slot: 'profile.ProfileScreen')])));
+  Widget _shopRow(String label, String count, int icon, {String? sub}) => InkWell(
+        onTap: () => _openShop(label),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Row(children: [
+            Container(width: 38, height: 38, decoration: BoxDecoration(color: const Color(0x14E3BD7D), borderRadius: BorderRadius.circular(19)), child: Center(child: EditableSvg.asset('assets/icons/icon_${icon.toString().padLeft(2, '0')}.svg', width: 16, height: 16, colorFilter: const ColorFilter.mode(_accent, BlendMode.srcIn), slot: 'profile.ProfileScreen'))),
+            const SizedBox(width: 16),
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              EditableLabel('profile.ProfileScreen', label, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
+              if (sub != null) ...[const SizedBox(height: 3), Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12, color: _dim))] else Text(count, style: const TextStyle(fontFamily: _mono, fontSize: 12, color: _faint)),
+            ])),
+            const Icon(Icons.chevron_right_rounded, size: 20, color: _faint),
+          ]),
+        ),
+      );
 
   Widget _viewAll({required String icon, required VoidCallback onTap, bool pill = false}) => InkWell(onTap: onTap, borderRadius: BorderRadius.circular(999), child: Container(padding: pill ? const EdgeInsets.symmetric(horizontal: 9, vertical: 6) : EdgeInsets.zero, decoration: pill ? BoxDecoration(color: const Color(0x08FFFFFF), border: const Border.fromBorderSide(BorderSide(color: _border)), borderRadius: BorderRadius.circular(999)) : null, child: Row(mainAxisSize: MainAxisSize.min, children: [const EditableLabel('profile.ProfileScreen', 'View All', style: TextStyle(fontSize: 12, color: _dim)), const SizedBox(width: 5), EditableSvg.asset(icon, width: pill ? 16 : 13, height: pill ? 16 : 13, colorFilter: const ColorFilter.mode(_dim, BlendMode.srcIn), slot: 'profile.ProfileScreen')])));
 
@@ -1129,7 +1131,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 class _Background extends StatelessWidget {
   const _Background();
   @override
-  Widget build(BuildContext context) => DecoratedBox(decoration: BoxDecoration(image: DecorationImage(image: slotImageProvider(context, 'profile.Background', 'assets/profile_source/img-bg.jpeg', const AssetImage('assets/profile_source/img-bg.jpeg')), fit: BoxFit.cover, alignment: Alignment.topCenter), gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x26000000), Color(0xB8000000), Color(0xEA000000)])), child: const SizedBox.expand());
+  Widget build(BuildContext context) => DecoratedBox(decoration: BoxDecoration(image: DecorationImage(image: slotImageProvider(context, 'profile.Background', 'assets/profile_source/img-bg.jpeg', const AssetImage('assets/profile_source/img-bg.jpeg')), fit: BoxFit.cover, alignment: Alignment.topCenter), gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x99000000), Color(0xE6000000), Color(0xFF000000)])), child: const SizedBox.expand());
 }
 
 class _GrainPainter extends CustomPainter {
@@ -1157,7 +1159,29 @@ class GlassCard extends StatelessWidget {
   final double? minHeight;
   const GlassCard({super.key, required this.child, this.padding = const EdgeInsets.all(16), this.margin, this.radius = 22, this.image, this.overlay, this.backgroundColor, this.minHeight});
   @override
-  Widget build(BuildContext context) => Container(
+  Widget build(BuildContext context) {
+    // Sprint 2026-10-12: calm glass wrapper around a black card.
+    if (image == null) {
+      return Container(
+        width: double.infinity,
+        margin: margin,
+        constraints: minHeight == null ? null : BoxConstraints(minHeight: minHeight!),
+        child: GlassBlackCard(
+          radius: radius + 4,
+          frame: 5,
+          intensity: .45,
+          padding: EdgeInsets.zero,
+          child: Stack(children: [
+            if (overlay != null) Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(gradient: overlay))),
+            Padding(padding: padding, child: child),
+          ]),
+        ),
+      );
+    }
+    return _imageCard(context);
+  }
+
+  Widget _imageCard(BuildContext context) => Container(
         margin: margin,
         constraints: minHeight == null ? null : BoxConstraints(minHeight: minHeight!),
         decoration: BoxDecoration(borderRadius: BorderRadius.circular(radius), border: const Border.fromBorderSide(BorderSide(color: _borderSoft)), color: backgroundColor ?? _surface, image: image == null ? null : DecorationImage(image: slotImageProvider(context, 'profile.GlassCard', image!, AssetImage(image!)), fit: BoxFit.cover, alignment: Alignment.center)),
