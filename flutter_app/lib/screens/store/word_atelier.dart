@@ -25,6 +25,7 @@ import 'store_routes.dart';
 import 'store_terms_sheet.dart';
 import '../../admin/template/editable.dart';
 import '../../admin/layout/layout_sections.dart';
+import '../../data/app_control.dart';
 
 class WordAtelierScreen extends StatelessWidget {
   const WordAtelierScreen({super.key});
@@ -218,9 +219,14 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
           ),
           onRequest: () => openRequestWords(context),
         ));
-        sections.add(const StoreGlassFilmBanner(
-          asset: 'assets/video/store-title-banner.mp4',
-        ));
+        // Brief B (calm): the decorative title film ships off; admin flag
+        // store_atelier_title_film turns it back on.
+        if (AppControl.instance
+            .flag('store_atelier_title_film', fallback: false)) {
+          sections.add(const StoreGlassFilmBanner(
+            asset: 'assets/video/store-title-banner.mp4',
+          ));
+        }
         // Plans banner — same subscribe film as the Meaning / Signature rooms.
         sections.add(const LSection('subscribe', 'Subscribe banner', StoreSubscribeBanner(
           videoAsset: StoreSubscribeBanner.kSubscriptionAlternateVideo,
@@ -262,7 +268,10 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
       }
 
       // Every fifth category row — same as part010 ROW_VIDS.
-      if (_chip == 'ALL' && (i + 1) % 5 == 0) {
+      // Brief B (calm): row films ship off (flag store_atelier_row_vids).
+      if (_chip == 'ALL' &&
+          (i + 1) % 5 == 0 &&
+          AppControl.instance.flag('store_atelier_row_vids', fallback: false)) {
         final vidIdx = (i + 1) ~/ 5 - 1;
         if (vidIdx >= 0 && vidIdx < kRmRowVids.length) {
           sections.add(RmRowVid(url: nwsbVideo(kRmRowVids[vidIdx])));
@@ -309,14 +318,18 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
         18: ('rows', 'Word collections'),
         -2: ('promo3', 'Signature Store banner'),
         -1: ('disclaimer', 'Disclaimer'),
-      }, [
+      },
+          // Brief B (calm): the hype row is being retired and the third split
+          // promo is folded; promo + promo2 keep the page's promo slots.
+          hiddenByDefault: const {'hype', 'promo3'},
+          [
         StorePixelsHero(
           onBrowseAll: _browseAll,
           onViewCart: _viewCart,
           videoAsset: nwsbVideo(kRmHeroVidFile),
           videoTitle: '',
         ),
-        const SizedBox(height: 18),
+        const SizedBox(height: 28),
         StoreRegistrySection(config: AtelierMix.coupons),
         // Kept as the one hyped row (legacy cards + their admin image slots).
         const StoreTextCap(child: NowssbHypeRail()),
@@ -325,7 +338,7 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
           title: 'Featured collections',
           child: StoreRegistrySection(config: AtelierMix.glassy),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 28),
         StoreTextCap(child: ColoredSplitPromoBanner.forSurface(
           SplitPromoSurface.wordAtelier,
           onTap: () => Navigator.of(context).push(
@@ -335,7 +348,7 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
           ),
           margin: const EdgeInsets.only(bottom: 8),
         )),
-        const SizedBox(height: 8),
+        const SizedBox(height: 20),
         StoreGlassPanel(
           radius: 32,
           padding: const EdgeInsets.all(5),
@@ -355,7 +368,7 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
             },
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 32),
         const EditableLabel('word_atelier.WordAtelierBody',
           'YOUR WORD LIBRARY',
           style: TextStyle(
@@ -397,7 +410,7 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
             ),
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 20),
         ...sections,
         StoreTextCap(child: ColoredSplitPromoBanner(
           spec: SplitPromoExtras.at(
