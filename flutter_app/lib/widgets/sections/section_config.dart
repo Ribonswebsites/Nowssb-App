@@ -588,11 +588,26 @@ class SectionStyle {
     this.glass = false,
     this.glowColor,
     this.accent,
+    this.glassCard = false,
+    this.glassTitle,
+    this.glassIntensity,
   });
 
   static const empty = SectionStyle();
 
+  /// Widget-internal glass treatment (e.g. the glassy carousel's own frame).
   final bool glass;
+
+  /// UD-0: when true the registry wraps the whole section in a
+  /// `GlassBlackCard` (frosted frame around a near-black card). Off by
+  /// default so existing pages keep their look.
+  final bool glassCard;
+
+  /// UD-0: optional header shown inside the [glassCard] wrapper.
+  final String? glassTitle;
+
+  /// UD-0: 0..1 frost strength for the [glassCard] wrapper (default 0.6).
+  final double? glassIntensity;
 
   /// ARGB int, e.g. 0xFFE8D5A3.
   final int? glowColor;
@@ -605,6 +620,11 @@ class SectionStyle {
       glass: _b(m['glass']) ?? false,
       glowColor: _i(m['glowColor']),
       accent: _i(m['accent']),
+      glassCard: _b(m['glassCard']) ?? false,
+      glassTitle: m['glassTitle'] is String ? m['glassTitle'] as String : null,
+      glassIntensity: m['glassIntensity'] is num
+          ? (m['glassIntensity'] as num).toDouble()
+          : null,
     );
   }
 
@@ -612,6 +632,9 @@ class SectionStyle {
         if (glass) 'glass': glass,
         if (glowColor != null) 'glowColor': glowColor,
         if (accent != null) 'accent': accent,
+        if (glassCard) 'glassCard': glassCard,
+        if (glassTitle != null) 'glassTitle': glassTitle,
+        if (glassIntensity != null) 'glassIntensity': glassIntensity,
       };
 
   SectionStyle copyWith({
@@ -620,11 +643,17 @@ class SectionStyle {
     int? accent,
     bool clearGlowColor = false,
     bool clearAccent = false,
+    bool? glassCard,
+    String? glassTitle,
+    double? glassIntensity,
   }) =>
       SectionStyle(
         glass: glass ?? this.glass,
         glowColor: clearGlowColor ? null : (glowColor ?? this.glowColor),
         accent: clearAccent ? null : (accent ?? this.accent),
+        glassCard: glassCard ?? this.glassCard,
+        glassTitle: glassTitle ?? this.glassTitle,
+        glassIntensity: glassIntensity ?? this.glassIntensity,
       );
 }
 

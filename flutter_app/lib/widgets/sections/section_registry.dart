@@ -7,6 +7,8 @@ library;
 
 import 'package:flutter/widgets.dart';
 
+import '../glass_black_card.dart';
+
 import 'artist_cards_section.dart';
 import 'category_tiles_section.dart';
 import 'coupon_banner_section.dart';
@@ -91,7 +93,17 @@ class SectionRegistry {
     if (!config.enabled) return const SizedBox.shrink();
     final e = _byType[config.type];
     if (e == null) return _placeholder(context, config);
-    return e.builder(context, config);
+    final child = e.builder(context, config);
+    // UD-0: opt-in GlassBlackCard wrapper; default (false) is unchanged.
+    final st = config.style;
+    if (!st.glassCard) return child;
+    return GlassBlackCard(
+      title: st.glassTitle,
+      intensity: st.glassIntensity ?? GlassBlackCard.defaultIntensity,
+      radius: UiRadii.card,
+      padding: const EdgeInsets.all(UiSpace.md),
+      child: child,
+    );
   }
 
   SectionConfig defaultConfigFor(String type, {required String id}) {
