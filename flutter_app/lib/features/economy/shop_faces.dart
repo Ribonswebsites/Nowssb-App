@@ -2,8 +2,6 @@
 /// screens. Colours and card shapes follow those screens. The offers are NowssB.
 library;
 
-import 'dart:ui' show ImageFilter;
-
 import 'package:flutter/material.dart';
 
 import '../../data/store_catalog.dart';
@@ -75,27 +73,12 @@ class _GlassPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: wash,
-      appBar: bar,
-      body: Padding(
-        padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(22),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.62),
-                borderRadius: BorderRadius.circular(22),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.9)),
-              ),
-              child: child,
-            ),
-          ),
-        ),
-      ),
-    );
+    final bg = wash == const Color(0xFF2874F0)
+        ? const Color(0xFFF5F6F8)
+        : wash == const Color(0xFFE8EEF6)
+            ? const Color(0xFFF7F7F7)
+            : Colors.white;
+    return Scaffold(backgroundColor: bg, appBar: bar, body: child);
   }
 }
 
@@ -1045,27 +1028,25 @@ class CoinbackPage extends StatelessWidget {
         children: [
           Container(
             margin: const EdgeInsets.fromLTRB(12, 12, 12, 4),
-            height: 168,
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(18), gradient: const RadialGradient(colors: [Color(0xFFE9D5FF), Color(0xFFC084FC), Color(0xFF9333EA)])),
+            height: 176,
+            padding: const EdgeInsets.fromLTRB(18, 16, 12, 16),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(18), gradient: const LinearGradient(colors: [Color(0xFFC084FC), Color(0xFF9333EA), Color(0xFF6D28D9)])),
             child: Row(
               children: [
-                ClipRRect(borderRadius: const BorderRadius.horizontal(left: Radius.circular(18)), child: Image.asset(art, width: 110, height: 168, fit: BoxFit.cover)),
                 const Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(10, 16, 12, 12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('FREE COINBACK', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, height: 1)),
-                        SizedBox(height: 4),
-                        Text('ON EVERY ORDER', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13)),
-                        SizedBox(height: 10),
-                        _HeroPill(),
-                      ],
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('FREE COINBACK', style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w900, height: 1)),
+                      SizedBox(height: 4),
+                      Text('ON EVERY ORDER', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 14)),
+                      SizedBox(height: 12),
+                      _HeroPill(),
+                    ],
                   ),
                 ),
+                ClipRRect(borderRadius: BorderRadius.circular(14), child: Image.asset(art, width: 120, height: 144, fit: BoxFit.cover)),
               ],
             ),
           ),

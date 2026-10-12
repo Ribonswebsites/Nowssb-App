@@ -3,8 +3,6 @@
 /// server grants and caps every coin.
 library;
 
-import 'dart:ui' show ImageFilter;
-
 import 'package:flutter/material.dart';
 
 import '../../screens/quotes_live.dart';
@@ -140,70 +138,64 @@ class _LiveFreeCoins extends StatelessWidget {
               ]
             : actions;
         return Scaffold(
-          backgroundColor: const Color(0xFF6A1B9A),
+          backgroundColor: Colors.white,
           appBar: AppBar(
             backgroundColor: const Color(0xFF6A1B9A),
             foregroundColor: Colors.white,
             elevation: 0,
-            title: const Text('Free Coins'),
+            title: const Text('Free Coins', style: TextStyle(fontWeight: FontWeight.w600)),
             actions: [
               IconButton(onPressed: () => NwsbLinks.cart(context), icon: const Icon(Icons.search)),
               IconButton(onPressed: () => NwsbLinks.cart(context), icon: const Icon(Icons.shopping_cart_outlined)),
             ],
           ),
-          body: Padding(
-            padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(22),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.72),
-                    borderRadius: BorderRadius.circular(22),
-                    border: Border.all(color: Colors.white),
-                  ),
-                  child: ListView(
-                    padding: const EdgeInsets.fromLTRB(12, 12, 12, 24),
-                    children: [
-                      Container(
-                        height: 168,
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          gradient: const LinearGradient(colors: [Color(0xFF7C4DFF), Color(0xFF512DA8)]),
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Text('Earn\nUp to $cap\ncoins\nto shop', style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w900, height: 1.05)),
-                            ),
-                            Container(
-                              width: 120,
-                              height: 120,
-                              decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFFFFC107)),
-                              alignment: Alignment.center,
-                              child: const Text('NOW', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 22)),
-                            ),
-                          ],
-                        ),
+          body: ListView(
+            padding: const EdgeInsets.fromLTRB(12, 12, 12, 28),
+            children: [
+              Container(
+                height: 180,
+                padding: const EdgeInsets.fromLTRB(18, 16, 8, 16),
+                decoration: BoxDecoration(borderRadius: BorderRadius.circular(16), gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF7C4DFF), Color(0xFF512DA8)])),
+                child: Row(
+                  children: [
+                    Expanded(child: Text('Earn\nUp to $cap\ncoins\nto shop', style: const TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w900, height: 1.02))),
+                    Container(
+                      width: 128,
+                      height: 128,
+                      decoration: const BoxDecoration(shape: BoxShape.circle, gradient: SweepGradient(colors: [Color(0xFFE53935), Color(0xFFFFC107), Color(0xFF6A1B9A), Color(0xFFE53935)])),
+                      alignment: Alignment.center,
+                      child: Container(
+                        width: 46,
+                        height: 46,
+                        alignment: Alignment.center,
+                        decoration: const BoxDecoration(color: Color(0xFFFFC107), shape: BoxShape.circle),
+                        child: const Text('N', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18)),
                       ),
-                      const SizedBox(height: 12),
-                      for (var i = 0; i < rows.length; i++)
-                        _EarnBanner(
-                          title: '${rows[i]['title']}',
-                          coins: sInt(rows[i]['coins']),
-                          flip: i.isOdd,
-                          onTap: () {
-                            final go = _dest('${rows[i]['id']}');
-                            if (go != null) go(context);
-                          },
-                        ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-            ),
+              const SizedBox(height: 12),
+              for (var i = 0; i < rows.length; i++)
+                _EarnBanner(
+                  title: '${rows[i]['title']}',
+                  coins: sInt(rows[i]['coins']),
+                  flip: i.isOdd,
+                  onTap: () {
+                    final go = _dest('${rows[i]['id']}');
+                    if (go != null) go(context);
+                  },
+                ),
+              const SizedBox(height: 8),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.bolt, color: Color(0xFFFFC107)),
+                  Text('  Explore more with coins  ', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+                  Icon(Icons.bolt, color: Color(0xFFFFC107)),
+                ],
+              ),
+            ],
           ),
         );
       },
