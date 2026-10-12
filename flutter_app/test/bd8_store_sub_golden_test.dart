@@ -10,6 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/screens/store.dart';
+import 'package:nowssb/screens/subscription.dart';
 import 'package:nowssb/widgets/page_shell.dart';
 
 import 'fake_video_platform.dart';
@@ -22,6 +23,7 @@ void main() {
     'nwsb_terms_meaning': '1',
     'nwsb_terms_signature': '1',
     'nwsb_terms_ebooks': '1',
+    'nwsb_terms_subscription': '1',
   });
 
   setUpAll(() async {
@@ -89,6 +91,9 @@ void main() {
   final pages = <String, Widget Function()>{
     'atelier': () => const WordAtelierScreen(),
     'meanings': () => const MeaningStoreScreen(),
+    'signature': () => const SignatureStoreScreen(),
+    'ebooks': () => const EbooksStoreScreen(),
+    'plans': () => const SubscriptionScreen(),
   };
   for (final w in [320.0, 390.0]) {
     for (final k in [1.0, 1.3, 2.0]) {
@@ -149,6 +154,16 @@ void main() {
         }
       });
       await tester.pump(const Duration(milliseconds: 200));
+      // Plans shows its research-proposal terms sheet first; agree to it.
+      final agree = find.textContaining('I Agree', findRichText: true);
+      if (agree.evaluate().isNotEmpty) {
+        await tester.tap(agree.first);
+        for (var i = 0; i < 4; i++) {
+          await tester.runAsync(
+              () => Future<void>.delayed(const Duration(milliseconds: 100)));
+          await tester.pump(const Duration(milliseconds: 300));
+        }
+      }
       restore();
       await expectLater(find.byType(MaterialApp),
           matchesGoldenFile('goldens/store-sub-$name.png'));

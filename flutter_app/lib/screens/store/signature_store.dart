@@ -293,7 +293,7 @@ class _SignatureBody extends StatelessWidget {
             ],
           ),
         ]),
-        const SizedBox(height: 18),
+        const SizedBox(height: 28),
         LSection('info', 'About signatures', Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -338,7 +338,7 @@ class _SignatureBody extends StatelessWidget {
           margin: const EdgeInsets.only(bottom: 40),
         ))),
         const LSection('mix', 'Banner mix', StoreTextCap(child: BannerMix(seed: 0))),
-        const SizedBox(height: 12),
+        const SizedBox(height: 24),
         LSection('promo3', 'Promo banner 2', StoreTextCap(child: ColoredSplitPromoBanner(
           spec: SplitPromoExtras.at(11, onTap: () => openRequestWords(context)),
         ))),
@@ -346,7 +346,10 @@ class _SignatureBody extends StatelessWidget {
           text:
               'Signatures are one-of-a-kind. Owned once, never restocked. For educational and wellness purposes only.',
         )),
-      ]),
+      ],
+          // Brief B (calm): the hype row is retired; ships off, admin can
+          // re-enable it.
+          hiddenByDefault: const {'hype'}),
     );
   }
 }
