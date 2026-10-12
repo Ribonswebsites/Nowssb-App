@@ -79,7 +79,6 @@ class NotificationsSettingsPage extends StatelessWidget {
                             ),
                     )),
                     const SizedBox(height: 12),
-                    const LSection('banners', 'Banner mix', BannerMix(seed: 0)),
                     const SizedBox(height: 6),
                     if (store.feed.isEmpty)
                       const _SettingsEmpty()

@@ -205,14 +205,6 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                       ],
                     ),
                   )),
-              const SizedBox(height: 8),
-              LSection(
-                  'promo',
-                  'Promo banner',
-                  ColoredSplitPromoBanner(
-                    spec: SplitPromoExtras.at(13),
-                    margin: EdgeInsets.zero,
-                  )),
               const SizedBox(height: 18),
               LSection(
                   'search',
