@@ -220,10 +220,6 @@ class HomeMenuDrawer extends StatelessWidget {
                     children: [
                       if (!light)
                         _ProfileHeader(onTap: () => _goTab(context, 4)),
-                      BrandTopBanner(
-                        compact: true,
-                        onTap: () => _push(context, const SubscriptionScreen()),
-                      ),
                       const SizedBox(height: 8),
                       _SectionLabel('Practice', light: light),
                       _Group(
