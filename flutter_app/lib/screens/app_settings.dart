@@ -135,7 +135,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
       onBack: () => Navigator.of(context).maybePop(),
       slivers: [
         SliverPadding(
-          padding: EdgeInsets.fromLTRB(16, 0, 16, 40 + bottom),
+          padding: EdgeInsets.fromLTRB(22, 8, 22, 56 + bottom),
           sliver: SliverList.list(
             // Server-driven order (Admin → UI Editor); bundled order by default.
             children: layoutChildren(context, 'settings', [
@@ -145,7 +145,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                   NestedDarkWrap(
                     // Profile is a bottom-nav root — switch tab, don't push a second Profile.
                     onTap: () => NavScope.goTo(context, 4),
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(20),
                     child: Row(
                       children: [
                         Container(
@@ -153,15 +153,10 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                           height: 52,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            gradient: const LinearGradient(
-                              colors: [
-                                Color(0x22E8D5A3),
-                                Color(0x1CC8E8F5),
-                              ],
-                            ),
+                            color: Colors.black,
                             border: Border.all(
-                              color: const Color(0x40E8D5A3),
-                              width: 2,
+                              color: const Color(0x2EE8D5A3),
+                              width: 1,
                             ),
                           ),
                           child: const Icon(Icons.person_outline,
@@ -177,8 +172,9 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                                 'Your profile',
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w500,
+                                  letterSpacing: 0.2,
                                 ),
                               ),
                               const SizedBox(height: 2),
@@ -790,26 +786,26 @@ class _Sec extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 22),
+      padding: const EdgeInsets.only(bottom: 34),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.only(left: 4, bottom: 10),
+            padding: const EdgeInsets.only(left: 6, bottom: 12),
             child: EditableLabel(
               'app_settings.Sec',
               label,
               style: const TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1.6,
-                color: Color(0x73FFFFFF),
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                letterSpacing: 2.2,
+                color: Color(0x8CE8D5A3),
               ),
             ),
           ),
           HeavyGlassPanel(
-            padding: const EdgeInsets.fromLTRB(8, 10, 8, 10),
-            radius: 22,
+            padding: const EdgeInsets.fromLTRB(10, 12, 10, 12),
+            radius: 28,
             child: Column(children: children),
           ),
         ],
@@ -837,14 +833,14 @@ class _NavRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return NestedDarkWrap(
-      margin: EdgeInsets.only(bottom: last ? 0 : 8),
+      margin: EdgeInsets.only(bottom: last ? 0 : 10),
       onTap: onTap,
       child: Row(
         children: [
           Icon(icon,
               size: 22,
-              color: danger ? const Color(0xD9F87171) : NwsbColors.gold),
-          const SizedBox(width: 12),
+              color: danger ? const Color(0xD9F87171) : const Color(0xB3E8D5A3)),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -854,8 +850,8 @@ class _NavRow extends StatelessWidget {
                   title,
                   style: TextStyle(
                     color: danger ? const Color(0xD9F87171) : Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
                 if (sub != null) ...[
@@ -865,8 +861,9 @@ class _NavRow extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      color: Color(0x73FFFFFF),
-                      fontSize: 11,
+                      color: Color(0x80FFFFFF),
+                      fontSize: 12,
+                      height: 1.4,
                     ),
                   ),
                 ],
@@ -903,15 +900,15 @@ class _ToggleRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return NestedDarkWrap(
-      margin: EdgeInsets.only(bottom: last ? 0 : 8),
+      margin: EdgeInsets.only(bottom: last ? 0 : 10),
       onTap: () {
         HapticFeedback.selectionClick();
         onChanged(!value);
       },
       child: Row(
         children: [
-          Icon(icon, size: 22, color: NwsbColors.gold),
-          const SizedBox(width: 12),
+          Icon(icon, size: 22, color: const Color(0xB3E8D5A3)),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -921,8 +918,8 @@ class _ToggleRow extends StatelessWidget {
                   title,
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -930,8 +927,9 @@ class _ToggleRow extends StatelessWidget {
                   'app_settings.ToggleRow',
                   sub,
                   style: const TextStyle(
-                    color: Color(0x73FFFFFF),
-                    fontSize: 11,
+                    color: Color(0x80FFFFFF),
+                    fontSize: 12,
+                    height: 1.4,
                   ),
                 ),
               ],
@@ -970,12 +968,12 @@ class _PillRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return NestedDarkWrap(
-      margin: EdgeInsets.only(bottom: last ? 0 : 8),
+      margin: EdgeInsets.only(bottom: last ? 0 : 10),
       onTap: onTap,
       child: Row(
         children: [
-          Icon(icon, size: 22, color: NwsbColors.gold),
-          const SizedBox(width: 12),
+          Icon(icon, size: 22, color: const Color(0xB3E8D5A3)),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -985,8 +983,8 @@ class _PillRow extends StatelessWidget {
                   title,
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -994,8 +992,9 @@ class _PillRow extends StatelessWidget {
                   'app_settings.PillRow',
                   sub,
                   style: const TextStyle(
-                    color: Color(0x73FFFFFF),
-                    fontSize: 11,
+                    color: Color(0x80FFFFFF),
+                    fontSize: 12,
+                    height: 1.4,
                   ),
                 ),
               ],

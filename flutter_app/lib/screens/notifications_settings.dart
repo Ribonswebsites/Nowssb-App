@@ -27,7 +27,7 @@ class NotificationsSettingsPage extends StatelessWidget {
       onBack: () => Navigator.of(context).maybePop(),
       slivers: [
         SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.fromLTRB(22, 8, 22, 40),
           sliver: SliverToBoxAdapter(
             child: ListenableBuilder(
               listenable: NotifStore.instance,
@@ -88,14 +88,14 @@ class NotificationsSettingsPage extends StatelessWidget {
                     const LSection('kinds', 'What you get', _SecHead(label: 'What you get')),
                     for (final g in NotifStore.groups) ...[
                       Padding(
-                        padding: const EdgeInsets.only(left: 4, top: 16, bottom: 8),
+                        padding: const EdgeInsets.only(left: 6, top: 22, bottom: 10),
                         child: Text(
                           g.name.toUpperCase(),
                           style: const TextStyle(
-                            fontSize: 9,
-                            fontWeight: FontWeight.w700,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
                             letterSpacing: 2,
-                            color: Color(0x99E8D5A3),
+                            color: Color(0x66FFFFFF),
                           ),
                         ),
                       ),
@@ -133,17 +133,15 @@ class _MasterCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(top: 4, bottom: 6),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(top: 8, bottom: 14),
+      padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        color: on
-            ? const Color(0x12E8D5A3)
-            : const Color(0x0DFFFFFF),
-        borderRadius: BorderRadius.circular(18),
+        color: const Color(0xD9000000),
+        borderRadius: BorderRadius.circular(28),
         border: Border.all(
           color: on
-              ? const Color(0x52E8D5A3)
-              : const Color(0x1AFFFFFF),
+              ? const Color(0x33E8D5A3)
+              : const Color(0x14FFFFFF),
         ),
       ),
       child: Row(
@@ -167,7 +165,7 @@ class _MasterCard extends StatelessWidget {
               color: on ? NwsbColors.goldLight : const Color(0x8CFFFFFF),
             ),
           ),
-          const SizedBox(width: 13),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -175,8 +173,9 @@ class _MasterCard extends StatelessWidget {
                 const EditableLabel('notifications_settings.MasterCard',
                   'All Notifications',
                   style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
+                    fontSize: 17,
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: 0.2,
                     color: Colors.white,
                   ),
                 ),
@@ -209,16 +208,16 @@ class _SecHead extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 22, bottom: 10),
+      padding: const EdgeInsets.only(top: 30, bottom: 12),
       child: Row(
         children: [
           Text(
             label.toUpperCase(),
             style: const TextStyle(
-              fontSize: 9,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 2.4,
-              color: Color(0x61FFFFFF),
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
+              letterSpacing: 2.2,
+              color: Color(0x8CE8D5A3),
             ),
           ),
           const Spacer(),
@@ -288,16 +287,16 @@ class _FeedList extends StatelessWidget {
     final shown = feed.length < _preview ? feed.length : _preview;
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0x0AFFFFFF),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0x17FFFFFF)),
+        color: const Color(0xD9000000),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: const Color(0x12FFFFFF)),
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(
         children: [
           for (var i = 0; i < shown; i++) ...[
             if (i > 0)
-              const Divider(height: 1, color: Color(0x0FFFFFFF)),
+              const Divider(height: 1, indent: 18, endIndent: 18, color: Color(0x0FFFFFFF)),
             _FeedRow(
               item: feed[i],
               label: store.labelOf(feed[i].type),
@@ -305,7 +304,7 @@ class _FeedList extends StatelessWidget {
             ),
           ],
           if (feed.length > shown) ...[
-            const Divider(height: 1, color: Color(0x0FFFFFFF)),
+            const Divider(height: 1, indent: 18, endIndent: 18, color: Color(0x0FFFFFFF)),
             InkWell(
               onTap: () => showNotificationsSheet(context),
               child: Padding(
@@ -350,7 +349,7 @@ class _FeedRow extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -438,16 +437,16 @@ class _KindGroup extends StatelessWidget {
       opacity: masterOn ? 1 : 0.42,
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0x0AFFFFFF),
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: const Color(0x17FFFFFF)),
+          color: const Color(0xD9000000),
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: const Color(0x12FFFFFF)),
         ),
         clipBehavior: Clip.antiAlias,
         child: Column(
           children: [
             for (var i = 0; i < group.items.length; i++) ...[
               if (i > 0)
-                const Divider(height: 1, color: Color(0x0FFFFFFF)),
+                const Divider(height: 1, indent: 18, endIndent: 18, color: Color(0x0FFFFFFF)),
               _KindRow(
                 kind: group.items[i],
                 isOn: masterOn && !off.contains(group.items[i].k),
@@ -475,7 +474,7 @@ class _KindRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
       child: Row(
         children: [
           _IconBox(url: NotifIcons.urlFor(kind.k)),
@@ -487,8 +486,8 @@ class _KindRow extends StatelessWidget {
                 Text(
                   kind.label,
                   style: const TextStyle(
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
                     color: Colors.white,
                   ),
                 ),
@@ -496,9 +495,9 @@ class _KindRow extends StatelessWidget {
                 Text(
                   kind.sub,
                   style: const TextStyle(
-                    fontSize: 11,
+                    fontSize: 12,
                     fontWeight: FontWeight.w300,
-                    color: Color(0x6BFFFFFF),
+                    color: Color(0x80FFFFFF),
                     height: 1.4,
                   ),
                 ),
@@ -556,13 +555,13 @@ class _NtSwitch extends StatelessWidget {
         alignment: on ? Alignment.centerRight : Alignment.centerLeft,
         decoration: BoxDecoration(
           color: on
-              ? const Color(0xE6E8D5A3)
-              : const Color(0x1AFFFFFF),
+              ? const Color(0xB3E8D5A3)
+              : const Color(0x14FFFFFF),
           borderRadius: BorderRadius.circular(999),
           border: Border.all(
             color: on
-                ? const Color(0xF2E8D5A3)
-                : const Color(0x29FFFFFF),
+                ? const Color(0x00000000)
+                : const Color(0x1FFFFFFF),
           ),
         ),
         child: Container(
