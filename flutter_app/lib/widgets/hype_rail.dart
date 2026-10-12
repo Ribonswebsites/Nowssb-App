@@ -221,7 +221,9 @@ class NowssbHypeRail extends StatelessWidget {
     final spacing = layout.spacing ?? 12;
     final rankGutter = (posterW * 0.34).clamp(44.0, 58.0);
     final tileW = posterW + rankGutter;
-    const textBlock = 72.0; // title + subtitle + hype
+    // Title + subtitle + hype at 1.0x. Grows with the user's text scale so
+    // the block never overflows at large accessibility sizes (unchanged at 1.0).
+    final textBlock = MediaQuery.textScalerOf(context).scale(72.0);
     final stackH = posterH + 16;
     final listH = layout.height ?? (stackH + textBlock);
     final pad = layout.padding ?? const EdgeInsets.only(bottom: 16);

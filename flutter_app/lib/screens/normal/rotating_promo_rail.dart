@@ -41,8 +41,6 @@ class NormalPromoRail extends StatefulWidget {
 
 class _NormalPromoRailState extends State<NormalPromoRail>
     with SingleTickerProviderStateMixin {
-  /// 0 = grid, 1 = Store, 2 = Player, 3 = Earn
-  var _page = 0;
   Timer? _cycle;
 
   late final AnimationController _motion = AnimationController(
@@ -70,8 +68,6 @@ class _NormalPromoRailState extends State<NormalPromoRail>
           onTap: widget.onEarn,
         ),
       ];
-
-  static const _pageCount = 4;
 
   @override
   void initState() {
