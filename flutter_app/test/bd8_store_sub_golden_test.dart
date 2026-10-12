@@ -4,11 +4,13 @@ library;
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/screens/store.dart';
+import 'package:nowssb/widgets/page_shell.dart';
 
 import 'fake_video_platform.dart';
 
@@ -87,6 +89,44 @@ void main() {
   final pages = <String, Widget Function()>{
     'atelier': () => const WordAtelierScreen(),
   };
+  for (final w in [320.0, 390.0]) {
+    for (final k in [1.0, 1.3, 2.0]) {
+      testWidgets('store sub header: no clipped title/subtitle @${w}px x$k',
+          (tester) async {
+        await pump(tester, const WordAtelierScreen(), Size(w, 844), k);
+        restore();
+        final clipped = <String>[];
+        var seen = 0;
+        final header = find.byType(PageShell);
+        for (final e in find
+            .descendant(of: header, matching: find.text('NowssB Store'))
+            .evaluate()
+            .followedBy(find
+                .byWidgetPredicate((w) =>
+                    w is Text && w.data == 'The Word Atelier' && w.maxLines == 2)
+                .evaluate())) {
+          seen++;
+          final ro = e.renderObject;
+          if (ro is RenderParagraph && ro.didExceedMaxLines) {
+            clipped.add(ro.text.toPlainText());
+          }
+          // A mid-word break shows up as a 3+ line title.
+          if (ro is RenderParagraph) {
+            final lines = ro.getBoxesForSelection(TextSelection(
+                    baseOffset: 0, extentOffset: ro.text.toPlainText().length))
+                .map((b) => b.top.round())
+                .toSet()
+                .length;
+            if (lines > 2) clipped.add('${ro.text.toPlainText()} x$lines');
+          }
+        }
+        expect(seen, 2);
+        expect(clipped, isEmpty);
+        await tester.pumpWidget(const SizedBox());
+        await tester.pump(const Duration(seconds: 11));
+      });
+    }
+  }
   pages.forEach((name, build) {
     testWidgets('store sub $name golden 390x844', (tester) async {
       await pump(tester, build(), const Size(390, 844), 1.0);

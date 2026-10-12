@@ -92,12 +92,13 @@ class _PageShellState extends State<PageShell> {
   /// narrow phone (or with large text) that left the title only a few pixels
   /// and overflowed the row, so the actions get their own row above the title.
   Widget _header(BuildContext context, BoxConstraints c) {
-    final scale = MediaQuery.textScalerOf(context).scale(14) / 14;
     final plain = widget.plain && widget.canvas == null;
     final titleColor = plain ? NwsbColors.ink : Colors.white;
     final subColor = plain ? const Color(0xFF5C564E) : const Color(0xCCFFFFFF);
-    final stacked = widget.onStorePicker != null &&
-        (c.maxWidth < 340 || scale > 1.15);
+    // Store pages always stack: the bag bar + Stores pill took so much of
+    // the row that even at 390px "NowssB Store" broke mid-word. On their own
+    // row the title and subtitle get the full width at any text scale.
+    final stacked = widget.onStorePicker != null;
     final back = widget.onBack == null
         ? null
         : GestureDetector(
@@ -193,8 +194,7 @@ class _PageShellState extends State<PageShell> {
           const SizedBox(height: 4),
           Text(
             widget.subtitle!,
-            maxLines: 1,
-            softWrap: false,
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontSize: 14,
