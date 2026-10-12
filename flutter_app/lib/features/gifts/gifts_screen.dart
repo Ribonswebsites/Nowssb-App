@@ -4,19 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../theme/tokens.dart';
-import '../../widgets/banner_mix.dart';
-import '../../widgets/brand_top_banner.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
 import '../economy/money.dart';
 import '../economy/play_billing.dart';
-import '../../widgets/four_banners.dart';
 import '../../widgets/hype_rail.dart';
 import '../../admin/template/editable.dart';
 import '../economy/reward_fx.dart';
 import 'gift_show.dart';
+import 'gift_unwrap.dart';
 import '../programs/program_kit.dart';
 import '../programs/program_heroes.dart';
 import '../programs/program_router.dart';
@@ -412,14 +410,7 @@ class _GiftsScreenState extends State<GiftsScreen> {
           const SizedBox(height: 8),
           const GiftPlanGrid(),
           const SizedBox(height: 12),
-          const GiftOpenCard(),
-          const SizedBox(height: 12),
-          BrandTopBanner(
-            bare: true,
-            title: 'NowssB Gifts',
-            mark: NwsbMarks.gift,
-            onTap: () => showGiftCardSheet(context, kGiftCatalog.first.id),
-          ),
+          const GiftUnwrapReveal(child: GiftOpenCard()),
           const SizedBox(height: 12),
           ColoredSplitPromoBanner(
             margin: EdgeInsets.zero,
@@ -433,15 +424,6 @@ class _GiftsScreenState extends State<GiftsScreen> {
             ),
           ),
           const SizedBox(height: 12),
-          const FourBanners(
-            current: Programme.gifts,
-            splitTitle: 'NowssB Gifts',
-            splitCta: 'Send a gift',
-            blackTitle: 'A real purchase',
-            blackSub: 'The code exists only after Play accepts it.',
-          ),
-          const SizedBox(height: 12),
-          const BannerMix(seed: 5),
           const SizedBox(height: 16),
           ProgramTabsBlock(spec: kGiftsSpec, initialTab: start, scrollTo: start != null, goRef: _go, showDisclaimer: false),
         ],
