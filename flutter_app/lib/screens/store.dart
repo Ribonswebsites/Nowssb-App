@@ -318,7 +318,16 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
                 'plans', 'Subscription plans', [items[16], items[17]]),
             LSection('disclaimer', 'Disclaimer', items[18]),
             LSection('credits', 'Credits', items[19]),
-          ]);
+          ],
+            // BD-8b: the Spotlight banners now open these stores, so the old
+            // department sections ship turned off. Admin can re-enable them.
+            hiddenByDefault: const {
+                'atelier',
+                'meaning',
+                'signature',
+                'ebooks',
+                'plans'
+              });
     return Scaffold(
       backgroundColor: NwsbColors.deep,
       body: Stack(
@@ -1139,22 +1148,6 @@ class _SpotlightBanner extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text(dept.eyebrow,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                                color: Color(0xB3FFFFFF),
-                                fontSize: 10,
-                                letterSpacing: 2.4)),
-                        const SizedBox(height: 6),
-                        Text(dept.title,
-                            textAlign: TextAlign.center,
-                            maxLines: 2,
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                height: 1.25,
-                                fontWeight: FontWeight.w400)),
-                        const SizedBox(height: 14),
                         Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 22, vertical: 9),

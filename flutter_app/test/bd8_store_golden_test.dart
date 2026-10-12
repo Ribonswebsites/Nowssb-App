@@ -106,7 +106,16 @@ void main() {
       (tester) async {
     final errors =
         await pump(tester, const StoreScreen(), const Size(320, 568), 1.3);
-    await scrollTo(tester, find.text('Subscription Plans').first);
+    final st = tester.state<ScrollableState>(find
+        .byWidgetPredicate(
+            (w) => w is Scrollable && w.axisDirection == AxisDirection.down)
+        .first);
+    for (var g = 0; g < 100; g++) {
+      final p = st.position;
+      if (p.pixels >= p.maxScrollExtent - 1) break;
+      p.jumpTo((p.pixels + 300).clamp(0, p.maxScrollExtent));
+      await tester.pump(const Duration(milliseconds: 50));
+    }
     restore();
     expect(errors, isEmpty);
   });
