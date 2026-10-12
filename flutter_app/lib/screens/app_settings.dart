@@ -54,6 +54,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
 
   bool _screenWake = true;
   bool _appearDiscover = true;
+  int _tab = 0;
 
   @override
   void initState() {
@@ -125,9 +126,67 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
     UiScope.watch(context); // the Admin row follows the admin flag live
     final s = Settings.instance;
     final bottom = MediaQuery.paddingOf(context).bottom;
+    final isAdmin = AdminState.instance.isAdmin;
 
-    // Same shell as every settings sub-page (Notifications, Fashion Plus,
-    // Quick access, Widgets): backdrop, white round back, glass sections.
+    // v4 (Ribon 8:22 PM): CLiQ Perks layout (member hero, one profile
+    // action, two underlined tabs, rows) in NowssB's original colours, glass
+    // and film. Titles only. Every setting,
+    // toggle and route from before is kept.
+    final mine = <Widget>[
+      if (_match('Notifications'))
+        _Row(icon: Icons.notifications_none_rounded, title: 'Notifications', onTap: () => _push(const NotificationsSettingsPage())),
+      if (_match('Player Settings'))
+        _Row(icon: Icons.tune_rounded, title: 'Player', onTap: () => _push(const PlayerSettingsScreen())),
+      if (_match('Quick Access'))
+        _Row(icon: Icons.dashboard_customize_outlined, title: 'Quick access', onTap: () => _push(const QuickAccessScreen())),
+      if (_match('Player Guide'))
+        _Row(icon: Icons.menu_book_outlined, title: 'Player Guide', onTap: () {
+          // Decode the opening slide and orb badges during the transition.
+          OnboardingWarmup.playerGuide(context, firstOnly: true);
+          _push(PlayerGuideScreen(onDone: () => Navigator.of(context).maybePop()));
+        }),
+      if (_match('Hero header'))
+        _Row(icon: Icons.view_agenda_outlined, title: 'Hero header', onTap: () => _push(const WidgetsPage())),
+      if (_match('Fashion Plus'))
+        _Row(icon: Icons.auto_awesome_outlined, title: 'Fashion Plus', onTap: () => _push(const FashionPlusScreen())),
+      if (_match('Today\'s quote'))
+        _Row(icon: Icons.format_quote_rounded, title: 'Today\'s quote', onTap: () => _push(const QuotesWeekScreen())),
+      if (_match('Screen'))
+        _Row(icon: Icons.light_mode_outlined, title: 'Screen awake',
+            onTap: () => _setWake(!_screenWake),
+            trailing: _Toggle(on: _screenWake, onTap: () => _setWake(!_screenWake))),
+      if (_match('Nav'))
+        _Row(icon: Icons.space_dashboard_outlined, title: 'Nav bar',
+            onTap: _cycleNav,
+            trailing: _Chip(s.navColor == 'glass' ? 'Glass' : 'Black')),
+    ];
+    final account = <Widget>[
+      if (_match('Appear'))
+        _Row(icon: Icons.travel_explore, title: 'Appear in Discover',
+            onTap: () => _setDiscover(!_appearDiscover),
+            trailing: _Toggle(on: _appearDiscover, onTap: () => _setDiscover(!_appearDiscover))),
+      if (_match('Request') || _match('Word'))
+        _Row(icon: Icons.edit_note_outlined, title: 'Request words', onTap: () => openRequestWords(context)),
+      if (_match('Cached'))
+        _Row(icon: Icons.cleaning_services_outlined, title: 'Clear cache', onTap: _clearCache),
+      if (_match('Clear Practice') || _match('history'))
+        _Row(icon: Icons.history_toggle_off_rounded, title: 'Clear history', onTap: () => _confirmClearHistory(), danger: true),
+      // Only for an account the server marks as admin (admins/{uid}).
+      if (isAdmin && (_match('Admin') || _match('Template') || _match('Edit')))
+        _Row(icon: Icons.admin_panel_settings_outlined, title: 'Admin', onTap: () => openAdminHome(context)),
+      if (_match('Privacy'))
+        _Row(icon: Icons.lock_outline, title: 'Privacy', onTap: () => _openUrl('https://nowssb.com/privacy')),
+      if (_match('Terms'))
+        _Row(icon: Icons.description_outlined, title: 'Terms', onTap: () => _openUrl('https://nowssb.com/terms')),
+      if (_match('About'))
+        _Row(icon: Icons.info_outline, title: 'About', onTap: _openAbout),
+      if (_match('Sign Out'))
+        _Row(icon: Icons.logout_rounded, title: 'Sign out', onTap: _signOut),
+      if (_match('Delete'))
+        _Row(icon: Icons.person_remove_outlined, title: 'Delete account', onTap: _deleteAccount, danger: true),
+    ];
+    final rows = _q.isNotEmpty ? [...mine, ...account] : (_tab == 0 ? mine : account);
+
     return PageShell(
       eyebrow: 'NowssB',
       title: 'Settings',
@@ -135,331 +194,35 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
       onBack: () => Navigator.of(context).maybePop(),
       slivers: [
         SliverPadding(
-          padding: EdgeInsets.fromLTRB(22, 8, 22, 56 + bottom),
+          padding: EdgeInsets.fromLTRB(16, 0, 16, 40 + bottom),
           sliver: SliverList.list(
             // Server-driven order (Admin → UI Editor); bundled order by default.
             children: layoutChildren(context, 'settings', [
-              LSection(
-                  'profile',
-                  'Profile card',
-                  NestedDarkWrap(
-                    // Profile is a bottom-nav root — switch tab, don't push a second Profile.
-                    onTap: () => NavScope.goTo(context, 4),
-                    padding: const EdgeInsets.all(20),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 52,
-                          height: 52,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.black,
-                            border: Border.all(
-                              color: const Color(0x2EE8D5A3),
-                              width: 1,
-                            ),
-                          ),
-                          child: const Icon(Icons.person_outline,
-                              color: NwsbColors.gold),
-                        ),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const EditableLabel(
-                                'app_settings.AppSettingsScreen',
-                                'Your profile',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w500,
-                                  letterSpacing: 0.2,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              const EditableLabel(
-                                'app_settings.AppSettingsScreen',
-                                'Account · plan · edit',
-                                style: TextStyle(
-                                  color: Color(0x85FFFFFF),
-                                  fontSize: 12,
-                                ),
-                              ),
-                              const SizedBox(height: 7),
-                              ListenableBuilder(
-                                listenable: EconomyMirror.instance,
-                                builder: (context, _) {
-                                  final plan = EconomyMirror.instance.plan;
-                                  final label = plan.trim().isEmpty
-                                      ? 'FREE'
-                                      : plan.toUpperCase();
-                                  return _Badge(label);
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                        const Icon(Icons.chevron_right,
-                            color: Color(0x38FFFFFF), size: 18),
-                      ],
-                    ),
-                  )),
+              // Profile is a bottom-nav root: switch tab, don't push.
+              LSection('profile', 'Member card', _MemberHero(onProfile: () => NavScope.goTo(context, 4))),
               const SizedBox(height: 18),
-              LSection(
-                  'search',
-                  'Search settings',
-                  Container(
-                    height: 48,
-                    margin: const EdgeInsets.only(bottom: 22),
-                    padding: const EdgeInsets.symmetric(horizontal: 14),
-                    decoration: BoxDecoration(
-                      color: const Color(0x14FFFFFF),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: const Color(0x24FFFFFF)),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.search,
-                            size: 18, color: Color(0x59FFFFFF)),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: TextField(
-                            controller: _search,
-                            style: const TextStyle(
-                                color: Colors.white, fontSize: 14),
-                            decoration: const InputDecoration(
-                              hintText: 'Search settings...',
-                              hintStyle: TextStyle(color: Color(0x59FFFFFF)),
-                              border: InputBorder.none,
-                              isDense: true,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  )),
-              if (_match('Player Guide') ||
-                  _match('Hero header') ||
-                  _match('Fashion Plus') ||
-                  _match('Quick Access') ||
-                  _match('Today\'s quote') ||
-                  _match('Player Settings'))
-                LSection(
-                    'intro-appearance',
-                    'Intro & Appearance',
-                    _Sec(
-                      label: 'INTRO & APPEARANCE',
-                      children: [
-                        if (_match('Player Guide'))
-                          _NavRow(
-                            icon: Icons.menu_book_outlined,
-                            title: 'Player Guide',
-                            sub: 'Replay the player setup pages',
-                            onTap: () {
-                              // Decode the opening slide and orb badges
-                              // during the route transition.
-                              OnboardingWarmup.playerGuide(context,
-                                  firstOnly: true);
-                              _push(
-                                PlayerGuideScreen(
-                                  onDone: () =>
-                                      Navigator.of(context).maybePop(),
-                                ),
-                              );
-                            },
-                          ),
-                        if (_match('Hero header'))
-                          _NavRow(
-                            icon: Icons.view_agenda_outlined,
-                            title: 'Hero header & widgets',
-                            sub: 'TV · full · plain · shortcuts',
-                            onTap: () => _push(const WidgetsPage()),
-                          ),
-                        if (_match('Fashion Plus'))
-                          _NavRow(
-                            icon: Icons.auto_awesome_outlined,
-                            title: 'Fashion Plus',
-                            sub: s.fashionPlus
-                                ? 'Motion on'
-                                : 'Still backgrounds',
-                            onTap: () => _push(const FashionPlusScreen()),
-                          ),
-                        if (_match('Quick Access'))
-                          _NavRow(
-                            icon: Icons.dashboard_customize_outlined,
-                            title: 'Quick Access',
-                            sub: 'Customize bottom navigation',
-                            onTap: () => _push(const QuickAccessScreen()),
-                          ),
-                        if (_match('Today\'s quote'))
-                          _NavRow(
-                            icon: Icons.format_quote_rounded,
-                            title: 'Today\'s quote',
-                            sub: s.todayQuote.trim().isEmpty
-                                ? 'Quotes to live by this week'
-                                : s.todayQuote.trim(),
-                            onTap: () => _push(const QuotesWeekScreen()),
-                          ),
-                        if (_match('Player Settings'))
-                          _NavRow(
-                            icon: Icons.tune_rounded,
-                            title: 'Player Settings',
-                            sub: 'AURA equalizer · quality · sleep',
-                            last: true,
-                            onTap: () => _push(const PlayerSettingsScreen()),
-                          ),
-                      ],
-                    )),
-              if (_match('Screen') || _match('Nav'))
-                LSection(
-                    'device',
-                    'Device',
-                    _Sec(
-                      label: 'DEVICE',
-                      children: [
-                        if (_match('Screen'))
-                          _ToggleRow(
-                            icon: Icons.phone_android,
-                            title: 'Keep Screen Awake',
-                            sub: 'Stay on while NowssB is open',
-                            value: _screenWake,
-                            onChanged: (v) {
-                              setState(() => _screenWake = v);
-                              _saveBool('ss_screen_wake', v);
-                              DeviceFlags.keepAwake(v);
-                            },
-                          ),
-                        if (_match('Nav'))
-                          _PillRow(
-                            icon: Icons.space_dashboard_outlined,
-                            title: 'Nav Bar',
-                            sub: s.navColor == 'glass' ? 'Glass' : 'Black',
-                            pill: s.navColor == 'glass' ? 'Glass' : 'Black',
-                            last: true,
-                            onTap: _cycleNav,
-                          ),
-                      ],
-                    )),
-              if (_match('Notification'))
-                LSection(
-                    'notifications',
-                    'Notifications',
-                    _Sec(
-                      label: 'NOTIFICATIONS',
-                      children: [
-                        _NavRow(
-                          icon: Icons.notifications_none,
-                          title: 'Notifications',
-                          sub: 'Daily words, streak and today’s offer',
-                          last: true,
-                          onTap: () => _push(const NotificationsSettingsPage()),
-                        ),
-                      ],
-                    )),
-              if (_match('Appear') || _match('Privacy') || _match('Delete'))
-                LSection(
-                    'privacy-social',
-                    'Privacy & Social',
-                    _Sec(
-                      label: 'PRIVACY & SOCIAL',
-                      children: [
-                        if (_match('Appear'))
-                          _ToggleRow(
-                            icon: Icons.travel_explore,
-                            title: 'Appear in Discover',
-                            sub: 'Others can find your profile',
-                            value: _appearDiscover,
-                            onChanged: _setDiscover,
-                          ),
-                        if (_match('Privacy'))
-                          _NavRow(
-                            icon: Icons.lock_outline,
-                            title: 'Privacy Policy',
-                            sub: 'What NowssB keeps and why',
-                            onTap: () => _openUrl('https://nowssb.com/privacy'),
-                          ),
-                        if (_match('Delete'))
-                          _NavRow(
-                            icon: Icons.person_remove_outlined,
-                            title: 'Delete Account',
-                            sub: 'Erase your account and its data',
-                            last: true,
-                            danger: true,
-                            onTap: _deleteAccount,
-                          ),
-                      ],
-                    )),
-              if (_match('Cached') ||
-                  _match('Clear Practice') ||
-                  _match('About') ||
-                  _match('Terms') ||
-                  _match('Sign Out'))
-                LSection(
-                    'app-about',
-                    'App & About',
-                    _Sec(
-                      label: 'APP & ABOUT',
-                      children: [
-                        if (_match('Cached'))
-                          _NavRow(
-                            icon: Icons.cleaning_services_outlined,
-                            title: 'Cached Data',
-                            sub: 'Clear temporary media cache',
-                            onTap: _clearCache,
-                          ),
-                        if (_match('Clear Practice'))
-                          _NavRow(
-                            icon: Icons.delete_outline,
-                            title: 'Clear Practice History',
-                            sub: 'Remove session logs — cannot be undone',
-                            danger: true,
-                            onTap: () => _confirmClearHistory(),
-                          ),
-                        if (_match('Request') || _match('Word'))
-                          _NavRow(
-                            icon: Icons.edit_note_outlined,
-                            title: 'Request Words',
-                            sub: 'Ask the atelier for a new word',
-                            onTap: () => openRequestWords(context),
-                          ),
-                        // Only for an account the server marks as admin
-                        // (Firestore admins/{uid}) — see lib/admin.
-                        if (AdminState.instance.isAdmin &&
-                            (_match('Admin') ||
-                                _match('Template') ||
-                                _match('Edit')))
-                          _NavRow(
-                            icon: Icons.admin_panel_settings_outlined,
-                            title: 'Admin',
-                            sub: 'Words · quotes · requests · template editor',
-                            onTap: () => openAdminHome(context),
-                          ),
-                        if (_match('About'))
-                          _NavRow(
-                            icon: Icons.info_outline,
-                            title: 'About NowssB',
-                            sub: 'v2.6.0 · nowssb.com',
-                            onTap: _openAbout,
-                          ),
-                        if (_match('Terms'))
-                          _NavRow(
-                            icon: Icons.description_outlined,
-                            title: 'Terms of Service',
-                            sub: 'nowssb.com/terms',
-                            onTap: () => _openUrl('https://nowssb.com/terms'),
-                          ),
-                        if (_match('Sign Out'))
-                          _NavRow(
-                            icon: Icons.logout,
-                            title: 'Sign Out',
-                            sub: 'End this session',
-                            last: true,
-                            danger: true,
-                            onTap: _signOut,
-                          ),
-                      ],
-                    )),
+              LSection('tabs', 'Tabs', _Tabs(
+                index: _tab,
+                labels: const ['YOUR SETTINGS', 'ACCOUNT'],
+                onTap: (i) {
+                  HapticFeedback.selectionClick();
+                  setState(() => _tab = i);
+                },
+              )),
+              const SizedBox(height: 14),
+              LSection('search', 'Search settings', _SearchField(controller: _search)),
+              const SizedBox(height: 14),
+              LSection('rows', 'Settings', AnimatedSwitcher(
+                duration: const Duration(milliseconds: 280),
+                child: rows.isEmpty
+                    ? const SizedBox(key: ValueKey('none'), height: 1)
+                    : HeavyGlassPanel(
+                        key: ValueKey('$_tab$_q'),
+                        padding: const EdgeInsets.fromLTRB(8, 10, 8, 10),
+                        radius: 22,
+                        child: Column(children: rows),
+                      ),
+              )),
             ]),
           ),
         ),
@@ -467,6 +230,12 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
     );
   }
 
+  void _setWake(bool v) {
+    HapticFeedback.selectionClick();
+    setState(() => _screenWake = v);
+    _saveBool('ss_screen_wake', v);
+    DeviceFlags.keepAwake(v);
+  }
   Future<void> _clearCache() async {
     PaintingBinding.instance.imageCache.clear();
     PaintingBinding.instance.imageCache.clearLiveImages();
@@ -744,271 +513,233 @@ class _SignOutDialog extends StatelessWidget {
   }
 }
 
-class _Badge extends StatelessWidget {
-  const _Badge(this.label);
-  final String label;
+const _gold = NwsbColors.goldLight;
+
+/// CLiQ-style member hero in NowssB's own look: a frosted glass card over
+/// the page film, greeting, plan, the original gold-ringed avatar, and the
+/// page's single profile action.
+class _MemberHero extends StatelessWidget {
+  const _MemberHero({required this.onProfile});
+  final VoidCallback onProfile;
+
+  @override
+  Widget build(BuildContext context) {
+    String first = '';
+    try {
+      final n = FirebaseAuth.instance.currentUser?.displayName?.trim() ?? '';
+      if (n.isNotEmpty) first = n.split(' ').first;
+    } catch (_) {}
+    return HeavyGlassPanel(
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
+      radius: 26,
+      child: Column(
+        children: [
+          Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: const LinearGradient(colors: [Color(0x22E8D5A3), Color(0x1CC8E8F5)]),
+              border: Border.all(color: const Color(0x40E8D5A3), width: 2),
+            ),
+            child: const Icon(Icons.person_outline, color: NwsbColors.gold, size: 30),
+          ),
+          const SizedBox(height: 14),
+          Text(first.isEmpty ? 'Hello' : 'Hello $first',
+              style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 14)),
+          const SizedBox(height: 4),
+          ListenableBuilder(
+            listenable: EconomyMirror.instance,
+            builder: (context, _) {
+              final plan = EconomyMirror.instance.plan.trim();
+              return Text("You're a ${plan.isEmpty ? 'FREE' : plan.toUpperCase()} member",
+                  style: const TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w700));
+            },
+          ),
+          const SizedBox(height: 20),
+          NestedDarkWrap(
+            margin: EdgeInsets.zero,
+            radius: 999,
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 13),
+            onTap: onProfile,
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('Open profile',
+                    style: TextStyle(color: _gold, fontSize: 14.5, fontWeight: FontWeight.w700)),
+                SizedBox(width: 6),
+                Icon(Icons.arrow_forward_rounded, color: _gold, size: 17),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Tabs extends StatelessWidget {
+  const _Tabs({required this.index, required this.labels, required this.onTap});
+  final int index;
+  final List<String> labels;
+  final ValueChanged<int> onTap;
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: const Color(0x1AE8D5A3),
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: const Color(0x4DE8D5A3)),
+      decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Color(0x24FFFFFF)))),
+      child: Row(
+        children: [
+          for (var i = 0; i < labels.length; i++)
+            Expanded(
+              child: InkWell(
+                onTap: () => onTap(i),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      child: Text(labels[i],
+                          style: TextStyle(
+                            color: i == index ? Colors.white : const Color(0x73FFFFFF),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1.2,
+                          )),
+                    ),
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 260),
+                      height: 2,
+                      color: i == index ? NwsbColors.gold : const Color(0x00000000),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+        ],
       ),
-      child: EditableLabel(
-        'app_settings.Badge',
-        label,
-        style: const TextStyle(
-          fontSize: 9,
-          fontWeight: FontWeight.w800,
-          letterSpacing: 1.2,
-          color: NwsbColors.goldLight,
+    );
+  }
+}
+
+class _SearchField extends StatelessWidget {
+  const _SearchField({required this.controller});
+  final TextEditingController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    // Same field as the original Settings search.
+    return Container(
+      height: 48,
+      padding: const EdgeInsets.symmetric(horizontal: 14),
+      decoration: BoxDecoration(
+        color: const Color(0x14FFFFFF),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0x24FFFFFF)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.search, size: 18, color: Color(0x59FFFFFF)),
+          const SizedBox(width: 10),
+          Expanded(
+            child: TextField(
+              controller: controller,
+              style: const TextStyle(color: Colors.white, fontSize: 14),
+              decoration: const InputDecoration(
+                hintText: 'Search settings...',
+                hintStyle: TextStyle(color: Color(0x59FFFFFF)),
+                border: InputBorder.none,
+                isDense: true,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// A title-only row in the original nested dark wrap, with its own icon.
+class _Row extends StatelessWidget {
+  const _Row({required this.icon, required this.title, required this.onTap, this.trailing, this.danger = false});
+  final IconData icon;
+  final String title;
+  final VoidCallback onTap;
+  final Widget? trailing;
+  final bool danger;
+
+  @override
+  Widget build(BuildContext context) {
+    const red = Color(0xD9F87171);
+    return NestedDarkWrap(
+      margin: const EdgeInsets.only(bottom: 8),
+      onTap: onTap,
+      child: Row(
+        children: [
+          Icon(icon, size: 22, color: danger ? red : NwsbColors.gold),
+          const SizedBox(width: 14),
+          Expanded(
+            child: EditableLabel('app_settings.Row', title,
+                style: TextStyle(color: danger ? red : Colors.white, fontSize: 14.5, fontWeight: FontWeight.w700)),
+          ),
+          trailing ??
+              Icon(Icons.chevron_right, size: 16, color: danger ? const Color(0x80F87171) : const Color(0x55FFFFFF)),
+        ],
+      ),
+    );
+  }
+}
+
+class _Toggle extends StatelessWidget {
+  const _Toggle({required this.on, required this.onTap});
+  final bool on;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      toggled: on,
+      button: true,
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 240),
+          curve: Curves.easeOutCubic,
+          width: 46,
+          height: 26,
+          padding: const EdgeInsets.all(2),
+          alignment: on ? Alignment.centerRight : Alignment.centerLeft,
+          decoration: BoxDecoration(
+            color: on ? const Color(0xE6E8D5A3) : const Color(0x1AFFFFFF),
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(color: on ? const Color(0xF2E8D5A3) : const Color(0x29FFFFFF)),
+          ),
+          child: Container(
+            width: 20,
+            height: 20,
+            decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+          ),
         ),
       ),
     );
   }
 }
 
-class _Sec extends StatelessWidget {
-  const _Sec({required this.label, required this.children});
+class _Chip extends StatelessWidget {
+  const _Chip(this.label);
   final String label;
-  final List<Widget> children;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 34),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 6, bottom: 12),
-            child: EditableLabel(
-              'app_settings.Sec',
-              label,
-              style: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w500,
-                letterSpacing: 2.2,
-                color: Color(0x8CE8D5A3),
-              ),
-            ),
-          ),
-          HeavyGlassPanel(
-            padding: const EdgeInsets.fromLTRB(10, 12, 10, 12),
-            radius: 28,
-            child: Column(children: children),
-          ),
-        ],
+    // The original Nav Bar pill.
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: const Color(0x1AE8D5A3),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0x4DE8D5A3)),
       ),
-    );
-  }
-}
-
-class _NavRow extends StatelessWidget {
-  const _NavRow({
-    required this.icon,
-    required this.title,
-    this.sub,
-    required this.onTap,
-    this.last = false,
-    this.danger = false,
-  });
-  final IconData icon;
-  final String title;
-  final String? sub;
-  final VoidCallback onTap;
-  final bool last;
-  final bool danger;
-
-  @override
-  Widget build(BuildContext context) {
-    return NestedDarkWrap(
-      margin: EdgeInsets.only(bottom: last ? 0 : 10),
-      onTap: onTap,
-      child: Row(
-        children: [
-          Icon(icon,
-              size: 22,
-              color: danger ? const Color(0xD9F87171) : const Color(0xB3E8D5A3)),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                EditableLabel(
-                  'app_settings.NavRow',
-                  title,
-                  style: TextStyle(
-                    color: danger ? const Color(0xD9F87171) : Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                if (sub != null) ...[
-                  const SizedBox(height: 2),
-                  Text(
-                    sub!,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Color(0x80FFFFFF),
-                      fontSize: 12,
-                      height: 1.4,
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-          Icon(
-            Icons.chevron_right,
-            size: 16,
-            color: danger ? const Color(0x80F87171) : const Color(0x55FFFFFF),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ToggleRow extends StatelessWidget {
-  const _ToggleRow({
-    required this.icon,
-    required this.title,
-    required this.sub,
-    required this.value,
-    required this.onChanged,
-    this.last = false,
-  });
-  final IconData icon;
-  final String title;
-  final String sub;
-  final bool value;
-  final ValueChanged<bool> onChanged;
-  final bool last;
-
-  @override
-  Widget build(BuildContext context) {
-    return NestedDarkWrap(
-      margin: EdgeInsets.only(bottom: last ? 0 : 10),
-      onTap: () {
-        HapticFeedback.selectionClick();
-        onChanged(!value);
-      },
-      child: Row(
-        children: [
-          Icon(icon, size: 22, color: const Color(0xB3E8D5A3)),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                EditableLabel(
-                  'app_settings.ToggleRow',
-                  title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                EditableLabel(
-                  'app_settings.ToggleRow',
-                  sub,
-                  style: const TextStyle(
-                    color: Color(0x80FFFFFF),
-                    fontSize: 12,
-                    height: 1.4,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Switch.adaptive(
-            value: value,
-            onChanged: (v) {
-              HapticFeedback.selectionClick();
-              onChanged(v);
-            },
-            activeColor: NwsbColors.goldLight,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _PillRow extends StatelessWidget {
-  const _PillRow({
-    required this.icon,
-    required this.title,
-    required this.sub,
-    required this.pill,
-    required this.onTap,
-    this.last = false,
-  });
-  final IconData icon;
-  final String title;
-  final String sub;
-  final String pill;
-  final VoidCallback onTap;
-  final bool last;
-
-  @override
-  Widget build(BuildContext context) {
-    return NestedDarkWrap(
-      margin: EdgeInsets.only(bottom: last ? 0 : 10),
-      onTap: onTap,
-      child: Row(
-        children: [
-          Icon(icon, size: 22, color: const Color(0xB3E8D5A3)),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                EditableLabel(
-                  'app_settings.PillRow',
-                  title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                EditableLabel(
-                  'app_settings.PillRow',
-                  sub,
-                  style: const TextStyle(
-                    color: Color(0x80FFFFFF),
-                    fontSize: 12,
-                    height: 1.4,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: const Color(0x1AE8D5A3),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              pill,
-              style: const TextStyle(
-                color: NwsbColors.goldLight,
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        ],
-      ),
+      child: Text(label, style: const TextStyle(color: NwsbColors.goldLight, fontSize: 12, fontWeight: FontWeight.w700)),
     );
   }
 }
@@ -1078,3 +809,5 @@ class _ThemeCard extends StatelessWidget {
     );
   }
 }
+
+

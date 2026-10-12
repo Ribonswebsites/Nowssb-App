@@ -79,6 +79,7 @@ class NotificationsSettingsPage extends StatelessWidget {
                             ),
                     )),
                     const SizedBox(height: 12),
+                    const LSection('banners', 'Banner mix', BannerMix(seed: 0)),
                     const SizedBox(height: 6),
                     if (store.feed.isEmpty)
                       const _SettingsEmpty()
@@ -181,8 +182,8 @@ class _MasterCard extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   on
-                      ? 'You are receiving notifications'
-                      : 'Everything is muted',
+                      ? 'On'
+                      : 'Muted',
                   style: const TextStyle(
                     fontSize: 11.5,
                     fontWeight: FontWeight.w300,
@@ -257,7 +258,7 @@ class _SettingsEmpty extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           const EditableLabel('notifications_settings.SettingsEmpty',
-            'New updates land here — orders, messages, offers, your routine and everything else you have switched on below.',
+            'New updates land here.',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 11.5,
@@ -312,7 +313,7 @@ class _FeedList extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        'See all ${feed.length} in the bell',
+                        'See all ${feed.length}',
                         style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -488,16 +489,6 @@ class _KindRow extends StatelessWidget {
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
                     color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  kind.sub,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w300,
-                    color: Color(0x80FFFFFF),
-                    height: 1.4,
                   ),
                 ),
               ],
