@@ -2,6 +2,8 @@
 /// screens. Colours and card shapes follow those screens. The offers are NowssB.
 library;
 
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/material.dart';
 
 import '../../data/store_catalog.dart';
@@ -65,6 +67,38 @@ class ShopBar extends StatelessWidget implements PreferredSizeWidget {
   }
 }
 
+class _GlassPage extends StatelessWidget {
+  const _GlassPage({required this.wash, required this.bar, required this.child});
+  final Color wash;
+  final PreferredSizeWidget bar;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: wash,
+      appBar: bar,
+      body: Padding(
+        padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(22),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.62),
+                borderRadius: BorderRadius.circular(22),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.9)),
+              ),
+              child: child,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class CouponsFace extends StatefulWidget {
   const CouponsFace({super.key, this.scratch});
   final Widget? scratch;
@@ -116,10 +150,10 @@ class _CouponsFaceState extends State<CouponsFace> {
   @override
   Widget build(BuildContext context) {
     final list = _list;
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: const ShopBar(title: 'My Coupons', color: Colors.white, light: true),
-      body: Column(
+    return _GlassPage(
+      wash: const Color(0xFFD2B4F5),
+      bar: const ShopBar(title: 'My Coupons', color: Colors.white, light: true),
+      child: Column(
         children: [
           Expanded(
             child: ListView(
@@ -448,10 +482,10 @@ class _RewardsFaceState extends State<RewardsFace> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F6F8),
-      appBar: ShopBar(title: 'My Rewards', color: _blue, trailing: GestureDetector(onTap: widget.onCoupons, child: const Text('Add Coupon'))),
-      body: Column(
+    return _GlassPage(
+      wash: const Color(0xFF2874F0),
+      bar: ShopBar(title: 'My Rewards', color: _blue, trailing: GestureDetector(onTap: widget.onCoupons, child: const Text('Add Coupon'))),
+      child: Column(
         children: [
           Container(
             color: Colors.white,
@@ -810,9 +844,9 @@ class _GiftsFaceState extends State<GiftsFace> {
   @override
   Widget build(BuildContext context) {
     final offers = _flip ? widget.offers.reversed.toList() : widget.offers;
-    return Scaffold(
-      backgroundColor: const Color(0xFFF7F7F7),
-      appBar: ShopBar(
+    return _GlassPage(
+      wash: const Color(0xFFE8EEF6),
+      bar: ShopBar(
         title: 'Gifts',
         color: Colors.white,
         light: true,
@@ -820,7 +854,7 @@ class _GiftsFaceState extends State<GiftsFace> {
           IconButton(onPressed: () => NwsbLinks.cart(context), icon: const Icon(Icons.shopping_bag_outlined, color: _ink)),
         ],
       ),
-      body: ListenableBuilder(
+      child: ListenableBuilder(
         listenable: EconomyMirror.instance,
         builder: (context, _) {
           final coins = EconomyMirror.instance.coins;
@@ -996,9 +1030,9 @@ class CoinbackPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cats = kRmCategories.where((c) => c.words.isNotEmpty).take(4).toList();
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: ShopBar(
+    return _GlassPage(
+      wash: const Color(0xFFD58BFF),
+      bar: ShopBar(
         title: title,
         color: const Color(0xFFD58BFF),
         actions: [
@@ -1006,7 +1040,7 @@ class CoinbackPage extends StatelessWidget {
           IconButton(onPressed: () => NwsbLinks.cart(context), icon: const Icon(Icons.shopping_cart_outlined, color: Colors.white)),
         ],
       ),
-      body: ListView(
+      child: ListView(
         padding: const EdgeInsets.only(bottom: 28),
         children: [
           Container(

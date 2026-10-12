@@ -12,6 +12,8 @@ import '../programs/program_router.dart';
 import '../programs/program_kit.dart';
 import 'coin_glass.dart';
 
+import '../economy/shop_faces.dart' as shop;
+
 const kPromo = 'assets/banners/programs/earn.png';
 const _accent = NwsbColors.goldLight;
 
@@ -20,13 +22,18 @@ class CoinbackPage extends StatelessWidget {
   final Map<String, dynamic>? preset;
 
   @override
-  Widget build(BuildContext context) => CoinSummaryScaffold(
+  Widget build(BuildContext context) {
+    if (preset != null) {
+      return CoinSummaryScaffold(
         title: 'COINBACK',
         accent: _accent,
         preset: preset,
         info: 'NowssB credits coinback after each verified order. Coins have no cash value.',
         builder: _body,
       );
+    }
+    return const shop.CoinbackPage(title: 'Coinback store', art: 'assets/store/intro-store.webp');
+  }
 }
 
 List<Widget> _body(BuildContext context, Map<String, dynamic> s) {

@@ -3,11 +3,15 @@
 /// server grants and caps every coin.
 library;
 
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/material.dart';
 
 import '../../screens/quotes_live.dart';
 import '../../shell/nav_shell.dart';
+import '../../shell/nwsb_links.dart';
 import '../../theme/tokens.dart';
+import '../economy/economy_api.dart';
 import '../social/echo_wall_screen.dart';
 import '../gifts/spin_wheel.dart';
 import '../programs/program_kit.dart';
@@ -22,13 +26,18 @@ class FreeCoinsPage extends StatelessWidget {
   final bool showWheel;
 
   @override
-  Widget build(BuildContext context) => CoinSummaryScaffold(
+  Widget build(BuildContext context) {
+    if (preset != null) {
+      return CoinSummaryScaffold(
         title: 'FREE COINS',
         accent: _accent,
         preset: preset,
         info: 'Free coins count toward a daily limit set by NowssB. Coins have no cash value.',
         builder: (c, s) => _body(c, s, showWheel),
       );
+    }
+    return const _LiveFreeCoins();
+  }
 }
 
 List<Widget> _body(BuildContext context, Map<String, dynamic> s, bool showWheel) {
@@ -107,4 +116,146 @@ void Function(BuildContext)? _dest(String id) {
   if (id == 'quote') return (c) => push(c, const QuotesWeekScreen());
   if (id == 'echo_first_post') return (c) => push(c, const EchoWallScreen());
   return null;
+}
+
+class _LiveFreeCoins extends StatelessWidget {
+  const _LiveFreeCoins();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: EconomyMirror.instance,
+      builder: (context, _) {
+        final s = EconomyMirror.instance.summary;
+        final t = sMap(s['today']);
+        final actions = sList(t['actions']);
+        final ceiling = sInt(t['ceiling']);
+        final cap = ceiling > 0 ? ceiling : 1500;
+        final rows = actions.isEmpty
+            ? const [
+                {'title': 'Open the app', 'coins': 5, 'id': 'open'},
+                {'title': 'Word of the day', 'coins': 10, 'id': 'word_of_day'},
+                {'title': 'Sound Bath', 'coins': 10, 'id': 'sound_bath'},
+                {'title': 'Read one meaning', 'coins': 8, 'id': 'read_meaning'},
+              ]
+            : actions;
+        return Scaffold(
+          backgroundColor: const Color(0xFF6A1B9A),
+          appBar: AppBar(
+            backgroundColor: const Color(0xFF6A1B9A),
+            foregroundColor: Colors.white,
+            elevation: 0,
+            title: const Text('Free Coins'),
+            actions: [
+              IconButton(onPressed: () => NwsbLinks.cart(context), icon: const Icon(Icons.search)),
+              IconButton(onPressed: () => NwsbLinks.cart(context), icon: const Icon(Icons.shopping_cart_outlined)),
+            ],
+          ),
+          body: Padding(
+            padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(22),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.72),
+                    borderRadius: BorderRadius.circular(22),
+                    border: Border.all(color: Colors.white),
+                  ),
+                  child: ListView(
+                    padding: const EdgeInsets.fromLTRB(12, 12, 12, 24),
+                    children: [
+                      Container(
+                        height: 168,
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          gradient: const LinearGradient(colors: [Color(0xFF7C4DFF), Color(0xFF512DA8)]),
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text('Earn\nUp to $cap\ncoins\nto shop', style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w900, height: 1.05)),
+                            ),
+                            Container(
+                              width: 120,
+                              height: 120,
+                              decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFFFFC107)),
+                              alignment: Alignment.center,
+                              child: const Text('NOW', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 22)),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      for (var i = 0; i < rows.length; i++)
+                        _EarnBanner(
+                          title: '${rows[i]['title']}',
+                          coins: sInt(rows[i]['coins']),
+                          flip: i.isOdd,
+                          onTap: () {
+                            final go = _dest('${rows[i]['id']}');
+                            if (go != null) go(context);
+                          },
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _EarnBanner extends StatelessWidget {
+  const _EarnBanner({required this.title, required this.coins, required this.flip, required this.onTap});
+  final String title;
+  final int coins;
+  final bool flip;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    const arts = [
+      'assets/store/intro-words.webp',
+      'assets/store/intro-meanings.webp',
+      'assets/store/picker-words.png',
+      'assets/store/intro-ebooks.webp',
+    ];
+    final photo = ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: Image.asset(arts[title.hashCode.abs() % arts.length], width: 132, height: 84, fit: BoxFit.cover),
+    );
+    final copy = Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Earn up to $coins coins', style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+          const SizedBox(height: 4),
+          Text(title, style: const TextStyle(color: Color(0xFF717171), fontSize: 13)),
+          const SizedBox(height: 4),
+          const Text('Earn now  ›', style: TextStyle(fontWeight: FontWeight.w700)),
+        ],
+      ),
+    );
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Material(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: Row(children: flip ? [copy, const SizedBox(width: 8), photo] : [photo, const SizedBox(width: 10), copy]),
+          ),
+        ),
+      ),
+    );
+  }
 }
