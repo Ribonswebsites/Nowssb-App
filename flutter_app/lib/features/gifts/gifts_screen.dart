@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 
 import '../../theme/tokens.dart';
 import '../../widgets/colored_split_promo_banner.dart';
+import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
@@ -15,6 +16,7 @@ import '../../admin/template/editable.dart';
 import '../economy/reward_fx.dart';
 import 'gift_show.dart';
 import 'gift_unwrap.dart';
+import 'spin_wheel.dart';
 import '../programs/program_kit.dart';
 import '../programs/program_heroes.dart';
 import '../programs/program_router.dart';
@@ -373,61 +375,260 @@ class _GiftsScreenState extends State<GiftsScreen> {
   Widget build(BuildContext context) {
     final start = widget.initialTab ?? (widget.startOnRedeem ? 'redeem' : null);
     return EconomyPage(
-      goodToKnow: kGiftsDisclaimer,
       title: 'NowssB Gifts',
       mark: NwsbMarks.gift,
-      action: GestureDetector(
-        // History: switch to Received and scroll the tabs into view.
-        onTap: () => _tab('received'),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0x66FFFFFF)),
-          ),
-          child: const Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.history, color: Colors.white, size: 15),
-              SizedBox(width: 4),
-              EditableLabel('gifts_screen.GiftsScreen', 'History', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600)),
-            ],
-          ),
-        ),
-      ),
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
-        cacheExtent: 1600,
-        children: [
-          const GiftsHero(),
-          const GiftShowcase(),
-          const SizedBox(height: 16),
-          const GiftWheel(),
-          const SizedBox(height: 12),
-          const RandomGiftButton(),
-          const SizedBox(height: 16),
-          const EditableLabel('gifts_screen.GiftsScreen', 'GIFT CARDS', style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontSize: 12, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 8),
-          const GiftPlanGrid(),
-          const SizedBox(height: 12),
-          const GiftUnwrapReveal(child: GiftOpenCard()),
-          const SizedBox(height: 12),
-          ColoredSplitPromoBanner(
-            margin: EdgeInsets.zero,
-            spec: SplitPromoSpec(
-              title: 'Got a code?',
-              cta: 'Redeem a gift',
-              leftColor: const Color(0xFF3D2914),
-              rightColor: const Color(0xFFE07A3D),
-              art: SplitPromoArts.redLotus,
-              onTap: () => _tab('redeem'),
+      action: Row(mainAxisSize: MainAxisSize.min, children: [
+        IconButton(
+          tooltip: 'Good to know',
+          visualDensity: VisualDensity.compact,
+          onPressed: () => showDialog<void>(
+            context: context,
+            builder: (c) => AlertDialog(
+              backgroundColor: NwsbColors.plate,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: BorderSide(color: NwsbColors.gold.withValues(alpha: .35))),
+              content: SingleChildScrollView(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+                  for (final t in [kGiftsDisclaimer, ...kGiftsRules])
+                    Padding(padding: const EdgeInsets.only(bottom: 10), child: Text(t, style: const TextStyle(color: NwsbColors.mist, fontSize: 13, height: 1.45))),
+                ]),
+              ),
             ),
           ),
-          const SizedBox(height: 12),
+          icon: const Icon(Icons.info_outline_rounded, color: NwsbColors.goldLight, size: 20),
+        ),
+      ]),
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 48),
+        children: [
+          _TodayGiftHero(onTab: _tab),
           const SizedBox(height: 16),
-          ProgramTabsBlock(spec: kGiftsSpec, initialTab: start, scrollTo: start != null, goRef: _go, showDisclaimer: false),
+          _QuietCounts(onTab: _tab),
+          const SizedBox(height: 16),
+          // The page's original banner video: the Daily Spin (spin-wheel.mp4).
+          const GiftWheel(),
+          const SizedBox(height: 20),
+          _GiftTabs(initial: start, goRef: _go),
         ],
       ),
+    );
+  }
+}
+
+/// Hero (layout from Ribon's scratch-card ref; colours and art are the
+/// original NowssB ones): a frosted glass card with the original gift banner
+/// art (assets/gifts/gift-hero.png), one strip with one action.
+class _TodayGiftHero extends StatefulWidget {
+  const _TodayGiftHero({required this.onTab});
+  final void Function(String) onTab;
+  @override
+  State<_TodayGiftHero> createState() => _TodayGiftHeroState();
+}
+
+class _TodayGiftHeroState extends State<_TodayGiftHero> {
+  bool _busy = false;
+
+  Future<void> _open(bool opened) async {
+    if (opened) return widget.onTab('free');
+    if (_busy || EconomyMirror.instance.summary.isEmpty) return;
+    setState(() => _busy = true);
+    try {
+      final r = await EconomyApi.call('openDailyBox');
+      if (mounted) await GiftUnwrapMoment.show(context, title: '${r['title'] ?? 'Today\u2019s gift'}', items: giftItemsIn(r));
+    } catch (e) {
+      if (mounted) showEconomyError(context, e);
+    }
+    await EconomyMirror.instance.refresh();
+    if (mounted) setState(() => _busy = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: EconomyMirror.instance,
+      builder: (context, _) {
+        final s = EconomyMirror.instance.summary;
+        final opened = sMap(s['today'])['boxOpened'] != null;
+        final waiting = giftsWaiting(s);
+        return Column(children: [
+          GestureDetector(
+            onTap: () => _open(opened),
+            child: GlassWrap(
+              margin: EdgeInsets.zero,
+              padding: EdgeInsets.zero,
+              child: Column(children: [
+                SizedBox(
+                  height: 300,
+                  width: double.infinity,
+                  child: Stack(fit: StackFit.expand, children: [
+                    EditableImage.asset('assets/gifts/gift-hero.png', fit: BoxFit.cover, alignment: const Alignment(0, -.75), slot: 'gifts_screen.GiftsHero',
+                        errorBuilder: (_, __, ___) => const SizedBox()),
+                    IgnorePointer(child: Opacity(opacity: .6, child: Lottie.asset(kGiftSparkleLottie, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const SizedBox()))),
+                  ]),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  child: Text(
+                    _busy ? 'Opening\u2026' : opened ? 'Opened today' : 'Tap to open',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: NwsbColors.goldLight, fontSize: 16, fontWeight: FontWeight.w700, letterSpacing: .4),
+                  ),
+                ),
+              ]),
+            ),
+          ),
+          const SizedBox(height: 14),
+          GestureDetector(
+            onTap: () => widget.onTab('free'),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+              decoration: BoxDecoration(color: NwsbColors.gold.withValues(alpha: .14), border: Border.all(color: NwsbColors.gold.withValues(alpha: .45)), borderRadius: BorderRadius.circular(30)),
+              child: Text('$waiting waiting', style: const TextStyle(color: NwsbColors.goldLight, fontSize: 14, fontWeight: FontWeight.w700)),
+            ),
+          ),
+        ]);
+      },
+    );
+  }
+}
+
+/// Three real numbers, no cards: unopened boxes, received, sent.
+class _QuietCounts extends StatelessWidget {
+  const _QuietCounts({required this.onTab});
+  final void Function(String) onTab;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: GiftBook.instance,
+      builder: (context, _) {
+        final s = EconomyMirror.instance.summary;
+        final boxes = giftsWaiting(s);
+        final items = GiftBook.instance.items;
+        final rec = items.where((g) => g.direction == 'received').length;
+        final sent = items.where((g) => g.direction == 'sent').length;
+        Widget cell(String n, String label, String tab, String img) => Expanded(
+              child: GestureDetector(
+                onTap: () => onTab(tab),
+                child: Container(
+                  height: 110,
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), border: Border.all(color: const Color(0x26FFFFFF))),
+                  child: Stack(fit: StackFit.expand, children: [
+                    Image.asset(img, fit: BoxFit.cover),
+                    const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x00000000), Color(0xFA000000)], stops: [.15, .8]))),
+                    Positioned(
+                      left: 12,
+                      bottom: 10,
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text(n, style: const TextStyle(fontFamily: 'Outfit', color: Colors.white, fontSize: 24, fontWeight: FontWeight.w600)),
+                        Text(label, style: const TextStyle(color: NwsbColors.goldLight, fontSize: 12, fontWeight: FontWeight.w600)),
+                      ]),
+                    ),
+                  ]),
+                ),
+              ),
+            );
+        return Row(children: [
+          cell('$boxes', 'Waiting', 'free', 'assets/gifts/box-gold.webp'),
+          cell('$rec', 'Received', 'received', 'assets/gifts/box-black.webp'),
+          cell('$sent', 'Sent', 'sent', 'assets/gifts/box-black.webp'),
+        ]);
+      },
+    );
+  }
+}
+
+/// One real source for "waiting": unopened server boxes plus today's box
+/// if it is still closed. Used by the pill and the Waiting tile.
+int giftsWaiting(Map<String, dynamic> s) =>
+    sList(s['boxes']).length + (s.isNotEmpty && sMap(s['today'])['boxOpened'] == null ? 1 : 0);
+
+/// Items the server granted, from a reward response (gift box effect,
+/// items list, granted map or plain coins).
+List<Map<String, dynamic>> giftItemsIn(Map<String, dynamic> r) {
+  List<Map<String, dynamic>> asItems(Object? v) => sList(v);
+  var items = asItems(r['items']);
+  for (final e in sList(r['effects'])) {
+    if (items.isEmpty && e['kind'] == 'giftbox') items = asItems(e['items']);
+  }
+  if (items.isEmpty && r['granted'] is Map) items = [sMap(r['granted'])];
+  final coins = coinsIn(r);
+  if (items.isEmpty && coins > 0) items = [{'type': 'coins', 'coins': coins, 'label': '$coins coins'}];
+  return items;
+}
+
+/// Calm tab switcher: one compact horizontal pill row, then the real tab.
+class _GiftTabs extends StatefulWidget {
+  const _GiftTabs({this.initial, required this.goRef});
+  final String? initial;
+  final ValueNotifier<void Function(String)?> goRef;
+  @override
+  State<_GiftTabs> createState() => _GiftTabsState();
+}
+
+class _GiftTabsState extends State<_GiftTabs> {
+  static final _tabs = kGiftsSpec.tabs.where((t) => t.id != 'rules').toList();
+  late String _id = _tabs.any((t) => t.id == widget.initial) ? widget.initial! : 'free';
+  final _anchor = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    widget.goRef.value = _go;
+    if (widget.initial != null) WidgetsBinding.instance.addPostFrameCallback((_) => _reveal());
+  }
+
+  void _go(String id) {
+    if (id == 'rules') id = 'free';
+    setState(() => _id = id);
+    _reveal();
+  }
+
+  void _reveal() {
+    final c = _anchor.currentContext;
+    if (c != null) Scrollable.ensureVisible(c, duration: const Duration(milliseconds: 400), curve: Curves.easeOutCubic);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final tab = _tabs.firstWhere((t) => t.id == _id);
+    return ProgramTabsScope(
+      go: _go,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Container(
+          key: _anchor,
+          height: 44,
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(color: NwsbColors.plate.withValues(alpha: .55), border: Border.all(color: NwsbColors.gold.withValues(alpha: .25)), borderRadius: BorderRadius.circular(30)),
+          child: Row(children: [
+            for (final t in _tabs)
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => _go(t.id),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 220),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(color: t.id == _id ? NwsbColors.gold : Colors.transparent, borderRadius: BorderRadius.circular(26)),
+                    child: Text(t.title,
+                        maxLines: 1,
+                        style: TextStyle(color: t.id == _id ? NwsbColors.plate : NwsbColors.mist, fontSize: 12.5, fontWeight: FontWeight.w700)),
+                  ),
+                ),
+              ),
+          ]),
+        ),
+        const SizedBox(height: 14),
+        ListenableBuilder(
+          listenable: EconomyMirror.instance,
+          builder: (context, _) {
+            final s = EconomyMirror.instance.summary;
+            return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              ...layoutChildren(context, 'gifts.program.${tab.id}', tab.build(context, s)),
+            ]);
+          },
+        ),
+      ]),
     );
   }
 }
