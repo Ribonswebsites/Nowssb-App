@@ -271,7 +271,17 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
     }
 
     if (banners.isNotEmpty) {
-      sections.insert(0, RmBannerRail(banners: banners, height: 112));
+      // UI-9: rail banners are fixed-height; cap their text and grow the
+      // rail a little with enlarged text so titles never clip.
+      final k = MediaQuery.textScalerOf(context)
+          .scale(100)
+          .clamp(100, kStoreCardMaxTextScale * 100) / 100;
+      sections.insert(
+        0,
+        StoreTextCap(
+          child: RmBannerRail(banners: banners, height: 112 + (k - 1) * 60),
+        ),
+      );
     }
 
     if (_chip == 'ALL' && !_allRows && cats.length > 10) {
@@ -309,14 +319,14 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
         const SizedBox(height: 18),
         StoreRegistrySection(config: AtelierMix.coupons),
         // Kept as the one hyped row (legacy cards + their admin image slots).
-        const NowssbHypeRail(),
+        const StoreTextCap(child: NowssbHypeRail()),
         StoreRegistrySection(config: AtelierMix.tiles),
         StoreMixRow(
           title: 'Featured collections',
           child: StoreRegistrySection(config: AtelierMix.glassy),
         ),
         const SizedBox(height: 16),
-        ColoredSplitPromoBanner.forSurface(
+        StoreTextCap(child: ColoredSplitPromoBanner.forSurface(
           SplitPromoSurface.wordAtelier,
           onTap: () => Navigator.of(context).push(
             MaterialPageRoute<void>(
@@ -324,7 +334,7 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
             ),
           ),
           margin: const EdgeInsets.only(bottom: 8),
-        ),
+        )),
         const SizedBox(height: 8),
         StoreGlassPanel(
           radius: 32,
@@ -389,7 +399,7 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
         ),
         const SizedBox(height: 8),
         ...sections,
-        ColoredSplitPromoBanner(
+        StoreTextCap(child: ColoredSplitPromoBanner(
           spec: SplitPromoExtras.at(
             7,
             onTap: () => Navigator.of(context).push(
@@ -398,7 +408,7 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
               ),
             ),
           ),
-        ),
+        )),
         const StoreDisclaimer(
           text:
               'Words shared or sold here are for educational and wellness purposes only — nothing here is medical advice. Purchases are final once unlocked. Any information you share with us is kept strictly confidential and never sold or shared with third parties.',

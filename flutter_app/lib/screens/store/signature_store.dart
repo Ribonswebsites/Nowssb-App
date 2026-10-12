@@ -83,7 +83,7 @@ class _SignatureBody extends StatelessWidget {
           'Signature artists',
           StoreMixRow(
             title: 'Rarest signatures',
-            child: ArtistCardsSection(
+            child: StoreTextCap(child: ArtistCardsSection(
               config: SignatureMix.artists,
               onTap: (item) {
                 for (final c in kRmCategories) {
@@ -101,7 +101,7 @@ class _SignatureBody extends StatelessWidget {
                 }
                 storeMixOpenLink(context, item);
               },
-            ),
+            )),
           ),
         ),
         LSection(
@@ -112,7 +112,7 @@ class _SignatureBody extends StatelessWidget {
             child: StoreRegistrySection(config: SignatureMix.glassy),
           ),
         ),
-        const LSection('hype', 'Most hyped', NowssbHypeRail()),
+        const LSection('hype', 'Most hyped', StoreTextCap(child: NowssbHypeRail())),
         LSection(
           'spotlight',
           'Signature spotlight',
@@ -160,11 +160,11 @@ class _SignatureBody extends StatelessWidget {
               ),
           ],
         ),
-        LSection('promo', 'Request words banner', ColoredSplitPromoBanner.forSurface(
+        LSection('promo', 'Request words banner', StoreTextCap(child: ColoredSplitPromoBanner.forSurface(
           SplitPromoSurface.signatureStore,
           onTap: () => openRequestWords(context),
           margin: const EdgeInsets.only(bottom: 8),
-        )),
+        ))),
         if (w2.isNotEmpty) LSection.group('words2', 'Signature collection II', align: CrossAxisAlignment.start, [
           RmCatBanner(
             title: 'Signature Collection · II',
@@ -333,15 +333,15 @@ class _SignatureBody extends StatelessWidget {
           ),
         )),
         const SizedBox(height: 36),
-        LSection('promo2', 'Promo banner', ColoredSplitPromoBanner(
+        LSection('promo2', 'Promo banner', StoreTextCap(child: ColoredSplitPromoBanner(
           spec: SplitPromoExtras.at(10, onTap: () => openRequestWords(context)),
           margin: const EdgeInsets.only(bottom: 40),
-        )),
-        const LSection('mix', 'Banner mix', BannerMix(seed: 0)),
+        ))),
+        const LSection('mix', 'Banner mix', StoreTextCap(child: BannerMix(seed: 0))),
         const SizedBox(height: 12),
-        LSection('promo3', 'Promo banner 2', ColoredSplitPromoBanner(
+        LSection('promo3', 'Promo banner 2', StoreTextCap(child: ColoredSplitPromoBanner(
           spec: SplitPromoExtras.at(11, onTap: () => openRequestWords(context)),
-        )),
+        ))),
         const LSection('disclaimer', 'Disclaimer', StoreDisclaimer(
           text:
               'Signatures are one-of-a-kind. Owned once, never restocked. For educational and wellness purposes only.',

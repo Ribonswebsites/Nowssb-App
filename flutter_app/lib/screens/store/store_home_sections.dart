@@ -372,12 +372,17 @@ class _RecommendedCard extends StatelessWidget {
               alignment: Alignment.center,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 14),
-                child: Column(
+                // UI-9: fixed-height card — cap text, keep 2 lines max.
+                child: MediaQuery.withClampedTextScaling(
+                  maxScaleFactor: kStoreCardMaxTextScale,
+                  child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       data.title,
                       textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w800,
@@ -388,12 +393,15 @@ class _RecommendedCard extends StatelessWidget {
                     Text(
                       data.sub,
                       textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         fontSize: 12,
                         color: Color(0xCCFFFFFF),
                       ),
                     ),
                   ],
+                ),
                 ),
               ),
             ),
@@ -605,14 +613,18 @@ class _ItemCountPill extends StatelessWidget {
             color: NwsbColors.goldLight,
           ),
           const SizedBox(width: 5),
-          EditableLabel('store_home_sections.ItemCountPill',
+          Flexible(
+            child: EditableLabel('store_home_sections.ItemCountPill',
             label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: const TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.w700,
               letterSpacing: 0.8,
               color: Color(0xCCFFFFFF),
             ),
+          ),
           ),
         ],
       ),
@@ -787,7 +799,13 @@ class StoreLimitedTimeFreeSection extends StatelessWidget {
                 ),
               ),
               if (onRequestWords != null)
-                GestureDetector(
+                // UI-9: cap the CTA so large text scales it down instead of
+                // pushing the heading off the row.
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 140),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: GestureDetector(
                   onTap: onRequestWords,
                   child: Container(
                     padding: const EdgeInsets.symmetric(
@@ -807,6 +825,8 @@ class StoreLimitedTimeFreeSection extends StatelessWidget {
                         color: NwsbColors.goldLight,
                       ),
                     ),
+                  ),
+                ),
                   ),
                 ),
             ],
@@ -1023,12 +1043,19 @@ class StoreBrowseByGoalSection extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        Text(
-                          g.$1,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
+                        // UI-9: one line, shrinks under large text.
+                        Flexible(
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              g.$1,
+                              maxLines: 1,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
                         ),
                       ],
@@ -1317,8 +1344,12 @@ class StoreGlassPlaylistCarousel extends StatelessWidget {
         children: [
           _SectionHeader(title: 'Featured Collections', onSeeAll: onSeeAll),
           const SizedBox(height: 12),
-          SizedBox(
-            height: 292,
+          // UI-9: cards cap at 1.3× text and the rail grows to match.
+          MediaQuery.withClampedTextScaling(
+            maxScaleFactor: kStoreCardMaxTextScale,
+            child: Builder(
+              builder: (context) => SizedBox(
+            height: 292 + MediaQuery.textScalerOf(context).scale(100) - 100,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: (meanings ? _meaningCards : _wordCards).length,
@@ -1423,6 +1454,8 @@ class StoreGlassPlaylistCarousel extends StatelessWidget {
                                   children: [
                                     Text(
                                       c.rows[r].$1,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(
                                         fontSize: 13,
                                         fontWeight: FontWeight.w700,
@@ -1431,6 +1464,8 @@ class StoreGlassPlaylistCarousel extends StatelessWidget {
                                     ),
                                     Text(
                                       c.rows[r].$2,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(
                                         fontSize: 11,
                                         color: Color(0x77FFFFFF),
@@ -1448,6 +1483,8 @@ class StoreGlassPlaylistCarousel extends StatelessWidget {
                   ),
                 );
               },
+            ),
+          ),
             ),
           ),
         ],
@@ -2121,10 +2158,13 @@ class StoreQuickMosaic extends StatelessWidget {
         children: [
           SizedBox(
             height: 180,
-            child: Row(
+            // UI-9: on a ~320px phone the fixed 180px tile left the bars
+            // ~34px for text; the tile now yields width on narrow screens.
+            child: LayoutBuilder(
+              builder: (context, c) => Row(
               children: [
                 SizedBox(
-                  width: 180,
+                  width: (c.maxWidth * 0.5).clamp(120.0, 180.0),
                   height: 180,
                   child: HeavyGlassPanel(
                     margin: EdgeInsets.zero,
@@ -2167,6 +2207,7 @@ class StoreQuickMosaic extends StatelessWidget {
                   ),
                 ),
               ],
+            ),
             ),
           ),
           const SizedBox(height: 12),
@@ -2237,16 +2278,25 @@ class _MosaicTile extends StatelessWidget {
                 children: [
                   NwsbIcon(mark, size: 22, color: const Color(0xFFE8D5A3)),
                   const Spacer(),
-                  EditableLabel('store_home_sections.MosaicTile',
-                    title,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w800,
+                  // UI-9: title shrinks to fit instead of wrapping past the
+                  // fixed tile; subtitle stays one line.
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: EditableLabel('store_home_sections.MosaicTile',
+                      title,
+                      maxLines: 1,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
                   ),
                   EditableLabel('store_home_sections.MosaicTile',
                     sub,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: Color(0xB8FFFFFF),
                       fontSize: 12,
@@ -2282,8 +2332,11 @@ class _MosaicBar extends StatelessWidget {
       child: HeavyGlassPanel(
         margin: EdgeInsets.zero,
         radius: 18,
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        child: Row(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        // UI-9: half-height bar — cap text and let the title take 2 lines.
+        child: MediaQuery.withClampedTextScaling(
+          maxScaleFactor: kStoreCardMaxTextScale,
+          child: Row(
           children: [
             NwsbIcon(mark, size: 18, color: const Color(0xFFE8D5A3)),
             const SizedBox(width: 10),
@@ -2294,7 +2347,7 @@ class _MosaicBar extends StatelessWidget {
                 children: [
                   EditableLabel('store_home_sections.MosaicBar',
                     title,
-                    maxLines: 1,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: Colors.white,
@@ -2315,6 +2368,7 @@ class _MosaicBar extends StatelessWidget {
               ),
             ),
           ],
+        ),
         ),
       ),
     );

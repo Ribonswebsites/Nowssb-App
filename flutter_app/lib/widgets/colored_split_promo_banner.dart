@@ -299,6 +299,19 @@ class ColoredSplitPromoBanner extends StatelessWidget {
   final double height;
   final EdgeInsets margin;
 
+  Widget _title({bool ellipsis = false}) => Text(
+        spec.title,
+        maxLines: 3,
+        overflow: ellipsis ? TextOverflow.ellipsis : null,
+        style: TextStyle(
+          color: Color.lerp(Colors.white, spec.rightColor, 0.35)!,
+          fontSize: 15.5,
+          fontWeight: FontWeight.w700,
+          height: 1.22,
+          letterSpacing: -0.2,
+        ),
+      );
+
   @override
   Widget build(BuildContext context) {
     final r = BorderRadius.circular(14);
@@ -339,51 +352,48 @@ class ColoredSplitPromoBanner extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              // UI-9: hand-broken titles shrink to fit on
+                              // narrow phones / large text instead of clipping.
                               Expanded(
-                                child: Text(
-                                  spec.title,
-                                  maxLines: 3,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    color: Color.lerp(
-                                      Colors.white,
-                                      spec.rightColor,
-                                      0.35,
-                                    )!,
-                                    fontSize: 15.5,
-                                    fontWeight: FontWeight.w700,
-                                    height: 1.22,
-                                    letterSpacing: -0.2,
-                                  ),
-                                ),
+                                child: spec.title.contains('\n')
+                                    ? FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        alignment: Alignment.topLeft,
+                                        child: _title(),
+                                      )
+                                    : _title(ellipsis: true),
                               ),
                               const SizedBox(height: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 7,
-                                ),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(40),
-                                  border: Border.all(
-                                    color: Color.lerp(
-                                      Colors.white,
-                                      spec.rightColor,
-                                      0.45,
-                                    )!,
-                                    width: 1.2,
+                              FittedBox(
+                                fit: BoxFit.scaleDown,
+                                alignment: Alignment.centerLeft,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 7,
                                   ),
-                                ),
-                                child: Text(
-                                  spec.cta,
-                                  style: TextStyle(
-                                    color: Color.lerp(
-                                      Colors.white,
-                                      spec.rightColor,
-                                      0.35,
-                                    )!,
-                                    fontSize: 11.5,
-                                    fontWeight: FontWeight.w700,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(40),
+                                    border: Border.all(
+                                      color: Color.lerp(
+                                        Colors.white,
+                                        spec.rightColor,
+                                        0.45,
+                                      )!,
+                                      width: 1.2,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    spec.cta,
+                                    style: TextStyle(
+                                      color: Color.lerp(
+                                        Colors.white,
+                                        spec.rightColor,
+                                        0.35,
+                                      )!,
+                                      fontSize: 11.5,
+                                      fontWeight: FontWeight.w700,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -419,8 +429,10 @@ class ColoredSplitPromoBanner extends StatelessWidget {
                                 fit: BoxFit.contain,
                                 alignment: Alignment.bottomCenter,
                                 filterQuality: FilterQuality.high,
-                                errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-                                slot: 'colored_split_promo_banner.ColoredSplitPromoBanner',
+                                errorBuilder: (_, __, ___) =>
+                                    const SizedBox.shrink(),
+                                slot:
+                                    'colored_split_promo_banner.ColoredSplitPromoBanner',
                               ),
                             ),
                           ],

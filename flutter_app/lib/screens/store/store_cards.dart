@@ -284,13 +284,18 @@ class RmCatBanner extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Row(
-                          children: [
-                            Flexible(
-                              child: EditableLabel('store_cards.RmCatBanner',
+                  // UI-9: title + badge wrap instead of squeezing, and the
+                  // View-all pill scales down rather than eating the title.
+                  LayoutBuilder(
+                    builder: (context, c) => Row(
+                      children: [
+                        Expanded(
+                          child: Wrap(
+                            spacing: 8,
+                            runSpacing: 4,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              EditableLabel('store_cards.RmCatBanner',
                                 title,
                                 style: TextStyle(
                                   fontSize: 15,
@@ -299,39 +304,48 @@ class RmCatBanner extends StatelessWidget {
                                   color: titleColor,
                                 ),
                               ),
-                            ),
-                            if (badge != null) ...[
-                              const SizedBox(width: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 7,
-                                  vertical: 2,
-                                ),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(4),
-                                  border: Border.all(
-                                    color: titleColor.withValues(alpha: 0.45),
+                              if (badge != null)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 7,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(4),
+                                    border: Border.all(
+                                      color:
+                                          titleColor.withValues(alpha: 0.45),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    badge!,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: 1.2,
+                                      color: titleColor,
+                                    ),
                                   ),
                                 ),
-                                child: Text(
-                                  badge!,
-                                  style: TextStyle(
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w700,
-                                    letterSpacing: 1.2,
-                                    color: titleColor,
-                                  ),
-                                ),
-                              ),
                             ],
-                          ],
+                          ),
                         ),
-                      ),
-                      if (onViewAll != null) ...[
-                        const SizedBox(width: 8),
-                        StoreViewAllControl(onTap: onViewAll!),
+                        if (onViewAll != null) ...[
+                          const SizedBox(width: 8),
+                          ConstrainedBox(
+                            constraints:
+                                BoxConstraints(maxWidth: c.maxWidth * 0.42),
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerRight,
+                              child: StoreViewAllControl(onTap: onViewAll!),
+                            ),
+                          ),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
                   if (sub.isNotEmpty) ...[
                     const SizedBox(height: 3),
@@ -413,7 +427,10 @@ class StoreBlackPill extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(18, 8, 10, 8),
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: EditableLabel('store_cards.StoreBlackPill',
+                // UI-9: two lines must fit the fixed pill height.
+                child: MediaQuery.withClampedTextScaling(
+                  maxScaleFactor: 1.3,
+                  child: EditableLabel('store_cards.StoreBlackPill',
                   label,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -423,6 +440,7 @@ class StoreBlackPill extends StatelessWidget {
                     letterSpacing: 0.8,
                     height: 1.15,
                     color: accent,
+                  ),
                   ),
                 ),
               ),
@@ -698,23 +716,35 @@ class RmRowHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 18, bottom: 10),
-      child: Row(
-        children: [
-          Expanded(
-            child: EditableLabel('store_cards.RmRowHeader',
-              title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w800,
-                color: Colors.white,
-                letterSpacing: -0.3,
+      // UI-9: two lines before ellipsis, and View all scales down instead of
+      // squeezing the title on a small phone / large text.
+      child: LayoutBuilder(
+        builder: (context, c) => Row(
+          children: [
+            Expanded(
+              child: EditableLabel('store_cards.RmRowHeader',
+                title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                  letterSpacing: -0.3,
+                ),
               ),
             ),
-          ),
-          if (onViewAll != null) StoreViewAllControl(onTap: onViewAll!),
-        ],
+            if (onViewAll != null)
+              ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: c.maxWidth * 0.42),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerRight,
+                  child: StoreViewAllControl(onTap: onViewAll!),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -863,6 +893,10 @@ _CatRibbon? ribbonForCategory(String? id) {
   }
 }
 
+/// UI-9: fixed-size store tiles (word card, pills) cap text scaling here so
+/// large accessibility text never overflows them; page copy scales freely.
+const double kStoreCardMaxTextScale = 1.3;
+
 class RmWordCard extends StatelessWidget {
   const RmWordCard({
     super.key,
@@ -976,6 +1010,9 @@ class RmWordCard extends StatelessWidget {
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(10, 10, 12, 10),
+                        // UI-9: fixed 228px tile; cap text past 1.3×.
+                        child: MediaQuery.withClampedTextScaling(
+                        maxScaleFactor: kStoreCardMaxTextScale,
                         child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -993,16 +1030,21 @@ class RmWordCard extends StatelessWidget {
                       color: const Color(0x66FFFFFF),
                     ),
                     const SizedBox(width: 8),
+                    // UI-9: long names (e.g. Signature words) shrink to fit
+                    // rather than being cut to "Premium Exclu…".
                     Expanded(
-                      child: Text(
-                        name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                          height: 1.05,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          name,
+                          maxLines: 1,
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                            height: 1.05,
+                          ),
                         ),
                       ),
                     ),
@@ -1232,6 +1274,7 @@ class RmWordCard extends StatelessWidget {
                 ),
               ],
             ),
+                      ),
                       ),
                     ),
                   ],

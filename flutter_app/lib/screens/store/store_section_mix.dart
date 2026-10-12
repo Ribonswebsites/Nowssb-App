@@ -39,7 +39,29 @@ class StoreMixRow extends StatelessWidget {
       );
 }
 
+/// UI-9: caps text scaling for a shared, fixed-height widget (hype rail,
+/// split promo, artist cards, registry sections) used on a store page.
+///
+/// Those widgets size their cards in pixels; past [kStoreCardMaxTextScale]
+/// their copy overflowed on a ~320px phone. Page headings and body copy keep
+/// the full system text size.
+class StoreTextCap extends StatelessWidget {
+  const StoreTextCap({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => MediaQuery.withClampedTextScaling(
+        maxScaleFactor: kStoreCardMaxTextScale,
+        child: child,
+      );
+}
+
 /// Builds [config] through the shared [SectionRegistry].
+///
+/// UI-9: text is capped at [kStoreCardMaxTextScale] and the text-bound
+/// section types get a little extra height while the system text is
+/// enlarged (none at 1.0×), so their copy fits on small phones.
 class StoreRegistrySection extends StatelessWidget {
   const StoreRegistrySection({super.key, required this.config});
 
@@ -49,12 +71,39 @@ class StoreRegistrySection extends StatelessWidget {
   Widget build(BuildContext context) {
     SectionConfigs.watch(context);
     ensureSectionRegistry();
-    final live = SectionConfigs.instance.resolveIn(context, config);
-    return SectionAnimLayer(
-      animation: live.animation,
-      child: SectionRegistry.instance.build(context, live),
+    return StoreTextCap(
+      child: Builder(builder: (context) {
+        final k = MediaQuery.textScalerOf(context).scale(100) / 100;
+        final live = SectionConfigs.instance.resolveIn(context, config);
+        return SectionAnimLayer(
+          animation: live.animation,
+          child: SectionRegistry.instance
+              .build(context, _forTextScale(live, k)),
+        );
+      }),
     );
   }
+}
+
+/// Extra height per +1.0 text scale, for types whose cards hold fixed text.
+const _kTextGrowth = <String, double>{
+  SectionTypeId.couponBanner: 110,
+  SectionTypeId.glassyCarousel: 40,
+};
+
+/// Cached so a rebuild at the same text size hands back the same config
+/// (a new config re-arms autoplay timers).
+final _scaledConfigs = Expando<Map<int, SectionConfig>>('ui9TextScale');
+
+SectionConfig _forTextScale(SectionConfig config, double k) {
+  final growth = _kTextGrowth[config.type];
+  final base = config.layout.height;
+  if (growth == null || base == null || k <= 1.0) return config;
+  final bucket = (k * 20).round(); // 0.05 steps
+  final cache = _scaledConfigs[config] ??= <int, SectionConfig>{};
+  return cache[bucket] ??= config.copyWith(
+    layout: config.layout.copyWith(height: base + (bucket / 20 - 1) * growth),
+  );
 }
 
 // Configs are built once (static final / cached in State) so a rebuild on

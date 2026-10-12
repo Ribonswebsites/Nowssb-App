@@ -88,6 +88,150 @@ class _PageShellState extends State<PageShell> {
     if (mounted) setState(() {});
   }
 
+  /// UI-9: store pages carry a bag bar + Stores pill on the right. On a
+  /// narrow phone (or with large text) that left the title only a few pixels
+  /// and overflowed the row, so the actions get their own row above the title.
+  Widget _header(BuildContext context, BoxConstraints c) {
+    final scale = MediaQuery.textScalerOf(context).scale(14) / 14;
+    final plain = widget.plain && widget.canvas == null;
+    final titleColor = plain ? NwsbColors.ink : Colors.white;
+    final subColor = plain ? const Color(0xFF5C564E) : const Color(0xCCFFFFFF);
+    final stacked = widget.onStorePicker != null &&
+        (c.maxWidth < 340 || scale > 1.15);
+    final back = widget.onBack == null
+        ? null
+        : GestureDetector(
+            onTap: widget.onBack,
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              width: 42,
+              height: 42,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.arrow_back,
+                  size: 19, color: NwsbColors.ink),
+            ),
+          );
+    final trailing = <Widget>[
+      if (widget.actions.isNotEmpty) ...[
+        const SizedBox(width: 8),
+        ...widget.actions,
+      ],
+      if (widget.onStorePicker != null) ...[
+        const SizedBox(width: 8),
+        const StoreBagBar(),
+        const SizedBox(width: 8),
+        GestureDetector(
+          onTap: widget.onStorePicker,
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            height: 42,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(21),
+              color: plain ? const Color(0xF216181E) : const Color(0x33FFFFFF),
+              border: Border.all(color: plain ? const Color(0x66E8D5A3) : const Color(0x44FFFFFF)),
+            ),
+            // Fixed 42px pill: cap its label so it never pushes the row.
+            child: MediaQuery.withClampedTextScaling(
+              maxScaleFactor: 1.3,
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.storefront_outlined,
+                      size: 18, color: Colors.white),
+                  SizedBox(width: 6),
+                  EditableLabel('page_shell.PageShell',
+                    'Stores',
+                    maxLines: 1,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    ];
+    final titles = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (widget.eyebrow.trim().isNotEmpty) ...[
+          Text(
+            widget.eyebrow.toUpperCase(),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 10,
+              letterSpacing: 3,
+              fontWeight: FontWeight.w700,
+              color: NwsbColors.gold,
+            ),
+          ),
+          const SizedBox(height: 4),
+        ],
+        EditableLabel('page_shell.PageShell',
+          widget.title,
+          maxLines: stacked ? 2 : null,
+          overflow: stacked ? TextOverflow.ellipsis : null,
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w800,
+            color: titleColor,
+            height: 1.1,
+          ),
+        ),
+        if (widget.subtitle != null &&
+            widget.subtitle!.trim().isNotEmpty) ...[
+          const SizedBox(height: 4),
+          Text(
+            widget.subtitle!,
+            maxLines: 1,
+            softWrap: false,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: subColor,
+              height: 1.2,
+            ),
+          ),
+        ],
+      ],
+    );
+    if (stacked) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              if (back != null) back,
+              const Spacer(),
+              ...trailing,
+            ],
+          ),
+          const SizedBox(height: 12),
+          titles,
+        ],
+      );
+    }
+    return Row(
+      children: [
+        if (back != null) ...[back, const SizedBox(width: 14)],
+        Expanded(child: titles),
+        ...trailing,
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final bare = widget.canvas != null;
@@ -179,109 +323,7 @@ class _PageShellState extends State<PageShell> {
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
-                    child: Row(
-                      children: [
-                        if (widget.onBack != null) ...[
-                          GestureDetector(
-                            onTap: widget.onBack,
-                            behavior: HitTestBehavior.opaque,
-                            child: Container(
-                              width: 42,
-                              height: 42,
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(Icons.arrow_back,
-                                  size: 19, color: NwsbColors.ink),
-                            ),
-                          ),
-                          const SizedBox(width: 14),
-                        ],
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              if (widget.eyebrow.trim().isNotEmpty) ...[
-                                Text(
-                                  widget.eyebrow.toUpperCase(),
-                                  style: const TextStyle(
-                                    fontSize: 10,
-                                    letterSpacing: 3,
-                                    fontWeight: FontWeight.w700,
-                                    color: NwsbColors.gold,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                              ],
-                              EditableLabel('page_shell.PageShell',
-                                widget.title,
-                                style: TextStyle(
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.w800,
-                                  color: titleColor,
-                                  height: 1.1,
-                                ),
-                              ),
-                              if (widget.subtitle != null &&
-                                  widget.subtitle!.trim().isNotEmpty) ...[
-                                const SizedBox(height: 4),
-                                Text(
-                                  widget.subtitle!,
-                                  maxLines: 1,
-                                  softWrap: false,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: subColor,
-                                    height: 1.2,
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                        if (widget.actions.isNotEmpty) ...[
-                          const SizedBox(width: 8),
-                          ...widget.actions,
-                        ],
-                        if (widget.onStorePicker != null) ...[
-                          const SizedBox(width: 8),
-                          const StoreBagBar(),
-                          const SizedBox(width: 8),
-                          GestureDetector(
-                            onTap: widget.onStorePicker,
-                            behavior: HitTestBehavior.opaque,
-                            child: Container(
-                              height: 42,
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(21),
-                                color: plain ? const Color(0xF216181E) : const Color(0x33FFFFFF),
-                                border: Border.all(color: plain ? const Color(0x66E8D5A3) : const Color(0x44FFFFFF)),
-                              ),
-                              child: const Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(Icons.storefront_outlined, size: 18, color: Colors.white),
-                                  SizedBox(width: 6),
-                                  EditableLabel('page_shell.PageShell',
-                                    'Stores',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
+                    child: LayoutBuilder(builder: _header),
                   ),
                 ),
                 ...widget.slivers,

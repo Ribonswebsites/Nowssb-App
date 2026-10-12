@@ -273,14 +273,14 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
         ),
         StoreMixRow(
           title: 'Featured meanings',
-          child: ArtistCardsSection(config: _artists, onTap: _openArtist),
+          child: StoreTextCap(child: ArtistCardsSection(config: _artists, onTap: _openArtist)),
         ),
         CategoryTilesSection(
           config: MeaningMix.tiles,
           onTileTap: _onMixTile,
         ),
         // Kept as the one hyped row (legacy cards + their admin image slots).
-        const NowssbHypeRail(),
+        const StoreTextCap(child: NowssbHypeRail()),
         StoreMixRow(
           title: 'Explore the stores',
           child: StoreRegistrySection(config: MeaningMix.glassy),
@@ -345,7 +345,7 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
           onSeeAll: () => _openViewAll('Recommended for You'),
           onOpenWord: _openMeaning,
         ),
-        ColoredSplitPromoBanner.forSurface(
+        StoreTextCap(child: ColoredSplitPromoBanner.forSurface(
           SplitPromoSurface.meaningStore,
           onTap: () => Navigator.of(context).push(
             MaterialPageRoute<void>(
@@ -353,7 +353,7 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
             ),
           ),
           margin: const EdgeInsets.only(bottom: 8),
-        ),
+        )),
         StoreFeaturedPlaylistSection(
           meanings: true,
           onSeeAll: () => _openViewAll('Featured Playlist'),
@@ -365,14 +365,14 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
           onOpenWord: _openMeaning,
         ),
         const SizedBox(height: 36),
-        ColoredSplitPromoBanner(
+        StoreTextCap(child: ColoredSplitPromoBanner(
           spec: SplitPromoExtras.at(8).copyWith(
             title: 'Every meaning,\none plan.',
             cta: 'See meaning plans',
             onTap: () => NwsbLinks.subscription(context),
           ),
           margin: const EdgeInsets.only(bottom: 36),
-        ),
+        )),
         ..._meaningCollectionSections(context, order, cats),
         if (cats.isEmpty)
           const Padding(
@@ -381,9 +381,9 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
                 child: EditableLabel('meaning_store.MeaningStoreBody', 'No meanings match.',
                     style: TextStyle(color: Color(0x8CFFFFFF)))),
           ),
-        ColoredSplitPromoBanner(
+        StoreTextCap(child: ColoredSplitPromoBanner(
           spec: SplitPromoExtras.at(9, onTap: () => openRequestWords(context)),
-        ),
+        )),
         const StoreDisclaimer(
           text:
               'Meanings shared or sold here are for educational and wellness purposes only — nothing here is medical advice. Purchases are final once unlocked.',

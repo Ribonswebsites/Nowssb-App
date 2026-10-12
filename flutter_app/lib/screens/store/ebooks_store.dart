@@ -198,7 +198,7 @@ class _EbooksBody extends StatelessWidget {
             child: StoreRegistrySection(config: EbooksMix.glassy),
           ),
         ),
-        const LSection('hype', 'Most hyped', NowssbHypeRail()),
+        const LSection('hype', 'Most hyped', StoreTextCap(child: NowssbHypeRail())),
         const LSection('intro', 'Intro line', Text(
           'Deep-dive guides on sound, phonetic origin and healing practice — '
           'yours to keep, read anywhere, forever. Not a word catalogue.',
@@ -210,15 +210,15 @@ class _EbooksBody extends StatelessWidget {
           books: books,
         )),
         const SizedBox(height: 12),
-        LSection('promo', 'Split promo banner', ColoredSplitPromoBanner.forSurface(
+        LSection('promo', 'Split promo banner', StoreTextCap(child: ColoredSplitPromoBanner.forSurface(
           SplitPromoSurface.ebooksStore,
           onTap: books.isEmpty ? null : () => openEbookDetail(context, books.first),
           margin: const EdgeInsets.only(bottom: 8),
-        )),
+        ))),
         const SizedBox(height: 8),
         LSection.group('books', 'All books', align: CrossAxisAlignment.start, [for (final b in books) _EbookRow(book: b)]),
         const SizedBox(height: 40),
-        LSection('promo2', 'Promo banner', ColoredSplitPromoBanner(
+        LSection('promo2', 'Promo banner', StoreTextCap(child: ColoredSplitPromoBanner(
           spec: SplitPromoExtras.at(12).copyWith(
             title: 'Read the science\nbehind the sound.',
             cta: 'Read a guide',
@@ -227,16 +227,16 @@ class _EbooksBody extends StatelessWidget {
                 : () => openEbookDetail(context, books[1 % books.length]),
           ),
           margin: const EdgeInsets.only(bottom: 48),
-        )),
-        const LSection('mix', 'Banner mix', BannerMix(seed: 0)),
+        ))),
+        const LSection('mix', 'Banner mix', StoreTextCap(child: BannerMix(seed: 0))),
         const SizedBox(height: 12),
-        LSection('promo3', 'Promo banner 2', ColoredSplitPromoBanner(
+        LSection('promo3', 'Promo banner 2', StoreTextCap(child: ColoredSplitPromoBanner(
           spec: SplitPromoExtras.at(13).copyWith(
             title: 'Your ebooks,\nready to read.',
             cta: 'Open Reader',
             onTap: () => NwsbLinks.reader(context),
           ),
-        )),
+        ))),
         const LSection('disclaimer', 'Disclaimer', StoreDisclaimer(text: kEbDisclaimer)),
       ]),
     );
@@ -316,14 +316,19 @@ class _EbookBrowseStrip extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        Text(
-                          g.$1,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xCCFFFFFF),
+                        // UI-9: one line that shrinks under large text.
+                        Flexible(
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              g.$1,
+                              maxLines: 1,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xCCFFFFFF),
+                              ),
+                            ),
                           ),
                         ),
                       ],
@@ -375,31 +380,46 @@ class _EbookRow extends StatelessWidget {
                   margin: const EdgeInsets.symmetric(horizontal: 14),
                   color: const Color(0x26FFFFFF),
                 ),
+                // UI-9: was a fixed 120px column — at 1.3×/2× text on a
+                // ~320px phone the title + sub ran far past it. Now at least
+                // the cover height, growing with the text; price stays last.
                 Expanded(
-                  child: SizedBox(
-                    height: 120,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(minHeight: 120),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          book.title,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white,
-                            height: 1.15,
-                          ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              book.title,
+                              // UI-9: room for long titles at 2× text.
+                              maxLines: 6,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
+                                height: 1.15,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              book.sub,
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                height: 1.4,
+                                color: Color(0x8CFFFFFF),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                          ],
                         ),
-                        const SizedBox(height: 6),
-                        Text(
-                          book.sub,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            height: 1.4,
-                            color: Color(0x8CFFFFFF),
-                          ),
-                        ),
-                        const Spacer(),
                         Text(
                           Entitlements.instance.canOpenEbook(book.title, price: StorePrices.instance.priceFor('ebook:${book.title.toLowerCase()}', shown: book.price))
                               ? 'Yours'
@@ -488,8 +508,11 @@ class _EbookRow extends StatelessWidget {
                             colors: [Color(0xFFF3E4B7), Color(0xFFC8A96E)],
                           ),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        // UI-9: label + art scale down inside the 42px button.
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             const EditableLabel('ebooks_store.EbookRow',
                               'Buy Now',
@@ -516,6 +539,7 @@ class _EbookRow extends StatelessWidget {
                               ),
                             ),
                           ],
+                        ),
                         ),
                       ),
                     ),
