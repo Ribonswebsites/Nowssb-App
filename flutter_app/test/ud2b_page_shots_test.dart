@@ -18,6 +18,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/screens/features_page.dart';
+import 'package:nowssb/screens/home_normal.dart';
 import 'package:nowssb/screens/personal_coach.dart';
 import 'package:nowssb/shell/nav_shell.dart';
 import 'package:nowssb/theme/theme.dart';
@@ -98,5 +99,9 @@ void main() {
   });
   testWidgets('coach', (t) async {
     await shot(t, const PersonalCoachScreen(), 'ud2b-coach-$_tag');
+  });
+  testWidgets('home normal', (t) async {
+    await shot(t, const HomeNormal(), 'ud2c-home-normal-$_tag');
+    VideoPool.instance.debugDropAll();
   });
 }

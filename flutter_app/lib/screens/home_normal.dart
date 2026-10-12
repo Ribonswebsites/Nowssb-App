@@ -748,15 +748,22 @@ class _TopRow extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 12),
-        const EditableLabel('home_normal.TopRow',
-          'NowssB',
-          maxLines: 1,
-          softWrap: false,
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w800,
-            letterSpacing: -0.3,
-            color: Color(0xFF1A1A1A),
+        // UD-2c: shrinks only when it would not fit (320px @ 1.3x).
+        const Flexible(
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: EditableLabel('home_normal.TopRow',
+              'NowssB',
+              maxLines: 1,
+              softWrap: false,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.3,
+                color: Color(0xFF1A1A1A),
+              ),
+            ),
           ),
         ),
         const Spacer(),
