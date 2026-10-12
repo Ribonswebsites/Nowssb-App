@@ -163,7 +163,8 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
     _startBeat();
     if (NwsbFirebase.ready) {
       FirebaseAuth.instance.authStateChanges().listen((u) {
-        if (u != null && !u.isAnonymous) unawaited(PlayCheckout.start().catchError((_) {}));
+        if (u != null && !u.isAnonymous)
+          unawaited(PlayCheckout.start().catchError((_) {}));
       });
     }
     // Read the manifest while the splash plays, so the prompt is ready when
@@ -172,7 +173,9 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
     if (_splashDone) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _checkForUpdate(coldStart: true);
-        unawaited(PhoneNotifications.instance.announceAfterLaunch().then((_) => AdminPromoGuard.apply()));
+        unawaited(PhoneNotifications.instance
+            .announceAfterLaunch()
+            .then((_) => AdminPromoGuard.apply()));
       });
     }
   }
@@ -224,7 +227,8 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
       final updater = NwsbUpdater.instance;
       await updater.check(force: coldStart);
       if (!mounted || updater.available == null || updater.required) return;
-      if (nwsbUpdateDialogOpen || !updater.shouldPrompt(coldStart: coldStart)) return;
+      if (nwsbUpdateDialogOpen || !updater.shouldPrompt(coldStart: coldStart))
+        return;
       final context = _navigatorKey.currentContext;
       if (context == null || !context.mounted) return;
       unawaited(showNwsbUpdateDialog(context));
@@ -246,7 +250,8 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
                 navigatorKey: _navigatorKey,
                 child: AdminReturnPill(
                   navigatorKey: _navigatorKey,
-                  child: NotificationPopupHost(child: child ?? const SizedBox()),
+                  child:
+                      NotificationPopupHost(child: child ?? const SizedBox()),
                 ),
               )),
           title: 'NowssB',
@@ -264,12 +269,15 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
                   VideoPool.instance.unhold();
                   setState(() => _splashDone = true);
                   unawaited(_checkForUpdate(coldStart: true));
-                  unawaited(PhoneNotifications.instance.announceAfterLaunch().then((_) => AdminPromoGuard.apply()));
+                  unawaited(PhoneNotifications.instance
+                      .announceAfterLaunch()
+                      .then((_) => AdminPromoGuard.apply()));
                   unawaited(DeviceFlags.applySaved());
                 }),
             ],
           ),
         ),
+      ),
     );
   }
 }

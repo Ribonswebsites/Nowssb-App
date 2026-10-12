@@ -9,13 +9,13 @@
 /// circle. Glyphs scaled up slightly inside the same circle size.
 library;
 
-import '../../admin/admin_promo_hide.dart';
 import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 
+import '../../admin/admin_promo_hide.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../admin/template/editable.dart';
@@ -95,7 +95,8 @@ class _NormalPromoRailState extends State<NormalPromoRail>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const EditableLabel('rotating_promo_rail.NormalPromoRail',
+            const EditableLabel(
+              'rotating_promo_rail.NormalPromoRail',
               'More ways to keep your rhythm',
               style: TextStyle(
                 color: NwsbColors.inkSoft,
@@ -115,7 +116,8 @@ class _NormalPromoRailState extends State<NormalPromoRail>
               ),
             ),
           ],
-        ),,
+        ),
+      ),
     );
   }
 }
@@ -355,7 +357,6 @@ class _IconDisc extends StatelessWidget {
   }
 }
 
-
 class _WhiteSvgDisc extends StatelessWidget {
   const _WhiteSvgDisc({
     required this.mark,
@@ -483,16 +484,35 @@ class _PillCard extends StatelessWidget {
                   width: 44,
                   height: 44,
                   alignment: Alignment.center,
-                  decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                  child: NwsbIcon(_mark, size: 22, color: const Color(0xFF12141A), strokeWidth: 1.7),
+                  decoration: const BoxDecoration(
+                      color: Colors.white, shape: BoxShape.circle),
+                  child: NwsbIcon(_mark,
+                      size: 22,
+                      color: const Color(0xFF12141A),
+                      strokeWidth: 1.7),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
-                    Text(door.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w800)),
-                    const SizedBox(height: 2),
-                    Text(door.subtitle, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xCCFFFFFF), fontSize: 12, height: 1.25)),
-                  ]),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(door.title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800)),
+                        const SizedBox(height: 2),
+                        Text(door.subtitle,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                                color: Color(0xCCFFFFFF),
+                                fontSize: 12,
+                                height: 1.25)),
+                      ]),
                 ),
               ]),
             ),
