@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:nowssb/features/coins/coinback_page.dart';
 import 'package:nowssb/features/coins/free_coins_page.dart';
 
 /// Shaped like GET /api/economy summary (functions/_lib/economy/summary.js).
@@ -62,6 +63,9 @@ void main() {
   testWidgets('Free coins page', (tester) async {
     await shot(tester, FreeCoinsPage(preset: summary, showWheel: false), 'free_coins.png', h: 1100);
     expect(find.text('FREE TODAY'), findsNothing); // tree torn down
+  });
+  testWidgets('Coinback page', (tester) async {
+    await shot(tester, CoinbackPage(preset: summary), 'coinback.png', h: 1100);
   });
 }
 

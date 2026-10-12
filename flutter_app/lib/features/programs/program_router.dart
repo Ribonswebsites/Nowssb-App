@@ -8,9 +8,10 @@ import 'package:flutter/material.dart';
 import '../economy/partner_screen.dart';
 import '../earn/earnings_screen.dart';
 import '../earn/nowssb_one.dart';
+import '../coins/coinback_page.dart';
 import '../coins/free_coins_page.dart';
 
-enum Programme { earn, rewards, coupons, gifts, reference, partner, earnings, freeCoins }
+enum Programme { earn, rewards, coupons, gifts, reference, partner, earnings, freeCoins, coinback }
 
 abstract final class Programmes {
   static Widget page(Programme p, {String? tab}) => switch (p) {
@@ -22,6 +23,7 @@ abstract final class Programmes {
         Programme.partner => PartnerScreen(initialTab: tab),
         Programme.earnings => const EarningsScreen(),
         Programme.freeCoins => const FreeCoinsPage(),
+        Programme.coinback => const CoinbackPage(),
       };
 
   static Future<void> open(BuildContext context, Programme p, {String? tab}) =>
@@ -37,6 +39,7 @@ abstract final class Programmes {
         'coupons' => Programme.coupons,
         'reference' => Programme.reference,
         'free coins' => Programme.freeCoins,
+        'coinback' => Programme.coinback,
         _ => null,
       };
 }
