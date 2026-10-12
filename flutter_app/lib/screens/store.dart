@@ -38,6 +38,8 @@ import '../admin/template/editable.dart';
 import '../admin/layout/layout_sections.dart';
 import '../widgets/hype_rail.dart';
 import '../widgets/home_keep_alive.dart';
+import '../widgets/glass_black_card.dart';
+import '../theme/ui_tokens.dart';
 import '../shell/nwsb_links.dart';
 
 class StoreScreen extends StatelessWidget {
@@ -97,7 +99,8 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
                           fontWeight: FontWeight.w800,
                           letterSpacing: -1.0)),
                   SizedBox(height: 8),
-                  EditableLabel('store.StoreHomeContent', 'Own the words. Unlock the meanings.',
+                  EditableLabel('store.StoreHomeContent',
+                      'Own the words. Unlock the meanings.',
                       style: TextStyle(
                           color: Color(0xAFFFFFFF), fontSize: 13, height: 1.3)),
                 ],
@@ -113,24 +116,24 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
       if (!AppControl.instance.flag('resale', fallback: false))
         const SizedBox.shrink()
       else
-      Padding(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-        child: Row(
-          children: [
-            _StoreTab(
-              label: 'Shop',
-              selected: !_resell,
-              onTap: () => setState(() => _resell = false),
-            ),
-            const SizedBox(width: 8),
-            _StoreTab(
-              label: 'Resell',
-              selected: _resell,
-              onTap: () => setState(() => _resell = true),
-            ),
-          ],
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+          child: Row(
+            children: [
+              _StoreTab(
+                label: 'Shop',
+                selected: !_resell,
+                onTap: () => setState(() => _resell = false),
+              ),
+              const SizedBox(width: 8),
+              _StoreTab(
+                label: 'Resell',
+                selected: _resell,
+                onTap: () => setState(() => _resell = true),
+              ),
+            ],
+          ),
         ),
-      ),
       _StoreGlassSection(
         margin: const EdgeInsets.fromLTRB(12, 8, 12, 10),
         children: [
@@ -143,7 +146,9 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
       ),
       // Kept visually empty for existing deep-link smoke tests; the old hero
       // itself is intentionally gone from the rendered Store page.
-      const Opacity(opacity: 0, child: EditableLabel('store.StoreHomeContent', 'Enter Store')),
+      const Opacity(
+          opacity: 0,
+          child: EditableLabel('store.StoreHomeContent', 'Enter Store')),
       const Padding(
         padding: EdgeInsets.fromLTRB(12, 4, 12, 10),
         child: BannerMix(seed: 6),
@@ -266,14 +271,16 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
       ),
       const Padding(
         padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
-        child: EditableLabel('store.StoreHomeContent',
+        child: EditableLabel(
+          'store.StoreHomeContent',
           'Disclaimer & Confidentiality\n\nWords, meanings, ebooks and verification badges shared or sold here are for educational and wellness purposes only — nothing here is medical advice. Purchases are final once unlocked. Any information you share with us is kept strictly confidential and never sold or shared with third parties.',
           style: TextStyle(fontSize: 11, height: 1.5, color: Color(0x73FFFFFF)),
         ),
       ),
       const Padding(
         padding: EdgeInsets.symmetric(vertical: 24),
-        child: EditableLabel('store.StoreHomeContent',
+        child: EditableLabel(
+          'store.StoreHomeContent',
           'NowssB\n© 2026 Adv. Sanjaykumar Gadge · Shabdapathy',
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 11, height: 1.6, color: Color(0x73FFFFFF)),
@@ -285,21 +292,30 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
         // Server-driven order (Admin → UI Editor); bundled order by default.
         : layoutChildren(context, 'store.home', [
             LSection('header', 'Title & bag', items[0]),
-            const LSection('hype', 'Most hyped', Padding(
-              padding: EdgeInsets.fromLTRB(16, 10, 0, 0),
-              child: NowssbHypeRail(),
-            )),
+            LSection('depttabs', 'Department tabs (BD-8)',
+                _StoreDeptTabs(depts: _depts(context))),
+            LSection('spotlight', 'Spotlight Picks (BD-8)',
+                _SpotlightPicks(depts: _depts(context))),
+            const LSection(
+                'hype',
+                'Most hyped',
+                Padding(
+                  padding: EdgeInsets.fromLTRB(16, 10, 0, 0),
+                  child: NowssbHypeRail(),
+                )),
             LSection('tabs', 'Shop / Resell tabs', items[1]),
             LSection('rotator', 'Picture rotator', items[2]),
             LSection('halfoff', 'Half-off rail', items[3]),
             items[4],
             LSection.group('atelier', 'Word Atelier', [items[5], items[6]]),
             LSection.group('meaning', 'Meaning Store', [items[7], items[8]]),
-            LSection.group('signature', 'Signature Store', [items[9], items[10]]),
+            LSection.group(
+                'signature', 'Signature Store', [items[9], items[10]]),
             LSection('promo', 'Split promo banner', items[11]),
             LSection.group('connect', 'NowssB Connect', [items[12], items[13]]),
             LSection.group('ebooks', 'eBooks', [items[14], items[15]]),
-            LSection.group('plans', 'Subscription plans', [items[16], items[17]]),
+            LSection.group(
+                'plans', 'Subscription plans', [items[16], items[17]]),
             LSection('disclaimer', 'Disclaimer', items[18]),
             LSection('credits', 'Credits', items[19]),
           ]);
@@ -361,6 +377,40 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
     );
   }
 
+  /// BD-8: the five store departments, each opening its existing page.
+  static List<_Dept> _depts(BuildContext context) => [
+        _Dept(
+            'Word Atelier',
+            'THE WORD LIBRARY',
+            'Build your personal library',
+            'assets/video/hero-word-store-poster.webp',
+            () => _push(context, const WordAtelierScreen())),
+        _Dept(
+            'Meanings',
+            'AI-DECODED ORIGINS',
+            'Meanings beneath every word',
+            'assets/video/hero-meaning-store-poster.webp',
+            () => _push(context, const MeaningStoreScreen())),
+        _Dept(
+            'Signature',
+            'LIMITED COLLECTIONS',
+            '15 Words · 5 Meanings',
+            'assets/video/signature-store-poster.webp',
+            () => _push(context, const SignatureStoreScreen())),
+        _Dept(
+            'Ebooks',
+            'READ · LEARN · PRACTICE',
+            'NowssB Ebooks',
+            'assets/video/hero-ebooks-poster.webp',
+            () => _push(context, const EbooksStoreScreen())),
+        _Dept(
+            'Plans',
+            'RESONANCE · FREQUENCY · X',
+            'Subscription Plans',
+            'assets/video/subscription-a-poster.webp',
+            () => _push(context, const SubscriptionScreen())),
+      ];
+
   static void _push(BuildContext context, Widget page) {
     Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => page));
   }
@@ -373,19 +423,25 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
     try {
       await WordRequestStore.instance.submit(
         word: 'Verification badge',
-        notes: 'Please review my profile for a NowssB verification badge (Blue, Silver, Gold or Diamond).',
+        notes:
+            'Please review my profile for a NowssB verification badge (Blue, Silver, Gold or Diamond).',
         kind: 'verify',
       );
-      msg = 'Verification requested. The team will reply in your notifications.';
+      msg =
+          'Verification requested. The team will reply in your notifications.';
     } catch (e) {
-      msg = e is ArgumentError ? '${e.message}' : 'The request could not be sent. Try again.';
+      msg = e is ArgumentError
+          ? '${e.message}'
+          : 'The request could not be sent. Try again.';
     }
-    messenger.showSnackBar(SnackBar(content: Text(msg), behavior: SnackBarBehavior.floating));
+    messenger.showSnackBar(
+        SnackBar(content: Text(msg), behavior: SnackBarBehavior.floating));
   }
 }
 
 class _StoreTab extends StatelessWidget {
-  const _StoreTab({required this.label, required this.selected, required this.onTap});
+  const _StoreTab(
+      {required this.label, required this.selected, required this.onTap});
   final String label;
   final bool selected;
   final VoidCallback onTap;
@@ -403,7 +459,8 @@ class _StoreTab extends StatelessWidget {
             borderRadius: BorderRadius.circular(999),
             border: Border.all(color: const Color(0x55C8A96E)),
           ),
-          child: EditableLabel('store.StoreTab',
+          child: EditableLabel(
+            'store.StoreTab',
             label,
             style: TextStyle(
               color: selected ? NwsbColors.ink : Colors.white,
@@ -559,7 +616,7 @@ class _StoreBanner extends StatelessWidget {
               fit: BoxFit.cover,
               errorBuilder: (_, __, ___) =>
                   const ColoredBox(color: Colors.black),
-                  slot: 'store.StoreBanner',
+              slot: 'store.StoreBanner',
             ),
             const DecoratedBox(
               decoration: BoxDecoration(
@@ -577,7 +634,8 @@ class _StoreBanner extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  EditableLabel('store.StoreBanner', 'SHABDAPATHY · COLLECTIONS',
+                  EditableLabel(
+                      'store.StoreBanner', 'SHABDAPATHY · COLLECTIONS',
                       style: TextStyle(
                           fontSize: 10,
                           letterSpacing: 2.5,
@@ -589,7 +647,8 @@ class _StoreBanner extends StatelessWidget {
                           fontWeight: FontWeight.w300,
                           color: Colors.white)),
                   SizedBox(height: 5),
-                  EditableLabel('store.StoreBanner', 'Word Library · Meaning Library · NowssB Signature',
+                  EditableLabel('store.StoreBanner',
+                      'Word Library · Meaning Library · NowssB Signature',
                       style: TextStyle(fontSize: 11, color: Color(0xB3FFFFFF))),
                 ],
               ),
@@ -643,7 +702,10 @@ class _StoreVideoSection extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          NwsbVideo(asset: asset, priority: ClipPriority.feature, slot: 'store.StoreVideoSection'),
+          NwsbVideo(
+              asset: asset,
+              priority: ClipPriority.feature,
+              slot: 'store.StoreVideoSection'),
           const DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -771,7 +833,8 @@ class _SignatureDoor extends StatelessWidget {
               left: 16,
               right: 48,
               top: 12,
-              child: EditableLabel('store.SignatureDoor', 'SHABDAPATHY · THE RAREST',
+              child: EditableLabel(
+                  'store.SignatureDoor', 'SHABDAPATHY · THE RAREST',
                   style: TextStyle(
                       fontSize: 10,
                       letterSpacing: 2.2,
@@ -791,10 +854,12 @@ class _SignatureDoor extends StatelessWidget {
                           color: Colors.white,
                           fontWeight: FontWeight.w300)),
                   SizedBox(height: 6),
-                  EditableLabel('store.SignatureDoor', 'One per category. Owned once, never restocked.',
+                  EditableLabel('store.SignatureDoor',
+                      'One per category. Owned once, never restocked.',
                       style: TextStyle(fontSize: 11, color: Color(0xB3FFFFFF))),
                   SizedBox(height: 12),
-                  EditableLabel('store.SignatureDoor', '15 Words   ·   5 Meanings',
+                  EditableLabel(
+                      'store.SignatureDoor', '15 Words   ·   5 Meanings',
                       style: TextStyle(
                           fontSize: 10,
                           letterSpacing: 1.5,
@@ -901,49 +966,216 @@ class _MiniStoreCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final card = Container(
-        margin: const EdgeInsets.fromLTRB(0, 6, 0, 6),
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: const Color(0xFF000000),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0x24FFFFFF)),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: const BoxDecoration(
-                  shape: BoxShape.circle, color: Color(0x14FFFFFF)),
-              child: Icon(icon, color: NwsbColors.gold, size: 21),
+      margin: const EdgeInsets.fromLTRB(0, 6, 0, 6),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFF000000),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0x24FFFFFF)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: const BoxDecoration(
+                shape: BoxShape.circle, color: Color(0x14FFFFFF)),
+            child: Icon(icon, color: NwsbColors.gold, size: 21),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                EditableLabel('store.MiniStoreCard', eyebrow,
+                    style: const TextStyle(
+                        fontSize: 9,
+                        letterSpacing: 1.2,
+                        color: Color(0x99FFFFFF))),
+                const SizedBox(height: 3),
+                EditableLabel('store.MiniStoreCard', title,
+                    style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white)),
+                const SizedBox(height: 3),
+                EditableLabel('store.MiniStoreCard', sub,
+                    style: const TextStyle(
+                        fontSize: 11, height: 1.3, color: Color(0x8CFFFFFF))),
+              ],
             ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  EditableLabel('store.MiniStoreCard', eyebrow,
-                      style: const TextStyle(
-                          fontSize: 9,
-                          letterSpacing: 1.2,
-                          color: Color(0x99FFFFFF))),
-                  const SizedBox(height: 3),
-                  EditableLabel('store.MiniStoreCard', title,
-                      style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white)),
-                  const SizedBox(height: 3),
-                  EditableLabel('store.MiniStoreCard', sub,
-                      style: const TextStyle(
-                          fontSize: 11, height: 1.3, color: Color(0x8CFFFFFF))),
-                ],
-              ),
-            ),
-            const Icon(Icons.arrow_forward, size: 16, color: Color(0xB3FFFFFF)),
-          ],
-        ),
-      );
+          ),
+          const Icon(Icons.arrow_forward, size: 16, color: Color(0xB3FFFFFF)),
+        ],
+      ),
+    );
     return GestureDetector(onTap: onTap, child: card);
   }
+}
+
+class _Dept {
+  const _Dept(this.label, this.eyebrow, this.title, this.poster, this.open);
+  final String label;
+  final String eyebrow;
+  final String title;
+  final String poster;
+  final VoidCallback open;
+}
+
+/// BD-8: Calm department tab strip (ALL + each store).
+class _StoreDeptTabs extends StatelessWidget {
+  const _StoreDeptTabs({required this.depts});
+  final List<_Dept> depts;
+
+  @override
+  Widget build(BuildContext context) {
+    Widget tab(String label, bool selected, VoidCallback? onTap) => InkWell(
+          onTap: onTap,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                    color: selected ? Colors.white : Colors.transparent,
+                    width: 2),
+              ),
+            ),
+            child: Text(label,
+                style: TextStyle(
+                    color: selected ? Colors.white : const Color(0x80FFFFFF),
+                    fontSize: 11,
+                    letterSpacing: 1.0,
+                    fontWeight: selected ? FontWeight.w500 : FontWeight.w400)),
+          ),
+        );
+    return Container(
+      margin: const EdgeInsets.only(top: 10),
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: Color(0x22FFFFFF))),
+      ),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: Row(children: [
+          tab('All', true, null),
+          for (final d in depts)
+            KeyedSubtree(
+                key: ValueKey('store-tab-${d.label}'),
+                child: tab(d.label, false, d.open)),
+        ]),
+      ),
+    );
+  }
+}
+
+/// BD-8: centred "Spotlight Picks" heading + full-width department banners
+/// with a white Shop Now pill (Nykaa dark home).
+class _SpotlightPicks extends StatelessWidget {
+  const _SpotlightPicks({required this.depts});
+  final List<_Dept> depts;
+
+  @override
+  Widget build(BuildContext context) => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(24, 36, 24, 24),
+            child: Row(children: [
+              Expanded(child: Divider(color: Color(0x1AFFFFFF))),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12),
+                child: Text('Spotlight Picks',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w300,
+                        letterSpacing: 1.2)),
+              ),
+              Expanded(child: Divider(color: Color(0x1AFFFFFF))),
+            ]),
+          ),
+          for (final d in depts) _SpotlightBanner(dept: d),
+        ],
+      );
+}
+
+class _SpotlightBanner extends StatelessWidget {
+  const _SpotlightBanner({required this.dept});
+  final _Dept dept;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.fromLTRB(
+            UiSpace.xl - 4, 0, UiSpace.xl - 4, UiSpace.xxl - 4),
+        child: GestureDetector(
+          onTap: dept.open,
+          // Brief B: calm glass wrapper around a black card, lots of air.
+          child: GlassBlackCard(
+            padding: EdgeInsets.zero,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(UiRadii.card - UiSpace.sm),
+              child: AspectRatio(
+                aspectRatio: 16 / 11,
+                child: Stack(fit: StackFit.expand, children: [
+                  Image.asset(dept.poster,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) =>
+                          const ColoredBox(color: Color(0xFF111318))),
+                  const DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Color(0x00000000), Color(0xCC000000)],
+                        stops: [0.35, 1],
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: 20,
+                    right: 20,
+                    bottom: 22,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(dept.eyebrow,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                                color: Color(0xB3FFFFFF),
+                                fontSize: 10,
+                                letterSpacing: 2.4)),
+                        const SizedBox(height: 6),
+                        Text(dept.title,
+                            textAlign: TextAlign.center,
+                            maxLines: 2,
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                height: 1.25,
+                                fontWeight: FontWeight.w400)),
+                        const SizedBox(height: 14),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 22, vertical: 9),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: const Text('Shop Now',
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 12,
+                                  letterSpacing: 0.3,
+                                  fontWeight: FontWeight.w500)),
+                        ),
+                      ],
+                    ),
+                  ),
+                ]),
+              ),
+            ),
+          ),
+        ),
+      );
 }

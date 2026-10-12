@@ -97,7 +97,8 @@ class _NavShellState extends State<NavShell> {
     _widgetTaps = HomeWidgetSync.instance.clicks.listen(_onWidgetTap);
     // Daily 'open the app' activity (server caps it at once a day).
     reportEarn('open');
-    NotifRouter.instance.attach(context, goTab: _goToTab, popToRoot: _popShellOverlays);
+    NotifRouter.instance
+        .attach(context, goTab: _goToTab, popToRoot: _popShellOverlays);
   }
 
   StreamSubscription<Uri>? _widgetTaps;
@@ -120,12 +121,14 @@ class _NavShellState extends State<NavShell> {
       _popShellOverlays();
       reportEarn('word_of_day');
       Navigator.of(context).push(MaterialPageRoute(
-        builder: (_) => PracticePlayerScreen(words: [w!], title: 'Word of the day', showIntro: false),
+        builder: (_) => PracticePlayerScreen(
+            words: [w!], title: 'Word of the day', showIntro: false),
       ));
     } else if (what == 'streak') {
       _popShellOverlays();
       Navigator.of(context).push(MaterialPageRoute(
-        builder: (_) => PracticeProgressScreen(words: ContentStore.instance.library),
+        builder: (_) =>
+            PracticeProgressScreen(words: ContentStore.instance.library),
       ));
     }
   }
@@ -414,7 +417,7 @@ class _NavShellState extends State<NavShell> {
                 // Inset mode pill from screen/card edge (Normal/Fashion toggle).
                 left: 20,
                 right: 20,
-                bottom: 88,
+                bottom: 112,
                 child: SafeArea(
                   top: false,
                   child: Row(
@@ -465,7 +468,46 @@ class _NavShellState extends State<NavShell> {
                         final background = settings.navColor == 'black'
                             ? const Color(0xF5000000)
                             : const Color(0xF5182033);
-                        return Container(
+                        final slots = settings.navSlots;
+                        // BD-8: Nykaa-style raised centre button. The middle
+                        // slot (same destination, same order) sticks up above
+                        // the bar as a calm black circle (brief B).
+                        final centre =
+                            slots.length.isOdd ? slots.length ~/ 2 : -1;
+                        Widget navIcon(String slot, double iconSize) =>
+                            (_navFeatures[slot]?['img'] ?? '')
+                                    .startsWith('asset:')
+                                ? EditableImage.asset(
+                                    (_navFeatures[slot]?['img'] ?? '')
+                                        .substring(6),
+                                    width: iconSize,
+                                    height: iconSize,
+                                    fit: BoxFit.contain,
+                                    errorBuilder: (_, __, ___) => Icon(
+                                      Icons.circle_outlined,
+                                      size: 22,
+                                      color: slot == 'connect' ||
+                                              _primaryTab(slot) == _i
+                                          ? NwsbColors.goldLight
+                                          : const Color(0x99FFFFFF),
+                                    ),
+                                    slot: 'nav_shell.NavShell',
+                                  )
+                                : Image.network(
+                                    _navFeatures[slot]?['img'] ?? '',
+                                    width: iconSize,
+                                    height: iconSize,
+                                    fit: BoxFit.contain,
+                                    errorBuilder: (_, __, ___) => Icon(
+                                      Icons.circle_outlined,
+                                      size: 22,
+                                      color: slot == 'connect' ||
+                                              _primaryTab(slot) == _i
+                                          ? NwsbColors.goldLight
+                                          : const Color(0x99FFFFFF),
+                                    ),
+                                  );
+                        final bar = Container(
                           height: 58,
                           decoration: BoxDecoration(
                             color: background,
@@ -473,10 +515,8 @@ class _NavShellState extends State<NavShell> {
                             border: Border.all(color: const Color(0x22FFFFFF)),
                           ),
                           child: Row(children: [
-                            for (var i = 0;
-                                i < settings.navSlots.length;
-                                i++) ...[
-                              if (i > 0)
+                            for (var i = 0; i < slots.length; i++) ...[
+                              if (i > 0 && i != centre && i != centre + 1)
                                 Container(
                                   width: 1,
                                   height: 18,
@@ -487,84 +527,84 @@ class _NavShellState extends State<NavShell> {
                               Expanded(
                                 child: GestureDetector(
                                   behavior: HitTestBehavior.opaque,
-                                  onTap: () => _goToSlot(settings.navSlots[i]),
+                                  onTap: () => _goToSlot(slots[i]),
                                   child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisAlignment: i == centre
+                                        ? MainAxisAlignment.end
+                                        : MainAxisAlignment.center,
                                     children: [
-                                      (_navFeatures[settings.navSlots[i]]
-                                                      ?['img'] ??
-                                                  '')
-                                              .startsWith('asset:')
-                                          ? EditableImage.asset(
-                                              (_navFeatures[settings
-                                                              .navSlots[i]]
-                                                          ?['img'] ??
-                                                      '')
-                                                  .substring(6),
-                                              width: 28,
-                                              height: 28,
-                                              fit: BoxFit.contain,
-                                              errorBuilder: (_, __, ___) =>
-                                                  Icon(
-                                                Icons.circle_outlined,
-                                                size: 22,
-                                                color: settings.navSlots[i] ==
-                                                            'connect' ||
-                                                        _primaryTab(settings
-                                                                .navSlots[i]) ==
-                                                            _i
-                                                    ? NwsbColors.goldLight
-                                                    : const Color(0x99FFFFFF),
-                                              ),
-                                              slot: 'nav_shell.NavShell',
-                                            )
-                                          : Image.network(
-                                              _navFeatures[settings.navSlots[i]]
-                                                      ?['img'] ??
-                                                  '',
-                                              width: 28,
-                                              height: 28,
-                                              fit: BoxFit.contain,
-                                              errorBuilder: (_, __, ___) =>
-                                                  Icon(
-                                                Icons.circle_outlined,
-                                                size: 22,
-                                                color: settings.navSlots[i] ==
-                                                            'connect' ||
-                                                        _primaryTab(settings
-                                                                .navSlots[i]) ==
-                                                            _i
-                                                    ? NwsbColors.goldLight
-                                                    : const Color(0x99FFFFFF),
-                                              ),
-                                            ),
-                                      const SizedBox(height: 3),
+                                      if (i != centre) navIcon(slots[i], 28),
+                                      if (i != centre)
+                                        const SizedBox(height: 3),
                                       Text(
-                                        _navFeatures[settings.navSlots[i]]
-                                                ?['label'] ??
-                                            settings.navSlots[i],
+                                        _navFeatures[slots[i]]?['label'] ??
+                                            slots[i],
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
+                                        textScaler: TextScaler.linear(
+                                            MediaQuery.textScalerOf(context)
+                                                .scale(1)
+                                                .clamp(1.0, 1.3)),
                                         style: TextStyle(
                                           fontSize: 9,
-                                          fontWeight: _primaryTab(
-                                                      settings.navSlots[i]) ==
-                                                  _i
-                                              ? FontWeight.w700
-                                              : FontWeight.w400,
-                                          color: _primaryTab(
-                                                      settings.navSlots[i]) ==
-                                                  _i
+                                          fontWeight:
+                                              _primaryTab(slots[i]) == _i
+                                                  ? FontWeight.w700
+                                                  : FontWeight.w400,
+                                          color: _primaryTab(slots[i]) == _i
                                               ? NwsbColors.goldLight
                                               : const Color(0x99FFFFFF),
                                         ),
                                       ),
+                                      if (i == centre)
+                                        const SizedBox(height: 7),
                                     ],
                                   ),
                                 ),
                               ),
                             ],
                           ]),
+                        );
+                        if (centre < 0) return bar;
+                        final active = _primaryTab(slots[centre]) == _i;
+                        return SizedBox(
+                          height: 58 + 24,
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            alignment: Alignment.bottomCenter,
+                            children: [
+                              Positioned(
+                                  left: 0, right: 0, bottom: 0, child: bar),
+                              Positioned(
+                                top: 0,
+                                child: GestureDetector(
+                                  key: const ValueKey('nav-raised-centre'),
+                                  onTap: () => _goToSlot(slots[centre]),
+                                  child: Container(
+                                    width: 58,
+                                    height: 58,
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: const Color(0xFF0B0C0F),
+                                      border: Border.all(
+                                          color: active
+                                              ? NwsbColors.goldLight
+                                              : const Color(0x33FFFFFF),
+                                          width: 1.2),
+                                      boxShadow: const [
+                                        BoxShadow(
+                                            color: Color(0x80000000),
+                                            blurRadius: 14,
+                                            offset: Offset(0, 6)),
+                                      ],
+                                    ),
+                                    child: navIcon(slots[centre], 30),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         );
                       }),
                     ),
@@ -779,7 +819,8 @@ class _TabletRail extends StatelessWidget {
         width: 26,
         height: 26,
         fit: BoxFit.contain,
-        errorBuilder: (_, __, ___) => Icon(Icons.circle_outlined, size: 22, color: fallback),
+        errorBuilder: (_, __, ___) =>
+            Icon(Icons.circle_outlined, size: 22, color: fallback),
         slot: 'nav_shell.TabletRail',
       );
     }
@@ -791,7 +832,8 @@ class _TabletRail extends StatelessWidget {
       width: 26,
       height: 26,
       fit: BoxFit.contain,
-      errorBuilder: (_, __, ___) => Icon(Icons.circle_outlined, size: 22, color: fallback),
+      errorBuilder: (_, __, ___) =>
+          Icon(Icons.circle_outlined, size: 22, color: fallback),
     );
   }
 
@@ -808,7 +850,9 @@ class _TabletRail extends StatelessWidget {
           children: [
             Icon(icon, size: 20, color: ink),
             const SizedBox(height: 2),
-            Text(label, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w600, color: ink)),
+            Text(label,
+                style: TextStyle(
+                    fontSize: 9, fontWeight: FontWeight.w600, color: ink)),
           ],
         ),
       ),
@@ -844,4 +888,3 @@ class _NavRoutinesPage extends StatelessWidget {
     );
   }
 }
-
