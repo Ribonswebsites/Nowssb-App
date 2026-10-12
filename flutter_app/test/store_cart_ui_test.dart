@@ -72,7 +72,7 @@ void main() {
           File('lib/screens/store/store_home_sections.dart').readAsStringSync();
       expect(sections, contains('class StoreQuickMosaic'));
       expect(sections, contains('assets/video/store-orb-box.mp4'));
-      expect(sections, contains('width: 180'));
+      expect(sections, contains('clamp(120.0, 180.0)'));
       expect(atelier, contains('StoreQuickMosaic('));
 
       final catalog = File('lib/data/store_catalog.dart').readAsStringSync();
