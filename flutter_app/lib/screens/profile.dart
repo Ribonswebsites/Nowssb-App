@@ -50,6 +50,9 @@ import '../admin/layout/layout_sections.dart';
 import '../features/programs/program_cards.dart';
 
 const _accent = Color(0xFFE3BD7D);
+const _pBg = Colors.black;
+const _pInk = _text;
+const _pSub = _dim;
 const _text = Color(0xFFF5F5F3);
 const _dim = Color(0xFF8C8C8C);
 const _faint = Color(0xFF565656);
@@ -453,34 +456,66 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Positioned.fill(child: IgnorePointer(child: CustomPaint(painter: _GrainPainter()))),
           SafeArea(
             bottom: false,
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: double.infinity),
-                child: ListView(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
-                  // Server-driven order (Admin → UI Editor); bundled order by default.
-      children: layoutChildren(context, 'profile', [
-                    LSection('banner', 'Banner', _banner()),
-                    LSection('card', 'Profile card', Column(crossAxisAlignment: CrossAxisAlignment.start, children: [_profileCard(), _balancePill()])),
-                    LSection('earn', 'Earn hub', _earnHub()),
-                    LSection('progress', 'Progress', _progress()),
-                    LSection('about', 'About', _about()),
-                    LSection('promo', 'Split promo banner', ColoredSplitPromoBanner.forSurface(
-                      SplitPromoSurface.profile,
-                      onTap: () => NavScope.goTo(context, 1),
-                    )),
-                    LSection('quick', 'Quick access', _quickAccess()),
-                    LSection('recent', 'Recent activity', _recentActivity()),
-                    LSection('motto', 'Motto', _motto()),
-                    LSection('week', 'Week tracker', _weekTracker(today)),
-                    LSection('prefs', 'Preferences', _preferences()),
-                    LSection('shop', 'Shop', _shop()),
-                    LSection('account', 'Account', _account()),
-                    LSection('quote', 'Quote', _quote()),
-                    LSection('signout', 'Sign out', _signOut()),
+            child: ListView(
+              padding: const EdgeInsets.only(bottom: 120),
+              children: [
+                Padding(padding: const EdgeInsets.symmetric(horizontal: 20), child: Column(children: [_banner(), _rbHero()])),
+                const SizedBox(height: 26),
+                Padding(padding: const EdgeInsets.symmetric(horizontal: 20), child: Column(children: [
+                _rbGroup('Practice', [
+                  _rbRow(Icons.insights_rounded, 'Progress', '${PracticeProgress.instance.streak}d', () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => PracticeProgressScreen(words: ContentStore.instance.library)))),
+                  _rbRow(Icons.self_improvement_rounded, 'Practice', '', () => _openQuick('Sessions')),
+                  _rbRow(Icons.favorite_border_rounded, 'Saved', '', () => _openQuick('Saved')),
+                  _rbRow(Icons.inbox_outlined, 'Journal', '', () => _openQuick('Journal')),
+                  _rbRow(Icons.apps_rounded, 'Shortcuts', '', () => _openQuick('More')),
+                ]),
+                ListenableBuilder(
+                  listenable: Listenable.merge([CartBag.instance, Entitlements.instance]),
+                  builder: (context, _) => _rbGroup('Shop', [
+                    _rbRow(Icons.shopping_bag_outlined, 'Cart', '${CartBag.instance.cartCount}', () => _openShop('Cart')),
+                    _rbRow(Icons.bookmark_border_rounded, 'Wishlist', '${CartBag.instance.wishCount}', () => _openShop('Wishlist')),
+                    _rbRow(Icons.receipt_long_outlined, 'Orders', '${Entitlements.instance.owned.length}', () => _openShop('Orders')),
                   ]),
                 ),
-              ),
+                ListenableBuilder(
+                  listenable: Listenable.merge([EconomyMirror.instance, EarnWallet.instance]),
+                  builder: (context, _) {
+                    final m = EconomyMirror.instance;
+                                    return _rbGroup('Rewards', [
+                      _rbRow(Icons.savings_outlined, 'Vault', '${m.coins}', () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const VaultScreen()))),
+                      _rbRow(Icons.workspace_premium_outlined, 'NowssB Earn', m.live ? m.circleTier : '', () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CircleScreen()))),
+                      _rbRow(Icons.hub_outlined, 'Earn hub', '', () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarnHubScreen()))),
+                      _rbRow(Icons.card_giftcard_outlined, 'Gifts', '', () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const GiftsScreen()))),
+                      _rbRow(Icons.account_balance_wallet_outlined, 'Earnings', m.live ? FxBook.instance.formatCents(m.lifetimeCents) : '', () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarningsScreen()))),
+                    ]);
+                  },
+                ),
+                _rbGroup('Preferences', [
+                  _rbTrail('Sound', Switch(activeColor: Colors.black, activeTrackColor: _accent, value: _soundOn, onChanged: (v) async { setState(() => _soundOn = v); await _prefs.setString('nowssb_sound', v ? 'on' : 'off'); })),
+                  _rbTrail('Duration', Row(mainAxisSize: MainAxisSize.min, children: [
+                    _rbStep(Icons.remove_rounded, () => _stepDuration(-15)),
+                    SizedBox(width: 70, child: Text(_durationText, textAlign: TextAlign.center, style: const TextStyle(fontFamily: _mono, fontSize: 13.5, color: _pInk))),
+                    _rbStep(Icons.add_rounded, () => _stepDuration(15)),
+                  ])),
+                  _rbTrail('Reminder', InkWell(onTap: _pickReminder, borderRadius: BorderRadius.circular(999), child: Container(padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6), decoration: BoxDecoration(border: Border.all(color: _border), borderRadius: BorderRadius.circular(999)), child: Text(_reminderText, style: const TextStyle(fontFamily: _mono, fontSize: 13.5, color: _pInk))))),
+                ]),
+                ListenableBuilder(
+                  listenable: EconomyMirror.instance,
+                  builder: (context, _) => _rbGroup('Account', [
+                    _rbTrail('Member since', Text(_memberSince, style: const TextStyle(fontSize: 13, color: _pSub))),
+                    _rbRow(Icons.diamond_outlined, 'Plan', _planName, () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SubscriptionScreen()))),
+                    _rbRow(Icons.tune_rounded, 'Settings', '', () => _openQuick('Settings')),
+                  ]),
+                ),
+                const SizedBox(height: 6),
+                Center(
+                  child: TextButton(
+                    onPressed: _doSignOut,
+                    child: const Text('Sign out', style: TextStyle(fontSize: 14, color: _pSub, letterSpacing: .4)),
+                  ),
+                ),
+                ])),
+              ],
             ),
           ),
             if (_recentOpen) _recentSheet(),
@@ -489,6 +524,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
   }
+
+  // REBUILD-C 8:22 rule: original NowssB background, grain and banner
+  // media exactly as on main 235ae99; layout from the CLiQ Perks ref.
+  Widget _rbBackdrop() => Stack(fit: StackFit.expand, children: [
+        const _Background(),
+        IgnorePointer(child: CustomPaint(painter: _GrainPainter())),
+      ]);
 
   Widget _banner() {
     final banner = _bannerUrl;
@@ -515,6 +557,171 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       );
   }
+
+  Widget _circleButton({required String asset, required VoidCallback onTap, double size = 38}) => Material(color: Colors.transparent, child: InkWell(onTap: onTap, customBorder: const CircleBorder(), child: Container(width: size, height: size, decoration: BoxDecoration(color: const Color(0x52000000), shape: BoxShape.circle, border: const Border.fromBorderSide(BorderSide(color: Color(0x29FFFFFF)))), child: Center(child: EditableSvg.asset(asset, width: size * .47, height: size * .47, colorFilter: const ColorFilter.mode(_text, BlendMode.srcIn), placeholderBuilder: (_) => Icon(Icons.circle_outlined, size: size * .47, color: _dim), slot: 'profile.ProfileScreen')))));
+
+  Widget _rbAvatar() {
+    final initial = (_nameController.text.trim().isEmpty ? 'P' : _nameController.text.trim().substring(0, 1)).toUpperCase();
+    return Stack(clipBehavior: Clip.none, children: [
+      Positioned.fill(
+        child: Container(
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(shape: BoxShape.circle, color: const Color(0xFF0A0A0A), border: Border.all(color: const Color(0xCCFFB199), width: 1.2)),
+          child: _photo != null
+              ? Image.file(_photo!, fit: BoxFit.cover)
+              : CachedNetworkImage(
+                  imageUrl: (_avatarUrl != null && _avatarUrl!.startsWith('http')) ? _avatarUrl! : kDefaultAvatar,
+                  fit: BoxFit.cover,
+                  placeholder: (_, __) => Center(child: Text(initial, style: const TextStyle(fontFamily: _mono, fontSize: 30, color: _text))),
+                  errorWidget: (_, __, ___) => Center(child: Text(initial, style: const TextStyle(fontFamily: _mono, fontSize: 30, color: _text))),
+                ),
+        ),
+      ),
+      Positioned(
+        right: -2,
+        bottom: -2,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: _pickPhoto,
+            customBorder: const CircleBorder(),
+            child: Container(width: 22, height: 22, decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white, border: Border.all(color: Colors.black, width: 1)), child: const Icon(Icons.photo_camera_rounded, size: 12, color: Colors.black)),
+          ),
+        ),
+      ),
+    ]);
+  }
+
+  Widget _rbHero() => ListenableBuilder(
+        listenable: Listenable.merge([EconomyMirror.instance, PracticeProgress.instance]),
+        builder: (context, _) {
+          final m = EconomyMirror.instance;
+          final signedIn = NwsbFirebase.ready && FirebaseAuth.instance.currentUser != null;
+          final plan = _planName == 'Free' ? 'Free' : _planName;
+          final first = _nameController.text.trim().split(' ').first;
+          final until = m.subUntil > 0 && _planName != 'Free' ? DateTime.fromMillisecondsSinceEpoch(m.subUntil) : null;
+          const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+          return Column(children: [
+            const SizedBox(height: 8),
+            Text(first.isEmpty ? 'Hello' : 'Hello $first', style: const TextStyle(fontSize: 16, color: _pInk)),
+            const SizedBox(height: 4),
+            Text("You're on ${plan.toUpperCase()}", style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: _pInk)),
+            const SizedBox(height: 22),
+            // Member card: glass-wrapped black card with the original ring art.
+            GlassBlackCard(
+              padding: EdgeInsets.zero,
+              child: SizedBox(
+                height: 150,
+                child: Row(children: [
+                  SizedBox(
+                    width: 140,
+                    child: Stack(children: [
+                      Positioned.fill(child: EditableImage.asset('assets/profile_source/img-ring.png', fit: BoxFit.cover, alignment: const Alignment(0, -.16), slot: 'profile.ProfileScreen')),
+                      Align(alignment: const Alignment(.1, -.25), child: SizedBox.square(dimension: 76, child: _rbAvatar())),
+                    ]),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 22, 16, 18),
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        InkWell(
+                          onTap: _editName,
+                          child: Row(children: [
+                            Flexible(child: Text(_nameController.text.isEmpty ? 'Your name' : _nameController.text, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: _text))),
+                            const SizedBox(width: 6),
+                            const Icon(Icons.edit_outlined, size: 14, color: _dim),
+                          ]),
+                        ),
+                        const Spacer(),
+                        Row(children: [
+                          Text(plan.toUpperCase(), style: const TextStyle(fontSize: 13, letterSpacing: 2, fontWeight: FontWeight.w700, color: _accent)),
+                          const SizedBox(width: 6),
+                          const Icon(Icons.auto_awesome, size: 13, color: _accent),
+                        ]),
+                      ]),
+                    ),
+                  ),
+                ]),
+              ),
+            ).animate().fadeIn(duration: 600.ms).slideY(begin: .05, curve: Curves.easeOutCubic),
+            const SizedBox(height: 22),
+            if (signedIn)
+              InkWell(
+                onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const VaultScreen())),
+                borderRadius: BorderRadius.circular(16),
+                child: Container(
+                  width: 220,
+                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                  decoration: BoxDecoration(color: const Color(0x14FFFFFF), borderRadius: BorderRadius.circular(16), border: Border.all(color: _border)),
+                  child: Row(children: [
+                    Expanded(child: Column(children: [
+                      const Text('Coins', style: TextStyle(fontSize: 12, color: _pSub)),
+                      const SizedBox(height: 4),
+                      Text('${m.coins}', style: const TextStyle(fontFamily: _mono, fontSize: 20, color: _pInk)),
+                    ])),
+                    const Icon(Icons.chevron_right_rounded, color: _pInk),
+                  ]),
+                ),
+              ),
+            const SizedBox(height: 14),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                style: FilledButton.styleFrom(backgroundColor: const Color(0x1FFFFFFF), foregroundColor: _text, side: const BorderSide(color: _border), padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
+                onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SubscriptionScreen())),
+                child: const Text('VIEW PLANS', style: TextStyle(letterSpacing: 1.6, fontSize: 13)),
+              ),
+            ),
+            if (until != null) ...[
+              const SizedBox(height: 10),
+              Text('Valid until ${until.day} ${months[until.month - 1]} ${until.year}', style: const TextStyle(fontSize: 12, color: _pSub)),
+            ],
+          ]);
+        },
+      );
+
+  Widget _rbGroup(String title, List<Widget> rows) => Padding(
+        padding: const EdgeInsets.only(bottom: 26),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Padding(padding: const EdgeInsets.only(left: 6, bottom: 10), child: Text(title.toUpperCase(), style: const TextStyle(fontSize: 10.5, letterSpacing: 2.2, color: _pSub))),
+          GlassBlackCard(
+            padding: EdgeInsets.zero,
+            child: SizedBox(
+              width: double.infinity,
+              child: Column(children: [
+                for (var i = 0; i < rows.length; i++) ...[
+                  if (i > 0) const Divider(height: 1, thickness: .5, indent: 62, color: _borderSoft),
+                  rows[i],
+                ],
+              ]),
+            ),
+          ),
+        ]),
+      );
+
+  Widget _rbRow(IconData icon, String label, String value, VoidCallback onTap) => InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          child: Row(children: [
+            Container(width: 32, height: 32, decoration: BoxDecoration(shape: BoxShape.circle, color: const Color(0x14E3BD7D)), child: Icon(icon, size: 16, color: _accent)),
+            const SizedBox(width: 14),
+            Expanded(child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 15, color: _pInk))),
+            if (value.isNotEmpty) Padding(padding: const EdgeInsets.only(left: 8), child: Text(value, style: const TextStyle(fontFamily: _mono, fontSize: 13, color: _pInk))),
+            const Icon(Icons.chevron_right_rounded, size: 20, color: _pSub),
+          ]),
+        ),
+      );
+
+  Widget _rbTrail(String label, Widget trailing) => Padding(
+        padding: const EdgeInsets.fromLTRB(62, 12, 16, 12),
+        child: Row(children: [Expanded(child: Text(label, style: const TextStyle(fontSize: 15, color: _pInk))), trailing]),
+      );
+
+  Widget _rbStep(IconData icon, VoidCallback onTap) => Material(
+        color: Colors.transparent,
+        child: InkWell(onTap: onTap, customBorder: const CircleBorder(), child: Container(width: 28, height: 28, decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: _border)), child: Icon(icon, size: 14, color: _pInk))),
+      );
 
   Future<void> _pickBanner() async {
     final chosen = await showModalBottomSheet<String>(
