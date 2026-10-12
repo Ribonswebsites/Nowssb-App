@@ -121,16 +121,10 @@ void main() {
     // a zero-opacity EditableLabel keeps the slot id for the template editor).
     // Terms for the hub are pre-accepted via SharedPreferences mock above.
     await pump(tester, const StoreScreen());
-    final scrollable = find.byType(Scrollable).first;
-    for (final label in [
-      'WORD ATELIER',
-      'MEANING STORE',
-      'SIGNATURE STORE',
-      'SHABDAPATHY · LIBRARY',
-    ]) {
-      await tester.scrollUntilVisible(find.text(label), 260,
-          scrollable: scrollable);
-      expect(find.text(label), findsWidgets);
+    // BD-8: departments are reached through the dept tabs / Spotlight
+    // Picks (the old department sections ship hidden by default).
+    for (final label in ['Word Atelier', 'Meanings', 'Signature', 'Ebooks', 'Plans']) {
+      expect(find.text(label, skipOffstage: false), findsWidgets, reason: label);
     }
     expect(tester.takeException(), isNull);
   });
