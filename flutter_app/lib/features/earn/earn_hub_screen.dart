@@ -20,7 +20,6 @@ import '../economy/coupon_screen.dart';
 import '../economy/partner_screen.dart';
 import '../economy/reference_screen.dart';
 import '../../widgets/program_shelf.dart';
-import '../../widgets/hype_rail.dart';
 import '../../admin/template/editable.dart';
 import '../../admin/layout/layout_sections.dart';
 import '../programs/coupons_program.dart';
@@ -45,8 +44,8 @@ class EarnHubScreen extends StatelessWidget {
         spec: SplitPromoSpec(
           title: 'NowssB Earn',
           cta: 'Agents, rewards, gifts',
-          leftColor: Color(0xFF2A1B4D),
-          rightColor: Color(0xFFC8A96E),
+          leftColor: Color(0xFF0B0D0C),
+          rightColor: Color(0xFF8FA89A),
           art: SplitPromoArts.egyptianGold,
         ),
       ),
@@ -58,33 +57,19 @@ class EarnHubScreen extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
             // Server-driven order (Admin → UI Editor); bundled order by default.
       children: layoutChildren(context, 'earn', [
-              const LSection('hype', 'Most hyped', NowssbHypeRail()),
-              if (w.uid == null)
-                GoldButton(
-                  label: 'Sign in to see your balance',
-                  onTap: () => NwsbSignInPage.open(context),
-                )
-              else ...[
-                CoinCount(value: w.coins, style: const TextStyle(fontSize: 28, color: NwsbColors.goldLight, fontWeight: FontWeight.w700)),
-                MoneyCount(cents: w.cash, style: const TextStyle(color: NwsbColors.mist)),
-                Text(w.plan, style: const TextStyle(color: NwsbColors.mist)),
-                const SizedBox(height: 6),
-                Text('${w.sellerTier} · ${w.wordsSold}/${w.nextSellerTarget} sold', style: const TextStyle(color: NwsbColors.mist)),
-                Text('${w.circleTier} · ${w.code.isEmpty ? 'code paused' : w.code}', style: const TextStyle(color: NwsbColors.mist)),
-              ],
-              const SizedBox(height: 8),
-              const LSection('note', 'Privacy note', EconomyNote('This page is only yours. Coin and cash balances are not on the public Word Print.')),
-              const SizedBox(height: 8),
-              const GlassLine(text: 'Earn, rewards, gifts, resell, print, the wall. Swipe the shelf.'),
-              const SizedBox(height: 12),
+              _CalmBalanceCard(w: w),
+              const SizedBox(height: 24),
+              const LSection('note', 'Privacy note', Padding(
+                padding: EdgeInsets.symmetric(horizontal: 6),
+                child: Text('This page is only yours. Coin and cash balances are not on the public Word Print.',
+                    style: TextStyle(color: Color(0x99FFFFFF), fontSize: 12.5, height: 1.5)),
+              )),
+              const SizedBox(height: 24),
               const CoinCollectCard(pageKey: 'hub', amount: 8, title: 'Earn hub coins'),
-              const SizedBox(height: 12),
-              // Each poster opens its own programme (see openPoster).
-              const ProgramShelf(),
-              const SizedBox(height: 14),
+              const SizedBox(height: 24),
               // The six programs from the plan, each with its full tab set.
               LSection.group('programs', 'Programs', [
-                const EditableLabel('earn_hub_screen.EarnHubScreen', 'THE PROGRAMS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12)),
+                const EditableLabel('earn_hub_screen.EarnHubScreen', 'THE PROGRAMS', style: TextStyle(color: _kCalmAccent, letterSpacing: 2.4, fontSize: 11, fontWeight: FontWeight.w500)),
                 const SizedBox(height: 8),
                 ProgramLink(title: 'NowssB Earn', sub: 'Ranks, team, sales, targets, payouts', mark: NwsbMarks.piggy, page: () => const EarnProgramPage()),
                 ProgramLink(title: 'NowssB Rewards', sub: 'Daily coins, streaks, quests, season, leagues', mark: NwsbMarks.rewards, page: () => const RewardsProgramPage()),
@@ -93,18 +78,18 @@ class EarnHubScreen extends StatelessWidget {
                 ProgramLink(title: 'NowssB Reference', sub: 'Your links, friends, sharer ladder', mark: NwsbMarks.reference, page: () => const ReferenceProgramPage()),
                 ProgramLink(title: 'Partner Program', sub: 'Milestones, perks, buyer discount', mark: NwsbMarks.crown, page: () => const PartnerProgramPage()),
               ]),
-              const SizedBox(height: 12),
+              const SizedBox(height: 24),
               LSection.group('more', 'More', [
                 ProgramLink(title: 'Your Earning', sub: 'Balance, payout account, request a payout', mark: NwsbMarks.bars, page: () => const EarningsScreen()),
                 ProgramLink(title: 'Word Print', sub: 'Your public profile of words', mark: NwsbMarks.word, page: () => WordPrintScreen(uid: w.uid)),
                 ProgramLink(title: 'Echo Wall', sub: 'Posts from people on NowssB', mark: NwsbMarks.verified, page: () => const EchoWallScreen()),
               ]),
-              const SizedBox(height: 18),
-              const LSection('coins', 'Coin ledger', EditableLabel('earn_hub_screen.EarnHubScreen', 'COIN LEDGER', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12))),
+              const SizedBox(height: 24),
+              const LSection('coins', 'Coin ledger', EditableLabel('earn_hub_screen.EarnHubScreen', 'COIN LEDGER', style: TextStyle(color: _kCalmAccent, letterSpacing: 2.4, fontSize: 11, fontWeight: FontWeight.w500))),
               const SizedBox(height: 8),
               _ledger('coinLedger', w.uid),
-              const SizedBox(height: 16),
-              const LSection('cash', 'Cash ledger', EditableLabel('earn_hub_screen.EarnHubScreen', 'CASH LEDGER', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12))),
+              const SizedBox(height: 24),
+              const LSection('cash', 'Cash ledger', EditableLabel('earn_hub_screen.EarnHubScreen', 'CASH LEDGER', style: TextStyle(color: _kCalmAccent, letterSpacing: 2.4, fontSize: 11, fontWeight: FontWeight.w500))),
               const SizedBox(height: 8),
               _ledger('commissionLedger', w.uid),
             ]),
@@ -141,6 +126,69 @@ class EarnHubScreen extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+}
+
+/// One calm accent for the Rewards page (sage), per the Oct 12 brief.
+const Color _kCalmAccent = Color(0xFF9FB8A8);
+
+/// Play Points style balance card: black glass, lots of air, one accent.
+/// Read-only mirror of server state (EconomyMirror); grants nothing.
+class _CalmBalanceCard extends StatelessWidget {
+  const _CalmBalanceCard({required this.w});
+  final EconomyMirror w;
+
+  @override
+  Widget build(BuildContext context) {
+    const soft = TextStyle(color: Color(0xB3FFFFFF), fontSize: 13, height: 1.4);
+    return Container(
+      padding: const EdgeInsets.fromLTRB(22, 24, 22, 22),
+      decoration: BoxDecoration(
+        color: const Color(0xCC0A0A0A),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: const Color(0x1FFFFFFF)),
+        boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 24, offset: Offset(0, 10))],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(children: [
+            Container(
+              width: 8,
+              height: 8,
+              decoration: const BoxDecoration(color: _kCalmAccent, shape: BoxShape.circle),
+            ),
+            const SizedBox(width: 10),
+            const Flexible(
+              child: Text('YOUR REWARDS', style: TextStyle(color: _kCalmAccent, letterSpacing: 2.4, fontSize: 11, fontWeight: FontWeight.w500)),
+            ),
+          ]),
+          const SizedBox(height: 18),
+          if (w.uid == null) ...[
+            const Text('Breathe in. Your coins, gifts and coupons wait here.', style: soft),
+            const SizedBox(height: 18),
+            GoldButton(label: 'Sign in to see your balance', onTap: () => NwsbSignInPage.open(context)),
+          ] else ...[
+            CoinCount(value: w.coins, style: const TextStyle(fontSize: 40, color: Colors.white, fontWeight: FontWeight.w300, letterSpacing: -0.5)),
+            const SizedBox(height: 4),
+            MoneyCount(cents: w.cash, style: soft),
+            const SizedBox(height: 18),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: LinearProgressIndicator(
+                minHeight: 4,
+                value: w.nextSellerTarget <= 0 ? 0 : (w.wordsSold / w.nextSellerTarget).clamp(0, 1).toDouble(),
+                backgroundColor: const Color(0x1AFFFFFF),
+                valueColor: const AlwaysStoppedAnimation(_kCalmAccent),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text('${w.sellerTier} · ${w.wordsSold}/${w.nextSellerTarget} sold', style: soft),
+            Text('${w.plan} · ${w.circleTier} · ${w.code.isEmpty ? 'code paused' : w.code}', style: soft),
+          ],
+        ],
+      ),
     );
   }
 }
