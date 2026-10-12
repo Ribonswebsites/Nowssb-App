@@ -18,6 +18,7 @@ import '../../data/content.dart';
 import '../../data/entitlements.dart';
 import '../../data/store_catalog.dart';
 import '../../data/store_prices.dart';
+import '../../features/economy/shop_faces.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../shell/nwsb_links.dart';
@@ -38,7 +39,9 @@ class EbooksStoreScreen extends StatelessWidget {
   const EbooksStoreScreen({super.key});
 
   @override
-  Widget build(BuildContext context) => StoreTermsHost(
+  Widget build(BuildContext context) => const CoinbackPage(title: 'Ebooks', art: 'assets/store/intro-ebooks.webp');
+
+  Widget _retired(BuildContext context) => StoreTermsHost(
         which: 'ebooks',
         head: 'Ebooks described by sound',
         child: PageShell(

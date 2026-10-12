@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import '../../admin/layout/layout_sections.dart';
 import '../../admin/template/editable.dart';
 import '../../data/store_catalog.dart';
+import '../../features/economy/shop_faces.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/glass_black_card.dart';
 import '../../widgets/page_shell.dart';
@@ -30,7 +31,9 @@ class SignatureStoreScreen extends StatelessWidget {
   const SignatureStoreScreen({super.key});
 
   @override
-  Widget build(BuildContext context) => StoreTermsHost(
+  Widget build(BuildContext context) => const CoinbackPage(title: 'Signature', art: 'assets/store/intro-signature.webp');
+
+  Widget _retired(BuildContext context) => StoreTermsHost(
         which: 'signature',
         head: 'Signatures described by sound',
         child: PageShell(

@@ -6,6 +6,7 @@ import '../../theme/tokens.dart';
 import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
 import '../economy/coupon_screen.dart';
+import '../economy/shop_faces.dart';
 import '../economy/play_billing.dart';
 import '../economy/reward_fx.dart';
 import '../programs/program_kit.dart';
@@ -30,12 +31,7 @@ class VaultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return EconomyPage(
-      goodToKnow: kRewardsDisclaimer,
-      title: 'NowssB Rewards',
-      mark: NwsbMarks.rewards,
-      child: _VaultBody(initialTab: initialTab),
-    );
+    return RewardsFace(onCoupons: () => NwsbLinks.push(context, const CouponScreen()));
   }
 }
 

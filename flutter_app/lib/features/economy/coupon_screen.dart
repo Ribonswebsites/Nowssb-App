@@ -20,6 +20,7 @@ import 'reward_fx.dart';
 import 'economy_theme.dart';
 import 'scratch_card.dart';
 import 'coupon_tickets.dart';
+import 'shop_faces.dart';
 import '../programs/program_kit.dart';
 import '../programs/program_heroes.dart';
 import '../programs/program_router.dart';
@@ -50,6 +51,10 @@ class _CouponScreenState extends State<CouponScreen> {
 
   @override
   Widget build(BuildContext context) {
+    return CouponsFace(scratch: const DailyScratchCard());
+  }
+
+  Widget _retired(BuildContext context) {
     return EconomyPage(
       goodToKnow: kCouponsDisclaimer,
       title: 'NowssB Coupons',

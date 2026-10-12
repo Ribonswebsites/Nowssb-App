@@ -24,6 +24,7 @@ import 'spin_wheel.dart';
 import '../programs/program_kit.dart';
 import '../programs/program_heroes.dart';
 import '../programs/program_router.dart';
+import '../economy/shop_faces.dart';
 import '../programs/gifts_program.dart';
 
 class GiftItem {
@@ -379,6 +380,11 @@ class _GiftsScreenState extends State<GiftsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final offers = [for (final g in kGiftCatalog) GiftOffer(g.id, g.label, 'Gift card', g.cents)];
+    return GiftsFace(offers: offers, onClaim: (o) => showGiftCardSheet(context, o.id));
+  }
+
+  Widget _retired(BuildContext context) {
     final start = widget.initialTab ?? (widget.startOnRedeem ? 'redeem' : null);
     return EconomyPage(
       title: 'NowssB Gifts',
