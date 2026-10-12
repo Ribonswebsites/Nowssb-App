@@ -25,6 +25,7 @@ class NwsbScratchCard extends StatefulWidget {
     this.height = 168,
     this.rarity,
     this.onFirstTouch,
+    this.glowColor,
     this.revealAt = 0.55,
     this.enabled = true,
     this.oddsNote,
@@ -32,6 +33,9 @@ class NwsbScratchCard extends StatefulWidget {
 
   final Widget prize;
   final VoidCallback onCleared;
+
+  /// Overrides the open-frame glow (default: the rarity colour).
+  final Color? glowColor;
   final double height;
 
   /// Rarity of the sealed card (shown as the frame glow once open).
@@ -140,7 +144,7 @@ class _NwsbScratchCardState extends State<NwsbScratchCard> with TickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    final glow = widget.rarity == null ? null : rarityColor(widget.rarity);
+    final glow = widget.glowColor ?? (widget.rarity == null ? null : rarityColor(widget.rarity));
     return LayoutBuilder(builder: (context, c) {
       _size = Size(c.maxWidth.isFinite ? c.maxWidth : 320, widget.height);
       return GestureDetector(

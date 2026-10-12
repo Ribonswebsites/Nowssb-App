@@ -4,6 +4,8 @@
 library;
 
 import 'dart:async';
+import 'dart:math' as math;
+import 'dart:ui' show ImageFilter;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +13,7 @@ import 'package:flutter/material.dart';
 import '../../admin/layout/layout_sections.dart';
 import '../../data/firebase.dart';
 import '../../theme/tokens.dart';
+import '../../widgets/nwsb_coin_fly.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../economy/economy_api.dart';
 import '../economy/play_billing.dart';
@@ -58,35 +61,879 @@ List<Widget> _mine(BuildContext context, Map<String, dynamic> s) {
   final tokens = sList(s['tokens']);
   final cards = sList(s['scratchCards']);
   final soon = DateTime.now().add(const Duration(days: 3)).millisecondsSinceEpoch;
+  // Hero figure: the sum of the server's capINR on every active discount,
+  // only when every discount has a cap (an uncapped one has no honest
+  // ceiling). Otherwise the hero shows the real count instead.
+  final capped = coupons.isNotEmpty && coupons.every((c) => sNum(c['capINR']) > 0);
+  final capSum = capped ? coupons.fold<num>(0, (a, c) => a + sNum(c['capINR'])) : 0;
   return [
-    LSection('cards', 'Sealed cards', PCard(children: [
-      const PHeading('Waiting to scratch', 'Your cards', slot: 'coupons_program.mine'),
-      if (cards.isEmpty) const PEmpty('No sealed cards. Earn them from streaks, quests, gift boxes and purchases, or get one in the Coupon Shop.'),
-      for (final r in const ['mythic', 'legendary', 'epic', 'rare', 'common'])
-        if (cards.any((c) => c['rarity'] == r))
-          GestureDetector(
-            onTap: () => ProgramTabsScope.goTo(context, 'scratch'),
-            child: PRow(title: '${rarityTitle(r)} · ${cards.where((c) => c['rarity'] == r).length}', sub: 'Open them in Scratch', mark: NwsbMarks.coupon, color: rarityColor(r), trailing: const Icon(Icons.chevron_right, color: NwsbColors.goldLight)),
-          ),
-    ])),
-    LSection('coupons', 'Discounts', PCard(children: [
-      const PHeading('Use at checkout', 'Discounts', slot: 'coupons_program.mine'),
-      if (coupons.isEmpty) const PEmpty('No discounts yet.'),
-      for (final c in coupons)
-        PRow(
-          title: '${c['label'] ?? '${sInt(c['pct'])}% off'}',
-          sub: '${c['scope'] ?? 'any'} · cap ${inr(sNum(c['capINR']))}${sInt(c['expiresAt']) > 0 ? ' · until ${shortDate(c['expiresAt'])}' : ''}',
-          mark: NwsbMarks.bag,
-          trailing: sInt(c['expiresAt']) > 0 && sInt(c['expiresAt']) < soon ? const PPill('Expiring soon', color: Color(0xFFFFA24C)) : null,
-        ),
-    ])),
-    LSection('tokens', 'Tokens', PCard(children: [
-      const PHeading('Unlocks', 'Tokens', slot: 'coupons_program.mine'),
-      if (tokens.isEmpty) const PEmpty('No tokens yet. Tokens unlock a stage, a word or a sample.'),
-      for (final t in tokens) PRow(title: '${t['label'] ?? t['item']}', sub: 'From ${t['source'] ?? 'a reward'} · ${shortDate(t['at'])}', mark: NwsbMarks.stages),
-    ])),
+    LSection('hero', 'Coupons for you', _MineHero(discounts: coupons.length, sealed: cards.length, tokens: tokens.length, capSumINR: capSum)),
+    const SizedBox(height: 28),
     const LSection('code', 'Enter a code', _CodeBox()),
+    const SizedBox(height: 44),
+    LSection('coupons', 'Discounts', _World(seed: 0, child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      const _CalmLabel('DISCOUNTS', slot: 'coupons_program.mine'),
+      const SizedBox(height: 16),
+      if (coupons.isEmpty)
+        const _CalmEmpty(icon: Icons.local_offer_outlined, text: 'No discounts yet')
+      else
+        for (final c in coupons)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 18),
+            child: _Tilt(child: _CouponTicket(coupon: c, expiringSoon: sInt(c['expiresAt']) > 0 && sInt(c['expiresAt']) < soon)),
+          ),
+    ]))),
+    const SizedBox(height: 40),
+    LSection('cards', 'Sealed cards', _World(seed: 1, child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      const _CalmLabel('SCRATCH', slot: 'coupons_program.mine'),
+      const SizedBox(height: 16),
+      if (cards.isEmpty)
+        const _CalmEmpty(icon: Icons.style_outlined, text: 'No sealed cards')
+      else
+        for (final c in cards)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 20),
+            child: CouponScratchTicket(key: ValueKey('ticket_${c['id']}'), card: c),
+          ),
+    ]))),
+    const SizedBox(height: 40),
+    LSection('tokens', 'Tokens', _World(seed: 2, child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      const _CalmLabel('TOKENS', slot: 'coupons_program.mine'),
+      const SizedBox(height: 16),
+      if (tokens.isEmpty)
+        const _CalmEmpty(icon: Icons.key_outlined, text: 'No tokens yet')
+      else
+        for (final t in tokens)
+          Padding(padding: const EdgeInsets.only(bottom: 14), child: _Tilt(child: _TokenBanner(token: t))),
+    ]))),
   ];
+}
+
+/// The one calm accent shared with the Rewards page.
+const Color _kMineAccent = NwsbColors.gold;
+
+class _CalmLabel extends StatelessWidget {
+  const _CalmLabel(this.text, {required this.slot});
+  final String text;
+  final String slot;
+  @override
+  Widget build(BuildContext context) => EditableLabel(slot, text,
+      style: const TextStyle(color: _kMineAccent, letterSpacing: 2.4, fontSize: 11, fontWeight: FontWeight.w500));
+}
+
+class _CalmGlass extends StatelessWidget {
+  const _CalmGlass({required this.children});
+  final List<Widget> children;
+  @override
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.fromLTRB(14, 8, 14, 8),
+        decoration: BoxDecoration(
+          color: const Color(0xCC0A0A0A),
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: const Color(0x1FFFFFFF)),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: children),
+      );
+}
+
+class _CalmEmpty extends StatelessWidget {
+  const _CalmEmpty({required this.icon, required this.text});
+  final IconData icon;
+  final String text;
+  @override
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
+        decoration: BoxDecoration(
+          color: const Color(0x990A0A0A),
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: const Color(0x14FFFFFF)),
+        ),
+        child: Row(children: [
+          Icon(icon, color: _kMineAccent, size: 22),
+          const SizedBox(width: 14),
+          Expanded(child: EditableLabel('coupons_program.CalmEmpty', text, style: const TextStyle(color: Color(0x99FFFFFF), fontSize: 13, height: 1.45))),
+        ]),
+      );
+}
+
+bool _still(BuildContext context) => MediaQuery.maybeOf(context)?.disableAnimations ?? false;
+
+/// "Coupons for you": deep glass, a huge figure and a slow gold glow. The
+/// figure is the sum of the server's discount caps when every discount is
+/// capped, otherwise the real count of what is waiting.
+class _MineHero extends StatefulWidget {
+  const _MineHero({required this.discounts, required this.sealed, required this.tokens, required this.capSumINR});
+  final int discounts;
+  final int sealed;
+  final int tokens;
+  final num capSumINR;
+  @override
+  State<_MineHero> createState() => _MineHeroState();
+}
+
+class _MineHeroState extends State<_MineHero> with SingleTickerProviderStateMixin {
+  late final AnimationController _glow = AnimationController(vsync: this, duration: const Duration(seconds: 7));
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_still(context)) {
+      _glow
+        ..stop()
+        ..value = 0.5;
+    } else if (!_glow.isAnimating) {
+      _glow.repeat(reverse: true);
+    }
+  }
+
+  @override
+  void dispose() {
+    _glow.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final w = widget;
+    final ready = w.discounts + w.sealed + w.tokens;
+    final money = w.capSumINR > 0;
+    final big = money ? inr(w.capSumINR) : '$ready';
+    final caption = money ? 'savings ready' : (ready == 1 ? 'coupon ready' : 'coupons ready');
+    return RepaintBoundary(
+      child: AnimatedBuilder(
+        animation: _glow,
+        builder: (context, child) {
+          final t = Curves.easeInOut.transform(_glow.value);
+          return _Glass(
+            radius: 32,
+            border: Color.lerp(const Color(0x26FFFFFF), NwsbColors.gold.withValues(alpha: 0.6), t)!,
+            glow: NwsbColors.gold.withValues(alpha: 0.05 + 0.12 * t),
+            child: child!,
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 30, 20, 30),
+          child: Row(children: [
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+                const EditableLabel('coupons_program.mine', 'Coupons for you',
+                    style: TextStyle(color: NwsbColors.goldLight, fontSize: 12, letterSpacing: 2, fontWeight: FontWeight.w500)),
+                const SizedBox(height: 10),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: ShaderMask(
+                    shaderCallback: (r) => const LinearGradient(colors: [Color(0xFFFFFFFF), NwsbColors.goldLight, NwsbColors.gold]).createShader(r),
+                    child: Text(big, key: const ValueKey('hero_figure'),
+                        style: const TextStyle(color: Colors.white, fontSize: 68, height: 1, fontWeight: FontWeight.w200, letterSpacing: -2)),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                EditableLabel('coupons_program.MineHero', caption, style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 14)),
+              ]),
+            ),
+            EditableImage.asset(NwsbCoinFly.disc, width: 64, height: 64, fit: BoxFit.contain, slot: 'coupons_program.mine.hero',
+                errorBuilder: (_, __, ___) => const SizedBox(width: 64)),
+          ]),
+        ),
+      ),
+    );
+  }
+}
+
+/// Frosted glass in the app's own palette (Store-home cards).
+class _Glass extends StatelessWidget {
+  const _Glass({required this.child, this.radius = 30, this.border = const Color(0x1FFFFFFF), this.glow});
+  final Widget child;
+  final double radius;
+  final Color border;
+  final Color? glow;
+  @override
+  Widget build(BuildContext context) => Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(radius),
+          boxShadow: glow == null ? null : [BoxShadow(color: glow!, blurRadius: 36, spreadRadius: -6)],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(radius),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(radius),
+                border: Border.all(color: border),
+                gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0x1AFFFFFF), Color(0x08FFFFFF)]),
+              ),
+              child: child,
+            ),
+          ),
+        ),
+      );
+}
+
+/// Section wrapper: one frosted glass panel.
+class _World extends StatelessWidget {
+  const _World({required this.seed, required this.child});
+  final int seed;
+  final Widget child;
+  @override
+  Widget build(BuildContext context) => _Glass(child: Padding(padding: const EdgeInsets.fromLTRB(14, 18, 14, 4), child: child));
+}
+
+/// A subtle 3D tilt toward the finger (perspective transform). Listener does
+/// not join the gesture arena, so taps and scrolls behave as before. Off when
+/// the system asks for reduced motion.
+class _Tilt extends StatefulWidget {
+  const _Tilt({required this.child});
+  final Widget child;
+  @override
+  State<_Tilt> createState() => _TiltState();
+}
+
+class _TiltState extends State<_Tilt> {
+  Offset _a = Offset.zero;
+
+  void _at(Offset p) {
+    final s = context.size;
+    if (s == null || s.isEmpty) return;
+    setState(() => _a = Offset(((p.dy / s.height) - 0.5) * -0.10, ((p.dx / s.width) - 0.5) * 0.10));
+  }
+
+  void _rest([PointerEvent? _]) => setState(() => _a = Offset.zero);
+
+  @override
+  Widget build(BuildContext context) {
+    if (_still(context)) return widget.child;
+    return Listener(
+      onPointerDown: (e) => _at(e.localPosition),
+      onPointerMove: (e) => _at(e.localPosition),
+      onPointerUp: _rest,
+      onPointerCancel: _rest,
+      child: TweenAnimationBuilder<Offset>(
+        tween: Tween(end: _a),
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOut,
+        builder: (context, a, child) => Transform(
+          alignment: Alignment.center,
+          transform: Matrix4.identity()
+            ..setEntry(3, 2, 0.0012)
+            ..rotateX(a.dx)
+            ..rotateY(a.dy),
+          child: child,
+        ),
+        child: widget.child,
+      ),
+    );
+  }
+}
+
+/// Every coupon type has its own silhouette (from the reference sheet).
+enum _Shape {
+  /// "Special Discount" list ticket: notched stub on the left.
+  stub,
+
+  /// "Coin Terminal" pass: tall, side notches at the tear line.
+  terminal,
+
+  /// "My Rewards" brand tile: scalloped stamp edge.
+  stamp,
+
+  /// Gift scratch tile: notched stub with bevelled right corners.
+  gift,
+
+  /// "Free coins" offer banner: wide, a notch pair near the right end.
+  banner,
+}
+
+Path _shapePath(_Shape s, Size z, {double stub = 92, double tear = 0.6}) {
+  Path notch(Offset a, Offset b, double r) => Path()
+    ..addOval(Rect.fromCircle(center: a, radius: r))
+    ..addOval(Rect.fromCircle(center: b, radius: r));
+  switch (s) {
+    case _Shape.stub:
+      final base = Path()..addRRect(RRect.fromRectAndRadius(Offset.zero & z, const Radius.circular(20)));
+      return Path.combine(PathOperation.difference, base, notch(Offset(stub, 0), Offset(stub, z.height), 9));
+    case _Shape.gift:
+      const b = 16.0;
+      final base = Path()
+        ..moveTo(10, 0)
+        ..lineTo(z.width - b, 0)
+        ..lineTo(z.width, b)
+        ..lineTo(z.width, z.height - b)
+        ..lineTo(z.width - b, z.height)
+        ..lineTo(10, z.height)
+        ..arcToPoint(Offset(0, z.height - 10), radius: const Radius.circular(10))
+        ..lineTo(0, 10)
+        ..arcToPoint(const Offset(10, 0), radius: const Radius.circular(10))
+        ..close();
+      return Path.combine(PathOperation.difference, base, notch(Offset(stub, 0), Offset(stub, z.height), 10));
+    case _Shape.terminal:
+      final y = z.height * tear;
+      final base = Path()..addRRect(RRect.fromRectAndRadius(Offset.zero & z, const Radius.circular(26)));
+      return Path.combine(PathOperation.difference, base, notch(Offset(0, y), Offset(z.width, y), 13));
+    case _Shape.stamp:
+      const r = 4.5, step = 15.0;
+      final holes = Path();
+      for (var x = step / 2 + 6; x < z.width - 6; x += step) {
+        holes
+          ..addOval(Rect.fromCircle(center: Offset(x, 0), radius: r))
+          ..addOval(Rect.fromCircle(center: Offset(x, z.height), radius: r));
+      }
+      for (var y = step / 2 + 6; y < z.height - 6; y += step) {
+        holes
+          ..addOval(Rect.fromCircle(center: Offset(0, y), radius: r))
+          ..addOval(Rect.fromCircle(center: Offset(z.width, y), radius: r));
+      }
+      final base = Path()..addRRect(RRect.fromRectAndRadius(Offset.zero & z, const Radius.circular(8)));
+      return Path.combine(PathOperation.difference, base, holes);
+    case _Shape.banner:
+      final x = z.width - stub;
+      final base = Path()..addRRect(RRect.fromRectAndRadius(Offset.zero & z, const Radius.circular(18)));
+      return Path.combine(PathOperation.difference, base, notch(Offset(x, 0), Offset(x, z.height), 8));
+  }
+}
+
+class _ShapeClipper extends CustomClipper<Path> {
+  const _ShapeClipper(this.shape, {this.stub = 92, this.tear = 0.6});
+  final _Shape shape;
+  final double stub;
+  final double tear;
+  @override
+  Path getClip(Size size) => _shapePath(shape, size, stub: stub, tear: tear);
+  @override
+  bool shouldReclip(_ShapeClipper old) => old.shape != shape || old.stub != stub || old.tear != tear;
+}
+
+/// The foil edge: a sweep-gradient stroke along the ticket's own outline.
+class _FoilEdge extends CustomPainter {
+  const _FoilEdge(this.shape, this.colors, {this.stub = 92, this.tear = 0.6, this.width = 1.6});
+  final _Shape shape;
+  final List<Color> colors;
+  final double stub;
+  final double tear;
+  final double width;
+  @override
+  void paint(Canvas canvas, Size size) {
+    final path = _shapePath(shape, size, stub: stub, tear: tear);
+    canvas.drawPath(
+      path,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = width
+        ..shader = SweepGradient(colors: [...colors, colors.first], transform: const GradientRotation(-0.6)).createShader(Offset.zero & size),
+    );
+  }
+
+  @override
+  bool shouldRepaint(_FoilEdge old) => old.shape != shape || old.colors != colors || old.stub != stub;
+}
+
+/// A shaped, foil-edged glass ticket.
+class _ShapedTicket extends StatelessWidget {
+  const _ShapedTicket({required this.shape, required this.accent, required this.child, this.stub = 92, this.tear = 0.6, this.fill});
+  final _Shape shape;
+  final Color accent;
+  final Widget child;
+  final double stub;
+  final double tear;
+  final Gradient? fill;
+  @override
+  Widget build(BuildContext context) {
+    final foil = [accent, const Color(0xEEFFFFFF), Color.lerp(accent, Colors.black, 0.45)!, accent.withValues(alpha: 0.7), const Color(0x99FFFFFF)];
+    return CustomPaint(
+      foregroundPainter: _FoilEdge(shape, foil, stub: stub, tear: tear),
+      child: ClipPath(
+        clipper: _ShapeClipper(shape, stub: stub, tear: tear),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: fill ??
+                LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color.lerp(const Color(0xFF0B0B0B), accent, 0.10)!, const Color(0xF0080808)],
+                ),
+          ),
+          child: child,
+        ),
+      ),
+    );
+  }
+}
+
+/// Art tile: a glowing gradient square with the type's mark.
+class _ArtTile extends StatelessWidget {
+  const _ArtTile({required this.icon, required this.accent, this.size = 56});
+  final IconData icon;
+  final Color accent;
+  final double size;
+  @override
+  Widget build(BuildContext context) => Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(size * 0.3),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [accent.withValues(alpha: 0.42), accent.withValues(alpha: 0.08)],
+          ),
+          border: Border.all(color: accent.withValues(alpha: 0.5)),
+          boxShadow: [BoxShadow(color: accent.withValues(alpha: 0.25), blurRadius: 18, spreadRadius: -4)],
+        ),
+        child: Icon(icon, color: Color.lerp(accent, Colors.white, 0.35), size: size * 0.5),
+      );
+}
+
+/// Accent and art per discount scope (server field `scope`).
+const Color _kWordAccent = NwsbColors.goldLight;
+const Color _kSubAccent = NwsbColors.gold;
+const Color _kAnyAccent = Color(0xFFB8975C); // deeper NowssB gold
+const Color _kTokenAccent = NwsbColors.mist;
+
+/// A discount from the server (label, pct, capINR, scope, source,
+/// expiresAt). Each scope gets its own ticket.
+class _CouponTicket extends StatelessWidget {
+  const _CouponTicket({required this.coupon, required this.expiringSoon});
+  final Map<String, dynamic> coupon;
+  final bool expiringSoon;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = coupon;
+    final pct = sInt(c['pct']);
+    final cap = sNum(c['capINR']);
+    final scope = '${c['scope'] ?? 'any'}';
+    final until = sInt(c['expiresAt']) > 0 ? 'Till ${shortDate(c['expiresAt'])}' : 'No expiry';
+    return switch (scope) {
+      'word' => _wordTicket(pct, cap, until),
+      'subscription' => _subscriptionPass(pct, cap, until),
+      _ => _anyStamp(pct, cap, scope, until),
+    };
+  }
+
+  Widget _soonPill() => const PPill('Expiring', color: _kWordAccent);
+
+  /// Word: the "Special Discount" list ticket (art left, title, offer).
+  Widget _wordTicket(int pct, num cap, String until) => _ShapedTicket(
+        shape: _Shape.stub,
+        stub: 96,
+        accent: _kWordAccent,
+        child: IntrinsicHeight(
+          child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            const SizedBox(width: 96, child: Center(child: _ArtTile(icon: Icons.auto_stories_outlined, accent: _kWordAccent))),
+            const _DashedDivider(),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 18, 14, 18),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+                  Row(children: [
+                    const Expanded(
+                      child: EditableLabel('coupons_program.mine', 'WORD', style: TextStyle(color: _kWordAccent, fontSize: 10.5, letterSpacing: 1.8, fontWeight: FontWeight.w600)),
+                    ),
+                    if (expiringSoon) _soonPill(),
+                  ]),
+                  const SizedBox(height: 8),
+                  Text('$pct% off', style: const TextStyle(color: NwsbColors.goldLight, fontSize: 24, fontWeight: FontWeight.w300, height: 1.1)),
+                  const SizedBox(height: 6),
+                  Text([if (cap > 0) 'cap ${inr(cap)}', until].join(' · '), style: const TextStyle(color: Color(0x80FFFFFF), fontSize: 11.5)),
+                ]),
+              ),
+            ),
+          ]),
+        ),
+      );
+
+  /// Subscription: the tall "Coin Terminal" pass with side notches.
+  Widget _subscriptionPass(int pct, num cap, String until) => SizedBox(
+        height: 196,
+        child: _ShapedTicket(
+          shape: _Shape.terminal,
+          tear: 0.62,
+          accent: _kSubAccent,
+          fill: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFF241F14), Color(0xFF0E0D0A), Color(0xF0080808)], stops: [0, 0.6, 0.6]),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Expanded(
+              flex: 62,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(22, 18, 18, 14),
+                child: Row(children: [
+                  Expanded(
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
+                      Row(children: [
+                        const EditableLabel('coupons_program.mine', 'PASS', style: TextStyle(color: _kSubAccent, fontSize: 10.5, letterSpacing: 1.8, fontWeight: FontWeight.w600)),
+                        const Spacer(),
+                        if (expiringSoon) _soonPill(),
+                      ]),
+                      const SizedBox(height: 8),
+                      Text('$pct% OFF', style: const TextStyle(color: NwsbColors.goldLight, fontSize: 38, fontWeight: FontWeight.w200, height: 1)),
+                      if (cap > 0) Text('up to ${inr(cap)}', style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12.5)),
+                    ]),
+                  ),
+                  const _ArtTile(icon: Icons.workspace_premium_outlined, accent: _kSubAccent, size: 60),
+                ]),
+              ),
+            ),
+            const SizedBox(height: 1, child: _DashedRule()),
+            Expanded(
+              flex: 38,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(22, 8, 18, 8),
+                child: Row(children: [
+                  Expanded(
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
+                      Text(until, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0x99FFFFFF), fontSize: 12)),
+                    ]),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(999), border: Border.all(color: _kSubAccent.withValues(alpha: 0.5))),
+                    child: const EditableLabel('coupons_program.mine', 'Subscription', style: TextStyle(color: _kSubAccent, fontSize: 11, fontWeight: FontWeight.w500)),
+                  ),
+                ]),
+              ),
+            ),
+          ]),
+        ),
+      );
+
+  /// Any item: the "My Rewards" brand tile, a scalloped stamp.
+  Widget _anyStamp(int pct, num cap, String scope, String until) => _ShapedTicket(
+        shape: _Shape.stamp,
+        accent: _kAnyAccent,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(22, 22, 22, 22),
+          child: Column(children: [
+            Row(children: [
+              const _ArtTile(icon: Icons.sell_outlined, accent: _kAnyAccent, size: 46),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(scope == 'any' ? 'ANY ITEM' : scope.toUpperCase(),
+                      style: const TextStyle(color: _kAnyAccent, fontSize: 10.5, letterSpacing: 1.8, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 4),
+                  Text('$pct% off${cap > 0 ? ' · ${inr(cap)}' : ''}',
+                      style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w300)),
+                ]),
+              ),
+              if (expiringSoon) _soonPill(),
+            ]),
+            const SizedBox(height: 12),
+            const SizedBox(height: 1, child: _DashedRule()),
+            const SizedBox(height: 10),
+            Align(alignment: Alignment.centerLeft, child: Text(until, style: const TextStyle(color: Color(0x80FFFFFF), fontSize: 11.5))),
+          ]),
+        ),
+      );
+}
+
+/// A token as a wide "Free coins" offer banner, art on the right stub.
+class _TokenBanner extends StatelessWidget {
+  const _TokenBanner({required this.token});
+  final Map<String, dynamic> token;
+  @override
+  Widget build(BuildContext context) {
+    final t = token;
+    return _ShapedTicket(
+      shape: _Shape.banner,
+      stub: 84,
+      accent: _kTokenAccent,
+      fill: LinearGradient(colors: [_kTokenAccent.withValues(alpha: 0.16), const Color(0xF0080808)], stops: const [0, 0.7]),
+      child: SizedBox(
+        height: 86,
+        child: Row(children: [
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 12, 12, 12),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
+                const EditableLabel('coupons_program.mine', 'TOKEN', style: TextStyle(color: _kTokenAccent, fontSize: 10.5, letterSpacing: 1.8, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 5),
+                Text('${t['label'] ?? t['item']}', maxLines: 1, overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w400)),
+              ]),
+            ),
+          ),
+          const SizedBox(width: 84, child: Center(child: _ArtTile(icon: Icons.vpn_key_outlined, accent: _kTokenAccent, size: 48))),
+        ]),
+      ),
+    );
+  }
+}
+
+class _DashedDivider extends StatelessWidget {
+  const _DashedDivider();
+  @override
+  Widget build(BuildContext context) => const SizedBox(width: 1, child: CustomPaint(painter: _DashPainter()));
+}
+
+class _DashedRule extends StatelessWidget {
+  const _DashedRule();
+  @override
+  Widget build(BuildContext context) => const CustomPaint(painter: _DashPainter(horizontal: true));
+}
+
+class _DashPainter extends CustomPainter {
+  const _DashPainter({this.horizontal = false});
+  final bool horizontal;
+  @override
+  void paint(Canvas canvas, Size size) {
+    final p = Paint()
+      ..color = const Color(0x33FFFFFF)
+      ..strokeWidth = 1;
+    if (horizontal) {
+      for (var x = 18.0; x < size.width - 18; x += 8) {
+        canvas.drawLine(Offset(x, 0.5), Offset(x + 4, 0.5), p);
+      }
+      return;
+    }
+    for (var y = 12.0; y < size.height - 12; y += 8) {
+      canvas.drawLine(Offset(0.5, y), Offset(0.5, y + 4), p);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_DashPainter old) => old.horizontal != horizontal;
+}
+
+/// Tone per rarity in NowssB gold tones.
+Color _goldFor(String rarity) => switch (rarity.toLowerCase()) {
+      'common' || '' => const Color(0xFFB8975C),
+      'rare' => NwsbColors.gold,
+      _ => NwsbColors.goldLight,
+    };
+
+/// Sealed-card look per rarity: shape, art and foil.
+({_Shape shape, IconData icon}) _sealedLook(String rarity) => switch (rarity.toLowerCase()) {
+      'common' || '' => (shape: _Shape.gift, icon: Icons.redeem_outlined),
+      'rare' => (shape: _Shape.stub, icon: Icons.card_giftcard_outlined),
+      _ => (shape: _Shape.stamp, icon: Icons.diamond_outlined),
+    };
+
+/// Asks the server to open one sealed card (the existing revealScratch
+/// endpoint). The server alone draws the prize.
+Future<Map<String, dynamic>> _serverReveal(Map<String, dynamic> card) =>
+    EconomyApi.call('revealScratch', {'id': card['id']});
+
+/// A sealed card as a real ticket: shaped by rarity, a dashed tear line, and
+/// a finger-scratch panel. The first scratch asks the server to open the
+/// seal; what shows underneath is only what the server returned. When the
+/// scratch clears and the server has answered, the prize lands with a burst
+/// and a shimmer (skipped under reduced motion). If the call fails the
+/// panel re-seals with a calm note.
+class CouponScratchTicket extends StatefulWidget {
+  const CouponScratchTicket({super.key, required this.card, this.reveal = _serverReveal});
+  final Map<String, dynamic> card;
+
+  /// The server call. Tests pass their own future; the app never does.
+  final Future<Map<String, dynamic>> Function(Map<String, dynamic> card) reveal;
+
+  @override
+  State<CouponScratchTicket> createState() => _CouponScratchTicketState();
+}
+
+class _CouponScratchTicketState extends State<CouponScratchTicket> with SingleTickerProviderStateMixin {
+  Future<Map<String, dynamic>>? _pending;
+  Map<String, dynamic>? _result;
+  String? _error;
+  var _seal = 0; // bumps to re-seal the scratch panel after a failed call
+  late final AnimationController _burst = AnimationController(vsync: this, duration: const Duration(milliseconds: 1300));
+
+  String get _id => '${widget.card['id']}';
+
+  @override
+  void initState() {
+    super.initState();
+    final kept = _revealedThisSession[_id];
+    if (kept != null && kept['_result'] is Map<String, dynamic>) {
+      _result = kept['_result'] as Map<String, dynamic>;
+      _burst.value = 1;
+    }
+  }
+
+  @override
+  void dispose() {
+    _burst.dispose();
+    super.dispose();
+  }
+
+  void _open() {
+    if (_pending != null || _result != null) return;
+    setState(() => _error = null);
+    _pending = widget.reveal(widget.card).then((r) {
+      if (r.isEmpty) throw const FormatException('empty');
+      _revealedThisSession[_id] = {...widget.card, '_result': r};
+      if (mounted) setState(() => _result = r);
+      return r;
+    }).catchError((Object e) {
+      if (mounted) {
+        setState(() {
+          _error = e is EconomyException ? e.message : 'Not opened, still sealed';
+          _pending = null;
+          _seal++;
+        });
+      }
+      return <String, dynamic>{};
+    });
+  }
+
+  Future<void> _cleared() async {
+    _open();
+    final p = _pending;
+    if (p == null) return;
+    final r = await p;
+    if (!mounted || r.isEmpty) return;
+    // The burst plays only once the server result is in hand.
+    if (_still(context)) {
+      _burst.value = 1;
+    } else {
+      unawaited(_burst.forward(from: 0));
+    }
+    if (r['already'] == true) return;
+    unawaited(celebrate(context, r, title: '${rarityTitle('${r['rarity'] ?? widget.card['rarity'] ?? ''}')} card'));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final rarity = '${widget.card['rarity'] ?? 'common'}';
+    final color = _goldFor(rarity);
+    final look = _sealedLook(rarity);
+    final r = _result;
+    final Widget prize = r != null
+        ? _BurstReveal(
+            anim: _burst,
+            color: NwsbColors.goldLight,
+            child: Text('${r['label'] ?? 'Prize'}', textAlign: TextAlign.center, maxLines: 2,
+                style: const TextStyle(color: Color(0xFFFFFFFF), fontWeight: FontWeight.w400, fontSize: 18, height: 1.25)),
+          )
+        : _pending != null
+            ? const Column(mainAxisSize: MainAxisSize.min, children: [
+                SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 1.6, color: _kMineAccent)),
+                SizedBox(height: 10),
+                EditableLabel('coupons_program.mine', 'Opening…', style: TextStyle(color: Color(0x99FFFFFF), fontSize: 12)),
+              ])
+            : const EditableLabel('coupons_program.mine', 'Scratch to open', style: TextStyle(color: Color(0x99FFFFFF), fontSize: 12));
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      SizedBox(
+        height: 222,
+        child: _ShapedTicket(
+          shape: look.shape,
+          stub: 88,
+          accent: color,
+          child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            SizedBox(
+              width: 88,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 14),
+                child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  _ArtTile(icon: look.icon, accent: color, size: 50),
+                  const SizedBox(height: 12),
+                  Text(rarityTitle(rarity).toUpperCase(), textAlign: TextAlign.center,
+                      style: TextStyle(color: color, fontSize: 10, letterSpacing: 1.6, fontWeight: FontWeight.w600)),
+                ]),
+              ),
+            ),
+            const _DashedDivider(),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(12, 14, 14, 12),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(14),
+                    child: NwsbScratchCard(
+                      key: ValueKey('seal_${_id}_$_seal'),
+                      height: 190,
+                      rarity: rarity,
+                      glowColor: color,
+                      onFirstTouch: _open,
+                      onCleared: _cleared,
+                      prize: prize,
+                    ),
+                  ),
+                ]),
+              ),
+            ),
+          ]),
+        ),
+      ),
+      if (_error != null) ...[
+        const SizedBox(height: 8),
+        Text(_error!, style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12, height: 1.4)),
+      ],
+    ]);
+  }
+}
+
+/// The prize landing: rays and a ring burst out, sparks drift, a light band
+/// sweeps over the text, and the text settles from a slight scale. Fully
+/// deterministic (no randomness), and static when [anim] is at 1.
+class _BurstReveal extends StatelessWidget {
+  const _BurstReveal({required this.anim, required this.color, required this.child});
+  final Animation<double> anim;
+  final Color color;
+  final Widget child;
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+        animation: anim,
+        child: child,
+        builder: (context, child) {
+          final t = anim.value;
+          final pop = t >= 1 ? 1.0 : 0.82 + 0.18 * Curves.easeOutBack.transform((t * 1.6).clamp(0.0, 1.0));
+          Widget text = Transform.scale(scale: pop, child: child);
+          if (t > 0 && t < 1) {
+            final x = -1.5 + 3.0 * Curves.easeInOut.transform(((t - 0.15) / 0.7).clamp(0.0, 1.0));
+            text = ShaderMask(
+              blendMode: BlendMode.srcATop,
+              shaderCallback: (r) => LinearGradient(
+                begin: Alignment(x - 0.5, -0.4),
+                end: Alignment(x + 0.5, 0.4),
+                colors: const [Color(0x00FFFFFF), Color(0xCCFFF6DA), Color(0x00FFFFFF)],
+              ).createShader(r),
+              child: text,
+            );
+          }
+          return Stack(alignment: Alignment.center, clipBehavior: Clip.none, children: [
+            if (t > 0 && t < 1) Positioned.fill(child: IgnorePointer(child: CustomPaint(key: const ValueKey('coupon_burst'), painter: _BurstPainter(t, color)))),
+            text,
+          ]);
+        },
+      );
+}
+
+class _BurstPainter extends CustomPainter {
+  _BurstPainter(this.t, this.color);
+  final double t;
+  final Color color;
+  @override
+  void paint(Canvas canvas, Size size) {
+    final c = size.center(Offset.zero);
+    final reach = size.longestSide * 0.75;
+    final e = Curves.easeOutCubic.transform(t);
+    final fade = Curves.easeIn.transform((1 - t).clamp(0.0, 1.0)).clamp(0.0, 1.0) * 0.4 + (1 - t).clamp(0.0, 1.0) * 0.6;
+    canvas.drawCircle(c, reach * 0.55, Paint()..shader = RadialGradient(colors: [color.withValues(alpha: 0.55 * fade), color.withValues(alpha: 0)]).createShader(Rect.fromCircle(center: c, radius: reach * 0.55)));
+    final ray = Paint()
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = 3;
+    const n = 16;
+    for (var i = 0; i < n; i++) {
+      final a = i * 6.2831853 / n + 0.2;
+      final long = i.isEven ? 1.0 : 0.7;
+      final d = Offset(math.cos(a), math.sin(a));
+      ray.color = Color.lerp(color, Colors.white, i.isEven ? 0.5 : 0)!.withValues(alpha: 0.85 * fade);
+      canvas.drawLine(c + d * (reach * 0.18 * e + 12), c + d * (reach * 0.5 * e * long + 16), ray);
+    }
+    canvas.drawCircle(c, 14 + reach * 0.5 * e, Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.5 * fade + 0.5
+      ..color = Colors.white.withValues(alpha: 0.55 * fade));
+    final spark = Paint()..color = const Color(0xFFFFF1CF).withValues(alpha: fade);
+    for (var i = 0; i < 10; i++) {
+      final a = i * 0.628 + 0.5;
+      final d = Offset(math.cos(a), math.sin(a)) * (reach * (0.25 + 0.04 * (i % 4)) * e + 20);
+      canvas.drawCircle(c + d + Offset(0, 18 * t * t), 1.6 + (i % 3), spark);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_BurstPainter old) => old.t != t || old.color != color;
 }
 
 /// Cards opened this session stay on screen (the summary lists only sealed
@@ -391,26 +1238,32 @@ class _CodeBoxState extends State<_CodeBox> {
   }
 
   @override
-  Widget build(BuildContext context) => PCard(children: [
-        const PHeading('Have a code?', 'Claim a coupon code', slot: 'coupons_program.mine'),
-        TextField(
-          controller: _c,
-          textCapitalization: TextCapitalization.characters,
-          style: const TextStyle(color: Colors.white, letterSpacing: 1.2),
-          onChanged: (_) => setState(() {}),
-          decoration: const InputDecoration(hintText: 'NWSB-…', hintStyle: TextStyle(color: NwsbColors.mist)),
-        ),
-        const SizedBox(height: 8),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: PClaim(
-            label: 'Claim',
+  Widget build(BuildContext context) => _CalmGlass(children: [
+                Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+          Expanded(
+            child: TextField(
+              controller: _c,
+              textCapitalization: TextCapitalization.characters,
+              style: const TextStyle(color: Colors.white, letterSpacing: 1.2),
+              onChanged: (_) => setState(() {}),
+              decoration: const InputDecoration(
+                hintText: 'Coupon code',
+                hintStyle: TextStyle(color: Color(0x66FFFFFF)),
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+              ),
+            ),
+          ),
+          PClaim(
+            label: 'Add',
+            enabled: _c.text.trim().isNotEmpty,
             action: 'claimTicket',
             data: {'code': _c.text.trim()},
             title: 'Coupon',
             onDone: (r) => setState(() => _note = r['locked'] == true || r['action'] != null ? '${r['label']}: ${r['how']}' : r['win'] == false ? 'No win this time (${r['winPct']}% chance).' : '${r['label'] ?? 'Claimed'} is on your account.'),
           ),
-        ),
+        ]),
         if (_note != null) PEmpty(_note!),
       ]);
 }
