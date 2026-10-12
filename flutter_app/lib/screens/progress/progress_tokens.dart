@@ -1,6 +1,8 @@
 /// Colours and shared chrome for My Progress (Glass Orb).
 library;
 
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/material.dart';
 
 class MpColors {
@@ -9,8 +11,8 @@ class MpColors {
   static const white = Color(0xFFF5F5F3);
   static const muted = Color(0xFF9B9D9E);
   static const gold = Color(0xFFD9C98F);
-  static const line = Color(0x21FFFFFF);
-  static const glass = Color(0x99040506);
+  static const line = Color(0x14FFFFFF);
+  static const glass = Color(0x8C0A0B0C);
   /// Notifications-level backdrop blur sigma.
   static const glassBlur = 13.0;
   static const dim = Color(0xFF858A8C);
@@ -25,14 +27,15 @@ class ProgressEyebrow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(top: tightTop ? 6 : 22, bottom: 13),
+      padding: EdgeInsets.only(top: tightTop ? 12 : 40, bottom: 16),
       child: Text(
-        label.toUpperCase(),
+        label,
         style: const TextStyle(
-          color: MpColors.gold,
-          fontSize: 10,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 3.2,
+          color: MpColors.soft,
+          fontSize: 15,
+          fontWeight: FontWeight.w500,
+          letterSpacing: 0.4,
+          height: 1.3,
         ),
       ),
     );
@@ -44,7 +47,7 @@ class ProgressGlass extends StatelessWidget {
     super.key,
     required this.child,
     this.padding,
-    this.radius = 24,
+    this.radius = 28,
     this.minHeight,
   });
 
@@ -55,18 +58,21 @@ class ProgressGlass extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(radius),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: MpColors.glassBlur, sigmaY: MpColors.glassBlur),
+        child: Container(
       constraints: minHeight == null ? null : BoxConstraints(minHeight: minHeight!),
       padding: padding,
       decoration: BoxDecoration(
         color: MpColors.glass,
         borderRadius: BorderRadius.circular(radius),
         border: Border.all(color: MpColors.line),
-        boxShadow: const [
-          BoxShadow(color: Color(0x40000000), blurRadius: 45, offset: Offset(0, 18)),
-        ],
       ),
       child: child,
+        ),
+      ),
     );
   }
 }

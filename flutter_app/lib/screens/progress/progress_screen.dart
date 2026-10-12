@@ -17,7 +17,6 @@ import 'progress_insight.dart';
 import 'progress_sessions.dart';
 import 'progress_stats.dart';
 import 'progress_tokens.dart';
-import '../../widgets/colored_split_promo_banner.dart';
 import '../../admin/layout/layout_sections.dart';
 
 class PracticeProgressScreen extends StatefulWidget {
@@ -82,7 +81,7 @@ class _PracticeProgressScreenState extends State<PracticeProgressScreen> {
   }
 
   Widget _pad(Widget child) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 24),
         child: child,
       );
 
@@ -102,14 +101,13 @@ class _PracticeProgressScreenState extends State<PracticeProgressScreen> {
           ProgressHeroBgVideo(opacity: (1.0 - _scrollBg).clamp(0.0, 1.0)),
           ProgressScrollBgVideo(opacity: 0.15 + 0.85 * _scrollBg),
           const ProgressVideoShade(),
-          const ProgressGrain(),
           Column(
             children: [
               ProgressHeader(onBack: _handleBack),
               Expanded(
                 child: ListView(
                   controller: _scroll,
-                  padding: const EdgeInsets.only(bottom: 90),
+                  padding: const EdgeInsets.only(bottom: 120),
                   // Server-driven order (Admin → UI Editor); bundled order by default.
       children: layoutChildren(context, 'progress', [
                     // Full-bleed orb overlay (page video shows through).
@@ -120,11 +118,6 @@ class _PracticeProgressScreenState extends State<PracticeProgressScreen> {
                     )),
                     LSection('numbers', 'Your numbers', _pad(const ProgressEyebrow('Your Numbers', tightTop: true))),
                     _pad(ProgressStatsRow(progress: progress)),
-                    const SizedBox(height: 14),
-                    LSection('promo', 'Split promo banner', _pad(ColoredSplitPromoBanner.forSurface(
-                      SplitPromoSurface.progress,
-                      onTap: () => NavScope.goTo(context, 1),
-                    ))),
                     LSection('week', 'This week', _pad(const ProgressEyebrow('This Week'))),
                     _pad(ProgressWeekGrid(progress: progress)),
                     if (progress.lastPracticed != null) LSection.group('last', 'Last practiced', align: CrossAxisAlignment.stretch, [
