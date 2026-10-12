@@ -7,10 +7,10 @@
 /// is a different sheet — this is only the hamburger.
 library;
 
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import 'brand_top_banner.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -20,6 +20,7 @@ import '../data/content.dart';
 import '../screens/app_settings.dart';
 import '../features/bazaar/bazaar_screen.dart';
 import '../features/earn/earn_hub_screen.dart';
+import '../features/economy/economy_api.dart';
 import '../features/earn/earnings_screen.dart';
 import '../features/social/echo_wall_screen.dart';
 import '../features/gifts/gifts_screen.dart';
@@ -94,25 +95,9 @@ class HomeMenuDrawer extends StatelessWidget {
     required this.goTab,
   });
 
-  /// `true` = Normal / neumorphic home (`body.nm-mode`).
+  /// Kept for callers; both homes open the same dark, calm menu.
   final bool light;
   final void Function(int tab) goTab;
-
-  // Drawn marks only — no remote icon photos.
-  static const _mark = {
-    'home': NwsbMarks.house,
-    'practice': NwsbMarks.play,
-    'routines': NwsbMarks.flame,
-    'library': NwsbMarks.sound,
-    'science': NwsbMarks.book,
-    'shabda': NwsbMarks.signature,
-    'progress': NwsbMarks.trending,
-    'store': NwsbMarks.bag,
-    'meaning': NwsbMarks.meaning,
-    'profile': NwsbMarks.user,
-    'settings': NwsbMarks.gear,
-    'connect': NwsbMarks.reader,
-  };
 
   void _close(BuildContext context) => Navigator.of(context).maybePop();
 
@@ -132,337 +117,180 @@ class HomeMenuDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     final top = MediaQuery.paddingOf(context).top;
     final bottom = MediaQuery.paddingOf(context).bottom;
-    // Fashion menu mirrors AppSettingsScreen exactly (solid deep + gold wash,
-    // not the old photo backdrop). Normal keeps neumorphic light look.
-    final bg = light ? const Color(0xFFEEF1F7) : const Color(0xFF060C18);
-    final headerBg = light ? const Color(0xFFEEF1F7) : const Color(0xEB060C18);
-    final titleColor = light ? NwsbColors.ink : Colors.white;
-    final footerColor =
-        light ? const Color(0x66000000) : const Color(0x4DFFFFFF);
-
+    final resale = AppControl.instance.flag('resale', fallback: false);
     return Material(
-      color: Colors.transparent,
-      child: SizedBox.expand(
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            if (!light) ...[
-              const Positioned.fill(
-                child: ColoredBox(color: Color(0xFF060C18)),
-              ),
-              const Positioned.fill(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: RadialGradient(
-                      center: Alignment(-0.6, -0.8),
-                      radius: 1.1,
-                      colors: [Color(0x44E8D5A3), Color(0x00060C18)],
-                    ),
-                  ),
-                ),
-              ),
-            ] else
-              Positioned.fill(child: ColoredBox(color: bg)),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Container(
-                  padding: EdgeInsets.fromLTRB(
-                    20,
-                    top + 14,
-                    20,
-                    14,
-                  ),
-                  decoration: BoxDecoration(
-                    color: headerBg,
-                    border: Border(
-                      bottom: BorderSide(
-                        color: light
-                            ? const Color(0x12000000)
-                            : const Color(0x12FFFFFF),
-                      ),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      _BackBtn(light: light, onTap: () => _close(context)),
-                      const SizedBox(width: 12),
-                      Flexible(
-                        child: Text.rich(
-                          TextSpan(
-                            children: [
-                              TextSpan(
-                                text: 'Menu',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w500,
-                                  letterSpacing: 0.4,
-                                  color: titleColor,
-                                ),
-                              ),
-                            ],
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: ListView(
-                    padding: EdgeInsets.fromLTRB(
-                      light ? 0 : 20,
-                      light ? 0 : 20,
-                      light ? 0 : 20,
-                      bottom + 40,
-                    ),
-                    children: [
-                      if (!light)
-                        _ProfileHeader(onTap: () => _goTab(context, 4)),
-                      const SizedBox(height: 8),
-                      _SectionLabel('Practice', light: light),
-                      _Group(
-                        light: light,
-                        children: [
-                          _Row(
-                            light: light,
-                            mark: _mark['home']!,
-                            label: 'Home',
-                            sub: 'Dashboard',
-                            onTap: () => _goTab(context, 0),
-                          ),
-                          _Row(
-                            light: light,
-                            mark: _mark['practice']!,
-                            viewBox: 22,
-                            label: 'Daily Practice',
-                            sub: 'Morning ritual',
-                            onTap: () => _goTab(context, 1),
-                          ),
-                          _Row(
-                            light: light,
-                            mark: _mark['routines']!,
-                            label: 'My Routines',
-                            sub: '5 routine slots',
-                            last: true,
-                            onTap: () => _push(context, const _RoutinesPage()),
-                          ),
-                        ],
-                      ),
-                      _SectionLabel('Content', light: light),
-                      _Group(
-                        light: light,
-                        children: [
-                          _Row(
-                            light: light,
-                            mark: _mark['library']!,
-                            label: 'Sound Library',
-                            sub: 'Root frequencies',
-                            onTap: () =>
-                                _push(context, const SoundLibraryScreen()),
-                          ),
-                          _Row(
-                            light: light,
-                            mark: _mark['science']!,
-                            label: 'Word Science',
-                            sub: 'NowssB system',
-                            onTap: () => _push(
-                              context,
-                              const AboutNowssbScreen(science: true),
-                            ),
-                          ),
-                          _Row(
-                            light: light,
-                            mark: _mark['shabda']!,
-                            label: 'Shabdapathy',
-                            sub: 'Foundations',
-                            last: true,
-                            onTap: () =>
-                                _push(context, const ReaderHubScreen()),
-                          ),
-                        ],
-                      ),
-                      _SectionLabel('Journey', light: light),
-                      _Group(
-                        light: light,
-                        children: [
-                          _Row(
-                            light: light,
-                            mark: _mark['progress']!,
-                            viewBox: 22,
-                            label: 'My Progress',
-                            sub: 'Healing journey',
-                            onTap: () => _push(
-                              context,
-                              PracticeProgressScreen(
-                                words: ContentStore.instance.library,
-                              ),
-                            ),
-                          ),
-                          _Row(
-                            light: light,
-                            mark: _mark['store']!,
-                            label: 'NowssB Store',
-                            sub: 'Word & Meaning Libraries',
-                            onTap: () => _goTab(context, 3),
-                          ),
-                          _Row(
-                            light: light,
-                            mark: _mark['meaning']!,
-                            label: 'Meaning Store',
-                            sub: 'True hidden meanings',
-                            last: true,
-                            onTap: () =>
-                                _push(context, const MeaningStoreScreen()),
-                          ),
-                        ],
-                      ),
-                      _SectionLabel('Account', light: light),
-                      _Group(
-                        light: light,
-                        children: [
-                          _Row(
-                            light: light,
-                            mark: _mark['profile']!,
-                            label: 'Profile',
-                            sub: 'Settings & account',
-                            onTap: () => _goTab(context, 4),
-                          ),
-                          _Row(
-                            light: light,
-                            mark: _mark['settings']!,
-                            label: 'Settings',
-                            sub: 'Preferences',
-                            onTap: () =>
-                                _push(context, const AppSettingsScreen()),
-                          ),
-                          _Row(
-                            light: light,
-                            mark: NwsbMarks.bell,
-                            label: 'Notifications',
-                            sub: 'Turn them on for this phone',
-                            last: true,
-                            onTap: () => _push(
-                              context,
-                              const NotificationsSettingsPage(),
-                            ),
-                          ),
-                        ],
-                      ),
-                      _SectionLabel('Rewards', light: light),
-                      _Group(
-                        light: light,
-                        children: [
-                          _Row(
-                            light: light,
-                            mark: NwsbMarks.piggy,
-                            label: 'NowssB Earn',
-                            sub: 'Agents, codes, commission',
-                            onTap: () => _push(context, const EarnHubScreen()),
-                          ),
-                          _Row(
-                            light: light,
-                            mark: NwsbMarks.rewards,
-                            label: 'NowssB Rewards',
-                            sub: 'Daily coins, quests, one invite',
-                            onTap: () => _push(context, const VaultScreen()),
-                          ),
-                          _Row(
-                            light: light,
-                            mark: NwsbMarks.gift,
-                            label: 'NowssB Gifts',
-                            sub: 'Boxes, the wheel, gift cards',
-                            onTap: () => _push(context, const GiftsScreen()),
-                          ),
-                          _Row(
-                            light: light,
-                            mark: NwsbMarks.coupon,
-                            label: 'NowssB Coupons',
-                            sub: 'Scratch, codes, paid cards',
-                            onTap: () => _push(context, const CouponScreen()),
-                          ),
-                          if (AppControl.instance.flag('resale', fallback: false))
-                            _Row(
-                              light: light,
-                              mark: NwsbMarks.bag,
-                              label: 'Resell',
-                              sub: 'Listings inside the Store',
-                              onTap: () => _push(context, const BazaarScreen()),
-                            ),
-                          _Row(
-                            light: light,
-                            mark: NwsbMarks.bars,
-                            label: 'Earnings',
-                            sub: 'Payouts and commissions',
-                            onTap: () => _push(context, const EarningsScreen()),
-                          ),
-                          _Row(
-                            light: light,
-                            mark: NwsbMarks.bell,
-                            label: 'Activity',
-                            sub: 'Coin and cash ledger',
-                            last: true,
-                            onTap: () => _push(context, const EarnHubScreen()),
-                          ),
-                        ],
-                      ),
-                      _SectionLabel('Community', light: light),
-                      _Group(
-                        light: light,
-                        children: [
-                          _Row(
-                            light: light,
-                            mark: NwsbMarks.user,
-                            label: 'Word Print',
-                            sub: 'Public profile',
-                            onTap: () => _push(context, const WordPrintScreen()),
-                          ),
-                          _Row(
-                            light: light,
-                            mark: NwsbMarks.feed,
-                            label: 'Echo Wall',
-                            sub: 'Reflections',
-                            onTap: () => _push(context, const EchoWallScreen()),
-                          ),
-                          _Row(
-                            light: light,
-                            mark: _mark['connect']!,
-                            label: 'NowssB Connect',
-                            sub: 'Echo Wall · community',
-                            last: true,
-                            onTap: () =>
-                                _push(context, const EchoWallScreen()),
-                          ),
-                        ],
-                      ),
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(light ? 24 : 4, 40, light ? 24 : 4, 0),
-                        child: EditableLabel('home_menu_drawer.HomeMenuDrawer',
-                          'Shabdapathy · v9.5',
-                          style: TextStyle(
-                            fontSize: 9,
-                            fontWeight: FontWeight.w300,
-                            letterSpacing: 3,
-                            color: footerColor,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+      color: NwsbColors.deep,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          // CLiQ-style: deep night with one soft gold moon wash.
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: RadialGradient(
+                  center: Alignment(0.9, -1.0),
+                  radius: 1.2,
+                  colors: [Color(0x33E8D5A3), Color(0x00060C18)]),
             ),
-          ],
-        ),
+          ),
+          ListView(
+            padding: EdgeInsets.fromLTRB(20, top + 10, 20, bottom + 36),
+            children: [
+              Row(children: [
+                const Expanded(
+                  child: Text('Menu',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 34,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.8)),
+                ),
+                _RoundBtn(
+                    icon: Icons.close_rounded, onTap: () => _close(context)),
+              ]),
+              const SizedBox(height: 18),
+              _MemberCard(onTap: () => _goTab(context, 4)),
+              const SizedBox(height: 22),
+              GridView.count(
+                crossAxisCount: 4,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                mainAxisSpacing: 14,
+                crossAxisSpacing: 10,
+                childAspectRatio: 0.74,
+                children: [
+                  _Tile3D(
+                      mark: NwsbMarks.play,
+                      viewBox: 22,
+                      label: 'Practice',
+                      onTap: () => _goTab(context, 1)),
+                  _Tile3D(
+                      mark: NwsbMarks.sound,
+                      label: 'Sounds',
+                      onTap: () => _push(context, const SoundLibraryScreen())),
+                  _Tile3D(
+                      mark: NwsbMarks.trending,
+                      viewBox: 22,
+                      label: 'Progress',
+                      onTap: () => _push(
+                          context,
+                          PracticeProgressScreen(
+                              words: ContentStore.instance.library))),
+                  _Tile3D(
+                      mark: NwsbMarks.bag,
+                      label: 'Store',
+                      onTap: () => _goTab(context, 3)),
+                  _Tile3D(
+                      mark: NwsbMarks.piggy,
+                      label: 'Earn',
+                      onTap: () => _push(context, const EarnHubScreen())),
+                  _Tile3D(
+                      mark: NwsbMarks.rewards,
+                      label: 'Rewards',
+                      onTap: () => _push(context, const VaultScreen())),
+                  _Tile3D(
+                      mark: NwsbMarks.gift,
+                      label: 'Gifts',
+                      onTap: () => _push(context, const GiftsScreen())),
+                  _Tile3D(
+                      mark: NwsbMarks.coupon,
+                      label: 'Coupons',
+                      onTap: () => _push(context, const CouponScreen())),
+                ],
+              ),
+              const _Label('Explore'),
+              _Row(
+                  mark: NwsbMarks.house,
+                  label: 'Home',
+                  sub: 'Your dashboard',
+                  onTap: () => _goTab(context, 0)),
+              _Row(
+                  mark: NwsbMarks.flame,
+                  label: 'My Routines',
+                  sub: 'Five routine slots',
+                  onTap: () => _push(context, const _RoutinesPage())),
+              _Row(
+                  mark: NwsbMarks.book,
+                  label: 'Word Science',
+                  sub: 'How NowssB works',
+                  onTap: () =>
+                      _push(context, const AboutNowssbScreen(science: true))),
+              _Row(
+                  mark: NwsbMarks.signature,
+                  label: 'Shabdapathy',
+                  sub: 'Foundations to read',
+                  onTap: () => _push(context, const ReaderHubScreen())),
+              _Row(
+                  mark: NwsbMarks.meaning,
+                  label: 'Meaning Store',
+                  sub: 'True hidden meanings',
+                  onTap: () => _push(context, const MeaningStoreScreen()),
+                  last: true),
+              const _Label('Money'),
+              if (resale)
+                _Row(
+                    mark: NwsbMarks.bag,
+                    label: 'Resell',
+                    sub: 'Listings inside the Store',
+                    onTap: () => _push(context, const BazaarScreen())),
+              _Row(
+                  mark: NwsbMarks.bars,
+                  label: 'Earnings',
+                  sub: 'Balance and payouts',
+                  onTap: () => _push(context, const EarningsScreen()),
+                  last: true),
+              const _Label('Community'),
+              _Row(
+                  mark: NwsbMarks.user,
+                  label: 'Word Print',
+                  sub: 'Your public page',
+                  onTap: () => _push(context, const WordPrintScreen())),
+              _Row(
+                  mark: NwsbMarks.feed,
+                  label: 'Echo Wall',
+                  sub: 'Reflections from others',
+                  onTap: () => _push(context, const EchoWallScreen()),
+                  last: true),
+              const _Label('You'),
+              _Row(
+                  mark: NwsbMarks.user,
+                  label: 'Profile',
+                  sub: 'Account and details',
+                  onTap: () => _goTab(context, 4)),
+              _Row(
+                  mark: NwsbMarks.gear,
+                  label: 'Settings',
+                  sub: 'Preferences',
+                  onTap: () => _push(context, const AppSettingsScreen())),
+              _Row(
+                  mark: NwsbMarks.bell,
+                  label: 'Notifications',
+                  sub: 'Reminders on this phone',
+                  onTap: () =>
+                      _push(context, const NotificationsSettingsPage()),
+                  last: true),
+              const SizedBox(height: 36),
+              const Center(
+                child: EditableLabel(
+                  'home_menu_drawer.HomeMenuDrawer',
+                  'Shabdapathy · v9.5',
+                  style: TextStyle(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w300,
+                      letterSpacing: 3,
+                      color: Color(0x4DFFFFFF)),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 }
 
-class _BackBtn extends StatelessWidget {
-  const _BackBtn({required this.light, required this.onTap});
-  final bool light;
+class _RoundBtn extends StatelessWidget {
+  const _RoundBtn({required this.icon, required this.onTap});
+  final IconData icon;
   final VoidCallback onTap;
 
   @override
@@ -474,259 +302,171 @@ class _BackBtn extends StatelessWidget {
         width: 42,
         height: 42,
         decoration: BoxDecoration(
-          color: light ? Colors.white : const Color(0x12FFFFFF),
+          color: const Color(0x12FFFFFF),
           shape: BoxShape.circle,
-          border: light ? null : Border.all(color: const Color(0x2EFFFFFF)),
-          boxShadow: light
-              ? const [
-                  BoxShadow(
-                    color: Color(0x1A000000),
-                    blurRadius: 10,
-                    offset: Offset(3, 3),
-                  ),
-                ]
-              : null,
+          border: Border.all(color: const Color(0x24FFFFFF)),
         ),
-        child: Icon(
-          light ? Icons.arrow_back_ios_new_rounded : Icons.arrow_back,
-          size: light ? 16 : 18,
-          color: light ? NwsbColors.ink : Colors.white70,
-        ),
+        child: Icon(icon, size: 20, color: Colors.white70),
       ),
     );
   }
 }
 
-class _SectionLabel extends StatelessWidget {
-  const _SectionLabel(this.text, {required this.light});
+/// Quiet small-caps heading, YouTube Music library style.
+class _Label extends StatelessWidget {
+  const _Label(this.text);
   final String text;
-  final bool light;
 
   @override
   Widget build(BuildContext context) {
-    // Fashion uses settings _Sec label metrics; Normal keeps drawer inset.
     return Padding(
-      padding: light
-          ? const EdgeInsets.fromLTRB(32, 20, 20, 8)
-          : const EdgeInsets.only(left: 6, bottom: 12, top: 10),
+      padding: const EdgeInsets.fromLTRB(4, 28, 4, 6),
       child: Text(
         text.toUpperCase(),
-        style: TextStyle(
-          fontSize: light ? 9 : 10,
-          letterSpacing: light ? 2.5 : 2.4,
-          fontWeight: light ? FontWeight.w700 : FontWeight.w600,
-          color: light ? NwsbColors.gold : const Color(0x8CE8D5A3),
-        ),
+        style: const TextStyle(
+            fontSize: 10.5,
+            letterSpacing: 2.4,
+            fontWeight: FontWeight.w600,
+            color: Color(0x8CE8D5A3)),
       ),
     );
   }
 }
 
-class _Group extends StatelessWidget {
-  const _Group({required this.light, required this.children});
-  final bool light;
-  final List<Widget> children;
+/// Glass shortcut tile (SBI benefit-tile layout, NowssB glass and gold).
+class _Tile3D extends StatelessWidget {
+  const _Tile3D(
+      {required this.mark,
+      required this.label,
+      required this.onTap,
+      this.viewBox = 24});
+  final String mark;
+  final String label;
+  final VoidCallback onTap;
+  final double viewBox;
 
   @override
   Widget build(BuildContext context) {
-    if (!light) {
-      // Match AppSettingsScreen _Sec → HeavyGlassPanel.
-      return Padding(
-        padding: const EdgeInsets.only(bottom: 26),
-        child: HeavyGlassPanel(
-          padding: const EdgeInsets.all(10),
-          radius: 24,
-          child: Column(children: children),
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.selectionClick();
+        onTap();
+      },
+      child: Column(children: [
+        Expanded(
+          child: AspectRatio(
+            aspectRatio: 1,
+            child: HeavyGlassPanel(
+              radius: 20,
+              padding: const EdgeInsets.all(4),
+              child: NestedDarkWrap(
+                margin: EdgeInsets.zero,
+                radius: 16,
+                padding: EdgeInsets.zero,
+                child: Center(
+                    child: NwsbIcon(mark,
+                        size: 24,
+                        color: NwsbColors.goldLight,
+                        viewBox: viewBox)),
+              ),
+            ),
+          ),
         ),
-      );
-    }
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF0F2F7),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x24000000),
-            blurRadius: 18,
-            offset: Offset(7, 7),
-          ),
-          BoxShadow(
-            color: Color(0xF7FFFFFF),
-            blurRadius: 14,
-            offset: Offset(-5, -5),
-          ),
-        ],
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Column(children: children),
+        const SizedBox(height: 8),
+        Text(label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+                color: Color(0xEBFFFFFF),
+                fontSize: 12.5,
+                fontWeight: FontWeight.w500)),
+      ]),
     );
   }
 }
 
+/// A flat list row: icon, title, subtitle, chevron, hairline divider.
 class _Row extends StatelessWidget {
   const _Row({
-    required this.light,
+    required this.mark,
     required this.label,
     required this.sub,
     required this.onTap,
-    this.mark,
-    this.viewBox = 24,
-    this.icon,
     this.last = false,
   });
 
-  final bool light;
+  final String mark;
   final String label;
   final String sub;
   final VoidCallback onTap;
-  final String? mark;
-  final double viewBox;
-  final Widget? icon;
   final bool last;
-
-  Widget _glyph(Color color) {
-    if (icon != null) return icon!;
-    return NwsbIcon(
-      mark ?? NwsbMarks.arrow,
-      size: 22,
-      color: color,
-      viewBox: viewBox,
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
-    if (!light) {
-      // Match AppSettingsScreen _NavRow → NestedDarkWrap.
-      final leading = SizedBox(
-        width: 36,
-        height: 36,
-        child: Center(
-          child: NwsbIcon(
-            mark ?? NwsbMarks.arrow,
-            size: 20,
-            color: NwsbColors.goldLight,
-            viewBox: viewBox,
-          ),
+    return InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: () {
+        HapticFeedback.selectionClick();
+        onTap();
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        margin: const EdgeInsets.only(bottom: 8),
+        decoration: BoxDecoration(
+          color: const Color(0xB3000000),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0x24FFFFFF)),
         ),
-      );
-      return NestedDarkWrap(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
-        margin: EdgeInsets.only(bottom: last ? 0 : 8),
-        onTap: onTap,
-        child: Row(
-          children: [
-            leading,
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  EditableLabel('home_menu_drawer.Row',
-                    label,
-                    style: const TextStyle(
+        child: Row(children: [
+          Container(
+            width: 38,
+            height: 38,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: const Color(0xFF000000),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0x1FFFFFFF)),
+            ),
+            child: NwsbIcon(mark, size: 18, color: NwsbColors.goldLight),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              EditableLabel('home_menu_drawer.Row', label,
+                  style: const TextStyle(
                       color: Color(0xEBFFFFFF),
-                      fontSize: 14.5,
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: 0.2,
-                    ),
-                  ),
-                  const SizedBox(height: 3),
-                  EditableLabel('home_menu_drawer.Row',
-                    sub,
-                    style: const TextStyle(
-                      color: Color(0x66FFFFFF),
-                      fontSize: 11.5,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const Icon(
-              Icons.chevron_right,
-              size: 16,
-              color: Color(0x33FFFFFF),
-            ),
-          ],
-        ),
-      );
-    }
-
-    final labelColor = NwsbColors.ink;
-    final subColor = const Color(0x73000000);
-    final chevColor = const Color(0x47000000);
-
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () {
-          HapticFeedback.selectionClick();
-          onTap();
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-          decoration: BoxDecoration(
-            border: last
-                ? null
-                : const Border(
-                    bottom: BorderSide(color: Color(0x0F000000)),
-                  ),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w400,
+                      letterSpacing: 0.2)),
+            ]),
           ),
-          child: Row(
-            children: [
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFEEF1F7),
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x21000000),
-                      blurRadius: 7,
-                      offset: Offset(3, 3),
-                      spreadRadius: -1,
-                    ),
-                  ],
-                ),
-                alignment: Alignment.center,
-                child: _glyph(NwsbColors.gold),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    EditableLabel('home_menu_drawer.Row',
-                      label,
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: labelColor,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    EditableLabel('home_menu_drawer.Row',
-                      sub,
-                      style: TextStyle(fontSize: 12, color: subColor),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(Icons.chevron_right_rounded, size: 18, color: chevColor),
-            ],
-          ),
-        ),
+          const Icon(Icons.chevron_right_rounded,
+              size: 18, color: Color(0x33FFFFFF)),
+        ]),
       ),
     );
   }
 }
 
-/// Small, quiet profile line at the top of the menu (opens Profile tab).
-class _ProfileHeader extends StatelessWidget {
-  const _ProfileHeader({required this.onTap});
+/// Hero member card: metallic gold with a slow sweeping sheen and glow.
+class _MemberCard extends StatefulWidget {
+  const _MemberCard({required this.onTap});
   final VoidCallback onTap;
+  @override
+  State<_MemberCard> createState() => _MemberCardState();
+}
+
+class _MemberCardState extends State<_MemberCard>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _c =
+      AnimationController(vsync: this, duration: const Duration(seconds: 6))
+        ..repeat(count: 6);
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -739,66 +479,149 @@ class _ProfileHeader extends StatelessWidget {
     final name = (u?.displayName?.trim().isNotEmpty ?? false)
         ? u!.displayName!.trim()
         : 'Welcome';
-    final sub = u?.email ?? 'Breathe. Practice. Return.';
-    final initial = name.characters.first.toUpperCase();
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 18),
-      child: NestedDarkWrap(
-        margin: EdgeInsets.zero,
-        radius: 20,
-        padding: const EdgeInsets.fromLTRB(16, 16, 14, 16),
-        onTap: onTap,
-        child: Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              alignment: Alignment.center,
+    return GestureDetector(
+      onTap: widget.onTap,
+      child: ListenableBuilder(
+        listenable: Listenable.merge([EconomyMirror.instance, _c]),
+        builder: (context, _) {
+          final w = EconomyMirror.instance;
+          final t = _c.value;
+          final glow = 0.25 + 0.15 * math.sin(t * math.pi * 2).abs();
+          return AspectRatio(
+            aspectRatio: 1.62,
+            child: Container(
+              clipBehavior: Clip.antiAlias,
               decoration: BoxDecoration(
-                shape: BoxShape.circle,
+                borderRadius: BorderRadius.circular(26),
                 border: Border.all(color: const Color(0x66E8D5A3)),
-              ),
-              child: Text(
-                initial,
-                style: const TextStyle(
-                  color: NwsbColors.goldLight,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w500,
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color(0xFF3A2E17),
+                    Color(0xFF000000),
+                    Color(0xFF000000)
+                  ],
+                  stops: [0, 0.5, 1],
                 ),
-              ),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Color(0xEBFFFFFF),
-                      fontSize: 15.5,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    sub,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Color(0x66FFFFFF),
-                      fontSize: 11.5,
-                    ),
-                  ),
+                boxShadow: [
+                  BoxShadow(
+                      color: NwsbColors.gold.withValues(alpha: glow),
+                      blurRadius: 40,
+                      spreadRadius: 2,
+                      offset: const Offset(0, 14))
                 ],
               ),
+              child: Stack(children: [
+                // Sweeping metallic sheen.
+                Positioned.fill(
+                  child: FractionalTranslation(
+                    translation: Offset(-1.2 + 2.4 * t, 0),
+                    child: Transform.rotate(
+                      angle: 0.35,
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(colors: [
+                            Color(0x00FFFFFF),
+                            Color(0x55FFFFFF),
+                            Color(0x00FFFFFF)
+                          ], stops: [
+                            0.35,
+                            0.5,
+                            0.65
+                          ]),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(22, 20, 22, 20),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(children: [
+                          const Text('NOWSSB',
+                              style: TextStyle(
+                                  color: Color(0xFFE8D5A3),
+                                  fontSize: 12,
+                                  letterSpacing: 4,
+                                  fontWeight: FontWeight.w800)),
+                          const Spacer(),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                                color: const Color(0xFFE8D5A3),
+                                borderRadius: BorderRadius.circular(20)),
+                            child: Text(
+                                w.uid == null ? 'GUEST' : w.plan.toUpperCase(),
+                                style: const TextStyle(
+                                    color: Color(0xFF000000),
+                                    fontSize: 10.5,
+                                    letterSpacing: 1.5,
+                                    fontWeight: FontWeight.w800)),
+                          ),
+                        ]),
+                        const Spacer(),
+                        Text(name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                                color: Color(0xFFFFFFFF),
+                                fontSize: 28,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: -0.5,
+                                height: 1.05)),
+                        const SizedBox(height: 4),
+                        Text(
+                            w.uid == null
+                                ? 'Sign in'
+                                : '${w.circleTier} member',
+                            style: const TextStyle(
+                                color: Color(0xB3FFFFFF),
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600)),
+                        if (w.uid != null) ...[
+                          const SizedBox(height: 12),
+                          Row(children: [
+                            _Stat(value: '${w.coins}', label: 'coins'),
+                            _Stat(value: '${w.streak}', label: 'day streak'),
+                            _Stat(value: '${w.practice}', label: 'sessions'),
+                          ]),
+                        ],
+                      ]),
+                ),
+              ]),
             ),
-            const Icon(Icons.chevron_right, size: 16, color: Color(0x33FFFFFF)),
-          ],
-        ),
+          );
+        },
       ),
+    );
+  }
+}
+
+class _Stat extends StatelessWidget {
+  const _Stat({required this.value, required this.label});
+  final String value;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(value,
+            maxLines: 1,
+            style: const TextStyle(
+                color: Color(0xFFFFFFFF),
+                fontSize: 18,
+                fontWeight: FontWeight.w800)),
+        Text(label,
+            style: const TextStyle(
+                color: Color(0x99FFFFFF),
+                fontSize: 10.5,
+                fontWeight: FontWeight.w600)),
+      ]),
     );
   }
 }
@@ -814,7 +637,8 @@ class _RoutinesPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: const Color(0xFF060C18),
         foregroundColor: Colors.white,
-        title: const EditableLabel('home_menu_drawer.RoutinesPage', 'My Routines'),
+        title:
+            const EditableLabel('home_menu_drawer.RoutinesPage', 'My Routines'),
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),

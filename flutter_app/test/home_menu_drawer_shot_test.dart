@@ -5,11 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:nowssb/features/economy/economy_api.dart';
 import 'package:nowssb/widgets/home_menu_drawer.dart';
 
 void main() {
   testWidgets('home menu drawer renders calm layout', (tester) async {
-    tester.view.physicalSize = const Size(412, 915);
+    tester.view.physicalSize = const Size(412, 1500);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
     final out = Platform.environment['DRAWER_SHOT'];
@@ -28,6 +29,16 @@ void main() {
             .load();
       });
     }
+    if (Platform.environment['DRAWER_FILLED'] == '1') {
+      // TEST data only, to show the signed-in card.
+      EconomyMirror.instance
+        ..uid = 'preview'
+        ..coins = 1240
+        ..streak = 6
+        ..practice = 41
+        ..plan = 'Pro'
+        ..circleTier = 'Gold';
+    }
     final key = GlobalKey();
     await tester.pumpWidget(MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -37,9 +48,11 @@ void main() {
         child: HomeMenuDrawer(light: false, goTab: (_) {}),
       ),
     ));
+    await tester.runAsync(() => Future<void>.delayed(const Duration(seconds: 2)));
     await tester.pump(const Duration(milliseconds: 500));
     expect(find.text('Menu'), findsOneWidget);
     expect(find.text('Welcome'), findsOneWidget);
+    EconomyMirror.instance.uid = null;
     if (out != null) {
       await tester.runAsync(() async {
         final b = key.currentContext!.findRenderObject()! as RenderRepaintBoundary;
