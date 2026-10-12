@@ -10,8 +10,9 @@ import '../earn/earnings_screen.dart';
 import '../earn/nowssb_one.dart';
 import '../coins/coinback_page.dart';
 import '../coins/free_coins_page.dart';
+import '../coins/multiplier_page.dart';
 
-enum Programme { earn, rewards, coupons, gifts, reference, partner, earnings, freeCoins, coinback }
+enum Programme { earn, rewards, coupons, gifts, reference, partner, earnings, freeCoins, coinback, multiplier }
 
 abstract final class Programmes {
   static Widget page(Programme p, {String? tab}) => switch (p) {
@@ -24,6 +25,7 @@ abstract final class Programmes {
         Programme.earnings => const EarningsScreen(),
         Programme.freeCoins => const FreeCoinsPage(),
         Programme.coinback => const CoinbackPage(),
+        Programme.multiplier => const MultiplierPage(),
       };
 
   static Future<void> open(BuildContext context, Programme p, {String? tab}) =>
@@ -40,6 +42,7 @@ abstract final class Programmes {
         'reference' => Programme.reference,
         'free coins' => Programme.freeCoins,
         'coinback' => Programme.coinback,
+        'multiplier' || 'multiply' => Programme.multiplier,
         _ => null,
       };
 }

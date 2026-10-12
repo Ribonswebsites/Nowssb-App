@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:nowssb/features/coins/coinback_page.dart';
 import 'package:nowssb/features/coins/free_coins_page.dart';
+import 'package:nowssb/features/coins/multiplier_page.dart';
 
 /// Shaped like GET /api/economy summary (functions/_lib/economy/summary.js).
 final summary = <String, dynamic>{
@@ -66,6 +67,9 @@ void main() {
   });
   testWidgets('Coinback page', (tester) async {
     await shot(tester, CoinbackPage(preset: summary), 'coinback.png', h: 1100);
+  });
+  testWidgets('Multiplier page', (tester) async {
+    await shot(tester, MultiplierPage(preset: summary), 'multiplier.png', h: 900);
   });
 }
 
