@@ -265,7 +265,7 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
       },
           // Brief B (calm): hype row retired; the second Signature promo is
           // folded (promo + promo3 keep the page's promo slots).
-          hiddenByDefault: const {'hype', 'promo2'},
+          hiddenByDefault: const {'hype', 'glassy', 'promo2', 'promo3'},
           [
         // Single hero/video area — no back-to-back promo banners.
         StorePixelsHero(
@@ -284,11 +284,9 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
           onTileTap: _onMixTile,
         ),
         // Kept as the one hyped row (legacy cards + their admin image slots).
-        const StoreTextCap(child: NowssbHypeRail()),
-        StoreMixRow(
-          title: 'Explore the stores',
-          child: StoreRegistrySection(config: MeaningMix.glassy),
-        ),
+        // Declutter: hype rail + 'Explore the stores' removed (slots kept).
+        const SizedBox.shrink(),
+        const SizedBox.shrink(),
         const SizedBox(height: 28),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 2),

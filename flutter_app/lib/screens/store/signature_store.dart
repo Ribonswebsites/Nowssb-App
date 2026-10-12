@@ -105,15 +105,6 @@ class _SignatureBody extends StatelessWidget {
           ),
         ),
         LSection(
-          'glassy',
-          'Explore the stores',
-          StoreMixRow(
-            title: 'Explore the stores',
-            child: StoreRegistrySection(config: SignatureMix.glassy),
-          ),
-        ),
-        const LSection('hype', 'Most hyped', StoreTextCap(child: NowssbHypeRail())),
-        LSection(
           'spotlight',
           'Signature spotlight',
           StoreRegistrySection(config: SignatureMix.spotlight),

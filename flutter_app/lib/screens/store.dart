@@ -296,13 +296,6 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
                 _StoreDeptTabs(depts: _depts(context))),
             LSection('spotlight', 'Spotlight Picks (BD-8)',
                 _SpotlightPicks(depts: _depts(context))),
-            const LSection(
-                'hype',
-                'Most hyped',
-                Padding(
-                  padding: EdgeInsets.fromLTRB(16, 10, 0, 0),
-                  child: NowssbHypeRail(),
-                )),
             LSection('tabs', 'Shop / Resell tabs', items[1]),
             LSection('rotator', 'Picture rotator', items[2]),
             LSection('halfoff', 'Half-off rail', items[3]),

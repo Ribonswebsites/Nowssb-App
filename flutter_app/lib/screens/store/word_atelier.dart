@@ -321,7 +321,7 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
       },
           // Brief B (calm): the hype row is being retired and the third split
           // promo is folded; promo + promo2 keep the page's promo slots.
-          hiddenByDefault: const {'hype', 'promo3'},
+          hiddenByDefault: const {'hype', 'coupons', 'glassy', 'promo2', 'promo3'},
           [
         StorePixelsHero(
           onBrowseAll: _browseAll,
@@ -330,9 +330,9 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
           videoTitle: '',
         ),
         const SizedBox(height: 28),
-        StoreRegistrySection(config: AtelierMix.coupons),
-        // Kept as the one hyped row (legacy cards + their admin image slots).
-        const StoreTextCap(child: NowssbHypeRail()),
+        // Declutter: coupon carousel + hype rail removed (slots kept).
+        const SizedBox.shrink(),
+        const SizedBox.shrink(),
         StoreRegistrySection(config: AtelierMix.tiles),
         StoreMixRow(
           title: 'Featured collections',

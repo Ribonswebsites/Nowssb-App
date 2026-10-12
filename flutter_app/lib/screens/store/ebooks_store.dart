@@ -181,24 +181,10 @@ class _EbooksBody extends StatelessWidget {
         )),
         // UI-7 varied mix: coupons → tiles → glassy → hype (no two alike).
         LSection(
-          'coupons',
-          'Coupon banner',
-          StoreRegistrySection(config: EbooksMix.coupons),
-        ),
-        LSection(
           'tiles',
           'Category tiles',
           StoreRegistrySection(config: EbooksMix.tiles),
         ),
-        LSection(
-          'glassy',
-          'Explore the stores',
-          StoreMixRow(
-            title: 'Explore the stores',
-            child: StoreRegistrySection(config: EbooksMix.glassy),
-          ),
-        ),
-        const LSection('hype', 'Most hyped', StoreTextCap(child: NowssbHypeRail())),
         const LSection('intro', 'Intro line', Text(
           'Deep-dive guides on sound, phonetic origin and healing practice — '
           'yours to keep, read anywhere, forever. Not a word catalogue.',
