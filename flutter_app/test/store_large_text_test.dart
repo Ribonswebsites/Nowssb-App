@@ -128,8 +128,9 @@ void main() {
         }
 
         FlutterError.onError = prev;
-        // The walk really covered a long page, top to bottom.
-        expect(state.position.maxScrollExtent, greaterThan(2000));
+        // The walk really covered a long page, top to bottom (calm store
+        // pages are shorter now that the repeated banners are retired).
+        expect(state.position.maxScrollExtent, greaterThan(1500));
         expect(state.position.pixels,
             closeTo(state.position.maxScrollExtent, 1));
         // ignore: avoid_print

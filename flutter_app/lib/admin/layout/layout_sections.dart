@@ -154,6 +154,10 @@ List<SectionItem> applyLayout(
       if (e.id != isolate) continue;
     } else if (!e.showsNow) {
       continue;
+    } else if (isRetiredOnPage(pageId, e)) {
+      // Retired for good on this page (calm brief): a saved server layout
+      // must not bring it back.
+      continue;
     }
     final Widget base;
     if (e.isTemplate) {
@@ -838,4 +842,30 @@ class _CarouselAutoRotateState extends State<CarouselAutoRotate> {
 
   @override
   Widget build(BuildContext context) => widget.child;
+}
+
+
+/// Saved-layout sections that the calm store pages no longer draw, even
+/// when an older server layout (ui_layouts) still lists them as visible:
+/// the coupon carousel, "Explore the stores", the hyped rows and the
+/// repeated banner mixes.
+const kRetiredStoreTemplateKinds = <String>{
+  'couponBanner',
+  'couponPromo',
+  'pieceCoupon',
+  'glassyCarousel',
+  'hypedRow',
+  'pieceHype',
+  'bannerMix',
+  'fourBanners',
+};
+
+/// Built-in store sections that are retired the same way.
+const kRetiredStoreBuiltins = <String>{'hype', 'coupons', 'glassy', 'mix', 'promo2', 'promo3'};
+
+/// [e] is retired on [pageId] (store sub pages only).
+bool isRetiredOnPage(String pageId, SectionEntry e) {
+  if (!pageId.startsWith('store.')) return false;
+  if (e.isTemplate) return kRetiredStoreTemplateKinds.contains(e.kind);
+  return kRetiredStoreBuiltins.contains(e.builtinId);
 }
