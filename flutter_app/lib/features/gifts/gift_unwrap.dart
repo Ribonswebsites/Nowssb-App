@@ -1,11 +1,18 @@
-/// Gift unwrap: a black-glass gift box with a gold ribbon. Tap it and the
-/// lid lifts and tips away, the ribbon parts, a soft gold glow blooms and
-/// the wrapped content rises out. Pure Flutter — no external assets.
+/// The NowssB gift unwrap moment.
+///
+/// One focus per beat: a single hero box floats in a pool of gold light,
+/// shakes when tapped, bursts open (Lottie "Gift Box Opening Animation" by
+/// Goodeisgn) with light rays and a gold confetti burst (painted), then the real
+/// server-granted contents rise in a glass card with one Claim action.
+/// Reduced motion (MediaQuery.disableAnimations) skips straight to the reveal.
+/// Credits: flutter_app/assets/CREDITS.md.
 library;
 
 import 'dart:math' as math;
+import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 import '../../theme/tokens.dart';
 import '../economy/reward_fx.dart';
@@ -395,7 +402,7 @@ class _GiftUnwrapRevealState extends State<GiftUnwrapReveal> with SingleTickerPr
     super.dispose();
   }
 
-  static const _gold = Color(0xFFE4C56A);
+  static const _goldC = Color(0xFFE4C56A);
 
   @override
   Widget build(BuildContext context) {
@@ -420,7 +427,7 @@ class _GiftUnwrapRevealState extends State<GiftUnwrapReveal> with SingleTickerPr
                     Container(
                       width: 160 + 80 * lid, height: 160 + 80 * lid,
                       decoration: BoxDecoration(shape: BoxShape.circle, gradient: RadialGradient(colors: [
-                        _gold.withValues(alpha: .30 * lid), _gold.withValues(alpha: 0),
+                        _goldC.withValues(alpha: .30 * lid), _goldC.withValues(alpha: 0),
                       ])),
                     ),
                     // box body
@@ -434,7 +441,7 @@ class _GiftUnwrapRevealState extends State<GiftUnwrapReveal> with SingleTickerPr
                               colors: [Color(0xFF1A1408), Colors.black, Color(0xFF14100A)]),
                           border: Border.all(color: const Color(0x99E4C56A)),
                         ),
-                        child: Center(child: Container(width: 16, color: _gold.withValues(alpha: 1 - lid * .7))),
+                        child: Center(child: Container(width: 16, color: _goldC.withValues(alpha: 1 - lid * .7))),
                       ),
                     ),
                     // lid
@@ -449,9 +456,9 @@ class _GiftUnwrapRevealState extends State<GiftUnwrapReveal> with SingleTickerPr
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(8),
                               color: const Color(0xFF1A1408),
-                              border: Border.all(color: _gold),
+                              border: Border.all(color: _goldC),
                             ),
-                            child: Center(child: Container(width: 16, color: _gold)),
+                            child: Center(child: Container(width: 16, color: _goldC)),
                           ),
                         ),
                       ),
@@ -459,7 +466,7 @@ class _GiftUnwrapRevealState extends State<GiftUnwrapReveal> with SingleTickerPr
                     Positioned(
                       bottom: 0,
                       child: Text(widget.label,
-                          style: const TextStyle(color: _gold, letterSpacing: 1.4, fontSize: 12, fontWeight: FontWeight.w700)),
+                          style: const TextStyle(color: _goldC, letterSpacing: 1.4, fontSize: 12, fontWeight: FontWeight.w700)),
                     ),
                   ]),
                 ),

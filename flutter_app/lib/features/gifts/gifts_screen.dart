@@ -3,6 +3,10 @@ import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'package:lottie/lottie.dart';
+
+import '../../admin/layout/layout_sections.dart';
+
 import '../../theme/tokens.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/glass_wrap.dart';
@@ -342,9 +346,11 @@ class _GiftCardSheetState extends State<_GiftCardSheet> {
       );
 }
 
-/// The one NowssB Gifts page: the gift showcase, Daily Spin, gift cards and
-/// boxes on top; the programme tabs (Free Gifts · Send · Received · Sent ·
-/// Redeem · Rules) below.
+/// The one NowssB Gifts page. Rebuilt Oct 12 (calm, one focus): a single
+/// hero gift in a pool of gold light with today's real box state and one
+/// Open action, a quiet line of real counts, then the programme tabs
+/// (Free Gifts · Send · Received · Sent · Redeem · Rules). No banners,
+/// carousels or rails. Opening plays the unwrap moment (gift_unwrap.dart).
 class GiftsScreen extends StatefulWidget {
   const GiftsScreen({super.key, this.startOnRedeem = false, this.initialTab});
   final bool startOnRedeem;

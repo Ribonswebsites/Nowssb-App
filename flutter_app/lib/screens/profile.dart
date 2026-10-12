@@ -48,6 +48,7 @@ import '../widgets/glass_black_card.dart';
 import '../admin/template/editable.dart';
 import '../admin/layout/layout_sections.dart';
 import '../features/programs/program_cards.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 const _accent = Color(0xFFE3BD7D);
 const _pBg = Colors.black;
@@ -100,7 +101,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   int _duration = 15;
   TimeOfDay _reminder = const TimeOfDay(hour: 7, minute: 0);
   bool _loading = true;
-  bool _recentOpen = false;
   String _toast = '';
   OverlayEntry? _toastEntry;
 
@@ -430,17 +430,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void _onLiveProgress() { if (mounted) setState(() {}); }
 
 
+  // ───────────────────────── REBUILD-C (Oct 12, 2026) ─────────────────────────
+  // Minimal profile: one striking hero (gold sound halo around the avatar),
+  // a CLiQ-style member line with the real plan, the real coin balance, then
+  // calm grouped rows. Not server-layout driven: layoutChildren() is
+  // deliberately not used here so no ui_overrides/server layout can re-add
+  // the old banner/promo/quote sections.
   @override
   Widget build(BuildContext context) {
     if (_loading) {
       return const Scaffold(
         backgroundColor: Colors.black,
-        body: Center(
-          child: AppThinkingLoader(label: 'Preparing…', state: OrbState.listening),
-        ),
+        body: Center(child: AppThinkingLoader(label: 'Preparing…', state: OrbState.listening)),
       );
     }
-    final int today = (DateTime.now().weekday - 1).clamp(0, 6).toInt();
     return Theme(
       data: ThemeData.dark(useMaterial3: true).copyWith(
         scaffoldBackgroundColor: Colors.black,
@@ -449,11 +452,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         textTheme: ThemeData.dark().textTheme.apply(fontFamily: 'SF Pro Display'),
       ),
       child: Scaffold(
-        backgroundColor: Colors.black,
-        body: Stack(
-        children: [
-          const Positioned.fill(child: _Background()),
-          Positioned.fill(child: IgnorePointer(child: CustomPaint(painter: _GrainPainter()))),
+        backgroundColor: _pBg,
+        body: Stack(children: [
+          Positioned.fill(child: _rbBackdrop()),
           SafeArea(
             bottom: false,
             child: ListView(
@@ -518,9 +519,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ],
             ),
           ),
-            if (_recentOpen) _recentSheet(),
-          ],
-        ),
+        ]),
       ),
     );
   }
@@ -773,148 +772,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _showToast('Banner updated');
   }
 
-  Widget _profileCard() => GlassCard(
-        margin: const EdgeInsets.only(bottom: 14),
-        radius: 26,
-        // CLiQ-style member card: one subtle diagonal sheen, no neon.
-        overlay: const LinearGradient(begin: Alignment(-1, -1), end: Alignment(1, 1), colors: [Color(0x00FFFFFF), Color(0x0FFFFFFF), Color(0x00FFFFFF)], stops: [.25, .5, .75]),
-        padding: EdgeInsets.zero,
-        child: SizedBox(
-          height: 138,
-          child: Row(
-            children: [
-              SizedBox(
-                width: 132,
-                child: Stack(children: [
-                  const Positioned.fill(child: ColoredBox(color: Color(0xFF0A0A0A))),
-                  Positioned.fill(child: Transform.scale(scale: 1.16, child: Opacity(opacity: .98, child: EditableImage.asset('assets/profile_source/img-ring.png', fit: BoxFit.cover, alignment: const Alignment(.0, -.16), slot: 'profile.ProfileScreen')))),
-                  Positioned(
-                    top: 18,
-                    right: 17,
-                    child: Container(
-                      width: 76,
-                      height: 76,
-                      clipBehavior: Clip.antiAlias,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: const Color(0xFF0A0A0A),
-                        border: Border.all(color: const Color(0x99E8D5A3), width: 1.2),
-                        boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 8, offset: Offset(2, 3))],
-                      ),
-                      child: _photo != null
-                          ? Image.file(_photo!, fit: BoxFit.cover)
-                          : CachedNetworkImage(
-                              imageUrl: (_avatarUrl != null && _avatarUrl!.startsWith('http')) ? _avatarUrl! : kDefaultAvatar,
-                              fit: BoxFit.cover,
-                              errorWidget: (_, __, ___) => Center(child: Text((_nameController.text.trim().isEmpty ? 'P' : _nameController.text.trim().substring(0, 1)).toUpperCase(), style: const TextStyle(fontFamily: _mono, fontSize: 24, fontWeight: FontWeight.w600, color: _text))),
-                            ),
-                    ),
-                  ),
-                  Positioned(right: 10, bottom: 10, child: _circleButton(asset: 'assets/icons/icon_02.svg', size: 28, onTap: _pickPhoto)),
-                ]),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    const EditableLabel('profile.ProfileScreen', 'PRACTITIONER', style: TextStyle(fontSize: 11, letterSpacing: 2, color: _accent, fontWeight: FontWeight.w600)),
-                    const SizedBox(height: 4),
-                    Row(children: [Flexible(child: Text(_nameController.text, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600, letterSpacing: -.2))), const SizedBox(width: 8), InkWell(onTap: _editName, child: EditableSvg.asset('assets/icons/icon_03.svg', width: 13, height: 13, colorFilter: const ColorFilter.mode(_dim, BlendMode.srcIn), slot: 'profile.ProfileScreen'))]),
-                    const SizedBox(height: 6),
-                    const Flexible(child: EditableLabel('profile.ProfileScreen', 'Practicing daily, growing steadily.', maxLines: 2, style: TextStyle(fontSize: 12.5, height: 1.45, color: _dim))),
-                    const SizedBox(height: 9),
-                    ListenableBuilder(
-                      listenable: EconomyMirror.instance,
-                      builder: (context, _) {
-                        final plan = _planName;
-                        return Container(padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 5), decoration: BoxDecoration(color: const Color(0x08FFFFFF), border: const Border.fromBorderSide(BorderSide(color: _border)), borderRadius: BorderRadius.circular(999)), child: Row(mainAxisSize: MainAxisSize.min, children: [Container(width: 6, height: 6, decoration: const BoxDecoration(color: _accent, shape: BoxShape.circle)), const SizedBox(width: 6), Text(plan == 'Free' ? 'Free Plan' : plan, style: const TextStyle(fontSize: 11.5, letterSpacing: .45))]));
-                      },
-                    ),
-                  ]),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-
   String get _planName => EconomyMirror.instance.plan;
 
   /// Small glass pill with the signed-in user's existing coin balance
   /// (EconomyMirror). Hidden when there is no signed-in wallet.
-  Widget _balancePill() => ListenableBuilder(
-        listenable: EconomyMirror.instance,
-        builder: (context, _) {
-          final signedIn = NwsbFirebase.ready && FirebaseAuth.instance.currentUser != null;
-          if (!signedIn) return const SizedBox(height: 24);
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 34),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(999),
-              onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarnHubScreen())),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
-                decoration: BoxDecoration(color: const Color(0x0DFFFFFF), border: Border.all(color: _border), borderRadius: BorderRadius.circular(999)),
-                child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  const Icon(Icons.toll_outlined, size: 16, color: _accent),
-                  const SizedBox(width: 8),
-                  Text('${EconomyMirror.instance.coins}', style: const TextStyle(fontFamily: _mono, fontSize: 14, fontWeight: FontWeight.w600, color: _text)),
-                  const SizedBox(width: 6),
-                  const Text('coins', style: TextStyle(fontSize: 12.5, color: _dim)),
-                ]),
-              ),
-            ),
-          );
-        },
-      );
-
-  Widget _earnHub() {
-    return ListenableBuilder(
-      listenable: Listenable.merge([EconomyMirror.instance, EarnWallet.instance]),
-      builder: (context, _) {
-    final live = EconomyMirror.instance.live;
-    final coins = EconomyMirror.instance.coins;
-    final streak = live ? EconomyMirror.instance.streak : PracticeProgress.instance.streak;
-    final code = EconomyMirror.instance.code.isNotEmpty ? EconomyMirror.instance.code : (EarnWallet.instance.code.isNotEmpty ? EarnWallet.instance.code : '—');
-    final refs = EconomyMirror.instance.paidReferrals;
-    final tier = live ? EconomyMirror.instance.circleTier : 'Member';
-    final earned = live ? EconomyMirror.instance.lifetimeCents : 0;
-    return Column(
-      children: [
-        const SectionBlock(
-          marginBottom: 18,
-          title: 'Programs',
-          child: ProgramCardsStrip(),
-        ),
-        _sectionList('Rewards & Earn', [
-          _linkRow(Icons.savings_outlined, 'Rewards', '$coins coins · streak $streak · open Vault', () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const VaultScreen()))),
-          _linkRow(Icons.workspace_premium_outlined, 'NowssB Earn · $tier', '$code · $refs paid referrals', () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CircleScreen()))),
-          _linkRow(Icons.card_giftcard_outlined, 'Gifts', 'Send or redeem · a real purchase, shared as a code', () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const GiftsScreen()))),
-          _linkRow(Icons.account_balance_wallet_outlined, 'Earnings', '${live ? FxBook.instance.formatCents(earned) : 'Sign in'} · sales, referrals, payouts', () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarningsScreen()))),
-        ]),
-      ],
-    );
-      },
-    );
-  }
-
-  Widget _linkRow(IconData icon, String title, String sub, VoidCallback onTap) => InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          child: Row(children: [
-            Container(width: 38, height: 38, decoration: BoxDecoration(color: const Color(0x14E3BD7D), borderRadius: BorderRadius.circular(19)), child: Icon(icon, size: 18, color: _accent)),
-            const SizedBox(width: 16),
-            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
-              const SizedBox(height: 3),
-              Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12, color: _dim)),
-            ])),
-            const Icon(Icons.chevron_right_rounded, size: 20, color: _faint),
-          ]),
-        ),
-      );
-
   Widget _earnLink(String label, Widget page) => InkWell(
         onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => page)),
         borderRadius: BorderRadius.circular(14),
@@ -926,105 +787,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             border: const Border.fromBorderSide(BorderSide(color: _border)),
           ),
           child: EditableLabel('profile.ProfileScreen', label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: _text)),
-        ),
-      );
-
-  Widget _progress() {
-    void openProgress() {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => PracticeProgressScreen(words: ContentStore.instance.library),
-        ),
-      );
-    }
-
-    return ListenableBuilder(
-      listenable: Listenable.merge([PracticeProgress.instance, EconomyMirror.instance]),
-      builder: (context, _) {
-    final p = PracticeProgress.instance;
-    return SectionBlock(
-      title: 'Your Progress',
-      trailing: _viewAll(icon: 'assets/icons/icon_05.svg', onTap: openProgress),
-      child: InkWell(
-        onTap: openProgress,
-        borderRadius: BorderRadius.circular(22),
-        child: GlassCard(
-          margin: const EdgeInsets.only(bottom: 0),
-          padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
-          child: Row(
-            children: [
-              GestureDetector(
-                onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const VaultScreen())),
-                child: _TeaserStat(
-                  '${EconomyMirror.instance.coins}',
-                  'Coins',
-                  expanded: false,
-                  figure: CoinCount(
-                    value: EconomyMirror.instance.coins,
-                    style: const TextStyle(fontFamily: _mono, fontSize: 22, fontWeight: FontWeight.w600, height: 1, color: _text),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: InkWell(
-                  onTap: openProgress,
-                  child: Row(
-                    children: [
-                      _TeaserStat('${p.streak}', 'Streak'),
-                      const SizedBox(width: 10),
-                      _TeaserStat('${p.totalSessions}', 'Sessions'),
-                      const SizedBox(width: 10),
-                      _TeaserStat('${p.uniqueWords}', 'Words'),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                width: 34,
-                height: 34,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: _borderSoft),
-                  color: const Color(0x14FFFFFF),
-                ),
-                alignment: Alignment.center,
-                child: _svgIcon('assets/icons/icon_16.svg', 14, _dim),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-      },
-    );
-  }
-
-  Widget _about() => GlassCard(
-        margin: const EdgeInsets.only(bottom: 40),
-        padding: const EdgeInsets.all(22),
-        image: 'assets/profile_source/img-about.jpeg',
-        overlay: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xB8000000), Color(0x61000000), Color(0xBF000000)]),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [EditableSvg.asset('assets/icons/icon_04.svg', width: 15, height: 15, colorFilter: const ColorFilter.mode(_dim, BlendMode.srcIn), slot: 'profile.ProfileScreen'), const SizedBox(width: 9), const EditableLabel('profile.ProfileScreen', 'About NowssB', style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600))]),
-          const SizedBox(height: 14),
-          const FractionallySizedBox(widthFactor: .78, child: EditableLabel('profile.ProfileScreen', 'Before a word had a spelling, it had a sound. NowssB works backward from the dictionary — past the meaning, past the letters — to the breath and vibration a word first came from, so you practice the origin, not just the definition.', style: TextStyle(fontSize: 14, height: 1.65, color: _dim))),
-        ]),
-      );
-
-  Widget _quickAccess() => SectionBlock(
-        marginBottom: 38,
-        title: 'Quick Access',
-        trailing: _viewAll(icon: 'assets/icons/icon_05.svg', onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const QuickAccessScreen()))),
-        child: GlassCard(
-          padding: const EdgeInsets.all(16),
-          image: 'assets/profile_source/img-qa.jpeg',
-          overlay: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xC7000000), Color(0x52000000), Color(0xCC000000)]),
-          child: Row(children: List.generate(5, (i) {
-            final names = ['Sessions', 'Saved', 'Liked', 'Journal', 'Settings'];
-            return Expanded(child: Padding(padding: EdgeInsets.only(right: i == 4 ? 0 : 8), child: _quickItem(names[i], i + 6)));
-          })),
         ),
       );
 
@@ -1055,111 +817,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return r.isEmpty ? 'Coins' : r;
   }
 
-  Widget _recentActivity() {
-    final raw = EconomyMirror.instance.summary['recentCoins'];
-    final items = <EarnActivity>[
-      for (final r in (raw is List ? raw : const []))
-        if (r is Map)
-          EarnActivity(
-            at: (r['at'] as num?)?.toInt() ?? 0,
-            title: _coinReason('${r['reason'] ?? ''}'),
-            detail: r['balance'] == null ? '' : 'Balance ${r['balance']}',
-            coins: (r['delta'] as num?)?.toInt() ?? 0,
-          ),
-    ];
-    return SectionBlock(
-      marginBottom: 40,
-      title: 'Recent Activity',
-      trailing: _viewAll(icon: 'assets/icons/icon_11.svg', onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarnHubScreen())), pill: true),
-      child: GlassCard(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-        child: items.isEmpty
-            ? const Padding(
-                padding: EdgeInsets.all(16),
-                child: EditableLabel('profile.ProfileScreen', 'Coins, sales, and referrals show up here.', style: TextStyle(fontSize: 13, color: _dim)),
-              )
-            : Column(children: [
-                for (var i = 0; i < items.length && i < 6; i++)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
-                    decoration: BoxDecoration(border: Border(bottom: i == items.length - 1 || i == 5 ? BorderSide.none : const BorderSide(color: _borderSoft))),
-                    child: Row(children: [
-                      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(items[i].title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600)),
-                        const SizedBox(height: 2),
-                        Text(items[i].detail, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12.5, color: _dim)),
-                      ])),
-                      const SizedBox(width: 10),
-                      Text(
-                        items[i].coins == 0 ? '—' : (items[i].coins > 0 ? '+${items[i].coins}' : '${items[i].coins}'),
-                        style: const TextStyle(fontFamily: _mono, fontSize: 12, color: _accent),
-                      ),
-                    ]),
-                  ),
-              ]),
-      ),
-    );
-  }
-
-  Widget _motto() => GlassCard(
-        margin: const EdgeInsets.only(bottom: 40),
-        minHeight: 210,
-        padding: const EdgeInsets.fromLTRB(18, 24, 18, 18),
-        image: 'assets/profile_source/img-motto.jpeg',
-        overlay: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0x8C000000), Color(0x40000000), Color(0x99000000)]),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [const EditableLabel('profile.ProfileScreen', '“', style: TextStyle(fontFamily: 'Georgia', fontSize: 26, color: _accent)), const SizedBox(width: 8), const EditableLabel('profile.ProfileScreen', 'MY MOTTO', style: TextStyle(fontSize: 11, letterSpacing: 2, color: _dim, fontWeight: FontWeight.w600))]),
-          const SizedBox(height: 16),
-          const FractionallySizedBox(widthFactor: .66, child: Text.rich(TextSpan(children: [TextSpan(text: 'My Focus.\nBreathe.\nLet go.\n'), TextSpan(text: 'Grow.', style: TextStyle(color: _accent))]), style: TextStyle(fontSize: 25, height: 1.22, fontWeight: FontWeight.w300))),
-          const SizedBox(height: 14),
-          Row(children: [Expanded(child: _compactQuick('Practice', _durationText, 15)), const SizedBox(width: 5), Expanded(child: _compactQuick('Reminder', _reminderText, 17)), const SizedBox(width: 5), Expanded(child: ListenableBuilder(listenable: EconomyMirror.instance, builder: (context, _) => _compactQuick('Plan', _planName, 21)))]),
-        ]),
-      );
-
-  Widget _compactQuick(String label, String value, int icon) => Container(
-        padding: const EdgeInsets.fromLTRB(7, 8, 7, 9),
-        decoration: BoxDecoration(color: const Color(0x85040405), border: const Border.fromBorderSide(BorderSide(color: _borderSoft)), borderRadius: BorderRadius.circular(16)),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Container(width: 30, height: 30, decoration: BoxDecoration(color: const Color(0x29E3BD7D), border: Border.all(color: const Color(0x59E3BD7D)), borderRadius: BorderRadius.circular(10)), child: Center(child: EditableSvg.asset('assets/icons/icon_${icon.toString().padLeft(2, '0')}.svg', width: 14, height: 14, colorFilter: const ColorFilter.mode(_accent, BlendMode.srcIn), slot: 'profile.ProfileScreen'))), EditableSvg.asset('assets/icons/icon_${(icon + 1).toString().padLeft(2, '0')}.svg', width: 12, height: 12, colorFilter: const ColorFilter.mode(_faint, BlendMode.srcIn), slot: 'profile.ProfileScreen')]), const SizedBox(height: 9), Text(label.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 7, letterSpacing: .7, color: _dim)), const SizedBox(height: 3), Text(value, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600))]),
-      );
-
-  Widget _weekTracker(int today) {
-    final week = PracticeProgress.instance.thisWeekDays;
-    return Container(
-        margin: const EdgeInsets.only(bottom: 44),
-        child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: List.generate(7, (i) {
-          // Days this account actually practiced (PracticeProgress), read-only.
-          final done = week[i].done;
-          final future = i > today;
-          return AnimatedContainer(
-              duration: const Duration(milliseconds: 150),
-              width: 42,
-              height: 42,
-              decoration: BoxDecoration(shape: BoxShape.circle, color: done ? const Color(0xFFF2F2F0) : Colors.transparent, border: Border.all(color: future ? _borderSoft : (i == today ? const Color(0xD9FFFFFF) : _borderSoft), width: i == today ? 1.5 : 1)),
-              child: Center(child: Text(const ['M','T','W','T','F','S','S'][i], style: TextStyle(fontFamily: _mono, fontSize: 13, fontWeight: i == today ? FontWeight.w600 : FontWeight.w400, color: done ? Colors.black : (future ? _dim.withOpacity(.32) : _dim)))),
-          );
-        })),
-      );
-  }
-
-  Widget _preferences() => _sectionList('Preferences', [
-        _listRow('Sound Feedback', trailing: ToggleSwitch(value: _soundOn, onChanged: (v) async { setState(() => _soundOn = v); await _prefs.setString('nowssb_sound', v ? 'on' : 'off'); })),
-        _listRow('Practice Duration', trailing: Row(mainAxisSize: MainAxisSize.min, children: [_roundAction('assets/icons/icon_24.svg', () => _stepDuration(-15)), const SizedBox(width: 14), SizedBox(width: 64, child: Text(_durationText, textAlign: TextAlign.center, style: const TextStyle(fontFamily: _mono, fontSize: 14))), const SizedBox(width: 14), _roundAction('assets/icons/icon_25.svg', () => _stepDuration(15))])),
-        _listRow('Daily Reminder', trailing: InkWell(onTap: _pickReminder, borderRadius: BorderRadius.circular(999), child: Container(padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6), decoration: BoxDecoration(color: const Color(0x08FFFFFF), border: const Border.fromBorderSide(BorderSide(color: _border)), borderRadius: BorderRadius.circular(999)), child: Text(_reminderText, style: const TextStyle(fontFamily: _mono, fontSize: 13.5))))),
-        _listRow('App Version', muted: true, trailing: const EditableLabel('profile.ProfileScreen', 'Build ${NwsbAppUpdate.currentBuild}', style: TextStyle(fontSize: 13, color: _dim))),
-      ]);
-
   // Real counts: the bag and wishlist (CartBag) and the items this account
   // owns (users/{uid}/owned, via Entitlements).
-  Widget _shop() => ListenableBuilder(
-        listenable: Listenable.merge([CartBag.instance, Entitlements.instance]),
-        builder: (context, _) => _sectionList('Shop & Orders', [
-          _shopRow('Cart', '${CartBag.instance.cartCount}', 26, sub: '${CartBag.instance.cartCount} in your cart'),
-          _shopRow('Wishlist', '${CartBag.instance.wishCount}', 28, sub: '${CartBag.instance.wishCount} saved for later'),
-          _shopRow('Orders', '${Entitlements.instance.owned.length}', 30, sub: '${Entitlements.instance.owned.length} owned'),
-        ]),
-      );
-
-  String _recentFilter = 'All';
 
   static String _ago(String iso) {
     final t = DateTime.tryParse(iso);
@@ -1193,23 +852,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return '${months[t.month - 1]} ${t.year}';
   }
-
-  Widget _account() => ListenableBuilder(
-        listenable: EconomyMirror.instance,
-        builder: (context, _) => _sectionList('Account', [
-          _listRow('Member Since', trailing: Text(_memberSince, style: const TextStyle(fontSize: 13, color: _dim))),
-          _listRow('Current Plan', trailing: Row(mainAxisSize: MainAxisSize.min, children: [Text(_planName, style: const TextStyle(fontSize: 13, color: _dim)), const SizedBox(width: 10), InkWell(onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SubscriptionScreen())), child: const EditableLabel('profile.ProfileScreen', 'Upgrade', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, decoration: TextDecoration.underline)))])),
-        ]),
-      );
-
-  Widget _quote() => GlassCard(
-        margin: const EdgeInsets.only(bottom: 34),
-        minHeight: 170,
-        padding: const EdgeInsets.fromLTRB(24, 28, 24, 28),
-        image: 'assets/profile_source/img-quote.jpeg',
-        overlay: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xB3000000), Color(0x52000000), Color(0xC7000000)]),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [const EditableLabel('profile.ProfileScreen', '“', style: TextStyle(fontFamily: 'Georgia', fontSize: 38, color: _faint, height: 1)), const SizedBox(height: 8), const FractionallySizedBox(widthFactor: .70, child: EditableLabel('profile.ProfileScreen', 'Long before there was language, there was only sound.', style: TextStyle(fontSize: 17, height: 1.5))), const SizedBox(height: 16), const EditableLabel('profile.ProfileScreen', '— THE IDEA BEHIND NOWSSB', style: TextStyle(fontSize: 11, letterSpacing: 1.3, color: _dim))]),
-      );
 
   Future<void> _doSignOut() async {
     final ok = await showDialog<bool>(
@@ -1257,82 +899,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     Navigator.of(context, rootNavigator: true).popUntil((route) => route.isFirst);
   }
 
-  Widget _signOut() => InkWell(
-        onTap: _doSignOut,
-        borderRadius: BorderRadius.circular(22),
-        child: Container(margin: const EdgeInsets.only(bottom: 30), padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: const Color(0x08FFFFFF), border: const Border.fromBorderSide(BorderSide(color: _border)), borderRadius: BorderRadius.circular(22)), alignment: Alignment.center, child: const EditableLabel('profile.ProfileScreen', 'Sign Out', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500))),
-      );
-
   // Calm list: one glass-wrapped black card, rows with thin inset dividers.
-  Widget _sectionList(String title, List<Widget> rows) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        SectionLabel(title),
-        GlassCard(margin: const EdgeInsets.only(bottom: 40), padding: const EdgeInsets.symmetric(vertical: 6), child: Column(children: [
-          for (var i = 0; i < rows.length; i++) ...[
-            if (i > 0) const Divider(height: 1, thickness: .5, indent: 20, endIndent: 20, color: _borderSoft),
-            rows[i],
-          ],
-        ])),
-      ]);
-
-  Widget _listRow(String label, {required Widget trailing, bool muted = false}) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-        child: Row(children: [Expanded(child: EditableLabel('profile.ProfileScreen', label, style: TextStyle(fontSize: 15, color: muted ? _faint : _text))), const SizedBox(width: 12), trailing]),
-      );
-
-  Widget _shopRow(String label, String count, int icon, {String? sub}) => InkWell(
-        onTap: () => _openShop(label),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          child: Row(children: [
-            Container(width: 38, height: 38, decoration: BoxDecoration(color: const Color(0x14E3BD7D), borderRadius: BorderRadius.circular(19)), child: Center(child: EditableSvg.asset('assets/icons/icon_${icon.toString().padLeft(2, '0')}.svg', width: 16, height: 16, colorFilter: const ColorFilter.mode(_accent, BlendMode.srcIn), slot: 'profile.ProfileScreen'))),
-            const SizedBox(width: 16),
-            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              EditableLabel('profile.ProfileScreen', label, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
-              if (sub != null) ...[const SizedBox(height: 3), Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12, color: _dim))] else Text(count, style: const TextStyle(fontFamily: _mono, fontSize: 12, color: _faint)),
-            ])),
-            const Icon(Icons.chevron_right_rounded, size: 20, color: _faint),
-          ]),
-        ),
-      );
-
-  Widget _viewAll({required String icon, required VoidCallback onTap, bool pill = false}) => InkWell(onTap: onTap, borderRadius: BorderRadius.circular(999), child: Container(padding: pill ? const EdgeInsets.symmetric(horizontal: 9, vertical: 6) : EdgeInsets.zero, decoration: pill ? BoxDecoration(color: const Color(0x08FFFFFF), border: const Border.fromBorderSide(BorderSide(color: _border)), borderRadius: BorderRadius.circular(999)) : null, child: Row(mainAxisSize: MainAxisSize.min, children: [const EditableLabel('profile.ProfileScreen', 'View All', style: TextStyle(fontSize: 12, color: _dim)), const SizedBox(width: 5), EditableSvg.asset(icon, width: pill ? 16 : 13, height: pill ? 16 : 13, colorFilter: const ColorFilter.mode(_dim, BlendMode.srcIn), slot: 'profile.ProfileScreen')])));
-
-  Widget _svgIcon(String asset, double size, Color color) => EditableSvg.asset(
-        asset,
-        width: size,
-        height: size,
-        colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
-        placeholderBuilder: (_) => Icon(Icons.circle_outlined, size: size, color: color.withOpacity(.45)),
-        slot: 'profile.ProfileScreen',
-      );
-
-  Widget _circleButton({required String asset, required VoidCallback onTap, double size = 38}) => Material(color: Colors.transparent, child: InkWell(onTap: onTap, customBorder: const CircleBorder(), child: Container(width: size, height: size, decoration: BoxDecoration(color: const Color(0x52000000), shape: BoxShape.circle, border: const Border.fromBorderSide(BorderSide(color: Color(0x29FFFFFF)))), child: Center(child: _svgIcon(asset, size * .47, _text)))));
-
-  Widget _roundAction(String asset, VoidCallback onTap) => Material(color: Colors.transparent, child: InkWell(onTap: onTap, customBorder: const CircleBorder(), child: Container(width: 28, height: 28, decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: _border)), child: Center(child: _svgIcon(asset, 13, _text)))));
-
-  Widget _recentSheet() => Stack(children: [
-        Positioned.fill(child: GestureDetector(onTap: () => setState(() => _recentOpen = false), child: Container(color: Colors.black.withOpacity(.68)))),
-        Align(alignment: Alignment.bottomCenter, child: SafeArea(top: false, child: Padding(padding: const EdgeInsets.all(16), child: _AnimatedSheet(child: GlassCard(radius: 28, padding: const EdgeInsets.all(20), backgroundColor: const Color(0xE60A0A0C), child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [const SectionLabel('Activity Library', bottom: 6), const EditableLabel('profile.ProfileScreen', 'More recent sessions', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, letterSpacing: -.4))])), _circleButton(asset: 'assets/icons/icon_32.svg', onTap: () => setState(() => _recentOpen = false))]),
-          const SizedBox(height: 16),
-          Builder(builder: (context) {
-            final all = _recentSessions;
-            final cats = <String>['All', ...{for (final r in all) r.cat}.take(4)];
-            final shown = [for (final r in all) if (_recentFilter == 'All' || r.cat == _recentFilter) r].take(8).toList();
-            const imgs = ['assets/profile_source/img-act1.jpeg', 'assets/profile_source/img-act2.jpeg', 'assets/profile_source/img-act3.jpeg', 'assets/profile_source/img-motto.jpeg'];
-            return Column(mainAxisSize: MainAxisSize.min, children: [
-              SizedBox(height: 38, child: ListView(scrollDirection: Axis.horizontal, children: cats.map((x) => Padding(padding: const EdgeInsets.only(right: 7), child: _SheetTab(label: x, active: x == _recentFilter, onTap: () => setState(() => _recentFilter = x)))).toList())),
-              const SizedBox(height: 14),
-              if (shown.isEmpty)
-                const Padding(padding: EdgeInsets.symmetric(vertical: 18), child: EditableLabel('profile.ProfileScreen', 'No sessions yet. Practise a word and it shows here.', style: TextStyle(fontSize: 13, color: _dim)))
-              else
-                GridView.count(shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), crossAxisCount: MediaQuery.sizeOf(context).width <= 360 ? 1 : 2, crossAxisSpacing: 10, mainAxisSpacing: 10, childAspectRatio: 2.55, children: [
-                  for (var i = 0; i < shown.length; i++) _MoreCard(shown[i].word, '${shown[i].cat} · ${shown[i].when}', imgs[i % imgs.length]),
-                ]),
-            ]);
-          }),
-        ])))))),
-      ]);
 }
 
 class _Background extends StatelessWidget {
