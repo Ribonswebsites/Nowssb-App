@@ -1,0 +1,344 @@
+/// E-books rebuild (spec 14 / 14.3 / 19), behind `newui_ebooks`.
+/// Library of 2:3 outline cards with price strips → detail with procedural
+/// hero, description, sample and Buy / Gift / Add coupon → Reader entry.
+library;
+
+import 'package:flutter/material.dart';
+
+import '../../../data/store_catalog.dart';
+import '../../../kit/kit.dart';
+import '../../../nowssb_ui/nowssb_ui.dart';
+import '../../../screens/store/store_actions.dart';
+import '../../../shell/nwsb_links.dart';
+import 'ebooks_motion.dart';
+import 'ebooks_source.dart';
+
+/// Side effects, injectable for tests.
+class EbooksActions {
+  const EbooksActions({this.buy, this.gift, this.coupon, this.read});
+  final void Function(BuildContext, EbBook)? buy, gift, coupon, read;
+
+  void doBuy(BuildContext c, EbBook b) => buy != null
+      ? buy!(c, b)
+      : storeBuyNow(c, ebookBagItem(title: b.title, sub: b.sub, img: b.cover, price: b.price));
+  void doGift(BuildContext c, EbBook b) => gift != null
+      ? gift!(c, b)
+      : storeAddToCart(c, ebookBagItem(title: b.title, sub: b.sub, img: b.cover, price: b.price));
+  void doCoupon(BuildContext c, EbBook b) => coupon != null
+      ? coupon!(c, b)
+      : NwsbLinks.cart(c);
+  void doRead(BuildContext c, EbBook b) => read != null ? read!(c, b) : NwsbLinks.reader(c);
+}
+
+String _money(int cents) => KitMoney.cents(cents);
+
+const _outlines = [NTokens.violet, NTokens.mint, NTokens.pink, NTokens.gold];
+Color _outline(int i) => _outlines[i % _outlines.length];
+
+class EbooksNewUiPage extends StatefulWidget {
+  const EbooksNewUiPage({super.key, this.source = const LiveEbooksSource(), this.actions = const EbooksActions(), this.reduceEffects = false});
+  final EbooksSource source;
+  final EbooksActions actions;
+  final bool reduceEffects;
+  @override
+  State<EbooksNewUiPage> createState() => _EbooksNewUiPageState();
+}
+
+class _EbooksNewUiPageState extends State<EbooksNewUiPage> {
+  late Future<List<EbBook>> _f = _load();
+  Future<List<EbBook>> _load() {
+    final f = widget.source.load();
+    f.ignore(); // FutureBuilder still sees the error; avoid unhandled reports
+    return f;
+  }
+  void _retry() => setState(() {
+        _f = _load();
+      });
+
+  @override
+  Widget build(BuildContext context) => NAppBackdrop(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          foregroundColor: NTokens.textHi,
+          title: const Text('E-books'),
+          actions: [
+            IconButton(
+              tooltip: 'How it works',
+              icon: const Icon(Icons.help_outline_rounded),
+              onPressed: () => showEbooksHowItWorks(context),
+            ),
+          ],
+        ),
+        body: FutureBuilder<List<EbBook>>(
+          future: _f,
+          builder: (context, s) {
+            if (s.connectionState != ConnectionState.done) return const _Loading();
+            if (s.hasError) {
+              return widget.source.offline
+                  ? _Message(key: const Key('eb-offline'), icon: Icons.cloud_off_rounded, title: "You're offline", text: "You're offline. Your downloaded books still open in the Reader.", button: 'Try again', onTap: _retry)
+                  : _Message(key: const Key('eb-error'), icon: Icons.error_outline_rounded, title: 'Something went wrong', text: "We couldn't load the library.", button: 'Try again', onTap: _retry);
+            }
+            final books = s.data ?? const <EbBook>[];
+            if (books.isEmpty) {
+              return _Message(key: const Key('eb-empty'), icon: Icons.auto_stories_outlined, title: 'No e-books yet', text: 'No e-books yet. New titles arrive soon.', button: 'Open the Reader', onTap: () => widget.actions.doRead(context, kEbBooks.first));
+            }
+            return _Library(books: books, page: widget);
+          },
+        ),
+      ));
+}
+
+class _Library extends StatelessWidget {
+  const _Library({required this.books, required this.page});
+  final List<EbBook> books;
+  final EbooksNewUiPage page;
+  @override
+  Widget build(BuildContext context) => CustomScrollView(slivers: [
+        SliverToBoxAdapter(child: EbPagesOfLight(height: 180, reduce: page.reduceEffects)),
+        if (page.source.offline)
+          const SliverToBoxAdapter(
+            child: Padding(
+              key: Key('eb-offline-banner'),
+              padding: EdgeInsets.fromLTRB(20, 0, 20, 8),
+              child: Text("Offline: showing saved library", style: TextStyle(color: NTokens.gold)),
+            ),
+          ),
+        const SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(20, 4, 20, 12),
+            child: Text('Library', style: TextStyle(color: NTokens.textHi, fontSize: 22, fontWeight: FontWeight.w800)),
+          ),
+        ),
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
+          sliver: SliverGrid.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, crossAxisSpacing: 14, mainAxisSpacing: 14, childAspectRatio: 0.52),
+            itemCount: books.length,
+            itemBuilder: (c, i) => _BookCard(book: books[i], index: i, page: page),
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 40),
+            child: GlassPill(style: PillStyle.outlined, label: 'Your e-books, ready to read', icon: Icons.menu_book_outlined, onTap: () => page.actions.doRead(context, books.first)),
+          ),
+        ),
+      ]);
+}
+
+String _priceLabel(EbooksSource s, EbBook b) => s.owns(b) ? 'Yours' : _money(s.priceCents(b));
+
+class _BookCard extends StatelessWidget {
+  const _BookCard({required this.book, required this.index, required this.page});
+  final EbBook book;
+  final int index;
+  final EbooksNewUiPage page;
+  @override
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        label: '${book.title}, ${_priceLabel(page.source, book)}',
+        child: GestureDetector(
+          key: Key('eb-card-${book.key}'),
+          onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+            builder: (_) => EbookDetailNewUi(book: book, index: index, source: page.source, actions: page.actions, reduceEffects: page.reduceEffects),
+          )),
+          child: NGlass(
+            padding: const EdgeInsets.all(8),
+            accent: _outline(index),
+            tint: _outline(index),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              AspectRatio(aspectRatio: 2 / 3, child: Hero(tag: 'eb-${book.key}', child: _Cover(url: book.cover, title: book.title, color: _outline(index)))),
+              const SizedBox(height: 8),
+              Text(book.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: NTokens.textHi, fontWeight: FontWeight.w700)),
+              const Spacer(),
+              EbPriceStrip(label: _priceLabel(page.source, book), color: _outline(index)),
+            ]),
+          ),
+        ),
+      );
+}
+
+class _Cover extends StatelessWidget {
+  const _Cover({required this.url, required this.title, required this.color});
+  final String url, title;
+  final Color color;
+  @override
+  Widget build(BuildContext context) {
+    final fallback = Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [color.withValues(alpha: 0.7), NTokens.bgBottom]),
+      ),
+      alignment: Alignment.center,
+      padding: const EdgeInsets.all(8),
+      child: Text(title, textAlign: TextAlign.center, style: const TextStyle(color: NTokens.textHi, fontWeight: FontWeight.w700)),
+    );
+    if (url.isEmpty) return fallback;
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: Image.network(url, fit: BoxFit.cover, errorBuilder: (_, __, ___) => fallback,
+          loadingBuilder: (_, child, p) => p == null ? child : fallback),
+    );
+  }
+}
+
+class EbookDetailNewUi extends StatelessWidget {
+  const EbookDetailNewUi({super.key, required this.book, required this.index, required this.source, required this.actions, this.reduceEffects = false});
+  final EbBook book;
+  final int index;
+  final EbooksSource source;
+  final EbooksActions actions;
+  final bool reduceEffects;
+
+  @override
+  Widget build(BuildContext context) {
+    final owned = source.owns(book);
+    final price = source.priceCents(book);
+    return NAppBackdrop(
+      child: Scaffold(
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(backgroundColor: Colors.transparent, foregroundColor: NTokens.textHi, title: Text(book.title, overflow: TextOverflow.ellipsis)),
+      body: ListView(padding: const EdgeInsets.fromLTRB(20, 0, 20, 40), children: [
+        Stack(alignment: Alignment.center, children: [
+          EbPagesOfLight(height: 240, reduce: reduceEffects),
+          SizedBox(height: 200, child: AspectRatio(aspectRatio: 2 / 3, child: Hero(tag: 'eb-${book.key}', child: _Cover(url: book.cover, title: book.title, color: _outline(index))))),
+        ]),
+        const SizedBox(height: 16),
+        Text(book.title, style: const TextStyle(color: NTokens.textHi, fontSize: 24, fontWeight: FontWeight.w800)),
+        const SizedBox(height: 4),
+        Text(book.sub, style: const TextStyle(color: NTokens.textLo)),
+        Row(children: [
+          Text(owned ? 'Yours' : _money(price), style: const TextStyle(color: NTokens.gold, fontSize: 20, fontWeight: FontWeight.w800)),
+          const _Info(title: 'Price', text: 'One payment, the book is yours to read anywhere in the NowssB Reader.', example: 'Coins can cover part of the price at checkout.'),
+        ]),
+        const SizedBox(height: 12),
+        NGlass(child: Text(book.about, style: const TextStyle(color: NTokens.textLo, height: 1.6))),
+        const SizedBox(height: 16),
+        const Text('Sample', style: TextStyle(color: NTokens.mint, letterSpacing: 2, fontWeight: FontWeight.w700)),
+        const SizedBox(height: 8),
+        NGlass(
+          key: const Key('eb-sample'),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            for (var n = 0; n < book.contents.length && n < 3; n++)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Text('${n + 1}.  ${book.contents[n]}', style: const TextStyle(color: NTokens.textHi)),
+              ),
+            if (book.contents.length > 3)
+              Text('+ ${book.contents.length - 3} more chapters', style: const TextStyle(color: NTokens.textLo)),
+          ]),
+        ),
+        const SizedBox(height: 20),
+        if (owned)
+          Center(child: GlassPill(label: 'Open in Reader', style: PillStyle.solid, icon: Icons.menu_book_rounded, onTap: () => actions.doRead(context, book)))
+        else ...[
+          SizedBox(width: double.infinity, child: Center(child: GlassPill(label: 'Buy', style: PillStyle.solid, onTap: () => actions.doBuy(context, book)))),
+          const Padding(
+            padding: EdgeInsets.only(top: 6, bottom: 12),
+            child: Text("You'll be charged through Google Play.", textAlign: TextAlign.center, style: TextStyle(color: NTokens.textLo, fontSize: 12)),
+          ),
+          Row(children: [
+            Expanded(child: GlassPill(style: PillStyle.outlined, label: 'Gift', icon: Icons.card_giftcard_rounded, onTap: () => actions.doGift(context, book))),
+            const SizedBox(width: 12),
+            Expanded(child: GlassPill(style: PillStyle.outlined, label: 'Add coupon', icon: Icons.confirmation_number_outlined, onTap: () => actions.doCoupon(context, book))),
+          ]),
+        ],
+        const SizedBox(height: 24),
+        const Text(kEbDisclaimer, style: TextStyle(color: NTokens.textLo, fontSize: 11)),
+      ]),
+    ));
+  }
+}
+
+class _Loading extends StatelessWidget {
+  const _Loading();
+  @override
+  Widget build(BuildContext context) => GridView.count(
+        key: const Key('eb-loading'),
+        padding: const EdgeInsets.all(16),
+        crossAxisCount: 2,
+        crossAxisSpacing: 14,
+        mainAxisSpacing: 14,
+        childAspectRatio: 0.52,
+        children: List.generate(4, (_) => const GlassSkeleton(height: 300)),
+      );
+}
+
+class _Message extends StatelessWidget {
+  const _Message({super.key, required this.icon, required this.title, required this.text, required this.button, required this.onTap});
+  final IconData icon;
+  final String title, text, button;
+  final VoidCallback onTap;
+  @override
+  Widget build(BuildContext context) => Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: GlassStateCard(icon: icon, title: title, message: text, action: button, onAction: onTap),
+        ),
+      );
+}
+
+/// ⓘ next to a number (spec 19.3), opened in the kit's black-card popup.
+class _Info extends StatelessWidget {
+  const _Info({required this.title, required this.text, required this.example});
+  final String title, text, example;
+  @override
+  Widget build(BuildContext context) => IconButton(
+        tooltip: 'What is $title?',
+        iconSize: 18,
+        icon: const Icon(Icons.info_outline_rounded, color: NTokens.mint),
+        onPressed: () => showGlassPopup<void>(
+          context,
+          builder: (c) => Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(title, style: const TextStyle(color: NTokens.textHi, fontSize: 17, fontWeight: FontWeight.w800)),
+            const SizedBox(height: 8),
+            Text(text, style: const TextStyle(color: NTokens.textLo, height: 1.5)),
+            const SizedBox(height: 8),
+            Text(example, style: const TextStyle(color: NTokens.gold, height: 1.5)),
+            const SizedBox(height: 12),
+            Align(alignment: Alignment.centerRight, child: GlassPill(label: 'Got it', dense: true, onTap: () => Navigator.pop(c))),
+          ]),
+        ),
+      );
+}
+
+/// Layer 1 guide (spec 19.1): Browse → Preview → Read anywhere.
+Future<void> showEbooksHowItWorks(BuildContext context) =>
+    showGlassPopup<void>(context, builder: (c) => _HowItWorks(onDone: () => Navigator.pop(c)));
+
+class _HowItWorks extends StatefulWidget {
+  const _HowItWorks({required this.onDone});
+  final VoidCallback onDone;
+  @override
+  State<_HowItWorks> createState() => _HowItWorksState();
+}
+
+class _HowItWorksState extends State<_HowItWorks> {
+  static const _slides = [
+    (Icons.grid_view_rounded, 'Browse', 'Pick a book from the library.'),
+    (Icons.visibility_outlined, 'Preview', 'Read the description and a sample first.'),
+    (Icons.menu_book_rounded, 'Read anywhere', 'Your books open in the Reader on any phone.'),
+  ];
+  int _i = 0;
+  @override
+  Widget build(BuildContext context) {
+    final s = _slides[_i];
+    final last = _i == _slides.length - 1;
+    return Column(mainAxisSize: MainAxisSize.min, children: [
+          Icon(s.$1, size: 48, color: NTokens.mint),
+          const SizedBox(height: 12),
+          Text(s.$2, style: const TextStyle(color: NTokens.textHi, fontSize: 20, fontWeight: FontWeight.w800)),
+          const SizedBox(height: 6),
+          Text(s.$3, textAlign: TextAlign.center, style: const TextStyle(color: NTokens.textLo)),
+          const SizedBox(height: 8),
+          Text('Step ${_i + 1} of ${_slides.length}', style: const TextStyle(color: NTokens.textLo, fontSize: 12)),
+          const SizedBox(height: 12),
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            TextButton(onPressed: widget.onDone, child: const Text('Skip')),
+            TextButton(onPressed: last ? widget.onDone : () => setState(() => _i++), child: Text(last ? 'Done' : 'Next')),
+          ]),
+        ]);
+  }
+}

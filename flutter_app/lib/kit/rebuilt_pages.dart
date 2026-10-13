@@ -4,6 +4,7 @@
 ///   AppRoutes.registerRebuilt(AppPage.coupons, (c, a) => CouponsHome(tab: a.tab));
 library;
 
+import '../features/ebooks/newui/ebooks_page.dart';
 import '../features/gifts/newui/gifts_hub_page.dart';
 import '../features/rewards_newui/rewards_page.dart';
 import '../features/coins/wallet/coins_wallet_entry.dart';
@@ -25,6 +26,7 @@ void registerRebuiltPages() {
   AppRoutes.registerRebuilt(AppPage.store, (c, a) => const NewStorePage());
   AppRoutes.registerRebuilt(AppPage.partner, (c, a) => const PartnerHomePage());
   AppRoutes.registerRebuilt(AppPage.storeSignature, (c, a) => const SignatureWordsPage());
+  AppRoutes.registerRebuilt(AppPage.storeEbooks, (c, a) => const EbooksNewUiPage());
   // ignore: unused_local_variable
   const pages = AppPage.values; // keeps the import live until the first line lands
 }

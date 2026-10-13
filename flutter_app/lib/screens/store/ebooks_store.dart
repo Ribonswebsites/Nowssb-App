@@ -18,6 +18,8 @@ import '../../data/content.dart';
 import '../../data/entitlements.dart';
 import '../../data/store_catalog.dart';
 import '../../data/store_prices.dart';
+import '../../features/ebooks/newui/ebooks_page.dart';
+import '../../kit/kit.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../shell/nwsb_links.dart';
@@ -38,9 +40,13 @@ class EbooksStoreScreen extends StatelessWidget {
   const EbooksStoreScreen({super.key});
 
   @override
-  Widget build(BuildContext context) => _retired(context);
+  Widget build(BuildContext context) => NewUiGate(
+        page: 'ebooks',
+        legacy: _retired,
+        rebuilt: (_) => const EbooksNewUiPage(),
+      );
 
-  Widget _retired(BuildContext context) => StoreTermsHost(
+  static Widget _retired(BuildContext context) => StoreTermsHost(
         which: 'ebooks',
         head: 'Ebooks described by sound',
         child: PageShell(
