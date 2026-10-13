@@ -283,7 +283,7 @@ class GiftsHubView extends StatelessWidget {
           separatorBuilder: (_, __) => const SizedBox(width: 10),
           itemBuilder: (_, i) => SizedBox(
             width: 140,
-            child: GiftTile(title: items[i].label, caption: '₹${items[i].cents}', color: color, validTill: 'Send gift', onTap: () => onBuy(items[i].id)),
+            child: GiftTile(title: items[i].label, caption: 'Price shown in your currency at checkout', color: color, validTill: 'Send gift', onTap: () => onBuy(items[i].id)),
           ),
         ),
       ),
@@ -322,14 +322,14 @@ class GiftsHubView extends StatelessWidget {
             child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
               const Text('Pick a gift', style: TextStyle(color: GiftsPalette.text, fontSize: 18, fontWeight: FontWeight.w800)),
               const SizedBox(height: 4),
-              const Text('Paid with Google Play. You get a link to share.', style: TextStyle(color: GiftsPalette.soft, fontSize: 12)),
+              const Text('Paid with Google Play in your currency. You get a link to share.', style: TextStyle(color: GiftsPalette.soft, fontSize: 12)),
               const SizedBox(height: 8),
               Flexible(
                 child: ListView(shrinkWrap: true, children: [
                   for (final g in snapshot.catalog)
                     ListTile(
                       title: Text(g.label, style: const TextStyle(color: GiftsPalette.text)),
-                      trailing: Text('₹${g.cents}', style: const TextStyle(color: GiftsPalette.pink, fontWeight: FontWeight.w700)),
+                      trailing: const Icon(Icons.chevron_right_rounded, color: GiftsPalette.pink),
                       onTap: () {
                         Navigator.of(c).pop();
                         onBuy(g.id);
