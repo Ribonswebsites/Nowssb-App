@@ -101,7 +101,7 @@ class _GlassVideoScaffoldState extends State<GlassVideoScaffold> {
   void initState() {
     super.initState();
     final a = widget.videoAsset;
-    if (false && a != null && !NwsbEffects.instance.reduced) { // AppBackdrop owns the video
+    if (a != null && widget.dim < 0) { // never: AppBackdrop owns the video
       _c = VideoPlayerController.asset(a, videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true))
         ..setLooping(true)..setVolume(0)
         ..initialize().then((_) { if (mounted) { setState(() {}); _c!.play(); } });
@@ -120,7 +120,6 @@ class _GlassVideoScaffoldState extends State<GlassVideoScaffold> {
       bottomNavigationBar: widget.bottomBar,
       body: Stack(fit: StackFit.expand, children: [
         const NAppBackdrop(),
-        if (widget.shapes) const IgnorePointer(child: FloatingShapes()),
         SafeArea(bottom: false, child: widget.body),
       ]),
     );
