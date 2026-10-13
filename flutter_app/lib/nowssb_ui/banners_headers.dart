@@ -11,18 +11,18 @@ class SplitOfferBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Padding(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: NGlass(radius: 26, accent: accent, onTap: onTap, padding: EdgeInsets.zero,
-        child: SizedBox(height: 120, child: Stack(children: [
-          if (image != null) Positioned.fill(left: 120, child: ShaderMask(
-              shaderCallback: (r) => const LinearGradient(colors: [Colors.transparent, Colors.white], stops: [0, .45]).createShader(r),
+        child: SizedBox(height: 124, width: double.infinity, child: LayoutBuilder(builder: (context, c) => Stack(children: [
+          if (image != null) Positioned(right: 0, top: 0, bottom: 0, width: c.maxWidth * .6, child: ShaderMask(
+              shaderCallback: (r) => const LinearGradient(colors: [Colors.transparent, Colors.white], stops: [0, .55]).createShader(r),
               blendMode: BlendMode.dstIn, child: Image(image: image!, fit: BoxFit.cover))),
-          Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            if (eyebrow != null) Text(eyebrow!, style: const TextStyle(color: NTokens.mint, fontSize: 11, fontWeight: FontWeight.w700)),
-            SizedBox(width: 190, child: Text(headline, maxLines: 2,
-                style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w800))),
+          Padding(padding: const EdgeInsets.fromLTRB(16, 12, 16, 12), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            if (eyebrow != null) Text(eyebrow!, style: const TextStyle(color: NTokens.mint, fontSize: 11, height: 1.2, fontWeight: FontWeight.w700)),
+            SizedBox(width: c.maxWidth * .55, child: Text(headline, maxLines: 2, overflow: TextOverflow.ellipsis,
+                style: const TextStyle(color: Colors.white, fontSize: 16, height: 1.2, fontWeight: FontWeight.w800))),
             const Spacer(),
             GlassPill(label: cta, trailing: Icons.chevron_right, dense: true, onTap: onTap),
           ])),
-        ]))));
+        ])))));
 }
 
 /// B2 Voucher promo banner (e.g. "Redeem your coin voucher").
@@ -115,7 +115,11 @@ class CurvedHeroHeader extends StatelessWidget {
           border: const Border(bottom: BorderSide(color: NTokens.border))),
       child: Column(children: [
         const SizedBox(height: 20),
-        Text('✦ $sparkle ✦', style: const TextStyle(color: NTokens.mint, fontSize: 12, fontWeight: FontWeight.w700)),
+        Row(mainAxisSize: MainAxisSize.min, children: [
+          const Icon(Icons.auto_awesome, size: 12, color: NTokens.mint), const SizedBox(width: 6),
+          Text(sparkle, style: const TextStyle(color: NTokens.mint, fontSize: 12, fontWeight: FontWeight.w700)),
+          const SizedBox(width: 6), const Icon(Icons.auto_awesome, size: 12, color: NTokens.mint),
+        ]),
         const SizedBox(height: 6),
         Text3D(title, size: 30),
         const SizedBox(height: 10),

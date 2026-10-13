@@ -50,7 +50,8 @@ class NTokens {
 
   static List<BoxShadow> glow(Color accent, [double e = 1]) => [
         BoxShadow(color: accent.withValues(alpha: .35 * e), blurRadius: 30 * e, spreadRadius: -4),
-        BoxShadow(color: Colors.black.withValues(alpha: .28), blurRadius: 24, offset: const Offset(0, 14)),
+        // Soft, inset-spread drop shadow so it never shows as a dark band through translucent glass.
+        BoxShadow(color: Colors.black.withValues(alpha: .16), blurRadius: 28, spreadRadius: -10, offset: const Offset(0, 12)),
       ];
 }
 
