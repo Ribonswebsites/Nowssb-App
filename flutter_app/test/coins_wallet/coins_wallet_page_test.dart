@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:nowssb/features/coins/wallet/coins_flag.dart';
+import 'package:nowssb/kit/kit.dart';
 import 'package:nowssb/features/coins/wallet/coins_wallet_data.dart';
 import 'package:nowssb/features/coins/wallet/coins_wallet_page.dart';
 
@@ -25,9 +25,10 @@ final _full = CoinsWalletState(balance: 500, worthLabel: '\$5.00', expiringSoon:
 
 void main() {
   test('flag: off for users by default, on for admins, on when flag set', () {
-    expect(newUiCoinsEnabled(isAdmin: false, flags: {}), isFalse);
-    expect(newUiCoinsEnabled(isAdmin: true, flags: {}), isTrue);
-    expect(newUiCoinsEnabled(isAdmin: false, flags: {kNewUiCoinsFlag: true}), isTrue);
+    expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: false)), isFalse);
+    expect(NewUi.decide(const NewUiInputs(isAdmin: true, remote: false)), isTrue);
+    expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: true)), isTrue);
+    expect(AppRoutes.hasRebuilt(AppPage.coins), isTrue);
   });
 
   test('calculator respects cap and balance', () {

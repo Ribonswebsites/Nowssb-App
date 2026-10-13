@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io' show SocketException;
 import 'package:flutter/material.dart';
 import 'coins_wallet_data.dart';
-import 'coins_wallet_glass.dart';
+import '../../../nowssb_ui/nowssb_ui.dart';
 import 'coins_wallet_motion.dart';
 
 const _gold = Color(0xFFE0A526);
@@ -74,14 +74,14 @@ class _CoinsWalletPageState extends State<CoinsWalletPage> {
       case _Phase.error:
       case _Phase.offline:
         final off = _phase == _Phase.offline;
-        return Center(child: Padding(padding: const EdgeInsets.all(24), child: CoinsGlass(radius: 28,
+        return Center(child: Padding(padding: const EdgeInsets.all(24), child: NGlass(radius: 28,
           child: Column(mainAxisSize: MainAxisSize.min, children: [
             Icon(off ? Icons.wifi_off : Icons.error_outline, color: Colors.white, size: 36),
             const SizedBox(height: 8),
             Text(off ? "You're offline. Your coins are safe." : "Couldn't load your coins.",
                 key: Key(off ? 'coins_offline' : 'coins_error'), style: const TextStyle(color: Colors.white)),
             const SizedBox(height: 12),
-            CoinsGlass(radius: 999, padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            NGlass(radius: 999, padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 onTap: _load, child: const Text('Try again', style: TextStyle(color: Colors.white))),
           ]))));
       case _Phase.ready:
@@ -99,11 +99,11 @@ class _CoinsWalletPageState extends State<CoinsWalletPage> {
           const SizedBox(height: 16),
           if (s.expiringSoon > 0 && s.expiresOn != null) _expiryStrip(s),
           if (s.balance == 0 && s.ledger.isEmpty)
-            const CoinsGlass(key: Key('coins_empty'), child: Text(
+            const NGlass(key: Key('coins_empty'), child: Text(
                 'No coins yet. Tap Earn: check in today for your first coins.',
                 style: TextStyle(color: Colors.white))),
           const SizedBox(height: 16),
-          CalmEntrance(index: 3, child: CoinsGlass(key: const Key('coins_boost'), radius: 28, accent: _gold, onTap: widget.onOpenBoost,
+          CalmEntrance(index: 3, child: NGlass(key: const Key('coins_boost'), radius: 28, accent: _gold, onTap: widget.onOpenBoost,
             child: const Row(children: [
               Icon(Icons.bolt, color: _gold, size: 32), SizedBox(width: 12),
               Expanded(child: Text('Coin Boost: earn coins faster. Your spend cap stays the same.',
@@ -116,7 +116,7 @@ class _CoinsWalletPageState extends State<CoinsWalletPage> {
 
   Widget _hero(CoinsWalletState s) {
     final reduce = MediaQuery.maybeOf(context)?.disableAnimations ?? false;
-    return CoinsGlass(radius: 30, blur: 22, accent: _gold, padding: const EdgeInsets.all(24),
+    return NGlass(radius: 30, blur: 22, accent: _gold, padding: const EdgeInsets.all(24),
         child: Column(children: [
           const LotusCoin3D(size: 84),
           TweenAnimationBuilder<int>(
@@ -144,13 +144,13 @@ class _CoinsWalletPageState extends State<CoinsWalletPage> {
             Text('Worth up to ${s.worthLabel} off your next purchase', style: const TextStyle(color: Colors.white)),
           ],
           const SizedBox(height: 10),
-          CoinsGlass(key: const Key('coins_ratio'), radius: 999, padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+          NGlass(key: const Key('coins_ratio'), radius: 999, padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
               child: Text('1 coin = ${s.currency}${s.coinValue.toStringAsFixed(2)} · up to ${s.capPercent}% of a price',
                   style: const TextStyle(color: Colors.white, fontSize: 12))),
         ]));
   }
 
-  Widget _bigButton(String label, IconData icon, Key key, VoidCallback onTap) => CoinsGlass(key: key, radius: 24,
+  Widget _bigButton(String label, IconData icon, Key key, VoidCallback onTap) => NGlass(key: key, radius: 24,
         accent: _violet, onTap: onTap, padding: const EdgeInsets.symmetric(vertical: 18),
         child: Column(children: [Icon(icon, color: Colors.white, size: 28), const SizedBox(height: 6),
           Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600))]));
@@ -158,7 +158,7 @@ class _CoinsWalletPageState extends State<CoinsWalletPage> {
   Widget _expiryStrip(CoinsWalletState s) {
     final d = s.expiresOn!;
     final days = d.difference(DateTime.now()).inDays;
-    return CoinsGlass(key: const Key('coins_expiry'), accent: Colors.orange,
+    return NGlass(key: const Key('coins_expiry'), accent: Colors.orange,
         child: Text('${s.expiringSoon} coins expire on ${d.year}-${_two(d.month)}-${_two(d.day)} '
             '(${days < 0 ? 0 : days} days left). Use them in time.', style: const TextStyle(color: Colors.white)));
   }
@@ -189,7 +189,7 @@ class _CoinsWalletPageState extends State<CoinsWalletPage> {
     ];
     _sheet(ctx, Column(key: const Key('coins_earn_sheet'), mainAxisSize: MainAxisSize.min, children: [
       const Text('Ways to earn', style: TextStyle(color: Colors.white, fontSize: 20)),
-      for (final r in rows) Padding(padding: const EdgeInsets.only(top: 8), child: CoinsGlass(
+      for (final r in rows) Padding(padding: const EdgeInsets.only(top: 8), child: NGlass(
           child: Row(children: [const Icon(Icons.circle, color: _gold, size: 10), const SizedBox(width: 10),
             Expanded(child: Text('${r.$1}: ${r.$2}', style: const TextStyle(color: Colors.white)))]))),
     ]));
@@ -217,13 +217,13 @@ class _UseCalculatorState extends State<_UseCalculator> {
       Text('Coins can cover up to ${widget.state.capPercent}% of a price',
           style: const TextStyle(color: Colors.white, fontSize: 18)),
       const SizedBox(height: 12),
-      CoinsGlass(child: TextField(key: const Key('coins_price_field'),
+      NGlass(child: TextField(key: const Key('coins_price_field'),
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           style: const TextStyle(color: Colors.white),
           decoration: const InputDecoration(labelText: 'Item price', border: InputBorder.none),
           onChanged: (v) => setState(() => _price = double.tryParse(v) ?? 0))),
       const SizedBox(height: 12),
-      CoinsGlass(accent: _gold, child: Text(
+      NGlass(accent: _gold, child: Text(
           'Coins you can use: ${c.coinsUsable}, You pay: ${widget.state.currency}${c.youPay.toStringAsFixed(2)}',
           key: const Key('coins_calc_result'), style: const TextStyle(color: Colors.white))),
       const SizedBox(height: 6),
@@ -254,7 +254,7 @@ class _HistoryState extends State<_History> {
       if (list.isEmpty) const Padding(padding: EdgeInsets.all(16),
           child: Text('Nothing here yet.', key: Key('coins_history_empty'), style: TextStyle(color: Colors.white70))),
       ConstrainedBox(constraints: const BoxConstraints(maxHeight: 360), child: ListView(shrinkWrap: true, children: [
-        for (final e in list) Padding(padding: const EdgeInsets.only(top: 6), child: CoinsGlass(
+        for (final e in list) Padding(padding: const EdgeInsets.only(top: 6), child: NGlass(
             child: Row(children: [
               Expanded(child: Text(e.label, style: const TextStyle(color: Colors.white))),
               Text('${e.kind == LedgerKind.earned ? '+' : '-'}${e.amount}',
