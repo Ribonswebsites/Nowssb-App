@@ -325,7 +325,7 @@ class GiftsHubView extends StatelessWidget {
         accent: GiftsPalette.pink,
         builder: (c) => Padding(
           padding: const EdgeInsets.all(12),
-          child: NGlass(
+          child: _SheetBody(
             child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
               const Text('Pick a gift', style: TextStyle(color: GiftsPalette.text, fontSize: 18, fontWeight: FontWeight.w800)),
               const SizedBox(height: 4),
@@ -360,7 +360,7 @@ class GiftsHubView extends StatelessWidget {
         accent: GiftsPalette.pink,
         builder: (_) => Padding(
           padding: const EdgeInsets.all(12),
-          child: NGlass(
+          child: _SheetBody(
             child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
               const Text('How gifts work', style: TextStyle(color: GiftsPalette.text, fontSize: 18, fontWeight: FontWeight.w800)),
               const SizedBox(height: 10),
@@ -487,7 +487,7 @@ class _GiftsRedeemSheetState extends State<GiftsRedeemSheet> {
   @override
   Widget build(BuildContext context) => Padding(
         padding: EdgeInsets.fromLTRB(12, 12, 12, 12 + MediaQuery.of(context).viewInsets.bottom),
-        child: NGlass(
+        child: _SheetBody(
           child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             const Text('Redeem a gift', style: TextStyle(color: GiftsPalette.text, fontSize: 18, fontWeight: FontWeight.w800)),
             const SizedBox(height: 10),
@@ -548,4 +548,12 @@ class _AutoOpenState extends State<_AutoOpen> {
 
   @override
   Widget build(BuildContext context) => widget.child;
+}
+
+/// Sheet content sits straight in the kit sheet's black card (no second glass box).
+class _SheetBody extends StatelessWidget {
+  const _SheetBody({required this.child});
+  final Widget child;
+  @override
+  Widget build(BuildContext context) => child;
 }
