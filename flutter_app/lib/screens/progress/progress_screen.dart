@@ -16,6 +16,8 @@ import 'progress_hero.dart';
 import 'progress_insight.dart';
 import 'progress_tokens.dart';
 import 'progress_week_ring.dart';
+import 'newui/progress_flag.dart';
+import 'newui/progress_new_screen.dart';
 
 class PracticeProgressScreen extends StatefulWidget {
   const PracticeProgressScreen({super.key, this.words = const []});
@@ -77,6 +79,9 @@ class _PracticeProgressScreenState extends State<PracticeProgressScreen> {
   @override
   Widget build(BuildContext context) {
     final p = PracticeProgress.instance;
+    if (newUiProgressEnabled()) {
+      return ProgressNewScreen(load: ProgressLoad.ready, view: ProgressView.from(p), onBack: _handleBack, onStart: _handleBack);
+    }
     final organFor = <String, String>{
       for (final w in widget.words)
         if (w.word.isNotEmpty && w.organ.isNotEmpty) w.word: w.organ,

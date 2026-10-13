@@ -8,3 +8,6 @@
 - Backdrop orbs: procedural CustomPainter, original code, no third-party assets.
 - Icons: Flutter Material Icons (Apache 2.0).
 - Polish round: 3D clay medal, floating clay spheres, light sweep, breathing progress glow, count-up numbers and staggered entrance are all procedural Flutter code (CustomPainter/tweens), original, no third-party files. Online references (Dribbble/Contra glass meditation concepts, clay medal packs) were looked at for mood only; none bundled (their licenses are premium or unclear).
+
+## Progress page (newui_progress)
+- Aura background, progress ring: procedural CustomPainter written in-repo. No third-party assets bundled.
