@@ -19,9 +19,9 @@ Widget _app(GiftsSnapshot s, {VoidCallback? retry, void Function(String)? buy, G
     );
 
 void main() {
-  test('flag: override wins, default off for non-admin', () {
+  test('flag: override wins, default on for everyone', () {
     expect(newUiGiftsEnabled(override: true), isTrue);
-    expect(newUiGiftsEnabled(), isFalse);
+    expect(newUiGiftsEnabled(), isTrue);
   });
 
   testWidgets('loading state', (t) async {
