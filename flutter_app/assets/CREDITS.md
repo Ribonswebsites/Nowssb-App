@@ -39,3 +39,5 @@
   (CustomPainter, `lib/features/coins/wallet/coins_wallet_motion.dart`). No third-party assets bundled.
 - Style references only (nothing copied): Dribbble meditation concepts
   https://dribbble.com/shots/26945891--Yoga-Meditation-App, https://dribbble.com/shots/23762839-MindHub-Meditation-App-UI-Kit
+## Menu & Settings (newui_menu_settings)
+- No third-party assets. Backdrop is a procedural CustomPainter (original work).

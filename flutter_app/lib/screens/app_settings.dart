@@ -40,6 +40,9 @@ import 'quotes_live.dart';
 import 'store/request_words.dart';
 import 'widgets_page.dart';
 import '../admin/template/editable.dart';
+import '../pages/menu_settings/glass_menu_settings_page.dart';
+import '../pages/menu_settings/menu_settings_model.dart';
+import '../pages/menu_settings/newui_flag.dart';
 
 class AppSettingsScreen extends StatefulWidget {
   const AppSettingsScreen({super.key});
@@ -121,12 +124,54 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
     HapticFeedback.selectionClick();
   }
 
+  List<SettingSection> _newUiSections(bool isAdmin) => [
+        SettingSection('Your app', [
+          SettingItem(id: 'notifications', title: 'Notifications', icon: Icons.notifications_none_rounded, onTap: () => _push(const NotificationsSettingsPage())),
+          SettingItem(id: 'player', title: 'Player', icon: Icons.tune_rounded, onTap: () => _push(const PlayerSettingsScreen())),
+          SettingItem(id: 'quick_access', title: 'Quick access', icon: Icons.dashboard_customize_outlined, onTap: () => _push(const QuickAccessScreen())),
+          SettingItem(id: 'hero', title: 'Hero header', icon: Icons.view_agenda_outlined, onTap: () => _push(const WidgetsPage())),
+          SettingItem(id: 'fashion_plus', title: 'Fashion Plus', icon: Icons.auto_awesome_outlined, onTap: () => _push(const FashionPlusScreen())),
+          SettingItem(id: 'quote', title: "Today's quote", icon: Icons.format_quote_rounded, onTap: () => _push(const QuotesWeekScreen())),
+        ]),
+        SettingSection('Comfort', [
+          SettingItem(id: 'screen_awake', title: 'Screen awake', icon: Icons.light_mode_outlined, kind: SettingKind.toggle, value: _screenWake, onChanged: (v) => _setWake(v)),
+          SettingItem(id: 'nav', title: 'Nav bar', subtitle: Settings.instance.navColor, icon: Icons.space_dashboard_outlined, onTap: _cycleNav),
+          SettingItem(id: 'discover', title: 'Appear in Discover', icon: Icons.travel_explore, kind: SettingKind.toggle, value: _appearDiscover, onChanged: (v) => _setDiscover(v)),
+        ]),
+        SettingSection('Data', [
+          SettingItem(id: 'request_words', title: 'Request words', icon: Icons.edit_note_outlined, onTap: () => openRequestWords(context)),
+          SettingItem(id: 'clear_cache', title: 'Clear cache', icon: Icons.cleaning_services_outlined, onTap: _clearCache),
+          SettingItem(id: 'clear_history', title: 'Clear history', icon: Icons.history_toggle_off_rounded, destructive: true, onTap: () => _confirmClearHistory()),
+        ]),
+        if (isAdmin)
+          SettingSection('Admin', [
+            SettingItem(id: 'admin', title: 'Admin', icon: Icons.admin_panel_settings_outlined, onTap: () => openAdminHome(context)),
+          ]),
+        SettingSection('About', [
+          SettingItem(id: 'privacy', title: 'Privacy', icon: Icons.lock_outline, onTap: () => _openUrl('https://nowssb.com/privacy')),
+          SettingItem(id: 'terms', title: 'Terms', icon: Icons.description_outlined, onTap: () => _openUrl('https://nowssb.com/terms')),
+          SettingItem(id: 'about', title: 'About', icon: Icons.info_outline, onTap: _openAbout),
+        ]),
+        SettingSection('Account', [
+          SettingItem(id: 'sign_out', title: 'Sign out', icon: Icons.logout_rounded, onTap: _signOut),
+          SettingItem(id: 'delete_account', title: 'Delete account', icon: Icons.person_remove_outlined, destructive: true, onTap: _deleteAccount),
+        ]),
+      ];
+
   @override
   Widget build(BuildContext context) {
     UiScope.watch(context); // the Admin row follows the admin flag live
     final s = Settings.instance;
     final bottom = MediaQuery.paddingOf(context).bottom;
     final isAdmin = AdminState.instance.isAdmin;
+
+    // newui_menu_settings: rebuilt glass page (admins ON, users OFF).
+    if (NewUiMenuSettingsFlag.isOn) {
+      return GlassMenuSettingsPage(
+        load: () async => _newUiSections(isAdmin),
+        displayName: FirebaseAuth.instance.currentUser?.displayName,
+      );
+    }
 
     // v4 (Ribon 8:22 PM): CLiQ Perks layout (member hero, one profile
     // action, two underlined tabs, rows) in NowssB's original colours, glass
