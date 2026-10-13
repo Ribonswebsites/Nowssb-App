@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nowssb/pages/coupons/coupon_models.dart';
 import 'package:nowssb/pages/coupons/coupons_home_page.dart';
-import 'package:nowssb/pages/coupons/coupons_motion.dart';
 
 class FakeRepo implements CouponsRepo {
   FakeRepo({this.items = const [], this.fail, this.code = const CouponCodeResult(true, 'Coupon added')});
@@ -34,7 +33,7 @@ Future<void> _pump(WidgetTester t, CouponsRepo r) async {
   t.view.devicePixelRatio = 3;
   addTearDown(t.view.reset);
   await t.pumpWidget(MaterialApp(
-    home: CouponsHomePage(repo: r, banner: const SizedBox(height: 40, child: Text('BANNER')), onAllRewards: () {}, onScratch: () {}, animate: false),
+    home: CouponsHomePage(repo: r, banner: const SizedBox(height: 40, child: Text('BANNER')), onAllRewards: () {}, onScratch: () {}, animate: false, background: const ColoredBox(color: Color(0xFF3A3550))),
   ));
 }
 
@@ -54,7 +53,7 @@ void main() {
     await _pump(t, FakeRepo());
     await t.pump();
     expect(find.byKey(const Key('coupons-empty')), findsOneWidget);
-    expect(find.text('You have 0 new coupons'), findsOneWidget);
+    expect(find.textContaining('You have 0 new coupons'), findsOneWidget);
   });
 
   testWidgets('error state retries', (t) async {
@@ -83,7 +82,7 @@ void main() {
     await _pump(t, FakeRepo(items: [_a, _b]));
     await t.pump();
     expect(find.text('BANNER'), findsOneWidget);
-    expect(find.text('You have 1 new coupons'), findsOneWidget);
+    expect(find.textContaining('You have 1 new coupons'), findsOneWidget);
     expect(find.text('New'), findsOneWidget);
     await t.scrollUntilVisible(find.text('20% OFF A WORD'), 200, scrollable: find.byType(Scrollable).first);
     await t.tap(find.text('20% OFF A WORD'));
@@ -99,14 +98,15 @@ void main() {
   testWidgets('category filter', (t) async {
     await _pump(t, FakeRepo(items: [_a, _b]));
     await t.pump();
+    await t.scrollUntilVisible(find.text('Categories'), 150, scrollable: find.byType(Scrollable).first);
     await t.tap(find.text('Categories'));
     await t.pumpAndSettle();
     await t.tap(find.text('E-books'));
     await t.pump();
     await t.tap(find.text('Show coupons'));
     await t.pumpAndSettle();
-    expect(find.text('7-DAY EBOOK'), findsOneWidget);
-    expect(find.text('20% OFF A WORD'), findsNothing);
+    expect(find.text('7-DAY EBOOK', skipOffstage: false), findsOneWidget);
+    expect(find.text('20% OFF A WORD', skipOffstage: false), findsNothing);
   });
 
   testWidgets('code field: empty, success, error', (t) async {
@@ -129,17 +129,16 @@ void main() {
     expect(find.text('That code is not valid.'), findsOneWidget);
   });
 
-  testWidgets('animated aura + entrances run without errors', (t) async {
+  testWidgets('animated entrances run without errors', (t) async {
     t.view.physicalSize = const Size(390 * 3, 844 * 3);
     t.view.devicePixelRatio = 3;
     addTearDown(t.view.reset);
-    await t.pumpWidget(MaterialApp(home: CouponsHomePage(repo: FakeRepo(items: [_a, _b]), banner: const SizedBox(height: 40), onAllRewards: () {}, onScratch: () {})));
+    await t.pumpWidget(MaterialApp(home: CouponsHomePage(repo: FakeRepo(items: [_a, _b]), banner: const SizedBox(height: 40), onAllRewards: () {}, onScratch: () {}, background: const ColoredBox(color: Color(0xFF3A3550)))));
     for (var i = 0; i < 10; i++) {
       await t.pump(const Duration(milliseconds: 300));
     }
     expect(t.takeException(), isNull);
-    expect(find.byType(CouponsAura), findsOneWidget);
-    expect(find.text('7-DAY EBOOK'), findsOneWidget);
+    expect(find.text('7-DAY EBOOK', skipOffstage: false), findsOneWidget);
     await t.pumpWidget(const SizedBox());
   });
 }

@@ -52,7 +52,7 @@ void main() {
     await t.pumpWidget(MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(fontFamily: 'Roboto', brightness: Brightness.dark),
-      home: CouponsHomePage(repo: r, banner: const _BannerStub(), onAllRewards: () {}, onScratch: () {}, animate: false),
+      home: CouponsHomePage(repo: r, banner: const _BannerStub(), onAllRewards: () {}, onScratch: () {}, animate: false, background: const ColoredBox(color: Color(0xFF3A3550))),
     ));
     await t.pump();
     await t.pump(const Duration(milliseconds: 600));
@@ -83,6 +83,7 @@ void main() {
 
   testWidgets('4 filter sheet', (t) async {
     await setup(t, _Repo(_items));
+    await t.scrollUntilVisible(find.text('Categories'), 150, scrollable: find.byType(Scrollable).first);
     await t.tap(find.text('Categories'));
     await t.pumpAndSettle();
     await t.tap(find.text('Words'));

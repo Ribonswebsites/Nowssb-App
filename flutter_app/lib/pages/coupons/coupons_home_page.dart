@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 
 import '../../features/economy/coupon_screen.dart' show DailyScratchCard;
 import '../../features/programs/program_router.dart';
+import '../../widgets/app_backdrop.dart';
 import '../../widgets/sections/coupon_banner_section.dart';
 import 'coupon_models.dart';
 import 'coupon_popups.dart';
@@ -13,7 +14,10 @@ import 'coupons_glass.dart';
 import 'coupons_motion.dart';
 
 class CouponsHomePage extends StatefulWidget {
-  const CouponsHomePage({super.key, this.repo = const DefaultCouponsRepo(), this.banner, this.onAllRewards, this.onScratch, this.animate = true});
+  const CouponsHomePage({super.key, this.repo = const DefaultCouponsRepo(), this.banner, this.onAllRewards, this.onScratch, this.animate = true, this.background});
+
+  /// Defaults to the app's original background ([AppBackdrop]); tests stub it.
+  final Widget? background;
 
   /// Hero float loop; off in tests and when the OS asks for reduced motion.
   final bool animate;
@@ -112,7 +116,7 @@ class _CouponsHomePageState extends State<CouponsHomePage> {
   Widget build(BuildContext context) {
     final newCount = _all.where((c) => c.isNew && c.status == CouponStatus.active).length;
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1530),
+      backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.white,
@@ -125,7 +129,7 @@ class _CouponsHomePageState extends State<CouponsHomePage> {
       ),
       bottomNavigationBar: _bottomBar(),
       body: Stack(children: [
-        Positioned.fill(child: CouponsAura(animate: widget.animate)),
+        Positioned.fill(child: widget.background ?? const AppBackdrop()),
         RefreshIndicator(
           onRefresh: _load,
           child: ListView(padding: const EdgeInsets.fromLTRB(16, 4, 16, 24), children: [
@@ -278,23 +282,21 @@ class _HeroState extends State<_Hero> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) => CouponGlass(
-        radius: 28,
-        tint: kCouponViolet,
-        padding: const EdgeInsets.all(18),
+        padding: const EdgeInsets.fromLTRB(14, 20, 14, 14),
         child: Column(children: [
-          const Row(mainAxisSize: MainAxisSize.min, children: [Icon(Icons.auto_awesome, size: 14, color: Colors.white70), SizedBox(width: 6), Text('Level up your savings', style: TextStyle(color: Colors.white70))]),
-          const SizedBox(height: 4),
-          const Text('COUPONS FOR YOU', style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w900, letterSpacing: 1)),
-          const SizedBox(height: 8),
+          const AppCoin(size: 84),
+          const SizedBox(height: 14),
           CouponGlass(
+            inner: true,
             radius: 20,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-            child: Text('You have ${widget.newCount} new coupons', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
-          ),
-          SizedBox(
-            height: 120,
-            width: 200,
-            child: AnimatedBuilder(animation: _a, builder: (_, __) => CustomPaint(painter: CouponArtPainter(t: _a.value))),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              const Text('COUPONS FOR YOU', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 4),
+              Text('Level up your savings. You have ${widget.newCount} new coupons.', style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 13)),
+              const SizedBox(height: 12),
+              const Row(children: [PageDots(count: 3, active: 0)]),
+            ]),
           ),
         ]),
       );
@@ -307,43 +309,44 @@ class _Ticket extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final a = rarityAccent(c.rarity);
     return Semantics(
       button: true,
       label: '${c.offer}. ${c.scope}',
       child: PressScale(
         onTap: onTap,
         child: CouponGlass(
-          clipper: const TicketClipper(),
-          tint: a,
-          padding: const EdgeInsets.fromLTRB(18, 14, 18, 14),
-          child: Row(children: [
+          padding: const EdgeInsets.fromLTRB(12, 16, 12, 12),
+          child: Column(children: [
             Stack(clipBehavior: Clip.none, children: [
-              Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(borderRadius: BorderRadius.circular(16), gradient: LinearGradient(colors: [a, a.withValues(alpha: 0.4)])),
-                child: const Icon(Icons.confirmation_number_rounded, color: Colors.white, size: 30),
-              ),
+              const AppCoin(size: 64),
               if (c.isNew)
                 Positioned(
-                  top: -6,
-                  left: -4,
+                  top: -4,
+                  right: -18,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(color: const Color(0xFF3B82F6), borderRadius: BorderRadius.circular(10)),
-                    child: const Text('New', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w700)),
+                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
+                    child: const Text('New', style: TextStyle(color: Color(0xFF1C1830), fontSize: 10, fontWeight: FontWeight.w800)),
                   ),
                 ),
             ]),
-            const SizedBox(width: 14),
-            Expanded(
+            const SizedBox(height: 12),
+            CouponGlass(
+              inner: true,
+              radius: 20,
+              padding: const EdgeInsets.fromLTRB(16, 14, 12, 12),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(c.label, style: const TextStyle(color: Colors.white70, fontSize: 12)),
-                Text(c.offer, style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w900)),
-                Text(c.scope, style: const TextStyle(color: Colors.white54, fontSize: 12)),
-                const SizedBox(height: 4),
-                const Text('View details >', style: TextStyle(color: Color(0xFF7FB2FF), fontWeight: FontWeight.w700, fontSize: 13)),
+                Text(c.label, style: const TextStyle(color: Color(0x99FFFFFF), fontSize: 12)),
+                const SizedBox(height: 2),
+                Text(c.offer, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
+                const SizedBox(height: 2),
+                Text(c.scope, style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12.5)),
+                const SizedBox(height: 12),
+                Row(children: [
+                  Text(rarityName(c.rarity), style: const TextStyle(color: Color(0xCCFFFFFF), fontSize: 13)),
+                  const Spacer(),
+                  WhitePill('View details', onTap: onTap),
+                ]),
               ]),
             ),
           ]),
