@@ -144,7 +144,7 @@ class _Message extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(body, style: _body),
                   const SizedBox(height: 18),
-                  Align(alignment: Alignment.centerRight, child: PgCtaPill(label: action, onTap: onTap)),
+                  Align(alignment: Alignment.centerRight, child: PgPill(label: action, onTap: onTap)),
                 ]),
               ),
             ]),
@@ -205,7 +205,7 @@ class _Ready extends StatelessWidget {
             key: Key('pg-offline'),
             padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             child: Row(children: [
-              Icon(Icons.wifi_off_rounded, color: PgColors.lilac, size: 18),
+              Icon(Icons.wifi_off_rounded, color: Colors.white, size: 18),
               SizedBox(width: 8),
               Expanded(child: Text("You're offline. Showing progress saved on this phone.", style: TextStyle(color: PgColors.sub))),
             ]),
@@ -233,10 +233,10 @@ class _Ready extends StatelessWidget {
                 Row(children: [
                   Text('${v.totalSessions} sessions', style: const TextStyle(color: PgColors.sub, fontSize: 12)),
                   const Spacer(),
-                  PgDots(done: [for (final d in v.week.take(7)) d.done], current: v.week.indexWhere((d) => d.isToday)),
-                  const SizedBox(width: 12),
                   PgPill(label: 'Practice', onTap: onStart),
                 ]),
+                const SizedBox(height: 12),
+                Center(child: PgDots(done: [for (final d in v.week.take(7)) d.done], current: v.week.indexWhere((d) => d.isToday))),
               ]),
             ),
           ]),
@@ -304,9 +304,9 @@ class _Stat extends StatelessWidget {
   @override
   Widget build(BuildContext context) => PgGlass(
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
-        child: Column(children: [
+        child: SizedBox(width: double.infinity, child: Column(children: [
           Text(value, style: const TextStyle(color: PgColors.ink, fontSize: 22, fontWeight: FontWeight.w700)),
           Text(label, style: const TextStyle(color: PgColors.sub, fontSize: 12)),
-        ]),
+        ])),
       );
 }

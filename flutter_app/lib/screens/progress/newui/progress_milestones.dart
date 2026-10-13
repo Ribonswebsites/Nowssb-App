@@ -68,7 +68,7 @@ class _Badge extends StatelessWidget {
                 child: CircularProgressIndicator(
                   value: m.fraction,
                   strokeWidth: 3,
-                  color: PgColors.lilac,
+                  color: Colors.white,
                   backgroundColor: const Color(0x22FFFFFF),
                 ),
               ),
@@ -77,10 +77,7 @@ class _Badge extends StatelessWidget {
                 height: 44,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  gradient: m.done
-                      ? const RadialGradient(center: Alignment(-0.4, -0.4), colors: [Color(0xFFEDE8FF), PgColors.violet, Color(0xFF4B3A9E)])
-                      : null,
-                  color: m.done ? null : const Color(0x14FFFFFF),
+                                    color: m.done ? Colors.white : const Color(0x1FFFFFFF),
                 ),
                 child: Icon(m.icon, size: 22, color: m.done ? PgColors.pillInk : PgColors.sub),
               ),

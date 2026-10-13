@@ -1,20 +1,17 @@
 /// Page-local glass pieces for the new Progress page, styled to
 /// /workspace/specs/card-reference-exact.png (card only, never its background).
 ///
-/// TODO(nglass): swap [PgGlass]/[PgPanel] for UI Design's rebuilt NGlass from
-/// package:nowssb/nowssb_ui once it lands on main (origin/main at 3:30 PM IST
-/// still has the old violet-glow NGlass). Call sites keep (child, padding).
+/// Outer card uses the kit's rebuilt NGlass (origin/main).
 library;
 
 import 'dart:math' as math;
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
+import '../../../nowssb_ui/glass_core.dart' show NGlass;
+import '../../../nowssb_ui/tokens.dart' show NTokens;
+
 class PgColors {
-  static const violet = Color(0xFF9B8CFF);
-  static const violetDeep = Color(0xFF6C4DFF);
-  static const lilac = Color(0xFFE4DEFF);
   static const ink = Color(0xFFFFFFFF);
   static const sub = Color(0xB3FFFFFF); // muted white body text
   static const glass = Color(0x40CFC6F2); // translucent light-lavender frost
@@ -23,38 +20,17 @@ class PgColors {
   static const pillInk = Color(0xFF1E1A33);
 }
 
-/// Outer frosted card: lavender frost, 1px soft white border, radius 26.
+/// Outer frosted card: the kit's rebuilt neutral NGlass (white frost, 1px
+/// soft white border) at radius 30, per Ribon's approved card (5:53 PM IST).
 class PgGlass extends StatelessWidget {
-  const PgGlass({super.key, required this.child, this.padding = const EdgeInsets.all(16), this.radius = 26});
+  const PgGlass({super.key, required this.child, this.padding = const EdgeInsets.all(16), this.radius = 30});
   final Widget child;
   final EdgeInsets padding;
   final double radius;
 
   @override
-  Widget build(BuildContext context) {
-    final r = BorderRadius.circular(radius);
-    return DecoratedBox(
-      decoration: BoxDecoration(borderRadius: r, boxShadow: const [
-        BoxShadow(color: Color(0x33000000), blurRadius: 24, offset: Offset(0, 10)),
-      ]),
-      child: ClipRRect(
-        borderRadius: r,
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-          child: Container(
-            padding: padding,
-            decoration: BoxDecoration(
-              borderRadius: r,
-              gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight,
-                  colors: [Color(0x4DE4DEFF), PgColors.glass]),
-              border: Border.all(color: PgColors.edge, width: 1),
-            ),
-            child: child,
-          ),
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) =>
+      NGlass(radius: radius, blur: NTokens.blurLarge, padding: padding, child: child);
 }
 
 /// Inner frosted panel (lower half of the reference card), radius 20.
@@ -90,25 +66,6 @@ class PgPill extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
             child: Text(label, style: const TextStyle(color: PgColors.pillInk, fontSize: 13, fontWeight: FontWeight.w700)),
           ),
-        ),
-      );
-}
-
-/// Violet gradient pill ("Get started" variant in the reference).
-class PgCtaPill extends StatelessWidget {
-  const PgCtaPill({super.key, required this.label, this.onTap});
-  final String label;
-  final VoidCallback? onTap;
-  @override
-  Widget build(BuildContext context) => GestureDetector(
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(14),
-            gradient: const LinearGradient(colors: [PgColors.violetDeep, PgColors.violet]),
-          ),
-          child: Text(label, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700)),
         ),
       );
 }
@@ -165,7 +122,7 @@ class _RingPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round;
     canvas.drawArc(rect.deflate(8), 0, 2 * math.pi, false, p..color = const Color(0x22FFFFFF));
     canvas.drawArc(rect.deflate(8), -math.pi / 2, 2 * math.pi * v, false,
-        p..shader = const SweepGradient(colors: [PgColors.violet, PgColors.lilac, PgColors.violet]).createShader(rect));
+        p..color = Colors.white);
   }
 
   @override
