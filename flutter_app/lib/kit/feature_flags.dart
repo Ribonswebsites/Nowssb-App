@@ -8,6 +8,8 @@
 ///   4. Everyone else → off.
 library;
 
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -62,9 +64,14 @@ abstract final class NewUi {
       _overrides[k] = on;
     }
     _bump.value++;
+    // Fire-and-forget: the in-memory override is what isOn reads.
+    unawaited(_persist('$_prefsPrefix$k', on));
+  }
+
+  static Future<void> _persist(String k, bool? on) async {
     try {
       final p = await SharedPreferences.getInstance();
-      on == null ? await p.remove('$_prefsPrefix$k') : await p.setBool('$_prefsPrefix$k', on);
+      on == null ? await p.remove(k) : await p.setBool(k, on);
     } catch (_) {}
   }
 

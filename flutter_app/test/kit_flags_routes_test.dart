@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nowssb/kit/kit.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  setUpAll(() => SharedPreferences.setMockInitialValues({}));
   group('NewUi.decide', () {
     test('off for regular users by default', () {
       expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: null)), isFalse);

@@ -198,5 +198,6 @@ abstract final class SubscriptionRepository {
 /// Localized money display (integer minor units in, string out).
 abstract final class KitMoney {
   static String cents(int cents, {String? locale}) => FxBook.instance.formatCents(cents, locale: locale);
+  @Deprecated('Legacy INR display with a fallback rate. New pages use KitMoney.cents.')
   static String rupees(num rupees, {String? locale}) => FxBook.instance.formatRupees(rupees, locale: locale);
 }
