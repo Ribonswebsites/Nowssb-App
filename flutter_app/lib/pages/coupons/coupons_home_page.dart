@@ -10,6 +10,7 @@ import '../../widgets/sections/coupon_banner_section.dart';
 import 'coupon_models.dart';
 import 'coupon_popups.dart';
 import 'coupons_glass.dart';
+import 'coupons_motion.dart';
 
 class CouponsHomePage extends StatefulWidget {
   const CouponsHomePage({super.key, this.repo = const DefaultCouponsRepo(), this.banner, this.onAllRewards, this.onScratch, this.animate = true});
@@ -124,7 +125,7 @@ class _CouponsHomePageState extends State<CouponsHomePage> {
       ),
       bottomNavigationBar: _bottomBar(),
       body: Stack(children: [
-        const Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFF2A2050), Color(0xFF120E22)])))),
+        Positioned.fill(child: CouponsAura(animate: widget.animate)),
         RefreshIndicator(
           onRefresh: _load,
           child: ListView(padding: const EdgeInsets.fromLTRB(16, 4, 16, 24), children: [
@@ -167,7 +168,10 @@ class _CouponsHomePageState extends State<CouponsHomePage> {
             ),
           ];
         }
-        return [for (final c in l) Padding(padding: const EdgeInsets.only(bottom: 12), child: _Ticket(c: c, onTap: () => showCouponDetail(context, c)))];
+        return [
+          for (var i = 0; i < l.length; i++)
+            Padding(padding: const EdgeInsets.only(bottom: 12), child: CalmEntrance(index: i, animate: widget.animate, child: _Ticket(c: l[i], onTap: () => showCouponDetail(context, l[i])))),
+        ];
     }
   }
 
@@ -307,7 +311,7 @@ class _Ticket extends StatelessWidget {
     return Semantics(
       button: true,
       label: '${c.offer}. ${c.scope}',
-      child: GestureDetector(
+      child: PressScale(
         onTap: onTap,
         child: CouponGlass(
           clipper: const TicketClipper(),

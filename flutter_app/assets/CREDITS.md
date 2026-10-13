@@ -6,3 +6,4 @@
 
 ## Coupons page (newui_coupons)
 - All Coupons art (hero coupon, ticket notches, glass) is procedural `CustomPainter`/`CustomClipper` code written for NowssB. No third-party assets bundled.
+- Round 2 motion (aura glow, floating glass orbs, tilted 3D ring, staggered entrances) is procedural code in `lib/pages/coupons/coupons_motion.dart`. Ideas only from Dribbble/Mobbin/Behance/Spline-style meditation UIs; nothing copied or bundled. LottieFiles free files are under the Lottie Simple License (commercial use OK, no attribution required) but none are bundled yet.

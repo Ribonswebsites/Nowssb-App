@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nowssb/pages/coupons/coupon_models.dart';
 import 'package:nowssb/pages/coupons/coupons_home_page.dart';
+import 'package:nowssb/pages/coupons/coupons_motion.dart';
 
 class FakeRepo implements CouponsRepo {
   FakeRepo({this.items = const [], this.fail, this.code = const CouponCodeResult(true, 'Coupon added')});
@@ -126,5 +127,19 @@ void main() {
     await t.pump();
     await t.pump();
     expect(find.text('That code is not valid.'), findsOneWidget);
+  });
+
+  testWidgets('animated aura + entrances run without errors', (t) async {
+    t.view.physicalSize = const Size(390 * 3, 844 * 3);
+    t.view.devicePixelRatio = 3;
+    addTearDown(t.view.reset);
+    await t.pumpWidget(MaterialApp(home: CouponsHomePage(repo: FakeRepo(items: [_a, _b]), banner: const SizedBox(height: 40), onAllRewards: () {}, onScratch: () {})));
+    for (var i = 0; i < 10; i++) {
+      await t.pump(const Duration(milliseconds: 300));
+    }
+    expect(t.takeException(), isNull);
+    expect(find.byType(CouponsAura), findsOneWidget);
+    expect(find.text('7-DAY EBOOK'), findsOneWidget);
+    await t.pumpWidget(const SizedBox());
   });
 }
