@@ -6,8 +6,6 @@ import 'coins_wallet_data.dart';
 import '../../../nowssb_ui/nowssb_ui.dart';
 import '../../../widgets/nwsb_coin_fly.dart' show NwsbCoinDisc;
 
-const _gold = Color(0xFFE0A526);
-const _violet = Color(0xFFB39DFF);
 
 /// Lighter inner frosted panel (reference card's lower text card).
 class _InnerPanel extends StatelessWidget {
@@ -127,12 +125,16 @@ class _CoinsWalletPageState extends State<CoinsWalletPage> {
                 'No coins yet. Tap Earn: check in today for your first coins.',
                 style: TextStyle(color: Colors.white))),
           const SizedBox(height: 16),
-          NGlass(key: const Key('coins_boost'), radius: 28, accent: _gold, onTap: widget.onOpenBoost,
-            child: const Row(children: [
-              Icon(Icons.bolt, color: _gold, size: 32), SizedBox(width: 12),
-              Expanded(child: Text('Coin Boost: earn coins faster. Your spend cap stays the same.',
-                  style: TextStyle(color: Colors.white))),
-              Icon(Icons.chevron_right, color: Colors.white),
+          NGlass(key: const Key('coins_boost'), radius: NTokens.rCard, onTap: widget.onOpenBoost,
+            child: Row(children: [
+              const SizedBox(width: 4),
+              const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text('Coin Boost', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w800)),
+                SizedBox(height: 4),
+                Text('Earn coins faster. Your spend cap stays the same.',
+                    style: TextStyle(color: NTokens.textLo, fontSize: 12, height: 1.4)),
+              ])),
+              GlassPill(label: 'Open', style: PillStyle.white, dense: true, onTap: widget.onOpenBoost),
             ])),
         ]));
     }
@@ -140,51 +142,29 @@ class _CoinsWalletPageState extends State<CoinsWalletPage> {
 
   Widget _hero(CoinsWalletState s) {
     final reduce = MediaQuery.maybeOf(context)?.disableAnimations ?? false;
-    return NGlass(radius: NTokens.rHero + 2, blur: NTokens.blurLarge, padding: const EdgeInsets.fromLTRB(14, 22, 14, 14),
-        child: Column(children: [
-          // round "photo" slot at the top: the app's own NowssB coin
-          Container(width: 132, height: 132, alignment: Alignment.center,
-              decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white.withValues(alpha: .10),
-                  border: Border.all(color: Colors.white.withValues(alpha: .5), width: 2)),
-              child: const NwsbCoinDisc(size: 96)),
-          const SizedBox(height: 18),
-          _InnerPanel(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            TweenAnimationBuilder<int>(
-              tween: IntTween(begin: 0, end: s.balance),
-              duration: reduce ? Duration.zero : const Duration(milliseconds: 1200),
-              curve: Curves.easeOutCubic,
-              builder: (_, v, __) => Row(children: [
-                Text('$v', key: const Key('coins_balance'),
-                    style: const TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w800, height: 1.1)),
-                const Text(' coins', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700)),
-                IconButton(visualDensity: VisualDensity.compact,
-                    icon: const Icon(Icons.info_outline, color: Colors.white70, size: 18),
-                    onPressed: () => _info(context, 'Coin balance',
-                        'Coins you can spend now. Example: price \$10, coins cover up to \$3.50, you pay \$6.50.')),
-              ]),
-            ),
-            const SizedBox(height: 6),
-            if (s.worthLabel != null)
-              Text('Worth up to ${s.worthLabel} off your next purchase',
-                  style: const TextStyle(color: NTokens.textLo, fontSize: 13, height: 1.35)),
-            Text('1 coin = ${s.currency}${s.coinValue.toStringAsFixed(2)} · up to ${s.capPercent}% of a price',
-                key: const Key('coins_ratio'), style: const TextStyle(color: NTokens.textLo, fontSize: 13, height: 1.35)),
-            const SizedBox(height: 14),
-            Row(children: [
-              GestureDetector(onTap: () => _openEarn(context),
-                  child: const Text('How to earn', style: TextStyle(color: NTokens.textLo, fontSize: 13))),
-              const Spacer(),
-              GestureDetector(onTap: () => _openUse(context, s), child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
-                  child: const Text('Use coins', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 13)))),
-            ]),
-          ])),
-        ]));
+    final sub = [
+      if (s.worthLabel != null) 'Worth up to ${s.worthLabel} off your next purchase.',
+      '1 coin = ${s.currency}${s.coinValue.toStringAsFixed(2)} · up to ${s.capPercent}% of a price.',
+    ].join(' ');
+    return TweenAnimationBuilder<int>(
+      key: const Key('coins_hero'),
+      tween: IntTween(begin: 0, end: s.balance),
+      duration: reduce ? Duration.zero : const Duration(milliseconds: 1200),
+      curve: Curves.easeOutCubic,
+      // Approved card (UI Design MeditationCard); the round image is the app's own coin.
+      builder: (_, v, __) => _CoinMeditationCard(
+        title: '$v coins',
+        subtitle: sub,
+        secondary: 'How to earn',
+        onSecondary: () => _openEarn(context),
+        cta: 'Use coins',
+        onCta: () => _openUse(context, s),
+      ),
+    );
   }
 
   Widget _bigButton(String label, IconData icon, Key key, VoidCallback onTap) => NGlass(key: key, radius: 24,
-        accent: _violet, onTap: onTap, padding: const EdgeInsets.symmetric(vertical: 18),
+        onTap: onTap, padding: const EdgeInsets.symmetric(vertical: 18),
         child: SizedBox(width: double.infinity, child: Column(mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center, children: [
           Icon(icon, color: Colors.white, size: 28), const SizedBox(height: 6),
@@ -193,7 +173,7 @@ class _CoinsWalletPageState extends State<CoinsWalletPage> {
   Widget _expiryStrip(CoinsWalletState s) {
     final d = s.expiresOn!;
     final days = d.difference(DateTime.now()).inDays;
-    return NGlass(key: const Key('coins_expiry'), accent: Colors.orange,
+    return NGlass(key: const Key('coins_expiry'), radius: NTokens.rBox,
         child: Text('${s.expiringSoon} coins expire on ${d.year}-${_two(d.month)}-${_two(d.day)} '
             '(${days < 0 ? 0 : days} days left). Use them in time.', style: const TextStyle(color: Colors.white)));
   }
@@ -207,10 +187,11 @@ class _CoinsWalletPageState extends State<CoinsWalletPage> {
         actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Got it'))]));
 
   Future<void> _sheet(BuildContext ctx, Widget child) => showModalBottomSheet<void>(context: ctx,
-      isScrollControlled: true, backgroundColor: const Color(0xE60B0B12),
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
-      builder: (_) => SafeArea(child: SingleChildScrollView(padding: EdgeInsets.fromLTRB(16, 16, 16,
-          16 + MediaQuery.of(ctx).viewInsets.bottom), child: child)));
+      isScrollControlled: true, backgroundColor: Colors.transparent, elevation: 0,
+      builder: (_) => SafeArea(child: Padding(
+          padding: EdgeInsets.fromLTRB(10, 0, 10, 10 + MediaQuery.of(ctx).viewInsets.bottom),
+          child: NGlass(radius: 36, blur: NTokens.blurSheet, padding: const EdgeInsets.all(16),
+              child: SingleChildScrollView(child: child)))));
 
   void _openEarn(BuildContext ctx) {
     const rows = [
@@ -225,7 +206,7 @@ class _CoinsWalletPageState extends State<CoinsWalletPage> {
     _sheet(ctx, Column(key: const Key('coins_earn_sheet'), mainAxisSize: MainAxisSize.min, children: [
       const Text('Ways to earn', style: TextStyle(color: Colors.white, fontSize: 20)),
       for (final r in rows) Padding(padding: const EdgeInsets.only(top: 8), child: NGlass(
-          child: Row(children: [const Icon(Icons.circle, color: _gold, size: 10), const SizedBox(width: 10),
+          child: Row(children: [const Icon(Icons.circle, color: Colors.white70, size: 8), const SizedBox(width: 10),
             Expanded(child: Text('${r.$1}: ${r.$2}', style: const TextStyle(color: Colors.white)))]))),
     ]));
   }
@@ -258,7 +239,7 @@ class _UseCalculatorState extends State<_UseCalculator> {
           decoration: const InputDecoration(labelText: 'Item price', border: InputBorder.none),
           onChanged: (v) => setState(() => _price = double.tryParse(v) ?? 0))),
       const SizedBox(height: 12),
-      NGlass(accent: _gold, child: Text(
+      NGlass(radius: NTokens.rBox, child: Text(
           'Coins you can use: ${c.coinsUsable}, You pay: ${widget.state.currency}${c.youPay.toStringAsFixed(2)}',
           key: const Key('coins_calc_result'), style: const TextStyle(color: Colors.white))),
       const SizedBox(height: 6),
@@ -282,20 +263,56 @@ class _HistoryState extends State<_History> {
     return Column(key: const Key('coins_history_sheet'), mainAxisSize: MainAxisSize.min, children: [
       Wrap(spacing: 8, children: [
         for (final f in <LedgerKind?>[null, ...LedgerKind.values])
-          ChoiceChip(key: Key('coins_filter_${f?.name ?? 'all'}'), label: Text(f == null ? 'All' : f.name),
-              selected: _filter == f, onSelected: (_) => setState(() => _filter = f)),
+          GlassPill(key: Key('coins_filter_${f?.name ?? 'all'}'),
+              label: f == null ? 'All' : '${f.name[0].toUpperCase()}${f.name.substring(1)}',
+              style: _filter == f ? PillStyle.white : PillStyle.glass, dense: true,
+              onTap: () => setState(() => _filter = f)),
       ]),
       const SizedBox(height: 8),
       if (list.isEmpty) const Padding(padding: EdgeInsets.all(16),
           child: Text('Nothing here yet.', key: Key('coins_history_empty'), style: TextStyle(color: Colors.white70))),
       ConstrainedBox(constraints: const BoxConstraints(maxHeight: 360), child: ListView(shrinkWrap: true, children: [
-        for (final e in list) Padding(padding: const EdgeInsets.only(top: 6), child: NGlass(
+        for (final e in list) Padding(padding: const EdgeInsets.only(top: 6), child: NGlass(radius: NTokens.rBox,
             child: Row(children: [
               Expanded(child: Text(e.label, style: const TextStyle(color: Colors.white))),
               Text('${e.kind == LedgerKind.earned ? '+' : '-'}${e.amount}',
-                  style: TextStyle(color: e.kind == LedgerKind.earned ? _gold : Colors.white60)),
+                  style: TextStyle(color: e.kind == LedgerKind.earned ? Colors.white : NTokens.textLo, fontWeight: FontWeight.w700)),
             ]))),
       ])),
     ]);
   }
+}
+
+/// Same structure, radii, spacing and type as the kit's approved
+/// [MeditationCard], but the round slot holds the app's own coin widget
+/// ([NwsbCoinDisc], with its built-in fallback) instead of an ImageProvider.
+/// Swap to MeditationCard if the kit gains a `leading` widget slot.
+class _CoinMeditationCard extends StatelessWidget {
+  const _CoinMeditationCard({required this.title, required this.subtitle, required this.secondary,
+      required this.cta, this.onCta, this.onSecondary});
+  final String title, subtitle, secondary, cta;
+  final VoidCallback? onCta, onSecondary;
+  @override
+  Widget build(BuildContext context) => NGlass(radius: NTokens.rHero, blur: NTokens.blurLarge, padding: const EdgeInsets.all(18),
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
+        const SizedBox(height: 8),
+        Container(width: 140, height: 140, alignment: Alignment.center,
+            decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white.withValues(alpha: .08),
+                border: Border.all(color: Colors.white.withValues(alpha: .5), width: 2)),
+            child: const NwsbCoinDisc(size: 104)),
+        const SizedBox(height: 20),
+        NGlass(radius: NTokens.rCard, elevation: .3, padding: const EdgeInsets.all(16),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(title, style: const TextStyle(color: Colors.white, fontSize: 22, height: 1.15, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 8),
+              Text(subtitle, style: const TextStyle(color: NTokens.textLo, fontSize: 12, height: 1.4)),
+              const SizedBox(height: 14),
+              Row(children: [
+                Expanded(child: GestureDetector(onTap: onSecondary, child: Text(secondary, maxLines: 1,
+                    overflow: TextOverflow.ellipsis, style: const TextStyle(color: NTokens.textLo, fontSize: 12)))),
+                const SizedBox(width: 8),
+                GlassPill(label: cta, style: PillStyle.white, dense: true, onTap: onCta),
+              ]),
+            ])),
+      ]));
 }
