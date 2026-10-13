@@ -1,9 +1,8 @@
-/// Page-local glass pieces. Replace with Bug Hunter's GlassWrapper kit
-/// (spec 14.2) once it is on main; APIs kept small for an easy swap.
+/// Signature card built on the shared nowssb_ui glass (NGlass).
 library;
 
-import 'dart:ui';
 import 'package:flutter/material.dart';
+import '../../nowssb_ui/nowssb_ui.dart' hide Rarity;
 import 'signature_models.dart';
 import 'tilt_shine.dart';
 
@@ -16,35 +15,6 @@ Color rarityGlow(Rarity r) => const [
       Color(0xFFB57CFF),
       Color(0xFFFFC857),
     ][r.index];
-
-class SigGlass extends StatelessWidget {
-  const SigGlass({super.key, required this.child, this.padding = const EdgeInsets.all(16), this.glow});
-  final Widget child;
-  final EdgeInsets padding;
-  final Color? glow;
-  @override
-  Widget build(BuildContext context) => Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: [if (glow != null) BoxShadow(color: glow!.withValues(alpha: 0.35), blurRadius: 24)],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(24),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-            child: Container(
-              padding: padding,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
-              ),
-              child: child,
-            ),
-          ),
-        ),
-      );
-}
 
 /// Tall portrait premium card with gold inner frame and rarity glow.
 class SignatureCard extends StatelessWidget {
@@ -65,8 +35,9 @@ class SignatureCard extends StatelessWidget {
           aspectRatio: 3 / 4.6,
           child: TiltShine(
             enabled: effects && !word.locked,
-            child: SigGlass(
-            glow: glow,
+            child: NGlass(
+            accent: glow,
+            blur: 16,
             padding: const EdgeInsets.all(8),
             child: Container(
               decoration: BoxDecoration(

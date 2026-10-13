@@ -18,7 +18,7 @@ import '../../widgets/glass_black_card.dart';
 import '../../widgets/page_shell.dart';
 import 'product_detail.dart';
 import 'request_words.dart';
-import '../../pages/signature_words/signature_flag.dart';
+import '../../kit/kit.dart';
 import '../../pages/signature_words/signature_words_page.dart';
 import 'store_cards.dart';
 import 'store_home_sections.dart';
@@ -33,9 +33,13 @@ class SignatureStoreScreen extends StatelessWidget {
   const SignatureStoreScreen({super.key});
 
   @override
-  Widget build(BuildContext context) => const CoinbackPage(title: 'Signature', art: 'assets/store/intro-signature.webp');
+  Widget build(BuildContext context) => NewUiGate(
+        page: 'signature',
+        legacy: _legacy,
+        rebuilt: (_) => const SignatureWordsPage(),
+      );
 
-  Widget _retired(BuildContext context) => StoreTermsHost(
+  Widget _legacy(BuildContext context) => StoreTermsHost(
         which: 'signature',
         head: 'Signatures described by sound',
         child: PageShell(

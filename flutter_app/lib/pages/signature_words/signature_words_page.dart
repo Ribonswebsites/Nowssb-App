@@ -1,5 +1,5 @@
 /// Rebuilt Signature Words page (spec 14 "Signature Words", 19).
-/// Behind flag `newui_signature`; see signature_flag.dart.
+/// Behind flag `newui_signature` via the shared kit (NewUi / AppRoutes).
 library;
 
 import 'dart:async';
@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'aura_background.dart';
 import 'mandala_painter.dart';
 import 'signature_models.dart';
+import '../../nowssb_ui/nowssb_ui.dart' hide Rarity;
 import 'signature_widgets.dart';
 
 class SignatureWordsPage extends StatefulWidget {
@@ -121,15 +122,17 @@ class _SignatureWordsPageState extends State<SignatureWordsPage> {
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
+      isScrollControlled: true,
       builder: (_) => Padding(
         padding: const EdgeInsets.all(16),
-        child: SigGlass(
-          glow: rarityGlow(w.rarity),
+        child: NGlass(
+          accent: rarityGlow(w.rarity),
+          blur: 16,
           child: Container(
             key: const Key('sig-detail'),
             color: Colors.black.withValues(alpha: 0.4),
             padding: const EdgeInsets.all(16),
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
+            child: SingleChildScrollView(child: Column(mainAxisSize: MainAxisSize.min, children: [
               MandalaLoop(size: 110, animate: !reduce && !w.locked),
               const SizedBox(height: 8),
               Text(w.locked ? 'Locked drop' : w.word, style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w600)),
@@ -157,7 +160,7 @@ class _SignatureWordsPageState extends State<SignatureWordsPage> {
                 const SizedBox(height: 6),
                 const Text('Coins are taken from your balance after you confirm.', style: TextStyle(color: Colors.white54, fontSize: 11)),
               ],
-            ]),
+            ])),
           ),
         ),
       ),
@@ -187,7 +190,8 @@ class _SignatureWordsPageState extends State<SignatureWordsPage> {
       backgroundColor: Colors.transparent,
       builder: (_) => const Padding(
         padding: EdgeInsets.all(16),
-        child: SigGlass(
+        child: NGlass(
+          blur: 16,
           child: Column(key: Key('sig-help-sheet'), mainAxisSize: MainAxisSize.min, children: [
             Text('How it works', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600)),
             SizedBox(height: 12),
@@ -205,8 +209,9 @@ class _Hero extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-        child: SigGlass(
-          glow: kGold,
+        child: NGlass(
+          accent: kGold,
+          blur: 16,
           child: Row(children: [
             MandalaLoop(size: 96, animate: !reduce),
             const SizedBox(width: 14),
