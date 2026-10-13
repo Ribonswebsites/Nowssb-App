@@ -5,16 +5,18 @@ library;
 import 'package:flutter/material.dart';
 
 import 'rewards_data.dart';
-import 'lotus_coin.dart';
 import 'rewards_glass.dart';
 
 class RewardsNewUiPage extends StatefulWidget {
-  const RewardsNewUiPage({super.key, this.loader = loadRewardsFromServer, this.onOpen});
+  const RewardsNewUiPage({super.key, this.loader = loadRewardsFromServer, this.onOpen, this.background});
   final RewardsLoader loader;
 
   /// Called with a destination id ('checkin', 'streaks', 'quests', 'chests',
   /// 'boost', 'store', 'coins', 'earn'); wired to AppRoutes once it exists.
   final void Function(String id)? onOpen;
+
+  /// Defaults to the app's original background video; tests pass its poster.
+  final Widget? background;
 
   @override
   State<RewardsNewUiPage> createState() => _RewardsNewUiPageState();
@@ -38,7 +40,7 @@ class _RewardsNewUiPageState extends State<RewardsNewUiPage> {
     return Scaffold(
       backgroundColor: RGlass.bgBottom,
       body: Stack(children: [
-        const Positioned.fill(child: RAuraBackground()),
+        Positioned.fill(child: widget.background ?? const RVideoBackground()),
         SafeArea(
           child: FutureBuilder<RewardsData>(
             future: _future,
@@ -84,7 +86,7 @@ class _RewardsNewUiPageState extends State<RewardsNewUiPage> {
       SliverPadding(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
         sliver: SliverList.list(
-            children: _reveal([
+            children: [
           Row(children: [
             if (Navigator.of(context).canPop()) const BackButton(color: Colors.white),
             const Expanded(child: Text('Rewards', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w700))),
@@ -128,7 +130,7 @@ class _RewardsNewUiPageState extends State<RewardsNewUiPage> {
           const SizedBox(height: 8),
           RFilterChips(options: const ['All', 'Coupons', 'Gifts', 'Chests', 'Expired'], selected: _filter, onSelect: (f) => setState(() => _filter = f)),
           const SizedBox(height: 12),
-        ])),
+        ]),
       ),
       if (shown.isEmpty)
         SliverToBoxAdapter(
@@ -149,12 +151,11 @@ class _RewardsNewUiPageState extends State<RewardsNewUiPage> {
             crossAxisCount: 2,
             mainAxisSpacing: 12,
             crossAxisSpacing: 12,
-            childAspectRatio: .82,
+            childAspectRatio: .8,
             children: [for (final i in shown) RGiftTile(item: i)],
           ),
         ),
     ]);
   }
 
-  List<Widget> _reveal(List<Widget> ws) => [for (final (i, w) in ws.indexed) CalmReveal(index: i, child: w)];
 }
