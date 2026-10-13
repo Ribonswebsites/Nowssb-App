@@ -5,11 +5,11 @@
 /// widgets until NowssB Bug Hunter's shared kit lands on main.
 library;
 
-import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
+import '../../widgets/app_backdrop.dart';
 import 'menu_settings_model.dart';
 
 typedef SectionLoader = Future<List<SettingSection>> Function();
@@ -21,7 +21,12 @@ class GlassMenuSettingsPage extends StatefulWidget {
     this.isOnline,
     this.displayName,
     this.reduceEffects = false,
+    this.background,
   });
+
+  /// Behind the glass. Defaults to the app's original [AppBackdrop]
+  /// (Fashion Plus film / saved still). Tests pass a poster frame.
+  final Widget? background;
 
   final SectionLoader load;
   final Future<bool> Function()? isOnline;
@@ -84,9 +89,9 @@ class _GlassMenuSettingsPageState extends State<GlassMenuSettingsPage> {
     final reduce = widget.reduceEffects ||
         MediaQuery.maybeOf(context)?.disableAnimations == true;
     return Scaffold(
-      backgroundColor: const Color(0xFF120E24),
+      backgroundColor: Colors.black,
       body: Stack(children: [
-        Positioned.fill(child: _AuraBackdrop(animate: !reduce)),
+        Positioned.fill(child: widget.background ?? const AppBackdrop()),
         SafeArea(
           child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             _Header(name: widget.displayName),
@@ -119,7 +124,7 @@ class _GlassMenuSettingsPageState extends State<GlassMenuSettingsPage> {
       case MenuSettingsStatus.loading:
         return const Center(
             key: Key('ms_loading'),
-            child: CircularProgressIndicator(color: Color(0xFFC9B8FF)));
+            child: CircularProgressIndicator(color: Colors.white));
       case MenuSettingsStatus.error:
         return _Message(
           key: const Key('ms_error'),
@@ -150,9 +155,11 @@ class _GlassMenuSettingsPageState extends State<GlassMenuSettingsPage> {
             for (final s in list) ...[
               Padding(
                 padding: const EdgeInsets.fromLTRB(6, 14, 6, 8),
-                child: Text(s.title.toUpperCase(),
+                child: Text(s.title,
                     style: const TextStyle(
-                        color: Colors.white60, fontSize: 12, letterSpacing: 1.4)),
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700)),
               ),
               _Glass(
                 blur: blur,
@@ -191,7 +198,7 @@ class _Header extends StatelessWidget {
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             const Text('Settings',
                 style: TextStyle(
-                    color: Colors.white, fontSize: 28, fontWeight: FontWeight.w300)),
+                    color: Colors.white, fontSize: 30, fontWeight: FontWeight.w700)),
             if (name != null && name!.isNotEmpty)
               Text(name!, style: const TextStyle(color: Colors.white60)),
           ]),
@@ -211,10 +218,10 @@ class _ItemTile extends StatelessWidget {
     return ListTile(
       key: Key('ms_item_${item.id}'),
       leading: Icon(item.icon, color: color.withValues(alpha: 0.85)),
-      title: Text(item.title, style: TextStyle(color: color)),
+      title: Text(item.title, style: TextStyle(color: color, fontWeight: FontWeight.w600)),
       subtitle: item.subtitle == null
           ? null
-          : Text(item.subtitle!, style: const TextStyle(color: Colors.white54)),
+          : Text(item.subtitle!, style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12.5)),
       trailing: isToggle
           ? Switch(
               value: item.value,
@@ -245,107 +252,53 @@ class _Message extends StatelessWidget {
               style: const TextStyle(color: Colors.white70)),
           if (action != null) ...[
             const SizedBox(height: 12),
-            TextButton(onPressed: onAction, child: Text(action!)),
+            FilledButton(
+              onPressed: onAction,
+              style: FilledButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: const Color(0xFF1A1A1A),
+                shape: const StadiumBorder(),
+                padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
+              ),
+              child: Text(action!, style: const TextStyle(fontWeight: FontWeight.w600)),
+            ),
           ],
         ]),
       );
 }
 
-/// Page-local glass pane. Swap for the shared GlassWrapper kit when it lands.
+/// Frosted card per /workspace/specs/card-reference-exact.png: white tint
+/// ~17%, strong blur, 26px corners, 1px white border at 30%, soft shadow.
 class _Glass extends StatelessWidget {
   const _Glass({required this.child, this.blur = true});
   final Widget child;
   final bool blur;
+  static const _r = BorderRadius.all(Radius.circular(26));
   @override
   Widget build(BuildContext context) {
     final box = DecoratedBox(
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.07),
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+        color: Colors.white.withValues(alpha: blur ? 0.17 : 0.24),
+        borderRadius: _r,
+        border: Border.all(color: Colors.white.withValues(alpha: 0.30)),
       ),
-      child: Material(type: MaterialType.transparency, child: child),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+        child: Material(type: MaterialType.transparency, child: child),
+      ),
     );
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(22),
-      child: blur
-          ? RepaintBoundary(
-              child: BackdropFilter(
-                  filter: ui.ImageFilter.blur(sigmaX: 14, sigmaY: 14), child: box))
-          : box,
+    return DecoratedBox(
+      decoration: const BoxDecoration(borderRadius: _r, boxShadow: [
+        BoxShadow(color: Color(0x40000000), blurRadius: 24, offset: Offset(0, 10)),
+      ]),
+      child: ClipRRect(
+        borderRadius: _r,
+        child: blur
+            ? RepaintBoundary(
+                child: BackdropFilter(
+                    filter: ui.ImageFilter.blur(sigmaX: 24, sigmaY: 24), child: box))
+            : box,
+      ),
     );
   }
-}
-
-/// Slow drifting violet orbs, procedural (no assets, nothing to license).
-class _AuraBackdrop extends StatefulWidget {
-  const _AuraBackdrop({required this.animate});
-  final bool animate;
-  @override
-  State<_AuraBackdrop> createState() => _AuraBackdropState();
-}
-
-class _AuraBackdropState extends State<_AuraBackdrop>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _c =
-      AnimationController(vsync: this, duration: const Duration(seconds: 24));
-
-  @override
-  void initState() {
-    super.initState();
-    if (widget.animate) _c.repeat();
-  }
-
-  @override
-  void dispose() {
-    _c.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) => RepaintBoundary(
-        child: AnimatedBuilder(
-          animation: _c,
-          builder: (_, __) => CustomPaint(painter: _AuraPainter(_c.value)),
-        ),
-      );
-}
-
-class _AuraPainter extends CustomPainter {
-  _AuraPainter(this.t);
-  final double t;
-  @override
-  void paint(Canvas canvas, Size size) {
-    canvas.drawRect(
-      Offset.zero & size,
-      Paint()
-        ..shader = const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF241B4A), Color(0xFF120E24)],
-        ).createShader(Offset.zero & size),
-    );
-    const orbs = [
-      (0.2, 0.15, 0.55, Color(0xFF8F7BFF)),
-      (0.85, 0.4, 0.45, Color(0xFFD7A8FF)),
-      (0.4, 0.85, 0.6, Color(0xFF5E7BFF)),
-    ];
-    for (var i = 0; i < orbs.length; i++) {
-      final (x, y, r, c) = orbs[i];
-      final a = 2 * math.pi * (t + i / 3);
-      final center = Offset(
-          size.width * (x + 0.05 * math.sin(a)), size.height * (y + 0.04 * math.cos(a)));
-      final radius = size.shortestSide * r;
-      canvas.drawCircle(
-        center,
-        radius,
-        Paint()
-          ..shader = RadialGradient(colors: [c.withValues(alpha: 0.35), c.withValues(alpha: 0)])
-              .createShader(Rect.fromCircle(center: center, radius: radius)),
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(_AuraPainter old) => old.t != t;
 }
