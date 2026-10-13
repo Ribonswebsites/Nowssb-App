@@ -16,9 +16,9 @@
 - Aura background, progress ring: procedural CustomPainter written in-repo. No third-party assets bundled.
 - Polish round (Oct 13 2026): breathing 3D-style orb, floating sphere/torus/pill, milestone badges, count-up and entrance motion are all procedural Flutter code (CustomPainter/TweenAnimationBuilder). No Lottie, Rive, image, video or font assets added. Design inspiration only (no art copied): Stillwater meditation flow (swiftpieces.com), Sleek meditation template "Your Journey", Zenly on Behance, Dribbble "3D Concept - Meditation App".
 ## Gifts page (newui_gifts)
-- Glass gift box hero (isometric 3D-style box, ribbon, bow, drifting petals, floor shadow), breathing glow, floating orbs, glass tiles, staggered reveals and coin chip: procedural CustomPainter / Flutter widgets, written for NowssB. No new third-party files.
-- Reuses `assets/gifts/sparkle_stars_loop_gold.json` (credited above, Lottie Simple License, free commercial use) faintly behind the hero box.
-- Ideas only, no art copied: Meditate app's earn-a-mandala reward loop (screensdesign.com, 60fps.design) and glass-card / particle styling seen in Flow - Mindfulness (App Store). Lottie Simple License checked at https://lottiefiles.com/page/license on Oct 13 2026.
+- Background: the app's own AppBackdrop (original background video / still). No added backgrounds.
+- Card style copied from /workspace/specs/card-reference-exact.png (card only). Built in Flutter, no new files.
+- Photos: existing `assets/images/circles/` (NowssB UI Design kit). Coin: existing `NwsbCoinDisc` asset. No new assets.
 
 ## Signature Words (newui_signature)
 - Golden mandala loop: procedural CustomPainter (lib/pages/signature_words/mandala_painter.dart), original code, no third-party assets.
