@@ -32,7 +32,7 @@
 - Orbit rings hero: procedural CustomPainter, original code, no third-party assets.
 
 ## Rewards page (newui_rewards)
-- Golden lotus coin over still water with ripples and orbiting sparkles (lib/features/rewards_newui/lotus_coin.dart), aura background, glass tiles, count-up and calm staggered reveal: procedural CustomPainter / Flutter code, original. No Lottie, Rive, image, video or font files added. Icons: Flutter Material Icons (Apache 2.0).
+- Correction (Oct 13 2026): custom lotus coin and aura background removed. The page uses the app's original background video, the app's existing coin (NwsbCoinDisc) and existing circle photos; reference-matched frosted glass cards written in code. Icons: Flutter Material Icons (Apache 2.0).
 - Ideas only, nothing copied or bundled: Meditate app's earn-a-mandala reward loop (screensdesign.com showcase), Dribbble "streak reward" search results for layout mood. Researched Oct 13 2026.
 ## NowssB Coins wallet (newui_coins)
 - Golden lotus coin, water ripples, floating 3D orbs, breathing glow and sparkle burst are all drawn in code

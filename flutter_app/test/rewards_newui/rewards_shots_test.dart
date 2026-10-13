@@ -43,15 +43,34 @@ void main() {
         await (FontLoader('MaterialIcons')..addFont(f('MaterialIcons-Regular.otf'))).load();
       });
     }
+    Widget bg = const ColoredBox(color: Colors.black);
+    if (out != null) {
+      // The app's original background video, shown as its own poster frame.
+      final bytes = File('assets/video/7e4d709136dc254a_grok_video_2026-07-18-15-53-02_ubjx5b-poster.webp').readAsBytesSync();
+      final provider = MemoryImage(bytes);
+      bg = Image(image: provider, fit: BoxFit.cover);
+    }
     final key = GlobalKey();
     await t.pumpWidget(RepaintBoundary(
       key: key,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: ThemeData(fontFamily: 'Roboto', useMaterial3: true),
-        home: RewardsNewUiPage(loader: loader),
+        home: RewardsNewUiPage(loader: loader, background: bg),
       ),
     ));
+    if (out != null) {
+      await t.runAsync(() async {
+        final ctx = find.byType(RewardsNewUiPage).evaluate().first;
+        for (final e in find.byType(Image).evaluate()) {
+          await precacheImage((e.widget as Image).image, e);
+        }
+        for (final n in ['lotus', 'lake', 'candle_incense', 'milky_way']) {
+          await precacheImage(AssetImage('assets/images/circles/$n.webp'), ctx);
+        }
+        await precacheImage(const AssetImage('assets/icons/nwsb-coin.webp'), ctx);
+      });
+    }
     for (var i = 0; i < 12; i++) {
       await t.pump(const Duration(milliseconds: 150));
     }
@@ -73,8 +92,8 @@ void main() {
   Finder scroller() => find.descendant(of: find.byKey(const Key('rewards.scroll')), matching: find.byType(Scrollable)).first;
 
   testWidgets('1 hub top', (t) => shot(t, 'rewards-1', () async => _demo()));
-  testWidgets('2 hub scrolled', (t) => shot(t, 'rewards-2', () async => _demo(), then: () => t.drag(scroller(), const Offset(0, -420))));
-  testWidgets('3 my rewards grid', (t) => shot(t, 'rewards-3', () async => _demo(), then: () => t.drag(scroller(), const Offset(0, -1400))));
+  testWidgets('2 hub scrolled', (t) => shot(t, 'rewards-2', () async => _demo(), then: () => t.drag(scroller(), const Offset(0, -520))));
+  testWidgets('3 my rewards grid', (t) => shot(t, 'rewards-3', () async => _demo(), then: () => t.drag(scroller(), const Offset(0, -1600))));
   testWidgets('4 loading', (t) => shot(t, 'rewards-4', () => Completer<RewardsData>().future));
   testWidgets('5 empty', (t) => shot(t, 'rewards-5', () async => RewardsData.fromSummary(const {})));
   testWidgets('6 error', (t) => shot(t, 'rewards-6', () async => throw Exception('x')));
