@@ -282,7 +282,7 @@ class _HeroState extends State<_Hero> with SingleTickerProviderStateMixin {
         tint: kCouponViolet,
         padding: const EdgeInsets.all(18),
         child: Column(children: [
-          const Text('✦ Level up your savings', style: TextStyle(color: Colors.white70)),
+          const Row(mainAxisSize: MainAxisSize.min, children: [Icon(Icons.auto_awesome, size: 14, color: Colors.white70), SizedBox(width: 6), Text('Level up your savings', style: TextStyle(color: Colors.white70))]),
           const SizedBox(height: 4),
           const Text('COUPONS FOR YOU', style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w900, letterSpacing: 1)),
           const SizedBox(height: 8),

@@ -145,7 +145,7 @@ Future<void> showCouponDetail(BuildContext context, NwCoupon c, {VoidCallback? o
       radius: 18,
       tint: a,
       child: Row(children: [
-        Expanded(child: Text(c.code, style: const TextStyle(color: Colors.white, fontFamily: 'monospace', fontWeight: FontWeight.w700, letterSpacing: 1.2))),
+        Expanded(child: Text(c.code, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, letterSpacing: 1.2))),
         TextButton(
           onPressed: () {
             Clipboard.setData(ClipboardData(text: c.code));

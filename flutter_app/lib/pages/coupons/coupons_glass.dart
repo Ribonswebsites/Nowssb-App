@@ -113,11 +113,15 @@ class CouponArtPainter extends CustomPainter {
     for (var y = r.top + 6; y < r.bottom - 6; y += 8) {
       c.drawLine(Offset(r.left + r.width * 0.32, y), Offset(r.left + r.width * 0.32, y + 4), dash);
     }
-    final tp = TextPainter(
-      text: const TextSpan(text: '%', style: TextStyle(fontSize: 34, fontWeight: FontWeight.w900, color: Colors.white)),
-      textDirection: TextDirection.ltr,
-    )..layout();
-    tp.paint(c, Offset(r.left + r.width * 0.62 - tp.width / 2, -tp.height / 2));
+    // Drawn percent sign (no font dependency).
+    final pc = Offset(r.left + r.width * 0.64, 0);
+    final pen = Paint()
+      ..color = Colors.white
+      ..strokeWidth = 5
+      ..strokeCap = StrokeCap.round;
+    c.drawLine(pc + const Offset(-12, 14), pc + const Offset(12, -14), pen);
+    c.drawCircle(pc + const Offset(-9, -9), 5, Paint()..color = Colors.white);
+    c.drawCircle(pc + const Offset(9, 9), 5, Paint()..color = Colors.white);
     c.restore();
   }
 
