@@ -117,8 +117,7 @@ class _EarningsNewUiPageState extends State<EarningsNewUiPage> {
       const Padding(padding: EdgeInsets.symmetric(horizontal: 24),
           child: Text('EARNINGS LIST', style: TextStyle(color: NTokens.mint, fontSize: 11, letterSpacing: 1.6, fontWeight: FontWeight.w800))),
       const SizedBox(height: 10),
-      Padding(padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: FilterChipRow(labels: _filters, selected: _filter, onSelect: (i) => setState(() => _filter = i))),
+      FilterChipRow(labels: _filters, selected: {_filter}, onSelect: (i) => setState(() => _filter = i)),
       const SizedBox(height: 12),
       if (d.status == EarningsStatus.empty || rows.isEmpty)
         const Padding(padding: EdgeInsets.symmetric(horizontal: 16), child: GlassStateCard(icon: Icons.spa_outlined,

@@ -6,6 +6,7 @@ library;
 
 import 'dart:async';
 
+import '../../features/economy/economy_api.dart' show EconomyMirror;
 import '../../kit/kit.dart';
 
 enum EarningKind { sale, commission, payout }
@@ -75,7 +76,7 @@ class ServerPayoutProvider implements PayoutProvider {
           url: '${value['onboardUrl'] ?? ''}'.startsWith('http') ? '${value['onboardUrl']}' : null,
           message: '${value['message'] ?? ''}',
           supported: '${value['rail'] ?? ''}' != 'unsupported')),
-      KitErr(:final message, :final code) => KitErr(message, code),
+      KitErr(:final message, :final code) => KitErr(message, code: code),
     };
   }
   @override
