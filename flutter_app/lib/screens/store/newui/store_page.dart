@@ -4,20 +4,24 @@ library;
 
 import 'package:flutter/material.dart';
 
-import 'store_aura.dart';
+import '../../../widgets/app_backdrop.dart';
+import 'store_card.dart';
 import 'store_feed.dart';
 import '../../../nowssb_ui/nowssb_ui.dart';
 
 typedef StoreOpen = void Function(StoreDept dept, StoreItem? item);
 
 class NewStorePage extends StatefulWidget {
-  const NewStorePage({super.key, this.loader, this.onOpen, this.currency = 'USD', this.locale});
+  const NewStorePage({super.key, this.loader, this.onOpen, this.currency = 'USD', this.locale, this.background});
   final StoreLoader? loader;
   final StoreOpen? onOpen;
 
   /// Localized display currency (global app: never hardcode one country).
   final String currency;
   final String? locale;
+
+  /// The app's original background (video/still). Tests pass a plain one.
+  final Widget? background;
 
   @override
   State<NewStorePage> createState() => _NewStorePageState();
@@ -42,9 +46,10 @@ class _NewStorePageState extends State<NewStorePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: NTokens.bgBottom,
-      body: StoreAura(
-        child: SafeArea(
+      backgroundColor: Colors.transparent,
+      body: Stack(children: [
+        Positioned.fill(child: widget.background ?? const AppBackdrop()),
+        SafeArea(
           child: ListenableBuilder(
             listenable: _feed,
             builder: (context, _) => RefreshIndicator(
@@ -61,7 +66,7 @@ class _NewStorePageState extends State<NewStorePage> {
             ),
           ),
         ),
-      ),
+      ]),
     );
   }
 
@@ -76,7 +81,10 @@ class _NewStorePageState extends State<NewStorePage> {
           childAspectRatio: 2.4,
           children: [
             for (final d in _depts)
-              NGlass(
+              Semantics(
+               button: true,
+               label: 'Open ${d.$2}',
+               child: NGlass(
                 key: ValueKey('dept_${d.$1.name}'),
                 accent: d.$4,
                 onTap: () => widget.onOpen?.call(d.$1, null),
@@ -89,7 +97,7 @@ class _NewStorePageState extends State<NewStorePage> {
                         style: const TextStyle(color: NTokens.textHi, fontWeight: FontWeight.w600)),
                   ),
                 ]),
-              ),
+              )),
           ],
         ),
       );
@@ -136,62 +144,87 @@ class _NewStorePageState extends State<NewStorePage> {
         ),
       );
 
-  Widget _rail(StoreRail r) => Padding(
-        padding: const EdgeInsets.only(top: 16),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Semantics(
-              header: true,
-              child: Text(r.title,
-                  style: const TextStyle(color: NTokens.textHi, fontSize: 18, fontWeight: FontWeight.w700)),
-            ),
-          ),
-          const SizedBox(height: 10),
-          SizedBox(
-            height: 132,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: r.items.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 12),
-              itemBuilder: (_, i) {
-                final it = r.items[i];
-                return SizedBox(
-                  width: 150,
-                  child: NGlass(
-                    key: ValueKey('item_${it.id}'),
-                    onTap: () => widget.onOpen?.call(it.dept, it),
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text(it.title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(color: NTokens.textHi, fontWeight: FontWeight.w700, fontSize: 16)),
-                      const SizedBox(height: 4),
-                      Text(it.subtitle,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(color: NTokens.textLo, fontSize: 12)),
-                      const Spacer(),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: .16),
-                          borderRadius: BorderRadius.circular(NTokens.rPill),
-                        ),
-                        child: Text(
-                          formatStorePrice(it.priceMinor, locale: widget.locale, currency: widget.currency),
-                          style: const TextStyle(color: NTokens.gold, fontWeight: FontWeight.w700),
-                        ),
-                      ),
-                    ]),
-                  ),
-                );
-              },
-            ),
-          ),
-        ]),
+  Widget _rail(StoreRail r) => _RefRail(
+        rail: r,
+        price: (m) => formatStorePrice(m, locale: widget.locale, currency: widget.currency),
+        onOpen: (it) => widget.onOpen?.call(it.dept, it),
       );
+}
+
+class _RefRail extends StatefulWidget {
+  const _RefRail({required this.rail, required this.price, required this.onOpen});
+  final StoreRail rail;
+  final String Function(int) price;
+  final void Function(StoreItem) onOpen;
+  @override
+  State<_RefRail> createState() => _RefRailState();
+}
+
+class _RefRailState extends State<_RefRail> {
+  final _pc = PageController(viewportFraction: .62);
+  int _i = 0;
+
+  @override
+  void dispose() {
+    _pc.dispose();
+    super.dispose();
+  }
+
+  void _go(int i) {
+    final reduce = MediaQuery.maybeDisableAnimationsOf(context) ?? false;
+    if (reduce) {
+      _pc.jumpToPage(i);
+    } else {
+      _pc.animateToPage(i, duration: const Duration(milliseconds: 380), curve: Curves.easeOutCubic);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final items = widget.rail.items;
+    return Padding(
+      padding: const EdgeInsets.only(top: 18),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Semantics(
+            header: true,
+            child: Text(widget.rail.title,
+                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700)),
+          ),
+        ),
+        const SizedBox(height: 10),
+        SizedBox(
+          height: 340,
+          child: PageView.builder(
+            controller: _pc,
+            padEnds: false,
+            itemCount: items.length,
+            onPageChanged: (i) => setState(() => _i = i),
+            itemBuilder: (_, i) {
+              final it = items[i];
+              return Padding(
+                padding: EdgeInsets.only(left: i == 0 ? 20 : 6, right: 6),
+                child: StoreRefCard(
+                  key: ValueKey('item_${it.id}'),
+                  title: it.title,
+                  body: it.subtitle,
+                  price: widget.price(it.priceMinor),
+                  image: NCircles.at(i + widget.rail.dept.index * 3),
+                  isLast: i == items.length - 1,
+                  onOpen: () => widget.onOpen(it),
+                  onNext: () => _go(i + 1),
+                  onSkip: () => _go(items.length - 1),
+                ),
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 10),
+        StorePageDots(count: items.length, index: _i),
+      ]),
+    );
+  }
 }
 
 class _Header extends StatelessWidget {

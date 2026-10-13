@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:nowssb/data/settings.dart';
+import 'package:nowssb/nowssb_ui/nowssb_ui.dart';
 import 'package:nowssb/screens/store/newui/store_feed.dart';
 import 'package:nowssb/screens/store/newui/store_page.dart';
 
@@ -22,9 +24,19 @@ void main() {
       key: key,
       child: MediaQuery(
         data: const MediaQueryData(size: Size(390, 844), disableAnimations: true),
-        child: MaterialApp(debugShowCheckedModeBanner: false, theme: ThemeData(fontFamily: 'Roboto'), home: NewStorePage(loader: l)),
+        child: MaterialApp(debugShowCheckedModeBanner: false, theme: ThemeData(fontFamily: 'Roboto'), home: NewStorePage(loader: l, background: Image.asset(Settings.fashionImages.first, fit: BoxFit.cover))),
       ),
     ));
+    await t.pump();
+    await t.runAsync(() async {
+      for (final e in find.byType(Image).evaluate()) {
+        await precacheImage((e.widget as Image).image, e);
+      }
+      final ctx = find.byType(Scaffold).evaluate().first;
+      for (final c in NCircles.all) {
+        await precacheImage(c, ctx);
+      }
+    });
     await t.pump();
     if (scroll > 0) {
       await t.drag(find.byType(CustomScrollView), Offset(0, -scroll));
