@@ -6,7 +6,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import 'store_glass.dart';
+import '../../../nowssb_ui/nowssb_ui.dart';
 
 class StoreAura extends StatefulWidget {
   const StoreAura({super.key, required this.child});
@@ -61,7 +61,7 @@ class _AuraPainter extends CustomPainter {
         ..shader = const LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [StorePalette.bgTop, StorePalette.bgBottom],
+          colors: [NTokens.bgTop, NTokens.bgBottom],
         ).createShader(rect),
     );
     final v = Curves.easeInOut.transform(t.value);
@@ -77,9 +77,9 @@ class _AuraPainter extends CustomPainter {
       );
     }
 
-    orb(.15 + .04 * math.sin(v * math.pi), .12, .55, StorePalette.violet);
-    orb(.9, .38 - .03 * v, .45, StorePalette.pink);
-    orb(.3, .82, .6, StorePalette.teal.withValues(alpha: .7));
+    orb(.15 + .04 * math.sin(v * math.pi), .12, .55, NTokens.violet);
+    orb(.9, .38 - .03 * v, .45, NTokens.pink);
+    orb(.3, .82, .6, NTokens.mint.withValues(alpha: .7));
   }
 
   @override

@@ -5,7 +5,6 @@ library;
 import 'package:flutter/material.dart';
 
 import '../../data/store_catalog.dart';
-import '../../features/economy/shop_faces.dart';
 import '../../data/store_prices.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
@@ -35,7 +34,7 @@ class WordAtelierScreen extends StatelessWidget {
   const WordAtelierScreen({super.key});
 
   @override
-  Widget build(BuildContext context) => const CoinbackPage(title: 'Words', art: 'assets/store/intro-words.webp');
+  Widget build(BuildContext context) => _retired(context);
 
   Widget _retired(BuildContext context) => StoreTermsHost(
         which: 'word',

@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 import 'store_aura.dart';
 import 'store_feed.dart';
-import 'store_glass.dart';
+import '../../../nowssb_ui/nowssb_ui.dart';
 
 typedef StoreOpen = void Function(StoreDept dept, StoreItem? item);
 
@@ -33,16 +33,16 @@ class _NewStorePageState extends State<NewStorePage> {
   }
 
   static const _depts = [
-    (StoreDept.words, 'Words', Icons.spa_rounded, StorePalette.violet),
-    (StoreDept.meanings, 'Meanings', Icons.menu_book_rounded, StorePalette.teal),
-    (StoreDept.signature, 'Signature', Icons.draw_rounded, StorePalette.pink),
-    (StoreDept.ebooks, 'E-books', Icons.auto_stories_rounded, StorePalette.coinGold),
+    (StoreDept.words, 'Words', Icons.spa_rounded, NTokens.violet),
+    (StoreDept.meanings, 'Meanings', Icons.menu_book_rounded, NTokens.mint),
+    (StoreDept.signature, 'Signature', Icons.draw_rounded, NTokens.pink),
+    (StoreDept.ebooks, 'E-books', Icons.auto_stories_rounded, NTokens.gold),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: StorePalette.bgBottom,
+      backgroundColor: NTokens.bgBottom,
       body: StoreAura(
         child: SafeArea(
           child: ListenableBuilder(
@@ -76,10 +76,9 @@ class _NewStorePageState extends State<NewStorePage> {
           childAspectRatio: 2.4,
           children: [
             for (final d in _depts)
-              StoreGlass(
+              NGlass(
                 key: ValueKey('dept_${d.$1.name}'),
                 accent: d.$4,
-                semanticLabel: 'Open ${d.$2}',
                 onTap: () => widget.onOpen?.call(d.$1, null),
                 child: Row(children: [
                   Icon(d.$3, color: d.$4),
@@ -87,7 +86,7 @@ class _NewStorePageState extends State<NewStorePage> {
                   Flexible(
                     child: Text(d.$2,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(color: StorePalette.text, fontWeight: FontWeight.w600)),
+                        style: const TextStyle(color: NTokens.textHi, fontWeight: FontWeight.w600)),
                   ),
                 ]),
               ),
@@ -102,7 +101,7 @@ class _NewStorePageState extends State<NewStorePage> {
           SliverToBoxAdapter(
             child: Padding(
               padding: EdgeInsets.all(40),
-              child: Center(child: CircularProgressIndicator(key: Key('store_loading'), color: StorePalette.lilac)),
+              child: Center(child: CircularProgressIndicator(key: Key('store_loading'), color: NTokens.mint)),
             ),
           ),
         ];
@@ -120,17 +119,17 @@ class _NewStorePageState extends State<NewStorePage> {
   Widget _notice(Key key, IconData icon, String text, {bool retry = true}) => SliverToBoxAdapter(
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: StoreGlass(
+          child: NGlass(
             key: key,
-            radius: StoreRadius.hero,
+            radius: NTokens.rHero,
             padding: const EdgeInsets.all(24),
             child: Column(children: [
-              Icon(icon, color: StorePalette.lilac, size: 36),
+              Icon(icon, color: NTokens.mint, size: 36),
               const SizedBox(height: 12),
-              Text(text, textAlign: TextAlign.center, style: const TextStyle(color: StorePalette.textSoft)),
+              Text(text, textAlign: TextAlign.center, style: const TextStyle(color: NTokens.textLo)),
               if (retry) ...[
                 const SizedBox(height: 12),
-                TextButton(onPressed: _feed.load, child: const Text('Try again')),
+                TextButton(onPressed: _feed.load, style: TextButton.styleFrom(foregroundColor: NTokens.mint), child: const Text('Try again')),
               ],
             ]),
           ),
@@ -145,7 +144,7 @@ class _NewStorePageState extends State<NewStorePage> {
             child: Semantics(
               header: true,
               child: Text(r.title,
-                  style: const TextStyle(color: StorePalette.text, fontSize: 18, fontWeight: FontWeight.w700)),
+                  style: const TextStyle(color: NTokens.textHi, fontSize: 18, fontWeight: FontWeight.w700)),
             ),
           ),
           const SizedBox(height: 10),
@@ -160,30 +159,29 @@ class _NewStorePageState extends State<NewStorePage> {
                 final it = r.items[i];
                 return SizedBox(
                   width: 150,
-                  child: StoreGlass(
+                  child: NGlass(
                     key: ValueKey('item_${it.id}'),
-                    semanticLabel: it.title,
                     onTap: () => widget.onOpen?.call(it.dept, it),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Text(it.title,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(color: StorePalette.text, fontWeight: FontWeight.w700, fontSize: 16)),
+                          style: const TextStyle(color: NTokens.textHi, fontWeight: FontWeight.w700, fontSize: 16)),
                       const SizedBox(height: 4),
                       Text(it.subtitle,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(color: StorePalette.textSoft, fontSize: 12)),
+                          style: const TextStyle(color: NTokens.textLo, fontSize: 12)),
                       const Spacer(),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
                           color: Colors.white.withValues(alpha: .16),
-                          borderRadius: BorderRadius.circular(StoreRadius.pill),
+                          borderRadius: BorderRadius.circular(NTokens.rPill),
                         ),
                         child: Text(
                           formatStorePrice(it.priceMinor, locale: widget.locale, currency: widget.currency),
-                          style: const TextStyle(color: StorePalette.coinGold, fontWeight: FontWeight.w700),
+                          style: const TextStyle(color: NTokens.gold, fontWeight: FontWeight.w700),
                         ),
                       ),
                     ]),
@@ -202,9 +200,9 @@ class _Header extends StatelessWidget {
   Widget build(BuildContext context) => const Padding(
         padding: EdgeInsets.fromLTRB(20, 20, 20, 8),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('Store', style: TextStyle(color: StorePalette.text, fontSize: 30, fontWeight: FontWeight.w800)),
+          Text('Store', style: TextStyle(color: NTokens.textHi, fontSize: 30, fontWeight: FontWeight.w800)),
           SizedBox(height: 4),
-          Text('Breathe in. Choose words that stay with you.', style: TextStyle(color: StorePalette.textSoft)),
+          Text('Breathe in. Choose words that stay with you.', style: TextStyle(color: NTokens.textLo)),
         ]),
       );
 }
