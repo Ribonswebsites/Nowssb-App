@@ -4,7 +4,7 @@ import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:video_player/video_player.dart';
+import 'package:nowssb/widgets/app_backdrop.dart' show AppBackdrop;
 import 'package:nowssb/theme/liquid_glass_theme.dart' show NwsbEffects;
 import 'package:nowssb/widgets/motion.dart' show NwsbMotion;
 import 'tokens.dart';
@@ -42,7 +42,7 @@ class _NGlassState extends State<NGlass> {
         borderRadius: r,
         gradient: LinearGradient(
           begin: Alignment.topLeft, end: Alignment.bottomRight,
-          colors: [Color.alphaBlend((widget.tint ?? widget.accent).withValues(alpha: .12), top), bot],
+          colors: [widget.tint == null ? top : Color.alphaBlend(widget.tint!.withValues(alpha: .10), top), bot],
         ),
         border: Border.all(color: NTokens.border, width: 1),
       ),
@@ -74,79 +74,43 @@ class _NGlassState extends State<NGlass> {
   }
 }
 
-/// Every screen: background video (or gradient fallback) + glow orbs +
-/// floating 3D shapes + glass content. Uses video_player directly with a
-/// configurable asset; swap to VideoPool.instance.lease(...) to share the
-/// app's pooled controllers (lib/media/video_pool.dart).
-class GlassVideoScaffold extends StatefulWidget {
+/// Every screen: the app's ORIGINAL background ([AppBackdrop]: the saved
+/// Fashion Plus film, or its still / poster when the film is off or effects
+/// are reduced) with glass content on top. The kit adds NO background of its
+/// own: no gradient, no orbs, no floating shapes.
+/// [videoAsset] and [shapes] are kept only for source compatibility and are
+/// ignored. [background] lets tests inject a frame or photo.
+class GlassVideoScaffold extends StatelessWidget {
   const GlassVideoScaffold({
-    super.key, required this.body, this.appBar, this.bottomBar,
-    this.videoAsset = 'assets/video/7e4d709136dc254a_grok_video_2026-07-18-15-53-02_ubjx5b.mp4',
-    this.posterAsset, this.shapes = true, this.dim = .35,
+    super.key, required this.body, this.appBar, this.bottomBar, this.background,
+    @Deprecated('Ignored: the app background is always used') this.videoAsset,
+    @Deprecated('Ignored') this.posterAsset,
+    @Deprecated('Ignored: the kit adds no background shapes') this.shapes = false,
+    @Deprecated('Ignored') this.dim = 0,
   });
   final Widget body;
   final PreferredSizeWidget? appBar;
   final Widget? bottomBar;
+  final Widget? background;
   final String? videoAsset, posterAsset;
   final bool shapes;
   final double dim;
+
   @override
-  State<GlassVideoScaffold> createState() => _GlassVideoScaffoldState();
+  Widget build(BuildContext context) => Scaffold(
+        backgroundColor: Colors.transparent,
+        extendBodyBehindAppBar: true,
+        extendBody: true,
+        appBar: appBar,
+        bottomNavigationBar: bottomBar,
+        body: Stack(fit: StackFit.expand, children: [
+          RepaintBoundary(child: background ?? const AppBackdrop()),
+          SafeArea(bottom: false, child: body),
+        ]),
+      );
 }
 
-class _GlassVideoScaffoldState extends State<GlassVideoScaffold> {
-  VideoPlayerController? _c;
-  @override
-  void initState() {
-    super.initState();
-    final a = widget.videoAsset;
-    if (a != null && !NwsbEffects.instance.reduced) {
-      _c = VideoPlayerController.asset(a, videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true))
-        ..setLooping(true)..setVolume(0)
-        ..initialize().then((_) { if (mounted) { setState(() {}); _c!.play(); } });
-    }
-  }
-  @override
-  void dispose() { _c?.dispose(); super.dispose(); }
-
-  @override
-  Widget build(BuildContext context) {
-    final c = _c;
-    return Scaffold(
-      backgroundColor: NTokens.bgBottom,
-      extendBodyBehindAppBar: true,
-      extendBody: true,
-      appBar: widget.appBar,
-      bottomNavigationBar: widget.bottomBar,
-      body: Stack(fit: StackFit.expand, children: [
-        const DecoratedBox(decoration: BoxDecoration(gradient: NTokens.bgGradient)),
-        if (widget.posterAsset != null && (c == null || !c.value.isInitialized))
-          Image.asset(widget.posterAsset!, fit: BoxFit.cover),
-        if (c != null && c.value.isInitialized)
-          RepaintBoundary(child: FittedBox(fit: BoxFit.cover, child: SizedBox(
-            width: c.value.size.width, height: c.value.size.height, child: VideoPlayer(c)))),
-        ColoredBox(color: NTokens.bgBottom.withValues(alpha: widget.dim)),
-        const _GlowOrbs(),
-        if (widget.shapes) const IgnorePointer(child: FloatingShapes()),
-        SafeArea(bottom: false, child: widget.body),
-      ]),
-    );
-  }
-}
-
-class _GlowOrbs extends StatelessWidget {
-  const _GlowOrbs();
-  @override
-  Widget build(BuildContext context) => IgnorePointer(child: Stack(children: [
-        _orb(const Alignment(-1.1, -0.8), NTokens.violet, 320),
-        _orb(const Alignment(1.2, 0.1), NTokens.pink, 260),
-        _orb(const Alignment(-0.6, 1.1), const Color(0xFF3B82F6), 300),
-      ]));
-  Widget _orb(Alignment a, Color c, double s) => Align(alignment: a, child: Container(
-      width: s, height: s, decoration: BoxDecoration(shape: BoxShape.circle,
-      gradient: RadialGradient(colors: [c.withValues(alpha: .45), c.withValues(alpha: 0)]))));
-}
-
+/// Optional decorative shapes. NOT used by any kit background.
 /// Floating 3D torus (pink) + capsule pills (mint), slow drift (8s loop).
 class FloatingShapes extends StatefulWidget {
   const FloatingShapes({super.key, this.items = FloatingShapes.defaults});

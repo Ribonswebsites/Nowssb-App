@@ -110,9 +110,10 @@ class CurvedHeroHeader extends StatelessWidget {
   final String sparkle, title, countLabel;
   @override
   Widget build(BuildContext context) => ClipPath(clipper: _CurveBottom(), child: Container(height: 280,
-      decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter,
-          colors: [NTokens.violet.withValues(alpha: .55), NTokens.bgMid.withValues(alpha: .25)]),
-          border: const Border(bottom: BorderSide(color: NTokens.border))),
+      // Frosted glass over the app video, no colour background.
+      decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter,
+          colors: [NTokens.glassTop, NTokens.glassBottom]),
+          border: Border(bottom: BorderSide(color: NTokens.border))),
       child: Column(children: [
         const SizedBox(height: 20),
         Row(mainAxisSize: MainAxisSize.min, children: [

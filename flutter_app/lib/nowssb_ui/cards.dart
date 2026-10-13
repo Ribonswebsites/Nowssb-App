@@ -1,6 +1,8 @@
 // Card family. Base = MeditationCard (spec reference): frosted violet panel,
 // circular image, bold white title, small glass pill, page dots.
+import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
+import 'package:nowssb/theme/liquid_glass_theme.dart' show NwsbEffects;
 import 'glass_core.dart';
 import 'pills_chips.dart';
 import 'circle_assets.dart';
@@ -18,33 +20,99 @@ class CircleImage extends StatelessWidget {
           image: image == null ? null : DecorationImage(image: image!, fit: BoxFit.cover)));
 }
 
-/// V1 Meditation card (onboarding / feature / How-It-Works / gift detail).
+/// V1 Meditation card, matched to /workspace/specs/card-reference-exact.png.
+/// Every size is a fraction of the card width W (measured on the reference):
+/// radius .10W, side padding .06W, status row .07W, photo .64W with a thin
+/// light ring, inner panel radius .07W / padding .065W, title .072W w800,
+/// body .031W grey, Skip .034W, white Next pill .034W dark text, dots .016W,
+/// home bar .30W. Outer glass: white 18%->9%, blur 26, 1px white 36% border.
 class MeditationCard extends StatelessWidget {
   const MeditationCard({super.key, required this.title, this.subtitle, this.image,
-    this.cta = 'Next', this.onCta, this.secondary, this.dots, this.dotIndex = 0, this.blur = 0});
+    this.cta = 'Next', this.onCta, this.secondary = 'Skip', this.onSecondary, this.dots = 3, this.dotIndex = 0,
+    this.blur = NTokens.cardBlur, this.statusBar = true, this.time = '9:41', this.onClose, this.onHeart, this.liked = false,
+    this.homeBar = true});
   final String title; final String? subtitle, secondary; final ImageProvider? image;
-  final String cta; final VoidCallback? onCta; final int? dots; final int dotIndex; final double blur;
+  final String cta; final VoidCallback? onCta, onSecondary, onClose, onHeart; final int? dots; final int dotIndex;
+  final double blur; final bool statusBar, liked, homeBar; final String time;
+
   @override
-  Widget build(BuildContext context) => NGlass(radius: NTokens.rHero, blur: blur, padding: const EdgeInsets.all(18),
-      child: Column(mainAxisSize: MainAxisSize.min, children: [
-        const SizedBox(height: 8),
-        CircleImage(image: image),
-        const SizedBox(height: 20),
-        NGlass(radius: NTokens.rCard, elevation: .3, padding: const EdgeInsets.all(16),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(title, style: const TextStyle(color: Colors.white, fontSize: 22, height: 1.15, fontWeight: FontWeight.w800)),
-              if (subtitle != null) ...[const SizedBox(height: 8),
-                Text(subtitle!, style: const TextStyle(color: NTokens.textLo, fontSize: 12, height: 1.4))],
-              const SizedBox(height: 14),
-              Row(children: [
-                Expanded(child: secondary == null ? const SizedBox.shrink()
-                    : Text(secondary!, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: NTokens.textLo, fontSize: 12))),
-                const SizedBox(width: 8),
-                GlassPill(label: cta, style: PillStyle.white, dense: true, onTap: onCta),
-              ]),
-              if (dots != null) ...[const SizedBox(height: 10), Center(child: PageDots(count: dots!, index: dotIndex))],
+  Widget build(BuildContext context) => LayoutBuilder(builder: (context, c) {
+        final w = c.maxWidth.isFinite ? c.maxWidth : 300.0;
+        final r = BorderRadius.circular(w * .10);
+        final reduced = NwsbEffects.instance.reduced;
+        Widget card = DecoratedBox(
+          decoration: BoxDecoration(borderRadius: r, border: Border.all(color: NTokens.border),
+              gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight,
+                  colors: [NTokens.glassTop, NTokens.glassBottom])),
+          child: Padding(padding: EdgeInsets.fromLTRB(w * .06, w * .035, w * .06, w * .03), child: Column(mainAxisSize: MainAxisSize.min, children: [
+            if (statusBar) SizedBox(height: w * .06, child: Row(children: [
+              Text(time, style: TextStyle(color: Colors.white, fontSize: w * .033, fontWeight: FontWeight.w600)),
+              const Spacer(),
+              Icon(Icons.signal_cellular_alt_rounded, color: Colors.white, size: w * .04),
+              SizedBox(width: w * .012),
+              Icon(Icons.wifi_rounded, color: Colors.white, size: w * .04),
+              SizedBox(width: w * .012),
+              Icon(Icons.battery_full_rounded, color: Colors.white, size: w * .045),
             ])),
-      ]));
+            SizedBox(height: w * .02),
+            Row(children: [
+              GestureDetector(onTap: onClose, child: Container(width: w * .05, height: w * .05,
+                  decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
+                  child: Icon(Icons.close_rounded, size: w * .035, color: NTokens.ink))),
+              const Spacer(),
+              GestureDetector(onTap: onHeart, child: Icon(liked ? Icons.favorite_rounded : Icons.favorite_rounded,
+                  color: Colors.white, size: w * .06)),
+            ]),
+            SizedBox(height: w * .03),
+            Container(width: w * .64, height: w * .64,
+                decoration: BoxDecoration(shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white.withValues(alpha: .55), width: 1.2),
+                    color: Colors.white.withValues(alpha: .12),
+                    image: image == null ? null : DecorationImage(image: image!, fit: BoxFit.cover))),
+            SizedBox(height: w * .06),
+            // Inner frosted panel (lighter, own radius)
+            DecoratedBox(
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(w * .07),
+                  border: Border.all(color: Colors.white.withValues(alpha: .30)),
+                  gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight,
+                      colors: [NTokens.panelTop, NTokens.panelBottom])),
+              child: Padding(padding: EdgeInsets.fromLTRB(w * .065, w * .075, w * .05, w * .04),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+                  Text(title, style: TextStyle(color: Colors.white, fontSize: w * .072, height: 1.18, fontWeight: FontWeight.w800)),
+                  if (subtitle != null) ...[SizedBox(height: w * .035),
+                    Text(subtitle!, style: TextStyle(color: NTokens.bodyGrey, fontSize: w * .031, height: 1.45))],
+                  SizedBox(height: w * .04),
+                  Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                    Expanded(child: secondary == null ? const SizedBox.shrink() : GestureDetector(onTap: onSecondary,
+                        child: Text(secondary!, maxLines: 1, overflow: TextOverflow.ellipsis,
+                            style: TextStyle(color: Colors.white.withValues(alpha: .8), fontSize: w * .034, fontWeight: FontWeight.w500)))),
+                    SizedBox(width: w * .02),
+                    ConstrainedBox(constraints: BoxConstraints(maxWidth: w * .45), child: GestureDetector(onTap: onCta, child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: w * .055, vertical: w * .03),
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(w * .04),
+                          gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter,
+                              colors: [Colors.white, Color(0xFFE4E1EC)]),
+                          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: .18), blurRadius: 10, offset: const Offset(0, 4))]),
+                      child: FittedBox(fit: BoxFit.scaleDown, child: Text(cta, maxLines: 1,
+                          style: TextStyle(color: NTokens.ink, fontSize: w * .034, fontWeight: FontWeight.w700)))))),
+                  ]),
+                  if (dots != null) ...[SizedBox(height: w * .035), Center(child: FittedBox(fit: BoxFit.scaleDown, child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    for (var i = 0; i < dots!; i++) Container(width: w * .016, height: w * .016,
+                        margin: EdgeInsets.symmetric(horizontal: w * .008),
+                        decoration: BoxDecoration(shape: BoxShape.circle,
+                            color: Colors.white.withValues(alpha: i == dotIndex ? .95 : .4))),
+                  ])))],
+                ])),
+            ),
+            if (homeBar) ...[SizedBox(height: w * .045), Container(width: w * .30, height: w * .012,
+                decoration: BoxDecoration(color: Colors.white.withValues(alpha: .9), borderRadius: BorderRadius.circular(99)))],
+          ])),
+        );
+        card = ClipRRect(borderRadius: r, child: reduced || blur <= 0 ? card
+            : BackdropFilter(filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur), child: card));
+        // No drop shadow: on translucent glass it shows through as a dark inner band.
+        return RepaintBoundary(child: card);
+      });
 }
 
 /// V2 Shelf product card (Flipkart shelf -> glass): image tile, name, bottom benefit pill.
