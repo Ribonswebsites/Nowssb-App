@@ -37,8 +37,9 @@ class MeditationCard extends StatelessWidget {
                 Text(subtitle!, style: const TextStyle(color: NTokens.textLo, fontSize: 12, height: 1.4))],
               const SizedBox(height: 14),
               Row(children: [
-                if (secondary != null) Text(secondary!, style: const TextStyle(color: NTokens.textLo, fontSize: 12)),
-                const Spacer(),
+                Expanded(child: secondary == null ? const SizedBox.shrink()
+                    : Text(secondary!, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: NTokens.textLo, fontSize: 12))),
+                const SizedBox(width: 8),
                 GlassPill(label: cta, style: PillStyle.white, dense: true, onTap: onCta),
               ]),
               if (dots != null) ...[const SizedBox(height: 10), Center(child: PageDots(count: dots!, index: dotIndex))],

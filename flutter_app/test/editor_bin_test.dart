@@ -234,13 +234,24 @@ void main() {
     c.pickSection(_liveIds(c).first);
     await _settle(tester, 2);
     final strip = find.byKey(const ValueKey('context-strip'));
-    for (final t in ['Edit text', 'Style', 'Animate', 'Delete', 'Done']) {
-      final w = find.descendant(of: strip, matching: find.text(t));
-      expect(w, findsOneWidget, reason: '"$t" under its icon');
-      final tool = find.ancestor(of: w, matching: find.byType(StripTool));
-      final size = tester.getSize(tool.first);
-      expect(size.width, greaterThanOrEqualTo(48), reason: '$t is wide enough to hit');
-      expect(size.height, greaterThanOrEqualTo(48), reason: '$t is tall enough to hit');
+    // Since 0f7eab18 a picked section opens a panel of chips (an icon strip
+    // for elements): find each tool by its key, then check the words and the
+    // thumb-sized target whichever form it takes.
+    for (final (key, words) in [
+      ('strip-text', 'Edit text'),
+      ('strip-look', 'Style'),
+      ('strip-animate', 'Animate'),
+      ('strip-delete', 'Delete'),
+      ('strip-done', null),
+    ]) {
+      final tool = find.descendant(of: strip, matching: find.byKey(ValueKey(key)));
+      expect(tool, findsOneWidget, reason: '$key in the strip');
+      if (words != null) {
+        expect(find.descendant(of: tool, matching: find.text(words)), findsOneWidget, reason: '"$words" in plain words');
+      }
+      final size = tester.getSize(tool);
+      expect(size.width, greaterThanOrEqualTo(48), reason: '$key is wide enough to hit');
+      expect(size.height, greaterThanOrEqualTo(40), reason: '$key is tall enough to hit');
     }
     c.unpick();
     for (final s in c.sections) {

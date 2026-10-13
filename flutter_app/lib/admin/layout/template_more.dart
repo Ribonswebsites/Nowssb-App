@@ -5,7 +5,10 @@
 /// template field (`tpl.<page>.<entry>.<field>`), so a tap edits it.
 library;
 
+import 'dart:ui' show PlatformDispatcher;
+
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import 'template_fresh.dart';
 import 'template_motion.dart';
@@ -303,6 +306,18 @@ const _f = 'assets/store/collections/nature.webp';
 const _g = 'assets/store/collections/peace.webp';
 const _h = 'assets/store/collections/sacred.webp';
 
+/// A placeholder price in the phone's own currency (never one fixed
+/// country's symbol): starter text only, the admin types the real figure.
+/// Whole numbers, formatted by intl for the device locale.
+String samplePrice(num amount, {String? locale}) {
+  final loc = locale ?? PlatformDispatcher.instance.locale.toString();
+  try {
+    return NumberFormat.simpleCurrency(locale: loc, decimalDigits: 0).format(amount);
+  } catch (_) {
+    return NumberFormat.simpleCurrency(decimalDigits: 0).format(amount);
+  }
+}
+
 Map<String, dynamic> moreStarter(String kind) {
   final fresh = freshStarter(kind);
   if (fresh.isNotEmpty) return fresh;
@@ -318,7 +333,7 @@ Map<String, dynamic> moreStarter(String kind) {
       'cardsGrid' => {'title': 'Browse by mood', 'image': _a, 't1': 'Calm', 'image2': _b, 't2': 'Focus', 'image3': _c, 't3': 'Sleep', 'image4': _d, 't4': 'Energy'},
       'cardsTall' => {'title': 'This week', 'image': _e, 't1': 'The cosmos within', 'image2': _f, 't2': 'Back to nature'},
       'cardsList' => {'title': 'Keep going', 'image': _a, 't1': 'Morning breath', 's1': '5 min · Day 3', 'image2': _b, 't2': 'Healing words', 's2': '8 min · New', 'image3': _c, 't3': 'Deep rest', 's3': '15 min'},
-      'cardsPricing' => {'title': 'Choose your plan', 't1': 'Monthly', 'p1': '₹199', 't2': 'Yearly', 'p2': '₹1,499', 't3': 'Lifetime', 'p3': '₹3,999', 'cta': 'Choose', 'route': 'tab:4'},
+      'cardsPricing' => {'title': 'Choose your plan', 't1': 'Monthly', 'p1': samplePrice(199), 't2': 'Yearly', 'p2': samplePrice(1499), 't3': 'Lifetime', 'p3': samplePrice(3999), 'cta': 'Choose', 'route': 'tab:4'},
       'cardsProfile' => {'image': _d, 'title': 'Meera Rao', 'subtitle': 'Breath coach · 12 years', 'cta': 'Follow', 'route': 'tab:2'},
       'cardsOverlap' => {'title': 'Collections', 'subtitle': 'Hand-picked sets of practices', 'image': _g, 'image2': _h, 'image3': _e, 'cta': 'Open', 'route': 'tab:3'},
       'featureGrid' => {'title': 'Why people stay', 't1': 'Read aloud', 's1': 'Every word, spoken', 't2': 'Offline', 's2': 'Works anywhere', 't3': 'Daily', 's3': 'New each day', 't4': 'Private', 's4': 'Only for you'},
@@ -337,14 +352,14 @@ Map<String, dynamic> moreStarter(String kind) {
       'ctaNewsletter' => {'title': 'A calm note each Sunday', 'subtitle': 'Short, kind and never spam', 'cta': 'Join the list', 'route': 'tab:2'},
       'ctaPicture' => {'image': _c, 'title': 'New: sleep sounds', 'subtitle': 'Rain, waves, forest', 'cta': 'Listen', 'route': 'tab:1'},
       'couponGold' => {'amount': '30%', 'title': 'OFF your first year', 'code': 'CALM30', 'subtitle': 'Valid till 31 Dec', 'route': 'tab:4'},
-      'couponStub' => {'amount': '₹200', 'title': 'Off any course', 'code': 'HEAL200', 'subtitle': 'One use per person', 'route': 'tab:4'},
+      'couponStub' => {'amount': samplePrice(200), 'title': 'Off any course', 'code': 'HEAL200', 'subtitle': 'One use per person', 'route': 'tab:4'},
       'couponNeon' => {'amount': '50%', 'title': 'Weekend offer', 'code': 'GLOW50', 'route': 'tab:4'},
       'couponRound' => {'amount': '25', 'title': 'Percent off the store', 'code': 'STORE25', 'subtitle': 'Ends Sunday', 'route': 'tab:4'},
-      'couponStrip' => {'amount': '₹99', 'title': 'First month', 'code': 'FIRST99', 'route': 'tab:4'},
+      'couponStrip' => {'amount': samplePrice(99), 'title': 'First month', 'code': 'FIRST99', 'route': 'tab:4'},
       'couponPastel' => {'a1': '15%', 't1': 'Books', 'c1': 'READ15', 'a2': '20%', 't2': 'Courses', 'c2': 'LEARN20', 'route': 'tab:4'},
       'offerFlash' => {'eyebrow': 'FLASH SALE', 'title': 'Everything 40% off', 'subtitle': 'Today only · ends at midnight', 'cta': 'Shop now', 'route': 'tab:4'},
-      'offerBundle' => {'title': 'Calm + Sleep bundle', 'image': _b, 'image2': _c, 'price': '₹499', 'subtitle': 'Save ₹300', 'cta': 'Get both', 'route': 'tab:4'},
-      'offerPrice' => {'title': 'Premium, for a year', 'old': '₹2,399', 'price': '₹1,499', 'cta': 'Upgrade', 'route': 'tab:4', 'image': _e},
+      'offerBundle' => {'title': 'Calm + Sleep bundle', 'image': _b, 'image2': _c, 'price': samplePrice(499), 'subtitle': 'Save ${samplePrice(300)}', 'cta': 'Get both', 'route': 'tab:4'},
+      'offerPrice' => {'title': 'Premium, for a year', 'old': samplePrice(2399), 'price': samplePrice(1499), 'cta': 'Upgrade', 'route': 'tab:4', 'image': _e},
       'splitLeft' => {'image': _a, 'title': 'Words that listen', 'body': 'Each healing word comes with its meaning and a voice.', 'cta': 'Read', 'route': 'tab:3'},
       'splitRight' => {'image': _d, 'title': 'Rest is a practice', 'body': 'Short evening sessions to let the day go.', 'cta': 'Try one', 'route': 'tab:1'},
       'splitOverlap' => {'image': _f, 'title': 'Back to nature', 'body': 'Sounds recorded in forests and hills.', 'cta': 'Listen', 'route': 'tab:1'},

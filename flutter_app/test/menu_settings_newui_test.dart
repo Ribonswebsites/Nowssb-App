@@ -36,6 +36,7 @@ void main() {
 
   testWidgets('loading then ready', (t) async {
     await t.pumpWidget(_app(GlassMenuSettingsPage(
+        background: const ColoredBox(color: Colors.black),
         reduceEffects: true,
         load: () => Future.delayed(const Duration(milliseconds: 50), _sections))));
     expect(find.byKey(const Key('ms_loading')), findsOneWidget);
@@ -47,6 +48,7 @@ void main() {
   testWidgets('error state retries', (t) async {
     var calls = 0;
     await t.pumpWidget(_app(GlassMenuSettingsPage(
+        background: const ColoredBox(color: Colors.black),
         reduceEffects: true,
         load: () async {
           calls++;
@@ -61,13 +63,14 @@ void main() {
   });
 
   testWidgets('empty and search-empty states', (t) async {
-    await t.pumpWidget(_app(GlassMenuSettingsPage(reduceEffects: true, load: () async => const [])));
+    await t.pumpWidget(_app(GlassMenuSettingsPage(background: const ColoredBox(color: Colors.black), reduceEffects: true, load: () async => const [])));
     await t.pump();
     expect(find.byKey(const Key('ms_empty')), findsOneWidget);
   });
 
   testWidgets('offline banner', (t) async {
     await t.pumpWidget(_app(GlassMenuSettingsPage(
+        background: const ColoredBox(color: Colors.black),
         reduceEffects: true, load: () async => _sections(), isOnline: () async => false)));
     await t.pump();
     expect(find.byKey(const Key('ms_offline')), findsOneWidget);
@@ -78,6 +81,7 @@ void main() {
     var about = 0;
     bool? wake;
     await t.pumpWidget(_app(GlassMenuSettingsPage(
+        background: const ColoredBox(color: Colors.black),
         reduceEffects: true,
         load: () async => _sections(onAbout: () => about++, onWake: (v) => wake = v))));
     await t.pump();

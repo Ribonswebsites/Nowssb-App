@@ -1,56 +1,32 @@
-/// Rebuilt Profile page (flag `newui_profile`). Soft violet glass, meditative,
-/// one clear action per card (spec 0.5, 14-16, 19-20).
+/// Rebuilt Profile page (flag `newui_profile`). Sits on the app's original
+/// background (AppBackdrop: the user's chosen video/image), with the shared
+/// kit's frosted NGlass cards on top, matching card-reference-exact.png.
 library;
-
-import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
+import '../../nowssb_ui/cards.dart';
+import '../../nowssb_ui/glass_core.dart';
+import '../../nowssb_ui/pills_chips.dart';
+import '../../nowssb_ui/tokens.dart';
 import '../../screens/app_settings.dart';
 import '../../screens/progress/progress_screen.dart';
 import '../../screens/saved_words.dart';
 import '../../screens/subscription.dart';
-import 'aura_painter.dart';
-import 'breathing_orb.dart';
+import '../../widgets/app_backdrop.dart';
 import 'milestones.dart';
 import 'profile_data.dart';
 
-const _ink = Color(0xFFF4F1FF);
-const _sub = Color(0xB3E6E0FF);
-const _violet = Color(0xFFB79CFF);
+const _ink = NTokens.textHi;
+const _sub = NTokens.textLo;
 
-/// Glass pane used by every item (spec 0.5). Page-local stand-in for the
-/// shared kit's GlassWrapper (14.2); swap when Bug Hunter's kit lands.
-class ProfileGlass extends StatelessWidget {
-  const ProfileGlass({super.key, required this.child, this.padding = const EdgeInsets.all(16), this.onTap, this.semanticLabel});
-  final Widget child;
-  final EdgeInsets padding;
-  final VoidCallback? onTap;
-  final String? semanticLabel;
-
-  @override
-  Widget build(BuildContext context) {
-    final r = BorderRadius.circular(22);
-    Widget body = ClipRRect(
-      borderRadius: r,
-      child: BackdropFilter(
-        filter: ui.ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            borderRadius: r,
-            gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0x26FFFFFF), Color(0x0FFFFFFF)]),
-            border: Border.all(color: const Color(0x33FFFFFF)),
-          ),
-          child: Padding(padding: padding, child: child),
-        ),
-      ),
+/// Kit NGlass card plus a screen-reader label (no page-local glass).
+Widget _card({Key? key, required Widget child, EdgeInsets padding = const EdgeInsets.all(16), VoidCallback? onTap, String? label}) => Semantics(
+      key: key,
+      button: onTap != null,
+      label: label,
+      child: NGlass(padding: padding, onTap: onTap, child: child),
     );
-    if (onTap != null) {
-      body = Material(type: MaterialType.transparency, child: InkWell(borderRadius: r, onTap: onTap, child: body));
-    }
-    return Semantics(button: onTap != null, label: semanticLabel, child: body);
-  }
-}
 
 typedef ProfileNav = void Function(BuildContext context, String target);
 
@@ -65,10 +41,12 @@ void defaultProfileNav(BuildContext context, String target) {
 }
 
 class NewProfilePage extends StatefulWidget {
-  const NewProfilePage({super.key, this.source = const LiveProfileSource(), this.onNavigate = defaultProfileNav, this.animate = true});
+  const NewProfilePage({super.key, this.source = const LiveProfileSource(), this.onNavigate = defaultProfileNav, this.animate = true, this.backdrop});
   final ProfileSource source;
   final ProfileNav onNavigate;
   final bool animate;
+  /// Tests pass a still frame; the app uses its original AppBackdrop.
+  final Widget? backdrop;
 
   @override
   State<NewProfilePage> createState() => _NewProfilePageState();
@@ -105,9 +83,9 @@ class _NewProfilePageState extends State<NewProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0C0A16),
+      backgroundColor: Colors.black,
       body: Stack(children: [
-        Positioned.fill(child: _motion ? const ProfileAura() : CustomPaint(painter: AuraPainter(0))),
+        Positioned.fill(child: widget.backdrop ?? const AppBackdrop()),
         SafeArea(child: _body()),
       ]),
     );
@@ -117,7 +95,7 @@ class _NewProfilePageState extends State<NewProfilePage> {
     switch (_phase) {
       case _Phase.loading:
         return const Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-          SizedBox(width: 28, height: 28, child: CircularProgressIndicator(strokeWidth: 2, color: _violet)),
+          SizedBox(width: 28, height: 28, child: CircularProgressIndicator(strokeWidth: 2, color: _ink)),
           SizedBox(height: 14),
           Text('Gathering your calm…', key: Key('profile-loading'), style: TextStyle(color: _sub)),
         ]));
@@ -126,34 +104,28 @@ class _NewProfilePageState extends State<NewProfilePage> {
       case _Phase.offline:
         return _message(const Key('profile-offline'), Icons.wifi_off_rounded, 'You’re offline', 'Connect to the internet to see your journey.');
       case _Phase.ready:
-        return RefreshIndicator(onRefresh: _load, color: _violet, child: _ready(_data!));
+        return RefreshIndicator(onRefresh: _load, color: NTokens.violet, child: _ready(_data!));
     }
   }
 
   Widget _message(Key key, IconData icon, String title, String body) => Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
-          child: ProfileGlass(
+          child: _card(
             child: Column(key: key, mainAxisSize: MainAxisSize.min, children: [
-              Icon(icon, color: _violet, size: 36),
+              Icon(icon, color: _ink, size: 36),
               const SizedBox(height: 12),
               Text(title, style: const TextStyle(color: _ink, fontSize: 18, fontWeight: FontWeight.w600), textAlign: TextAlign.center),
               const SizedBox(height: 6),
               Text(body, style: const TextStyle(color: _sub), textAlign: TextAlign.center),
               const SizedBox(height: 16),
-              FilledButton(
-                key: const Key('profile-retry'),
-                style: FilledButton.styleFrom(backgroundColor: _violet, foregroundColor: const Color(0xFF1B1530), minimumSize: const Size(140, 48)),
-                onPressed: _load,
-                child: const Text('Try again'),
-              ),
+              GlassPill(key: const Key('profile-retry'), label: 'Try again', style: PillStyle.white, onTap: _load),
             ]),
           ),
         ),
       );
 
   Widget _ready(ProfileData d) {
-    final initial = d.name.isNotEmpty ? d.name.characters.first.toUpperCase() : '·';
     return ListView(
       key: const Key('profile-ready'),
       padding: const EdgeInsets.fromLTRB(18, 12, 18, 32),
@@ -169,30 +141,23 @@ class _NewProfilePageState extends State<NewProfilePage> {
           ),
         ]),
         const SizedBox(height: 12),
-        _enter(0, Column(children: [
-          BreathingOrb(
-            key: const Key('profile-orb'),
-            size: 170,
-            animate: _motion,
-            child: CircleAvatar(
-              radius: 30,
-              backgroundColor: const Color(0x33FFFFFF),
-              foregroundImage: d.avatarUrl != null ? NetworkImage(d.avatarUrl!) : null,
-              child: Text(initial, style: const TextStyle(color: _ink, fontSize: 24)),
-            ),
+        _enter(0, Semantics(
+          key: const Key('profile-hero'),
+          label: 'Profile of ${d.name}',
+          child: MeditationCard(
+            image: d.avatarUrl != null ? NetworkImage(d.avatarUrl!) : null,
+            title: d.name,
+            subtitle: 'Level ${d.level} · ${d.signedIn ? 'Synced to your account' : 'Saved on this phone'}',
+            cta: 'Progress',
+            onCta: () => widget.onNavigate(context, 'progress'),
           ),
-          Text(d.name, key: const Key('profile-name'), style: const TextStyle(color: _ink, fontSize: 22, fontWeight: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
-          const SizedBox(height: 4),
-          Text('Level ${d.level} · ${d.signedIn ? 'Synced' : 'On this phone'}', style: const TextStyle(color: _sub)),
-          const SizedBox(height: 4),
-          const Text('Breathe with the orb: in as it grows, out as it settles.', style: TextStyle(color: _sub, fontSize: 12), textAlign: TextAlign.center),
-        ])),
+        )),
         const SizedBox(height: 14),
         if (d.isEmpty)
-          ProfileGlass(
+          _card(
             key: const Key('profile-empty'),
             onTap: () => widget.onNavigate(context, 'progress'),
-            semanticLabel: 'Start your first session',
+            label: 'Start your first session',
             child: const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('Your journey starts with one breath', style: TextStyle(color: _ink, fontSize: 16, fontWeight: FontWeight.w600)),
               SizedBox(height: 6),
@@ -238,7 +203,7 @@ class _NewProfilePageState extends State<NewProfilePage> {
   Widget _milestones(ProfileData d) {
     final list = milestonesFor(d);
     final earned = list.where((m) => m.earned).length;
-    return ProfileGlass(
+    return _card(
       key: const Key('profile-milestones'),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('Milestones · $earned of ${list.length}', style: const TextStyle(color: _ink, fontSize: 16, fontWeight: FontWeight.w600)),
@@ -255,10 +220,10 @@ class _NewProfilePageState extends State<NewProfilePage> {
                   height: 56,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    gradient: m.earned ? const RadialGradient(center: Alignment(-0.3, -0.4), colors: [Color(0xFFF1E9FF), Color(0xFFB79CFF), Color(0xFF5B45B8)]) : null,
+                    color: m.earned ? Colors.white.withValues(alpha: 0.9) : Colors.white.withValues(alpha: 0.06),
                     border: Border.all(color: const Color(0x44FFFFFF)),
                   ),
-                  child: Icon(m.earned ? Icons.spa_rounded : Icons.lock_outline_rounded, color: m.earned ? const Color(0xFF231A4A) : _sub, size: 22),
+                  child: Icon(m.earned ? Icons.spa_rounded : Icons.lock_outline_rounded, color: m.earned ? const Color(0xFF2A2340) : _sub, size: 22),
                 ),
               ),
             ),
@@ -267,7 +232,7 @@ class _NewProfilePageState extends State<NewProfilePage> {
     );
   }
 
-  Widget _stat(String label, String value, Key key) => ProfileGlass(
+  Widget _stat(String label, String value, Key key) => _card(
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
         child: Column(children: [
           Text(value, key: key, style: const TextStyle(color: _ink, fontSize: 22, fontWeight: FontWeight.w600)),
@@ -278,7 +243,7 @@ class _NewProfilePageState extends State<NewProfilePage> {
 
   Widget _week(List<bool> week) {
     const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-    return ProfileGlass(
+    return _card(
       child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
         for (var i = 0; i < 7; i++)
           Column(children: [
@@ -288,7 +253,7 @@ class _NewProfilePageState extends State<NewProfilePage> {
               height: 26,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: i < week.length && week[i] ? _violet : Colors.transparent,
+                color: i < week.length && week[i] ? Colors.white : Colors.transparent,
                 border: Border.all(color: const Color(0x55FFFFFF)),
               ),
             ),
@@ -301,12 +266,12 @@ class _NewProfilePageState extends State<NewProfilePage> {
 
   Widget _link(String target, IconData icon, String title, String hint) => Padding(
         padding: const EdgeInsets.only(bottom: 10),
-        child: ProfileGlass(
+        child: _card(
           key: Key('profile-link-$target'),
           onTap: () => widget.onNavigate(context, target),
-          semanticLabel: title,
+          label: title,
           child: Row(children: [
-            Icon(icon, color: _violet),
+            Icon(icon, color: _ink),
             const SizedBox(width: 14),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

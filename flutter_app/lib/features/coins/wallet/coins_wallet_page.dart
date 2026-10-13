@@ -1,18 +1,40 @@
 import 'dart:async';
 import 'dart:io' show SocketException;
 import 'package:flutter/material.dart';
+import 'coins_video_bg.dart';
 import 'coins_wallet_data.dart';
 import '../../../nowssb_ui/nowssb_ui.dart';
-import 'coins_wallet_motion.dart';
+import '../../../widgets/nwsb_coin_fly.dart' show NwsbCoinDisc;
 
 const _gold = Color(0xFFE0A526);
 const _violet = Color(0xFFB39DFF);
+const kCoinsBgVideo = 'assets/video/7e4d709136dc254a_grok_video_2026-07-18-15-53-02_ubjx5b.mp4';
+const _kCoinsBgPoster = 'assets/video/7e4d709136dc254a_grok_video_2026-07-18-15-53-02_ubjx5b-poster.webp';
+
+/// Lighter inner frosted panel (reference card's lower text card).
+class _InnerPanel extends StatelessWidget {
+  const _InnerPanel({required this.child});
+  final Widget child;
+  @override
+  Widget build(BuildContext context) => Container(
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(18, 18, 18, 14),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(22),
+          color: Colors.white.withValues(alpha: .14),
+          border: Border.all(color: Colors.white.withValues(alpha: .28)),
+        ),
+        child: child,
+      );
+}
 
 /// NowssB Coins wallet (spec §18.1). Behind `newui_coins` (see coins_flag.dart).
 class CoinsWalletPage extends StatefulWidget {
-  const CoinsWalletPage({super.key, required this.source, this.onOpenBoost});
+  const CoinsWalletPage({super.key, required this.source, this.onOpenBoost, this.videoAsset = kCoinsBgVideo});
   final CoinsWalletSource source;
   final VoidCallback? onOpenBoost;
+  /// The app's original background video (null = poster only, used in tests).
+  final String? videoAsset;
   @override
   State<CoinsWalletPage> createState() => _CoinsWalletPageState();
 }
@@ -22,7 +44,6 @@ enum _Phase { loading, ready, error, offline }
 class _CoinsWalletPageState extends State<CoinsWalletPage> {
   _Phase _phase = _Phase.loading;
   CoinsWalletState? _s;
-  bool _counted = false;
 
   @override
   void initState() {
@@ -50,12 +71,15 @@ class _CoinsWalletPageState extends State<CoinsWalletPage> {
 
   @override
   Widget build(BuildContext context) {
+    final reduce = MediaQuery.maybeOf(context)?.disableAnimations ?? false;
     return Scaffold(
+      backgroundColor: Colors.black,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text('NowssB Coins'),
+        title: const Text('NowssB Coins', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+        iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           IconButton(key: const Key('coins_help'), tooltip: 'How coins work', icon: const Icon(Icons.help_outline),
               onPressed: () => _info(context, 'Coins', 'Earn coins every day, spend up to 35% of any price, and use them before they expire.')),
@@ -63,7 +87,8 @@ class _CoinsWalletPageState extends State<CoinsWalletPage> {
               onPressed: _s == null ? null : () => _openHistory(context)),
         ],
       ),
-      body: AuraBackground(child: SafeArea(child: _body(context))),
+      body: CoinsVideoBackground(video: reduce ? null : widget.videoAsset, poster: _kCoinsBgPoster,
+          child: SafeArea(child: _body(context))),
     );
   }
 
@@ -87,15 +112,15 @@ class _CoinsWalletPageState extends State<CoinsWalletPage> {
       case _Phase.ready:
         final s = _s!;
         return RefreshIndicator(onRefresh: _load, child: ListView(padding: const EdgeInsets.all(16), children: [
-          CalmEntrance(child: BreathingGlow(child: _hero(s))),
+          _hero(s),
           const SizedBox(height: 16),
-          CalmEntrance(index: 1, child: Row(children: [
+          Row(children: [
             Expanded(child: _bigButton('Earn', Icons.add_circle_outline, const Key('coins_earn'), () => _openEarn(context))),
             const SizedBox(width: 10),
             Expanded(child: _bigButton('Use', Icons.shopping_bag_outlined, const Key('coins_use'), () => _openUse(context, s))),
             const SizedBox(width: 10),
             Expanded(child: _bigButton('History', Icons.receipt_long, const Key('coins_history'), () => _openHistory(context))),
-          ])),
+          ]),
           const SizedBox(height: 16),
           if (s.expiringSoon > 0 && s.expiresOn != null) _expiryStrip(s),
           if (s.balance == 0 && s.ledger.isEmpty)
@@ -103,57 +128,68 @@ class _CoinsWalletPageState extends State<CoinsWalletPage> {
                 'No coins yet. Tap Earn: check in today for your first coins.',
                 style: TextStyle(color: Colors.white))),
           const SizedBox(height: 16),
-          CalmEntrance(index: 3, child: NGlass(key: const Key('coins_boost'), radius: 28, accent: _gold, onTap: widget.onOpenBoost,
+          NGlass(key: const Key('coins_boost'), radius: 28, accent: _gold, onTap: widget.onOpenBoost,
             child: const Row(children: [
               Icon(Icons.bolt, color: _gold, size: 32), SizedBox(width: 12),
               Expanded(child: Text('Coin Boost: earn coins faster. Your spend cap stays the same.',
                   style: TextStyle(color: Colors.white))),
               Icon(Icons.chevron_right, color: Colors.white),
-            ]))),
+            ])),
         ]));
     }
   }
 
   Widget _hero(CoinsWalletState s) {
     final reduce = MediaQuery.maybeOf(context)?.disableAnimations ?? false;
-    return NGlass(radius: 30, blur: 22, accent: _gold, padding: const EdgeInsets.all(24),
+    return NGlass(radius: NTokens.rHero + 2, blur: NTokens.blurLarge, padding: const EdgeInsets.fromLTRB(14, 22, 14, 14),
         child: Column(children: [
-          const LotusCoin3D(size: 84),
-          TweenAnimationBuilder<int>(
-            tween: IntTween(begin: 0, end: s.balance),
-            duration: reduce ? Duration.zero : const Duration(milliseconds: 1400),
-            curve: Curves.easeOutCubic,
-            onEnd: () => WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (mounted && !_counted) setState(() => _counted = true);
-            }),
-            builder: (_, v, __) => Stack(alignment: Alignment.center, clipBehavior: Clip.none, children: [
-              SparkleBurst(play: _counted),
-              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                Text('$v', key: const Key('coins_balance'), style: const TextStyle(color: Colors.white, fontSize: 48,
-                    fontWeight: FontWeight.w700, fontFeatures: [FontFeature.tabularFigures()],
-                    shadows: [Shadow(color: Color(0x88E0A526), blurRadius: 18)])),
-                IconButton(icon: const Icon(Icons.info_outline, color: Colors.white70, size: 18),
+          // round "photo" slot at the top: the app's own NowssB coin
+          Container(width: 132, height: 132, alignment: Alignment.center,
+              decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white.withValues(alpha: .10),
+                  border: Border.all(color: Colors.white.withValues(alpha: .5), width: 2)),
+              child: const NwsbCoinDisc(size: 96)),
+          const SizedBox(height: 18),
+          _InnerPanel(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            TweenAnimationBuilder<int>(
+              tween: IntTween(begin: 0, end: s.balance),
+              duration: reduce ? Duration.zero : const Duration(milliseconds: 1200),
+              curve: Curves.easeOutCubic,
+              builder: (_, v, __) => Row(children: [
+                Text('$v', key: const Key('coins_balance'),
+                    style: const TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w800, height: 1.1)),
+                const Text(' coins', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700)),
+                IconButton(visualDensity: VisualDensity.compact,
+                    icon: const Icon(Icons.info_outline, color: Colors.white70, size: 18),
                     onPressed: () => _info(context, 'Coin balance',
                         'Coins you can spend now. Example: price \$10, coins cover up to \$3.50, you pay \$6.50.')),
               ]),
-            ]),
-          ),
-          const Text('coins', style: TextStyle(color: Colors.white70, letterSpacing: 1.2)),
-          if (s.worthLabel != null) ...[
+            ),
             const SizedBox(height: 6),
-            Text('Worth up to ${s.worthLabel} off your next purchase', style: const TextStyle(color: Colors.white)),
-          ],
-          const SizedBox(height: 10),
-          NGlass(key: const Key('coins_ratio'), radius: 999, padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-              child: Text('1 coin = ${s.currency}${s.coinValue.toStringAsFixed(2)} · up to ${s.capPercent}% of a price',
-                  style: const TextStyle(color: Colors.white, fontSize: 12))),
+            if (s.worthLabel != null)
+              Text('Worth up to ${s.worthLabel} off your next purchase',
+                  style: const TextStyle(color: NTokens.textLo, fontSize: 13, height: 1.35)),
+            Text('1 coin = ${s.currency}${s.coinValue.toStringAsFixed(2)} · up to ${s.capPercent}% of a price',
+                key: const Key('coins_ratio'), style: const TextStyle(color: NTokens.textLo, fontSize: 13, height: 1.35)),
+            const SizedBox(height: 14),
+            Row(children: [
+              GestureDetector(onTap: () => _openEarn(context),
+                  child: const Text('How to earn', style: TextStyle(color: NTokens.textLo, fontSize: 13))),
+              const Spacer(),
+              GestureDetector(onTap: () => _openUse(context, s), child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
+                  child: const Text('Use coins', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 13)))),
+            ]),
+          ])),
         ]));
   }
 
   Widget _bigButton(String label, IconData icon, Key key, VoidCallback onTap) => NGlass(key: key, radius: 24,
         accent: _violet, onTap: onTap, padding: const EdgeInsets.symmetric(vertical: 18),
-        child: Column(children: [Icon(icon, color: Colors.white, size: 28), const SizedBox(height: 6),
-          Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600))]));
+        child: SizedBox(width: double.infinity, child: Column(mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center, children: [
+          Icon(icon, color: Colors.white, size: 28), const SizedBox(height: 6),
+          Text(label, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600))])));
 
   Widget _expiryStrip(CoinsWalletState s) {
     final d = s.expiresOn!;
@@ -172,7 +208,7 @@ class _CoinsWalletPageState extends State<CoinsWalletPage> {
         actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Got it'))]));
 
   Future<void> _sheet(BuildContext ctx, Widget child) => showModalBottomSheet<void>(context: ctx,
-      isScrollControlled: true, backgroundColor: const Color(0xFF231A44),
+      isScrollControlled: true, backgroundColor: const Color(0xE60B0B12),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
       builder: (_) => SafeArea(child: SingleChildScrollView(padding: EdgeInsets.fromLTRB(16, 16, 16,
           16 + MediaQuery.of(ctx).viewInsets.bottom), child: child)));

@@ -3,6 +3,7 @@
 import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'app_video_backdrop.dart';
 import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
 import 'package:nowssb/theme/liquid_glass_theme.dart' show NwsbEffects;
@@ -15,7 +16,7 @@ import 'tokens.dart';
 class NGlass extends StatefulWidget {
   const NGlass({
     super.key, required this.child, this.radius = NTokens.rCard,
-    this.accent = NTokens.violet, this.blur = 0, this.elevation = 1,
+    this.accent = NTokens.neutral, this.blur = 0, this.elevation = 1,
     this.padding = const EdgeInsets.all(16), this.onTap, this.tint,
   });
   final Widget child;
@@ -82,7 +83,7 @@ class GlassVideoScaffold extends StatefulWidget {
   const GlassVideoScaffold({
     super.key, required this.body, this.appBar, this.bottomBar,
     this.videoAsset = 'assets/video/7e4d709136dc254a_grok_video_2026-07-18-15-53-02_ubjx5b.mp4',
-    this.posterAsset, this.shapes = true, this.dim = .35,
+    this.posterAsset, this.shapes = false, this.dim = .35,
   });
   final Widget body;
   final PreferredSizeWidget? appBar;
@@ -100,7 +101,7 @@ class _GlassVideoScaffoldState extends State<GlassVideoScaffold> {
   void initState() {
     super.initState();
     final a = widget.videoAsset;
-    if (a != null && !NwsbEffects.instance.reduced) {
+    if (a != null && widget.dim < 0) { // never: AppBackdrop owns the video
       _c = VideoPlayerController.asset(a, videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true))
         ..setLooping(true)..setVolume(0)
         ..initialize().then((_) { if (mounted) { setState(() {}); _c!.play(); } });
@@ -111,7 +112,6 @@ class _GlassVideoScaffoldState extends State<GlassVideoScaffold> {
 
   @override
   Widget build(BuildContext context) {
-    final c = _c;
     return Scaffold(
       backgroundColor: NTokens.bgBottom,
       extendBodyBehindAppBar: true,
@@ -119,33 +119,13 @@ class _GlassVideoScaffoldState extends State<GlassVideoScaffold> {
       appBar: widget.appBar,
       bottomNavigationBar: widget.bottomBar,
       body: Stack(fit: StackFit.expand, children: [
-        const DecoratedBox(decoration: BoxDecoration(gradient: NTokens.bgGradient)),
-        if (widget.posterAsset != null && (c == null || !c.value.isInitialized))
-          Image.asset(widget.posterAsset!, fit: BoxFit.cover),
-        if (c != null && c.value.isInitialized)
-          RepaintBoundary(child: FittedBox(fit: BoxFit.cover, child: SizedBox(
-            width: c.value.size.width, height: c.value.size.height, child: VideoPlayer(c)))),
-        ColoredBox(color: NTokens.bgBottom.withValues(alpha: widget.dim)),
-        const _GlowOrbs(),
-        if (widget.shapes) const IgnorePointer(child: FloatingShapes()),
+        const NAppBackdrop(),
         SafeArea(bottom: false, child: widget.body),
       ]),
     );
   }
 }
 
-class _GlowOrbs extends StatelessWidget {
-  const _GlowOrbs();
-  @override
-  Widget build(BuildContext context) => IgnorePointer(child: Stack(children: [
-        _orb(const Alignment(-1.1, -0.8), NTokens.violet, 320),
-        _orb(const Alignment(1.2, 0.1), NTokens.pink, 260),
-        _orb(const Alignment(-0.6, 1.1), const Color(0xFF3B82F6), 300),
-      ]));
-  Widget _orb(Alignment a, Color c, double s) => Align(alignment: a, child: Container(
-      width: s, height: s, decoration: BoxDecoration(shape: BoxShape.circle,
-      gradient: RadialGradient(colors: [c.withValues(alpha: .45), c.withValues(alpha: 0)]))));
-}
 
 /// Floating 3D torus (pink) + capsule pills (mint), slow drift (8s loop).
 class FloatingShapes extends StatefulWidget {

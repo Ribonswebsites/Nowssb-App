@@ -5,6 +5,7 @@ library;
 import 'package:flutter/material.dart';
 
 import '../../../data/practice_progress.dart';
+import '../../../widgets/app_backdrop.dart';
 import 'progress_glass.dart';
 import 'progress_milestones.dart';
 import 'progress_motion.dart';
@@ -42,20 +43,23 @@ class ProgressView {
 }
 
 class ProgressNewScreen extends StatelessWidget {
-  const ProgressNewScreen({super.key, required this.load, this.view, this.onBack, this.onRetry, this.onStart});
+  const ProgressNewScreen({super.key, required this.load, this.view, this.onBack, this.onRetry, this.onStart, this.background});
   final ProgressLoad load;
   final ProgressView? view;
   final VoidCallback? onBack, onRetry, onStart;
+
+  /// Defaults to the app's own [AppBackdrop] (original background video /
+  /// saved still). Tests inject a still frame because video can't play there.
+  final Widget? background;
 
   @override
   Widget build(BuildContext context) {
     return Theme(
       data: ThemeData.dark(useMaterial3: true),
       child: Scaffold(
-        backgroundColor: PgColors.bg,
+        backgroundColor: Colors.black,
         body: Stack(fit: StackFit.expand, children: [
-          const PgAura(),
-          const PgFloaters(),
+          background ?? const AppBackdrop(),
           SafeArea(
             child: Column(children: [
               _Header(onBack: onBack),
@@ -72,7 +76,7 @@ class ProgressNewScreen extends StatelessWidget {
       case ProgressLoad.loading:
         return const Center(
           key: Key('pg-loading'),
-          child: CircularProgressIndicator(color: PgColors.lilac),
+          child: CircularProgressIndicator(color: Colors.white),
         );
       case ProgressLoad.error:
         return _Message(
@@ -96,7 +100,7 @@ class ProgressNewScreen extends StatelessWidget {
             onTap: onStart,
           );
         }
-        return _Ready(view: v, offline: load == ProgressLoad.offline);
+        return _Ready(view: v, offline: load == ProgressLoad.offline, onStart: onStart);
     }
   }
 }
@@ -125,21 +129,23 @@ class _Message extends StatelessWidget {
   final VoidCallback? onTap;
   @override
   Widget build(BuildContext context) => Center(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: PgGlass(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
             child: Column(mainAxisSize: MainAxisSize.min, children: [
-              Icon(icon, color: PgColors.lilac, size: 40),
+              const _CardTop(),
               const SizedBox(height: 12),
-              Text(title, textAlign: TextAlign.center, style: const TextStyle(color: PgColors.ink, fontSize: 18, fontWeight: FontWeight.w600)),
-              const SizedBox(height: 8),
-              Text(body, textAlign: TextAlign.center, style: const TextStyle(color: PgColors.sub)),
-              const SizedBox(height: 16),
-              FilledButton(
-                style: FilledButton.styleFrom(backgroundColor: PgColors.violet, foregroundColor: PgColors.bg),
-                onPressed: onTap,
-                child: Text(action),
+              _Circle(child: Icon(icon, color: Colors.white, size: 64)),
+              const SizedBox(height: 18),
+              PgPanel(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(title, style: _title),
+                  const SizedBox(height: 8),
+                  Text(body, style: _body),
+                  const SizedBox(height: 18),
+                  Align(alignment: Alignment.centerRight, child: PgCtaPill(label: action, onTap: onTap)),
+                ]),
               ),
             ]),
           ),
@@ -147,9 +153,44 @@ class _Message extends StatelessWidget {
       );
 }
 
+const _title = TextStyle(color: PgColors.ink, fontSize: 24, height: 1.15, fontWeight: FontWeight.w800);
+const _body = TextStyle(color: PgColors.sub, fontSize: 12.5, height: 1.4);
+const _label = TextStyle(color: PgColors.ink, fontWeight: FontWeight.w700);
+
+/// Status-bar-style top row with a heart, as in the reference card.
+class _CardTop extends StatelessWidget {
+  const _CardTop({this.text = 'NowssB'});
+  final String text;
+  @override
+  Widget build(BuildContext context) => Row(children: [
+        Text(text, style: const TextStyle(color: PgColors.sub, fontSize: 11, fontWeight: FontWeight.w600)),
+        const Spacer(),
+        const Icon(Icons.favorite_rounded, color: Colors.white, size: 16),
+      ]);
+}
+
+/// Big round "photo" slot near the top of the card. No new art: filled with
+/// real data (ring) or an existing Material icon.
+class _Circle extends StatelessWidget {
+  const _Circle({required this.child});
+  final Widget child;
+  @override
+  Widget build(BuildContext context) => Container(
+        width: 168,
+        height: 168,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: const Color(0x33FFFFFF),
+          border: Border.all(color: PgColors.edge),
+        ),
+        child: Center(child: child),
+      );
+}
+
 class _Ready extends StatelessWidget {
-  const _Ready({required this.view, required this.offline});
+  const _Ready({required this.view, required this.offline, this.onStart});
   final ProgressView view;
+  final VoidCallback? onStart;
   final bool offline;
 
   @override
@@ -170,34 +211,42 @@ class _Ready extends StatelessWidget {
             ]),
           ),
         ),
-      // Breathing orb; glow follows real weekly consistency.
-      PgEnter(index: 0, child: Center(child: PgOrb(intensity: v.weekPercent / 100))),
-      const SizedBox(height: 4),
-      // Hero: streak + weekly consistency ring.
-      PgGlass(
-        padding: const EdgeInsets.all(20),
-        child: Row(children: [
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Text('Current streak', style: TextStyle(color: PgColors.sub)),
-              PgCount(
-                  key: const Key('pg-streak'),
-                  value: v.streak,
-                  suffix: v.streak == 1 ? ' day' : ' days',
-                  style: const TextStyle(color: PgColors.ink, fontSize: 34, fontWeight: FontWeight.w700)),
-              const SizedBox(height: 6),
-              Text(v.todaySessions > 0 ? 'Practised today. Lovely.' : 'One calm practice keeps it going.',
-                  style: const TextStyle(color: PgColors.lilac)),
-            ]),
-          ),
-          Semantics(label: 'This week ${v.weekPercent} percent', child: PgRing(value: v.weekPercent / 100, label: '${v.weekPercent}%')),
-        ]),
+      PgEnter(
+        index: 0,
+        child: PgGlass(
+          padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+          child: Column(children: [
+            const _CardTop(text: 'This week'),
+            const SizedBox(height: 12),
+            Semantics(
+              label: 'This week ${v.weekPercent} percent',
+              child: _Circle(child: PgRing(value: v.weekPercent / 100, label: '${v.weekPercent}%', size: 150)),
+            ),
+            const SizedBox(height: 18),
+            PgPanel(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                PgCount(key: const Key('pg-streak'), value: v.streak, suffix: v.streak == 1 ? ' day' : ' days', style: _title),
+                const Text('Meditation streak', style: _title),
+                const SizedBox(height: 8),
+                Text(v.todaySessions > 0 ? 'Practised today. Lovely.' : 'One calm practice keeps it going.', style: _body),
+                const SizedBox(height: 16),
+                Row(children: [
+                  Text('${v.totalSessions} sessions', style: const TextStyle(color: PgColors.sub, fontSize: 12)),
+                  const Spacer(),
+                  PgDots(done: [for (final d in v.week.take(7)) d.done], current: v.week.indexWhere((d) => d.isToday)),
+                  const SizedBox(width: 12),
+                  PgPill(label: 'Practice', onTap: onStart),
+                ]),
+              ]),
+            ),
+          ]),
+        ),
       ),
       const SizedBox(height: 12),
       // Week strip.
       PgGlass(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('This week', style: TextStyle(color: PgColors.ink, fontWeight: FontWeight.w600)),
+          const Text('This week', style: _label),
           const SizedBox(height: 12),
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             for (var i = 0; i < v.week.length && i < 7; i++)
@@ -207,10 +256,10 @@ class _Ready extends StatelessWidget {
                   height: 30,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: v.week[i].done ? PgColors.violet : const Color(0x14FFFFFF),
-                    border: Border.all(color: v.week[i].isToday ? PgColors.lilac : Colors.transparent, width: 2),
+                    color: v.week[i].done ? Colors.white : const Color(0x1FFFFFFF),
+                    border: Border.all(color: v.week[i].isToday ? Colors.white : Colors.transparent, width: 2),
                   ),
-                  child: v.week[i].done ? const Icon(Icons.check_rounded, size: 16, color: PgColors.bg) : null,
+                  child: v.week[i].done ? const Icon(Icons.check_rounded, size: 16, color: PgColors.pillInk) : null,
                 ),
                 const SizedBox(height: 4),
                 Text(days[i], style: const TextStyle(color: PgColors.sub, fontSize: 12)),
@@ -236,11 +285,11 @@ class _Ready extends StatelessWidget {
         const SizedBox(height: 12),
         PgGlass(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const Text('Recent practice', style: TextStyle(color: PgColors.ink, fontWeight: FontWeight.w600)),
+            const Text('Recent practice', style: _label),
             const SizedBox(height: 8),
             Wrap(spacing: 8, runSpacing: 8, children: [
               for (final w in v.recent)
-                Chip(label: Text(w), backgroundColor: const Color(0x1AFFFFFF), side: const BorderSide(color: PgColors.edge)),
+                Chip(label: Text(w), backgroundColor: const Color(0x26FFFFFF), side: const BorderSide(color: PgColors.edge)),
             ]),
           ]),
         ),

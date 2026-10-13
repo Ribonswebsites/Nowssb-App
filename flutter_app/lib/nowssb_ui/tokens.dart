@@ -4,13 +4,13 @@ import 'package:flutter/material.dart';
 
 class NTokens {
   NTokens._();
-  // Background (deep indigo-violet)
-  static const bgTop = Color(0xFF2A1B6B);
-  static const bgMid = Color(0xFF3B2A9A);
-  static const bgBottom = Color(0xFF120B3A);
+  // Background: neutral. Pages show the app's original AppBackdrop video.
+  static const bgTop = Color(0xFF101114);
+  static const bgMid = Color(0xFF0C0D10);
+  static const bgBottom = Color(0xFF08090B);
   static const bgGradient = LinearGradient(
     begin: Alignment.topLeft, end: Alignment.bottomRight,
-    colors: [Color(0xFF4B2A9E), bgMid, bgBottom],
+    colors: [bgTop, bgMid, bgBottom],
   );
   // Glass
   static const glassTop = Color(0x38FFFFFF); // 22%
@@ -22,6 +22,8 @@ class NTokens {
   static const violetTint = Color(0x339C7BFF);
   // Accents
   static const violet = Color(0xFF8B5CF6);
+  /// Neutral default accent for kit glass (no violet cast).
+  static const neutral = Color(0xFFFFFFFF);
   static const indigoBtn = Color(0xFF6D4CFF);
   static const pink = Color(0xFFE879F9); // torus
   static const mint = Color(0xFF7FE7D6); // pill shape
@@ -50,7 +52,8 @@ class NTokens {
 
   static List<BoxShadow> glow(Color accent, [double e = 1]) => [
         BoxShadow(color: accent.withValues(alpha: .35 * e), blurRadius: 30 * e, spreadRadius: -4),
-        BoxShadow(color: Colors.black.withValues(alpha: .28), blurRadius: 24, offset: const Offset(0, 14)),
+        // Soft, inset-spread drop shadow so it never shows as a dark band through translucent glass.
+        BoxShadow(color: Colors.black.withValues(alpha: .16), blurRadius: 28, spreadRadius: -10, offset: const Offset(0, 12)),
       ];
 }
 

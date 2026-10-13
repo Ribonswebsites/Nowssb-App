@@ -50,7 +50,7 @@ import '../admin/layout/layout_sections.dart';
 import '../features/programs/program_cards.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../pages/profile/new_profile_page.dart';
-import '../pages/profile/profile_flag.dart';
+import '../kit/feature_flags.dart';
 
 const _accent = Color(0xFFE3BD7D);
 const _pBg = Colors.black;
@@ -86,13 +86,14 @@ const kDefaultAvatar =
 /// Progress as a pushed route; this widget must never return Progress as its
 /// own body (that made Profile and Progress feel identical).
 /// Entry point. Shows the rebuilt page when `newui_profile` is on
-/// (admins always; users only once Ribon flips the flag), else the old page.
+/// (shared kit flags: admins, or config/app.flags.newui_profile), else the old page.
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context) => ProfileFlagGate(
-        newUi: (_) => const NewProfilePage(),
+  Widget build(BuildContext context) => NewUiGate(
+        page: 'profile',
+        rebuilt: (_) => const NewProfilePage(),
         legacy: (_) => const LegacyProfileScreen(),
       );
 }
