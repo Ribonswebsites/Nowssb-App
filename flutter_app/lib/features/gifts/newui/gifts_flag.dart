@@ -1,12 +1,5 @@
-import '../../../admin/admin_state.dart';
-import '../../../data/app_control.dart';
+import '../../../kit/kit.dart';
 
-/// Feature flag for the rebuilt Gifts page: `newui_gifts`.
-/// OFF for users by default, ON for admin accounts, unless the console
-/// sets the key explicitly (config flags map, read by [AppControl]).
-bool newUiGiftsEnabled({bool? override}) {
-  if (override != null) return override;
-  final set = AppControl.instance.flags['newui_gifts'];
-  if (set != null) return set;
-  return AdminState.instance.isAdmin;
-}
+/// `newui_gifts` through the shared kit ([NewUi]): debug override →
+/// remote `config/app.flags.newui_gifts` → admins on → everyone else off.
+bool newUiGiftsEnabled({bool? override}) => override ?? NewUi.isOn('gifts');

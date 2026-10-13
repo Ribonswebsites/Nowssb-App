@@ -188,32 +188,3 @@ class GiftsReveal extends StatelessWidget {
     );
   }
 }
-
-/// Coin balance chip (top-right, spec 23.6): gold lotus coin + balance.
-class GiftsCoinChip extends StatelessWidget {
-  const GiftsCoinChip({super.key, required this.coins, this.onTap});
-  final int coins;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) => Semantics(
-        button: true,
-        label: '$coins coins',
-        excludeSemantics: true,
-        child: InkWell(
-          key: const Key('gifts.coins'),
-          borderRadius: BorderRadius.circular(20),
-          onTap: onTap,
-          child: GiftsGlass(
-            radius: 20,
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            tint: GiftsPalette.amber,
-            child: Row(mainAxisSize: MainAxisSize.min, children: [
-              const Icon(Icons.spa_rounded, color: GiftsPalette.amber, size: 16),
-              const SizedBox(width: 5),
-              Text('$coins', style: const TextStyle(color: GiftsPalette.text, fontWeight: FontWeight.w700, fontSize: 13)),
-            ]),
-          ),
-        ),
-      );
-}

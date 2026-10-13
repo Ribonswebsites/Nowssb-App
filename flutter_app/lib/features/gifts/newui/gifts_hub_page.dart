@@ -3,6 +3,8 @@ import 'dart:io' show SocketException;
 
 import 'package:flutter/material.dart';
 
+import '../../../kit/kit.dart';
+import '../../../nowssb_ui/nowssb_ui.dart';
 import '../../economy/economy_api.dart';
 import '../gift_unwrap.dart';
 import '../gifts_screen.dart';
@@ -89,15 +91,17 @@ class _GiftsNewUiPageState extends State<GiftsNewUiPage> {
 
   Future<void> _load() async {
     setState(() => _error = null);
-    try {
-      await EconomyApi.call('summary');
-    } catch (e) {
-      if (mounted && !GiftBook.instance.ready) setState(() => _error = e);
-    }
+    // Kit refresh swallows errors; an empty summary afterwards means it failed.
+    await CoinsRepository.refresh();
+    if (mounted && !GiftBook.instance.ready) setState(() => _error = 'load');
   }
 
   Future<String> _redeem(String code) async {
-    final r = await EconomyApi.call('redeemGift', {'code': code});
+    final res = await GiftsRepository.redeemGift({'code': code});
+    final r = switch (res) {
+      KitOk(:final value) => value,
+      KitErr(:final message) => throw EconomyException(message),
+    };
     if (mounted) {
       final g = r['granted'];
       unawaited(GiftUnwrapMoment.show(context, title: '${r['title'] ?? 'A gift for you'}', items: g is Map ? [Map<String, dynamic>.from(g)] : const []));
@@ -145,21 +149,20 @@ class GiftsHubView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: GiftsPalette.bgBottom,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        foregroundColor: GiftsPalette.text,
-        elevation: 0,
-        title: const Text('NowssB Gifts'),
+    return GlassVideoScaffold(
+      shapes: animate,
+      // Video off when motion is off (tests, reduced effects handled by the kit).
+      videoAsset: animate ? 'assets/video/7e4d709136dc254a_grok_video_2026-07-18-15-53-02_ubjx5b.mp4' : null,
+      appBar: GlassTopBar(
+        title: 'NowssB Gifts',
         actions: [
-          if (snapshot.load == GiftsLoad.ready || snapshot.load == GiftsLoad.empty) Center(child: GiftsCoinChip(coins: snapshot.coins, onTap: onCoins)),
-          IconButton(tooltip: 'How gifts work', icon: const Icon(Icons.help_outline_rounded), onPressed: () => _showHelp(context)),
+          if (snapshot.load == GiftsLoad.ready || snapshot.load == GiftsLoad.empty)
+            CoinChip(key: const Key('gifts.coins'), balance: '${snapshot.coins}', onTap: onCoins),
+          IconButton(tooltip: 'How gifts work', icon: const Icon(Icons.help_outline_rounded, color: Colors.white), onPressed: () => _showHelp(context)),
         ],
       ),
-      extendBodyBehindAppBar: true,
-      body: GiftsBackdrop(
-        child: SafeArea(
+      body: Builder(
+        builder: (context) => SafeArea(
           child: _AutoOpen(
             open: initialTab == 'redeem' && snapshot.load == GiftsLoad.ready,
             onOpen: _showRedeem,
@@ -173,28 +176,23 @@ class GiftsHubView extends StatelessWidget {
   Widget _body(BuildContext context) {
     switch (snapshot.load) {
       case GiftsLoad.loading:
-        return const Center(child: CircularProgressIndicator(key: Key('gifts.loading'), color: GiftsPalette.pink));
+        return ListView(
+            key: const Key('gifts.loading'),
+            padding: const EdgeInsets.all(16),
+            children: const [GlassSkeleton(height: 150), SizedBox(height: 14), GlassSkeleton(height: 80), SizedBox(height: 14), GlassSkeleton(height: 160)]);
       case GiftsLoad.error:
       case GiftsLoad.offline:
         final off = snapshot.load == GiftsLoad.offline;
         return Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
-            child: GiftsGlass(
-              child: Column(mainAxisSize: MainAxisSize.min, children: [
-                Icon(off ? Icons.wifi_off_rounded : Icons.cloud_off_rounded, color: GiftsPalette.soft, size: 40),
-                const SizedBox(height: 12),
-                Text(off ? 'You are offline.' : 'Gifts did not load.',
-                    key: Key(off ? 'gifts.offline' : 'gifts.error'),
-                    style: const TextStyle(color: GiftsPalette.text, fontSize: 16, fontWeight: FontWeight.w700)),
-                const SizedBox(height: 6),
-                Text(off ? 'Connect, then try again.' : 'Please try again.', style: const TextStyle(color: GiftsPalette.soft)),
-                const SizedBox(height: 14),
-                FilledButton(
-                    onPressed: onRetry,
-                    style: FilledButton.styleFrom(backgroundColor: GiftsPalette.pink, foregroundColor: GiftsPalette.bgBottom),
-                    child: const Text('Try again')),
-              ]),
+            child: GlassStateCard(
+              key: Key(off ? 'gifts.offline' : 'gifts.error'),
+              icon: off ? Icons.wifi_off_rounded : Icons.cloud_off_rounded,
+              title: off ? 'You are offline.' : 'Gifts did not load.',
+              message: off ? 'Connect, then try again.' : 'Please try again.',
+              action: 'Try again',
+              onAction: onRetry,
             ),
           ),
         );
@@ -219,7 +217,7 @@ class GiftsHubView extends StatelessWidget {
     }
   }
 
-  Widget _hero(BuildContext context) => GiftsGlass(
+  Widget _hero(BuildContext context) => NGlass(
         padding: const EdgeInsets.fromLTRB(18, 22, 18, 18),
         child: Row(children: [
           GiftsHeroScene(size: 96, animate: animate),
@@ -245,17 +243,25 @@ class GiftsHubView extends StatelessWidget {
         ]),
       );
 
-  Widget _shortcuts(BuildContext context) => Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        GiftsShortcut(icon: Icons.shopping_bag_rounded, label: 'Buy a gift', onTap: () => _showBuy(context)),
-        GiftsShortcut(icon: Icons.self_improvement_rounded, label: 'Free gifts', color: GiftsPalette.teal, onTap: () => _showHelp(context)),
-        GiftsShortcut(icon: Icons.inventory_2_rounded, label: 'My gifts', color: GiftsPalette.violet, onTap: () => _openMyGifts(context)),
-        GiftsShortcut(icon: Icons.redeem_rounded, label: 'Redeem', color: GiftsPalette.amber, onTap: () => _showRedeem(context)),
-      ]);
+  Widget _shortcuts(BuildContext context) => ShortcutTileRow(
+        items: const [
+          (Icons.shopping_bag_rounded, 'Buy a gift'),
+          (Icons.self_improvement_rounded, 'Free gifts'),
+          (Icons.inventory_2_rounded, 'My gifts'),
+          (Icons.redeem_rounded, 'Redeem'),
+        ],
+        onTap: (i) => switch (i) {
+          0 => _showBuy(context),
+          1 => _showHelp(context),
+          2 => _openMyGifts(context),
+          _ => _showRedeem(context),
+        },
+      );
 
   Widget _freeProgress() {
     final p = (snapshot.minutesToday / snapshot.minutesTarget).clamp(0.0, 1.0);
     final left = (snapshot.minutesTarget - snapshot.minutesToday).clamp(0, snapshot.minutesTarget);
-    return GiftsGlass(
+    return NGlass(
       tint: GiftsPalette.teal,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         const Text('Free gifts by daily time spent', style: TextStyle(color: GiftsPalette.text, fontWeight: FontWeight.w700)),
@@ -283,7 +289,8 @@ class GiftsHubView extends StatelessWidget {
           separatorBuilder: (_, __) => const SizedBox(width: 10),
           itemBuilder: (_, i) => SizedBox(
             width: 140,
-            child: GiftTile(title: items[i].label, caption: 'Price shown in your currency at checkout', color: color, validTill: 'Send gift', onTap: () => onBuy(items[i].id)),
+            child: GiftsCardTile(
+                title: items[i].label, caption: 'Price shown in your currency at checkout', color: color, footer: 'Send gift', onTap: () => onBuy(items[i].id)),
           ),
         ),
       ),
@@ -292,7 +299,7 @@ class GiftsHubView extends StatelessWidget {
 
   Widget _myGiftsPreview(BuildContext context) {
     if (snapshot.entries.isEmpty) {
-      return GiftsGlass(
+      return NGlass(
         key: const Key('gifts.empty'),
         child: Column(children: [
           const Icon(Icons.card_giftcard_rounded, color: GiftsPalette.soft, size: 34),
@@ -311,14 +318,14 @@ class GiftsHubView extends StatelessWidget {
     ]);
   }
 
-  void _openMyGifts(BuildContext context) => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => GiftsMineView(entries: snapshot.entries)));
+  void _openMyGifts(BuildContext context) => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => GiftsMineView(entries: snapshot.entries, animate: animate)));
 
-  Future<void> _showBuy(BuildContext context) => showModalBottomSheet<void>(
-        context: context,
-        backgroundColor: Colors.transparent,
+  Future<void> _showBuy(BuildContext context) => showGlassSheet<void>(
+        context,
+        accent: GiftsPalette.pink,
         builder: (c) => Padding(
           padding: const EdgeInsets.all(12),
-          child: GiftsGlass(
+          child: NGlass(
             child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
               const Text('Pick a gift', style: TextStyle(color: GiftsPalette.text, fontSize: 18, fontWeight: FontWeight.w800)),
               const SizedBox(height: 4),
@@ -342,19 +349,18 @@ class GiftsHubView extends StatelessWidget {
         ),
       );
 
-  Future<void> _showRedeem(BuildContext context) => showModalBottomSheet<void>(
-        context: context,
-        isScrollControlled: true,
-        backgroundColor: Colors.transparent,
+  Future<void> _showRedeem(BuildContext context) => showGlassSheet<void>(
+        context,
+        accent: GiftsPalette.amber,
         builder: (_) => GiftsRedeemSheet(onRedeem: onRedeem),
       );
 
-  void _showHelp(BuildContext context) => showModalBottomSheet<void>(
-        context: context,
-        backgroundColor: Colors.transparent,
+  void _showHelp(BuildContext context) => showGlassSheet<void>(
+        context,
+        accent: GiftsPalette.pink,
         builder: (_) => Padding(
           padding: const EdgeInsets.all(12),
-          child: GiftsGlass(
+          child: NGlass(
             child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
               const Text('How gifts work', style: TextStyle(color: GiftsPalette.text, fontSize: 18, fontWeight: FontWeight.w800)),
               const SizedBox(height: 10),
@@ -374,8 +380,9 @@ class GiftsHubView extends StatelessWidget {
 
 /// My gifts: received / sent / expired, 2-column grid, expired greyed.
 class GiftsMineView extends StatelessWidget {
-  const GiftsMineView({super.key, required this.entries});
+  const GiftsMineView({super.key, required this.entries, this.animate = true});
   final List<GiftsEntry> entries;
+  final bool animate;
 
   @override
   Widget build(BuildContext context) {
@@ -386,39 +393,53 @@ class GiftsMineView extends StatelessWidget {
     ];
     return DefaultTabController(
       length: tabs.length,
-      child: Scaffold(
-        backgroundColor: GiftsPalette.bgBottom,
-        appBar: AppBar(
-          backgroundColor: GiftsPalette.bgTop,
-          foregroundColor: GiftsPalette.text,
-          title: const Text('My gifts'),
-          bottom: TabBar(
-              indicatorColor: GiftsPalette.pink,
-              labelColor: GiftsPalette.text,
-              unselectedLabelColor: GiftsPalette.soft,
-              tabs: [for (final t in tabs) Tab(text: t.$1)]),
-        ),
-        body: GiftsBackdrop(
-          child: TabBarView(children: [
-            for (final t in tabs)
-              t.$2.isEmpty
-                  ? const Center(child: Text('Nothing here yet.', style: TextStyle(color: GiftsPalette.soft)))
-                  : GridView.count(
-                      padding: const EdgeInsets.all(16),
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 12,
-                      crossAxisSpacing: 12,
-                      childAspectRatio: .95,
-                      children: [
-                        for (final e in t.$2)
-                          GiftTile(
-                            title: e.title,
-                            caption: e.note.isEmpty ? (e.direction == 'sent' ? 'You sent this' : 'A gift for you') : e.note,
-                            validTill: e.status == 'redeemed' ? 'Opened' : (e.expired ? '' : 'Not opened'),
-                            expired: e.expired,
-                          ),
-                      ],
-                    ),
+      child: GlassVideoScaffold(
+        shapes: animate,
+        videoAsset: null, // one video per screen stack: the hub already plays it
+        appBar: const GlassTopBar(title: 'My gifts'),
+        body: SafeArea(
+          child: Column(children: [
+            const SizedBox(height: 70),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: NGlass(
+                radius: NTokens.rPill,
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: TabBar(
+                    indicatorColor: GiftsPalette.pink,
+                    labelColor: GiftsPalette.text,
+                    unselectedLabelColor: GiftsPalette.soft,
+                    dividerColor: Colors.transparent,
+                    tabs: [for (final t in tabs) Tab(text: t.$1)]),
+              ),
+            ),
+            Expanded(
+              child: TabBarView(children: [
+                for (final t in tabs)
+                  t.$2.isEmpty
+                      ? const Center(
+                          child: Padding(
+                              padding: EdgeInsets.all(24),
+                              child:
+                                  GlassStateCard(icon: Icons.redeem_rounded, title: 'Nothing here yet.', message: 'Gifts show here when you send or get one.')))
+                      : GridView.count(
+                          padding: const EdgeInsets.all(16),
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 12,
+                          crossAxisSpacing: 12,
+                          childAspectRatio: .95,
+                          children: [
+                            for (final e in t.$2)
+                              GiftsCardTile(
+                                title: e.title,
+                                caption: e.note.isEmpty ? (e.direction == 'sent' ? 'You sent this' : 'A gift for you') : e.note,
+                                footer: e.status == 'redeemed' ? 'Opened' : (e.expired ? '' : 'Not opened'),
+                                expired: e.expired,
+                              ),
+                          ],
+                        ),
+              ]),
+            ),
           ]),
         ),
       ),
@@ -466,7 +487,7 @@ class _GiftsRedeemSheetState extends State<GiftsRedeemSheet> {
   @override
   Widget build(BuildContext context) => Padding(
         padding: EdgeInsets.fromLTRB(12, 12, 12, 12 + MediaQuery.of(context).viewInsets.bottom),
-        child: GiftsGlass(
+        child: NGlass(
           child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             const Text('Redeem a gift', style: TextStyle(color: GiftsPalette.text, fontSize: 18, fontWeight: FontWeight.w800)),
             const SizedBox(height: 10),

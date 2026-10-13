@@ -86,7 +86,7 @@ void main() {
       GiftsEntry(title: 'Basic', note: '', direction: 'sent', status: 'active'),
       GiftsEntry(title: 'Old', note: '', direction: 'received', status: 'expired'),
     ];
-    await t.pumpWidget(const MaterialApp(home: GiftsMineView(entries: entries)));
+    await t.pumpWidget(const MaterialApp(home: GiftsMineView(entries: entries, animate: false)));
     expect(find.text('From Asha'), findsOneWidget);
     await t.tap(find.text('Expired'));
     await t.pumpAndSettle();
