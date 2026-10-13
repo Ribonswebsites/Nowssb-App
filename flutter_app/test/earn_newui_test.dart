@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nowssb/features/earn/newui/earn_newui_page.dart';
 import 'package:nowssb/features/earn/newui/earn_newui_screen.dart';
+import 'package:nowssb/features/earn/newui/earn_downline_page.dart';
+import 'package:nowssb/kit/data_layer.dart';
 import 'package:nowssb/features/earn/newui/earn_view_data.dart';
 
 Widget _wrap(Widget w) => MaterialApp(
@@ -12,6 +14,12 @@ Widget _wrap(Widget w) => MaterialApp(
       home: w,
     );
 
+const _team = [
+  EarnTeamMember(id: 'a', name: 'Asha', rank: 'Officer', words: 12),
+  EarnTeamMember(id: 'b', name: 'Ben'),
+  EarnTeamMember(id: 'c', name: 'Cy', level: 2),
+];
+
 void main() {
   group('EarnViewData', () {
     test('targets follow 100/500/1000/2000', () {
@@ -21,9 +29,34 @@ void main() {
       expect(const EarnViewData(wordsSold: 2000).nextTarget, isNull);
       expect(const EarnViewData(wordsSold: 2000).targetProgress, 1);
     });
-    test('rank index maps ladder, unknown is 0', () {
-      expect(const EarnViewData(rank: 'Executive Officer').rankIndex, 2);
-      expect(const EarnViewData(rank: 'Seller').rankIndex, 0);
+    test('medal follows server metal, unknown is Bronze', () {
+      expect(const EarnViewData(metal: 'Gold').rankIndex, 2);
+      expect(const EarnViewData(metal: '').rankIndex, 0);
+    });
+    test('fromSummary maps server reply honestly', () {
+      final d = EarnViewData.fromSummary({
+        'standing': {'title': 'Officer', 'metal': 'Silver', 'ratePct': 22},
+        'words': 140,
+        'targets': [{'words': 500}, {'words': 100}],
+        'team': [
+          {'uid': 'a', 'name': 'Asha', 'level': 1, 'words': 12},
+          {'uid': 'b', 'name': 'Ben', 'level': 2},
+          {'uid': 'c', 'name': 'Cy', 'level': 7},
+        ],
+      });
+      expect(d.load, EarnLoad.ready);
+      expect(d.rank, 'Officer');
+      expect(d.ratePct, 22);
+      expect(d.targets, [100, 500]);
+      expect(d.nextTarget, 500);
+      expect(d.teamSize, 3);
+      expect(d.team.last.level, 2); // capped at 2 levels
+    });
+    test('fresh agent is empty; errors map to states', () {
+      expect(EarnViewData.fromSummary({}).load, EarnLoad.empty);
+      expect(EarnViewData.fromError(const KitErr('x', code: 'offline')).load, EarnLoad.offline);
+      expect(EarnViewData.fromError(const KitErr('x', code: 'unauthenticated')).load, EarnLoad.empty);
+      expect(EarnViewData.fromError(const KitErr('Boom')).errorMessage, 'Boom');
     });
   });
 
@@ -63,7 +96,7 @@ void main() {
   testWidgets('ready shows rank, stats, progress and task taps', (t) async {
     var earnings = 0;
     await t.pumpWidget(_wrap(EarnNewUiPage(
-      data: const EarnViewData(load: EarnLoad.ready, signedIn: true, rank: 'Officer', ratePct: 20, wordsSold: 120, teamSize: 3),
+      data: const EarnViewData(load: EarnLoad.ready, signedIn: true, rank: 'Officer', metal: 'Silver', ratePct: 20, wordsSold: 120, team: _team),
       actions: EarnActions(onEarnings: () => earnings++),
     )));
     expect(find.text('Officer'), findsOneWidget);
@@ -89,11 +122,25 @@ void main() {
     expect(find.textContaining('Join as an agent'), findsOneWidget);
   });
 
-  testWidgets('gate shows legacy when flag off, new when on', (t) async {
-    await t.pumpWidget(_wrap(const EarnNewUiGate(legacy: Text('legacy'), newUi: Text('new'), debugOverride: false)));
-    expect(find.text('legacy'), findsOneWidget);
-    await t.pumpWidget(_wrap(const EarnNewUiGate(legacy: Text('legacy'), newUi: Text('new'), debugOverride: true)));
-    expect(find.text('new'), findsOneWidget);
+  testWidgets('screen loads through EarnRepository result', (t) async {
+    await t.pumpWidget(_wrap(EarnNewUiScreen(load: () async => const KitErr('x', code: 'offline'))));
+    await t.pump();
+    expect(find.byKey(const Key('earn-offline')), findsOneWidget);
+  });
+
+  testWidgets('downline empty state', (t) async {
+    await t.pumpWidget(_wrap(const EarnDownlinePage(data: EarnViewData(load: EarnLoad.ready))));
+    expect(find.byKey(const Key('earn-team-empty')), findsOneWidget);
+  });
+
+  testWidgets('downline shows 2 levels and node stats', (t) async {
+    await t.pumpWidget(_wrap(const EarnDownlinePage(data: EarnViewData(load: EarnLoad.ready, team: _team))));
+    await t.pump();
+    expect(find.text('2 direct · 1 through your team'), findsOneWidget);
+    await t.tap(find.byKey(const Key('earn-node-a')));
+    await t.pumpAndSettle();
+    expect(find.text('Asha'), findsOneWidget);
+    expect(find.text('12'), findsOneWidget);
   });
 
   testWidgets('honesty note shows on ready', (t) async {
@@ -104,7 +151,7 @@ void main() {
 
   testWidgets('with motion on, numbers count up to real values', (t) async {
     await t.pumpWidget(const MaterialApp(
-      home: EarnNewUiPage(data: EarnViewData(load: EarnLoad.ready, signedIn: true, ratePct: 20, wordsSold: 120, teamSize: 3)),
+      home: EarnNewUiPage(data: EarnViewData(load: EarnLoad.ready, signedIn: true, ratePct: 20, wordsSold: 120, team: _team)),
     ));
     await t.pump(const Duration(milliseconds: 100));
     expect(find.text('120'), findsNothing);

@@ -1,74 +1,29 @@
-import 'dart:io';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import '../../../data/app_control.dart';
+import '../../../kit/app_routes.dart';
+import '../../../kit/data_layer.dart';
 import '../../../widgets/referral_share_sheet.dart';
 import '../../economy/economy_api.dart';
-import '../earnings_screen.dart';
+import 'earn_downline_page.dart';
 import 'earn_newui_page.dart';
 import 'earn_view_data.dart';
 
-/// Feature flag key (rules: `newui_<page>`, OFF for users, ON for admins).
-const kEarnNewUiFlag = 'newui_earn';
+/// Flag page key: `newui_earn` (see kit/feature_flags.dart).
+const kEarnNewUiPage = 'earn';
 
-/// Shows [newUi] when `newui_earn` is on or the account is an admin,
-/// otherwise the live [legacy] page. [debugOverride] is for tests.
-class EarnNewUiGate extends StatefulWidget {
-  const EarnNewUiGate({super.key, required this.legacy, required this.newUi, this.debugOverride});
-  final Widget legacy;
-  final Widget newUi;
-  final bool? debugOverride;
-
-  @override
-  State<EarnNewUiGate> createState() => _EarnNewUiGateState();
-}
-
-class _EarnNewUiGateState extends State<EarnNewUiGate> {
-  bool _admin = false;
-
-  @override
-  void initState() {
-    super.initState();
-    if (widget.debugOverride == null) _checkAdmin();
-  }
-
-  Future<void> _checkAdmin() async {
-    try {
-      final u = FirebaseAuth.instance.currentUser;
-      if (u == null) return;
-      final s = await FirebaseFirestore.instance.collection('admins').doc(u.uid).get();
-      if (mounted && s.exists) setState(() => _admin = true);
-    } catch (_) {}
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final o = widget.debugOverride;
-    if (o != null) return o ? widget.newUi : widget.legacy;
-    return ListenableBuilder(
-      listenable: AppControl.instance,
-      builder: (_, __) {
-        final on = _admin || AppControl.instance.flag(kEarnNewUiFlag, fallback: false);
-        return on ? widget.newUi : widget.legacy;
-      },
-    );
-  }
-}
-
-/// Connects [EarnNewUiPage] to the live economy data.
+/// Loads the hub from the shared [EarnRepository] and wires taps to [AppRoutes].
 class EarnNewUiScreen extends StatefulWidget {
-  const EarnNewUiScreen({super.key});
+  const EarnNewUiScreen({super.key, this.load});
+
+  /// Test seam; defaults to [EarnRepository.summary].
+  final Future<KitResult<Json>> Function()? load;
 
   @override
   State<EarnNewUiScreen> createState() => _EarnNewUiScreenState();
 }
 
 class _EarnNewUiScreenState extends State<EarnNewUiScreen> {
-  EarnLoad _load = EarnLoad.loading;
-  String _error = '';
+  EarnViewData _data = const EarnViewData();
 
   @override
   void initState() {
@@ -77,60 +32,34 @@ class _EarnNewUiScreenState extends State<EarnNewUiScreen> {
   }
 
   Future<void> _fetch() async {
-    setState(() => _load = EarnLoad.loading);
-    final m = EconomyMirror.instance;
-    if (m.uid == null) {
-      setState(() => _load = EarnLoad.empty);
-      return;
-    }
-    try {
-      await EconomyApi.call('summary');
-      if (!mounted) return;
-      setState(() => _load = EarnLoad.ready);
-    } on SocketException {
-      if (mounted) setState(() => _load = EarnLoad.offline);
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _load = EarnLoad.error;
-          _error = '';
-        });
-      }
-    }
+    setState(() => _data = const EarnViewData());
+    final r = await (widget.load ?? EarnRepository.summary)();
+    if (!mounted) return;
+    setState(() {
+      _data = switch (r) {
+        KitOk(:final value) => EarnViewData.fromSummary(value, code: EconomyMirror.instance.code),
+        KitErr() => EarnViewData.fromError(r),
+      };
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: EconomyMirror.instance,
-      builder: (context, _) {
-        final m = EconomyMirror.instance;
-        final st = m.summary['earn'];
-        final rate = st is Map ? (st['ratePct'] as num?)?.round() ?? 0 : 0;
-        var data = EarnViewData(
-          load: _load,
-          signedIn: m.uid != null,
-          rank: m.sellerTier,
-          ratePct: rate,
-          wordsSold: m.wordsSold,
-          teamSize: m.paidReferrals,
-          cashCents: m.cash,
-          code: m.code,
-          errorMessage: _error,
-        );
-        if (_load == EarnLoad.ready && data.isFresh) {
-          data = EarnViewData(load: EarnLoad.empty, signedIn: true, code: m.code);
-        }
-        return EarnNewUiPage(
-          data: data,
-          actions: EarnActions(
-            onRetry: _fetch,
-            onHelp: () => showEarnHowItWorks(context),
-            onEarnings: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarningsScreen())),
-            onShareCode: m.code.isEmpty ? null : () => showReferralShareSheet(context, code: m.code),
-          ),
-        );
-      },
+    final d = _data;
+    return EarnNewUiPage(
+      data: d,
+      actions: EarnActions(
+        onRetry: _fetch,
+        onSignIn: _fetch,
+        onHelp: () => showEarnHowItWorks(context),
+        onEarnings: () => AppRoutes.open(context, AppPage.earnings, source: 'earn.newui'),
+        onTeam: () => Navigator.of(context).push(MaterialPageRoute<void>(
+          settings: const RouteSettings(name: '/earn/downline'),
+          builder: (_) => EarnDownlinePage(data: d),
+        )),
+        onTask: (_) => AppRoutes.open(context, AppPage.storeWords, source: 'earn.newui'),
+        onShareCode: d.code.isEmpty ? null : () => showReferralShareSheet(context, code: d.code),
+      ),
     );
   }
 }
