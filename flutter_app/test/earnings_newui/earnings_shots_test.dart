@@ -64,9 +64,9 @@ void main() {
     }
     if (sheet) {
       await t.drag(find.byType(PageView), const Offset(-300, 0));
-      await t.pump(const Duration(milliseconds: 600));
+      await t.pumpAndSettle();
       await t.tap(find.text('Next').hitTestable().first);
-      await t.pump(const Duration(milliseconds: 400));
+      await t.pumpAndSettle();
       await t.tap(find.byKey(const ValueKey('country-DE')));
       await t.pump(const Duration(milliseconds: 300));
     }

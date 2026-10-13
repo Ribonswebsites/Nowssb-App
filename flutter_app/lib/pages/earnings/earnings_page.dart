@@ -105,7 +105,7 @@ class _EarningsNewUiPageState extends State<EarningsNewUiPage> {
     final kinds = [null, EarningKind.sale, EarningKind.commission, EarningKind.payout];
     final rows = d.rows.where((r) => kinds[_filter] == null || r.kind == kinds[_filter]).toList();
     return ListView(key: const ValueKey('earnings-ready'), padding: const EdgeInsets.fromLTRB(0, 60, 0, 32), children: [
-      SizedBox(height: 420, child: PageView.builder(controller: _pager, itemCount: cards.length,
+      SizedBox(height: 480, child: PageView.builder(controller: _pager, itemCount: cards.length,
           onPageChanged: (i) => setState(() => _page = i),
           itemBuilder: (_, i) {
             final c = cards[i];

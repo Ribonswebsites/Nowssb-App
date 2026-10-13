@@ -30,11 +30,15 @@ const ready = EarningsData(status: EarningsStatus.ready, balanceCents: 4250, row
 ]);
 
 Widget app(EarningsData d, PayoutProvider p) => MaterialApp(home: MediaQuery(
-    data: const MediaQueryData(size: Size(390, 844), disableAnimations: true),
+    data: const MediaQueryData(size: Size(390, 2400), disableAnimations: true),
     child: EarningsNewUiPage(data: d, provider: p, money: fmt, background: const ColoredBox(color: Colors.black))));
 
 void main() {
   setUp(NewUi.resetForTest);
+  Future<void> tall(WidgetTester t) async {
+    await t.binding.setSurfaceSize(const Size(390, 2400));
+    addTearDown(() => t.binding.setSurfaceSize(null));
+  }
 
   test('flag is on by default for everyone', () {
     expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: null)), isTrue);
@@ -45,6 +49,7 @@ void main() {
     expect(find.byKey(const ValueKey('earnings-loading')), findsOneWidget);
   });
   testWidgets('empty', (t) async {
+    await tall(t);
     await t.pumpWidget(app(const EarningsData(status: EarningsStatus.empty), FakeProvider()));
     expect(find.text('No earnings yet'), findsOneWidget);
   });
@@ -57,12 +62,15 @@ void main() {
     expect(find.text('Sign in to see earnings'), findsOneWidget);
   });
   testWidgets('ready: kit MeditationCard, local currency, no INR, filter', (t) async {
+    await tall(t);
     await t.pumpWidget(app(ready, FakeProvider()));
     expect(find.byType(MeditationCard), findsWidgets);
     expect(find.textContaining('€42.50'), findsOneWidget);
     expect(find.textContaining('₹'), findsNothing);
     expect(find.byType(EarningTicketRow), findsNWidgets(3));
     expect(find.byType(ExpiredOverlay), findsOneWidget);
+    await t.ensureVisible(find.text('Payouts'));
+    await t.pumpAndSettle();
     await t.tap(find.text('Payouts'));
     await t.pump();
     expect(find.byType(EarningTicketRow), findsOneWidget);
