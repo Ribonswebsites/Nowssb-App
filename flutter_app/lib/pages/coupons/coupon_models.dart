@@ -44,6 +44,13 @@ class CouponCodeResult {
   final String message;
 }
 
+/// No currency on this page (no-INR rule): the shared catalogue lines carry
+/// rupee caps ("Cap ₹35."), so drop the amount and keep a neutral note.
+String neutralScope(String line) => line
+    .replaceAll(RegExp(r'Cap\s*(₹|INR|Rs\.?)\s*[\d,]+\.?\s*', caseSensitive: false), 'Discount is capped. ')
+    .replaceAll(RegExp(r'(₹|\bINR\b|\bRs\.?)\s*[\d,]+'), '')
+    .trim();
+
 abstract class CouponsRepo {
   Future<List<NwCoupon>> load();
   Future<CouponCodeResult> addCode(String code);
@@ -75,7 +82,7 @@ class DefaultCouponsRepo implements CouponsRepo {
             id: kWideCoupons[i].code,
             label: _cat(kWideCoupons[i]) == 'Subscriptions' ? 'Special pass' : 'Special discount',
             offer: kWideCoupons[i].banner,
-            scope: kWideCoupons[i].line,
+            scope: neutralScope(kWideCoupons[i].line),
             code: kWideCoupons[i].copy,
             category: _cat(kWideCoupons[i]),
             rarity: _rar(kWideCoupons[i]),

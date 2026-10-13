@@ -23,8 +23,8 @@ class _Repo implements CouponsRepo {
 }
 
 const _items = [
-  NwCoupon(id: 'a', label: 'Festive offer', offer: '20% OFF A WORD', scope: 'Cap ₹35. Does not stack.', code: 'NWSB-SAVE20', category: 'Words', isNew: true),
-  NwCoupon(id: 'b', label: 'Special discount', offer: '15% OFF MEANINGS', scope: 'Cap ₹80. Catalogue, not cash.', code: 'NWSB-MEAN15', category: 'Meanings', rarity: CouponRarity.rare, isNew: true),
+  NwCoupon(id: 'a', label: 'Festive offer', offer: '20% OFF A WORD', scope: 'Cap 200 coins. Does not stack.', code: 'NWSB-SAVE20', category: 'Words', isNew: true),
+  NwCoupon(id: 'b', label: 'Special discount', offer: '15% OFF MEANINGS', scope: 'Cap 500 coins. Catalogue, not cash.', code: 'NWSB-MEAN15', category: 'Meanings', rarity: CouponRarity.rare, isNew: true),
   NwCoupon(id: 'c', label: 'Special pass', offer: '3-DAY SIGNATURE', scope: 'Does not unlock Partner.', code: 'NWSB-SIG3', category: 'Subscriptions', rarity: CouponRarity.epic),
   NwCoupon(id: 'd', label: 'Special pass', offer: '30-DAY STANDARD', scope: 'Catalogue prize, not cash.', code: 'NWSB-STD30', category: 'Subscriptions', rarity: CouponRarity.legendary),
 ];
