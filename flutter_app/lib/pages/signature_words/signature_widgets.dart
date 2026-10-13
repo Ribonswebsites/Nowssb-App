@@ -5,6 +5,7 @@ library;
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'signature_models.dart';
+import 'tilt_shine.dart';
 
 const kGold = Color(0xFFE8C46A);
 const kViolet = Color(0xFF8B7CF6);
@@ -47,7 +48,8 @@ class SigGlass extends StatelessWidget {
 
 /// Tall portrait premium card with gold inner frame and rarity glow.
 class SignatureCard extends StatelessWidget {
-  const SignatureCard({super.key, required this.word, required this.onTap});
+  const SignatureCard({super.key, required this.word, required this.onTap, this.effects = true});
+  final bool effects;
   final SignatureWord word;
   final VoidCallback onTap;
   @override
@@ -61,7 +63,9 @@ class SignatureCard extends StatelessWidget {
         onTap: onTap,
         child: AspectRatio(
           aspectRatio: 3 / 4.6,
-          child: SigGlass(
+          child: TiltShine(
+            enabled: effects && !word.locked,
+            child: SigGlass(
             glow: glow,
             padding: const EdgeInsets.all(8),
             child: Container(
@@ -92,6 +96,7 @@ class SignatureCard extends StatelessWidget {
                 ],
               ),
             ),
+          ),
           ),
         ),
       ),

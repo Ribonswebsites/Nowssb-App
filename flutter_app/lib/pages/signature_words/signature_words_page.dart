@@ -4,6 +4,7 @@ library;
 
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'aura_background.dart';
 import 'mandala_painter.dart';
 import 'signature_models.dart';
 import 'signature_widgets.dart';
@@ -59,14 +60,9 @@ class _SignatureWordsPageState extends State<SignatureWordsPage> {
           IconButton(key: const Key('sig-help'), tooltip: 'Help', icon: const Icon(Icons.help_outline), onPressed: () => _help(context)),
         ],
       ),
-      body: DecoratedBox(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF241A5C), Color(0xFF120B2E), Color(0xFF0A0720)],
-          ),
-        ),
+      extendBodyBehindAppBar: true,
+      body: AuraBackground(
+        animate: !reduce,
         child: SafeArea(child: _body(reduce)),
       ),
     );
@@ -113,7 +109,7 @@ class _SignatureWordsPageState extends State<SignatureWordsPage> {
           sliver: SliverGrid(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, mainAxisSpacing: 14, crossAxisSpacing: 14, childAspectRatio: 3 / 4.6),
             delegate: SliverChildBuilderDelegate(
-              (c, i) => SignatureCard(word: list[i], onTap: () => _open(list[i])),
+              (c, i) => SignatureCard(word: list[i], effects: !reduce, onTap: () => _open(list[i], reduce)),
               childCount: list.length,
             ),
           ),
@@ -121,7 +117,7 @@ class _SignatureWordsPageState extends State<SignatureWordsPage> {
     ]);
   }
 
-  void _open(SignatureWord w) {
+  void _open(SignatureWord w, bool reduce) {
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
@@ -134,10 +130,19 @@ class _SignatureWordsPageState extends State<SignatureWordsPage> {
             color: Colors.black.withValues(alpha: 0.4),
             padding: const EdgeInsets.all(16),
             child: Column(mainAxisSize: MainAxisSize.min, children: [
+              MandalaLoop(size: 110, animate: !reduce && !w.locked),
+              const SizedBox(height: 8),
               Text(w.locked ? 'Locked drop' : w.word, style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w600)),
               const SizedBox(height: 6),
               Text('${w.rarity.label} · ${w.sound}', textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70)),
-              const SizedBox(height: 16),
+              const SizedBox(height: 6),
+              TextButton.icon(
+                key: const Key('sig-rarity-info'),
+                onPressed: () => _rarityInfo(context),
+                icon: const Icon(Icons.info_outline, size: 16, color: Colors.white54),
+                label: const Text('What does rarity mean?', style: TextStyle(color: Colors.white54, fontSize: 12)),
+              ),
+              const SizedBox(height: 10),
               if (w.locked)
                 const Text('This word unlocks at its drop date.', style: TextStyle(color: kGold))
               else if (w.owned)
@@ -155,6 +160,23 @@ class _SignatureWordsPageState extends State<SignatureWordsPage> {
             ]),
           ),
         ),
+      ),
+    );
+  }
+
+  void _rarityInfo(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      builder: (c) => AlertDialog(
+        key: const Key('sig-rarity-dialog'),
+        backgroundColor: const Color(0xFF0E0A22),
+        title: const Text('Rarity', style: TextStyle(color: Colors.white)),
+        content: const Text(
+          'Rarity is a label for how special a word is: Common, Rare, Epic or Legendary. '
+          'You always pick the exact word you collect and see its fixed price first. There are no random draws.',
+          style: TextStyle(color: Colors.white70),
+        ),
+        actions: [TextButton(onPressed: () => Navigator.of(c).pop(), child: const Text('Got it'))],
       ),
     );
   }

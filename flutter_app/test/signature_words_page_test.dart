@@ -69,6 +69,27 @@ void main() {
     expect(find.byKey(const Key('sig-help-sheet')), findsOneWidget);
   });
 
+  testWidgets('rarity info explains fixed prices, no random draws', (t) async {
+    t.view.physicalSize = const Size(1080, 2400);
+    t.view.devicePixelRatio = 2.5;
+    addTearDown(t.view.reset);
+    await t.pumpWidget(_app(const DemoSignatureSource()));
+    await t.pumpAndSettle();
+    await t.tap(find.byKey(const ValueKey('sig-card-lumen')));
+    await t.pumpAndSettle();
+    await t.tap(find.byKey(const Key('sig-rarity-info')));
+    await t.pumpAndSettle();
+    expect(find.textContaining('no random draws'), findsOneWidget);
+  });
+
+  testWidgets('effects on: animated page builds and disposes cleanly', (t) async {
+    await t.pumpWidget(const MaterialApp(home: SignatureWordsPage()));
+    await t.pump(const Duration(milliseconds: 100));
+    await t.pump(const Duration(seconds: 1));
+    expect(find.byKey(const ValueKey('sig-card-aum')), findsOneWidget);
+    await t.pumpWidget(const SizedBox());
+  });
+
   test('flag override', () {
     expect(newUiSignatureEnabled(override: true), isTrue);
     expect(newUiSignatureEnabled(override: false), isFalse);

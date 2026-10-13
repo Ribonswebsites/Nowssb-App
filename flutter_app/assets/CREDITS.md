@@ -19,3 +19,5 @@
 
 ## Signature Words (newui_signature)
 - Golden mandala loop: procedural CustomPainter (lib/pages/signature_words/mandala_painter.dart), original code, no third-party assets.
+- Aura background (aura_background.dart), card tilt + shine sweep (tilt_shine.dart), shaded mandala core: procedural code, original, no third-party assets.
+- Researched only (not bundled): LottieFiles free animations under the Lottie Simple License (https://lottiefiles.com/page/license); flutter_holographic (github.com/xcc3641/flutter_holographic) as a technique reference. Nothing copied.

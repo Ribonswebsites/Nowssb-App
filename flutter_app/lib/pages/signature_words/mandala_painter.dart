@@ -28,7 +28,10 @@ class MandalaPainter extends CustomPainter {
       }
       canvas.restore();
     }
-    canvas.drawCircle(c, r * 0.12, Paint()..color = color.withValues(alpha: 0.9));
+    // Soft halo + shaded "3D" gold core (light from top-left).
+    canvas.drawCircle(c, r, Paint()..shader = RadialGradient(colors: [color.withValues(alpha: 0.22), color.withValues(alpha: 0)]).createShader(Rect.fromCircle(center: c, radius: r)));
+    final core = Rect.fromCircle(center: c, radius: r * 0.16);
+    canvas.drawCircle(c, r * 0.16, Paint()..shader = const RadialGradient(center: Alignment(-0.4, -0.4), colors: [Color(0xFFFFF4CF), Color(0xFFE8C46A), Color(0xFF8A6420)], stops: [0, 0.55, 1]).createShader(core));
   }
 
   @override
