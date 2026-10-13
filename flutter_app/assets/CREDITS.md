@@ -11,3 +11,4 @@
 
 ## Progress page (newui_progress)
 - Aura background, progress ring: procedural CustomPainter written in-repo. No third-party assets bundled.
+- Polish round (Oct 13 2026): breathing 3D-style orb, floating sphere/torus/pill, milestone badges, count-up and entrance motion are all procedural Flutter code (CustomPainter/TweenAnimationBuilder). No Lottie, Rive, image, video or font assets added. Design inspiration only (no art copied): Stillwater meditation flow (swiftpieces.com), Sleek meditation template "Your Journey", Zenly on Behance, Dribbble "3D Concept - Meditation App".

@@ -16,6 +16,8 @@ ProgressView _view({int sessions = 5}) => ProgressView(
       recent: const ['Calm', 'Focus'],
     );
 
+Finder _main() => find.descendant(of: find.byKey(const Key('pg-ready')), matching: find.byType(Scrollable)).first;
+
 Widget _app(Widget w) => MediaQuery(data: const MediaQueryData(disableAnimations: true), child: MaterialApp(home: w));
 
 void main() {
@@ -45,15 +47,36 @@ void main() {
     expect(find.text('3 days'), findsOneWidget);
   });
 
+  testWidgets('large text scale does not overflow', (t) async {
+    await t.pumpWidget(MediaQuery(
+        data: const MediaQueryData(disableAnimations: true, textScaler: TextScaler.linear(1.3)),
+        child: MaterialApp(home: ProgressNewScreen(load: ProgressLoad.ready, view: _view()))));
+    expect(t.takeException(), isNull);
+  });
+
   testWidgets('ready flow: stats, week, recent, back', (t) async {
     var back = false;
     await t.pumpWidget(_app(ProgressNewScreen(load: ProgressLoad.ready, view: _view(), onBack: () => back = true)));
     expect(find.byKey(const Key('pg-offline')), findsNothing);
     expect(find.text('57%'), findsOneWidget);
     expect(find.text('42'), findsOneWidget);
+    await t.scrollUntilVisible(find.text('Calm'), 200, scrollable: _main());
     expect(find.text('Calm'), findsOneWidget);
     await t.tap(find.byTooltip('Back'));
     expect(back, isTrue);
+  });
+
+  testWidgets('milestones are honest and orb renders', (t) async {
+    await t.pumpWidget(_app(ProgressNewScreen(load: ProgressLoad.ready, view: _view())));
+    await t.scrollUntilVisible(find.byKey(const Key('pg-next-milestone')), 200, scrollable: _main());
+    expect(find.byKey(const Key('pg-next-milestone')), findsOneWidget);
+    expect(find.text('Next: 7-day streak (3/7)'), findsOneWidget);
+  });
+
+  testWidgets('animated mode settles to real values', (t) async {
+    await t.pumpWidget(MaterialApp(home: ProgressNewScreen(load: ProgressLoad.ready, view: _view())));
+    await t.pump(const Duration(seconds: 2));
+    expect(find.text('3 days'), findsOneWidget);
   });
 
   test('flag override wins', () {

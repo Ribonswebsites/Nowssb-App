@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 
 import '../../../data/practice_progress.dart';
 import 'progress_glass.dart';
+import 'progress_milestones.dart';
+import 'progress_motion.dart';
 
 enum ProgressLoad { loading, ready, error, offline }
 
@@ -53,6 +55,7 @@ class ProgressNewScreen extends StatelessWidget {
         backgroundColor: PgColors.bg,
         body: Stack(fit: StackFit.expand, children: [
           const PgAura(),
+          const PgFloaters(),
           SafeArea(
             child: Column(children: [
               _Header(onBack: onBack),
@@ -167,6 +170,9 @@ class _Ready extends StatelessWidget {
             ]),
           ),
         ),
+      // Breathing orb; glow follows real weekly consistency.
+      PgEnter(index: 0, child: Center(child: PgOrb(intensity: v.weekPercent / 100))),
+      const SizedBox(height: 4),
       // Hero: streak + weekly consistency ring.
       PgGlass(
         padding: const EdgeInsets.all(20),
@@ -174,8 +180,11 @@ class _Ready extends StatelessWidget {
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               const Text('Current streak', style: TextStyle(color: PgColors.sub)),
-              Text('${v.streak} ${v.streak == 1 ? 'day' : 'days'}',
-                  key: const Key('pg-streak'), style: const TextStyle(color: PgColors.ink, fontSize: 34, fontWeight: FontWeight.w700)),
+              PgCount(
+                  key: const Key('pg-streak'),
+                  value: v.streak,
+                  suffix: v.streak == 1 ? ' day' : ' days',
+                  style: const TextStyle(color: PgColors.ink, fontSize: 34, fontWeight: FontWeight.w700)),
               const SizedBox(height: 6),
               Text(v.todaySessions > 0 ? 'Practised today. Lovely.' : 'One calm practice keeps it going.',
                   style: const TextStyle(color: PgColors.lilac)),
@@ -218,6 +227,11 @@ class _Ready extends StatelessWidget {
         const SizedBox(width: 12),
         Expanded(child: _Stat(label: 'Words', value: '${v.uniqueWords}')),
       ]),
+      const SizedBox(height: 12),
+      PgEnter(
+        index: 3,
+        child: PgMilestoneRail(items: pgMilestones(streak: v.streak, sessions: v.totalSessions, minutes: v.totalMinutes)),
+      ),
       if (v.recent.isNotEmpty) ...[
         const SizedBox(height: 12),
         PgGlass(
