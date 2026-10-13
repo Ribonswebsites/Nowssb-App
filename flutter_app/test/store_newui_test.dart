@@ -38,8 +38,8 @@ void main() {
     expect(find.byKey(const Key('store_loading')), findsOneWidget);
     c.complete(_rails);
     await t.pump();
-    expect(find.bySemanticsLabel('Open Words'), findsOneWidget);
-    await t.tap(find.text('Words'));
+    expect(find.bySemanticsLabel(RegExp('Open Word Atelier')), findsOneWidget);
+    await t.tap(find.text('Word Atelier'));
     expect(opened.last, StoreDept.words);
     await t.tap(find.text('Next').first);
     await t.pump();
@@ -50,6 +50,26 @@ void main() {
     expect(find.textContaining('₹'), findsNothing);
     await t.tap(ticket);
     expect((opened.last as StoreItem?)?.id, 'a');
+  });
+
+  testWidgets('hub shortcuts reach Get Verified and Plans', (t) async {
+    final hit = <String>[];
+    await t.pumpWidget(_app(NewStorePage(loader: () async => _rails, background: _bg, onOpen: (_, __) {}, shortcuts: [
+      StoreShortcut('Get Verified', Icons.verified_outlined, (_) => hit.add('v')),
+      StoreShortcut('Subscription Plans', Icons.workspace_premium_outlined, (_) => hit.add('p')),
+    ])));
+    await t.pump();
+    for (final l in ['Word Atelier', 'Meanings', 'Signature', 'Ebooks']) {
+      expect(find.text(l), findsWidgets, reason: l);
+      if (l != 'Ebooks') {
+        await t.tap(find.descendant(of: find.byKey(ValueKey('dept_${{'Word Atelier': 'words', 'Meanings': 'meanings', 'Signature': 'signature'}[l]}')), matching: find.text('Next')));
+        await t.pumpAndSettle();
+      }
+    }
+    await t.ensureVisible(find.text('Get Verified'));
+    await t.tap(find.text('Get Verified'));
+    await t.tap(find.text('Subscription Plans'));
+    expect(hit, ['v', 'p']);
   });
 
   testWidgets('words page shows only words with carousel and tickets', (t) async {
@@ -84,7 +104,7 @@ void main() {
     expect(find.byKey(const Key('store_error')), findsOneWidget);
     await t.tap(find.text('Try again'));
     await t.pump();
-    expect(find.text('Words'), findsOneWidget);
+    expect(find.text('Word Atelier'), findsOneWidget);
   });
 
   testWidgets('offline', (t) async {

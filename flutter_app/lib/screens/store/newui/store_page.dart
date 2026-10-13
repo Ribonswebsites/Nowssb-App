@@ -27,10 +27,10 @@ void _defaultOpen(BuildContext context, StoreDept dept, StoreItem? item) {
 }
 
 const _deptInfo = {
-  StoreDept.words: ('Words', 'Own the words that calm you. Each one carries its sound and story.'),
+  StoreDept.words: ('Word Atelier', 'Own the words that calm you. Each one carries its sound and story.'),
   StoreDept.meanings: ('Meanings', 'Unlock the root and meaning behind every word you love.'),
   StoreDept.signature: ('Signature', 'Rare, one-of-a-kind words made into your signature.'),
-  StoreDept.ebooks: ('E-books', 'Read the science of sound, one gentle chapter at a time.'),
+  StoreDept.ebooks: ('Ebooks', 'Read the science of sound, one gentle chapter at a time.'),
 };
 
 /// Rarity pill for a product, from its price band (display only).
@@ -42,9 +42,18 @@ Rarity _rarityFor(int usdCents) => usdCents >= 400
             ? Rarity.rare
             : Rarity.common;
 
+/// A hub shortcut to a page outside the catalogue (Get Verified, Plans...).
+class StoreShortcut {
+  const StoreShortcut(this.label, this.icon, this.onTap);
+  final String label;
+  final IconData icon;
+  final void Function(BuildContext context) onTap;
+}
+
 /// Store hub (`/store`).
 class NewStorePage extends StatelessWidget {
-  const NewStorePage({super.key, this.loader, this.onOpen, this.locale, this.background});
+  const NewStorePage({super.key, this.loader, this.onOpen, this.locale, this.background, this.shortcuts = const []});
+  final List<StoreShortcut> shortcuts;
   final StoreLoader? loader;
   final StoreOpen? onOpen;
   final String? locale;
@@ -76,6 +85,18 @@ class NewStorePage extends StatelessWidget {
                   ),
               ],
             ),
+            if (shortcuts.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+                child: Wrap(spacing: 8, runSpacing: 8, children: [
+                  for (final sc in shortcuts)
+                    Semantics(
+                      button: true,
+                      label: sc.label,
+                      child: GlassPill(key: ValueKey('shortcut_${sc.label}'), label: sc.label, icon: sc.icon, onTap: () => sc.onTap(context)),
+                    ),
+                ]),
+              ),
             if (deals.isNotEmpty) _TicketList(title: 'Today\'s picks', items: deals, locale: locale, onOpen: open),
           ];
         },
@@ -271,7 +292,7 @@ class _CardCarouselState extends State<_CardCarousel> {
   Widget build(BuildContext context) {
     final e = widget.entries;
     return SizedBox(
-      height: 430,
+      height: 470,
       child: PageView.builder(
         key: ValueKey('carousel_${widget.railKey}'),
         controller: _pc,

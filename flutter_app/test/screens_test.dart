@@ -9,6 +9,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:nowssb/kit/kit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nowssb/data/settings.dart';
 import 'package:nowssb/media/video_pool.dart';
@@ -120,6 +121,8 @@ void main() {
     // Store home lists departments directly (the old Enter Store hero is gone;
     // a zero-opacity EditableLabel keeps the slot id for the template editor).
     // Terms for the hub are pre-accepted via SharedPreferences mock above.
+    await NewUi.setDebugOverride('store', false); // legacy hub; rebuilt hub: store_newui_test
+    addTearDown(() => NewUi.setDebugOverride('store', null));
     await pump(tester, const StoreScreen());
     // BD-8: departments are reached through the dept tabs / Spotlight
     // Picks (the old department sections ship hidden by default).

@@ -18,7 +18,10 @@ import 'fake_video_platform.dart';
 
 void main() {
   // These cover the legacy Store screens; the rebuilt ones have store_newui_test.
-  setUpAll(() => NewUi.setDebugOverride('store', false));
+  setUpAll(() async {
+    await NewUi.setDebugOverride('store', false);
+    await NewUi.setDebugOverride('signature', false);
+  });
   tearDownAll(NewUi.resetForTest);
 
   TestWidgetsFlutterBinding.ensureInitialized();

@@ -51,7 +51,11 @@ class StoreScreen extends StatelessWidget {
   Widget build(BuildContext context) => StoreTermsHost(
         which: 'hub',
         head: 'Before you enter the store',
-        child: NewUiGate(page: 'store', legacy: (_) => const _StoreHomeContent(), rebuilt: (_) => const NewStorePage()),
+        child: NewUiGate(page: 'store', legacy: (_) => const _StoreHomeContent(), rebuilt: (_) => NewStorePage(shortcuts: [
+              StoreShortcut('Get Verified', Icons.verified_outlined, _StoreHomeContentState._confirmVerification),
+              StoreShortcut('Subscription Plans', Icons.workspace_premium_outlined,
+                  (c) => AppRoutes.open(c, AppPage.subscription, source: 'store_newui')),
+            ])),
       );
 }
 
