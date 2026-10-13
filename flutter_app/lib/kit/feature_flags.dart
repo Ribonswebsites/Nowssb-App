@@ -2,10 +2,9 @@
 ///
 /// Order (first match wins):
 ///   1. Debug override (debug/profile builds only, kept in memory + prefs).
-///   2. Remote `config/app.flags.newui_<page>` set to **true** → on for
-///      everyone (Ribon's release switch). `false` or absent → step 3.
-///   3. Admin accounts ([NwsbAdmin.isAdmin]) → on.
-///   4. Everyone else → off.
+///   2. Remote `config/app.flags.newui_<page>` set to **false** → off
+///      (kill switch).
+///   3. Everyone else (absent or true) → ON for all users.
 library;
 
 import 'dart:async';
@@ -31,8 +30,9 @@ abstract final class NewUi {
   /// Pure decision. Unit-tested.
   static bool decide(NewUiInputs i) {
     if (i.debugOverride != null) return i.debugOverride!;
-    if (i.remote == true) return true;
-    return i.isAdmin;
+    // Ribon: rebuilt pages are ON for everyone. Only an explicit remote
+    // `false` (kill switch) turns a page off.
+    return i.remote != false;
   }
 
   static final Map<String, bool> _overrides = {};
