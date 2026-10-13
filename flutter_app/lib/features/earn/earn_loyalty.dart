@@ -8,6 +8,7 @@ library;
 import 'dart:math' as math;
 
 import 'package:firebase_auth/firebase_auth.dart';
+import '../economy/money.dart';
 import 'package:flutter/material.dart';
 
 import '../../data/firebase.dart';
@@ -208,9 +209,9 @@ class _BoardState extends State<_Board> {
       const SizedBox(height: 12),
       if (!_nextTab) ..._now(step) else ..._later(step, next, need),
       const SizedBox(height: 8),
-      const Text(
-        'Paid only on cleared sales, after tax and the store fee. Not guaranteed. A line under ₹15 is not paid. The chain stops at 55% of Net. Gifted passes do not raise a rank. 10 coins = ₹1 in the catalogue, not cash.',
-        style: TextStyle(color: NwsbColors.mist, fontSize: 11, height: 1.4),
+      Text(
+        'Paid only on cleared sales, after tax and the store fee. Not guaranteed. A line under ${FxBook.instance.formatRupees(15)} is not paid. The chain stops at 55% of Net. Gifted passes do not raise a rank. 10 coins = ${FxBook.instance.formatRupees(1)} in the catalogue, not cash.',
+        style: const TextStyle(color: NwsbColors.mist, fontSize: 11, height: 1.4),
       ),
       if (widget.yours) const SizedBox(height: 4) else const SizedBox(height: 8),
       if (!widget.yours)

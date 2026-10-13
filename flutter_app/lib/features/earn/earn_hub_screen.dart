@@ -149,7 +149,7 @@ class EarnHubLegacyScreen extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 6),
                 child: Text(
                   collection == 'commissionLedger'
-                      ? '${doc.data()['note'] ?? doc.data()['type'] ?? ''}  ₹${(((doc.data()['paise'] as num?) ?? 0) / 100).toStringAsFixed(2)}'
+                      ? '${doc.data()['note'] ?? doc.data()['type'] ?? ''}  ${FxBook.instance.formatRupees(((doc.data()['paise'] as num?) ?? 0) / 100)}'
                       : '${doc.data()['reason'] ?? ''}  ${doc.data()['delta'] ?? 0}',
                   style: const TextStyle(color: Colors.white),
                 ),

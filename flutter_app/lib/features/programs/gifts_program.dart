@@ -5,6 +5,7 @@ library;
 
 import 'dart:async';
 
+import '../economy/money.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -130,7 +131,7 @@ class _SendPickerState extends State<_SendPicker> {
             mark: NwsbMarks.gift,
             selected: c.id == id,
             progress: c.id == id ? 1 : 0,
-            line: '\u20b9${c.cents}',
+            line: FxBook.instance.formatRupees(c.cents),
             onTap: () => setState(() => _id = c.id),
           ),
         const SizedBox(height: 6),

@@ -6,6 +6,7 @@ library;
 
 import 'dart:async';
 
+import '../economy/money.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
@@ -195,8 +196,7 @@ class _CheckoutPanelState extends State<CheckoutPanel> {
   }
 
   String _inr(Object? v) {
-    final n = (v as num?) ?? 0;
-    return n == n.roundToDouble() ? '₹${n.round()}' : '₹${n.toStringAsFixed(2)}';
+    return FxBook.instance.formatRupees((v as num?) ?? 0);
   }
 
   @override

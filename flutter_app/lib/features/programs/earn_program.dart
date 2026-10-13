@@ -3,6 +3,7 @@
 /// server through the money lock on real cleared Play sales only.
 library;
 
+import '../economy/money.dart';
 import 'package:flutter/material.dart';
 
 import '../../admin/layout/layout_sections.dart';
@@ -86,7 +87,7 @@ List<Widget> _overview(BuildContext context, Map<String, dynamic> s) => [
 
 Widget _money(String label, num v, String sub) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(label.toUpperCase(), style: const TextStyle(color: NwsbColors.gold, fontSize: 10, letterSpacing: 1.3, fontWeight: FontWeight.w800)),
-      CountUp(v, prefix: '\u20b9', style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
+      Text(FxBook.instance.formatRupees(v), style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
       EditableLabel('earn_program.shared', sub, style: const TextStyle(color: NwsbColors.mist, fontSize: 11)),
     ]);
 
@@ -188,7 +189,7 @@ List<Widget> _sales(BuildContext context, Map<String, dynamic> s) => [
               title: _type('${x['type']}'),
               sub: '${x['note']}${sInt(x['availableAt']) > now ? ' · available ${shortDate(x['availableAt'])}' : ''} · ${shortDate(x['at'])}',
               mark: NwsbMarks.earn,
-              trailing: Text('${sNum(x['inr']) >= 0 ? '+' : '\u2212'}\u20b9${sNum(x['inr']).abs().toStringAsFixed(2)}', style: TextStyle(color: sNum(x['inr']) >= 0 ? NwsbColors.goldLight : const Color(0xFFFF8A8A), fontWeight: FontWeight.w800)),
+              trailing: Text('${sNum(x['inr']) >= 0 ? '+' : '\u2212'}${FxBook.instance.formatRupees(sNum(x['inr']).abs())}', style: TextStyle(color: sNum(x['inr']) >= 0 ? NwsbColors.goldLight : const Color(0xFFFF8A8A), fontWeight: FontWeight.w800)),
             ),
         ]);
       })),
@@ -205,7 +206,7 @@ List<Widget> _targets(BuildContext context, Map<String, dynamic> s) => [
             Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
               PRow(
                 title: '${sInt(x['words'])} words sold',
-                sub: '\u20b9${sInt(x['cashINR'])} bonus (pending 30 days) · ${sInt(x['coins'])} coins · ${rarityTitle('${x['coupon']}')} card',
+                sub: '${FxBook.instance.formatRupees(sInt(x['cashINR']))} bonus (pending 30 days) · ${sInt(x['coins'])} coins · ${rarityTitle('${x['coupon']}')} card',
                 mark: NwsbMarks.rewards,
                 trailing: x['reached'] == true ? const PPill('Reached', color: NwsbColors.goldLight) : null,
               ),
@@ -235,7 +236,7 @@ List<Widget> _payouts(BuildContext context, Map<String, dynamic> s) => [
         final acct = sMap(r['payoutAccount']);
         return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           PCard(glow: NwsbColors.gold, children: [
-            _money('Available', sNum(bal['availableINR']), 'Minimum \u20b9${sInt(bal['minPayoutINR'])} · paid by UPI after a person approves it'),
+            _money('Available', sNum(bal['availableINR']), 'Minimum ${FxBook.instance.formatRupees(sInt(bal['minPayoutINR']))} · paid by UPI after a person approves it'),
             const SizedBox(height: 10),
             Align(
               alignment: Alignment.centerLeft,

@@ -7,6 +7,7 @@ library;
 import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
+import '../economy/money.dart';
 import 'package:flutter/material.dart';
 import '../economy/coupon_screen.dart';
 import '../economy/economy_api.dart';
@@ -245,7 +246,7 @@ class _TierBody extends StatelessWidget {
             ),
             _BenefitCard(
               title: 'Coins',
-              line: '10 coins = ₹1 in the catalogue. They are not a cash balance.',
+              line: '10 coins = ${FxBook.instance.formatRupees(1)} in the catalogue. They are not a cash balance.',
               color: const Color(0xFFFFC857),
             ),
             const SizedBox(height: 8),
@@ -527,7 +528,7 @@ class _Facts extends StatelessWidget {
           const SizedBox(height: 12),
           _q('What does this rank pay?', '${step.rate}% of Net on your own cleared sales.${step.leg1 == 0 ? '' : ' Plus ${_pct(step.leg1)}% on level 1${step.leg2 == 0 ? '' : ' and ${_pct(step.leg2)}% on level 2'}.'}'),
           _q('Can I buy the rank?', 'No. A plan you bought must be active, but the word target is what moves you up. A gifted pass does not.'),
-          _q('What is Net?', 'The sale after tax and the store fee. A line under ₹15 is not paid. Refunds are reversed.'),
+          _q('What is Net?', 'The sale after tax and the store fee. A line under ${FxBook.instance.formatRupees(15)} is not paid. Refunds are reversed.'),
           _q(last ? 'Is this the top?' : 'What is next?', last ? 'Diamond II is the last rank.' : '${next!.title} pays ${next!.rate}% once ${next!.minWords} words have sold.'),
         ],
       ),

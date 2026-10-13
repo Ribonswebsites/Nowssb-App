@@ -5,6 +5,7 @@
 /// everything else is a tile. Empty config falls back to NowssB defaults.
 library;
 
+import '../../features/economy/money.dart';
 import 'package:flutter/material.dart';
 
 import '../../admin/template/editable.dart';
@@ -47,14 +48,14 @@ const _kDefaultTiles = <SectionMediaItem>[
   ),
 ];
 
-const _kDefaultChips = <SectionMediaItem>[
-  SectionMediaItem(id: 'chip.popular', title: 'Popular', meta: {'kind': 'chip'}),
-  SectionMediaItem(id: 'chip.new', title: 'New', meta: {'kind': 'chip'}),
-  SectionMediaItem(id: 'chip.coupons', title: 'Coupons', meta: {'kind': 'chip'}),
+List<SectionMediaItem> get _kDefaultChips => <SectionMediaItem>[
+  const SectionMediaItem(id: 'chip.popular', title: 'Popular', meta: {'kind': 'chip'}),
+  const SectionMediaItem(id: 'chip.new', title: 'New', meta: {'kind': 'chip'}),
+  const SectionMediaItem(id: 'chip.coupons', title: 'Coupons', meta: {'kind': 'chip'}),
   SectionMediaItem(
     id: 'chip.under499',
-    title: 'Under ₹499',
-    meta: {'kind': 'chip'},
+    title: 'Under ${FxBook.instance.formatRupees(499)}',
+    meta: const {'kind': 'chip'},
   ),
 ];
 

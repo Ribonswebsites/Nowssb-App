@@ -7,6 +7,7 @@ library;
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../economy/money.dart';
 import 'package:flutter/material.dart';
 
 import '../../admin/layout/layout_sections.dart';
@@ -32,7 +33,8 @@ Map<String, dynamic> sMap(Object? v) => v is Map ? v.map((k, v) => MapEntry('$k'
 List<Map<String, dynamic>> sList(Object? v) => v is List ? v.whereType<Map>().map(sMap).toList() : <Map<String, dynamic>>[];
 int sInt(Object? v) => v is num ? v.toInt() : v is Timestamp ? v.millisecondsSinceEpoch : v is DateTime ? v.millisecondsSinceEpoch : int.tryParse('${v ?? ''}') ?? 0;
 num sNum(Object? v) => v is num ? v : num.tryParse('${v ?? ''}') ?? 0;
-String inr(num v) => '\u20b9${v % 1 == 0 ? v.toInt() : v.toStringAsFixed(2)}';
+/// Server rupee amount shown in the viewer's local currency (display only).
+String inr(num v) => FxBook.instance.formatRupees(v);
 String shortDate(Object? ms) {
   final n = sInt(ms);
   if (n <= 0) return '';

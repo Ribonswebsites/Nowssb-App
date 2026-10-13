@@ -264,7 +264,7 @@ class _GiftCardSheetState extends State<_GiftCardSheet> {
                               FutureBuilder<String>(
                                 future: _price,
                                 builder: (context, snap) => Text(
-                                  snap.data == null || snap.data == 'Play price' || snap.data!.isEmpty ? '\u20b9${widget.card.cents}' : snap.data!,
+                                  snap.data == null || snap.data == 'Play price' || snap.data!.isEmpty ? FxBook.instance.formatRupees(widget.card.cents) : snap.data!,
                                   style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 15),
                                 ),
                               ),
