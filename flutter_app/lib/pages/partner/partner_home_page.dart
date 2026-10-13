@@ -6,6 +6,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 import '../../features/economy/money.dart';
 import '../../features/programs/partner_program.dart';
@@ -138,7 +139,7 @@ class _Hub extends StatelessWidget {
           _Glass(
             key: const Key('partner-discount'),
             child: Text(
-              'Buyers through your link get ${FxBook.instance.formatCents(data.buyerDiscountUsdCents, locale: localeTag)} off',
+              'Buyers through your link get ${localMoney(data.buyerDiscountUsdCents, cc, localeTag)} off',
               style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
             ),
           ),
@@ -327,4 +328,49 @@ class _RingsPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_RingsPainter old) => old.t != t;
+}
+
+const _eur = {
+  'AT',
+  'BE',
+  'HR',
+  'CY',
+  'EE',
+  'FI',
+  'FR',
+  'DE',
+  'GR',
+  'IE',
+  'IT',
+  'LV',
+  'LT',
+  'LU',
+  'MT',
+  'NL',
+  'PT',
+  'SK',
+  'SI',
+  'ES',
+};
+const _byCountry = {
+  'US': 'USD',
+  'GB': 'GBP',
+  'JP': 'JPY',
+  'CA': 'CAD',
+  'AU': 'AUD',
+  'SG': 'SGD',
+  'AE': 'AED',
+  'IN': 'INR',
+};
+
+/// Formats USD cents in the viewer's local currency (by region), using the
+/// app's FX rates. Falls back to USD when the region or rate is unknown.
+String localMoney(int usdCents, String countryCode, String localeTag) {
+  final cc = countryCode.toUpperCase();
+  var code = _eur.contains(cc) ? 'EUR' : (_byCountry[cc] ?? 'USD');
+  final rate = FxBook.instance.rates[code];
+  if (rate == null) code = 'USD';
+  final loc = NumberFormat.localeExists(localeTag) ? localeTag : 'en';
+  return NumberFormat.simpleCurrency(name: code, locale: loc, decimalDigits: code == 'JPY' ? 0 : 2)
+      .format(usdCents / 100 * (rate ?? 1));
 }

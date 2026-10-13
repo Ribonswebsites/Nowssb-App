@@ -93,6 +93,7 @@ void main() {
     expect(find.textContaining('(DE)'), findsOneWidget);
     expect(find.textContaining('VAT ID'), findsOneWidget);
     expect(find.textContaining('₹'), findsNothing);
+    expect(find.textContaining('€'), findsOneWidget);
   });
 
   test('payout info is country-aware and never India-specific', () {
