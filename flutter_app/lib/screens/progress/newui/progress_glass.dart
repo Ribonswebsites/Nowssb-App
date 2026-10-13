@@ -1,8 +1,9 @@
-/// Page-local glass pieces for the new Progress page.
+/// Page-local glass pieces for the new Progress page, styled to
+/// /workspace/specs/card-reference-exact.png (card only, never its background).
 ///
-/// SWAP POINT: NowssB Bug Hunter's shared kit (GlassWrapper, spec 14.2) is not
-/// on main yet. When it lands, replace [PgGlass] with GlassWrapper and delete
-/// this file's [PgGlass]; every call site uses the same (child, padding) shape.
+/// TODO(nglass): swap [PgGlass]/[PgPanel] for UI Design's rebuilt NGlass from
+/// package:nowssb/nowssb_ui once it lands on main (origin/main at 3:30 PM IST
+/// still has the old violet-glow NGlass). Call sites keep (child, padding).
 library;
 
 import 'dart:math' as math;
@@ -11,113 +12,125 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class PgColors {
-  static const bg = Color(0xFF1A1433);
   static const violet = Color(0xFF9B8CFF);
-  static const lilac = Color(0xFFD9D0FF);
-  static const ink = Color(0xFFF7F5FF);
-  static const sub = Color(0xFFB9B2D9);
-  static const glass = Color(0x22FFFFFF);
-  static const edge = Color(0x40FFFFFF);
+  static const violetDeep = Color(0xFF6C4DFF);
+  static const lilac = Color(0xFFE4DEFF);
+  static const ink = Color(0xFFFFFFFF);
+  static const sub = Color(0xB3FFFFFF); // muted white body text
+  static const glass = Color(0x40CFC6F2); // translucent light-lavender frost
+  static const panel = Color(0x26FFFFFF); // inner frosted panel
+  static const edge = Color(0x59FFFFFF); // soft white 1px border
+  static const pillInk = Color(0xFF1E1A33);
 }
 
+/// Outer frosted card: lavender frost, 1px soft white border, radius 26.
 class PgGlass extends StatelessWidget {
-  const PgGlass({super.key, required this.child, this.padding = const EdgeInsets.all(16), this.radius = 24});
+  const PgGlass({super.key, required this.child, this.padding = const EdgeInsets.all(16), this.radius = 26});
   final Widget child;
   final EdgeInsets padding;
   final double radius;
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(radius),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-        child: Container(
-          padding: padding,
-          decoration: BoxDecoration(
-            color: PgColors.glass,
-            borderRadius: BorderRadius.circular(radius),
-            border: Border.all(color: PgColors.edge),
+    final r = BorderRadius.circular(radius);
+    return DecoratedBox(
+      decoration: BoxDecoration(borderRadius: r, boxShadow: const [
+        BoxShadow(color: Color(0x33000000), blurRadius: 24, offset: Offset(0, 10)),
+      ]),
+      child: ClipRRect(
+        borderRadius: r,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          child: Container(
+            padding: padding,
+            decoration: BoxDecoration(
+              borderRadius: r,
+              gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight,
+                  colors: [Color(0x4DE4DEFF), PgColors.glass]),
+              border: Border.all(color: PgColors.edge, width: 1),
+            ),
+            child: child,
           ),
-          child: child,
         ),
       ),
     );
   }
 }
 
-/// Procedural "aura": slow floating soft orbs (no bundled assets, spec 15/16).
-/// Respects reduced motion: static when animations are disabled.
-class PgAura extends StatefulWidget {
-  const PgAura({super.key});
+/// Inner frosted panel (lower half of the reference card), radius 20.
+class PgPanel extends StatelessWidget {
+  const PgPanel({super.key, required this.child, this.padding = const EdgeInsets.fromLTRB(18, 18, 14, 14)});
+  final Widget child;
+  final EdgeInsets padding;
   @override
-  State<PgAura> createState() => _PgAuraState();
+  Widget build(BuildContext context) => Container(
+        padding: padding,
+        decoration: BoxDecoration(
+          color: PgColors.panel,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: const Color(0x33FFFFFF), width: 1),
+        ),
+        child: child,
+      );
 }
 
-class _PgAuraState extends State<PgAura> with SingleTickerProviderStateMixin {
-  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(seconds: 24));
-
+/// Small white rounded pill ("Next" in the reference).
+class PgPill extends StatelessWidget {
+  const PgPill({super.key, required this.label, this.onTap});
+  final String label;
+  final VoidCallback? onTap;
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final reduce = MediaQuery.maybeOf(context)?.disableAnimations ?? false;
-    if (reduce) {
-      _c.stop();
-    } else if (!_c.isAnimating) {
-      _c.repeat();
-    }
-  }
-
-  @override
-  void dispose() {
-    _c.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) => RepaintBoundary(
-        child: AnimatedBuilder(
-          animation: _c,
-          builder: (_, __) => CustomPaint(painter: _AuraPainter(_c.value), size: Size.infinite),
+  Widget build(BuildContext context) => Material(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+            child: Text(label, style: const TextStyle(color: PgColors.pillInk, fontSize: 13, fontWeight: FontWeight.w700)),
+          ),
         ),
       );
 }
 
-class _AuraPainter extends CustomPainter {
-  _AuraPainter(this.t);
-  final double t;
-
+/// Violet gradient pill ("Get started" variant in the reference).
+class PgCtaPill extends StatelessWidget {
+  const PgCtaPill({super.key, required this.label, this.onTap});
+  final String label;
+  final VoidCallback? onTap;
   @override
-  void paint(Canvas canvas, Size size) {
-    canvas.drawRect(
-      Offset.zero & size,
-      Paint()
-        ..shader = const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFF2A2156), PgColors.bg, Color(0xFF120E24)],
-        ).createShader(Offset.zero & size),
-    );
-    const orbs = [
-      (0.2, 0.18, 0.32, Color(0x669B8CFF)),
-      (0.85, 0.35, 0.26, Color(0x55E7B8FF)),
-      (0.4, 0.75, 0.38, Color(0x447F9CFF)),
-    ];
-    for (var i = 0; i < orbs.length; i++) {
-      final o = orbs[i];
-      final a = 2 * math.pi * (t + i / 3);
-      final c = Offset(size.width * (o.$1 + 0.04 * math.sin(a)), size.height * (o.$2 + 0.03 * math.cos(a)));
-      final r = size.shortestSide * o.$3;
-      canvas.drawCircle(
-        c,
-        r,
-        Paint()..shader = RadialGradient(colors: [o.$4, o.$4.withAlpha(0)]).createShader(Rect.fromCircle(center: c, radius: r)),
+  Widget build(BuildContext context) => GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            gradient: const LinearGradient(colors: [PgColors.violetDeep, PgColors.violet]),
+          ),
+          child: Text(label, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700)),
+        ),
       );
-    }
-  }
+}
 
+/// Page dots: filled = done, wide = today.
+class PgDots extends StatelessWidget {
+  const PgDots({super.key, required this.done, this.current = -1});
+  final List<bool> done;
+  final int current;
   @override
-  bool shouldRepaint(_AuraPainter old) => old.t != t;
+  Widget build(BuildContext context) => Row(mainAxisSize: MainAxisSize.min, children: [
+        for (var i = 0; i < done.length; i++)
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 2),
+            width: i == current ? 14 : 5,
+            height: 5,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(3),
+              color: done[i] || i == current ? Colors.white : const Color(0x59FFFFFF),
+            ),
+          ),
+      ]);
 }
 
 /// Ring showing a 0..1 fraction (weekly consistency).

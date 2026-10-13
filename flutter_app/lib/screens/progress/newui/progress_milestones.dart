@@ -82,7 +82,7 @@ class _Badge extends StatelessWidget {
                       : null,
                   color: m.done ? null : const Color(0x14FFFFFF),
                 ),
-                child: Icon(m.icon, size: 22, color: m.done ? PgColors.bg : PgColors.sub),
+                child: Icon(m.icon, size: 22, color: m.done ? PgColors.pillInk : PgColors.sub),
               ),
             ]),
             const SizedBox(height: 6),

@@ -9,7 +9,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:nowssb/data/settings.dart';
 import 'package:nowssb/screens/progress/newui/progress_new_screen.dart';
+
+/// Video can't play in widget tests: use a still frame of the app's own backdrop.
+final _bg = Image.asset(Settings.fashionImages.first, fit: BoxFit.cover);
 
 ProgressView _view({int sessions = 12}) => ProgressView(
       streak: 4,
@@ -47,9 +51,10 @@ void main() {
           theme: ThemeData(fontFamily: 'Roboto', brightness: Brightness.dark),
           builder: (c, child) => MediaQuery(
               data: MediaQuery.of(c).copyWith(disableAnimations: true), child: child!),
-          home: ProgressNewScreen(load: load, view: view, onBack: () {}, onRetry: () {}, onStart: () {}),
+          home: ProgressNewScreen(background: _bg, load: load, view: view, onBack: () {}, onRetry: () {}, onStart: () {}),
         ),
       ));
+      await t.runAsync(() => precacheImage(_bg.image, key.currentContext!));
       await t.pump(const Duration(seconds: 2));
       expect(t.takeException(), isNull);
       final dir = Directory('/workspace/screens');
