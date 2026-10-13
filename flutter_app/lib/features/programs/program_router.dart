@@ -14,13 +14,14 @@ import '../vault/vault_screen.dart';
 import '../coins/coinback_page.dart';
 import '../coins/free_coins_page.dart';
 import '../coins/multiplier_page.dart';
+import '../rewards_newui/rewards_flag.dart';
 
 enum Programme { earn, rewards, coupons, gifts, reference, partner, earnings, freeCoins, coinback, multiplier }
 
 abstract final class Programmes {
   static Widget page(Programme p, {String? tab}) => switch (p) {
         Programme.earn => NowssbOnePage(focus: tab ?? 'ranks'),
-        Programme.rewards => const VaultScreen(),
+        Programme.rewards => const RewardsEntry(),
         Programme.coupons => const CouponScreen(),
         Programme.gifts => const GiftsScreen(),
         Programme.reference => const NowssbOnePage(focus: 'links'),
