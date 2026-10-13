@@ -14,8 +14,15 @@ class _Src implements SignatureSource {
 
 Widget _app(SignatureSource s) => MaterialApp(home: SignatureWordsPage(source: s, reduceEffects: true));
 
+void _phone(WidgetTester t) {
+  t.view.physicalSize = const Size(1080, 2400);
+  t.view.devicePixelRatio = 2.5;
+  addTearDown(t.view.reset);
+}
+
 void main() {
   testWidgets('loading state', (t) async {
+    _phone(t);
     final c = Completer<List<SignatureWord>>();
     await t.pumpWidget(_app(_Src(() => c.future)));
     expect(find.byKey(const Key('sig-loading')), findsOneWidget);
@@ -24,12 +31,14 @@ void main() {
   });
 
   testWidgets('empty state', (t) async {
+    _phone(t);
     await t.pumpWidget(_app(_Src(() async => [])));
     await t.pumpAndSettle();
     expect(find.byKey(const Key('sig-empty')), findsOneWidget);
   });
 
   testWidgets('error state with retry', (t) async {
+    _phone(t);
     var calls = 0;
     await t.pumpWidget(_app(_Src(() async {
       calls++;
@@ -43,15 +52,14 @@ void main() {
   });
 
   testWidgets('offline state', (t) async {
+    _phone(t);
     await t.pumpWidget(_app(_Src(() async => throw const OfflineException())));
     await t.pumpAndSettle();
     expect(find.byKey(const Key('sig-offline')), findsOneWidget);
   });
 
   testWidgets('grid, collection filter, detail and help', (t) async {
-    t.view.physicalSize = const Size(1080, 2400);
-    t.view.devicePixelRatio = 2.5;
-    addTearDown(t.view.reset);
+    _phone(t);
     await t.pumpWidget(_app(const DemoSignatureSource()));
     await t.pumpAndSettle();
     expect(find.byKey(const ValueKey('sig-card-aum')), findsOneWidget);
@@ -70,10 +78,10 @@ void main() {
   });
 
   testWidgets('rarity info explains fixed prices, no random draws', (t) async {
-    t.view.physicalSize = const Size(1080, 2400);
-    t.view.devicePixelRatio = 2.5;
-    addTearDown(t.view.reset);
+    _phone(t);
     await t.pumpWidget(_app(const DemoSignatureSource()));
+    await t.pumpAndSettle();
+    await t.ensureVisible(find.byKey(const ValueKey('sig-card-lumen')));
     await t.pumpAndSettle();
     await t.tap(find.byKey(const ValueKey('sig-card-lumen')));
     await t.pumpAndSettle();
@@ -83,6 +91,7 @@ void main() {
   });
 
   testWidgets('effects on: animated page builds and disposes cleanly', (t) async {
+    _phone(t);
     await t.pumpWidget(const MaterialApp(home: SignatureWordsPage()));
     await t.pump(const Duration(milliseconds: 100));
     await t.pump(const Duration(seconds: 1));
@@ -90,9 +99,8 @@ void main() {
     await t.pumpWidget(const SizedBox());
   });
 
-  test('flag rules: off for users, on for admins and remote release', () {
+  test('flag rules: on for everyone, remote false is the kill switch', () {
     expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: null)), isTrue);
-    expect(NewUi.decide(const NewUiInputs(isAdmin: true, remote: null)), isTrue);
-    expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: true)), isTrue);
+    expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: false)), isFalse);
   });
 }

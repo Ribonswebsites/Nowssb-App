@@ -4,11 +4,10 @@ library;
 
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'aura_background.dart';
-import 'mandala_painter.dart';
 import 'signature_models.dart';
 import '../../nowssb_ui/nowssb_ui.dart' hide Rarity;
 import 'signature_widgets.dart';
+import '../../widgets/nwsb_coin_fly.dart' show NwsbCoinDisc;
 
 class SignatureWordsPage extends StatefulWidget {
   const SignatureWordsPage({super.key, this.source = const DemoSignatureSource(), this.reduceEffects = false});
@@ -51,7 +50,7 @@ class _SignatureWordsPageState extends State<SignatureWordsPage> {
   Widget build(BuildContext context) {
     final reduce = widget.reduceEffects || MediaQuery.of(context).disableAnimations;
     return Scaffold(
-      backgroundColor: const Color(0xFF120B2E),
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.white,
@@ -62,17 +61,14 @@ class _SignatureWordsPageState extends State<SignatureWordsPage> {
         ],
       ),
       extendBodyBehindAppBar: true,
-      body: AuraBackground(
-        animate: !reduce,
-        child: SafeArea(child: _body(reduce)),
-      ),
+      body: NAppBackdrop(child: SafeArea(child: _body(reduce))),
     );
   }
 
   Widget _body(bool reduce) {
     switch (_status) {
       case _Status.loading:
-        return const Center(child: CircularProgressIndicator(key: Key('sig-loading'), color: kGold));
+        return const Center(child: CircularProgressIndicator(key: Key('sig-loading'), color: NTokens.gold));
       case _Status.error:
         return _Message(key: const Key('sig-error'), icon: Icons.error_outline, text: 'Something went wrong loading Signature Words.', action: 'Try again', onTap: _load);
       case _Status.offline:
@@ -86,9 +82,8 @@ class _SignatureWordsPageState extends State<SignatureWordsPage> {
       SliverToBoxAdapter(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
-          child: Row(children: [
+          child: Wrap(spacing: 8, runSpacing: 8, children: [
             ChoiceChip(key: const Key('sig-all'), label: const Text('All'), selected: !_ownedOnly, onSelected: (_) => setState(() => _ownedOnly = false)),
-            const SizedBox(width: 8),
             ChoiceChip(key: const Key('sig-owned'), label: const Text('My collection'), selected: _ownedOnly, onSelected: (_) => setState(() => _ownedOnly = true)),
           ]),
         ),
@@ -106,13 +101,16 @@ class _SignatureWordsPageState extends State<SignatureWordsPage> {
         )
       else
         SliverPadding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
-          sliver: SliverGrid(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, mainAxisSpacing: 14, crossAxisSpacing: 14, childAspectRatio: 3 / 4.6),
-            delegate: SliverChildBuilderDelegate(
-              (c, i) => SignatureCard(word: list[i], effects: !reduce, onTap: () => _open(list[i], reduce)),
-              childCount: list.length,
-            ),
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 32),
+          sliver: SliverList.separated(
+            itemCount: list.length + 1,
+            separatorBuilder: (_, __) => const SizedBox(height: 12),
+            itemBuilder: (c, i) => i == 0
+                ? const Padding(
+                    padding: EdgeInsets.only(left: 4, top: 4),
+                    child: Text('SIGNATURE WORDS', style: TextStyle(color: NTokens.mint, fontSize: 11, letterSpacing: 1.6, fontWeight: FontWeight.w800)),
+                  )
+                : SignatureCard(word: list[i - 1], index: _words.indexOf(list[i - 1]), onTap: () => _open(list[i - 1], reduce)),
           ),
         ),
     ]);
@@ -126,14 +124,13 @@ class _SignatureWordsPageState extends State<SignatureWordsPage> {
       builder: (_) => Padding(
         padding: const EdgeInsets.all(16),
         child: NGlass(
-          accent: rarityGlow(w.rarity),
+          accent: kitRarity(w.rarity).color,
           blur: 16,
           child: Container(
             key: const Key('sig-detail'),
-            color: Colors.black.withValues(alpha: 0.4),
-            padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(16),
             child: SingleChildScrollView(child: Column(mainAxisSize: MainAxisSize.min, children: [
-              MandalaLoop(size: 110, animate: !reduce && !w.locked),
+              CircleImage(image: NCircles.at(_words.indexOf(w)), size: 110, ring: kitRarity(w.rarity).color),
               const SizedBox(height: 8),
               Text(w.locked ? 'Locked drop' : w.word, style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w600)),
               const SizedBox(height: 6),
@@ -147,16 +144,19 @@ class _SignatureWordsPageState extends State<SignatureWordsPage> {
               ),
               const SizedBox(height: 10),
               if (w.locked)
-                const Text('This word unlocks at its drop date.', style: TextStyle(color: kGold))
+                const Text('This word unlocks at its drop date.', style: TextStyle(color: NTokens.gold))
               else if (w.owned)
-                const Text('In your collection', style: TextStyle(color: kGold))
+                const Text('In your collection', style: TextStyle(color: NTokens.gold))
               else ...[
-                FilledButton(
-                  key: const Key('sig-buy'),
-                  style: FilledButton.styleFrom(backgroundColor: kGold, foregroundColor: Colors.black),
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Text('Collect for ${w.priceCoins} coins'),
-                ),
+                Wrap(alignment: WrapAlignment.center, crossAxisAlignment: WrapCrossAlignment.center, spacing: 8, runSpacing: 8, children: [
+                  const NwsbCoinDisc(size: 22),
+                  GlassPill(
+                    key: const Key('sig-buy'),
+                    label: 'Collect for ${w.priceCoins} coins',
+                    style: PillStyle.white,
+                    onTap: () => Navigator.of(context).pop(),
+                  ),
+                ]),
                 const SizedBox(height: 6),
                 const Text('Coins are taken from your balance after you confirm.', style: TextStyle(color: Colors.white54, fontSize: 11)),
               ],
@@ -168,19 +168,19 @@ class _SignatureWordsPageState extends State<SignatureWordsPage> {
   }
 
   void _rarityInfo(BuildContext context) {
-    showDialog<void>(
-      context: context,
-      builder: (c) => AlertDialog(
-        key: const Key('sig-rarity-dialog'),
-        backgroundColor: const Color(0xFF0E0A22),
-        title: const Text('Rarity', style: TextStyle(color: Colors.white)),
-        content: const Text(
+    showGlassPopup<void>(
+      context,
+      builder: (c) => Column(key: const Key('sig-rarity-dialog'), mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const Text('Rarity', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800)),
+        const SizedBox(height: 10),
+        const Text(
           'Rarity is a label for how special a word is: Common, Rare, Epic or Legendary. '
           'You always pick the exact word you collect and see its fixed price first. There are no random draws.',
-          style: TextStyle(color: Colors.white70),
+          style: TextStyle(color: NTokens.textLo, height: 1.4),
         ),
-        actions: [TextButton(onPressed: () => Navigator.of(c).pop(), child: const Text('Got it'))],
-      ),
+        const SizedBox(height: 14),
+        Align(alignment: Alignment.centerRight, child: GlassPill(label: 'Got it', style: PillStyle.white, dense: true, onTap: () => Navigator.of(c).pop())),
+      ]),
     );
   }
 
@@ -203,26 +203,61 @@ class _SignatureWordsPageState extends State<SignatureWordsPage> {
   }
 }
 
-class _Hero extends StatelessWidget {
+class _Hero extends StatefulWidget {
   const _Hero({required this.reduce});
   final bool reduce;
   @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-        child: NGlass(
-          accent: kGold,
-          blur: 16,
-          child: Row(children: [
-            MandalaLoop(size: 96, animate: !reduce),
-            const SizedBox(width: 14),
-            const Expanded(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('Signature Words', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600)),
-                SizedBox(height: 4),
-                Text('Rare words, each with its own sound. Collect them.', style: TextStyle(color: Colors.white70, fontSize: 13)),
-              ]),
-            ),
-          ]),
+  State<_Hero> createState() => _HeroState();
+}
+
+class _HeroState extends State<_Hero> {
+  final _pc = PageController(viewportFraction: 0.86);
+  int _i = 0;
+  static const _slides = [
+    ('Rare words', 'Each Signature word is one of a few special words, chosen for you to keep.', 'lotus'),
+    ('Your own signature sound', 'Every word comes with its own calm sound to practise and make yours.', 'singing_bowl'),
+    ('Collect them', 'Pick the exact word you want at a fixed price. No random draws.', 'milky_way'),
+  ];
+
+  @override
+  void dispose() {
+    _pc.dispose();
+    super.dispose();
+  }
+
+  void _next() {
+    final n = (_i + 1) % _slides.length;
+    if (widget.reduce) {
+      _pc.jumpToPage(n);
+    } else {
+      _pc.animateToPage(n, duration: const Duration(milliseconds: 420), curve: Curves.easeOutCubic);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+        height: 400,
+        child: PageView.builder(
+          key: const Key('sig-hero'),
+          controller: _pc,
+          itemCount: _slides.length,
+          onPageChanged: (i) => setState(() => _i = i),
+          itemBuilder: (c, i) {
+            final s = _slides[i];
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(6, 8, 6, 8),
+              child: SingleChildScrollView(physics: const NeverScrollableScrollPhysics(), child: MeditationCard(
+                title: s.$1,
+                subtitle: s.$2,
+                image: NCircles.of(s.$3),
+                secondary: 'Skip',
+                cta: 'Next',
+                onCta: _next,
+                dots: _slides.length,
+                dotIndex: i,
+              )),
+            );
+          },
         ),
       );
 }
@@ -238,7 +273,7 @@ class _Message extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(32),
           child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Icon(icon, color: kGold, size: 44),
+            Icon(icon, color: NTokens.gold, size: 44),
             const SizedBox(height: 12),
             Text(text, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70)),
             const SizedBox(height: 16),

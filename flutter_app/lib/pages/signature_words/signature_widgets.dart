@@ -1,96 +1,70 @@
-/// Signature card built on the shared nowssb_ui glass (NGlass).
+/// Signature cards in the approved design: frosted coupon-ticket rows
+/// (approved-2) built from the shared nowssb_ui pieces, priced with the
+/// app's original coin (NwsbCoinDisc).
 library;
 
 import 'package:flutter/material.dart';
-import '../../nowssb_ui/nowssb_ui.dart' hide Rarity;
+import '../../nowssb_ui/nowssb_ui.dart' as ui;
+import '../../widgets/nwsb_coin_fly.dart' show NwsbCoinDisc;
 import 'signature_models.dart';
-import 'tilt_shine.dart';
 
-const kGold = Color(0xFFE8C46A);
-const kViolet = Color(0xFF8B7CF6);
+ui.Rarity kitRarity(Rarity r) => ui.Rarity.values[r.index];
 
-Color rarityGlow(Rarity r) => const [
-      Color(0xFF9FB3C8),
-      Color(0xFF5EA8FF),
-      Color(0xFFB57CFF),
-      Color(0xFFFFC857),
-    ][r.index];
-
-/// Tall portrait premium card with gold inner frame and rarity glow.
 class SignatureCard extends StatelessWidget {
-  const SignatureCard({super.key, required this.word, required this.onTap, this.effects = true});
-  final bool effects;
+  const SignatureCard({super.key, required this.word, required this.index, required this.onTap});
   final SignatureWord word;
+  final int index;
   final VoidCallback onTap;
+
   @override
   Widget build(BuildContext context) {
-    final glow = rarityGlow(word.rarity);
+    final r = kitRarity(word.rarity);
+    Widget card = ClipPath(
+      clipper: const ui.NotchClipper(radius: 22, notch: 10),
+      child: ui.NGlass(
+        radius: 22,
+        accent: r.color,
+        onTap: onTap,
+        padding: const EdgeInsets.fromLTRB(20, 14, 20, 14),
+        child: Row(children: [
+          ui.CircleImage(image: ui.NCircles.at(index), size: 64, ring: r.color),
+          const SizedBox(width: 12),
+          const SizedBox(height: 64, child: ui.DashedLine(vertical: true)),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Wrap(spacing: 6, runSpacing: 4, children: [
+                ui.RarityChip(r),
+                if (word.owned) const ui.GlassBadge('OWNED', color: ui.NTokens.mint),
+              ]),
+              const SizedBox(height: 6),
+              Text(word.locked ? 'Upcoming drop' : word.sound,
+                  style: const TextStyle(color: ui.NTokens.textLo, fontSize: 12)),
+              Text(word.locked ? 'Locked' : word.word,
+                  style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 2),
+              if (word.locked)
+                Text(_dropLabel(word.dropAt), style: const TextStyle(color: ui.NTokens.mint, fontSize: 12, fontWeight: FontWeight.w700))
+              else if (word.owned)
+                const Text('In your collection', style: TextStyle(color: ui.NTokens.mint, fontSize: 12, fontWeight: FontWeight.w700))
+              else
+                Row(children: [
+                  const NwsbCoinDisc(size: 16),
+                  const SizedBox(width: 4),
+                  Flexible(child: Text('${word.priceCoins} coins', overflow: TextOverflow.ellipsis, style: const TextStyle(color: ui.NTokens.mint, fontSize: 12, fontWeight: FontWeight.w700))),
+                ]),
+            ]),
+          ),
+          if (word.locked) const Icon(Icons.lock_rounded, color: Colors.white70, size: 20),
+        ]),
+      ),
+    );
     return Semantics(
       button: true,
-      label: '${word.word}, ${word.rarity.label}${word.locked ? ', locked' : ''}',
-      child: GestureDetector(
-        key: ValueKey('sig-card-${word.id}'),
-        onTap: onTap,
-        child: AspectRatio(
-          aspectRatio: 3 / 4.6,
-          child: TiltShine(
-            enabled: effects && !word.locked,
-            child: NGlass(
-            accent: glow,
-            blur: 16,
-            padding: const EdgeInsets.all(8),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: kGold.withValues(alpha: 0.7), width: 1.2),
-              ),
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(word.rarity.label.toUpperCase(),
-                      style: TextStyle(color: glow, fontSize: 10, letterSpacing: 1.6, fontWeight: FontWeight.w700)),
-                  const Spacer(),
-                  Center(
-                    child: word.locked
-                        ? const Icon(Icons.lock_rounded, color: kGold, size: 40)
-                        : Text(word.word,
-                            style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w600)),
-                  ),
-                  const Spacer(),
-                  Text(word.locked ? _dropLabel(word.dropAt) : word.sound,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 12)),
-                  const SizedBox(height: 8),
-                  _PriceStrip(word: word),
-                ],
-              ),
-            ),
-          ),
-          ),
-        ),
-      ),
+      label: '${word.locked ? 'Locked drop' : word.word}, ${word.rarity.label}',
+      child: KeyedSubtree(key: ValueKey('sig-card-${word.id}'), child: card),
     );
   }
 }
 
-String _dropLabel(DateTime? d) =>
-    d == null ? 'Upcoming drop' : 'Drops ${d.day}/${d.month}/${d.year}';
-
-class _PriceStrip extends StatelessWidget {
-  const _PriceStrip({required this.word});
-  final SignatureWord word;
-  @override
-  Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-        decoration: BoxDecoration(
-          color: (word.owned ? kViolet : kGold).withValues(alpha: 0.22),
-          borderRadius: BorderRadius.circular(99),
-        ),
-        child: Text(
-          word.owned ? 'Collected' : '${word.priceCoins} coins',
-          style: TextStyle(color: word.owned ? Colors.white : kGold, fontSize: 12, fontWeight: FontWeight.w600),
-        ),
-      );
-}
+String _dropLabel(DateTime? d) => d == null ? 'Drop date to be announced' : 'Drops ${d.day}/${d.month}/${d.year}';

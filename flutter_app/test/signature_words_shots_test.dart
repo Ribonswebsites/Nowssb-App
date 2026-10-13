@@ -45,6 +45,18 @@ Future<void> _shot(WidgetTester t, SignatureSource src, String name, [Future<voi
     await act();
     await t.pumpAndSettle();
   }
+  for (var k = 0; k < 2; k++) {
+    await t.runAsync(() async {
+      for (final e in find.byType(Image).evaluate()) {
+        await precacheImage((e.widget as Image).image, e, onError: (_, __) {});
+      }
+      for (final e in find.byType(DecoratedBox).evaluate()) {
+        final d = (e.widget as DecoratedBox).decoration;
+        if (d is BoxDecoration && d.image != null) await precacheImage(d.image!.image, e, onError: (_, __) {});
+      }
+    });
+    await t.pumpAndSettle();
+  }
   await expectLater(find.byType(MaterialApp), matchesGoldenFile('shots/$name.png'));
 }
 
@@ -55,9 +67,14 @@ void main() {
   testWidgets('2 detail', (t) => _shot(t, demo, 'signature-2', () => t.tap(find.byKey(const ValueKey('sig-card-aum')))), skip: _skip);
   testWidgets('3 help', (t) => _shot(t, demo, 'signature-3', () => t.tap(find.byKey(const Key('sig-help')))), skip: _skip);
   testWidgets('4 rarity', (t) => _shot(t, demo, 'signature-4', () async {
+        await t.drag(find.byType(CustomScrollView), const Offset(0, -500));
+        await t.pumpAndSettle();
         await t.tap(find.byKey(const ValueKey('sig-card-lumen')));
         await t.pumpAndSettle();
         await t.tap(find.byKey(const Key('sig-rarity-info')));
+      }), skip: _skip);
+  testWidgets('9 list', (t) => _shot(t, demo, 'signature-9', () async {
+        await t.drag(find.byType(CustomScrollView), const Offset(0, -500));
       }), skip: _skip);
   testWidgets('5 collection', (t) => _shot(t, demo, 'signature-5', () => t.tap(find.byKey(const Key('sig-owned')))), skip: _skip);
   testWidgets('6 empty', (t) => _shot(t, _Src(() async => []), 'signature-6'), skip: _skip);
