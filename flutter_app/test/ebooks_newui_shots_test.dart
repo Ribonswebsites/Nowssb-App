@@ -24,6 +24,8 @@ class _Src implements EbooksSource {
   @override
   num priceOf(EbBook b) => b.price;
   @override
+  int priceCents(EbBook b) => ebookCatalogToCents(b.price);
+  @override
   bool owns(EbBook b) => owned.contains(b.key);
 }
 

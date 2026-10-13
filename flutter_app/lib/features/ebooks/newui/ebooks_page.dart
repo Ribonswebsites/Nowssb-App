@@ -6,7 +6,7 @@ library;
 import 'package:flutter/material.dart';
 
 import '../../../data/store_catalog.dart';
-import '../../../screens/store/store_cards.dart' show inr;
+import '../../../kit/kit.dart';
 import '../../../nowssb_ui/nowssb_ui.dart';
 import '../../../screens/store/store_actions.dart';
 import '../../../shell/nwsb_links.dart';
@@ -30,10 +30,7 @@ class EbooksActions {
   void doRead(BuildContext c, EbBook b) => read != null ? read!(c, b) : NwsbLinks.reader(c);
 }
 
-/// Catalog prices are INR (rupees). KitMoney.cents expects USD cents, and
-/// KitMoney.rupees is deprecated, so show the same INR label the legacy
-/// store shows until the catalog carries minor-unit prices.
-String _money(num rupees) => inr(rupees);
+String _money(int cents) => KitMoney.cents(cents);
 
 const _outlines = [NTokens.violet, NTokens.mint, NTokens.pink, NTokens.gold];
 Color _outline(int i) => _outlines[i % _outlines.length];
@@ -130,7 +127,7 @@ class _Library extends StatelessWidget {
       ]);
 }
 
-String _priceLabel(EbooksSource s, EbBook b) => s.owns(b) ? 'Yours' : _money(s.priceOf(b));
+String _priceLabel(EbooksSource s, EbBook b) => s.owns(b) ? 'Yours' : _money(s.priceCents(b));
 
 class _BookCard extends StatelessWidget {
   const _BookCard({required this.book, required this.index, required this.page});
@@ -197,7 +194,7 @@ class EbookDetailNewUi extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final owned = source.owns(book);
-    final price = source.priceOf(book);
+    final price = source.priceCents(book);
     return Scaffold(
       backgroundColor: NTokens.bgBottom,
       appBar: AppBar(backgroundColor: Colors.transparent, foregroundColor: NTokens.textHi, title: Text(book.title, overflow: TextOverflow.ellipsis)),

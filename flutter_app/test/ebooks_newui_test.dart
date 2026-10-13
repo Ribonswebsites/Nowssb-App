@@ -22,6 +22,8 @@ class FakeSource implements EbooksSource {
   @override
   num priceOf(EbBook b) => b.price;
   @override
+  int priceCents(EbBook b) => ebookCatalogToCents(b.price);
+  @override
   bool owns(EbBook b) => owned.contains(b.key);
 }
 
@@ -137,5 +139,10 @@ void main() {
 
   test('storeEbooks route uses the ebooks flag', () {
     expect(AppRoutes.byScreenId('store.ebooks')?.flag, 'ebooks');
+  });
+
+  test('catalog price converts to USD cents, never shown 1:1', () {
+    expect(ebookCatalogToCents(835), 1000); // 835 at 83.5/USD = 10.00 USD
+    expect(KitMoney.cents(ebookCatalogToCents(499), locale: 'en_US'), isNot(contains('499')));
   });
 }
