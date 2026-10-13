@@ -5,11 +5,13 @@ library;
 import 'package:flutter/material.dart';
 
 import 'rewards_data.dart';
+import 'lotus_coin.dart';
 import 'rewards_glass.dart';
 
 class RewardsNewUiPage extends StatefulWidget {
   const RewardsNewUiPage({super.key, this.loader = loadRewardsFromServer, this.onOpen});
   final RewardsLoader loader;
+
   /// Called with a destination id ('checkin', 'streaks', 'quests', 'chests',
   /// 'boost', 'store', 'coins', 'earn'); wired to AppRoutes once it exists.
   final void Function(String id)? onOpen;
@@ -28,6 +30,7 @@ class _RewardsNewUiPageState extends State<RewardsNewUiPage> {
       _future = f;
     });
   }
+
   void _open(String id) => widget.onOpen?.call(id);
 
   @override
@@ -54,10 +57,12 @@ class _RewardsNewUiPageState extends State<RewardsNewUiPage> {
                   onAction: _reload,
                 );
               }
-              return RefreshIndicator(onRefresh: () async {
-                  _reload();
-                  await _future.catchError((_) => RewardsData.fromSummary(const {}));
-                }, child: _hub(snap.data!));
+              return RefreshIndicator(
+                  onRefresh: () async {
+                    _reload();
+                    await _future.catchError((_) => RewardsData.fromSummary(const {}));
+                  },
+                  child: _hub(snap.data!));
             },
           ),
         ),
@@ -66,17 +71,20 @@ class _RewardsNewUiPageState extends State<RewardsNewUiPage> {
   }
 
   Widget _hub(RewardsData d) {
-    final shown = d.items.where((i) => switch (_filter) {
-          'Coupons' => i.kind == RewardKind.coupon && !i.expired,
-          'Gifts' => i.kind == RewardKind.gift && !i.expired,
-          'Chests' => i.kind == RewardKind.chest && !i.expired,
-          'Expired' => i.expired,
-          _ => true,
-        }).toList();
-    return CustomScrollView(slivers: [
+    final shown = d.items
+        .where((i) => switch (_filter) {
+              'Coupons' => i.kind == RewardKind.coupon && !i.expired,
+              'Gifts' => i.kind == RewardKind.gift && !i.expired,
+              'Chests' => i.kind == RewardKind.chest && !i.expired,
+              'Expired' => i.expired,
+              _ => true,
+            })
+        .toList();
+    return CustomScrollView(key: const Key('rewards.scroll'), slivers: [
       SliverPadding(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-        sliver: SliverList.list(children: [
+        sliver: SliverList.list(
+            children: _reveal([
           Row(children: [
             if (Navigator.of(context).canPop()) const BackButton(color: Colors.white),
             const Expanded(child: Text('Rewards', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w700))),
@@ -112,12 +120,15 @@ class _RewardsNewUiPageState extends State<RewardsNewUiPage> {
           ),
           const SizedBox(height: 12),
           RArrowBar(label: 'Earn & Save', onTap: () => _open('earn')),
+          const SizedBox(height: 8),
+          Text('Coins have no cash value and can cover only part of a price. Boosts speed up earning, never the spend cap.',
+              style: TextStyle(color: Colors.white.withValues(alpha: .55), fontSize: 11)),
           const SizedBox(height: 20),
           const Text('My Rewards', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
           RFilterChips(options: const ['All', 'Coupons', 'Gifts', 'Chests', 'Expired'], selected: _filter, onSelect: (f) => setState(() => _filter = f)),
           const SizedBox(height: 12),
-        ]),
+        ])),
       ),
       if (shown.isEmpty)
         SliverToBoxAdapter(
@@ -135,10 +146,15 @@ class _RewardsNewUiPageState extends State<RewardsNewUiPage> {
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
           sliver: SliverGrid.count(
-            crossAxisCount: 2, mainAxisSpacing: 12, crossAxisSpacing: 12, childAspectRatio: .82,
+            crossAxisCount: 2,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            childAspectRatio: .82,
             children: [for (final i in shown) RGiftTile(item: i)],
           ),
         ),
     ]);
   }
+
+  List<Widget> _reveal(List<Widget> ws) => [for (final (i, w) in ws.indexed) CalmReveal(index: i, child: w)];
 }

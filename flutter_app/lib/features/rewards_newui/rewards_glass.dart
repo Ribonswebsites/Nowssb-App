@@ -8,6 +8,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
+import 'lotus_coin.dart';
 import 'rewards_data.dart';
 
 abstract final class RGlass {
@@ -80,14 +81,18 @@ class _AuraPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final r = Offset.zero & size;
-    canvas.drawRect(r, Paint()..shader = const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [RGlass.bgTop, RGlass.bgBottom]).createShader(r));
+    canvas.drawRect(
+        r,
+        Paint()
+          ..shader = const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [RGlass.bgTop, RGlass.bgBottom]).createShader(r));
     const orbs = [(.2, .15, 90.0, Color(0x66B79CFF)), (.85, .35, 120.0, Color(0x447FD3FF)), (.3, .75, 140.0, Color(0x44FF9EDB))];
     for (var i = 0; i < orbs.length; i++) {
       final (x, y, rad, c) = orbs[i];
       final a = 2 * math.pi * (t + i / 3);
       final o = Offset(size.width * x + 14 * math.cos(a), size.height * y + 18 * math.sin(a));
       final breathe = rad * (1 + .08 * math.sin(a * 2));
-      canvas.drawCircle(o, breathe, Paint()..shader = RadialGradient(colors: [c, c.withValues(alpha: 0)]).createShader(Rect.fromCircle(center: o, radius: breathe)));
+      canvas.drawCircle(
+          o, breathe, Paint()..shader = RadialGradient(colors: [c, c.withValues(alpha: 0)]).createShader(Rect.fromCircle(center: o, radius: breathe)));
     }
   }
 
@@ -111,7 +116,7 @@ class RCoinChip extends StatelessWidget {
             child: Row(mainAxisSize: MainAxisSize.min, children: [
               const Icon(Icons.spa_rounded, color: RGlass.gold, size: 18),
               const SizedBox(width: 6),
-              Text('$coins', key: const Key('rewards.coins'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+              CountUpText(coins, key: const Key('rewards.coins'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
             ]),
           ),
         ),
@@ -143,12 +148,15 @@ class _RHeroCarouselState extends State<RHeroCarousel> {
                     child: Row(children: [
                       Expanded(
                         child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
-                          FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: Text(t, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800))),
+                          FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerLeft,
+                              child: Text(t, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800))),
                           const SizedBox(height: 6),
                           Text(s, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.white.withValues(alpha: .8))),
                         ]),
                       ),
-                      const Icon(Icons.spa_rounded, size: 64, color: RGlass.gold),
+                      const LotusCoin(size: 96),
                     ]),
                   ),
                 ),
@@ -161,7 +169,8 @@ class _RHeroCarouselState extends State<RHeroCarousel> {
             AnimatedContainer(
               duration: const Duration(milliseconds: 250),
               margin: const EdgeInsets.symmetric(horizontal: 3),
-              width: k == _i ? 22 : 8, height: 4,
+              width: k == _i ? 22 : 8,
+              height: 4,
               decoration: BoxDecoration(color: Colors.white.withValues(alpha: k == _i ? .9 : .3), borderRadius: BorderRadius.circular(2)),
             ),
         ]),
@@ -289,7 +298,11 @@ class RGiftTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = switch (item.kind) { RewardKind.gift => const Color(0xFFFF9EDB), RewardKind.chest => RGlass.gold, RewardKind.coupon => RGlass.violet };
-    final icon = switch (item.kind) { RewardKind.gift => Icons.card_giftcard_rounded, RewardKind.chest => Icons.inventory_2_rounded, RewardKind.coupon => Icons.confirmation_number_rounded };
+    final icon = switch (item.kind) {
+      RewardKind.gift => Icons.card_giftcard_rounded,
+      RewardKind.chest => Icons.inventory_2_rounded,
+      RewardKind.coupon => Icons.confirmation_number_rounded
+    };
     final till = item.validTill;
     final tile = RGlassBox(
       key: Key('rewards.tile.${item.id}'),
@@ -302,20 +315,33 @@ class RGiftTile extends StatelessWidget {
             child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
               CircleAvatar(radius: 26, backgroundColor: color.withValues(alpha: .3), child: Icon(icon, color: Colors.white, size: 28)),
               const SizedBox(height: 8),
-              Text(item.title, textAlign: TextAlign.center, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
-              if (item.caption.isNotEmpty) Text(item.caption, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.white.withValues(alpha: .7), fontSize: 11)),
-              if (till != null) Text('Valid till ${till.day}/${till.month}/${till.year}', style: TextStyle(color: Colors.white.withValues(alpha: .6), fontSize: 11)),
+              Text(item.title,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+              if (item.caption.isNotEmpty)
+                Text(item.caption, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.white.withValues(alpha: .7), fontSize: 11)),
+              if (till != null)
+                Text('Valid till ${till.day}/${till.month}/${till.year}', style: TextStyle(color: Colors.white.withValues(alpha: .6), fontSize: 11)),
             ]),
           ),
         ),
         Container(
-          height: 26, width: double.infinity, alignment: Alignment.center,
+          height: 26,
+          width: double.infinity,
+          alignment: Alignment.center,
           color: item.expired ? Colors.black38 : color.withValues(alpha: .6),
           child: Text(item.expired ? 'Expired' : 'Use now', style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600)),
         ),
       ]),
     );
-    return item.expired ? Opacity(opacity: .5, child: ColorFiltered(colorFilter: const ColorFilter.matrix(<double>[.33, .33, .33, 0, 0, .33, .33, .33, 0, 0, .33, .33, .33, 0, 0, 0, 0, 0, 1, 0]), child: tile)) : tile;
+    return item.expired
+        ? Opacity(
+            opacity: .5,
+            child: ColorFiltered(
+                colorFilter: const ColorFilter.matrix(<double>[.33, .33, .33, 0, 0, .33, .33, .33, 0, 0, .33, .33, .33, 0, 0, 0, 0, 0, 1, 0]), child: tile))
+        : tile;
   }
 }
 
@@ -341,7 +367,8 @@ class RStateMessage extends StatelessWidget {
               Text(body, textAlign: TextAlign.center, style: TextStyle(color: Colors.white.withValues(alpha: .75))),
               if (action != null) ...[
                 const SizedBox(height: 14),
-                FilledButton(onPressed: onAction, style: FilledButton.styleFrom(backgroundColor: RGlass.violet, foregroundColor: RGlass.bgBottom), child: Text(action!)),
+                FilledButton(
+                    onPressed: onAction, style: FilledButton.styleFrom(backgroundColor: RGlass.violet, foregroundColor: RGlass.bgBottom), child: Text(action!)),
               ],
             ]),
           ),

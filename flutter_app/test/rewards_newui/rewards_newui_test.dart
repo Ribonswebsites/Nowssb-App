@@ -5,13 +5,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:nowssb/features/rewards_newui/rewards_data.dart';
 import 'package:nowssb/features/rewards_newui/rewards_flag.dart';
 import 'package:nowssb/features/rewards_newui/rewards_page.dart';
+import 'package:nowssb/features/rewards_newui/lotus_coin.dart';
 
 final _now = DateTime(2026, 10, 13);
 RewardsData _full() => RewardsData.fromSummary({
       'wallet': {'coins': 420},
       'today': {'login': false},
       'streaks': {'current': 7},
-      'quests': {'weekly': [{'claimed': false}, {'claimed': true}]},
+      'quests': {
+        'weekly': [
+          {'claimed': false},
+          {'claimed': true}
+        ]
+      },
       'chests': {'ready': 1},
       'deal': {'title': 'Words bundle, 2x coins back'},
       'myRewards': [
@@ -89,12 +95,12 @@ void main() {
     expect(find.text('420'), findsOneWidget);
     expect(find.text('24 hour deal'), findsOneWidget);
     expect(find.text('Unlocks tomorrow'), findsOneWidget);
-    await t.scrollUntilVisible(find.byKey(const Key('rewards.tile.c1')), 200, scrollable: find.byType(Scrollable).last);
+    await t.scrollUntilVisible(find.byKey(const Key('rewards.tile.c1')), 200, scrollable: find.descendant(of: find.byKey(const Key('rewards.scroll')), matching: find.byType(Scrollable)).first);
     await t.ensureVisible(find.byKey(const Key('rewards.filter.Expired')));
     await t.pump();
     await t.tap(find.byKey(const Key('rewards.filter.Expired')));
     await t.pump();
-    await t.scrollUntilVisible(find.byKey(const Key('rewards.tile.x1')), 200, scrollable: find.byType(Scrollable).last);
+    await t.scrollUntilVisible(find.byKey(const Key('rewards.tile.x1')), 200, scrollable: find.descendant(of: find.byKey(const Key('rewards.scroll')), matching: find.byType(Scrollable)).first);
     expect(find.byKey(const Key('rewards.tile.x1')), findsOneWidget);
     expect(find.byKey(const Key('rewards.tile.c1')), findsNothing);
     expect(find.text('Expired'), findsWidgets);
@@ -102,13 +108,27 @@ void main() {
     await t.pump();
     await t.tap(find.byKey(const Key('rewards.filter.Gifts')));
     await t.pump();
-    await t.scrollUntilVisible(find.byKey(const Key('rewards.tile.g1')), 200, scrollable: find.byType(Scrollable).last);
+    await t.scrollUntilVisible(find.byKey(const Key('rewards.tile.g1')), 200, scrollable: find.descendant(of: find.byKey(const Key('rewards.scroll')), matching: find.byType(Scrollable)).first);
     expect(find.byKey(const Key('rewards.tile.g1')), findsOneWidget);
     await t.ensureVisible(find.text('Earn & Save'));
     await t.pump();
     await t.tap(find.text('Earn & Save'));
-    await t.scrollUntilVisible(find.byKey(const Key('rewards.coins')), -300, scrollable: find.byType(Scrollable).last);
+    await t.scrollUntilVisible(find.byKey(const Key('rewards.coins')), -300, scrollable: find.descendant(of: find.byKey(const Key('rewards.scroll')), matching: find.byType(Scrollable)).first);
     await t.tap(find.byKey(const Key('rewards.coins')));
     expect(opened, ['earn', 'coins']);
+  });
+
+  testWidgets('lotus coin animates with motion and count-up lands on server value', (t) async {
+    await t.pumpWidget(const MaterialApp(home: Scaffold(body: Column(children: [LotusCoin(), CountUpText(420)]))));
+    await t.pump(const Duration(milliseconds: 1200));
+    expect(find.text('420'), findsOneWidget);
+    expect(find.byType(LotusCoin), findsOneWidget);
+    await t.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('honesty note shown', (t) async {
+    await _pump(t, () async => _full());
+    await t.pump();
+    expect(find.textContaining('no cash value'), findsOneWidget);
   });
 }

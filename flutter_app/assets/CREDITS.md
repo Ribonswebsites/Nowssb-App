@@ -30,3 +30,7 @@
 
 ## Partner page (newui_partner)
 - Orbit rings hero: procedural CustomPainter, original code, no third-party assets.
+
+## Rewards page (newui_rewards)
+- Golden lotus coin over still water with ripples and orbiting sparkles (lib/features/rewards_newui/lotus_coin.dart), aura background, glass tiles, count-up and calm staggered reveal: procedural CustomPainter / Flutter code, original. No Lottie, Rive, image, video or font files added. Icons: Flutter Material Icons (Apache 2.0).
+- Ideas only, nothing copied or bundled: Meditate app's earn-a-mandala reward loop (screensdesign.com showcase), Dribbble "streak reward" search results for layout mood. Researched Oct 13 2026.
