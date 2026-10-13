@@ -3,6 +3,9 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../../kit/kit.dart';
+import 'newui/store_feed.dart';
+import 'newui/store_page.dart';
 
 import '../../data/store_catalog.dart';
 import '../../data/store_prices.dart';
@@ -34,7 +37,11 @@ class WordAtelierScreen extends StatelessWidget {
   const WordAtelierScreen({super.key});
 
   @override
-  Widget build(BuildContext context) => _retired(context);
+  Widget build(BuildContext context) => NewUiGate(
+        page: 'store',
+        legacy: _retired,
+        rebuilt: (_) => const StoreDeptPage(dept: StoreDept.words),
+      );
 
   Widget _retired(BuildContext context) => StoreTermsHost(
         which: 'word',

@@ -8,6 +8,7 @@ import '../features/gifts/newui/gifts_hub_page.dart';
 import '../features/rewards_newui/rewards_page.dart';
 import '../features/coins/wallet/coins_wallet_entry.dart';
 import '../features/earn/newui/earn_newui_screen.dart';
+import '../screens/store/newui/store_feed.dart';
 import '../screens/store/newui/store_page.dart';
 import '../pages/partner/partner_home_page.dart';
 import '../pages/signature_words/signature_words_page.dart';
@@ -23,6 +24,8 @@ void registerRebuiltPages() {
   AppRoutes.registerRebuilt(AppPage.coins, buildCoinsWallet);
   AppRoutes.registerRebuilt(AppPage.earn, (c, a) => const EarnNewUiScreen());
   AppRoutes.registerRebuilt(AppPage.store, (c, a) => const NewStorePage());
+  AppRoutes.registerRebuilt(AppPage.storeWords, (c, a) => const StoreDeptPage(dept: StoreDept.words));
+  AppRoutes.registerRebuilt(AppPage.storeMeanings, (c, a) => const StoreDeptPage(dept: StoreDept.meanings));
   AppRoutes.registerRebuilt(AppPage.partner, (c, a) => const PartnerHomePage());
   AppRoutes.registerRebuilt(AppPage.storeSignature, (c, a) => const SignatureWordsPage());
   // ignore: unused_local_variable

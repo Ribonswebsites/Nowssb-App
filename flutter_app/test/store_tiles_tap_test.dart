@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:nowssb/kit/kit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nowssb/admin/layout/ui_layouts.dart';
 import 'package:nowssb/media/video_pool.dart';
@@ -22,6 +23,10 @@ class _Obs extends NavigatorObserver {
 }
 
 void main() {
+  // These cover the legacy Store screens; the rebuilt ones have store_newui_test.
+  setUpAll(() => NewUi.setDebugOverride('store', false));
+  tearDownAll(NewUi.resetForTest);
+
   TestWidgetsFlutterBinding.ensureInitialized();
   SharedPreferences.setMockInitialValues({'nwsb_terms_hub': '1'});
 

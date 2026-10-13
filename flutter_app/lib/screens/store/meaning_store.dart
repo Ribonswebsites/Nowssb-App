@@ -13,6 +13,9 @@ library;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../../kit/kit.dart';
+import 'newui/store_feed.dart';
+import 'newui/store_page.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../../data/content.dart';
@@ -73,7 +76,11 @@ class MeaningStoreScreen extends StatelessWidget {
   const MeaningStoreScreen({super.key});
 
   @override
-  Widget build(BuildContext context) => _retired(context);
+  Widget build(BuildContext context) => NewUiGate(
+        page: 'store',
+        legacy: _retired,
+        rebuilt: (_) => const StoreDeptPage(dept: StoreDept.meanings),
+      );
 
   Widget _retired(BuildContext context) => StoreTermsHost(
         which: 'meaning',

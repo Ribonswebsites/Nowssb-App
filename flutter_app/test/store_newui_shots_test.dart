@@ -15,7 +15,7 @@ import 'package:nowssb/screens/store/newui/store_page.dart';
 void main() {
   final dir = Platform.environment['STORE_SHOTS_DIR'];
   setUpAll(_loadFonts);
-  Future<void> shot(WidgetTester t, String name, StoreLoader l, {double scroll = 0}) async {
+  Future<void> shot(WidgetTester t, String name, Widget Function(Widget bg) page, {double scroll = 0}) async {
     t.view.physicalSize = const Size(1170, 2532);
     t.view.devicePixelRatio = 3;
     addTearDown(t.view.reset);
@@ -24,7 +24,7 @@ void main() {
       key: key,
       child: MediaQuery(
         data: const MediaQueryData(size: Size(390, 844), disableAnimations: true),
-        child: MaterialApp(debugShowCheckedModeBanner: false, theme: ThemeData(fontFamily: 'Roboto'), home: NewStorePage(loader: l, background: Image.asset(Settings.fashionImages.first, fit: BoxFit.cover))),
+        child: MaterialApp(debugShowCheckedModeBanner: false, theme: ThemeData(fontFamily: 'Roboto'), home: page(Image.asset(Settings.fashionImages.first, fit: BoxFit.cover))),
       ),
     ));
     await t.pump();
@@ -39,7 +39,7 @@ void main() {
     });
     await t.pump();
     if (scroll > 0) {
-      await t.drag(find.byType(CustomScrollView), Offset(0, -scroll));
+      await t.drag(find.byType(ListView).first, Offset(0, -scroll));
       await t.pump();
     }
     if (dir == null) return;
@@ -51,10 +51,14 @@ void main() {
     });
   }
 
-  testWidgets('store-1 ready top', (t) async => shot(t, 'store-1', bundledStoreRails));
-  testWidgets('store-2 ready scrolled', (t) async => shot(t, 'store-2', bundledStoreRails, scroll: 400));
-  testWidgets('store-3 empty', (t) async => shot(t, 'store-3', () async => []));
-  testWidgets('store-4 offline', (t) async => shot(t, 'store-4', () async => throw const SocketException('x')));
+  testWidgets('store-1 hub top', (t) async => shot(t, 'store-1', (b) => NewStorePage(loader: bundledStoreRails, background: b)));
+  testWidgets('store-2 hub list', (t) async => shot(t, 'store-2', (b) => NewStorePage(loader: bundledStoreRails, background: b), scroll: 420));
+  testWidgets('store-3 empty', (t) async => shot(t, 'store-3', (b) => NewStorePage(loader: () async => [], background: b)));
+  testWidgets('store-4 offline', (t) async => shot(t, 'store-4', (b) => NewStorePage(loader: () async => throw const SocketException('x'), background: b)));
+  testWidgets('words-1', (t) async => shot(t, 'words-1', (b) => StoreDeptPage(dept: StoreDept.words, loader: bundledStoreRails, background: b)));
+  testWidgets('words-2', (t) async => shot(t, 'words-2', (b) => StoreDeptPage(dept: StoreDept.words, loader: bundledStoreRails, background: b), scroll: 420));
+  testWidgets('meanings-1', (t) async => shot(t, 'meanings-1', (b) => StoreDeptPage(dept: StoreDept.meanings, loader: bundledStoreRails, background: b)));
+  testWidgets('meanings-2', (t) async => shot(t, 'meanings-2', (b) => StoreDeptPage(dept: StoreDept.meanings, loader: bundledStoreRails, background: b), scroll: 420));
 }
 
 Future<void> _loadFonts() async {

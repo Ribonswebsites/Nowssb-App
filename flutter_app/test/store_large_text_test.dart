@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:nowssb/kit/kit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/screens/store/ebooks_store.dart';
@@ -25,6 +26,10 @@ const String? _dumpTo = String.fromEnvironment('UI9_DUMP') == ''
     : String.fromEnvironment('UI9_DUMP');
 
 void main() {
+  // These cover the legacy Store screens; the rebuilt ones have store_newui_test.
+  setUpAll(() => NewUi.setDebugOverride('store', false));
+  tearDownAll(NewUi.resetForTest);
+
   TestWidgetsFlutterBinding.ensureInitialized();
 
   SharedPreferences.setMockInitialValues({

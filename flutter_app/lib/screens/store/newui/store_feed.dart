@@ -6,13 +6,16 @@ import 'dart:async';
 import 'dart:io' show SocketException;
 
 import 'package:flutter/foundation.dart';
-import 'package:intl/intl.dart';
+
+import '../../../features/economy/money.dart';
+import '../../../kit/kit.dart';
 
 import '../../../data/store_catalog.dart';
+import '../../../data/store_prices.dart';
 
 enum StoreDept { words, meanings, signature, ebooks }
 
-/// One product on a rail. Money is integer minor units (spec 25).
+/// One product on a rail. [priceMinor] is integer US cents, the FX base (spec 25).
 @immutable
 class StoreItem {
   const StoreItem({required this.id, required this.title, required this.subtitle, required this.priceMinor, required this.dept});
@@ -33,32 +36,33 @@ typedef StoreLoader = Future<List<StoreRail>> Function();
 
 enum StorePhase { loading, ready, empty, error, offline }
 
-String formatStorePrice(int minor, {String? locale, required String currency}) {
-  final f = NumberFormat.simpleCurrency(locale: locale, name: currency);
-  final major = minor ~/ 100;
-  final cents = minor % 100;
-  if (cents == 0) {
-    return NumberFormat.simpleCurrency(locale: locale, name: currency, decimalDigits: 0).format(major);
-  }
-  return f.format(minor / 100);
-}
+/// Display a price in the reader's local currency (FxBook rates, spec 25).
+/// [usdCents] is the base amount in US cents; never labels it with a
+/// fixed currency.
+String formatStorePrice(int usdCents, {String? locale}) => KitMoney.cents(usdCents, locale: locale);
 
-int _minor(num major) => (major * 100).round();
+/// Catalogue prices are authored as rupee amounts (config/store, India
+/// Play tier). Convert to the USD-cent base through the live FX book so
+/// the label is always the reader's own currency.
+int catalogueToUsdCents(num catalogueAmount) {
+  final perUsd = FxBook.instance.rates['INR'] ?? 83.5; // verify: config/fx
+  return ((catalogueAmount / perUsd) * 100).round();
+}
 
 /// Default loader: bundled catalogue (no network needed).
 Future<List<StoreRail>> bundledStoreRails() async {
   final words = <StoreItem>[
     for (final c in kRmCategories)
       for (final w in c.words.take(2))
-        StoreItem(id: 'w_${c.id}_${w.word}', title: w.word, subtitle: c.label, priceMinor: _minor(99), dept: StoreDept.words),
+        StoreItem(id: 'w_${c.id}_${w.word}', title: w.word, subtitle: c.label, priceMinor: catalogueToUsdCents(StorePrices.instance.defaultFor('word')), dept: StoreDept.words),
   ].take(10).toList();
   final meanings = [
     for (final m in kMsBaseMeanings.take(10))
-      StoreItem(id: 'm_${m.key}', title: m.word, subtitle: m.category, priceMinor: _minor(m.price), dept: StoreDept.meanings),
+      StoreItem(id: 'm_${m.key}', title: m.word, subtitle: m.category, priceMinor: catalogueToUsdCents(m.price), dept: StoreDept.meanings),
   ];
   final books = [
     for (final b in kEbBooks)
-      StoreItem(id: 'e_${b.key}', title: b.title, subtitle: b.sub, priceMinor: _minor(b.price), dept: StoreDept.ebooks),
+      StoreItem(id: 'e_${b.key}', title: b.title, subtitle: b.sub, priceMinor: catalogueToUsdCents(b.price), dept: StoreDept.ebooks),
   ];
   return [
     if (words.isNotEmpty) StoreRail(title: 'Words to own', dept: StoreDept.words, items: words),

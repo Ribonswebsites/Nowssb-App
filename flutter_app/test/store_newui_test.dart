@@ -10,60 +10,85 @@ const _rails = [
   StoreRail(title: 'Words to own', dept: StoreDept.words, items: [
     StoreItem(id: 'a', title: 'Calm', subtitle: 'Peace', priceMinor: 199, dept: StoreDept.words),
   ]),
+  StoreRail(title: 'New meanings', dept: StoreDept.meanings, items: [
+    StoreItem(id: 'm', title: 'Earth', subtitle: 'Elements', priceMinor: 59, dept: StoreDept.meanings),
+  ]),
 ];
 
-Widget _app(StoreLoader l, {StoreOpen? onOpen}) => MediaQuery(
-      data: const MediaQueryData(disableAnimations: true),
-      child: MaterialApp(home: NewStorePage(loader: l, onOpen: onOpen, background: const ColoredBox(color: Colors.black))),
+const _bg = ColoredBox(color: Colors.black);
+
+Widget _app(Widget page) => MediaQuery(
+      data: const MediaQueryData(size: Size(390, 844), disableAnimations: true),
+      child: MaterialApp(home: page),
     );
 
 void main() {
-  testWidgets('loading then ready, item tap opens', (t) async {
+  setUp(() {
+    // Under test there is no live FX doc, so prices fall back to USD base
+    // formatting; the label never comes from a hardcoded currency.
+  });
+
+  testWidgets('hub: loading then ready, dept card and ticket open', (t) async {
+    t.view.physicalSize = const Size(390 * 3, 844 * 3);
+    t.view.devicePixelRatio = 3;
+    addTearDown(t.view.reset);
     final c = Completer<List<StoreRail>>();
-    StoreItem? opened;
-    await t.pumpWidget(_app(() => c.future, onOpen: (_, i) => opened = i));
+    final opened = <Object?>[];
+    await t.pumpWidget(_app(NewStorePage(loader: () => c.future, background: _bg, onOpen: (d, i) => opened.add(i ?? d))));
     expect(find.byKey(const Key('store_loading')), findsOneWidget);
     c.complete(_rails);
     await t.pump();
-    expect(find.text('Calm'), findsOneWidget);
-    expect(find.textContaining(r'$1.99'), findsOneWidget);
-    expect(find.text('Open'), findsOneWidget); // single card: last -> Open pill
-    expect(find.bySemanticsLabel(RegExp('Open Words')), findsOneWidget);
-    await t.ensureVisible(find.text('Open'));
+    expect(find.bySemanticsLabel('Open Words'), findsOneWidget);
+    await t.tap(find.text('Words'));
+    expect(opened.last, StoreDept.words);
+    await t.tap(find.text('Next').first);
     await t.pump();
+    final ticket = find.byKey(const ValueKey('ticket_a'));
+    await t.ensureVisible(ticket);
+    await t.pump();
+    expect(find.textContaining('Calm ·'), findsOneWidget);
+    expect(find.textContaining('₹'), findsNothing);
+    await t.tap(ticket);
+    expect((opened.last as StoreItem?)?.id, 'a');
+  });
+
+  testWidgets('words page shows only words with carousel and tickets', (t) async {
+    StoreItem? opened;
+    await t.pumpWidget(_app(StoreDeptPage(dept: StoreDept.words, loader: () async => _rails, background: _bg, onOpen: (_, i) => opened = i)));
+    await t.pump();
+    expect(find.text('Calm'), findsOneWidget);
+    expect(find.textContaining('Earth'), findsNothing);
     await t.tap(find.text('Open'));
     expect(opened?.id, 'a');
   });
 
-  testWidgets('dept tile opens dept', (t) async {
-    StoreDept? d;
-    await t.pumpWidget(_app(() async => _rails, onOpen: (x, _) => d = x));
+  testWidgets('meanings page empty when no meanings', (t) async {
+    await t.pumpWidget(_app(StoreDeptPage(dept: StoreDept.meanings, loader: () async => [_rails.first], background: _bg)));
     await t.pump();
-    await t.tap(find.byKey(const ValueKey('dept_ebooks')));
-    expect(d, StoreDept.ebooks);
+    expect(find.byKey(const Key('store_empty')), findsOneWidget);
   });
 
   testWidgets('empty', (t) async {
-    await t.pumpWidget(_app(() async => []));
+    await t.pumpWidget(_app(NewStorePage(loader: () async => [], background: _bg)));
     await t.pump();
     expect(find.byKey(const Key('store_empty')), findsOneWidget);
   });
 
   testWidgets('error then retry', (t) async {
     var n = 0;
-    await t.pumpWidget(_app(() async {
+    await t.pumpWidget(_app(NewStorePage(background: _bg, loader: () async {
       if (n++ == 0) throw StateError('x');
       return _rails;
-    }));
+    })));
     await t.pump();
     expect(find.byKey(const Key('store_error')), findsOneWidget);
     await t.tap(find.text('Try again'));
     await t.pump();
-    expect(find.text('Calm'), findsOneWidget);
+    expect(find.text('Words'), findsOneWidget);
   });
 
   testWidgets('offline', (t) async {
-    await t.pumpWidget(_app(() async => throw const SocketException('no')));
+    await t.pumpWidget(_app(NewStorePage(background: _bg, loader: () async => throw const SocketException('no'))));
     await t.pump();
     expect(find.byKey(const Key('store_offline')), findsOneWidget);
   });

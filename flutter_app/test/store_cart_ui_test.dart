@@ -2,12 +2,17 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:nowssb/kit/kit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:nowssb/data/cart_bag.dart';
 import 'package:nowssb/screens/store/store_cards.dart';
 
 void main() {
+  // These cover the legacy Store screens; the rebuilt ones have store_newui_test.
+  setUpAll(() => NewUi.setDebugOverride('store', false));
+  tearDownAll(NewUi.resetForTest);
+
   TestWidgetsFlutterBinding.ensureInitialized();
 
   test(
