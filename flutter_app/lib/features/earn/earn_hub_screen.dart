@@ -12,6 +12,7 @@ import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
 import '../economy/money.dart';
 import 'earnings_screen.dart';
+import 'newui/earn_newui_screen.dart';
 import '../social/echo_wall_screen.dart';
 import '../gifts/gifts_screen.dart';
 import '../vault/vault_screen.dart';
@@ -36,8 +37,17 @@ import '../programs/program_router.dart';
 import '../programs/reference_program.dart';
 import '../programs/rewards_program.dart';
 
+/// Entry point: new Earn hub behind `newui_earn`, legacy hub otherwise.
 class EarnHubScreen extends StatelessWidget {
   const EarnHubScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) =>
+      const EarnNewUiGate(legacy: EarnHubLegacyScreen(), newUi: EarnNewUiScreen());
+}
+
+class EarnHubLegacyScreen extends StatelessWidget {
+  const EarnHubLegacyScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
