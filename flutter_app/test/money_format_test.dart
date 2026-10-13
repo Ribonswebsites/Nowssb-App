@@ -45,7 +45,7 @@ void main() {
     expect(fx.formatNice(BaseAmounts.underChip, locale: 'en_US'), r'$6'); // 499/80 = 6.24
     expect(fx.formatNice(BaseAmounts.minPaidLine, locale: 'en_US'), r'$0.20'); // 0.1875
     expect(fx.formatNice(BaseAmounts.coinExampleCoins / BaseAmounts.coinsPerUnit, locale: 'de_DE'), allOf(contains('1'), contains('€'), isNot(contains(','))));  // 100/80*0.9 = 1.125 → 1
-    expect(fx.formatNice(BaseAmounts.underChip, locale: 'ja_JP'), contains('935')); // 935.6 → 935 (step 5)
+    expect(fx.formatNice(BaseAmounts.underChip, locale: 'ja_JP'), contains('940')); // 935.6 → 940 (step 10 above 500)
     expect(fx.formatNice(BaseAmounts.underChip, locale: 'en_GB'), r'$6'); // no GBP rate here → USD, no invented rate
   });
 
